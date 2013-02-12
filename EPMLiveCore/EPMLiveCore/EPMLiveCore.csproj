@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C773AE44-F066-446A-9CBD-D24AFA794E34}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EPMLiveCore</RootNamespace>
+    <AssemblyName>EPMLiveCore</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetOfficeVersion>15.0</TargetOfficeVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <SandboxedSolution>False</SandboxedSolution>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\APIException.cs" />
+    <Compile Include="API\APITeam.cs" />
+    <Compile Include="API\Applications\ApplicationInstaller.cs" />
+    <Compile Include="API\Applications\Applications.cs" />
+    <Compile Include="API\Applications\ApplicationUninstaller.cs" />
+    <Compile Include="API\BaseJob.cs" />
+    <Compile Include="API\Comments\CommentManager.cs" />
+    <Compile Include="API\Comments\XmlDataManager.cs" />
+    <Compile Include="API\ExecutionStatus.asmx.cs" />
+    <Compile Include="API\ListCommands\ListCommands.cs" />
+    <Compile Include="API\MyWork\FieldInfo.cs" />
+    <Compile Include="API\MyWork\ListItem.cs" />
+    <Compile Include="API\MyWork\MyPersonalization.cs" />
+    <Compile Include="API\MyWork\MyWork.cs" />
+    <Compile Include="API\MyWork\MyWorkField.cs" />
+    <Compile Include="API\MyWork\MyWorkGridView.cs" />
+    <Compile Include="API\MyWork\Utils.cs" />
+    <Compile Include="API\Notification\APIEmail.cs" />
+    <Compile Include="API\Notification\Notification.cs" />
+    <Compile Include="API\PropertyHash.cs" />
+    <Compile Include="API\Publish\APIPublish.cs" />
+    <Compile Include="API\Reporting\Reporting.cs" />
+    <Compile Include="API\ResourceGrid\ResourceGrid.cs" />
+    <Compile Include="API\ResourceGrid\ResourceGridGlobalViewManager.cs" />
+    <Compile Include="API\ResourceGrid\ResourceGridPersonalViewManager.cs" />
+    <Compile Include="API\ResourceManagement\ResourceManager.cs" />
+    <Compile Include="API\Resource\Resource.cs" />
+    <Compile Include="API\Response.cs" />
+    <Compile Include="API\SolGalTemplatesManager.cs" />
+    <Compile Include="API\SPAdmin\EventReceiverManager.cs" />
+    <Compile Include="API\SPAdmin\FeatureEventsManager.cs" />
+    <Compile Include="API\Template\Template.cs" />
+    <Compile Include="API\Timer.cs" />
+    <Compile Include="AppsListEvents\AppsListEvents.cs" />
+    <Compile Include="AssignmentPlanner\API\Gateway.cs" />
+    <Compile Include="AssignmentPlanner\AssignmentManager.cs" />
+    <Compile Include="AssignmentPlanner\AssignmentPlannerGlobalViewManager.cs" />
+    <Compile Include="AssignmentPlanner\AssignmentPlannerPersonalViewManager.cs" />
+    <Compile Include="AssignmentPlanner\GridManager.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControl.cs" />
+    <Compile Include="CascadingLookupRenderControls\CascadingMultiLookupRenderControl.cs" />
+    <Compile Include="CascadingLookup\CascadingLookup.Field.cs" />
+    <Compile Include="CascadingLookup\CascadingLookup.FieldControl.cs" />
+    <Compile Include="CascadingLookup\CascadingLookup.FieldSettings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AppsListEvents\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a0b8e287-cd4e-45c4-b77c-6ec4dfe05a4a}</SharePointProjectItemId>
+    </None>
+    <None Include="BuildTeam\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9cf05ac6-0692-49fb-8c37-2ec1acb6a29c}</SharePointProjectItemId>
+    </None>
+    <None Include="CONFIG\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ce3e15fd-6a5b-4e21-8c3d-b5d4df121ea3}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\AppNavFixUp\AppNavFixUp.feature">
+      <FeatureId>{3aa712ee-ed28-48bc-8219-1c5a8c9b5fbc}</FeatureId>
+    </None>
+    <None Include="key.snk" />
+    <None Include="Package\Package.package">
+      <PackageId>{64ede3b7-292b-4f08-b56f-1452b1834805}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="AppsListEvents\Elements.xml" />
+    <Content Include="BuildTeam\Elements.xml" />
+    <Content Include="CONFIG\webconfig.EPMLIVE.xml" />
+    <Content Include="Features\AppNavFixUp\AppNavFixUp.Template.xml">
+      <DependentUpon>AppNavFixUp.feature</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+</Project>
