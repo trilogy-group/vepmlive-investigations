@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<List xmlns:ows="Microsoft SharePoint" Title="WorkEngine Work List" Type="10115" Id="4b34bd92-9e33-4bb1-bd2d-b8760ab67a62" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/EPMLiveWorkList" BaseType="0" xmlns="http://schemas.microsoft.com/sharepoint/">
+	<MetaData>
+		<ContentTypes>
+			<ContentTypeRef ID="0x01">
+				<Folder TargetName="Item" />
+			</ContentTypeRef>
+			<ContentTypeRef ID="0x0120" />
+		</ContentTypes>
+
+		<Fields>
+			<Field ID="{431AD2CB-28E0-46A9-B1FC-813F384333D6}" Name="StartDate" Type="DateTime" DisplayName ="Start Date" Format ="DateOnly" Sealed ="FALSE" AllowDeletion="FALSE" Description ="Enter the estimated start date for this item."></Field>
+			<Field ID="{08B1143C-1A7C-4BF1-840F-2956240F9987}" Name="DueDate" Type ="DateTime" DisplayName ="Due Date" Format ="DateOnly" Sealed ="FALSE" AllowDeletion="FALSE" Description ="Enter the estimated due date for this item."></Field>
+			<Field ID="{7138B526-FD98-4AF6-82CC-034DC9F0C60C}" Name="AssignedTo" Type ="UserMulti" DisplayName ="Assigned To" Sealed ="FALSE" AllowDeletion="FALSE" Description ="Enter the resource(s) assigned to this item.  You can enter their email address, username, or use the address book."></Field>
+			<Field ID="{EC70454D-9CE5-4A8F-AC90-6D138A2F7D18}" Name="Priority" Type ="Choice" DisplayName ="Priority" Sealed ="FALSE" AllowDeletion="FALSE">
+				<CHOICES>
+					<CHOICE>(1) High</CHOICE>
+					<CHOICE>(2) Normal</CHOICE>
+					<CHOICE>(3) Low</CHOICE>
+				</CHOICES>
+			</Field>
+			<Field ID="{5C820A57-98D6-44B5-95E6-4A717CFE5A06}" Name="Status" Type ="Choice" DisplayName ="Status" Sealed ="FALSE" AllowDeletion="FALSE">
+				<CHOICES>
+					<CHOICE>Not Started</CHOICE>
+					<CHOICE>In Progress</CHOICE>
+					<CHOICE>Completed</CHOICE>
+					<CHOICE>Deferred</CHOICE>
+					<CHOICE>Waiting on someone else</CHOICE>
+				</CHOICES>
+			</Field>
+			<Field ID="{06125EFD-0158-472F-A239-B1DCB70C56C0}" Name="Work" Type ="Number" DisplayName ="Work" Decimals ="2" Sealed ="FALSE" Description ="Enter the estimated work (in hours) for this item." AllowDeletion="FALSE"></Field>
+			<Field ID="{286B49E6-2788-489E-9A3B-9B4F1F36A88B}" Name="PercentComplete" Type ="Number" Decimals="0" Percentage="TRUE" DisplayName ="% Complete" Min="0" Max="1" Sealed ="FALSE" AllowDeletion="TRUE"></Field>
+			<Field ID="{AF0367F9-7BE3-4E34-8B57-1E490B6701A0}" Name="Body" Type="Note" RichText="TRUE" DisplayName ="Description" Sealed ="FALSE" AllowDeletion="FALSE"></Field>
+			<Field ID="{4CA432B3-A971-422C-A5FB-DE66367E4784}" Name="CommentCount" Type ="Number" DisplayName ="Comment Count" Sealed ="FALSE" AllowDeletion="FALSE" Hidden="TRUE"></Field>
+			<Field ID="{04278B74-406D-4E82-97C8-58D519C451C9}" Name="Complete" Type ="Boolean" DisplayName ="Complete" Sealed ="FALSE" ShowInEditForm ="TRUE" ShowInNewForm ="FALSE" AllowDeletion="FALSE">
+				<Default>0</Default>
+			</Field>
+			<Field ID="{F874D569-72ED-4A8C-A9B4-28890901E633}" Name="Timesheet" Type ="Boolean" DisplayName ="Timesheet" Sealed ="FALSE" ShowInEditForm ="TRUE" ShowInNewForm ="TRUE" AllowDeletion="FALSE">
+				<Default>0</Default>
+			</Field>
+			<Field ID="{C8CED27E-737F-426C-B9D7-A73BAB63F419}" Name="ScheduleStatus" Type ="Calculated" ResultType="Text" DisplayName ="Schedule Status" Sealed ="FALSE" ShowInEditForm ="FALSE" ShowInNewForm ="FALSE" AllowDeletion="FALSE">
+				<Formula>=IF(Status="Completed","checkmark.GIF",IF([DaysOverdue]&gt;=30,"RED.GIF",IF([DaysOverdue]&gt;0,"YELLOW.GIF","GREEN.GIF")))</Formula>
+				<Default></Default>
+				<FieldRefs>
+					<FieldRef Name="Status" ID="{5C820A57-98D6-44B5-95E6-4A717CFE5A06}"></FieldRef>
+					<FieldRef Name="DaysOverdue" ID="{7BC38B24-EEE1-4D6C-A346-E754D3F53A59}"></FieldRef>
+				</FieldRefs>
+			</Field>
+			<Field ID="{7BC38B24-EEE1-4D6C-A346-E754D3F53A59}" Name="DaysOverdue" Type ="Calculated" ResultType="Number" DisplayName ="Days Overdue" Sealed ="FALSE" ShowInEditForm ="FALSE" ShowInNewForm ="FALSE" AllowDeletion="FALSE">
+				<Formula>=IF([DueDate]&lt;&gt;"",IF(Status&lt;&gt;"Completed",IF([DueDate]&lt;Today,Today-[DueDate],0),0),0)</Formula>
+				<Default></Default>
+				<FieldRefs>
+					<FieldRef Name="Status" ID="{5C820A57-98D6-44B5-95E6-4A717CFE5A06}"></FieldRef>
+					<FieldRef Name="DueDate" ID="{08B1143C-1A7C-4BF1-840F-2956240F9987}"></FieldRef>
+				</FieldRefs>
+			</Field>
+			<Field ID="{DAAD8F91-DA63-4AD4-9BD0-660F21D066E0}" Name="Due" Type ="Calculated" ResultType="Text" DisplayName ="Due" Sealed ="FALSE" ShowInEditForm ="FALSE" ShowInNewForm ="FALSE" AllowDeletion="FALSE">
+				<Formula>=IF(Status="Completed","NA",IF([DueDate]="","No Due Date",IF([DueDate]&lt;Today,"(1) Overdue",IF([DueDate]=Today,"(2) Due Today",IF([DueDate]=Today+1,"(3) Due Tomorrow",IF(Week=[TodayWeek],IF(Year=[TodayYear],"(4) Due This Week","(7) Future"),IF(Week=[TodayWeek]+1,IF(Year=[TodayYear],"(5) Due Next Week","(7) Future"),IF(MONTH([DueDate])=MONTH(Today),IF(Year=[TodayYear],"(6) Due This Month","(7) Future"),"(7) Future"))))))))</Formula>
+				<Default></Default>
+				<FieldRefs>
+					<FieldRef Name="DueDate" ID="{08B1143C-1A7C-4BF1-840F-2956240F9987}"></FieldRef>
+				</FieldRefs>
+			</Field>
+			<Field ID="{D034B94C-F4F4-4612-8CBC-F7211F77D4DE}" Name="Year" Type ="Calculated" ResultType="Number" DisplayName ="Year" Sealed ="FALSE" ShowInEditForm ="FALSE" ShowInNewForm ="FALSE" ShowInDisplayForm ="FALSE" AllowDeletion="FALSE">
+				<Formula>
+					=IF([DueDate]&lt;&gt;"",YEAR([DueDate]))
+				</Formula>
+				<Default></Default>
+				<FieldRefs>
+					<FieldRef Name="DueDate" ID="{08B1143C-1A7C-4BF1-840F-2956240F9987}"></FieldRef>
+				</FieldRefs>
+			</Field>
+			<Field ID="{4C0D6DE8-9726-40D1-87CD-AADB93AB2775}" Name="Week" Type ="Calculated" ResultType="Number" DisplayName ="Week" Sealed ="FALSE" ShowInEditForm ="FALSE" ShowInNewForm ="FALSE" ShowInDisplayForm ="FALSE" AllowDeletion="FALSE">
+				<Formula>
+					=IF([DueDate]&lt;&gt;"",INT(([DueDate]-DATE(YEAR([DueDate]),1,1)+(TEXT(WEEKDAY(DATE(YEAR([DueDate]),1,1)),"d")))/7)+1,0)
+				</Formula>
+				<Default></Default>
+				<FieldRefs>
+					<FieldRef Name="DueDate" ID="{08B1143C-1A7C-4BF1-840F-2956240F9987}"></FieldRef>
+				</FieldRefs>
+			</Field>
+			<Field ID="{1F00E80F-0F81-4740-9E47-14A1C1A1F639}" Name="TodayYear" Type ="Calculated" ResultType="Number" DisplayName ="Today Year" Sealed ="FALSE" ShowInEditForm ="FALSE" ShowInNewForm ="FALSE" ShowInDisplayForm ="FALSE" AllowDeletion="FALSE">
+				<Formula>=YEAR(Today)</Formula>
+				<Default></Default>
+				<FieldRefs></FieldRefs>
+			</Field>
+			<Field ID="{79C1BC18-7AEB-4C17-9973-15E10589146B}" Name="TodayWeek" Type ="Calculated" ResultType="Number" DisplayName ="Today Week" Sealed ="FALSE" ShowInEditForm ="FALSE" ShowInNewForm ="FALSE" ShowInDisplayForm ="FALSE" AllowDeletion="FALSE">
+				<Formula>=IF(Today&lt;&gt;"",INT((Today-DATE(YEAR(Today),1,1)+(TEXT(WEEKDAY(DATE(YEAR(Today),1,1)),"d")))/7)+1,0)</Formula>
+				<Default></Default>
+				<FieldRefs></FieldRefs>
+			</Field>
+			<Field ID="{5BE4B3BE-301B-461B-A2A2-4ABEF2EB9BC6}" Name="Commenters" Type ="Note" DisplayName ="Commenters" Sealed ="FALSE" AllowDeletion="FALSE" Hidden="TRUE"></Field>
+			<Field ID="{81979ABA-8631-45CA-80EC-BCCEC8061795}" Name="CommentersRead" Type ="Note" DisplayName ="CommentersRead" Sealed ="FALSE" AllowDeletion="FALSE" Hidden="TRUE"></Field>
+		</Fields>
+		<Views>
+			<View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE">
+				<Toolbar Type="ShowToolbar" />
+				<XslLink Default="TRUE">main.xsl</XslLink>
+				<RowLimit Paged="TRUE">30</RowLimit>
+				<ViewFields>
+					<FieldRef Name="LinkTitleNoMenu"></FieldRef>
+				</ViewFields>
+				<Query>
+					<OrderBy>
+						<FieldRef Name="Modified" Ascending="FALSE"></FieldRef>
+					</OrderBy>
+				</Query>
+				<ParameterBindings>
+					<ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" />
+					<ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+					<ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" />
+				</ParameterBindings>
+			</View>
+			<View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/images/generic.png" Url="AllItems.aspx">
+				<WebParts>
+					<AllUsersWebPart WebPartZoneID="Main" WebPartOrder="0">
+						<![CDATA[<WebPart xmlns="http://schemas.microsoft.com/WebPart/v2">
+									<Assembly>EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5</Assembly>
+									<TypeName>EPMLiveWebParts.GridListView</TypeName>
+									<Title>Grid/Gantt View</Title>
+									<Description>Provides a grid or gantt view for any list on your site with rollup capability.</Description>
+									<PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
+					</WebPart>]]>
+
+					</AllUsersWebPart>
+				</WebParts>
+				<Toolbar Type="ShowToolbar" />
+				<XslLink Default="TRUE">main.xsl</XslLink>
+				<RowLimit Paged="TRUE">30</RowLimit>
+
+				<ViewFields>
+					<FieldRef Name="LinkTitle"></FieldRef>
+					<FieldRef Name="StartDate"></FieldRef>
+					<FieldRef Name="DueDate"></FieldRef>
+					<FieldRef Name="AssignedTo"></FieldRef>
+					<FieldRef Name="Priority"></FieldRef>
+					<FieldRef Name="Status"></FieldRef>
+					<FieldRef Name="Work"></FieldRef>
+					<FieldRef Name="PercentComplete"></FieldRef>
+				</ViewFields>
+				<Query>
+					<OrderBy>
+						<FieldRef Name="ID"></FieldRef>
+					</OrderBy>
+				</Query>
+				<ParameterBindings>
+					<ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+					<ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" />
+				</ParameterBindings>
+			</View>
+		</Views>
+		<Forms>
+			<Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" Template ="EPMLiveListForm"/>
+			<Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" Template ="EPMLiveListForm"/>
+			<Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" Template ="EPMLiveListForm"/>
+		</Forms>
+	</MetaData>
+</List>

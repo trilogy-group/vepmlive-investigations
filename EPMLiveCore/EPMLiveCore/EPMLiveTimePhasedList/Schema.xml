@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<List xmlns:ows="Microsoft SharePoint" Title="EPMLiveTimePhasedList" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/EPMLiveTimePhasedList" BaseType="0" Name="EPMLiveTimePhasedList" Id="20c9623c-0fa9-4249-8abb-67f339097f07" Type="5100" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <MetaData>
+    <ContentTypes>
+      <ContentTypeRef ID="0x0100d7db06b3acd948aca75ce1d1e54f2594">
+        <Folder TargetName="EPMLiveTPListCT"/>
+      </ContentTypeRef>
+      <ContentTypeRef ID="0x0120"/>
+    </ContentTypes>
+    <Fields>
+      <Field ID="{DD80EF56-5754-4063-A9CF-4C42401FE8C3}"
+          Type="Text"
+          Name="Task"
+          DisplayName="Task"
+          StaticName="Task"
+          Hidden="FALSE"
+          Required="FALSE"
+          Sealed="TRUE" />
+      <Field ID="{F622308D-62DF-41b3-A467-3EBCCB57FEA8}"
+        Type="Text"
+        Name="WBS"
+        DisplayName="WBS"
+        StaticName="WBS"
+        Hidden="FALSE"
+        Required="FALSE"
+        Sealed="TRUE" />
+      <Field ID="{212AD2A4-9320-467a-956F-134F85DA5CD2}"
+        Type="Text"
+        Name="Resource"
+        DisplayName="Resource"
+        StaticName="Resource"
+        Hidden="FALSE"
+        Required="FALSE"
+        Sealed="TRUE" />
+      <Field ID="{32CDECC8-A366-4f4e-AAA0-8A5E3F64356F}"
+        Type="Text"
+        Name="ValueType"
+        DisplayName="ValueType"
+        StaticName="ValueType"
+        Hidden="FALSE"
+        Required="FALSE"
+        Sealed="TRUE" />
+      <Field ID="{5E1EBF32-7AF6-4a6e-A863-50375F31F044}"
+        Type="Number"
+        Name="TimePhasedType"
+        DisplayName="TimePhasedType"
+        StaticName="TimePhasedType"
+        Hidden="FALSE"
+        Required="FALSE"
+        Sealed="TRUE" />
+    </Fields>
+    <Views>
+      <View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE">
+        <Toolbar />
+        <XslLink>main.xsl</XslLink>
+        <ViewBody>
+          <HTML><![CDATA[<tr class="]]></HTML>
+          <GetVar Name="AlternateStyle" />
+          <HTML><![CDATA["]]></HTML>
+          <Switch>
+            <Expr>
+              <GetVar Name="TabularView" />
+            </Expr>
+            <Case Value="1">
+              <HTML><![CDATA[ iid="]]></HTML>
+              <Counter Type="View" />
+              <HTML>,</HTML>
+              <Column Name="ID" HTMLEncode="TRUE" />
+              <HTML><![CDATA[,]]></HTML>
+              <LookupColumn Name="FSObjType" HTMLEncode="TRUE" />
+              <HTML><![CDATA["><td class="ms-vb-itmcbx"><input type="checkbox" class="s4-itm-cbx"/></td>]]></HTML>
+            </Case>
+            <Default>
+              <HTML><![CDATA[>]]></HTML>
+            </Default>
+          </Switch>
+          <IfEqual>
+            <Expr1>
+              <GetVar Name="AlternateStyle" />
+            </Expr1>
+            <Expr2>ms-alternating</Expr2>
+            <Then>
+              <SetVar Scope="Request" Name="AlternateStyle"></SetVar>
+            </Then>
+            <Else>
+              <SetVar Scope="Request" Name="AlternateStyle">ms-alternating</SetVar>
+            </Else>
+          </IfEqual>
+          <Fields>
+            <HTML><![CDATA[<td class="]]></HTML>
+            <FieldSwitch>
+              <Expr>
+                <Property Select="ClassInfo" />
+              </Expr>
+              <Case Value="Menu">
+                <HTML><![CDATA[ms-vb-title" onmouseover="OnChildItem(this)" height="100%]]></HTML>
+              </Case>
+              <Case Value="Icon">ms-vb-icon</Case>
+              <Default>
+                <FieldSwitch>
+                  <Expr>
+                    <Property Select="Type" />
+                    <PresenceEnabled />
+                  </Expr>
+                  <Case Value="UserTRUE">ms-vb-user</Case>
+                  <Case Value="UserMultiTRUE">ms-vb-user</Case>
+                  <Default>ms-vb2</Default>
+                </FieldSwitch>
+              </Default>
+            </FieldSwitch>
+            <HTML><![CDATA[">]]></HTML>
+            <Field />
+            <HTML><![CDATA[</td>]]></HTML>
+          </Fields>
+          <HTML><![CDATA[</tr>]]></HTML>
+        </ViewBody>
+        <RowLimit>20</RowLimit>
+        <ViewFields>
+          <FieldRef Name="LinkTitleNoMenu"></FieldRef>
+        </ViewFields>
+        <Query>
+          <OrderBy>
+            <FieldRef Name="Modified" Ascending="FALSE"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" />
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" />
+        </ParameterBindings>
+      </View>
+      <View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/images/generic.png" Url="AllItems.aspx">
+        <Toolbar />
+        <XslLink>main.xsl</XslLink>
+        <ViewBody>
+          <HTML><![CDATA[<tr class="]]></HTML>
+          <GetVar Name="AlternateStyle" />
+          <HTML><![CDATA["]]></HTML>
+          <Switch>
+            <Expr>
+              <GetVar Name="TabularView" />
+            </Expr>
+            <Case Value="1">
+              <HTML><![CDATA[ iid="]]></HTML>
+              <Counter Type="View" />
+              <HTML>,</HTML>
+              <Column Name="ID" HTMLEncode="TRUE" />
+              <HTML><![CDATA[,]]></HTML>
+              <LookupColumn Name="FSObjType" HTMLEncode="TRUE" />
+              <HTML><![CDATA["><td class="ms-vb-itmcbx"><input type="checkbox" class="s4-itm-cbx"/></td>]]></HTML>
+            </Case>
+            <Default>
+              <HTML><![CDATA[>]]></HTML>
+            </Default>
+          </Switch>
+          <IfEqual>
+            <Expr1>
+              <GetVar Name="AlternateStyle" />
+            </Expr1>
+            <Expr2>ms-alternating</Expr2>
+            <Then>
+              <SetVar Scope="Request" Name="AlternateStyle"></SetVar>
+            </Then>
+            <Else>
+              <SetVar Scope="Request" Name="AlternateStyle">ms-alternating</SetVar>
+            </Else>
+          </IfEqual>
+          <Fields>
+            <HTML><![CDATA[<td class="]]></HTML>
+            <FieldSwitch>
+              <Expr>
+                <Property Select="ClassInfo" />
+              </Expr>
+              <Case Value="Menu">
+                <HTML><![CDATA[ms-vb-title" onmouseover="OnChildItem(this)" height="100%]]></HTML>
+              </Case>
+              <Case Value="Icon">ms-vb-icon</Case>
+              <Default>
+                <FieldSwitch>
+                  <Expr>
+                    <Property Select="Type" />
+                    <PresenceEnabled />
+                  </Expr>
+                  <Case Value="UserTRUE">ms-vb-user</Case>
+                  <Case Value="UserMultiTRUE">ms-vb-user</Case>
+                  <Default>ms-vb2</Default>
+                </FieldSwitch>
+              </Default>
+            </FieldSwitch>
+            <HTML><![CDATA[">]]></HTML>
+            <Field />
+            <HTML><![CDATA[</td>]]></HTML>
+          </Fields>
+          <HTML><![CDATA[</tr>]]></HTML>
+        </ViewBody>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+          <FieldRef Name="Attachments"></FieldRef>
+          <FieldRef Name="LinkTitle"></FieldRef>
+        </ViewFields>
+        <Query>
+          <OrderBy>
+            <FieldRef Name="ID"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" />
+        </ParameterBindings>
+      </View>
+    </Views>
+    <Forms>
+      <Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+    </Forms>
+  </MetaData>
+</List>

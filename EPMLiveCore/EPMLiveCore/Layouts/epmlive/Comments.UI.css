@@ -1,0 +1,20 @@
+﻿body
+{
+    overflow:hidden;
+}
+
+.commentsContainer
+{   
+    position:relative;
+    overflow: auto;
+    top: 10px;
+    padding-left: 8px; 
+    padding-right: 8px;
+    height: 350px;
+}
+
+.customCommentItem
+{
+    width: 100% !important;
+    
+}

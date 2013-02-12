@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ListTemplate Name="EPM Live Workspace Center"
+                DisplayName="EPM Live Workspace Center"
+                Description=""
+                BaseType="0"
+                Type="10302"
+                OnQuickLaunch="FALSE"
+                SecurityBits="11"
+                Sequence="310"
+				Hidden="FALSE"
+                Image="/_layouts/images/itlink.gif" />
+</Elements>

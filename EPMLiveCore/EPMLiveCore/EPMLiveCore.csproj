@@ -43,7 +43,8 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
@@ -157,6 +158,600 @@
     <Compile Include="EPMLivePCForm\PCFieldIterator.cs" />
     <Compile Include="EPMLivePCForm\TCFieldIterator.cs" />
     <Compile Include="EPMLiveProjectCenterEvent\EPMLiveProjectCenterEvent.cs" />
+    <Compile Include="EPMLiveTaskCenterEvent\EPMLiveTaskCenterEvent.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupField.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupFieldControl.cs" />
+    <Compile Include="FilteredLookup\FilteredLookupFieldEditor.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FilteredLookup\MultipleFilteredLookupFieldControl.cs" />
+    <Compile Include="FilteredLookup\Util.cs" />
+    <Compile Include="GlobalResources\MultiAppNavigationResources.Designer.cs" />
+    <Compile Include="GlobalResources\WorkEngineLookupPickerResources.Designer.cs" />
+    <Compile Include="Infrastructure\BaseClasses\BaseManager.cs" />
+    <Compile Include="Infrastructure\BaseClasses\SPListItemManager.cs" />
+    <Compile Include="Infrastructure\Errors.cs" />
+    <Compile Include="Infrastructure\GridView\GlobalGridViewManager.cs" />
+    <Compile Include="Infrastructure\GridView\GridView.cs" />
+    <Compile Include="Infrastructure\GridView\GridViewManagerFactory.cs" />
+    <Compile Include="Infrastructure\GridView\GridViewUtils.cs" />
+    <Compile Include="Infrastructure\GridView\PersonalGridViewManager.cs" />
+    <Compile Include="Infrastructure\Interfaces\IGridViewManager.cs" />
+    <Compile Include="Infrastructure\Interfaces\ISPListItemManager.cs" />
+    <Compile Include="Infrastructure\ResourceManagement\DepartmentManager.cs" />
+    <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManager.cs" />
+    <Compile Include="ISAPI\Lic\Licensing.asmx.cs">
+      <DependentUpon>Licensing.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ISAPI\WorkEngine.asmx.cs">
+      <DependentUpon>WorkEngine.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Jobs\AdSynchJob.cs" />
+    <Compile Include="Jobs\Applications\InstallAndConfigure.cs" />
+    <Compile Include="Jobs\Applications\Uninstall.cs" />
+    <Compile Include="Jobs\Notifications.cs" />
+    <Compile Include="Jobs\ResourcePlan.cs" />
+    <Compile Include="Jobs\TimerFix.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\IStep.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\JobStep.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\JobStepAttribute.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\Step.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\Utilities.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddFiles.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListData.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\DBUpgrader.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallAndConfigureLists.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallReportingEvents.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\MasterPageUpdateStep.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\PFEPermissionMapper.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ReportingUpgrade.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\SiteFeatures.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\TimeOff.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePool.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateWebs.cs" />
+    <Compile Include="Jobs\Upgrades\WE43UpgradeJob.cs" />
+    <Compile Include="Layouts\epmlive\acttest.aspx.cs">
+      <DependentUpon>acttest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\acttest.aspx.designer.cs">
+      <DependentUpon>acttest.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\addusers.aspx.cs">
+      <DependentUpon>addusers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\addusers.aspx.designer.cs">
+      <DependentUpon>addusers.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\adsyncadmin.aspx.cs">
+      <DependentUpon>adsyncadmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\adsyncadmin.aspx.designer.cs">
+      <DependentUpon>adsyncadmin.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\AddCommunity.aspx.cs">
+      <DependentUpon>AddCommunity.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\AddCommunity.aspx.designer.cs">
+      <DependentUpon>AddCommunity.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Apps.aspx.cs">
+      <DependentUpon>Apps.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Apps.aspx.designer.cs">
+      <DependentUpon>Apps.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\appstore.aspx.cs">
+      <DependentUpon>appstore.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\appstore.aspx.designer.cs">
+      <DependentUpon>appstore.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\ChooseCommunity.aspx.cs">
+      <DependentUpon>ChooseCommunity.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\ChooseCommunity.aspx.designer.cs">
+      <DependentUpon>ChooseCommunity.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Install.aspx.cs">
+      <DependentUpon>Install.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Install.aspx.designer.cs">
+      <DependentUpon>Install.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\InstallDone.aspx.cs">
+      <DependentUpon>InstallDone.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\InstallDone.aspx.designer.cs">
+      <DependentUpon>InstallDone.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\installfromstore.aspx.cs">
+      <DependentUpon>installfromstore.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\installfromstore.aspx.designer.cs">
+      <DependentUpon>installfromstore.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\InstallNav.aspx.cs">
+      <DependentUpon>InstallNav.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\InstallNav.aspx.designer.cs">
+      <DependentUpon>InstallNav.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Manage.aspx.cs">
+      <DependentUpon>Manage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Manage.aspx.designer.cs">
+      <DependentUpon>Manage.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\ManageApps.aspx.cs">
+      <DependentUpon>ManageApps.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\ManageApps.aspx.designer.cs">
+      <DependentUpon>ManageApps.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\noact.aspx.cs">
+      <DependentUpon>noact.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\noact.aspx.designer.cs">
+      <DependentUpon>noact.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\precheck.aspx.cs">
+      <DependentUpon>precheck.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\precheck.aspx.designer.cs">
+      <DependentUpon>precheck.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\PreCheckDone.aspx.cs">
+      <DependentUpon>PreCheckDone.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\PreCheckDone.aspx.designer.cs">
+      <DependentUpon>PreCheckDone.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\proxy.aspx.cs">
+      <DependentUpon>proxy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\proxy.aspx.designer.cs">
+      <DependentUpon>proxy.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Terms.aspx.cs">
+      <DependentUpon>Terms.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\Terms.aspx.designer.cs">
+      <DependentUpon>Terms.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\uninstall.aspx.cs">
+      <DependentUpon>uninstall.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\uninstall.aspx.designer.cs">
+      <DependentUpon>uninstall.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\uninstallcheck.aspx.cs">
+      <DependentUpon>uninstallcheck.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\uninstallcheck.aspx.designer.cs">
+      <DependentUpon>uninstallcheck.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\UninstallCheckDone.aspx.cs">
+      <DependentUpon>UninstallCheckDone.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\UninstallCheckDone.aspx.designer.cs">
+      <DependentUpon>UninstallCheckDone.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\UninstallDone.aspx.cs">
+      <DependentUpon>UninstallDone.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\applications\UninstallDone.aspx.designer.cs">
+      <DependentUpon>UninstallDone.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\AsyncNavActions.aspx.cs">
+      <DependentUpon>AsyncNavActions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\AsyncNavActions.aspx.designer.cs">
+      <DependentUpon>AsyncNavActions.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\BuildTeam.aspx.cs">
+      <DependentUpon>BuildTeam.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\BuildTeam.aspx.designer.cs">
+      <DependentUpon>BuildTeam.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\BuildTeamHelper.aspx.cs">
+      <DependentUpon>BuildTeamHelper.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\BuildTeamHelper.aspx.designer.cs">
+      <DependentUpon>BuildTeamHelper.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ChangeApp.aspx.cs">
+      <DependentUpon>ChangeApp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ChangeApp.aspx.designer.cs">
+      <DependentUpon>ChangeApp.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ChangeAppAjaxDataHost.aspx.cs">
+      <DependentUpon>ChangeAppAjaxDataHost.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ChangeAppAjaxDataHost.aspx.designer.cs">
+      <DependentUpon>ChangeAppAjaxDataHost.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Comments.aspx.cs">
+      <DependentUpon>Comments.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Comments.aspx.designer.cs">
+      <DependentUpon>Comments.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CommentsProxy.aspx.cs">
+      <DependentUpon>CommentsProxy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CommentsProxy.aspx.designer.cs">
+      <DependentUpon>CommentsProxy.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CommonActionsAjaxDataHost.aspx.cs">
+      <DependentUpon>CommonActionsAjaxDataHost.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CommonActionsAjaxDataHost.aspx.designer.cs">
+      <DependentUpon>CommonActionsAjaxDataHost.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CreateNewAjaxDataHost.aspx.cs">
+      <DependentUpon>CreateNewAjaxDataHost.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CreateNewAjaxDataHost.aspx.designer.cs">
+      <DependentUpon>CreateNewAjaxDataHost.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CreateNewWorkspace.aspx.cs">
+      <DependentUpon>CreateNewWorkspace.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CreateNewWorkspace.aspx.designer.cs">
+      <DependentUpon>CreateNewWorkspace.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomEditNav.aspx.cs">
+      <DependentUpon>CustomEditNav.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomEditNav.aspx.designer.cs">
+      <DependentUpon>CustomEditNav.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomNewNav.aspx.cs">
+      <DependentUpon>CustomNewNav.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomNewNav.aspx.designer.cs">
+      <DependentUpon>CustomNewNav.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomQlReord.aspx.cs">
+      <DependentUpon>CustomQlReord.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomQlReord.aspx.designer.cs">
+      <DependentUpon>CustomQlReord.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomQuikLnch.aspx.cs">
+      <DependentUpon>CustomQuikLnch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomQuikLnch.aspx.designer.cs">
+      <DependentUpon>CustomQuikLnch.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\customtnreord.aspx.cs">
+      <DependentUpon>CustomTnReord.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\customtnreord.aspx.designer.cs">
+      <DependentUpon>customtnreord.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomTopNav.aspx.cs">
+      <DependentUpon>CustomTopNav.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\CustomTopNav.aspx.designer.cs">
+      <DependentUpon>CustomTopNav.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\deleteweb.aspx.cs">
+      <DependentUpon>deleteweb.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\deleteweb.aspx.designer.cs">
+      <DependentUpon>deleteweb.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandler.aspx.cs">
+      <DependentUpon>GenericEntityTypeAheadAjaxHandler.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandler.aspx.designer.cs">
+      <DependentUpon>GenericEntityTypeAheadAjaxHandler.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\GetWorkspaceListTree.aspx.cs">
+      <DependentUpon>GetWorkspaceListTree.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\GetWorkspaceListTree.aspx.designer.cs">
+      <DependentUpon>GetWorkspaceListTree.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\gotoresources.aspx.cs">
+      <DependentUpon>gotoresources.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\gotoresources.aspx.designer.cs">
+      <DependentUpon>gotoresources.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\gridganttsettings.aspx.cs">
+      <DependentUpon>gridganttsettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\gridganttsettings.aspx.designer.cs">
+      <DependentUpon>gridganttsettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ListLookupConfig.aspx.cs">
+      <DependentUpon>ListLookupConfig.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ListLookupConfig.aspx.designer.cs">
+      <DependentUpon>ListLookupConfig.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ListLookupEdit.aspx.cs">
+      <DependentUpon>ListLookupEdit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ListLookupEdit.aspx.designer.cs">
+      <DependentUpon>ListLookupEdit.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\MoreInformation.aspx.cs">
+      <DependentUpon>MoreInformation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\MoreInformation.aspx.designer.cs">
+      <DependentUpon>MoreInformation.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\myworksettings.aspx.cs">
+      <DependentUpon>myworksettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\myworksettings.aspx.designer.cs">
+      <DependentUpon>myworksettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\newapp.aspx.cs">
+      <DependentUpon>newapp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\newapp.aspx.designer.cs">
+      <DependentUpon>newapp.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\newitem.aspx.cs">
+      <DependentUpon>newitem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\newitem.aspx.designer.cs">
+      <DependentUpon>newitem.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\notifications.aspx.cs">
+      <DependentUpon>notifications.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\notifications.aspx.designer.cs">
+      <DependentUpon>notifications.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\notificationsadmin.aspx.cs">
+      <DependentUpon>notificationsadmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\notificationsadmin.aspx.designer.cs">
+      <DependentUpon>notificationsadmin.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\permissions.aspx.cs">
+      <DependentUpon>permissions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\permissions.aspx.designer.cs">
+      <DependentUpon>permissions.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\prjsetng.aspx.cs">
+      <DependentUpon>prjsetng.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\prjsetng.aspx.designer.cs">
+      <DependentUpon>prjsetng.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\publishersettings.aspx.cs">
+      <DependentUpon>publishersettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\publishersettings.aspx.designer.cs">
+      <DependentUpon>publishersettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\regionalsetng.aspx.cs">
+      <DependentUpon>regionalsetng.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\regionalsetng.aspx.designer.cs">
+      <DependentUpon>regionalsetng.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ReportCheckActions.aspx.cs">
+      <DependentUpon>ReportCheckActions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ReportCheckActions.aspx.designer.cs">
+      <DependentUpon>ReportCheckActions.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ReportFilterViewCreator.aspx.cs">
+      <DependentUpon>ReportFilterViewCreator.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ReportFilterViewCreator.aspx.designer.cs">
+      <DependentUpon>ReportFilterViewCreator.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\requestworkspace.aspx.cs">
+      <DependentUpon>requestworkspace.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\requestworkspace.aspx.designer.cs">
+      <DependentUpon>requestworkspace.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\resourcecapacity.aspx.cs">
+      <DependentUpon>resourcecapacity.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\resourcecapacity.aspx.designer.cs">
+      <DependentUpon>resourcecapacity.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SaveCurrentSiteAsTemplate.aspx.cs">
+      <DependentUpon>SaveCurrentSiteAsTemplate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SaveCurrentSiteAsTemplate.aspx.designer.cs">
+      <DependentUpon>SaveCurrentSiteAsTemplate.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\settings.aspx.cs">
+      <DependentUpon>settings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\settings.aspx.designer.cs">
+      <DependentUpon>settings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\setup.aspx.cs">
+      <DependentUpon>setup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\setup.aspx.designer.cs">
+      <DependentUpon>setup.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\sitepermissions.aspx.cs">
+      <DependentUpon>sitepermissions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\sitepermissions.aspx.designer.cs">
+      <DependentUpon>sitepermissions.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SmallParentUrlDialog.aspx.cs">
+      <DependentUpon>SmallParentUrlDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SmallParentUrlDialog.aspx.designer.cs">
+      <DependentUpon>SmallParentUrlDialog.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SolutionStoreProxy.aspx.cs">
+      <DependentUpon>SolutionStoreProxy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SolutionStoreProxy.aspx.designer.cs">
+      <DependentUpon>SolutionStoreProxy.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\TemplateGalleryRedirect.aspx.cs">
+      <DependentUpon>TemplateGalleryRedirect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\TemplateGalleryRedirect.aspx.designer.cs">
+      <DependentUpon>TemplateGalleryRedirect.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\timersettings.aspx.cs">
+      <DependentUpon>timersettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\timersettings.aspx.designer.cs">
+      <DependentUpon>timersettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\totalfields.aspx.cs">
+      <DependentUpon>totalfields.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\totalfields.aspx.designer.cs">
+      <DependentUpon>totalfields.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\unsealfields.aspx.cs">
+      <DependentUpon>unsealfields.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\unsealfields.aspx.designer.cs">
+      <DependentUpon>unsealfields.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
+      <DependentUpon>proxy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.designer.cs">
+      <DependentUpon>proxy.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\Upgrade.aspx.cs">
+      <DependentUpon>Upgrade.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\Upgrade.aspx.designer.cs">
+      <DependentUpon>Upgrade.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx.cs">
+      <DependentUpon>UpgradeDone.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx.designer.cs">
+      <DependentUpon>UpgradeDone.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx.cs">
+      <DependentUpon>WE43Upgrader.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx.designer.cs">
+      <DependentUpon>WE43Upgrader.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\viewmessages.aspx.cs">
+      <DependentUpon>viewmessages.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\viewmessages.aspx.designer.cs">
+      <DependentUpon>viewmessages.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\websettings.aspx.cs">
+      <DependentUpon>websettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\websettings.aspx.designer.cs">
+      <DependentUpon>websettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\WEPeopleEditorAjaxHandler.aspx.cs">
+      <DependentUpon>WEPeopleEditorAjaxHandler.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\WEPeopleEditorAjaxHandler.aspx.designer.cs">
+      <DependentUpon>WEPeopleEditorAjaxHandler.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\WorkspaceListWPCanvas.aspx.cs">
+      <DependentUpon>WorkspaceListWPCanvas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\WorkspaceListWPCanvas.aspx.designer.cs">
+      <DependentUpon>WorkspaceListWPCanvas.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListDefinitions\EPMLiveLists.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -207,13 +802,55 @@
     <None Include="EPMLiveRollupFields\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{23ac5233-31c5-4abc-b0b3-8d06db401c39}</SharePointProjectItemId>
     </None>
+    <None Include="EPMLiveTaskCenterEvent\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{f22da657-5d1e-4881-a8cd-da55d2421b71}</SharePointProjectItemId>
+    </None>
     <None Include="EPMLiveTaskCenter\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{2798d301-5514-434e-9715-b924c017ab18}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveTimePhasedList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{60ac5174-784c-42bf-a348-1da258586062}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveTimePhasedWebServices\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{55a3a3f8-db8e-4a47-b21f-60f143b5c359}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveTopLevelMenus\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{8125f1ed-7b98-4851-83b6-0641f1dd54c3}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveTPListCT\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{3c14e5e1-976e-4f5d-a88d-ddd4058fbb7b}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveValueTypesList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{3fcac462-efd4-42a8-9999-c60c8a66656e}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveWorkList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{80626d44-8deb-460d-a360-08f5ab77f8b4}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveWorkspaceCenter\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1f4cac70-edc8-435f-98d2-a90d0349f313}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveWorkspaceMenus\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ed4c73b0-c66d-447f-b679-d91cb0667b61}</SharePointProjectItemId>
     </None>
     <None Include="Features\AppNavFixUp\AppNavFixUp.feature">
       <FeatureId>{3aa712ee-ed28-48bc-8219-1c5a8c9b5fbc}</FeatureId>
     </None>
-    <None Include="key.snk" />
+    <None Include="GlobalResources\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{0c03c0e3-b739-4aa6-956a-62145153e2aa}</SharePointProjectItemId>
+    </None>
+    <None Include="Images\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{bf60dd84-fcc4-46e8-979b-985f006cca5a}</SharePointProjectItemId>
+    </None>
+    <None Include="ISAPI\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
+    </None>
+    <None Include="Layouts\epmlive\Project1.mpp" />
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{4ac6e44b-916f-4550-98aa-fba67f5cc363}</SharePointProjectItemId>
+    </None>
+    <None Include="ListDefinitions\Departments\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{36ef267a-3b01-4f5e-9fd6-570504eb797f}</SharePointProjectItemId>
+    </None>
     <None Include="Package\Package.package">
       <PackageId>{64ede3b7-292b-4f08-b56f-1452b1834805}</PackageId>
     </None>
@@ -221,7 +858,10 @@
       <DependentUpon>Package.package</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="GlobalResources\MultiAppNavigationResources.resx" />
+    <EmbeddedResource Include="GlobalResources\WorkEngineLookupPickerResources.resx" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="AppsListEvents\Elements.xml" />
     <Content Include="BuildTeam\Elements.xml" />
@@ -258,11 +898,1412 @@
     <Content Include="EPMLiveProjectCenter\Schema.xml" />
     <Content Include="EPMLiveRollupFields\Elements.xml" />
     <Content Include="EPMLiveRollupFields\Schema.xml" />
+    <Content Include="EPMLiveTaskCenterEvent\Elements.xml" />
     <Content Include="EPMLiveTaskCenter\Elements.xml" />
     <Content Include="EPMLiveTaskCenter\Schema.xml" />
+    <Content Include="EPMLiveTimePhasedList\Elements.xml" />
+    <Content Include="EPMLiveTimePhasedList\Schema.xml" />
+    <Content Include="EPMLiveTimePhasedWebServices\Elements.xml" />
+    <Content Include="EPMLiveTimePhasedWebServices\EPMLiveTimePhased.asmx" />
+    <Content Include="EPMLiveTimePhasedWebServices\EPMLiveTimephaseddisco.aspx" />
+    <Content Include="EPMLiveTimePhasedWebServices\EPMLiveTimephasedwsdl.aspx" />
+    <Content Include="EPMLiveTopLevelMenus\Elements.xml" />
+    <Content Include="EPMLiveTPListCT\Elements.xml" />
+    <Content Include="EPMLiveValueTypesList\Elements.xml" />
+    <Content Include="EPMLiveValueTypesList\Schema.xml" />
+    <Content Include="EPMLiveWorkList\Elements.xml" />
+    <Content Include="EPMLiveWorkList\Schema.xml" />
+    <Content Include="EPMLiveWorkspaceCenter\Elements.xml" />
+    <Content Include="EPMLiveWorkspaceCenter\Schema.xml" />
+    <Content Include="EPMLiveWorkspaceMenus\Elements.xml" />
     <Content Include="Features\AppNavFixUp\AppNavFixUp.Template.xml">
       <DependentUpon>AppNavFixUp.feature</DependentUpon>
     </Content>
+    <Content Include="GlobalResources\Elements.xml" />
+    <Content Include="Images\16doc.gif" />
+    <Content Include="Images\16fold.gif" />
+    <Content Include="Images\active.png" />
+    <Content Include="Images\Approvals.png" />
+    <Content Include="Images\Arrow Down Lg.gif" />
+    <Content Include="Images\Arrow Down Trend.gif" />
+    <Content Include="Images\Arrow Down.GIF" />
+    <Content Include="Images\Arrow Left Right.png" />
+    <Content Include="Images\Arrow Left.GIF" />
+    <Content Include="Images\Arrow Right Lg.gif" />
+    <Content Include="Images\Arrow Right.GIF" />
+    <Content Include="Images\Arrow Up Lg.gif" />
+    <Content Include="Images\Arrow Up Trend.gif" />
+    <Content Include="Images\Arrow Up.GIF" />
+    <Content Include="Images\At Risk.gif" />
+    <Content Include="Images\BLACK.gif" />
+    <Content Include="Images\BLUE.gif" />
+    <Content Include="Images\Cancelled.GIF" />
+    <Content Include="Images\Caution.gif" />
+    <Content Include="Images\Checked.png" />
+    <Content Include="Images\checkmark.gif" />
+    <Content Include="Images\checkon.gif" />
+    <Content Include="Images\CIRCLE.gif" />
+    <Content Include="Images\close.gif" />
+    <Content Include="Images\closed.png" />
+    <Content Include="Images\Completed.gif" />
+    <Content Include="Images\completed.png" />
+    <Content Include="Images\deferred.gif" />
+    <Content Include="Images\deferred.png" />
+    <Content Include="Images\EPMLive.ico" />
+    <Content Include="Images\epmlivegantt.gif" />
+    <Content Include="Images\EPMLiveHome.png" />
+    <Content Include="Images\epmliveicon.gif" />
+    <Content Include="Images\epmlivelogo.gif" />
+    <Content Include="Images\epmlivelogosmall.gif" />
+    <Content Include="Images\epmlivesmall.gif" />
+    <Content Include="Images\epmlive_rt_check.gif" />
+    <Content Include="Images\epmlive_rt_find.gif" />
+    <Content Include="Images\epmlive_rt_rt.gif" />
+    <Content Include="Images\Green.gif" />
+    <Content Include="Images\High Priority.gif" />
+    <Content Include="Images\In Progress.gif" />
+    <Content Include="Images\info.gif" />
+    <Content Include="Images\inprogress.png" />
+    <Content Include="Images\IssueRisk.png" />
+    <Content Include="Images\ITWE.PNG" />
+    <Content Include="Images\Low Priority.GIF" />
+    <Content Include="Images\LTWE.png" />
+    <Content Include="Images\menualertsmall.gif" />
+    <Content Include="Images\MyIssues.gif" />
+    <Content Include="Images\MyRisks.gif" />
+    <Content Include="Images\newtask.gif" />
+    <Content Include="Images\Not Started.png" />
+    <Content Include="Images\notstarted.png" />
+    <Content Include="Images\Off Track.gif" />
+    <Content Include="Images\On Track.gif" />
+    <Content Include="Images\pgProj.png" />
+    <Content Include="Images\pgResPlans.png" />
+    <Content Include="Images\PPEOPLEs.gif" />
+    <Content Include="Images\ppublisher.gif" />
+    <Content Include="Images\Project2007Logo.gif" />
+    <Content Include="Images\Project2007LogoSmall.gif" />
+    <Content Include="Images\proposed.png" />
+    <Content Include="Images\Red.gif" />
+    <Content Include="Images\ReportCenter.png" />
+    <Content Include="Images\spgraphic.gif" />
+    <Content Include="Images\Sr_Overdue.gif" />
+    <Content Include="Images\Star.GIF" />
+    <Content Include="Images\Urgent.GIF" />
+    <Content Include="Images\waiting.png" />
+    <Content Include="Images\WESite.png" />
+    <Content Include="Images\WHITE.GIF" />
+    <Content Include="Images\wpepmlive.gif" />
+    <Content Include="Images\Yellow.gif" />
+    <Content Include="ISAPI\Lic\Licensing.asmx" />
+    <Content Include="ISAPI\Lic\licensingdisco.aspx" />
+    <Content Include="ISAPI\Lic\licensingwsdl.aspx" />
+    <Content Include="ISAPI\WorkEngine.asmx" />
+    <Content Include="ISAPI\WorkEnginedisco.aspx" />
+    <Content Include="ISAPI\WorkEnginewsdl.aspx" />
+    <Content Include="Layouts\epmliverollups.js" />
+    <Content Include="Layouts\epmlive\acttest.aspx" />
+    <Content Include="Layouts\epmlive\addcode.aspx" />
+    <Content Include="Layouts\epmlive\addperiod.aspx" />
+    <Content Include="Layouts\epmlive\addperiods.aspx" />
+    <Content Include="Layouts\epmlive\addusers.aspx" />
+    <Content Include="Layouts\epmlive\adsyncadmin.aspx" />
+    <Content Include="Layouts\epmlive\applications\AddCommunity.aspx" />
+    <Content Include="Layouts\epmlive\applications\Applications.css" />
+    <Content Include="Layouts\epmlive\applications\Apps.aspx" />
+    <Content Include="Layouts\epmlive\applications\appstore.aspx" />
+    <Content Include="Layouts\epmlive\applications\ChooseCommunity.aspx" />
+    <Content Include="Layouts\epmlive\applications\Install.aspx" />
+    <Content Include="Layouts\epmlive\applications\InstallDone.aspx" />
+    <Content Include="Layouts\epmlive\applications\installfromstore.aspx" />
+    <Content Include="Layouts\epmlive\applications\InstallNav.aspx" />
+    <Content Include="Layouts\epmlive\applications\Manage.aspx" />
+    <Content Include="Layouts\epmlive\applications\ManageApps.aspx" />
+    <Content Include="Layouts\epmlive\applications\noact.aspx" />
+    <Content Include="Layouts\epmlive\applications\precheck.aspx" />
+    <Content Include="Layouts\epmlive\applications\PreCheckDone.aspx" />
+    <Content Include="Layouts\epmlive\applications\proxy.aspx" />
+    <Content Include="Layouts\epmlive\applications\Terms.aspx" />
+    <Content Include="Layouts\epmlive\applications\uninstall.aspx" />
+    <Content Include="Layouts\epmlive\applications\uninstallcheck.aspx" />
+    <Content Include="Layouts\epmlive\applications\UninstallCheckDone.aspx" />
+    <Content Include="Layouts\epmlive\applications\UninstallDone.aspx" />
+    <Content Include="Layouts\epmlive\AsyncNavActions.aspx" />
+    <Content Include="Layouts\epmlive\blank.gif" />
+    <Content Include="Layouts\epmlive\BtnCommonActions.js" />
+    <Content Include="Layouts\epmlive\BtnCreateNew.js" />
+    <Content Include="Layouts\epmlive\BuildTeam.aspx" />
+    <Content Include="Layouts\epmlive\BuildTeam.js" />
+    <Content Include="Layouts\epmlive\BuildTeamHelper.aspx" />
+    <Content Include="Layouts\epmlive\BuildTeamPageComponent.js" />
+    <Content Include="Layouts\epmlive\buildteamtools.js" />
+    <Content Include="Layouts\epmlive\ChangeApp.aspx" />
+    <Content Include="Layouts\epmlive\ChangeAppAjaxDataHost.aspx" />
+    <Content Include="Layouts\epmlive\checkurl.aspx" />
+    <Content Include="Layouts\epmlive\Comments.aspx" />
+    <Content Include="Layouts\epmlive\comments.js" />
+    <Content Include="Layouts\epmlive\Comments.UI.css" />
+    <Content Include="Layouts\epmlive\CommentsProxy.aspx" />
+    <Content Include="Layouts\epmlive\CommonActionsAjaxDataHost.aspx" />
+    <Content Include="Layouts\epmlive\CreateNewAjaxDataHost.aspx" />
+    <Content Include="Layouts\epmlive\CreateNewWorkspace.aspx" />
+    <Content Include="Layouts\epmlive\CreateNewWorkspace.css" />
+    <Content Include="Layouts\epmlive\CreateNewWorkspace.js" />
+    <Content Include="Layouts\epmlive\CreateWorkspace.aspx" />
+    <Content Include="Layouts\epmlive\CustomEditNav.aspx" />
+    <Content Include="Layouts\epmlive\CustomNewNav.aspx" />
+    <Content Include="Layouts\epmlive\CustomQlReord.aspx" />
+    <Content Include="Layouts\epmlive\CustomQuikLnch.aspx" />
+    <Content Include="Layouts\epmlive\CustomTnReord.aspx" />
+    <Content Include="Layouts\epmlive\CustomTopNav.aspx" />
+    <Content Include="Layouts\epmlive\datepicker2.js" />
+    <Content Include="Layouts\epmlive\deleteweb.aspx" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\dhtmlxcalendar.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\dhtmlxcalendar.js" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\dhtmlxcalendar_skins.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\blank.html" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\btn_clr.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\calendar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\calendar_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\callt.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\calrt.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_arrow_bwd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_arrow_fwd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_bg_double.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_bg_double.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_bg_single.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_bg_single_long.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_bg_single_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\cal_bg_single_mini.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\icon_minicalendar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\skins.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\tp_btnsIncDec.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\cal_arrow_bwd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\cal_arrow_fwd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\cal_bg_single_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\cal_bg_single_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Black\cell_select.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\cal_arrow_bwd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\cal_arrow_fwd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\cal_bg_single.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\cal_bg_single_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Blue\cal_bg_single_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Classic\btns.GIF" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Classic\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Classic\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Classic\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Classic\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Classic\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Classic\cal_bg_single.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Macos\bwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Macos\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Macos\dhtmlxcalendar_skins.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Macos\fwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Macos\simplegrey_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Macos\simplegrey_cell_select.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\btns.GIF" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\bwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\cal_bg_single_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\cal_bg_single_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleBlue\fwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\btns.GIF" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\bwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\fwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorDark\simplecolor-dark_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\bwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleColorSand\fwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\btns.GIF" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\bwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\cal_bg_single_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\cal_bg_single_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\cell_select.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_SimpleGrey\fwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Skyblue\btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Skyblue\cal_bg_single.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Skyblue\cal_header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Skyblue\cell_select.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\bwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\cal_bg_single.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\cal_bg_single_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\cell_hover.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\cell_select.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Vista\fwd_arrow.png" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\btn_clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\btn_close.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\btn_maxi.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\btn_mini.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\btn_today.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\bwd_arrow.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\cal_bg_single.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\imgs\__dhxCal_skin_Yahoolike\fwd_arrow.gif" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_classic.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_dhx_skyblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_simpleblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_simplecolordark.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_simplecolorsand.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_simplegrey.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_vista.css" />
+    <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_yahoolike.css" />
+    <Content Include="Layouts\epmlive\DHTML\dhtmlxajax.js" />
+    <Content Include="Layouts\epmlive\DHTML\dhtmlxtreegrid.js" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\dhtmlxaccordion.js" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\imgs\dhxaccord_dhx_black\dhtmlxaccordion_bg.png" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\imgs\dhxaccord_dhx_blue\dhtmlxaccordion_bg.png" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\imgs\dhxaccord_glassy_blue\dhxaccord_item_label.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\imgs\dhxaccord_standard\dhxaccord_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\imgs\dhxaccord_standard_old\dhxaccord_item_label.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\skins\dhtmlxaccordion_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\skins\dhtmlxaccordion_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xaccord\skins\dhtmlxaccordion_standard.css" />
+    <Content Include="Layouts\epmlive\DHTML\xajax\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\dhtmlxcombo.css" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\dhtmlxcombo.js" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\ext\dhtmlxcombo_extra.js" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\ext\dhtmlxcombo_group.js" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\ext\dhtmlxcombo_whp.js" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\imgs\blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xcombo\imgs\combo_select.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xdataproc\dhtmlxdataprocessor.js" />
+    <Content Include="Layouts\epmlive\DHTML\xdataproc\dhtmlxdataprocessor_debug.js" />
+    <Content Include="Layouts\epmlive\DHTML\xdataproc\dhtmlxdataprocessor_deprecated.js" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\dhtmlxeditor.css" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\dhtmlxeditor.js" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\ext\dhtmlxeditor_ext.js" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_center.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_center_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_justify.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_justify_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\align_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\bold.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\bold_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h2_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h3_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\h4_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\indent_dec.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\indent_dec_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\indent_inc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\indent_inc_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\italic.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\italic_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\list_bullet.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\list_bullet_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\list_number.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\list_number_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\script_sub.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\script_sub_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\script_super.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\script_super_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\strike.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\strike_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\underline.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_black\underline_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_center.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_center_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_justify.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_justify_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\align_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\bold.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\bold_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h2_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h3_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\h4_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\indent_dec.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\indent_dec_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\indent_inc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\indent_inc_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\italic.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\italic_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\list_bullet.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\list_bullet_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\list_number.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\list_number_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\script_sub.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\script_sub_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\script_super.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\script_super_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\strike.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\strike_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\underline.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_blue\underline_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_center.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_center_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_justify.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_justify_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\align_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\bold.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\bold_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\dhxeditor_bg_lite.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h2_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h3_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\h4_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\indent_dec.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\indent_dec_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\indent_inc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\indent_inc_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\italic.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\italic_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\list_bullet.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\list_bullet_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\list_number.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\list_number_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\script_sub.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\script_sub_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\script_super.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\script_super_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\strike.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\strike_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\underline.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_skyblue\underline_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_center.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_center_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_justify.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_justify_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\align_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\bold.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\bold_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\dhxeditor_bg_lite.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h2_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h3_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\h4_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\indent_dec.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\indent_dec_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\indent_inc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\indent_inc_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\italic.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\italic_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\list_bullet.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\list_bullet_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\list_number.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\list_number_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\script_sub.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\script_sub_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\script_super.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\script_super_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\strike.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\strike_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\underline.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_dhx_web\underline_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_center.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_center_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_justify.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_justify_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\align_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\bold.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\bold_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\clear.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h2_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h3_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\h4_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\indent_dec.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\indent_dec_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\indent_inc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\indent_inc_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\italic.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\italic_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\list_bullet.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\list_bullet_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\list_number.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\list_number_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\script_sub.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\script_sub_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\script_super.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\script_super_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\strike.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\strike_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\underline.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\imgs\dhxeditor_standard\underline_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\skins\dhtmlxeditor_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\skins\dhtmlxeditor_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\skins\dhtmlxeditor_dhx_skyblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\skins\dhtmlxeditor_dhx_web.css" />
+    <Content Include="Layouts\epmlive\DHTML\xeditor\skins\dhtmlxeditor_standard.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\calendar.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\calendar.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\calendar_init.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\event.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\img\callt.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\img\calrt.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\img\calx.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\license.txt" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\calendar\YAHOO.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\Copy of dhtmlxgridcell.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\dhtmlxcommon_debug.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\dhtmlxgrid.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\dhtmlxgrid.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\dhtmlxgridcell.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\dhtmlxgrid_OLD.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\dhtmlxgrid_skins.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_calc.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_3but.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_acheck.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_calck.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_calendar.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_clist.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_cntr.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_combo.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_context.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_dec.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_dhxcalendar.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_grid.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_limit.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_link.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_liveedit.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_mro.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_passw.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_ra_str.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_sub_row.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_time.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_tree.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\excells\dhtmlxgrid_excell_wbut.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_data.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_deprecated.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_drag.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_fast.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_filter.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_form.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_group.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_hextra.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_hmenu.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_hmenu.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_json.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_keymap_access.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_keymap_excel.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_keymap_extra.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_markers.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_math.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_mcol.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_nxml.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_over.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_pgn.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_pgn_bricks.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_pivot.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_post.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_rowspan.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_selection.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_splt.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_srnd.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_ssc.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_start.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_undo.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlxgrid_validation.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlx_extdrag.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\ext\dhtmlx_extdrag.js" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\16doc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\admintitlegraphic.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_left_abs.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_left_abs_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_right_abs.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_right_abs_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ar_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\blanc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\combo_select.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\combo_select_dhx_black.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\combo_select_dhx_blue.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\combo_select_dhx_skyblue.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\blanc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\folder.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\leaf.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\line.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\line1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\line2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\line3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\line4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\minus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\minus1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\minus2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\minus3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\minus4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\minus5.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\plus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\plus1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\plus2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\plus3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\plus4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\plus5.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\sort_asc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\csh_bluebooks\sort_desc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\dhxgrid_dhx_black\hdr.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\dhxgrid_dhx_blue\hdr.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\dhxgrid_glassy_blue\ftr.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\dhxgrid_glassy_blue\hdr.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\dyn_.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\dyn_down.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\dyn_up.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\false.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\folder.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ganttview.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\green.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\header_bg_60.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\ICODCT.GIF" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\blanc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\book.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\books.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\books_cat.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\cd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\dvd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\dvds.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\item_chk0.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\item_chk0_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\item_chk1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\item_chk1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\leaf.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\line.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\line1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\line2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\line3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\line4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\minus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\minus1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\minus2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\minus3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\minus4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\minus5.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\music.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\plus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\plus1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\plus2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\plus3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\plus4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\plus5.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\radio_chk0.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\radio_chk0_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\radio_chk1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\radio_chk1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\sort_asc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_books\sort_desc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\blanc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\folder.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\item_chk0.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\item_chk0_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\item_chk1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\item_chk1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\leaf.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\line.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\line1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\line2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\line3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\line4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\minus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\minus1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\minus2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\minus3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\minus4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\minus5.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\plus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\plus1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\plus2.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\plus3.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\plus4.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\plus5.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\radio_chk0.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\radio_chk0_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\radio_chk1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\radio_chk1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\sort_asc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\icons_greenfolders\sort_desc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\imageloaderror.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\iReportsLibrary.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\item_chk0.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\item_chk0_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\item_chk1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\item_chk1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\leaf.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\menuaddview.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\minus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\plus.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\radio_chk0.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\radio_chk0_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\radio_chk1.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\radio_chk1_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\red.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\results.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinA_header.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinB_header.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinC_header.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinC_top_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinC_top_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinD_bottom_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinD_bottom_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skinD_header.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skin_light_header.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\skin_modern_header.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\sky_blue_grid.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\sky_blue_sel.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\sky_blue_sel2.png" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\sort_asc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\sort_desc.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\STSICON.GIF" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\true.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_skyblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\dhtmlxcontainer.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\dhtmlxlayout.css" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\dhtmlxlayout.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_collapsedhor.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_collapsedver.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_cpanel_btn_dock.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_cpanel_btn_undock.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_drag_hor.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_drag_ver.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_hor1l.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_hor1r.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_hor2l.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_hor2r.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_progress_global.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_ver1b.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_ver1t.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_ver2b.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_black\dhxlayout_ver2t.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_collapsedhor.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_collapsedver.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_cpanel_btn_dock.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_cpanel_btn_undock.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_drag_hor.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_drag_ver.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_hor1l.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_hor1r.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_hor2l.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_hor2r.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_progress_global.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_ver1b.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_ver1t.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_ver2b.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_blue\dhxlayout_ver2t.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_bg_sb.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_collapsedhor.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_collapsedver.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_cpanel_btn_dock.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_cpanel_btn_undock.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_drag_hor.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_drag_ver.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_skyblue\dhxlayout_progress_global.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_web\dhxlayout_bg_sb.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_web\dhxlayout_btns.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_web\dhxlayout_drag_hor.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_web\dhxlayout_drag_ver.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_web\dhxlayout_progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\imgs\dhxlayout_dhx_web\dhxlayout_progress_global.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern4a.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern4c.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern4e.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern4f.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern4j.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern4l.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern4w.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern5e.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern5u.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern5w.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\patterns\dhtmlxlayout_pattern6c.js" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\skins\dhtmlxlayout_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\skins\dhtmlxlayout_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\skins\dhtmlxlayout_dhx_skyblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xlayout\skins\dhtmlxlayout_dhx_web.css" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\dhtmlxmenu.js" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\ext\dhtmlxmenu_ext.js" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_black\dhtmlxmenu_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_black\dhtmlxmenu_chrd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_black\dhtmlxmenu_loader.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_black\dhtmlxmenu_subar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_black\dhtmlxmenu_upar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_blue\dhtmlxmenu_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_blue\dhtmlxmenu_chrd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_blue\dhtmlxmenu_loader.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_blue\dhtmlxmenu_subar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_blue\dhtmlxmenu_upar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhtmlxmenu_chrd.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhtmlxmenu_loader.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhtmlxmenu_subar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhtmlxmenu_upar.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhxmenu_bg_acccell.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhxmenu_subselbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhxmenu_topselbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\imgs\dhxmenu_dhx_skyblue\dhxmenu_topsepbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\skins\dhtmlxmenu_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\skins\dhtmlxmenu_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xmenu\skins\dhtmlxmenu_dhx_skyblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\dhtmlxcontainer.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\dhtmlxtabbar.css" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\dhtmlxtabbar.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\dhtmlxtabbar_start.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\ext\dhtmlxtabbar_deprecated.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\blank.html" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dark_blue\dark_blue_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dark_blue\dark_blue_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dark_blue\dark_blue_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dark_blue\dark_blue_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\default\close.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\default\default_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\default\default_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\default\default_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\default\default_scroll_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\default\default_scroll_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\default\default_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_black\close.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_black\dhx_black_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_black\dhx_black_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_black\dhx_black_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_black\dhx_black_scroll_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_black\dhx_black_scroll_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_black\dhx_black_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_blue\close.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_blue\dhx_blue_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_blue\dhx_blue_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_blue\dhx_blue_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_blue\dhx_blue_scroll_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_blue\dhx_blue_scroll_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_blue\dhx_blue_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\bg_bottom.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\bg_left.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\bg_right.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\bg_top.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\close.png" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\dhxlayout_bg_sb.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\dhx_skyblue_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\dhx_skyblue_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\dhx_skyblue_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\dhx_skyblue_scroll_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\dhx_skyblue_scroll_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_skyblue\dhx_skyblue_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_web\dhx_web_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_web\dhx_web_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_web\dhx_web_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\dhx_web\dhx_web_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\glassy_blue\glassy_blue_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\glassy_blue\glassy_blue_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\glassy_blue\glassy_blue_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\glassy_blue\glassy_blue_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\modern\modern_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\modern\modern_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\modern\modern_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\modern\modern_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\silver\silver_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\silver\silver_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\silver\silver_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\silver\silver_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winbiscarf\winbiscarf_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winbiscarf\winbiscarf_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winbiscarf\winbiscarf_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winbiscarf\winbiscarf_scroll_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winbiscarf\winbiscarf_scroll_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winbiscarf\winbiscarf_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winscarf\winscarf_bottom.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winscarf\winscarf_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winscarf\winscarf_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winscarf\winscarf_scroll_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winscarf\winscarf_scroll_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtab\imgs\winscarf\winscarf_top.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\dhtmlxtoolbar.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_bg_over.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_btnarrow.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_btnarrow_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_middle.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_middle_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_pen_def.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_pen_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_pen_over.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_black\dhxtoolbar_slider_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_bg_over.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_btnarrow.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_btnarrow_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_middle.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_middle_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_pen_def.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_pen_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_pen_over.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_blue\dhxtoolbar_slider_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_bg_acccell.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_bg_layoutcell.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_bg_over.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_bg_pressed.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_btnarrow.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_btnarrow_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_sep_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_left.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_left_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_middle.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_middle_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_pen_def.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_pen_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_pen_over.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_right.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_slider_right_dis.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_subbg_over.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_skyblue\dhxtoolbar_subbg_sel.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_btnarrow.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_sliderbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_sliderpen.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_subselbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_subsepbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_topbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_topselbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\imgs\dhxtoolbar_dhx_web\dhxtoolbar_topsepbg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\skins\dhtmlxtoolbar_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\skins\dhtmlxtoolbar_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\skins\dhtmlxtoolbar_dhx_skyblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xtoolbar\skins\dhtmlxtoolbar_dhx_web.css" />
+    <Content Include="Layouts\epmlive\DHTML\xtreegrid\dhtmlxtreegrid.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtreegrid\dhtmlxtreegridMenus.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtreegrid\dhtmlxtreegrid_old.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtreegrid\ext\dhtmlxtreegrid_filter.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtreegrid\ext\dhtmlxtreegrid_lines.js" />
+    <Content Include="Layouts\epmlive\DHTML\xtreegrid\ext\dhtmlxtreegrid_property.css" />
+    <Content Include="Layouts\epmlive\DHTML\xtreegrid\ext\dhtmlxtreegrid_property.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\dhtmlxwindows.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\dhtmlxwindows.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\ext\dhtmlxwindows_sb.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\ext\dhtmlxwindows_wmn.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\ext\dhtmlxwindows_wtb.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_aqua_dark.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_aqua_orange.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_aqua_sky.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_clear_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_clear_green.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_clear_silver.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_clear_userbtn_tray.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_modern_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_modern_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_modern_red.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_standard.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_standard_userbtn_tray.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_user_button_template.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_web.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindows\skins\dhtmlxwindows_web_userbtn_tray.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindow\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindow\dhtmlxwindows.css" />
+    <Content Include="Layouts\epmlive\DHTML\xwindow\dhtmlxwindows.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindow\ext\dhtmlxwindows_sb.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindow\ext\dhtmlxwindows_wmn.js" />
+    <Content Include="Layouts\epmlive\DHTML\xwindow\ext\dhtmlxwindows_wtb.js" />
+    <Content Include="Layouts\epmlive\EditableFields.aspx" />
+    <Content Include="Layouts\epmlive\editcode.aspx" />
+    <Content Include="Layouts\epmlive\EmptyGalleryPlaceHolder.html" />
+    <Content Include="Layouts\epmlive\EPMLiveEditNav.js" />
+    <Content Include="Layouts\epmlive\EPMLiveQuickLaunch.js" />
+    <Content Include="Layouts\epmlive\EPMLiveTopNav.js" />
+    <Content Include="Layouts\epmlive\fieldaudit.aspx" />
+    <Content Include="Layouts\epmlive\FieldSynch.aspx" />
+    <Content Include="Layouts\epmlive\GenericEntityPickerStyle.css" />
+    <Content Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandler.aspx" />
+    <Content Include="Layouts\epmlive\getGeneralSetting.aspx" />
+    <Content Include="Layouts\epmlive\getproject.aspx" />
+    <Content Include="Layouts\epmlive\GetWorkspaceListTree.aspx" />
+    <Content Include="Layouts\epmlive\getworkspacexml.aspx" />
+    <Content Include="Layouts\epmlive\gotoresources.aspx" />
+    <Content Include="Layouts\epmlive\gridganttsettings.aspx" />
+    <Content Include="Layouts\epmlive\GridGanttSettings.js" />
+    <Content Include="Layouts\epmlive\images\16x16Text.gif" />
+    <Content Include="Layouts\epmlive\images\add.GIF" />
+    <Content Include="Layouts\epmlive\images\addcommunity16.gif" />
+    <Content Include="Layouts\epmlive\images\addicon.gif" />
+    <Content Include="Layouts\epmlive\images\addteam.png" />
+    <Content Include="Layouts\epmlive\images\Arrow.gif" />
+    <Content Include="Layouts\epmlive\images\backbutton.png" />
+    <Content Include="Layouts\epmlive\images\baseline.gif" />
+    <Content Include="Layouts\epmlive\images\blanktemplate.png" />
+    <Content Include="Layouts\epmlive\images\buildteam.gif" />
+    <Content Include="Layouts\epmlive\images\buildteam16.gif" />
+    <Content Include="Layouts\epmlive\images\Bullhorn.png" />
+    <Content Include="Layouts\epmlive\images\calc.gif" />
+    <Content Include="Layouts\epmlive\images\comments16.gif" />
+    <Content Include="Layouts\epmlive\images\comments16.png" />
+    <Content Include="Layouts\epmlive\images\comments32.png" />
+    <Content Include="Layouts\epmlive\images\commonactions.gif" />
+    <Content Include="Layouts\epmlive\images\Create.png" />
+    <Content Include="Layouts\epmlive\images\delete.GIF" />
+    <Content Include="Layouts\epmlive\images\deleteteam.png" />
+    <Content Include="Layouts\epmlive\images\down.gif" />
+    <Content Include="Layouts\epmlive\images\dropdown2.gif" />
+    <Content Include="Layouts\epmlive\images\epmlive-logo.png" />
+    <Content Include="Layouts\epmlive\images\error.png" />
+    <Content Include="Layouts\epmlive\images\feedback.gif" />
+    <Content Include="Layouts\epmlive\images\green-arrow.png" />
+    <Content Include="Layouts\epmlive\images\info.png" />
+    <Content Include="Layouts\epmlive\images\installapplication16.gif" />
+    <Content Include="Layouts\epmlive\images\iReportsLibrary.png" />
+    <Content Include="Layouts\epmlive\images\itemworkspace.png" />
+    <Content Include="Layouts\epmlive\images\left.GIF" />
+    <Content Include="Layouts\epmlive\images\link.GIF" />
+    <Content Include="Layouts\epmlive\images\linkeditems.gif" />
+    <Content Include="Layouts\epmlive\images\LoadingBar.gif" />
+    <Content Include="Layouts\epmlive\images\menuganttview.gif" />
+    <Content Include="Layouts\epmlive\images\menugridview.gif" />
+    <Content Include="Layouts\epmlive\images\mewa_left.gif" />
+    <Content Include="Layouts\epmlive\images\mewa_right.gif" />
+    <Content Include="Layouts\epmlive\images\moreoptions.png" />
+    <Content Include="Layouts\epmlive\images\navtipwhite.png" />
+    <Content Include="Layouts\epmlive\images\notavailable.png" />
+    <Content Include="Layouts\epmlive\images\notification-icons\assigned-to.png" />
+    <Content Include="Layouts\epmlive\images\notification-icons\comment.png" />
+    <Content Include="Layouts\epmlive\images\notification-icons\pending-project-update.png" />
+    <Content Include="Layouts\epmlive\images\notification-icons\system.png" />
+    <Content Include="Layouts\epmlive\images\notificationgreen.png" />
+    <Content Include="Layouts\epmlive\images\notificationgrey.png" />
+    <Content Include="Layouts\epmlive\images\o14_person_placeholder_32.png" />
+    <Content Include="Layouts\epmlive\images\pencil32x32.bmp" />
+    <Content Include="Layouts\epmlive\images\Plus.png" />
+    <Content Include="Layouts\epmlive\images\Plus14.png" />
+    <Content Include="Layouts\epmlive\images\print.gif" />
+    <Content Include="Layouts\epmlive\images\printmenu.gif" />
+    <Content Include="Layouts\epmlive\images\PurchaseAccounts.png" />
+    <Content Include="Layouts\epmlive\images\Question.png" />
+    <Content Include="Layouts\epmlive\images\refresh.png" />
+    <Content Include="Layouts\epmlive\images\ReportFilterViewCreator\FullPageVerticalLayout.gif" />
+    <Content Include="Layouts\epmlive\images\ReportFilterViewCreator\HeaderFooter3ColumnLayout.gif" />
+    <Content Include="Layouts\epmlive\images\ReportFilterViewCreator\HeaderLeftColumnBodyLayout.gif" />
+    <Content Include="Layouts\epmlive\images\ReportFilterViewCreator\HeaderRightColumnBodyLayout.gif" />
+    <Content Include="Layouts\epmlive\images\resources32.png" />
+    <Content Include="Layouts\epmlive\images\right.GIF" />
+    <Content Include="Layouts\epmlive\images\scrollto.gif" />
+    <Content Include="Layouts\epmlive\images\search.png" />
+    <Content Include="Layouts\epmlive\images\settings\Advanced.png" />
+    <Content Include="Layouts\epmlive\images\settings\AdvancedSettings.png" />
+    <Content Include="Layouts\epmlive\images\settings\Collab.png" />
+    <Content Include="Layouts\epmlive\images\settings\Config.png" />
+    <Content Include="Layouts\epmlive\images\settings\editcosts.png" />
+    <Content Include="Layouts\epmlive\images\settings\Look.png" />
+    <Content Include="Layouts\epmlive\images\settings\Planner.gif" />
+    <Content Include="Layouts\epmlive\images\settings\PortfolioMgmt.png" />
+    <Content Include="Layouts\epmlive\images\settings\Reporting.png" />
+    <Content Include="Layouts\epmlive\images\settings\ResourceMgmt.png" />
+    <Content Include="Layouts\epmlive\images\settings\System.png" />
+    <Content Include="Layouts\epmlive\images\settings\Timesheet.png" />
+    <Content Include="Layouts\epmlive\images\settings\UserMgmt.png" />
+    <Content Include="Layouts\epmlive\images\settings\Users.png" />
+    <Content Include="Layouts\epmlive\images\unlink.GIF" />
+    <Content Include="Layouts\epmlive\images\up.gif" />
+    <Content Include="Layouts\epmlive\images\warning.png" />
+    <Content Include="Layouts\epmlive\images\WESite.png" />
+    <Content Include="Layouts\epmlive\images\WorkEngine-logo.gif" />
+    <Content Include="Layouts\epmlive\images\Workspaces.png" />
+    <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
+    <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\jquery.endless-scroll.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\jquery.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\jquery.placeholder.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\jquery.timeago.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\jquery.tmpl.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\knockout-1.2.1.debug.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\knockout-1.2.1.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\slimScroll.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\spjs-utility.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.js" />
+    <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
+    <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.5.2.js" />
+    <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.6.2.min.js" />
+    <Content Include="Layouts\epmlive\jQueryLibrary\jquery.sharepoint-json.js" />
+    <Content Include="Layouts\epmlive\jQueryLibrary\xml2json.js" />
+    <Content Include="Layouts\epmlive\ListLookupConfig.aspx" />
+    <Content Include="Layouts\epmlive\ListLookupEdit.aspx" />
+    <Content Include="Layouts\epmlive\LMR.Comments.UI.js" />
+    <Content Include="Layouts\epmlive\modal\modal.css" />
+    <Content Include="Layouts\epmlive\modal\modal.js" />
+    <Content Include="Layouts\epmlive\modal\modalmain.css" />
+    <Content Include="Layouts\epmlive\modal\overlay.png" />
+    <Content Include="Layouts\epmlive\modal\pencil.gif" />
+    <Content Include="Layouts\epmlive\ModifiedDropDown.js" />
+    <Content Include="Layouts\epmlive\MoreInformation.aspx" />
+    <Content Include="Layouts\epmlive\myworksettings.aspx" />
+    <Content Include="Layouts\epmlive\newapp.aspx" />
+    <Content Include="Layouts\epmlive\newapp.js" />
+    <Content Include="Layouts\epmlive\newitem.aspx" />
+    <Content Include="Layouts\epmlive\newproject.aspx" />
+    <Content Include="Layouts\epmlive\newproject.js" />
+    <Content Include="Layouts\epmlive\notifications.aspx" />
+    <Content Include="Layouts\epmlive\notificationsadmin.aspx" />
+    <Content Include="Layouts\epmlive\openprojectplan.aspx" />
+    <Content Include="Layouts\epmlive\outlooksynch.aspx" />
+    <Content Include="Layouts\epmlive\permissions.aspx" />
+    <Content Include="Layouts\epmlive\prjsetng.aspx" />
+    <Content Include="Layouts\epmlive\publishersettings.aspx" />
+    <Content Include="Layouts\epmlive\refreshind.aspx" />
+    <Content Include="Layouts\epmlive\refreshpc.aspx" />
+    <Content Include="Layouts\epmlive\regionalsetng.aspx" />
+    <Content Include="Layouts\epmlive\ReportCheckActions.aspx" />
+    <Content Include="Layouts\epmlive\ReportFilterViewCreator.aspx" />
+    <Content Include="Layouts\epmlive\requestworkspace.aspx" />
+    <Content Include="Layouts\epmlive\resourcecapacity.aspx" />
+    <Content Include="Layouts\epmlive\resourcetools.js" />
+    <Content Include="Layouts\epmlive\rollupexport.aspx" />
+    <Content Include="Layouts\epmlive\runtimer.aspx" />
+    <Content Include="Layouts\epmlive\SaveCurrentSiteAsTemplate.aspx" />
+    <Content Include="Layouts\epmlive\SaveTeam.aspx" />
+    <Content Include="Layouts\epmlive\setPCfield.aspx" />
+    <Content Include="Layouts\epmlive\settings.aspx" />
+    <Content Include="Layouts\epmlive\setup.aspx" />
+    <Content Include="Layouts\epmlive\SiteHierarchyMenu.js" />
+    <Content Include="Layouts\epmlive\sitepermissions.aspx" />
+    <Content Include="Layouts\epmlive\SmallParentUrlDialog.aspx" />
+    <Content Include="Layouts\epmlive\SocialData.css" />
+    <Content Include="Layouts\epmlive\SolutionStoreProxy.aspx" />
+    <Content Include="Layouts\epmlive\stylesheets\buildteam.css" />
+    <Content Include="Layouts\epmlive\stylesheets\buildteamIE.css" />
+    <Content Include="Layouts\epmlive\stylesheets\buttons.css" />
+    <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
+    <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
+    <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
+    <Content Include="Layouts\epmlive\synchperiods.aspx" />
+    <Content Include="Layouts\epmlive\TemplateGalleryRedirect.aspx" />
+    <Content Include="Layouts\epmlive\timersettings.aspx" />
+    <Content Include="Layouts\epmlive\totalfields.aspx" />
+    <Content Include="Layouts\epmlive\tpreports\capreport.aspx" />
+    <Content Include="Layouts\epmlive\tpreports\reportlist.aspx" />
+    <Content Include="Layouts\epmlive\tpreports\tpreport.aspx" />
+    <Content Include="Layouts\epmlive\tpsetup.aspx" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\BackgroundsRight.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\ButtonSpace.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Toolbar.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Borders\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Backgrounds_.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\MainBG.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Sort_.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Colors\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Defaults.xml" />
+    <Content Include="Layouts\epmlive\TreeGrid\Ding.wav" />
+    <Content Include="Layouts\epmlive\TreeGrid\Drag.cur" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\BackgroundsRight.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\ButtonSpace.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Toolbar.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Folder\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\GridE.js" />
+    <Content Include="Layouts\epmlive\TreeGrid\GridEOnDemand.js" />
+    <Content Include="Layouts\epmlive\TreeGrid\Help.html" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Light\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\BackgroundsRight.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\ButtonSpace.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Toolbar.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Modern\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\BackgroundsOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Button.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\critgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\critganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\HScroll.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\MenuOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\summarygantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\summaryganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\taskgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\taskganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MyWork\VScroll.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\NoDrag.cur" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Office\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Plain\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Reg.js" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Robust\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\BackgroundsOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\critgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\critganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\HScroll.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\MenuOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\summarygantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\summaryganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\taskgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\taskganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Standard\VScroll.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Text.xml" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\BackgroundsOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\critgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\critganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\HScroll.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\MenuOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\summarygantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\summaryganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\taskgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\taskganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\VScroll.gif" />
+    <Content Include="Layouts\epmlive\unsealfields.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx" />
+    <Content Include="Layouts\epmlive\viewmessages.aspx" />
+    <Content Include="Layouts\epmlive\viewrollup.aspx" />
+    <Content Include="Layouts\epmlive\ViewSecurity.aspx" />
+    <Content Include="Layouts\epmlive\websettings.aspx" />
+    <Content Include="Layouts\epmlive\WEDispFormPageComponent.js" />
+    <Content Include="Layouts\epmlive\WEPeopleEditorAjaxHandler.aspx" />
+    <Content Include="Layouts\epmlive\WEPeopleEditorAutoComplete.js" />
+    <Content Include="Layouts\epmlive\WorkEngineStatusing.js" />
+    <Content Include="Layouts\epmlive\WorkspaceListWPCanvas.aspx" />
+    <Content Include="Layouts\layouts.sitemap.epmlive.xml" />
+    <Content Include="ListDefinitions\Departments\Elements.xml" />
+    <Content Include="ListDefinitions\Departments\Schema.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Layouts\EPMLiveCore\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

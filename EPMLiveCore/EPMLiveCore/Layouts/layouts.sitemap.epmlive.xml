@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<siteMap> 
+    <siteMapNode url="/_layouts/epmlive/setup.aspx" 
+		parentUrl="/_layouts/settings.aspx" title="General Settings"/> 
+	<siteMapNode url="/_layouts/epmlive/websettings.aspx" 
+		parentUrl="/_layouts/settings.aspx" title="Web Settings"/>
+  
+	<siteMapNode url="/_layouts/epmlive/sitesettings.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Site Collection Settings"/>
+  
+	<siteMapNode url="/_layouts/epmlive/timesheetadmin.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Timesheet Settings">
+		<siteMapNode url="/_layouts/epmlive/viewts.aspx"
+		parentUrl="/_layouts/timesheetadmin.aspx" title="View Timesheets For Period"/>		
+	</siteMapNode>
+  
+	<siteMapNode url="/_layouts/epmlive/publishersettings.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Publisher Settings"/>
+
+	<siteMapNode url="/_layouts/epmlive/planneradmin.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Planner Settings"/>
+
+	<siteMapNode url="/_layouts/epmlive/editplanner.aspx"
+	parentUrl="/_layouts/epmlive/planneradmin.aspx" title="Edit Planner"/>
+	
+	<siteMapNode url="/_layouts/epmlive/workplannerconfig.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Work Planner Settings"/>
+
+  <siteMapNode url="/_layouts/epmlive/agile/agileconfig.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Agile Planner Settings"/>
+  
+	<siteMapNode url="/_layouts/epmlive/timersettings.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Timer Settings">
+		<siteMapNode url="/_layouts/epmlive/viewmessages.aspx"
+			parentUrl="/_layouts/epmlive/timersettings.aspx" title="Timer Messages"/>
+	</siteMapNode>
+	
+	<siteMapNode url="/_layouts/epmlive/notificationsadmin.aspx"
+		parentUrl="/_layouts/settings.aspx" title="Notification Settings"/>
+	
+	<siteMapNode url="/_layouts/epmlive/notifications.aspx" 
+		parentUrl="/_layouts/settings.aspx" title="My Notifications"/>
+
+	<siteMapNode url="/_layouts/epmlive/newitem.aspx" 
+		parentUrl="/default.aspx" title="New Item"/>
+  
+	<siteMapNode url="/_layouts/epmlive/newproject.aspx" 
+		parentUrl="/default.aspx" title="Create Project"/>
+  
+	<siteMapNode url="/_layouts/epmlive/newapp.aspx"
+		parentUrl="/default.aspx" title="New Item"/>
+  
+	<siteMapNode url="/_layouts/epmlive/createworkspace.aspx" 
+		parentUrl="/default.aspx" title="Create Workspace"/>
+  
+	<siteMapNode url="/_layouts/epmlive/tasks.aspx" 
+		parentUrl="/default.aspx" title="Project Work Plan"/>
+
+  <siteMapNode url="/_layouts/epmlive/agile/tasks.aspx" 
+		parentUrl="/default.aspx" title="Agile Planner"/>
+  
+	<siteMapNode url="/_layouts/epmlive/ViewSecurity.aspx" 
+		parentUrl="/_layouts/listedit.aspx" title="View Permissions"/>
+  
+	<siteMapNode url="/_layouts/epmlive/EditableFields.aspx" 
+		parentUrl="/_layouts/listedit.aspx" title="Manage Editable Fields"/>
+  
+	<siteMapNode url="/_layouts/epmlive/FieldSynch.aspx"
+		parentUrl="/_layouts/listedit.aspx" title="List Synchronization"/>
+  
+	<siteMapNode url="/_layouts/epmlive/totalfields.aspx"
+		parentUrl="/_layouts/listedit.aspx" title="Total Field Settings"/>
+	
+	<siteMapNode url="/_layouts/epmlive/gridganttsettings.aspx"
+		parentUrl="/_layouts/listedit.aspx" title="General Settings" requiredParameters="List">
+
+		<siteMapNode url="/_layouts/epmlive/fieldaudit.aspx?List=1"
+			parentUrl="/_layouts/epmlive/gridganttsettings.aspx" title="Field Audit"/>
+
+	</siteMapNode>
+
+
+	<siteMapNode url="/_layouts/epmlive/templates.aspx" parentUrl="/_layouts/settings.aspx" title="Synchronization Settings"/>
+	<siteMapNode url="/_layouts/epmlive/viewlogentry.aspx" parentUrl="/_layouts/epmlive/templates.aspx" title="View Log Entry"/>
+	<siteMapNode url="/_layouts/epmlive/editfields.aspx" parentUrl="/_layouts/epmlive/templates.aspx" title="Sync Options"/>
+	<siteMapNode url="/_layouts/epmlive/setsitetemplate.aspx" parentUrl="/_layouts/epmlive/templates.aspx" title="Set Site Template"/>
+	<siteMapNode url="/_layouts/epmlive/setsitecollsyncsettings.aspx" parentUrl="/_layouts/epmlive/templates.aspx" title="Template Synchronization"/>
+
+  <siteMapNode url="/_layouts/epmlive/listmappings.aspx" parentUrl="/_layouts/settings.aspx" title="Reporting List Mappings"/>
+  <siteMapNode parentUrl="/_layouts/epmlive/listmappings.aspx" url="/_layouts/epmlive/SetupListMapping.aspx" title="Add List Mapping"/>
+  <siteMapNode parentUrl="/_layouts/epmlive/listmappings.aspx" url="/_layouts/epmlive/AllSchedules.aspx" title="Reporting Schedules"/>
+  <siteMapNode parentUrl="/_layouts/epmlive/listmappings.aspx" url="/_layouts/epmlive/EventAudit.aspx" title="List Event Receiver Audit"/>
+  <siteMapNode parentUrl="/_layouts/epmlive/listmappings.aspx" url="/_layouts/epmlive/ReportLog.aspx" title="Reporting Log"/>
+  <siteMapNode parentUrl="/_layouts/epmlive/listmappings.aspx" url="/_layouts/epmlive/ReportSchedule.aspx" title="Snapshot Manager"/>
+
+
+  <siteMapNode parentUrl="/_layouts/settings.aspx" url="/_layouts/epmlive/sitepermissions.aspx" title="Site Permissions"/>
+  <siteMapNode parentUrl="/_layouts/epmlive/sitepermissions.aspx" url="/_layouts/epmlive/AddUsers.aspx" title="Site Permissions: Add User"/>
+  <siteMapNode parentUrl="/_layouts/epmlive/sitepermissions.aspx" url="/_layouts/epmlive/permissions.aspx" title="Site Permissions: Add User"/>
+
+	<siteMapNode parentUrl="/_layouts/settings.aspx" url="/_layouts/epmlive/adsyncadmin.aspx" title="Active Directory Synchronization"/>
+</siteMap>
