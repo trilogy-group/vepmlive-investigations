@@ -50,9 +50,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.SharePoint" />
@@ -102,7 +110,53 @@
     <Compile Include="CascadingLookupRenderControls\CascadingMultiLookupRenderControl.cs" />
     <Compile Include="CascadingLookup\CascadingLookup.Field.cs" />
     <Compile Include="CascadingLookup\CascadingLookup.FieldControl.cs" />
-    <Compile Include="CascadingLookup\CascadingLookup.FieldSettings.cs" />
+    <Compile Include="CascadingLookup\CascadingLookup.FieldSettings.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
+      <DependentUpon>DaysHoursBreakdownFieldSettings.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.designer.cs">
+      <DependentUpon>DaysHoursBreakdownFieldSettings.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveJS.ascx.cs">
+      <DependentUpon>EPMLiveJS.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveJS.ascx.designer.cs">
+      <DependentUpon>EPMLiveJS.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx.cs">
+      <DependentUpon>EPMLiveNotifications.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx.designer.cs">
+      <DependentUpon>EPMLiveNotifications.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx.cs">
+      <DependentUpon>EPMLiveStatusbar.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx.designer.cs">
+      <DependentUpon>EPMLiveStatusbar.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\TemplateVersoning.ascx.cs">
+      <DependentUpon>TemplateVersoning.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\TemplateVersoning.ascx.designer.cs">
+      <DependentUpon>TemplateVersoning.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DepartmentEvent\DepartmentEvent.cs" />
+    <Compile Include="EPMLiveConfig\EPMLiveConfig.Field.cs" />
+    <Compile Include="EPMLiveConfig\EPMLiveConfig.FieldControl.cs" />
+    <Compile Include="EPMLivePCForm\ManageableLists.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="EPMLivePCForm\PCFieldIterator.cs" />
+    <Compile Include="EPMLivePCForm\TCFieldIterator.cs" />
+    <Compile Include="EPMLiveProjectCenterEvent\EPMLiveProjectCenterEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +168,47 @@
     </None>
     <None Include="CONFIG\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ce3e15fd-6a5b-4e21-8c3d-b5d4df121ea3}</SharePointProjectItemId>
+    </None>
+    <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{469d37ee-8a39-483a-9bc0-135fa45704a2}</SharePointProjectItemId>
+    </None>
+    <None Include="DepartmentEvent\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1a0c8387-6eca-4059-954a-5597e9ec510f}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveConfigMenus\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9f2a6923-a6eb-43e7-8e73-7b01eada0266}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveMasterTopLevel\EPMLive.master" />
+    <None Include="EPMLiveMasterTopLevel\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{3a9c4efe-9c87-4864-93c5-f41679e2c83a}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveMasterWorkspace\EPMLive.master" />
+    <None Include="EPMLiveMasterWorkspace\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{d8014760-23a3-4741-bb87-fb55984ffa83}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveMultiAppDelegate\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{f8588844-247c-4e30-9ae4-77e6f1e3d4c2}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveOutlineCodesList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{3dd8c741-67c8-497b-839e-1946742c0961}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLivePeriodsList\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{aab0c61e-1203-4f2d-96d7-a7c00112d9a4}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveProjectCenterEvent\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{29c6f8a4-eb66-4313-a26d-3c611def87e1}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveProjectCenterRollup\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{c4811f25-124a-4b86-a050-78a6385f9533}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveProjectCenter\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{aac5b62a-fc79-4c81-8b82-85a3bdc03cca}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveRollupFields\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{23ac5233-31c5-4abc-b0b3-8d06db401c39}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveTaskCenter\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{2798d301-5514-434e-9715-b924c017ab18}</SharePointProjectItemId>
     </None>
     <None Include="Features\AppNavFixUp\AppNavFixUp.feature">
       <FeatureId>{3aa712ee-ed28-48bc-8219-1c5a8c9b5fbc}</FeatureId>
@@ -131,6 +226,40 @@
     <Content Include="AppsListEvents\Elements.xml" />
     <Content Include="BuildTeam\Elements.xml" />
     <Content Include="CONFIG\webconfig.EPMLIVE.xml" />
+    <Content Include="CONTROLTEMPLATES\CascadingLookup.FieldControl.ascx" />
+    <Content Include="CONTROLTEMPLATES\CascadingLookup.FieldSettings.ascx" />
+    <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldControl.ascx" />
+    <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveControlTemplates.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveJS.ascx" />
+    <Content Include="CONTROLTEMPLATES\epmlivelisttemplates.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx" />
+    <Content Include="CONTROLTEMPLATES\FilteredLookupField.ascx" />
+    <Content Include="CONTROLTEMPLATES\FilteredLookupFieldEditor.ascx" />
+    <Content Include="CONTROLTEMPLATES\FilteredLookupMultiField.ascx" />
+    <Content Include="CONTROLTEMPLATES\ResourceLevels.ascx" />
+    <Content Include="CONTROLTEMPLATES\ResourcePermissions.ascx" />
+    <Content Include="CONTROLTEMPLATES\rollupfieldcontrolprops.ascx" />
+    <Content Include="CONTROLTEMPLATES\TemplateVersoning.ascx" />
+    <Content Include="DepartmentEvent\Elements.xml" />
+    <Content Include="EPMLiveConfigMenus\Elements.xml" />
+    <Content Include="EPMLiveMasterTopLevel\Elements.xml" />
+    <Content Include="EPMLiveMasterWorkspace\Elements.xml" />
+    <Content Include="EPMLiveMultiAppDelegate\Elements.xml" />
+    <Content Include="EPMLiveOutlineCodesList\Elements.xml" />
+    <Content Include="EPMLiveOutlineCodesList\Schema.xml" />
+    <Content Include="EPMLivePeriodsList\Elements.xml" />
+    <Content Include="EPMLivePeriodsList\Schema.xml" />
+    <Content Include="EPMLiveProjectCenterEvent\Elements.xml" />
+    <Content Include="EPMLiveProjectCenterRollup\Elements.xml" />
+    <Content Include="EPMLiveProjectCenterRollup\Schema.xml" />
+    <Content Include="EPMLiveProjectCenter\Elements.xml" />
+    <Content Include="EPMLiveProjectCenter\Schema.xml" />
+    <Content Include="EPMLiveRollupFields\Elements.xml" />
+    <Content Include="EPMLiveRollupFields\Schema.xml" />
+    <Content Include="EPMLiveTaskCenter\Elements.xml" />
+    <Content Include="EPMLiveTaskCenter\Schema.xml" />
     <Content Include="Features\AppNavFixUp\AppNavFixUp.Template.xml">
       <DependentUpon>AppNavFixUp.feature</DependentUpon>
     </Content>
