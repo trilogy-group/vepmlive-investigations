@@ -1,0 +1,75 @@
+mygrid#gridid#.addFocusedCommands = function($arr)
+{
+	Array.add($arr, 'EnableResourcePlannerTab');
+	Array.add($arr, 'EnableResourcePlannerMain');
+	Array.add($arr, 'SelectResources');
+	Array.add($arr, 'SavePlan');
+	Array.add($arr, 'OpenPlan');
+	Array.add($arr, 'PrintPlan');
+	Array.add($arr, 'EnableResourcePlannerGantt');
+	Array.add($arr, 'ZoomOut');
+	Array.add($arr, 'ZoomIn');
+	Array.add($arr, 'ScrollTo');
+	return $arr;
+}
+
+mygrid#gridid#.getGlobalCommands = function($arr)
+{
+	return $arr;
+}
+
+mygrid#gridid#.canHandleCommand = function($Grid, commandId)
+{
+	switch(commandId)
+	{
+		
+		case 'EnableResourcePlannerTab':
+		case 'EnableResourcePlannerMain':
+		case 'SelectResources':
+		case 'SavePlan':
+		case 'OpenPlan':
+		case 'PrintPlan':
+		case 'ZoomOut':
+		case 'ZoomIn':
+		case 'ScrollTo':
+		case 'EnableResourcePlannerGantt':
+			return true;
+
+		default:
+			return false;	
+	}
+}
+
+mygrid#gridid#.handleCommand = function($Grid, commandId, properties)
+{
+	
+	if(commandId === 'OpenPlan')
+	{
+		loadPlans($Grid._cururl);
+	}
+	else if(commandId === 'PrintPlan')
+	{
+		setTimeout("printGantt" + $Grid._gridid + "()",1);
+	}
+	else if(commandId === 'SavePlan')
+	{
+		savePlan($Grid._cururl);
+	}
+	else if(commandId === 'SelectResources')
+	{
+		location.href = $Grid._viewurl + "?action=changeRes";
+	}
+	else if(commandId === 'ZoomIn')
+	{
+		GanttZoomIn();
+	}
+	else if(commandId === 'ZoomOut')
+	{
+		GanttZoomOut();
+	}
+	else if(commandId === 'ScrollTo')
+	{
+		scrollTo();
+	}
+}
+

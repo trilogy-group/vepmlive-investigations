@@ -1,0 +1,275 @@
+<ContextualGroup Id="Ribbon.MyWorkContextualTabGroup"
+                 Color="Blue"
+                 Title="{title}"
+                 Command="MyWorkContextualTab.EnableContextualGroup"
+                 Sequence="502"
+                 ContextualGroupId="MyWorkContextualTabGroup">
+  <Tab Id="Ribbon.MyWorkTab"
+       Title="Manage"
+       Description="Manage Work"
+       Command="MyWorkContextualTab.EnableMyWorkTab"
+       Sequence="501">
+    <Scaling Id="Ribbon.MyWorkTab.Scaling">
+      <MaxSize Id="Ribbon.MyWorkTab.MaxSizeNew" GroupId="Ribbon.MyWorkTab.MyWorkGroupNew" Size="MyWorkLayout" />
+      <MaxSize Id="Ribbon.MyWorkTab.MaxSizeManage" GroupId="Ribbon.MyWorkTab.MyWorkGroupManage" Size="MyWorkLayout" />
+      <MaxSize Id="Ribbon.MyWorkTab.MaxSizeViews" GroupId="Ribbon.MyWorkTab.MyWorkGroupViews" Size="MyWorkLayout" />
+      <MaxSize Id="Ribbon.MyWorkTab.MaxSizeViews" GroupId="Ribbon.MyWorkTab.MyWorkGroupWorkFilter" Size="MyWorkLayout" />
+      <MaxSize Id="Ribbon.MyWorkTab.MaxSizeShareTrack" GroupId="Ribbon.MyWorkTab.MyWorkGroupShareTrack" Size="MyWorkLayout" />
+      <Scale Id="Ribbon.MyWorkTab.Scaling.MyWorkTabScalingNew" GroupId="Ribbon.MyWorkTab.MyWorkGroupNew" Size="MyWorkLayoutSmall" />
+      <Scale Id="Ribbon.MyWorkTab.Scaling.MyWorkTabScalingManage" GroupId="Ribbon.MyWorkTab.MyWorkGroupManage" Size="MyWorkLayoutSmall" />
+      <Scale Id="Ribbon.MyWorkTab.Scaling.MyWorkTabScalingViews" GroupId="Ribbon.MyWorkTab.MyWorkGroupViews" Size="MyWorkLayoutSmall" />
+      <Scale Id="Ribbon.MyWorkTab.Scaling.MyWorkTabScalingViews" GroupId="Ribbon.MyWorkTab.MyWorkGroupWorkFilter" Size="MyWorkLayoutSmall" />
+      <Scale Id="Ribbon.MyWorkTab.Scaling.MyWorkTabScalingShareTrack" GroupId="Ribbon.MyWorkTab.MyWorkGroupShareTrack" Size="MyWorkLayoutSmall" />
+    </Scaling>
+    <Groups Id="Ribbon.MyWorkTab.Groups">
+      <Group Id="Ribbon.MyWorkTab.MyWorkGroupNew"
+             Description="New"
+             Title="New"
+             Command="MyWorkContextualTab.EnableMyWorkGroupNew"
+             Sequence="52"
+             Template="Ribbon.Templates.MyWorkTemplate">
+        <Controls Id="Ribbon.MyWork.New.Controls">
+          <SplitButton Id="Ribbon.MyWork.New.NewItem"
+                  Command="MyWork.Cmd.NewItem"
+				  PopulateDynamically="true"
+                  PopulateQueryCommand="MyWork.Cmd.NewItem.Populate"
+				  PopulateOnlyOnce="false"
+                  Description="Add a new item"
+                  LabelText="New Item"
+                  TemplateAlias="ONERWFIXED"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/newitem-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/newitem-16.png" />
+        </Controls>
+      </Group>
+      <Group Id="Ribbon.MyWorkTab.MyWorkGroupManage"
+             Description="Manage"
+             Title="Manage"
+             Command="MyWorkContextualTab.EnableMyWorkGroupManage"
+             Sequence="53"
+             Template="Ribbon.Templates.MyWorkTemplate">
+        <Controls Id="Ribbon.MyWork.Manage.Controls">
+          <Button Id="Ribbon.MyWork.Manage.EditItem"
+                  Command="MyWork.Cmd.EditItem"
+                  Description="Edit this item"
+                  LabelText="Edit Item"
+                  TemplateAlias="ONERWFIXED"
+                  Sequence="10"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/edititem-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/edititem-16.png" />
+          <Button Id="Ribbon.MyWork.Manage.Comments"
+                  Command="MyWork.Cmd.Comments"
+                  Description="Comments"
+                  LabelText="Comments"
+                  TemplateAlias="ONERWFIXED"
+                  Sequence="30"
+                  Image32by32="/_layouts/epmlive/images/comments32.png"
+                  Image16by16="/_layouts/epmlive/images/comments16.gif" />
+        </Controls>
+      </Group>
+      <Group Id="Ribbon.MyWorkTab.MyWorkGroupViews"
+             Description="Views"
+             Title="Views"
+             Command="MyWorkContextualTab.EnableMyWorkGroupViews"
+             Sequence="54"
+             Template="Ribbon.Templates.MyWorkTemplate">
+        <Controls Id="Ribbon.MyWork.ViewsM.Controls">
+          <Label Id="Ribbon.MyWork.ViewsM.CurrentViewLabel"
+                 LabelText="Current View:"
+                 ForId="Ribbon.MyWork.ViewsM.CurrentViewDropDown"
+                 TemplateAlias="THRRWFIXED" />
+          <DropDown Id="Ribbon.MyWork.ViewsM.CurrentViewDropDown"
+                    Command="MyWork.Cmd.CurrentViewDropDown.Select"
+                    PopulateDynamically="true"
+                    PopulateQueryCommand="MyWork.Cmd.CurrentViewDropDown.Populate"
+					PopulateOnlyOnce="false"
+					QueryCommand="MyWork.Cmd.CurrentViewDropDown.Query"
+					Width="75px"
+                    TemplateAlias="THRRWFIXED" />
+        </Controls>
+      </Group>
+      <Group Id="Ribbon.MyWorkTab.MyWorkGroupShareTrack"
+             Description="Share &amp; Track"
+             Title="Share &amp; Track"
+             Command="MyWorkContextualTab.EnableMyWorkGroupShareTrack"
+             Sequence="55"
+             Template="Ribbon.Templates.MyWorkTemplate">
+        <Controls Id="Ribbon.MyWork.ShareTrack.Controls">
+          <Button Id="Ribbon.MyWork.ShareTrack.AlertMe"
+                  Command="MyWork.Cmd.AlertMe"
+                  Description="Alert Me"
+                  LabelText="Alert Me"
+                  TemplateAlias="ONERWFIXED"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/alertme-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/alertme-16.png" />
+        </Controls>
+      </Group>
+	  <Group Id="Ribbon.MyWorkTab.MyWorkGroupWorkFilter"
+             Description="Work Filter"
+             Title="Work Filter"
+             Command="MyWorkContextualTab.EnableMyWorkGroupWorkFilter"
+             Sequence="55"
+             Template="Ribbon.Templates.MyWorkTemplate">
+        <Controls Id="Ribbon.MyWork.ShareTrack.Controls">
+          <CheckBox Id="Ribbon_MyWork_WorkFilter_DueAgo"
+					LabelText="Only show work that was due within"
+					Command="MyWork.Cmd.DueAgo"
+					QueryCommand="MyWork.Cmd.DueAgo.Query"
+					TemplateAlias="THRRWFIXED" />
+		  <TextBox Id="Ribbon_MyWork_WorkFilter_DueAgoDays"
+				   Width="25px"
+				   Command="MyWork.Cmd.DueAgoDays"
+				   QueryCommand="MyWork.Cmd.DueAgoDays.Query"
+				   TemplateAlias="THRRWFIXED" />
+		  <Label Id="Ribbon_MyWork_WorkFilter_DueAgoLabel"
+                 LabelText="days ago."
+                 ForId="Ribbon_MyWork_WorkFilter_DueAgoDays"
+                 TemplateAlias="THRRWFIXED" />
+		  <CheckBox Id="Ribbon_MyWork_WorkFilter_DueAfter"
+					LabelText="Only show work that is due within"
+					Command="MyWork.Cmd.DueAfter"
+					QueryCommand="MyWork.Cmd.DueAfter.Query"
+					TemplateAlias="THRRWFIXED" />
+		  <TextBox Id="Ribbon_MyWork_WorkFilter_DueAfterDays"
+				   Width="25px"
+				   Command="MyWork.Cmd.DueAfterDays"
+				   QueryCommand="MyWork.Cmd.DueAfterDays.Query"
+				   TemplateAlias="THRRWFIXED" />
+		  <Label Id="Ribbon_MyWork_WorkFilter_DueAfterLabel"
+                 LabelText="days in the future."
+                 ForId="Ribbon_MyWork_WorkFilter_DueAfterDays"
+                 TemplateAlias="THRRWFIXED" />
+        </Controls>
+      </Group>
+    </Groups>
+  </Tab>
+  <Tab Id="Ribbon.MyWorkViewsTab"
+       Title="Views"
+       Description="Manage Views"
+       Command="MyWorkContextualTab.EnableMyWorkTab"
+       Sequence="502">
+    <Scaling Id="Ribbon.MyWorkViewsTab.Scaling">
+      <MaxSize Id="Ribbon.MyWorkViewsTab.MaxSizeViews" GroupId="Ribbon.MyWorkViewsTab.MyWorkGroupViews" Size="MyWorkLayout" />
+      <MaxSize Id="Ribbon.MyWorkViewsTab.MaxSizeViews" GroupId="Ribbon.MyWorkViewsTab.MyWorkGroupActions" Size="MyWorkLayout" />
+      <Scale Id="Ribbon.MyWorkViewsTab.Scaling.MyWorkTabScalingViews" GroupId="Ribbon.MyWorkViewsTab.MyWorkGroupViews" Size="MyWorkLayoutSmall" />
+      <Scale Id="Ribbon.MyWorkViewsTab.Scaling.MyWorkTabScalingViews" GroupId="Ribbon.MyWorkViewsTab.MyWorkGroupActions" Size="MyWorkLayoutSmall" />
+    </Scaling>
+    <Groups Id="Ribbon.MyWorkViewsTab.Groups">
+      <Group Id="Ribbon.MyWorkViewsTab.MyWorkGroupViews"
+             Description="Views"
+             Title="Views"
+             Command="MyWorkContextualTab.EnableMyWorkGroupViews"
+             Sequence="54"
+             Template="Ribbon.Templates.MyWorkTemplate">
+        <Controls Id="Ribbon.MyWork.Views.Controls">
+          <Button Id="Ribbon.MyWork.Views.SaveView"
+                  Command="MyWork.Cmd.SaveView"
+                  Description="Save View"
+                  LabelText="Save View"
+                  TemplateAlias="THRRW"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/saveview-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/saveview-16.png" />
+          <Button Id="Ribbon.MyWork.Views.RenameView"
+                  Command="MyWork.Cmd.RenameView"
+                  Description="Rename View"
+                  LabelText="Rename View"
+                  TemplateAlias="THRRW"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/renameview-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/renameview-16.png" />
+          <Button Id="Ribbon.MyWork.Views.DeleteView"
+                  Command="MyWork.Cmd.DeleteView"
+                  Description="Delete View"
+                  LabelText="Delete View"
+                  TemplateAlias="THRRW"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/deleteview-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/deleteview-16.png" />
+		  <Button Id="Ribbon.MyWork.Actions.SelectColoumns"
+                  Command="MyWork.Cmd.SelectColoumns"
+                  Description="Select Columns"
+                  LabelText="Select Columns"
+                  TemplateAlias="THRRWFIXED"
+                  Image32by32="/_layouts/1033/images/formatmap32x32.png"
+				  Image32by32Top="-96"
+				  Image32by32Left="-352"
+				  Image16by16Top="-144"
+				  Image16by16Left="-176"
+				  Image16by16="/_layouts/1033/images/formatmap16x16.png" />
+          <Label Id="Ribbon.MyWork.Views.CurrentViewLabel"
+                 LabelText="Current View:"
+                 ForId="Ribbon.MyWork.Views.CurrentViewDropDown"
+                 TemplateAlias="THRRWFIXED" />
+          <DropDown Id="Ribbon.MyWork.Views.CurrentViewDropDown"
+                    Command="MyWork.Cmd.CurrentViewDropDown.Select"
+                    PopulateDynamically="true"
+                    PopulateQueryCommand="MyWork.Cmd.CurrentViewDropDown.Populate"
+					PopulateOnlyOnce="false"
+					QueryCommand="MyWork.Cmd.CurrentViewDropDown.Query"
+					Width="75px"
+                    TemplateAlias="THRRWFIXED" />
+          <ToggleButton Id="Ribbon.MyWork.Views.ShowHideFilters"
+                  Command="MyWork.Cmd.ShowHideFilters"
+				  QueryCommand="MyWork.Cmd.ShowHideFilters.Query"
+                  Description="Show/Hide Filters"
+                  LabelText="Show Filters"
+                  TemplateAlias="THRRW"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/showhidefilters-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/showhidefilters-16.png" />
+		  <ToggleButton Id="Ribbon.MyWork.Views.ShowHideGrouping"
+                  Command="MyWork.Cmd.ShowHideGrouping"
+				  QueryCommand="MyWork.Cmd.ShowHideGrouping.Query"
+                  Description="Show/Hide Grouping"
+                  LabelText="Show Grouping"
+                  TemplateAlias="THRRW"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/showhidegrouping-32.png"
+                  Image16by16="_layouts/epmlive/images/grouping.gif" />
+		  <Button Id="Ribbon.MyWork.Views.ClearSort"
+                  Command="MyWork.Cmd.ClearSort"
+                  Description="Removes Sorting"
+                  LabelText="Remove Sorting"
+                  TemplateAlias="THRRW"
+                  Sequence="30"
+                  Image32by32="_layouts/epmlive/images/mywork/ribbon/sort-32.png"
+                  Image16by16="_layouts/epmlive/images/mywork/ribbon/sort-16.png" />
+        </Controls>
+      </Group>
+	  <Group Id="Ribbon.MyWorkViewsTab.MyWorkGroupActions"
+             Description="Actions"
+             Title="Actions"
+             Command="MyWorkContextualTab.EnableMyWorkGroupActions"
+             Sequence="55"
+             Template="Ribbon.Templates.MyWorkTemplate">
+        <Controls Id="Ribbon.MyWork.Actions.Controls">
+		  <ToggleButton Id="Ribbon.MyWork.Actions.ShowHideCompletedItems"
+                  Command="MyWork.Cmd.ShowHideCompletedItems"
+				  QueryCommand="MyWork.Cmd.ShowHideCompletedItems.Query"
+                  Description="Show/Hide Completed Items"
+                  LabelText="Show Completed"
+                  TemplateAlias="THRRWFIXED"
+                  Image32by32="/_layouts/1033/images/formatmap32x32.png"
+				  Image32by32Top="-128"
+				  Image32by32Left="-256"
+				  Image16by16Top="-144"
+				  Image16by16Left="0"
+				  Image16by16="/_layouts/1033/images/formatmap16x16.png" />
+		  <FlyoutAnchor Id="Ribbon.MyWork.Actions.ShowMe"
+				  LabelText="Show Me"
+				  Image32by32="/_layouts/1033/images/formatmap32x32.png"
+				  Image32by32Top="-256"
+				  Image32by32Left="-256"
+				  Image16by16Top="-32"
+				  Image16by16Left="-144"
+				  Image16by16="/_layouts/1033/images/formatmap16x16.png" 
+				  Command="MyWork.Cmd.ShowMe" 
+				  PopulateQueryCommand="MyWork.Cmd.ShowMe.Populate"
+				  PopulateDynamically="true" 
+				  PopulateOnlyOnce="false"
+				  TemplateAlias="THRRWFIXED" />
+          <TextBox Id="Ribbon_MyWork_Actions_Search"
+				   Width="100px"
+				   Command="MyWork.Cmd.Search"
+				   QueryCommand="MyWork.Cmd.Search.Query"
+				   TemplateAlias="THRRWFIXED" />
+        </Controls>
+      </Group>
+    </Groups>
+  </Tab>
+</ContextualGroup>

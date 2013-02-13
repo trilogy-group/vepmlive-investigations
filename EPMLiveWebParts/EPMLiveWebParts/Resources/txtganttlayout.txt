@@ -1,0 +1,64 @@
+<Grid>
+	<Cfg id='GanttGrid#gridid#' SuppressCfg='1' DateStrings='2' ConstWidth="1" NoVScroll="1"/>
+	<Cfg MainCol='Title' NameCol='Title' Style='GM' CSS="/_layouts/epmlive/treegrid/mywork/grid.css"/>
+	<Cfg Undo='1'/>
+	<Cfg ExportType='Expanded,Outline'/>
+	<Cfg ChildParts='0'/>
+	<Cfg PrintCols='1'/>
+	<Cfg ExportCols='1'/>
+	<Cfg ShowDeleted='0' Calculated='0'/>
+	<Cfg FullId='0'/>
+	<Cfg SelectingCells="1" SelectClass="0" />
+	<Cfg Searching='1'/>
+	<Toolbar Visible='0'></Toolbar>
+	<Panel Visible='0' />
+	<Cfg NoTreeLines='1' DetailOn='0' MidWidth="400" MinRowHeight='15' MaxRowHeight='15' StandardFilter='2' MenuColumnsSort="0" StaticCursor="1"/>
+	<Cfg Code="GTACCNPSQEBSLC" CanDrag="0" PrintLocation="1"/>
+	<LeftCols>
+		
+	</LeftCols>
+	<Cols>
+
+		<C Name="siteid" Visible="0" CanPrint="0"/>
+		<C Name="webid" Visible="0" CanPrint="0"/>
+		<C Name="listid" Visible="0" CanPrint="0"/>
+		<C Name="itemid" Visible="0" CanPrint="0"/>
+		<C Name="SiteUrl" Visible="0" CanPrint="0"/>
+		<C Name="viewMenus" Visible="0" CanPrint="0"/>
+		<C Name="Descendants" Visible="0" CanPrint="0"/>
+
+	</Cols>
+	<RightCols>
+		
+		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttComplete="PercentComplete"
+		GanttHideExclude="0" GanttChartRound="w" GanttHeader1="w#dddddd MMMM yyyy" GanttHeader2="d#ddddd"
+		GanttZoom="weeks and days" GanttEndLast="0" CanExport="0" CanEdit="1" GanttMin="1/1/1990" GanttMax="1/1/2100" GanttDescendants="Descendants" GanttEdit="Main,Dependency"/>
+
+	</RightCols>
+	<Def>
+		<D Name="Summary" Expanded="1" Calculated="1" CanSelect="0" /> 
+		<D Name="Summary" GGanttIcons="1" GGanttClass="GanttG" GGanttEdit="0" GGanttHover="0" DurationFormula="ganttduration('G')" Class="SummaryTask" CanEdit="0" CanDrag="0"/> 
+
+		<D Name="R" Calculated='0' CanEdit="0" CanDrag="0" CanSelect="1" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" ShowHint="0" GGanttEdit="0" />
+
+		<D Name="GridType" Title="Gantt"/>
+	</Def>
+
+	<Header Visible='1' Title='Task Name' G='Gantt' GNoColor='0' Notifications=""/>
+
+	<Zoom>
+
+		<Z Name="z1" GanttUnits="M6" GanttChartRound="y" GanttWidth="18" GanttWidthEx="76" GanttBackground=";y#1/1/2008" GanttHeader1="y#yyyy" GanttHeader2="M6#MMMMMM" /> 
+		<Z Name="z2" GanttUnits="M3" GanttChartRound="y" GanttWidth="24" GanttWidthEx="101" GanttBackground=";y#1/1/2008" GanttHeader1="y#yyyy" GanttHeader2="M3#MMMMM" /> 
+		<Z Name="z3" GanttUnits="M" GanttChartRound="y" GanttWidth="18" GanttWidthEx="76" GanttBackground=";M6#1/1/2008" GanttHeader1="M6#MMMMMM. yyyy" GanttHeader2="M#MM" /> 
+		<Z Name="z4" GanttUnits="M" GanttChartRound="M6" GanttWidth="28" GanttWidthEx="118" GanttBackground=";M3#1/1/2008" GanttHeader1="M3#MMMMM. yyyy" GanttHeader2="M#MMM" /> 
+		<Z Name="z5" GanttUnits="d" GanttChartRound="M" GanttWidth="3" GanttWidthEx="12.6" GanttBackground=";M#1/1/2008" GanttHeader1="M#MMM yyyy" GanttHeader2="w#d." /> 
+		<Z Name="z6" GanttUnits="d" GanttChartRound="w" GanttWidth="18" GanttWidthEx="76" GanttHeader1="w#'week 'ddddddd' ' MMMM yyyy" GanttHeader2="d#%d" GanttHeader3="d#ddddd" /> 
+		<Z Name="days and hours" GanttUnits="h" GanttChartRound="d" GanttWidth="18" GanttWidthEx="76" GanttHeader1="d#dddd dddddd MMMM yyyy" GanttHeader2="h#HH"/>
+	</Zoom>
+
+	<Body>
+		<B>
+		</B>
+	</Body>
+</Grid>

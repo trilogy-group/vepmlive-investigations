@@ -1,0 +1,11 @@
+<ToggleButton
+Id="Ribbon.List.ViewFormat.Gantt"
+Sequence="20"
+Command="DisplayGanttView"
+Image32by32="/_layouts/images/ganttview.gif"
+LabelText="Gantt View"
+QueryCommand="QueryDisplayGanttView"
+TemplateAlias="o1"
+/>
+
+

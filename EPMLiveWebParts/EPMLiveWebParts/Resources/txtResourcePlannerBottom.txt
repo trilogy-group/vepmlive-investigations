@@ -1,0 +1,22 @@
+
+	        </td>
+	    </tr>
+	</table>
+</td>
+<td class="ms-toolbar" nowrap="true" align="right">
+	<table border=0 cellpadding=0 cellspacing=0 style='margin-right: 4px'>
+		    <tr>
+		    
+		    <td nowrap class="ms-listheaderlabel">Resource Pool View:&nbsp;</td>
+            <td id="" nowrap="nowrap" class="ms-viewselector">
+			
+				<select onChange="changeview#gridid#()" id="viewselector#gridid#">
+					#lists#
+				</select>
+
+            </td>
+            </tr>
+		    </table>
+</td>
+</tr>
+</table>

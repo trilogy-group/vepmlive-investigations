@@ -1,0 +1,57 @@
+<script type="text/javascript">
+      ctx = new ContextInfo();
+      
+      var existingHash = '';
+      if(window.location.href.indexOf("#") > -1){
+        existingHash = window.location.href.substr(window.location.href.indexOf("#"));
+      }
+      ctx.existingServerFilterHash = existingHash;
+      if (ctx.existingServerFilterHash.indexOf("ServerFilter=") == 1) {
+        ctx.existingServerFilterHash = ctx.existingServerFilterHash.replace(/-/g, '&').replace(/&&/g, '-');
+        var serverFilterRootFolder = GetUrlKeyValue("RootFolder", true,ctx.existingServerFilterHash);
+        var currentRootFolder = GetUrlKeyValue("RootFolder", true);
+        if("" == serverFilterRootFolder && "" != currentRootFolder)
+        {
+          ctx.existingServerFilterHash += "&RootFolder=" + currentRootFolder;
+        }
+        window.location.hash = '';
+        window.location.search = '?' + ctx.existingServerFilterHash.substr("ServerFilter=".length + 1);
+      }
+        
+          ctx.listBaseType = 5;
+      
+      ctx.NavigateForFormsPages = false;
+      ctx.listTemplate = "1100";
+      ctx.listName = "{8D0E717D-99CF-4CE4-8D72-4CE2D8868838}";
+      ctx.view = "{EEC39215-D35B-4873-95DB-2254A1205296}";
+      ctx.listUrlDir = "/p1/Lists/Issues";
+      ctx.HttpPath = "http://jasondev2008/p1/_vti_bin/owssvr.dll?CS=65001";
+      ctx.HttpRoot = "http://jasondev2008/p1";
+      ctx.imagesPath = "/_layouts/images/";
+      ctx.PortalUrl = "";
+      ctx.SendToLocationName = "";
+      ctx.SendToLocationUrl = "";
+      
+          ctx.RecycleBinEnabled = 1;
+        
+      ctx.OfficialFileName = "";
+      ctx.OfficialFileNames = "";
+      ctx.WriteSecurity = "1";
+      ctx.SiteTitle = "Project 1";
+      ctx.ListTitle = "Issues";
+      if (ctx.PortalUrl == "") ctx.PortalUrl = null;
+      ctx.displayFormUrl = "http://jasondev2008/p1/_layouts/listform.aspx?PageType=4&ListId={8D0E717D-99CF-4CE4-8D72-4CE2D8868838}";
+      ctx.editFormUrl = "http://jasondev2008/p1/_layouts/listform.aspx?PageType=6&ListId={8D0E717D-99CF-4CE4-8D72-4CE2D8868838}";
+      ctx.isWebEditorPreview = 0;
+      ctx.ctxId = 10;
+      ctx.isXslView = true;
+      
+      if (g_ViewIdToViewCounterMap["{EEC39215-D35B-4873-95DB-2254A1205296}"] == null)
+          g_ViewIdToViewCounterMap["{EEC39215-D35B-4873-95DB-2254A1205296}"]= 10;
+      ctx.CurrentUserId = 1;
+      
+        ctx.verEnabled = 1;
+      
+      ctx10 = ctx;
+      g_ctxDict['ctx10'] = ctx;
+    </script>

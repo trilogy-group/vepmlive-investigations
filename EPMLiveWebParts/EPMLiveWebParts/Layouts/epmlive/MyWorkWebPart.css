@@ -1,0 +1,369 @@
+﻿ul.MWG_Popup
+{
+    padding:0;
+    margin:0;
+}
+ul.MWG_Popup > li
+{
+    list-style:none;
+    width:20px;
+    height:20px;
+    text-align:center;
+    line-height:20px;
+    cursor:pointer;
+}
+
+ul.MWG_Popup > li:hover
+{
+    background-color:Aqua;
+}
+
+li.MWG_PopupSelected
+{
+    background-color:Orange;
+}
+
+div.MWG_Comment, div.MWG_CommentDisabled, div.MWG_Comment_Completed, div.MWG_CommentRead, div.MWG_CommentRead_Completed, div.MWG_CommentHovered
+{
+    width:30px;
+    height:20px;
+    background-image:url('images/mywork/comment-green.png');
+    background-repeat:no-repeat;
+    background-position: center center;
+    line-height:20px;
+    text-align:center;
+}
+
+div.MWG_CommentHovered {
+    background-image:url('images/mywork/comment-lightgreen.png') !important;
+    cursor: pointer;
+}
+
+div.MWG_CommentRead 
+{
+    background-image:url('images/mywork/comment.png');
+}
+
+div.MWG_CommentDisabled
+{
+    background-image:none;
+}
+
+span.MWG_CommentCounter {
+    color:#fff;
+    font-size:8px;
+    font-weight:600;
+    position: relative;
+    top: -4px;
+}
+
+.MWG_NoBgImg
+{
+    background-image:url('images/mywork/edit-row-completed.png');
+}
+
+.MWG_CompletedRow { }
+
+.MWG_OverDue
+{
+    color:Red;
+}
+
+.MWG_CompletedLineThrough {
+    text-decoration: line-through;
+}
+
+.MWG_OverDue_Completed
+{
+    background-image:url('/_layouts/epmlive/treegrid/mywork13/common.png');
+    background-repeat:no-repeat;
+    background-position: 5px -303px;
+    height: 20px;
+    line-height: 20px;
+}
+
+.MWG_UnCompletedRow_Normal
+{
+    background-image:url('/_layouts/epmlive/treegrid/mywork13/common.png');
+    background-repeat:no-repeat;
+    background-position: 5px -203px;
+}
+
+.MWG_CompletedRow_OverDue
+{
+    background-image:url('/_layouts/epmlive/treegrid/mywork13/common.png');
+    background-repeat:no-repeat;
+    background-position: 5px -353px;
+}
+
+.MWG_CompletedRow_Normal
+{
+    background-image:url('/_layouts/epmlive/treegrid/mywork13/common.png');
+    background-repeat:no-repeat;
+    background-position: 5px -253px;
+}
+
+.MWG_Comment_Small
+{
+    background-image:url('images/mywork/comment-small.png');
+    background-repeat:no-repeat;
+    background-position:center;
+    width:15px;
+    height:15px;
+    display:inline-block;
+    margin-left:5px;
+}
+
+ul.MWG_UL
+{
+    margin:0;
+    padding:0;
+}
+
+ul.MWG_UL > li
+{
+    list-style-type:none;
+    display:inline-block;
+    padding:5px;
+    margin:5px;
+    background-color:Aqua;
+}
+
+.MWG_Bold 
+{
+    font-weight: bold;
+}
+
+.MWG_Processing {
+    float: left;
+    margin-right: 5px;
+    display: none;
+}
+
+input#Ribbon_MyWork_Actions_Search, input#MWG_Search, .MWG_SearchClose, .MWG_SearchProcessing {
+    background-image: url(/_layouts/epmlive/images/mywork/find-icon.png);
+    background-position: 110px center;
+    background-repeat: no-repeat;
+    padding-right: 25px;  
+}
+
+.MWG_SearchClose {
+    background-image: url("/_layouts/epmlive/images/mywork/close-icon.png") !important;
+    background-position: 115px center !important;
+}
+
+.MWG_SearchProcessing {
+    background-image: url("/_layouts/epmlive/images/mywork/loading16.gif") !important;
+}
+
+.MWG_Hover {
+    cursor: pointer;
+    _cursor: hand;
+}
+
+#MWG_Header > h2
+{
+    font-family: "Segoe UI Light","Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 3.33em;
+    white-space: nowrap;
+    color: #262626;
+    font-weight: 200;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.mwg-menuitem {
+    color: #666666;
+    font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    float: left;
+    padding: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    _cursor: hand;
+}
+
+.mwg-menuitem:hover, #MWG_Pivot > div.selected {
+    color: #0072C6;
+}
+
+#MWG_Pivot > div.selector {
+    font-weight: 900;
+    letter-spacing: 0.75px;
+    position: relative;
+    top: -3px;
+}
+
+#MWG_PivotMenu_wrap {
+    position: relative;
+    display: none;
+    padding: 0 !important;
+}
+
+#MWG_PivotMenu_wrap:hover {
+    color: #666666;
+}
+
+div#MWG_PivotMenu, .mwg-submenu {
+    position: absolute;
+    top: 30px;
+    white-space: nowrap;
+    background-color: #FFFFFF;
+    border: 1px solid #D1D1D1;
+    border-collapse: separate;
+    box-shadow: 0 0 7px 0 rgba(0, 0, 0, 0.47);
+    left: -25px;
+    overflow: visible;
+    text-align: left;
+    z-index: 9999;
+}
+
+#MWG_PivotMenu > ul {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+
+#MWG_PivotMenu li {
+    color: #444444;
+    font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    padding: 6px 35px 6px 25px;
+}
+
+#MWG_PivotMenu li:hover {
+    background-color: #E6F2FB;
+    cursor: pointer;
+    _cursor: hand;
+}
+
+#MWG_PivotMenu li.mwg-mi-clear {
+    background-image: url("/_layouts/epmlive/images/mywork/filteroff.gif");
+    background-position: 5px center;
+    background-repeat: no-repeat;
+    border-bottom: 1px solid #C6C6C6;
+    display: none;
+}
+
+div#MWG_PivotClose {
+    background-color: #FDFDFD;
+    border: 1px solid #ABABAB;
+    color: #444444;
+    float: right;
+    font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 11px;
+    margin: 10px;
+    padding: 8px 15px;
+}
+
+div#MWG_PivotClose:hover {
+    background-color: #E6F2FA;
+    border-color: #92C0E0;
+}
+
+li.mwg-smi {
+    background-image: url("/_layouts/epmlive/images/mywork/right-arrow.png");
+    background-position: 112px center;
+    background-repeat: no-repeat;
+}
+
+.mwg-submenu-wrap {
+    float: right;
+    position: relative;
+    display: none;
+}
+
+.mwg-submenu {
+    box-shadow: 2px 0 7px 0 rgba(0, 0, 0, 0.47);
+    left: 35px;
+    top: -7px;
+}
+
+.mwg-submenu > ul {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+.mwg-submenu > ul > li {
+    padding: 6px 10px !important;
+}
+
+#MWG_Pivot_Search {
+    margin-left: 20px;
+}
+
+#MWG_Search {
+    background-position: 130px center !important;
+    border: 1px solid #ABABAB;
+    color: #444444;
+    font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    height: 20px;
+    padding-left: 3px;
+    position: relative;
+    top: -4px;
+    width: 125px;
+}
+
+#MWG_Search:hover {
+    border-color: #2A8DD4;
+}
+
+.mwg-watermark {
+    color: #777777;
+}
+
+#Ribbon_MyWork_WorkFilter_DueAgoDays,
+#Ribbon_MyWork_WorkFilter_DueAfterDays {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.MWG_NewItemIndicator {
+    margin-left: 5px;
+}
+
+.EPMLiveMyWorkTitle > div, .MWG_CompletedLineThrough > div , .HideCol0Title > div {
+    display: inline;
+}
+
+.epmlive-toggle-switch{
+    width:25px;
+    height:20px;
+    color:#ffffff;
+    font-family:Segoe UI, Segoe, Helvetica;
+    font-size:14px;
+    line-height:20px;
+    padding:0;
+    padding-left:3px;
+    padding-right:3px;
+    font-weight:bold;
+    border:2px solid #C0C0C0;
+    position:relative;
+    cursor:pointer;
+    _cursor:hand;
+}
+
+.epmlive-toggle-switch > span{
+    position:relative;
+    top:-1px;
+}
+
+.epmlive-toggle-switch-on{
+    background-color:#4B89B2;
+}
+
+.epmlive-toggle-switch-off{
+    background-color:#E8E8E8;
+    color:#A0A0A0;
+    text-align:right;
+}
+
+.epmlive-toggle-switch-slider{
+    background-color:#C0C0C0;
+    position:absolute;
+    top:-4px;
+    width:15px;
+    height:28px;
+}

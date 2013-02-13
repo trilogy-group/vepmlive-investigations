@@ -1,0 +1,18 @@
+﻿body
+{
+}
+
+.reportFilterDiv
+{
+    float: left;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.reportFilterButtonDiv
+{
+    float: left;
+    margin-top: 10px;    
+    margin-left: -7px;
+    margin-right: 15px;
+}

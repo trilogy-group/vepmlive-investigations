@@ -1,0 +1,28 @@
+<MyWork>
+  <Query>
+    <Where>
+	  <And>
+	    <Neq>
+		  <FieldRef Name="Complete" />
+		  <Value Type="Boolean">1</Value>
+		</Neq>
+		<Or>
+		  <IsNull>
+		    <FieldRef Name="DueDate" />
+	      </IsNull>
+		  <And>
+		    <Geq>
+			  <FieldRef Name="DueDate" />
+			  <Value IncludeTimeValue="TRUE" Type="DateTime">{FromDateTime}</Value>
+			</Geq>
+			<Leq>
+			  <FieldRef Name="DueDate" />
+			  <Value IncludeTimeValue="TRUE" Type="DateTime">{ToDateTime}</Value>
+			</Leq>
+	      </And>
+		</Or>
+	  </And>
+	</Where>
+  </Query>
+  <CompleteItemsQuery>False</CompleteItemsQuery>
+</MyWork>

@@ -1,0 +1,175 @@
+var curGrid;
+var curRowId;
+var curRow;
+
+function epmlive_delete(grid, rowid)
+{
+	if(confirm('Are you sure you want to send the item(s) to the Recycle Bin?'))
+	{
+		if(grid)
+			curGrid = grid;
+
+		if(rowid)
+			curRowId = rowid;
+
+		var weburl = curGrid.getUserData(curRowId,"SiteUrl");
+		var listid = curGrid.getUserData(curRowId,"listid");
+		var itemid = curGrid.getUserData(curRowId,"itemid");
+		var webid = curGrid.getUserData(curRowId,"webid");
+
+		if(weburl == "/")
+			weburl = "";
+
+
+
+		weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=deletemulti&Source=" + document.location.href;
+
+		var id = SP.UI.Notify.addNotification("Deleting Item...", true, "", null);
+
+		setTimeout("epmlive_doDelete('" + id + "','" + weburl + "',curGrid,'" + curRowId + "')", 10 );
+	}
+}
+
+function epmlive_doDelete(id, weburl, grid)
+{
+
+	var loader = dhtmlxAjax.postSync(weburl, "Items=" + grid.getCheckedIds());
+
+	if(loader.xmlDoc.responseText.trim() != "Success")
+	{
+		alert("Failed to delete: " + loader.xmlDoc.responseText);
+	}
+	else
+	{
+		var oRows = grid.getCheckedRowIds().split(',');
+		for(var oRow in oRows)
+		{
+			grid.setRowHidden(oRows[oRow], true);
+		}
+		
+	}
+
+	SP.UI.Notify.removeNotification(id);
+}
+
+
+function getSingleItem(siteid,webid,listid,itemid,rowid)
+{
+	if(curGrid._gridMode == 'gantt')
+	{
+		ajaxpost();
+	}
+	else
+	{
+		var val = SP.UI.Notify.addNotification("Updating Saved Row...", false,  "", null);
+		dhtmlxAjax.post(curGrid._singleItemUrl, "siteid=" + siteid + "&webid=" + webid + "&listid=" + listid + "&itemid=" + itemid + "&rowid=" + rowid,getSingleItemResponse);
+	}
+}
+
+function getSingleItemResponse(loader)
+{
+	if(loader.xmlDoc.responseText!=null)
+	{
+		var xmlDoc = loader.xmlDoc.responseXML;
+		for(var i = 0;i<xmlDoc.childNodes.length;i++)
+		{
+			var rowXml = xmlDoc.childNodes[i];
+			setRowValues(rowXml);
+		}
+	}
+	else
+		alert("Response contains no XML");
+}
+
+function setRowValues(rowsXml)
+{
+	for(var i = 0;i<rowsXml.childNodes.length;i++)
+	{
+		setRowValue(rowsXml.childNodes[i])
+	}
+}
+
+function setRowValue(rowXml)
+{
+	var rowId = rowXml.getAttribute("id")
+	
+	var cellCounter = 0;
+
+	for(var i = 0;i<rowXml.childNodes.length;i++)
+	{
+		if(rowXml.childNodes[i].nodeName == "userdata")
+		{
+			if(rowXml.childNodes[i].firstChild != null)
+				curGrid.setUserData(rowId,rowXml.childNodes[i].getAttribute("name"),rowXml.childNodes[i].firstChild.nodeValue);
+		}
+		else if(rowXml.childNodes[i].nodeName == "cell")
+		{
+			if(!curGrid._editmode)
+			{
+				if(curGrid.getColType(cellCounter) != "tree")
+					curGrid.setCellExcellType(rowId, cellCounter, "ro");
+					
+				curGrid.lockRow(rowId, true);
+			}
+			
+			var cellval = "";
+			var celltype = "";
+			try
+			{
+				celltype = rowXml.childNodes[i].getAttribute("type");
+			}catch(e){}
+			
+			
+			if(rowXml.childNodes[i].childNodes.length > 0)
+			{
+				cellval = rowXml.childNodes[i].firstChild.nodeValue;
+			}
+			
+			if(celltype == "combo")
+				curGrid.cells(rowId,cellCounter).setValue(rowXml.childNodes[i]);	
+			else
+				curGrid.cells(rowId,cellCounter).setValue(cellval);	
+			cellCounter++;
+		}
+	}
+	
+}
+
+var _Eepkcontrol;
+var _Eweburl;
+var _Eview;
+var _Elistid;
+function epkmulti(epkcontrol, weburl, ids, view, listid)
+{
+
+	if(weburl == "/")
+		weburl = "";
+
+	_Eepkcontrol = epkcontrol;
+	_Eweburl = weburl;
+	_Eview = view;
+	_Elistid = listid;
+
+	sm("dlgPosting", 150, 50);
+
+	dhtmlxAjax.post(weburl + "/_layouts/ppm/gridaction.aspx?action=postepkmultipage", "IDs=" + ids, epkmultiresponse);
+
+}
+
+function epkmultiresponse(ret)
+{
+	hm("dlgPosting");
+
+	var ticket = ret.xmlDoc.ResponseText;
+
+	if (ticket == undefined)
+		ticket = ret.xmlDoc.responseText;
+
+	var weburl = _Eweburl + "/_layouts/ppm/gridaction.aspx?action=epkmultipage&ticket=" + ticket + "&epkcontrol=" + _Eepkcontrol + "&view=" + _Eview + "&listid=" + _Elistid;
+
+	function myCallback(dialogResult, returnValue){}
+
+	var options = { url: weburl, showMaximized: true, showClose: true, dialogReturnValueCallback:myCallback };
+
+	SP.UI.ModalDialog.showModalDialog(options);
+}

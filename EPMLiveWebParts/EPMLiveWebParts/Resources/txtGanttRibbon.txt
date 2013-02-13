@@ -1,0 +1,39 @@
+<Group
+                Id="Ribbon.List.EPMLiveGanttView"
+                Sequence="30"
+                Command="EPMLiveGanttViewGroup"
+                Description=""
+                Title="Gantt"
+                Image32by32Popup="/_layouts/#language#/images/formatmap32x32.png" Image32by32PopupTop="-448" Image32by32PopupLeft="-192"
+                Template="Ribbon.Templates.Flexible2"
+          >
+            <Controls Id="Ribbon.List.GanttView.Controls">
+              <Button
+                Id="Ribbon.List.EPMLiveGanttView.ZoomIn"
+                Sequence="10"
+                Command="ZoomIn"
+                Image16by16="/_layouts/#language#/images/formatmap16x16.png" Image16by16Top="-16" Image16by16Left="-56"
+                Image32by32="/_layouts/#language#/images/formatmap32x32.png" Image32by32Top="-448" Image32by32Left="-192"
+                LabelText="Zoom In"
+                TemplateAlias="o1"
+              />
+              <Button
+                Id="Ribbon.List.EPMLiveGanttView.ZoomOut"
+                Sequence="20"
+                Command="ZoomOut"
+                Image16by16="/_layouts/#language#/images/formatmap16x16.png" Image16by16Top="-240" Image16by16Left="-176"
+                Image32by32="/_layouts/#language#/images/formatmap32x32.png" Image32by32Top="-64" Image32by32Left="-32"
+                LabelText="Zoom Out"
+                TemplateAlias="o1"
+              />
+              <Button
+                Id="Ribbon.List.EPMLiveGanttView.ScrollToTask"
+                Sequence="30"
+                Command="ScrollTask"
+                Image16by16="/_layouts/#language#/images/formatmap16x16.png" Image16by16Top="-32" Image16by16Left="-240"
+                Image32by32="/_layouts/#language#/images/formatmap32x32.png" Image32by32Top="-448" Image32by32Left="-352"
+                LabelText="Scroll To Task"
+                TemplateAlias="o1"
+              />
+            </Controls>
+          </Group>

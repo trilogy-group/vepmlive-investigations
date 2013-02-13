@@ -1,0 +1,15 @@
+<li id="0" class=ms-MenuUIULItem>
+	<DIV class=ms-MenuUIULItem text="#title#" onClick="#gridfunc#" type="option" iconAltText sequence="200" onmouseover="javascript:this.className='ms-MenuUIULItemHover';" onmouseout="javascript:this.className='ms-MenuUIULItem';">
+		<A id=mp18_0_0_Anchor class=ms-MenuUIULLink onclick="return false;" href="javascript:;">
+			<SPAN style="WHITE-SPACE: nowrap" class=ms-MenuUIIcon align="center">
+				<IMG id=mp18_0_0_ICON class=ms-MenuUIULImg title="" alt="" src="#image#" width=16 height=16>
+			</SPAN>
+			<SPAN style="WHITE-SPACE: nowrap" id=ID_#command# class=ms-MenuUILabel>
+				<SPAN style="WHITE-SPACE: nowrap">#title#</SPAN>
+				<SPAN></SPAN>
+			</SPAN>
+			<SPAN style="WIDTH: auto; DISPLAY: none; WHITE-SPACE: nowrap; cssFloat: left" class=ms-MenuUIAccessKey></SPAN>
+			<SPAN style="DISPLAY: none; WHITE-SPACE: nowrap" class=ms-MenuUISubmenuArrow></SPAN>
+		</A>
+	</DIV>
+</li>

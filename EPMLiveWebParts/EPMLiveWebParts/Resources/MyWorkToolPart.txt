@@ -1,0 +1,703 @@
+<table style="width: 450px;">
+    <tr>
+    <td><input id="cbUseCentralizedSettings__ID__" name="cbUseCentralizedSettings__ID__"
+                    type="checkbox" onclick="toggleCentralizedSettingsUsage__ID__()" />
+      Use Centralized Settings
+      <div style='width: 100%' class='UserDottedLine'> </div></td>
+  </tr>
+  <tr id="trListsAndFields__ID__">
+    <td><table width="100%">
+        <tr>
+          <td colspan="3"><strong>Lists and Fields</strong></td>
+        </tr>
+		<tr>
+          <td colspan="3">Select which Lists will be included in the My Work results.  All Lists based off the EPM Live Work List Definition are available for inclusion/exclusion.</td>
+        </tr>
+		<tr>
+          <td width="200">Excluded MyWork Lists<br />
+            <select id="lstExcludedMyWorkLists__ID__" multiple="multiple" name="lstExcludedMyWorkLists__ID__" style="width: 200px; height: 100px;" onchange="showListDetails__ID__(this)">
+            </select></td>
+          <td align="center" width="50"><input id="btnInclude__ID__" type="button" value="&gt;&gt;" onclick="moveListBoxItems__ID__('lstExcludedMyWorkLists__ID__', 'lstIncludedMyWorkLists__ID__')" />
+            <br />
+            <br />
+            <input id="btnExclude__ID__" type="button" value="&lt;&lt;" onclick="moveListBoxItems__ID__('lstIncludedMyWorkLists__ID__', 'lstExcludedMyWorkLists__ID__')" /></td>
+          <td width="200">Included MyWork Lists<br />
+            <select id="lstIncludedMyWorkLists__ID__" name="lstIncludedMyWorkLists__ID__" multiple="multiple" style="width: 200px; height: 100px;" onchange="showListDetails__ID__(this)">
+            </select>
+            <input id="selectedMyWorkLists__ID__" name="selectedMyWorkLists__ID__" type="hidden" /></td>
+        </tr>
+		<tr>
+          <td colspan="3"><div id="listName__ID__">&nbsp;</div>
+            <div id="listInWebs__ID__">&nbsp;</div></td>
+        </tr>
+		<tr>
+          <td width="200">&nbsp;</td>
+          <td align="center" width="50">&nbsp;</td>
+          <td width="200">&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="3">Please enter the List names of any additional Lists to be included in the My Work results.</td>
+        </tr>
+        <tr>
+          <td align="right" width="200"><textarea id="tbLists__ID__" name="tbLists__ID__" cols="20" style="width: 200px;"
+                                rows="5"></textarea>
+            <br />
+            <a href="javascript:refreshFields__ID__();">[Refresh fields below]</a></td>
+          <td width="50">&nbsp;</td>
+          <td width="200">&nbsp;</td>
+        </tr>
+        <tr>
+          <td width="200">&nbsp;</td>
+          <td align="center" width="50">&nbsp;</td>
+          <td width="200">&nbsp;</td>
+        </tr>
+		<tr>
+          <td colspan="3">The Fields displayed are all available fields based on the Lists included/excluded above.  Select which fields will be available for users to add/remove from their My Work views.</td>
+        </tr>
+        <tr>
+          <td width="200"> Global fields available<br />
+            <select id="lstAvailableFields__ID__" multiple="multiple" name="lstAvailableFields__ID__" style="width: 200px; height: 100px;" onchange="showFieldDetails__ID__(this)">
+            </select></td>
+          <td align="center" width="50"><input id="btnAdd__ID__" type="button" value="&gt;&gt;" onclick="moveListBoxItems__ID__('lstAvailableFields__ID__', 'lstSelectedFields__ID__')" />
+            <br />
+            <br />
+            <input id="btnRemove__ID__" type="button" value="&lt;&lt;" onclick="moveListBoxItems__ID__('lstSelectedFields__ID__', 'lstAvailableFields__ID__')" /></td>
+          <td width="200"> Fields used by this web part<br />
+            <select id="lstSelectedFields__ID__" name="lstSelectedFields__ID__" multiple="multiple" style="width: 200px; height: 100px;" onchange="showFieldDetails__ID__(this)">
+            </select>
+            <input id="selectedFields__ID__" name="selectedFields__ID__" type="hidden" /></td>
+        </tr>
+        <tr>
+          <td colspan="3"><div id="internalFieldName__ID__">&nbsp;</div>
+            <div id="fieldInLists__ID__">&nbsp;</div></td>
+        </tr>
+        <tr>
+          <td colspan="3">&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="3"><strong>Additional Site Collections</strong></td>
+        </tr>
+        <tr>
+          <td colspan="3"> Enter full URLs if you prefer to use other Site Collections<br />
+            (blank will assume this Site Collection only) </td>
+        </tr>
+        <tr>
+          <td colspan="3"><textarea id="tbCrossSiteUrls__ID__" name="tbCrossSiteUrls__ID__" cols="20" rows="5"
+                                style="width: 100%;"></textarea></td>
+        </tr>
+        <tr>
+          <td colspan="3">&nbsp;</td>
+        </tr>
+		<tr>
+          <td colspan="3"><strong>Performance Mode</strong></td>
+        </tr>
+        <tr>
+          <td colspan="3"><input id="cbPerformanceMode__ID__" name="cbPerformanceMode__ID__" type="checkbox" />On/Off</td>
+        </tr>
+		<tr>
+          <td colspan="3"><strong>Filter Settings</strong></td>
+        </tr>
+        <tr>
+          <td colspan="3">
+		    <div>
+				<input id="cbDaysAgo__ID__" type="checkbox" onclick="document.getElementById('tbDaysAgo__ID__').disabled = !this.checked;" name="cbDaysAgo__ID__">
+				<label for="cbDaysAgo__ID__">Only show work that was due within</label>
+				<input id="tbDaysAgo__ID__" type="text" style="width:25px;margin:3px 5px;" onchange="this.value = this.value <= 0 ? '' : this.value;" name="tbDaysAgo__ID__">days ago.
+			</div>
+			<div>
+				<input id="cbDaysAfter__ID__" type="checkbox" onclick="document.getElementById('tbDaysAfter__ID__').disabled = !this.checked;" name="cbDaysAfter__ID__">
+				<label for="cbDaysAfter__ID__">Only show work that is due within</label>
+				<input id="tbDaysAfter__ID__" type="text" style="width:25px;margin:3px 5px;" onchange="this.value = this.value <= 0 ? '' : this.value;" name="tbDaysAfter__ID__">days in the future.
+			</div>
+	      </td>
+        </tr>
+		<tr>
+          <td colspan="3"><strong>New Item Icon Setting</strong></td>
+        </tr>
+        <tr>
+          <td colspan="3">
+		    <input id="cbNewItemIndicator__ID__" type="checkbox" onclick="document.getElementById('tbNewItemIndicator__ID__').disabled = !this.checked;" name="cbNewItemIndicator__ID__">
+			<label for="cbNewItemIndicator__ID__">Mark item as new if it was created within</label>
+			<input id="tbNewItemIndicator__ID__" type="text" style="width:25px;margin:3px;" onchange="this.value = this.value <= 0 ? '' : this.value;" name="tbNewItemIndicator__ID__">days.
+            <div style='width: 100%' class='UserDottedLine'> </div>
+	      </td>
+        </tr>
+		<!--<tr>
+          <td colspan="3"><strong>New Item Button Lists</strong></td>
+        </tr>
+        <tr>
+          <td colspan="3"> Leaving this box blank will disable the &quot;New Item&quot; button in the 
+              MyWork WebPart. </td>
+        </tr>
+        <tr>
+          <td align="right" width="200"><textarea id="tbNewItemButtonLists__ID__" name="tbNewItemButtonLists__ID__" cols="20" style="width: 200px;"
+                                rows="5"></textarea></td>
+          <td width="50">&nbsp;</td>
+          <td width="200">&nbsp;</td>
+        </tr>-->
+        <tr>
+          <td colspan="3">&nbsp;</td>
+        </tr>
+      </table></td>
+  </tr>
+  <!--<tr>
+    <td><strong>General Settings</strong></td>
+  </tr>
+  <tr>
+    <td><input id="cbHideNewButton__ID__" name="cbHideNewButton__ID__" type="checkbox" />
+      Hide New Button </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><strong>Edit Settings</strong></td>
+  </tr>
+  <tr>
+    <td><input id="cbAllowEditToggle__ID__" name="cbAllowEditToggle__ID__" type="checkbox" />
+      Allow Edit Toggle </td>
+  </tr>
+  <tr>
+    <td><input id="cbDefaultToEditMode__ID__" name="cbDefaultToEditMode__ID__" type="checkbox" />
+      Default to Edit Mode </td>
+  </tr>-->
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+    <tr>
+        <td>
+            Default Global View
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <select id="defaultGlobalViews__ID__" name="defaultGlobalViews__ID__" style="width: 200px;">
+            </select>
+        </td>
+    </tr>
+	<tr>
+        <td>
+            <input id="cbShowToolbar__ID__" type="checkbox" name="cbShowToolbar__ID__">
+			<label for="cbShowToolbar__ID__">Display filters toolbar.</label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            &nbsp;</td>
+    </tr>
+</table>
+<script type="text/javascript">
+        var allListsAndFields__ID__ = [allListsAndFields__VAL__];
+		var listWebs__ID__ = {listWebs__VAL__};
+        var fieldLists__ID__ = {fieldLists__VAL__};
+        var objMyWork__ID__ = {objMyWork__VAL__};
+
+        var cbUseCentralizedSettings__ID__ = document.getElementById('cbUseCentralizedSettings__ID__');
+        var cbPerformanceMode__ID__ = document.getElementById('cbPerformanceMode__ID__');
+        var cbDaysAgo__ID__ = document.getElementById('cbDaysAgo__ID__');
+        var cbDaysAfter__ID__ = document.getElementById('cbDaysAfter__ID__');
+        var cbNewItemIndicator__ID__ = document.getElementById('cbNewItemIndicator__ID__');
+        var tbDaysAgo__ID__ = document.getElementById('tbDaysAgo__ID__');
+        var tbDaysAfter__ID__ = document.getElementById('tbDaysAfter__ID__');
+        var tbNewItemIndicator__ID__ = document.getElementById('tbNewItemIndicator__ID__');
+        var cbShowToolbar__ID__ = document.getElementById('cbShowToolbar__ID__');
+        
+		//var cbHideNewButton__ID__ = document.getElementById('cbHideNewButton__ID__');
+        //var cbAllowEditToggle__ID__ = document.getElementById('cbAllowEditToggle__ID__');
+        //var cbDefaultToEditMode__ID__ = document.getElementById('cbDefaultToEditMode__ID__');
+        
+		var defaultGlobalViews__ID__ = document.getElementById('defaultGlobalViews__ID__');
+        var tbNewItemButtonLists__ID__ = document.getElementById('tbNewItemButtonLists__ID__');
+
+        if (objMyWork__ID__.useCentralizedSettings) cbUseCentralizedSettings__ID__.checked = true;
+        else cbUseCentralizedSettings__ID__.checked = false;
+
+        if (objMyWork__ID__.performanceMode) cbPerformanceMode__ID__.checked = true;
+        else cbPerformanceMode__ID__.checked = false;
+		
+		if (objMyWork__ID__.showToolbar) cbShowToolbar__ID__.checked = true;
+        else cbShowToolbar__ID__.checked = false;
+
+		if (objMyWork__ID__.daysAgoEnabled) cbDaysAgo__ID__.checked = true;
+        else cbDaysAgo__ID__.checked = false;
+
+		if (objMyWork__ID__.daysAfterEnabled) cbDaysAfter__ID__.checked = true;
+        else cbDaysAfter__ID__.checked = false;
+
+		if (objMyWork__ID__.newItemIndicatorEnabled) cbNewItemIndicator__ID__.checked = true;
+        else cbNewItemIndicator__ID__.checked = false;
+
+		tbDaysAgo__ID__.value = objMyWork__ID__.daysAgo;
+		tbDaysAfter__ID__.value = objMyWork__ID__.daysAfter;
+		tbNewItemIndicator__ID__.value = objMyWork__ID__.newItemIndicator;
+
+        //if (objMyWork__ID__.hideNewButton) cbHideNewButton__ID__.checked = true;
+        //else cbHideNewButton__ID__.checked = false;
+
+        //if (objMyWork__ID__.allowEditToggle) cbAllowEditToggle__ID__.checked = true;
+        //else cbAllowEditToggle__ID__.checked = false;
+
+        //if (objMyWork__ID__.defaultToEditMode) cbDefaultToEditMode__ID__.checked = true;
+        //else cbDefaultToEditMode__ID__.checked = false;
+
+        for (var v in objMyWork__ID__.defaultGlobalViews) {
+            var view = objMyWork__ID__.defaultGlobalViews[v];
+
+            var opt = document.createElement('option');
+
+            opt.text = view.Name;
+            opt.value = view.Id;
+            opt.selected = view.Default;
+
+            defaultGlobalViews__ID__.options.add(opt);
+        }
+
+        for (var list in objMyWork__ID__.newItemButtonLists) {
+            tbNewItemButtonLists__ID__.value += objMyWork__ID__.newItemButtonLists[list] + "\n";
+        }
+
+        toggleCentralizedSettingsUsage__ID__();
+
+        var tbLists__ID__ = document.getElementById('tbLists__ID__');
+
+		var lstIncludedMyWorkLists__ID__ = document.getElementById('lstIncludedMyWorkLists__ID__');
+		var lstExcludedMyWorkLists__ID__ = document.getElementById('lstExcludedMyWorkLists__ID__');
+
+        var lstSelectedFields__ID__ = document.getElementById('lstSelectedFields__ID__');
+        var lstAvailableFields__ID__ = document.getElementById('lstAvailableFields__ID__');
+
+        loadListsAndFields__ID__();
+
+        var tbCrossSiteUrls__ID__ = document.getElementById('tbCrossSiteUrls__ID__');
+
+        for (var crossSite in objMyWork__ID__.crossSiteUrls) 
+        {
+            tbCrossSiteUrls__ID__.value += objMyWork__ID__.crossSiteUrls[crossSite] + "\n";
+        }
+
+        function isEmpty__ID__(str)
+        {
+            str = str.replace(/^\s+|\s+$/, '');
+
+            return (str.length == 0);
+        }
+
+        function refreshFields__ID__() {
+			var intRegex = /^\d+$/;
+
+			var unique = function (arr) {
+				var a = arr.concat();
+				var o = {}, i, l = a.length, r = [];
+
+				for (i = 0; i < l; i++) { o[arr[i]] = arr[i] };
+				for (i in o) { r.push(o[i]); }
+
+				return r;
+			};
+
+			var intersect = function (arr1, arr2) {
+				var a = arr1.concat();
+				var b = arr2.concat();
+				
+				var result = new Array();
+				while (a.length > 0 && b.length > 0 ) {  
+					if (a[0] < b[0]) { a.shift(); }
+					else if (a[0] > b[0]) { b.shift(); }
+					else {
+						result.push(a.shift());
+						b.shift();
+					}
+				}
+
+				return result;
+			};
+
+			var remove = function (value, arr) {
+				for (var i = 0; i < arr.length; ++i) {
+					if (arr[i] === value) {
+						arr.splice(i, 1);
+						break;
+					}
+				}
+			};
+
+            var selectedLists = tbLists__ID__.value.split('\n');
+
+            var e = lstExcludedMyWorkLists__ID__.options.length > 0;
+            var i = lstIncludedMyWorkLists__ID__.options.length > 0;
+            var a = selectedLists.length > 0 && selectedLists[0] !== '';
+
+            var getIncludedListFields = function () {
+                var fields = [];
+
+                for (var o = 0; o < lstIncludedMyWorkLists__ID__.options.length; o++) {
+                    var list = lstIncludedMyWorkLists__ID__.options[o].text;
+                    for (var l in allListsAndFields__ID__) {
+                        if (list === allListsAndFields__ID__[l].List) {
+                            for (var f in allListsAndFields__ID__[l].Fields) {
+                                var tf = allListsAndFields__ID__[l].Fields[f];
+
+								if (tf.InternalName === undefined) { continue; }
+
+                                fields.push(tf.InternalName + '@' + tf.PrettyName);
+                            }
+                        }
+                    }
+                }
+
+                return fields;
+            };
+
+            var getExcludedListFields = function () {
+                var fields = [];
+
+                for (var o = 0; o < lstExcludedMyWorkLists__ID__.options.length; o++) {
+                    var list = lstExcludedMyWorkLists__ID__.options[o].text;
+                    for (var l in allListsAndFields__ID__) {
+                        if (list === allListsAndFields__ID__[l].List) {
+                            for (var f in allListsAndFields__ID__[l].Fields) {
+                                var tf = allListsAndFields__ID__[l].Fields[f];
+
+								if (tf.InternalName === undefined) { continue; }
+
+                                fields.push(tf.InternalName + '@' + tf.PrettyName);
+                            }
+                        }
+                    }
+                }
+
+                return fields;
+            };
+            
+            var getAdditionalListFields = function () {
+                var fields = [];
+
+                for (var o = 0; o < selectedLists.length; o++) {
+                    var list = selectedLists[o];
+                    for (var l in allListsAndFields__ID__) {
+                        if (list === allListsAndFields__ID__[l].List) {
+                            for (var f in allListsAndFields__ID__[l].Fields) {
+                                var tf = allListsAndFields__ID__[l].Fields[f];
+
+								if (tf.InternalName === undefined) { continue; }
+
+                                fields.push(tf.InternalName + '@' + tf.PrettyName);
+                            }
+                        }
+                    }
+                }
+
+                return fields;
+            };
+            
+            var getAllMyWorkFields = function () {
+                return getIncludedListFields().concat(getExcludedListFields());
+            };
+            
+            var getIncludedAndAdditionalListFields = function() {
+                return getIncludedListFields().concat(getAdditionalListFields());
+            };
+
+            var removeListItem = function (list, value) {
+                var index = -1;
+
+                for (var j = 0; i < list.options.length; ++j) {
+					var opt = list.options[j];
+
+					if (opt === undefined) { continue; }
+
+                    if (opt.value === value) {
+                        index = j;
+                        break;
+                    }
+                }
+
+                if (index !== -1) { list.options.remove(index); }
+            };
+            
+            var availableFields;
+            
+            if ((!e && i && !a) || (e && !i && !a)) {
+                availableFields = getAllMyWorkFields();
+            } else if ((!e && i && a) || (e && i && a)) {
+                availableFields = getIncludedAndAdditionalListFields();
+            } else if (e && !i && a) {
+                availableFields = getAdditionalListFields();
+            } else if (e && i && !a) {
+                availableFields = getIncludedListFields();
+            }
+
+			availableFields = availableFields.sort();
+			availableFields = unique(availableFields);
+
+			var selectedFields = [];
+
+			for (var i = 0; i < lstSelectedFields__ID__.options.length; i++) {
+				var list = lstSelectedFields__ID__.options[i];
+
+				if (list === undefined) { continue; }
+
+				selectedFields.push(list.value + '@' + list.text);
+			}
+
+			selectedFields = intersect(selectedFields.sort(), availableFields);
+
+			for (var selectedField in selectedFields) {
+				remove(selectedFields[selectedField], availableFields);
+			}
+
+			clearListBox__ID__(lstAvailableFields__ID__);
+
+			for (var f in availableFields) {
+				if (!intRegex.test(f)) { continue; }
+
+				var field = availableFields[f].split('@');
+
+				addListItem__ID__(field[1], field[0], lstAvailableFields__ID__);
+			}
+
+			clearListBox__ID__(lstSelectedFields__ID__);
+
+			for (var f in selectedFields) {
+				if (!intRegex.test(f)) { continue; }
+
+				var field = selectedFields[f].split('@');
+
+				addListItem__ID__(field[1], field[0], lstSelectedFields__ID__);
+			}
+
+            sortLists__ID__();
+        }
+
+        function clearListBox__ID__(listBox)
+        {
+            while (listBox.options.length > 0)
+            {
+                listBox.options[0] = null;
+            }
+        }
+
+        function toggleCentralizedSettingsUsage__ID__() 
+        {
+            var tr = document.getElementById('trListsAndFields__ID__');
+
+            if (cbUseCentralizedSettings__ID__.checked) tr.style.display = 'none';
+            else tr.style.display = '';
+        }
+
+        function loadListsAndFields__ID__() 
+        {
+			tbLists__ID__.value = '';
+
+            for (var list in objMyWork__ID__.selectedLists) 
+            {
+				var list = objMyWork__ID__.selectedLists[list];
+                var myWorkList = false;
+
+				for (var i = 0; i < lstIncludedMyWorkLists__ID__.options.length; i++) {
+					if (list === lstIncludedMyWorkLists__ID__.options[i].text) myWorkList = true;
+				}
+
+				for (var i = 0; i < lstExcludedMyWorkLists__ID__.options.length; i++) {
+					if (list === lstExcludedMyWorkLists__ID__.options[i].text) myWorkList = true;
+				}
+
+				if(!myWorkList) {
+					tbLists__ID__.value += list + "\n";
+				}
+            }
+
+			clearListBox__ID__(lstIncludedMyWorkLists__ID__);
+			for (var list in objMyWork__ID__.includedMyWorkLists) 
+            {
+                addListItem__ID__(objMyWork__ID__.includedMyWorkLists[list].Name, objMyWork__ID__.includedMyWorkLists[list].Id, lstIncludedMyWorkLists__ID__);
+            }
+
+			clearListBox__ID__(lstExcludedMyWorkLists__ID__);
+			for (var list in objMyWork__ID__.excludedMyWorkLists) 
+            {
+                addListItem__ID__(objMyWork__ID__.excludedMyWorkLists[list].Name, objMyWork__ID__.excludedMyWorkLists[list].Id, lstExcludedMyWorkLists__ID__);
+            }
+
+			clearListBox__ID__(lstSelectedFields__ID__);
+            for (var field in objMyWork__ID__.selectedFields) 
+            {
+                addListItem__ID__(objMyWork__ID__.selectedFields[field].PrettyName, objMyWork__ID__.selectedFields[field].InternalName, lstSelectedFields__ID__);
+            }
+
+			refreshFields__ID__();
+
+            updateSelectedLists__ID__();
+        }
+
+        function sortLists__ID__()
+        {
+            sortListBox__ID__(lstSelectedFields__ID__);
+            sortListBox__ID__(lstAvailableFields__ID__);
+			sortListBox__ID__(lstIncludedMyWorkLists__ID__);
+			sortListBox__ID__(lstExcludedMyWorkLists__ID__);
+        }
+
+        function listItemExists__ID__(itemValue, listBox) 
+        {
+            for (var i = 0; i < listBox.options.length; i++)
+            {
+                if (itemValue == listBox.options[i].value) return true;
+            }
+
+            return false;
+        }
+
+        function addListItem__ID__(text, value, listBox) 
+        {
+            var opt = document.createElement("option");
+            opt.text = text;
+            opt.value = value;
+
+            listBox.options.add(opt);
+        }
+
+        function sortListBox__ID__(listBox) 
+        {
+            var options = new Array();
+
+            for (var i = 0; i < listBox.options.length; i++)
+            {
+                var opt = new Array();
+
+                opt.push(listBox.options[i].text);
+                opt.push(listBox.options[i].value);
+
+                options.push(opt);
+            }
+
+            clearListBox__ID__(listBox);
+
+            options.sort(function(a, b)
+            {
+                var x = a[0].toLowerCase();
+                var y = b[0].toLowerCase();
+
+                return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+            });
+
+            for (var i = 0; i < options.length; i++)
+            {
+                addListItem__ID__(options[i][0], options[i][1], listBox)
+            }
+        }
+
+        function moveListBoxItems__ID__(fromList, toList)
+        {
+            var fromListBox = document.getElementById(fromList);
+            var toListBox = document.getElementById(toList);
+
+            if (fromListBox.options.length == 0) return;
+            if (fromListBox.options.selectedIndex == -1) return;
+
+            while (fromListBox.options.selectedIndex >= 0)
+            {
+                var opt = fromListBox.options[fromListBox.options.selectedIndex];
+
+                addListItem__ID__(opt.text, opt.value, toListBox);
+
+                fromListBox.options.remove(fromListBox.options.selectedIndex);
+            }
+
+            sortLists__ID__();
+            updateSelectedLists__ID__();
+        }
+
+        function updateSelectedLists__ID__()
+        {
+            var selectedFields = document.getElementById('selectedFields__ID__');
+            selectedFields.value = '';
+
+            for (var i = 0; i < lstSelectedFields__ID__.options.length; i++)
+            {
+                selectedFields.value += lstSelectedFields__ID__.options[i].value + ',';    
+            }
+
+            selectedFields.value = selectedFields.value.substring(0, selectedFields.value.length - 1);
+
+			var includedLists = document.getElementById('selectedMyWorkLists__ID__');
+            includedLists.value = '';
+
+            for (var i = 0; i < lstIncludedMyWorkLists__ID__.options.length; i++)
+            {
+                includedLists.value += lstIncludedMyWorkLists__ID__.options[i].text + ',';    
+            }
+
+            includedLists.value = includedLists.value.substring(0, includedLists.value.length - 1);
+        }
+
+        function showFieldDetails__ID__(listBox)
+        {
+            var count = 0;
+
+            for (var i = 0; i < listBox.options.length; i++)
+            {
+                if (listBox.options[i].selected) count++;
+
+                if (count > 1) break;
+            }
+
+            var internalFieldNameDiv = document.getElementById('internalFieldName__ID__');
+            var fieldInListsDiv = document.getElementById('fieldInLists__ID__');
+
+            if (count == 1)
+            {
+                var field = listBox.options[listBox.options.selectedIndex].value;
+
+                internalFieldNameDiv.innerHTML = 'Internal name: ' + field;
+                var fieldInLists = 'In the following lists: ';
+
+                for (var i = 0; i < fieldLists__ID__[field].length; i++)
+                {
+                    fieldInLists += ' ' + fieldLists__ID__[field][i] + ',';
+                }
+
+                fieldInListsDiv.innerHTML = fieldInLists.substring(0, fieldInLists.length - 1);
+            }
+            else
+            {
+                internalFieldNameDiv.innerHTML = '&nbsp;';
+                fieldInListsDiv.innerHTML = '&nbsp;';
+            }
+        }
+
+		function showListDetails__ID__(listBox)
+        {
+            var count = 0;
+
+            for (var i = 0; i < listBox.options.length; i++)
+            {
+                if (listBox.options[i].selected) count++;
+
+                if (count > 1) break;
+            }
+
+            var listNameDiv = document.getElementById('listName__ID__');
+            var listInWebsDiv = document.getElementById('listInWebs__ID__');
+
+            if (count == 1)
+            {
+                var list = listBox.options[listBox.options.selectedIndex].value;
+
+                listNameDiv.innerHTML = 'My Work List: ' + listBox.options[listBox.options.selectedIndex].text;
+                var listInWebs = 'In the following webs:<br/>';
+
+                for (var i = 0; i < listWebs__ID__[list].length; i++)
+                {
+                    listInWebs += ' ' + listWebs__ID__[list][i] + '<br/>';
+                }
+
+                listInWebsDiv.innerHTML = listInWebs.substring(0, listInWebs.length - 1);
+            }
+            else
+            {
+                listNameDiv.innerHTML = '&nbsp;';
+                listInWebsDiv.innerHTML = '&nbsp;';
+            }
+        }
+</script>

@@ -1,0 +1,203 @@
+	function changeList()
+	{
+		document.getElementById("divTpLoading").style.display = "";
+		document.getElementById("divEverything").style.display = "none";
+		
+		var ddlList = document.getElementById("ddlList#tpid#");
+		var strList = ddlList.options[ddlList.selectedIndex].value;
+		
+		dhtmlxAjax.post(webUrl + "/_layouts/epmlive/getListInfo.aspx", "listurl=" + strList, changeListResponse);	
+	}
+	
+	
+	function changeListResponse(loader)
+	{
+		if(loader.xmlDoc.responseText!=null)
+		{
+			var xmlDoc = loader.xmlDoc.responseText;
+			var sInfo = xmlDoc.split('\n');
+			setFields(sInfo[1]);
+			setViews(sInfo[0]);
+		}
+		else
+			alert("Response contains no XML");
+			
+		document.getElementById("divTpLoading").style.display = "none";
+		document.getElementById("divEverything").style.display = "";
+	}
+	
+	function setViews(cViews)
+	{
+	
+		try
+		{
+			var sViews = cViews.split("|");
+			var ddlViews = document.getElementById("ddlView#tpid#");
+			ddlViews.options.length = 0;
+
+			ddlViews.options[ddlViews.options.length] = newOpt("< Select View >","", false);
+			
+			for(var i = 0;i< sViews.length;i++)
+			{
+				ddlViews.options[ddlViews.options.length] = newOpt(sViews[i],sViews[i], false);
+			}
+		}catch(e)
+		{
+			alert(e);
+		}	
+	}
+
+	function newOpt(text, val, sel)
+	{
+		var elOptNew = document.createElement('option');
+        elOptNew.text = text;
+        elOptNew.value = val;
+		elOptNew.selected = sel;
+		return elOptNew;
+	}
+	
+	function setFields(cFields)
+	{
+		var sFields = cFields.split(",");
+		
+		var start = document.getElementById("ddlStart#tpid#");
+		var finish = document.getElementById("ddlFinish#tpid#");
+		var progress = document.getElementById("ddlProgress#tpid#");
+		var milestone = document.getElementById("ddlMilestone#tpid#");
+		var info = document.getElementById("ddlInfo#tpid#");
+		var wbs = document.getElementById("ddlWBS#tpid#");
+		var group1 = document.getElementById("ddlGroup1#tpid#");
+		var group2 = document.getElementById("ddlGroup2#tpid#");
+		
+		start.options.length = 0;
+		finish.options.length = 0;
+		progress.options.length = 0;
+		milestone.options.length = 0;
+		info.options.length = 0;
+		wbs.options.length = 0;
+		group1.options.length = 0;
+		group2.options.length = 0;
+
+
+		
+
+		start.options[start.options.length] = newOpt("< Select Field >","", false);
+		finish.options[finish.options.length] = newOpt("< Select Field >","", false);
+		progress.options[progress.options.length] = newOpt("< Select Field >","", false);
+		milestone.options[milestone.options.length] = newOpt("< Select Field >","", false);
+		info.options[info.options.length] = newOpt("< Select Field >","", false);
+		wbs.options[wbs.options.length] = newOpt("< Select Field >","", false);
+		group1.options[group1.options.length] = newOpt("< Select Field >","", false);
+		group2.options[group2.options.length] = newOpt("< Select Field >","", false);
+
+		for(var i = 0;i< sFields.length;i++)
+		{
+			var sFieldInfo = sFields[i].split('|');
+			if(sFieldInfo[2] == "DateTime")
+			{
+				start.options[start.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propStart));
+				finish.options[finish.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propFinish));
+				info.options[info.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propInfo));
+				group1.options[group1.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup1));
+				group2.options[group2.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup2));
+			}
+			else if(sFieldInfo[2] == "Number")
+			{
+				group1.options[group1.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup1));
+				group2.options[group2.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup2));
+				info.options[info.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propInfo));
+				progress.options[progress.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propProgress));
+			}
+			else if(sFieldInfo[2] == "Boolean")
+			{
+				group1.options[group1.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup1));
+				group2.options[group2.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup2));
+				info.options[info.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propInfo));
+				milestone.options[milestone.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propMilestone));
+			}
+			else if(sFieldInfo[2] == "Text")
+			{
+				group1.options[group1.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup1));
+				group2.options[group2.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup2));
+				info.options[info.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propInfo));
+				wbs.options[wbs.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propWBS));
+			}
+			else
+			{
+				group1.options[group1.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup1));
+				group2.options[group2.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propGroup2));
+				info.options[info.options.length] = newOpt(sFieldInfo[0],sFieldInfo[1],(sFieldInfo[1]==propInfo));
+			}
+		}
+		
+		var ddlList = document.getElementById("ddlList#tpid#");
+		var strList = ddlList.options[ddlList.selectedIndex].text;
+		
+		var ddlLinkType = document.getElementById("ddlLinkType#tpid#");
+		ddlLinkType.options.length = 0;
+		ddlLinkType.options[ddlLinkType.options.length] = newOpt("Use View Settings","",(propLinkType == ""));
+		ddlLinkType.options[ddlLinkType.options.length] = newOpt("Go To Workspace","workspace",(propLinkType == "workspace"));
+		if(strList == "Project Center")
+		{
+			ddlLinkType.options[ddlLinkType.options.length] = newOpt("Edit Work Plan","workplan",(propLinkType == "workplan"));
+			ddlLinkType.options[ddlLinkType.options.length] = newOpt("Task Center","tasks",(propLinkType == "tasks"));
+		}
+	}
+
+	function lockContext()
+	{
+		if(document.getElementById("chkLock#tpid#").checked)
+		{
+			var lst = document.getElementById("ddlList#tpid#");
+			var vw = document.getElementById("ddlView#tpid#");
+			
+			lst.disabled = true;		
+			vw.disabled = true;
+			
+			for (var i=0; i<lst.options.length; i++) 
+			{
+				if(lst.options[i].value == contextList)
+				{
+					lst.options[i].selected = true;
+				}
+			}
+			
+			for (var i=0; i<vw.options.length; i++) 
+			{
+				if(vw.options[i].value == contextView)
+				{
+					vw.options[i].selected = true;
+				}
+			}
+			
+			changeList();
+			//setFields(contextFields);
+		}
+		else
+		{
+			document.getElementById("ddlList#tpid#").disabled = false;
+			document.getElementById("ddlView#tpid#").disabled = false;
+		}		
+	}
+	
+	function useDefaults()
+	{
+		if(document.getElementById("chkUseDefaults#tpid#").checked)
+		{
+			document.getElementById("divNonDefaults").style.display = "none";
+		}
+		else
+		{
+			document.getElementById("divNonDefaults").style.display = "";
+		}
+	}
+	
+	if(contextList == "")
+	{
+		document.getElementById("chkLock#tpid#").disabled = true;
+		document.getElementById("chkLock#tpid#").checked = false;
+	}
+	function loadFields()
+	{
+		setFields(oFields);
+	}
