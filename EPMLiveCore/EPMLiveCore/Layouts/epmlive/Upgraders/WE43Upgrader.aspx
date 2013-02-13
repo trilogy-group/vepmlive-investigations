@@ -8,10 +8,10 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WE43Upgrader.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.Upgraders.WE43Upgrader" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    
-    <style>
-    
-        .button-green:hover 
+	
+	<style>
+	
+		.button-green:hover 
 {
 background: #71BF31;
 border: 1px solid #60BA16;
@@ -74,36 +74,36 @@ color: white;
 }
 
 
-    </style>
+	</style>
 
-    <script language="javascript">
-        var installEnabled = false;
+	<script language="javascript">
+		var installEnabled = false;
 
-        function enableInstall() {
+		function enableInstall() {
 
-            if (document.getElementById("chkTerms").checked == true) {
-                installEnabled = true;
-                document.getElementById('installbutton').className = "button button-green";
-            }
-            else {
-                installEnabled = false;
-                document.getElementById('installbutton').className = "button button-green-disabled";
-            }
-        }
+			if (document.getElementById("chkTerms").checked == true) {
+				installEnabled = true;
+				document.getElementById('installbutton').className = "button button-green";
+			}
+			else {
+				installEnabled = false;
+				document.getElementById('installbutton').className = "button button-green-disabled";
+			}
+		}
 
-        function Install() {
+		function Install() {
 
-            if (installEnabled) {
-                var surl = "Upgrade.aspx?V=4.3.0";
+			if (installEnabled) {
+				var surl = "Upgrade.aspx?V=4.3.0";
 
-                var options = { url: surl, width: 500, height: 250, showClose: true };
+				var options = { url: surl, width: 500, height: 250, showClose: true };
 
-                SP.UI.ModalDialog.showModalDialog(options);
+				SP.UI.ModalDialog.showModalDialog(options);
 
-            }
+			}
 
-        }
-    </script>
+		}
+	</script>
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -111,21 +111,22 @@ color: white;
 <asp:Label ID="lblError" runat="server"></asp:Label>
 
 <asp:Panel ID="pnlMain" runat="server">
-    <div style="padding:20px">
-    <%=sText %>
-    <br /><br />
+	<div style="padding:20px">
+	<%=sText %>
+	<br /><br />
 
-    <div class="controls" style="">
-	        <label class="checkbox inline">
-		        <input type="checkbox" id="chkTerms" value="option1" onclick="javascript:enableInstall()"></input><span class="wizText">I Agree.</span>
-            </label>
-        </div>
+	<div class="controls" style="">
+		<p><asp:Label ID="NotRootMessageLabel" runat="server" Text="You are choosing to run the upgrader on a site other than the root site.  Are you sure you want to run the upgrader on this site?" Visible="False" ForeColor="Red"></asp:Label></p>
+			<label class="checkbox inline">
+				<input type="checkbox" id="chkTerms" value="option1" onclick="javascript:enableInstall()"></input><span class="wizText">I Agree.</span>
+			</label>
+		</div>
 
-        <div style="padding-top:10px;">
-                <a class="button button-green-disabled" href="javascript:void(0);" id="installbutton" onclick="Install();">Upgrade Now</a>
-            </div>
-    </div>
-    </asp:Panel>
+		<div style="padding-top:10px;">
+				<a class="button button-green-disabled" href="javascript:void(0);" id="installbutton" onclick="Install();">Upgrade Now</a>
+			</div>
+	</div>
+	</asp:Panel>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

@@ -23,7 +23,7 @@
 
         $.getScript('<%= WebUrl %>/_layouts/epmlive/javascripts/libraries/jquery.tmpl.min.js', function () {
             $.getScript('<%= WebUrl %>/_layouts/epmlive/javascripts/libraries/jquery-ui.min.js', function () {
-                $.getScript('<%= WebUrl %>/_layouts/epmlive/javascripts/libraries/knockout-1.2.1.js', function () {
+                $.getScript('<%= WebUrl %>/_layouts/epmlive/javascripts/libraries/knockout-2.2.1.js', function () {
                     $.getScript('<%= WebUrl %>/_layouts/epmlive/xml2json.js', function () {
                         $.getScript('<%= WebUrl %>/_layouts/epmlive/MD5.js', function () {
                             $.getScript('<%= WebUrl %>/_layouts/epmlive/javascripts/jquery.multiselect.min.js', function () {

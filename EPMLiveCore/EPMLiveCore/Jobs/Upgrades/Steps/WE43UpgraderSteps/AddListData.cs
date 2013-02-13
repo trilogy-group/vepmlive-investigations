@@ -103,33 +103,40 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                 DataTable dt = oNonWork.Items.GetDataTable();
 
-                SPField oField = oTimeOff.Fields.GetFieldByInternalName("TimeOffType");
-
-                if(oField.Type == SPFieldType.Choice)
+                try
                 {
+                    SPField oField = oTimeOff.Fields.GetFieldByInternalName("TimeOffType");
 
-                    SPFieldChoice oChoice = (SPFieldChoice)oField;
-
-                    foreach(string choice in oChoice.Choices)
+                    if (oField.Type == SPFieldType.Choice)
                     {
-                        try
+
+                        SPFieldChoice oChoice = (SPFieldChoice)oField;
+
+                        foreach (string choice in oChoice.Choices)
                         {
-                            DataRow[] dr = dt.Select("Title='" + choice + "'");
-                            if(dr.Length == 0)
+                            try
                             {
+                                DataRow[] dr = dt.Select("Title='" + choice + "'");
+                                if (dr.Length == 0)
+                                {
 
-                                SPListItem li = oNonWork.Items.Add();
-                                li["Title"] = choice;
-                                li.Update();
+                                    SPListItem li = oNonWork.Items.Add();
+                                    li["Title"] = choice;
+                                    li.Update();
 
-                                LogMessage("\t" + choice);
+                                    LogMessage("\t" + choice);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                LogMessage("", choice + ": " + ex.Message, 3);
                             }
                         }
-                        catch(Exception ex)
-                        {
-                            LogMessage("", choice + ": " + ex.Message, 3);
-                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("", ex.Message, 3);
                 }
             }
         }

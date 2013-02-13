@@ -62,6 +62,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -79,7 +80,7 @@ namespace EPMLiveCore.API
 {
     public class MyWork
     {
-        #region Fields (37) 
+        #region Fields (35) 
 
         private const string ASSIGNED_TO_FIELD = "AssignedTo";
         private const string COMMENT_COL_WIDTH = "36";
@@ -110,7 +111,6 @@ namespace EPMLiveCore.API
         private const string MY_WORK_GRID_GLOBAL_VIEWS = "EPMLive_MyWork_Grid_GlobalViews";
         private const string MY_WORK_GRID_PERSONAL_VIEWS = "EPMLive_MyWork_Grid_PersonalViews";
         private const int MY_WORK_LIST_SERVER_TEMPLATE_ID = 10115;
-        private const string MY_WORK_WORKING_ON_TAG_SITE_ID_EXISTS = "MyWork_WorkingOn_TagSiteIdExists";
         private const string PRIORITY_COL_WIDTH = "25";
         private const string PRIORITY_FIELD = "Priority";
         private const string SITE_ID_FIELD = "SiteId";
@@ -119,12 +119,11 @@ namespace EPMLiveCore.API
         private const string TITLE_FIELD = "Title";
         private const string WEB_ID_FIELD = "WebId";
         private const string WORK_TYPE_FIELD = "Work0000Type";
-        private const string WORKING_ON_COL_WIDTH = "100";
         private const string WORKING_ON_FIELD = "WorkingOn";
 
         #endregion Fields 
 
-        #region Methods (53) 
+        #region Methods (54) 
 
         // Public Methods (8) 
 
@@ -471,35 +470,7 @@ namespace EPMLiveCore.API
                 {
                     if (reportData.GetListMapping(configWeb.Lists["My Work"].ID) != null)
                     {
-                        bool exists = true;
-
-                        SPWeb web = spWeb;
-
-                        foreach (
-                            DataTable dataTable in
-                                from table in new[] {"[dbo].[Tags]", "[dbo].[TagOrders]"}
-                                let queryExecutor = new QueryExecutor(web)
-                                select queryExecutor.ExecuteReportingDBQuery(
-                                    @"SELECT COUNT(*) AS Found FROM dbo.sysobjects WHERE id = object_id(@Table)",
-                                    new Dictionary<string, object> {{"@Table", table}}))
-                        {
-                            if (dataTable.Rows.Count > 0)
-                            {
-                                if ((int) dataTable.Rows[0]["Found"] != 1)
-                                {
-                                    exists = false;
-                                }
-                            }
-                            else
-                            {
-                                exists = false;
-                            }
-                        }
-
-                        if (exists)
-                        {
-                            useReportingDb = true;
-                        }
+                        useReportingDb = true;
                     }
                 }
             }
@@ -507,7 +478,7 @@ namespace EPMLiveCore.API
             return useReportingDb;
         }
 
-        // Private Methods (29) 
+        // Private Methods (30) 
 
         /// <summary>
         ///     Builds the field element.
@@ -623,11 +594,33 @@ namespace EPMLiveCore.API
             {
                 using (SPWeb web = spSite.OpenWeb(theWebId))
                 {
+                    var workingOnDict = new Dictionary<string, List<string>>();
+
+                    var dtWorkingOn = GetWorkingOn(web);
+                    if (dtWorkingOn.Rows.Count > 0)
+                    {
+                        foreach (DataRow dataRow in dtWorkingOn.Rows)
+                        {
+                            var key = dataRow["ListId"].ToString().ToUpper();
+                            key = key.Replace("{", string.Empty);
+                            key = key.Replace("}", string.Empty);
+
+                            if (!workingOnDict.ContainsKey(key))
+                            {
+                                workingOnDict.Add(key,new List<string>());
+                            }
+
+                            workingOnDict[key].Add(dataRow["ItemId"].ToString());
+                        }
+                    }
+
                     foreach (string selectedList in selectedLists.Distinct().OrderBy(l => l))
                     {
                         SPList spList = web.Lists.TryGetList(selectedList);
 
                         if (spList == null) continue;
+
+                        //WriteToDebugWindow("List: " + spList.Title);
 
                         var spQuery = new SPQuery
                                           {QueryThrottleMode = SPQueryThrottleOption.Override};
@@ -659,8 +652,13 @@ namespace EPMLiveCore.API
 
                         if (!listContainsField) continue;
 
+                        //WriteToDebugWindow("Total items: " + spListItemCollection.Count);
+
+                        var itemCount = 1;
                         foreach (SPListItem spListItem in spListItemCollection)
                         {
+                            //WriteToDebugWindow("Processing item # " + itemCount++);
+
                             SPListItem theListItem = spListItem;
 
                             var fieldsElement = new XElement("Fields");
@@ -691,15 +689,31 @@ namespace EPMLiveCore.API
                                 fieldsElement.Add(fieldElement);
                             }
 
+                            var listId = spList.ID.ToString().ToUpper();
+
                             var itemElement = new XElement("Item");
                             itemElement.Add(new XAttribute("ID",
                                                            spListItem["ID"].ToString().ToUpper()));
-                            itemElement.Add(new XAttribute("ListID", spList.ID.ToString().ToUpper()));
+                            
+                            itemElement.Add(new XAttribute("ListID", listId));
                             itemElement.Add(new XAttribute("WebID", theWebId.ToString().ToUpper()));
                             itemElement.Add(new XAttribute("SiteID", spSite.ID.ToString().ToUpper()));
                             itemElement.Add(new XAttribute("SiteURL", spSite.Url));
                             itemElement.Add(new XAttribute(WORK_TYPE_FIELD, spList.Title));
                             itemElement.Add(new XAttribute("Workspace", web.Title));
+
+                            bool workingOn = false;
+
+                            string key = listId;
+                            key = key.Replace("{", string.Empty);
+                            key = key.Replace("}", string.Empty);
+
+                            if (workingOnDict.ContainsKey(key))
+                            {
+                                workingOn = workingOnDict[key].Contains(spListItem.ID.ToString(CultureInfo.InvariantCulture));
+                            }
+
+                            itemElement.Add(new XAttribute(WORKING_ON_FIELD, workingOn));
 
                             itemElement.Add(fieldsElement);
 
@@ -776,7 +790,9 @@ namespace EPMLiveCore.API
             DataTable fieldsTable;
             DataTable flagsTable;
 
-            using (var myWorkReportData = new MyWorkReportData(spWeb.Site.ID))
+            Guid siteId = spWeb.Site.ID;
+
+            using (var myWorkReportData = new MyWorkReportData(siteId))
             {
                 MapCompleteField(spWeb, myWorkReportData);
 
@@ -798,45 +814,48 @@ namespace EPMLiveCore.API
 
                 SPUser currentUser = spWeb.CurrentUser;
 
-                bool tagSiteIdExists;
-
-                string configSetting = CoreFunctions.getConfigSetting(spWeb.Site.RootWeb,
-                                                                      MY_WORK_WORKING_ON_TAG_SITE_ID_EXISTS);
-
-                bool.TryParse(configSetting ?? string.Empty, out tagSiteIdExists);
-
-                if (!tagSiteIdExists)
-                {
-                    bool exists = TagSiteIdExists(spWeb);
-
-                    CoreFunctions.setConfigSetting(spWeb.Site.RootWeb, MY_WORK_WORKING_ON_TAG_SITE_ID_EXISTS,
-                                                   exists.ToString());
-
-                    tagSiteIdExists = exists;
-                }
-
-                string workingOnQuery = tagSiteIdExists
-                                            ? string.Format(
-                                                @"SELECT COUNT(TagId) FROM dbo.TagOrders WHERE (dbo.TagOrders.ListId = dbo.LSTMyWork.ListId)
-                                                AND (dbo.TagOrders.ItemId = dbo.LSTMyWork.ItemId) AND (dbo.TagOrders.TagId = 
-                                                    (SELECT dbo.Tags.TagId FROM dbo.Tags WHERE dbo.Tags.Name = N'WorkingOn' 
-                                                AND dbo.Tags.ResourceId = {0} AND dbo.Tags.SiteId = N'{1}'))",
-                                                currentUser.ID, spWeb.Site.ID)
-                                            : "SELECT 0";
-
                 string sql = string.Format(
-                    @"SELECT DISTINCT *, ({8}) AS WorkingOn 
-                                FROM dbo.LSTMyWork WHERE ([AssignedToID] = {0})  AND ([Complete] {1} 1)
+                    @"SELECT DISTINCT * FROM dbo.LSTMyWork WHERE ([AssignedToID] = {0})  AND ([Complete] {1} 1)
                                 AND ([WebUrl] LIKE N'{2}%' OR [WebUrl] = N'{2}' OR [WebUrl] = N'/' AND [SiteId] = N'{3}')
                                 AND ([DueDate] IS NULL OR ([DueDate] >= '{4}' AND [DueDate] <= '{5}'))
                                 AND ([WorkType] IN ({6})) {7}",
                     currentUser.ID, getCompletedItems ? "=" : "<>",
-                    spWeb.SafeServerRelativeUrl(), spWeb.Site.ID,
+                    spWeb.SafeServerRelativeUrl(), siteId,
                     ((DateTime) from).ToString("MM/dd/yyyy HH:mm:ss"),
                     ((DateTime) to).ToString("MM/dd/yyyy HH:mm:ss"),
-                    queryLists, archivedWebIds, workingOnQuery);
+                    queryLists, archivedWebIds);
 
-                myWorkDataTable = myWorkReportData.ExecuteSql(sql);
+                DataTable dataTable = myWorkReportData.ExecuteSql(sql);
+
+                myWorkDataTable = new DataTable();
+
+                foreach (DataColumn dataColumn in dataTable.Columns)
+                {
+                    myWorkDataTable.Columns.Add(dataColumn.ColumnName, dataColumn.DataType);
+                }
+
+                var list = new List<string>();
+
+                EnumerableRowCollection<DataRow> dataRows = dataTable.AsEnumerable();
+
+                foreach (DataRow dataRow in dataRows)
+                {
+                    string key = dataRow["SiteId"].ToString() + dataRow["WebId"] + dataRow["ListId"] + dataRow["ItemId"] + dataRow["AssignedToID"];
+                    key = key.Replace("{", string.Empty).Replace("}", string.Empty).ToUpper();
+
+                    if (list.Contains(key)) continue;
+
+                    list.Add(key);
+
+                    DataRow row = myWorkDataTable.NewRow();
+
+                    foreach (DataColumn dataColumn in myWorkDataTable.Columns)
+                    {
+                        row[dataColumn.ColumnName] = dataRow[dataColumn.ColumnName];
+                    }
+
+                    myWorkDataTable.Rows.Add(row);
+                }
 
                 if (myWorkDataTable.Rows.Count == 0) return tables;
 
@@ -899,6 +918,23 @@ namespace EPMLiveCore.API
 
             Dictionary<string, int> colDict = GenerateColDictionary(myWorkDataTable, myWorkFields);
 
+            var workingOnDict = new Dictionary<string, List<string>>();
+
+            foreach (DataRow dataRow in GetWorkingOn(spWeb).Rows)
+            {
+                string key = dataRow["ListId"].ToString().ToUpper();
+
+                key = key.Replace("{", string.Empty);
+                key = key.Replace("}", string.Empty);
+
+                if (!workingOnDict.ContainsKey(key))
+                {
+                    workingOnDict.Add(key, new List<string>());
+                }
+
+                workingOnDict[key].Add(dataRow["ItemId"].ToString());
+            }
+
             foreach (string selectedList in selectedLists)
             {
                 var dataTable = new DataTable();
@@ -928,17 +964,17 @@ namespace EPMLiveCore.API
 
                     bool workingOn = false;
 
-                    try
+                    string key = dataRow["ListId"].ToString().ToUpper();
+
+                    key = key.Replace("{", string.Empty);
+                    key = key.Replace("}", string.Empty);
+
+                    if (workingOnDict.ContainsKey(key))
                     {
-                        object workingOnVal = dataRow[WORKING_ON_FIELD];
-                        if (workingOnVal != DBNull.Value && workingOnVal != null &&
-                            int.Parse(workingOnVal.ToString()) > 0)
+                        if (workingOnDict[key].Contains(dataRow["ItemId"].ToString()))
                         {
                             workingOn = true;
                         }
-                    }
-                    catch
-                    {
                     }
 
                     row[WORKING_ON_FIELD] = workingOn;
@@ -1007,12 +1043,14 @@ namespace EPMLiveCore.API
                 var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
                 eventWaitHandles.Add(eventWaitHandle);
 
+                string list = selectedList;
                 var thread = new Thread(() =>
                                             {
                                                 try
                                                 {
                                                     DataTable dataTable = QueryMyWorkData(spSiteDataQuery, url, id,
                                                                                           spUserToken);
+                                                    dataTable.TableName = list;
 
                                                     lock (locker)
                                                     {
@@ -1035,6 +1073,46 @@ namespace EPMLiveCore.API
             if (spExceptionOccured)
             {
                 throw new APIException(2016, "Cannot run the SP site data query.");
+            }
+
+            var dictWorkingOn = new Dictionary<string, List<string>>();
+
+            foreach (DataRow dataRow in GetWorkingOn(spWeb).Rows)
+            {
+                string key = dataRow["ListId"].ToString().ToUpper();
+
+                key = key.Replace("{", string.Empty);
+                key = key.Replace("}", string.Empty);
+
+                if (!dictWorkingOn.ContainsKey(key))
+                {
+                    dictWorkingOn.Add(key, new List<string>());
+                }
+
+                dictWorkingOn[key].Add(dataRow["ItemId"].ToString());
+            }
+
+            foreach (DataTable dataTable in dataTables.Where(dataTable => dataTable.Rows.Count > 0))
+            {
+                foreach (DataRow dataRow in dataTable.Rows)
+                {
+                    bool workingOn = false;
+
+                    string key = dataRow["ListId"].ToString().ToUpper();
+
+                    key = key.Replace("{", string.Empty);
+                    key = key.Replace("}", string.Empty);
+
+                    if (dictWorkingOn.ContainsKey(key))
+                    {
+                        if (dictWorkingOn[key].Contains(dataRow["ID"].ToString()))
+                        {
+                            workingOn = true;
+                        }
+                    }
+
+                    dataRow[WORKING_ON_FIELD] = workingOn;
+                }
             }
 
             return dataTables;
@@ -1090,7 +1168,7 @@ namespace EPMLiveCore.API
                     {
                         try
                         {
-                            value = DateTime.Parse(value).ToString("G");
+                            value = DateTime.Parse(value).ToString("yyyy-M-d HH:mm:ss");
                         }
                         catch
                         {
@@ -1651,167 +1729,32 @@ namespace EPMLiveCore.API
         /// <summary>
         ///     Gets the working on.
         /// </summary>
-        /// <param name="data">The data.</param>
+        /// <param name="spWeb">The sp web.</param>
         /// <returns></returns>
-        private static DataTable GetWorkingOn(string data)
+        private static DataTable GetWorkingOn(SPWeb spWeb)
         {
-            // @TODO: Query for SiteId in Tags
- 
-            var dataTable = new DataTable();
+            const string sql = @"SELECT dbo.TagOrders.ItemId, dbo.TagOrders.ListId, dbo.Tags.SiteId
+                                        FROM dbo.TagOrders INNER JOIN dbo.Tags ON dbo.TagOrders.TagId = dbo.Tags.TagId
+                                        WHERE (dbo.Tags.Name = N'WorkingOn') AND (dbo.Tags.ResourceId = @ResourceId) AND (dbo.Tags.SiteId = @SiteId)";
 
-            var selectedLists = new List<string>();
-            var selectedFields = new List<string>();
-            var siteUrls = new List<string>();
-            bool performanceMode = true;
-            bool noListsSelected = true;
+            var queryExecutor = new QueryExecutor(spWeb);
 
-            GetSettings(data, ref selectedFields, ref selectedLists, ref siteUrls, ref performanceMode,
-                        ref noListsSelected);
-
-            string sql = @"SELECT TOP (100) PERCENT dbo.TagOrders.TagOrder, dbo.TagOrders.TagOrderId, dbo.LSTMyWork.* 
-                                      FROM dbo.TagOrders INNER JOIN dbo.Tags ON dbo.TagOrders.TagId = dbo.Tags.TagId 
-                                                         INNER JOIN dbo.LSTMyWork ON dbo.TagOrders.ListId = dbo.LSTMyWork.ListId AND dbo.TagOrders.ItemId = dbo.LSTMyWork.ItemId
-                                      WHERE (dbo.Tags.Type = @TagType) AND (dbo.Tags.ResourceId = @ResourceId) AND (dbo.LSTMyWork.AssignedToID = @ResourceId)
-                                      ORDER BY dbo.TagOrders.TagOrder";
-
-            foreach (string siteUrl in siteUrls)
-            {
-                using (var spSite = new SPSite(siteUrl))
-                {
-                    using (SPWeb spWeb = spSite.OpenWeb())
-                    {
-                        var epmData = new EPMData(spWeb.Site.ID) {Command = sql, CommandType = CommandType.Text};
-
-                        epmData.Params.Add(new SqlParameter("@TagType", 1));
-                        epmData.Params.Add(new SqlParameter("@ResourceId", spWeb.CurrentUser.ID));
-
-                        DataTable workingOnTable = epmData.GetTable(epmData.GetClientReportingConnection);
-
-                        if (workingOnTable.Rows.Count > 0)
-                        {
-                            IEnumerable<string> columns = from DataColumn dataColumn in workingOnTable.Columns
-                                                          select string.Format(@"N'{0}'", dataColumn.ColumnName);
-
-                            var lists = new List<string>();
-                            foreach (string lstId in workingOnTable.Rows.Cast<DataRow>()
-                                                                   .Select(r => r["ListId"].ToString())
-                                                                   .Select(listId => string.Format(@"N'{0}'", listId))
-                                                                   .Where(lstId => !lists.Contains(lstId)))
-                            {
-                                lists.Add(lstId);
-                            }
-
-                            sql = string.Format(@"SELECT ColumnName, InternalName, SharePointType, RPTListId AS ListId 
-                                                      FROM dbo.RPTColumn WHERE (ColumnName IN ({0})) AND (RPTListId IN ({1}))",
-                                                string.Join(",", columns.ToArray()),
-                                                string.Join(",", lists.ToArray()));
-
-                            epmData.Command = sql;
-                            epmData.Params.Clear();
-
-                            DataTable fieldsTable = epmData.GetTable(epmData.GetClientReportingConnection);
-
-                            sql =
-                                @"SELECT ListId, ItemId, Value FROM dbo.PERSONALIZATIONS WHERE [Key] = 'Flag' AND UserId = @Username";
-
-                            epmData.Command = sql;
-
-                            epmData.Params.Clear();
-                            epmData.Params.Add(new SqlParameter("@Username", spWeb.CurrentUser.LoginName));
-
-                            DataTable flagsTable;
-                            DataTable table = epmData.GetTable(epmData.GetClientReportingConnection);
-
-                            if (table != null)
-                            {
-                                flagsTable = table;
-                            }
-                            else
-                            {
-                                flagsTable = new DataTable();
-
-                                flagsTable.Columns.Add("ListId", typeof (Guid));
-                                flagsTable.Columns.Add("ItemId", typeof (int));
-                                flagsTable.Columns.Add("Value", typeof (byte));
-                            }
-
-                            flagsTable.PrimaryKey = new[] {flagsTable.Columns["ListId"], flagsTable.Columns["ItemId"]};
-
-                            EnumerableRowCollection<DataRow> fieldsTableRows = fieldsTable.AsEnumerable();
-
-                            List<string> myWorkFields =
-                                (from r in fieldsTableRows select r["InternalName"].ToString()).Distinct().ToList();
-                            Dictionary<string, int> colDict = GenerateColDictionary(workingOnTable, myWorkFields);
-
-                            foreach (string field in myWorkFields)
-                            {
-                                dataTable.Columns.Add(field, typeof (object));
-                            }
-
-                            dataTable.Columns.Add("TagOrder", typeof (int));
-                            dataTable.Columns.Add("TagOrderId", typeof (Guid));
-
-                            foreach (DataRow dataRow in workingOnTable.Rows)
-                            {
-                                DataRow row = dataTable.NewRow();
-
-                                foreach (string selectedField in myWorkFields)
-                                {
-                                    row[selectedField] = GetMyWorkFieldValue(selectedField, dataRow, colDict,
-                                                                             fieldsTableRows,
-                                                                             flagsTable);
-                                }
-
-                                row["TagOrder"] = dataRow["TagOrder"];
-                                row["TagOrderId"] = dataRow["TagOrderId"];
-
-                                dataTable.Rows.Add(row);
-                            }
-                        }
-
-                        epmData.Dispose();
-                    }
-                }
-            }
-
-            return dataTable;
+            return queryExecutor.ExecuteEpmLiveQuery(sql,
+                                                     new Dictionary<string, object>
+                                                         {
+                                                             {"@ResourceId", spWeb.CurrentUser.ID},
+                                                             {"@SiteId", spWeb.Site.ID}
+                                                         });
         }
 
         /// <summary>
         ///     Gets the working on.
         /// </summary>
-        /// <param name="siteId">The site id.</param>
-        /// <param name="dataTable">The data table.</param>
-        private static void GetWorkingOn(Guid siteId, DataTable dataTable)
+        /// <param name="data">The data.</param>
+        /// <returns></returns>
+        private static DataTable GetWorkingOn(string data)
         {
-            if (dataTable.Rows.Count <= 0) return;
-
-            if (!dataTable.Columns.Contains(WORKING_ON_FIELD))
-            {
-                dataTable.Columns.Add(WORKING_ON_FIELD, typeof (object));
-            }
-
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                var epmData = new EPMData(siteId)
-                                  {
-                                      Command =
-                                          @"SELECT COUNT(TagId) FROM dbo.TagOrders WHERE (dbo.TagOrders.ListId = @ListId) AND (dbo.TagOrders.ItemId = @ItemId)",
-                                      CommandType = CommandType.Text
-                                  };
-
-                epmData.Params.Add(new SqlParameter("@ListId", dataRow["ListId"]));
-                epmData.Params.Add(new SqlParameter("@ItemId", dataRow["ID"]));
-
-                object result = epmData.ExecuteScalar(epmData.GetClientReportingConnection);
-
-                epmData.Dispose();
-
-                if (result != null && result != DBNull.Value)
-                {
-                    dataRow[WORKING_ON_FIELD] = (int) result > 0;
-                }
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -2046,11 +1989,6 @@ namespace EPMLiveCore.API
                 }
             }
 
-            foreach (DataRow dataRow in dataTable.Rows)
-            {
-                dataRow[WORKING_ON_FIELD] = false;
-            }
-
             return dataTable;
         }
 
@@ -2227,6 +2165,15 @@ namespace EPMLiveCore.API
                     new Dictionary<string, object>());
 
             return resultDt.Rows.Count > 0;
+        }
+
+        /// <summary>
+        ///     Writes to debug window.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        private static void WriteToDebugWindow(string message)
+        {
+            Debug.WriteLine("*** MyWork: " + message);
         }
 
         // Internal Methods (16) 

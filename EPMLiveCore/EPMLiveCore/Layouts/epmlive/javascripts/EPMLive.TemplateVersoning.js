@@ -2,7 +2,7 @@
 /// <reference path="EPMLive.js" />
 
 function registerTemplateVersoningScript() {
-    (function(epmLiveTemplateVersoning, $, $$, undefined) {
+    (function (epmLiveTemplateVersoning, $, $$, undefined) {
         epmLiveTemplateVersoning.statusbar = null;
 
         function parseValue(value) {
@@ -40,14 +40,14 @@ function registerTemplateVersoningScript() {
                 temp = t;
             }
 
-            var template = { };
+            var template = {};
 
             for (var i = 0; i < temp.length; i++) {
                 var tmp = temp[i];
 
                 for (var tp in tmp) {
                     if (tmp.hasOwnProperty(tp)) {
-                        var key = tp.replace( /@/ , '').toLowerCase();
+                        var key = tp.replace(/@/, '').toLowerCase();
                         var value = tmp[tp];
 
                         if (key === 'solution') {
@@ -59,14 +59,14 @@ function registerTemplateVersoningScript() {
                                 sol = value;
                             }
 
-                            var solution = { };
+                            var solution = {};
 
                             for (var j = 0; j < sol.length; j++) {
                                 var sln = sol[j];
 
                                 for (var s in sln) {
                                     if (sln.hasOwnProperty(s)) {
-                                        var solutionKey = s.replace( /@/ , '').toLowerCase();
+                                        var solutionKey = s.replace(/@/, '').toLowerCase();
                                         var solutionValue = sln[s];
 
                                         solutionValue = parseValue(solutionValue);
@@ -143,7 +143,7 @@ function registerTemplateVersoningScript() {
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
 
-                success: function(response) {
+                success: function (response) {
                     if (response.d) {
                         var responseJson = $$.parseJson(response.d);
 
@@ -161,13 +161,13 @@ function registerTemplateVersoningScript() {
                     }
                 },
 
-                error: function(error) {
+                error: function (error) {
                     $$.log(error);
                 }
             });
         }
 
-        epmLiveTemplateVersoning.saveTemplate = function() {
+        epmLiveTemplateVersoning.saveTemplate = function () {
 
             function animateSaveStatus(element, prefix) {
                 var html = element.html();
@@ -197,9 +197,12 @@ function registerTemplateVersoningScript() {
             var includeContentCheckbox = $('#EpmLiveTemplateVersoningincludeContentCheckbox');
             includeContentCheckbox.attr('disabled', 'disabled');
 
-            var saveStatusElement = $('#EpmLiveTemplateVersoningSaveStatus');
+            var saveStatusElement = $('#EpmLiveTemplateVersoningSaveStatusMessage');
+            var loaderElement = $('#EpmLiveTemplateVersoningSaveStatusProgress');
 
-            var saveStatusAnimationInterval = setInterval(function() {
+            loaderElement.show();
+
+            var saveStatusAnimationInterval = setInterval(function () {
                 animateSaveStatus(saveStatusElement, 'Saving');
             }, 500);
 
@@ -214,6 +217,8 @@ function registerTemplateVersoningScript() {
                     message = 'Saving the site as template failed.';
                 }
 
+                loaderElement.hide();
+
                 saveStatusElement.css('color', color);
                 saveStatusElement.html(message);
 
@@ -222,7 +227,7 @@ function registerTemplateVersoningScript() {
                 includeContentCheckbox.removeAttr('disabled');
             }
 
-            $.post($$.currentWebUrl + '/_layouts/epmlive/SaveCurrentSiteAsTemplate.aspx', { __REQUESTDIGEST: $("#__REQUESTDIGEST").val() }, function(response) {
+            $.post($$.currentWebUrl + '/_layouts/epmlive/SaveCurrentSiteAsTemplate.aspx', { __REQUESTDIGEST: $("#__REQUESTDIGEST").val() }, function (response) {
                 if (response) {
                     if (response.indexOf('SUCCESS') !== -1) {
                         reportStatus(true);
@@ -238,7 +243,7 @@ function registerTemplateVersoningScript() {
             });
         };
 
-        epmLiveTemplateVersoning.promptSaveTemplate = function() {
+        epmLiveTemplateVersoning.promptSaveTemplate = function () {
             var element = document.createElement('div');
             element.innerHTML = $('#EPMLiveTemplateVersoningSavePrompt').html();
 
@@ -246,8 +251,8 @@ function registerTemplateVersoningScript() {
 
             options.title = 'Save Template';
             options.html = element;
-            options.height = 80;
-            options.width = 515;
+            options.height = 85;
+            options.width = 565;
             options.allowMaximize = false;
             options.showClose = false;
 
@@ -255,7 +260,7 @@ function registerTemplateVersoningScript() {
         };
 
         getTemplateInformation();
-    }(window.epmLiveTemplateVersoning = window.epmLiveTemplateVersoning || { }, window.jQuery, epmLive));
+    } (window.epmLiveTemplateVersoning = window.epmLiveTemplateVersoning || {}, window.jQuery, epmLive));
 }
 
 ExecuteOrDelayUntilScriptLoaded(registerTemplateVersoningScript, 'EPMLive.js');

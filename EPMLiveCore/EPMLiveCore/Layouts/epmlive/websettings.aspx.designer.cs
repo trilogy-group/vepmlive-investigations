@@ -49,6 +49,24 @@ namespace EPMLiveCore {
         protected global::System.Web.UI.WebControls.CheckBox chkDisableContextualSlideouts;
         
         /// <summary>
+        /// ifsWalkMe control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifsWalkMe;
+        
+        /// <summary>
+        /// tbWalkMe control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tbWalkMe;
+        
+        /// <summary>
         /// pnlResources control.
         /// </summary>
         /// <remarks>

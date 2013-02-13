@@ -11,9 +11,9 @@
 <div id="EPMLiveStatusbar" data-bind="visible: (collection().length > 0) && epmLive.getUrlParamByName('IsDlg') !== '1', template: { name: 'EPMLiveStatusbarTemplate', foreach: collection() }"></div>
 
 <script type="text/html" id="EPMLiveStatusbarTemplate">
-    <div class="EPMLiveStatusbar ${cssClass()}" data-bind="template: { name: 'EPMLiveStatuTemplate', foreach: collection() }"></div>
+    <div class="EPMLiveStatusbar" data-bind="template: { name: 'EPMLiveStatuTemplate', foreach: collection() }, css: cssClass()"></div>
 </script>
 
 <script type="text/html" id="EPMLiveStatuTemplate">
-    <span class="EPMLiveStatus EPMLiveStatus-${align()}">{{if title()}}<b>${title()}: </b>{{/if}}{{if icon()}}<img src="${icon()}" align="absmiddle"/> {{/if}}<span data-bind="html: message()"></span></span>
+    <span class="EPMLiveStatus" data-bind="css: 'EPMLiveStatus-' + align()">{{if title()}}<b>${title()}: </b>{{/if}}{{if icon()}}<img src="${icon()}" align="absmiddle"/> {{/if}}<span data-bind="html: message()"></span></span>
 </script>

@@ -67,9 +67,16 @@ namespace EPMLiveCore
                     }
                     catch { }
 
+                    try
+                    {
+                        tbWalkMe.Text = CoreFunctions.getConfigSetting(web, "EPMLiveWalkMeId");
+                    }
+                    catch { }
+
                     if (!web.CurrentUser.IsSiteAdmin)
                     {
                         pnlAllowSynch.Visible = false;
+                        ifsWalkMe.Visible = false;
                     }
                     else
                     {
@@ -108,6 +115,8 @@ namespace EPMLiveCore
                                 }
                             }
                         }
+
+                        ifsWalkMe.Visible = true;
                     }
                     foreach (SPList list in web.Lists)
                     {
@@ -170,6 +179,7 @@ namespace EPMLiveCore
             CoreFunctions.setConfigSetting(web, "EPMLiveDisablePublishing", chkDisablePublishing.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "EPMLiveDisablePlanners", chkDisablePlanners.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "EPMLiveDisableContextualSlideouts", chkDisableContextualSlideouts.Checked.ToString());
+            CoreFunctions.setConfigSetting(web, "EPMLiveWalkMeId", tbWalkMe.Text.ToString());
 
             if (web.CurrentUser.IsSiteAdmin)
             {

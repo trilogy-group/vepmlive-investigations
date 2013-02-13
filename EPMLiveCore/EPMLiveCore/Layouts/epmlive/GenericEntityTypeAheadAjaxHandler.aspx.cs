@@ -98,7 +98,8 @@ namespace EPMLiveCore
 
                 if (dt != null)
                 {
-                    foreach (DataRow r in dt.Rows)
+                    DataRow[] results = dt.Select("", _field + " ASC");
+                    foreach (DataRow r in results)
                     {
                         try
                         {
@@ -126,7 +127,8 @@ namespace EPMLiveCore
 
                 if (dt != null)
                 {
-                    foreach (DataRow r in dt.Rows)
+                    DataRow[] results = dt.Select("", _field + " ASC");
+                    foreach (DataRow r in results)
                     {
                         _sbResult.Append(r["ID"].ToString() + "," + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
                     }

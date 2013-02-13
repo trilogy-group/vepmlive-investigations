@@ -44,7 +44,11 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 {
                     oTimeOffType = oTimeOff.Fields.GetFieldByInternalName("TimeOffType");
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    LogMessage("", ex.Message, 3);
+                    return true;
+                }
 
                 if(oTimeOffType.Type == SPFieldType.Choice)
                 {

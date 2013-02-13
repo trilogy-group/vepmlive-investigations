@@ -185,6 +185,15 @@ namespace EPMLiveCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 0M8R4KGxGuEAAAAAAAAAAAAAAAAAAAAAPgADAP7/CQAGAAAAAAAAAAAAAAACAAAAwwAAAAAAAAAAEAAAAgAAAAQAAAD+////AAAAAMIAAAC/AAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ResourceExporterVBA {
+            get {
+                return ResourceManager.GetString("ResourceExporterVBA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 3.
         /// </summary>
         internal static string ResourceGridDefaultGlobalViewVersion {

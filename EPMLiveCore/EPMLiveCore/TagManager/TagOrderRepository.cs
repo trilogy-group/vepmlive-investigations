@@ -1,15 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.TagManager
 {
     internal class TagOrderRepository
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
+        private readonly QueryExecutor _queryExecutor;
         private readonly SPWeb _spWeb;
 
         #endregion Fields 
@@ -23,6 +24,7 @@ namespace EPMLiveCore.TagManager
         public TagOrderRepository(SPWeb spWeb)
         {
             _spWeb = spWeb;
+            _queryExecutor = new QueryExecutor(_spWeb);
         }
 
         #endregion Constructors 
@@ -45,19 +47,14 @@ namespace EPMLiveCore.TagManager
                 return order;
             }
 
-            var epmData = new EPMData(_spWeb.Site.ID)
-                              {
-                                  Command =
-                                      @"INSERT INTO TagOrders (TagId, ListId, ItemId, TagOrder) VALUES (@TagId, @ListId, @ItemId, 
-                                               (SELECT (SELECT COALESCE(MAX(TagOrder), 0) FROM TagOrders WHERE TagId = @TagId) + 1))",
-                                  CommandType = CommandType.Text
-                              };
-
-            epmData.Params.Add(new SqlParameter("@TagId", tagOrder.TagId));
-            epmData.Params.Add(new SqlParameter("@ListId", tagOrder.ListId));
-            epmData.Params.Add(new SqlParameter("@ItemId", tagOrder.ItemId));
-
-            epmData.ExecuteNonQuery(epmData.GetClientReportingConnection);
+            _queryExecutor.ExecuteEpmLiveNonQuery(
+                @"INSERT INTO TagOrders (TagId, ListId, ItemId, TagOrder) VALUES (@TagId, @ListId, @ItemId, (SELECT (SELECT COALESCE(MAX(TagOrder), 0) FROM TagOrders WHERE TagId = @TagId) + 1))",
+                new Dictionary<string, object>
+                    {
+                        {"@TagId", tagOrder.TagId},
+                        {"@ListId", tagOrder.ListId},
+                        {"@ItemId", tagOrder.ItemId}
+                    });
 
             return Find(tagOrder.TagId, tagOrder.ListId, tagOrder.ItemId);
         }
@@ -71,18 +68,9 @@ namespace EPMLiveCore.TagManager
         /// <returns></returns>
         public TagOrder Find(Guid tagId, Guid listId, int itemId)
         {
-            var epmData = new EPMData(_spWeb.Site.ID)
-                              {
-                                  Command =
-                                      @"SELECT TagOrderId, TagOrder FROM TagOrders WHERE TagId = @TagId AND ListId = @ListId AND ItemId = @ItemId",
-                                  CommandType = CommandType.Text
-                              };
-
-            epmData.Params.Add(new SqlParameter("@TagId", tagId));
-            epmData.Params.Add(new SqlParameter("@ListId", listId));
-            epmData.Params.Add(new SqlParameter("@ItemId", itemId));
-
-            DataTable dataTable = epmData.GetTable(epmData.GetClientReportingConnection);
+            DataTable dataTable = _queryExecutor.ExecuteEpmLiveQuery(
+                @"SELECT TagOrderId, TagOrder FROM TagOrders WHERE TagId = @TagId AND ListId = @ListId AND ItemId = @ItemId",
+                new Dictionary<string, object> {{"@TagId", tagId}, {"@ListId", listId}, {"@ItemId", itemId}});
 
             if (dataTable.Rows.Count > 0)
             {
@@ -104,18 +92,14 @@ namespace EPMLiveCore.TagManager
 
             if (order == null) return;
 
-            var epmData = new EPMData(_spWeb.Site.ID)
-                              {
-                                  Command =
-                                      @"DELETE FROM TagOrders WHERE TagId = @TagId AND ListId = @ListId AND ItemId = @ItemId",
-                                  CommandType = CommandType.Text
-                              };
-
-            epmData.Params.Add(new SqlParameter("@TagId", tagOrder.TagId));
-            epmData.Params.Add(new SqlParameter("@ListId", tagOrder.ListId));
-            epmData.Params.Add(new SqlParameter("@ItemId", tagOrder.ItemId));
-
-            epmData.ExecuteNonQuery(epmData.GetClientReportingConnection);
+            _queryExecutor.ExecuteEpmLiveNonQuery(
+                @"DELETE FROM TagOrders WHERE TagId = @TagId AND ListId = @ListId AND ItemId = @ItemId",
+                new Dictionary<string, object>
+                    {
+                        {"@TagId", tagOrder.TagId},
+                        {"@ListId", tagOrder.ListId},
+                        {"@ItemId", tagOrder.ItemId}
+                    });
         }
 
         #endregion Methods 

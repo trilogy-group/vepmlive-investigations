@@ -29,6 +29,7 @@ namespace EPMLiveCore.ControlTemplates
         protected override void OnPreRender(EventArgs e)
         {
             ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/libraries/jquery.min.js", false);
+            ManageWalkMeIntegration();
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -49,6 +50,40 @@ namespace EPMLiveCore.ControlTemplates
             EPMFileVersion = fileVersion;
         }
 
+        private void ManageWalkMeIntegration()
+        {
+            string sWalkMeId = string.Empty;
+            try{
+                sWalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
+            }
+            catch{}
+
+
+            if(!string.IsNullOrEmpty(sWalkMeId)){
+                try
+                {
+                    Page.ClientScript.RegisterClientScriptBlock(
+                        //Type type//
+                        Page.GetType(), 
+                        //string key//
+                        "WalkMeScript_" + sWalkMeId, 
+                        //string script//
+                        @"(function () {
+                            var walkme = document.createElement('script');
+                            walkme.type = 'text/javascript';
+                            walkme.async = true;
+                            walkme.src = '##SCHEME##://d3b3ehuo35wzeh.cloudfront.net/users/##WALKMEID##/walkme_##WALKMEID##_https.js';
+                            var s = document.getElementsByTagName('script')[0];
+                            s.parentNode.insertBefore(walkme, s);
+                        })();".Replace("##SCHEME##", Request.Url.Scheme).Replace("##WALKMEID##", sWalkMeId),
+                        //bool addScriptTags//
+                        true
+                    );
+                }
+                catch { }
+            }
+            
+        }
         #endregion Methods 
     }
 }

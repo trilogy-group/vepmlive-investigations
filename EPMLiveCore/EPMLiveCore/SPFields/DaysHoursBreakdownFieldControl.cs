@@ -457,22 +457,29 @@ namespace EPMLiveCore.SPFields
 
                     bool resourceFoundInPool = false;
 
-                    foreach (SPListItem resourceListItem in from SPListItem resourceListItem in resourcesList.Items
-                                                            let spAccount = resourceListItem["SharePointAccount"]
-                                                            where spAccount != null
-                                                            let spFieldUserValue =
-                                                                new SPFieldUserValue(web, (string) spAccount)
-                                                            let spUser = spFieldUserValue.User
-                                                            where spUser != null
-                                                            where spUser.ID == web.CurrentUser.ID
-                                                            select resourceListItem)
+                    foreach (SPListItem resourceListItem in resourcesList.Items)
                     {
-                        GetWorkHours(workHoursList, resourceListItem, web);
-                        GetHolidays(holidaysList, resourceListItem);
+                        try
+                        {
+                            object spAccount = resourceListItem["SharePointAccount"];
 
-                        resourceFoundInPool = true;
+                            if (spAccount == null) continue;
 
-                        break;
+                            var spFieldUserValue = new SPFieldUserValue(web, (string)spAccount);
+                            SPUser spUser = spFieldUserValue.User;
+
+                            if (spUser == null) continue;
+
+                            if (spUser.ID != web.CurrentUser.ID) continue;
+
+                            GetWorkHours(workHoursList, resourceListItem, web);
+                            GetHolidays(holidaysList, resourceListItem);
+
+                            resourceFoundInPool = true;
+
+                            break;
+                        }
+                        catch { }
                     }
 
                     if (!resourceFoundInPool)

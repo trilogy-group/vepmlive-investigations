@@ -1,15 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.TagManager
 {
     internal class TagRepository
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
+        private readonly QueryExecutor _queryExecutor;
         private readonly SPWeb _spWeb;
 
         #endregion Fields 
@@ -23,6 +24,7 @@ namespace EPMLiveCore.TagManager
         public TagRepository(SPWeb spWeb)
         {
             _spWeb = spWeb;
+            _queryExecutor = new QueryExecutor(_spWeb);
         }
 
         #endregion Constructors 
@@ -44,19 +46,15 @@ namespace EPMLiveCore.TagManager
 
             Guid siteId = _spWeb.Site.ID;
 
-            var epmData = new EPMData(siteId)
-                              {
-                                  Command =
-                                      "INSERT INTO Tags (Name, Type, ResourceId, SiteId) VALUES (@Name, @Type, @ResourceId, @SiteId)",
-                                  CommandType = CommandType.Text
-                              };
-
-            epmData.Params.Add(new SqlParameter("@Name", tag.Name));
-            epmData.Params.Add(new SqlParameter("@Type", tag.Type));
-            epmData.Params.Add(new SqlParameter("@ResourceId", tag.ResourceId));
-            epmData.Params.Add(new SqlParameter("@SiteId", tag.SiteId));
-
-            epmData.ExecuteNonQuery(epmData.GetClientReportingConnection);
+            _queryExecutor.ExecuteEpmLiveNonQuery(
+                "INSERT INTO Tags (Name, Type, ResourceId, SiteId) VALUES (@Name, @Type, @ResourceId, @SiteId)",
+                new Dictionary<string, object>
+                    {
+                        {"@Name", tag.Name},
+                        {"@Type", tag.Type},
+                        {"@ResourceId", tag.ResourceId},
+                        {"@SiteId", tag.SiteId}
+                    });
 
             return Find(tag.Type, tag.ResourceId, siteId).Id;
         }
@@ -70,45 +68,47 @@ namespace EPMLiveCore.TagManager
         /// <returns></returns>
         public Tag Find(int tagType, int resourceId, Guid siteId)
         {
-            using (var myWorkReportData = new MyWorkReportData(_spWeb.Site.ID))
+            DataTable tags =
+                _queryExecutor.ExecuteEpmLiveQuery(
+                    "SELECT * FROM Tags WHERE Type = @TagType AND ResourceId = @ResourceId AND SiteId = @SiteId",
+                    new Dictionary<string, object>
+                        {
+                            {"@TagType", tagType},
+                            {"@ResourceId", resourceId},
+                            {"@SiteId", siteId}
+                        });
+
+            if (tags.Rows.Count > 0)
             {
-                DataTable tags =
-                    myWorkReportData.ExecuteSql(string.Format(
-                        "SELECT * FROM Tags WHERE Type = {0} AND ResourceId = {1} AND SiteId = '{2}'", tagType,
-                        resourceId, siteId));
+                DataRow row = tags.Rows[0];
 
-                if (tags.Rows.Count > 0)
+                var tag = new Tag((Guid) row["TagId"]);
+
+                object name = row["Name"];
+                if (name != DBNull.Value && name != null)
                 {
-                    DataRow row = tags.Rows[0];
-
-                    var tag = new Tag((Guid) row["TagId"]);
-
-                    object name = row["Name"];
-                    if (name != DBNull.Value && name != null)
-                    {
-                        tag.Name = (string) name;
-                    }
-
-                    object type = row["Type"];
-                    if (type != DBNull.Value && type != null)
-                    {
-                        tag.Type = (int) type;
-                    }
-
-                    object resId = row["ResourceId"];
-                    if (resId != DBNull.Value && resId != null)
-                    {
-                        tag.ResourceId = (int) resId;
-                    }
-
-                    object sId = row["SiteId"];
-                    if (sId != DBNull.Value && sId != null)
-                    {
-                        tag.SiteId = (Guid) sId;
-                    }
-
-                    return tag;
+                    tag.Name = (string) name;
                 }
+
+                object type = row["Type"];
+                if (type != DBNull.Value && type != null)
+                {
+                    tag.Type = (int) type;
+                }
+
+                object resId = row["ResourceId"];
+                if (resId != DBNull.Value && resId != null)
+                {
+                    tag.ResourceId = (int) resId;
+                }
+
+                object sId = row["SiteId"];
+                if (sId != DBNull.Value && sId != null)
+                {
+                    tag.SiteId = (Guid) sId;
+                }
+
+                return tag;
             }
 
             return new Tag(Guid.Empty);

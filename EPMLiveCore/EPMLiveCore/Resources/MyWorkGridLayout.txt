@@ -31,7 +31,7 @@
 	<Head><Filter CanHide="0" CanEdit="1" /></Head>
 	<Solid>
 		<Group CanHide="0" />
-		<I id="NoData" Html="There are no active work items assigned to you." />
+		<I id="NoData" Html="There are no active work items in this view." />
 	</Solid>
 	<Lang>
 		<Text StartErr = "Fatal error! &lt;br/>My Work grid cannot render" />

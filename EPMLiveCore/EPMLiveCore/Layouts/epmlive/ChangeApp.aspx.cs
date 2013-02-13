@@ -7,6 +7,7 @@ using System.Web;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 using EPMLiveCore.GlobalResources;
+using System.Threading;
 
 namespace EPMLiveCore
 {
@@ -27,9 +28,9 @@ namespace EPMLiveCore
                 SetNewAppId();
                 SPUtility.Redirect(SPContext.Current.Web.Url, SPRedirectFlags.Default, HttpContext.Current);
             }
-            catch (Exception ex)
+            catch (ThreadAbortException ex)
             {
-                SPUtility.Redirect(SPContext.Current.Web.Url, SPRedirectFlags.Default, HttpContext.Current);
+                SPUtility.Redirect(SPContext.Current.Web.Url, SPRedirectFlags.DoNotEndResponse, HttpContext.Current);
             }
         }
 

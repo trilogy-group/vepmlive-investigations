@@ -166,4 +166,7 @@
   <data name="WorkingOnGridLayout" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\WorkingOnGridLayout.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
   </data>
+  <data name="ResourceExporterVBA" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResourceExporterVBA.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
 </root>

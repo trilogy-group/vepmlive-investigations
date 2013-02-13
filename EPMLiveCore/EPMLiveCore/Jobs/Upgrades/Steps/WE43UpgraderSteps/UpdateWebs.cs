@@ -26,13 +26,41 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             {
                 LogMessage("Web: " + web.ServerRelativeUrl);
 
-                UpdateMaster(web);
+                try
+                {
+                    UpdateMaster(web);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("", ex.Message, 3);
+                }
 
-                ActivateAppsList(web);
+                try
+                {
+                    ActivateAppsList(web);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("", ex.Message, 3);
+                }
 
-                UpdateSettings(web);
+                try
+                {
+                    UpdateSettings(web);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("", ex.Message, 3);
+                }
 
-                AddCommunity(web);
+                try
+                {
+                    AddCommunity(web);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("", ex.Message, 3);
+                }
 
             }
 
@@ -140,6 +168,8 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
         private void AddCommunity(SPWeb web)
         {
+            LogMessage("Adding Communities");
+
             SPList list = EPMLiveCore.API.Applications.GetApplicationList(web);
 
             SPQuery query = new SPQuery();

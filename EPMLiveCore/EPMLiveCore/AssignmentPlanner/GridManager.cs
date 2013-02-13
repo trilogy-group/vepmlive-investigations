@@ -253,8 +253,9 @@ namespace EPMLiveCore.AssignmentPlanner
                                      new XAttribute("Flag", string.Format(@"<img src=""{0}"" class=""AP_Flag""/>", flagUrl)),
                                      new XAttribute("FlagValue", flagValue), new XAttribute("Height", 23));
 
-                        bElement.Add(iElement);
+                        if (resourceId == 0 || string.IsNullOrEmpty(resourceName)) continue;
 
+                        bElement.Add(iElement);
                         if (!resources.ContainsKey(resourceId)) resources.Add(resourceId, resourceName);
                     }
                 }

@@ -7,36 +7,27 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EPMLiveCore.Layouts.epmlive.Upgraders {
+namespace EPMLiveCore.Layouts.epmlive {
     
     
-    public partial class WE43Upgrader {
+    public partial class ImportResourceStatus {
         
         /// <summary>
-        /// lblError control.
+        /// MissingJobIdErrorLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblError;
+        protected global::System.Web.UI.WebControls.Label MissingJobIdErrorLabel;
         
         /// <summary>
-        /// pnlMain control.
+        /// Panel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlMain;
-        
-        /// <summary>
-        /// NotRootMessageLabel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label NotRootMessageLabel;
+        protected global::System.Web.UI.WebControls.Panel Panel;
     }
 }

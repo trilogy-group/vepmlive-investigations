@@ -46,6 +46,10 @@
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files (x86)\Open XML SDK\V2.0\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveIntegration">
       <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
     </Reference>
@@ -78,6 +82,7 @@
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
@@ -85,6 +90,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.SharePoint" />
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Act.cs" />
@@ -119,9 +125,11 @@
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
+    <Compile Include="API\ResourceGrid\ResourceExporter.cs" />
     <Compile Include="API\ResourceGrid\ResourceGrid.cs" />
     <Compile Include="API\ResourceGrid\ResourceGridGlobalViewManager.cs" />
     <Compile Include="API\ResourceGrid\ResourceGridPersonalViewManager.cs" />
+    <Compile Include="API\ResourceGrid\ResourceImporter.cs" />
     <Compile Include="API\ResourceManagement\ResourceManager.cs" />
     <Compile Include="API\Resource\Resource.cs" />
     <Compile Include="API\Response.cs" />
@@ -254,6 +262,7 @@
     <Compile Include="Jobs\Applications\InstallAndConfigure.cs" />
     <Compile Include="Jobs\Applications\Uninstall.cs" />
     <Compile Include="Jobs\Notifications.cs" />
+    <Compile Include="Jobs\ResourceImportJob.cs" />
     <Compile Include="Jobs\ResourcePlan.cs" />
     <Compile Include="Jobs\SecurityUpdate.cs" />
     <Compile Include="Jobs\TimerFix.cs" />
@@ -558,6 +567,13 @@
     <Compile Include="Layouts\epmlive\deleteweb.aspx.designer.cs">
       <DependentUpon>deleteweb.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\FileDownloader.aspx.cs">
+      <DependentUpon>FileDownloader.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\FileDownloader.aspx.designer.cs">
+      <DependentUpon>FileDownloader.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandler.aspx.cs">
       <DependentUpon>GenericEntityTypeAheadAjaxHandler.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -585,6 +601,20 @@
     </Compile>
     <Compile Include="Layouts\epmlive\gridganttsettings.aspx.designer.cs">
       <DependentUpon>gridganttsettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ImportResources.aspx.cs">
+      <DependentUpon>ImportResources.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ImportResources.aspx.designer.cs">
+      <DependentUpon>ImportResources.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ImportResourceStatus.aspx.cs">
+      <DependentUpon>ImportResourceStatus.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ImportResourceStatus.aspx.designer.cs">
+      <DependentUpon>ImportResourceStatus.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\Integration\Add.aspx.cs">
       <DependentUpon>Add.aspx</DependentUpon>
@@ -2775,6 +2805,7 @@
     <Content Include="Layouts\epmlive\EPMLiveTopNav.js" />
     <Content Include="Layouts\epmlive\fieldaudit.aspx" />
     <Content Include="Layouts\epmlive\FieldSynch.aspx" />
+    <Content Include="Layouts\epmlive\FileDownloader.aspx" />
     <Content Include="Layouts\epmlive\GenericEntityPickerStyle.css" />
     <Content Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandler.aspx" />
     <Content Include="Layouts\epmlive\getGeneralSetting.aspx" />
@@ -2875,6 +2906,8 @@
     <Content Include="Layouts\epmlive\images\WESite.png" />
     <Content Include="Layouts\epmlive\images\WorkEngine-logo.gif" />
     <Content Include="Layouts\epmlive\images\Workspaces.png" />
+    <Content Include="Layouts\epmlive\ImportResources.aspx" />
+    <Content Include="Layouts\epmlive\ImportResourceStatus.aspx" />
     <Content Include="Layouts\epmlive\Integration\Add.aspx" />
     <Content Include="Layouts\epmlive\Integration\Add.css" />
     <Content Include="Layouts\epmlive\Integration\Columns.aspx" />
@@ -2895,10 +2928,12 @@
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.tmpl.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\knockout-1.2.1.debug.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\knockout-1.2.1.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\knockout-2.2.1.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\slimScroll.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\spjs-utility.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\ResourceImporter.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.5.2.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.6.2.min.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery.sharepoint-json.js" />
@@ -2951,6 +2986,10 @@
     <Content Include="Layouts\epmlive\stylesheets\buildteam.css" />
     <Content Include="Layouts\epmlive\stylesheets\buildteamIE.css" />
     <Content Include="Layouts\epmlive\stylesheets\buttons.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -3242,6 +3281,7 @@
     <None Include="Resources\txtFileDefaultSections.txt" />
     <None Include="Resources\txtTeamGridLayout.txt" />
     <None Include="Resources\WorkingOnGridLayout.txt" />
+    <None Include="Resources\ResourceExporterVBA.txt" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
     <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />

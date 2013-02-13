@@ -25,13 +25,13 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
                     pnlMain.Visible = false;
                     lblError.Text = "You are not an admin.";
                 }
-                else if(!Web.IsRootWeb)
-                {
-                    lblError.Text = "You must run this on the root web.";
-                    pnlMain.Visible = false;
-                }
                 else
                 {
+                    if (!Web.IsRootWeb)
+                    {
+                        NotRootMessageLabel.Visible = true;
+                    }
+
                     string storeurl = CoreFunctions.getFarmSetting("workenginestore");
 
                     try

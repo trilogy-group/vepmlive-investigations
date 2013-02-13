@@ -114,7 +114,7 @@ namespace EPMLiveCore
      * 17000 - Reporting_GetMyWorkData
      * 17100 - Reporting_GetMyWorkFields
      * 17600 - Reporting_RefreshAll
-     * 
+     *
      * ===============================
      * ASSIGNMENT PLANNER
      * ===============================
@@ -1256,6 +1256,24 @@ namespace EPMLiveCore
             try
             {
                 return Response.Success(ResourceGrid.DeleteResourcePoolResource(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Exports the resources.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="oWeb">The o web.</param>
+        /// <returns></returns>
+        public static string ExportResources(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(ResourceGrid.ExportResources(oWeb));
             }
             catch (APIException ex)
             {
