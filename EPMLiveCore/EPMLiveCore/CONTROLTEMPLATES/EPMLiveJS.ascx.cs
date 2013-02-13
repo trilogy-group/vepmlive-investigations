@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
 using System.Web.UI;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
@@ -7,8 +10,9 @@ namespace EPMLiveCore.ControlTemplates
 {
     public partial class EPMLiveJS : UserControl
     {
-        #region Fields (6) 
+        #region Fields (7) 
 
+        protected string EPMFileVersion;
         protected string SiteId;
         protected string SiteUrl;
         protected string WebFullUrl;
@@ -35,6 +39,14 @@ namespace EPMLiveCore.ControlTemplates
             WebFullUrl = _spWeb.Url;
             WebId = _spWeb.ID.ToString();
             WebUrl = _spWeb.SafeServerRelativeUrl();
+
+            string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+            if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
+            {
+                fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+            }
+
+            EPMFileVersion = fileVersion;
         }
 
         #endregion Methods 

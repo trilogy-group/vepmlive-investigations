@@ -51,20 +51,29 @@ namespace EPMLiveCore
 
         protected void Page_Init(object sender, EventArgs e)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            Act act = new Act(Web);
+            if(act.IsOnline)
             {
-                _ADSync = new ADSync();
-                _htDropdownIds = new Hashtable();
-                DropDownListScheduleType.SelectedIndexChanged += new EventHandler(DropDownListScheduleType_SelectedIndexChanged);
+                Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/noaccess.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+            }
+            else
+            {
 
-                InitDomain();
-                InitGroups();
-                InitResourcePoolFields();
-                InitSchedule();
-                InitExclusions();
-                InitDelete();
-                LoadScheduleStatus();
-            });
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    _ADSync = new ADSync();
+                    _htDropdownIds = new Hashtable();
+                    DropDownListScheduleType.SelectedIndexChanged += new EventHandler(DropDownListScheduleType_SelectedIndexChanged);
+
+                    InitDomain();
+                    InitGroups();
+                    InitResourcePoolFields();
+                    InitSchedule();
+                    InitExclusions();
+                    InitDelete();
+                    LoadScheduleStatus();
+                });
+            }
         }
 
         protected void btnRunManually_Click(object sender, EventArgs e)

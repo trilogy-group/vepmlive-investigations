@@ -1,0 +1,40 @@
+<Grid>
+	<Cfg id='TeamGrid' SuppressCfg='0'/> <!-- Configuration is not saved to cookies -->
+	<Cfg MainCol='Title' NameCol='Title' Style='GM' CSS='TreeGrid/WorkEngine/Grid.css'  Undo='0' ChildParts='0'/>
+	<Cfg ExportType='Expanded,Outline'/>
+	<Cfg PrintCols='1'/>
+	<Cfg ExportCols='1'/>
+	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' />
+	<Cfg StaticCursor='1' Dragging='0' SelectingCells='1' ShowDeleted='0' SelectClass='0'/>
+
+	<Toolbar Visible='0'></Toolbar>
+
+	<Panel Visible='1' Delete='0' Move='0' NoFormatEscape='1' CanHide='0'/>
+
+	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2'/>
+	
+	<Cfg Code="GTACCNPSQEBSLC"/>
+
+	<LeftCols>
+		<C Name='Photo' Visible='1' Width='65' Type='Html' CanHide='1'/>
+		<C Name='Title' Visible='1' RelWidth='1' CanHide='0' Type='Html'/>
+	</LeftCols>
+	<Cols>
+		
+	</Cols>
+	<RightCols>
+		
+	</RightCols>
+	<Def>
+		<D Name="R" Calculated='0' HoverCell='Color' HoverRow='Color'/>
+		<D Name="Group" CanSelect='0'/>
+	</Def>
+	<Solid>
+
+	</Solid>
+	<Header Visible='1'/>
+	<Head>
+		<I Kind='Filter' Visible='0' id='Filter'/>
+		<I Kind='Group' Visible='0' id='GroupRow'/>
+	</Head>
+</Grid>

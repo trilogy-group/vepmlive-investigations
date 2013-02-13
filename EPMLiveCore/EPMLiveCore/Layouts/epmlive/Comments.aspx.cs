@@ -26,6 +26,11 @@ namespace EPMLiveCore
         protected string _currentUserLoginName = string.Empty;
         protected string _listTitle = string.Empty;
         protected string _itemTitle = string.Empty;
+        protected string _wpeId = string.Empty;
+        protected string _listId = string.Empty;
+        protected string _itemId = string.Empty;
+        protected string _authorId = string.Empty;
+        protected string _assigneeIds = string.Empty;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -36,7 +41,167 @@ namespace EPMLiveCore
             ManageFields();
             AddCommentersFields();
             BuildHTMLTableRowsForEachComment();
+            //InsertPeopleEditor();
+            SetTOPeople();
+            SetCCPeople();
         }
+
+        //protected void Page_Init(object sender, EventArgs e)
+        //{
+        //    InsertPeopleEditor();
+        //}
+
+        private void SetCCPeople()
+        {
+            string users = string.Empty;
+            List<string> usersCol = new List<string>();
+            List<int> userIds = new List<int>();
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite es = new SPSite(SPContext.Current.Web.Url))
+                {
+                    using (SPWeb ew = es.OpenWeb())
+                    {
+                        SPList l = ew.Lists.GetList(_ListId, true, true, true);
+                        SPListItem i = l.GetItemById(_ItemId);
+                        string raw = string.Empty;
+                        try
+                        {
+                            raw = i["Commenters"].ToString();
+                        }
+                        catch { }
+
+                        if (!string.IsNullOrEmpty(raw))
+                        {
+                            string[] saC = raw.Split(',');
+                            if (saC.Length > 0)
+                            {
+                                foreach (string s in saC)
+                                {
+
+                                    int temp = -1;
+                                    try
+                                    {
+                                        temp = int.Parse(s);
+                                    }
+                                    catch { }
+
+                                    if (temp != -1 && !userIds.Contains(temp))
+                                    {
+                                        userIds.Add(temp);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (userIds.Count > 0)
+                        {
+                            foreach (int ui in userIds)
+                            {
+                                SPUser u = null;
+                                try
+                                {
+                                    u = ew.AllUsers.GetByID(ui);
+                                }
+                                catch { }
+
+                                if (u != null && !usersCol.Contains(u.LoginName))
+                                {
+                                    usersCol.Add(u.LoginName);
+                                }
+                            }
+                        }
+
+                        if (usersCol.Count > 0)
+                        {
+                            users = string.Join(",", usersCol.ToArray());
+                        }
+                    }
+                }
+            });
+
+            //(this.Page.FindControl(_wpeId) as WEPeopleEditor).CommaSeparatedAccounts = users;
+            CCPeopleEditor.CommaSeparatedAccounts = users;
+        }
+
+        private void SetTOPeople()
+        {
+            string users = string.Empty;
+            List<string> usersCol = new List<string>();
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite es = new SPSite(SPContext.Current.Web.Url))
+                {
+                    using (SPWeb ew = es.OpenWeb())
+                    {
+                        SPList l = ew.Lists.GetList(_ListId, true, true, true);
+                        SPListItem i = l.GetItemById(_ItemId);
+                        SPFieldLookupValue author = null;
+                        try
+                        {
+                            author = new SPFieldLookupValue(i["Author"].ToString());
+                        }
+                        catch { }
+
+                        SPFieldLookupValueCollection assignedTos = null;
+                        try
+                        {
+                            assignedTos = new SPFieldLookupValueCollection(i["AssignedTo"].ToString());
+                        }
+                        catch { }
+
+                        if (author != null)
+                        {
+                            SPUser u = null;
+                            try
+                            {
+                                u = ew.AllUsers.GetByID(author.LookupId);
+                            }
+                            catch { }
+                            if (u != null && !usersCol.Contains(u.Name))
+                            {
+                                usersCol.Add(u.Name);
+                            }
+                        }
+
+                        if (assignedTos != null)
+                        {
+                            foreach (SPFieldLookupValue lv in assignedTos)
+                            {
+                                SPUser u = null;
+                                try
+                                {
+                                    u = ew.AllUsers.GetByID(lv.LookupId);
+                                }
+                                catch { }
+                                if (u != null && !usersCol.Contains(u.Name))
+                                {
+                                    usersCol.Add(u.Name);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (usersCol.Count > 0)
+            {
+                spanCommenters.InnerText = string.Join(", ", usersCol.ToArray());
+            }
+        }
+
+        //private void InsertPeopleEditor()
+        //{
+        //    pnlCCPeopleEditor.Controls.Clear();
+        //    WEPeopleEditor wpe = new WEPeopleEditor();
+        //    wpe.Height = new System.Web.UI.WebControls.Unit("10px");
+            
+        //    pnlCCPeopleEditor.Controls.Add(wpe);
+        //    wpe.ID = "commentWPE";
+        //    _wpeId = wpe.ID;
+        //    pnlCCPeopleEditor.Height = new System.Web.UI.WebControls.Unit("10px"); 
+        //}
 
         private void EnsureCommentsListExist()
         {
@@ -86,12 +251,14 @@ namespace EPMLiveCore
             {
                 _ListId = new Guid(Request.Params["listId"]);
                 hdnListId.Value = _ListId.ToString("D");
+                _listId = Request.Params["listId"];
             }
 
             if (!string.IsNullOrEmpty(Request.Params["itemid"]))
             {
                 _ItemId = Convert.ToInt32(Request.Params["itemid"]);
                 hdnItemId.Value = _ItemId.ToString();
+                _itemId = Request.Params["itemid"];
             }
 
             if (!string.IsNullOrEmpty(Request.Params["listId"]))
@@ -100,6 +267,14 @@ namespace EPMLiveCore
                 SPListItem item = list.GetItemById(_ItemId);
                 _listTitle = SPHttpUtility.HtmlEncode(list.Title);
                 _itemTitle = (item[item.Fields.GetFieldByInternalName("Title").Id] != null) ? SPHttpUtility.HtmlEncode(item[item.Fields.GetFieldByInternalName("Title").Id].ToString()) : string.Empty;
+            }
+
+            if (!string.IsNullOrEmpty(_listId) && !string.IsNullOrEmpty(_itemId))
+            {
+                SPList list = currentWeb.Lists[new Guid(_listId)];
+                SPListItem item = list.GetItemById(int.Parse(_itemId));
+                _authorId = GetItemAuthorId(item);
+                _assigneeIds = GetItemAssigneeIds(item);
             }
 
             hdnUserId.Value = Web.CurrentUser.ID.ToString();
@@ -136,6 +311,69 @@ namespace EPMLiveCore
                     _userPictureUrl = currentSite.MakeFullUrl(currentWeb.ServerRelativeUrl) + "/_layouts/epmlive/images/O14_person_placeHolder_32.png";
                 }
             }
+
+        }
+
+        private bool UserIsAssigned(int userID, SPListItem item)
+        {
+            bool isAssigned = false;
+            SPField testFld = null;
+
+            try
+            {
+                testFld = item.Fields[item.Fields.GetFieldByInternalName("AssignedTo").Id];
+            }
+            catch { }
+
+            if ((testFld != null) && (item[item.Fields.GetFieldByInternalName("AssignedTo").Id] != null))
+            {
+                SPFieldUserValueCollection uc = (SPFieldUserValueCollection)item[item.Fields.GetFieldByInternalName("AssignedTo").Id];
+                foreach (SPFieldUserValue uv in uc)
+                {
+                    if (uv.LookupId == userID)
+                    {
+                        isAssigned = true;
+                        break;
+                    }
+                }
+            }
+
+            return isAssigned;
+        }
+
+        private string GetItemAssigneeIds(SPListItem item)
+        {  
+            SPField testFld = null;
+            StringBuilder sb = new StringBuilder();
+ 
+            try
+            {
+                testFld = item.Fields[item.Fields.GetFieldByInternalName("AssignedTo").Id];
+            }
+            catch { }
+
+            if ((testFld != null) && (item[item.Fields.GetFieldByInternalName("AssignedTo").Id] != null))
+            {
+                SPFieldUserValueCollection uc = new SPFieldUserValueCollection(SPContext.Current.Web, item[item.Fields.GetFieldByInternalName("AssignedTo").Id].ToString());
+                foreach(SPFieldUserValue uv in uc)
+                {
+                    sb.Append(uv.LookupId.ToString() + ",");
+                }
+            }
+
+            string result = sb.ToString().TrimEnd(',');
+
+            return result;
+        }
+
+        private string GetItemAuthorId(SPListItem item)
+        {
+            // get user object 
+            SPFieldUser author = (SPFieldUser)item.Fields[SPBuiltInFieldId.Author];
+            SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(item[SPBuiltInFieldId.Author].ToString());
+            SPUser authorObj = userVal.User;
+
+            return (authorObj == null ) ? string.Empty : authorObj.ID.ToString();
         }
 
         private void AddCommentersFields()
@@ -228,12 +466,12 @@ namespace EPMLiveCore
                             }
 
                             // get user object 
-                            SPFieldUser author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
+                            SPFieldUser author = null;
+                            author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
                             SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
                             SPUser authorObj = userVal.User;
-
                             // (if current user is item creator OR in commenters column OR in the assigned to field) AND not in commentersread column
-                            if (((SPContext.Current.Web.CurrentUser.ID == authorObj.ID) || (laCommenters.Contains(SPContext.Current.Web.CurrentUser.ID)) || (CommentManager.UserIsAssigned(SPContext.Current.Web.CurrentUser.ID, originListItem)))
+                            if (((authorObj != null && SPContext.Current.Web.CurrentUser.ID == authorObj.ID) || (laCommenters.Contains(SPContext.Current.Web.CurrentUser.ID)) || (CommentManager.UserIsAssigned(SPContext.Current.Web.CurrentUser.ID, originListItem)))
                                 && (!laCommentersRead.Contains(SPContext.Current.Web.CurrentUser.ID)))
                             {
                                 string sNewCommentersRead = originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id].ToString() : string.Empty;
@@ -268,7 +506,6 @@ namespace EPMLiveCore
 
                             originListItem.SystemUpdate();
                         }
-
                     }
                 }
             });
@@ -296,9 +533,15 @@ namespace EPMLiveCore
                 foreach (SPListItem item in items)
                 {
                     // get user object 
-                    SPFieldUser author = (SPFieldUser)item.Fields[SPBuiltInFieldId.Author];
+                    SPFieldUser author = null;
+                    author = (SPFieldUser)item.Fields[SPBuiltInFieldId.Author];
                     SPFieldUserValue user = (SPFieldUserValue)author.GetFieldValue(item[SPBuiltInFieldId.Author].ToString());
                     SPUser userObject = user.User;
+
+                    if (userObject == null)
+                    {
+                        continue;
+                    }
 
                     //get user picture from user id
                     SPList userInfoList = Web.SiteUserInfoList;

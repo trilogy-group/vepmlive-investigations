@@ -145,7 +145,7 @@
 	                    </wssuc:InputFormSection>
 	                    
 	                    <tr><td colspan="2"><table class="ms-toolbar" width="100%" cellpadding="3" style="height:20px">
-                        <tr><td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">New Project Options</h3></td></tr>
+                        <tr><td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">New Workspace Options</h3></td></tr>
                         </table></td></tr>
                   
                         <wssuc:InputFormSection ID="InputFormSection6" Title="Valid Templates"

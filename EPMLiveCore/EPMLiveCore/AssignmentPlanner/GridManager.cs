@@ -151,6 +151,7 @@ namespace EPMLiveCore.AssignmentPlanner
                 var workDayEndHour = (short) (spRegionalSettings.WorkDayEndHour/60);
 
                 string siteUrl = _spWeb.Site.Url;
+                string safeServerRelativeUrl = _spWeb.SafeServerRelativeUrl();
 
                 foreach (
                     XElement resourceElement in
@@ -236,7 +237,7 @@ namespace EPMLiveCore.AssignmentPlanner
 
                         if (personalizationRootElement != null)
                         {
-                            flag = (from e in personalizationRootElement.Elements("Personalization")
+                            flag = (from e in personalizationRootElement.Descendants("Personalization")
                                     let keyAttribute = e.Attribute("Key")
                                     where keyAttribute != null && keyAttribute.Value.Equals("AssignmentPlannerFlag")
                                     let valueAttribute = e.Attribute("Value")
@@ -244,8 +245,13 @@ namespace EPMLiveCore.AssignmentPlanner
                                     select valueAttribute.Value).FirstOrDefault();
                         }
 
+                        var flagValue = flag ?? "0";
+                        var flagUrl = safeServerRelativeUrl + "/_layouts/epmlive/images/mywork/flagged.png";
+                        if (flagValue.Equals("0")) flagUrl = safeServerRelativeUrl + "/_layouts/epmlive/images/mywork/unflagged.png";
+
                         iElement.Add(new XAttribute("Duration", string.Empty),
-                                     new XAttribute("Flag", flag ?? "0"));
+                                     new XAttribute("Flag", string.Format(@"<img src=""{0}"" class=""AP_Flag""/>", flagUrl)),
+                                     new XAttribute("FlagValue", flagValue), new XAttribute("Height", 23));
 
                         bElement.Add(iElement);
 

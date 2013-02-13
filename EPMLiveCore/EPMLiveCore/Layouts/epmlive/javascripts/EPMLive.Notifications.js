@@ -87,7 +87,7 @@
     };
 
     function notificationsAreVisible() {
-        return $("#EPMLiveNotificationsWrap").is(":visible");
+        return epmLiveNotifications.showNotifications();
     };
 
     function doFlash() {
@@ -168,9 +168,9 @@
     epmLiveNotifications.notificationCounterColor = k.dependentObservable(function () {
         if (!notificationsAreVisible()) {
             if (this.newSystemNotifications().length > 0) {
-                return '#CC3C29';
+                return '#89CE00';
             } else if (this.newGeneralNotifications().length > 0) {
-                return '#55A4F2';
+                return '#26C6F4';
             } else {
                 return '#547194';
             }
@@ -263,7 +263,7 @@
             if (visible) {
                 epmLiveNotifications.notifications.unshift(notification);
                 if (!notification.notificationread()) {
-                    epmLiveNotifications.totalNewNotifications(epmLiveNotifications.totalNewNotifications() + 1);
+                    epmLiveNotifications.totalNewNotifications(parseInt(epmLiveNotifications.totalNewNotifications()) + 1);
                     if (!epmLiveNotifications.firstTimeLoad) {
                         doFlash();
                     }
@@ -294,7 +294,6 @@
         if (epmLiveNotifications.updatedNotifications.length > 0) {
             for (var j = 0; j < epmLiveNotifications.updatedNotifications.length; j++) {
                 getNotificationById(epmLiveNotifications.updatedNotifications[j]).notificationread(true);
-                //epmLiveNotifications.totalNewNotifications(epmLiveNotifications.totalNewNotifications() - 1);
             }
 
             epmLiveNotifications.updatedNotifications = [];
@@ -471,6 +470,8 @@
                 if (epmLiveNotifications.totalNewNotifications() > 0) {
                     epmLiveNotifications.markMessagesAsRead();
                 }
+
+                window.setTimeout(function () { $("#EPMLiveNotificationsWrap").show(); }, 1);
             } else {
                 hideNotifications(notificationCounter, notificationCounterScreen);
             }

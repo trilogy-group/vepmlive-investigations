@@ -34,6 +34,7 @@
         SPLIMBatchOp,
         SPLIMBatchOpRootEleNotFound,
         SPLIMBatchOpIdNotFound,
-        SPLIMBatchOpFieldAttrNotFound
+        SPLIMBatchOpFieldAttrNotFound,
+        SPLIMGetAllFromDB
     }
 }

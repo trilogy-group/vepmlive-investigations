@@ -27,6 +27,10 @@
                     </asp:Panel>
 
                     <asp:TextBox ID="DaysHoursBreakdownTotalHoursTextBox" title="DaysHoursBreakdownTotalHours" style="display: none" runat="server" Text="0" />
+                    
+                    <asp:Panel ID="DHBErrorPanel" title="DHBErrorPanel" runat="server">
+                        <asp:Label ID="DHBErrorLabel" runat="server" Font-Size="11px" ForeColor="#CC0000"></asp:Label>
+                    </asp:Panel>
                 </ContentTemplate> 
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="DaysHoursBreakdownStartDateTextBox" EventName="TextChanged" />

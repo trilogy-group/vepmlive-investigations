@@ -9,7 +9,7 @@
         SecurityBits="11"
         Sequence="410"
         DisplayName="Departments"
-		 HiddenList="TRUE"
+    		HiddenList="TRUE"
         Description="Departments"
         Image="/_layouts/images/itwe.png" Hidden="True"/>
 </Elements>

@@ -1,0 +1,31 @@
+</td>
+	    </tr>
+	</table>
+</td>
+<td class='ms-toolbar' nowrap='true' align='right'>
+	<table border=0 cellpadding=0 cellspacing=0 style='margin-right: 4px'>
+		    <tr>
+		    
+		    <td nowrap class='ms-listheaderlabel'>Resource Pool View:&nbsp;</td>
+            <td id='' nowrap='nowrap' class='ms-viewselector' onmouseover=""this.className='ms-viewselectorhover'"" onmouseout=""this.className='ms-viewselector'"">
+			<span style='display:none'>
+
+
+                <menu type='ServerMenu' id='EPMLiveTaskRollupViewSelectorMenu' CompactMode='true'>
+                #viewList#
+                </menu>
+            </span>
+
+            <span title='Open Menu'>
+            <div  id='zz35_ViewSelectorMenu_t' class='ms-viewselector' onmouseover='MMU_PopMenuIfShowing(this);MMU_EcbTableMouseOverOut(this, true)' hoverActive='ms-viewselectorhover' hoverInactive='ms-viewselector' onclick="" MMU_Open(byid('EPMLivetaskRollupViewSelectorMenu'), MMU_GetMenuFromClientId('zz35_ViewSelectorMenu'),event,true, 'ctl00_m_g_1b415116_2722_4b37_9cad_bab8dd8f7b5e_ctl00_ctl00_toolBarTbl_RightRptControls_ctl01_ctl00_onetViewSelector', 0);"" foa=""MMU_GetMenuFromClientId('zz35_ViewSelectorMenu')"" oncontextmenu='this.click(); return false;' nowrap='nowrap'>
+            <a id='zz35_ViewSelectorMenu' accesskey='W' href='#' onclick='javascript:return false;' style='cursor:hand;white-space:nowrap;' onfocus=""MMU_EcbLinkOnFocusBlur(byid('EPMLivetaskRollupViewSelectorMenu'), this, true);"" onkeydown=""MMU_EcbLinkOnKeyDown(byid('EPMLivetaskRollupViewSelectorMenu'), MMU_GetMenuFromClientId('zz35_ViewSelectorMenu'), event);"" onclick=' MMU_Open(byid('EPMLivetaskRollupViewSelectorMenu'), MMU_GetMenuFromClientId('zz35_ViewSelectorMenu'),event,true, 'ctl00_m_g_1b415116_2722_4b37_9cad_bab8dd8f7b5e_ctl00_ctl00_toolBarTbl_RightRptControls_ctl01_ctl00_onetViewSelector', 0);"" oncontextmenu='this.click(); return false;' menuTokenValues='MENUCLIENTID=zz35_ViewSelectorMenu,TEMPLATECLIENTID=EPMLivetaskRollupViewSelectorMenu' serverclientid='zz35_ViewSelectorMenu'>
+                #currentView#
+            <img src='/_layouts/images/blank.gif' border='0' alt='Use SHIFT+ENTER to open the menu (new window).'/></a>
+            <img align='absbottom' src='/_layouts/images/blank.gif' alt='' /></div></span>
+			
+            </td>
+            </tr>
+		    </table>
+</td>
+</tr>
+</table>

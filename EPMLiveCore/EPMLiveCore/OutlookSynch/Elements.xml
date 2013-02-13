@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomAction Id="OutlookSynch"
+	RegistrationType="List"
+	RegistrationId="10702"
+	GroupId="ActionsMenu"
+	Location="Microsoft.SharePoint.StandardMenu"
+	Sequence="1000"
+	Title="Connect To Outlook"
+	Description="Connect this list with Outlook 2007"
+	ImageUrl="/_layouts/images/MENUOUTL.gif" >
+    <UrlAction Url="_layouts/epmlive/outlooksynch.aspx?ListId={ListId}"/>
+  </CustomAction>
+</Elements>

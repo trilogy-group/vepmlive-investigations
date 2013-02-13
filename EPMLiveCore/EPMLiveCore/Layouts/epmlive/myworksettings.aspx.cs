@@ -17,20 +17,21 @@ namespace EPMLiveCore
 {
     public partial class myworksettings : LayoutsPageBase
     {
-        #region Fields (14) 
+        #region Fields (15) 
 
+        public const string GENERAL_SETTINGS_WORK_DAY_FILTERS = "EPMLive_MyWork_GeneralSettings_WorkDayFilters";
+        public const string GENERAL_SETTINGS_NEW_ITEM_INDICATOR = "EPMLive_MyWork_GeneralSettings_NewItemIndicator";
         private const string GeneralSettingsCrossSiteUrls = "EPMLive_MyWork_GeneralSettings_CrossSiteUrls";
         private const string GeneralSettingsExcludedMyWorkLists = "EPMLive_MyWork_GeneralSettings_ExcludedMyWorkLists";
         private const string GeneralSettingsListsAndFields = "EPMLive_MyWork_GeneralSettings_AllListsAndFields";
         private const string GeneralSettingsMyWorkIncludeFixApplied = "EPMLive_MyWork_GeneralSettings_IncludeFixApplied";
         private const string GeneralSettingsMyWorkListsAndFields = "EPMLive_MyWork_GeneralSettings_MyWorkListsAndFields";
-        //private const string GeneralSettingsNewItemButtonLists = "EPMLive_MyWork_GeneralSettings_NewItemButtonLists";
         private const string GeneralSettingsPerformanceMode = "EPMLive_MyWork_GeneralSettings_PerformanceMode";
         private const string GeneralSettingsSelectedFields = "EPMLive_MyWork_GeneralSettings_SelectedFields";
         public const string GeneralSettingsSelectedLists = "EPMLive_MyWork_GeneralSettings_SelectedLists";
         public const string GeneralSettingsSelectedMyWorkLists = "EPMLive_MyWork_GeneralSettings_SelectedMyWorkLists";
         private const int MyWorkListServerTemplateId = 10115;
-        private readonly SPWeb _web = SPContext.Current.Web;
+        private SPWeb _web;
         protected string FieldLists;
         protected string ListWorkspaces;
         protected List<MWList> MyWorkLists;
@@ -43,11 +44,9 @@ namespace EPMLiveCore
         {
             get
             {
-                //if (string.IsNullOrEmpty(tbSelectedLists.Text)) return null;
-
                 List<string> lists =
                     tbSelectedLists.Text.Replace("\r\n", "\n").Split('\n').Where(list => !string.IsNullOrEmpty(list)).
-                        ToList();
+                                    ToList();
                 lists.AddRange(from ListItem item in lstIncludedMyWorkLists.Items select item.Text);
 
                 return lists.Distinct().ToArray();
@@ -72,7 +71,7 @@ namespace EPMLiveCore
                 string archivedWebString = string.Join(",",
                                                        archivedWebs.Select(
                                                            archivedWeb => string.Format("'{0}'", archivedWeb)).
-                                                           ToArray());
+                                                                    ToArray());
 
                 string queryString =
                     @"
@@ -135,10 +134,12 @@ namespace EPMLiveCore
         // Protected Methods (9) 
 
         /// <summary>
-        /// Handles the OnClick event of the btnAddField control.
+        ///     Handles the OnClick event of the btnAddField control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void btnAddField_OnClick(object sender, EventArgs e)
         {
             var fieldsToRemove = new List<ListItem>();
@@ -158,10 +159,12 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Handles the OnClick event of the btnExcludeList control.
+        ///     Handles the OnClick event of the btnExcludeList control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void btnExcludeList_OnClick(object sender, EventArgs e)
         {
             var listsToRemove = new List<ListItem>();
@@ -181,10 +184,12 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Handles the OnClick event of the btnIncludeList control.
+        ///     Handles the OnClick event of the btnIncludeList control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void btnIncludeList_OnClick(object sender, EventArgs e)
         {
             var listsToRemove = new List<ListItem>();
@@ -205,10 +210,12 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Handles the OnClick event of the btnRefreshField control.
+        ///     Handles the OnClick event of the btnRefreshField control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void btnRefreshField_OnClick(object sender, EventArgs e)
         {
             Dictionary<string, List<string>> listsAndFields = GetListsAndFields();
@@ -217,21 +224,6 @@ namespace EPMLiveCore
             List<string> selectedFields =
                 (lstSelectedFields.Items.Cast<ListItem>().Select(listItem => listItem.Value)).ToList();
 
-            //if (string.IsNullOrEmpty(tbSelectedLists.Text))
-            //{
-            //    IOrderedEnumerable<ListItem> availableFields = (listsAndFields.SelectMany(
-            //        listAndField => listAndField.Value)
-            //        .Where(theField => !selectedFields.Exists(f => f.Equals(theField))).Select(
-            //            theField => new ListItem(theField.ToPrettierName(_web), theField)))
-            //        .ToList().Distinct().OrderBy(f => f.Text);
-
-            //    lstAllFields.DataTextField = "Text";
-            //    lstAllFields.DataValueField = "Value";
-            //    lstAllFields.DataSource = availableFields;
-            //    lstAllFields.DataBind();
-            //}
-            //else
-            //{
             string[] selectedLists = CurrentlySelectedLists;
 
             #region Available Fields
@@ -255,13 +247,6 @@ namespace EPMLiveCore
                                      let fieldInternalName = field.ToPrettierName(_web)
                                      where !lstSelectedFields.Items.Contains(new ListItem(fieldInternalName, field))
                                      select new ListItem(fieldInternalName, field));
-
-            //availableFields.AddRange(from myWorkListsAndField in myWorkListsAndFields
-            //                         where selectedLists.Contains(myWorkListsAndField.Key)
-            //                         from field in myWorkListsAndField.Value
-            //                         let fieldInternalName = field.ToPrettierName(_web)
-            //                         where !lstSelectedFields.Items.Contains(new ListItem(fieldInternalName, field))
-            //                         select new ListItem(fieldInternalName, field));
 
             lstAllFields.DataSource = availableFields.Distinct().OrderBy(f => f.Text);
             lstAllFields.DataTextField = "Text";
@@ -287,16 +272,16 @@ namespace EPMLiveCore
 
             #endregion
 
-            //}
-
             ListMyWorkFields();
         }
 
         /// <summary>
-        /// Handles the OnClick event of the btnRemoveField control.
+        ///     Handles the OnClick event of the btnRemoveField control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void btnRemoveField_OnClick(object sender, EventArgs e)
         {
             var fieldsToRemove = new List<ListItem>();
@@ -315,30 +300,36 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Handles the OnClick event of the btnReset control.
+        ///     Handles the OnClick event of the btnReset control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void btnReset_OnClick(object sender, EventArgs e)
         {
             LoadGeneralSettings();
         }
 
         /// <summary>
-        /// Handles the OnClick event of the btnSave control.
+        ///     Handles the OnClick event of the btnSave control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void btnSave_OnClick(object sender, EventArgs e)
         {
             SaveGeneralSettings();
         }
 
         /// <summary>
-        /// Handles the RowDataBound event of the GvFields control.
+        ///     Handles the RowDataBound event of the GvFields control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Web.UI.WebControls.GridViewRowEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.Web.UI.WebControls.GridViewRowEventArgs" /> instance containing the event data.
+        /// </param>
         protected void GvFields_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             if (e.Row.RowType != DataControlRowType.DataRow) return;
@@ -356,12 +347,15 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Handles the Load event of the Page control.
+        ///     Handles the Load event of the Page control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">
+        ///     The <see cref="System.EventArgs" /> instance containing the event data.
+        /// </param>
         protected void Page_Load(object sender, EventArgs e)
         {
+            _web = SPContext.Current.Web;
             _web.AllowUnsafeUpdates = true;
 
             #region MASTER RESET
@@ -427,7 +421,8 @@ namespace EPMLiveCore
                                                                                                list =>
                                                                                                string.Format(@"'{0}'",
                                                                                                              list)).
-                                                                                               ToArray()))).ToList();
+                                                                                                     ToArray())))
+                                            .ToList();
 
             FieldLists = string.Join(",", fields.ToArray());
             hfFieldLists.Value = FieldLists;
@@ -453,7 +448,7 @@ namespace EPMLiveCore
         // Private Methods (9) 
 
         /// <summary>
-        /// Gets the lists and fields.
+        ///     Gets the lists and fields.
         /// </summary>
         /// <returns></returns>
         private Dictionary<string, List<string>> GetListsAndFields()
@@ -479,7 +474,7 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Gets my work lists and fields.
+        ///     Gets my work lists and fields.
         /// </summary>
         /// <returns></returns>
         private Dictionary<string, List<string>> GetMyWorkListsAndFields()
@@ -505,7 +500,7 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Determines if the fix is applied.
+        ///     Determines if the fix is applied.
         /// </summary>
         /// <returns></returns>
         private bool IncludeFixApplied()
@@ -516,7 +511,7 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Lists my work fields.
+        ///     Lists my work fields.
         /// </summary>
         private void ListMyWorkFields()
         {
@@ -542,7 +537,7 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Loads the general settings.
+        ///     Loads the general settings.
         /// </summary>
         private void LoadGeneralSettings()
         {
@@ -563,7 +558,7 @@ namespace EPMLiveCore
                 {
                     List<string> selectedMyWorkLists =
                         CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedMyWorkLists).Split(new[] {','}).
-                            ToList();
+                                      ToList();
 
                     var excludedLists = new List<string>();
                     var includedLists = new List<string>();
@@ -588,26 +583,6 @@ namespace EPMLiveCore
                                                    true.ToString(CultureInfo.InvariantCulture));
                 }
             }
-
-            //List<string> selectedMyWorkLists =
-            //    CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedMyWorkLists).Split(new[] {','}).ToList();
-
-            //MyWorkLists = GetMyWorkListsFromDb(_web, MyWork.GetArchivedWebs(_web.Site.ID));
-
-            //foreach (MWList list in MyWorkLists)
-            //{
-            //    var listItem = new ListItem(list.Name, list.Id);
-
-            //    if (selectedMyWorkLists.Contains(list.Name) ||
-            //        (selectedMyWorkLists.Count == 1 && string.IsNullOrEmpty(selectedMyWorkLists[0])))
-            //    {
-            //        lstIncludedMyWorkLists.Items.Add(listItem);
-            //    }
-            //    else
-            //    {
-            //        lstExcludedMyWorkLists.Items.Add(listItem);
-            //    }
-            //}
 
             List<string> excludedMyWorkLists =
                 CoreFunctions.getConfigSetting(_web, GeneralSettingsExcludedMyWorkLists).Split(new[] {','}).ToList();
@@ -634,15 +609,6 @@ namespace EPMLiveCore
             {
                 tbSelectedLists.Text += selectedList + Environment.NewLine;
             }
-
-            #endregion
-
-            #region New Item Button List
-
-            //string newItemButtonLists = CoreFunctions.getConfigSetting(_web, GeneralSettingsNewItemButtonLists);
-
-            //if (!string.IsNullOrEmpty(newItemButtonLists))
-            //    tbNewItemButtonLists.Text = newItemButtonLists.Replace("|", Environment.NewLine);
 
             #endregion
 
@@ -705,10 +671,61 @@ namespace EPMLiveCore
             cbPerformanceMode.Checked = string.IsNullOrEmpty(performanceMode) || performanceMode.Equals("on");
 
             #endregion
+
+            #region My Work Grid Settings
+
+            bool agoFilterEnabled = false;
+            int agoFilterDays = 0;
+            bool afterFilterEnabled = false;
+            int afterFilterDays = 0;
+
+            var dayFilters = CoreFunctions.getConfigSetting(_web, GENERAL_SETTINGS_WORK_DAY_FILTERS);
+
+            if (!string.IsNullOrEmpty(dayFilters))
+            {
+                string[] filters = dayFilters.Split('|');
+
+                bool.TryParse(filters[0], out agoFilterEnabled);
+                int.TryParse(filters[1], out agoFilterDays);
+                bool.TryParse(filters[2], out afterFilterEnabled);
+                int.TryParse(filters[3], out afterFilterDays);
+            }
+
+            cbDaysAgo.Checked = agoFilterEnabled;
+            cbDaysAfter.Checked = afterFilterEnabled;
+
+            if (agoFilterDays > 0) tbDaysAgo.Text = agoFilterDays.ToString(CultureInfo.InvariantCulture);
+            if (afterFilterDays > 0) tbDaysAfter.Text = afterFilterDays.ToString(CultureInfo.InvariantCulture);
+
+            tbDaysAgo.Enabled = agoFilterEnabled;
+            tbDaysAfter.Enabled = afterFilterEnabled;
+
+            hfDaysAgo.Value = tbDaysAgo.Text;
+            hfDaysAfter.Value = tbDaysAfter.Text;
+
+            bool indicatorActive = true;
+            int indicatorDays = 2;
+
+            var newItemIndicator = CoreFunctions.getConfigSetting(_web, GENERAL_SETTINGS_NEW_ITEM_INDICATOR);
+
+            if (!string.IsNullOrEmpty(newItemIndicator))
+            {
+                var settings = newItemIndicator.Split('|');
+
+                bool.TryParse(settings[0], out indicatorActive);
+                int.TryParse(settings[1], out indicatorDays);
+            }
+
+            cbNewItemIndicator.Checked = indicatorActive;
+            if (indicatorDays > 0) tbNewItemIndicator.Text = indicatorDays.ToString(CultureInfo.InvariantCulture);
+            tbNewItemIndicator.Enabled = indicatorActive;
+            hfNewItemIndicator.Value = tbNewItemIndicator.Text;
+
+            #endregion
         }
 
         /// <summary>
-        /// Checks if the my work list exists.
+        ///     Checks if the my work list exists.
         /// </summary>
         /// <returns></returns>
         private bool MyWorkListExists()
@@ -717,7 +734,7 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Determines if this is a new setup.
+        ///     Determines if this is a new setup.
         /// </summary>
         /// <returns></returns>
         private bool NewSetup()
@@ -732,7 +749,7 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Saves the general settings.
+        ///     Saves the general settings.
         /// </summary>
         private void SaveGeneralSettings()
         {
@@ -763,14 +780,53 @@ namespace EPMLiveCore
                 (lstSelectedFields.Items.Cast<ListItem>().Select(listItem => listItem.Value)).ToArray();
             CoreFunctions.setConfigSetting(_web, GeneralSettingsSelectedFields, string.Join(",", selectedFields));
 
-            //CoreFunctions.setConfigSetting(_web, GeneralSettingsNewItemButtonLists,
-            //                               tbNewItemButtonLists.Text.Replace(Environment.NewLine, "|"));
-
             CoreFunctions.setConfigSetting(_web, GeneralSettingsCrossSiteUrls,
                                            tbCrossSiteUrls.Text.Replace(Environment.NewLine, "|"));
 
             CoreFunctions.setConfigSetting(_web, GeneralSettingsPerformanceMode,
                                            cbPerformanceMode.Checked ? "on" : "off");
+
+            var daysAgo = string.Empty;
+            var daysAfter = string.Empty;
+
+            if (!string.IsNullOrEmpty(hfDaysAgo.Value))
+            {
+                var text = hfDaysAgo.Value.Trim();
+                int days;
+                if (int.TryParse(text, out days))
+                {
+                    if (days > 0) daysAgo = text;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(hfDaysAfter.Value))
+            {
+                var text = hfDaysAfter.Value.Trim();
+                int days;
+                if (int.TryParse(text, out days))
+                {
+                    if (days > 0) daysAfter = text;
+                }
+            }
+
+            var dayFilters = string.Format("{0}|{1}|{2}|{3}", cbDaysAgo.Checked, daysAgo, cbDaysAfter.Checked, daysAfter);
+
+            CoreFunctions.setConfigSetting(_web, GENERAL_SETTINGS_WORK_DAY_FILTERS, dayFilters.ToLower());
+
+            var daysIndicator = string.Empty;
+
+            if (!string.IsNullOrEmpty(hfNewItemIndicator.Value))
+            {
+                var text = hfNewItemIndicator.Value.Trim();
+                int days;
+                if (int.TryParse(text, out days))
+                {
+                    if (days > 0) daysIndicator = text;
+                }
+            }
+
+            CoreFunctions.setConfigSetting(_web, GENERAL_SETTINGS_NEW_ITEM_INDICATOR,
+                                           string.Format("{0}|{1}", cbNewItemIndicator.Checked, daysIndicator).ToLower());
 
             if (!String.IsNullOrEmpty(Request["Source"]))
             {
@@ -783,7 +839,7 @@ namespace EPMLiveCore
         }
 
         /// <summary>
-        /// Sets the lists and fields.
+        ///     Sets the lists and fields.
         /// </summary>
         /// <returns></returns>
         private void SetListsAndFields()
@@ -793,19 +849,23 @@ namespace EPMLiveCore
 
             foreach (SPList spList in _web.Lists)
             {
-                List<string> fields =
+                try
+                {
+                    List<string> fields =
                     (from SPField spField in spList.Fields
                      where !spField.Hidden && spField.Reorderable
                      select spField.InternalName).ToList();
 
-                string title = spList.Title;
+                    string title = spList.Title;
 
-                listsAndFields.Add(title, fields);
+                    listsAndFields.Add(title, fields);
 
-                if ((int)spList.BaseTemplate == MyWorkListServerTemplateId || title.Equals("My Work"))
-                {
-                    myWorkListsAndFields.Add(title, fields);
+                    if ((int)spList.BaseTemplate == MyWorkListServerTemplateId || title.Equals("My Work"))
+                    {
+                        myWorkListsAndFields.Add(title, fields);
+                    }
                 }
+                catch { }
             }
 
             string serializedListsAndFields = listsAndFields.Aggregate(string.Empty, (current, listAndFields)
@@ -832,7 +892,7 @@ namespace EPMLiveCore
                                                                                                  string.Join(",",
                                                                                                              myWorkListAndFields
                                                                                                                  .Value.
-                                                                                                                 ToArray
+                                                                                                                  ToArray
                                                                                                                  ())));
 
             CoreFunctions.setConfigSetting(_web, GeneralSettingsMyWorkListsAndFields,

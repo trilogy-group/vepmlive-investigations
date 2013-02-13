@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EPMLiveCore</RootNamespace>
-    <AssemblyName>EPMLiveCore</AssemblyName>
+    <AssemblyName>EPM Live Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
@@ -43,16 +43,35 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPMLiveIntegration">
+      <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\EPMLiveReportsAdmin.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll</HintPath>
+    </Reference>
+    <Reference Include="EPMLiveWorkPlanner, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\EPMLiveWorkPlanner\EPMLiveWorkPlanner\bin\Debug\EPMLiveWorkPlanner.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -68,6 +87,8 @@
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Act.cs" />
+    <Compile Include="ADSync.cs" />
     <Compile Include="API\APIException.cs" />
     <Compile Include="API\APITeam.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
@@ -77,6 +98,12 @@
     <Compile Include="API\Comments\CommentManager.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
     <Compile Include="API\ExecutionStatus.asmx.cs" />
+    <Compile Include="API\Integration\IntegrationAdmin.cs" />
+    <Compile Include="API\Integration\IntegrationControls.cs" />
+    <Compile Include="API\Integration\IntegrationControlTemplate.cs" />
+    <Compile Include="API\Integration\IntegrationCore.cs" />
+    <Compile Include="API\Integration\IntegrationDescriptionTemplate.cs" />
+    <Compile Include="API\Integration\SqlIntegration.cs" />
     <Compile Include="API\ListCommands\ListCommands.cs" />
     <Compile Include="API\MyWork\FieldInfo.cs" />
     <Compile Include="API\MyWork\ListItem.cs" />
@@ -87,6 +114,8 @@
     <Compile Include="API\MyWork\Utils.cs" />
     <Compile Include="API\Notification\APIEmail.cs" />
     <Compile Include="API\Notification\Notification.cs" />
+    <Compile Include="API\Personalization.cs" />
+    <Compile Include="API\PersonalizationManager.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
@@ -101,12 +130,20 @@
     <Compile Include="API\SPAdmin\FeatureEventsManager.cs" />
     <Compile Include="API\Template\Template.cs" />
     <Compile Include="API\Timer.cs" />
+    <Compile Include="API\ViewManager.cs" />
+    <Compile Include="AppNavFixUp.cs" />
+    <Compile Include="AppSettingsHelper.cs" />
     <Compile Include="AppsListEvents\AppsListEvents.cs" />
+    <Compile Include="AssignedToEvent.cs" />
     <Compile Include="AssignmentPlanner\API\Gateway.cs" />
     <Compile Include="AssignmentPlanner\AssignmentManager.cs" />
     <Compile Include="AssignmentPlanner\AssignmentPlannerGlobalViewManager.cs" />
     <Compile Include="AssignmentPlanner\AssignmentPlannerPersonalViewManager.cs" />
     <Compile Include="AssignmentPlanner\GridManager.cs" />
+    <Compile Include="BtnChangeApp.cs" />
+    <Compile Include="BtnCommonActions.cs" />
+    <Compile Include="BtnCreateNew.cs" />
+    <Compile Include="CascadingLookupFieldValueCollection.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControl.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingMultiLookupRenderControl.cs" />
     <Compile Include="CascadingLookup\CascadingLookup.Field.cs" />
@@ -114,6 +151,8 @@
     <Compile Include="CascadingLookup\CascadingLookup.FieldSettings.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="ChildParentSync.cs" />
+    <Compile Include="CommentCCPeopleEditor.cs" />
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -149,7 +188,13 @@
     <Compile Include="CONTROLTEMPLATES\TemplateVersoning.ascx.designer.cs">
       <DependentUpon>TemplateVersoning.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="CoreFunctions.cs" />
+    <Compile Include="DataQueryFactory.cs" />
     <Compile Include="DepartmentEvent\DepartmentEvent.cs" />
+    <Compile Include="DisabledItemEventScope.cs" />
+    <Compile Include="EditableFieldDisplay.cs" />
+    <Compile Include="EditIn.cs" />
+    <Compile Include="EditTasks.cs" />
     <Compile Include="EPMLiveConfig\EPMLiveConfig.Field.cs" />
     <Compile Include="EPMLiveConfig\EPMLiveConfig.FieldControl.cs" />
     <Compile Include="EPMLivePCForm\ManageableLists.cs">
@@ -159,6 +204,10 @@
     <Compile Include="EPMLivePCForm\TCFieldIterator.cs" />
     <Compile Include="EPMLiveProjectCenterEvent\EPMLiveProjectCenterEvent.cs" />
     <Compile Include="EPMLiveTaskCenterEvent\EPMLiveTaskCenterEvent.cs" />
+    <Compile Include="EPMLiveTimePhased.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FilteredLookup\FilteredLookupField.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldControl.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldEditor.cs">
@@ -166,10 +215,19 @@
     </Compile>
     <Compile Include="FilteredLookup\MultipleFilteredLookupFieldControl.cs" />
     <Compile Include="FilteredLookup\Util.cs" />
+    <Compile Include="GenericEntityEditor.cs" />
+    <Compile Include="GenericEntityPickerPropertyBag.cs" />
+    <Compile Include="GenericPickerDialog.cs" />
+    <Compile Include="GenericPublishEvent.cs" />
+    <Compile Include="GenericQueryControl.cs" />
+    <Compile Include="GlobalResourceHelper.cs" />
     <Compile Include="GlobalResources\MultiAppNavigationResources.Designer.cs" />
     <Compile Include="GlobalResources\WorkEngineLookupPickerResources.Designer.cs" />
+    <Compile Include="GridGanttSettings.cs" />
     <Compile Include="Infrastructure\BaseClasses\BaseManager.cs" />
+    <Compile Include="Infrastructure\BaseClasses\ReportingProxyBase.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManager.cs" />
+    <Compile Include="Infrastructure\EPMLiveFileStore.cs" />
     <Compile Include="Infrastructure\Errors.cs" />
     <Compile Include="Infrastructure\GridView\GlobalGridViewManager.cs" />
     <Compile Include="Infrastructure\GridView\GridView.cs" />
@@ -180,6 +238,8 @@
     <Compile Include="Infrastructure\Interfaces\ISPListItemManager.cs" />
     <Compile Include="Infrastructure\ResourceManagement\DepartmentManager.cs" />
     <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManager.cs" />
+    <Compile Include="Infrastructure\WEFeatures.cs" />
+    <Compile Include="IntegrateEvents\IntegrateEvents.cs" />
     <Compile Include="ISAPI\Lic\Licensing.asmx.cs">
       <DependentUpon>Licensing.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -188,11 +248,14 @@
       <DependentUpon>WorkEngine.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ItemEnableTeamEvent.cs" />
+    <Compile Include="ItemSecurityEventReceiver.cs" />
     <Compile Include="Jobs\AdSynchJob.cs" />
     <Compile Include="Jobs\Applications\InstallAndConfigure.cs" />
     <Compile Include="Jobs\Applications\Uninstall.cs" />
     <Compile Include="Jobs\Notifications.cs" />
     <Compile Include="Jobs\ResourcePlan.cs" />
+    <Compile Include="Jobs\SecurityUpdate.cs" />
     <Compile Include="Jobs\TimerFix.cs" />
     <Compile Include="Jobs\Upgrades\Steps\IStep.cs" />
     <Compile Include="Jobs\Upgrades\Steps\JobStep.cs" />
@@ -201,10 +264,12 @@
     <Compile Include="Jobs\Upgrades\Steps\Utilities.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddFiles.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListData.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AppListFetureActivationStep.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\DBUpgrader.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallAndConfigureLists.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\InstallReportingEvents.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\MasterPageUpdateStep.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\Miscellaneous.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\PFEPermissionMapper.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\ReportingUpgrade.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\SiteFeatures.cs" />
@@ -212,6 +277,7 @@
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePool.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateWebs.cs" />
     <Compile Include="Jobs\Upgrades\WE43UpgradeJob.cs" />
+    <Compile Include="JSONUtil.cs" />
     <Compile Include="Layouts\epmlive\acttest.aspx.cs">
       <DependentUpon>acttest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -401,6 +467,13 @@
     <Compile Include="Layouts\epmlive\ChangeAppAjaxDataHost.aspx.designer.cs">
       <DependentUpon>ChangeAppAjaxDataHost.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\commentersupdate.aspx.cs">
+      <DependentUpon>commentersupdate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\commentersupdate.aspx.designer.cs">
+      <DependentUpon>commentersupdate.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Comments.aspx.cs">
       <DependentUpon>Comments.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -513,6 +586,48 @@
     <Compile Include="Layouts\epmlive\gridganttsettings.aspx.designer.cs">
       <DependentUpon>gridganttsettings.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Add.aspx.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Add.aspx.designer.cs">
+      <DependentUpon>Add.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Columns.aspx.cs">
+      <DependentUpon>Columns.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Columns.aspx.designer.cs">
+      <DependentUpon>Columns.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Connection.aspx.cs">
+      <DependentUpon>Connection.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Connection.aspx.designer.cs">
+      <DependentUpon>Connection.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Delete.aspx.cs">
+      <DependentUpon>Delete.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Delete.aspx.designer.cs">
+      <DependentUpon>Delete.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\IntegrationList.aspx.cs">
+      <DependentUpon>IntegrationList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\IntegrationList.aspx.designer.cs">
+      <DependentUpon>IntegrationList.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Properties.aspx.cs">
+      <DependentUpon>Properties.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Properties.aspx.designer.cs">
+      <DependentUpon>Properties.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\ListLookupConfig.aspx.cs">
       <DependentUpon>ListLookupConfig.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -526,6 +641,13 @@
     </Compile>
     <Compile Include="Layouts\epmlive\ListLookupEdit.aspx.designer.cs">
       <DependentUpon>ListLookupEdit.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\listViewHost.aspx.cs">
+      <DependentUpon>listViewHost.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\listViewHost.aspx.designer.cs">
+      <DependentUpon>listViewHost.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\MoreInformation.aspx.cs">
       <DependentUpon>MoreInformation.aspx</DependentUpon>
@@ -554,6 +676,13 @@
     </Compile>
     <Compile Include="Layouts\epmlive\newitem.aspx.designer.cs">
       <DependentUpon>newitem.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\noaccess.aspx.cs">
+      <DependentUpon>noaccess.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\noaccess.aspx.designer.cs">
+      <DependentUpon>noaccess.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\notifications.aspx.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
@@ -716,6 +845,13 @@
     <Compile Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx.designer.cs">
       <DependentUpon>UpgradeDone.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx.cs">
+      <DependentUpon>WE432Upgrader.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx.designer.cs">
+      <DependentUpon>WE432Upgrader.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx.cs">
       <DependentUpon>WE43Upgrader.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -752,7 +888,232 @@
       <DependentUpon>WorkspaceListWPCanvas.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="ListDefinitions\EPMLiveLists.cs" />
+    <Compile Include="ListDisplaySettingIterator.cs" />
+    <Compile Include="ListDisplayUtils.cs" />
+    <Compile Include="MultiAppCustomSiteMapProvider.cs" />
+    <Compile Include="NotificationCounter.cs" />
+    <Compile Include="NotificationEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ReportAuth.cs" />
+    <Compile Include="ReportingProxy\QueryExecutor.cs" />
+    <Compile Include="ResourceLevels\ResourceLevelsField.cs" />
+    <Compile Include="ResourceLevels\ResourceLevelsFieldControl.cs" />
+    <Compile Include="ResourcePermissions\ResourcePermissionsField.cs" />
+    <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
+    <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
+    <Compile Include="ResourceTools.cs" />
+    <Compile Include="SiteNavigationRibbonButton.cs" />
+    <Compile Include="SPFields\DaysHoursBreakdownField.cs" />
+    <Compile Include="SPFields\DaysHoursBreakdownFieldControl.cs" />
+    <Compile Include="StatusingEvent.cs" />
+    <Compile Include="TagManager\API\Gateway.cs" />
+    <Compile Include="TagManager\Tag.cs" />
+    <Compile Include="TagManager\TagManager.cs" />
+    <Compile Include="TagManager\TagOrder.cs" />
+    <Compile Include="TagManager\TagOrderRepository.cs" />
+    <Compile Include="TagManager\TagRepository.cs" />
+    <Compile Include="TemplateVersion.cs" />
+    <Compile Include="TEMPLATE\admin\epmlive\createsite.aspx.cs">
+      <DependentUpon>createsite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TEMPLATE\admin\epmlive\createsite.aspx.designer.cs">
+      <DependentUpon>createsite.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TEMPLATE\admin\epmlive\emailmanager.aspx.cs">
+      <DependentUpon>emailmanager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TEMPLATE\admin\epmlive\emailmanager.aspx.designer.cs">
+      <DependentUpon>emailmanager.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TEMPLATE\admin\epmlive\SystemMessages.aspx.cs">
+      <DependentUpon>SystemMessages.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TEMPLATE\admin\epmlive\SystemMessages.aspx.designer.cs">
+      <DependentUpon>SystemMessages.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TEMPLATE\admin\epmlive\usersv2.aspx.cs">
+      <DependentUpon>usersv2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TEMPLATE\admin\epmlive\usersv2.aspx.designer.cs">
+      <DependentUpon>usersv2.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TotalsRollup\TotalsRollup.Field.cs" />
+    <Compile Include="TotalsRollup\TotalsRollupFieldControl.cs" />
+    <Compile Include="TotalsRollup\TotalsRollupProperties.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserManager.cs" />
+    <Compile Include="Utilities.cs" />
+    <Compile Include="ViewPermissions\ViewPermissionSelectorMenu.cs" />
+    <Compile Include="ViewSelectorDelegate\ViewSelectorDelegate.cs" />
+    <Compile Include="Web References\ActLicensing\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\ApplicationStore\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\AppStoreReporting\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\FeatureActivationSvc\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\SSRS2005\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\SSRS2006\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\WorkEngineService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\WorkEngineSolutionStoreListSvc\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="WebPageCode\addcode.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\addperiod.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\addperiods.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminaddkey.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminconns.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminfeatures.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminqueue.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminservers.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminusers.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminversions.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\adminviewqueue.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\capreport.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\checkurl.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\CreateWorkspace.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\editcode.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\fieldaudit.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\FieldSyncPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\getgeneralsetting.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\getproject.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\getworkspacexml.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ListDisplayPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\manageschedule.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\newproject.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\openprojectplan.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\outlooksynch.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\refreshind.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\refreshpc.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\reportlist.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\rollupexport.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\runtimer.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\SaveTeam.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\setPCfield.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\synchperiods.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\tpreport.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\tpsetup.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ViewPermissionPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\ViewPermissionUtil.cs" />
+    <Compile Include="WebPageCode\viewrollup.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebServiceInstaller.cs" />
+    <Compile Include="WEPeopleEditor.cs" />
+    <Compile Include="WEPeopleQuery.cs" />
+    <Compile Include="WEPickerDialog.cs" />
+    <Compile Include="WorkEngineActivation.cs" />
+    <Compile Include="WorkEngineActivationInstaller.cs" />
+    <Compile Include="WorkEngineListEventsFeatureReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AppsListEvents\SharePointProjectItem.spdata">
@@ -773,6 +1134,7 @@
     <None Include="EPMLiveConfigMenus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9f2a6923-a6eb-43e7-8e73-7b01eada0266}</SharePointProjectItemId>
     </None>
+    <None Include="EPMLiveLists.snk" />
     <None Include="EPMLiveMasterTopLevel\EPMLive.master" />
     <None Include="EPMLiveMasterTopLevel\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{3a9c4efe-9c87-4864-93c5-f41679e2c83a}</SharePointProjectItemId>
@@ -835,11 +1197,110 @@
     <None Include="Features\AppNavFixUp\AppNavFixUp.feature">
       <FeatureId>{3aa712ee-ed28-48bc-8219-1c5a8c9b5fbc}</FeatureId>
     </None>
+    <None Include="Features\BuildTeam\BuildTeam.feature">
+      <FeatureId>{48688ef3-eba8-4e80-8003-4b57cc614561}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveConfigMenus\EPMLiveConfigMenus.feature">
+      <FeatureId>{3d7c7cbf-a0e9-462c-82a9-a6abb6064c90}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveMasterSettingsLists\EPMLiveMasterSettingsLists.feature">
+      <FeatureId>{5ba08d46-5c74-49d8-8287-0cafd8961b66}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveMasterTopLevel\EPMLiveMasterTopLevel.feature">
+      <FeatureId>{24e8341d-126a-4e34-bff8-a6de75cc9489}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveMasterWorkspace\EPMLiveMasterWorkspace.feature">
+      <FeatureId>{486f402b-54f9-46e1-b33c-bd7f7c3662e2}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveProjectCenter\EPMLiveProjectCenter.feature">
+      <FeatureId>{16a6747e-132d-4e25-a467-20d3fd0e9baf}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveProjectCenterEvent\EPMLiveProjectCenterEvent.feature">
+      <FeatureId>{3fdbda2e-bdcb-4701-bcd1-657f99725ade}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveProjectCenterRollup\EPMLiveProjectCenterRollup.feature">
+      <FeatureId>{39f1040c-3d10-45f2-9eeb-2c4bb7f981b5}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveTaskCenter\EPMLiveTaskCenter.feature">
+      <FeatureId>{92ee4d72-533a-4518-87f8-6b8ab029d220}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveTaskCenterEvent\EPMLiveTaskCenterEvent.feature">
+      <FeatureId>{25f96d6e-4e7a-4137-993d-c3229601bb6a}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveTimePhasedList\EPMLiveTimePhasedList.feature">
+      <FeatureId>{24571702-d540-4257-9f5a-6bf07be3c737}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveTopLevelMenus\EPMLiveTopLevelMenus.feature">
+      <FeatureId>{061ad691-02bd-4916-b651-d29f18fcbb78}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveWorkgroupMenus\EPMLiveWorkgroupMenus.feature">
+      <FeatureId>{a004c917-eb2a-4d8b-bfda-a785c671da71}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveWorkList\EPMLiveWorkList.feature">
+      <FeatureId>{1b429274-5d44-48c4-b1ca-98c56230eddf}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.feature">
+      <FeatureId>{bd45b455-49f0-4bee-989c-867626214618}</FeatureId>
+    </None>
+    <None Include="Features\WorkgroupAdministration\WorkgroupAdministration.feature">
+      <FeatureId>{597b4d8e-96e3-4b57-afa6-1aacdf3fb5aa}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineSiteCore\WorkEngineSiteCore.feature">
+      <FeatureId>{4e5aa9b8-31b9-44f2-a43a-df6945b41b8e}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineResourcePool\WorkEngineResourcePool.feature">
+      <FeatureId>{25ab9d46-7230-460f-93c7-d15361e495ac}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineMasterWorkspaceTopNav\WorkEngineMasterWorkspaceTopNav.feature">
+      <FeatureId>{90f7b4ab-4af7-4ac2-966a-697a742b723e}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineMasterWorkspace\WorkEngineMasterWorkspace.feature">
+      <FeatureId>{aeed742f-367c-4a4d-9eb9-923bc67beb13}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineMasterTopLevel\WorkEngineMasterTopLevel.feature">
+      <FeatureId>{71a29dd8-438a-44ef-a621-0020aa4d2bd4}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineListDefinitions\WorkEngineListDefinitions.feature">
+      <FeatureId>{69a6492b-359b-43d4-b021-f4f20ae3b6c6}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineCore\WorkEngineCore.feature">
+      <FeatureId>{baf12306-20f2-40f6-9771-bd1a4cf77334}</FeatureId>
+    </None>
+    <None Include="Features\WorkEngineAppsList\WorkEngineAppsList.feature">
+      <FeatureId>{149e0492-0460-4a68-894b-efd2ecd588f8}</FeatureId>
+    </None>
+    <None Include="Features\WebServices\WebServices.feature">
+      <FeatureId>{0b0b8e8f-3c19-4278-ab47-b671258e4cf5}</FeatureId>
+    </None>
+    <None Include="Features\WebInit\WebInit.feature">
+      <FeatureId>{9b267c4b-c570-4cf8-ab1d-4d3f051efc87}</FeatureId>
+    </None>
+    <None Include="Features\TaskCenterListToolbars\TaskCenterListToolbars.feature">
+      <FeatureId>{2f47d32d-8922-4de4-ae05-4639ebc34b7a}</FeatureId>
+    </None>
+    <None Include="Features\ResourcePoolEvent\ResourcePoolEvent.feature">
+      <FeatureId>{986a6428-ff0c-4161-bdb1-117a909b8f22}</FeatureId>
+    </None>
+    <None Include="Features\ProjectCenterListToolbars\ProjectCenterListToolbars.feature">
+      <FeatureId>{a5a4ccf1-a322-4f92-96a4-4869e3598c35}</FeatureId>
+    </None>
+    <None Include="Features\OutlookSynch\OutlookSynch.feature">
+      <FeatureId>{c0f72801-721b-4cad-8649-683ff01130ab}</FeatureId>
+    </None>
+    <None Include="Features\MasterV43LightBlueWS\MasterV43LightBlueWS.feature">
+      <FeatureId>{da1e6a1a-47e4-40ce-a701-82c99c4b9ddf}</FeatureId>
+    </None>
+    <None Include="Features\MasterV43LightBlueTop\MasterV43LightBlueTop.feature">
+      <FeatureId>{65ff47a5-cb5f-4ec6-b1d2-07f4cebed7f5}</FeatureId>
+    </None>
     <None Include="GlobalResources\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{0c03c0e3-b739-4aa6-956a-62145153e2aa}</SharePointProjectItemId>
     </None>
     <None Include="Images\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{bf60dd84-fcc4-46e8-979b-985f006cca5a}</SharePointProjectItemId>
+    </None>
+    <None Include="IntegrateEvents\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{b71a410c-3054-45d2-8d5c-d3a98c376343}</SharePointProjectItemId>
     </None>
     <None Include="ISAPI\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
@@ -851,16 +1312,308 @@
     <None Include="ListDefinitions\Departments\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{36ef267a-3b01-4f5e-9fd6-570504eb797f}</SharePointProjectItemId>
     </None>
+    <None Include="ListDefinitions\HolidaySchedules\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{5d2a4b49-a35d-4a7f-a890-3df0e7da2974}</SharePointProjectItemId>
+    </None>
+    <None Include="ListDefinitions\Holidays\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{0d0f5e5d-f966-40b2-b877-646ea67331b7}</SharePointProjectItemId>
+    </None>
+    <None Include="ListDefinitions\Roles\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{023f8c54-15c2-4d1a-b1f2-239297edcb49}</SharePointProjectItemId>
+    </None>
+    <None Include="ListDefinitions\WorkHours\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{966f585d-a885-46ec-abfb-d463902ae45a}</SharePointProjectItemId>
+    </None>
+    <None Include="MasterV43LightBlueTop\MasterV43LightBlueTop.master" />
+    <None Include="MasterV43LightBlueTop\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{387fc784-e6cc-441d-a100-bbcf7244db36}</SharePointProjectItemId>
+    </None>
+    <None Include="MasterV43LightBlueWS\MasterV43LightBlueWS.master" />
+    <None Include="MasterV43LightBlueWS\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{c194a288-a206-4f7f-b90d-a9f81ddc0c3f}</SharePointProjectItemId>
+    </None>
+    <None Include="Menus\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{40e1d26c-a5de-4bd0-bb9b-4e48b1382360}</SharePointProjectItemId>
+    </None>
+    <None Include="OutlookSynch\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{070fec7e-4a62-44d8-b44c-a7c5811ab1e1}</SharePointProjectItemId>
+    </None>
     <None Include="Package\Package.package">
       <PackageId>{64ede3b7-292b-4f08-b56f-1452b1834805}</PackageId>
     </None>
     <None Include="Package\Package.Template.xml">
       <DependentUpon>Package.package</DependentUpon>
     </None>
+    <None Include="ProjectCenterListToolbars\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{1858eebf-9040-4105-9f00-792ca8cc081d}</SharePointProjectItemId>
+    </None>
+    <None Include="ResourcePoolEvent\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{949fa534-10f8-4add-998e-6f4ce94cdf2e}</SharePointProjectItemId>
+    </None>
+    <None Include="TaskCenterListToolbars\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{49dabf13-4a85-4da0-a0aa-f7c331d7698d}</SharePointProjectItemId>
+    </None>
+    <None Include="TEMPLATE\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{fb58384f-11d7-4a86-991b-0057bb656fd2}</SharePointProjectItemId>
+    </None>
+    <None Include="ViewPermissions\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{53993af9-aa39-4f86-8a19-9398402813f4}</SharePointProjectItemId>
+    </None>
+    <None Include="ViewSelectorDelegate\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9e5b33c1-1666-4525-ac20-cdef5b03ff84}</SharePointProjectItemId>
+    </None>
+    <None Include="Web References\ActLicensing\licensing.wsdl" />
+    <None Include="Web References\ActLicensing\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\ApplicationStore\appstore.wsdl" />
+    <None Include="Web References\ApplicationStore\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\AppStoreReporting\appstore.wsdl" />
+    <None Include="Web References\AppStoreReporting\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\FeatureActivationSvc\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\FeatureActivationSvc\service.wsdl" />
+    <None Include="Web References\SSRS2005\ActiveState.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\CatalogItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\DataRetrievalPlan.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\DataSetDefinition.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\DataSource.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\DataSourceDefinition.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\DataSourcePrompt.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Event.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ExecutionSettingEnum.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ExpirationDefinition.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Extension.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ExtensionParameter.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ExtensionSettings.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ItemTypeEnum.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Job.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ModelCatalogItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ModelDrillthroughReport.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ModelItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ParameterValue.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ParameterValueOrFieldReference.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Policy.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Property.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\SSRS2005\ReportHistorySnapshot.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ReportParameter.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\reportservice2005.wsdl" />
+    <None Include="Web References\SSRS2005\Role.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Schedule.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\ScheduleDefinitionOrReference.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Subscription.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Task.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2005\Warning.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ActiveState.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\CatalogItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\DataRetrievalPlan.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\DataSetDefinition.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\DataSource.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\DataSourceDefinition.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\DataSourcePrompt.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Event.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ExecutionSettingEnum.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ExpirationDefinition.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Extension.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ExtensionParameter.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ExtensionSettings.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ItemTypeEnum.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Job.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ModelCatalogItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ModelDrillthroughReport.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ModelItem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ParameterValue.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ParameterValueOrFieldReference.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Policy.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Property.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\SSRS2006\ReportHistorySnapshot.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ReportParameter.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\reportservice2006.wsdl" />
+    <None Include="Web References\SSRS2006\Role.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Schedule.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\ScheduleDefinitionOrReference.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Subscription.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Task.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SSRS2006\Warning.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\WorkEngineService\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\WorkEngineService\workengine.wsdl" />
+    <None Include="Web References\WorkEngineSolutionStoreListSvc\lists.wsdl" />
+    <None Include="Web References\WorkEngineSolutionStoreListSvc\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="WorkEngineActivation\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{436e17be-6868-47d3-a7ac-3879fbc1e963}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkEngineApps\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{b5778735-d830-4ff5-b1eb-db02dabd614a}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkEngineMasterTopLevel\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{312fe107-6697-417b-9c4f-b85ecb0ef898}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkEngineMasterTopLevel\WETopLevel.master" />
+    <None Include="WorkEngineMasterWorkspaceTopNav\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{97885644-05c2-4370-bec7-35edb8425417}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkEngineMasterWorkspaceTopNav\WEWorkspaceTopNav.master" />
+    <None Include="WorkEngineMasterWorkspace\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{047fb0df-932d-46d0-af76-a94a4e6589f5}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkEngineMasterWorkspace\WEWorkspace.master" />
+    <None Include="WorkEngineResourcePool\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{c8d4fa34-f122-4b2d-a328-449f3614e483}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkgroupAdministration\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{4ce5bbb0-05e6-426b-8977-b839c6828060}</SharePointProjectItemId>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="GlobalResources\MultiAppNavigationResources.resx" />
     <EmbeddedResource Include="GlobalResources\WorkEngineLookupPickerResources.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="AppsListEvents\Elements.xml" />
@@ -884,7 +1637,9 @@
     <Content Include="CONTROLTEMPLATES\TemplateVersoning.ascx" />
     <Content Include="DepartmentEvent\Elements.xml" />
     <Content Include="EPMLiveConfigMenus\Elements.xml" />
-    <Content Include="EPMLiveMasterTopLevel\Elements.xml" />
+    <Content Include="EPMLiveMasterTopLevel\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="EPMLiveMasterWorkspace\Elements.xml" />
     <Content Include="EPMLiveMultiAppDelegate\Elements.xml" />
     <Content Include="EPMLiveOutlineCodesList\Elements.xml" />
@@ -918,6 +1673,102 @@
     <Content Include="EPMLiveWorkspaceMenus\Elements.xml" />
     <Content Include="Features\AppNavFixUp\AppNavFixUp.Template.xml">
       <DependentUpon>AppNavFixUp.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\BuildTeam\BuildTeam.Template.xml">
+      <DependentUpon>BuildTeam.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveConfigMenus\EPMLiveConfigMenus.Template.xml">
+      <DependentUpon>EPMLiveConfigMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveMasterSettingsLists\EPMLiveMasterSettingsLists.Template.xml">
+      <DependentUpon>EPMLiveMasterSettingsLists.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveMasterTopLevel\EPMLiveMasterTopLevel.Template.xml">
+      <DependentUpon>EPMLiveMasterTopLevel.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveMasterWorkspace\EPMLiveMasterWorkspace.Template.xml">
+      <DependentUpon>EPMLiveMasterWorkspace.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveProjectCenter\EPMLiveProjectCenter.Template.xml">
+      <DependentUpon>EPMLiveProjectCenter.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveProjectCenterEvent\EPMLiveProjectCenterEvent.Template.xml">
+      <DependentUpon>EPMLiveProjectCenterEvent.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveProjectCenterRollup\EPMLiveProjectCenterRollup.Template.xml">
+      <DependentUpon>EPMLiveProjectCenterRollup.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveTaskCenter\EPMLiveTaskCenter.Template.xml">
+      <DependentUpon>EPMLiveTaskCenter.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveTaskCenterEvent\EPMLiveTaskCenterEvent.Template.xml">
+      <DependentUpon>EPMLiveTaskCenterEvent.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveTimePhasedList\EPMLiveTimePhasedList.Template.xml">
+      <DependentUpon>EPMLiveTimePhasedList.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveTopLevelMenus\EPMLiveTopLevelMenus.Template.xml">
+      <DependentUpon>EPMLiveTopLevelMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveWorkgroupMenus\EPMLiveWorkgroupMenus.Template.xml">
+      <DependentUpon>EPMLiveWorkgroupMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveWorkList\EPMLiveWorkList.Template.xml">
+      <DependentUpon>EPMLiveWorkList.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.Template.xml">
+      <DependentUpon>EPMLiveWorkspaceMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkgroupAdministration\WorkgroupAdministration.Template.xml">
+      <DependentUpon>WorkgroupAdministration.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineSiteCore\WorkEngineSiteCore.Template.xml">
+      <DependentUpon>WorkEngineSiteCore.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineResourcePool\WorkEngineResourcePool.Template.xml">
+      <DependentUpon>WorkEngineResourcePool.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineMasterWorkspaceTopNav\WorkEngineMasterWorkspaceTopNav.Template.xml">
+      <DependentUpon>WorkEngineMasterWorkspaceTopNav.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineMasterWorkspace\WorkEngineMasterWorkspace.Template.xml">
+      <DependentUpon>WorkEngineMasterWorkspace.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineMasterTopLevel\WorkEngineMasterTopLevel.Template.xml">
+      <DependentUpon>WorkEngineMasterTopLevel.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineListDefinitions\WorkEngineListDefinitions.Template.xml">
+      <DependentUpon>WorkEngineListDefinitions.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineCore\WorkEngineCore.Template.xml">
+      <DependentUpon>WorkEngineCore.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WorkEngineAppsList\WorkEngineAppsList.Template.xml">
+      <DependentUpon>WorkEngineAppsList.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WebServices\WebServices.Template.xml">
+      <DependentUpon>WebServices.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\WebInit\WebInit.Template.xml">
+      <DependentUpon>WebInit.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\TaskCenterListToolbars\TaskCenterListToolbars.Template.xml">
+      <DependentUpon>TaskCenterListToolbars.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\ResourcePoolEvent\ResourcePoolEvent.Template.xml">
+      <DependentUpon>ResourcePoolEvent.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\ProjectCenterListToolbars\ProjectCenterListToolbars.Template.xml">
+      <DependentUpon>ProjectCenterListToolbars.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\OutlookSynch\OutlookSynch.Template.xml">
+      <DependentUpon>OutlookSynch.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\MasterV43LightBlueWS\MasterV43LightBlueWS.Template.xml">
+      <DependentUpon>MasterV43LightBlueWS.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\MasterV43LightBlueTop\MasterV43LightBlueTop.Template.xml">
+      <DependentUpon>MasterV43LightBlueTop.feature</DependentUpon>
     </Content>
     <Content Include="GlobalResources\Elements.xml" />
     <Content Include="Images\16doc.gif" />
@@ -994,6 +1845,7 @@
     <Content Include="Images\WHITE.GIF" />
     <Content Include="Images\wpepmlive.gif" />
     <Content Include="Images\Yellow.gif" />
+    <Content Include="IntegrateEvents\Elements.xml" />
     <Content Include="ISAPI\Lic\Licensing.asmx" />
     <Content Include="ISAPI\Lic\licensingdisco.aspx" />
     <Content Include="ISAPI\Lic\licensingwsdl.aspx" />
@@ -1009,6 +1861,7 @@
     <Content Include="Layouts\epmlive\adsyncadmin.aspx" />
     <Content Include="Layouts\epmlive\applications\AddCommunity.aspx" />
     <Content Include="Layouts\epmlive\applications\Applications.css" />
+    <Content Include="Layouts\epmlive\applications\AppPreCheck.png" />
     <Content Include="Layouts\epmlive\applications\Apps.aspx" />
     <Content Include="Layouts\epmlive\applications\appstore.aspx" />
     <Content Include="Layouts\epmlive\applications\ChooseCommunity.aspx" />
@@ -1036,9 +1889,11 @@
     <Content Include="Layouts\epmlive\BuildTeamHelper.aspx" />
     <Content Include="Layouts\epmlive\BuildTeamPageComponent.js" />
     <Content Include="Layouts\epmlive\buildteamtools.js" />
+    <Content Include="Layouts\epmlive\CCPeopleEditorAutoComplete.js" />
     <Content Include="Layouts\epmlive\ChangeApp.aspx" />
     <Content Include="Layouts\epmlive\ChangeAppAjaxDataHost.aspx" />
     <Content Include="Layouts\epmlive\checkurl.aspx" />
+    <Content Include="Layouts\epmlive\commentersupdate.aspx" />
     <Content Include="Layouts\epmlive\Comments.aspx" />
     <Content Include="Layouts\epmlive\comments.js" />
     <Content Include="Layouts\epmlive\Comments.UI.css" />
@@ -1201,6 +2056,7 @@
     <Content Include="Layouts\epmlive\DHTML\calendar\skins\dhtmlxcalendar_yahoolike.css" />
     <Content Include="Layouts\epmlive\DHTML\dhtmlxajax.js" />
     <Content Include="Layouts\epmlive\DHTML\dhtmlxtreegrid.js" />
+    <Content Include="Layouts\epmlive\DHTML\skins\dhtmlxmenu_dhx_blue.css" />
     <Content Include="Layouts\epmlive\DHTML\xaccord\dhtmlxaccordion.js" />
     <Content Include="Layouts\epmlive\DHTML\xaccord\dhtmlxcommon.js" />
     <Content Include="Layouts\epmlive\DHTML\xaccord\imgs\dhxaccord_dhx_black\dhtmlxaccordion_bg.png" />
@@ -1956,6 +2812,12 @@
     <Content Include="Layouts\epmlive\images\green-arrow.png" />
     <Content Include="Layouts\epmlive\images\info.png" />
     <Content Include="Layouts\epmlive\images\installapplication16.gif" />
+    <Content Include="Layouts\epmlive\images\integration\base.png" />
+    <Content Include="Layouts\epmlive\images\integration\editcols.png" />
+    <Content Include="Layouts\epmlive\images\integration\editcon.png" />
+    <Content Include="Layouts\epmlive\images\integration\office365.png" />
+    <Content Include="Layouts\epmlive\images\integration\salesforce.png" />
+    <Content Include="Layouts\epmlive\images\integration\sql.png" />
     <Content Include="Layouts\epmlive\images\iReportsLibrary.png" />
     <Content Include="Layouts\epmlive\images\itemworkspace.png" />
     <Content Include="Layouts\epmlive\images\left.GIF" />
@@ -1972,6 +2834,7 @@
     <Content Include="Layouts\epmlive\images\notification-icons\assigned-to.png" />
     <Content Include="Layouts\epmlive\images\notification-icons\comment.png" />
     <Content Include="Layouts\epmlive\images\notification-icons\pending-project-update.png" />
+    <Content Include="Layouts\epmlive\images\notification-icons\resources.png" />
     <Content Include="Layouts\epmlive\images\notification-icons\system.png" />
     <Content Include="Layouts\epmlive\images\notificationgreen.png" />
     <Content Include="Layouts\epmlive\images\notificationgrey.png" />
@@ -2012,6 +2875,13 @@
     <Content Include="Layouts\epmlive\images\WESite.png" />
     <Content Include="Layouts\epmlive\images\WorkEngine-logo.gif" />
     <Content Include="Layouts\epmlive\images\Workspaces.png" />
+    <Content Include="Layouts\epmlive\Integration\Add.aspx" />
+    <Content Include="Layouts\epmlive\Integration\Add.css" />
+    <Content Include="Layouts\epmlive\Integration\Columns.aspx" />
+    <Content Include="Layouts\epmlive\Integration\Connection.aspx" />
+    <Content Include="Layouts\epmlive\Integration\Delete.aspx" />
+    <Content Include="Layouts\epmlive\Integration\IntegrationList.aspx" />
+    <Content Include="Layouts\epmlive\Integration\Properties.aspx" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
@@ -2035,6 +2905,7 @@
     <Content Include="Layouts\epmlive\jQueryLibrary\xml2json.js" />
     <Content Include="Layouts\epmlive\ListLookupConfig.aspx" />
     <Content Include="Layouts\epmlive\ListLookupEdit.aspx" />
+    <Content Include="Layouts\epmlive\listViewHost.aspx" />
     <Content Include="Layouts\epmlive\LMR.Comments.UI.js" />
     <Content Include="Layouts\epmlive\modal\modal.css" />
     <Content Include="Layouts\epmlive\modal\modal.js" />
@@ -2049,6 +2920,7 @@
     <Content Include="Layouts\epmlive\newitem.aspx" />
     <Content Include="Layouts\epmlive\newproject.aspx" />
     <Content Include="Layouts\epmlive\newproject.js" />
+    <Content Include="Layouts\epmlive\noaccess.aspx" />
     <Content Include="Layouts\epmlive\notifications.aspx" />
     <Content Include="Layouts\epmlive\notificationsadmin.aspx" />
     <Content Include="Layouts\epmlive\openprojectplan.aspx" />
@@ -2079,6 +2951,20 @@
     <Content Include="Layouts\epmlive\stylesheets\buildteam.css" />
     <Content Include="Layouts\epmlive\stylesheets\buildteamIE.css" />
     <Content Include="Layouts\epmlive\stylesheets\buttons.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_222222_256x240.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_454545_256x240.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_888888_256x240.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
@@ -2173,6 +3059,31 @@
     <Content Include="Layouts\epmlive\TreeGrid\Modern\Toolbar.png" />
     <Content Include="Layouts\epmlive\TreeGrid\Modern\Tree.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\Modern\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\BackgroundsOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\critgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\critganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\GridWork.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\HScroll.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\MenuOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\summarygantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\summaryganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\taskgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\taskganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\VScroll.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MyWork\Backgrounds.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MyWork\BackgroundsOLD.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MyWork\Button.gif" />
@@ -2288,6 +3199,7 @@
     <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx" />
     <Content Include="Layouts\epmlive\viewmessages.aspx" />
     <Content Include="Layouts\epmlive\viewrollup.aspx" />
@@ -2301,9 +3213,190 @@
     <Content Include="Layouts\layouts.sitemap.epmlive.xml" />
     <Content Include="ListDefinitions\Departments\Elements.xml" />
     <Content Include="ListDefinitions\Departments\Schema.xml" />
+    <Content Include="ListDefinitions\HolidaySchedules\Elements.xml" />
+    <Content Include="ListDefinitions\HolidaySchedules\Schema.xml" />
+    <Content Include="ListDefinitions\Holidays\Elements.xml" />
+    <Content Include="ListDefinitions\Holidays\Schema.xml" />
+    <Content Include="ListDefinitions\Roles\Elements.xml" />
+    <Content Include="ListDefinitions\Roles\Schema.xml" />
+    <Content Include="ListDefinitions\WorkHours\Elements.xml" />
+    <Content Include="ListDefinitions\WorkHours\Schema.xml" />
+    <Content Include="MasterV43LightBlueTop\Elements.xml" />
+    <Content Include="MasterV43LightBlueWS\Elements.xml" />
+    <Content Include="Menus\Elements.xml" />
+    <Content Include="OutlookSynch\Elements.xml" />
+    <Content Include="ProjectCenterListToolbars\Elements.xml" />
+    <Content Include="ResourcePoolEvent\Elements.xml" />
+    <None Include="Resources\AssignmentPlannerGridLayout.txt" />
+    <None Include="Resources\DefaultCommunityNavs.txt" />
+    <None Include="Resources\Javascript.txt" />
+    <None Include="Resources\MyWorkGridLayout.txt" />
+    <None Include="Resources\ResourceDDLBottom.txt" />
+    <None Include="Resources\D.txt" />
+    <None Include="Resources\ResourceGridLayout.txt" />
+    <None Include="Resources\txtBuildTeamResPool.txt" />
+    <None Include="Resources\txtBuildTeamRibbonTemplate.txt" />
+    <None Include="Resources\txtBuildTeamTab.txt" />
+    <None Include="Resources\txtCheckResourceJS.txt" />
+    <None Include="Resources\txtEPKWebpart.txt" />
+    <None Include="Resources\txtFileDefaultSections.txt" />
+    <None Include="Resources\txtTeamGridLayout.txt" />
+    <None Include="Resources\WorkingOnGridLayout.txt" />
+    <Content Include="TaskCenterListToolbars\Elements.xml" />
+    <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
+    <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />
+    <Content Include="TEMPLATE\admin\epmlive\addkey.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\createsite.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\emailmanager.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\features.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\preview.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\queue.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\servers.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\SystemMessages.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\users.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\usersv2.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\versions.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\viewqueue.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\wcsettings.aspx" />
+    <Content Include="TEMPLATE\features\EPMLiveTimePhasedWebServices\EPMLiveTimePhased.asmx" />
+    <Content Include="TEMPLATE\features\EPMLiveTimePhasedWebServices\EPMLiveTimephaseddisco.aspx" />
+    <Content Include="TEMPLATE\features\EPMLiveTimePhasedWebServices\EPMLiveTimephasedwsdl.aspx" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineDept\default.aspx" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineDept\defaultdws.aspx" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineDept\xml\ONET.XML" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineHome\default.aspx" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineHome\defaultdws.aspx" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineHome\xml\ONET.XML" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineWorkspace\default.aspx" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineWorkspace\defaultdws.aspx" />
+    <Content Include="TEMPLATE\SiteTemplates\WorkEngineWorkspace\xml\ONET.XML" />
+    <Content Include="TEMPLATE\xml\fldtypes_EPMLive.xml" />
+    <Content Include="ViewPermissions\Elements.xml" />
+    <Content Include="ViewSelectorDelegate\Elements.xml" />
+    <Content Include="WorkEngineActivation\Elements.xml" />
+    <Content Include="WorkEngineApps\Elements.xml" />
+    <Content Include="WorkEngineApps\Schema.xml" />
+    <Content Include="WorkEngineMasterTopLevel\Elements.xml" />
+    <Content Include="WorkEngineMasterWorkspaceTopNav\Elements.xml" />
+    <Content Include="WorkEngineMasterWorkspace\Elements.xml" />
+    <Content Include="WorkEngineResourcePool\Elements.xml" />
+    <Content Include="WorkEngineResourcePool\Schema.xml" />
+    <Content Include="WorkgroupAdministration\Elements.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Layouts\EPMLiveCore\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\ActLicensing\licensing.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\ActLicensing\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\ActLicensing\licensing.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\ApplicationStore\appstore.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\ApplicationStore\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\ApplicationStore\appstore.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\AppStoreReporting\appstore.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\AppStoreReporting\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\AppStoreReporting\appstore.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\FeatureActivationSvc\service.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\FeatureActivationSvc\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\FeatureActivationSvc\service.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\SSRS2005\reportservice2005.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\SSRS2005\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\SSRS2005\reportservice2005.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\SSRS2006\reportservice2006.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\SSRS2006\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\SSRS2006\reportservice2006.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\WorkEngineService\workengine.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\WorkEngineService\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\WorkEngineService\workengine.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\WorkEngineSolutionStoreListSvc\lists.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\WorkEngineSolutionStoreListSvc\</RelPath>
+      <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\WorkEngineSolutionStoreListSvc\lists.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

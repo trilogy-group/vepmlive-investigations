@@ -156,6 +156,9 @@ namespace EPMLiveCore.Jobs
 
             //=========================================
 
+
+            
+
             finishJob();
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -187,6 +190,8 @@ namespace EPMLiveCore.Jobs
 
             cn.Close();
         }
+
+        
 
         private string getResUrl(string resUrl)
         {
@@ -302,7 +307,7 @@ namespace EPMLiveCore.Jobs
                         try
                         {
                             sErrors += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing List: " + sList;
-                            oList = web.Lists[sList] as SPList;
+                            oList = web.Lists.TryGetList(sList);
                             if(oList != null)
                             {
 

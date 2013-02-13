@@ -67,6 +67,33 @@ namespace EPMLiveCore {
         protected global::Microsoft.SharePoint.WebControls.CssLink CssLink1;
         
         /// <summary>
+        /// EPMLiveJS1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl EPMLiveJS1;
+        
+        /// <summary>
+        /// spanCommenters control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl spanCommenters;
+        
+        /// <summary>
+        /// CCPeopleEditor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::EPMLiveCore.CommentCCPeopleEditor CCPeopleEditor;
+        
+        /// <summary>
         /// pnlCommentsContainer control.
         /// </summary>
         /// <remarks>

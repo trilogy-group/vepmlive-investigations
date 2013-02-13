@@ -11,7 +11,7 @@
 		<Fields>
 			<Field ID="{431AD2CB-28E0-46A9-B1FC-813F384333D6}" Name="StartDate" Type="DateTime" DisplayName ="Start Date" Format ="DateOnly" Sealed ="FALSE" AllowDeletion="FALSE" Description ="Enter the estimated start date for this item."></Field>
 			<Field ID="{08B1143C-1A7C-4BF1-840F-2956240F9987}" Name="DueDate" Type ="DateTime" DisplayName ="Due Date" Format ="DateOnly" Sealed ="FALSE" AllowDeletion="FALSE" Description ="Enter the estimated due date for this item."></Field>
-			<Field ID="{7138B526-FD98-4AF6-82CC-034DC9F0C60C}" Name="AssignedTo" Type ="UserMulti" DisplayName ="Assigned To" Sealed ="FALSE" AllowDeletion="FALSE" Description ="Enter the resource(s) assigned to this item.  You can enter their email address, username, or use the address book."></Field>
+			<Field ID="{7138B526-FD98-4AF6-82CC-034DC9F0C60C}" List="UserInfo" Name="AssignedTo" Type ="UserMulti" DisplayName ="Assigned To" Sealed ="FALSE" AllowDeletion="FALSE" Description ="Enter the resource(s) assigned to this item.  You can enter their email address, username, or use the address book."></Field>
 			<Field ID="{EC70454D-9CE5-4A8F-AC90-6D138A2F7D18}" Name="Priority" Type ="Choice" DisplayName ="Priority" Sealed ="FALSE" AllowDeletion="FALSE">
 				<CHOICES>
 					<CHOICE>(1) High</CHOICE>

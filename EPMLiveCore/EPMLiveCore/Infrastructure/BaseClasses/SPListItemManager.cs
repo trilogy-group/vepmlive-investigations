@@ -11,8 +11,8 @@ namespace EPMLiveCore.Infrastructure
     {
         #region Fields (3) 
 
-        private readonly string _elementName;
-        private readonly string _rootElementName;
+        protected readonly string ElementName;
+        protected readonly string RootElementName;
         private int _batchProcessLimit;
 
         #endregion Fields 
@@ -47,8 +47,8 @@ namespace EPMLiveCore.Infrastructure
 
                         ParentList = spList;
 
-                        _rootElementName = rootElementName;
-                        _elementName = elementName;
+                        RootElementName = rootElementName;
+                        ElementName = elementName;
                         _batchProcessLimit = 100;
                     }
                 }
@@ -190,11 +190,11 @@ namespace EPMLiveCore.Infrastructure
                 SPListItemCollection spListItemCollection = ParentList.Items;
                 SPFieldCollection spFieldCollection = ParentList.Fields;
 
-                var rootElement = new XElement(_rootElementName);
+                var rootElement = new XElement(RootElementName);
 
                 foreach (SPListItem spListItem in spListItemCollection)
                 {
-                    var itemElement = new XElement(_elementName);
+                    var itemElement = new XElement(ElementName);
                     itemElement.Add(new XAttribute("ID", spListItem["ID"]));
 
                     foreach (SPField spField in spFieldCollection)
@@ -308,7 +308,7 @@ namespace EPMLiveCore.Infrastructure
             ParentList.ParentWeb.AllowUnsafeUpdates = false;
         }
 
-        // Protected Methods (1) 
+        // Protected Methods (2) 
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources
@@ -323,8 +323,6 @@ namespace EPMLiveCore.Infrastructure
             ParentList = null;
         }
 
-        // Private Methods (3) 
-
         /// <summary>
         /// Gets the field special values.
         /// </summary>
@@ -334,23 +332,33 @@ namespace EPMLiveCore.Infrastructure
         /// <param name="fieldEditValue">The field edit value.</param>
         /// <param name="fieldTextValue">The field text value.</param>
         /// <param name="fieldHtmlValue">The field HTML value.</param>
-        private void GetFieldSpecialValues(SPField spField, string stringValue, object value,
-                                           out string fieldEditValue,
-                                           out string fieldTextValue, out string fieldHtmlValue)
+        protected void GetFieldSpecialValues(SPField spField, string stringValue, object value,
+                                             out string fieldEditValue,
+                                             out string fieldTextValue, out string fieldHtmlValue)
         {
             if (spField.Type != SPFieldType.DateTime)
             {
-                fieldTextValue = string.IsNullOrEmpty(stringValue)
+                fieldTextValue = stringValue;
+                fieldEditValue = stringValue;
+                fieldHtmlValue = stringValue;
+
+                try
+                {
+                    fieldTextValue = string.IsNullOrEmpty(stringValue)
                                      ? string.Empty
                                      : spField.GetFieldValueAsText(value) ?? string.Empty;
 
-                fieldHtmlValue = string.IsNullOrEmpty(stringValue)
-                                     ? string.Empty
-                                     : spField.GetFieldValueAsHtml(value) ?? string.Empty;
+                    fieldEditValue = string.IsNullOrEmpty(stringValue)
+                                         ? string.Empty
+                                         : spField.GetFieldValueForEdit(value) ?? string.Empty;
 
-                fieldEditValue = string.IsNullOrEmpty(stringValue)
-                                     ? string.Empty
-                                     : spField.GetFieldValueForEdit(value) ?? string.Empty;
+                    fieldHtmlValue = string.IsNullOrEmpty(stringValue)
+                                         ? string.Empty
+                                         : spField.GetFieldValueAsHtml(value) ?? string.Empty;
+                }
+                catch
+                {
+                }
             }
             else
             {
@@ -363,6 +371,8 @@ namespace EPMLiveCore.Infrastructure
                 fieldEditValue = specialValue;
             }
         }
+
+        // Private Methods (2) 
 
         /// <summary>
         /// Performs the batch list operation.
@@ -394,15 +404,15 @@ namespace EPMLiveCore.Infrastructure
                     {
                         spWeb.AllowUnsafeUpdates = true;
 
-                        XElement rootElement = serializedListItems.Element(_rootElementName);
+                        XElement rootElement = serializedListItems.Element(RootElementName);
 
                         if (rootElement == null)
                         {
                             throw new APIException((int) Errors.SPLIMBatchOpRootEleNotFound,
-                                                   string.Format(@"Cannot find the ""{0}"" element.", _rootElementName));
+                                                   string.Format(@"Cannot find the ""{0}"" element.", RootElementName));
                         }
 
-                        IEnumerable<XElement> itemElements = rootElement.Elements(_elementName);
+                        IEnumerable<XElement> itemElements = rootElement.Elements(ElementName);
 
                         var batchBuilder = new StringBuilder();
                         var batchResultBuilder = new StringBuilder();

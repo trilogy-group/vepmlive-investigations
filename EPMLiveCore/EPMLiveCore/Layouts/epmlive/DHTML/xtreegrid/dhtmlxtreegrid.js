@@ -453,7 +453,8 @@ dhtmlXGridObject.prototype.hovermenu = function (oRow) {
 
                     node.style.visibility = "";
                     node.style.display = "";
-                    node.parentNode.parentNode.style.background = "url(selbg-6B8E0DB5.png?ctag) #e4ecf5 repeat-x left top";
+                    //change made to remove missing image error in browser consoles
+                    //node.parentNode.parentNode.style.background = "url(selbg-6B8E0DB5.png?ctag) #e4ecf5 repeat-x left top";
                     node.parentNode.parentNode.style.borderRight = "#366092 1px solid";
                     node.parentNode.parentNode.style.borderLeft = "#366092 1px solid";
                     break;

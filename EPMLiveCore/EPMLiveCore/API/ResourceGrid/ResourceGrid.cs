@@ -13,9 +13,10 @@ namespace EPMLiveCore.API
 {
     internal sealed class ResourceGrid
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
-        private const string ComponentName = "ResourceGrid";
+        private const string COMPONENT_NAME = "ResourceGrid";
+        private static readonly Dictionary<string, string> _resourceDictionary = new Dictionary<string, string>();
 
         #endregion Fields 
 
@@ -65,7 +66,7 @@ namespace EPMLiveCore.API
         // Private Methods (7) 
 
         /// <summary>
-        /// Builds the department hierarchy.
+        ///     Builds the department hierarchy.
         /// </summary>
         /// <param name="dataRows">The data rows.</param>
         /// <param name="dataTable">The data table.</param>
@@ -76,15 +77,24 @@ namespace EPMLiveCore.API
                 DataRow currentRow = dataRow;
 
                 List<DataRow> childRows = dataRow.GetChildRows("ParentChild").ToList();
-                childRows.Remove(childRows.FirstOrDefault(childRow => childRow["Id"].Equals(currentRow["Id"])));
+                childRows.Remove(childRows.FirstOrDefault(childRow => childRow["IdClean"].Equals(currentRow["IdClean"])));
 
-                DataRow row = dataTable.Select(String.Format("Id = '{0}'", dataRow["Id"])).First();
+                DataRow row = dataTable.Select(String.Format("IdClean = '{0}'", dataRow["IdClean"])).First();
                 var children = (List<string>) row["Children"];
 
                 foreach (string child in childRows.Select(childRow => (string) childRow["Id"]).ToList()
-                    .Where(child => !children.Contains(child)))
+                                                  .Where(child => !children.Contains(child)))
                 {
                     children.Add(child);
+
+                    DataRow[] parents = dataTable.Select(string.Format("IdClean = '{0}'", dataRow["ParentIdClean"]));
+                    if (!parents.Any()) continue;
+
+                    var siblings = (List<string>) parents[0]["Children"];
+                    if (!siblings.Contains(child))
+                    {
+                        siblings.Add(child);
+                    }
                 }
 
                 if (childRows.Any())
@@ -95,25 +105,24 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Builds the I element.
+        ///     Builds the I element.
         /// </summary>
         /// <param name="gridFields">The grid fields.</param>
         /// <param name="resourcesList">The resources list.</param>
         /// <param name="gridSafeFields">The grid safe fields.</param>
         /// <param name="type">The type.</param>
-        /// <param name="specialValues">The special values.</param>
         /// <param name="value">The value.</param>
         /// <param name="spWeb">The sp web.</param>
         /// <param name="field">The field.</param>
         /// <param name="iElement">The i element.</param>
-        /// <param name="userInfoList">The user info list.</param>
+        /// <param name="dtUserInfo">The dt user info.</param>
         /// <param name="dataElement">The data element.</param>
         /// <param name="profilePic">The profile pic.</param>
         /// <param name="resourceId">The resource id.</param>
         private static void BuildIElement(Dictionary<string, SPField> gridFields, SPList resourcesList,
                                           Dictionary<string, string> gridSafeFields, string type,
-                                          IEnumerable<string> specialValues, string value, SPWeb spWeb, string field,
-                                          XElement iElement, SPList userInfoList, XElement dataElement,
+                                          string value, SPWeb spWeb, string field,
+                                          XElement iElement, DataTable dtUserInfo, XElement dataElement,
                                           ref string profilePic, ref int resourceId)
         {
             if (field.Equals("ID"))
@@ -126,9 +135,9 @@ namespace EPMLiveCore.API
 
                 try
                 {
-                    SPListItem spListItem = userInfoList.GetItemById(resourceId);
+                    DataRow dataRow = dtUserInfo.Rows.Find(resourceId);
 
-                    var thumbnail = spListItem["Picture"] as string;
+                    var thumbnail = dataRow["Picture"] as string;
 
                     if (!string.IsNullOrEmpty(thumbnail))
                     {
@@ -189,28 +198,10 @@ namespace EPMLiveCore.API
             }
 
             iElement.Add(new XAttribute(gridSafeFieldName, value));
-
-            foreach (string specialValue in specialValues)
-            {
-                if (type.Equals("DateTime") || type.Equals("Boolean"))
-                {
-                    iElement.Add(
-                        new XAttribute(
-                            string.Format("{0}.{1}", gridSafeFieldName, specialValue.First()),
-                            value));
-                }
-                else
-                {
-                    iElement.Add(
-                        new XAttribute(
-                            string.Format("{0}.{1}", gridSafeFieldName, specialValue.First()),
-                            dataElement.Attribute(specialValue).Value));
-                }
-            }
         }
 
         /// <summary>
-        /// Confirms the delete.
+        ///     Confirms the delete.
         /// </summary>
         /// <param name="resourceId">The resource id.</param>
         /// <param name="resourceManager">The resource manager.</param>
@@ -220,10 +211,12 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Extracts the resource id.
+        ///     Extracts the resource id.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="confirmDelete">if set to <c>true</c> [confirm delete].</param>
+        /// <param name="confirmDelete">
+        ///     if set to <c>true</c> [confirm delete].
+        /// </param>
         /// <returns></returns>
         private static int ExtractResourceId(string data, out bool confirmDelete)
         {
@@ -270,18 +263,11 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Filters the department resources.
+        ///     Filters the department resources.
         /// </summary>
         /// <param name="resultXml">The result XML.</param>
         private static void FilterDepartmentResources(ref XDocument resultXml)
         {
-            bool filteringEnabled;
-
-            bool.TryParse(CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLiveRBSSecurity"),
-                          out filteringEnabled);
-
-            if (!filteringEnabled) return;
-
             XDocument departmentsXml;
 
             using (var departmentManager = new DepartmentManager())
@@ -292,7 +278,9 @@ namespace EPMLiveCore.API
             var dataTable = new DataTable("Managers");
 
             dataTable.Columns.Add("Id", typeof (string));
+            dataTable.Columns.Add("IdClean", typeof (string));
             dataTable.Columns.Add("ParentId", typeof (string));
+            dataTable.Columns.Add("ParentIdClean", typeof (string));
             dataTable.Columns.Add("Managers", typeof (object));
             dataTable.Columns.Add("Children", typeof (List<string>));
 
@@ -304,6 +292,7 @@ namespace EPMLiveCore.API
             foreach (XElement departmentElement in departmentsXml.Root.Elements("Department"))
             {
                 string id = null;
+                string idClean = null;
                 string parent = null;
                 var managers = new List<string>();
 
@@ -326,7 +315,8 @@ namespace EPMLiveCore.API
                                 throw new APIException((int) Errors.CantFindIdAttr, "ID attribute was not found.");
                             }
 
-                            id = string.Format("{0};#{1}", idAttribute.Value, dataElement.Value);
+                            idClean = idAttribute.Value;
+                            id = string.Format("{0};#{1}", idClean, dataElement.Value);
                             break;
                         case "RBS":
                             parent = dataElement.Value;
@@ -342,9 +332,16 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                if (string.IsNullOrEmpty(parent)) parent = id;
+                if (string.IsNullOrEmpty(parent))
+                {
+                    parent = id;
+                }
+                else if (parent.Equals("0;#"))
+                {
+                    parent = id;
+                }
 
-                dataTable.Rows.Add(id, parent, managers, new List<string>());
+                dataTable.Rows.Add(id, idClean, parent, parent.Split(';')[0], managers, new List<string>());
             }
 
             var dataSet = new DataSet();
@@ -352,9 +349,9 @@ namespace EPMLiveCore.API
             dataSet.Tables.Add(dataTable);
             DataTable dsTable = dataSet.Tables["Managers"];
 
-            dataSet.Relations.Add("ParentChild", dsTable.Columns["Id"], dsTable.Columns["ParentId"]);
+            dataSet.Relations.Add("ParentChild", dsTable.Columns["IdClean"], dsTable.Columns["ParentIdClean"]);
 
-            BuildDepartmentHierarchy(dsTable.Select("ParentId = Id"), ref dataTable);
+            BuildDepartmentHierarchy(dsTable.Select("ParentIdClean = IdClean"), ref dataTable);
 
             foreach (DataRow dataRow in dataTable.Rows)
             {
@@ -368,24 +365,14 @@ namespace EPMLiveCore.API
             string username = string.Format("{0};#{1}", currentUser.ID, currentUser.Name);
 
             var departments = new List<string>();
-            foreach (
-                string department in
-                    from dataRow in dataTable.Select(string.Format("Managers LIKE '%{0}%'", username))
-                    from department in ((List<string>) dataRow["Children"])
-                    where !departments.Contains(department)
-                    select department)
+
+            foreach (string department in dataTable.Select(string.Format("Managers LIKE '%{0}%'", username))
+                                                   .SelectMany(dataRow => ((List<string>) dataRow["Children"]),
+                                                               (dataRow, department) => department.Split(';')[0])
+                                                   .Where(department => !departments.Contains(department)))
             {
                 departments.Add(department);
             }
-
-            if (!departments.Any())
-            {
-                throw new APIException((int) Errors.NotDeptManager,
-                                       string.Format("{0} is not a manager of any department.",
-                                                     currentUser.LoginName));
-            }
-
-            var resourcesToBeRemoved = new List<XElement>();
 
             if (resultXml.Root == null)
             {
@@ -397,48 +384,55 @@ namespace EPMLiveCore.API
                 bool validDepartment = false;
 
                 foreach (XElement dataElement in resourceElement.Elements()
-                    .Where(dataElement =>
-                               {
-                                   XAttribute fieldAttribute = dataElement.Attribute("Field");
-                                   return fieldAttribute != null && fieldAttribute.Value.Equals("Department");
-                               }))
+                                                                .Where(dataElement =>
+                                                                           {
+                                                                               XAttribute a = dataElement.Attribute("Field");
+                                                                               return a != null && a.Value.Equals("Department");
+                                                                           }))
                 {
-                    if (departments.Contains(dataElement.Value)) validDepartment = true;
-
+                    if (departments.Contains((dataElement.Value).Split(';')[0])) validDepartment = true;
                     break;
                 }
 
-                if (!validDepartment) resourcesToBeRemoved.Add(resourceElement);
-            }
-
-            foreach (XElement resourceElement in resourcesToBeRemoved)
-            {
-                resourceElement.Remove();
+                resourceElement.Add(new XAttribute("IsMyResource", validDepartment));
             }
         }
 
         /// <summary>
-        /// Parses the resources.
+        ///     Parses the resources.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns></returns>
         private static IEnumerable<string> ParseResources(string value)
         {
+            if (value.Equals("0;#")) return new List<string>();
+
+            SPList spList = SPContext.Current.Web.Lists["Resources"];
+
             var resources = new List<string>();
 
             string[] list = value.Replace(";#", ";").Split(';');
 
             for (int i = 0; i < list.Count() - 1; i++)
             {
-                string resource = string.Format("{0};#{1}", list[i], list[++i]);
-                if (!resources.Contains(resource)) resources.Add(resource);
+                string resourcePoolId = list[i];
+                string resource = string.Format("{0};#{1}", resourcePoolId, list[++i]);
+
+                if (!_resourceDictionary.ContainsKey(resource))
+                {
+                    SPListItem spListItem = spList.GetItemById(Convert.ToInt32(resourcePoolId));
+                    _resourceDictionary.Add(resource, spListItem["SharePointAccount"].ToString());
+                }
+
+                string mappedResource = _resourceDictionary[resource];
+                if (!resources.Contains(mappedResource)) resources.Add(mappedResource);
             }
 
             return resources;
         }
 
         /// <summary>
-        /// Registers the grid id and CSS.
+        ///     Registers the grid id and CSS.
         /// </summary>
         /// <param name="resultRootElement">The result root element.</param>
         /// <param name="dataXml">The data XML.</param>
@@ -476,7 +470,7 @@ namespace EPMLiveCore.API
         // Internal Methods (9) 
 
         /// <summary>
-        /// Deletes the resource pool resource.
+        ///     Deletes the resource pool resource.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -538,7 +532,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Deletes the resource pool views.
+        ///     Deletes the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -551,7 +545,7 @@ namespace EPMLiveCore.API
                     foreach (GridView gridView in GridViewUtils.ExtractViews(data))
                     {
                         using (
-                            IGridViewManager gridViewManager = gridViewFactory.MakeGridViewManager(ComponentName,
+                            IGridViewManager gridViewManager = gridViewFactory.MakeGridViewManager(COMPONENT_NAME,
                                                                                                    gridView))
                         {
                             gridViewManager.Remove(gridView);
@@ -572,7 +566,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Gets the resource pool data grid.
+        ///     Gets the resource pool data grid.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -584,9 +578,6 @@ namespace EPMLiveCore.API
                 {
                     SPList resourcesList = resourceManager.ParentList;
                     SPWeb spWeb = resourcesList.ParentWeb;
-                    SPSite spSite = spWeb.Site;
-
-                    SPList userInfoList = spSite.RootWeb.SiteUserInfoList;
 
                     XDocument resourceXml =
                         XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data))));
@@ -608,16 +599,24 @@ namespace EPMLiveCore.API
                     var gridSafeFields = new Dictionary<string, string>();
                     var gridFields = new Dictionary<string, SPField>();
 
-                    var specialValues = new[] {"TextValue", "HtmlValue", "EditValue"};
-
                     IEnumerable<XElement> resourceElements = resourceXml.Root.Elements("Resource");
 
-                    foreach (XElement resourceElement in resourceElements)
+                    var dtUserInfo = new DataTable();
+
+                    XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
+                    if (arrResourceElements.Any())
+                    {
+                        dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
+                        dtUserInfo.PrimaryKey = new[] {dtUserInfo.Columns["ID"]};
+                    }
+
+                    foreach (XElement resourceElement in arrResourceElements)
                     {
                         var iElement = new XElement("I");
 
                         int resourceId = 0;
-                        string profilePic = string.Format("{0}/_layouts/images/person.gif", spWeb.SafeServerRelativeUrl());
+                        string profilePic = string.Format("{0}/_layouts/images/person.gif",
+                                                          spWeb.SafeServerRelativeUrl());
 
                         foreach (XElement dataElement in resourceElement.Elements())
                         {
@@ -625,18 +624,21 @@ namespace EPMLiveCore.API
                             string value = dataElement.Attribute("HtmlValue").Value;
                             string type = dataElement.Attribute("Type").Value;
 
-                            BuildIElement(gridFields, resourcesList, gridSafeFields, type, specialValues, value,
-                                          spWeb, field, iElement, userInfoList, dataElement, ref profilePic,
+                            BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
+                                          spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
                                           ref resourceId);
                         }
 
                         iElement.Add(new XAttribute("ResourceID", resourceId));
                         iElement.Add(new XAttribute("ProfilePic",
                                                     string.Format(
-                                                        @"<div style=""width:100%;height:50px;text-align:center;padding-top:2.5px;padding-bottom:2.5px;"">
+                                                        @"<div class=""EPMLiveResourceGridPicture"">
                                                               <img src=""{0}"" height=""50""/>
                                                           </div>",
                                                         profilePic)));
+
+                        iElement.Add(new XAttribute("IsMyResource",
+                                                    bool.Parse(resourceElement.Attribute("IsMyResource").Value) ? 1 : 0));
 
                         bElement.Add(iElement);
                     }
@@ -657,7 +659,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Gets the resource pool data grid changes.
+        ///     Gets the resource pool data grid changes.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="spWeb">The sp web.</param>
@@ -680,7 +682,6 @@ namespace EPMLiveCore.API
                 var changesXml = new XElement("Changes");
 
                 SPList resourcesList = spWeb.Lists["Resources"];
-                SPList userInfoList = spWeb.Site.RootWeb.SiteUserInfoList;
 
                 var spListItems = new List<SPListItem>();
 
@@ -721,10 +722,16 @@ namespace EPMLiveCore.API
                     }
                 }
 
+                var dtUserInfo = new DataTable();
+
+                if (spListItems.Count > 0)
+                {
+                    dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
+                    dtUserInfo.PrimaryKey = new[] {dtUserInfo.Columns["ID"]};
+                }
+
                 var gridSafeFields = new Dictionary<string, string>();
                 var gridFields = new Dictionary<string, SPField>();
-
-                var specialValues = new[] {"TextValue", "HtmlValue", "EditValue"};
 
                 foreach (SPListItem spListItem in spListItems)
                 {
@@ -747,13 +754,10 @@ namespace EPMLiveCore.API
 
                             string rawValue = (val as string) ?? string.Empty;
 
-                            var dataElement = new XElement("Data", new XCData(rawValue),
-                                                           new XAttribute("TextValue", spField.GetFieldValueAsText(val)),
-                                                           new XAttribute("HtmlValue", value),
-                                                           new XAttribute("EditValue", spField.GetFieldValueForEdit(val)));
+                            var dataElement = new XElement("Data", new XCData(rawValue));
 
-                            BuildIElement(gridFields, resourcesList, gridSafeFields, type, specialValues, value,
-                                          spWeb, field, iElement, userInfoList, dataElement, ref profilePic,
+                            BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
+                                          spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
                                           ref resourceId);
                         }
                         catch
@@ -787,7 +791,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Gets the resource pool layout grid.
+        ///     Gets the resource pool layout grid.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -907,7 +911,7 @@ namespace EPMLiveCore.API
                             cElement.Add(new XAttribute("Format", format));
                         }
 
-                        cElement.Add(new XAttribute("Visible", 0), new XAttribute("ReadOnly", spField.ReadOnlyField));
+                        cElement.Add(new XAttribute("Visible", 0));
 
                         if (spField.InternalName.Equals("EXTID"))
                         {
@@ -934,7 +938,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Gets the resource pool views.
+        ///     Gets the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -952,7 +956,7 @@ namespace EPMLiveCore.API
                     {
                         using (
                             IGridViewManager gridViewManager = gridViewManagerFactory.MakeGridViewManager(
-                                ComponentName, gridViewManagerKind))
+                                COMPONENT_NAME, gridViewManagerKind))
                         {
                             gridViewManager.Initialize();
 
@@ -977,7 +981,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Gets the resources.
+        ///     Gets the resources.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -1034,7 +1038,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Saves the resource pool views.
+        ///     Saves the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -1048,7 +1052,7 @@ namespace EPMLiveCore.API
                     {
                         using (
                             IGridViewManager gridViewManager = gridViewManagerFactory.MakeGridViewManager(
-                                ComponentName, gridView))
+                                COMPONENT_NAME, gridView))
                         {
                             if (gridView.Id.Equals("dv"))
                             {
@@ -1073,7 +1077,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Updates the resource pool views.
+        ///     Updates the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -1087,7 +1091,7 @@ namespace EPMLiveCore.API
                     {
                         using (
                             IGridViewManager gridViewManager = gridViewManagerFactory.MakeGridViewManager(
-                                ComponentName, gridView))
+                                COMPONENT_NAME, gridView))
                         {
                             gridViewManager.Update(gridView);
                         }

@@ -1,0 +1,27 @@
+<td width="50" valign="top" style="padding:10px;">
+<br><br><br><br><br><br><br>
+	<input type="button" class="btn btn-small" value="&lt; Add" onClick="AddResource()" style="width:100px"><br><br>
+	<input type="button" class="btn btn-small" value="Remove &gt;" onClick="RemoveResource()" style="width:100px">
+</td>
+<td width="50%" id="tdResPool" valign="top">
+	<div class="gridHeader">Resource Pool</div>
+	<div class="toolbar">
+		<ul>
+ 		    <li>
+			    <a href="javascript:void(0);" onclick="AddResourcePool()" rel="tooltiptop" title="Add Resource"><img border="0" src="/_layouts/epmlive/images/addresource.gif" style="vertical-align: middle;"></a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="AddResColumns()" rel="tooltiptop" title="Select Columns"><img border="0" src="/_layouts/epmlive/images/selectcolumn.gif" style="vertical-align: middle;"></a>
+            </li>
+			<li>
+                <a href="javascript:void(0);" onclick="ResFilters()" rel="tooltiptop" title="Show/Hide Filters"><img border="0" src="/_layouts/epmlive/images/filter.png" style="vertical-align: middle;"></a>
+            </li>
+			<li>
+                <a href="javascript:void(0);" onclick="ResGroups()" rel="tooltiptop" title="Show/Hide Grouping"><img border="0" src="/_layouts/epmlive/images/grouping.gif" style="vertical-align: middle;"></a>
+            </li>
+        </ul>
+	</div>
+	<div id="divResPool" style="width:100%;height:100%;">
+		
+	</div>
+</td>

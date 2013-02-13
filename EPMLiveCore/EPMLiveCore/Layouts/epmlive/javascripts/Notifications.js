@@ -1,4 +1,4 @@
-﻿/// <version>4.3.7192012</version>
+﻿/// <version>4.3.2.172013</version>
 /// <reference path="EPMLive.Notifications.js" />
 /// <reference path="libraries/knockout-1.2.1.debug.js" />
 /// <reference path="libraries/jquery.endless-scroll.js" />
@@ -8,7 +8,7 @@ function initializeEPMLiveNotifications() {
     $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.timeago.js', function () {
         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
             $.getScript('/_layouts/epmlive/javascripts/libraries/slimScroll.js', function () {
-                $.getScript('/_layouts/epmlive/javascripts/EPMLive.Notifications.js', function () {
+                $.getScript('/_layouts/epmlive/javascripts/EPMLive.Notifications.js' + '?v=' + window.epmLive.fileVersion, function () {
                     (function () {
                         var $ = window.jQuery;
                         var $$ = window.epmLive;
@@ -19,7 +19,11 @@ function initializeEPMLiveNotifications() {
                         try {
                             console = window.console;
                         } catch (e) {
-                            if (!window.console) console = { log: function () { } };
+                            if (!window.console)
+                                console = {
+                                    log: function () {
+                                    }
+                                };
                         }
 
                         try {
@@ -32,7 +36,9 @@ function initializeEPMLiveNotifications() {
                                 1: 'system',
                                 3: 'comment',
                                 4: 'assigned-to',
-                                5: 'pending-project-update'
+                                5: 'pending-project-update',
+                                12: 'resources',
+                                13: 'resources'
                             };
 
                             n.queryInterval = 30000;
@@ -43,7 +49,7 @@ function initializeEPMLiveNotifications() {
                             ko.applyBindings(n, document.getElementById('EPMLiveNotificationCounter'));
                             ko.applyBindings(n, document.getElementById('EPMLiveNotificationCount'));
 
-                            function updateNotifications(result) {
+                            function updateNotifications(result, type) {
                                 if (!result) return;
 
                                 var notifications;
@@ -54,7 +60,36 @@ function initializeEPMLiveNotifications() {
                                     notifications = result;
                                 }
 
-                                for (var i = 0; i < notifications.length; i++) {
+                                var limit = n.notificationQueryLimit();
+                                var length = notifications.length;
+
+                                if (!firstLoad && type === 'NEW') {
+                                    if (length > limit) {
+                                        length = limit;
+
+                                        var aNoti = [];
+
+                                        for (var x = 0; x < n.notifications().length; x++) {
+                                            aNoti.push(n.notifications()[x]);
+                                        }
+
+                                        for (x = 0; x < aNoti.length; x++) {
+                                            n.notifications.remove(aNoti[x]);
+                                        }
+
+                                        aNoti = [];
+
+                                        for (x = 0; x < n.invisibleNotifications().length; x++) {
+                                            aNoti.push(n.invisibleNotifications()[x]);
+                                        }
+
+                                        for (x = 0; x < aNoti.length; x++) {
+                                            n.invisibleNotifications.remove(aNoti[x]);
+                                        }
+                                    }
+                                }
+
+                                for (var i = 0; i < length; i++) {
                                     var nf = notifications[i];
 
                                     var notification = {};
@@ -93,6 +128,26 @@ function initializeEPMLiveNotifications() {
                                     }
 
                                     n.registerNotification(notification);
+                                }
+
+                                if (!firstLoad && type === 'NEW') {
+                                    if ($('#EPMLiveNotificationCount').text() !== (notifications.length + '')) {
+                                        n.totalNewNotifications(notifications.length);
+
+                                        var color = '#D0D0D0';
+
+                                        if (!$('#EPMLiveNotificationsWrap').is(':visible')) {
+                                            if (n.newSystemNotifications().length > 0) {
+                                                color = '#89CE00';
+                                            } else if (n.newGeneralNotifications().length > 0) {
+                                                color = '#26C6F4';
+                                            } else {
+                                                color = '#547194';
+                                            }
+                                        }
+
+                                        $("#EPMLiveNotificationCounter").css('background', color);
+                                    }
                                 }
 
                                 n.firstTimeLoad = false;
@@ -140,7 +195,7 @@ function initializeEPMLiveNotifications() {
 
                                             if ($$.responseIsSuccess(responseJson.Result)) {
                                                 if (responseJson.Result.Notifications) {
-                                                    updateNotifications(responseJson.Result.Notifications.Notification);
+                                                    updateNotifications(responseJson.Result.Notifications.Notification, status);
 
                                                     if (firstLoad) {
                                                         firstLoad = false;
@@ -160,31 +215,17 @@ function initializeEPMLiveNotifications() {
                                     }
                                 });
 
-                                //                                if (status === 'NEW' || status === 'ALL') {
-                                //                                    setTimeout(function () {
-                                //                                        getNotifications('NEW');
-                                //                                    }, n.queryInterval);
-                                //                                }
-                            }
-
-                            function configureScrollbar(type) {
-                                $("#EPMLiveNotificationGeneral").endlessScroll({
-                                    callback: function () {
-                                        n.retrieveMoreNotifications(type, 'OLD');
-                                    }
-                                });
+                                if (status === 'NEW' || status === 'ALL') {
+                                    setTimeout(function () {
+                                        getNotifications('NEW');
+                                    }, n.queryInterval);
+                                }
                             }
 
                             n.retrieveMoreNotifications = function (type, status) {
                                 if (!n.getMoreNotifications(type, status)) {
                                     getNotifications(status, n.notificationQueryLimit(), n.notificationFirstPage(), n.notificationLastPage());
-                                    if (n.getMoreNotifications(type, status)) {
-                                        n.notificationFirstPage(n.notificationLastPage() + 1);
-
-                                        configureScrollbar(type);
-                                    }
-                                } else {
-                                    configureScrollbar(type);
+                                    n.notificationFirstPage(n.notificationLastPage());
                                 }
                             };
 

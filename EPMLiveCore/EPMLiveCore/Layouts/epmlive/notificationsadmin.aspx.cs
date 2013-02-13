@@ -33,7 +33,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected Button btnRemove;
         protected Button btnTest;
         protected DropDownList ddlRunTime;
-        protected TextBox txtFromEmail;
+        protected TextBox txtFromEmail; 
         protected TextBox txtEmailSubject;
         protected TextBox txtNotes;
         protected GridView gvNotificationLists;

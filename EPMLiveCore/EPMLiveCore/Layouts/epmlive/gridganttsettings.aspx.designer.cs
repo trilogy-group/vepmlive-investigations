@@ -229,6 +229,15 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.TextBox txtRequestList;
         
         /// <summary>
+        /// chkContentReporting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkContentReporting;
+        
+        /// <summary>
         /// SectionEmail control.
         /// </summary>
         /// <remarks>
@@ -274,15 +283,6 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.UserControl ifsEnableReporting;
         
         /// <summary>
-        /// InputFormControl1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormControl1;
-        
-        /// <summary>
         /// cbEnableReporting control.
         /// </summary>
         /// <remarks>
@@ -290,6 +290,15 @@ namespace EPMLiveCore.Layouts.epmlive {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox cbEnableReporting;
+        
+        /// <summary>
+        /// btnAddEvt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnAddEvt;
         
         /// <summary>
         /// PlaceHolder1 control.

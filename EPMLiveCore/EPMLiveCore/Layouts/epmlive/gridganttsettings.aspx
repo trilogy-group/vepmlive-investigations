@@ -197,7 +197,7 @@
             </ul>
             Show View Toolbar:  This checkbox determines whether or not the menu toolbar will be visible.<br /><br />
             Use Pop-up Editor: Use this feature to edit items in a pop-up instead of navigating away from the current page.<br /><br />
-            Enable Workspace Creation: Use this feature to allow workspaces to be created from the context menu of a list item.<br /><br />
+            
             Use Parent: When enabled this option will use the parent item when working with the ribbon and the context menus.<br /><br />
             Force Search: When enabled this option will make the users search for something prior to displaying the grid. This can increase performance if a list and/or view has many items.<br /><br />
             Persistent Search: When this is turned on the search functionality will apply to all views during your session in a list.<br /><br />
@@ -235,7 +235,7 @@
 			</wssuc:InputFormControl>
             <wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
-                    <asp:CheckBox ID="chkLockSearch" runat="server" Text="Persistant Search" />
+                    <asp:CheckBox ID="chkLockSearch" runat="server" Text="Persistent Search" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
             <wssuc:InputFormControl LabelText="" runat="server">
@@ -257,7 +257,7 @@
 		runat="server">
 		<Template_Description>
 		    Use this feature to allow workspaces to be created from the context menu of a list item.<br /><br />
-
+            Enable Workspace Creation: Use this feature to allow workspaces to be created from the context menu of a list item.<br /><br />
             Do No Delete Item: Select this option to keep the request item in the list once the workspace has been created.<br /><br />
             Item List: Enter the name of the list you would like to use in the new workspace.<br /><br />
             
@@ -298,12 +298,18 @@
             If this property is set and certain data is not rolling up or no data is rolling up at all, 
             please contact support or visit the <a href="http://kb.epmlive.com" target="_blank">Knowledge Base</a>.
             <br /><br />
-            To view a field audit report <a href="fieldaudit.aspx?List=<%=Request["List"] %>" target="_blank" >click here</a>.
+            To view a field audit report <a href="fieldaudit.aspx?List=<%=Request["List"] %>" target="_blank" >click here</a>.<br /><br />
+            Enable Content DB: This option will make the grid use the EPM Live content database which will greatly improve rollup performance.
 		</Template_Description>
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
                     <asp:CheckBox ID="chkPerformance" runat="server" Text="Enable Performance" />
+				 </Template_Control>
+			</wssuc:InputFormControl>
+            <wssuc:InputFormControl LabelText="" runat="server">
+				 <Template_Control>
+                    <asp:CheckBox ID="chkContentReporting" runat="server" Text="Enable Content DB" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
 		</Template_InputFormControls>
@@ -420,14 +426,14 @@
 		</Template_InputFormControls>
 	</wssuc:InputFormSection>
 	
-    <wssuc:InputFormSection Title="Enable WorkEngine Work List Features"
+    <wssuc:InputFormSection Title="Enable Work List Features"
 		Description=""
 		runat="server">
 		<Template_Description>
-		    By enabling the Work List Features, several components will be added to this List in order for better integration with the WorkEngine system.  The following components will be added:
+		    By enabling the Work List Features, several components will be added to this List in order for better integration with the EPMLive system.  The following components will be added:
             <br />
             <ul>    
-                <li>WorkEngine Grid/Gantt to all views</li>
+                <li>EPMLive Grid/Gantt to all views</li>
                 <li>Event Handlers to handle "Complete" Logic</li>
                 <li>Complete, % Complete, and Status fields will be added (if they do not already exist)</li>
             </ul>            
@@ -436,7 +442,7 @@
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
-                    <asp:CheckBox ID="chkWorkListFeat" runat="server" Text="Enable WorkEngine Work List Features" />
+                    <asp:CheckBox ID="chkWorkListFeat" runat="server" Text="Enable Work List Features" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
 		</Template_InputFormControls>
@@ -450,9 +456,14 @@
 		    By enabling reporting, this list will be mapped to reporting database.
 		</Template_Description>
 		<Template_InputFormControls>
-			<wssuc:InputFormControl ID="InputFormControl1" LabelText="" runat="server">
+			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
                     <asp:CheckBox ID="cbEnableReporting" runat="server" Text="Enable Reporting" />
+				 </Template_Control>
+			</wssuc:InputFormControl>
+            <wssuc:InputFormControl LabelText="" runat="server">
+				 <Template_Control>
+                    <asp:Button ID="btnAddEvt" runat="server" Text="Add Reporting Events" OnClick="AddReportEvent" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
 		</Template_InputFormControls>

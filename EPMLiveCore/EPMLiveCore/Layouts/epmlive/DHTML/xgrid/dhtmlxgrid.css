@@ -458,12 +458,24 @@ div.gridbox_modern .dhx_combo_edit{
   font-family:Tahoma;
 	font-size:11px;
 }
+
+/* EPM Live Mod in 4.3.1 to overwrite SharePoint hover style in grid */
+tr.ms-itmhover:hover
+{
+background:none !important;
+background-color:#EAF5FF !important;
+}
+
 div.gridbox_modern table.obj tr.rowselected td{
-	background-color:#9ac2e5;
+	/*background-color:#9ac2e5;  EPM Live Mod in 4.3.1 */
+	background-color:#C4E3FF;
+	border-top:1px solid #96CEFF !important;	
+    border-bottom:1px solid #96CEFF !important;
 	color:black;
 	}
 div.gridbox_modern table.obj tr.rowselected td.cellselected, div.gridbox table.obj td.cellselected {
-	background-color:#9ac2e5;
+	/*background-color:#9ac2e5; EPM Live Mod in 4.3.1 */
+	background-color:#C4E3FF;
 	}
 div.gridbox_modern .odd_modern{
 	background-color:#EDEDED;

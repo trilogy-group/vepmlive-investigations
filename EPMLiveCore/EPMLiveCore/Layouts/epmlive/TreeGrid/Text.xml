@@ -1,5 +1,5 @@
 <Grid>
-   <Cfg TextVersion="80101"/>
+   <Cfg TextVersion="90001"/>
    <Lang>
       
 <!-- All alert / confirm non HTML texts -->
@@ -150,17 +150,9 @@ V6_0=""
 V6_1=""
    DefaultsAlphabet="%d ..."
 V6_7=""
-   ExportPDFCaption = "Select columns to print"
-   PDFPageOptions="PDF page options"
-   PDFPageSize="Page size"
-   PDFPageSizes="Auto,Letter,Note,Legal,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9"
-   PDFPageOrientation="Page orientation"
-   PDFPageOrientations="Portrait,Landscape"
    PDFEmbedFonts="Embed fonts in PDF"
-   PDFFitPage="Fit to page"
-   PDFFitPages="Real size,Shrink to width,Resize to width,Single page"
-   PDFText="PDF image / text"
-   PDFTexts="Image only,Selectable text,Embedded fonts"
+   PDFFitPage="Fit to one page"
+   PDFFitPages="None,Width,Height,Single page"
    PrintRows="Maximum rows per page"
    PrintExpanded="Print all rows expanded"
    PrintFiltered="Print all rows (unfiltered)"
@@ -188,6 +180,25 @@ V8_0=""
    CalendarNone="&lt;i style='color:gray'>None&lt;/i>"
    CalendarEmpty="&lt;i style='color:gray'>Default&lt;/i>"
    CalendarEdit="&lt;i style='color:blue'>Edit ...&lt;/i>"
+V9_0=""
+   PrintPageOptions="Page size&lt;div style='font-size:10px;color:red;'>Set the same values also&lt;br> in the browser print dialog!&lt;/div>"
+   PDFPageOptions="Page size"
+   PrintPageRoot="Start page always by root row"
+   PrintVisible="Print visible Gantt only"
+   PrintSelected="Print selected rows only"
+   PrintWidth="Page width (px)"
+   PrintHeight="Page height (px)"
+   PrintPage="Page size"
+   PrintDPI="DPI (PPI) ratio"
+   PrintMarginWidth="Page margin width (mm)"
+   PrintMarginHeight="Page margin height (mm)"
+   PrintPageSize="Page size"
+   PrintPageSizes="Auto,26000,26000,Letter (8.5x11in),215.9,279.4,Legal (8.5x14in),215.9,355.6,Ledger (11x17in),279.4,431.8,A0 - (841x1189),841,1189,A1 - (841x1189),594,841,A2 - (420x594),420,594,A3 - (297x420),297,420,A4 - (210x297),210,297,A5 - (148x210),148,210,A6 - (105x148),105,148,A7 - (74x105),74,105,A8 - (52x74),52,74,A9 - (37x52),37,52,B0 - (1000x1414),1000,1414,B1 - (707x1000),707,1000,B2 - (500x707),500,707,B3 - (353x500),353,500,B4 - (250x353),250,353,B5 - (176x250),176,250"
+   PrintPageOrientation="Page orientation"
+   PrintPageOrientations="Portrait,Landscape"
+   PrintResults="Print size is %d x %d pages"
+   PDFText=""
+   PDFTexts="Image only,Selectable text,Embedded fonts"
  	/>
 
 

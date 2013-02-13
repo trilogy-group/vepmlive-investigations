@@ -278,7 +278,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     chkLockSearch.Checked = gSettings.LockSearch;
                     chkAssociatedItems.Checked = gSettings.AssociatedItems;
                     chkEnableTeam.Checked = gSettings.BuildTeam;
-
+                    chkContentReporting.Checked = gSettings.EnableContentReporting;
                     chkResTools.Checked = gSettings.EnableResourcePlan;
                     chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
 
@@ -343,14 +343,47 @@ namespace EPMLiveCore.Layouts.epmlive
                     if (reportBiz.SiteExists())
                     {
                         ifsEnableReporting.Visible = true;
-                        Collection<string> mappedLists = reportBiz.GetMappedListsIds();
-                        cbEnableReporting.Checked = mappedLists.Contains(list.ID.ToString().ToLower());
+                        Collection<string> mappedLists = reportBiz.GetMappedLists();
+                        Collection<string> mappedListIds = reportBiz.GetMappedListsIds();
+                        bool isMapped = mappedLists.Contains(list.Title);
+                        bool isMaster = mappedListIds.Contains(list.ID.ToString().ToLower());
+
+                        cbEnableReporting.Checked = isMapped;
+                        cbEnableReporting.Enabled = (isMaster || !isMapped);
+
+                        List<SPEventReceiverDefinition> evts = GetListEvents(list,
+                                                                            "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                                                            "EPMLiveReportsAdmin.ListEvents",
+                                                                            new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
+                                                                                                            SPEventReceiverType.ItemUpdated, 
+                                                                                                            SPEventReceiverType.ItemDeleting });
+
+                        bool hasEvents = (evts.Count > 0);
+                        btnAddEvt.Visible = (isMapped && !hasEvents);
                     }
                 }
             }
+        }
 
-            
 
+        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, List<SPEventReceiverType> types)
+        {
+            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+
+            try
+            {
+                evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
+                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                              types.Contains(e.Type)
+                        select e).ToList<SPEventReceiverDefinition>();
+            }
+            catch
+            {
+
+            }
+
+            return evts;
         }
 
         private void AddGridGanttToViews(SPList list)
@@ -730,21 +763,7 @@ namespace EPMLiveCore.Layouts.epmlive
             string className = "EPMLiveCore.StatusingEvent";
 
             SPEventReceiverDefinitionCollection eventColl = list.EventReceivers;
-            List<SPEventReceiverDefinition> listsToDelete = new List<SPEventReceiverDefinition>();
-
-            foreach (SPEventReceiverDefinition eventDef in eventColl)
-            {
-                if (eventDef.Assembly.Equals(assemblyName) &&
-                    eventDef.Class.Equals(className))
-                {
-                    if (eventDef.Type.Equals(SPEventReceiverType.ItemAdding) ||
-                        eventDef.Type.Equals(SPEventReceiverType.ItemUpdating) ||
-                        eventDef.Type.Equals(SPEventReceiverType.ItemDeleted))
-                    {
-                        listsToDelete.Add(eventDef);
-                    }
-                }
-            }
+            List<SPEventReceiverDefinition> listsToDelete = GetListEvents(list, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.ItemAdding, SPEventReceiverType.ItemUpdating, SPEventReceiverType.ItemDeleted });
 
             if (listsToDelete.Count > 0)
             {
@@ -757,6 +776,13 @@ namespace EPMLiveCore.Layouts.epmlive
             list.EventReceivers.Add(SPEventReceiverType.ItemAdding, assemblyName, className);
             list.EventReceivers.Add(SPEventReceiverType.ItemUpdating, assemblyName, className);
             list.EventReceivers.Add(SPEventReceiverType.ItemDeleted, assemblyName, className);
+
+            List<SPEventReceiverDefinition> newEvts = GetListEvents(list, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.ItemAdding, SPEventReceiverType.ItemUpdating, SPEventReceiverType.ItemDeleted });
+            foreach (SPEventReceiverDefinition evt in newEvts)
+            {
+                evt.SequenceNumber = 11000;
+                evt.Update();
+            }
 
             list.Update();
         }
@@ -903,6 +929,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.BuildTeam = chkEnableTeam.Checked;
             gSettings.BuildTeamSecurity = chkEnableTeamSecurity.Checked;
             gSettings.BuildTeamPermissions = GetGroupsPermissionsAssignment();
+            gSettings.EnableContentReporting = chkContentReporting.Checked;
             gSettings.SaveSettings();
 
             if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)
@@ -935,6 +962,19 @@ namespace EPMLiveCore.Layouts.epmlive
                 list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
                 list.EventReceivers.Add(SPEventReceiverType.ItemUpdated, assemblyName, className);
                 list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, assemblyName, className);
+
+                List<SPEventReceiverDefinition> newEvts = CoreFunctions.GetListEvents(list,
+                                                                   assemblyName,
+                                                                   className,
+                                                                   new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
+                                                                                                     SPEventReceiverType.ItemUpdated,
+                                                                                                     SPEventReceiverType.ItemDeleting});
+                foreach (SPEventReceiverDefinition evt in newEvts)
+                {
+                    evt.SequenceNumber = 11000;
+                    evt.Update();
+                }
+
                 list.Update();
             }
             else
@@ -1002,7 +1042,12 @@ namespace EPMLiveCore.Layouts.epmlive
                     evt.Delete();
                 }
 
-                list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
+                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
+                evtAdded.Type = SPEventReceiverType.ItemAdded;
+                evtAdded.Assembly = assemblyName;
+                evtAdded.Class = className;
+                evtAdded.SequenceNumber = 11000;
+                evtAdded.Update();
                 list.Update();
             }
             else 
@@ -1101,9 +1146,46 @@ namespace EPMLiveCore.Layouts.epmlive
                 }
             }
 
-            
-
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        }
+
+        protected void AddReportEvent(object sender, EventArgs e)
+        {
+            SPWeb web = SPContext.Current.Web;
+            SPList list = web.Lists[new Guid(Request["List"])];
+            string sAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+            string sClass = "EPMLiveReportsAdmin.ListEvents";
+            // remove existing event receivers first
+            List<SPEventReceiverDefinition> evts = GetListEvents(list,
+                                                                 sAssembly,
+                                                                 sClass,
+                                                                 new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
+                                                                                                                             SPEventReceiverType.ItemUpdated, 
+                                                                                                                             SPEventReceiverType.ItemDeleting });
+
+            foreach (SPEventReceiverDefinition ev in evts)
+            {
+                ev.Delete();
+            }
+
+            // then add event receivers
+            list.EventReceivers.Add(SPEventReceiverType.ItemAdded, sAssembly, sClass);
+            list.EventReceivers.Add(SPEventReceiverType.ItemUpdated, sAssembly, sClass);
+            list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, sAssembly, sClass);
+
+            List<SPEventReceiverDefinition> newEvts = GetListEvents(list,
+                                                                sAssembly,
+                                                                sClass,
+                                                                new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
+                                                                                                                             SPEventReceiverType.ItemUpdated, 
+                                                                                                                             SPEventReceiverType.ItemDeleting });
+            foreach (SPEventReceiverDefinition ev in newEvts)
+            {
+                ev.SequenceNumber = 11000;
+                ev.Update();
+            }
+
+            list.Update();
         }
 
         void ShowAlert()

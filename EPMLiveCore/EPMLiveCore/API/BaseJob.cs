@@ -71,6 +71,10 @@ namespace EPMLiveCore.API
                 cmd.Parameters.AddWithValue("@resulttext", sErrors);
                 cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
                 cmd.ExecuteNonQuery();
+
+                cmd = new SqlCommand("DELETE FROM TIMERJOBS where timerjobuid=@timerjobuid and scheduletype = 99", cn);
+                cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                cmd.ExecuteNonQuery();
             }
             //else
             //{

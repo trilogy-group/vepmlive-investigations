@@ -124,6 +124,10 @@ namespace EPMLiveCore.API
 
                                 iInstallAndConfigureApp();
 
+                                if(!bVerifyOnly)
+                                {
+                                    ReportToAppReporting(web);
+                                }
                             }
                         }
                     }
@@ -134,6 +138,32 @@ namespace EPMLiveCore.API
                     reportResults();
                 }
             }
+        }
+
+        private void ReportToAppReporting(SPWeb web)
+        {
+            try
+            {
+                Act act = new Act(web);
+                SPUser oUser = oWeb.AllUsers.GetByID(_configJob.userid);
+
+                int source = 1;
+                string sourceurl = "";
+
+
+                if(act.IsOnline)
+                {
+                    source = 2;
+                    sourceurl = web.Url;
+                }
+
+                AppStoreReporting.AppStore apprep = new AppStoreReporting.AppStore();
+                apprep.Timeout = 1000;
+                string ret = apprep.AddStoreInformation("<Info><Name><![CDATA[" + oUser.Name + "]]></Name><Email><![CDATA[" + oUser.Email + "]]></Email><Title><![CDATA[" + appDef.Title + "]]></Title><AppID><![CDATA[" + appDef.Id + "]]></AppID><Source><![CDATA[" + source + "]]></Source><SourceUrl><![CDATA[" + sourceurl + "]]></SourceUrl></Info>");
+
+
+            }
+            catch { }
         }
 
         private void reportResults()

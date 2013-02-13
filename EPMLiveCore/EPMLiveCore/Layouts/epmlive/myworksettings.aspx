@@ -6,7 +6,14 @@
 <%@ Register src="~/_controltemplates/InputFormSection.ascx" TagName="InputFormSection" TagPrefix="wssuc" %>
 <%@ Register src="~/_controltemplates/ButtonSection.ascx" TagName="ButtonSection" TagPrefix="wssuc" %>
 <%@ Page AutoEventWireup="true" CodeBehind="myworksettings.aspx.cs" DynamicMasterPageFile="~masterurl/default.master" Inherits="EPMLiveCore.myworksettings" Language="C#" %>
-<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server"></asp:Content>
+<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+    <style type="text/css">
+        .duefilter {
+            margin: 3px 5px;
+            margin-right: 0;
+        }
+    </style>
+</asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <asp:Panel ID="pnlAdmin" runat="server" Visible="false" Width="100%"> My Work settings are being configured at another site.<br />
@@ -20,7 +27,7 @@
                 <tr>
                     <td colspan="2"><table class="ms-toolbar" width="100%" cellpadding="3" style="height: 20px">
                                         <tr>
-                                            <td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">General Settings</h3></td>
+                                            <td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">Work Settings</h3></td>
                                         </tr>
                                     </table></td>
                 </tr>
@@ -90,17 +97,6 @@
                         </wssuc:InputFormControl>
                     </Template_InputFormControls>
                 </wssuc:InputFormSection>
-                <%--<wssuc:InputFormSection ID="ifsNewItemButtonSetting" Title="New Item Button Settings"
-                                        runat="server">
-                    <Template_Description>Please specify the lists you would like to get in the "New Item" button of the MyWork WebPart.</Template_Description>
-                    <Template_InputFormControls>
-                        <wssuc:InputFormControl ID="ifcNewItemButtonSetting" LabelText="New Item Button Lists" runat="server">
-                            <Template_Control>
-                                <asp:TextBox ID="tbNewItemButtonLists" runat="server" Columns="0" Rows="5" Width="450" Wrap="False" TextMode="MultiLine"></asp:TextBox>
-                            </Template_Control>
-                        </wssuc:InputFormControl>
-                    </Template_InputFormControls>
-                </wssuc:InputFormSection>--%>
                 <wssuc:InputFormSection ID="ifsCrossSiteSetting" Title="Cross Site Settings"
                                         runat="server">
                     <Template_Description>Please specify the cross site URL(s) from where you would like to get "My Work" items.</Template_Description>
@@ -183,6 +179,38 @@
                         </wssuc:InputFormControl>
                     </Template_InputFormControls>
                 </wssuc:InputFormSection>
+                <tr>
+                    <td colspan="2"><table class="ms-toolbar" width="100%" cellpadding="3" style="height: 20px">
+                                        <tr>
+                                            <td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">My Work Grid Settings</h3></td>
+                                        </tr>
+                                    </table></td>
+                </tr>
+                <wssuc:InputFormSection ID="ifsMyWorkGridFilterSetting" Title="Filter Settings"
+                                        runat="server">
+                    <Template_Description>Turn on filters to limit the data retrieved by the grid based on Due Date.</Template_Description>
+                    <Template_InputFormControls>
+                        <wssuc:InputFormControl ID="ifcMyWorkGridFilterSetting" LabelText="" runat="server">
+                            <Template_Control>
+                                <div><asp:CheckBox ID="cbDaysAgo" runat="server" Text="Only show work that was due within" onclick="toggleDueDayFilter('ago',this.checked);" /><asp:TextBox runat="server" ID="tbDaysAgo" Width="25" CssClass="duefilter" onchange="this.value = this.value <= 0 ? '' : this.value; updateDayFilterValue('ago', this.value);"/> days ago.</div>
+                                <div><asp:CheckBox ID="cbDaysAfter" runat="server" Text="Only show work that is due within" onclick="toggleDueDayFilter('after',this.checked);" /><asp:TextBox runat="server" ID="tbDaysAfter" Width="25" CssClass="duefilter" onchange="this.value = this.value <= 0 ? '' : this.value; updateDayFilterValue('after', this.value);"/> days in the future.</div>
+                                <asp:HiddenField runat="server" ID="hfDaysAgo"/><asp:HiddenField runat="server" ID="hfDaysAfter"/>
+                            </Template_Control>
+                        </wssuc:InputFormControl>
+                    </Template_InputFormControls>
+                </wssuc:InputFormSection>
+                <wssuc:InputFormSection ID="ifsMyWorkGridIndicatorSetting" Title="New Item Icon Setting"
+                                        runat="server">
+                    <Template_Description>Select the number of days an item is considered “new” in the grid.  A “new” icon will be displayed next to all items considered new based on this setting.</Template_Description>
+                    <Template_InputFormControls>
+                        <wssuc:InputFormControl ID="ifcMyWorkGridIndicatorSetting" LabelText="" runat="server">
+                            <Template_Control>
+                                <div><asp:CheckBox ID="cbNewItemIndicator" runat="server" Text="Mark item as new if it was created within" onclick="toggleNewItemIndicator(this.checked);" /><asp:TextBox runat="server" ID="tbNewItemIndicator" Width="25" CssClass="duefilter" onchange="this.value = this.value <= 0 ? '' : this.value; updateNewItemIndicatorValue(this.value);"/> days.</div>
+                                <asp:HiddenField runat="server" ID="hfNewItemIndicator"/>
+                            </Template_Control>
+                        </wssuc:InputFormControl>
+                    </Template_InputFormControls>
+                </wssuc:InputFormSection>
                 <wssuc:ButtonSection ID="ButtonSection" runat="server">
                     <Template_Buttons>
                         <asp:PlaceHolder ID="PlaceHolder" runat="server">
@@ -198,86 +226,120 @@
         <asp:HiddenField ID="hfListWorkspaces" runat="server" />
     </asp:Panel>
     <script type="text/javascript">
-      function showFieldDetails(listBox) {
-          var fieldLists = {<%=FieldLists%>};
-          var count = 0;
 
-          for (var i = 0; i < listBox.options.length; i++)
-          {
-              if (listBox.options[i].selected) count++;
+        var daysAgoId = '<%= tbDaysAgo.ClientID %>';
+        var daysAfterId = '<%= tbDaysAfter.ClientID %>';
+        var newItemIndicatorId = '<%= tbNewItemIndicator.ClientID %>';
+        var hfDaysAgoId = '<%= hfDaysAgo.ClientID %>';
+        var hfDaysAfterId = '<%= hfDaysAfter.ClientID %>';
+        var hfNewItemIndicatorId = '<%= hfNewItemIndicator.ClientID %>';
 
-              if (count > 1) break;
-          }
+        function toggleDueDayFilter(action, value) {
+            var element = document.getElementById(daysAgoId);
+            
+            if (action === 'after') {
+                element = document.getElementById(daysAfterId);
+            }
 
-          var internalFieldNameDiv = document.getElementById('internalFieldName');
-          var fieldInListsDiv = document.getElementById('fieldInLists');
+            element.disabled = !value;
+        }
+        
+        function updateDayFilterValue(action, value) {
+            if (action === 'ago') {
+                document.getElementById(hfDaysAgoId).value = value;
+            } else {
+                document.getElementById(hfDaysAfterId).value = value;
+            }
+        }
+        
+        function toggleNewItemIndicator(value) {
+            document.getElementById(newItemIndicatorId).disabled = !value;
+        }
+        
+        function updateNewItemIndicatorValue(value) {
+            document.getElementById(hfNewItemIndicatorId).value = value;
+        }
 
-          if (count == 1)
-          {
-              var field = listBox.options[listBox.options.selectedIndex].value;
+        function showFieldDetails(listBox) {
+            var fieldLists = {<%=FieldLists%>};
+            var count = 0;
 
-              internalFieldNameDiv.innerHTML = 'Internal name: ' + field;
-              var fieldInLists = 'In the following lists: ';
+            for (var i = 0; i < listBox.options.length; i++)
+            {
+                if (listBox.options[i].selected) count++;
 
-              for (var i = 0; i < fieldLists[field].length; i++)
-              {
-                  fieldInLists += ' ' + fieldLists[field][i] + ',';
-              }
+                if (count > 1) break;
+            }
 
-              fieldInListsDiv.innerHTML = fieldInLists.substring(0, fieldInLists.length - 1);
-          }
-          else
-          {
-              internalFieldNameDiv.innerHTML = '&nbsp;';
-              fieldInListsDiv.innerHTML = '&nbsp;';
-          }
-      }
+            var internalFieldNameDiv = document.getElementById('internalFieldName');
+            var fieldInListsDiv = document.getElementById('fieldInLists');
 
-      function showListDetails(listBox)
-      {
-          return true;
+            if (count == 1)
+            {
+                var field = listBox.options[listBox.options.selectedIndex].value;
 
-          var listWorkspaces = { <%=ListWorkspaces%> };
-          var count = 0;
+                internalFieldNameDiv.innerHTML = 'Internal name: ' + field;
+                var fieldInLists = 'In the following lists: ';
 
-          for (var i = 0; i < listBox.options.length; i++)
-          {
-              if (listBox.options[i].selected) count++;
+                for (var i = 0; i < fieldLists[field].length; i++)
+                {
+                    fieldInLists += ' ' + fieldLists[field][i] + ',';
+                }
 
-              if (count > 1) break;
-          }
+                fieldInListsDiv.innerHTML = fieldInLists.substring(0, fieldInLists.length - 1);
+            }
+            else
+            {
+                internalFieldNameDiv.innerHTML = '&nbsp;';
+                fieldInListsDiv.innerHTML = '&nbsp;';
+            }
+        }
 
-          var msgDiv = document.getElementById('listWorkspaceMsg');
-          var workspacesDiv = document.getElementById('listWorkspaces');
+        function showListDetails(listBox)
+        {
+            return true;
 
-          if (count == 1)
-          {
-              var list = listBox.options[listBox.options.selectedIndex].value;
+            var listWorkspaces = { <%=ListWorkspaces%> };
+            var count = 0;
 
-              msgDiv.innerHTML = 'In the following workspaces:';
-              workspacesDiv.innerHTML = '';
+            for (var i = 0; i < listBox.options.length; i++)
+            {
+                if (listBox.options[i].selected) count++;
 
-              for (var i = 0; i < listWorkspaces[list].length; i++)
-              {
-                  workspacesDiv.innerHTML += listWorkspaces[list][i] + '<br/>';
-              }
-          }
-          else
-          {
-              msgDiv.innerHTML = '&nbsp;';
-              workspacesDiv.innerHTML = '&nbsp;';
-          }
-      }
+                if (count > 1) break;
+            }
 
-      function newWin(url) {
-        window.open(url, '', config = 'height=400,width=700, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=yes');
-      }
+            var msgDiv = document.getElementById('listWorkspaceMsg');
+            var workspacesDiv = document.getElementById('listWorkspaces');
 
-      function pageRedir(url) {
-        window.location = url;
-      }
+            if (count == 1)
+            {
+                var list = listBox.options[listBox.options.selectedIndex].value;
+
+                msgDiv.innerHTML = 'In the following workspaces:';
+                workspacesDiv.innerHTML = '';
+
+                for (var i = 0; i < listWorkspaces[list].length; i++)
+                {
+                    workspacesDiv.innerHTML += listWorkspaces[list][i] + '<br/>';
+                }
+            }
+            else
+            {
+                msgDiv.innerHTML = '&nbsp;';
+                workspacesDiv.innerHTML = '&nbsp;';
+            }
+        }
+
+        function newWin(url) {
+            window.open(url, '', config = 'height=400,width=700, toolbar=no, menubar=no, scrollbars=no, resizable=yes,location=no, directories=no, status=yes');
+        }
+
+        function pageRedir(url) {
+            window.location = url;
+        }
     </script>
 </asp:Content>
-<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server"> WorkEngine Settings </asp:Content>
-<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" > WorkEngine Settings </asp:Content>
+<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server"> Work Settings </asp:Content>
+<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" > Work Settings </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderId="PlaceHolderPageDescription" runat="server"> Use this section to configure the settings for this site. </asp:Content>

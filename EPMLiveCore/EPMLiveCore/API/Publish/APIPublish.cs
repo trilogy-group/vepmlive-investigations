@@ -12,6 +12,61 @@ namespace EPMLiveCore.API
 {
     internal class APIPublish
     {
+        internal static string GetProjectInfoFromName(string xml, SPWeb web)
+        {
+            string id = "";
+            string sPlannerId = "";
+
+            try
+            {
+
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(xml);
+
+                string project = doc.FirstChild.InnerText;
+
+
+                SPQuery query = new SPQuery();
+                query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>" + project + "</Value></Eq></Where>";
+
+                string sProjectlist = "";
+                try
+                {
+                    sProjectlist = doc.FirstChild.Attributes["List"].Value;
+                }
+                catch { }
+                
+                if(sProjectlist == "")
+                    sProjectlist = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLivePublisherProjectCenter", false);
+
+                SPList sList = web.Lists[sProjectlist];
+
+                SPListItemCollection col = sList.GetItems(query);
+
+                if(col.Count >= 1)
+                {
+                    id = (web.ID + "." + sList.ID + "." + col[0].ID).ToLower();
+                    Dictionary<string, PlannerDefinition> defs = CoreFunctions.GetPlannerList(web, col[0]);
+
+                    foreach(KeyValuePair<string, PlannerDefinition> def in defs)
+                    {
+                        sPlannerId = def.Key;
+                    }
+                }
+                
+                
+            }
+            catch(Exception ex)
+            {
+
+                throw new APIException(100001, "Error: " + ex.Message);
+            }
+
+            return "<ProjectInfo ProjectId=\"" + id + "\"></ProjectInfo>"; ;
+        }
+
+
+
         private static XmlDocument iGetPublisherSettings(string planner, SPWeb web, SPWeb lWeb)
         {
             XmlDocument docProperties = new XmlDocument();
@@ -123,6 +178,20 @@ namespace EPMLiveCore.API
 
             nd = docProperties.CreateNode(XmlNodeType.Element, "EPMLivePCListTC", docProperties.NamespaceURI);
             nd.InnerText = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + planner + "PCField");
+            attr = docProperties.CreateAttribute("Locked");
+            attr.Value = "1";
+            nd.Attributes.Append(attr);
+            ndMain.AppendChild(nd);
+
+            nd = docProperties.CreateNode(XmlNodeType.Element, "EPMLiveUsePerformance", docProperties.NamespaceURI);
+            nd.InnerText = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + planner + "UsePerf");
+            attr = docProperties.CreateAttribute("Locked");
+            attr.Value = "1";
+            nd.Attributes.Append(attr);
+            ndMain.AppendChild(nd);
+
+            nd = docProperties.CreateNode(XmlNodeType.Element, "EPMLivePlanner", docProperties.NamespaceURI);
+            nd.InnerText = planner;
             attr = docProperties.CreateAttribute("Locked");
             attr.Value = "1";
             nd.Attributes.Append(attr);
@@ -455,7 +524,7 @@ namespace EPMLiveCore.API
             return message;
         }
 
-        public static string GetUpdateCount(string xml)
+        public static string GetUpdateCount(string xml, SPWeb oWeb)
         {
             string message = "";
 
@@ -477,39 +546,54 @@ namespace EPMLiveCore.API
                 catch { }
                 if(key != "")
                 {
-                    SPSite site = SPContext.Current.Site;
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        SPWeb web = SPContext.Current.Web;
+                        using(SPSite site = new SPSite(oWeb.Site.ID))
                         {
-                            string sPlannerList = CoreFunctions.getLockConfigSetting(web, "EPMLivePlanner" + sPlannerID + "ProjectCenter", false);
-
-                            if(sPlannerList != "")
+                            using(SPWeb web = site.OpenWeb(oWeb.ID))
                             {
-                                SPList oProjectCenter = web.Lists.TryGetList(sPlannerList);
+                                string sPlannerList = CoreFunctions.getLockConfigSetting(web, "EPMLivePlanner" + sPlannerID + "ProjectCenter", false);
 
-                                if(oProjectCenter != null)
+                                if(sPlannerList != "")
                                 {
-                                    string taskCenterListName = CoreFunctions.getLockConfigSetting(web, key + "TaskCenter", false);
-                                    string taskCenterProjectField = CoreFunctions.getLockConfigSetting(web, key + "TaskCenterProjectField", false);
-                                    if(taskCenterProjectField == "")
-                                        taskCenterProjectField = "Project";
+                                    SPList oProjectCenter = web.Lists.TryGetList(sPlannerList);
 
-                                    SPList oTaskCenter = web.Lists[taskCenterListName];
-                                    SPListItem oProject = oProjectCenter.GetItemById(int.Parse(sID));
+                                    if(oProjectCenter != null)
+                                    {
+                                        string taskCenterListName = CoreFunctions.getLockConfigSetting(web, key + "TaskCenter", false);
+                                        string taskCenterProjectField = CoreFunctions.getLockConfigSetting(web, key + "TaskCenterProjectField", false);
+                                        if(taskCenterProjectField == "")
+                                            taskCenterProjectField = "Project";
+
+                                        SPList oTaskCenter = web.Lists[taskCenterListName];
+                                        SPListItem oProject = oProjectCenter.GetItemById(int.Parse(sID));
 
 
-                                    SPSiteDataQuery query = new SPSiteDataQuery();
-                                    query.Lists = "<Lists><List ID=\"" + oTaskCenter.ID.ToString() + "\"/></Lists>";
-                                    query.Query = "<Where><And><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + sID + "</Value></Eq><Neq><FieldRef Name=\"IsPublished\"/><Value Type=\"Boolean\">1</Value></Neq></And></Where>";
-                                    query.ViewFields = "<FieldRef Name=\"Title\"/><FieldRef Name=\"taskuid\"/><FieldRef Name=\"IsPublished\"/>";
+                                        SPSiteDataQuery query = new SPSiteDataQuery();
+                                        query.Lists = "<Lists><List ID=\"" + oTaskCenter.ID.ToString() + "\"/></Lists>";
+                                        query.Query = "<Where><And><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + sID + "</Value></Eq><Neq><FieldRef Name=\"IsPublished\"/><Value Type=\"Boolean\">1</Value></Neq></And></Where>";
+                                        query.ViewFields = "<FieldRef Name=\"Title\"/><FieldRef Name=\"taskuid\"/><FieldRef Name=\"IsPublished\"/>";
+                                        query.QueryThrottleMode = SPQueryThrottleOption.Override;
+                                        string limit = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "updateperflimit");
 
-                                    DataTable dt = oTaskCenter.ParentWeb.GetSiteData(query);
+                                        if(limit != "")
+                                        {
+                                            try
+                                            {
+                                                query.RowLimit = uint.Parse(limit);
+                                            }
+                                            catch { }
+                                        }
 
-                                    message = dt.Rows.Count.ToString();
+                                        DataTable dt = oTaskCenter.ParentWeb.GetSiteData(query);
+
+                                        message = dt.Rows.Count.ToString();
+                                        
+                                    }
                                 }
                             }
                         }
-                    }
+                    });
                 }
                 else
                 {
@@ -524,7 +608,7 @@ namespace EPMLiveCore.API
             return message;
         }
 
-        public static string ProcessUpdates(string xml)
+        public static string ProcessUpdates(string xml, SPWeb oWeb)
         {
             string message = "";
             bool errors = false;
@@ -624,7 +708,7 @@ namespace EPMLiveCore.API
 
                                     message += "</Project>";
 
-                                    if(GetUpdateCount(xml) == "0")
+                                    if(GetUpdateCount(xml, oWeb) == "0")
                                     {
                                         if(oProjectCenter.Fields.ContainsFieldWithInternalName("PendingUpdates"))
                                         {
@@ -656,7 +740,7 @@ namespace EPMLiveCore.API
             return message;
         }
 
-        public static string GetUpdates(string xml)
+        public static string GetUpdates(string xml, SPWeb oWeb)
         {
             string message = "";
 
@@ -689,70 +773,87 @@ namespace EPMLiveCore.API
 
                 if(key != "")
                 {
-                    SPSite site = SPContext.Current.Site;
+
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        SPWeb web = SPContext.Current.Web;
+                        using(SPSite site = new SPSite(oWeb.Site.ID))
                         {
-                            string sPlannerList = CoreFunctions.getLockConfigSetting(web, "EPMLivePlanner" + sPlannerID + "ProjectCenter", false);
-
-                            if(sPlannerList != "")
+                            using(SPWeb web = site.OpenWeb(oWeb.ID))
                             {
-                                SPList oProjectCenter = web.Lists.TryGetList(sPlannerList);
+                                string sPlannerList = CoreFunctions.getLockConfigSetting(web, "EPMLivePlanner" + sPlannerID + "ProjectCenter", false);
 
-                                if(oProjectCenter != null)
+                                if(sPlannerList != "")
                                 {
-                                    string taskCenterListName = CoreFunctions.getLockConfigSetting(web, key + "TaskCenter", false);
-                                    string taskCenterFields = CoreFunctions.getLockConfigSetting(web, key + "TaskCenterFields", false);
-                                    string taskCenterProjectField = CoreFunctions.getLockConfigSetting(web, key + "TaskCenterProjectField", false);
-                                    if(taskCenterProjectField == "")
-                                        taskCenterProjectField = "Project";
+                                    SPList oProjectCenter = web.Lists.TryGetList(sPlannerList);
 
-                                    string resUrl = CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", true);
-                                    
-                                    DataTable dtTeam = null;
-                                    dtTeam = APITeam.GetResourcePool("", web);
-
-                                    /*if(resUrl.ToLower() == web.ServerRelativeUrl.ToLower())
+                                    if(oProjectCenter != null)
                                     {
+                                        string taskCenterListName = CoreFunctions.getLockConfigSetting(web, key + "TaskCenter", false);
+                                        string taskCenterFields = CoreFunctions.getLockConfigSetting(web, key + "TaskCenterFields", false);
+                                        string taskCenterProjectField = CoreFunctions.getLockConfigSetting(web, key + "TaskCenterProjectField", false);
+                                        if(taskCenterProjectField == "")
+                                            taskCenterProjectField = "Project";
+
+                                        string resUrl = CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", true);
+
+                                        DataTable dtTeam = null;
+                                        dtTeam = APITeam.GetResourcePool("", web);
+
+                                        /*if(resUrl.ToLower() == web.ServerRelativeUrl.ToLower())
+                                        {
                                         
-                                    }
-                                    else
-                                    {
-                                        using(SPWeb rweb = web.Site.OpenWeb(resUrl))
-                                        {
-                                            dtTeam = APITeam.getTeam(rweb, "", "", true);
                                         }
-                                    }*/
-
-                                    Hashtable hshTaskCenterFields = new Hashtable();
-                                    if(taskCenterFields != "")
-                                    {
-                                        foreach(string taskCenterField in taskCenterFields.Split('|'))
+                                        else
                                         {
-                                            string[] sTaskCenterField = taskCenterField.Split(',');
-                                            if(!hshTaskCenterFields.Contains(sTaskCenterField[0]))
+                                            using(SPWeb rweb = web.Site.OpenWeb(resUrl))
                                             {
-                                                hshTaskCenterFields.Add(sTaskCenterField[1], sTaskCenterField[0]);
+                                                dtTeam = APITeam.getTeam(rweb, "", "", true);
+                                            }
+                                        }*/
+
+                                        Hashtable hshTaskCenterFields = new Hashtable();
+                                        if(taskCenterFields != "")
+                                        {
+                                            foreach(string taskCenterField in taskCenterFields.Split('|'))
+                                            {
+                                                string[] sTaskCenterField = taskCenterField.Split(',');
+                                                if(!hshTaskCenterFields.Contains(sTaskCenterField[0]))
+                                                {
+                                                    hshTaskCenterFields.Add(sTaskCenterField[1], sTaskCenterField[0]);
+                                                }
                                             }
                                         }
+
+                                        SPListItem oProject = oProjectCenter.GetItemById(int.Parse(sID));
+
+                                        SPList oTaskCenter = web.Lists[taskCenterListName];
+
+                                        SPSiteDataQuery query = new SPSiteDataQuery();
+                                        query.Lists = "<Lists><List ID=\"" + oTaskCenter.ID.ToString() + "\"/></Lists>";
+                                        query.Query = "<Where><And><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + sID + "</Value></Eq><Neq><FieldRef Name=\"IsPublished\"/><Value Type=\"Boolean\">1</Value></Neq></And></Where>";
+                                        query.ViewFields = "<FieldRef Name=\"Title\"/>";
+                                        query.QueryThrottleMode = SPQueryThrottleOption.Override;
+
+                                        string limit = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "updateperflimit");
+
+                                        if(limit != "")
+                                        {
+                                            try
+                                            {
+                                                query.RowLimit = uint.Parse(limit);
+                                            }
+                                            catch { }
+                                        }
+
+                                        DataTable dt = oTaskCenter.ParentWeb.GetSiteData(query);
+
+                                        message = "<Project>" + buildTasks(dt, hshTaskCenterFields, oTaskCenter, userType, dtTeam, dateformat) + "</Project>";
+
                                     }
-
-                                    SPListItem oProject = oProjectCenter.GetItemById(int.Parse(sID));
-
-                                    SPList oTaskCenter = web.Lists[taskCenterListName];
-
-                                    SPSiteDataQuery query = new SPSiteDataQuery();
-                                    query.Lists = "<Lists><List ID=\"" + oTaskCenter.ID.ToString() + "\"/></Lists>";
-                                    query.Query = "<Where><And><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + sID + "</Value></Eq><Neq><FieldRef Name=\"IsPublished\"/><Value Type=\"Boolean\">1</Value></Neq></And></Where>";
-                                    query.ViewFields = "<FieldRef Name=\"Title\"/>";
-
-                                    DataTable dt = oTaskCenter.ParentWeb.GetSiteData(query);
-
-                                    message = "<Project>" + buildTasks(dt, hshTaskCenterFields, oTaskCenter, userType, dtTeam, dateformat) + "</Project>";
                                 }
                             }
                         }
-                    }
+                    });
                 }
                 else
                 {

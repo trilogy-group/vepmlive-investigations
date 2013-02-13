@@ -2,7 +2,7 @@
    
 	<!-- Basic grid configuration -->
    <Cfg
-      DefaultsVersion="80101"
+      DefaultsVersion="90001"
       
 		AutoVersion="1" SuppressCfg="0" DefaultCfg="3" DefaultCfgMenu="1"
       
@@ -19,8 +19,9 @@
       CopyPasteTree="0" CopyPasteInternal="0"
       CopySelected="1" CopyFocused="1" CopyCols="1" CopyEdit="1"
       Pasting="1" PasteSelected="1" PasteFocused="8" PasteCols="4" PasteTree="2"
+      MaxAvailability="100000"
       
-      PageTime="200"
+      PageTime="200" RemoveUnusedPages="2"
 		Paging="0" PageLength="20" PageLengthDiv="1" AllPages="1" MaxPages="20"
       ColPaging="0" ColPageLength="10" ColPageMin="10" MaxColPages="10"
 		ChildPaging="2" RemoveCollapsed="0" 
@@ -30,9 +31,11 @@
       AutoUpdate="0"
       ReloadChanged="5"
 		CacheTimeout="10"
-		ExportFormat="1" ExportType="Indent,Expanded" ExportRows="500" CSVValueSeparator=";" CSVRowSeparator="&#x0a;" CSVQuote='"' CSVLevel='#'
-		PrintRows="50" PrintFiltered="0" PrintExpanded="0" PrintIcons="1" PrintPrint="1" PrintLocation="0"
-      PDFPageSize="8" PDFPageOrientation="0" PDFFitPage="1" PDFText="1"
+      ChangesUpdate="1"
+		ExportCols="2" ExportFormat="1" ExportType="Indent,Expanded" ExportRows="500" CSVValueSeparator=";" CSVRowSeparator="&#x0a;" CSVQuote='"' CSVLevel='#'
+		PrintCols="2" PrintRows="50" PrintFiltered="0" PrintExpanded="0" PrintIcons="1" PrintPrint="1" PrintLocation="0" PrintGanttSplit="1" PrintGanttSplitMin="100" PrintVarHeight="1"
+      PrintPageWidth="643" PrintPageHeight="971" PrintPageSize="8" PrintPageOrientation="0" PrintDPI="96" PrintDefaultDPI="96" PrintMinDPI="96" PrintMarginWidth="40" PrintMarginHeight="40" PrintPaddingWidth="0" PrintPaddingHeight="0"
+      ExportPDFCols="2" PDFFitPage="0" PDFText="1"
       ExpandAllLoaded="0" ExpandAllLevels="3"
       
       AbsoluteCursors="5" BorderCursors="2"
@@ -114,7 +117,7 @@
 		OnDblClickResize="GridResizeDefault"
       
       OnClickButtonCorrect="CorrectAllDependencies"
-      OnClickButtonZoomFit="ZoomFitAll"
+      OnClickButtonZoomFit="ZoomFit"
       OnClickButtonZoomIn="ZoomIn"
       OnClickButtonZoomOut="ZoomOut"
 
@@ -177,8 +180,8 @@
 
       OnClick2Cell="ShowPopupMenu OR Focus AND StartEdit" 
 		OnClick2Resize="GridResizeDefault"
-      OnDrag1Row='0' OnDrag2Row='Scroll' OnDrag3Row='DragRow'
-      OnDrag2Grid='Scroll'
+      OnDrag1Row='0' OnDrag2Row='0' OnDrag3Row='DragRow'
+      OnDrag2Grid='0'
       OnDrag2PanelMove="DragCopy"
       OnDrag3PanelMove="DragCopyChildren"
       OnDrag2Pager="ScrollPager"
@@ -213,6 +216,8 @@
 		OnCtrlDown="ShowDefaultsF OR ShowFilterMenuF OR ShowCalendarF OR ButtonClickF"
       OnCtrlZ="Undo" OnCtrlY="Redo"
 		OnCtrlC="Copy,0" OnCtrlX="Exclude,0" OnCtrlV="Paste,0"
+      OnMetaZ="Undo" OnMetaY="Redo"
+      OnMetaC="Copy,0" OnMetaX="Exclude,0" OnMetaV="Paste,0"
       OnCtrlAltD="DebugUndo"
       
   		KeyCodes1="Space=32,Enter=13,Esc=27,Backspace=8,Tab=9"
@@ -266,8 +271,8 @@
       <!-- Default header row -->
       <D Name="Header" Def=""
          Visible="1" Wrap="0"
-   		   CanEdit="0" CanFocus="0" CanFilter="0" AcceptChild="0" CanExport="1" CanCopyPaste="3" CanPrint="2"
-   		   Deleted="0" Selected="0" Changed="0" Added="0" Moved="0"
+   		CanEdit="0" CanFocus="0" CanFilter="0" AcceptChild="0" CanExport="1" CanCopyPaste="3" CanPrint="2"
+   		Deleted="0" Selected="0" Changed="0" Added="0" Moved="0"
 		   Expanded="0" Calculated="0"
 		   HoverCell="Color" HoverRow="Background" FocusCell="Border,Color,Class" FocusRow=""
          />
@@ -293,8 +298,8 @@
       <!-- Default column for type Gantt -->
       <D Name="Gantt" Def="C" MenuName="Gantt chart"
          CanSort="0" CanEdit="0" CanResize="0" CanFilter="0" CanCopyPaste="0" CanGroup="0" CanSearch="0" WidthPad="" ShowHint="0" CanDrag="0"
-         GanttOrder="Chart,Availability,Constraints,Run,Main,Flow,Mark,Dependency,Format,Flags,Points" GanttObject="Main" GanttFormatObject="Last" GanttFlowJoin="1"
-         GanttWidth="18" GanttUnits="d" GanttLeft="0" GanttRight="0" MaxWidth="10000" GanttRoundUnits="0"
+         GanttOrder="Chart,Availability,Constraints,Run,Main,Flow,Mark,Dependency,Format,Flags,Points" GanttObject="Main" GanttFormatObject="Last" GanttFlowJoin="1" GanttResizeBeforeMove="2"
+         GanttSize="" GanttWidth="18" GanttUnits="d" GanttLeft="0" GanttRight="0" MaxWidth="10000" GanttRoundUnits="0"
          GanttDataUnits="d" GanttEndLast="1" GanttResourcesAssign="4" GanttPointsShift="3" GanttAvailabilityFormat="0.##"
          GanttHover="1" GanttEdit="All" GanttResizeDelete="1" GanttUseConstraints="2" GanttShowConstraints="1"
          GanttSmoothZoom="1" GanttHideExclude="0" GanttChangeExclude="0" GanttMaxExclude="10000000" GanttBase="" GanttBaseCanEdit="2" GanttFinish="" GanttFinishCanEdit="1"
@@ -321,15 +326,15 @@
 
    <!-- Row left panel -->
 	<Panel 
-		Def="" Visible="1" Move="0" Select="1" Delete="1" Copy="0" CanPrint="0"
-      CanHide="1" CanResize="0" CanMove="0" CanDrag="1" CanExport="0" CanCopyPaste="0" CanSelect="0"
+		Def="" Visible="1" Move="0" Select="1" Delete="1" Copy="0" Prepared="1"
+      CanHide="1" CanResize="0" CanMove="0" CanDrag="1" CanExport="0" CanCopyPaste="0" CanSelect="0" CanPrint="0"
 		HoverCell="Color" HoverRow="Background"
       CopyMenu="CopyRow,CopyTree,CopyEmpty,CopySelected,CopySelectedTree,CopySelectedEmpty,CopySelectedChildEnd,CopySelectedTreeChildEnd,CopySelectedEmptyChildEnd,AddRow,AddChildEnd"
 		/>
 
 	<!-- Right side pager -->
 	<Pager 
-		Visible="1" Width="100" MinWidth="35" CanResize="1" CanHide="1" Hover="1"
+		Visible="1" Width="100" MinWidth="35" CanResize="1" CanHide="1" Hover="1" Name="Pager"
 		/>
 
    <!-- Row displayed when no variable rows are visible -->
@@ -340,10 +345,10 @@
 
 	<!-- Bottom toolbar -->
    <Toolbar id="Toolbar" CanPrint="0" Space="4"
-      Cells="Correct,Save,Reload,Repaint,Print,ExportPDF,Export,Undo,Redo,Add,AddChild,Join,Split,Outdent,Indent,Sort,Calc,ExpandAll,CollapseAll,ZoomIn,ZoomOut,ZoomFit,Columns,Cfg,Help,Debug,StyleTitle,StyleCombo,StyleStandard,StyleLight,StyleOffice,StyleModern,StyleBorders,StyleQuery,StyleRobust,StylePlain,StyleColors,Empty,Formula,Resize"
+      Cells="Correct,Save,Reload,Repaint,Print,ExportPDF,Export,Undo,Redo,Add,AddChild,Join,Split,Outdent,Indent,Sort,Calc,ExpandAll,CollapseAll,ZoomIn,ZoomOut,ZoomFit,Columns,Cfg,Help,Debug,StyleTitle,StyleCombo,StyleStandard,StyleLight,StyleOffice,StyleModern,StyleBorders,StyleQuery,StyleExtJS,StyleRobust,StylePlain,StyleColors,Empty,Formula,Resize"
       SaveOnEnter="Validate AND Save" SaveVisibleFormula="(Grid.Data.Upload.Url||Grid.Data.Upload.Tag||Grid.Data.Upload.Data)&amp;&amp;!Grid.Detail?1:0"
       ReloadOnEnter="Reload" ReloadVisibleFormula="!Grid.Detail"
-      RepaintOnEnter="RenderPages" RepaintVisibleFormula="(Grid.Paging==1||Grid.Paging==2)&amp;&amp;Grid.AllPages||Grid.ColPaging||Grid.ChildParts" RepaintFormula="Grid.Paging==2||Grid.ColPaging==2||Grid.ChildParts==2?0:1"
+      RepaintOnEnter="RenderPages" RepaintVisibleFormula="(Grid.Paging==1||Grid.Paging==2)&amp;&amp;Grid.AllPages||Grid.ColPaging||Grid.ChildParts&amp;&amp;Grid.ChildPaging!=3" RepaintFormula="Grid.Paging==2||Grid.ColPaging==2||Grid.ChildParts==2?0:1"
       PrintOnEnter="Print"
       ExportPDFOnEnter="ExportPDF" ExportPDFVisibleFormula="!!Grid.Data.ExportPDF.Url"
       ExportOnEnter="Export" ExportVisibleFormula="!!Grid.Data.Export.Url"
@@ -375,9 +380,9 @@
       StyleTitle="&lt;span style='color:#999;'>Style:&lt;/span>" StyleTitleWidth="-2" StyleTitleType="Html" 
       StyleTitleNoColor="1" StyleTitleCanFocus="0" StyleTitleVisibleFormula="!!Row.Styles" StyleTitleWrap="0"
       
-      StyleComboSwitch="1" StyleComboList="Standard,Light,Office,Modern,Borders,Query,Robust,Plain,Colors" StyleComboPopupIcon="2" StyleComboVisibleFormula="Row.Styles==2"
-      StyleComboFormula="var S={GS:'Standard',GL:'Light',GO:'Office',GM:'Modern',GB:'Borders',GQ:'Query',GR:'Robust',GP:'Plain',GC:'Colors'}[Grid.Style];return S?S:Grid.Style"
-      StyleComboOnChange="Grid.SetStyle({Standard:'GS',Light:'GL',Office:'GO',Modern:'GM',Borders:'GB',Query:'GQ',Robust:'GR',Plain:'GP',Colors:'GC'}[Value],Value,1)"
+      StyleComboSwitch="1" StyleComboList="Standard,Light,Office,Modern,Borders,Query,ExtJS,Robust,Plain,Colors" StyleComboPopupIcon="2" StyleComboVisibleFormula="Row.Styles==2"
+      StyleComboFormula="var S={GS:'Standard',GL:'Light',GO:'Office',GM:'Modern',GB:'Borders',GQ:'Query',GE:'ExtJS',GR:'Robust',GP:'Plain',GC:'Colors'}[Grid.Style];return S?S:Grid.Style"
+      StyleComboOnChange="Grid.SetStyle({Standard:'GS',Light:'GL',Office:'GO',Modern:'GM',Borders:'GB',Query:'GQ',ExtJS:'GE',Robust:'GR',Plain:'GP',Colors:'GC'}[Value],Value,1)"
             
       StyleStandardIcon="Standard" StyleStandardSwitch="1" StyleStandardVisibleFormula="Row.Styles==1"
       StyleStandardFormula="Grid.Style=='GS'" StyleStandardOnClick="Grid.SetStyle('GS','Standard',1);return 1" StyleStandardOnEnter="Grid.SetStyle('GS','Standard',1)"
@@ -391,6 +396,8 @@
       StyleBordersFormula="Grid.Style=='GB'" StyleBordersOnClick="Grid.SetStyle('GB','Borders',1);return 1" StyleBordersOnEnter="Grid.SetStyle('GB','Borders',1)"
       StyleQueryIcon="Query" StyleQuerySwitch="1" StyleQueryVisibleFormula="Row.Styles==1"
       StyleQueryFormula="Grid.Style=='GQ'" StyleQueryOnClick="Grid.SetStyle('GQ','Query',1);return 1" StyleQueryOnEnter="Grid.SetStyle('GQ','Query',1)"
+      StyleExtJSIcon="ExtJS" StyleExtJSSwitch="1" StyleExtJSVisibleFormula="Row.Styles==1"
+      StyleExtJSFormula="Grid.Style=='GE'" StyleExtJSOnClick="Grid.SetStyle('GE','ExtJS',1);return 1" StyleExtJSOnEnter="Grid.SetStyle('GE','ExtJS',1)"
       StyleRobustIcon="Robust" StyleRobustSwitch="1" StyleRobustVisibleFormula="Row.Styles==1"
       StyleRobustFormula="Grid.Style=='GR'" StyleRobustOnClick="Grid.SetStyle('GR','Robust',1);return 1" StyleRobustOnEnter="Grid.SetStyle('GR','Robust',1)"
       StylePlainIcon="Plain" StylePlainSwitch="1" StylePlainVisibleFormula="Row.Styles==1"

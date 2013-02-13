@@ -12,7 +12,7 @@ namespace EPMLiveCore.API
 {
     internal class Notification
     {
-        #region Fields (1) 
+        #region Fields (1)
 
         private static readonly Dictionary<string, string[]> ValidInputs = new Dictionary<string, string[]>
                                                                                {
@@ -20,9 +20,9 @@ namespace EPMLiveCore.API
                                                                                    {"Value", new[] {"false", "true"}}
                                                                                };
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Methods (12) 
+        #region Methods (12)
 
         // Private Methods (10) 
 
@@ -132,7 +132,7 @@ namespace EPMLiveCore.API
                                             spWeb);
 
                 SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
-                var cultureInfo = new CultureInfo((int) spRegionalSettings.LocaleId);
+                var cultureInfo = new CultureInfo((int)spRegionalSettings.LocaleId);
 
                 string[] dateParts = epmNotification.CreatedAt.Split(' ')[0].Split('/');
                 var dateTime = new DateTime(Convert.ToInt32(dateParts[2]), Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]));
@@ -152,7 +152,12 @@ namespace EPMLiveCore.API
                         {
                             using (SPWeb web = site.OpenWeb())
                             {
-                                SPUser user = web.SiteUsers.GetByID(epmNotification.CreatedBy);
+                                SPUser user = null;
+                                try
+                                {
+                                    user = web.SiteUsers.GetByID(epmNotification.CreatedBy);
+                                }
+                                catch { }
 
                                 if (user != null)
                                 {
@@ -207,8 +212,7 @@ namespace EPMLiveCore.API
                             var sqlConnection =
                                 new SqlConnection(CoreFunctions.getConnectionString(spSite.WebApplication.Id)))
                         {
-                            var sqlCommand = new SqlCommand("spNGetNotifications", sqlConnection)
-                                                 {CommandType = CommandType.StoredProcedure};
+                            var sqlCommand = new SqlCommand("spNGetNotifications", sqlConnection) { CommandType = CommandType.StoredProcedure };
 
                             SqlParameter userName = sqlCommand.Parameters.Add("@UserName", SqlDbType.NVarChar);
                             SqlParameter userId = sqlCommand.Parameters.Add("@UserId", SqlDbType.NVarChar);
@@ -424,7 +428,7 @@ namespace EPMLiveCore.API
         private static void SetNotificationFlag(EPMNotification epmNotification, SqlConnection sqlConnection,
                                                 SPUser user)
         {
-            var sqlCommand = new SqlCommand("spNSetBit", sqlConnection) {CommandType = CommandType.StoredProcedure};
+            var sqlCommand = new SqlCommand("spNSetBit", sqlConnection) { CommandType = CommandType.StoredProcedure };
 
             SqlParameter notificationId = sqlCommand.Parameters.Add("@FK", SqlDbType.UniqueIdentifier);
             SqlParameter userId = sqlCommand.Parameters.Add("@userid", SqlDbType.VarChar);
@@ -505,8 +509,7 @@ namespace EPMLiveCore.API
         private static void TranslateNotificationToPersonalization(EPMNotification epmNotification,
                                                                    SqlConnection sqlConnection, SPUser user)
         {
-            var sqlCommand = new SqlCommand("spNTranslateNotificationToPersonalization", sqlConnection)
-                                 {CommandType = CommandType.StoredProcedure};
+            var sqlCommand = new SqlCommand("spNTranslateNotificationToPersonalization", sqlConnection) { CommandType = CommandType.StoredProcedure };
 
             SqlParameter notificationId = sqlCommand.Parameters.Add("@NotificationId", SqlDbType.UniqueIdentifier);
             SqlParameter userName = sqlCommand.Parameters.Add("@UserName", SqlDbType.NVarChar);
@@ -760,13 +763,13 @@ namespace EPMLiveCore.API
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
 
         #region Nested type: EPMNotification
 
         private struct EPMNotification
         {
-            #region Data Members (20) 
+            #region Data Members (20)
 
             public string CreatedAt;
             public string CreatedAtDateString;
@@ -789,7 +792,7 @@ namespace EPMLiveCore.API
             public bool UserEmailed;
             public Guid WebId;
 
-            #endregion Data Members 
+            #endregion Data Members
         }
 
         #endregion

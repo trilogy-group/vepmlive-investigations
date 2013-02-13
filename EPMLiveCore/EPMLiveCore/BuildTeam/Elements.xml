@@ -1,39 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
-  <CustomAction
+	<CustomAction
 	Id="EPMLive.Workgroup.Admin.SitePermissions"
 	GroupId="EPMLive.Workgroup.Admin"
 	Location="Microsoft.SharePoint.SiteSettings"
 	Sequence="10"
 	Title="Build Team">
-    <UrlAction Url="_layouts/epmlive/buildteam.aspx" />
-  </CustomAction>
+		<UrlAction Url="_layouts/epmlive/buildteam.aspx" />
+	</CustomAction>
 
-  <CustomAction
+	<CustomAction
 		  Id="EPMLive.ResourceTools"
 		  Location="CommandUI.Ribbon"
 		  Title="Resource Tools Build Team"
 		  Sequence="102">
-    <CommandUIExtension>
-      <CommandUIDefinitions>
-        <CommandUIDefinition Location ="Ribbon.List.EPMLive.ResourceTools.Controls._children">
-          <Button Command ="RBuildTeam" Id ="Ribbon.List.EPMLive.RBuildTeam" LabelText="Build Team" Image32by32="/_layouts/epmlive/images/resources32.png" TemplateAlias="o1"/>
-        </CommandUIDefinition>
-      </CommandUIDefinitions>
-      <CommandUIHandlers>
-        <CommandUIHandler Command="RBuildTeam" CommandAction="javascript:ResourceToolsBuildTeam();" EnabledScript="javascript:ResourceToolsBuildTeamEnabled();"></CommandUIHandler>
-      </CommandUIHandlers>
+		<CommandUIExtension>
+			<CommandUIDefinitions>
+				<CommandUIDefinition Location ="Ribbon.List.EPMLive.ResourceTools.Controls._children">
+					<Button Command ="RBuildTeam" Id ="Ribbon.List.EPMLive.RBuildTeam" LabelText="Build Team" Image32by32="/_layouts/epmlive/images/resources32.png" TemplateAlias="o1"/>
+				</CommandUIDefinition>
+			</CommandUIDefinitions>
+			<CommandUIHandlers>
+				<CommandUIHandler Command="RBuildTeam" CommandAction="javascript:ResourceToolsBuildTeam();" EnabledScript="javascript:ResourceToolsBuildTeamEnabled();"></CommandUIHandler>
+			</CommandUIHandlers>
 
-    </CommandUIExtension>
+		</CommandUIExtension>
 
-  </CustomAction>
+	</CustomAction>
 
-  <CustomAction
+	<CustomAction
       ScriptSrc="epmlive/buildteamtools.js"
       Location="ScriptLink"
       Sequence="100"
       >
-  </CustomAction>
-
-
+	</CustomAction>
+	
+	
 </Elements>

@@ -55,7 +55,7 @@
     <UrlAction Url="_layouts/epmlive/timesheetadmin.aspx" />
   </CustomAction>
 	
-	<CustomAction Id="EPMLive.Workgroup.Admin.Setup" GroupId="EPMLive.Workgroup.Admin" Location="Microsoft.SharePoint.SiteSettings" Sequence="2002" Title="My Work Settings">
+	<CustomAction Id="EPMLive.Workgroup.Admin.Setup" GroupId="EPMLive.Workgroup.Admin" Location="Microsoft.SharePoint.SiteSettings" Sequence="2002" Title="Work Settings">
 		<UrlAction Url="_layouts/epmlive/myworksettings.aspx" />
 	</CustomAction>
 

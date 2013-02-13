@@ -1,0 +1,66 @@
+<Grid>
+	<Cfg Code="GTACCNPSQEBSLC" Version="4.3.2.120412" />
+	<Cfg SuppressCfg="1" Style="GS" />
+	<Cfg MainCol="Title" NameCol="Title" />
+	<Cfg ConstWidth="0" />
+	<Cfg NoVScroll="1" />
+	<Cfg Undo="0" />
+	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" />
+	<Cfg Searching="1" />
+	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
+	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="20" MaxRowHeight="20" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
+	<Cfg Paging="2" AllPages="1" PageLength="10" MaxPages="20" NoPager="1" ChildParts="2" />
+	<Def>
+		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" />
+		<D Name="R" TitleHtmlPrefixFormula="'&lt;img id=&quot;MWG_Processing_'+Row.id+'&quot; class=&quot;MWG_Processing&quot; src=&quot;/_layouts/epmlive/images/mywork/loading16.gif&quot;>&lt;/img>'"/>
+		<D Name="R" TitleLowerFormula="Row.Title?(Row.Title+'').toLowerCase():''"/>
+		<D Name="R" TitleClass="EPMLiveMyWorkTitle"/>
+		<D Name="R" StatusFCFormula="Row.Status?Row.Status:''"/>
+		<D Name="R" DueDateFCFormula="Row.DueDate?DateToString(Row.DueDate, 'yyyyMMdd'):''"/>
+		<D Name="R" DueDateFC2Formula="Row.DueDateFC?Row.DueDateFC:''"/>
+		<D Name="R" Calculated="1" CalcOrder="TitleHtmlPrefix,CompleteClass,DueDateClass,DueDayClass,TitleLower,StatusFC,DueDateFC,DueDateFC2" Wrap="0" ShowHint="0" NoColorState="1" CanEdit="0" Height="30" />
+		<D Name="Group" HoverCell="" HoverRow="" FocusCell="" FocusRow="" />
+		<D Name="Group" CanFilter="2" TitleEmptyValueFormula="'No '+Grid.Header[Row.GroupCol]" />
+		<D Name="Group" Class="EPMLiveMyWorkGroup" TitleClass="EPMLiveMyWorkGroupTitle" />
+		<D Name="Group" TitleHtmlPrefixFormula="' &lt;span class=&quot;EPMLiveMyWorkGroupPrefix&quot;>'+Grid.Header[Row.GroupCol]+': &lt;/span>'"/>
+		<D Name="Group" TitleHtmlPostfixFormula="' &lt;span class=&quot;EPMLiveMyWorkGroupPostfix&quot;>('+count(4)+')&lt;/span>'"/>
+		<D Name="Group" Calculated="1" CalcOrder="CompleteClass,DueDateClass,DueDayClass,TitleEmptyValue,TitleHtmlPostfix"/>
+	</Def>
+	<Toolbar Visible="0" CanHide="0" />
+	<Panel Visible="0" CanHide="0" />
+	<Head><Filter CanHide="0" CanEdit="1" /></Head>
+	<Solid>
+		<Group CanHide="0" />
+		<I id="NoData" Html="There are no active work items assigned to you." />
+	</Solid>
+	<Lang>
+		<Text StartErr = "Fatal error! &lt;br/>My Work grid cannot render" />
+	</Lang>
+	<LeftCols>
+		<C Name="ItemID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="ListID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="WebID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="SiteID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="AuthorID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="Commenters" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="CommentersRead" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="SiteURL" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="EditMode" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="TitleLower" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" />
+		<C Name="StatusFC" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" />
+		<C Name="DueDateFC" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" Type="Int" />
+		<C Name="DueDateFC2" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" Type="Int" />
+		<C Name="Complete" Type="Bool" Width="20" OnClick="changeCompleteStatus(Grid,Row,Col); return true;" ClassFormula="calculateDueColor('Complete',Row)" CanFilter="0" CanGroup="0" CanHide="0" CanResize="0" CanSort="0" />
+		<C Name="CommentCount" Type="Html" Width="26" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" />
+		<C Name="Priority" Type="Html" Width="25" />
+		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" />
+	</LeftCols>
+	<Cols/>
+	<RightCols>
+		<C Name="Workspace" Visible="0" CanFilter="0" CanGroup="0" />
+		<C Name="Flag" Type="Html" Width="40" OnClick="updateFlag(Grid,Row,Col); return true;" />
+		<C Name="DueDay" Type="Html" Width="150" ClassFormula="calculateDueColor('DueDay',Row)" Align="Right" />
+		<C Name="WorkingOn" Type="Html" Width="100" Visible="0" />
+	</RightCols>
+	<Header Complete="" Edit="" CommentCount="" Priority="&lt;img src=&quot;/_layouts/epmlive/images/mywork/priority.png&quot; /&gt;" Flag="&lt;img src=&quot;/_layouts/epmlive/images/mywork/flagged.png&quot; /&gt;" Work0000Type="Work Type" DueDay="Due Day" WorkingOn="Working On" NoEscape="1" SortIcons="2" HoverCell="" HoverRow="" DueDayAlign="Right" />
+</Grid>

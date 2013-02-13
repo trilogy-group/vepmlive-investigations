@@ -47,10 +47,12 @@ namespace EPMLiveCore
 
             int retVal = -1;
 
+            if(System.Web.HttpContext.Current != null)
+                System.Web.HttpContext.Current.Items["FormDigestValidated"] = true;
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                System.Web.HttpContext.Current.Items["FormDigestValidated"] = true;
+                
 
                 ArrayList arrUsers = GetFarmFeatureUsers(featureId);
 

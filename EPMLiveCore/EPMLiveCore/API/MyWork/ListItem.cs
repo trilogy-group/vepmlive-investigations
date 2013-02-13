@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore.API
 {
@@ -15,7 +14,7 @@ namespace EPMLiveCore.API
         // Private Methods (2) 
 
         /// <summary>
-        /// Gets the list item element.
+        ///     Gets the list item element.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -32,7 +31,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Gets the list item elements.
+        ///     Gets the list item elements.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -54,7 +53,7 @@ namespace EPMLiveCore.API
         // Internal Methods (3) 
 
         /// <summary>
-        /// Gets the list item.
+        ///     Gets the list item.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -85,14 +84,15 @@ namespace EPMLiveCore.API
                 {
                     using (SPWeb spWeb = spSite.OpenWeb(webId))
                     {
-                        SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
+                        SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ??
+                                                                spWeb.RegionalSettings;
 
                         listItemElement.Add(new XElement("Fields"));
                         XElement fieldsElement = listItemElement.Element("Fields");
 
                         SPList spList = spWeb.Lists[listId];
 
-                        SPListItem spListItem = spList.Items.GetItemById(itemId);
+                        SPListItem spListItem = spList.GetItemById(itemId);
 
                         foreach (
                             SPField field in
@@ -106,15 +106,16 @@ namespace EPMLiveCore.API
                             {
                                 string value = spListItem[field.Id].ToString();
 
-                                if (field.Type == SPFieldType.Number||field.Type==SPFieldType.Currency)
+                                if (field.Type == SPFieldType.Number || field.Type == SPFieldType.Currency)
                                 {
                                     if (!string.IsNullOrEmpty(value))
                                     {
                                         try
                                         {
                                             value = Decimal.Parse(value,
-                                                new CultureInfo((int)currentContextRegionalSettings.LocaleId))
-                                                .ToString(CultureInfo.InvariantCulture);
+                                                                  new CultureInfo(
+                                                                      (int) currentContextRegionalSettings.LocaleId))
+                                                           .ToString(CultureInfo.InvariantCulture);
                                         }
                                         catch
                                         {
@@ -130,7 +131,8 @@ namespace EPMLiveCore.API
                                     {
                                         DateTime dateTime = currentContextRegionalSettings
                                             .TimeZone.UTCToLocalTime(spRegionalSettings.TimeZone
-                                            .LocalTimeToUTC(DateTime.Parse(value)));
+                                                                                       .LocalTimeToUTC(
+                                                                                           DateTime.Parse(value)));
 
                                         value = dateTime.ToString("MMM dd, yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                                     }
@@ -163,7 +165,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Determines whether [is moderation enabled] [the specified list].
+        ///     Determines whether [is moderation enabled] [the specified list].
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -223,7 +225,7 @@ namespace EPMLiveCore.API
         }
 
         /// <summary>
-        /// Updates the list item.
+        ///     Updates the list item.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -255,21 +257,25 @@ namespace EPMLiveCore.API
                     {
                         SPWeb web = SPContext.Current.Web;
                         SPUser currentUser = web.CurrentUser;
-                        SPRegionalSettings currentContextRegionalSettings = currentUser.RegionalSettings ?? web.RegionalSettings;
+                        SPRegionalSettings currentContextRegionalSettings = currentUser.RegionalSettings ??
+                                                                            web.RegionalSettings;
 
                         Dictionary<string, string> fieldValues = Utils.GetFieldValues(xElement);
 
-                        using (var spSite = new SPSite(siteUrl,web.Site.RootWeb.AllUsers[currentUser.LoginName].UserToken))
+                        using (
+                            var spSite = new SPSite(siteUrl, web.Site.RootWeb.AllUsers[currentUser.LoginName].UserToken)
+                            )
                         {
                             using (SPWeb spWeb = spSite.OpenWeb(webId))
                             {
-                                SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
+                                SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ??
+                                                                        spWeb.RegionalSettings;
 
                                 spWeb.AllowUnsafeUpdates = true;
 
                                 SPList spList = spWeb.Lists[listId];
 
-                                SPListItem spListItem = spList.Items.GetItemById(itemId);
+                                SPListItem spListItem = spList.GetItemById(itemId);
 
                                 Dictionary<string, Dictionary<string, string>> fieldProperties =
                                     Utils.GetFieldProperties(spList);
@@ -322,15 +328,26 @@ namespace EPMLiveCore.API
                                     if (spField.Type == SPFieldType.Number)
                                     {
                                         if (((SPFieldNumber) spField).ShowAsPercentage)
-                                            theValue = (double.Parse(theValue, new CultureInfo("en-US")) / 100).ToString(CultureInfo.InvariantCulture);
+                                            theValue =
+                                                (double.Parse(theValue, new CultureInfo("en-US"))/100).ToString(
+                                                    CultureInfo.InvariantCulture);
                                     }
                                     else if (spField.Type == SPFieldType.DateTime)
                                     {
-                                        var dateTime = new DateTime((Convert.ToInt64(theValue)*10000) + 621355968000000000);
-                                        DateTime localTimeToUtc = currentContextRegionalSettings.TimeZone.LocalTimeToUTC(dateTime);
-                                        DateTime utcToLocalTime = spRegionalSettings.TimeZone.UTCToLocalTime(localTimeToUtc);
+                                        try
+                                        {
+                                            var dateTime =
+                                                new DateTime((Convert.ToInt64(theValue)*10000) + 621355968000000000);
+                                            DateTime localTimeToUtc =
+                                                currentContextRegionalSettings.TimeZone.LocalTimeToUTC(dateTime);
+                                            DateTime utcToLocalTime =
+                                                spRegionalSettings.TimeZone.UTCToLocalTime(localTimeToUtc);
 
-                                        theValue = utcToLocalTime.ToString(CultureInfo.InvariantCulture);
+                                            theValue = utcToLocalTime.ToString(CultureInfo.InvariantCulture);
+                                        }
+                                        catch
+                                        {
+                                        }
                                     }
 
                                     spListItem[theField] = theValue;

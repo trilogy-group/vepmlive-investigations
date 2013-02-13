@@ -315,24 +315,29 @@ namespace EPMLiveCore.API
                 {
                     SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id));
                     cn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT status,timerjobuid from vwQueueTimer where siteguid=@siteuid and webguid=@webuid and jobtype=@jobtype", cn);
-                    cmd.Parameters.AddWithValue("@siteuid", siteid);
-                    cmd.Parameters.AddWithValue("@webuid", webid);
-                    cmd.Parameters.AddWithValue("@jobtype", jobtype);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-
+                    
                     bool bExists = false;
                     int status = 0;
 
-                    if(dr.Read())
+                    if(scheduletype != 99)
                     {
-                        bExists = true;
-                        status = dr.GetInt32(0);
-                        jobuid = dr.GetGuid(1);
+                        SqlCommand cmd = new SqlCommand("SELECT status,timerjobuid from vwQueueTimer where siteguid=@siteuid and webguid=@webuid and jobtype=@jobtype", cn);
+                        cmd.Parameters.AddWithValue("@siteuid", siteid);
+                        cmd.Parameters.AddWithValue("@webuid", webid);
+                        cmd.Parameters.AddWithValue("@jobtype", jobtype);
+
+                        SqlDataReader dr = cmd.ExecuteReader();
+
+                        
+
+                        if(dr.Read())
+                        {
+                            bExists = true;
+                            status = dr.GetInt32(0);
+                            jobuid = dr.GetGuid(1);
+                        }
+                        dr.Close();
                     }
-                    dr.Close();
 
                     if(!bExists)
                     {

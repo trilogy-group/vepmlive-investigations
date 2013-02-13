@@ -10,6 +10,12 @@ $(function () {
     }
 });
 
+var loadingHtml = "<div id=\"divLoadingIcon\" style=\"width:100%; vertical-align: middle; white-space: nowrap; background-color: rgb(255, 255, 255);padding-top:10px;padding-bottom:20px;\">" +
+                    "<IMG style=\"margin-left:230px; margin-right:10px; vertical-align: middle\" title=\"Working...\" alt=\"Working...\" src=\"/_layouts/images/progress-circle-24.gif\">" +
+                    "<SPAN style=\"TEXT-ALIGN: center; WHITE-SPACE: nowrap; COLOR: black; VERTICAL-ALIGN: middle; OVERFLOW: hidden;font-family:Verdana;font-size:12px;color:#686868;\">Working...</SPAN>" +
+                  "</div>";
+
+
 function QueuePopulateIMNRC(emailAddress, element) {
     setTimeout("IMNRC('" + emailAddress + "', document.getElementById('" + element.id + "'));", 100);
 }
@@ -69,6 +75,10 @@ function ajaxPost(command) {
         case "CreateComment":
             notifyId = SP.UI.Notify.addNotification('Creating comment...', true);
             setTimeout('SP.UI.Notify.removeNotification(notifyId)', 300);
+            $('#commentItem_PlaceHolder').after(loadingHtml);
+            $('#postBtn').removeClass('epmliveButton-emphasize');
+            $('#postBtn').addClass('epmliveButton-disabled')
+            $('#postBtn').attr('disabled', true);
             break;
         case "ReadComment":
             notifyId = SP.UI.Notify.addNotification('Reading comment...', true);
@@ -91,11 +101,24 @@ function ajaxPost(command) {
     var qsCommentItemId = $('#hdnCommentItemId').val();
     var qsUserId = $('#hdnUserId').val();
 
-//    var withBRs = $('#brText').html();
-//    var textWithBreaks = withBRs.replace(/\<br\>/gi, '\r');
-//    $('#area').text(textWithBreaks);
+    //    var withBRs = $('#brText').html();
+    //    var textWithBreaks = withBRs.replace(/\<br\>/gi, '\r');
+    //    $('#area').text(textWithBreaks);
 
     var qsComment = $('#tbCommentInput').html();
+    // clear text box
+    $('#tbCommentInput').html("");
+    // reset box sizes
+    var commentDivHeight = $('#tbCommentInput').height();
+    var subDivHeight = $('.commentsContainer').height();
+    if (commentDivHeight > 72) {
+        var diff = (commentDivHeight - 72);
+        $('.commentsContainer').height(300 - diff);
+    }
+    else {
+        $('.commentsContainer').height(300);
+    }
+
     var newContentBoxId = '#socialCommentInputBox_' + qsCommentItemId;
     var qsNewComment = "";
     var qsNewCommentHTML = "";
@@ -116,6 +139,7 @@ function ajaxPost(command) {
                 case "CreateComment":
                     if (oJson.Result.Status == "1") {
                         alert(oJson.Result.Error.Text);
+                        $('#divLoadingIcon').fadeOut('slow');
                         SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
                     }
                     else {
@@ -123,16 +147,16 @@ function ajaxPost(command) {
                         var newCommentBox = $('#commentItem_Model')
                                             .clone()
                                             .attr('id', 'commentItem_' + commentItemId)
-                                            .css('display', '')
                                             .wrap('<div></div>')
                                             .parent()
                                             .html();
+
 
                         $('#commentItem_PlaceHolder').after(newCommentBox);
                         $('#commentItem_' + commentItemId).find('#divComment_Model').attr('id', 'divComment_' + commentItemId);
                         $('#commentItem_' + commentItemId).find('#divComment_' + commentItemId).html(qsComment);
 
-                        $('#commentItem_' + commentItemId).find('#lnkUserProfile').attr('href', userProfileUrl).text(currentUserLoginName);
+                        $('#commentItem_' + commentItemId).find('#lnkUserProfile').attr('href', userProfileUrl);
                         $('#commentItem_' + commentItemId).find('#lnkUserProfile').text(currentUserLoginName);
                         $('#commentItem_' + commentItemId).find('#spanCreatedDate').text(oJson.Result.Comments.CommentItem.Comment.createdDate);
 
@@ -143,6 +167,22 @@ function ajaxPost(command) {
                         $('#commentItem_' + commentItemId).find('#btnCommentItemDelete_Model').attr('id', 'btnCommentItemDelete_' + commentItemId);
 
                         $('#commentItem_' + commentItemId).find('#commentAvailBubble_Model').attr('onload', 'QueuePopulateIMNRC(\'' + userEmail + '\',this);');
+
+                        //                        var newComment = commentModel.replace(/##commentItem_Model##/g, 'commentItem_' + commentItemId)
+                        //                                                                             .replace(/##divComment_Model##/g, 'divComment_' + commentItemId)
+                        //                                                                             .replace(/##qsComment##/g, qsComment)
+                        //                                                                             .replace(/##lnkUserProfileHref##/g, userProfileUrl)
+                        //                                                                             .replace(/##lnkUserProfileText##/g, currentUserLoginName)
+                        //                                                                             .replace(/##Created_Date##/g, oJson.Result.Comments.CommentItem.Comment.createdDate)
+                        //                                                                             .replace(/##imgUserProfile##/g, 'imgUserProfile_' + commentItemId)
+                        //                                                                             .replace(/##imgUserProfileSrc##/g, userPictureUrl)
+                        //                                                                             .replace(/##btnCommentItemEdit_Model##/g, 'btnCommentItemEdit_' + commentItemId)
+                        //                                                                             .replace(/##btnCommentItemDelete_Model##/g, 'btnCommentItemDelete_' + commentItemId)
+                        //                                                                             .replace(/##commentAvailBubble_ModelOnLoad##/g, 'QueuePopulateIMNRC(\'' + userEmail + '\',this);');
+
+                        $('#divLoadingIcon').fadeOut('slow', function () {
+                            $('#commentItem_' + commentItemId).fadeIn('slow');
+                        });
 
                         var btnPostId = '#btnCommentItemEdit_' + commentItemId;
                         $(btnPostId).click(function () {
@@ -157,6 +197,10 @@ function ajaxPost(command) {
                             ajaxPost('DeleteComment');
                             return false;
                         });
+
+                        $('#postBtn').removeClass('epmliveButton-disabled');
+                        $('#postBtn').addClass('epmliveButton-emphasize');
+                        $('#postBtn').attr('disabled', false);
                     }
                     break;
                 case "DeleteComment":
@@ -188,9 +232,9 @@ function ajaxPost(command) {
 
     xmlhttp.send("command=" + command +
                         "&comment=" + escape(qsComment) +
-                        //"&commenthtml=" + qsCommentHTML +
+    //"&commenthtml=" + qsCommentHTML +
                         "&newcomment=" + escape(qsNewComment) +
-                        //"&newcommenthtml=" + qsNewCommentHTML +
+    //"&newcommenthtml=" + qsNewCommentHTML +
                         "&itemId=" + qsItemId +
                         "&listId=" + qsListId +
                         "&commentItemId=" + qsCommentItemId +

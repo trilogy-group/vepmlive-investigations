@@ -97,6 +97,36 @@ function GEInit() {
                         controlProps = window._LookupFieldsPropsArray[index];
                     }
 
+                    switch (e.keyCode) {
+                        case 8:
+                            var text = $(this).text();
+                            var lastChar = text.substr(text.length - 1, 1);
+                            if (lastChar == ';') {
+                                var tester = $(this).html();
+                                var eleParent = null;
+                                try {
+                                    eleParent = $('<div>' + tester + '</div>');
+                                }
+                                catch (e) {
+                                }
+
+                                if (eleParent != null) {
+                                    if (eleParent.find('SPAN').length > 0) {
+                                        try {
+                                            $(this).children('span:last-child').remove();
+                                            $(this).html($(this).html().replace(/;$/, ''));
+                                            //$(this).html($(this).html().replace(/(&nbsp;)$/, ''));
+                                            //$(this).html($(this).html().replace(/(&nbsp;)$/, ''));
+                                        }
+                                        catch (e) {
+                                        }
+                                    }
+                                }
+                            }
+
+                            break;
+                    }
+
                     // test if single lookup field already has a value
                     if ((e.keyCode >= 65 && e.keyCode <= 90) ||
                             (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 96 && e.keyCode <= 105) ||
@@ -116,6 +146,8 @@ function GEInit() {
                             }
                         }
                     }
+
+
                 });
 
                 // register keyup event with type ahead logic 
@@ -131,10 +163,83 @@ function GEInit() {
                             if (!SPControlContainsValue($(this).attr('id'))) {
                                 RedisableChildren(controlProps);
                             }
+
+                            var sSearch = $(this).html();
+                            sSearch = ParseForSearchVal(sSearch);
+                            // clearn text for firefox
+                            if (sSearch.indexOf('<br>') != -1) {
+                                sSearch = sSearch.replace(/<br>/g, '');
+                            }
+
+                            sSearch = sSearch.trim();
+                            controlProps.ControlInfo.SearchText = sSearch;
+
+                            if (controlProps.ControlInfo.SearchText.length > 0) {
+                                // is multi select
+                                if (controlProps.ControlInfo.IsMultiSelect ||
+                                // or is single select and does not contain a value already
+                                    (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
+
+                                    if (controlProps.Parent != '') {
+                                        var index = CheckIfDataExists(controlProps);
+                                        var cachedata = GetCachedData(index);
+                                        BuildDropDownWithCache(cachedata, controlProps);
+                                    }
+                                    else {
+                                        var cacheObjID = CheckIfDataExists(controlProps);
+                                        var cachedata = '';
+                                        cachedata = GetCachedData(cacheObjID);
+                                        cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
+                                        //if (cachedata.trim() != '') {
+                                        BuildDropDownWithCache(cachedata, controlProps);
+                                        //}
+                                    }
+                                }
+                            }
+                            else {
+                                RemoveTypeAheadChoiceCandidate(controlProps);
+                            }
+
                             break;
                         case 46:
                             if (!SPControlContainsValue($(this).attr('id'))) {
                                 RedisableChildren(controlProps);
+                            }
+
+                            var sSearch = $(this).html();
+                            sSearch = ParseForSearchVal(sSearch);
+                            // clearn text for firefox
+                            if (sSearch.indexOf('<br>') != -1) {
+                                sSearch = sSearch.replace(/<br>/g, '');
+                            }
+
+                            sSearch = sSearch.trim();
+                            controlProps.ControlInfo.SearchText = sSearch;
+
+                            if (controlProps.ControlInfo.SearchText.length > 0) {
+                                // is multi select
+                                if (controlProps.ControlInfo.IsMultiSelect ||
+                                // or is single select and does not contain a value already
+                                    (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
+
+                                    if (controlProps.Parent != '') {
+                                        var index = CheckIfDataExists(controlProps);
+                                        var cachedata = GetCachedData(index);
+                                        BuildDropDownWithCache(cachedata, controlProps);
+                                    }
+                                    else {
+                                        var cacheObjID = CheckIfDataExists(controlProps);
+                                        var cachedata = '';
+                                        cachedata = GetCachedData(cacheObjID);
+                                        cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
+                                        //if (cachedata.trim() != '') {
+                                        BuildDropDownWithCache(cachedata, controlProps);
+                                        //}
+                                    }
+                                }
+                            }
+                            else {
+                                RemoveTypeAheadChoiceCandidate(controlProps);
                             }
                             break;
                         case 13:
@@ -159,7 +264,7 @@ function GEInit() {
                                         var newText = $(selectedDiv).html();
                                         controlProps.ControlInfo.SingleSelectDisplayVal = newText;
                                         controlProps.ControlInfo.SingleSelectLookupVal = $(selectedDiv).attr('value');
-                                        UpdateSingleSelectPickerValue(controlProps);
+                                        UpdateSingleSelectPickerValueWOValidation(controlProps, controlProps.ControlInfo.SingleSelectLookupVal);
                                     }
                                     else {
                                         // data has been loaded, and user has not selected anything, just click validate
@@ -177,7 +282,8 @@ function GEInit() {
                                     if (controlProps.ControlInfo.CandidateIndex != -1) {
                                         var selectedDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
                                         var newText = $(selectedDiv).html();
-                                        UpdateMultiSelectPickerValue(controlProps, newText);
+                                        var index = $(selectedDiv).attr('value');
+                                        UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
                                     }
                                     else {
                                         // data has been loaded, and user has not selected anything, just click validate
@@ -510,11 +616,15 @@ function GEInit() {
                             var newText = $(this).html();
                             controlProps.ControlInfo.SingleSelectDisplayVal = newText;
                             controlProps.ControlInfo.SingleSelectLookupVal = $(this).attr('value');
-                            UpdateSingleSelectPickerValue(controlProps);
+                            //UpdateSingleSelectPickerValue(controlProps);
+                            var index = $(this).attr('value');
+                            UpdateSingleSelectPickerValueWOValidation(controlProps, index);
                         }
                         else {
                             var newText = $(this).html();
-                            UpdateMultiSelectPickerValue(controlProps, newText);
+                            //UpdateMultiSelectPickerValue(controlProps, newText);
+                            var index = $(this).attr('value');
+                            UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
                         }
                     });
 
@@ -670,11 +780,15 @@ function GEInit() {
                             var newText = $(this).html();
                             controlProps.ControlInfo.SingleSelectDisplayVal = newText;
                             controlProps.ControlInfo.SingleSelectLookupVal = $(this).attr('value');
-                            UpdateSingleSelectPickerValue(controlProps);
+                            //UpdateSingleSelectPickerValue(controlProps);
+                            var index = $(this).attr('value');
+                            UpdateSingleSelectPickerValueWOValidation(controlProps, index);
                         }
                         else {
                             var newText = $(this).html();
-                            UpdateMultiSelectPickerValue(controlProps, newText);
+                            var index = $(this).attr('value');
+                            //UpdateMultiSelectPickerValue(controlProps, newText);
+                            UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
                         }
                     });
 
@@ -750,6 +864,34 @@ function GEInit() {
 
             RemoveTypeAheadChoiceCandidate(controlProps);
             ValidateEntity(controlProps.ControlInfo.GenericEntityCheckNameId);
+
+            UpdateChildrenValues(controlProps);
+        }
+
+        function UpdateSingleSelectPickerValueWOValidation(controlProps, index) {
+
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus();
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).html('');
+            var selectedValue = controlProps.ControlInfo.SingleSelectDisplayVal;
+            var spEntityStyle = '<span contenteditable="false" title="' + selectedValue + '" class="ms-entity-resolved" tabindex="-1" iscontenttype="true" id="span' + index + '" onmouseover="this.contentEditable=false;" onmouseout="this.contentEditable=true;">' +
+	                                '<div description="' + selectedValue + '" isresolved="True" displaytext="' + selectedValue + '" key="' + index + '" id="divEntityData" style="display:none;">' +
+		                                '<div style="display:none;" data="">' + selectedValue + '</div>' +
+	                                '</div>' +
+	                                '<span contenteditable="" oncontextmenu="onContextMenuSpnRw(event,ctx);" onmousedown="onMouseDownRw(event);" tabindex="-1" id="content">' + selectedValue + '</span>' +
+                                '</span>';
+
+            //$('#' + controlProps.ControlInfo.GenericEntityDivId).html(spEntityStyle);
+
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append(spEntityStyle);
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append(';');
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
+
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).css('color', '#000000');
+
+            RemoveTypeAheadChoiceCandidate(controlProps);
+            //ValidateEntity(controlProps.ControlInfo.GenericEntityCheckNameId);
 
             UpdateChildrenValues(controlProps);
         }
@@ -1042,6 +1184,29 @@ function GEInit() {
             $('#' + controlProps.ControlInfo.GenericEntityDivId).append(newTextVal);
             RemoveTypeAheadChoiceCandidate(controlProps);
             ValidateEntity(controlProps.ControlInfo.GenericEntityCheckNameId);
+        }
+
+        function UpdateMultiSelectPickerValueWOValidation(controlProps, newTextVal, index) {
+            // updates the picker's values
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus();
+            var clean = $('#' + controlProps.ControlInfo.GenericEntityDivId).html();
+            clean = clean.substring(0, clean.lastIndexOf(';') + 1);
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).html(clean);
+
+            var spEntityStyle = '<span contenteditable="false" title="' + newTextVal + '" class="ms-entity-resolved" tabindex="-1" iscontenttype="true" id="span1" onmouseover="this.contentEditable=false;" onmouseout="this.contentEditable=true;">' +
+	                                '<div description="' + newTextVal + '" isresolved="True" displaytext="' + newTextVal + '" key="' + index + '" id="divEntityData" style="display:none;">' +
+		                                '<div data=""></div>' +
+	                                '</div>' +
+	                                '<span contenteditable="" oncontextmenu="onContextMenuSpnRw(event,ctx);" onmousedown="onMouseDownRw(event);" tabindex="-1" id="content">' + newTextVal + '</span>' +
+                                '</span>';
+
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append(spEntityStyle);
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append(';');
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
+            RemoveTypeAheadChoiceCandidate(controlProps);
+            //ValidateEntity(controlProps.ControlInfo.GenericEntityCheckNameId);
         }
 
         function PostDataBackToMultiSelectLookup() {
@@ -1374,6 +1539,7 @@ function GEInit() {
         }
 
     } (window.epmLiveGenericEntityEditor = window.epmLiveGenericEntityEditor || {}, jQuery));
+
 }
 ExecuteOrDelayUntilScriptLoaded(GEInit, "EPMLive.js");
 

@@ -283,6 +283,123 @@ namespace EPMLiveCore {
         protected global::Microsoft.SharePoint.WebControls.SPGridView GvFields;
         
         /// <summary>
+        /// ifsMyWorkGridFilterSetting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifsMyWorkGridFilterSetting;
+        
+        /// <summary>
+        /// ifcMyWorkGridFilterSetting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifcMyWorkGridFilterSetting;
+        
+        /// <summary>
+        /// cbDaysAgo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbDaysAgo;
+        
+        /// <summary>
+        /// tbDaysAgo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tbDaysAgo;
+        
+        /// <summary>
+        /// cbDaysAfter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbDaysAfter;
+        
+        /// <summary>
+        /// tbDaysAfter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tbDaysAfter;
+        
+        /// <summary>
+        /// hfDaysAgo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfDaysAgo;
+        
+        /// <summary>
+        /// hfDaysAfter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfDaysAfter;
+        
+        /// <summary>
+        /// ifsMyWorkGridIndicatorSetting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifsMyWorkGridIndicatorSetting;
+        
+        /// <summary>
+        /// ifcMyWorkGridIndicatorSetting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifcMyWorkGridIndicatorSetting;
+        
+        /// <summary>
+        /// cbNewItemIndicator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbNewItemIndicator;
+        
+        /// <summary>
+        /// tbNewItemIndicator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tbNewItemIndicator;
+        
+        /// <summary>
+        /// hfNewItemIndicator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfNewItemIndicator;
+        
+        /// <summary>
         /// ButtonSection control.
         /// </summary>
         /// <remarks>

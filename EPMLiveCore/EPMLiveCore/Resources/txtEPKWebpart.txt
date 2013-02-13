@@ -1,0 +1,152 @@
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr id="idWorkspaceArea">
+        <td>
+            <div id="idEPK3PDiv">
+                <object classid="CLSID:376F87A8-2670-4595-8ECD-435834A81C7E" codebase="***EPKURL***/CAB/EPK_3P.CAB#version=62,0,0,1531" type="application/x-oleobject" style="display: none"></object>
+            </div>
+
+            <div id="EPKDisplayDiv">
+                <object classid="CLSID:7393552F-C4E6-49F0-8B01-52819BB9A0BC" type="application/x-oleobject" ></object>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<script type="text/jscript">
+
+	document.body.onresize = Body_OnResize;
+
+	function getHeight()
+    {
+        var scnHei;
+        if (self.innerHeight) // all except Explorer
+	    {
+		    //scnWid = self.innerWidth;
+		    scnHei = self.innerHeight;
+	    }
+	    else if (document.documentElement && document.documentElement.clientHeight)
+	    {
+		    //scnWid = document.documentElement.clientWidth;
+		    scnHei = document.documentElement.clientHeight;
+	    }
+	    else if (document.body) // other Explorers
+	    {
+		    //scnWid = document.body.clientWidth;
+		    scnHei = document.body.clientHeight;
+	    }
+        return scnHei;
+    }
+
+	_spBodyOnLoadFunctionNames.push("Body_OnResize");
+
+	function Body_OnResize()
+	{
+		if(***RESIZE***)
+			document.getElementById("EPKDisplay").style.height= (getHeight() - 25);
+	}
+
+	function click()
+	{
+		var wp = document.getElementById('MSOZoneCell_WebPart');
+		fireEvent(wp, 'mouseup');
+	}
+
+    function CreateControl(sDivID, sHTML) {
+        var d = document.getElementById(sDivID);
+        d.innerHTML = sHTML;
+    }
+
+	function fireEvent(element,event)
+	{
+		if (document.createEventObject){
+			// dispatch for IE
+			var evt = document.createEventObject();
+			return element.fireEvent('on'+event,evt)
+		}
+		else{
+			// dispatch for firefox + others
+			var evt = document.createEvent("HTMLEvents");
+			evt.initEvent(event, true, true ); // event type,bubbling,cancelable
+			return !element.dispatchEvent(evt);
+		}
+	}
+
+    function HandleRequest(sContext, sXML, Control) {
+        switch (sContext) {
+			case "ParentRequest":
+				
+				switch(sXML)
+				{
+					case "LeftMouseButtonClick":
+						fireEvent(Control.parentNode, 'mouseup');
+						break;
+					case "Close":
+						if(SP.UI.DialogResult)
+							SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+						else
+							SP.UI.ModalDialog.commonModalDialogClose(0, '');
+						break;
+					default:
+						alert(sXML);
+						break;
+				}
+				break;
+            case "PageTitle":
+                //document.all("***WebPartCaption***").innerText = " - " + unescape(sXML);
+                break;
+            case "Redirect":
+                // we don't want to unescape here as params may be encoded
+                //window.location.href = unescape(sXML);
+                window.location.href = sXML;
+                break;
+            case "RedirectParent":
+                //parent.location.href = unescape(sXML);
+                //window.location.href = unescape(sXML);
+                window.location.href = sXML;
+                break;
+            case "MinClientHeight":
+                break;
+            default:
+                break;
+        }
+    }
+
+    function GetQueryParam(name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regexS = "[\\?&]" + name + "=([^&#]*)";
+        var regex = new RegExp(regexS);
+        var results = regex.exec(window.location.href);
+
+        if (results == null)
+            return "";
+        else
+            return results[1];
+    }
+
+    function decodeXML(sIn) {
+        var s = decodeURIComponent(sIn);
+        s = s.replace(/\&sp\;/g, " ");
+        return s;
+    }
+</script>
+
+ 
+
+<script for="EPKDisplay" event="Request(sContext,sXML);" type="text/jscript">
+    HandleRequest(sContext,sXML,this);
+</script>
+
+ 
+<script type="text/jscript">
+    CreateControl("EPKDisplayDiv", "<object classid='CLSID:7393552F-C4E6-49F0-8B01-52819BB9A0BC' id='EPKDisplay' type='application/x-oleobject' style='width: 100%; height:100px' viewastext></object>");
+    
+    if ("***TestMode***" == "Yes")
+        document.all("EPKDisplay").HandleData("ShowTestPanel", "");
+    else
+        document.all("EPKDisplay").HandleData("HideTestPanel", "");
+    document.all("EPKDisplay").HandleData("BeginSession", "***EPKURL***");
+    document.all("EPKDisplay").HandleData("SetControl", "***CONTROL***");
+    document.all("EPKDisplay").HandleData("SetPage", "");
+    document.all("EPKDisplay").HandleData("SetParam1", "***PARAMS***");
+    document.all("EPKDisplay").HandleData("DisplayControl", "");
+</script>

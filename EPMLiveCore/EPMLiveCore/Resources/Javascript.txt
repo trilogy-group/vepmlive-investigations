@@ -1,0 +1,169 @@
+<script language='javascript' type='text/javascript'>
+
+function gridfilter#Grid#(value)
+{
+var vals = value.split('|');
+myGrid#Grid#.filterBy(vals[0],vals[1]);
+}
+
+function postResources#Grid#()
+{
+var arrRows = myGrid#Grid#.getCheckedRows(0).split(',');
+var ress = '';
+var resCount = 0;
+if(arrRows != '')
+{
+for(var i = 0;i < arrRows.length;i++)
+{
+var res = myGrid#Grid#.getUserData(arrRows[i],'itemid');
+ if(res !='')
+ {
+ ress += res + ',';
+ resCount++;
+ }
+ }
+ if(resCount > 20)
+ {
+ alert('Please select less than 20 resources');
+ return false;
+ }
+ if(ress != '')
+ {
+ //ress = ress.substring(2);
+ document.getElementById('resourceList').value = ress;
+ }
+ else
+ {
+ alert('Please Select 1 or more resources');
+ return false;
+ }
+ }
+ else
+ {
+ alert('Please Select 1 or more resources');
+ return false;
+ }
+}
+
+function uncheckparent#Grid#(rowId)
+{
+ try{
+ var parent = myGrid#Grid#.getParentId(rowId);
+ if(parent != '0')
+ {
+ myGrid#Grid#.cells(parent,0).setValue(0);
+ uncheckparent#Grid#(parent);
+ }
+ }
+ catch(e)
+ {
+ alert(e);
+ }
+}
+
+
+function doOnCheck#Grid#(rowId,cellInd,state)
+{
+ try
+ {
+ var rows = myGrid#Grid#.getAllSubItems(rowId);
+ var arrRows = rows.split(',');
+ var curVal = myGrid#Grid#.cells(rowId,0).getValue();
+ if(arrRows != '')
+ {
+ for(var i = 0;i < arrRows.length;i++)
+ {
+ myGrid#Grid#.cells(arrRows[i],0).setValue(curVal);
+ }
+ }
+ if(curVal == '0')
+ {
+ uncheckparent#Grid#(rowId);
+ }
+ }
+ catch(e)
+ {
+ alert(e);
+ }
+}
+
+function changeview#Grid#(view) 
+{
+    try
+    {
+        document.getElementById('zz35_ViewSelectorMenu').innerText = view.replace(new RegExp( '%20', 'g' ), ' ');
+        document.getElementById('myGrid999').style.display = 'none';
+        document.getElementById('loadingmyGrid999').style.display = '';
+        myGrid#Grid#.detachHeader(1);
+        myGrid#Grid#.clearAll(true);
+        myGrid#Grid#.loadXML('#ResourceUrl#&view=' + view);
+    }
+    catch(e)
+    {
+        alert(e);
+    }
+}
+
+function setSize#Grid#()
+{
+    myGrid#Grid#._askRealRows();
+}
+
+function printgrid#Grid#() 
+{
+var temp = myGrid#Grid#.hdr.rows[2];
+var parent = temp.parentNode;
+parent.removeChild(temp,true);
+myGrid#Grid#.printView();
+parent.appendChild(temp);
+}
+
+function switchFilter#Grid#(hlink)
+{
+var input1 = myGrid#Grid#.hdr.rows[2];
+if(myGrid#Grid#Hidden == false)
+{
+    input1.style.display = 'none';
+    myGrid#Grid#Hidden = true;
+    if(hlink != null)
+    {
+        document.getElementById(hlink).innerHTML='&nbsp;Show Filters';
+    }
+}
+else
+{
+    input1.style.display = '';
+    myGrid#Grid#Hidden = false;
+    if(hlink != null)
+    {
+        document.getElementById(hlink).innerHTML='&nbsp;Hide Filters';
+    }
+}
+myGrid#Grid#.setSizes();
+}
+
+function switchFilterLoad#Grid#()
+{
+    switchFilter#Grid#(null);
+}            
+            
+        
+    var myGrid#Grid#Hidden = false;
+    myGrid#Grid# = new dhtmlXGridObject('myGrid999');
+    myGrid#Grid#.setImagePath('/_layouts/epmlive/dhtml/xgrid/imgs/');
+    myGrid#Grid#.setSkin('modern');
+    myGrid#Grid#.enableAutoHeigth(true,500,true);
+    myGrid#Grid#.enableSmartRendering(true);
+    myGrid#Grid#.enableSmartXMLParsing(false);
+    myGrid#Grid#.setImageSize(1,1);
+    myGrid#Grid#.enableTreeCellEdit(false);
+    myGrid#Grid#.setDateFormat('%m/%d/%Y');
+    myGrid#Grid#.attachEvent('onXLE', clearLoader);
+    myGrid#Grid#.attachEvent('onCheck', doOnCheck#Grid#);
+    myGrid#Grid#.init();
+    try{
+    myGrid#Grid#.loadXML('#ResourceUrl#&view=#DefaultView#');
+    }
+    catch (e) { alert(e); }
+
+    </script>

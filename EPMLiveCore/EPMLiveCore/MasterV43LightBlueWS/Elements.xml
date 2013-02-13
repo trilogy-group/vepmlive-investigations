@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+	<Module Name="MasterV43LightBlueWS" Url="_catalogs/MasterPage">
+		<File Url="MasterV43LightBlueWS.master" Type="GhostableInLibrary"
+					IgnoreIfAlreadyExists="True" Path ="MasterV43LightBlueWS\MasterV43LightBlueWS.master">
+			<Property Name="ContentType"
+					Value="$Resources:cmscore,contenttype_masterpage_name;" />
+		</File>
+	</Module>
+</Elements>

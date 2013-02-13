@@ -1,0 +1,46 @@
+<Grid>
+	<Cfg Code="GTACCNPSQEBSLC" Version="4.3.2.120412" />
+	<Cfg SuppressCfg="1" />
+	<Cfg MainCol="Title" NameCol="Title" />
+	<Cfg ConstWidth="0" />
+	<Cfg Undo="0" />
+	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" />
+	<Cfg Searching="1" Selecting="1" Deleting="0" />
+	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
+	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="20" MaxRowHeight="20" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
+	<Cfg Paging="2" AllPages="1" PageLength="10" MaxPages="20" NoPager="1" ChildParts="2" />
+	<Cfg Editing="0" />
+	<Cfg NoVScroll="1" />
+	<Def>
+		<D Name="C" Width="200" />
+		<D Name="R" Wrap="0" ShowHint="0" NoColorState="1" Height="30" />
+		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Background" />
+		<D Name="Group" HoverCell="" HoverRow="" FocusCell="" FocusRow="" />
+		<D Name="Group" CanFilter="2" TitleEmptyValueFormula="'No '+Grid.Header[Row.GroupCol]" />
+		<D Name="Group" Class="EPMLiveResourceGridGroup" TitleClass="EPMLiveResourceGridGroupTitle" />
+		<D Name="Group" TitleHtmlPrefixFormula="' &lt;span class=&quot;EPMLiveResourceGridGroupPrefix&quot;>'+Grid.Header[Row.GroupCol]+': &lt;/span>'"/>
+		<D Name="Group" TitleHtmlPostfixFormula="' &lt;span class=&quot;EPMLiveResourceGridGroupPostfix&quot;>('+count(4)+')&lt;/span>'"/>
+		<D Name="Group" Calculated="1" CalcOrder="TitleEmptyValue,TitleHtmlPostfix"/>
+	</Def>
+	<Toolbar Visible="0" />
+	<Panel Delete="0" Visible="1" CanHide="0" HoverCell="Color" HoverRow="Color" />
+	<Head>
+		<Filter CanEdit="1" HoverRow="" HoverCell="" FocusRow="" FocusCell="" />
+	</Head>
+	<Solid>
+		<Group />
+		<I id="NoData" Html="No resource found." />
+	</Solid>
+	<Lang>
+		<Text StartErr = "Fatal error! &lt;br/>Resource grid cannot render" />
+	</Lang>
+	<LeftCols>
+		<C Name="ResourceID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="IsMyResource" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" />
+		<C Name="ProfilePic" Type="Html" Visible="1" CanFilter="0" CanGroup="0" CanSort="0" VarHeight="1" />
+		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" />
+	</LeftCols>
+	<Cols />
+	<RightCols />
+	<Header ProfilePic="Picture" Title="Display Name" NoEscape="1" HoverCell="Color" HoverRow="" SortIcons="2" />
+</Grid>

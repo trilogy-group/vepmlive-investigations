@@ -229,7 +229,7 @@ function Init() {
                             $('#' + controlProps.wePeopleEditorDivIDRoot + "_browse").attr('onclick', '');
                             var divId = controlProps.wePeopleEditorDivID;
                             $('#' + controlProps.wePeopleEditorDivIDRoot + "_browse").attr('onclick', 'var h = $(\'#' + divId + '\').height();if($(\'#' + divId + '\').html().indexOf(\'Type here to search\') != -1){$(\'#' + divId + '\').html(\'\'); $(\'#' + divId + '\').height(h);}' + originalJs);
-                               
+
                         }
 
                         if (!SPControlContainsValue(controlProps.wePeopleEditorDivID)) {
@@ -359,9 +359,15 @@ function Init() {
                             cleanItemTitle = member.Title.toLowerCase().trim();
                         }
                         var itemUsername = '';
-                        if (member.Username) {
-                            itemUsername = member.Username;
+                        if (member.PrincipalType == 'SharePointGroup') {
+                            itemUsername = member.SPAccountInfo.substring(member.SPAccountInfo.indexOf('#') + 1);
                         }
+                        else {
+                            if (member.Username) {
+                                itemUsername = member.Username;
+                            }
+                        }
+
                         var clnUsername = '';
                         if (member.Username) {
                             clnUsername = member.Username.toLowerCase().trim();
@@ -476,6 +482,11 @@ function Init() {
             var clean = $('#' + controlProps.wePeopleEditorDivID).html();
             clean = clean.substring(0, clean.lastIndexOf(';') + 1);
             clean = clean.replace(/&nbsp;/, '');
+            // clear <p> elements added by having cursor over first user name
+            if (clean.indexOf('<P>') != -1 || clean.indexOf('<p>') != -1) {
+                clean = clean.replace(/<P>/g, '');
+                clean = clean.replace(/<p>/g, '');
+            }
             $('#' + controlProps.wePeopleEditorDivID).html('');
             $('#' + controlProps.wePeopleEditorDivID).html(clean + newTextVal);
             RemoveTypeAheadChoiceCandidate(controlProps);

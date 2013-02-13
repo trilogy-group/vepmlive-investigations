@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements Id="{7F169685-AB58-4FA7-9FD8-013CF52033CD}" xmlns="http://schemas.microsoft.com/sharepoint/">
+    <!-- Do not change the value of the Name attribute below. If it does not match the folder name of the List Definition project item, an error will occur when the project is run. -->
+    <ListTemplate
+        Name="HolidaySchedules"
+        Type="60003"
+        BaseType="0"
+        OnQuickLaunch="TRUE"
+        SecurityBits="11"
+        Sequence="410"
+		    HiddenList="TRUE"
+		    Hidden ="True"
+        DisplayName="Holiday Schedules"
+        Description="Holiday Schedules"
+        Image="/_layouts/images/itwe.png"/>
+</Elements>

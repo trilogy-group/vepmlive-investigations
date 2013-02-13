@@ -56,8 +56,8 @@ namespace EPMLiveCore
      * ===============================
      * PERSONALIZATION FUNCTIONS
      * ===============================
-     * 5000 - GetMyPersonalization
-     * 5020 - SetMyPersonalization
+     * 5030 - Personalization_Get
+     * 5040 - Personalization_Set
      * 
      * ===============================
      * FIELD INFO FUNCTIONS
@@ -124,6 +124,11 @@ namespace EPMLiveCore
      * 18300 - 399 - AssignmentPlanner_LoadViews, SaveViews, UpdateViews, DeleteViews
      * 
      * ===============================
+     * TAG MANAGER
+     * ===============================
+     * 19xxx
+     * 
+     * ===============================
      * SHAREPOINT ADMIN FUNCTIONS
      * ===============================
      * 9001xx - EventReceiverManager
@@ -154,6 +159,7 @@ namespace EPMLiveCore
     public class WorkEngineAPI : WebService
     {
         private const string EPMLiveReportingAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+        private const string EPMLiveTSAssembly = "TimeSheets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
 
         #region Methods (3)
 
@@ -181,8 +187,8 @@ namespace EPMLiveCore
                 switch(FunctionParts[0].ToLower())
                 {
                     case "timesheet":
-                        assemblyInstance = Assembly.GetExecutingAssembly();
-                        thisClass = assemblyInstance.GetType("Timesheet.TimesheetAPI", true, true);
+                        assemblyInstance = Assembly.Load(EPMLiveTSAssembly);
+                        thisClass = assemblyInstance.GetType("TimeSheets.TimesheetAPI", true, true);
                         m = thisClass.GetMethod(FunctionParts[1]);
                         break;
                     case "reporting":
@@ -194,6 +200,18 @@ namespace EPMLiveCore
                     case "assignmentplanner":
                         assemblyInstance = Assembly.GetExecutingAssembly();
                         thisClass = assemblyInstance.GetType("EPMLiveCore.AssignmentPlanner.API.Gateway", true, true);
+                        m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
+                        apiClass = Activator.CreateInstance(thisClass);
+                        break;
+                    case "tagmanager":
+                        assemblyInstance = Assembly.GetExecutingAssembly();
+                        thisClass = assemblyInstance.GetType("EPMLiveCore.TagManager.API.Gateway", true, true);
+                        m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
+                        apiClass = Activator.CreateInstance(thisClass);
+                        break;
+                    case "personalization":
+                        assemblyInstance = Assembly.GetExecutingAssembly();
+                        thisClass = assemblyInstance.GetType("EPMLiveCore.API.Personalization", true, true);
                         m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
                         apiClass = Activator.CreateInstance(thisClass);
                         break;
@@ -323,6 +341,18 @@ namespace EPMLiveCore
             }
         }
 
+        public static string GetProjectInfoFromName(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(APIPublish.GetProjectInfoFromName(data, oWeb));
+            }
+            catch(APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         /// <summary>
         /// Gets Update Count
         /// </summary>
@@ -333,7 +363,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(APIPublish.GetUpdateCount(data));
+                return Response.Success(APIPublish.GetUpdateCount(data, oWeb));
             }
             catch (APIException ex)
             {
@@ -351,7 +381,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(APIPublish.GetUpdates(data));
+                return Response.Success(APIPublish.GetUpdates(data, oWeb));
             }
             catch (APIException ex)
             {
@@ -369,7 +399,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(APIPublish.ProcessUpdates(data));
+                return Response.Success(APIPublish.ProcessUpdates(data, oWeb));
             }
             catch (APIException ex)
             {
@@ -540,7 +570,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(MyWork.GetMyWorkGridViews());
+                return Response.Success(MyWork.GetMyWorkGridViews(oWeb));
             }
             catch (APIException ex)
             {
@@ -694,6 +724,42 @@ namespace EPMLiveCore
             try
             {
                 return MyWork.GetMyWorkGridLayout(data);
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Gets the working on grid layout.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="oWeb">The o web.</param>
+        /// <returns></returns>
+        public static string GetWorkingOnGridLayout(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return MyWork.GetWorkingOnGridLayout(data);
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Gets the working on grid data.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="oWeb">The o web.</param>
+        /// <returns></returns>
+        public static string GetWorkingOnGridData(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return MyWork.GetWorkingOnGridData(data);
             }
             catch (APIException ex)
             {
@@ -970,6 +1036,20 @@ namespace EPMLiveCore
             }
         }
 
+
+        public static string QueueItemMessage(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return APIEmail.QueueItemMessageXml(data, oWeb);
+            }
+            catch(Exception ex)
+            {
+                return Response.Failure(30011, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        
         /// <summary>
         /// Sends the email.
         /// </summary>

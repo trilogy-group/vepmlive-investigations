@@ -1,0 +1,33 @@
+<Grid>
+	<Cfg Code="GTACCNPSQEBSLC" Version="4.0" />
+	<Cfg SuppressCfg="1" Style="GS" />
+	<Cfg MainCol="Title" NameCol="Title" />
+	<Cfg ConstHeight="1" ConstWidth="0" />
+	<Cfg Undo="0" />
+	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" />
+	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
+	<Cfg NoTreeLines="1" DetailOn="0" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
+	<Def>
+		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" />
+	</Def>
+	<Toolbar Visible="0" CanHide="0" />
+	<Panel Visible="0" CanHide="0" />
+	<Head><Filter CanHide="0" CanEdit="1" /></Head>
+	<Solid>
+		<Group CanHide="0" />
+		<I id="NoData" Html="There are not currently working on anything." />
+	</Solid>
+	<Lang>
+		<Text StartErr = "Fatal error! &lt;br/>Working on grid cannot render" />
+	</Lang>
+	<LeftCols>
+		<C Name="ItemId" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="ListId" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="WebId" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="SiteId" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" />
+	</LeftCols>
+	<Cols/>
+	<RightCols/>
+	<Header Title="" NoEscape="1" SortIcons="2" HoverCell="" HoverRow="" />
+</Grid>

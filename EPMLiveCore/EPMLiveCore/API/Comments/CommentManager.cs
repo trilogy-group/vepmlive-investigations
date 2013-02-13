@@ -25,9 +25,11 @@ namespace EPMLiveCore.API
         const string XML_RESPONSE_COMMENT_ITEM = "<Comment " +
                                                  "listId=\"##listId##\" " +
                                                  "listName=\"##listName##\" " +
+                                                 "listUrl=\"##listUrl##\" " +
+                                                 "listDispUrl=\"##listDispUrl##\" " +
                                                  "itemId=\"##itemId##\" " +
                                                  "itemTitle=\"##itemTitle##\" " +
-                                                 "createdDate=\"##createdDate##\" " + 
+                                                 "createdDate=\"##createdDate##\" " +
                                                  "isLast=\"##isLast##\" " +
                                                  "><![CDATA[##comment##]]>";
 
@@ -80,101 +82,112 @@ namespace EPMLiveCore.API
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
                                                          .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime())
-                                                         .Replace("##comment##", (string)(HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment")) ?? string.Empty)));
+                                                         .Replace("##comment##", (string)(HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment").Replace('\"', '\'')) ?? string.Empty)));
                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
                 sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
+                // save current user
+                SPUser originalUser = SPContext.Current.Web.CurrentUser;
 
-                SPList originList = null;
-                SPListItem originListItem = null;
-                List<int> laCommenters = new List<int>();
-                cWeb.AllowUnsafeUpdates = true;
-                originList = cWeb.Lists[new Guid(dataMgr.GetPropVal("ListId"))];
-
-                if (originList != null)
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    originListItem = originList.GetItemById(int.Parse(dataMgr.GetPropVal("ItemId")));
-                }
-
-                if (originListItem != null)
-                {
-                    string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
-                    foreach (string s in sCommenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    using (SPSite es = new SPSite(SPContext.Current.Site.ID))
                     {
-                        if (!string.IsNullOrEmpty(s.Trim()))
+                        using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ServerRelativeUrl))
                         {
-                            laCommenters.Add(int.Parse(s));
-                        }
-                    }
-                    // get user object 
-                    SPFieldUser author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
-                    SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
-                    SPUser authorObj = userVal.User;
+                            SPList originList = null;
+                            SPListItem originListItem = null;
+                            List<int> laCommenters = new List<int>();
+                            ew.AllowUnsafeUpdates = true;
+                            originList = ew.Lists[new Guid(dataMgr.GetPropVal("ListId"))];
 
-                    // if user is not in commenters, and not creater or one of the assigned to users
-                    if (!laCommenters.Contains(SPContext.Current.Web.CurrentUser.ID) &&
-                        !SPContext.Current.Web.CurrentUser.ID.Equals(authorObj.ID) &&
-                        !UserIsAssigned(SPContext.Current.Web.CurrentUser.ID, originListItem))
-                    {
-                        laCommenters.Add(SPContext.Current.Web.CurrentUser.ID);
-                        StringBuilder sbNewCommenters = new StringBuilder();
-                        foreach (int id in laCommenters)
-                        {
-                            sbNewCommenters.Append(id.ToString() + ",");
-                        }
-
-                        sCommenters = sbNewCommenters.ToString();
-                        sCommenters = sCommenters.Remove(sCommenters.LastIndexOf(','));
-
-                        originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = sCommenters;
-                    }
-
-                    // set commentersread to blank
-                    originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
-                    // add current user to list
-                    originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = SPContext.Current.Web.CurrentUser.ID.ToString();
-                    originListItem.SystemUpdate();
-                    List<int> emailSentIDs = new List<int>();
-                    // send email to author
-                    if (SPContext.Current.Web.CurrentUser.ID != authorObj.ID)
-                    {
-                        emailSentIDs.Add(authorObj.ID);
-                        SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
-                    }
-
-                    // send email to assigned to people
-                    try
-                    {
-                        string[] vals = originListItem[originListItem.Fields.GetFieldByInternalName("AssignedTo").Id].ToString().Split(new string[] { ";#" }, StringSplitOptions.None);
-                        foreach (string val in vals)
-                        {
-                            int id;
-                            if (int.TryParse(val, out id) && !id.Equals(SPContext.Current.Web.CurrentUser.ID) && !emailSentIDs.Contains(id))
+                            if (originList != null)
                             {
-                                emailSentIDs.Add(id);
-                                SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                originListItem = originList.GetItemById(int.Parse(dataMgr.GetPropVal("ItemId")));
                             }
+
+                            if (originListItem != null)
+                            {
+                                string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
+                                foreach (string s in sCommenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    if (!string.IsNullOrEmpty(s.Trim()))
+                                    {
+                                        laCommenters.Add(int.Parse(s));
+                                    }
+                                }
+                                // get user object 
+                                SPFieldUser author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
+                                SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
+                                SPUser authorObj = userVal.User;
+
+                                // if user is not in commenters, and not creater or one of the assigned to users
+                                if (!laCommenters.Contains(originalUser.ID) &&
+                                    (authorObj != null && !originalUser.ID.Equals(authorObj.ID)) &&
+                                    !UserIsAssigned(originalUser.ID, originListItem))
+                                {
+                                    laCommenters.Add(originalUser.ID);
+                                    StringBuilder sbNewCommenters = new StringBuilder();
+                                    foreach (int id in laCommenters)
+                                    {
+                                        sbNewCommenters.Append(id.ToString() + ",");
+                                    }
+
+                                    sCommenters = sbNewCommenters.ToString();
+                                    sCommenters = sCommenters.Remove(sCommenters.LastIndexOf(','));
+
+                                    originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = sCommenters;
+                                }
+
+                                // set commentersread to blank
+                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
+                                // add current user to list
+                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
+                                originListItem.SystemUpdate();
+                                List<int> emailSentIDs = new List<int>();
+                                // send email to author
+                                if (authorObj != null && originalUser.ID != authorObj.ID)
+                                {
+                                    emailSentIDs.Add(authorObj.ID);
+                                    SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                }
+
+                                // send email to assigned to people
+                                try
+                                {
+                                    string[] vals = originListItem[originListItem.Fields.GetFieldByInternalName("AssignedTo").Id].ToString().Split(new string[] { ";#" }, StringSplitOptions.None);
+                                    foreach (string val in vals)
+                                    {
+                                        int id;
+                                        if (int.TryParse(val, out id) && !id.Equals(originalUser.ID) && !emailSentIDs.Contains(id))
+                                        {
+                                            emailSentIDs.Add(id);
+                                            SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                }
+
+                                // send email to each person in thread
+                                foreach (int id in laCommenters)
+                                {
+                                    if ((id != originalUser.ID) && !emailSentIDs.Contains(id))
+                                    {
+                                        emailSentIDs.Add(id);
+                                        SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                    }
+                                }
+                            }
+
+                            string createdDate = currentItem["Created"].ToString();
+                            //retVal = currentItem.ID.ToString() + "," + createdDate;
+                            retVal = sbResult.ToString();
+                            InsertCommentCount(dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"));
                         }
                     }
-                    catch
-                    {
-                    }
-
-                    // send email to each person in thread
-                    foreach (int id in laCommenters)
-                    {
-                        if ((id != SPContext.Current.Web.CurrentUser.ID) && !emailSentIDs.Contains(id))
-                        {
-                            emailSentIDs.Add(id);
-                            SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
-                        }
-                    }
-                }
-
-                string createdDate = currentItem["Created"].ToString();
-                //retVal = currentItem.ID.ToString() + "," + createdDate;
-                retVal = sbResult.ToString();
-                InsertCommentCount(dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"));
+                });
             }
             else
             {
@@ -239,6 +252,7 @@ namespace EPMLiveCore.API
             string retVal = string.Empty;
             SPWeb cWeb = SPContext.Current.Web;
             SPSite cSite = SPContext.Current.Site;
+            SPUser originalUser = SPContext.Current.Web.CurrentUser;
             // Data should look like the following:
             // ===============================
             // <Data>
@@ -307,7 +321,7 @@ namespace EPMLiveCore.API
                         List<int> emailSentIDs = new List<int>();
 
                         // send email to author
-                        if ((SPContext.Current.Web.CurrentUser.ID != authorObj.ID) && !emailSentIDs.Contains(authorObj.ID))
+                        if ((authorObj != null) && (SPContext.Current.Web.CurrentUser.ID != authorObj.ID) && !emailSentIDs.Contains(authorObj.ID))
                         {
                             emailSentIDs.Add(authorObj.ID);
                             SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "edited");
@@ -341,9 +355,21 @@ namespace EPMLiveCore.API
                             }
                         }
 
-                        originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
-                        originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = cWeb.CurrentUser.ID.ToString();
-                        originListItem.SystemUpdate();
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                     {
+                         using (SPSite es = new SPSite(cSite.ID))
+                         {
+                             using (SPWeb ew = es.OpenWeb(cWeb.ServerRelativeUrl))
+                             {
+                                 ew.AllowUnsafeUpdates = true;
+                                 SPList tempList = ew.Lists[originList.ID];
+                                 SPListItem tempItem = tempList.GetItemById(originListItem.ID);
+                                 tempItem[tempList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
+                                 tempItem[tempList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
+                                 tempItem.SystemUpdate();
+                             }
+                         }
+                     });
 
                     }
                 }
@@ -419,7 +445,7 @@ namespace EPMLiveCore.API
                     SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(i[SPBuiltInFieldId.Author].ToString());
                     SPUser authorObj = userVal.User;
 
-                    if (authorObj.ID == SPContext.Current.Web.CurrentUser.ID)
+                    if (authorObj != null && authorObj.ID == SPContext.Current.Web.CurrentUser.ID)
                     {
                         userHasCommentsLeft = true;
                     }
@@ -482,7 +508,7 @@ namespace EPMLiveCore.API
                             sNewComenters = sNewComenters.Remove(sNewComenters.LastIndexOf(','));
                         }
 
-                        originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = sNewComenters;
+                        //originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = sNewComenters;
 
                         // remove current user id from commentersRead field
                         StringBuilder sbNewCommentersRead = new StringBuilder();
@@ -497,9 +523,23 @@ namespace EPMLiveCore.API
                             sNewComentersRead = sNewComentersRead.Remove(sNewComenters.LastIndexOf(','));
                         }
 
-                        originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = sNewComentersRead;
+                        //originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = sNewComentersRead;
 
-                        originListItem.SystemUpdate();
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            using (SPSite es = new SPSite(currentSite.Url))
+                            {
+                                using (SPWeb ew = es.OpenWeb(currentWeb.ServerRelativeUrl))
+                                {
+                                    ew.AllowUnsafeUpdates = true;
+                                    SPList tempList = ew.Lists[originList.ID];
+                                    SPListItem tempItem = tempList.GetItemById(originListItem.ID);
+                                    tempItem[tempList.Fields.GetFieldByInternalName("Commenters").Id] = sNewComenters;
+                                    tempItem[tempList.Fields.GetFieldByInternalName("CommentersRead").Id] = sNewComentersRead;
+                                    tempItem.SystemUpdate();
+                                }
+                            }
+                        });
                     }
                 }
 
@@ -517,12 +557,14 @@ namespace EPMLiveCore.API
 
         public static void InsertCommentCount(string listId, string itemId)
         {
+            SPUser originalUser = SPContext.Current.Web.CurrentUser;
             SPWeb currentWeb = SPContext.Current.Web;
             SPSite currentSite = SPContext.Current.Site;
             SPList commentsList = currentWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
 
             if (commentsList != null)
             {
+
                 Guid targetListId = new Guid(listId);
 
                 currentWeb.AllowUnsafeUpdates = true;
@@ -579,10 +621,21 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    item[targetList.Fields.GetFieldByInternalName("CommentCount").Id] = commentCount;
-                    item.SystemUpdate();
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        using (SPSite site = new SPSite(currentSite.Url))
+                        {
+                            using (SPWeb web = site.OpenWeb(currentWeb.ServerRelativeUrl))
+                            {
+                                web.AllowUnsafeUpdates = true;
+                                SPList newTargetList = web.Lists[targetListId];
+                                SPListItem newItem = newTargetList.Items.GetItemById(Convert.ToInt32(itemId));
+                                newItem[targetList.Fields.GetFieldByInternalName("CommentCount").Id] = commentCount;
+                                newItem.SystemUpdate();
+                            }
+                        }
+                    });
                 }
-
 
             }
             else
@@ -611,6 +664,11 @@ namespace EPMLiveCore.API
                                    .Replace("</P>", "")
                                    .Replace("\n", "<br />")
                                    .Replace("\r\n", "<br />");
+
+            if (newComment.Contains("%20"))
+            {
+                newComment = HttpUtility.UrlDecode(newComment);
+            }
 
             try
             {
@@ -768,6 +826,40 @@ namespace EPMLiveCore.API
                     }
                 }
 
+                List<SPListItem> allCommentsCol = new List<SPListItem>();
+
+                foreach (string[] pair in aggregatedCommentItems)
+                {
+                    if (saLoadedItems.Count > 0 && saLoadedItems.Contains(pair[0] + '^' + pair[1]))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        List<SPListItem> commentsCol = (from SPListItem i in comments
+                                                        where new Guid(pair[0]).ToString().Equals(new Guid((string)(i["ListId"] ?? string.Empty)).ToString()) &&
+                                                            pair[1].Equals((string)(i["ItemId"] ?? string.Empty))
+                                                        select i
+                                                       ).ToList();
+                        allCommentsCol.AddRange(commentsCol);
+                    }
+                }
+
+                // sort aggregatedcommentitems by created date again
+                aggregatedCommentItems.Clear();
+                allCommentsCol = allCommentsCol.OrderByDescending(x => (DateTime)x["Created"]).ToList();
+                foreach (SPListItem it in allCommentsCol)
+                {
+                    string sListId = (string)(it["ListId"] ?? string.Empty);
+                    string sItemId = (string)(it["ItemId"] ?? string.Empty);
+                    string list = new Guid(sListId).ToString();
+
+                    if (!ContainsItem(aggregatedCommentItems, new[] { list, sItemId }))
+                    {
+                        aggregatedCommentItems.Add(new[] { list, sItemId });
+                    }
+                }
+
                 // Construct response XML
                 // =====================================
                 sbResult.Append(XML_RESPONSE_COMMENT_HEADER);
@@ -780,7 +872,7 @@ namespace EPMLiveCore.API
                 {
                     string[] rawIds = loadedItemIds.Split(',');
                     foreach (string s in rawIds)
-                    {   
+                    {
                         if (!string.IsNullOrEmpty(s) && !saLoadedItems.Contains(s))
                         {
                             saLoadedItems.Add(s);
@@ -840,8 +932,10 @@ namespace EPMLiveCore.API
 
                         sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", new Guid(sListId).ToString())
                                                                  .Replace("##listName##", realItem.ParentList.Title)
+                                                                 .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
+                                                                 .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
                                                                  .Replace("##itemId##", sItemId.ToString())
-                                                                 .Replace("##itemTitle##", realItem.Title)
+                                                                 .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                  .Replace("##createdDate##", dCreated.ToFriendlyDateAndTime())
                                                                  .Replace("##comment##", (string)(originalComment["Comment"] ?? string.Empty)));
 
@@ -849,6 +943,11 @@ namespace EPMLiveCore.API
                         SPFieldUser author = (SPFieldUser)originalComment.Fields[SPBuiltInFieldId.Author];
                         SPFieldUserValue user = (SPFieldUserValue)author.GetFieldValue(originalComment[SPBuiltInFieldId.Author].ToString());
                         SPUser userObject = user.User;
+
+                        if (userObject == null)
+                        {
+                            continue;
+                        }
 
                         //get user picture from user id
                         SPList userInfoList = SPContext.Current.Web.SiteUserInfoList;
@@ -884,7 +983,7 @@ namespace EPMLiveCore.API
                                                              .Replace("##userpic##", userPictureUrl));
 
                         sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
-                        
+
                         for (int i = 0; i < commentsDesc.Count; i++)
                         {
                             SPListItem comment = commentsDesc[i];
@@ -893,17 +992,22 @@ namespace EPMLiveCore.API
                                 string sListId2 = (string)(comment["ListId"] ?? string.Empty);
                                 string sItemId2 = (string)(comment["ItemId"] ?? string.Empty);
                                 DateTime dCreated2 = (DateTime)comment["Created"];
-                                
+
                                 // get user object 
                                 author = (SPFieldUser)comment.Fields[SPBuiltInFieldId.Author];
                                 user = (SPFieldUserValue)author.GetFieldValue(comment[SPBuiltInFieldId.Author].ToString());
                                 userObject = user.User;
 
+                                if (userObject == null)
+                                {
+                                    continue;
+                                }
+
                                 //get user picture from user id
                                 userInfoList = SPContext.Current.Web.SiteUserInfoList;
                                 userItem = userInfoList.GetItemById(userObject.ID);
                                 userPictureUrl = SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl) + "/_layouts/epmlive/images/O14_person_placeHolder_32.png";
-                                
+
                                 try
                                 {
                                     fldPicture = userItem.Fields.GetFieldByInternalName("Picture");
@@ -931,11 +1035,13 @@ namespace EPMLiveCore.API
                                 // 3. do not repeat items 
                                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", new Guid(sListId2).ToString())
                                                                          .Replace("##listName##", realItem.ParentList.Title)
+                                                                         .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
+                                                                         .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
                                                                          .Replace("##itemId##", sItemId2.ToString())
-                                                                         .Replace("##itemTitle##", realItem.Title)
+                                                                         .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                          .Replace("##createdDate##", dCreated2.ToFriendlyDateAndTime())
                                                                          .Replace("##comment##", (string)(comment["Comment"] ?? string.Empty)));
-                                                                     
+
                                 sbResult.Append(XML_USER_INFO_SECTION.Replace("##username##", userObject.Name)
                                                                      .Replace("##useremail##", userObject.Email)
                                                                      .Replace("##userprofile##", _userProfileUrl.Replace("##userid##", userObject.ID.ToString()))
