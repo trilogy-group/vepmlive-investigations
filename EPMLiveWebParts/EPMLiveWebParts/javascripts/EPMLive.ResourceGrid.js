@@ -1,4 +1,4 @@
-﻿/// <version>4.3.1.101512</version>
+﻿/// <version>4.3.3.1152012</version>
 /// <reference path="references/knockout-1.2.1.debug.js" />
 /// <reference path="references/jquery-1.7.1.js" />
 
@@ -17,6 +17,7 @@ function registerEpmLiveResourceGridScript() {
         $$.exportInProgress = false;
         $$.importInProgress = false;
         $$.webpartHeight = false;
+        $$.userIsSiteAdmin = false;
 
         $$.reports = {
             wcReportId: null,
@@ -1448,20 +1449,44 @@ function registerEpmLiveResourceGridScript() {
                 var status = statusbar.collection()[0];
 
                 $.ajax({
-                    type: 'GET',
-                    url: $$$.currentWebUrl + '/_layouts/epmlive/resourceexporter.aspx',
+                    type: 'POST',
+                    url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    data: "{ Function: 'ExportResources', Dataxml: '<ExportResources/>' }",
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
 
                     success: function (resp) {
-                        if (resp.success) {
-                            status.message('Resources exported succesfully. Click <a href="' + $$$.currentWebUrl + '/_layouts/epmlive/filedownloader.aspx?file=' + resp.file + '">here</a> to download the spreadsheet.');
-                            statusbar.color('blue');
+                        if (resp.d) {
+                            var responseJson = $$$.parseJson(resp.d);
+                            var result = responseJson.Result;
+
+                            if ($$$.responseIsSuccess(result)) {
+                                var resourceExporter = result.ResourceExporter;
+
+                                if (resourceExporter['@Success'] === 'True') {
+                                    status.message('Resources exported succesfully. Click <a href="' + $$$.currentWebUrl + '/_layouts/epmlive/filedownloader.aspx?fileid=' + resourceExporter['@File'] + '&filename=Resources.xlsm&ct=application/ms-excel">here</a> to download the spreadsheet.');
+                                    statusbar.color('blue');
+                                } else {
+                                    var message = resourceExporter['@Message'];
+
+                                    $$$.log(message);
+
+                                    status.title('Error');
+                                    status.message('Unable to export resources. The response was: ' + message);
+                                    statusbar.color('red');
+                                }
+                            } else {
+                                $$$.log(result);
+
+                                status.title('Error');
+                                status.message('Unable to export resources. The response was: ' + result);
+                                statusbar.color('red');
+                            }
                         } else {
-                            $$$.log(resp.message);
+                            $$$.log(resp.d);
 
                             status.title('Error');
-                            status.message('Unable to export resources. The response was: ' + resp.message);
+                            status.message('Unable to export resources. There was no response from the server.');
                             statusbar.color('red');
                         }
 
@@ -1483,15 +1508,20 @@ function registerEpmLiveResourceGridScript() {
             },
 
             importResources: function () {
-                throw new Error("Not implemented");
+                var options = window.SP.UI.$create_DialogOptions();
+
+                options.title = 'Import Resources';
+                options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
+
+                window.SP.UI.ModalDialog.showModalDialog(options);
             },
 
             canExport: function () {
-                return !$$.exportInProgress;
+                return !$$.exportInProgress && $$.userIsSiteAdmin;
             },
 
             canImport: function () {
-                return !$$.importInProgress;
+                return !$$.importInProgress && $$.userIsSiteAdmin;
             }
         };
 
@@ -1551,9 +1581,9 @@ function registerEpmLiveResourceGridScript() {
                     grid.MoveCol(col, lastCol, true, 0);
                 }
             }
-            
+
             var profilePicCol = cols['ProficePic'];
-            
+
             if (profilePicCol !== undefined && !cols['ProfilePic']) {
                 grid.SetAttribute(null, 'ProfilePic', 'Visible', '0', 0);
                 grid.Rerender();

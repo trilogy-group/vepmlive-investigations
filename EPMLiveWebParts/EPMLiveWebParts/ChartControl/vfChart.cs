@@ -595,23 +595,23 @@ namespace EPMLiveWebParts
 
             var qsItems = new Dictionary<string, object>
                               {
-                                  {QXfield, PropChartXaxisField},
-                                  {QXfieldLabel, PropChartXaxisFieldLabel},
-                                  {QYfieldLabel, PropChartYaxisFieldLabel},
-                                  {QZfieldLabel, PropChartZaxisFieldLabel},
-                                  {QBubbleChartColorField, PropBubbleChartColorField},
-                                  {QYfields, PropChartYaxisField},
-                                  {QZfield, PropChartZaxisField},
-                                  {QAggrtype, PropChartAggregationType},
-                                  {QList, PropChartSelectedList},
-                                  {QView, PropChartSelectedView},
+                                  {QXfield, HttpUtility.UrlEncode(PropChartXaxisField)},
+                                  {QXfieldLabel,  HttpUtility.UrlEncode(PropChartXaxisFieldLabel)},
+                                  {QYfieldLabel, HttpUtility.UrlEncode(PropChartYaxisFieldLabel)},
+                                  {QZfieldLabel, HttpUtility.UrlEncode(PropChartZaxisFieldLabel)},
+                                  {QBubbleChartColorField, HttpUtility.UrlEncode(PropBubbleChartColorField)},
+                                  {QYfields, HttpUtility.UrlEncode(PropChartYaxisField)},
+                                  {QZfield, HttpUtility.UrlEncode(PropChartZaxisField)},
+                                  {QAggrtype, HttpUtility.UrlEncode(PropChartAggregationType)},
+                                  {QList, HttpUtility.UrlEncode(PropChartSelectedList)},
+                                  {QView, HttpUtility.UrlEncode(PropChartSelectedView)},
                                   {QRolluplists, HttpUtility.UrlEncode(PropChartRollupLists)},
                                   {QRollupsites, HttpUtility.UrlEncode(PropChartRollupSites)},
-                                  {QChartType, PropChartMainStyle},
+                                  {QChartType, HttpUtility.UrlEncode(PropChartMainStyle)},
                                   {QView3D, PropChartView3D},
                                   {QWidth, PropChartWidth},
                                   {QHeight, PropChartHeight},
-                                  {QColorSet, PropChartSelectedPaletteName},
+                                  {QColorSet, HttpUtility.UrlEncode(PropChartSelectedPaletteName)},
                                   {QLegend, PropChartShowLegend},
                                   {QPercentage, PropChartShowYaxisValuesAsPercentage},
                                   {QCurrency, PropChartShowYaxisValuesAsCurrency},
@@ -619,9 +619,9 @@ namespace EPMLiveWebParts
                                   {QLabels, PropChartShowSeriesLabels},
                                   {QShowZeroValueData, PropChartShowZeroValueData},
                                   {QShowBubbleChartInputs, PropChartShowBubbleChartInputsInWebPart},
-                                  {QChartWebPartId, PropChartWebPartId},
-                                  {QLookupField, ChartLookupField},
-                                  {QLookupFieldList, ChartLookupFieldList}
+                                  {QChartWebPartId, HttpUtility.UrlEncode(PropChartWebPartId)},
+                                  {QLookupField, HttpUtility.UrlEncode(ChartLookupField)},
+                                  {QLookupFieldList, HttpUtility.UrlEncode(ChartLookupFieldList)}
                               };
 
             if (!string.IsNullOrEmpty(ReportFilterWebPartId))

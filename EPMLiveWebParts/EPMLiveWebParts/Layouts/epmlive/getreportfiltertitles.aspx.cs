@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using EPMLiveWebParts.ReportFiltering.DomainModel;
 using EPMLiveWebParts.ReportFiltering.DomainServices;
+using EPMLiveWebParts.Utilities;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using EPMLiveCore;
@@ -26,7 +27,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             _webPartId = Request.Form["WebPartId"];
             _filterOperator = Request.Form["FilterOperator"];
 
-            var filteredTitlesAsJson = "{}";
+            var jsonToReturn = "{}";
 
             if(RequestParametersAreValid())
             {
@@ -40,20 +41,44 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 var filteredTitles = QueryHelper.GetFilteredTitles(web, fieldSelection);
 
-                filteredTitlesAsJson = GetFilteredTitlesAsJson(filteredTitles);
+                if (fieldSelection.HasErrors)
+                {
+                    jsonToReturn = GetJsonWithErrorMessage(fieldSelection);
+                }
+                else
+                {
+                    jsonToReturn = GetFilteredTitlesAsJson(filteredTitles);
 
-                PersistSelectedFields(web, _webPartId, fieldSelection, list);
+                    PersistSelectedFields(web, _webPartId, fieldSelection, list);
+                }
             }
 
             Response.ContentType = "application/json";
-            Response.Write(filteredTitlesAsJson);
+            Response.Write(jsonToReturn);
+        }
+
+        private string GetJsonWithErrorMessage(ReportFilterSelection fieldSelection)
+        {
+            var jsonToReturn = new StringBuilder();
+            jsonToReturn.Append("[");
+
+            foreach (var errorMessage in fieldSelection.Errors)
+            {
+                var formattedFilteredTitle = errorMessage.Replace("\"", "\\\"");
+                jsonToReturn.AppendFormat("{{\"error\":\"{0}\"}},", formattedFilteredTitle);
+            }
+
+            jsonToReturn.Append("]");
+
+            return jsonToReturn.ToString().Replace(",]", "]");
         }
 
         private ReportFilterSelection GetFieldSelection(SPField field, SPWeb web)
         {
             var selectedFields = new List<string>();
+            _selectedFields = CleanValueIfFromPeoplePicker(_selectedFields);
             selectedFields.PopulateFromCommaSeparatedString(_selectedFields);
-            
+
             var returnValue = new ReportFilterSelection
             {
                 InternalFieldName = field.InternalName,
@@ -65,6 +90,43 @@ namespace EPMLiveWebParts.Layouts.epmlive
             };
 
             return returnValue;
+        }
+
+        /// <summary>
+        /// The value coming in from the people picker differs based on browser. This will clean it up so we
+        /// just have the chosen values and not any additional stuff.
+        /// </summary>
+        /// <param name="selectedFields"></param>
+        private string CleanValueIfFromPeoplePicker(string selectedFields)
+        {
+            //TODO: Clean this entire method up. It was hurried to get a bug fix out to production last minute. I know its gross.
+            if (string.IsNullOrEmpty(selectedFields)) return "";
+            
+            // If &#160 is in the string, then its coming from Internet Explorer, so strip off the stuff we don't need.
+            const string stringThatIndicatesPeoplePickerIsFromInternetExplorer = "&#160";
+            if(selectedFields.Contains(stringThatIndicatesPeoplePickerIsFromInternetExplorer))
+            {
+                var indexOf = selectedFields.IndexOf(stringThatIndicatesPeoplePickerIsFromInternetExplorer);
+                selectedFields = selectedFields.Left(indexOf);
+            }
+
+            // Trim the string and remove the ending comma if present.
+            selectedFields = selectedFields.Trim();
+            if (selectedFields.EndsWith(","))
+            {
+                selectedFields = selectedFields.Left(selectedFields.Length);
+            }
+
+            // Split the array and run through each element to trim it.
+            var selectedFieldsAsArray = selectedFields.Split(',');
+            for (var i = 0; i < selectedFieldsAsArray.Length; i++)
+            {
+                selectedFieldsAsArray[i] = selectedFieldsAsArray[i].Trim();
+            }
+
+            // Convert it back into a comma separated value and return.
+            var fieldsAsCsv = String.Join(",", selectedFieldsAsArray);
+            return fieldsAsCsv;
         }
 
         private bool RequestParametersAreValid()

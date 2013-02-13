@@ -46,6 +46,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             'ResourceGrid.Cmd.PlanAssignments',
             'ResourceGrid.Cmd.AttachFile',
             'ResourceGrid.Cmd.ViewProfile',
+            'ResourceGrid.Cmd.Export',
+            'ResourceGrid.Cmd.Import',
             'ResourceGrid.Cmd.Find',
             'ResourceGrid.Cmd.Find.Query',
             'ResourceGrid.Cmd.SendNotification',
@@ -107,6 +109,10 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'ResourceGrid.Cmd.MyResources':
             case 'ResourceGrid.Cmd.MyResources.Query':
                 return true;
+            case 'ResourceGrid.Cmd.Export':
+                return $$.actions.canExport();
+            case 'ResourceGrid.Cmd.Import':
+                return $$.actions.canImport();
             case 'ResourceGrid.Cmd.ViewItem':
             case 'ResourceGrid.Cmd.EditItem':
             case 'ResourceGrid.Cmd.DeleteItem':
@@ -198,6 +204,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             }
         }
         else if (commandId === 'ResourceGrid.Cmd.ReportsDropDown.Query') { properties['Value'] = '(Select a report)'; }
+
+        else if (commandId === 'ResourceGrid.Cmd.Export') { $$.actions.exportResources(); }
+        else if (commandId === 'ResourceGrid.Cmd.Import') { $$.actions.importResources(); }
 
         return true;
     },

@@ -95,20 +95,9 @@ namespace ReportFiltering.DomainServices
             var returnQuery = new StringBuilder();
             returnQuery.AppendFormat("<Where><In><FieldRef Name='{0}' /><Values>", fieldSelection.InternalFieldName);
 
-            var web = SPContext.Current.Web;
             foreach (var selectedField in fieldSelection.SelectedFields)
             {
-                try
-                {
-                    var user = web.SiteUsers[selectedField];
-                    if (user == null) break;
-                    returnQuery.AppendFormat("<Value Type='UserMulti'>{0}</Value>", user.Name);
-                }
-                catch
-                {
-                    fieldSelection.HasErrors = true;
-                    fieldSelection.Errors.Add(string.Format("The user '{0}' does not exist.", selectedField));
-                }
+                returnQuery.AppendFormat("<Value Type='UserMulti'>{0}</Value>", selectedField);
             }
 
             returnQuery.Append("</Values></In></Where>");

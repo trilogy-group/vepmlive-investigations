@@ -35,11 +35,11 @@ namespace EPMLiveWebParts.EpmCharting.DomainServices
                    returnValue = Convert.ToDouble(doubleAsString, formatProvider);
                }
            }
-           catch (OverflowException overflowEx)
+           catch (OverflowException)
            {
                // Don't do anything, the value couldn't be converted.
            }
-           catch (FormatException formatEx)
+           catch (FormatException)
            {
                // Don't do anything, the value couldn't be converted.
            }

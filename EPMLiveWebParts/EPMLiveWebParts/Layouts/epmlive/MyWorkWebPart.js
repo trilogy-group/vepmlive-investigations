@@ -115,7 +115,7 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
 
         if (col === 'WorkingOn') {
             event.cancelBubble = true;
-            return true;   
+            return true;
         }
 
         if (grid.RowCount === 1) {
@@ -136,7 +136,7 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
         if (rowBeingEdited) {
             if (row.id !== rowBeingEdited.id) {
                 grid.EndEdit(true);
-                
+
                 if (grid.HasChanges()) {
                     saveRow(grid.id, rowBeingEdited.id);
                 } else {
@@ -144,6 +144,7 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
                 }
 
                 MyWorkGrid.rowBeingEdited = null;
+                grid.TotalRowsInEditMode = 0;
             }
         }
 
@@ -312,6 +313,7 @@ Grids.OnLoaded = function (grid) {
                 }
 
                 MyWorkGrid.rowBeingEdited = null;
+                g.TotalRowsInEditMode = 0;
             }
         });
 
@@ -1863,6 +1865,11 @@ var MyWorkGrid = {
         MyWorkGrid.isDirty = true;
 
         MyWorkGrid.changeToolbarSelection('Completed');
+
+        try {
+            $('.GSNoDataRow').find('div').html('You do not have any completed work items.');
+        } catch (e) {
+        }
     },
 
     hideCompletedItems: function () {
@@ -1880,6 +1887,11 @@ var MyWorkGrid = {
         MyWorkGrid.isDirty = true;
 
         MyWorkGrid.changeToolbarSelection('Active');
+
+        try {
+            $('.GSNoDataRow').find('div').html('There are no active work items assigned to you.');
+        } catch (e) {
+        }
     },
 
     reloadCommentCount: function (result, value, params) {

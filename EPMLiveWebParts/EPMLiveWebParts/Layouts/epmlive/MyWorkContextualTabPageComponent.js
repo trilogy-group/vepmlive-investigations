@@ -23,6 +23,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         'MyWorkContextualTab.EnableMyWorkGroupNew',
         'MyWork.Cmd.NewItem',
         'MyWorkContextualTab.EnableMyWorkGroupManage',
+        'MyWork.Cmd.ViewItem',
         'MyWork.Cmd.EditItem',
         'MyWork.Cmd.Comments',
         'MyWorkContextualTab.EnableMyWorkGroupViews',
@@ -88,6 +89,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'MyWork.Cmd.NewItem':
             case 'MyWork.Cmd.NewItem.Populate':
                 return MyWorkGrid.canHandleNewItemRibbonCommand();
+            case 'MyWork.Cmd.ViewItem':
             case 'MyWork.Cmd.EditItem':
             case 'MyWork.Cmd.Comments':
             case 'MyWork.Cmd.AlertMe':
@@ -144,7 +146,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     handleCommand: function ContextualTabWebPart_CustomPageComponent$handleCommand(commandId, properties, sequence) {
         MyWorkGrid.gridId = this.$allWorkGridId;
 
-        if (commandId === 'MyWork.Cmd.EditItem') { doActionOnItem(this.$allWorkGridId, 'edit'); }
+        if (commandId === 'MyWork.Cmd.ViewItem') { doActionOnItem(this.$allWorkGridId, 'view'); }
+
+        else if (commandId === 'MyWork.Cmd.EditItem') { doActionOnItem(this.$allWorkGridId, 'edit'); }
 
         else if (commandId === 'MyWork.Cmd.Comments') { doActionOnItem(this.$allWorkGridId, 'comments'); }
 

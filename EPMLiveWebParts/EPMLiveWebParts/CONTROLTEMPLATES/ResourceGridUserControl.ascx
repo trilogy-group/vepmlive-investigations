@@ -222,6 +222,7 @@
                      epmLiveResourceGrid.maxVScroll = <%= MaxVScroll %>;
                      epmLiveResourceGrid.pfeInstalled = <%= PFEInstalled.ToString(CultureInfo.InvariantCulture).ToLower() %>;
                      epmLiveResourceGrid.reports.wcReportId = '<%= WcReportId %>';
+                     epmLiveResourceGrid.userIsSiteAdmin = <%= SPContext.Current.Web.CurrentUser.IsSiteAdmin.ToString().ToLower() %>;
 
                      window.TreeGrid('<treegrid Data_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Data_Timeout="0" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Function="GetResourcePoolDataGrid" Data_Param_Dataxml="<%= DataXml %>" Layout_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Layout_Timeout="0" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Function="GetResourcePoolLayoutGrid" Layout_Param_Dataxml="<%= LayoutXml %>" SuppressMessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
                  }, true);

@@ -97,6 +97,13 @@
     <Compile Include="Comments\Comments.cs" />
     <Compile Include="Comments\CommentsToolPart.cs" />
     <Compile Include="ContextualHelpSlideOut\ContextualHelpSlideOut.cs" />
+    <Compile Include="CONTROLTEMPLATES\AssignmentPlannerUserControl.ascx.cs">
+      <DependentUpon>AssignmentPlannerUserControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\AssignmentPlannerUserControl.ascx.designer.cs">
+      <DependentUpon>AssignmentPlannerUserControl.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="CONTROLTEMPLATES\ContextualHelpSlideOutControl.ascx.cs">
       <DependentUpon>ContextualHelpSlideOutControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -667,6 +674,7 @@
     <Content Include="ChartControl\Elements.xml" />
     <Content Include="Comments\Elements.xml" />
     <Content Include="ContextualHelpSlideOut\Elements.xml" />
+    <Content Include="CONTROLTEMPLATES\AssignmentPlannerUserControl.ascx" />
     <Content Include="CONTROLTEMPLATES\ContextualHelpSlideOutControl.ascx" />
     <Content Include="CONTROLTEMPLATES\ganttviewtoolbar.ascx" />
     <Content Include="CONTROLTEMPLATES\GridGantUserControl.ascx" />
@@ -696,6 +704,10 @@
     <Content Include="javascripts\EPMLive.WorkCenter.js" />
     <Content Include="javascripts\GridGantt.js" />
     <Content Include="javascripts\jquery.multiselect.min.js" />
+    <Content Include="javascripts\libraries\bootstrap-fileupload.js" />
+    <Content Include="javascripts\libraries\bootstrap-fileupload.min.js" />
+    <Content Include="javascripts\libraries\bootstrap.js" />
+    <Content Include="javascripts\libraries\bootstrap.min.js" />
     <Content Include="javascripts\libraries\jquery.watermark.js" />
     <Content Include="Layouts\epmlive\addmenu.css" />
     <Content Include="Layouts\epmlive\ajaxpost.aspx" />
@@ -799,6 +811,9 @@
     <Content Include="Layouts\epmlive\images\mywork\unflagged.png" />
     <Content Include="Layouts\epmlive\images\purchase.png" />
     <Content Include="Layouts\epmlive\images\resplan.gif" />
+    <Content Include="Layouts\epmlive\images\Ribbon\excel-export-16.png" />
+    <Content Include="Layouts\epmlive\images\Ribbon\excel-import-16.png" />
+    <Content Include="Layouts\epmlive\images\Ribbon\excel-import-32.png" />
     <Content Include="Layouts\epmlive\images\target.gif" />
     <Content Include="Layouts\epmlive\images\unsearch.png" />
     <Content Include="Layouts\epmlive\images\workitems.gif" />
@@ -820,6 +835,14 @@
     <Content Include="Layouts\epmlive\SL.Visifire.Charts.xap" />
     <Content Include="Layouts\epmlive\slideout.js" />
     <Content Include="Layouts\epmlive\slimScroll.js" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-fileupload.css" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-fileupload.min.css" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-responsive.css" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-responsive.min.css" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap.css" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap.min.css" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\images\glyphicons-halflings-white.png" />
+    <Content Include="Layouts\epmlive\styles\libraries\bootstrap\images\glyphicons-halflings.png" />
     <Content Include="Layouts\epmlive\styles\MyWork\shell.css" />
     <Content Include="Layouts\epmlive\styles\themes\grey\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Layouts\epmlive\styles\themes\grey\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -850,6 +873,8 @@
     <Content Include="ReportViewerSingle\Elements.xml" />
     <Content Include="ReportViewer\Elements.xml" />
     <Content Include="ResourcePlanning\Elements.xml" />
+    <Content Include="Resources\AssignmentPlanner_DelayScript.txt" />
+    <Content Include="Resources\MyWorkWebPart_MyWorkDefaultQuery.txt" />
     <Content Include="RollupSummary\Elements.xml" />
     <Content Include="SiteCollectionSetupWizard\Elements.xml" />
     <Content Include="TreeGrid\MyWork13\Backgrounds.gif" />
