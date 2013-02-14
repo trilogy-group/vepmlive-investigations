@@ -1,0 +1,66 @@
+﻿.transparentnotes {
+	zoom: 1;
+	filter: alpha(opacity=50);
+	opacity: 0.5;
+}
+
+.ms-cui-strip
+{
+    border: 0px !important;
+}
+
+.ms-cur-strip .ms-cui-dd
+{
+    height:20px !important;
+}
+
+
+.epmliveinput
+{
+    padding: 2px 5px;
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid #ABABAB;
+    color: #444444;
+    color: inherit;
+    font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-size:13px;
+    vertical-align: middle;
+    outline: none;
+}
+
+.epmliveinput:hover
+{
+    border-color:#92C0E0;
+}
+
+.epmliveinput:focus
+{
+border-color:#92C0E0;
+}
+
+
+.tsOK
+{
+    min-width: 4em;
+    padding: 7px 0px;
+    border: 1px solid #ABABAB;
+    background-color: #FDFDFD;
+    background-color: #FDFDFD;
+    font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 11px;
+    color: #444;
+}
+
+.tsOK:hover
+{
+    border-color: #92C0E0;
+    background-color: #E6F2FA;
+    cursor:pointer;
+}
+
+.tsOK:active
+{
+    border-color: #2A8DD4;
+    background-color: #92C0E0;
+    cursor:pointer;
+}

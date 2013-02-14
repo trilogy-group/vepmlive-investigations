@@ -1,0 +1,22 @@
+
+<GroupTemplate Id="Ribbon.Templates.Timesheet.Status">
+	<Layout Title="LargeLarge">
+		<OverflowSection Type="OneRow" TemplateAlias="o1" DisplayMode="Large"/>
+		<OverflowSection Type="OneRow" TemplateAlias="o2" DisplayMode="Large"/>
+		<Section Type="ThreeRow">
+			<Row>
+			  <ControlRef TemplateAlias="row1control" DisplayMode="Medium" />
+			</Row>
+			<Row>
+			  <ControlRef TemplateAlias="row2control" DisplayMode="Medium" />
+			</Row>            
+			<Row>
+			  <Strip>            
+			    <ControlRef TemplateAlias="previousPage" DisplayMode="Small" />
+			    <ControlRef TemplateAlias="currentPage" DisplayMode="Medium" />
+			    <ControlRef TemplateAlias="nextPage" DisplayMode="Small" />
+			  </Strip>
+			</Row>
+		</Section>
+	</Layout>
+</GroupTemplate>

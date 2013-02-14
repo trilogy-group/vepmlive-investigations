@@ -1,0 +1,328 @@
+var timesheets#gridid#;
+
+mygrid#gridid#._in_header_stat_summ=function(tag,index,c){
+	var calck=function(){                                           // define the function which will be used for calculations
+		var summ=0;                                                 // set initial counter value 
+		this.forEachRow(function(id){                         // for each row
+		    var tempval = this.cells(id,index).getValue().toString();        // add row_value
+		    if(tempval.split('|')[0] != "")
+			{
+				var strVals = tempval.split('|');
+
+				for(var i = 0;i<strVals.length;i+=2)
+				{
+					if(parseFloat(strVals[i + 1]).toString() != "NaN")
+						summ += parseFloat(strVals[i + 1]);
+				}
+			}
+			else
+			{
+				if(parseFloat(tempval).toString() != "NaN")
+					summ += parseFloat(tempval);
+			}
+		})
+		return summ;
+	}
+	this._stat_in_header(tag,calck,index,c);             //call default statistics handler processor
+}
+
+
+function disableChecks#gridid#()
+{
+	mygrid#gridid#.forEachRow(function(id){
+		if(mygrid#gridid#.getUserData(id,"submitted") != "True" && mygrid#gridid#.getUserData(id,"tsitemuid") != "")
+		{
+			mygrid#gridid#.cells(id,0).setValue(0);
+			mygrid#gridid#.cells(id,0).setDisabled(true);
+		}
+	});
+}
+
+function viewItem(url)
+{
+    var w = pageWidth() - 200;
+    var h = pageHeight() - 100;
+    sm('editItem#gridid#',w,h);
+    
+    document.getElementById("frmEditFrame#gridid#").src=url;
+}
+
+function viewItem#gridid#(link, action)
+{
+
+    var rowIdFull = link.parentNode.parentNode.parentNode.parentNode.idd;
+    var weburl = mygrid#gridid#.getUserData(rowIdFull,"SiteUrl");
+    var listId = mygrid#gridid#.getUserData(rowIdFull,"listid");
+    var webid = mygrid#gridid#.getUserData(rowIdFull,"webid");
+    var siteid = mygrid#gridid#.getUserData(rowIdFull,"siteid");
+    var editurl = mygrid#gridid#.getUserData(rowIdFull,"editurl");
+    var viewurl = mygrid#gridid#.getUserData(rowIdFull,"viewurl");
+    var itemId = mygrid#gridid#.getUserData(rowIdFull,"itemid");
+    var FullURL = mygrid#gridid#.getUserData(rowIdFull,"FullURL");
+
+    var wurl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&ListId=" + listId + "&ID=" + itemId + "&gridid=#gridid#&siteid=" + siteid + "&webid=" + webid + "&rowid=" + rowIdFull;
+    
+    function myCallback(dialogResult, returnValue)
+	{
+		if(dialogResult == 1)
+		{
+			var weburl = curGrid.getUserData(curRowId,"SiteUrl");
+			var listid = curGrid.getUserData(curRowId,"listid");
+			var itemid = curGrid.getUserData(curRowId,"itemid");
+			var webid = curGrid.getUserData(curRowId,"webid");
+			var siteid = curGrid.getUserData(curRowId,"siteid");
+
+			getSingleItem#gridid#(siteid,webid,listid,itemid,curRowId);
+		}
+	}
+
+	var options = { url: wurl, width: 700, dialogReturnValueCallback:myCallback };
+
+	SP.UI.ModalDialog.showModalDialog(options);
+}
+
+function approve#gridid#()
+{
+	var ids = mygrid#gridid#.getCheckedRows(0).split(',');
+	
+	var timesheets = "";
+	
+	for(var i = 0;i<ids.length;i++)
+	{
+		if(ids[i] != "")
+		{
+			//timesheets += "," + mygrid#gridid#.getUserData(ids[i],"tsitemuid") + "|" + mygrid#gridid#.cells(ids[i],1).getValue();
+			timesheets += "," + mygrid#gridid#.getUserData(ids[i],"tsitemuid");
+		}
+	}
+	if(timesheets.length > 0)
+		timesheets = timesheets.substring(1);
+	else
+		return;
+		
+	sm('dlgProcessing',200,100);
+	dhtmlxAjax.post(actionurl#gridid#,"action=approvePM&period=" + period#gridid# + "&tsitemuids=" + timesheets,closeApprove#gridid#);
+}
+
+function reject#gridid#()
+{
+	var ids = mygrid#gridid#.getCheckedRows(0).split(',');
+	
+	var timesheets = "";
+	
+	for(var i = 0;i<ids.length;i++)
+	{
+		if(ids[i] != "")
+		{
+			//timesheets += "," + mygrid#gridid#.getUserData(ids[i],"tsitemuid") + "|" + mygrid#gridid#.cells(ids[i],1).getValue();
+			timesheets += "," + mygrid#gridid#.getUserData(ids[i],"tsitemuid");
+		}
+	}
+	if(timesheets.length > 0)
+		timesheets = timesheets.substring(1);
+	else
+		return;
+		
+	sm('dlgProcessing',200,100);
+	dhtmlxAjax.post(actionurl#gridid#,"action=rejectPM&tsitemuids=" + timesheets,closeApprove#gridid#);
+}
+
+function hideCol#gridid#()
+{
+	mygrid#gridid#.setColumnHidden(0,true);
+}
+
+function closeApprove#gridid#(loader)
+{
+	if(loader.xmlDoc.responseText!=null)
+    {
+        if(loader.xmlDoc.responseText.substring(0,5) != "Error")
+        {
+            var strPeriod = loader.xmlDoc.responseText;
+
+            window.location.href = window.location.href;            
+        }
+        else
+        {
+            alert(loader.xmlDoc.responseText.replace(/<br>/g,"\r\n"));
+            hm('dlgProcessing');
+        }
+    }
+    else
+    {
+        alert("Response contains no XML");
+        hm('dlgProcessing');
+    }
+}
+
+//=========================timeeditor========================
+function eXcell_timeeditor(cell)
+{
+    if (cell)
+    {
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+        if(!this.grid._grid_mc)
+        {
+			var z=document.getElementById("timeeditorgrid#gridid#");
+
+			z.onclick=function(e){ (e||event).cancelBubble=true; }
+			
+			if (_isIE) { 
+				z.style.position="absolute"
+				z.style.top="0px"
+			}
+			document.body.insertBefore(z,document.body.firstChild);
+ 
+			this.grid._grid_mc = z;
+		}
+    }
+    this.setValue=function(val){
+
+		var strVal = "&nbsp;";
+		var hours = 0;
+		
+		if(val.split('|')[0] != "")
+		{
+			var strVals = val.split('|');
+			
+
+			for(var i = 0;i<strVals.length;i+=2)
+			{
+				if(strVals[i] == "N")
+				{
+					this.cell._notes = strVals[i+1];
+				}
+				else
+				{
+					hours += parseFloat(strVals[i + 1]);
+				}
+			}
+		}
+		
+		if(this.cell._notes != null && this.cell._notes != "")
+			this.setCValue("*" + hours);
+		else
+			this.setCValue(hours);
+        
+        this.cell._value = hours;
+        this.cell._values = val;
+        this.cell._innerhtml = true;
+        //this.val = val;
+    }
+
+    this.getValue=function(){
+		return this.cell._value;
+    }
+    this.edit=function(){
+		
+
+		this.val=this.cell._values;
+		
+		try
+		{
+			document.getElementById("timeeditor-#gridid#-N").value = "";
+		}catch(e){}
+		
+		var sRow = this.grid.getSelectedRowId();
+		
+		for(var i = 0;i<mygrid#gridid#.getColumnsNum();i++)
+        {
+			if(mygrid#gridid#.getColumnId(i) == "<![CDATA[Title]]>")
+			{
+				document.getElementById("timeeditortitle#gridid#").innerHTML = mygrid#gridid#.cells(sRow,i).getValue();
+			}
+        }
+		
+		var colLabel = this.grid.getColumnId(this.grid.getSelectedCellIndex());
+		
+		document.getElementById("timeeditordate#gridid#").innerHTML = colLabel.substring(8).replace(/_/g,"/");
+		
+		if(this.val.split('|')[0] != "")
+		{
+			var strVals = this.val.split('|');
+			
+			for(var i = 0;i<strVals.length;i+=2)
+			{
+				var inp = document.getElementById("timeeditor-#gridid#-" + strVals[i]);
+				if(inp != null)
+					inp.value = strVals[i + 1];
+			}
+		}
+		
+		//Position
+		var arPos = this.grid.getPosition(this.cell);
+
+		this.grid._grid_mc.style.position = "absolute";
+
+		if(arPos[0] + 200 > document.body.clientWidth)
+			this.grid._grid_mc.style.left=(document.body.clientWidth - 210)  + "px";
+		else
+			this.grid._grid_mc.style.left=arPos[0] + "px";
+		
+		if((arPos[1] + 100) > (document.body.clientHeight + document.body.scrollTop))
+			this.grid._grid_mc.style.top = (document.body.clientHeight + document.body.scrollTop - 105) + "px";
+		else
+			this.grid._grid_mc.style.top=arPos[1]  + "px";
+			
+		this.grid._grid_mc.style.display="";
+		
+		this.grid._grid_mc.style.position = "absolute";
+
+    }
+    this.detach=function(){
+		
+		this.grid._grid_mc.style.display="none";
+		
+		var values=this.cell._values;
+		
+		var newValues = "";
+		
+		var newValue = 0;
+		
+		if(values.split('|')[0] != "")
+		{
+			var strVals = values.split('|');
+			
+			for(var i = 0;i<strVals.length;i+=2)
+			{
+				var inp = document.getElementById("timeeditor-#gridid#-" + strVals[i]);
+				if(inp != null)
+				{
+					if((parseFloat(inp.value) == "NaN" || inp.value == "") && strVals[i] != "N")
+						newValues += "|" + strVals[i] + "|0";
+					else
+						newValues += "|" + strVals[i] + "|" + inp.value;
+				}
+			}
+			
+			if(newValues.length > 1)
+				newValues = newValues.substring(1);
+		}
+		
+        this.setValue(newValues);
+
+        return this.val != this.getValue();
+		
+    }
+}
+eXcell_timeeditor.prototype = new eXcell;
+//============================================================
+
+</script>
+
+
+<div id="editItem#gridid#" class="dialog">
+    <table width="100%" height="100%" id="tblEditItem" cellpadding="0" cellspacing="0">
+        <tr height="100%">
+            <td align="center" bgcolor="FFFFFF">
+                <div id="editItemLoad#gridid#">
+                    <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle;"/>
+                </div>
+                <iframe id="frmEditFrame#gridid#" width="100%" height="100%" frameborder="0" src="">
+                    
+                </iframe>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,979 @@
+<div id="dlgSaving" class="dialog">
+    <table width="100%">
+        <tr>
+            <td align="center" class="ms-sectionheader">
+                <img src="/_layouts/images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
+                <H3 class="ms-standardheader">Saving Timesheet...</h3>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="dlgSubmit" class="dialog">
+    <table width="100%">
+        <tr>
+            <td align="center" class="ms-sectionheader">
+                <img src="/_layouts/images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
+                <H3 class="ms-standardheader">Submitting Timesheet...</h3>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="dlgAdding" class="dialog">
+    <table width="100%">
+        <tr>
+            <td align="center" class="ms-sectionheader">
+                <img src="/_layouts/images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
+                <H3 class="ms-standardheader">Adding Timesheet Items...</h3>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="dlgUnsubmit" class="dialog">
+    <table width="100%">
+        <tr>
+            <td align="center" class="ms-sectionheader">
+                <img src="/_layouts/images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
+                <H3 class="ms-standardheader">Un-Submitting Timesheet...</h3>
+            </td>
+        </tr>
+        
+    </table>
+</div> 
+
+<div id="dlgError#gridid#" class="dialog">
+    <table width="100%" height="100%" cellpadding="0" cellspacing="3">
+		<tr>
+			<td class="ms-sectionheader"><H3 class="ms-standardheader">Error: </h3></td>
+		</tr>
+        <tr height="100%">
+            <td align="left"valign="top">
+                <div id="dlgErrorText#gridid#" style="overflow: auto;height=90%;width=100%" class="ms-descriptiontext"></div><br>
+            </td>
+        </tr>
+        <tr>
+			<td align="right">
+				<input type="button" class="ms-input" value="Close" onClick="hm('dlgError#gridid#');">
+			</td>
+		</tr>
+    </table>
+</div>
+
+<div id="editItem#gridid#" class="dialog">
+    <table width="100%" height="100%" id="tblEditItem" cellpadding="0" cellspacing="0">
+        <tr height="100%">
+            <td align="center" bgcolor="FFFFFF">
+                <div id="editItemLoad#gridid#">
+                    <img src="/_layouts/images/GEARS_ANv4.GIF" style="vertical-align: middle;"/>
+                </div>
+                <iframe id="frmEditFrame#gridid#" width="100%" height="100%" frameborder="0" src="">
+                    
+                </iframe>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script language="javascript">
+
+
+var addedParents#gridid# = new Array();
+var mywork#gridid#;
+function resetWorkGrid()
+{
+	mywork#gridid# = new dhtmlXGridObject('myworkgrid#griduid#');
+	mywork#gridid#.setImagePath("_layouts/epmlive/dhtml/xgrid/imgs/");
+	mywork#gridid#.setSkin("editgrid");
+	mywork#gridid#.setImageSize(1,1);
+	mywork#gridid#.setDateFormat("%m/%d/%Y");
+	mywork#gridid#.attachEvent("onXLE",clearLoaderWorkmywork#gridid#);
+	//mywork#gridid#.attachEvent("onXLE",switchFilterLoadmywork#gridid#);
+	mywork#gridid#.attachEvent("onXLE",disablerows#gridid#);
+	mywork#gridid#.enableTreeCellEdit(false);
+	mywork#gridid#.enableEditEvents(false,false,false);
+	mywork#gridid#.enableAutoHeight(true);
+	//mywork#gridid#.preventIECaching(true);
+	mywork#gridid#._gridid = '#gridid#';
+	mywork#gridid#.init();
+}
+
+resetWorkGrid();
+
+var arrColumnLookups#gridid#;
+
+function disablerows#gridid#()
+{
+	mywork#gridid#.forEachRow(function(id){    
+		if(mygrid#gridid#.doesRowExist(id) && mywork#gridid#.getUserData(id,"itemid") != "")
+		{
+			mywork#gridid#.cells(id,0).setValue(0);
+			mywork#gridid#.cells(id,0).setDisabled(true);
+		}
+	})
+}
+
+/*function viewItem(url)
+{
+    var w = pageWidth() - 200;
+    var h = pageHeight() - 100;
+    sm('editItem#gridid#',w,h);
+    
+    document.getElementById("frmEditFrame#gridid#").src=url;
+}*/
+
+
+function viewItem#gridid#(link, action)
+{
+    var rowIdFull = link.parentNode.parentNode.parentNode.parentNode.idd;
+	if(rowIdFull == null)
+		rowIdFull = mygrid#gridid#.getSelectedRowId();
+
+    var weburl = mygrid#gridid#.getUserData(rowIdFull,"SiteUrl");
+    var listId = mygrid#gridid#.getUserData(rowIdFull,"listid");
+    var webid = mygrid#gridid#.getUserData(rowIdFull,"webid");
+    var siteid = mygrid#gridid#.getUserData(rowIdFull,"siteid");
+    var editurl = mygrid#gridid#.getUserData(rowIdFull,"editurl");
+    var viewurl = mygrid#gridid#.getUserData(rowIdFull,"viewurl");
+    var itemId = mygrid#gridid#.getUserData(rowIdFull,"itemid");
+    var FullURL = mygrid#gridid#.getUserData(rowIdFull,"FullURL");
+
+    var wurl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&ListId=" + listId + "&ID=" + itemId + "&gridid=#gridid#&siteid=" + siteid + "&webid=" + webid + "&rowid=" + rowIdFull;
+    
+    function myCallback(dialogResult, returnValue)
+	{
+		if(dialogResult == 1)
+		{
+			var weburl = curGrid.getUserData(curRowId,"SiteUrl");
+			var listid = curGrid.getUserData(curRowId,"listid");
+			var itemid = curGrid.getUserData(curRowId,"itemid");
+			var webid = curGrid.getUserData(curRowId,"webid");
+			var siteid = curGrid.getUserData(curRowId,"siteid");
+
+			getSingleItem#gridid#(siteid,webid,listid,itemid,curRowId);
+		}
+	}
+
+	var options = { url: wurl, width: 700, dialogReturnValueCallback:myCallback };
+
+	SP.UI.ModalDialog.showModalDialog(options);
+}
+
+function viewItemmywork#gridid#(link, action)
+{
+    var rowIdFull = link.parentNode.parentNode.parentNode.parentNode.idd;
+	if(rowIdFull == null)
+		rowIdFull = mywork#gridid#.getSelectedRowId();
+
+    var weburl = mywork#gridid#.getUserData(rowIdFull,"SiteUrl");
+    var listId = mywork#gridid#.getUserData(rowIdFull,"listid");
+    var webid = mywork#gridid#.getUserData(rowIdFull,"webid");
+    var siteid = mywork#gridid#.getUserData(rowIdFull,"siteid");
+    var editurl = mywork#gridid#.getUserData(rowIdFull,"editurl");
+    var viewurl = mywork#gridid#.getUserData(rowIdFull,"viewurl");
+    var itemId = mywork#gridid#.getUserData(rowIdFull,"itemid");
+    var FullURL = mywork#gridid#.getUserData(rowIdFull,"FullURL");
+
+    var wurl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&ListId=" + listId + "&ID=" + itemId + "&gridid=mywork#gridid#&siteid=" + siteid + "&webid=" + webid + "&rowid=" + rowIdFull;
+    
+    function myCallback(dialogResult, returnValue)
+	{
+		
+	}
+
+	var options = { url: wurl, width: 700, dialogReturnValueCallback:myCallback };
+
+	SP.UI.ModalDialog.showModalDialog(options);
+}
+
+function cancelGetMyWork#gridid#()
+{
+	document.getElementById('workdiv#griduid#').style.display = "none";
+}
+
+function verifyParent#gridid#(oldParentId)
+{
+	if(oldParentId == 0)
+		return;
+	if(!mygrid#gridid#.doesRowExist(oldParentId))
+	{
+		var parentId = mywork#gridid#.getParentId(oldParentId);
+		verifyParent#gridid#(parentId);
+		
+		var values = new Array();
+		
+		mywork#gridid#.forEachCell(oldParentId,function(cell,ind){
+          values[ind] = mywork#gridid#.cells(oldParentId,ind).getValue();
+		})
+		
+		mygrid#gridid#.addRow(oldParentId,values,null,parentId,"","");
+		
+		
+		mygrid#gridid#.forEachCell(oldParentId,function(cell,ind){
+			if(mygrid#gridid#.getColType(ind) != "tree")
+				mygrid#gridid#.setCellExcellType(oldParentId, ind, "ro");
+		})
+		
+		mygrid#gridid#.cells(oldParentId, 0).setValue("");
+		
+		addedParents#gridid#.push(oldParentId);
+
+		//setTimeout("setupdated#gridid#('" + oldParentId + "')",10);
+		
+		mygrid#gridid#.openItem(parentId);
+		mygrid#gridid#.forEachCell(oldParentId,function(cell,ind){
+          mygrid#gridid#.setCellTextStyle(oldParentId, ind, "background: #EFEFEF");
+		})
+		
+		mygrid#gridid#.setRowTextBold(oldParentId);
+		mygrid#gridid#.lockRow(oldParentId, true);
+		
+	}
+}
+
+function setupdated#gridid#(oldParentId)
+{
+	for(var id in addedParents#gridid#)
+	{
+		myDataProcessor.setUpdated(addedParents#gridid#[id],false);
+		mygrid#gridid#.setRowTextBold(addedParents#gridid#[id]);
+	}
+
+}
+
+function deleteItem#gridid#()
+{
+	var strRows = mygrid#gridid#.getCheckedRows(0);
+	if(strRows != null && strRows != "")
+	{
+		if(confirm('Are you sure you want to remove that item from the timesheet?'))
+		{
+			var rowIds = strRows.split(',');
+			gridChanged#gridid# = true;
+			for(var i = 0;i<rowIds.length;i++)
+			{	
+				mygrid#gridid#.deleteRow(rowIds[i]);
+			}
+		}
+	}
+}
+
+function addMyWork#gridid#()
+{
+	document.getElementById('workdiv#griduid#').style.display = "none";
+	var selectId = mywork#gridid#.getCheckedRows(0);
+	if(selectId != null && selectId != "")
+	{
+		var selectIds = selectId.split(',');
+		for(var i = 0;i<selectIds.length;i++)
+		{
+			var sId = selectIds[i];
+			mywork#gridid#.cells(sId,0).setValue(0);
+			if(!mygrid#gridid#.doesRowExist(sId))
+			{
+				var parentId = mywork#gridid#.getParentId(sId);
+
+				addedParents#gridid# = new Array();
+
+				verifyParent#gridid#(parentId);
+				
+				setupdated#gridid#();
+
+				mywork#gridid#.moveRowTo(sId,parentId,'copy','child',mywork#gridid#,mygrid#gridid#);
+				
+				//myDataProcessor.setUpdated(sId,true);
+				mygrid#gridid#.openItem(parentId);
+				
+				mywork#gridid#.forEachCell(sId,function(cell,ind){
+					var type = mywork#gridid#.cells(sId,ind).cell._cellType||mywork#gridid#.getColType(ind);
+					mygrid#gridid#.setCellExcellType(sId, ind, type);
+					if(type == "usereditor" || type == "usereditorm")
+					{
+						mygrid#gridid#.cells(sId,ind).setValue(mywork#gridid#.cells(sId,ind).getAllUsers());
+					}
+					if(type == "choice" || type == "mchoice")
+					{
+						mygrid#gridid#.cells(sId,ind).cell._allvalues = mywork#gridid#.cells(sId,ind).cell._allvalues;
+					}
+				})
+				
+				mygrid#gridid#.setCellTextStyle(sId, 0, "background: #EFEFEF");
+				if(mygrid#gridid#Edit)
+					mygrid#gridid#.setCellTextStyle(sId, 1, "background: #EFEFEF");
+				
+				mygrid#gridid#.cells(sId,0).setValue(0);
+				mywork#gridid#.cells(sId,0).setDisabled(true);
+				//mywork#gridid#.cells(sId,0).setValue(0);
+				
+				mygrid#gridid#.setCellTextStyle(sId, mygrid#gridid#.getColumnsNum()-1, "background: #EFEFEF");
+				
+				gridChanged#gridid# = true;
+				
+				cellChanged#gridid#(2,sId,0,'','');
+			}
+			else
+			{
+				alert('The item: ' + mywork#gridid#.getUserData(sId,"title") + ' is already added to Time Sheet');
+			}
+		}
+		
+	}
+	document.getElementById('workdiv#griduid#').style.display = "";
+}
+
+function hideColumns#gridid#()
+{
+	var cols = mywork#gridid#.getColumnsNum();
+	for(var i = 0;i<cols;i++)
+	{
+		if(mywork#gridid#.getColumnLabel(i) == "hideme")
+			mywork#gridid#.setColumnHidden(i,true);
+		
+	}
+}
+
+function clearLoaderWorkmywork#gridid#(id)
+{
+    document.getElementById(id.entBox.id).style.display = "";
+    document.getElementById("loading" + id.entBox.id).style.display = "none";
+    setTimeout("hideColumns#gridid#()",1);
+}
+
+function changeworkview#gridid#(postdata, strTitle)
+{
+	document.getElementById('myworkgrid#griduid#').style.display = "none";
+    document.getElementById('loadingmyworkgrid#griduid#').style.display = "";
+    
+	//mywork#gridid#.clearAll();
+	//resetWorkGrid();
+    
+    mywork#gridid#.post(myworkurl#gridid# + "?rnd=" + guid() + "&width=" + mygridwidth#gridid#,postdata);
+    document.getElementById("zz35_WorkSelectorMenu").innerHTML = strTitle;
+}
+
+function searchWork#gridid#()
+{
+	document.getElementById('searchdiv#griduid#').style.display = "";
+	document.getElementById('workdiv#griduid#').style.display = "none";
+	
+	document.getElementById('searchTerm#gridid#').focus();
+}
+
+function autoAdd#gridid#()
+{
+	if(gridChanged#gridid#)
+	{
+		addaftersave#gridid# = true;
+		saveData#gridid#();
+	}
+	else
+	{
+		sm('dlgAdding',200,100);
+		dhtmlxAjax.post(actionurl#gridid#,"action=autoadd&ts_uid=" + tsuid#gridid# + "&period=" + period#gridid#,closeAdd#gridid#);
+	}
+}
+
+function closeAdd#gridid#(loader)
+{
+	if(loader.xmlDoc.responseText!=null)
+    {
+        if(loader.xmlDoc.responseText.substring(0,5) != "Error")
+        {
+            var strPeriod = loader.xmlDoc.responseText;
+            
+			var l = window.location.href;
+            
+			if(l.substring(l.length-1) == "#")
+				l = l.substring(0,l.length-1);
+
+            window.location.href = l;             
+        }
+        else
+        {
+            alert(loader.xmlDoc.responseText);
+            hm('dlgAdding');
+        }
+    }
+    else
+    {
+        alert("Response contains no XML");
+        hm('dlgAdding');
+    }
+}
+
+function KeyDownHandler#gridid#(event)
+{
+	if (event.keyCode == 13)
+    {
+        // cancel the default submit
+        event.returnValue=false;
+        event.cancel = true;
+        // submit the form by programmatically clicking the specified button
+        doSearch#gridid#();
+    }	
+}
+
+function doSearch#gridid#()
+{
+	var w = pageWidth() - 300;
+	var h = pageHeight() - 200;
+    document.getElementById('workdiv#griduid#').style.display = "";
+    //document.getElementById('searchdiv#griduid#').style.display = "none";
+    document.getElementById('myworkgrid#griduid#').style.display = "none";
+    document.getElementById('loadingmyworkgrid#griduid#').style.display = "";
+    
+	document.getElementById('workviewselector#gridid#').style.display = "none";
+
+    document.getElementById('myworktitle').innerText = "Search Results For: " + document.getElementById("searchTerm#gridid#").value;
+
+    mywork#gridid#.clearAll();
+    
+    mywork#gridid#.post(myworkurl#gridid# + "?rnd=" + guid() + "&searchcol=" + document.getElementById("searchCol#gridid#").value + "&searchterm=" + document.getElementById("searchTerm#gridid#").value + "&width=" + mygridwidth#gridid#,searchworkpost#gridid#);
+    
+    
+}
+
+function cancelSearch#gridid#()
+{
+	document.getElementById('searchdiv#griduid#').style.display = "none";
+}
+
+function getWorkGrid#gridid#(postdata, workstring)
+{
+
+	var w = pageWidth() - 300;
+	var h = pageHeight() - 200;
+    document.getElementById('workdiv#griduid#').style.display = "";
+    document.getElementById('searchdiv#griduid#').style.display = "none";
+    document.getElementById('myworkgrid#griduid#').style.display = "none";
+    document.getElementById('loadingmyworkgrid#griduid#').style.display = "";
+    
+    if(workstring == "Work" && allowotherwork#gridid#)
+		document.getElementById('workviewselector#gridid#').style.display = "";
+	else
+		document.getElementById('workviewselector#gridid#').style.display = "none";
+
+    document.getElementById('myworktitle').innerText = "Available Timesheet Items: " + workstring;    
+
+    mywork#gridid#.clearAll();
+      
+    mywork#gridid#.post(myworkurl#gridid# + "?rnd=" + guid() + "&width=" + mygridwidth#gridid#,postdata);
+}
+
+function closeSubmit#gridid#(loader)
+{
+	if(loader.xmlDoc.responseText!=null)
+    {
+        if(loader.xmlDoc.responseText.substring(0,5) != "Error")
+        {
+			var l = window.location.href;
+            
+			if(l.substring(l.length-1) == "#")
+				l = l.substring(0,l.length-1);
+
+            window.location.href = l;         
+        }
+        else
+        {
+            alert(loader.xmlDoc.responseText);
+            hm('dlgSubmit');
+        }
+    }
+    else
+    {
+        alert("Response contains no XML");
+        hm('dlgSubmit');
+    }
+
+	AfterSubmit(mygrid#gridid#);
+}
+
+function closeunsubmit#gridid#(loader)
+{
+	if(loader.xmlDoc.responseText!=null)
+    {
+        if(loader.xmlDoc.responseText.substring(0,5) != "Error")
+        {
+            var l = window.location.href;
+            
+			if(l.substring(l.length-1) == "#")
+				l = l.substring(0,l.length-1);
+
+            window.location.href = l;            
+        }
+        else
+        {
+            alert(loader.xmlDoc.responseText);
+            hm('dlgUnsubmit');
+        }
+    }
+    else
+    {
+        alert("Response contains no XML");
+        hm('dlgUnsubmit');
+    }
+
+	AfterUnSubmit(mygrid#gridid#);
+}
+
+function BeforeSave(grid)
+{
+	if(typeof TimesheetBeforeSave == 'function') 
+	{ 
+		try
+		{
+			var retVal = TimesheetBeforeSave(grid); 
+			if(retVal.CanSave)
+			{
+				return true;
+			}
+			else
+			{
+				alert(retVal.Message);
+				return false;
+			}
+		}
+		catch(e)
+		{
+			alert("Error Checking Save: " + e);
+		}			
+		return false;
+	}
+	else
+		return true;
+}
+
+function AfterSave(grid)
+{
+	if(typeof TimesheetAfterSave == 'function') 
+	{ 
+		try
+		{
+			TimesheetAfterSave(grid); 
+		}
+		catch(e)
+		{
+			alert("Error After Save: " + e);
+		}
+	}
+}
+
+function BeforeSubmit(grid)
+{
+	if(typeof TimesheetBeforeSubmit == 'function') 
+	{ 
+		try
+		{
+			var retVal = TimesheetBeforeSubmit(grid); 
+			if(retVal.CanSubmit)
+			{
+				return true;
+			}
+			else
+			{
+				alert(retVal.Message);
+				return false;
+			}
+		}
+		catch(e)
+		{
+			alert("Error Checking Submit: " + e);
+		}			
+		return false;
+	}
+	else
+		return true;
+}
+
+function AfterSubmit(grid)
+{
+	if(typeof TimesheetAfterSubmit == 'function') 
+	{ 
+		try
+		{
+			TimesheetAfterSubmit(grid); 
+		}
+		catch(e)
+		{
+			alert("Error After Submit: " + e);
+		}
+	}
+}
+
+
+function BeforeUnSubmit(grid)
+{
+	if(typeof TimesheetBeforeUnSubmit == 'function') 
+	{ 
+		try
+		{
+			var retVal = TimesheetBeforeUnSubmit(grid); 
+			if(retVal.CanUnSubmit)
+			{
+				return true;
+			}
+			else
+			{
+				alert(retVal.Message);
+				return false;
+			}
+		}
+		catch(e)
+		{
+			alert("Error Checking UnSubmit: " + e);
+		}			
+		return false;
+	}
+	else
+		return true;
+}
+
+function AfterUnSubmit(grid)
+{
+	if(typeof TimesheetAfterUnSubmit == 'function') 
+	{ 
+		try
+		{
+			TimesheetAfterUnSubmit(grid); 
+		}
+		catch(e)
+		{
+			alert("Error After UnSubmit: " + e);
+		}
+	}
+}
+
+function submit#gridid#()
+{
+	if(BeforeSubmit(mygrid#gridid#))
+	{
+
+		mygrid#gridid#.editStop();
+		if(gridChanged#gridid#)
+		{
+			//alert('You must save your timesheet first');
+			submitaftersave#gridid# = true;
+			saveData#gridid#();
+		}
+		else
+		{
+			if(validateValues#gridid#())
+			{
+				sm('dlgSubmit',200,100);
+				dhtmlxAjax.post(actionurl#gridid#,"action=submitTime&period=" + period#gridid# + "&ts_uid=" + tsuid#gridid#,closeSubmit#gridid#);
+			}
+		}
+	}
+}
+
+
+function unsubmit#gridid#()
+{
+	if(BeforeUnSubmit(mygrid#gridid#))
+	{
+		sm('dlgUnsubmit',200,100);
+		dhtmlxAjax.post(actionurl#gridid#,"action=unsubmitTime&ts_uid=" + tsuid#gridid#,closeunsubmit#gridid#);
+	}
+}
+
+function saveData#gridid#()
+{
+	if(BeforeSave(mygrid#gridid#))
+	{
+		mygrid#gridid#.editStop();
+    
+		sm('dlgSaving',200,100);
+		//alert(myDataProcessor.updatedRows.length);
+		//if(gridChanged#gridid#)
+		if(myDataProcessor.updatedRows.length > 0)
+		{
+			myDataProcessor.sendData();
+		}
+		else
+			hm('dlgSaving');
+    }
+    //document.getElementById("divStatus").innerHTML = "Saved";
+}
+
+function leavePage#gridid#(e)
+{
+    if(gridChanged#gridid#)
+    {
+        if(!e) e = window.event;
+	    //e.cancelBubble is supported by IE - this will kill the bubbling process.
+	    //e.cancelBubble = true;
+	    e.returnValue = 'You have unsaved changes.'; //This is displayed on the dialog
+
+	    if (e.stopPropagation) {
+		    e.stopPropagation();
+		    e.preventDefault();
+	    }
+    }
+}
+
+function viewnote#gridid#(chkVal)
+{
+	sm('dlgNote',200,100);
+}
+
+dhtmlXGridObject.prototype.registerLookup#gridid#=function(col,vals){
+
+    if(arrColumnLookups#gridid# == null)
+        arrColumnLookups#gridid# = new Array(mygrid#gridid#.getColumnsNum());
+		
+    arrColumnLookups#gridid#[col] = vals;
+};
+dhtmlXGridObject.prototype.registerLookupmywork#gridid#=function(col,vals){
+
+    if(arrColumnLookups#gridid# == null)
+        arrColumnLookups#gridid# = new Array(mygrid#gridid#.getColumnsNum());
+		
+    arrColumnLookups#gridid#[col] = vals;
+};
+function IsNumeric(sText)
+{
+   var ValidChars = "0123456789.";
+   var IsNumber=true;
+   var Char;
+
+ 
+	for (i = 0; i < sText.length && IsNumber == true; i++) 
+	{ 
+		Char = sText.charAt(i); 
+		if (ValidChars.indexOf(Char) == -1) 
+		{
+			IsNumber = false;
+		}
+	}
+   return IsNumber;
+   
+}
+function numberOnly#gridid#(evt) 
+{ 
+	var charCode = (evt.which) ? evt.which : window.event.keyCode;
+	var keyChar = String.fromCharCode(charCode); 
+    var re = /[0-9.]/ 
+    if(charCode == 8)
+    {
+		return true;
+    }
+    if(charCode == 13)
+    {
+		mygrid#gridid#.editStop();
+		return false;
+    }
+    else
+		return re.test(keyChar); 
+}
+
+//====================================================================
+
+
+mygrid#gridid#._in_header_stat_totalsumm=function(tag,index,c){
+	var calck=function(){                                           // define the function which will be used for calculations
+		var summ=0;                                                 // set initial counter value 
+		this.forEachRow(function(id){                         // for each row
+		    var tempval = this.cells(id,index).getValue().toString();        // add row_value
+			if(parseFloat(tempval).toString() != "NaN")
+				summ += parseFloat(tempval);
+
+		})
+		return parseFloat(summ.toFixed(2));
+	}
+	this._stat_in_header(tag,calck,index,c);             //call default statistics handler processor
+}
+
+mygrid#gridid#._in_header_stat_summ=function(tag,index,c){
+	var calck=function(){                                           // define the function which will be used for calculations
+		var summ=0;                                                 // set initial counter value 
+		this.forEachRow(function(id){                         // for each row
+		    var tempval = this.cells(id,index).getValue().toString();        // add row_value
+		    if(tempval.split('|')[0] != "")
+			{
+				var strVals = tempval.split('|');
+
+				for(var i = 0;i<strVals.length && strVals[i] != "N";i+=2)
+				{
+					if(parseFloat(strVals[i + 1]).toString() != "NaN")
+					{
+						summ += parseFloat(strVals[i + 1]);
+					}
+				}
+			}
+			else
+				if(parseFloat(tempval).toString() != "NaN")
+					summ += parseFloat(tempval);
+		})
+		return parseFloat(summ.toFixed(2));
+	}
+	this._stat_in_header(tag,calck,index,c);             //call default statistics handler processor
+}
+
+//=========================timeeditor========================
+function eXcell_timeeditor(cell)
+{
+    if (cell)
+    {
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+        if(!this.grid._grid_mc)
+        {
+			var z=document.getElementById("timeeditorgrid#gridid#");
+
+			z.onclick=function(e){ (e||event).cancelBubble=true; }
+			
+			if (_isIE) { 
+				z.style.position="absolute"
+				z.style.top="0px"
+			}
+			document.body.insertBefore(z,document.body.firstChild);
+ 
+			this.grid._grid_mc = z;
+		}
+    }
+    this.setValue=function(val){
+
+		var strVal = "&nbsp;";
+		var hours = 0;
+		
+		if(val.split('|')[0] != "")
+		{
+			var strVals = val.split('|');
+			
+
+			for(var i = 0;i<strVals.length;i+=2)
+			{
+				if(strVals[i] == "N")
+				{
+					this.cell._notes = strVals[i+1];
+				}
+				else
+				{
+					hours += parseFloat(strVals[i + 1]);
+				}
+			}
+		}
+		
+		if(this.cell._notes != null && this.cell._notes != "")
+			this.setCValue("*" + hours);
+		else
+			this.setCValue(hours);
+        
+        this.cell._value = hours;
+        this.cell._values = val;
+        this.cell._innerhtml = true;
+        //this.val = val;
+    }
+
+    this.getValue=function(){
+		return this.cell._values;
+    }
+    this.edit=function(){
+
+		this.val=this.getValue();
+		
+		try
+		{
+			document.getElementById("timeeditor-#gridid#-N").value = "";
+		}catch(e){}
+		
+		var sRow = this.grid.getSelectedRowId();
+		
+		var disabled = this.grid.getUserData(sRow, "tsdisabled");
+
+		for(var i = 0;i<mygrid#gridid#.getColumnsNum();i++)
+        {
+			if(mygrid#gridid#.getColumnId(i) == "<![CDATA[Title]]>")
+			{
+				document.getElementById("timeeditortitle#gridid#").innerHTML = mygrid#gridid#.cells(sRow,i).getValue();
+			}
+        }
+		
+		var colLabel = this.grid.getColumnId(this.grid.getSelectedCellIndex());
+		
+		document.getElementById("timeeditordate#gridid#").innerHTML = colLabel.substring(8).replace(/_/g,"/");
+		
+		if(this.val.split('|')[0] != "")
+		{
+			var strVals = this.val.split('|');
+			
+			for(var i = 0;i<strVals.length;i+=2)
+			{
+				var inp = document.getElementById("timeeditor-#gridid#-" + strVals[i]);
+				if(inp != null)
+					inp.value = strVals[i + 1];
+					
+				if(disabled == "1")
+					inp.disabled = true;
+				else if(mygrid#gridid#Edit)
+					inp.disabled = false;
+			}
+		}
+		
+		//Position
+		var arPos = this.grid.getPosition(this.cell);
+
+		this.grid._grid_mc.style.position = "absolute";
+
+		if(arPos[0] + 200 > document.body.clientWidth)
+			this.grid._grid_mc.style.left=(document.body.clientWidth - 210)  + "px";
+		else
+			this.grid._grid_mc.style.left=arPos[0] + "px";
+		
+		if((arPos[1] + 100) > (document.body.clientHeight + document.body.scrollTop))
+			this.grid._grid_mc.style.top = (document.body.clientHeight + document.body.scrollTop - 105) + "px";
+		else
+			this.grid._grid_mc.style.top=arPos[1]  + "px";
+			
+		this.grid._grid_mc.style.display="";
+		
+		this.grid._grid_mc.style.position = "absolute";
+		try
+		{
+			setTimeout("document.getElementById(firsteditorbox#gridid#).select()",10);
+		}catch(e){}
+    }
+    this.detach=function(){
+		
+		this.grid._grid_mc.style.display="none";
+		
+		var values=this.cell._values;
+		
+		var newValues = "";
+		
+		var newValue = 0;
+		
+		if(values.split('|')[0] != "")
+		{
+			var strVals = values.split('|');
+			
+			for(var i = 0;i<strVals.length;i+=2)
+			{
+				var inp = document.getElementById("timeeditor-#gridid#-" + strVals[i]);
+				if(inp != null)
+				{
+					if((parseFloat(inp.value) == "NaN" || inp.value == "") && strVals[i] != "N")
+						newValues += "|" + strVals[i] + "|0";
+					else
+						newValues += "|" + strVals[i] + "|" + inp.value;
+				}
+			}
+			
+			if(newValues.length > 1)
+				newValues = newValues.substring(1);
+		}
+		
+        this.setValue(newValues);
+
+        return this.val != this.getValue();
+		
+    }
+}
+eXcell_timeeditor.prototype = new eXcell;
+//============================================================
+
+initmb();
+window.onbeforeunload=leavePage#gridid#;
+
+</script>

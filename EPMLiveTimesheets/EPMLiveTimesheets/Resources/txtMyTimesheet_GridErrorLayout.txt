@@ -1,0 +1,22 @@
+<Grid>
+	<Cfg id="err" Code="GTACCNPSQEBSLC" Version="4.0" />
+	<Cfg SuppressCfg="1" Style="GM" />
+	<Cfg MainCol="Title" NameCol="Title" />
+	<Cfg ConstHeight="1" ConstWidth="0" />
+	<Cfg Undo="0" />
+	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" />
+	<Cfg Searching="1" />
+	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
+	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="20" MaxRowHeight="20" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
+	<Cfg Paging="2" NoPager="1" ChildParts="2" />
+	<Toolbar Visible="0" CanHide="0" />
+	<Panel Visible="0" CanHide="0" />
+	<Head><Filter CanHide="0" CanEdit="1" /></Head>
+	<LeftCols>
+		<C Name="Error" Visible="1" CanFilter="0" CanGroup="0" CanHide="0" />
+	</LeftCols>
+	<Header  />
+	<Foot>
+		<I Kind='Data' Error=''/>
+	</Foot>
+</Grid>

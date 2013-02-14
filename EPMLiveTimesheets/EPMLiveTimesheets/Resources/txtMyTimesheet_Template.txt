@@ -1,0 +1,43 @@
+<GroupTemplate Id="Ribbon.Templates.MyTimesheetTemplate">
+	<Layout Title="LargeMediumSmall" LayoutTitle="LargeMediumSmall">
+		<OverflowSection Type="OneRow" TemplateAlias="oL" DisplayMode="Large"/>
+		<OverflowSection Type="ThreeRow" TemplateAlias="oM" DisplayMode="Medium"/>
+		<OverflowSection Type="ThreeRow" TemplateAlias="oS" DisplayMode="Small"/>
+	</Layout>
+
+	<Layout Title="SmallSmall" LayoutTitle="SmallSmall">
+		<Section Alignment="Top" Type="OneRow">
+		<Row>
+			<ControlRef DisplayMode="Large" TemplateAlias="cust1" />
+			<ControlRef DisplayMode="Large" TemplateAlias="cust2" />
+		</Row>
+		</Section>
+		<OverflowSection Type="OneRow" TemplateAlias="o3" DisplayMode="Large"/>
+		<OverflowSection Type="ThreeRow" TemplateAlias="oM1" DisplayMode="Medium"/>
+		<OverflowSection Type="ThreeRow" TemplateAlias="oM" DisplayMode="Small"/>
+		<OverflowSection Type="ThreeRow" TemplateAlias="o2" DisplayMode="Small"/>
+	</Layout>
+
+
+	<Layout Title="PeriodView">
+		<Section Type="ThreeRow">
+			<Row>
+			  <ControlRef TemplateAlias="row1control" DisplayMode="Medium" />
+			  <Strip>            
+			    <ControlRef TemplateAlias="previousPage" DisplayMode="Small" />
+			    <ControlRef TemplateAlias="currentPage" DisplayMode="Medium" />
+			    <ControlRef TemplateAlias="nextPage" DisplayMode="Small" />
+			  </Strip>
+			</Row>
+			<Row>
+			  
+			</Row>
+			<Row>
+			  <ControlRef TemplateAlias="row2control1" DisplayMode="Medium" />
+			  <ControlRef TemplateAlias="row2control2" DisplayMode="Medium" />
+			</Row>            
+			
+		</Section>
+	</Layout>
+
+</GroupTemplate>
