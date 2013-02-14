@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
+  <Module Name="Project_Summary_Small" List="113" Url="_catalogs/wp">
+    <File Path="Project_Summary_Small\Project_Summary_Small.dwp" Url="Project_Summary_Small.dwp" Type="GhostableInLibrary">
+      <Property Name="Group" Value="WorkEngine Reporting" />
+    </File>
+  </Module>
+</Elements>

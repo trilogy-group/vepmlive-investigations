@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="8f916fa9-1c2d-4416-8036-4a272256e23d" solutionId="8f916fa9-1c2d-4416-8036-4a272256e23d" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveDashboards" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="4e8f5c33-a391-422e-9bc9-914cba82cff2" />
+  </features>
+</package>
