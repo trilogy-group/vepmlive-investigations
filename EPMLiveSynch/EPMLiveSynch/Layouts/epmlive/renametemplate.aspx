@@ -1,0 +1,1 @@
+﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %><%@ Page Language="C#" Inherits="EPMLiveSynch.RenameTemplate"%><%@ OutputCache Location="None" VaryByParam="None" %><%=result%>
