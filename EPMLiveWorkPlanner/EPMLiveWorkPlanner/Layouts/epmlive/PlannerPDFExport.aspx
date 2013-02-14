@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" ContentType="application/pdf" %><% Response.AppendHeader("Content-Disposition","attachment; filename=\"PlannerPDFExport.pdf\"");Response.AppendHeader("Cache-Control","max-age=1, must-revalidate");Response.Write(HttpUtility.HtmlDecode(Request["Data"])); %>

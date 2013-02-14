@@ -1,0 +1,276 @@
+<Tab Id="Ribbon.WorkViews" Title="Views" Description="Views" Sequence="1115">
+    <Scaling Id="Ribbon.WorkViews.Scaling">
+
+        <MaxSize Id="Ribbon.WorkViews.StandardGroup.MaxSize" GroupId="Ribbon.WorkViews.StandardGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkViews.StandardGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkViews.StandardGroup" Size="SmallSmall" />
+
+		<MaxSize Id="Ribbon.WorkViews.GanttGroup.MaxSize" GroupId="Ribbon.WorkViews.GanttGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkViews.GanttGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkViews.GanttGroup" Size="SmallSmall" />
+
+		<MaxSize Id="Ribbon.WorkViews.WorkViewsGroup.MaxSize" GroupId="Ribbon.WorkViews.WorkViewsGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkViews.WorkViewsGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkViews.WorkViewsGroup" Size="SmallSmall" />
+
+    </Scaling>
+    <Groups Id="Ribbon.WorkViews.Groups">
+
+        <Group Id="Ribbon.WorkViews.StandardGroup" Title="Share" Sequence="10" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkViews.StandardGroup.Controls">
+
+				<Button
+				Id="Ribbon.WorkViews.StandardGroup.SaveButton"
+				Sequence="10"
+				Description="Opens a modal dialog box"
+				Command="Ribbon.WorkPlanner.SaveButton"
+				Image32by32="/_layouts/images/save32x32.png"
+				LabelText="Save"
+				TemplateAlias="cust1"/>
+
+				<Button
+				Id="Ribbon.WorkViews.StandardGroup.PublishButton"
+				Sequence="20"
+				Image32by32="/_layouts/epmlive/images/publish.PNG"
+				Description="Simple alert button"
+				Command="Ribbon.WorkPlanner.PublishButton"
+				LabelText="Publish"
+				TemplateAlias="cust2"/>
+
+				<Button
+				Id="Ribbon.WorkViews.StandardGroup.CloseButton"
+				Sequence="30"
+				Image32by32="/_layouts/epmlive/images/close32.gif"
+				Description="Simple alert button"
+				Command="Ribbon.WorkPlanner.CloseButton"
+				LabelText="Close"
+				TemplateAlias="o3"/>
+
+				<Button
+				Id="Ribbon.WorkViews.StandardGroup.PrintButton"
+				Sequence="40"
+				Image16by16="/_layouts/epmlive/images/print.gif"
+				Command="Ribbon.WorkPlanner.PrintButton"
+				LabelText="Print"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.StandardGroup.ExcelButton"
+				Sequence="50"
+				Image16by16="/_layouts/epmlive/images/excel16.png"
+				Command="Ribbon.WorkPlanner.ExcelButton"
+				LabelText="Export Excel"
+				TemplateAlias="oM"/>
+
+			</Controls>
+        </Group>
+
+		<Group Id="Ribbon.WorkViews.WorkViewsGroup" Title="Views" Sequence="60" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkViews.WorkViewsGroup.Controls">
+			
+				<Label
+                Id="Ribbon.WorkViews.WorkViewsGroup.CurrentView"
+                Sequence="5"
+                Command="Ribbon.WorkPlanner.CurrentView"
+                LabelText="Current View:"
+                TemplateAlias="oM1"/>  
+
+				<DropDown
+                Id="Ribbon.WorkViews.WorkViewsGroup.DisplayView"
+                Sequence="6"
+                Command="Ribbon.WorkPlanner.DisplayView"
+                PopulateDynamically="true"
+                PopulateOnlyOnce="false"
+                PopulateQueryCommand="Ribbon.WorkPlanner.PopulateDisplayView"
+                QueryCommand="Ribbon.WorkPlanner.QueryDisplayView"
+                Width="75px"
+                TemplateAlias="oM1">
+              </DropDown>
+
+				<Button
+				Id="Ribbon.WorkViews.WorkViewsGroup.SaveView"
+				Sequence="10"
+				Image16by16="/_layouts/images/createview.gif"
+				Command="Ribbon.WorkPlanner.SaveView"
+				LabelText="Save View"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkViews.WorkViewsGroup.EditView"
+				Sequence="20"
+				Image16by16="/_layouts/epmlive/images/editview.gif"
+				Command="Ribbon.WorkPlanner.EditView"
+				LabelText="Rename View"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkViews.WorkViewsGroup.DeleteView"
+				Sequence="30"
+				Image16by16="/_layouts/epmlive/images/deleteview.gif"
+				Command="Ribbon.WorkPlanner.DeleteView"
+				LabelText="Delete View"
+				TemplateAlias="oM"/>
+
+				
+
+			  <Button
+				Id="Ribbon.WorkViews.WorkViewsGroup.SelectColumns"
+				Sequence="70"
+				Image16by16="/_layouts/epmlive/images/selectcolumn.gif"
+				Command="Ribbon.WorkPlanner.SelectColumns"
+				LabelText="Select Columns"
+				TemplateAlias="oM"/>
+				
+				<FlyoutAnchor Id="Ribbon.WorkViews.WorkViewsGroup.Expand" Sequence="75" PopulateDynamically="false" CommandValueId="-1" Command="Ribbon.WorkPlanner.Expand" Image16by16="/_layouts/epmlive/images/expand.gif" LabelText="Expand/Collapse" TemplateAlias="oM">
+                <Menu Id="Ribbon.WorkViews.WorkViewsGroup.Expand.Menu">
+                <MenuSection Id="Ribbon.WorkViews.WorkViewsGroup.Expand.Menu.Scope" Sequence="10" DisplayMode="Menu16">
+                <Controls Id="Ribbon.WorkViews.WorkViewsGroup.Expand.Menu.Scope.Controls">
+
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l0" Command="Ribbon.WorkPlanner.Expand" CommandValueId="0" LabelText="Collapse All" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l1" Command="Ribbon.WorkPlanner.Expand" CommandValueId="1" LabelText="Level 1" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l2" Command="Ribbon.WorkPlanner.Expand" CommandValueId="2" LabelText="Level 2" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l3" Command="Ribbon.WorkPlanner.Expand" CommandValueId="3" LabelText="Level 3" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l4" Command="Ribbon.WorkPlanner.Expand" CommandValueId="4" LabelText="Level 4" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l5" Command="Ribbon.WorkPlanner.Expand" CommandValueId="5" LabelText="Level 5" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l6" Command="Ribbon.WorkPlanner.Expand" CommandValueId="6" LabelText="Level 6" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l7" Command="Ribbon.WorkPlanner.Expand" CommandValueId="7" LabelText="Level 7" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l8" Command="Ribbon.WorkPlanner.Expand" CommandValueId="8" LabelText="Level 8" TemplateAlias="o1" />
+					<Button Id="Ribbon.WorkViews.WorkViewsGroup.Expand.l99" Command="Ribbon.WorkPlanner.Expand" CommandValueId="99" LabelText="Expand All" TemplateAlias="o1" />
+
+                </Controls>
+                </MenuSection>
+                </Menu>
+                </FlyoutAnchor>
+
+				<ToggleButton
+				Id="Ribbon.WorkViews.WorkViewsGroup.ShowFilters"
+				Sequence="80"
+				Image16by16="/_layouts/epmlive/images/filter.png"
+				Command="Ribbon.WorkPlanner.ShowFilters"
+				QueryCommand="Ribbon.WorkPlanner.QueryShowFilters"
+				LabelText="Show Filters"
+				TemplateAlias="oM"/>
+				
+				<!--<ToggleButton
+				Id="Ribbon.WorkViews.WorkViewsGroup.ShowGrouping"
+				Sequence="81"
+				Image16by16="/_layouts/epmlive/images/grouping.gif"
+				Command="Ribbon.WorkPlanner.ShowGrouping"
+				LabelText="Show Grouping"
+				QueryCommand="Ribbon.WorkPlanner.QueryShowGrouping"
+				TemplateAlias="oM"/>-->
+
+				<ToggleButton
+				Id="Ribbon.WorkViews.WorkViewsGroup.ShowAssignments"
+				Sequence="82"
+				Image16by16="/_layouts/epmlive/images/ShowAssignments.gif"
+				Command="Ribbon.WorkPlanner.ShowAssignments"
+				QueryCommand="Ribbon.WorkPlanner.QueryShowAssignments"
+				LabelText="Show Assignments"
+				TemplateAlias="oM"/>
+
+				<!--<ToggleButton
+				Id="Ribbon.WorkViews.WorkViewsGroup.ShowSummary"
+				Sequence="83"
+				Image16by16="/_layouts/epmlive/images/ShowSummary.gif"
+				Command="Ribbon.WorkPlanner.ShowSummary"
+				LabelText="Show Summary"
+				QueryCommand="Ribbon.WorkPlanner.QueryShowSummary"
+				TemplateAlias="oM"/>-->
+
+				<Button
+				Id="Ribbon.WorkViews.WorkViewsGroup.ClearSort"
+				Sequence="82"
+				Image16by16="/_layouts/epmlive/images/clearsort.gif"
+				Command="Ribbon.WorkPlanner.ClearSort"
+				LabelText="Clear Sorting"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkViews.WorkViewsGroup.CreateColumn"
+				Sequence="90"
+				Image16by16="/_layouts/epmlive/images/CreateColumn.gif"
+				Command="Ribbon.WorkPlanner.CreateColumn"
+				LabelText="Create Column"
+				TemplateAlias="oM"/>
+
+				<ToggleButton
+					Id="Ribbon.WorkPlanner.ResourcesGroup.ShowGrid"
+					Sequence="100"
+					Image16by16="/_layouts/epmlive/images/allocgrid16.gif"
+					Command="Ribbon.WorkPlanner.ShowResGrid"
+					LabelText="Resource Usage"
+					QueryCommand="Ribbon.WorkPlanner.QueryShowResGrid"
+					TemplateAlias="oM"/>
+
+					<ToggleButton
+					Id="Ribbon.WorkPlanner.InsertGroup.ShowBacklog"
+					Sequence="42"
+					Image16by16="/_layouts/epmlive/images/backlog16.gif"
+					Command="Ribbon.WorkPlanner.ShowBacklog"
+					LabelText="Show Backlog"
+					QueryCommand="Ribbon.WorkPlanner.QueryShowBacklog"
+					TemplateAlias="oM"/>
+
+			</Controls>
+        </Group>
+
+		<Group Id="Ribbon.WorkViews.GanttGroup" Title="Gantt" Sequence="70" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkViews.GanttGroup.Controls">
+
+				<Button
+				Id="Ribbon.WorkViews.GanttGroup.ZoomIn"
+				Sequence="10"
+				Description=""
+				Command="Ribbon.WorkPlanner.ZoomIn"
+				Image32by32="/_layouts/epmlive/images/zoomin.gif"
+				LabelText="Zoom In"
+				TemplateAlias="cust1"/>
+
+				<Button
+				Id="Ribbon.WorkViews.GanttGroup.ZoomOut"
+				Sequence="20"
+				Image32by32="/_layouts/epmlive/images/zoomout.gif"
+				Description=""
+				Command="Ribbon.WorkPlanner.ZoomOut"
+				LabelText="Zoom Out"
+				TemplateAlias="cust2"/>
+
+				<Button
+				Id="Ribbon.WorkViews.GanttGroup.ZoomFit"
+				Sequence="30"
+				Image16by16="/_layouts/epmlive/images/zoomfit.gif"
+				Command="Ribbon.WorkPlanner.ZoomFit"
+				LabelText="Zoom-Fit"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkViews.GanttGroup.ScrollTo"
+				Sequence="40"
+				Image16by16="/_layouts/epmlive/images/ScrollTo.gif"
+				Command="Ribbon.WorkPlanner.ScrollTo"
+				LabelText="Scroll To"
+				TemplateAlias="oM"/>
+
+				<ToggleButton
+				Id="Ribbon.WorkViews.GanttGroup.ShowHideGantt"
+				Sequence="50"
+				Image16by16="/_layouts/epmlive/images/showgantt.gif"
+				Command="Ribbon.WorkPlanner.ShowHideGantt"
+				LabelText="Show Gantt"
+				QueryCommand="Ribbon.WorkPlanner.QueryShowGantt"
+				TemplateAlias="oM"/>
+
+				<ToggleButton
+				  Command="Ribbon.WorkPlanner.ShowBaseline"
+				  Id="Ribbon.WorkViews.GanttGroup.ShowBaseline"
+				  Sequence="60"
+				  LabelText="Show Baseline"
+				  Image16by16="/_layouts/epmlive/images/baseline.gif"
+				  QueryCommand="Ribbon.WorkPlanner.QueryShowBaseline"
+				  TemplateAlias="oM"
+				/>
+
+			</Controls>
+        </Group>
+
+
+    </Groups>
+    </Tab>

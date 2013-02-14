@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+	<CustomAction
+		  Id="EPMLive.Workgroup.Admin.Summary"
+		  GroupId="EPMLive.Workgroup.Admin"
+		  Location="Microsoft.SharePoint.SiteSettings"
+		  Sequence="2004"
+		  Title="Work Planner Settings">
+		<UrlAction Url="_layouts/epmlive/workplannerconfig.aspx" />
+	</CustomAction>
+</Elements>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="6d504b47-8bc2-439f-bcf7-bdb95c349aa7" solutionId="6d504b47-8bc2-439f-bcf7-bdb95c349aa7" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveWorkPlanner" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="13a0b14d-4b1c-4f44-8264-02cea4345fa4" />
+    <featureReference itemId="7cb6a192-30de-441c-b0b0-f70c72785300" />
+  </features>
+  <projectItems>
+    <projectItemReference itemId="3ac07b86-ac50-4d97-a00a-719143fd6fe6" />
+    <projectItemReference itemId="51021b6f-4911-4c89-986d-0d6182309123" />
+  </projectItems>
+</package>

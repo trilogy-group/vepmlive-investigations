@@ -1,0 +1,82 @@
+<Grid>
+	<Cfg id='WorkPlannerGrid' SuppressCfg='1'  DateStrings='2' ConstWidth="1" ConstHeight="1"/>
+	<Cfg MainCol='Title' NameCol='Title' Style='Standard' Paging="2" PageLength="10" MaxPages="2"/>
+	<Cfg Undo='1'/>
+	<Cfg ExportType='Expanded,Outline'/>
+	<Cfg ChildParts='0'/>
+	<Cfg PrintCols='1'/>
+	<Cfg ExportCols='1'/>
+	<Cfg ShowDeleted='0'/>
+	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' AutoIdPrefix=''/>
+	<Cfg SelectingCells='0'/>
+	<Cfg Searching='1'/>
+	<Cfg StaticCursor='1'/>
+	<Pager Width="80" Visible="0"/>
+	<Toolbar Visible='0'></Toolbar>
+	<Panel Visible='1' Delete='0' Move='1' Select='0' NoFormatEscape='1' CanHide='0'/>
+	<Actions OnShiftDragCell='FillCells'/>
+	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MaxRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2' MinTagHeight="100"/>
+	<Cfg Code="GTACCNPSQEBSLC"/>
+	<LeftCols>
+		<C Name="Notifications" Width="80" Wrap="0" CanHide="0" Type="Html" CanMove="0" Visible="1" CanSort="0" NoColor="1"/>
+	</LeftCols>
+	<Cols>
+		
+	</Cols>
+	<RightCols>
+		
+		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttFlags="Deadline" GanttComplete="PercentComplete" Visible="1" GanttDuration="Duration" GanttHideExclude="0" GanttAncestors="Predecessors" GanttDescendants="Descendants" GanttChartRound="w" GanttEdit="Main,Dependency" GanttRight="1" GanttSlack="Slack" GanttHeader1="w#dddddd MMMM yyyy" GanttHeader2="d#ddddd" /> 
+		<C Name="G" GanttCorrectDependenciesFixed="1"  GanttCorrectDependencies="1" GanttIncorrectDependencies="2"/> 
+		<C Name="G" GanttChartMinStart="1990-1-1" GanttChartMaxEnd="2100-1-1" GanttZoom="weeks and days" GanttDataUnits="28800000" GanttEndLast="0" Width="200" /> 
+		<C Name="G" GanttFlow="BaselineDateRange" CanExport="0"/>
+		<C Name="G" GanttResourcesAssign="4" GanttResourcesExtra="0" GanttResources="USAGE" GanttAvailabilityMax="1" GanttAvailabilityExclude="0" />
+	</RightCols>
+	<Def>
+
+		<D Name='Folder' TitleHtmlPrefix='&lt;img src="/_layouts/epmlive/images/folder.gif"&gt;' CanDrag='0' Class='BoldCell' Calculated="1" CanFilter='1'/>
+		<D Name="Folder" GGanttClass="GanttG" GGanttIcons="1" GGanttEdit="0" GGanttHover="0" CanExpand="0"/>
+		<D Name="Folder" PercentCompleteFormula="ganttpercent('StartDate','DueDate','d')" DurationFormula="ganttduration('G')"/>
+		<D Name="Folder" Class="SummaryTask" CanSelect='0' />
+		<D Name="Folder"  WorkCapacityFormula="sum()" ResourcePointsFormula="sum()"/>
+
+		<D Name="Summary" Expanded="1" Calculated="1"/> 
+		<D Name="Summary" PercentCompleteFormula="ganttpercent('StartDate','DueDate','d')" /> 
+		<D Name="Summary" GGanttIcons="1" GGanttClass="GanttG" GGanttEdit="0" GGanttHover="0" AcceptDef="Task,Summary" DurationFormula="ganttduration('G')" Class="SummaryTask"/> 
+
+		<D Name="Milestone" Calculated="1" DurationCanEdit="0" StartDateCanEdit="0"/>
+
+		<D Name="Task" Calculated='0' DurationFormula="ganttduration('G')"/>
+
+		<D Name="Assignment" Class="Assignment" CanFilter="0" TaskTypeCanEdit="0" CanDrag='0' CanSelect='0' DurationFormula="ganttduration('G')" AcceptDef="Assignment" Visible="0"/>
+		
+		<D Name='Group' Calculated='1'/>
+
+		<D Name="RES" CanDelete="0" CanSelect="0" Calculated="1" CanEdit="0" CalcOrder="A,B,C,D,E,F,G" GGanttAvailability="Title#3#Assignment,Title#1#Assignment,Title#8#Assignment" GGanttAvailabilityFormat="0.#" /> 
+
+	</Def>
+	<Solid>
+		<Group Visible='0' id='GroupRow'/> 
+	</Solid>
+	<Header Visible='1' Title='Task Name' G='Gantt' GNoColor='0' Notifications=""/>
+
+	<Zoom>
+
+		<Z Name="z1" GanttUnits="M6" GanttChartRound="y" GanttWidth="18" GanttWidthEx="76" GanttBackground=";y#1/1/2008" GanttHeader1="y#yyyy" GanttHeader2="M6#MMMMMM" /> 
+		<Z Name="z2" GanttUnits="M3" GanttChartRound="y" GanttWidth="24" GanttWidthEx="101" GanttBackground=";y#1/1/2008" GanttHeader1="y#yyyy" GanttHeader2="M3#MMMMM" /> 
+		<Z Name="z3" GanttUnits="M" GanttChartRound="y" GanttWidth="18" GanttWidthEx="76" GanttBackground=";M6#1/1/2008" GanttHeader1="M6#MMMMMM. yyyy" GanttHeader2="M#MM" /> 
+		<Z Name="z4" GanttUnits="M" GanttChartRound="M6" GanttWidth="28" GanttWidthEx="118" GanttBackground=";M3#1/1/2008" GanttHeader1="M3#MMMMM. yyyy" GanttHeader2="M#MMM" /> 
+		<Z Name="z5" GanttUnits="d" GanttChartRound="M" GanttWidth="3" GanttWidthEx="12.6" GanttBackground=";M#1/1/2008" GanttHeader1="M#MMM yyyy" GanttHeader2="w#d." /> 
+		<Z Name="z6" GanttUnits="d" GanttChartRound="w" GanttWidth="18" GanttWidthEx="76" GanttHeader1="w#'week 'ddddddd' ' MMMM yyyy" GanttHeader2="d#%d" GanttHeader3="d#ddddd" /> 
+		<Z Name="days and hours" GanttUnits="h" GanttChartRound="d" GanttWidth="18" GanttWidthEx="76" GanttHeader1="d#dddd dddddd MMMM yyyy" GanttHeader2="h#HH"/>
+	</Zoom>
+	<Head>
+		<I Kind='Filter'  Visible='0'/>
+	</Head>
+	<Foot>
+		<I Kind='Data' CanEdit='1' id='NewTask' Title='New Item' Class='NewTask' NoColor='1' NoUpload='1' NoColorState='1' Def="Task" CanMove="0" CanDrag="0" CanSelect="0" CanExport="0" DefaultDate="2/2/2012"/>
+	</Foot>
+	<Resources>
+	  
+	</Resources>
+
+</Grid>

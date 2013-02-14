@@ -1,0 +1,1 @@
+TreeGrid( { Debug:"", Layout:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAgileLayout",Dataxml:"<%=sPlannerLayoutParam%>" } }, SuppressMessage:1 }, "agileDiv" ); 
