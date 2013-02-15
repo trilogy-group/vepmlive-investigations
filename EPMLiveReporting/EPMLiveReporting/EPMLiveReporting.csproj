@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B56160FE-490C-462A-BC9A-FEFFD2F1487C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EPMLiveReportsAdmin</RootNamespace>
+    <AssemblyName>EPMLiveReportsAdmin</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetOfficeVersion>15.0</TargetOfficeVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <SandboxedSolution>False</SandboxedSolution>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="API\DataManager.cs" />
+    <Compile Include="API\Errors.cs" />
+    <Compile Include="API\ReportingScope.cs" />
+    <Compile Include="API\ReportManager.cs" />
+    <Compile Include="DbFactory.cs" />
+    <Compile Include="EPMData.cs" />
+    <Compile Include="epmlive\ReportDatabases.aspx.cs">
+      <DependentUpon>ReportDatabases.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="epmlive\ReportDatabases.aspx.designer.cs">
+      <DependentUpon>ReportDatabases.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="epmlive\SetupReportDatabase.aspx.cs">
+      <DependentUpon>SetupReportDatabase.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="epmlive\SetupReportDatabase.aspx.designer.cs">
+      <DependentUpon>SetupReportDatabase.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EPMMenu.cs" />
+    <Compile Include="Jobs\CollectJob.cs" />
+    <Compile Include="Jobs\RefreshSec.cs" />
+    <Compile Include="Jobs\SnapshotJob.cs" />
+    <Compile Include="Layouts\EPMLive\Action.aspx.cs">
+      <DependentUpon>Action.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\Action.aspx.designer.cs">
+      <DependentUpon>Action.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\AllSchedules.aspx.cs">
+      <DependentUpon>AllSchedules.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\AllSchedules.aspx.designer.cs">
+      <DependentUpon>AllSchedules.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\AllSnapshots.aspx.cs">
+      <DependentUpon>AllSnapshots.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\AllSnapshots.aspx.designer.cs">
+      <DependentUpon>AllSnapshots.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\EventAudit.aspx.cs">
+      <DependentUpon>EventAudit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\EventAudit.aspx.designer.cs">
+      <DependentUpon>EventAudit.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ListMappings.aspx.cs">
+      <DependentUpon>ListMappings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ListMappings.aspx.designer.cs">
+      <DependentUpon>ListMappings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ReportLog.aspx.cs">
+      <DependentUpon>ReportLog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ReportLog.aspx.designer.cs">
+      <DependentUpon>ReportLog.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ReportSchedule.aspx.cs">
+      <DependentUpon>ReportSchedule.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ReportSchedule.aspx.designer.cs">
+      <DependentUpon>ReportSchedule.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\SetupListMapping.aspx.cs">
+      <DependentUpon>SetupListMapping.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\SetupListMapping.aspx.designer.cs">
+      <DependentUpon>SetupListMapping.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\Snapshot.aspx.cs">
+      <DependentUpon>Snapshot.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\Snapshot.aspx.designer.cs">
+      <DependentUpon>Snapshot.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\UpgradeReportingDB.aspx.cs">
+      <DependentUpon>UpgradeReportingDB.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\UpgradeReportingDB.aspx.designer.cs">
+      <DependentUpon>UpgradeReportingDB.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ViewLogDetail.aspx.cs">
+      <DependentUpon>ViewLogDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\ViewLogDetail.aspx.designer.cs">
+      <DependentUpon>ViewLogDetail.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListBiz.cs" />
+    <Compile Include="ListEvents.cs" />
+    <Compile Include="ListRefresh.cs" />
+    <Compile Include="LstEvents.cs" />
+    <Compile Include="MyWorkListEvents.cs" />
+    <Compile Include="MyWorkReportData.cs" />
+    <Compile Include="ProcessSecurity.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ReportBiz.cs" />
+    <Compile Include="ReportData.cs" />
+    <Compile Include="ReportingAPI.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="epmlive\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{73ab6fbc-92b9-4ed6-9d9e-bbf8b1ee8c62}</SharePointProjectItemId>
+    </None>
+    <None Include="key.snk" />
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{805e2070-4cdf-4f20-9a9a-296da0e466a4}</SharePointProjectItemId>
+    </None>
+    <None Include="Package\Package.package">
+      <PackageId>{823cf7cc-3c12-47a3-9f0a-6b69c391b915}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+    </None>
+    <None Include="TEMPLATE\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{01102227-0b21-4654-b05c-cdbc85df434e}</SharePointProjectItemId>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="epmlive\ReportDatabases.aspx" />
+    <Content Include="epmlive\SetupReportDatabase.aspx" />
+    <Content Include="Layouts\EPMLive\Action.aspx" />
+    <Content Include="Layouts\EPMLive\AllSchedules.aspx" />
+    <Content Include="Layouts\EPMLive\AllSnapshots.aspx" />
+    <Content Include="Layouts\EPMLive\EventAudit.aspx" />
+    <Content Include="Layouts\EPMLive\images\EPMAudit.GIF" />
+    <Content Include="Layouts\EPMLive\images\EPMEdit.GIF" />
+    <Content Include="Layouts\EPMLive\images\EPMRefresh.gif" />
+    <Content Include="Layouts\EPMLive\images\EPMSnapshot.gif" />
+    <Content Include="Layouts\EPMLive\images\EPMViewLog.GIF" />
+    <Content Include="Layouts\EPMLive\images\Icon0.png" />
+    <Content Include="Layouts\EPMLive\images\Icon1.png" />
+    <Content Include="Layouts\EPMLive\images\Icon2.png" />
+    <Content Include="Layouts\EPMLive\ListMappings.aspx" />
+    <Content Include="Layouts\EPMLive\ReportLog.aspx" />
+    <Content Include="Layouts\EPMLive\ReportSchedule.aspx" />
+    <Content Include="Layouts\EPMLive\SetupListMapping.aspx" />
+    <Content Include="Layouts\EPMLive\Snapshot.aspx" />
+    <Content Include="Layouts\EPMLive\UpgradeReportingDB.aspx" />
+    <Content Include="Layouts\EPMLive\ViewLogDetail.aspx" />
+    <None Include="Resources\InitDatabaseCreateTables.sql" />
+    <None Include="Resources\InitDatabaseCreateProcedures.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+</Project>
