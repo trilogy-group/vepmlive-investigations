@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="64ede3b7-292b-4f08-b56f-1452b1834805" solutionId="55aca119-d7c7-494a-b5a7-c3ade07d06eb" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveCore" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <assemblies>
+    <customAssembly location="EPMLiveIntegration.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll" />
+  </assemblies>
   <features>
     <featureReference itemId="3aa712ee-ed28-48bc-8219-1c5a8c9b5fbc" />
     <featureReference itemId="48688ef3-eba8-4e80-8003-4b57cc614561" />

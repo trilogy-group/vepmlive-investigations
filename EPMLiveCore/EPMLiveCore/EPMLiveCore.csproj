@@ -93,6 +93,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Act.cs" />
     <Compile Include="ADSync.cs" />
     <Compile Include="API\APIException.cs" />
@@ -1646,6 +1649,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll">
+      <Link>EPMLiveIntegration.dll</Link>
+    </Content>
     <Content Include="AppsListEvents\Elements.xml" />
     <Content Include="BuildTeam\Elements.xml" />
     <Content Include="CONFIG\webconfig.EPMLIVE.xml" />
