@@ -60,6 +60,9 @@
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Dashboard\Dashboard.cs" />
     <Compile Include="IssueSummary\IssueSummary.cs" />
     <Compile Include="Milestone_Summary\Milestone_Summary.cs" />
