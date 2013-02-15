@@ -49,11 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ColumnProperty.cs" />
     <Compile Include="IIntegrator.cs" />
     <Compile Include="IntegrationLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TransactionTable.cs" />
+    <Compile Include="TransactionTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="WebProperties.cs" />
   </ItemGroup>
   <ItemGroup>
