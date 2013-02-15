@@ -1,0 +1,264 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using EPMLiveCore;
+using EPMLiveCore.ListDefinitions;
+using Microsoft.SharePoint;
+using WorkEnginePPM.Core.DataSync;
+using WorkEnginePPM.Core.Entities;
+
+namespace WorkEnginePPM.Events.DataSync
+{
+    /// <summary>
+    /// List Item Events
+    /// </summary>
+    public class HolidaySyncEvent : SPItemEventReceiver
+    {
+        #region Methods (5) 
+
+        // Public Methods (3) 
+
+        /// <summary>
+        /// An item is being added.
+        /// </summary>
+        public override void ItemAdding(SPItemEventProperties properties)
+        {
+            if (!ValidateRequest(properties)) return;
+
+            if (!properties.List.Fields.ContainsFieldWithInternalName("EXTID")) return;
+
+            try
+            {
+                object schedule;
+                object hours;
+                object title;
+                object date;
+
+                GetFieldValues(properties, out schedule, out hours, out title, out date);
+
+                Guid uniqueId = Guid.NewGuid();
+
+                var newHoliday = new Holiday
+                                     {
+                                         Title = (string) title,
+                                         Date = (string) date,
+                                         Hours = (double) hours,
+                                         UniqueId = uniqueId
+                                     };
+
+                int newHolidayScheduleId = new SPFieldLookupValue((string) schedule).LookupId;
+
+                SPWeb spWeb = properties.Web;
+
+                using (var holidayManager = new HolidayManager(spWeb))
+                {
+                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int) EPMLiveLists.HolidaySchedules);
+                    if (spLists == null) throw new Exception("Cannot find the Holiday Schedules list.");
+
+                    List<HolidaySchedule> holidaySchedules =
+                        holidayManager.GetExistingHolidaySchedules(spLists.First().Items);
+
+                    foreach (HolidaySchedule holidaySchedule in holidaySchedules
+                        .Where(holidaySchedule => holidaySchedule.Id == newHolidayScheduleId))
+                    {
+                        holidaySchedule.Holidays.Add(newHoliday);
+                        break;
+                    }
+
+                    holidayManager.Synchronize(holidaySchedules);
+                    holidayManager.AddPFEHolidays(properties);
+                }
+            }
+            catch (Exception exception)
+            {
+                properties.Cancel = true;
+                properties.ErrorMessage = exception.Message;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+            }
+        }
+
+        /// <summary>
+        /// An item is being deleted.
+        /// </summary>
+        public override void ItemDeleting(SPItemEventProperties properties)
+        {
+            if (!ValidateRequest(properties)) return;
+
+            try
+            {
+                SPWeb spWeb = properties.Web;
+
+                using (var holidayManager = new HolidayManager(spWeb))
+                {
+                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int) EPMLiveLists.HolidaySchedules);
+                    if (spLists == null) throw new Exception("Cannot find the Holiday Schedules list.");
+
+                    List<HolidaySchedule> holidaySchedules =
+                        holidayManager.GetExistingHolidaySchedules(spLists.First().Items);
+
+                    bool holidayToDeleteFound = false;
+
+                    Holiday holidayToDelete = null;
+                    int holidayScheduleIndex = -1;
+
+                    for (int index = 0; index < holidaySchedules.Count; index++)
+                    {
+                        HolidaySchedule holidaySchedule = holidaySchedules[index];
+
+                        foreach (Holiday holiday in holidaySchedule.Holidays
+                            .Where(holiday => holiday.Id == properties.ListItem.ID))
+                        {
+                            holidayToDelete = holiday;
+                            holidayToDeleteFound = true;
+
+                            break;
+                        }
+
+                        if (!holidayToDeleteFound) continue;
+
+                        holidayScheduleIndex = index;
+                        break;
+                    }
+
+                    if (holidayScheduleIndex != -1)
+                    {
+                        holidaySchedules[holidayScheduleIndex].Holidays.Remove(holidayToDelete);
+                    }
+
+                    holidayManager.Synchronize(holidaySchedules);
+                }
+            }
+            catch (Exception exception)
+            {
+                properties.Cancel = true;
+                properties.ErrorMessage = exception.Message;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+            }
+        }
+
+        /// <summary>
+        /// An item is being updated.
+        /// </summary>
+        public override void ItemUpdating(SPItemEventProperties properties)
+        {
+            if (!ValidateRequest(properties)) return;
+
+            if (properties.ListItem == null) return;
+
+            if (!properties.List.Fields.ContainsFieldWithInternalName("EXTID")) return;
+
+            try
+            {
+                object schedule;
+                object hours;
+                object title;
+                object date;
+
+                GetFieldValues(properties, out schedule, out hours, out title, out date);
+
+                SPWeb spWeb = properties.Web;
+
+                using (var holidayManager = new HolidayManager(spWeb))
+                {
+                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int) EPMLiveLists.HolidaySchedules);
+                    if (spLists == null) throw new Exception("Cannot find the Holiday Schedules list.");
+
+                    List<HolidaySchedule> holidaySchedules =
+                        holidayManager.GetExistingHolidaySchedules(spLists.First().Items);
+
+                    bool updatedHolidayFound = false;
+
+                    Holiday updatedHoliday = null;
+                    int updatedHolidayScheduleIndex = -1;
+
+                    for (int index = 0; index < holidaySchedules.Count; index++)
+                    {
+                        HolidaySchedule holidaySchedule = holidaySchedules[index];
+
+                        foreach (Holiday holiday in holidaySchedule.Holidays
+                            .Where(holiday => holiday.Id == properties.ListItem.ID))
+                        {
+                            holiday.Title = (string) title;
+                            holiday.Date = (string) date;
+                            holiday.Hours = (double) hours;
+
+                            updatedHoliday = holiday;
+                            updatedHolidayFound = true;
+
+                            break;
+                        }
+
+                        if (!updatedHolidayFound) continue;
+
+                        updatedHolidayScheduleIndex = index;
+                        break;
+                    }
+
+                    if (updatedHolidayScheduleIndex != -1)
+                    {
+                        holidaySchedules[updatedHolidayScheduleIndex].Holidays.Remove(updatedHoliday);
+                    }
+
+                    var spFieldLookupValue = new SPFieldLookupValue((string) schedule);
+
+                    foreach (HolidaySchedule holidaySchedule in holidaySchedules
+                        .Where(holidaySchedule => holidaySchedule.Id == spFieldLookupValue.LookupId))
+                    {
+                        holidaySchedule.Holidays.Add(updatedHoliday);
+                        break;
+                    }
+
+                    holidayManager.Synchronize(holidaySchedules);
+                    holidayManager.AddPFEHolidays(properties);
+                }
+            }
+            catch (Exception exception)
+            {
+                properties.Cancel = true;
+                properties.ErrorMessage = exception.Message;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+            }
+        }
+
+        // Private Methods (2) 
+
+        /// <summary>
+        /// Gets the field values.
+        /// </summary>
+        /// <param name="properties">The properties.</param>
+        /// <param name="schedule">The schedule.</param>
+        /// <param name="hours">The hours.</param>
+        /// <param name="title">The title.</param>
+        /// <param name="date">The date.</param>
+        private void GetFieldValues(SPItemEventProperties properties, out object schedule, out object hours,
+                                    out object title, out object date)
+        {
+            title = properties.AfterProperties["Title"] ?? properties.ListItem["Title"];
+            date = properties.AfterProperties["Date"] ?? properties.ListItem["Date"];
+            hours = properties.AfterProperties["Hours"] ?? properties.ListItem["Hours"];
+            schedule = properties.AfterProperties["HolidaySchedule"] ?? properties.ListItem["HolidaySchedule"];
+
+            if (title == null) throw new Exception("Title cannot be empty.");
+            if (date == null) throw new Exception("Date cannot be empty.");
+            if (hours == null) throw new Exception("Hours cannot be empty.");
+            if (schedule == null) throw new Exception("Please select a holiday schedule.");
+
+            hours = double.Parse(hours.ToString());
+
+            date = ((string) date).Split('T')[0];
+        }
+
+        /// <summary>
+        /// Validates the request.
+        /// </summary>
+        /// <param name="properties">The properties.</param>
+        /// <returns></returns>
+        private bool ValidateRequest(SPItemEventProperties properties)
+        {
+            return properties.OpenSite().Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null &&
+                   properties.List.Title.Equals("Holidays");
+        }
+
+        #endregion Methods 
+    }
+}
