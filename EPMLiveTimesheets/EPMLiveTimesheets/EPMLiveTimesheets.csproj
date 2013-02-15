@@ -43,7 +43,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
@@ -79,6 +79,9 @@
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="API\TimesheetAPI.cs" />
     <Compile Include="Layouts\epmlive\MyTimesheetAddWork.aspx.cs">
       <DependentUpon>MyTimesheetAddWork.aspx</DependentUpon>
@@ -176,10 +179,10 @@
     <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{888a2922-b8a3-4660-8197-3c2f40c95f52}</SharePointProjectItemId>
     </None>
+    <None Include="EPMLiveLists.snk" />
     <None Include="Features\TimeSheets\TimeSheets.feature">
       <FeatureId>{9773496d-0cc9-45f0-8f89-5b8f12d220db}</FeatureId>
     </None>
-    <None Include="key.snk" />
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{f966bf5e-82ce-4d71-a20c-414a15de250d}</SharePointProjectItemId>
     </None>
