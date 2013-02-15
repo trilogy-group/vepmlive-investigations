@@ -85,6 +85,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ActionBar\ActionBar.cs" />
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
