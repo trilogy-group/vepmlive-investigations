@@ -11,7 +11,7 @@ using Microsoft.SharePoint.WebPartPages;
 
 namespace EPMLiveWebParts
 {
-    /// <summary>
+    /// <summary> 
     /// This web part evaluates all user profiles and displays all those that have 
     /// set a user picture.
     /// </summary>
