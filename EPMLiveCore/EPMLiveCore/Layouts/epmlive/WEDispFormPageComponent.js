@@ -48,7 +48,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
     },
     getGlobalCommands: function () {
         ULS_SP();
-        var $arr = getGlobalCommands();
+        var $arr = [];
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EditItem2');
         Array.add($arr, 'Ribbon.ListForm.Display.Associated.LinkedItems');
         Array.add($arr, 'Ribbon.ListForm.Display.Associated.LinkedItemsButton');

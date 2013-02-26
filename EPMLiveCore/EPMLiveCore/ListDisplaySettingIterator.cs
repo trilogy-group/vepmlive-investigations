@@ -2019,7 +2019,7 @@ namespace EPMLiveCore
                     FormField formField = control as FormField;
                     if (formField.Field.FieldValueType == typeof(DateTime))
                     {
-                        HandleDateField(formField);
+                        //HandleDateField(formField);
                     }
 
                     baseFieldControls.Add(formField);
