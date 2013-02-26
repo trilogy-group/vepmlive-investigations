@@ -19,19 +19,6 @@ function confirmPageLeave(e) {
     }
 }
 
-function fireEvent(element, event) {
-    if (document.createEventObject) {
-        // dispatch for IE
-        var evt = document.createEventObject();
-        return element.fireEvent('on' + event, evt);
-    } else {
-        // dispatch for firefox + others
-        var evt = document.createEvent("HTMLEvents");
-        evt.initEvent(event, true, true); // event type,bubbling,cancelable
-        return !element.dispatchEvent(evt);
-    }
-}
-
 function configureTitleCol(grid) {
     if (grid.Cols["Title"]["RelWidth"] === 100) {
         var width = grid.Cols['Title'].Width;
@@ -66,11 +53,6 @@ Grids.OnGetSortValue = function(grid, row, col, val) {
 Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
         document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
-
-        if (selectMyWorkWebPart) {
-            fireEvent(document.getElementById('MSO_ContentTable'), 'click');
-            fireEvent(document.getElementById('MSOZoneCell_WebPart' + myWorkWebPartQualifier), 'mouseup');
-        }
 
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
 
@@ -122,12 +104,7 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
             if (grid.Cols[col].Type !== 'Date' && col !== 'Flag' && col !== 'Edit' && col !== 'CommentCount' && col !== 'Priority' && col !== 'Complete') {
                 if (row.Kind === 'Data' && row.Def.Name === 'R') {
                     grid.SelectRow(row, !row.Selected);
-                    fireEvent(document.getElementById('MSO_ContentTable'), 'click');
-                    fireEvent(document.getElementById('MSOZoneCell_WebPart' + myWorkWebPartQualifier), 'mouseup');
                     window.RefreshCommandUI();
-                    setTimeout(function () {
-                        fireEvent(document.getElementById('MSOZoneCell_WebPart' + myWorkWebPartQualifier), 'mouseup');
-                    }, 10);
                 }
             }
         }

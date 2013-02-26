@@ -1591,11 +1591,6 @@ function registerEpmLiveResourceGridScript() {
         };
 
         window.Grids.OnReady = function (grid, start) {
-            if ($$.autoFocus) {
-                $$$.utils.fireEvent(document.getElementById('MSO_ContentTable'), 'click');
-                $$$.utils.fireEvent(document.getElementById('MSOZoneCell_WebPart{0}'.format($$.webpartQualifier)), 'mouseup');
-            }
-
             $$.id(grid.id);
 
             $$.views.load();
