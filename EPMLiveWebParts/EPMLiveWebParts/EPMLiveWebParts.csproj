@@ -50,9 +50,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\EPMLiveReporting\Reporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
+    <Reference Include="EPMLiveReportsAdmin">
+      <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -79,9 +78,8 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.SharePoint" />
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
-    <Reference Include="WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\WorkEnginePPM\WorkEnginePPM\bin\Debug\WorkEnginePPM.dll</HintPath>
+    <Reference Include="WorkEnginePPM">
+      <HintPath>..\..\PortfolioEngineCore\WorkEnginePPM\bin\Debug\WorkEnginePPM.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -268,6 +266,7 @@
     <Compile Include="ReportsCenter\ReportsCenter.cs" />
     <Compile Include="ReportViewerSingle\ReportViewerSingle.cs" />
     <Compile Include="ReportViewer\ReportViewer.cs" />
+    <Compile Include="ResourceGrid\ResourceGrid.cs" />
     <Compile Include="ResourcePlanning\ResourcePlanning.cs" />
     <Compile Include="RollupSummary\RollupSummary.cs" />
     <Compile Include="RollupSummary\SummaryRollupToolpart.cs" />
@@ -446,6 +445,10 @@
       <SharePointProjectItemId>{c7bcb468-4749-44fd-8ae1-622f057345c1}</SharePointProjectItemId>
     </None>
     <None Include="ReportViewer\WorkEngineReportViewer.dwp" />
+    <None Include="ResourceGrid\ResourceGrid.dwp" />
+    <None Include="ResourceGrid\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{54454d1c-b739-4b42-9ce7-0485a3503a14}</SharePointProjectItemId>
+    </None>
     <None Include="ResourcePlanning\ResourcePlanning.dwp" />
     <None Include="ResourcePlanning\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{3dd3edf1-7e8b-4597-bac7-bea94b40cffa}</SharePointProjectItemId>
@@ -875,6 +878,7 @@
     <Content Include="ReportsCenter\Elements.xml" />
     <Content Include="ReportViewerSingle\Elements.xml" />
     <Content Include="ReportViewer\Elements.xml" />
+    <Content Include="ResourceGrid\Elements.xml" />
     <Content Include="ResourcePlanning\Elements.xml" />
     <Content Include="Resources\AssignmentPlanner_DelayScript.txt" />
     <Content Include="Resources\MyWorkWebPart_MyWorkDefaultQuery.txt" />
