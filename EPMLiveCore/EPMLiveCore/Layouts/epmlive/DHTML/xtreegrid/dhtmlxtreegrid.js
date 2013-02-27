@@ -230,7 +230,7 @@ dhtmlXGridObject.prototype.kidsXmlFile = "";
 */
 dhtmlXGridObject.prototype.sortTreeRows = function (col, type, order) {
     var amet = "getValue";
-    if (this.cells5({ parentNode: { grid: this} }, this.getColType(col)).getDate) { //FIXME! move inside cells5 in 2.2
+    if (this.cells5({ parentNode: { grid: this } }, this.getColType(col)).getDate) { //FIXME! move inside cells5 in 2.2
         amet = "getDate";
         type = "str";
     }
@@ -753,7 +753,7 @@ dhtmlXGridObject.prototype.hovermenushow = function (dd, cell) {
 
     var showMenus = this.getUserData(row.id, "viewMenus").split(',');
 
-    var node = menu.firstChild.firstChild.firstChild;
+    var node = menu.firstChild;
 
     var lastSep;
 
@@ -787,6 +787,9 @@ eXcell_tree.prototype.setValue = function (valAr) {
         return this.setLabel(valAr);
 
 
+    var rid = this.cell.parentNode.idd;
+    var row = this.grid._h2.get[rid];
+
     if ((this.grid._tgc.imgURL == null) || (this.grid._tgc.imgURL != this.grid.imgURL)) {
         var _tgc = {};
         _tgc.spacer = "<img src='" + this.grid.imgURL + "blank.gif'  align='absmiddle' class='space'>";
@@ -797,13 +800,16 @@ eXcell_tree.prototype.setValue = function (valAr) {
         _tgc.minus = _tgc.imst + "minus.gif" + _tgc.imact;
         _tgc.blank = _tgc.imst + "blank.gif" + _tgc.imact;
 
-        if (this.grid._enableCMenus) {
+        var itemid = this.grid.getUserData(rid, "itemid");
+
+        if (this.grid._enableCMenus && itemid != "") {
             _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; position: relative; nowrap; height:" + (_isIE ? 20 : 18) + "px;' onmouseout=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenuout(this);\" onmouseover=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenu(this);\" id='" + this.cell.parentNode.idd + "'>";
-            _tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;'><SPAN>&nbsp;</SPAN><A id='menuA' onfocus='return false;' title='Open Menu' onclick='return false;' href='javascript:;'><IMG id='menuImg' style='visibility: hidden' alt='Open Menu' src='/_layouts/images/ecbarw.png' width=7 height=4 border=0></A><SPAN>&nbsp;</SPAN></DIV>";
+            //_tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;'><SPAN>&nbsp;</SPAN><A id='menuA' onfocus='return false;' title='Open Menu' onclick='return false;' href='javascript:;'><IMG id='menuImg' class='ms-ellipsis-icon' style='visibility: hidden' alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23' width=7 height=4 border=0></A><SPAN>&nbsp;</SPAN></DIV>";
+            _tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;' class='ms-list-itemLink'><A style='top: -5px;' href='' class='ms-lstItmLinkAnchor ms-ellipsis-a'><IMG class=ms-ellipsis-icon alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23'></A></DIV>";
         }
         else {
             _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; white-space : nowrap; height:" + (_isIE ? 20 : 18) + "px;'>";
-            _tgc.menu + "";
+            _tgc.menu = "";
         }
 
         _tgc.itemim = "' align='absmiddle' " + (this.grid._img_height ? (" height=\"" + this.grid._img_height + "\"") : "") + (this.grid._img_width ? (" width=\"" + this.grid._img_width + "\"") : "") + " ><span " + (_isFF ? "style='position:relative; top:2px';z-index=-1" : "z-index=-1") + "id='nodeval'>";
@@ -819,8 +825,7 @@ eXcell_tree.prototype.setValue = function (valAr) {
     var _h2 = this.grid._h2;
     var _tgc = this.grid._tgc;
 
-    var rid = this.cell.parentNode.idd;
-    var row = this.grid._h2.get[rid];
+
 
     if (this.grid.kidsXmlFile || this.grid._slowParse) {
         row.has_kids = (row.has_kids || (this.cell.parentNode._attrs["xmlkids"] && (row.state != "minus")));
