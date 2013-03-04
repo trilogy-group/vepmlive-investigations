@@ -1173,7 +1173,7 @@ namespace EPMLiveCore
                 // Add EPMLive custom entity picker control to 
                 // lookup fields
 
-                AddEntityPickersToLookups();
+                //AddEntityPickersToLookups();
             }
             else
                 base.CreateChildControls();
@@ -2033,27 +2033,27 @@ namespace EPMLiveCore
             return baseFieldControls;
         }
 
-        private static void HandleDateField(FormField formField)
-        {
-            if (formField.ControlMode == SPControlMode.Display)
-            {
-                return;
-            }
+        //private static void HandleDateField(FormField formField)
+        //{
+        //    if (formField.ControlMode == SPControlMode.Display)
+        //    {
+        //        return;
+        //    }
 
-            Control dateFieldControl = formField.Controls[0];
-            if (dateFieldControl.Controls.Count > 0)
-            {
-                DateTimeControl dateTimeControl = (DateTimeControl)dateFieldControl.Controls[0].Controls[1];
-                TextBox dateTimeTextBox = dateTimeControl.Controls[0] as TextBox;
-                if (dateTimeTextBox != null)
-                {
-                    if (!string.IsNullOrEmpty(dateTimeTextBox.Text))
-                    {
-                        formField.Value = DateTime.Parse(dateTimeTextBox.Text, CultureInfo.CurrentCulture);
-                    }
-                }
-            }
-        }
+        //    Control dateFieldControl = formField.Controls[0];
+        //    if (dateFieldControl.Controls.Count > 0)
+        //    {
+        //        DateTimeControl dateTimeControl = (DateTimeControl)dateFieldControl.Controls[0].Controls[1];
+        //        TextBox dateTimeTextBox = dateTimeControl.Controls[0] as TextBox;
+        //        if (dateTimeTextBox != null)
+        //        {
+        //            if (!string.IsNullOrEmpty(dateTimeTextBox.Text))
+        //            {
+        //                formField.Value = DateTime.Parse(dateTimeTextBox.Text, CultureInfo.CurrentCulture);
+        //            }
+        //        }
+        //    }
+        //}
 
     }
 }
