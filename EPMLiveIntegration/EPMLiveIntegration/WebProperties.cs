@@ -23,8 +23,10 @@ namespace EPMLiveIntegration
         public SiteProperties Site;
         public Guid ID;
         public string URL;
+        public string FullURL;
         public string Title;
         public Hashtable Properties;
+        public Guid IntegrationId;
     }
 
 }
