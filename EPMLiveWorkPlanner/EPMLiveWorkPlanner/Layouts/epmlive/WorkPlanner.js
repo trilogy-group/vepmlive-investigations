@@ -33,9 +33,13 @@ var canShowDetails = false;
 
 var divsaveTemplateDiv;
 
+var oLinkedTasks;
+
+var newtasktext = "Add New Task";
+
 function SetSplashText(text) {
 
-    document.getElementById("divSplashInfo").innerText = text;
+    document.getElementById("divSplashInfo").innerHTML = text;
 
 }
 
@@ -962,7 +966,7 @@ function DoNewRow(bAgileGrid) {
 
         }
     }
-
+    
     if (bAgileGrid) {
         newRow = agrid.GetRowById(newRow.id);
 
@@ -999,11 +1003,11 @@ function DoNewRow(bAgileGrid) {
 
         grid.Focus(ntRow, "Title");
     }
-
+    return;
     if (bAgile)
         RollDownFromParent(grid, newRow);
 
-    setWBSAndTaskID(grid.GetRowById('0'));
+    //setWBSAndTaskID(grid.GetRowById('0'));
 
     bNewRowHasChanged = false;
 
@@ -1096,9 +1100,15 @@ function SetTaskAssignments(Row) {
                         //SetPlannerFieldValue(newrow, "Work", diff, true);
                     }
                     else {
-                        if (Row.Work == "0" || Row.Work == "") {
-                            var st = Row.StartDate;
-                            var en = Row.DueDate;
+
+                        var fWork = 0;
+                        try {
+                            fWork = parseFloat(Row.Work);
+                        } catch (e) { }
+
+                        if (fWork == 0) {
+                            var st = grid.GetValue(Row, "StartDate")
+                            var en = grid.GetValue(Row, "DueDate")
                             var diff = grid.DiffGanttDate(st, en, "h");
                            // SetPlannerFieldValue(Row, "Work", diff, true);
                             grid.SetValue(Row, "Work", diff * assignmentcount, 1);
@@ -1430,8 +1440,12 @@ function iChangeView(view, bHide) {
     for (var i = 0; i < leftCols.length; i++) {
         lViews[leftCols[i]] = new Object();
         lViews[leftCols[i]] = 0;
-        if (leftCols[i] != "Panel")
+        if (leftCols[i] != "Panel") {
             grid.MoveCol(leftCols[i], 0, 1, 1);
+            try {
+                grid.Cols[leftCols[i]].Visible = 1;
+            } catch (e) { }
+        }
     }
 
     for (var i = 0; i < cols.length; i++) {
@@ -1439,7 +1453,12 @@ function iChangeView(view, bHide) {
         oViews[cols[i]] = 1;
 
         grid.MoveCol(cols[i], 1, 1, 1);
+        try {
+            grid.Cols[cols[i]].Visible = 1;
+        } catch (e) { }
     }
+
+    
 
     for (var c in grid.Cols) {
         if (oViews[c] == null && lViews[c] == null && c != "G") {
@@ -1462,18 +1481,19 @@ function iChangeView(view, bHide) {
         }
         if (!found)
             mainCols.push(vCols[i]);
-    } 
+    }
 
     grid.ChangeColsVisibility(allCols, mainCols, 0);
     grid.ShowCol("Notifications");
     grid.ShowCol("Panel");
     //grid.ChangeColsVisibility(allCols, "", 0);
-    
-    if (viewObject[view]["gantt"] == "1")
-        grid.ShowCol("G");
-    else
-        grid.HideCol("G");
 
+    try {
+        if (viewObject[view]["gantt"] == "1")
+            grid.ShowCol("G");
+        else if(grid.Cols["G"].Visible)
+            grid.HideCol("G");
+    } catch (e) { }
     //if (viewObject[view]["folders"] == "true" && bUseFolders)
     //    dhxLayout.cells(folderCell).expand();
     //else
@@ -1494,6 +1514,7 @@ function iChangeView(view, bHide) {
     //================Filters================
     if (viewObject[view]["filters"] == "") {
         grid.ChangeFilter("", "", "", 0, 0, null);
+        grid.ActionFilterOff();
     }
     else {
         var filters = viewObject[view]["filters"].split("^");
@@ -1503,7 +1524,10 @@ function iChangeView(view, bHide) {
             else
                 grid.HideRow(grid.GetRowById("Filter"));
         } catch (e) { }
-        grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);
+        if(filters[0] == "1")
+            grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);
+        else
+            grid.ActionFilterOff();
     }
     //==============sorting======================
     grid.sort = viewObject[view]["sorting"];
@@ -2809,7 +2833,7 @@ function Indent()
     grid.ActionCalcOn();
 }
 
-function NewTask(isSummary, isMilestone, isAbove, bAgileGrid) {
+function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForceNew) {
 
     if (bAgileGrid) {
         var aRow = Grids.AgileGrid.FRow;
@@ -2836,22 +2860,33 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid) {
         taskDef = "Summary";
     else if (isMilestone)
         taskDef = "Milestone";
+    else if (bIsExternal)
+        taskDef = "External";
 
     var newId = grid.GenerateId();
 
     //AddRow   (TRow parent, TRow next, bool show = false, string id = null, string Def = null)
 
-    
+    if (bAgile && row && row.id == "0")
+        row = null;
 
-    if (row == null) //No Row Selected
+    if (row == null || bForceNew) //No Row Selected
     {
         if (bAgile) {
             if (bAgileGrid) {
                 newrow = grid.AddRow(grid.GetRowById("BacklogRow"), null, true, newId, taskDef);
             }
             else {
-                alert('You must select an iteration to add your new task to');
-                return;
+
+                var lRow = grid.GetRowById("BacklogRow");
+                var iRow = lRow.previousSibling;
+                if (iRow && iRow.Def.Name == "Iteration") {
+                    newrow = grid.AddRow(iRow, null, true, newId, taskDef);
+                }
+                else {
+                    alert('You must have an iteration to add your new task.');
+                    return;
+                }
             }
         }
         else
@@ -2870,9 +2905,9 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid) {
                 newrow = grid.AddRow(row.parentNode, row.nextSibling, true, newId, taskDef);
         }
     }
-    
-    ApplyDefaults(grid, newrow, isMilestone, isSummary);
 
+    //ApplyDefaults(grid, newrow, isMilestone, isSummary);
+    
     setParentDef(grid, newrow);
     
     grid.SetValue(newrow, "Summary", 0, 1, 0);
@@ -2897,7 +2932,10 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid) {
     }
     ////hideNonFolders(hRow);
 
-    setWBSAndTaskID(Grids.WorkPlannerGrid.GetRowById('0'));
+    //setWBSAndTaskID(Grids.WorkPlannerGrid.GetRowById('0'));
+
+    if (bAgileGrid)
+        grid.HideRow(newrow);
 
     if(!bAgileGrid)
         grid.Focus(newrow, 'Title');
@@ -2943,6 +2981,9 @@ function getHTML(grid, row, col, val) {
                     if (grid.GetValue(row, "Attachments").toString().toLowerCase() == "true")
                         val += " <img src='/_layouts/epmlive/images/attach16.gif' alt='Task Has Attachments'>";
                 } catch (e) { }
+
+                if (row.Def.Name == "External")
+                    val += " <img src='/_layouts/epmlive/images/externallink.png' alt='Task Is External'>";
 
                 return val;
             }
@@ -3245,13 +3286,13 @@ function RefreshTeam(dialogResult, returnValue) {
 function ApplyDefaults(grid, row, isMilestone, isSummary) {
 
     if (grid && row) {
-        for (var oD in oDefaults) {
+        /*for (var oD in oDefaults) {
             if (grid.GetValue(row, oD) == "" && oD != "StartDate" && oD != "DueDate" && oD != "Duration" && !oRollDown[oD]) {
                 try {
                     grid.SetValue(row, oD, oDefaults[oD], 0, 0);
                 } catch (e) { }
             }
-        }
+        }*/
 
         grid.SetValue(row, "Summary", 0, 1, 0);
 
@@ -3941,6 +3982,36 @@ function CancelBubbling(obj, evt) {
     }
 }
 
+function newtaskfocus(textfield) {
+    if (textfield.value == newtasktext) {
+        textfield.value = "";
+        textfield.style.color = "#444444";
+    }
+}
+
+function newtaskblur(textfield)
+{
+    if (textfield.value == "") {
+        textfield.value = newtasktext;
+        textfield.style.color = "#9C9C9C";
+    }
+}
+
+function newtaskkeypress(textfield, event, agilegrid) {
+    if (event.which == 13 || event.keyCode == 13) {
+        if (textfield.value != newtasktext && textfield.value != "") {
+            var rid = NewTask(false, false, false, agilegrid, false, true);
+            var grid = Grids.WorkPlannerGrid;
+            var row = grid.GetRowById(rid);
+            if (row) {
+                grid.SetValue(row, "Title", textfield.value, 1, 0);
+                textfield.value = "";
+            }
+        }
+    }
+
+}
+
 function LeavePage(e) {
     try {
         var sBin = Grids.WorkPlannerGrid.HasChanges().toString(2);
@@ -4229,6 +4300,94 @@ function EditResourcePlanResponse(ret) {
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
+
+function LinkExternalTask() {
+
+    var weburl = sWebUrl + "/_layouts/epmlive/workplanlinktask.aspx?PlannerID=" + sPlannerID;
+
+    var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: AddExternalTask };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+
+}
+
+function AddExternalTask(dialogResult, returnValue) {
+    if (dialogResult == SP.UI.DialogResult.OK) {
+
+        grid = Grids.WorkPlannerGrid;
+
+        var rowid = NewTask(false, false, false, false, true);
+
+        var newRow = grid.GetRowById(rowid);
+
+        var ntRow = returnValue.Row;
+
+       
+
+        grid.ActionCalcOff();
+
+        //grid.SetValue(newRow, "StartDate", ntRow["StartDate"], 1, 0);
+        //grid.SetValue(newRow, "DueDate", ntRow["DueDate"], 1, 0);
+        //grid.SetValue(newRow, "Title", ntRow["Title"], 1, 0);
+        //grid.SetValue(newRow, "Duration", ntRow["Duration"], 1, 0);
+       
+        for (var c in grid.Cols) {
+            if (c != "id") {
+                if(validExternalField(c))
+                    SetPlannerFieldValue(newRow, c, ntRow[c], true);
+                //grid.SetValue(newRow, c, ntRow[c], 1, 0);
+            }
+        }
+
+        grid.SetValue(newRow, "ExternalLink", sPlannerID + "." + returnValue.ProjectID + "." + ntRow.id, 1, 0);
+        grid.SetValue(newRow, "LinkedTask", 1, 1, 0);
+        grid.SetValue(newRow, "IsExternal", 1, 1, 0);
+        grid.SetValue(newRow, "Predecessors", "", 1, 0);
+        grid.SetValue(newRow, "Descendants", "", 1, 0);
+
+        grid.ActionCalcOn();
+    }
+}
+
+function AcceptExternal() {
+
+    var grid = Grids.WorkPlannerExternalLinks;
+    var wgrid = Grids.WorkPlannerGrid;
+
+    for (var row in grid.Rows) {
+        var orow = grid.Rows[row];
+        
+
+        if (orow.Reject == "1") {
+
+            if (orow.Action == "Add") {
+
+                orow = wgrid.GetRowById(orow.puid);
+
+                wgrid.DeleteRow(orow, 2);
+            }
+            else {
+                orow = wgrid.GetRowById(orow.puid);
+
+                wgrid.SetValue(orow, "StartDate", wgrid.GetValue(orow, "OldStartDate"), 1, 1);
+                wgrid.SetValue(orow, "DueDate", wgrid.GetValue(orow, "OldDueDate"), 1, 1);
+            }
+
+        }
+    }
+
+    
+
+}
+
+function validExternalField(field) {
+    
+    if(field == "ExternalLink" || field == "IsExternal" || field == "Predecessors" || field == "Descendants")
+        return false;
+
+    return true;
+}
+
 //=======================Init Functions===============================
 function InitGantt() {
 
@@ -4307,13 +4466,75 @@ function InitView() {
             else
                 dhxLayout.cells(agileCell).collapse();
         } catch (e) { }
+
+        var grid = Grids.WorkPlannerGrid;
+
+        if (viewObject[view]["filters"] == "") {
+            grid.ActionFilterOff();
+        }
+        else {
+            var filters = viewObject[view]["filters"].split("^");
+            if (filters[0] != "1")
+                grid.ActionFilterOff();
+        }
         //iChangeView(v);
         break;
     }
 
     //HideTDialog();
-    SetSplashText("Finishing...");
+    SetSplashText("Finalizing...");
     setTimeout("InitFinal()", 1000);
+}
+
+function InitLinked() {
+
+    if (CanLinkExternal) {
+        
+        var grid = Grids.WorkPlannerGrid;
+        var row = grid.GetRowById("ExternalTasks");
+        if (row) {
+            if (row.Title != "") {
+
+                var tgrid = Grids.WorkPlannerExternalLinks;
+
+                var links = row.Title.split(',');
+
+                for (var ilink in links) {
+                    var link = links[ilink];
+                    var linkinfo = link.split(':');
+
+
+                    var r = grid.GetRowById(linkinfo[1]);
+
+                    var trow = grid.MoveRowsToGrid(r, tgrid, null, 2, 2);
+
+                    tgrid.ChangeDef(trow, "Task", 1, 0);
+
+                    tgrid.SetAttribute(trow, "Reject", "CanEdit", "1");
+                    tgrid.RefreshCell(trow, "Reject");
+
+                    if (linkinfo[0] == "A")
+                        tgrid.SetValue(trow, "Action", "Add", 1, 1);
+                    else if(linkinfo[0] == "U")
+                        tgrid.SetValue(trow, "Action", "Update", 1, 1);
+
+                    tgrid.SetValue(trow, "puid", r.id);
+                }
+
+                tgrid.ChangeSort("taskorder");
+                tgrid.SortRows();
+
+                var divexternal = document.getElementById("divExternalLinkAccept");
+
+                var options = { html: divexternal, width: 600, height: 400, showClose: false, allowMaximize: false, title: "External Links"
+                };
+
+                SP.UI.ModalDialog.showModalDialog(options);
+
+
+            }
+        }
+    }
 }
 
 function InitResources() {
@@ -4352,6 +4573,10 @@ function InitFinal() {
 
     CheckProjectStart();
 
+    document.getElementById("txtNewTask").value = newtasktext;
+    try {
+        document.getElementById("txtNewTask2").value = newtasktext;
+    } catch (e) { }
     setTimeout("InitFinal2()", 100);
 
 }
@@ -4360,7 +4585,7 @@ function InitFinal2() {
     var WGrid = Grids.WorkPlannerGrid;
     var AGrid = Grids.AgileGrid;
 
-    ApplyDefaults(WGrid, WGrid.GetRowById("NewTask"));
+    //ApplyDefaults(WGrid, WGrid.GetRowById("NewTask"));
 
     if (bAgile) {
         var backlog = WGrid.GetRowById("BacklogRow");
@@ -4377,6 +4602,8 @@ function InitFinal2() {
 function CloseInit() {
     document.getElementById("divCover").style.display = "none";
     hm("dlgSplash");
+    setTimeout("InitLinked()", 100);
+    
 }
 
 function HideBacklogRows(grid, row) {

@@ -197,8 +197,13 @@ function ChangeAgileView(view) {
     for (var i = 0; i < leftCols.length; i++) {
         lViews[leftCols[i]] = new Object();
         lViews[leftCols[i]] = 0;
-        if (leftCols[i] != "Panel")
+        if (leftCols[i] != "Panel") {
             grid.MoveCol(leftCols[i], 0, 1, 1);
+
+            try {
+                grid.Cols[leftCols[i]].Visible = 1;
+            } catch (e) { }
+        }
     }
 
     for (var i = 0; i < cols.length; i++) {
@@ -206,6 +211,9 @@ function ChangeAgileView(view) {
         oViews[cols[i]] = 1;
 
         grid.MoveCol(cols[i], 1, 1, 1);
+        try {
+            grid.Cols[cols[i]].Visible = 1;
+        } catch (e) { }
     }
 
     for (var c in grid.Cols) {

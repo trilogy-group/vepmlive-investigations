@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Web.UI.WebControls;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace EPMLiveWorkPlanner.Layouts.epmlive
 {
@@ -33,7 +34,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         protected bool bUseFolders;
 
         protected string iTaskType;
-
+        protected bool bEnableLink = false;
         private string sListProjectCenter;
         private string sListTaskCenter;
 
@@ -91,9 +92,22 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         int activation = -1;
 
+        protected string sLinkedTasks = "";
+
+        protected string CanLinkExternal = "false";
+
         protected void getFields(SPWeb web)
         {
             SPList lstTaskCenter = web.Lists[sListTaskCenter];
+
+            try
+            {
+                if(lstTaskCenter.Fields.GetFieldByInternalName("IsExternal") != null && lstTaskCenter.Fields.GetFieldByInternalName("ExternalLink") != null)
+                {
+                    CanLinkExternal = "true";
+                }
+            }
+            catch { }
 
             foreach(SPField oField in lstTaskCenter.Fields)
             {
@@ -588,6 +602,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             if(!String.IsNullOrEmpty(sPlannerID) && !String.IsNullOrEmpty(sProjectListId) && !String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sProjectType) && !String.IsNullOrEmpty(sTaskListId))
             {
+                SPList lstProjectCenter = web.Lists[sListProjectCenter];
+
+                SPListItem liProject = lstProjectCenter.GetItemById(int.Parse(sItemID));
+
+                sProjectName = liProject.Title;
+
                 if(sProjectType == "Online")
                 {
                     SPFile tFile = WorkPlannerAPI.GetTaskFile(web, sItemID, sPlannerID);
@@ -1004,6 +1024,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     bUseFolders = props.bUseFolders;
                     iTaskType = props.iTaskType.ToString();
                     bAgile = props.bAgile;
+                    bEnableLink = props.bEnableLinking;
                     bCalcCost = props.bCalcCost;
                     bCalcWork = props.bCalcWork;
 
@@ -1252,6 +1273,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                                 sViewObject = sb.ToString().Trim(',');
                         }
                         catch { }
+
+                        
                     }
                 }
             }
@@ -1313,6 +1336,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             if(!ribbon.IsTabAvailable("Ribbon.WorkViews"))
                 ribbon.MakeTabAvailable("Ribbon.WorkViews");
 
+            if(!bEnableLink)
+            {
+                ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.LinkExternalTask");
+            }
+
             if(bAgile)
             {
                 ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.NewSummary");
@@ -1337,7 +1365,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             ribbon.TrimById("Ribbon.WorkPlanner.ClipGroup.Copy");
             ribbon.TrimById("Ribbon.WorkPlanner.ClipGroup.Paste");
 
-
+            
             ribbon.InitialTabId = initialTabId;
         }
 
@@ -1370,6 +1398,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.NewMilestone", "NewTask(false, true);", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DeleteTasks", "DeleteTasks();", "MoreThan0Selected()"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ShowBacklog", "ShowBacklog();", "true"));
+            commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.LinkExternalTask", "LinkExternalTask();", "CanLinkExternal"));
 
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Details", "ShowTab('t1');", "canShowDetails"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Notes", "ShowNotes();", "canShowDetails"));

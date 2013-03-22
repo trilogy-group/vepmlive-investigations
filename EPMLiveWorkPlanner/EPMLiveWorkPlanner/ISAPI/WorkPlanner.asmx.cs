@@ -7,6 +7,7 @@ using System.Reflection;
 using Microsoft.SharePoint;
 using System.Xml;
 using System.Data;
+using System.Data.SqlClient;
 using System.Collections;
 using System.IO;
 using System.Text;
@@ -56,11 +57,13 @@ namespace EPMLiveWorkPlanner
             public bool bCalcCost = false;
             public bool bUseFolders = false;
             public int iTaskType = 0;
+            public bool bEnableLinking = false;
         }
 
         [WebMethod]
         public string Execute(string Functionname, string Dataxml)
         {
+            
             try
             {
                 Assembly assemblyInstance = Assembly.GetExecutingAssembly();
@@ -78,7 +81,277 @@ namespace EPMLiveWorkPlanner
 
         }
 
+        public static string GetExternalTasks(XmlDocument data, SPWeb oWeb)
+        {
+            string PlannerID = getAttribute(data.FirstChild, "PlannerID");
+            string ProjectID = getAttribute(data.FirstChild, "ProjectID");
 
+            XmlDocument docPlanInfo = new XmlDocument();
+            docPlanInfo.LoadXml("<GetTasks Planner=\"" + PlannerID + "\" ID=\"" + ProjectID + "\" View=\"\"/>");
+
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(iGetGeneralLayout(oWeb, Properties.Resources.txtDefaultConfig, docPlanInfo, false));
+
+            string sListTaskCenter = "";
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+
+                using(SPSite site = new SPSite(oWeb.Site.ID))
+                {
+                    using(SPWeb iweb = site.OpenWeb(oWeb.ID))
+                    {
+                        Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
+                        if(lockWeb == Guid.Empty || lockWeb == oWeb.ID)
+                        {
+                            sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLivePlanner" + PlannerID + "TaskCenter");
+                        }
+                        else
+                        {
+                            using(SPWeb w = site.OpenWeb(lockWeb))
+                            {
+                                sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + PlannerID + "TaskCenter");
+                            }
+
+                        }
+                    }
+                }
+            });
+
+            //DataTable dtProjects = EPMLiveCore.ReportingData.GetReportingData(oWeb, sListTaskCenter, false, "ProjectID=" + ProjectID + " And IsAssignment = 0", "taskorder");
+
+            XmlAttribute attr = doc.CreateAttribute("Editing");
+            attr.Value = "0";
+            doc.FirstChild.SelectSingleNode("//Cfg").Attributes.Append(attr);
+            attr = doc.CreateAttribute("Dragging");
+            attr.Value = "0";
+            doc.FirstChild.SelectSingleNode("//Cfg").Attributes.Append(attr);
+
+            XmlNode ndAction = doc.CreateNode(XmlNodeType.Element, "Actions", doc.NamespaceURI);
+            attr = doc.CreateAttribute("OnClickCell");
+            attr.Value = "ClearSelection,SelectRow";
+            ndAction.Attributes.Append(attr);
+            doc.FirstChild.AppendChild(ndAction);
+
+            XmlNode ndBody1 = doc.CreateNode(XmlNodeType.Element, "Body", doc.NamespaceURI);
+            XmlNode ndBody = doc.CreateNode(XmlNodeType.Element, "B", doc.NamespaceURI);
+            ndBody1.AppendChild(ndBody);
+
+
+            doc.FirstChild.SelectSingleNode("//Foot/I[@id='NewTask2']").Attributes["Visible"].Value = "0";
+            doc.FirstChild.SelectSingleNode("//Panel").Attributes["Visible"].Value = "0";
+            doc.FirstChild.SelectSingleNode("//D[@Name='Assignment']").Attributes["Visible"].Value = "0";
+
+            SPList oList = oWeb.Lists.TryGetList(sListTaskCenter);
+
+            Hashtable hshUserFields = new Hashtable();
+
+            SPQuery query = new SPQuery();
+            query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + ProjectID + "</Value></Eq></Where>";
+
+            SPListItemCollection lic = oList.GetItems(query);
+
+            ArrayList arrFields = new ArrayList();
+            arrFields.Add("ID");
+
+            foreach(SPField field in oList.Fields)
+            {
+                if(field.Type == SPFieldType.User)
+                    hshUserFields.Add(field.InternalName + "ID", field.InternalName);
+
+                if(!field.Hidden && isValidField(field.InternalName, false) && field.Reorderable)        
+                    arrFields.Add(field.InternalName);
+            }
+
+            doc.FirstChild.AppendChild(ndBody1);
+
+            SPList list = oWeb.Lists.TryGetList(sListTaskCenter);
+
+            foreach(string sField in arrFields)
+            {
+                if(sField != "Title" && sField != "ID")
+                {
+                    XmlNode ndCol = doc.CreateNode(XmlNodeType.Element, "C", doc.NamespaceURI);
+                    attr = doc.CreateAttribute("Name");
+                    attr.Value = sField;
+                    ndCol.Attributes.Append(attr);
+                    attr = doc.CreateAttribute("Visible");
+                    attr.Value = "0";
+                    ndCol.Attributes.Append(attr);
+                    doc.FirstChild.SelectSingleNode("//LeftCols").AppendChild(ndCol);
+
+                }
+            }
+
+            DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<Data><Columns></Columns></Data>", oWeb);
+
+            foreach(SPListItem li in lic)
+            {
+                XmlNode ndI = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
+
+                attr = doc.CreateAttribute("Def");
+                attr.Value = "Task";
+                ndI.Attributes.Append(attr);
+
+                foreach(string col in arrFields)
+                {
+                    if(col == "ID")
+                    {
+                        attr = doc.CreateAttribute("id");
+                        try
+                        {
+                            attr.Value = li["taskuid"].ToString();
+                        }
+                        catch { }
+                        ndI.Attributes.Append(attr);
+                    }
+                    else
+                    {
+                        if(hshUserFields.Contains(col))
+                        {
+                            string newusers = "";
+
+                            try
+                            {
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(oWeb, li[col].ToString());
+
+                                foreach(SPFieldUserValue uv in uvc)
+                                {
+
+                                    DataRow[] drRes = dtResources.Select("SPID='" + uv.LookupId + "'");
+
+                                    if(drRes.Length > 0)
+                                        newusers += ";" + drRes[0]["ID"].ToString();
+                                    
+                                }
+                            }
+                            catch { }
+
+                            attr = doc.CreateAttribute(hshUserFields[col].ToString());
+                            attr.Value = newusers.Trim(';');
+                            ndI.Attributes.Append(attr);
+                        }
+                        else
+                        {
+                            attr = doc.CreateAttribute(col);
+                            try
+                            {
+                                attr.Value = li[col].ToString();
+                            }
+                            catch { }
+                            ndI.Attributes.Append(attr);
+                        }
+                    }
+                }
+
+                try
+                {
+                    string WBS = ndI.Attributes["WBS"].Value;
+
+                    if(WBS.Contains("."))
+                    {
+                        WBS = WBS.Substring(0, WBS.IndexOf('.'));
+
+                        XmlNode ndParent = ndBody.SelectSingleNode("//I[@WBS='" + WBS + "']");
+
+                        if(ndParent != null)
+                        {
+                            ndParent.AppendChild(ndI);
+                            ndParent.Attributes["Def"].Value = "Summary";
+                        }
+                        else
+                            ndBody.AppendChild(ndI);
+                    }
+                    else
+                        ndBody.AppendChild(ndI);
+                }
+                catch { ndBody.AppendChild(ndI); }
+
+                
+            }
+
+            return doc.OuterXml;
+        }
+
+        public static string GetExternalProjects(XmlDocument data, SPWeb oWeb)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(Properties.Resources.txtExternalProjects);
+
+            string sListProjectCenter = "";
+
+            string PlannerID = getAttribute(data.FirstChild, "PlannerID");
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+
+                using(SPSite site = new SPSite(oWeb.Site.ID))
+                {
+                    using(SPWeb iweb = site.OpenWeb(oWeb.ID))
+                    {
+                        Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
+                        if(lockWeb == Guid.Empty || lockWeb == oWeb.ID)
+                        {
+                            sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(oWeb, "EPMLivePlanner" + PlannerID + "ProjectCenter");
+                        }
+                        else
+                        {
+                            using(SPWeb w = site.OpenWeb(lockWeb))
+                            {
+                                sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + PlannerID + "ProjectCenter");
+                            }
+
+                        }
+                    }
+                }
+            });
+
+            SPList oProjectCenter = oWeb.Lists.TryGetList(sListProjectCenter);
+
+            SPField title = oProjectCenter.Fields.GetFieldByInternalName("Title");
+
+            doc.FirstChild.SelectSingleNode("//Header").Attributes["Title"].Value = title.Title;
+
+            string orderby = "";
+            string query = EPMLiveCore.ReportingData.GetReportQuery(oWeb, oProjectCenter, "<OrderBy><FieldRef Name='Title'/></OrderBy>", out orderby);
+            DataTable dtProjects = EPMLiveCore.ReportingData.GetReportingData(oWeb, oProjectCenter.Title, false, query, orderby);
+
+            XmlNode ndBody = doc.FirstChild.SelectSingleNode("//Body/B");
+
+            foreach(DataRow dr in dtProjects.Rows)
+            {
+                XmlNode ndI = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
+
+                XmlAttribute attr = doc.CreateAttribute("Title");
+                attr.Value = dr["Title"].ToString();
+                ndI.Attributes.Append(attr);
+
+                attr = doc.CreateAttribute("Start");
+                try
+                {
+                    attr.Value = DateTime.Parse(dr["Start"].ToString()).ToShortDateString();
+                }
+                catch { }
+                ndI.Attributes.Append(attr);
+
+                attr = doc.CreateAttribute("Finish");
+                try
+                {
+                    attr.Value = DateTime.Parse(dr["Finish"].ToString()).ToShortDateString();
+                }
+                catch { }
+                ndI.Attributes.Append(attr);
+
+
+                attr = doc.CreateAttribute("id");
+                attr.Value = dr["ID"].ToString();
+                ndI.Attributes.Append(attr);
+
+                ndBody.AppendChild(ndI);
+            }
+
+            return doc.OuterXml;
+        }
         
         public static string ImportTasks(XmlDocument data, SPWeb oWeb)
         {
@@ -675,7 +948,7 @@ namespace EPMLiveWorkPlanner
                     catch { }
                     if(oField != null)
                     {
-                        if(!oField.ReadOnlyField)
+                        if(!oField.ReadOnlyField && oField.TypeAsString != "TotalRollup")
                         {
                             switch(oField.Type)
                             {
@@ -941,7 +1214,7 @@ namespace EPMLiveWorkPlanner
             SPFolder folder = web.GetFolder("Project Schedules/" + planner);
             if(!folder.Exists)
                 folder = web.Folders["Project Schedules"].SubFolders.Add(planner);
-
+            web.AllowUnsafeUpdates = true;
             folder.Files.Add(id + ".xml", oFile.OpenBinaryStream());
 
             oFile.Delete();
@@ -1246,8 +1519,10 @@ namespace EPMLiveWorkPlanner
             return null;
         }
 
-        private static string ProcessTaskXmlFromTaskCenter(XmlDocument doc, PlannerProps props, SPWeb web, string projectid)
+        private static string ProcessTaskXmlFromTaskCenter(XmlDocument doc, PlannerProps props, SPWeb web, string projectid, out int lastid)
         {
+            lastid = 0;
+
             SPList list = web.Lists.TryGetList(props.sListTaskCenter);
             if(list != null)
             {
@@ -1281,6 +1556,14 @@ namespace EPMLiveWorkPlanner
                             catch { }
                             ndTask.Attributes.Append(attr);
                         }
+
+                        try
+                        {
+                            int iid = int.Parse(id);
+                            if(iid > lastid)
+                                lastid = iid;
+                        }
+                        catch { }
                     }
 
                 }
@@ -1336,9 +1619,326 @@ namespace EPMLiveWorkPlanner
             }
             else
             {
-                return ProcessTaskXmlFromTaskCenter(doc, p, oWeb, data.FirstChild.Attributes["ID"].Value);
+
+                int lastid = 0;
+
+                ProcessTaskXmlFromTaskCenter(doc, p, oWeb, data.FirstChild.Attributes["ID"].Value, out lastid);
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                    cn.Open();
+
+                    SqlCommand cmd = new SqlCommand("SELECT * FROM PLANNERLINK where PlannerID=@plannerid and SourceProjectId=@projectid", cn);
+                    cmd.Parameters.AddWithValue("@plannerid", data.FirstChild.Attributes["Planner"].Value);
+                    cmd.Parameters.AddWithValue("@projectid", data.FirstChild.Attributes["ID"].Value);
+
+                    DataSet ds = new DataSet();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(ds);
+
+                    if(ds.Tables[0].Rows.Count > 0)
+                    {
+                        string taskupdates = "";
+
+                        SPList oProjectCenter = oWeb.Lists.TryGetList(p.sListProjectCenter);
+                        SPList oListTaskCenter = oWeb.Lists.TryGetList(p.sListTaskCenter);
+
+                        DataSet dsResources = GetResourceTable(p, oProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);
+
+                        if(oListTaskCenter != null)
+                        {
+                            foreach(DataRow dr in ds.Tables[0].Rows)
+                            {
+                                bool bLinked = false;
+                                try
+                                {
+                                    bLinked = bool.Parse(dr["Linked"].ToString());
+                                }
+                                catch { }
+                                XmlNode ndTsk = doc.SelectSingleNode("//I[@id='" + dr["SourceTaskId"].ToString() + "']");
+                                if(ndTsk != null)
+                                {
+                                    ArrayList arrP = new ArrayList(ndTsk.Attributes["Predecessors"].Value.Split(';'));
+                                    ArrayList arrD = new ArrayList(ndTsk.Attributes["Descendants"].Value.Split(';'));
+
+                                    string spredsucc = dr["Predecessors"].ToString();
+                                    string[] predsuccs = spredsucc.Split(',');
+                                    foreach(string predsucc in predsuccs)
+                                    {
+                                        string add = ProcessExternal(doc, oListTaskCenter, predsucc, dr["DestProjectId"].ToString(), data.FirstChild.Attributes["Planner"].Value, true, dsResources, ndTsk, bLinked, "", ref lastid);
+                                        if(add != "")
+                                        {
+                                            if(!arrP.Contains(add.Substring(3)))
+                                                arrP.Add(add.Substring(3));
+                                            //ndTsk.Attributes["Predecessors"].Value += ";" + add.Substring(3);
+                                            //ndTsk.Attributes["Predecessors"].Value = ndTsk.Attributes["Predecessors"].Value.Trim(';');
+                                            taskupdates += add;
+                                        }
+                                    }
+
+                                    spredsucc = dr["Successors"].ToString();
+                                    predsuccs = spredsucc.Split(',');
+                                    foreach(string predsucc in predsuccs)
+                                    {
+                                        string add = ProcessExternal(doc, oListTaskCenter, predsucc, dr["DestProjectId"].ToString(), data.FirstChild.Attributes["Planner"].Value, false, dsResources, ndTsk, bLinked, "", ref lastid);
+                                        if(add != "")
+                                        {
+                                            if(!arrD.Contains(add.Substring(3)))
+                                                arrD.Add(add.Substring(3));
+                                            taskupdates += add;
+                                        }
+
+                                    }
+
+                                    taskupdates += ProcessExternal(doc, oListTaskCenter, dr["DestTaskId"].ToString(), dr["DestProjectId"].ToString(), data.FirstChild.Attributes["Planner"].Value, false, dsResources, ndTsk, false, dr["SourceTaskId"].ToString(), ref lastid);
+
+                                    ndTsk.Attributes["Predecessors"].Value = String.Join(";", (string[])arrP.ToArray(typeof(string)));
+                                    ndTsk.Attributes["Descendants"].Value = String.Join(";", (string[])arrD.ToArray(typeof(string)));
+                                }
+                            }
+                        }
+                        cn.Close();
+
+                        if(taskupdates != "")
+                            AddCustomFooter(doc, "ExternalTasks", taskupdates.Trim(','));
+                    }
+                });
+
+
+                return doc.OuterXml;
             }
             
+        }
+
+        private static string ProcessExternal(XmlDocument doc, SPList oListTaskCenter, string predsucc, string projectid, string plannerid, bool before, DataSet dsResources, XmlNode ndTaskLinkedTO, bool bLinked, string curtaskid, ref int lastid)
+        {
+            string ret = "";
+
+            if(!string.IsNullOrEmpty(predsucc))
+            {
+                string sLinked = plannerid + "." + projectid+ "." + predsucc;
+
+                XmlNode ndTsk = null;
+
+                if(curtaskid != "")
+                    ndTsk = doc.SelectSingleNode("//I[@id='" + curtaskid + "']");
+                else
+                    ndTsk = doc.SelectSingleNode("//I[@ExternalLink='" + sLinked + "']");
+
+                SPQuery query = new SPQuery();
+                query.Query = "<Where><And><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + projectid + "</Value></Eq><Eq><FieldRef Name='taskuid'/><Value Type='Text'>" + predsucc + "</Value></Eq></And></Where>";
+
+                SPListItemCollection lic = oListTaskCenter.GetItems(query);
+
+                if(lic.Count > 0)
+                {
+                    if(ndTsk == null)
+                    {
+                        if(bLinked)
+                        {
+                            XmlAttribute attr;
+
+                            XmlNode ndNewTask = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
+
+                            attr = doc.CreateAttribute("Def");
+                            attr.Value = "External";
+                            ndNewTask.Attributes.Append(attr);
+
+                            lastid++;
+
+                            attr = doc.CreateAttribute("id");
+                            attr.Value = lastid.ToString();
+                            ndNewTask.Attributes.Append(attr);
+
+                            foreach(SPField oTempField in oListTaskCenter.Fields)
+                            {
+                                SPField oField = getRealField(oTempField);
+
+                                if(!oField.Hidden && isValidField(oField.InternalName, false) && oField.Reorderable && !bIsSpecialExternalField(oField.InternalName))
+                                {
+                                    var val = getFieldValue(lic[0], oField, dsResources);
+
+                                    if(oField.Type == SPFieldType.DateTime)
+                                    {
+                                        if(val != "")
+                                        {
+                                            attr = doc.CreateAttribute(oField.InternalName);
+                                            attr.Value = val;
+                                            ndNewTask.Attributes.Append(attr);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        attr = doc.CreateAttribute(oField.InternalName);
+                                        attr.Value = val;
+                                        ndNewTask.Attributes.Append(attr);
+                                    }
+
+                                }
+                            }
+
+                            attr = doc.CreateAttribute("ExternalLink");
+                            attr.Value = sLinked;
+                            ndNewTask.Attributes.Append(attr);
+
+                            attr = doc.CreateAttribute("IsExternal");
+                            attr.Value = "1";
+                            ndNewTask.Attributes.Append(attr);
+
+                            attr = doc.CreateAttribute("LinkedTask");
+                            attr.Value = "0";
+                            ndNewTask.Attributes.Append(attr);
+
+
+                            //attr = doc.CreateAttribute("MinStart");
+                            //attr.Value = ndNewTask.Attributes["StartDate"].Value;
+                            //ndNewTask.Attributes.Append(attr);
+
+                            //attr = doc.CreateAttribute("MaxEnd");
+                            //attr.Value = ndNewTask.Attributes["DueDate"].Value;
+                            //ndNewTask.Attributes.Append(attr);
+
+                            if(before)
+                                ndTaskLinkedTO.ParentNode.InsertBefore(ndNewTask, ndTaskLinkedTO);
+                            else
+                                ndTaskLinkedTO.ParentNode.InsertAfter(ndNewTask, ndTaskLinkedTO);
+
+                            ret = ",A:" + lastid;
+                        }
+                    }
+                    else
+                    {
+                        
+
+                        string SourceStart = "";
+                        string SourceFinish = "";
+                        string DestStart = "";
+                        string DestFinish = "";
+
+                        try
+                        {
+                            SourceStart = DateTime.Parse(ndTsk.Attributes["StartDate"].Value).ToString("yyyy-MM-dd");
+                        }
+                        catch { }
+                        try
+                        {
+                            SourceFinish = DateTime.Parse(ndTsk.Attributes["DueDate"].Value).ToString("yyyy-MM-dd");
+                        }
+                        catch { }
+                        try
+                        {
+                            DestStart = DateTime.Parse(lic[0]["StartDate"].ToString()).ToString("yyyy-MM-dd");
+                        }
+                        catch { }
+                        try
+                        {
+                            DestFinish = DateTime.Parse(lic[0]["DueDate"].ToString()).ToString("yyyy-MM-dd");
+                        }
+                        catch { }
+
+                        if(DestStart != SourceStart || DestFinish != SourceFinish)
+                        {
+                            ret = ",U:" + ndTsk.Attributes["id"].Value;
+
+                            XmlAttribute attr = ndTsk.Attributes["OldStartDate"];
+                            if(attr == null)
+                            {
+                                attr = doc.CreateAttribute("OldStartDate");
+                                ndTsk.Attributes.Append(attr);
+                            }
+                            attr.Value = ndTsk.Attributes["StartDate"].Value;
+
+                            attr = ndTsk.Attributes["OldDueDate"];
+                            if(attr == null)
+                            {
+                                attr = doc.CreateAttribute("OldDueDate");
+                                ndTsk.Attributes.Append(attr);
+                            }
+                            attr.Value = ndTsk.Attributes["DueDate"].Value;
+                        }
+
+                        foreach(SPField oTempField in oListTaskCenter.Fields)
+                        {
+                            SPField oField = getRealField(oTempField);
+
+                            if(!oField.Hidden && isValidField(oField.InternalName, false) && oField.Reorderable && !bIsSpecialExternalField(oField.InternalName))
+                            {
+                                try
+                                {
+                                    ndTsk.Attributes[oField.InternalName].Value = getFieldValue(lic[0], oField, dsResources);
+                                }
+                                catch { }
+
+                            }
+                        }
+                    }
+                }
+            }
+            return ret;
+        }
+
+        private static bool bIsSpecialExternalField(string field)
+        {
+            switch(field)
+            {
+                case "IsExternal":
+                case "ExternalLink":
+                case "Descendants":
+                case "Predecessors":
+                    return true;
+            }
+            return false;
+        }
+
+        public static string GetExternalLinkLayout(XmlDocument data, SPWeb oWeb)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(Properties.Resources.txtExternalLinksApproval);
+
+            return doc.OuterXml;
+        }
+
+        private static void AddCustomFooter(XmlDocument doc, string id, string title)
+        {
+            XmlNode ndFootRow = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
+
+            XmlAttribute attr = doc.CreateAttribute("id");
+            attr.Value = id;
+            ndFootRow.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("Type");
+            attr.Value = "Data";
+            ndFootRow.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("Visible");
+            attr.Value = "0";
+            ndFootRow.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("CanEdit");
+            attr.Value = "0";
+            ndFootRow.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("CanMove");
+            attr.Value = "0";
+            ndFootRow.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("CanSelect");
+            attr.Value = "0";
+            ndFootRow.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("Title");
+            attr.Value = title;
+            ndFootRow.Attributes.Append(attr);
+
+            XmlNode ndFoot = doc.FirstChild.SelectSingleNode("//Foot");
+            if(ndFoot == null)
+            {
+                ndFoot = doc.CreateNode(XmlNodeType.Element, "Foot", doc.NamespaceURI);
+                doc.FirstChild.SelectSingleNode("//Grid").AppendChild(ndFoot);
+            }
+
+            ndFoot.AppendChild(ndFootRow);
         }
 
         public static string GetUpdates(XmlDocument data, SPWeb oWeb)
@@ -1504,72 +2104,80 @@ namespace EPMLiveWorkPlanner
             if(ndTask.Attributes["id"].Value == "BacklogRow")
                 return;
 
+            string pdef = getAttribute(ndTask.ParentNode, "Def");
+            string def = getAttribute(ndTask, "Def");
+
+            
+
             if(ndTask.Attributes["Def"].Value == "Assignment" && ndTask.ParentNode.Attributes["TaskType"].Value == "Individual")
             {
-                XmlNode ndNew = data.CreateNode(XmlNodeType.Element, "Task", data.NamespaceURI);
-                XmlAttribute attr = data.CreateAttribute("UID");
-                attr.Value = ndTask.Attributes["id"].Value;
-                ndNew.Attributes.Append(attr);
-
-                attr = data.CreateAttribute("Folder");
-                attr.Value = parentfolder;
-                ndNew.Attributes.Append(attr);
-
-                attr = data.CreateAttribute("ID");
-                attr.Value = ndTask.Attributes["taskorder"].Value;
-                ndNew.Attributes.Append(attr);
-
-                
-
-                XmlNode ndTitle = data.CreateNode(XmlNodeType.Element, "Title", data.NamespaceURI);
-                ndTitle.InnerText = ndTask.ParentNode.Attributes["Title"].Value;
-
-                ndNew.AppendChild(ndTitle);
-
-
-                foreach(XmlAttribute fieldAttr in ndTask.Attributes)
+                if(pdef != "External")
                 {
-                    if(PublishIsValidField(fieldAttr.Name))
+                    XmlNode ndNew = data.CreateNode(XmlNodeType.Element, "Task", data.NamespaceURI);
+                    XmlAttribute attr = data.CreateAttribute("UID");
+                    attr.Value = ndTask.Attributes["id"].Value;
+                    ndNew.Attributes.Append(attr);
+
+                    attr = data.CreateAttribute("Folder");
+                    attr.Value = parentfolder;
+                    ndNew.Attributes.Append(attr);
+
+                    attr = data.CreateAttribute("ID");
+                    attr.Value = ndTask.Attributes["taskorder"].Value;
+                    ndNew.Attributes.Append(attr);
+
+
+
+                    XmlNode ndTitle = data.CreateNode(XmlNodeType.Element, "Title", data.NamespaceURI);
+                    ndTitle.InnerText = ndTask.ParentNode.Attributes["Title"].Value;
+
+                    ndNew.AppendChild(ndTitle);
+
+
+                    foreach(XmlAttribute fieldAttr in ndTask.Attributes)
                     {
-                        if(PublishIsAssignmentField(fieldAttr.Name))
+                        if(PublishIsValidField(fieldAttr.Name))
                         {
-                            XmlNode ndField = data.CreateNode(XmlNodeType.Element, "Field", data.NamespaceURI);
+                            if(PublishIsAssignmentField(fieldAttr.Name))
+                            {
+                                XmlNode ndField = data.CreateNode(XmlNodeType.Element, "Field", data.NamespaceURI);
 
-                            ndField.InnerText = PublishGetFieldValue(fieldAttr.Name, ndTask, oTaskCenter, dsResources);
-
-                            attr = data.CreateAttribute("Name");
-                            attr.Value = fieldAttr.Name;
-                            ndField.Attributes.Append(attr);
-
-                            ndNew.AppendChild(ndField);
-                        }
-                        else
-                        {
-                            
-                            XmlNode ndField = data.CreateNode(XmlNodeType.Element, "Field", data.NamespaceURI);
-
-                            if(fieldAttr.Name == "IsAssignment")
-                                 ndField.InnerText = "true";
-                            else
                                 ndField.InnerText = PublishGetFieldValue(fieldAttr.Name, ndTask, oTaskCenter, dsResources);
 
-                            attr = data.CreateAttribute("Name");
-                            attr.Value = fieldAttr.Name;
-                            ndField.Attributes.Append(attr);
+                                attr = data.CreateAttribute("Name");
+                                attr.Value = fieldAttr.Name;
+                                ndField.Attributes.Append(attr);
 
-                            ndNew.AppendChild(ndField);
+                                ndNew.AppendChild(ndField);
+                            }
+                            else
+                            {
+
+                                XmlNode ndField = data.CreateNode(XmlNodeType.Element, "Field", data.NamespaceURI);
+
+                                if(fieldAttr.Name == "IsAssignment")
+                                    ndField.InnerText = "true";
+                                else
+                                    ndField.InnerText = PublishGetFieldValue(fieldAttr.Name, ndTask, oTaskCenter, dsResources);
+
+                                attr = data.CreateAttribute("Name");
+                                attr.Value = fieldAttr.Name;
+                                ndField.Attributes.Append(attr);
+
+                                ndNew.AppendChild(ndField);
+                            }
                         }
                     }
-                }
-                if(iteration != "")
-                {
-                    try
+                    if(iteration != "")
                     {
-                        ndNew.SelectSingleNode("Field[@Name='CT" + props.sIterationCT + "']").InnerText = iteration;
+                        try
+                        {
+                            ndNew.SelectSingleNode("Field[@Name='CT" + props.sIterationCT + "']").InnerText = iteration;
+                        }
+                        catch { }
                     }
-                    catch { }
+                    data.FirstChild.AppendChild(ndNew);
                 }
-                data.FirstChild.AppendChild(ndNew);
             }
             else if(ndTask.Attributes["Def"].Value == "Assignment")
             {
@@ -1607,7 +2215,7 @@ namespace EPMLiveWorkPlanner
                 {
                     if(PublishIsValidField(fieldAttr.Name))
                     {
-                        if(ndTask.Attributes["TaskType"].Value == "Individual" && fieldAttr.Name == "AssignedTo")
+                        if((ndTask.Attributes["TaskType"].Value == "Individual" || def == "External") && fieldAttr.Name == "AssignedTo")
                         {
                             XmlNode ndField = data.CreateNode(XmlNodeType.Element, "Field", data.NamespaceURI);
 
@@ -1618,6 +2226,23 @@ namespace EPMLiveWorkPlanner
                             ndField.Attributes.Append(attr);
 
                             ndNew.AppendChild(ndField);
+                        }
+                        else if(fieldAttr.Name == "IsExternal")
+                        {
+                            XmlNode ndField = data.CreateNode(XmlNodeType.Element, "Field", data.NamespaceURI);
+
+                            if(def == "External")
+                                ndField.InnerText = "1";
+                            else
+                                ndField.InnerText = "0";
+
+                            attr = data.CreateAttribute("Name");
+                            attr.Value = fieldAttr.Name;
+                            ndField.Attributes.Append(attr);
+
+                            ndNew.AppendChild(ndField);
+
+                            
                         }
                         else
                         {
@@ -1632,6 +2257,13 @@ namespace EPMLiveWorkPlanner
                             ndNew.AppendChild(ndField);
                         }
                     }
+                }
+
+                if(ndTask.Attributes["Def"].Value == "Iteration")
+                {
+                    attr = data.CreateAttribute("Iteration");
+                    attr.Value = "1";
+                    ndNew.Attributes.Append(attr);
                 }
 
                 if(iteration != "")
@@ -1791,7 +2423,8 @@ namespace EPMLiveWorkPlanner
                 case "Project":
                 case "D":
                 case "Detail":
-                case "Descendants":
+                case "taskuid":
+                //case "Descendants":
                 case "TaskType":
                     return false;
             };
@@ -1998,6 +2631,107 @@ namespace EPMLiveWorkPlanner
 
             attr = docOut.CreateAttribute("Type");
             attr.Value = "Text";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("Visible");
+            attr.Value = "0";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("CanEdit");
+            attr.Value = "0";
+            ndNew.Attributes.Append(attr);
+
+            ndCols.AppendChild(ndNew);
+
+
+            ndNew = docOut.CreateNode(XmlNodeType.Element, "C", docOut.NamespaceURI);
+            attr = docOut.CreateAttribute("Name");
+            attr.Value = "LinkedTask";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("Type");
+            attr.Value = "Bool";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("Visible");
+            attr.Value = "0";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("CanEdit");
+            attr.Value = "0";
+            ndNew.Attributes.Append(attr);
+
+            ndCols.AppendChild(ndNew);
+
+
+            //ndNew = docOut.CreateNode(XmlNodeType.Element, "C", docOut.NamespaceURI);
+            //attr = docOut.CreateAttribute("Name");
+            //attr.Value = "MinStart";
+            //ndNew.Attributes.Append(attr);
+
+            //attr = docOut.CreateAttribute("Type");
+            //attr.Value = "Date";
+            //ndNew.Attributes.Append(attr);
+
+            //attr = docOut.CreateAttribute("Visible");
+            //attr.Value = "1";
+            //ndNew.Attributes.Append(attr);
+
+            //attr = docOut.CreateAttribute("CanEdit");
+            //attr.Value = "1";
+            //ndNew.Attributes.Append(attr);
+
+            //ndCols.AppendChild(ndNew);
+
+
+            //ndNew = docOut.CreateNode(XmlNodeType.Element, "C", docOut.NamespaceURI);
+            //attr = docOut.CreateAttribute("Name");
+            //attr.Value = "MaxEnd";
+            //ndNew.Attributes.Append(attr);
+
+            //attr = docOut.CreateAttribute("Type");
+            //attr.Value = "Date";
+            //ndNew.Attributes.Append(attr);
+
+            //attr = docOut.CreateAttribute("Visible");
+            //attr.Value = "1";
+            //ndNew.Attributes.Append(attr);
+
+            //attr = docOut.CreateAttribute("CanEdit");
+            //attr.Value = "1";
+            //ndNew.Attributes.Append(attr);
+
+            //ndCols.AppendChild(ndNew);
+
+
+
+            ndNew = docOut.CreateNode(XmlNodeType.Element, "C", docOut.NamespaceURI);
+            attr = docOut.CreateAttribute("Name");
+            attr.Value = "OldStartDate";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("Type");
+            attr.Value = "Date";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("Visible");
+            attr.Value = "0";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("CanEdit");
+            attr.Value = "0";
+            ndNew.Attributes.Append(attr);
+
+            ndCols.AppendChild(ndNew);
+
+
+            ndNew = docOut.CreateNode(XmlNodeType.Element, "C", docOut.NamespaceURI);
+            attr = docOut.CreateAttribute("Name");
+            attr.Value = "OldDueDate";
+            ndNew.Attributes.Append(attr);
+
+            attr = docOut.CreateAttribute("Type");
+            attr.Value = "Date";
             ndNew.Attributes.Append(attr);
 
             attr = docOut.CreateAttribute("Visible");
@@ -2291,8 +3025,89 @@ namespace EPMLiveWorkPlanner
                 }
             }
 
+            SPList oProjectCenter = web.Lists[p.sListProjectCenter];
 
+            SPListItem oProject = oProjectCenter.GetItemById(int.Parse(data.FirstChild.Attributes["ID"].Value));
+            //=================================Add Defaults==============================
+            
+            XmlAttribute attrDef;
 
+            XmlNode ndTaskDef = docOut.SelectSingleNode("//Def/D[@Name='Task']");
+
+            foreach(SPField oField in oListTaskCenter.Fields)
+            {
+                if(oField.Type != SPFieldType.User)
+                {
+                    try
+                    {
+                        if(!oField.ReadOnlyField)
+                        {
+                            XmlDocument docF = new XmlDocument();
+                            docF.LoadXml(oField.SchemaXml);
+
+                            string sDefault = docF.SelectSingleNode("//Default").InnerText;
+                            if(oField.Type == SPFieldType.DateTime && sDefault == "[today]")
+                            {
+
+                            }
+                            else if(oField.Type == SPFieldType.Number || oField.Type == SPFieldType.Currency)
+                            {
+                                if(sDefault != "" && sDefault != "0")
+                                {
+                                    attrDef = docOut.CreateAttribute(oField.InternalName);
+                                    attrDef.Value = sDefault.Replace("\"", "'");
+                                    ndTaskDef.Attributes.Append(attrDef);
+                                }
+                                //if(sDefault != "0" && sDefault != ".00")
+                                //sDefaults += oField.InternalName + ":\"" + sDefault.Replace("\"", "'") + "\",";
+                            }
+                            else if(oField.Type == SPFieldType.Boolean)
+                            {
+                                if(sDefault != "0")
+                                {
+                                    attrDef = docOut.CreateAttribute(oField.InternalName);
+                                    attrDef.Value = sDefault.Replace("\"", "'");
+                                    ndTaskDef.Attributes.Append(attrDef);
+                                }
+                            }
+                            else
+                            {
+                                attrDef = docOut.CreateAttribute(oField.InternalName);
+                                attrDef.Value = sDefault.Replace("\"", "'");
+                                ndTaskDef.Attributes.Append(attrDef);
+
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            try
+            {
+                attrDef = docOut.CreateAttribute("StartDate");
+                attrDef.Value = DateTime.Parse(oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString()).ToString("yyyy-MM-dd") + " " + (p.iWorkHours[0] / 60) + ":00"; //getFieldValue(oProject, oProjectCenter.Fields.GetFieldByInternalName("Start"), dsResources);// oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString();
+                ndTaskDef.Attributes.Append(attrDef);
+
+                attrDef = docOut.CreateAttribute("DueDate");
+                attrDef.Value = DateTime.Parse(oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString()).AddDays(1).ToString("yyyy-MM-dd") + " " + (p.iWorkHours[0] / 60) + ":00"; //getFieldValue(oProject, oProjectCenter.Fields.GetFieldByInternalName("Start"), dsResources);// oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString();
+                ndTaskDef.Attributes.Append(attrDef);
+            }
+            catch
+            {
+                attrDef = docOut.CreateAttribute("StartDate");
+                attrDef.Value = DateTime.Now.ToString("yyyy-MM-dd") + " " + (p.iWorkHours[0] / 60) + ":00";
+                ndTaskDef.Attributes.Append(attrDef);
+
+                attrDef = docOut.CreateAttribute("DueDate");
+                attrDef.Value = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd") + " " + (p.iWorkHours[0] / 60) + ":00";
+                ndTaskDef.Attributes.Append(attrDef);
+            }
+
+            attrDef = docOut.CreateAttribute("Duration");
+            attrDef.Value = "1";
+            ndTaskDef.Attributes.Append(attrDef);
+            //===============================================================
             appendSpecialColumns(ref docOut, ref ndCols);
 
             StringBuilder sb = new StringBuilder();
@@ -2425,9 +3240,7 @@ namespace EPMLiveWorkPlanner
             ndRightCols.AppendChild(ndNew);
             //<!--<C Name="G" GanttExclude = "w#1/5/2008~1/6/2008;w#1/6/2008~1/7/2008; d#00:00~9:00; d#18:00~24:00"/>-->
 
-            SPList oProjectCenter = web.Lists[p.sListProjectCenter];
-
-            SPListItem oProject = oProjectCenter.GetItemById(int.Parse(data.FirstChild.Attributes["ID"].Value));
+            
 
             if(oProjectCenter.Fields.ContainsField(sPlannerID + "FAC"))
             {
@@ -2545,7 +3358,14 @@ namespace EPMLiveWorkPlanner
                     ndFoot.AppendChild(ndRes);
                 }
             }
+
+            //if(p.bAgile && !bIsAgileLayout)
+            //{
+            //    docOut.FirstChild.SelectSingleNode("//I[@id='NewTask2']").Attributes["Visible"].Value = "0";
+            //}
+
             return docOut.OuterXml; 
+            
         }
 
         public static string GetAgileLayout(XmlDocument data, SPWeb oWeb)
@@ -4158,6 +4978,7 @@ namespace EPMLiveWorkPlanner
                 p.sIterationCT = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "AgileIterationField");
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "CalcWork"), out p.bCalcWork);
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "CalcCost"), out p.bCalcCost);
+                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "EnableLink"), out p.bEnableLinking);
             }
             else
             {
@@ -4231,6 +5052,7 @@ namespace EPMLiveWorkPlanner
 
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "CalcWork"), out p.bCalcWork);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "CalcCost"), out p.bCalcCost);
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "EnableLink"), out p.bEnableLinking);
                     }
                 }
             }

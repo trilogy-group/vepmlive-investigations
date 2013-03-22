@@ -35,7 +35,7 @@
     <script src="WorkPlannerAgile.js" type="text/javascript"></script>
     <%} %>
 <script src="TreeGrid/GridE.js"> </script>
-<link href="TreeGrid/Styles/Examples.css" rel="stylesheet" type="text/css" />
+
 <link href="WorkPlanner.css" rel="stylesheet" type="text/css" />
 
 <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
@@ -62,6 +62,18 @@
         background-color: #dfe3e8;
         padding:2px;
         border-bottom: #b1b5ba 1px solid;
+    }
+    
+    .newclassinput
+    {
+           padding: 2px 5px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border: 1px solid #FFFFFF;
+            color: #9C9C9C;
+            font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+            font-size:13px;
+            vertical-align: middle;
+            outline: none;
     }
     
     #mbox{background-color:#FFFFFF; padding:0px !important; border:2px solid #FFF;}
@@ -491,6 +503,18 @@
         <input type="button" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('txtTemplate').value + '`' + document.getElementById('txtTDescription').value); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /> &nbsp;<input type="button" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />
     </div>
 
+    <div id="divExternalLinkAccept" style="display:none;width:580px;padding:10px">
+        <div style="padding: 10px">
+            The following external tasks have been either updated or added. Select any tasks you would like to reject and click ok to continue.
+        </div>
+        <div id="divExternalLinkAcceptTree" style="width:580px;height:350px">
+            
+        </div>
+        <div style="padding: 10px;text-align:right">
+            <input type="button" class="ms-ButtonHeightWidth" value="OK" onclick="AcceptExternal();SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');"/>
+        </div>
+    </div>
+
     <div id="addlinkdiv" style="display:none;width:200;padding:10px">
 
         Link Type:
@@ -624,6 +648,10 @@
     var bLoading = true;
     var bRendering = true;
 
+    var CanLinkExternal = <%=CanLinkExternal %>;
+
+    oLinkedTasks = [ <%=sLinkedTasks %>];
+
     bCalcCost = <%=bCalcCost.ToString().ToLower() %>;
     bCalcWork = <%=bCalcWork.ToString().ToLower() %>;
 
@@ -728,6 +756,9 @@
         
         bLoading = false;
 
+        document.getElementById("divExternalLinkAccept").style.display="";
+        
+
         setTimeout("CreateTrees()", 100);
 
         
@@ -741,13 +772,14 @@
         CreateBasicTree("GetDetailLayout","detailTree");
         CreateBasicTree("GetAssignmentLayout","assignmentsDivTree");
         CreateBasicTree("GetLinksLayout","linksDivTree");
+        CreateBasicTree("GetExternalLinkLayout","divExternalLinkAcceptTree");
 
         TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetProjectInfo",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:1, Debug:"" }, "projectDiv" ); 
 
 
         TreeGrid(   { 
                     Layout:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetLayout",Dataxml:"<%=sPlannerLayoutParam %>" } } ,
-                    Upload:{ Url:"SaveWorkPlanner.aspx", Type:"Body",Format:"Internal",Data:"TGData",Flags:"Accepted,AllCols,NoIO",Param:{Dataxml:"<%=sPlannerDataParam %>"} } ,
+                    Upload:{ Url:"SaveWorkPlanner.aspx", Type:"Body",Format:"Internal",Data:"TGData",Flags:"Accepted,AllCols,NoIO,Defaults",Param:{Dataxml:"<%=sPlannerDataParam %>"} } ,
                     Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetTasks",Dataxml:"<%=sPlannerDataParam %>" } }, 
                     Debug:"Error",Export:{Url:"PlannerExcelExport.aspx"}, SuppressMessage:1
                     }, 

@@ -189,6 +189,12 @@
     <Compile Include="Layouts\epmlive\tasks.aspx.designer.cs">
       <DependentUpon>tasks.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\WorkPlanLinkTask.aspx.cs">
+      <DependentUpon>WorkPlanLinkTask.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\WorkPlanLinkTask.aspx.designer.cs">
+      <DependentUpon>WorkPlanLinkTask.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.cs">
       <DependentUpon>WorkPlanner.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -327,6 +333,7 @@
     <Content Include="Layouts\epmlive\images\editview.gif" />
     <Content Include="Layouts\epmlive\images\excel16.png" />
     <Content Include="Layouts\epmlive\images\expand.gif" />
+    <Content Include="Layouts\epmlive\images\externallink.png" />
     <Content Include="Layouts\epmlive\images\Filter.png" />
     <Content Include="Layouts\epmlive\images\FOLDER.GIF" />
     <Content Include="Layouts\epmlive\images\grouping.gif" />
@@ -388,6 +395,7 @@
     <Content Include="Layouts\epmlive\showgantt.aspx" />
     <Content Include="Layouts\epmlive\tasks.aspx" />
     <Content Include="Layouts\epmlive\updatetask.aspx" />
+    <Content Include="Layouts\epmlive\WorkPlanLinkTask.aspx" />
     <Content Include="Layouts\epmlive\WorkPlanner.aspx" />
     <Content Include="Layouts\epmlive\WorkPlanner.css" />
     <Content Include="Layouts\epmlive\WorkPlanner.js" />
@@ -399,6 +407,8 @@
     <Content Include="Layouts\epmlive\WorkPlannerWizard.aspx" />
     <Content Include="Layouts\epmlive\workplannerwizard.css" />
     <Content Include="PlannerMenus\Elements.xml" />
+    <None Include="Resources\txtExternalLinksApproval.txt" />
+    <None Include="Resources\txtExternalProjects.txt" />
     <Content Include="WEFolder\Elements.xml" />
     <Content Include="WorkPlannerMenus\Elements.xml" />
     <None Include="Resources\txtWorkPlannerTabTempalte.txt" />

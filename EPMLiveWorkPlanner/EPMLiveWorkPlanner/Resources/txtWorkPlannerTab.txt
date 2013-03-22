@@ -116,7 +116,13 @@
 					LabelText="Delete"
 					TemplateAlias="oM"/>
 
-				
+				<Button
+					Id="Ribbon.WorkPlanner.InsertGroup.LinkExternalTask"
+					Sequence="30"
+					Image16by16="/_layouts/epmlive/images/externallink.png"
+					Command="Ribbon.WorkPlanner.LinkExternalTask"
+					LabelText="External Task"
+					TemplateAlias="oM"/>
 
 			</Controls>
 		</Group>

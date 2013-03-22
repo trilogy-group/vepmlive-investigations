@@ -85,6 +85,6 @@
 		<I Kind='Filter'  Visible='0'/>
 	</Head>
 	<Foot>
-		<I Kind='Data' CanEdit='1' id='NewTask' Title='New Item' Class='NewTask' NoColor='1' NoUpload='1' NoColorState='1' Def="Task" CanMove="0" CanDrag="0" CanSelect="0" CanExport="0"/>
+		<I Kind='Data' CanEdit='1' id='NewTask3' Background="#FFFFFF" Title='New Item' Visible='1' Def="NewTaskBack" Class='NewRowBack' NoColor='1' NoUpload='1' NoColorState='1' LeftHtml="&lt;input type='text' style='width:100%' class='newclassinput' onkeypress='newtaskkeypress(this, event, true); CancelBubbling(this, event);' onkeydown='CancelBubbling(this, event);' onkeyup='CancelBubbling(this, event);' onclick='CancelBubbling(this, event);' value='New Task' onfocus='newtaskfocus(this)' onblur='newtaskblur(this);' id='txtNewTask2'&gt;" MidHtml="" RightHtml=""   CanMove="0" CanDrag="0" CanSelect="0" CanExport="0"/>
 	</Foot>
 </Grid>

@@ -166,6 +166,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
 
                 string firstLine = "";
+                
+                FileUpload1.PostedFile.InputStream.Position = 0;
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {

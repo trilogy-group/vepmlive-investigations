@@ -246,5 +246,43 @@ namespace EPMLiveWorkPlanner
 
             return arrFields;
         }
+
+        public static string getWorkPlannerFromTaskList(SPWeb w, string list)
+        {
+            string splanner = "";
+
+            try
+            {
+                Guid lWeb = EPMLiveCore.CoreFunctions.getLockedWeb(w);
+                if(lWeb == Guid.Empty)
+                    lWeb = w.ID;
+
+                using(SPSite site = w.Site)
+                {
+                    using(SPWeb web = site.OpenWeb(lWeb))
+                    {
+                        string planners = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlannerPlanners");
+
+                        foreach(string planner in planners.Split(','))
+                        {
+                            if(planner != "")
+                            {
+                                string[] sPlanner = planner.Split('|');
+                                string taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "TaskCenter");
+
+                                if(taskcenter != "")
+                                {
+                                    splanner = sPlanner[0];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return splanner;
+        }
     }
 }

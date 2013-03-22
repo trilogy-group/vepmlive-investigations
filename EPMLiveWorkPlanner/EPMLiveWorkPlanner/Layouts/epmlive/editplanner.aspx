@@ -449,6 +449,21 @@
 	                            </Template_InputFormControls>
                             </wssuc:InputFormSection>
 
+                            <wssuc:InputFormSection Title="Enable Linking"
+	                            Description=""
+	                            runat="server">
+	                            <Template_Description>
+                                    When enabled, this option will allow users to link tasks between projects.
+	                            </Template_Description>
+	                            <Template_InputFormControls>
+		                            <wssuc:InputFormControl LabelText="" runat="server">
+			                             <Template_Control>
+			                                <asp:CheckBox ID="chkLinking" runat="server" /> Enable Linking
+			                             </Template_Control>
+		                            </wssuc:InputFormControl>
+	                            </Template_InputFormControls>
+                            </wssuc:InputFormSection>
+
                             <wssuc:InputFormSection Title="Calculate Work"
 	                            Description=""
 	                            runat="server">

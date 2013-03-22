@@ -196,6 +196,12 @@ namespace EPMLiveWorkPlanner
                             chkLockPublisher.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "PJLock"));
                         }
                         catch { }
+
+                        try
+                        {
+                            chkLinking.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableLink"));
+                        }
+                        catch { }
                     }
                 }
                 catch { }
@@ -428,6 +434,7 @@ namespace EPMLiveWorkPlanner
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "LunchStart", ddlLunchStart.SelectedValue);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "LunchEnd", ddlLunchEnd.SelectedValue);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "DisablePC", chkDisableParentChild.Checked.ToString());
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "EnableLink", chkLinking.Checked.ToString());
 
                     if(chkAgilePlanner.Checked)
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "AgileIterationField", ddlAgileContentType.SelectedValue);
@@ -482,6 +489,42 @@ namespace EPMLiveWorkPlanner
                         locked = "0,0,0,0,0,0";
 
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJLockItems", locked);
+
+
+                    if(chkLinking.Checked)
+                    {
+
+                        SPList list = web.Lists[ddlTaskCenter.SelectedItem.Text];
+
+                        SPField f = null;
+                        try
+                        {
+                            f = list.Fields.GetFieldByInternalName("IsExternal");
+                        }
+                        catch { }
+                        if(f == null)
+                        {
+                            string sF = list.Fields.Add("IsExternal", SPFieldType.Boolean, false);
+                            f = list.Fields.GetFieldByInternalName("IsExternal");
+                            f.ShowInEditForm = false;
+                            f.ShowInNewForm = false;
+                            f.Update();
+                        }
+                        f = null;
+                        try
+                        {
+                            f = list.Fields.GetFieldByInternalName("ExternalLink");
+                        }
+                        catch { }
+                        if(f == null)
+                        {
+                            string sF = list.Fields.Add("ExternalLink", SPFieldType.Text, false);
+                            f = list.Fields.GetFieldByInternalName("ExternalLink");
+                            f.ShowInEditForm = false;
+                            f.ShowInNewForm = false;
+                            f.Update();
+                        }
+                    }
 
                     //Agile
                     //EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "AgileBacklog", ddlAgileBacklog.SelectedItem.Text);
