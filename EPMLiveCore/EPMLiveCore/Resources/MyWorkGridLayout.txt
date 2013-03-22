@@ -3,7 +3,7 @@
 	<Cfg SuppressCfg="1" Style="GS" />
 	<Cfg MainCol="Title" NameCol="Title" />
 	<Cfg ConstWidth="0" />
-	<Cfg NoVScroll="1" />
+	<Cfg NoVScroll="0" />
 	<Cfg Undo="0" />
 	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" />
 	<Cfg Searching="1" />
