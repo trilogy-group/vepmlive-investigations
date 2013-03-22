@@ -815,7 +815,7 @@ namespace EPMLiveCore.API
                 SPUser currentUser = spWeb.CurrentUser;
 
                 string sql = string.Format(
-                    @"SELECT DISTINCT * FROM dbo.LSTMyWork WHERE ([AssignedToID] = {0})  AND ([Complete] {1} 1)
+                    @"SELECT DISTINCT * FROM dbo.LSTMyWork WHERE ([AssignedToID] = {0})  AND ([Complete] {1} 1 OR [Complete] IS NULL)
                                 AND ([WebUrl] LIKE N'{2}%' OR [WebUrl] = N'{2}' OR [WebUrl] = N'/' AND [SiteId] = N'{3}')
                                 AND ([DueDate] IS NULL OR ([DueDate] >= '{4}' AND [DueDate] <= '{5}'))
                                 AND ([WorkType] IN ({6})) {7}",
@@ -1132,7 +1132,7 @@ namespace EPMLiveCore.API
 
             if (name.Equals(COMMENT_COUNT_FIELD))
                 value = !string.IsNullOrEmpty(value)
-                            ? decimal.Truncate(Convert.ToDecimal(value, new CultureInfo(""))).ToString()
+                            ? decimal.Truncate(Convert.ToDecimal(value, new CultureInfo(""))).ToString(CultureInfo.InvariantCulture)
                             : string.Empty;
 
             if (name.Equals("Priority"))

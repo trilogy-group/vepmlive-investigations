@@ -49,10 +49,35 @@ namespace EPMLiveCore.API
             switch (field.Type)
             {
                 case SPFieldType.DateTime:
-                    return (((SPFieldDateTime)field).DisplayFormat).ToString();
+                    return (((SPFieldDateTime) field).DisplayFormat).ToString();
                 case SPFieldType.Number:
-                    var spFieldNumber = (SPFieldNumber)field;
-                    return spFieldNumber.ShowAsPercentage ? "Percentage" : spFieldNumber.DisplayFormat.ToString();
+                    var spFieldNumber = (SPFieldNumber) field;
+
+                    string percentageSign = string.Empty;
+
+                    if (spFieldNumber.ShowAsPercentage)
+                    {
+                        percentageSign = @"\%";
+                    }
+
+                    switch (spFieldNumber.DisplayFormat)
+                    {
+                        case SPNumberFormatTypes.Automatic:
+                            return ",#0.##########" + percentageSign;
+                        case SPNumberFormatTypes.NoDecimal:
+                            return ",#0" + percentageSign;
+                        case SPNumberFormatTypes.OneDecimal:
+                            return ",#0.0" + percentageSign;
+                        case SPNumberFormatTypes.TwoDecimals:
+                            return ",#0.00" + percentageSign;
+                        case SPNumberFormatTypes.ThreeDecimals:
+                            return ",#0.000" + percentageSign;
+                        case SPNumberFormatTypes.FourDecimals:
+                            return ",#0.0000" + percentageSign;
+                        case SPNumberFormatTypes.FiveDecimals:
+                            return ",#0.00000" + percentageSign;
+                    }
+                    return string.Empty;
                 case SPFieldType.Currency:
                     return "Currency";
                 case SPFieldType.Calculated:

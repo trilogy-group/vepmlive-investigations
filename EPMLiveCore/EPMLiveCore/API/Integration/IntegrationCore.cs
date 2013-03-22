@@ -9,6 +9,7 @@ using System.Collections;
 using System.Reflection;
 using EPMLiveIntegration;
 using System.Xml;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore.API.Integration
 {
@@ -18,6 +19,16 @@ namespace EPMLiveCore.API.Integration
         SPWeb _web;
         SqlConnection cn;
         private bool WasOpen = false;
+
+        private class IntegratorDef
+        {
+            public IIntegrator iIntegrator;
+            public string Title;
+            public string IntKey;
+            public Guid ListId;
+            public string intcol;
+            public Guid intlistid;
+        }
 
         public IntegrationCore(Guid SiteId, Guid WebId)
         {
@@ -42,7 +53,68 @@ namespace EPMLiveCore.API.Integration
             return ds.Tables[0];
         }
 
-        
+        internal bool InstallIntegration(Guid intlistid, Guid listid, out string message)
+        {
+            try
+            {
+                IntegratorDef integrator = GetIntegrator(intlistid);
+
+                IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
+
+                Hashtable hshProps = GetProperties(intlistid);
+
+                WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
+
+                return integrator.iIntegrator.InstallIntegration(webprops, log, out message, integrator.IntKey, GetAPIUrl(_site.WebApplication.Id));
+            }
+            catch(Exception ex)
+            {
+                message = "Install Error: " + ex.Message;
+                return false;
+            }
+        }
+
+        internal SPListItem GetListItemFromExternalID(string intlistid, string intuid)
+        {
+
+            IntegratorDef def = GetIntegrator(new Guid(intlistid));
+
+            SPList list = _web.Lists[def.ListId];
+
+            SPQuery query = new SPQuery();
+            query.Query = "<Where><Eq><FieldRef Name='" + def.intcol + "'/><Value Type='Text'>" + intuid + "</Value></Eq></Where>";
+            SPListItemCollection lic = list.GetItems(query);
+            if(lic.Count > 0)
+            {
+
+                return lic[0];
+
+            }
+            else
+                return null;
+
+        }
+
+        internal bool RemoveIntegration(Guid intlistid, Guid listid, out string message)
+        {
+            try
+            {
+                IntegratorDef integrator = GetIntegrator(intlistid);
+
+                IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
+
+                Hashtable hshProps = GetProperties(intlistid);
+
+                WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
+
+                return integrator.iIntegrator.RemoveIntegration(webprops, log, out message, integrator.IntKey);
+            }
+            catch(Exception ex)
+            {
+                message = "Remove Error: " + ex.Message;
+                return false;
+            }
+        }
 
         public DataTable GetIntegrations(bool bOnline)
         {
@@ -154,7 +226,7 @@ namespace EPMLiveCore.API.Integration
 
             Hashtable hshProps = GetProperties(intlistid);
 
-            WebProperties webprops = GetWebProps(hshProps);
+            WebProperties webprops = GetWebProps(hshProps, intlistid);
 
             return integrator.GetDropDownValues(webprops, log, property, parentpropertvalue);
         }
@@ -169,7 +241,7 @@ namespace EPMLiveCore.API.Integration
 
             Hashtable hshProps = GetProperties(intlistid);
 
-            WebProperties webprops = GetWebProps(hshProps);
+            WebProperties webprops = GetWebProps(hshProps, intlistid);
 
             return integrator.TestConnection(webprops, log, out message);
         }
@@ -182,7 +254,7 @@ namespace EPMLiveCore.API.Integration
 
             IntegrationLog log = new IntegrationLog(cn, intlistid, list.ID, title);
 
-            WebProperties webprops = GetWebProps(Properties);
+            WebProperties webprops = GetWebProps(Properties, intlistid);
 
             return integrator.GetColumns(webprops, log, list.Title);
         }
@@ -195,7 +267,7 @@ namespace EPMLiveCore.API.Integration
 
             IntegrationLog log = new IntegrationLog(cn, intlistid, listid, title);
 
-            WebProperties webprops = GetWebProps(Properties);
+            WebProperties webprops = GetWebProps(Properties, intlistid);
 
             return integrator.TestConnection(webprops, log, out message);
         }
@@ -256,9 +328,60 @@ namespace EPMLiveCore.API.Integration
             return null;
         }
 
-        private void ProcessItemRow(DataRow dr, SPList list, DataTable dtColumns, Hashtable Properties, string ColId, Guid intlistid, Guid moduleid)
+        private void ProcessItemRow(DataRow dr, SPList list, DataTable dtColumns, Hashtable Properties, string ColId, Guid intlistid, Guid moduleid, bool bCanAdd, DataTable dtUserFields, Hashtable hshUserMap, bool bBuildTeamSec)
         {
 
+            
+
+            int ownerid = 0;
+
+            if(bBuildTeamSec)
+            {
+                try
+                {
+                    if(Properties["SecMatch"].ToString() != "")
+                    {
+
+                        ownerid = new SPFieldLookupValue(hshUserMap[dr[Properties["SecMatch"].ToString()]].ToString()).LookupId;
+
+                    }
+                }
+                catch { }
+            }
+
+            if(ownerid != 0)
+            {
+                SPUser user = null;
+                try
+                {
+                    user = list.ParentWeb.SiteUsers.GetByID(ownerid);
+                }
+                catch { }
+                if(user != null)
+                {
+                    using(SPSite site = new SPSite(list.ParentWeb.Site.ID, user.UserToken))
+                    {
+                        using(SPWeb web = site.OpenWeb(list.ParentWeb.ID))
+                        {
+                            SPList tlist = web.Lists[list.ID];
+                            iProcessItemRow(dr, tlist, dtColumns, Properties, ColId, intlistid, moduleid, bCanAdd, dtUserFields, hshUserMap);
+                        }
+                    }
+                }
+                else
+                    iProcessItemRow(dr, list, dtColumns, Properties, ColId, intlistid, moduleid, bCanAdd, dtUserFields, hshUserMap);
+            }
+            else
+            {
+                iProcessItemRow(dr, list, dtColumns, Properties, ColId, intlistid, moduleid, bCanAdd, dtUserFields, hshUserMap);
+            }
+
+            
+        }
+
+        internal int iProcessItemRow(DataRow dr, SPList list, DataTable dtColumns, Hashtable Properties, string ColId, Guid intlistid, Guid moduleid, bool bCanAdd, DataTable dtUserFields, Hashtable hshUserMap)
+        {
+            int itemid = 0;
             string matchList = "";
             string matchInt = "";
             try
@@ -268,16 +391,6 @@ namespace EPMLiveCore.API.Integration
                 matchList = match[0];
             }
             catch { }
-
-            DataSet dsUserFields = GetDataSet(list, "");
-            DataTable dtUserFields = dsUserFields.Tables[1];
-
-            Hashtable hshUserMap = new Hashtable();
-            if(dtUserFields.Select("Type='1'").Length > 0)
-            {
-                hshUserMap = GetUserMap(intlistid.ToString(), true);
-            }
-
 
             if(dr["ID"].ToString() == "")
             {
@@ -302,7 +415,8 @@ namespace EPMLiveCore.API.Integration
 
                         if(!bAlreadyMatched)
                         {
-                            ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap);
+                            itemid = li.ID;
+                            ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap, dtUserFields);
                         }
                     }
                 }
@@ -315,8 +429,8 @@ namespace EPMLiveCore.API.Integration
                 if(lic.Count > 0)
                 {
                     SPListItem li = lic[0];
-
-                    ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap);
+                    itemid = li.ID;
+                    ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap, dtUserFields);
                 }
                 else if(matchList != "")
                 {
@@ -326,7 +440,7 @@ namespace EPMLiveCore.API.Integration
                     if(lic.Count > 0)
                     {
                         SPListItem li = lic[0];
-
+                        itemid = li.ID;
                         bool bAlreadyMatched = false;
                         try
                         {
@@ -339,32 +453,46 @@ namespace EPMLiveCore.API.Integration
 
                         if(!bAlreadyMatched)
                         {
-                            ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap);
+                            ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap, dtUserFields);
                         }
                         else
                         {
-                            li = list.Items.Add();
+                            if(bCanAdd)
+                            {
+                                li = list.Items.Add();
 
-                            ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap);
+                                ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap, dtUserFields);
+                                itemid = li.ID;
+                            }
                         }
                     }
                     else
                     {
-                        SPListItem li = list.Items.Add();
+                        if(bCanAdd)
+                        {
+                            SPListItem li = list.Items.Add();
 
-                        ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap);
+                            ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap, dtUserFields);
+                            itemid = li.ID;
+                        }
                     }
                 }
                 else
                 {
-                    SPListItem li = list.Items.Add();
+                    if(bCanAdd)
+                    {
+                        SPListItem li = list.Items.Add();
 
-                    ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap);
+                        ProcessLIItem(list, li, dr, dtColumns, ColId, intlistid, moduleid, hshUserMap, dtUserFields);
+                        itemid = li.ID;
+                    }
                 }
             }
+
+            return itemid;
         }
 
-        private void ProcessLIItem(SPList list, SPListItem li, DataRow dr, DataTable dtColumns, string ColId, Guid intlistid, Guid moduleid, Hashtable hshUserMap)
+        internal void ProcessLIItem(SPList list, SPListItem li, DataRow dr, DataTable dtColumns, string ColId, Guid intlistid, Guid moduleid, Hashtable hshUserMap, DataTable dtUserFields)
         {
             try
             {
@@ -391,7 +519,7 @@ namespace EPMLiveCore.API.Integration
                                 string uInfo = "";
                                 try
                                 {
-                                    string []userinfo = dr[drC["IntegrationColumn"].ToString()].ToString().Split(',');
+                                    string[] userinfo = dr[drC["IntegrationColumn"].ToString()].ToString().Split(',');
                                     foreach(string sInfo in userinfo)
                                     {
                                         if(sInfo != "" && hshUserMap.Contains(sInfo))
@@ -410,11 +538,27 @@ namespace EPMLiveCore.API.Integration
                                     li[field.Id] = null;
                                 }
                             }
+                            else if(field.Type == SPFieldType.DateTime)
+                            {
+                                string sDateVal = dr[drC["IntegrationColumn"].ToString()].ToString();
+                                if(sDateVal != "")
+                                {
+                                    li[field.Id] = sDateVal;
+                                }
+                                else
+                                {
+                                    li[field.Id] = null;
+                                }
+                            }
                             else if(field.Type == SPFieldType.Lookup)
                             {
-                                if(drC["Setting"].ToString() == "1")
+                                if(drC["Setting"].ToString() != "1")
                                 {
-                                    li[field.Id] = GetLookupItem(((SPFieldLookup)field).LookupList, dr[drC["IntegrationColumn"].ToString()].ToString(), intlistid, moduleid);
+                                    DataRow[] drColUser = dtUserFields.Select("Fieldname='" + drC["SharePointColumn"].ToString() + "'");
+                                    if(drColUser[0]["LookupIntColID"].ToString() != "")
+                                        li[field.Id] = GetLookupItem(((SPFieldLookup)field).LookupList, dr[drC["IntegrationColumn"].ToString()].ToString(), intlistid, moduleid);
+                                    else
+                                        li[field.Id] = dr[drC["IntegrationColumn"].ToString()].ToString();
                                 }
                                 else
                                 {
@@ -435,11 +579,17 @@ namespace EPMLiveCore.API.Integration
             }
         }
 
+
+
         private void ProcessItemIncoming(DataRow dr)
         {
             try
             {
                 SPList list = _web.Lists[new Guid(dr["LIST_ID"].ToString())];
+
+                GridGanttSettings settings = new GridGanttSettings(list);
+
+                bool bBuildTeamSec = settings.BuildTeamSecurity;
 
                 Hashtable parms = new Hashtable();
                 parms.Add("listid", list.ID);
@@ -455,7 +605,7 @@ namespace EPMLiveCore.API.Integration
                     if(dr["TYPE"].ToString() == "1")//Update
                     {
 
-                        
+                        Hashtable props = GetProperties(new Guid(drIntegration["INT_LIST_ID"].ToString()));
 
                         if(drIntegration["LIVEINCOMING"].ToString().ToLower() == "true")
                         {
@@ -471,14 +621,44 @@ namespace EPMLiveCore.API.Integration
                                 dtItem.Columns.Add(drCol["IntegrationColumn"].ToString());
                             }
 
+                            try
+                            {
+                                if(props["SecMatch"].ToString() != "")
+                                    if(!dtItem.Columns.Contains(props["SecMatch"].ToString()))
+                                        dtItem.Columns.Add(props["SecMatch"].ToString());
+                            }
+                            catch { }
+
 
                             dtItem = GetExternalItem(dtItem, new Guid(drIntegration["INT_LIST_ID"].ToString()), list.ID, dr["INTITEM_ID"].ToString());
-
-                            if(dtItem.Rows.Count > 0)
+                            
+                            DataSet dsUserFields = GetDataSet(list, "", Guid.Empty);
+                            DataTable dtUserFields = dsUserFields.Tables[1];
+                            Hashtable hshUserMap = new Hashtable();
+                            if(dtUserFields.Select("Type='1'").Length > 0 || bBuildTeamSec)
                             {
-                                Hashtable props = GetProperties(new Guid(drIntegration["INT_LIST_ID"].ToString()));
+                                hshUserMap = GetUserMap(drIntegration["INT_LIST_ID"].ToString(), true);
+                            }
 
-                                ProcessItemRow(dtItem.Rows[0], list, dtCols, props, dr["COL_ID"].ToString(), new Guid(drIntegration["INT_LIST_ID"].ToString()), new Guid(drIntegration["MODULE_ID"].ToString()));
+                            foreach(DataRow drItem in dtItem.Rows)
+                            {
+                                
+
+                                bool bCanAdd = false;
+
+                                try {
+                                    bCanAdd = bool.Parse(props["AllowAddList"].ToString());
+                                }
+                                catch { }
+
+                                try
+                                {
+                                    if(props["SecMatch"].ToString() == "")
+                                        bBuildTeamSec = false;
+                                }
+                                catch { bBuildTeamSec = false; }
+
+                                ProcessItemRow(drItem, list, dtCols, props, dr["COL_ID"].ToString(), new Guid(drIntegration["INT_LIST_ID"].ToString()), new Guid(drIntegration["MODULE_ID"].ToString()), bCanAdd, dtUserFields, hshUserMap, bBuildTeamSec);
                             }
                         }
                     }
@@ -552,7 +732,7 @@ namespace EPMLiveCore.API.Integration
                     SPList list = _web.Lists[new Guid(dr["LIST_ID"].ToString())];
                     SPListItem li = list.Items.GetItemById(int.Parse(dr["ITEM_ID"].ToString()));
 
-                    DataSet dsItem = GetDataSet(list, dr["COL_ID"].ToString());
+                    DataSet dsItem = GetDataSet(list, dr["COL_ID"].ToString(), Guid.Empty);
 
                     ProcessItem(dsItem, li, list);
 
@@ -608,7 +788,7 @@ namespace EPMLiveCore.API.Integration
             }
         }
 
-        private void LogMessage(string intlistid, string listid, string message, int type)
+        internal void LogMessage(string intlistid, string listid, string message, int type)
         {
             OpenConnection();
 
@@ -625,7 +805,7 @@ namespace EPMLiveCore.API.Integration
             CloseConnection(false);
         }
 
-        private Hashtable GetUserMap(string integrationlistid, bool reverse)
+        internal Hashtable GetUserMap(string integrationlistid, bool reverse)
         {
             Hashtable hsh = new Hashtable();
 
@@ -729,7 +909,7 @@ namespace EPMLiveCore.API.Integration
             return hsh;
         }
 
-        private void PostIntegration(DataTable dtItems, DataTable dtUserFields, DataTable dtColumns, SPList list)
+        internal void PostIntegration(DataTable dtItems, DataTable dtUserFields, DataTable dtColumns, SPList list)
         {
             try
             {
@@ -791,7 +971,7 @@ namespace EPMLiveCore.API.Integration
                                     dr[dc.ColumnName] = newUserString.Trim(',');
                                 }
                             }
-                            else if(drColUser[0]["Type"].ToString() == "2" && drColMap[0]["Setting"].ToString() == "1")
+                            else if(drColUser[0]["Type"].ToString() == "2" && drColMap[0]["Setting"].ToString() != "1")
                             {
                                 if(drColUser[0]["LookupIntColID"].ToString() != "")
                                 {
@@ -809,7 +989,7 @@ namespace EPMLiveCore.API.Integration
 
                                             dr[dc.ColumnName] = li[col].ToString();
                                         }
-                                        catch { }
+                                        catch { dr[dc.ColumnName] = ""; }
 
                                     }
                                 }
@@ -877,61 +1057,74 @@ namespace EPMLiveCore.API.Integration
 
         private void PostIntegrationDeleteToExternal(DataTable dtItems, Guid intlistid, Guid listid)
         {
-            string title = "";
 
-            IIntegrator integrator = GetIntegrator(intlistid, out title);
+            IntegratorDef integrator = GetIntegrator(intlistid);
 
-            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, title);
+            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
 
             Hashtable hshProps = GetProperties(intlistid);
 
-            WebProperties webprops = GetWebProps(hshProps);
+            WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
 
-            integrator.DeleteItems(webprops, dtItems, log);
+            integrator.iIntegrator.DeleteItems(webprops, dtItems, log);
 
         }
 
-        private TransactionTable PostIntegrationUpdateToExternal(DataTable dtItems, Guid intlistid, Guid listid)
+        internal DataTable PullData(DataTable dtItems, Guid intlistid, Guid listid, DateTime dtLastSynched)
         {
-            string title = "";
 
-            IIntegrator integrator = GetIntegrator(intlistid, out title);
+            IntegratorDef integrator = GetIntegrator(intlistid);
 
-            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, title);
+            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
 
             Hashtable hshProps = GetProperties(intlistid);
 
-            WebProperties webprops = GetWebProps(hshProps);
+            WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
 
-            return integrator.UpdateItems(webprops, dtItems, log);
+            return integrator.iIntegrator.PullData(webprops, log, dtItems, dtLastSynched);
+
+        }
+
+        internal TransactionTable PostIntegrationUpdateToExternal(DataTable dtItems, Guid intlistid, Guid listid)
+        {
+
+            IntegratorDef integrator = GetIntegrator(intlistid);
+
+            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
+
+            Hashtable hshProps = GetProperties(intlistid);
+
+            WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
+
+            return integrator.iIntegrator.UpdateItems(webprops, dtItems, log);
         }
 
         private DataTable GetExternalItem(DataTable dtItems, Guid intlistid, Guid listid, string itemid)
         {
-            string title = "";
+            IntegratorDef integrator = GetIntegrator(intlistid);
 
-            IIntegrator integrator = GetIntegrator(intlistid, out title);
-
-            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, title);
+            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
 
             Hashtable hshProps = GetProperties(intlistid);
 
-            WebProperties webprops = GetWebProps(hshProps);
+            WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
 
-            return integrator.GetItem(webprops, log, itemid, dtItems);
+            return integrator.iIntegrator.GetItem(webprops, log, itemid, dtItems);
         }
 
-        private WebProperties GetWebProps(Hashtable Props)
+        private WebProperties GetWebProps(Hashtable Props, Guid intlistid)
         {
             WebProperties props = new WebProperties();
             props.Title = _web.Title;
             props.ID = _web.ID;
             props.URL = _web.ServerRelativeUrl;
-            
+            props.FullURL = _web.Url;
+
             props.Site.ID = _site.ID;
             props.Site.Title = _site.RootWeb.Title;
             props.Site.URL = _site.Url;
 
+            props.IntegrationId = intlistid;
 
             props.Properties = Props;
 
@@ -944,12 +1137,50 @@ namespace EPMLiveCore.API.Integration
             OpenConnection();
 
             Hashtable hshProps = new Hashtable();
-            SqlCommand cmd = new SqlCommand("SELECT     Property, Value FROM INT_PROPS WHERE INT_LIST_ID=@intlistid", cn);
+
+
+            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_MODULES.CustomProps FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid", cn);
             cmd.Parameters.AddWithValue("@intlistid", intlistid);
             SqlDataReader dr = cmd.ExecuteReader();
+
+            string propxml = "";
+
+            if(dr.Read())
+            {
+                propxml = dr.GetString(0);
+            }
+            dr.Close();
+
+            XmlDocument doc = new XmlDocument();
+
+            try
+            {
+                doc.LoadXml(propxml);
+            }
+            catch { doc.LoadXml("<props/>"); }
+
+            cmd = new SqlCommand("SELECT     Property, Value FROM INT_PROPS WHERE INT_LIST_ID=@intlistid", cn);
+            cmd.Parameters.AddWithValue("@intlistid", intlistid);
+            dr = cmd.ExecuteReader();
+
+
+
             while(dr.Read())
             {
-                hshProps.Add(dr.GetString(0), dr.GetString(1));
+                bool bPass = false;
+                try
+                {
+                    XmlNode nd = doc.FirstChild.SelectSingleNode("//Input[@Property='" + dr.GetString(0) + "']");
+                    if(nd != null && nd.Attributes["Type"].Value == "Password")
+                        bPass = true;
+                        
+                }
+                catch { }
+
+                if(bPass)
+                    hshProps.Add(dr.GetString(0), CoreFunctions.Decrypt(dr.GetString(1), "kKGBJ768d3q78^#&^dsas"));
+                else
+                    hshProps.Add(dr.GetString(0), dr.GetString(1));
             }
             dr.Close();
             CloseConnection(false);
@@ -957,29 +1188,38 @@ namespace EPMLiveCore.API.Integration
             return hshProps;
         }
 
-        private IIntegrator GetIntegrator(Guid intlistid, out string title)
+        private IntegratorDef GetIntegrator(Guid intlistid)
         {
             OpenConnection();
 
+            IntegratorDef def = new IntegratorDef();
+
             string netAssembly = "";
             string netClass = "";
-            title = "";
 
-            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_MODULES.MODULE_ID, dbo.INT_MODULES.NetAssembly, dbo.INT_MODULES.NetClass,Title FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid", cn);
+            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_MODULES.MODULE_ID, dbo.INT_MODULES.NetAssembly, dbo.INT_MODULES.NetClass,Title,INT_KEY,LIST_ID,INT_COLID,INT_LIST_ID FROM         dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID WHERE INT_LIST_ID=@intlistid", cn);
             cmd.Parameters.AddWithValue("@intlistid", intlistid);
             SqlDataReader dr = cmd.ExecuteReader();
             if(dr.Read())
             {
                 netAssembly = dr.GetString(1);
                 netClass = dr.GetString(2);
-                title = dr.GetString(3);
+                def.Title = dr.GetString(3);
+                def.IntKey = dr.GetString(4);
+                def.ListId = dr.GetGuid(5);
+                def.intcol = "INTUID" + dr.GetInt32(6);
+                def.intlistid = dr.GetGuid(7);
             }
             dr.Close();
 
             Assembly assemblyInstance = Assembly.Load(netAssembly);
             Type thisClass = assemblyInstance.GetType(netClass);
+            
+            
+            def.iIntegrator = (IIntegrator)Activator.CreateInstance(thisClass);
 
-            return (IIntegrator)Activator.CreateInstance(thisClass);
+
+            return def;
 
         }
 
@@ -1010,7 +1250,7 @@ namespace EPMLiveCore.API.Integration
 
         }
 
-        private void ProcessItem(DataSet dsItem, SPListItem li, SPList list)
+        internal void ProcessItem(DataSet dsItem, SPListItem li, SPList list)
         {
             
             ArrayList arrCols = new ArrayList();
@@ -1050,8 +1290,19 @@ namespace EPMLiveCore.API.Integration
                             case SPFieldType.User:
                                 val = li[field.Id].ToString();
                                 break;
+                            case SPFieldType.Calculated:
+                                val = field.GetFieldValue(li[field.Id].ToString()).ToString();
+                                int indexof = val.IndexOf(";#");
+                                if(indexof > 0)
+                                {
+                                    val = val.Substring(indexof + 2);
+                                }
+                                break;
                             default:
-                                val = field.GetFieldValueAsText(li[field.Id].ToString());
+                                if(field.TypeAsString == "TotalRollup")
+                                    val = field.GetFieldValue(li[field.Id].ToString()).ToString();
+                                else
+                                    val = field.GetFieldValueAsText(li[field.Id].ToString());
                                 break;
                         }
 
@@ -1139,7 +1390,7 @@ namespace EPMLiveCore.API.Integration
             }
         }
 
-        private DataSet GetDataSet(SPList list, string eventfromid)
+        internal DataSet GetDataSet(SPList list, string eventfromid, Guid intlistid)
         {
             DataSet dsIntegration = new DataSet();
 
@@ -1148,8 +1399,32 @@ namespace EPMLiveCore.API.Integration
 
             DataSet dsIntegrations = new DataSet();
 
-            SqlCommand cmd = new SqlCommand("SELECT * FROM INT_LISTS where LIST_ID=@listid and Active=1 and LIVEOUTGOING=1 order by priority", cn);
-            cmd.Parameters.AddWithValue("@listid", list.ID);
+            int priority = 0;
+
+            SqlCommand cmd;
+
+            if(eventfromid != "")
+            {
+                cmd = new SqlCommand("SELECT PRIORITY FROM INT_LISTS where LIST_ID=@listid and INT_COLID=@colid", cn);
+                cmd.Parameters.AddWithValue("@listid", list.ID);
+                cmd.Parameters.AddWithValue("@colid", eventfromid);
+                SqlDataReader drPri = cmd.ExecuteReader();
+                if(drPri.Read())
+                    priority = drPri.GetInt32(0);
+                drPri.Close();
+            }
+
+            if(intlistid == Guid.Empty)
+            {
+                cmd = new SqlCommand("SELECT * FROM INT_LISTS where LIST_ID=@listid and Active=1 and LIVEOUTGOING=1 and PRIORITY > @priority order by priority", cn);
+                cmd.Parameters.AddWithValue("@listid", list.ID);
+                cmd.Parameters.AddWithValue("@priority", priority);
+            }
+            else
+            {
+                cmd = new SqlCommand("SELECT * FROM INT_LISTS where INT_LIST_ID=@intlistid", cn);
+                cmd.Parameters.AddWithValue("@intlistid", intlistid);
+            }
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             da.Fill(dsIntegrations);
             
@@ -1257,6 +1532,24 @@ namespace EPMLiveCore.API.Integration
             return dsIntegration;
         }
 
+        private string GetAPIUrl(Guid webappid)
+        {
+            string apiurl = "";
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                try
+                {
+                    SPWebApplication webapp = SPWebService.ContentService.WebApplications[webappid];
+                    apiurl = webapp.Properties["epmliveapiurl"].ToString();
+                    if(apiurl.EndsWith("/"))
+                        apiurl += "integration.asmx";
+                    else
+                        apiurl += "/integration.asmx";
+                }
+                catch { }
+            });
+            return apiurl;
+        }
 
         internal void OpenConnection()
         {

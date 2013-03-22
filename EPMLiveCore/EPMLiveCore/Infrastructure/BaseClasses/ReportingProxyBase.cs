@@ -4,7 +4,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Infrastructure
 {
-    internal abstract class ReportingProxyBase
+    public abstract class ReportingProxyBase
     {
         #region Fields (2) 
 
@@ -37,6 +37,13 @@ namespace EPMLiveCore.Infrastructure
             Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.EPMData", true, true);
             ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
             return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
+        }
+
+        protected object GetReportDataClass()
+        {
+            Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportData", true, true);
+            ConstructorInfo constructorInfo = type.GetConstructor(new[] { typeof(Guid) });
+            return constructorInfo != null ? constructorInfo.Invoke(new object[] { Web.Site.ID }) : null;
         }
 
         /// <summary>

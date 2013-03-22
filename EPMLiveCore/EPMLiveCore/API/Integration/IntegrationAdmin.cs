@@ -46,61 +46,71 @@ namespace EPMLiveCore.API.Integration
             }
         }
 
-        internal void DeleteIntegration(Guid intlistid)
+        internal bool DeleteIntegration(Guid intlistid, out string message)
         {
-            Hashtable hshProps = new Hashtable();
-            hshProps.Add("intlistid", intlistid);
-
-            
-            string sql = "SELECT SITE_ID,WEB_ID,LIST_ID, INT_COLID from INT_LISTS where INT_LIST_ID=@intlistid";
-
-            DataSet ds = _core.GetDataSet(sql, hshProps);
-            DataRow dr = ds.Tables[0].Rows[0];
-            Guid listid = new Guid(dr["LIST_ID"].ToString());
-            string colid = "INTUID" + dr["INT_COLID"].ToString();
-            Guid SiteId = new Guid(dr["SITE_ID"].ToString());
-            Guid WebId = new Guid(dr["WEB_ID"].ToString());
-
-            sql = "DELETE FROM INT_LISTS where INT_LIST_ID=@intlistid";
-            
-            _core.ExecuteQuery(sql, hshProps, false);
-
-
-            sql = "DELETE FROM INT_LOG where INT_LIST_ID=@intlistid";
-            _core.ExecuteQuery(sql, hshProps, false);
-
-            sql = "DELETE FROM INT_COLUMNS where INT_LIST_ID=@intlistid";
-            _core.ExecuteQuery(sql, hshProps, false);
-
-            sql = "DELETE FROM INT_PROPS where INT_LIST_ID=@intlistid";
-            _core.ExecuteQuery(sql, hshProps, true);
-
-            using(SPSite site = new SPSite(SiteId))
+            message = "";
+            if(_core.RemoveIntegration(intlistid, ListId, out message))
             {
-                using(SPWeb web = site.OpenWeb(WebId))
+
+                Hashtable hshProps = new Hashtable();
+                hshProps.Add("intlistid", intlistid);
+
+
+                string sql = "SELECT SITE_ID,WEB_ID,LIST_ID, INT_COLID from INT_LISTS where INT_LIST_ID=@intlistid";
+
+                DataSet ds = _core.GetDataSet(sql, hshProps);
+                DataRow dr = ds.Tables[0].Rows[0];
+                Guid listid = new Guid(dr["LIST_ID"].ToString());
+                string colid = "INTUID" + dr["INT_COLID"].ToString();
+                Guid SiteId = new Guid(dr["SITE_ID"].ToString());
+                Guid WebId = new Guid(dr["WEB_ID"].ToString());
+
+                sql = "DELETE FROM INT_LISTS where INT_LIST_ID=@intlistid";
+
+                _core.ExecuteQuery(sql, hshProps, false);
+
+
+                sql = "DELETE FROM INT_LOG where INT_LIST_ID=@intlistid";
+                _core.ExecuteQuery(sql, hshProps, false);
+
+                sql = "DELETE FROM INT_COLUMNS where INT_LIST_ID=@intlistid";
+                _core.ExecuteQuery(sql, hshProps, false);
+
+                sql = "DELETE FROM INT_PROPS where INT_LIST_ID=@intlistid";
+                _core.ExecuteQuery(sql, hshProps, true);
+
+                using(SPSite site = new SPSite(SiteId))
                 {
-                    web.AllowUnsafeUpdates = true;
-                    SPList list = web.Lists[listid];
-                    SPField field = null;
-                    try
+                    using(SPWeb web = site.OpenWeb(WebId))
                     {
-                        field = list.Fields.GetFieldByInternalName(colid);
-                    }
-                    catch { }
+                        web.AllowUnsafeUpdates = true;
+                        SPList list = web.Lists[listid];
+                        SPField field = null;
+                        try
+                        {
+                            field = list.Fields.GetFieldByInternalName(colid);
+                        }
+                        catch { }
 
-                    if(field != null)
-                    {
-                        field.Hidden = false;
-                        field.Update();
-                        list.Fields.Delete(field.InternalName);
-                    }
-                    list.Update();
+                        if(field != null)
+                        {
+                            field.Hidden = false;
+                            field.Update();
+                            list.Fields.Delete(field.InternalName);
+                        }
+                        list.Update();
 
-                    RemoveEventHandlers(list);
+                        RemoveEventHandlers(list);
+                    }
                 }
+
+                _core.UpdatePriorityNumbers(listid);
+                return true;
             }
-            
-            _core.UpdatePriorityNumbers(listid);
+            else
+            {
+                return false;
+            }
         }
 
         internal void InstallEventHandlers(SPList list)
@@ -263,6 +273,8 @@ namespace EPMLiveCore.API.Integration
             {
                 using(SPWeb web = site.OpenWeb(WebId))
                 {
+                    web.AllowUnsafeUpdates = true;
+                    site.AllowUnsafeUpdates = true;
                     SPList list = web.Lists[ListId];
                     SPField field = null;
                     try
@@ -327,7 +339,16 @@ namespace EPMLiveCore.API.Integration
             {
                 if(c.GetType() == typeof(TextBox))
                 {
-                    hshNewProps.Add(c.ID, ((TextBox)c).Text);
+                    if(((TextBox)c).TextMode == TextBoxMode.Password)
+                    {
+                        if(((TextBox)c).Text != "")
+                        {
+                            string enc = CoreFunctions.Encrypt(((TextBox)c).Text, "kKGBJ768d3q78^#&^dsas");
+                            hshNewProps.Add(c.ID, enc);
+                        }
+                    }
+                    else
+                        hshNewProps.Add(c.ID, ((TextBox)c).Text);
                 }
                 else if(c.GetType() == typeof(DropDownList))
                 {

@@ -73,7 +73,8 @@ namespace EPMLiveCore.API
                 currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
                 currentItem[commentsList.Fields.GetFieldByInternalName("ListId").Id] = dataMgr.GetPropVal("ListId");
                 currentItem[commentsList.Fields.GetFieldByInternalName("ItemId").Id] = dataMgr.GetPropVal("ItemId");
-                currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = Uri.UnescapeDataString(dataMgr.GetPropVal("Comment"));
+                currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = dataMgr.GetPropVal("Comment");
+                //currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = Uri.UnescapeDataString(dataMgr.GetPropVal("Comment"));
                 currentItem.Update();
 
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()));
@@ -82,7 +83,7 @@ namespace EPMLiveCore.API
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
                                                          .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime())
-                                                         .Replace("##comment##", (string)(HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment").Replace('\"', '\'')) ?? string.Empty)));
+                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment") ?? string.Empty)))));
                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
                 sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
@@ -937,7 +938,7 @@ namespace EPMLiveCore.API
                                                                  .Replace("##itemId##", sItemId.ToString())
                                                                  .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                  .Replace("##createdDate##", dCreated.ToFriendlyDateAndTime())
-                                                                 .Replace("##comment##", (string)(originalComment["Comment"] ?? string.Empty)));
+                                                                 .Replace("##comment##", GetXMLSafeVersion((string)(originalComment["Comment"] ?? string.Empty))));
 
                         // get user object 
                         SPFieldUser author = (SPFieldUser)originalComment.Fields[SPBuiltInFieldId.Author];
@@ -1040,7 +1041,7 @@ namespace EPMLiveCore.API
                                                                          .Replace("##itemId##", sItemId2.ToString())
                                                                          .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                          .Replace("##createdDate##", dCreated2.ToFriendlyDateAndTime())
-                                                                         .Replace("##comment##", (string)(comment["Comment"] ?? string.Empty)));
+                                                                         .Replace("##comment##", GetXMLSafeVersion((string)(comment["Comment"] ?? string.Empty))));
 
                                 sbResult.Append(XML_USER_INFO_SECTION.Replace("##username##", userObject.Name)
                                                                      .Replace("##useremail##", userObject.Email)
@@ -1098,6 +1099,20 @@ namespace EPMLiveCore.API
                 }
             }
 
+            return result;
+        }
+
+        private static string GetXMLSafeVersion(string s)
+        {
+            string result = s;
+            if (!string.IsNullOrEmpty(result))
+            {
+                result = result.Replace("\"", "#quot#")
+                .Replace("&", "#amp#")
+                .Replace("'", "#apos#")
+                .Replace("<", "#lt#")
+                .Replace(">", "#gt#");
+            }
             return result;
         }
     }

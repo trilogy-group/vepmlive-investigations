@@ -103,6 +103,7 @@
     <Compile Include="API\Applications\Applications.cs" />
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
     <Compile Include="API\BaseJob.cs" />
+    <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
     <Compile Include="API\Comments\CommentManager.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
     <Compile Include="API\ExecutionStatus.asmx.cs" />
@@ -250,6 +251,11 @@
     <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManager.cs" />
     <Compile Include="Infrastructure\WEFeatures.cs" />
     <Compile Include="IntegrateEvents\IntegrateEvents.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.cs" />
+    <Compile Include="Integrations\Salesforce\SalesforceAuthResponse.cs" />
+    <Compile Include="Integrations\Salesforce\SalesforceServiceResponse.cs" />
+    <Compile Include="Integrations\Salesforce\SfMedadataService.cs" />
+    <Compile Include="Integrations\Salesforce\SfService.cs" />
     <Compile Include="ISAPI\Lic\Licensing.asmx.cs">
       <DependentUpon>Licensing.asmx</DependentUpon>
       <SubType>Component</SubType>

@@ -248,7 +248,7 @@ namespace EPMLiveCore.API
             {
                 string key = pair.Key;
 
-                if ((SPFieldType) pair.Value[1] != SPFieldType.Lookup && !key.Equals("ResourceLevel")) continue;
+                if ((SPFieldType)pair.Value[1] != SPFieldType.Lookup && (SPFieldType)pair.Value[1] != SPFieldType.Choice && !key.Equals("ResourceLevel")) continue;
 
                 string id = "rId" + lookupCounter;
 
@@ -555,7 +555,7 @@ namespace EPMLiveCore.API
                 var spFieldType = (SPFieldType) pair.Value[1];
 
                 if (spFieldType != SPFieldType.Boolean && spFieldType != SPFieldType.Lookup &&
-                    spFieldType != SPFieldType.User) continue;
+                    spFieldType != SPFieldType.User && spFieldType != SPFieldType.Choice) continue;
 
                 if (pair.Key.Equals("SharePointAccount")) continue;
 
@@ -577,6 +577,7 @@ namespace EPMLiveCore.API
                         formulaValue = "BValues!$A$1:$A$2";
                         break;
                     case SPFieldType.Lookup:
+                    case SPFieldType.Choice:
                         int count = ((List<string>) pair.Value[2]).Count();
                         formulaValue = pair.Key + "Values!$A$1" + (count > 1 ? ":$A$" + count : string.Empty);
                         break;
@@ -906,10 +907,18 @@ namespace EPMLiveCore.API
             switch (spFieldType)
             {
                 case SPFieldType.Choice:
-                    choices = ((SPFieldChoice) spField).Choices;
+                    choices = new List<string>();
+                    foreach (var choice in ((SPFieldChoice) spField).Choices)
+                    {
+                        ((List<string>) choices).Add("|" + choice);
+                    }
                     break;
                 case SPFieldType.MultiChoice:
-                    choices = ((SPFieldMultiChoice) spField).Choices;
+                    choices = new List<string>();
+                    foreach (var choice in ((SPFieldMultiChoice) spField).Choices)
+                    {
+                        ((List<string>)choices).Add("|" + choice);
+                    }
                     break;
                 case SPFieldType.Lookup:
                     choices = GetLookupChoices(spField);

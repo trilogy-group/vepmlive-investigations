@@ -28,6 +28,8 @@ namespace EPMLiveCore.API
         public bool Visible = true;
         public string[] ParentApplications;
         public string Community = "";
+        public string loadErrorMessage = "";
+        public string AppAssemblyVersion = "";
 
         public ApplicationDef()
         {
@@ -165,6 +167,16 @@ namespace EPMLiveCore.API
                 {
                     oList.Fields.Add("AppVersion", SPFieldType.Text, false);
                     oField = GetField(oList, "AppVersion");
+                    oField.ShowInEditForm = false;
+                    oField.ShowInNewForm = false;
+                    oField.Update();
+                }
+
+                oField = GetField(oList, "AppUrl");
+                if(oField == null)
+                {
+                    oList.Fields.Add("AppUrl", SPFieldType.Text, false);
+                    oField = GetField(oList, "AppUrl");
                     oField.ShowInEditForm = false;
                     oField.ShowInNewForm = false;
                     oField.Update();
@@ -1303,6 +1315,137 @@ namespace EPMLiveCore.API
             return appDef;
         }
 
+        private static string GetValidVersion(string checkVersion, string assVersion, string highestVersion)
+        {
+
+            if(isValidVersion(checkVersion, assVersion))
+            {
+                try
+                {
+                    if(highestVersion == "")
+                        return checkVersion;
+
+                    string[] sCheckVersion = checkVersion.Split('.');
+                    string[] sHighVersion = highestVersion.Split('.');
+
+                    if(int.Parse(sCheckVersion[0]) > int.Parse(sHighVersion[0]))
+                    {
+                        return checkVersion;
+                    }
+                    else
+                    {
+                        if(int.Parse(sCheckVersion[1]) > int.Parse(sHighVersion[1]))
+                        {
+                            return checkVersion;
+                        }
+                        else
+                        {
+                            if(int.Parse(sCheckVersion[2]) > int.Parse(sHighVersion[2]))
+                            {
+                                return checkVersion;
+                            }
+                            else
+                            {
+
+                                return highestVersion;
+
+                            }
+                        }
+                    }
+                }
+                catch { }
+                return highestVersion;
+
+            }
+            else
+                return highestVersion;
+
+        }
+
+        private static bool isValidVersion(string checkVersion, string assVersion)
+        {
+
+            try
+            {
+                string[] sCheckVersion = checkVersion.Split('.');
+                string[] sAssVersion = assVersion.Split('.');
+
+                if(int.Parse(sCheckVersion[0]) > int.Parse(sAssVersion[0]))
+                {
+                    return false;
+                }
+                else
+                {
+                    if(int.Parse(sCheckVersion[1]) > int.Parse(sAssVersion[1]))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if(int.Parse(sCheckVersion[2]) > int.Parse(sAssVersion[2]))
+                        {
+                            return false;
+                        }
+                        else
+                        {
+
+                            return true;
+
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+
+        }
+
+        private static string GetVersionFolder(WorkEngineSolutionStoreListSvc.Lists listSvc, string applicationfolder)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlNode queryOptions = xmlDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
+            queryOptions.InnerXml = "<ViewAttributes Scope=\"RecursiveAll\" />";
+
+            XmlNode query = xmlDoc.CreateNode(XmlNodeType.Element, "Query", "");
+            query.InnerXml =
+                "<Where><And><Eq><FieldRef Name='FileDirRef' />" +
+                "<Value Type='Text'>Applications/" + applicationfolder + "</Value></Eq><Eq><FieldRef Name=\"FSObjType\" /><Value Type=\"Lookup\">1</Value></Eq></And></Where>";
+
+            XmlNode node = listSvc.GetListItems("Applications", null, query, null, null, queryOptions, null);
+
+            string version = "";
+            
+            string assVersion = CoreFunctions.GetAssemblyVersion();
+
+            foreach(XmlNode nd in node.ChildNodes)
+            {
+                if(nd.Name == "rs:data")
+                {
+                    foreach(XmlNode ndChild in nd.ChildNodes)
+                    {
+                        if(ndChild.Name == "z:row")
+                        {
+
+                            string filename = getAttribute(ndChild, "ows_LinkFilename");
+
+                            if(filename.StartsWith("VERSION_"))
+                            {
+
+                                filename = filename.Substring(8);
+
+                                version = GetValidVersion(filename, assVersion, version);
+
+                            }
+
+                        }
+                    }
+                    break;
+                }
+            }
+            return version;
+
+        }
+
         public static ApplicationDef GetApplicationInfo(string id)
         {
             string storeurl = CoreFunctions.getFarmSetting("workenginestore");
@@ -1336,6 +1479,8 @@ namespace EPMLiveCore.API
 
             XmlNode ndItems = listSvc.GetListItems("Applications", null, ndQuery, ndViewFields, "10000", ndQueryOptions, null);
 
+            
+
             foreach(XmlNode nd in ndItems.ChildNodes)
             {
                 if(nd.Name == "rs:data")
@@ -1344,28 +1489,65 @@ namespace EPMLiveCore.API
                     {
                         if(ndChild.Name == "z:row")
                         {
-                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Applications/" + getAttribute(ndChild, "ows_Title");
-                            string sXml = "";
-                            using(WebClient webClient = new WebClient())
+                            string versionInfo = GetVersionFolder(listSvc, getAttribute(ndChild, "ows_Title"));
+
+                            if(versionInfo != "")
                             {
-                                webClient.Credentials = CoreFunctions.GetStoreCreds();
-                                byte[] fileBytes = null;
-                                fileBytes = webClient.DownloadData(rootFilePath + "/Feature.xml");
-                                System.Text.Encoding enc = System.Text.Encoding.ASCII;
-                                sXml = enc.GetString(fileBytes).TrimStart('?');
-                                fileBytes = null;
+                                appDef.AppAssemblyVersion = versionInfo;
+                                versionInfo = "/VERSION_" + versionInfo;
                             }
+
+                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
+                            string sXml = "";
                             appDef.url = rootFilePath;
                             appDef.Title = getAttribute(ndChild, "ows_Title");
                             appDef.Icon = getAttribute(ndChild, "ows_Icon");
-                            appDef.Version = getAttribute(ndChild, "ows_AppVersion");
+                            if(appDef.AppAssemblyVersion != "")
+                            {
+                                appDef.Version = appDef.AppAssemblyVersion + "_" + getAttribute(ndChild, "ows_AppVersion");
+                            }
+                            else
+                                appDef.Version = getAttribute(ndChild, "ows_AppVersion");
+
                             try
                             {
                                 appDef.Icon = new SPFieldUrlValue(appDef.Icon).Url;
                             }
                             catch { }
                             appDef.Id = int.Parse(id);
+                            
+
+                            try
+                            {
+                                using(WebClient webClient = new WebClient())
+                                {
+                                    webClient.Credentials = CoreFunctions.GetStoreCreds();
+                                    byte[] fileBytes = null;
+                                    fileBytes = webClient.DownloadData(rootFilePath + "/Feature.xml");
+                                    System.Text.Encoding enc = System.Text.Encoding.ASCII;
+                                    sXml = enc.GetString(fileBytes).TrimStart('?');
+                                    fileBytes = null;
+                                }
+                            }
+                            catch(Exception ex)
+                            {
+                                if(ex.Message.EndsWith("(404) Not Found."))
+                                {
+                                    appDef.loadErrorMessage = "No application for your version was found.";
+                                    return appDef;
+                                }
+                            }
                             appDef.ApplicationXml.LoadXml(sXml);
+
+                            try
+                            {
+                                if(appDef.ApplicationXml.FirstChild.SelectSingleNode("//Features/Feature[@ID='12345678-0000-0000-0000-000000000000']") != null)
+                                {
+                                    appDef.loadErrorMessage = "No application for your version was found.";
+                                    return appDef;
+                                }
+                            }
+                            catch { }
 
                             try
                             {

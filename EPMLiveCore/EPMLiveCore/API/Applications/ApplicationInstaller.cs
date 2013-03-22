@@ -88,6 +88,8 @@ namespace EPMLiveCore.API
             oWeb = web;
             iCommunity = iCommunityId;
             appDef = API.Applications.GetApplicationInfo(_id);
+
+
             CheckInstalledRoot();
 
             oAppList = oWeb.Lists.TryGetList("Installed Applications");
@@ -98,7 +100,7 @@ namespace EPMLiveCore.API
             }
             else
             {
-                 
+
                 SPQuery query = new SPQuery();
                 query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + appDef.Id + "</Value></Eq></Where>";
                 SPListItemCollection lic = oAppList.GetItems(query);
@@ -113,26 +115,31 @@ namespace EPMLiveCore.API
                     return;
                 }
 
-                if(CheckPermissions())
+                if(appDef.loadErrorMessage == "")
                 {
-                    if(CheckForApplicationList())
+                    if(CheckPermissions())
                     {
-                        if(CheckForPreReqs())
+                        if(CheckForApplicationList())
                         {
-                            if(CheckForKeys())
+                            if(CheckForPreReqs())
                             {
-
-                                iInstallAndConfigureApp();
-
-                                if(!bVerifyOnly)
+                                if(CheckForKeys())
                                 {
-                                    ReportToAppReporting(web);
+                                    iInstallAndConfigureApp();
+
+                                    if(!bVerifyOnly)
+                                    {
+                                        ReportToAppReporting(web);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
+                else
+                {
+                    addMessage(ErrorLevels.Error, "Check Applications", appDef.loadErrorMessage, 0);
+                }
                 if(oListItem != null)
                 {
                     reportResults();
@@ -220,6 +227,7 @@ namespace EPMLiveCore.API
                             li["Icon"] = appDef.Icon;
                             li["Status"] = "Not Installed";
                             li["InstallXML"] = appDef.ApplicationXml.OuterXml;
+                            li["AppUrl"] = appDef.url;
 
                             li.Update();
                         }
@@ -252,6 +260,11 @@ namespace EPMLiveCore.API
                                 SPListItem li = lic[0];
                                 appDef.ApplicationXml.LoadXml(li["InstallXML"].ToString());
                                 appDef.Version = li["AppVersion"].ToString();
+                                try
+                                {
+                                    appDef.url = oListItem["AppUrl"].ToString();
+                                }
+                                catch { }
                             }
                             catch(Exception ex)
                             {
@@ -341,10 +354,8 @@ namespace EPMLiveCore.API
                 float max = ListNdFeatures.Count;
                 float counter = 0;
 
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures = new Dictionary<Guid, SPFeatureDefinition>();
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -352,18 +363,12 @@ namespace EPMLiveCore.API
                     {
                         foreach(SPFeatureDefinition def in site.WebApplication.Farm.FeatureDefinitions)
                         {
-                            if(def.CompatibilityLevel == 14)
-                                ArrInstalledFarmFeatures14.Add(def.Id, def);
-                            else
-                                ArrInstalledFarmFeatures15.Add(def.Id, def);
+                            ArrInstalledFarmFeatures.Add(def.Id, def);
                         }
 
                         foreach(SPFeatureDefinition def in site.FeatureDefinitions )
                         {
-                            if (def.CompatibilityLevel == 14)
-                                ArrInstalledSiteFeatures14.Add(def.Id, def);
-                            else
-                                ArrInstalledSiteFeatures15.Add(def.Id, def);
+                            ArrInstalledSiteFeatures.Add(def.Id, def);
                         }
                     }
                 });
@@ -381,35 +386,22 @@ namespace EPMLiveCore.API
                             bool.TryParse(getAttribute(ndFeature, "IncludedInSolutions"), out bIncluded);
 
                             Guid gFeatureId = new Guid(FeatureId);
-                            if(ArrInstalledFarmFeatures15.ContainsKey(gFeatureId))
+                            if(ArrInstalledFarmFeatures.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures15[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
 
                             }
-                            else if (ArrInstalledFarmFeatures14.ContainsKey(gFeatureId))
+                            else if(ArrInstalledSiteFeatures.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures14[gFeatureId];
-
-                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
-
-                            }
-                            else if (ArrInstalledSiteFeatures15.ContainsKey(gFeatureId))
-                            {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures15[gFeatureId];
-
-                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
-                            }
-                            else if (ArrInstalledSiteFeatures14.ContainsKey(gFeatureId))
-                            {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures14[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
                             }
                             else
                             {
-                                if (bIncluded && bVerifyOnly)
+                                if(bIncluded && bVerifyOnly)
                                 {
                                     addMessage(ErrorLevels.NoError, (sFeatureName == "") ? FeatureId : sFeatureName, "", ParentMessageId);
                                 }
@@ -3027,7 +3019,7 @@ namespace EPMLiveCore.API
             }
             oListItem["InstallPercent"] = 0;
             oListItem["AppVersion"] = appDef.Version;
-
+            oListItem["AppUrl"] = appDef.url;
             oListItem.Update();
 
             if(!bVerifyOnly)
@@ -3071,6 +3063,8 @@ namespace EPMLiveCore.API
                     XmlNode ndApp = appDef.ApplicationXml.FirstChild.SelectSingleNode("Application");
 
                     iProcessLI(ndApp);
+
+                    addMessage(ErrorLevels.NoError, "Install Version", appDef.Version, 0);
 
                     if(!oWeb.IsRootWeb && !bIsInstalledElsewhere && !bVerifyOnly)
                     {

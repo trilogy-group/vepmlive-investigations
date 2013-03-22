@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Collections;
-using Microsoft.SharePoint;
 using EPMLiveIntegration;
 using System.Data.SqlClient;
 
@@ -18,7 +17,7 @@ namespace EPMLiveCore.API.Integration
             return true;
         }
 
-        public bool RemoveIntegration(WebProperties WebProps, IntegrationLog Log, out string Message)
+        public bool RemoveIntegration(WebProperties WebProps, IntegrationLog Log, out string Message, string IntegrationKey)
         {
             Message = "";
             return true;
@@ -80,7 +79,7 @@ namespace EPMLiveCore.API.Integration
 
                         if(ds.Tables[0].Rows.Count > 0)
                         {
-                            trans.AddRow(SPPID, UpdateRow(WebProps, drItem, Log, cn), TransactionType.INSERT);
+                            trans.AddRow(SPPID, UpdateRow(WebProps, drItem, Log, cn), TransactionType.UPDATE);
                         }
                         else
                         {
@@ -126,11 +125,44 @@ namespace EPMLiveCore.API.Integration
 
         }
 
-        public DataTable PullData(WebProperties WebProps, IntegrationLog Log, string Query, DataTable Items)
+        public DataTable PullData(WebProperties WebProps, IntegrationLog Log, DataTable Items, DateTime LastSynch)
         {
+            SqlConnection cn = GetConnection(WebProps.Properties);
+            cn.Open();
 
+            string cols = WebProps.Properties["IDColumn"].ToString();
 
-            return Items;
+            string where = "";
+            try
+            {
+                where = WebProps.Properties["Where"].ToString();
+            }
+            catch { }
+
+            foreach(DataColumn dc in Items.Columns)
+            {
+                if(dc.ColumnName != "ID")
+                {
+                    cols += "," + dc.ColumnName;
+                }
+            }
+
+            string sql = "SELECT " + cols + " FROM " + WebProps.Properties["Table"];
+            if(where != "")
+            {
+                sql += " Where " + where.Replace("'", "''");
+            }
+
+            SqlCommand cmd = new SqlCommand(sql, cn);
+            DataSet ds = new DataSet();
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+
+            cn.Close();
+
+            ds.Tables[0].Columns[WebProps.Properties["IDColumn"].ToString()].ColumnName = "ID";
+
+            return ds.Tables[0];
         }
 
         public DataTable GetItem(WebProperties WebProps, IntegrationLog Log, string ItemID, DataTable Items)
@@ -299,7 +331,11 @@ namespace EPMLiveCore.API.Integration
                 if(dc.ColumnName != "ID" && dc.ColumnName != "SPID")
                 {
                     paramnames += dc.ColumnName + " = @" + dc.ColumnName + ",";
-                    arrparams.Add(new SqlParameter("@" + dc.ColumnName, Item[dc.ColumnName].ToString()));
+                    if(Item[dc.ColumnName].ToString() == "")
+                        arrparams.Add(new SqlParameter("@" + dc.ColumnName, DBNull.Value));
+                    else
+                        arrparams.Add(new SqlParameter("@" + dc.ColumnName, Item[dc.ColumnName].ToString()));
+
                 }
             }
 

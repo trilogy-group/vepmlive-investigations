@@ -544,6 +544,9 @@ namespace EPMLiveCore.API
         private void UpdateItem(DataRow row, ICollection<string> lockedColumns, SPList spList, SPListItem spListItem,
                                 bool isGeneric)
         {
+            var spWeb = spList.ParentWeb;
+            var spRegionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
+
             foreach (
                 string columnName in
                     _dtResources.Columns.Cast<DataColumn>()
@@ -566,7 +569,7 @@ namespace EPMLiveCore.API
                             SPField spField = spList.Fields.GetFieldByInternalName(columnName);
                             if (spField.Type == SPFieldType.DateTime)
                             {
-                                value = SPUtility.CreateISO8601DateTimeFromSystemDateTime((DateTime) value);
+                                value = SPUtility.CreateISO8601DateTimeFromSystemDateTime(((DateTime)value).ToUniversalTime());
                             }
                         }
                     }

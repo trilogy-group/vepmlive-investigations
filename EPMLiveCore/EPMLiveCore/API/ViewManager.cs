@@ -143,6 +143,45 @@ namespace EPMLiveCore.API
             }
         }
 
+        public void DeleteView(string view)
+        {
+            try
+            {
+                Views.Remove(view);
+            }
+            catch { }
+            //foreach(KeyValuePair<string, Dictionary<string, string>> key in Views)
+            //{
+            //    if(key.Key == view)
+            //    {
+            //        Views.d
+            //    }
+            //}
+        }
+
+        public void RenameView(string view, string newname)
+        {
+            try
+            {
+                Dictionary<string, string> d = Views[view];
+                Views.Remove(view);
+                Views.Add(newname, d);
+            }
+            catch { }
+            //try
+            //{
+            //    Views[view]
+            //}
+            //catch { }
+            //foreach(KeyValuePair<string, Dictionary<string, string>> key in Views)
+            //{
+            //    if(key.Key == view)
+            //    {
+            //        Views.d
+            //    }
+            //}
+        }
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -175,8 +214,18 @@ namespace EPMLiveCore.API
             
             int i = 0;
 
+            SortedList sl = new SortedList();
+
             foreach(KeyValuePair<string, Dictionary<string, string>> de in Views)
             {
+
+                sl.Add(de.Key, de.Value);
+
+            }
+
+            foreach(DictionaryEntry de in sl)
+            {
+
                 StringBuilder sbi = new StringBuilder();
 
                 sbi.Append("V");
@@ -185,7 +234,7 @@ namespace EPMLiveCore.API
                 sbi.Append(de.Key);
                 sbi.Append("\",");
 
-                foreach(KeyValuePair<string, string> dei in de.Value)
+                foreach(KeyValuePair<string, string> dei in (Dictionary<string, string>)de.Value)
                 {
                     sbi.Append(dei.Key);
                     sbi.Append(":\"");

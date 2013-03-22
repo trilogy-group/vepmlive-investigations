@@ -17,10 +17,12 @@ namespace EPMLiveCore
        /// </summary>
        public override void ItemDeleting(SPItemEventProperties properties)
        {
-           API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(properties.SiteId, properties.Web.ID);
+           SPSecurity.RunWithElevatedPrivileges(delegate()
+           {
+               API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(properties.SiteId, properties.Web.ID);
 
-           core.SubmitDeleteListEvent(properties.ListItem, properties.AfterProperties);
-
+               core.SubmitDeleteListEvent(properties.ListItem, properties.AfterProperties);
+           });
        }
 
        /// <summary>
@@ -28,9 +30,12 @@ namespace EPMLiveCore
        /// </summary>
        public override void ItemAdded(SPItemEventProperties properties)
        {
-           API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(properties.SiteId, properties.Web.ID);
+           SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(properties.SiteId, properties.Web.ID);
 
-           core.SubmitListEvent(properties.ListItem, 1, properties.AfterProperties);
+                core.SubmitListEvent(properties.ListItem, 1, properties.AfterProperties);
+            });
        }
 
        /// <summary>
@@ -38,11 +43,12 @@ namespace EPMLiveCore
        /// </summary>
        public override void ItemUpdated(SPItemEventProperties properties)
        {
+           SPSecurity.RunWithElevatedPrivileges(delegate()
+           {
+               API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(properties.SiteId, properties.Web.ID);
 
-           API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(properties.SiteId, properties.Web.ID);
-
-           core.SubmitListEvent(properties.ListItem, 1, properties.AfterProperties);
-
+               core.SubmitListEvent(properties.ListItem, 1, properties.AfterProperties);
+           });
        }
 
 
