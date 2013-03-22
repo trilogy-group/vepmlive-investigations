@@ -52,7 +52,7 @@ namespace TimeSheets
             return impersonate;
         }
 
-        public static string processActualWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen)
+        public static string processActualWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
         {
             string error = "";
             //SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -63,8 +63,10 @@ namespace TimeSheets
                 //if(!bApprovalScreen)
                 //    sql = "SELECT * FROM vwTSItemHoursByMyTS where ts_uid=@ts_uid order by web_uid,list_uid";
 
+
                 SqlCommand cmd = new SqlCommand("spTSGetProjectsHours", cn);
                 cmd.Parameters.AddWithValue("@TSUID", tsuid);
+                cmd.Parameters.AddWithValue("@approved", bApproved);
                 cmd.CommandType = CommandType.StoredProcedure;
                 DataSet dsProjects = new DataSet();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -258,59 +260,56 @@ namespace TimeSheets
             {
                 try
                 {
-                    SPWeb resWeb = null;
-                    if(resUrl.ToLower() != web.Url.ToLower())
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
+                        SPWeb resWeb = null;
+
                         using(SPSite tempSite = new SPSite(resUrl))
                         {
 
                             resWeb = tempSite.OpenWeb();
-                            if(resWeb.Url.ToLower() != resUrl.ToLower())
+
+                            if(resWeb != null)
                             {
-                                resWeb = null;
+
+                                SPList list = resWeb.Lists["Resources"];
+
+                                string[] fields = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)).Split(',');
+
+                                SPUser user = web.AllUsers[username];
+
+                                SPQuery query = new SPQuery();
+                                query.Query = "<Where><Eq><FieldRef Name=\"SharePointAccount\" /><Value Type=\"User\">" + user.Name + "</Value></Eq></Where>";
+
+                                SPListItem li = list.GetItems(query)[0];
+
+                                foreach(string field in fields)
+                                {
+                                    SPField f = null;
+                                    string val = "";
+                                    try
+                                    {
+                                        f = list.Fields.GetFieldByInternalName(field);
+                                        val = f.GetFieldValueAsText(li[f.Id]);
+                                    }
+                                    catch { }
+                                    if(f != null)
+                                    {
+                                        cmd = new SqlCommand("INSERT INTO TSRESMETA (TS_UID,UserName,ColumnName,DisplayName,ColumnValue) VALUES (@TS_UID,@username,@ColumnName,@DisplayName,@ColumnValue)", cn);
+                                        cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                                        cmd.Parameters.AddWithValue("@ColumnName", field);
+                                        cmd.Parameters.AddWithValue("@UserName", username);
+                                        cmd.Parameters.AddWithValue("@DisplayName", f.Title);
+                                        cmd.Parameters.AddWithValue("@ColumnValue", val);
+                                        cmd.ExecuteNonQuery();
+                                    }
+                                }
+                                if(resWeb.ID != SPContext.Current.Web.ID)
+                                    resWeb.Close();
+
                             }
                         }
-                    }
-                    else
-                        resWeb = web;
-                    if(resWeb != null)
-                    {
-
-                        SPList list = resWeb.Lists["Resources"];
-
-                        string[] fields = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)).Split(',');
-
-                        SPUser user = web.AllUsers[username];
-
-                        SPQuery query = new SPQuery();
-                        query.Query = "<Where><Eq><FieldRef Name=\"SharePointAccount\" /><Value Type=\"User\">" + user.Name + "</Value></Eq></Where>";
-
-                        SPListItem li = list.GetItems(query)[0];
-
-                        foreach(string field in fields)
-                        {
-                            SPField f = null;
-                            string val = "";
-                            try
-                            {
-                                f = list.Fields.GetFieldByInternalName(field);
-                                val = f.GetFieldValueAsText(li[f.Id]);
-                            }
-                            catch { }
-                            if(f != null)
-                            {
-                                cmd = new SqlCommand("INSERT INTO TSRESMETA (TS_UID,UserName,ColumnName,DisplayName,ColumnValue) VALUES (@TS_UID,@username,@ColumnName,@DisplayName,@ColumnValue)", cn);
-                                cmd.Parameters.AddWithValue("@TS_UID", tsuid);
-                                cmd.Parameters.AddWithValue("@ColumnName", field);
-                                cmd.Parameters.AddWithValue("@UserName", username);
-                                cmd.Parameters.AddWithValue("@DisplayName", f.Title);
-                                cmd.Parameters.AddWithValue("@ColumnValue", val);
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                        if(resWeb.ID != SPContext.Current.Web.ID)
-                            resWeb.Close();
-                    }
+                    });
                 }
                 catch { }
             }

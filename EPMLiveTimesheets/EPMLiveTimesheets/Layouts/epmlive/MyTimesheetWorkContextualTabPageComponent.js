@@ -143,15 +143,62 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                 {
                                     //items += "," + id;
                                     var nRow = grid.MoveRowsToGrid(oRow, pGrid, null, 3, 2);
+                                    pGrid.ChangeDef(nRow, "R", 1, 0);
+                                    pGrid.SetValue(nRow, "TSTotals", 0, 0);
+                                    pGrid.Recalculate(nRow, "TSTotals", 1);
+
                                     pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
                                 }
                             }
                         }
                         else
                         {
-                            var nRow = grid.MoveRowsToGrid(oRow, pGrid, null, 3, 2);
-                            pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
-                            //items += "," + id;
+                            if(NonWork)
+                            {
+                            
+                                var found = false;
+
+                                for(var R in pGrid.Rows)
+                                {
+                                    try
+                                    {
+                                        var pRow = pGrid.Rows[R];
+
+                                        var plistid = pGrid.GetValue(pRow, "ListID");
+                                        var pitemid = pGrid.GetValue(pRow, "ItemID");
+
+                                        var listid = grid.GetValue(oRow, "ListID");
+                                        var itemid = grid.GetValue(oRow, "ItemID");
+    
+                                        if(plistid == listid && pitemid == itemid)
+                                        {
+                                            found = true;
+                                            break;
+                                        }
+                                    }catch(e){}
+                                }
+
+                                if(!found)
+                                {
+                                    var nRow = grid.MoveRowsToGrid(oRow, pGrid, null, 3, 2);
+                                    pGrid.ChangeDef(nRow, "R", 1, 0);
+                                    pGrid.SetValue(nRow, "TSTotals", 0, 0);
+                                    pGrid.Recalculate(nRow, "TSTotals", 1);
+                                    pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
+                                }
+                                else
+                                {
+                                    alert("(" + grid.GetValue(oRow, "Title") + ") is already in your timesheet.");
+                                }
+                            }
+                            else
+                            {
+                                var nRow = grid.MoveRowsToGrid(oRow, pGrid, null, 3, 2);
+                                pGrid.ChangeDef(nRow, "R", 1, 0);
+                                pGrid.SetValue(nRow, "TSTotals", 0, 0);
+                                pGrid.Recalculate(nRow, "TSTotals", 1);
+                                pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
+                            }
                         }
                     }
                 }

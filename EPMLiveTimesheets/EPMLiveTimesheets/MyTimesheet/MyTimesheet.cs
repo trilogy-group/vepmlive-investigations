@@ -33,6 +33,7 @@ namespace TimeSheets
         private string TSNotes = "false";
         private string TSTypeObject = "";
         private string TSCols = "";
+        private string TSDCols = "";
         private bool bIsCurrentTimesheetPeriod = false;
         private int iCurPeriodId = 0;
         private string sCurPeriodName = "";
@@ -52,6 +53,8 @@ namespace TimeSheets
         private string sCurrentViewId = "";
         private EPMLiveCore.Act act;
         int activation = 0;
+        bool bHasPeriods = false;
+        bool bCanEditViews = false;
 
         protected override void CreateChildControls()
         {
@@ -101,42 +104,15 @@ namespace TimeSheets
                     iCurPeriodId = int.Parse(drCur[0]["period_id"].ToString());
                     sCurPeriodName = ((DateTime)drCur[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)drCur[0]["period_end"]).ToShortDateString();
                 }
-
-                if(sPeriodId == "")
+                if(dtPeriods.Rows.Count > 0)
                 {
-                    DataRow []dr = dtPeriods.Select("CurPeriod='1'");
-                    if(dr.Length > 0)
+                    if(sPeriodId == "")
                     {
-                        sPeriodId = dr[0]["period_id"].ToString();
-                        sPeriodName = ((DateTime)dr[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr[0]["period_end"]).ToShortDateString();
-                        bIsCurrentTimesheetPeriod = true;
-                    }
-                    else
-                    {
-                        sPeriodId = dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_id"].ToString();
-                        sPeriodName = ((DateTime)dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_start"]).ToShortDateString() + " - " + ((DateTime)dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_end"]).ToShortDateString();
-                    }
-                }
-                else
-                {
-                    DataRow []dr = ds.Tables[0].Select("period_id='" + sPeriodId + "'");
-                    if(dr.Length > 0)
-                    {
-                        sPeriodName = ((DateTime)dr[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr[0]["period_end"]).ToShortDateString();
-                        try
+                        DataRow[] dr = dtPeriods.Select("CurPeriod='1'");
+                        if(dr.Length > 0)
                         {
-                            if(dr[0]["curPeriod"].ToString() == "1")
-                                bIsCurrentTimesheetPeriod = true;
-                        }
-                        catch { }
-                    }
-                    else
-                    {
-                        DataRow[] dr2 = ds.Tables[0].Select("CurPeriod='1'");
-                        if(dr2.Length > 0)
-                        {
-                            sPeriodId = dr2[0]["period_id"].ToString();
-                            sPeriodName = ((DateTime)dr2[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr2[0]["period_end"]).ToShortDateString();
+                            sPeriodId = dr[0]["period_id"].ToString();
+                            sPeriodName = ((DateTime)dr[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr[0]["period_end"]).ToShortDateString();
                             bIsCurrentTimesheetPeriod = true;
                         }
                         else
@@ -145,100 +121,136 @@ namespace TimeSheets
                             sPeriodName = ((DateTime)dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_start"]).ToShortDateString() + " - " + ((DateTime)dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_end"]).ToShortDateString();
                         }
                     }
-                }
-
-                string itmpprev = "";
-                bool bNext = false;
-
-                foreach(DataRow dr in dtPeriods.Rows)
-                {
-                    sPeriodList += "," + dr["period_id"].ToString() + "|" + ((DateTime)dr["period_start"]).ToShortDateString() + " - " + ((DateTime)dr["period_end"]).ToShortDateString();
-
-                    if(bNext)
+                    else
                     {
-                        bNext = false;
-
-                        iNextPeriod = int.Parse(dr["period_id"].ToString());
-                    }
-
-                    if(dr["period_id"].ToString() == sPeriodId && itmpprev != "")
-                    {
-                        iPreviousPeriod = int.Parse(itmpprev);
-                        bNext = true;
-                    }
-
-                    itmpprev = dr["period_id"].ToString();
-                }
-
-                sPeriodList = sPeriodList.Trim(',');
-
-                TSNotes = settings.AllowNotes.ToString().ToLower();
-
-
-                cmd = new SqlCommand("SELECT TSTYPE_ID, TSTYPE_NAME FROM TSTYPE where SITE_UID=@siteid", cn);
-                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-
-                SqlDataReader drTypes = cmd.ExecuteReader();
-                while(drTypes.Read())
-                {
-                    int id = drTypes.GetInt32(0);
-                        
-                    TSColType = 2;
-
-                    TSTypeObject += ",T" + id + ": '" + drTypes.GetString(1) + "'";
-
-                }
-                drTypes.Close();
-
-
-                TSTypeObject = "{" + TSTypeObject.Trim(',') + "}";
-
-                ArrayList arrPeriods = TimesheetAPI.GetPeriodDaysArray(cn, settings, web, sPeriodId);
-
-                foreach(DateTime dtStart in arrPeriods)
-                {
-                    TSCols += "\"P" + dtStart.Ticks + "\": true,";
-                }
-                 
-
-                TSCols = "{" + TSCols.Trim(',') + "}";
-
-
-                cmd = new SqlCommand("SELECT submitted, approval_status, locked FROM TSTIMESHEET where SITE_UID=@siteid and period_id=@period and username=@username", cn);
-                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                cmd.Parameters.AddWithValue("@period", sPeriodId);
-                cmd.Parameters.AddWithValue("@username", web.CurrentUser.LoginName);
-
-                SqlDataReader drTS = cmd.ExecuteReader();
-                if(drTS.Read())
-                {
-                    //Locked
-                    if(drTS.GetBoolean(2))
-                        bTsLocked = true;
-
-                    //Submitted
-                    if(drTS.GetBoolean(0))
-                    {
-                        if(drTS.GetInt32(1) == 1)
+                        DataRow[] dr = ds.Tables[0].Select("period_id='" + sPeriodId + "'");
+                        if(dr.Length > 0)
                         {
-                            sStatus = "Approved";
-                            if(!settings.DisableApprovals)
-                                bTsLocked = true;
-                        }
-                        else if(drTS.GetInt32(1) == 2)
-                        {
-                            sStatus = "Rejected";
+                            sPeriodName = ((DateTime)dr[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr[0]["period_end"]).ToShortDateString();
+                            try
+                            {
+                                if(dr[0]["curPeriod"].ToString() == "1")
+                                    bIsCurrentTimesheetPeriod = true;
+                            }
+                            catch { }
                         }
                         else
-                            sStatus = "Submitted";
+                        {
+                            DataRow[] dr2 = ds.Tables[0].Select("CurPeriod='1'");
+                            if(dr2.Length > 0)
+                            {
+                                sPeriodId = dr2[0]["period_id"].ToString();
+                                sPeriodName = ((DateTime)dr2[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr2[0]["period_end"]).ToShortDateString();
+                                bIsCurrentTimesheetPeriod = true;
+                            }
+                            else
+                            {
+                                sPeriodId = dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_id"].ToString();
+                                sPeriodName = ((DateTime)dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_start"]).ToShortDateString() + " - " + ((DateTime)dtPeriods.Rows[dtPeriods.Rows.Count - 1]["period_end"]).ToShortDateString();
+                            }
+                        }
                     }
+
+                    string itmpprev = "";
+                    bool bNext = false;
+
+                    foreach(DataRow dr in dtPeriods.Rows)
+                    {
+                        sPeriodList += "," + dr["period_id"].ToString() + "|" + ((DateTime)dr["period_start"]).ToShortDateString() + " - " + ((DateTime)dr["period_end"]).ToShortDateString();
+
+                        if(bNext)
+                        {
+                            bNext = false;
+
+                            iNextPeriod = int.Parse(dr["period_id"].ToString());
+                        }
+
+                        if(dr["period_id"].ToString() == sPeriodId)
+                        {
+                            if(itmpprev != "")
+                                iPreviousPeriod = int.Parse(itmpprev);
+                            bNext = true;
+                        }
+
+                        itmpprev = dr["period_id"].ToString();
+                    }
+
+                    sPeriodList = sPeriodList.Trim(',');
+
+                    TSNotes = settings.AllowNotes.ToString().ToLower();
+
+
+                    cmd = new SqlCommand("SELECT TSTYPE_ID, TSTYPE_NAME FROM TSTYPE where SITE_UID=@siteid", cn);
+                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+
+                    SqlDataReader drTypes = cmd.ExecuteReader();
+                    while(drTypes.Read())
+                    {
+                        int id = drTypes.GetInt32(0);
+
+                        TSColType = 2;
+
+                        TSTypeObject += ",T" + id + ": '" + drTypes.GetString(1) + "'";
+
+                    }
+                    drTypes.Close();
+
+
+                    TSTypeObject = "{" + TSTypeObject.Trim(',') + "}";
+
+                    ArrayList arrPeriods = TimesheetAPI.GetPeriodDaysArray(cn, settings, web, sPeriodId);
+
+                    foreach(DateTime dtStart in arrPeriods)
+                    {
+                        TSCols += "\"P" + dtStart.Ticks + "\": true,";
+                    }
+
+                    foreach(DateTime dtStart in arrPeriods)
+                    {
+                        TSDCols += "\"P" + dtStart.Ticks + "\": \"" + settings.DayDef.Split('|')[(int)dtStart.DayOfWeek * 3 + 1] + "|" + settings.DayDef.Split('|')[(int)dtStart.DayOfWeek * 3 + 2] + "\",";
+                    }
+
+                    TSCols = "{" + TSCols.Trim(',') + "}";
+                    TSDCols = "{" + TSDCols.Trim(',') + "}";
+
+                    cmd = new SqlCommand("SELECT submitted, approval_status, locked FROM TSTIMESHEET where SITE_UID=@siteid and period_id=@period and username=@username", cn);
+                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                    cmd.Parameters.AddWithValue("@period", sPeriodId);
+                    cmd.Parameters.AddWithValue("@username", web.CurrentUser.LoginName);
+
+                    SqlDataReader drTS = cmd.ExecuteReader();
+                    if(drTS.Read())
+                    {
+                        //Locked
+                        if(drTS.GetBoolean(2))
+                            bTsLocked = true;
+
+                        //Submitted
+                        if(drTS.GetBoolean(0))
+                        {
+                            if(drTS.GetInt32(1) == 1)
+                            {
+                                sStatus = "Approved";
+                                if(!settings.DisableApprovals)
+                                    bTsLocked = true;
+                            }
+                            else if(drTS.GetInt32(1) == 2)
+                            {
+                                sStatus = "Rejected";
+                            }
+                            else
+                                sStatus = "Submitted";
+                        }
+                    }
+                    drTS.Close();
+
+
+
+
+                    cn.Close();
+
+                    bHasPeriods = true;
                 }
-                drTS.Close();
-
-                
-
-
-                cn.Close();
             });
 
             
@@ -297,6 +309,12 @@ namespace TimeSheets
                 return;
             }
 
+            if(!bHasPeriods)
+            {
+                output.WriteLine("There are no periods setup for this TimeSheet. Please contact your system administrator");
+                return;
+            }
+
             string sUserId = "";
 
             if(!string.IsNullOrEmpty(Page.Request["Delegate"]))
@@ -304,6 +322,8 @@ namespace TimeSheets
                 SPUser user = TimesheetAPI.GetUser(SPContext.Current.Web, Page.Request["Delegate"]);
                 sUserId = user.ID.ToString();
             }
+
+            bCanEditViews = SPContext.Current.Web.DoesUserHavePermissions(SPBasePermissions.ManageWeb);
 
             string url = SPContext.Current.Web.Url;
             if(url == "/") url = "";
@@ -365,13 +385,15 @@ namespace TimeSheets
                                     TSObject" + sFullGridId + @".Views = " + views.ToJSON() + @";
                                     TSObject" + sFullGridId + @".CurrentView = '" + sCurrentView + @"';
                                     TSObject" + sFullGridId + @".CurrentViewId = '" + sCurrentViewId + @"';
+                                    TSObject" + sFullGridId + @".CanEditViews = " + bCanEditViews.ToString().ToLower() + @";
 
                                     TSColType = " + TSColType + @";
                                     TSNotes = " + TSNotes + @";
                                     TSTypeObject = " + TSTypeObject + @";
                                     TSCols = " + TSCols + @";
+                                    TSDCols = " + TSDCols + @";
                                     siteUrl = '" + url + @"';
-                                    
+                                    curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss") + @"')).getTime();
                             </script>
                             ");
             
@@ -392,7 +414,7 @@ namespace TimeSheets
 
                 View Name:<br />
                 <input type=""text"" class=""ms-input"" name=""viewname"" id=""viewname""/><br /><br />
-                <input type=""checkbox"" name=""chkViewDefault"" id=""chkViewDefault"" /> Default View <br /><br />
+                <div><input type=""checkbox"" name=""chkViewDefault"" id=""chkViewDefault"" /> Default View </div><br /><br />
                 <input type=""button"" value=""OK"" onclick=""SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('viewname').value + '|' + document.getElementById('chkViewDefault').checked); return false;"" class=""ms-ButtonHeightWidth"" style=""width:100px"" target=""_self"" /> &nbsp;
 
                <input type=""button"" value=""Cancel"" onclick=""SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;"" class=""ms-ButtonHeightWidth"" style=""width:100px"" target=""_self"" />  

@@ -113,6 +113,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'Ribbon.MyTimesheet.SaveView':
             case 'Ribbon.MyTimesheet.RenameView':
             case 'Ribbon.MyTimesheet.DeleteView':
+                return this.tsObject.CanEditViews;
             case 'Ribbon.MyTimesheet.CurrentViewDropDown.Select':
             case 'Ribbon.MyTimesheet.SelectColumns':
             case 'Ribbon.MyTimesheet.ShowHideFilters':
@@ -337,6 +338,36 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var grid = Grids["TS" + this.tsObject.id];
             properties.On = grid.GetRowById("Group").Visible;
         }
+        else if (commandId === 'Ribbon.MyTimesheet.DeleteView') {
+            var grid = Grids["TS" + this.tsObject.id];
+
+            if (confirm("Are you sure you want to delete this view: " + this.tsObject.CurrentView + "?")) {
+
+                DeleteView(grid, this.tsObject.CurrentView);
+
+            }
+        }
+        else if (commandId === 'Ribbon.MyTimesheet.RenameView') {
+
+            var grid = Grids["TS" + this.tsObject.id];
+
+            viewNameDiv.style.display = "";
+
+            viewNameDiv.firstChild.nextSibling.nextSibling.value = this.tsObject.CurrentView;
+            
+            viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
+
+            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
+                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = true;
+            }
+            else
+                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = false;
+
+            curGrid = grid;
+            cView = this.tsObject.CurrentView;
+            var options = { html: viewNameDiv, width: 250, height: 125, title: "Rename View", dialogReturnValueCallback: this.onRenameViewClose };
+            SP.UI.ModalDialog.showModalDialog(options);
+        }
         else if (commandId === 'Ribbon.MyTimesheet.SaveView') {
 
             var grid = Grids["TS" + this.tsObject.id];
@@ -345,6 +376,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             viewNameDiv.firstChild.nextSibling.nextSibling.value = this.tsObject.CurrentView;
 
+            
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "";
 
             if (this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
@@ -355,7 +387,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             curGrid = grid;
 
-            var options = { html: viewNameDiv, width: 250, height: 125, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
+            var options = { html: viewNameDiv, width: 250, height: 135, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
             SP.UI.ModalDialog.showModalDialog(options);
         }
         else if (commandId === 'Ribbon.MyTimesheet.ChangeView') {
@@ -405,6 +437,15 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var retval = returnValue.split('|');
 
             SaveView(curGrid, retval);
+        }
+
+    },
+
+    onRenameViewClose: function (dialogResult, returnValue) {
+        if (dialogResult == "1") {
+            var retval = returnValue.split('|');
+
+            RenameView(curGrid, cView, retval[0]);
         }
 
     },

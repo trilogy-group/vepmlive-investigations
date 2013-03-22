@@ -225,6 +225,8 @@ namespace TimeSheets
                     }
 
                     ndCols[0].Attributes["width"].Value = "25";
+                    
+                    XmlNode ndBeforeInit = docXml.SelectSingleNode("//head/beforeInit");
 
                     XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
                     newCol.InnerXml = "<![CDATA[&nbsp;]]>";
@@ -339,6 +341,29 @@ namespace TimeSheets
                                 footer += ",{#stat_summ}";
                             else
                                 footer += ",{#stat_total}";
+
+                            //XmlNode call = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
+                            //XmlAttribute attrC = docXml.CreateAttribute("command");
+                            //attrC.Value = "setNumberFormat";
+                            //call.Attributes.Append(attrC);
+
+                            //XmlNode param = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                            //param.InnerText = "";
+                            //call.AppendChild(param);
+
+                            //param = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                            //param.InnerText = i.ToString();
+                            //call.AppendChild(param);
+
+                            //param = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                            //param.InnerText = web.RegionalSettings.DecimalSeparator;
+                            //call.AppendChild(param);
+
+                            //param = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                            //param.InnerText = web.RegionalSettings.ThousandSeparator;
+                            //call.AppendChild(param);
+
+                            //ndBeforeInit.AppendChild(call);
                         }
 
                         footer += ",{#stat_totalsumm},-";
@@ -763,8 +788,8 @@ namespace TimeSheets
             //ndBeforeInit.RemoveChild(ndfooter); 
 
 
-
-
+             
+             
             data = docXml.OuterXml;
         }
 

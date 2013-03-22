@@ -86,6 +86,13 @@ namespace TimeSheets
 
                         DataSet dsTS = iGetTSData(cn, oWeb, user, sPeriod);
 
+                        bool bCanEdit = true;
+
+                        if(dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
+                        {
+                            bCanEdit = false;
+                        }
+
                         ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, oWeb, sPeriod);
 
                         try
@@ -98,7 +105,7 @@ namespace TimeSheets
                         {
                             if(!rows.Contains(dr["TS_ITEM_UID"].ToString()))
                             {
-                                XmlNode nd = CreateTSRow(ref docRet, dsTS, dr, arrLookups, arrPeriods, settings);
+                                XmlNode nd = CreateTSRow(ref docRet, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit);
 
                                 XmlAttribute attr = docRet.CreateAttribute("Added");
                                 attr.Value = "1";
@@ -144,6 +151,54 @@ namespace TimeSheets
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
             
+        }
+
+        public static string DeleteView(string data, SPWeb oWeb)
+        {
+            try
+            {
+                XmlDocument docTimesheet = new XmlDocument();
+                docTimesheet.LoadXml(data);
+
+                EPMLiveCore.API.ViewManager Views = GetViews(oWeb);
+
+                Views.DeleteView(docTimesheet.FirstChild.Attributes["Name"].Value);
+
+                oWeb.AllowUnsafeUpdates = true;
+
+                EPMLiveCore.CoreFunctions.setConfigSetting(oWeb, "EPMLiveTSViews", Views.ToString());
+
+                return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
+            }
+            catch(Exception ex)
+            {
+                return "<Views Status=\"1\">" + ex.Message + "</Views>";
+            }
+
+        }
+
+        public static string RenameView(string data, SPWeb oWeb)
+        {
+            try
+            {
+                XmlDocument docTimesheet = new XmlDocument();
+                docTimesheet.LoadXml(data);
+
+                EPMLiveCore.API.ViewManager Views = GetViews(oWeb);
+
+                Views.RenameView(docTimesheet.FirstChild.Attributes["Name"].Value, docTimesheet.FirstChild.Attributes["NewName"].Value);
+
+                oWeb.AllowUnsafeUpdates = true;
+
+                EPMLiveCore.CoreFunctions.setConfigSetting(oWeb, "EPMLiveTSViews", Views.ToString());
+
+                return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
+            }
+            catch(Exception ex)
+            {
+                return "<Views Status=\"1\">" + ex.Message + "</Views>";
+            }
+
         }
 
         public static string SaveWorkView(string data, SPWeb oWeb)
@@ -1051,7 +1106,12 @@ namespace TimeSheets
                         ndCol.Attributes.Append(attr1);
 
                         attr1 = docLayout.CreateAttribute("Format");
-                        attr1.Value = "0.##";
+                        //attr1.Value = "0.##";
+                        attr1.Value = ",0.00";
+                        ndCol.Attributes.Append(attr1);
+
+                        attr1 = docLayout.CreateAttribute("EditFormat");
+                        attr1.Value = ",0.00";
                         ndCol.Attributes.Append(attr1);
 
                         if(dsTypes.Tables[0].Rows.Count > 0 || settings.AllowNotes)
@@ -1520,7 +1580,7 @@ namespace TimeSheets
 
 
             XmlDocument docData = new XmlDocument();
-            docData.LoadXml("<Grid><Cfg TimesheetUID=\"\" /><Body><B></B></Body></Grid>");
+            docData.LoadXml("<Grid><Cfg TimesheetUID=\"\"/><Body><B></B></Body></Grid>");
 
             XmlNode ndB = docData.SelectSingleNode("//B");
 
@@ -1565,10 +1625,17 @@ namespace TimeSheets
                 }
                 catch { }
 
+                bool bCanEdit = true;
+
+                if(dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
+                {
+                    bCanEdit = false;
+                }
+
 
                 foreach(DataRow dr in dsTS.Tables[2].Rows)
                 {
-                    ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings));
+                    ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit));
                 }
 
                 docData.SelectSingleNode("//Cfg").Attributes["TimesheetUID"].Value = dsTS.Tables[0].Rows[0]["tsuid"].ToString();
@@ -1592,7 +1659,7 @@ namespace TimeSheets
             return docData.OuterXml;
         }
 
-        private static XmlNode CreateTSRow(ref XmlDocument docData, DataSet dsTS, DataRow dr, ArrayList arrLookups, ArrayList arrPeriods, TimesheetSettings settings)
+        private static XmlNode CreateTSRow(ref XmlDocument docData, DataSet dsTS, DataRow dr, ArrayList arrLookups, ArrayList arrPeriods, TimesheetSettings settings, bool bCanEdit)
         {
             DataRow result = null;
             try
@@ -1629,7 +1696,7 @@ namespace TimeSheets
 
             //============My Work Fields==============
 
-            if(result == null && dr["ITEM_TYPE"].ToString() == "1")
+            if(result == null && dr["ITEM_TYPE"].ToString() == "1")//Regular Work
             {
                 attr1 = docData.CreateAttribute("CanEdit");
                 attr1.Value = "0";
@@ -1640,7 +1707,7 @@ namespace TimeSheets
                 ndCol.Attributes.Append(attr1);
 
             }
-            else if(dr["ITEM_TYPE"].ToString() == "2")
+            else if(dr["ITEM_TYPE"].ToString() == "2")//Non Work
             {
                 attr1 = docData.CreateAttribute("CanEdit");
                 attr1.Value = "1";
@@ -1681,7 +1748,7 @@ namespace TimeSheets
 
                             if(result[dc.ColumnName].ToString().ToLower() == "true")
                                 en = "1";
-
+                            
                             attr1 = docData.CreateAttribute("CanEdit");
                             attr1.Value = en;
                             ndCol.Attributes.Append(attr1);
@@ -1717,15 +1784,18 @@ namespace TimeSheets
             //============Other Work Hours==============
             DataRow[] drTSOther = dsTS.Tables[6].Select("LIST_UID='" + dr["LIST_UID"].ToString() + "' AND ITEM_ID='" + dr["ITEM_ID"].ToString() + "'");
 
+            System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
+            IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
+
             if(drTSOther.Length > 0)
             {
                 attr1 = docData.CreateAttribute("TSOtherHours");
-                attr1.Value = drTSOther[0]["OtherHours"].ToString();
+                attr1.Value = float.Parse(drTSOther[0]["OtherHours"].ToString()).ToString(culture);
                 ndCol.Attributes.Append(attr1);
             }
 
             //============Hours==============
-            ProcessHours(ref ndCol, dsTS, settings, dr["TS_ITEM_UID"].ToString(), arrPeriods);
+            ProcessHours(ref ndCol, dsTS, settings, dr["TS_ITEM_UID"].ToString(), arrPeriods, culture);
             //============StopWatch==========
             DataRow[] drSW = dsTS.Tables[9].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"].ToString() + "'");
 
@@ -1744,6 +1814,11 @@ namespace TimeSheets
                 attr1 = docData.CreateAttribute("StopWatchIcon");
                 attr1.Value = "/_layouts/epmlive/images/tstimeroff.png";
                 ndCol.Attributes.Append(attr1);
+            }
+
+            if(!bCanEdit)
+            {
+                ndCol.Attributes["CanEdit"].Value = "0";
             }
 
             return ndCol;
@@ -1782,7 +1857,7 @@ namespace TimeSheets
 
         }
 
-        private static void ProcessHours(ref XmlNode ndCol, DataSet dsTS, TimesheetSettings settings, string tsitemuid, ArrayList arrPeriods)
+        private static void ProcessHours(ref XmlNode ndCol, DataSet dsTS, TimesheetSettings settings, string tsitemuid, ArrayList arrPeriods, IFormatProvider culture)
         {
             bool bHasTypes = (dsTS.Tables[7].Rows.Count > 0);
 
@@ -1799,7 +1874,7 @@ namespace TimeSheets
                     {
                         foreach(DataRow drHour in drHours)
                         {
-                            hoursString += "T" + drHour["TS_ITEM_TYPE_ID"].ToString() + ": " + drHour["TS_ITEM_HOURS"].ToString() + ",";
+                            hoursString += "T" + drHour["TS_ITEM_TYPE_ID"].ToString() + ": " + float.Parse(drHour["TS_ITEM_HOURS"].ToString()).ToString(culture) + ",";
 
                             totalHours += float.Parse(drHour["TS_ITEM_HOURS"].ToString());
                         }
@@ -1833,7 +1908,7 @@ namespace TimeSheets
                     if(drHours.Length > 0)
                     {
                         XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("P" + dtStart.Ticks);
-                        attr1.Value = drHours[0]["TS_ITEM_HOURS"].ToString();
+                        attr1.Value = float.Parse(drHours[0]["TS_ITEM_HOURS"].ToString()).ToString(culture);
                         ndCol.Attributes.Append(attr1);
                     }
 
@@ -1849,7 +1924,7 @@ namespace TimeSheets
                     if(drHours.Length > 0)
                     {
                         XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("P" + dtStart.Ticks);
-                        attr1.Value = drHours[0]["TS_ITEM_HOURS"].ToString();
+                        attr1.Value = float.Parse(drHours[0]["TS_ITEM_HOURS"].ToString()).ToString(culture);
                         ndCol.Attributes.Append(attr1);
                     }
                 }
@@ -2445,6 +2520,8 @@ namespace TimeSheets
                         attr.Value = dr["ItemID"].ToString();
                         ndRow.Attributes.Append(attr);
 
+                        
+
                         attr = docOut.CreateAttribute("TSEnabled");
                         attr.Value = "1";
                         ndRow.Attributes.Append(attr);
@@ -2513,7 +2590,7 @@ namespace TimeSheets
 
             if(!string.IsNullOrEmpty(SearchField) && !string.IsNullOrEmpty(SearchText))
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText);
+                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'","''"));
             }
             else if(bOtherWork)
             {

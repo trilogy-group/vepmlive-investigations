@@ -22,7 +22,6 @@ namespace TimeSheets
         public bool AllowStopWatch = false;
         public ArrayList TimesheetFields = new ArrayList();
 
-
         public TimesheetSettings(SPWeb oWeb)
         {
             SPSecurity.RunWithElevatedPrivileges(delegate(){

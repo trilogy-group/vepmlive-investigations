@@ -141,7 +141,7 @@ namespace TimeSheets
                                             //if (actualWork != "")
                                             //{
                                             if (!liveHours)
-                                                data = SharedFunctions.processActualWork(cn, Request["ts_uid"], site, false);
+                                                data = SharedFunctions.processActualWork(cn, Request["ts_uid"], site, false, true);
                                             //}
                                         }
 
@@ -202,7 +202,7 @@ namespace TimeSheets
                                         cmd.ExecuteNonQuery();
                                         if (EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "EPMLiveTSDisableApprovals").ToLower() == "true" && !liveHours)
                                         {
-                                            data = SharedFunctions.processActualWork(cn, Request["ts_uid"], site, true);
+                                            data = SharedFunctions.processActualWork(cn, Request["ts_uid"], site, true, true);
                                         } 
                                         if (data == "")
                                             data = "Success";
@@ -274,7 +274,7 @@ namespace TimeSheets
                                                 cmd.Parameters.AddWithValue("@notes", tsuid[1]);
                                                 cmd.ExecuteNonQuery();
 
-                                                data += SharedFunctions.processActualWork(cn, tsuid[0], site, true);
+                                                data += SharedFunctions.processActualWork(cn, tsuid[0], site, true, true);
                                             }
                                             
                                             if (data == "")

@@ -83,6 +83,9 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="API\TimesheetAPI.cs" />
+    <Compile Include="Jobs\ApprovalJob.cs" />
+    <Compile Include="Jobs\BaseJob.cs" />
+    <Compile Include="Jobs\SaveJob.cs" />
     <Compile Include="Layouts\epmlive\MyTimesheetAddWork.aspx.cs">
       <DependentUpon>MyTimesheetAddWork.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

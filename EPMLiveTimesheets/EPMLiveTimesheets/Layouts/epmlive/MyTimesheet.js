@@ -14,14 +14,15 @@ var curStoppingRow;
 var curStoppingGrid;
 var StopWatchResponse;
 var bStopWatchStartWaiting = false;
-
+var cView;
 var TSStatusMessage = null;
 var TSApprovalMessage = null;
 var bTSSaving = false;
 var bTSApproving = false;
 var iApproveInterval;
-
+var curServerDate;
 var spnMsg = null;
+
 
 Grids.OnRenderStart = function (grid) {
     if (grid.id.substr(0, 2) == "TS") {
@@ -198,35 +199,40 @@ function UnSubmitTimesheet(gridid) {
 
 function SubmitTimesheet(gridid) {
 
-    ShowMessage(gridid, "Submitting...", 140, 30);
+    if (!StopWatchRow) {
+        ShowMessage(gridid, "Submitting...", 140, 30);
 
-    var grid = Grids[gridid];
+        var grid = Grids[gridid];
 
-    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_SubmitTimesheet", "<Timesheet ID=\"" + grid.TimesheetUID + "\" />", function (response) {
-        var oResponse = eval("(" + response + ")");
+        EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_SubmitTimesheet", "<Timesheet ID=\"" + grid.TimesheetUID + "\" />", function (response) {
+            var oResponse = eval("(" + response + ")");
 
-        HideMessage(grid.id);
+            HideMessage(grid.id);
 
-        if (oResponse.SubmitTimesheet.Status == "0") {
+            if (oResponse.SubmitTimesheet.Status == "0") {
 
-            var newgridid = grid.id.substr(2);
-            var newobj = eval("TSObject" + newgridid);
+                var newgridid = grid.id.substr(2);
+                var newobj = eval("TSObject" + newgridid);
 
-            newobj.Status = "Submitted";
+                newobj.Status = "Submitted";
 
-            DisableAllRows(grid);
+                DisableAllRows(grid);
 
-            AfterSubmit(grid);
+                AfterSubmit(grid);
 
-            RefreshCommandUI();
+                RefreshCommandUI();
 
-        }
-        else {
-            alert(oResponse.SubmitTimesheet.Text);
-        }
+            }
+            else {
+                alert(oResponse.SubmitTimesheet.Text);
+            }
 
-        StartCheckApproveStatus(gridid);
-    });
+            StartCheckApproveStatus(gridid);
+        });
+    }
+    else {
+        alert('You have a stopwatch currently running, please stop the stopwatch before you submit');
+    }
 }
 
 function DisableAllRows(grid) {
@@ -236,7 +242,7 @@ function DisableAllRows(grid) {
         var oRow = grid.Rows[row];
 
         if (oRow.Kind == "Data" && oRow.id != "-1") {
-            grid.SetAttribute(oRow, null, "CanEdit", "0", true, false);
+            grid.SetAttribute(oRow, null, "CanEdit", 0, true, false);
         }
     }
 
@@ -376,6 +382,79 @@ function ChangeView(grid, view) {
     RefreshCommandUI();
 
     grid.Render();
+}
+
+function DeleteView(grid, view) {
+
+    ShowMessage(grid.id, "Deleting View...", 150, 50);
+
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_DeleteView", "<View Name=\"" + view + "\"/>", function (response) {
+        var oResponse = eval("(" + response + ")");
+        grid.StaticCursor = 1;
+
+        HideMessage(grid.id);
+
+        if (oResponse.Views.Status == "0") {
+
+            var newgridid = grid.id.substr(2);
+            var newobj = eval("TSObject" + newgridid);
+
+            newobj.Views = eval("(" + oResponse.Views.Text.replace(/&quot;/g, "\"") + ")");
+
+            for (var view in newobj.Views) {
+                var oView = newobj.Views[view];
+
+                //if (oView.Name == retval[0]) {
+                //    newobj.CurrentView = retval[0];
+                //    newobj.CurrentViewId = view;
+                //    break;
+                //}
+            }
+
+            newobj.CurrentView = "";
+            newobj.CurrentViewId = "";
+
+            RefreshCommandUI();
+        }
+        else {
+            alert(oResponse.Views.Text);
+        }
+    });
+}
+
+function RenameView(grid, view, newview) {
+
+    ShowMessage(grid.id, "Renaming View...", 150, 50);
+
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_RenameView", "<View Name=\"" + view + "\" NewName=\"" + newview + "\"/>", function (response) {
+        var oResponse = eval("(" + response + ")");
+        grid.StaticCursor = 1;
+
+        HideMessage(grid.id);
+
+        if (oResponse.Views.Status == "0") {
+
+            var newgridid = grid.id.substr(2);
+            var newobj = eval("TSObject" + newgridid);
+
+            newobj.Views = eval("(" + oResponse.Views.Text.replace(/&quot;/g, "\"") + ")");
+
+            for (var view in newobj.Views) {
+                var oView = newobj.Views[view];
+
+                if (oView.Name == newview) {
+                    newobj.CurrentView = newview;
+                    newobj.CurrentViewId = view;
+                    break;
+                }
+            }
+
+            RefreshCommandUI();
+        }
+        else {
+            alert(oResponse.Views.Text);
+        }
+    });
 }
 
 function SaveView(grid, retval) {
@@ -617,12 +696,12 @@ function DoPopUp(grid, row, col) {
 
                     grid.EndEdit(true);
 
-                    var strDivTag = "<div style='position: absolute; margin-left: 45px; cursor:pointer' onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='position: absolute; margin-left: 45px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='width:150px;height:75px;border:0px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
+                    var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer' onMouseDown=\"stopProp(event);\" onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='position: absolute; margin-left: 65px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='width:150px;height:75px;border:0px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
 
                     if (bLocked)
                         strDivTag += " disabled=\"disabled\"";
 
-                    strDivTag += ">" + pVal + "</textarea><br><input type=\"button\" value=\"OK\" onCLick=\"SaveNotes(event);\"></div>";
+                    strDivTag += ">" + pVal + "</textarea><br><input type=\"button\" value=\"OK\" onCLick=\"SaveNotes(event);stopProp(event);\"></div>";
 
 
 
@@ -770,13 +849,28 @@ Grids.OnValueChanged = function (grid, row, col, val) {
 
         var tVal = GetDecimalFromTime(val);
 
+        var oldVal = grid.GetValue(row, col);
+
         if (tVal.toString() == "NaN") {
             alert('That is not a valid entry.');
-            val = grid.GetValue(row, col);
+            val = oldVal;
         }
         else
             val = tVal;
 
+        if (TSDCols[col]) {
+            var minmax = TSDCols[col].split('|');
+            var min = parseFloat(minmax[0]);
+            var max = parseFloat(minmax[1]);
+            if (val > max) {
+                alert("You may only enter a maximum time of " + max + " hours");
+                val = oldVal;
+            }
+            if (val < min) {
+                alert("You must enter atleast time of " + min + " hours");
+                val = oldVal;
+            }
+        }
     }
     return val;
 }
@@ -790,6 +884,9 @@ function StopStopWatchClose(oDialogResult) {
                 if (SW != "Status") {
                     var oSW = StopWatchResponse[SW];
                     var fVal = parseFloat(curStoppingGrid.GetValue(curStoppingRow, "P" + oSW.DateTicks));
+
+                    if (isNaN(fVal))
+                        fVal = 0;
 
                     fVal += parseFloat(oSW.Minutes) / 60;
 
@@ -948,41 +1045,47 @@ function StartStopWatch(grid, row) {
     var newgridid = grid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
 
-    if (newobj.IsCurPeriod) {
-
-        EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_StartStopWatch", "<StopWatch ID=\"" + row.UID + "\" UserId=\"" + newobj.UserId + "\"/>", function (response) {
-
-            var oResp = eval("(" + response + ")");
-
-            if (oResp.StopWatch.Status == "0") {
-
-                grid.SetValue(row, "StopWatch", oResp.StopWatch.Text, 1, 0);
-                grid.SetAttribute(row, "StopWatch", "Icon", "/_layouts/epmlive/images/tstimeron.png", true, false);
-
-                StopWatchRow = row;
-                StopWatchGrid = grid;
-                RefreshStopWatch();
-            }
-            else {
-                alert(oResp.StopWatch.Text);
-            }
-        });
-
+    if (IsLocked(grid)) {
+        alert("You cannot start a stop watch on a submitted timesheet");
     }
-    else {
-        if (newobj.CurPeriodId == 0) {
-            alert("You can only start stopwatches within the period that the current date resides and there seems to be no period setup for today's date.");
+    else
+    {
+        if (newobj.IsCurPeriod) {
+
+            EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_StartStopWatch", "<StopWatch ID=\"" + row.UID + "\" UserId=\"" + newobj.UserId + "\"/>", function (response) {
+
+                var oResp = eval("(" + response + ")");
+
+                if (oResp.StopWatch.Status == "0") {
+
+                    grid.SetValue(row, "StopWatch", oResp.StopWatch.Text, 1, 0);
+                    grid.SetAttribute(row, "StopWatch", "Icon", "/_layouts/epmlive/images/tstimeron.png", true, false);
+
+                    StopWatchRow = row;
+                    StopWatchGrid = grid;
+                    RefreshStopWatch();
+                }
+                else {
+                    alert(oResp.StopWatch.Text);
+                }
+            });
+
         }
         else {
-            if (confirm("You can only start stopwatches within the period that the current date resides. Would you like to switch to period: " + newobj.CurPeriodName + "?")) {
-                var url = newobj.TSURL;
+            if (newobj.CurPeriodId == 0) {
+                alert("You can only start stopwatches within the period that the current date resides and there seems to be no period setup for today's date.");
+            }
+            else {
+                if (confirm("You can only start stopwatches within the period that the current date resides. Would you like to switch to period: " + newobj.CurPeriodName + "?")) {
+                    var url = newobj.TSURL;
 
-                if (url.indexOf("?") > 0)
-                    url += "&";
-                else
-                    url += "?";
+                    if (url.indexOf("?") > 0)
+                        url += "&";
+                    else
+                        url += "?";
 
-                location.href = url + "NewPeriod=" + newobj.CurPeriodId;
+                    location.href = url + "NewPeriod=" + newobj.CurPeriodId;
+                }
             }
         }
     }
@@ -990,12 +1093,13 @@ function StartStopWatch(grid, row) {
 
 Grids.OnGetHtmlValue = function (grid, row, col, val) {
     if (grid.id.substr(0, 2) == "TS") {
+
         if (col == "StopWatch") {
             if (StopWatchRow && row.UID == StopWatchRow.UID) {
 
                 var dt = new Date(val);
 
-                var dtNow = new Date();
+                var dtNow = new Date(new Date().getTime() - curServerDate);
 
                 var diff = dtNow.getTime() - dt.getTime();
 
@@ -1003,9 +1107,30 @@ Grids.OnGetHtmlValue = function (grid, row, col, val) {
 
             }
         }
+        else if (TSCols[col] || col == "TSTotals") {
+            if (val == "0" || val == "")
+                return "";
+            return getFormattedNumber(val.toLocaleString());
+        }
     }
 
 }
+
+function getFormattedNumber(Amount) {
+    var DecimalSeparator = Number("1.2").toLocaleString().substr(1, 1);
+
+    var AmountWithCommas = Amount.toLocaleString();
+    var arParts = String(AmountWithCommas).split(DecimalSeparator);
+    var intPart = arParts[0];
+    var decPart = (arParts.length > 1 ? arParts[1] : '');
+    decPart = (decPart + '00').substr(0, 2);
+    if (parseInt(decPart) == 0) {
+        decPart = "";
+        DecimalSeparator = "";
+    }
+    return intPart + DecimalSeparator + decPart;
+}
+
 
 function GetTimeDisplay(val) {
     var msecPerMinute = 1000 * 60;
@@ -1047,9 +1172,9 @@ function RefreshStopWatch() {
 
 function GetDecimalFromTime(time) {
     var sTime = time.split(':');
-    var lTime = parseFloat(sTime[0]);
+    var lTime = StringToNumber(sTime[0]);
     if (sTime.length > 1) {
-        var rTime = parseFloat(sTime[1]);
+        var rTime = StringToNumber(sTime[1]);
 
         rTime = rTime / 60;
 
@@ -1208,6 +1333,19 @@ function BeforeSubmit(grid) {
     }
     else
         return true;
+}
+
+function IsLocked(grid)
+{
+    var newgridid = grid.id.substr(2);
+    var newobj = eval("TSObject" + newgridid);
+
+    if (newobj.Locked || bTSApproving)
+        return true;
+    if (newobj.Status != 'Unsubmitted')
+        return true;
+        
+    return false;
 }
 
 function AfterSubmit(grid) {
