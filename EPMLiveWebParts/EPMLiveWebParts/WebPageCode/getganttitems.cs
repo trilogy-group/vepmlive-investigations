@@ -390,9 +390,31 @@ namespace EPMLiveWebParts
                     case SPFieldType.Number:
                         SPFieldNumber num = (SPFieldNumber)oField;
                         if(num.ShowAsPercentage)
-                            return (float.Parse(value) * 100).ToString();
+                        {
+                            if(value.Contains("%"))
+                                return value.Replace("%", "");
+                            else
+                                return (float.Parse(value) * 100).ToString();
+                        }
                         else
                             return value;
+                    case SPFieldType.Calculated:
+                        if(oField.Description == "Indicator")
+                        {
+                            if(value != "" && !value.StartsWith("<img src"))
+                                value = "<img src=\"/_layouts/images/" + value.ToLower() + "\">";
+                        }
+                        SPFieldCalculated calc = (SPFieldCalculated)oField;
+                        if(calc.ShowAsPercentage)
+                        {
+                            if(value.Contains("%"))
+                                return value.Replace("%", "");
+                            else
+                                return (float.Parse(value) * 100).ToString();
+                        }
+                        else
+                            return value;
+
                     default:
                         switch(oField.TypeAsString)
                         {
@@ -410,7 +432,7 @@ namespace EPMLiveWebParts
         private void ProcessItems(XmlNode ndParent, XmlNode ndRow, XmlNodeList arrFields, XmlDocument doc)
         {
 
-
+            
             XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
 
             XmlNodeList ndCells = ndRow.SelectNodes("cell");
@@ -538,7 +560,7 @@ namespace EPMLiveWebParts
         {
             string format = "";
 
-            switch(oField.Type)
+            switch(oField.Type) 
             {
                 case SPFieldType.DateTime:
                     try
@@ -557,7 +579,7 @@ namespace EPMLiveWebParts
                 case SPFieldType.Number:
                     if(oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
                     {
-                        format = "0\\%;;0\\%";
+                        format = "0\\%;0\\%;0\\%";
                     }
                     else
                     {
@@ -591,23 +613,30 @@ namespace EPMLiveWebParts
                             format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
                             break;
                         case "Number":
-                            int decCount = 0;
-                            string decimals = "";
-                            try
+                            if(oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
                             {
-                                decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                                format = "0\\%;0\\%;0\\%";
                             }
-                            catch { }
-
-                            for(int i = 0; i < decCount; i++)
+                            else
                             {
-                                decimals += "0";
+                                int decCount = 0;
+                                string decimals = "";
+                                try
+                                {
+                                    decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                                }
+                                catch { }
+
+                                for(int i = 0; i < decCount; i++)
+                                {
+                                    decimals += "0";
+                                }
+
+                                if(decCount > 0)
+                                    decimals = "." + decimals;
+
+                                format = ",0" + decimals;
                             }
-
-                            if(decCount > 0)
-                                decimals = "." + decimals;
-
-                            format = ",0" + decimals;
                             break;
                     };
                     break;

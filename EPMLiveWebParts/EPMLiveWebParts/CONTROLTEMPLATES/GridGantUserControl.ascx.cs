@@ -62,7 +62,7 @@ namespace EPMLiveWebParts
         protected void Page_Load(object sender, EventArgs e)
         {
             
-            try
+            /*try
             {
                 //Will be used client-side for XMLHTTP post
                 webUrl = SPContext.Current.Site.RootWeb.Url + "/_layouts/epmlive/ajaxpost.aspx";
@@ -295,7 +295,7 @@ namespace EPMLiveWebParts
             catch (Exception ex)
             {
                 Response.Write("The following error has occurred: <br />" + ex.Message);                
-            }
+            }*/
         }
     }
 }

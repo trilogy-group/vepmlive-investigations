@@ -286,7 +286,7 @@ function GetData() {
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
                                                                    .replace(/##createdDate##/g, oComment['@createdDate'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -322,7 +322,7 @@ function GetData() {
                                                                    .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -341,7 +341,7 @@ function GetData() {
                                                                    .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -363,7 +363,7 @@ function GetData() {
                                                                    .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -396,18 +396,20 @@ function GetData() {
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).blur(function (e) {
-                                            var id = $(this).attr('id').replace('tbCommentInput', '');
-                                            var newTarget = e.originalEvent.explicitOriginalTarget || document.activeElement;
-                                            var newCommentBtnId = 'btnNewComment' + id;
-                                            if (newTarget.id != newCommentBtnId) {
-                                                $('#' + newCommentBtnId).parent().css('display', 'none');
-                                                $(this).css('display', 'none');
-                                                $('#aNewCommentReply' + id).css('display', '');
-                                            }
+//                                            var id = $(this).attr('id').replace('tbCommentInput', '');
+//                                            var newTarget = e.originalEvent.explicitOriginalTarget || document.activeElement;
+//                                            var newCommentBtnId = 'btnNewComment' + id;
 
-                                            if ($$.UnescapeHTML($(this).html()) === undefined || $$.UnescapeHTML($(this).html()) === '') {
-                                                $(this).append($('<span style="color:gray">Write a reply...</span>'));
-                                            }
+//                                            if (newTarget.id != newCommentBtnId) {
+//                                                $('#' + newCommentBtnId).parent().css('display', 'none');
+//                                                $(this).css('display', 'none');
+//                                                $('#aNewCommentReply' + id).css('display', '');
+//                                            }
+//                                            if ($$.UnescapeHTML($(this).html()) === undefined || $$.UnescapeHTML($(this).html()) === '') {
+//                                                $(this).append($('<span style="color:gray">Write a reply...</span>'));
+//                                            }
+
+                                            return true;
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
@@ -558,7 +560,7 @@ function GetData() {
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
                                                                    .replace(/##createdDate##/g, oComment['@createdDate'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -593,7 +595,7 @@ function GetData() {
                                                                    .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -613,7 +615,7 @@ function GetData() {
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
                                                                    .replace(/##createdDate##/g, oComment['@createdDate'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -635,7 +637,7 @@ function GetData() {
                                                                    .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
                                                                    .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
                                                                    .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
-                                                                   .replace(/##comment##/g, unescape(oComment['#cdata']))
+                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
                                                                    .replace(/##itemTitle##/g, oComment['@itemTitle'])
                                                                    .replace(/##listName##/g, oComment['@listName'])
                                                                    .replace(/##listUrl##/g, oComment['@listUrl'])
@@ -684,18 +686,20 @@ function GetData() {
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).blur(function (e) {
-                                            var id = $(this).attr('id').replace('tbCommentInput', '');
-                                            var newTarget = e.originalEvent.explicitOriginalTarget || document.activeElement;
-                                            var newCommentBtnId = 'btnNewComment' + id;
-                                            if (newTarget.id != newCommentBtnId) {
-                                                $('#' + newCommentBtnId).parent().css('display', 'none');
-                                                $(this).css('display', 'none');
-                                                $('#aNewCommentReply' + id).css('display', '');
-                                            }
+                                            //                                            var id = $(this).attr('id').replace('tbCommentInput', '');
+                                            //                                            var newTarget = e.originalEvent.explicitOriginalTarget || document.activeElement;
+                                            //                                            var newCommentBtnId = 'btnNewComment' + id;
 
-                                            if ($$.UnescapeHTML($(this).html()) === undefined || $$.UnescapeHTML($(this).html()) === '') {
-                                                $(this).append($('<span style="color:gray">Write a reply...</span>'));
-                                            }
+                                            //                                            if (newTarget.id != newCommentBtnId) {
+                                            //                                                $('#' + newCommentBtnId).parent().css('display', 'none');
+                                            //                                                $(this).css('display', 'none');
+                                            //                                                $('#aNewCommentReply' + id).css('display', '');
+                                            //                                            }
+                                            //                                            if ($$.UnescapeHTML($(this).html()) === undefined || $$.UnescapeHTML($(this).html()) === '') {
+                                            //                                                $(this).append($('<span style="color:gray">Write a reply...</span>'));
+                                            //                                            }
+
+                                            return true;
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
@@ -887,6 +891,14 @@ function GetData() {
                       .replace(/'/g, '&#39;')
                       .replace(/</g, '&lt;')
                       .replace(/>/g, '&gt;');
+        }
+
+        $$.xmlUnescape = function (str) {
+            return str.replace(/#quot#/g, '"')
+                      .replace(/#amp#/g, '&')
+                      .replace(/#apos#/g, '\'')
+                      .replace(/#lt#/g, '<')
+                      .replace(/#gt#/g, '>');
         }
 
         //$('#divLoader_CommentsWebPart').css('margin-left', '45%').css('display', '');

@@ -24,10 +24,12 @@ namespace EPMLiveWebParts
         protected ListBox DefaultValueAsListBox;
         protected TextBox DefaultValueAsTextBox;
         protected PeopleEditor DefaultValueAsPeopleEditor;
-        protected DateTimeControl DefaultValueAsDateTimeBeginDate;
-        protected DateTimeControl DefaultValueAsDateTimeEndDate;
+        protected TextBox JqueryDatePickerBeginDate;
+        protected TextBox JqueryDatePickerEndDate;
         protected UpdatePanel WebControlUpdatePanel;
-        
+        protected Label BeginDateLabel;
+        protected Label EndDateLabel;
+
         public ReportingFilterToolpart()
         {
             UseDefaultStyles = true;
@@ -48,8 +50,12 @@ namespace EPMLiveWebParts
             Controls.Add(DefaultValueAsListBox);
             Controls.Add(DefaultValueAsTextBox);
             Controls.Add(DefaultValueAsPeopleEditor);
-            Controls.Add(DefaultValueAsDateTimeBeginDate);
-            Controls.Add(DefaultValueAsDateTimeEndDate);
+            Controls.Add(BeginDateLabel);
+            Controls.Add(JqueryDatePickerBeginDate);
+            Controls.Add(EndDateLabel);
+            Controls.Add(JqueryDatePickerEndDate);
+
+            AddJavascriptForDateTimeControls();
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -121,7 +127,7 @@ namespace EPMLiveWebParts
                     reportingFilterWebPart.DefaultValueForFieldFilter = DefaultValueAsPeopleEditor.CommaSeparatedAccounts;
                     break;
                 case SPFieldType.DateTime:
-                    reportingFilterWebPart.DefaultValueForFieldFilter = string.Format("{0},{1}", DefaultValueAsDateTimeBeginDate.SelectedDate.ToShortDateString(), DefaultValueAsDateTimeEndDate.SelectedDate.ToShortDateString());
+                    reportingFilterWebPart.DefaultValueForFieldFilter = string.Format("{0},{1}", JqueryDatePickerBeginDate.Text, JqueryDatePickerEndDate.Text);
                     break;
             }
 
@@ -131,23 +137,16 @@ namespace EPMLiveWebParts
 
         private void InitializeChildControls()
         {
-            
             DefaultValueAsTextBox = new TextBox();
             DefaultValueAsPeopleEditor = new PeopleEditor { ValidatorEnabled = true, MultiSelect = true };
             DefaultValueAsListBox = new ListBox { EnableViewState = true };
 
-            var calendarPopupUrl = SPContext.Current.Web.ServerRelativeUrl + "/_layouts/iframe.aspx";
-            DefaultValueAsDateTimeBeginDate = new DateTimeControl
-                                                  {
-                                                      DateOnly = true,
-                                                      DatePickerFrameUrl = calendarPopupUrl
-                                                  };
-            
-            DefaultValueAsDateTimeEndDate = new DateTimeControl
-                                                {
-                                                    DateOnly = true,
-                                                    DatePickerFrameUrl = calendarPopupUrl 
-                                                };
+            BeginDateLabel = new Label();
+            BeginDateLabel.Text = "Begin";
+            JqueryDatePickerBeginDate = new TextBox();
+            EndDateLabel = new Label();
+            EndDateLabel.Text = "End";
+            JqueryDatePickerEndDate = new TextBox();
 
             SharepointListDropDownList = new DropDownList { AutoPostBack = true, EnableViewState = true };
             SharepointListDropDownList.SelectedIndexChanged += SharepointListDropDownListSelectedIndexChanged;
@@ -297,8 +296,13 @@ namespace EPMLiveWebParts
                     DefaultValueAsPeopleEditor.RenderControl(output);
                     break;
                 case SPFieldType.DateTime:
-                    DefaultValueAsDateTimeBeginDate.RenderControl(output);
-                    DefaultValueAsDateTimeEndDate.RenderControl(output);
+                    BeginDateLabel.RenderControl(output);
+                    output.Write("<br/>");
+                    JqueryDatePickerBeginDate.RenderControl(output);
+                    output.Write("<br/>");
+                    EndDateLabel.RenderControl(output);
+                    output.Write("<br/>");
+                    JqueryDatePickerEndDate.RenderControl(output);
                     break;
             }
         }
@@ -380,12 +384,12 @@ namespace EPMLiveWebParts
 
                     if (beginDate != DateTime.MinValue)
                     {
-                        DefaultValueAsDateTimeBeginDate.SelectedDate = beginDate;
+                        JqueryDatePickerBeginDate.Text = beginDate.ToShortDateString();
                     }
 
                     if (endDate != DateTime.MinValue)
                     {
-                        DefaultValueAsDateTimeEndDate.SelectedDate = endDate;
+                        JqueryDatePickerEndDate.Text = endDate.ToShortDateString();
                     }
 
                     break;
@@ -446,5 +450,27 @@ namespace EPMLiveWebParts
                    field.Type == SPFieldType.User);
         }
 
+        private void AddJavascriptForDateTimeControls()
+        {
+            var javascript = (@"
+                                <script type=""text/javascript"">
+                                    function doDatePicker(){
+                                        jQuery(function($) {
+                                            $(""##BEGINDATECLIENTID#"").datepicker();
+                                            $(""##ENDDATECLIENTID#"").datepicker();
+                                        });
+                                    }
+
+                                    ExecuteOrDelayUntilScriptLoaded(doDatePicker, ""sp.js"");
+                                </script>
+                              ")
+                             .Replace("#BEGINDATECLIENTID#", JqueryDatePickerBeginDate.ClientID)
+                             .Replace("#ENDDATECLIENTID#", JqueryDatePickerEndDate.ClientID);
+
+            if (!Page.ClientScript.IsClientScriptBlockRegistered(GetType(), "reportFilterToolPart" + ID))
+            {
+                Page.ClientScript.RegisterClientScriptBlock(GetType(), "reportFilterToolPart" + ID, javascript);
+            }
+        }
     }
 }

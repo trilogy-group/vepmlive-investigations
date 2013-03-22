@@ -30,29 +30,5 @@ namespace EPMLiveWebParts.Utilities
 
             return returnVal;
         }
-
-        //TODO: Put these string methods into Core since they are universal.
-        public static string Left(this string param, int length)
-        {
-            var result = param.Substring(0, length);
-            return result;
-        }
-        public static string Right(this string param, int length)
-        {
-            var result = param.Substring(param.Length - length, length);
-            return result;
-        }
-
-        public static string Mid(this string param, int startIndex, int length)
-        {
-            var result = param.Substring(startIndex, length);
-            return result;
-        }
-
-        public static string Mid(this string param, int startIndex)
-        {
-            var result = param.Substring(startIndex);
-            return result;
-        }
     }
 }

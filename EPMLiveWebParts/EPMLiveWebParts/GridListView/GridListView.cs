@@ -1205,6 +1205,19 @@ namespace EPMLiveWebParts
                 hasAction = true;
             }
 
+            if(arrButtons.Contains("optimizer"))
+            {
+                sb.Append(@"<Button
+                Id=""Ribbon.ListItem.Manage.EPKOptimizer""
+                Sequence=""105""
+                Command=""EPKMultiAction""
+                Image16by16=""/_layouts/ppm/images/optimizer.png""
+                Image32by32=""/_layouts/ppm/images/optimizer.png""
+                LabelText=""Optimizer""
+                TemplateAlias=""o1""
+                />");
+                hasAction = true;
+            }
             
 
             if (hasAction)
@@ -2592,6 +2605,9 @@ namespace EPMLiveWebParts
                                                                     return grid.GetValue(row, key);
                                                                     }catch(e){}
                                                                     };");
+
+            output.WriteLine("mygrid" + sFullGridId + @".editStop = function(){  }");
+            
             //output.WriteLine("mygrid" + sFullGridId + @".getGlobalCommands = function($arr){return fnGetGlobalCommands($arr);};");
             //output.WriteLine("mygrid" + sFullGridId + @".canHandleCommand = function(this.$Grid, commandId){return fnCanHandleCommand(this.$Grid, commandId);};");
             //output.WriteLine("mygrid" + sFullGridId + @".addFocusedCommands = function($arr){return fnFocusedCommands($arr);};");
@@ -2653,8 +2669,10 @@ namespace EPMLiveWebParts
                 
         //output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"GridViewContextualTabPageComponent.js\");");
 
-
-        output.Write("setTimeout(\"clickTab()\", 100);");
+            if(SPContext.Current.ViewContext.View != null)
+            {
+                output.Write("setTimeout(\"clickTab()\", 100);");
+            }
 
             output.Write("</script>");
 
@@ -2727,15 +2745,14 @@ namespace EPMLiveWebParts
 
             }
 
-            //output.Write("<div id=\"gridmenu" + sFullGridId + "\" style=\"position:absolute;left:0px;display:none;\" class=\"ms-MenuUIPopupBody ms-MenuUIPopupScreen\">");
-            output.Write("<div id=\"gridmenu" + sFullGridId + "\" style=\"position:absolute;left:0px;display:none;\" class=\"js-callout-mainElement ms-core-defaultFont  ms-alignLeft ms-shadow\">");
-            //output.Write("<div class=\"ms-MenuUIPopupInner\" style=\"overflow: visible;\" isInner=\"true\">");
-            //output.Write("<div class=\"ms-MenuUI\" style=\"width: 177px;\">");
-            output.Write("<ul class=\"ms-core-menu-list\" style=\"width: 173px;\">");
+            output.Write("<div id=\"gridmenu" + sFullGridId + "\" style=\"position:absolute;left:0px;display:none;\" class=\"ms-MenuUIPopupBody ms-MenuUIPopupScreen\">");
+            output.Write("<div class=\"ms-MenuUIPopupInner\" style=\"overflow: visible;\" isInner=\"true\">");
+            output.Write("<div class=\"ms-MenuUI\" style=\"width: 177px;\">");
+            output.Write("<ul class=\"ms-MenuUIUL\" style=\"width: 173px;\">");
             //output.Write(Properties.Resources.txtGridMenus.Replace("#gridfunc#", "mygrid" + sFullGridId + ".menuaction(this);"));
             output.Write("</ul>");
-            //output.Write("</div>");
-            //output.Write("</div>");
+            output.Write("</div>");
+            output.Write("</div>");
             output.Write("</div>");
 
             //===================================

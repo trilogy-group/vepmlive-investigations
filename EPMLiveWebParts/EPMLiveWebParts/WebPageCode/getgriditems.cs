@@ -801,6 +801,7 @@ namespace EPMLiveWebParts
 
                             if(bUseReporting)
                             {
+
                                 if(field.Type == SPFieldType.User || field.Type == SPFieldType.Lookup)
                                 {
                                     try
@@ -828,11 +829,22 @@ namespace EPMLiveWebParts
                                     catch { }
 
                                 }
+                                else if(field.Type == SPFieldType.Calculated)
+                                {
+                                    SPFieldCalculated calc = (SPFieldCalculated)field;
+                                    if(calc.ShowAsPercentage)
+                                        try
+                                        {
+                                            val = (float.Parse(dr[field.InternalName].ToString()) / 100).ToString();
+                                        }
+                                        catch { }
+                                }
                                 else
                                 {
                                     val = dr[field.InternalName].ToString();
                                 }
                             }
+                            
                             else
                             {
                                 val = dr[field.InternalName].ToString();
@@ -3148,218 +3160,22 @@ namespace EPMLiveWebParts
             return view.Query;//.Replace("<FieldRef Name=\"SiteURLNoMenu\" />", "");
         }
 
-        private DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby)
-        {
+        
 
-            var rb = new EPMLiveReportsAdmin.ReportBiz(web.Site.ID);
-
-            if(rb.SiteExists())
-            {
-                EPMLiveReportsAdmin.EPMData data = new EPMLiveReportsAdmin.EPMData(web.Site.ID);
-
-                SqlConnection cn = data.GetClientReportingConnection;
-
-                SqlCommand cmd = new SqlCommand("select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'", cn);
-                bool borderby = false;
-                SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.Read())
-                    borderby = true;
-                dr.Close();
-
-                cmd = new SqlCommand("spGetReportListData", cn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                cmd.Parameters.AddWithValue("@webid", web.ID);
-                cmd.Parameters.AddWithValue("@weburl", web.ServerRelativeUrl);
-                cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
-                cmd.Parameters.AddWithValue("@rollup", bRollup);
-                cmd.Parameters.AddWithValue("@list", list);
-                cmd.Parameters.AddWithValue("@query", query);
-                if(borderby)
-                    cmd.Parameters.AddWithValue("@orderby", orderby);
-                
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
-
-                cn.Close();
-
-                return ds.Tables[0];
-            }
-            else
-                throw new Exception("Reporting Not Setup.");
-        }
-
-        private string GetReportQuery(SPWeb web, string spquery, out string orderby)
-        {
-            orderby = "";
-
-            if(spquery == "")
-                return "";
-
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml("<Query>" + spquery + "</Query>");
-
-            XmlNode ndWhere = doc.FirstChild.SelectSingleNode("//Where");
-
-            XmlNode ndGroupBy = doc.FirstChild.SelectSingleNode("//OrderBy");
-
-            foreach(XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
-            {
-                orderby += "," + nd.Attributes["Name"].Value;
-                try
-                {
-                    if(nd.Attributes["Ascending"].Value.ToLower() == "false")
-                        orderby += " DESC";
-                }
-                catch { }
-            }
-            orderby = orderby.Trim(',');
-
-            if(ndWhere == null)
-                return "";
-
-            string q = GetReportQueryNode(web, ndWhere.FirstChild);
-
-
-
-            return q;
-
-        }
-
-        private string GetReportQueryNode(SPWeb web, XmlNode nd)
-        {
-
-            if(nd.Name == "And")
-            {
-                return "(" + GetReportQueryNode(web, nd.FirstChild) + " And " + GetReportQueryNode(web, nd.FirstChild.NextSibling) + ")";
-            }
-            else if(nd.Name == "Or")
-            {
-                return "(" + GetReportQueryNode(web, nd.FirstChild) + " Or " + GetReportQueryNode(web, nd.FirstChild.NextSibling) + ")";
-            }
-            else
-            {
-
-
-                string field = nd.SelectSingleNode("FieldRef").Attributes["Name"].Value;
-
-                if(nd.Name == "IsNull")
-                {
-                    return field + " is null";
-                }
-                else
-                {
-                    XmlNode ndVals = null;
-                    try
-                    {
-                        ndVals = nd.SelectSingleNode("Values");
-                    }
-                    catch { }
-                    
-                    SPField oField = list.Fields.GetFieldByInternalName(field);
-                    
-                    
-
-                    if(ndVals != null)
-                    {
-                        string vals = "(";
-
-                        if(oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
-                        {
-                            field += "Text";
-                        }
-
-                        foreach(XmlNode ndVal in ndVals.SelectNodes("Value"))
-                        {
-                            vals += field + " = '" + ndVal.InnerText  + "' OR";
-                        }
-
-                        return vals.Trim('R').Trim('O') + ")";
-                    }
-                    else
-                    {
-                        string val = nd.SelectSingleNode("Value").InnerText;
-
-                       
-
-                        bool bLookup = false;
-
-                        if(oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
-                        {
-                            bLookup = true;
-                            field += "ID";
-                        }
-
-                        if(nd.SelectSingleNode("Value").SelectSingleNode("UserID") != null)
-                        {
-                            val = web.CurrentUser.ID.ToString();
-                        }
-                        if(val.ToLower() == "[today]")
-                        {
-                            val = DateTime.Now.ToString("s");
-                        }
-
-                        if(nd.Name == "BeginsWith")
-                        {
-                            return field + " Like '" + val + "%'";
-                        }
-                        else if(nd.Name == "Contains")
-                        {
-                            return field + " Like '%" + val + "%'";
-                        }
-                        else
-                        {
-                            string sign = GetNodeSign(nd.Name);
-
-                            if(bLookup && sign == "=")
-
-                                return "',' + CAST(" + field + " as varchar(MAX)) + ',' LIKE '%," + val + ",%'";
-                            else
-                                return field + " " + sign + " '" + val + "'";
-                        }
-                    }
-                }
-            }
-        }
-
-        public string GetNodeSign(string name)
-        {
-            switch(name.ToLower())
-            {
-                case "eq":
-                    return "=";
-                case "neq":
-                    return "<>";
-                case "gt":
-                    return ">";
-                case "geq":
-                    return ">=";
-                case "lt":
-                    return "<";
-                case "leq":
-                    return "<=";
-                case "beginswith":
-                    return "";
-                case "contains":
-                    return "";
-                default:
-                    return "=";
-            }
-        }
+        
 
         public virtual void addGroups(SPWeb web, string spquery, SortedList arrGTemp)
         {
             if(bUseReporting)
             {
                 string orderby = "";
-                string query = GetReportQuery(web, spquery, out orderby);
+                string query = EPMLiveCore.ReportingData.GetReportQuery(web, list, spquery, out orderby);
                 
                 if(rolluplists == null)
                 {
                     try
                     {
-                        DataTable dt = GetReportingData(web, list.Title, false, query, orderby);
+                        DataTable dt = EPMLiveCore.ReportingData.GetReportingData(web, list.Title, false, query, orderby);
                         if(dt != null)
                         {
                             dt.Columns.Add("SiteURL");
@@ -3388,7 +3204,7 @@ namespace EPMLiveWebParts
                     {
                         try
                         {
-                            DataTable dt = GetReportingData(web, rlist, true, query, orderby);
+                            DataTable dt = EPMLiveCore.ReportingData.GetReportingData(web, rlist, true, query, orderby);
                             if(dt != null)
                             {
                                 dt.Columns.Add("SiteURL");
@@ -5393,13 +5209,13 @@ namespace EPMLiveWebParts
                             {
                                 try
                                 {
-                                    if (!group)
+                                    //if (!group && !bUseReporting)
                                     {
                                         double fval = double.Parse(val, providerEn) * 100;
                                         val = fval.ToString(format) + "%";
                                     }
-                                    else
-                                        val += "%";
+                                    //else
+                                    //    val += "%";
                                 }
                                 catch { }
                             }
@@ -5635,392 +5451,7 @@ namespace EPMLiveWebParts
             return val;
         }
 
-        //=================FUNCTIONS ADDED======================================================================
-
-private void addItems(bool useForGantt) 
-        {
-            while (queueAllItems.Count > 0)
-            {
-                object o = queueAllItems.Dequeue();
-                if (o.GetType().ToString() == "Microsoft.SharePoint.SPListItem")
-                {
-                    SPListItem li = (SPListItem)o;
-                    if (arrItems.Contains(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID))
-                        addItem(li, li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID);
-
-                }
-                else if (o.GetType().ToString() == "System.Data.DataRow")
-                {
-                    addItem((DataRow)o,true);
-                }
-                else if (o.GetType().ToString() == "EPMLiveWebParts.getgriditems+AddItemType")
-                {
-                    AddItemType it = (AddItemType)o;
-                    SPListItem li = (SPListItem)it.o;
-                    if (arrItems.Contains(it.indexer))
-                        addItem(li, it.indexer);
-                }
-            }
-        }
-
-//========================================================================================================
-
-private void addItem(DataRow dr, bool useForGantt)
-        {
-            if (!arrItems.Contains(dr["WebID"].ToString() + "." + dr["ListID"].ToString() + "." + dr["ID"].ToString()))
-            {
-                return;
-            }
-            string tsdisabled = "";
-            string wbs = "";
-            if (dr.Table.Columns.Contains(usewbs))
-                wbs = dr[usewbs].ToString();
-
-            string[] groups = (string[])arrItems[dr["WebID"].ToString() + "." + dr["ListID"].ToString() + "." + dr["ID"].ToString()];
-
-            XmlNode ndNewItem = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
-            XmlAttribute attrId = docXml.CreateAttribute("id");
-            attrId.Value = dr["WebID"].ToString().ToLower().Trim("{}".ToCharArray()) + "." + dr["ListID"].ToString().ToLower().Trim("{}".ToCharArray()) + "." + dr["ID"].ToString();
-
-            XmlAttribute attrLocked = docXml.CreateAttribute("locked");
-
-            if (!inEditMode)
-            {
-                attrLocked.Value = "1";
-            }
-            ndNewItem.Attributes.Append(attrId);
-            if (!isTimesheet)
-                ndNewItem.Attributes.Append(attrLocked);
-
-            bool createworkspace = false;
-            if(dr["WebID"].ToString().Trim("{}".ToCharArray()).Equals(list.ParentWeb.ID.ToString(), StringComparison.CurrentCultureIgnoreCase) && dr["_ModerationStatus"].ToString() == "0" && dr["ChildItem"].ToString() == "")
-            {
-                createworkspace = true;
-            }
-
-            ndNewItem = addMenus(ndNewItem, list, createworkspace.ToString());
-
-
-            if (isTimesheet)
-            {
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "Work";
-                ndSiteUrl.Attributes.Append(attrName);
-                try
-                {
-                    ndSiteUrl.InnerText = dr["Work"].ToString();
-                }
-                catch { ndSiteUrl.InnerText = "0"; }
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-
-            //===========Site URL====================
-            {
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "SiteUrl";
-                ndSiteUrl.Attributes.Append(attrName);
-                ndSiteUrl.InnerText = dr["SiteUrl"].ToString();
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-
-            {
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "webid";
-                ndSiteUrl.Attributes.Append(attrName);
-                ndSiteUrl.InnerText = dr["WebID"].ToString();
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-            //===========SiteId====================
-            {
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "siteid";
-                ndSiteUrl.Attributes.Append(attrName);
-                ndSiteUrl.InnerText = dr["siteid"].ToString();
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-            //===========ListId====================
-            {
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "listid";
-                ndSiteUrl.Attributes.Append(attrName);
-                ndSiteUrl.InnerText = dr["ListID"].ToString();
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-            //===========ITemId====================
-            {
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "itemid";
-                ndSiteUrl.Attributes.Append(attrName);
-                ndSiteUrl.InnerText = dr["ID"].ToString();
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-            //===========Item Title====================
-            {
-                try
-                {
-                    XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                    XmlAttribute attrName = docXml.CreateAttribute("name");
-                    attrName.Value = "title";
-                    ndSiteUrl.Attributes.Append(attrName);
-                    ndSiteUrl.InnerText = dr["Title"].ToString();
-                    ndNewItem.AppendChild(ndSiteUrl);
-                }
-                catch { }
-            }
-            //===========
-
-            try
-            {
-                tsdisabled = dr["TSDisableItem"].ToString();
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "tsdisabled";
-                ndSiteUrl.Attributes.Append(attrName);
-                ndSiteUrl.InnerText = tsdisabled;
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-            catch { }
-            //===========EditUrl====================
-            if (usePopup && !inEditMode)
-            {
-                XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                XmlAttribute attrName = docXml.CreateAttribute("name");
-                attrName.Value = "popup";
-                ndSiteUrl.Attributes.Append(attrName);
-                ndSiteUrl.InnerText = "yes";
-                ndNewItem.AppendChild(ndSiteUrl);
-            }
-            if (inEditMode)
-            {
-                XmlNode ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                ndNewCell.InnerText = "";
-                ndNewItem.AppendChild(ndNewCell);
-            }
-            if (showCheckboxes && !isTimesheet)
-            {
-                XmlNode ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                ndNewCell.InnerXml = "<![CDATA[<input type=\"checkbox\">]]>";
-                ndNewItem.AppendChild(ndNewCell);
-            }
-            if (!titleFieldFound)
-            {
-                XmlNode ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                ndNewItem.AppendChild(ndNewCell);
-            }
-            SPViewFieldCollection vfc = view.ViewFields;
-            for (int i = 0; i < vfc.Count; i++)
-            {
-                string val = "";
-                string displayValue = "";
-                XmlNode ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-
-                bool wrapInCData = true;
-
-                try
-                {
-                    string fieldName = vfc[i];
-
-                    if (fieldName == "Edit")
-                    {
-                        displayValue = "#roweditid#";
-                    }
-                    else
-                    {
-
-                        SPField field = null;
-
-                        if (fieldName == "List" || fieldName == "Site")
-                        {
-                            field = list.Fields.GetFieldByInternalName(fieldName);
-                            val = dr[field.InternalName].ToString();
-                            displayValue = val;
-                        }
-                        else
-                        {
-                            field = getRealField(list.Fields.GetFieldByInternalName(fieldName));
-                            val = dr[field.InternalName].ToString();
-                        }
-
-                        if (field.Type != SPFieldType.Attachments)
-                            displayValue = formatField(val, fieldName, dr, false);
-
-                        bool editable = false;
-                        try
-                        {
-                            editable = true;
-                        }
-                        catch { }
-                        XmlDocument fieldXml = new XmlDocument();
-                        if (field.InternalName == "DocIcon")
-                        {
-                            if (dr.Table.Columns.Contains("List"))
-                            {
-                                if (hshLists.Contains(dr["List"].ToString()))
-                                {
-                                    string tIcon = hshLists[dr["List"].ToString()].ToString();
-                                    if (tIcon != "")
-                                        val = "<img src=\"" + list.ParentWeb.ServerRelativeUrl + "/_layouts/images/" + tIcon + "\">"; ;
-                                }
-                                displayValue = val;
-                            }
-                        }
-                        else if (field.InternalName == "Title")
-                        {
-                            if (hshColumnSelectFilter.Contains("Title"))
-                            {
-                                addFilterItems("Title", val);
-                            }
-                            displayValue = val;
-                        }
-                        else
-                        {
-                            switch (field.Type)
-                            {
-                                case SPFieldType.Attachments:
-                                    if (val == "true")
-                                        val = "<a href=\"" + dr["SiteUrl"].ToString() + "/_layouts/epmlive/gridaction.aspx?action=attachments&webid=" + dr["WebId"].ToString() + "&listid=" + dr["ListId"].ToString() + "&ID=" + dr["ID"].ToString() + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]) + "\">View</a>";
-                                    else
-                                        val = "";
-                                    break;
-                                case SPFieldType.User:
-                                    if (hshColumnSelectFilter.Contains(field.InternalName) && dr[fieldName].ToString() != "")
-                                    {
-                                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(dr[fieldName].ToString());
-                                        foreach (SPFieldLookupValue lv in lvc)
-                                        {
-                                            addFilterItems(field.InternalName, lv.LookupValue);
-                                        }
-                                    }
-                                    break;
-                                case SPFieldType.Calculated:
-                                    if (field.Description == "Indicator")
-                                    {
-                                        if (displayValue != "")
-                                            displayValue = "<img src=\"/_layouts/images/" + displayValue.ToLower() + "\">";
-                                    }
-
-                                    break;
-
-                            }
-
-                        }
-                        if (!wbs.Contains("."))
-                        {
-                            foreach (string group in groups)
-                            {
-                                setAggVal(group, fieldName, val, list);
-                            }
-                        }
-                        if (editable && inEditMode && (list.Fields.GetFieldByInternalName(field.InternalName).Type == SPFieldType.Choice || list.Fields.GetFieldByInternalName(field.InternalName).Type == SPFieldType.Lookup))
-                        {
-                            wrapInCData = false;
-
-                        }
-                        if (!editable && inEditMode)
-                        {
-                            XmlAttribute attrType = docXml.CreateAttribute("type");
-                            attrType.Value = "ro";
-                            ndNewCell.Attributes.Append(attrType);
-                        }
-                    }
-                }
-                catch { }
-
-                if (wrapInCData)
-                    displayValue = "<![CDATA[" + displayValue + "]]>";
-
-                ndNewCell.InnerXml = displayValue;
-
-                try
-                {
-                    ndNewItem.AppendChild(ndNewCell);
-                }
-                catch
-                {
-                    ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                    ndNewItem.AppendChild(ndNewCell);
-                }
-            }
-
-            int counter = 1;
-            foreach (string group in groups)
-            {
-
-                bool wbsfound = false;
-                XmlNode ndGroup = null;
-                if (wbs != "")
-                {
-                    int ind = wbs.LastIndexOf(".");
-                    if (ind > 0)
-                    {
-                        string parentwbs = wbs.Substring(0, ind);
-                        if (hshWBS.Contains(group + "\n" + parentwbs))
-                        {
-                            wbsfound = true;
-                            try
-                            {
-                                ndGroup = (XmlNode)hshWBS[group + "\n" + parentwbs];
-                            }
-                            catch { }
-                            if (ndGroup == null)
-                                return;
-
-                            if (expanded == "FALSE" || expanded == null)
-                            {
-                                XmlAttribute attrExpand = docXml.CreateAttribute("open");
-                                attrExpand.Value = "1";
-                                try
-                                {
-                                    XmlAttribute attrBold = docXml.CreateAttribute("style");
-                                    attrBold.Value = "font-weight:bold;";
-                                    ndGroup.Attributes.Append(attrBold);
-                                }
-                                catch { }
-                                ndGroup.Attributes.Append(attrExpand);
-                            }
-                        }
-                    }
-                }
-
-                if (!wbsfound)
-                {
-                    if (group != null)
-                        ndGroup = (XmlNode)hshItemNodes[group];
-                    else
-                        ndGroup = ndMainParent;
-
-                    if (ndGroup == null)
-                        return;
-                }
-
-                XmlNode ndCloned = ndNewItem.CloneNode(true);
-                string grouping = group;
-
-                if (grouping == null)
-                    grouping = "";
-                ndCloned.Attributes["id"].Value = ndCloned.Attributes["id"].Value + "." + counter.ToString();
-
-
-                XmlNode editNode = ndCloned.SelectSingleNode("//cell[.='#roweditid#']");
-                if (editNode != null)
-                    editNode.InnerText = "<a onclick=\"javascript:editRow" + gridname + "('" + ndCloned.Attributes["id"].Value + "');\" style=\"cursor:hand\"><img src=\"/_layouts/images/edit.gif\" border=\"0\"></a>";
-
-                ndGroup.AppendChild(ndCloned);
-                if (wbs != "")
-                {
-                    if (!hshWBS.Contains(group + "\n" + wbs))
-                        hshWBS.Add(group + "\n" + wbs, ndCloned);
-                }
-                counter++;
-            }
-        }
-//========================================================================================================
+       
 
 
 public virtual void getParams(SPWeb curWeb, string ganttParams)
@@ -6167,194 +5598,5 @@ public virtual void getParams(SPWeb curWeb, string ganttParams)
 
         }
 
-//========================================================================================================
-
-
-public string GetGridData(string ganttParams, SPWeb curWeb, string []requiredfields)
-        {
-           
-                curWeb.Site.CatchAccessDeniedException = false;
-
-                //getParams(curWeb);
-                getParams(curWeb, ganttParams);
-
-                docXml = new XmlDocument();
-                docXml.LoadXml("<rows></rows>");
-                ndMainParent = docXml.ChildNodes[0];
-
-                XmlDocument docGroup = new XmlDocument();
-                docGroup.LoadXml("<Query>" + view.Query + "</Query>");
-                try
-                {
-                    expanded = docGroup.FirstChild.FirstChild.Attributes["Collapse"].Value;
-                }
-                catch { }
-                try
-                {
-                    if (docGroup.FirstChild.SelectSingleNode("GroupBy") != null)
-                        hasGroups = true;
-                }
-                catch { }
-                if (view.AggregationsStatus == "On")
-                {
-                    XmlDocument docAgg = new XmlDocument();
-                    docAgg.LoadXml("<A>" + view.Aggregations + "</A>");
-
-                    foreach (XmlNode ndagg in docAgg.FirstChild.ChildNodes)
-                    {
-                        SPField field = getRealField(list.Fields.GetFieldByInternalName(ndagg.Attributes["Name"].Value));
-                        arrAggregationDef.Add(field.InternalName, ndagg.Attributes["Type"].Value);
-                    }
-                }
-
-                EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
-    
-                if (gSettings.TotalSettings != "")
-                {
-                    string[] fieldList = gSettings.TotalSettings.Split('\n');
-                    foreach (string field in fieldList)
-                    {
-                        if (field != "")
-                        {
-                            string[] fieldData = field.Split('|');
-                            try
-                            {
-                                if (list.Fields.GetFieldByInternalName(fieldData[0]) != null)
-                                    if (!arrAggregationDef.Contains(fieldData[0]))
-                                        arrAggregationDef.Add(fieldData[0], fieldData[1]);
-                            }
-                            catch { }
-                        }
-                    }
-                }
-
-
-                foreach(string field in requiredfields)
-                {
-                    if(!view.ViewFields.Exists(field) && list.Fields.ContainsField(field))
-                    {
-                        view.ViewFields.Add(field);
-                    }
-                }
-
-                addHeader();
-                addGroups(curWeb);
-                addItems(true);
-
-                foreach (DictionaryEntry de in hshItemNodes)
-                {
-                    if (de.Key.ToString() != "")
-                    {
-                        XmlNode ndGroup = (XmlNode)de.Value;
-
-                        for (int i = 1; i < arrColumns.Count; i++)
-                        {
-                            XmlNode ndCell = ndGroup.SelectSingleNode("cell[@id='" + arrColumns[i] + "']");//docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                            string cellValue = "";
-                            if (ndCell != null)
-                            {
-                                if (arrAggregationDef.Contains(arrColumns[i]))
-                                {
-                                    try
-                                    {
-                                        string agg = de.Key.ToString() + "\n" + arrColumns[i];
-                                        string val = arrAggregationVals[agg].ToString();
-
-                                        switch (arrAggregationDef[arrColumns[i]].ToString())
-                                        {
-                                            case "AVG":
-                                                if (val.Length > 0)
-                                                {
-                                                    val = val.Substring(1);
-                                                    double fVal = 0;
-                                                    string[] vals = val.Split(',');
-
-                                                    foreach (string s in vals)
-                                                    {
-                                                        try
-                                                        {
-                                                            fVal += double.Parse(s, providerEn);
-                                                        }
-                                                        catch { }
-                                                    }
-
-                                                    fVal = fVal / vals.Length;
-                                                    val = fVal.ToString(providerEn);
-
-                                                }
-                                                break;
-                                            case "STDEV":
-                                                if (val.Length > 0)
-                                                {
-                                                    val = val.Substring(1);
-                                                    double avg = 0;
-                                                    string[] vals = val.Split(',');
-                                                    double[] devs = new double[vals.Length];
-                                                    foreach (string s in vals)
-                                                    {
-                                                        try
-                                                        {
-                                                            avg += double.Parse(s, providerEn);
-                                                        }
-                                                        catch { }
-                                                    }
-                                                    avg = avg / vals.Length;
-
-                                                    try
-                                                    {
-                                                        for (int j = 0; j < vals.Length; j++)
-                                                        {
-                                                            devs[j] = double.Parse(vals[j], providerEn) - avg;
-                                                            devs[j] = devs[j] * devs[j];
-                                                        }
-                                                    }
-                                                    catch { }
-                                                    avg = 0;
-                                                    try
-                                                    {
-                                                        foreach (double f in devs)
-                                                            avg += f;
-                                                    }
-                                                    catch { }
-                                                    if (devs.Length >= 2)
-                                                        avg = avg / (devs.Length - 1);
-                                                    avg = Math.Sqrt(avg);
-                                                    val = avg.ToString(providerEn);
-                                                }
-                                                break;
-                                        };
-                                        if (arrAggregationDef[arrColumns[i]].ToString() == "COUNT")
-                                            cellValue = val;
-                                        else
-                                            cellValue = formatField(val, arrColumns[i].ToString(), false, true, null);
-                                    }
-                                    catch { }
-                                }
-                                ndCell.InnerXml = cellValue;
-                            }
-
-                            //ndGroup.AppendChild(ndCell);
-                        }
-                    }
-                }
-
-                XmlNode ndParam = docXml.SelectSingleNode("//rows/head/beforeInit/call[@command='attachHeader']/param");
-                if (ndParam != null)
-                {
-                    foreach (DictionaryEntry de in hshColumnSelectFilter)
-                    {
-                        string options = "";
-                        string[] strFilters = de.Value.ToString().Split('\n');
-                        foreach (string strFilter in strFilters)
-                        {
-                            options += "<option value=\"" + strFilter.Replace(",", "&#44;") + "\">" + strFilter.Replace(",", "&#44;") + "</option>";
-                        }
-                        ndParam.InnerText = ndParam.InnerText.Replace("#" + de.Key.ToString() + "#", options);
-                    }
-                    ndParam.InnerXml = "<![CDATA[" + ndParam.InnerText + "]]>";
-                }            
-            outputXml();
-            return data;
-        }
     }
 }

@@ -401,18 +401,6 @@ namespace EPMLiveWebParts
         //    return dt;
         //}
 
-        public DataTable Data()
-        {
-            bool isRollup = false;
-            InitRoutine(out isRollup);
-
-            InitializeReqdFields();
-            //SPWeb curWeb = AddReqdFieldsToView();
-            SPWeb curWeb = SPContext.Current.Web;
-            return ConvertXmlToDatatable(GetGridData(_ganttParams64bit, curWeb, (string[])_reqdfields.ToArray()));
-
-            //return dt;
-        }
 
         public IList<GridColumn> GetGridColumns(DataTable table)
         {

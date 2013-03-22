@@ -212,7 +212,7 @@ namespace EPMLiveWebParts
                         if(hassep)
                         {
                             hassep = false;
-                            sb.Append(@"<LI id=sep class=""ms-core-menu-separator"" type=""separator""><hr class=""ms-core-menu-separatorHr""/></LI>");
+                            sb.Append(@"<LI id=sep class=ms-MenuUIULItem type=""separator""><DIV class=ms-MenuUISeparator type=""separator"">&nbsp;</DIV></LI>");
                         }
                         sb.Append(de.Value);
                     }

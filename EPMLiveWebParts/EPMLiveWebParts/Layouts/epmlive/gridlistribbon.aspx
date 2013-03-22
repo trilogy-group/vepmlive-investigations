@@ -1269,6 +1269,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                     case "Ribbon.ListItem.Manage.EPKModeler":
                         epkcontrol = "modeler";
                         break;
+                    case "Ribbon.ListItem.Manage.EPKOptimizer":
+                        epkcontrol = "optimizer";
+                        break;
                 }
 
                 epkmulti(epkcontrol, this.$Grid._webrelurl, ids, this.$Grid._epkcostview, this.$Grid._listid);

@@ -17,7 +17,6 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
-using ReportFiltering;
 using ReportFiltering.Repositories;
 
 namespace EPMLiveWebParts
@@ -29,7 +28,7 @@ namespace EPMLiveWebParts
     public class ReportingFilter : Microsoft.SharePoint.WebPartPages.WebPart, IReportID
     {
 
-#region Fields
+        #region Fields
 
         protected Label FieldLabel;
         protected Label TitleLabel;
@@ -37,17 +36,18 @@ namespace EPMLiveWebParts
         protected NoEventValidationDropDownList FieldValueAsListBox;
         protected TextBox FieldValueAsTextBox;
         protected PeopleEditor FieldValueAsPeopleEditor;
-        protected DateTimeControl FieldValueAsDateTimeControlBeginDate;
-        protected DateTimeControl FieldValueAsDateTimeControlEndDate;
+        protected TextBox JqueryDatePickerBeginDate;
+        protected TextBox JqueryDatePickerEndDate;
+
         protected NoEventValidationDropDownList TitleListBox;
         protected Button FilterButton;
         protected Button FilterTitlesButton;
         protected DropDownList OperatorDropDownList;
         private ReportFilterUserSettings _persistedSettings;
 
-#endregion
+        #endregion
 
-#region Web Part Connections
+        #region Web Part Connections
 
         [ConnectionProvider("Provider for ID From Report Filter", "ReportIDProvider")]
         public IReportID ReportIDProvider()
@@ -59,12 +59,12 @@ namespace EPMLiveWebParts
         public string ReportID
         {
             get { return ID; }
-            set {}
+            set { }
         }
 
-#endregion
+        #endregion
 
-#region Web Part Properties
+        #region Web Part Properties
 
         [Category("Report Filter Control Properties")]
         [WebPartStorage(Storage.Shared)]
@@ -115,7 +115,7 @@ namespace EPMLiveWebParts
         [WebBrowsable(false)]
         public string DefaultValueForFieldFilter { get; set; }
 
-#endregion
+        #endregion
 
         protected override void OnInit(EventArgs e)
         {
@@ -226,33 +226,33 @@ namespace EPMLiveWebParts
             CreateChildControls();
         }
 
-#region Control Initialization Methods
+        #region Control Initialization Methods
 
         /// <summary>
         /// Initializes the page controls.
         /// </summary>
         private void InitializePageControls()
         {
-            FieldLabel = new Label {CssClass = "ui-multiselect-label"};
-            FilterButton = new Button {CssClass = "button-new silver"};
+            FieldLabel = new Label { CssClass = "ui-multiselect-label" };
+            FilterButton = new Button { CssClass = "button-new silver" };
             FilterTitlesButton = new Button
-                                     {
-                                         CssClass = "button-new silver",
-                                         OnClientClick = "SetFilteredTitles(); return false;"
-                                     };
+            {
+                CssClass = "button-new silver",
+                OnClientClick = "SetFilteredTitles(); return false;"
+            };
             TitleLabel = new Label { CssClass = "ui-multiselect-label" };
-            TitleListBox = new NoEventValidationDropDownList {EnableViewState = false};
+            TitleListBox = new NoEventValidationDropDownList { EnableViewState = true };
             OperatorDropDownList = new DropDownList();
             OperatorDropDownList.Attributes.Add("IsSingleSelect", "IsSingleSelect");
-            
+
             ErrorLabel = new Label();
 
-            FieldValueAsPeopleEditor = new PeopleEditor { EnableViewState = true, Width = new Unit(200, UnitType.Pixel)};
+            FieldValueAsPeopleEditor = new PeopleEditor { EnableViewState = true, Width = new Unit(200, UnitType.Pixel) };
 
             FieldValueAsListBox = new NoEventValidationDropDownList { EnableViewState = false };
             FieldValueAsListBox.Attributes.Add("DropdownType", "Field");
 
-            if(AllowMultipleFieldValuesToBeSelected)
+            if (AllowMultipleFieldValuesToBeSelected)
             {
                 FieldValueAsListBox.Attributes.Add("IsMultiSelect", "IsMultiSelect");
             }
@@ -270,20 +270,10 @@ namespace EPMLiveWebParts
                 TitleListBox.Attributes.Add("IsSingleSelect", "IsSingleSelect");
             }
 
-            FieldValueAsTextBox = new TextBox {EnableViewState = false};
+            FieldValueAsTextBox = new TextBox { EnableViewState = false };
 
-            var calendarPopupUrl = SPContext.Current.Web.ServerRelativeUrl + "/_layouts/iframe.aspx";
-            FieldValueAsDateTimeControlBeginDate = new DateTimeControl
-                                                       {
-                                                           DatePickerFrameUrl = calendarPopupUrl,
-                                                           EnableViewState = false
-                                                       };
-
-            FieldValueAsDateTimeControlEndDate = new DateTimeControl
-                                                     {
-                                                         DatePickerFrameUrl = calendarPopupUrl,
-                                                         EnableViewState = false
-                                                     };
+            JqueryDatePickerBeginDate = new TextBox();
+            JqueryDatePickerEndDate = new TextBox();
         }
 
         private void PopulateTitles()
@@ -317,14 +307,14 @@ namespace EPMLiveWebParts
             }
         }
 
-#endregion
+        #endregion
 
-#region Adding Controls to Control Tree Methods
+        #region Adding Controls to Control Tree Methods
 
         private void AddStyleForPeoplePickerToShowBorder()
         {
             if (Page.Form == null) return;
-            
+
             var styleForPeoplePickerToShowBorder = new HtmlGenericControl("style");
             styleForPeoplePickerToShowBorder.Attributes.Add("type", "text/css");
             styleForPeoplePickerToShowBorder.InnerHtml = ".ms-inputuserfield{ font-size:8pt; font-family:Verdana,sans-serif; border:1px solid #a5a5a5;} div.ms-inputuserfield a{color:#000000;text-decoration: none;font-weight:normal;font-style:normal;}div.ms-inputuserfield{padding-left:1px;padding-top:2px;}";
@@ -395,7 +385,7 @@ namespace EPMLiveWebParts
             FieldValueAsListBox.Width = new Unit(200, UnitType.Pixel);
             FieldValueAsListBox.SelectionMode = AllowMultipleFieldValuesToBeSelected ? ListSelectionMode.Multiple : ListSelectionMode.Single;
             fieldInputControlDiv.Controls.Add(FieldValueAsListBox);
-            
+
             mainDiv.Controls.Add(labelDiv);
             mainDiv.Controls.Add(fieldInputControlDiv);
         }
@@ -468,7 +458,7 @@ namespace EPMLiveWebParts
         private void AddFieldFilterControlForUserType(HtmlGenericControl mainDiv, SPField field, SPWeb web)
         {
             FieldLabel.Text = field.Title;
-            
+
             var labelDiv = GetControlDiv();
             labelDiv.Attributes.Add("valign", "top");
             labelDiv.Controls.Add(FieldLabel);
@@ -492,13 +482,13 @@ namespace EPMLiveWebParts
             var endDateLabelDiv = GetControlDiv();
             endDateLabelDiv.Controls.Add(endDateLabel);
 
-            FieldValueAsDateTimeControlBeginDate.DateOnly = true;
             var beginDateCalendarDiv = GetControlDiv();
-            beginDateCalendarDiv.Controls.Add(FieldValueAsDateTimeControlBeginDate);
-
-            FieldValueAsDateTimeControlEndDate.DateOnly = true;
+            beginDateCalendarDiv.Controls.Add(JqueryDatePickerBeginDate);
             var endDateCalendarDiv = GetControlDiv();
-            endDateCalendarDiv.Controls.Add(FieldValueAsDateTimeControlEndDate);
+            endDateCalendarDiv.Controls.Add(JqueryDatePickerEndDate);
+
+            JqueryDatePickerBeginDate.Text = DateTime.Now.ToShortDateString();
+            JqueryDatePickerEndDate.Text = DateTime.Now.ToShortDateString();
 
             mainDiv.Controls.Add(beginDateLabelDiv);
             mainDiv.Controls.Add(beginDateCalendarDiv);
@@ -527,6 +517,7 @@ namespace EPMLiveWebParts
             var errorDiv = GetControlDiv();
             ErrorLabel.Style.Add("color", "red");
             errorDiv.Controls.Add(ErrorLabel);
+            errorDiv.Controls.Add(new HtmlGenericControl("br"));
 
             mainDiv.Controls.Add(errorDiv);
         }
@@ -546,7 +537,7 @@ namespace EPMLiveWebParts
             TitleListBox.SelectionMode = AllowMultipleTitleValuesToBeSelected ? ListSelectionMode.Multiple : ListSelectionMode.Single;
             TitleListBox.ID = "TitleListBox";
             titleListDropDownDiv.Controls.Add(TitleListBox);
-            
+
             mainDiv.Controls.Add(titleLabelDiv);
             mainDiv.Controls.Add(titleListDropDownDiv);
         }
@@ -562,10 +553,10 @@ namespace EPMLiveWebParts
             {
                 FilterTitlesButton.Style.Add("display", "none"); // This button is triggered by javascript.
             }
-            
+
             var filterTitlesDiv = GetControlDivForButton();
-            filterTitlesDiv.Controls.Add(FilterTitlesButton);            
- 
+            filterTitlesDiv.Controls.Add(FilterTitlesButton);
+
             mainDiv.Controls.Add(filterTitlesDiv);
         }
 
@@ -578,7 +569,7 @@ namespace EPMLiveWebParts
 
             var filterButtonDiv = GetControlDivForButton();
             filterButtonDiv.Controls.Add(FilterButton);
-            
+
             mainDiv.Controls.Add(filterButtonDiv);
         }
 
@@ -630,19 +621,19 @@ namespace EPMLiveWebParts
             ErrorLabel.Text = errorMsg.ToString();
         }
 
-#endregion
+        #endregion
 
-#region Control State Methods
+        #region Control State Methods
 
         private void SetSelectedValueForFieldAsDateTime(ReportFilterUserSettings persistedValues, SPList list)
         {
             if (persistedValues == null) return;
-            
+
             var beginDateValue = persistedValues.FieldSelection.SelectedFields[0];
             var endDateValue = persistedValues.FieldSelection.SelectedFields[1];
 
             if (string.IsNullOrEmpty(beginDateValue) || string.IsNullOrEmpty(endDateValue)) return;
-            
+
             DateTime beginDate;
             DateTime.TryParse(beginDateValue, out beginDate);
 
@@ -651,12 +642,12 @@ namespace EPMLiveWebParts
 
             if (beginDate != DateTime.MinValue)
             {
-                FieldValueAsDateTimeControlBeginDate.SelectedDate = DateTime.Parse(beginDateValue);
+                JqueryDatePickerBeginDate.Text = beginDate.ToShortDateString();
             }
-            
+
             if (endDate != DateTime.MinValue)
             {
-                FieldValueAsDateTimeControlEndDate.SelectedDate = DateTime.Parse(endDateValue);
+                JqueryDatePickerEndDate.Text = endDate.ToShortDateString();
             }
         }
 
@@ -668,14 +659,14 @@ namespace EPMLiveWebParts
 
             if (!string.IsNullOrEmpty(fieldValuesAsCsv))
             {
-               FieldValueAsPeopleEditor.CommaSeparatedAccounts = fieldValuesAsCsv;
+                FieldValueAsPeopleEditor.CommaSeparatedAccounts = fieldValuesAsCsv;
             }
         }
 
         private void SetSelectedValueForFieldAsTextBox(ReportFilterUserSettings persistedValues, SPList list)
         {
             if (persistedValues == null) return;
-            
+
             string fieldValues = null;
 
             //TODO: RHS - This check is also done in at least one other place. Extract method.
@@ -697,7 +688,7 @@ namespace EPMLiveWebParts
         private void SetSelectedValueForFieldAsListBox(ReportFilterUserSettings persistedValues, SPList list)
         {
             if (persistedValues == null) return;
-            
+
             if (list.ID != persistedValues.ListId) return;
             if (persistedValues.FieldSelection.FieldNameForDisplay != FieldToFilterOn) return;
 
@@ -716,7 +707,7 @@ namespace EPMLiveWebParts
         private void SetSelectedFieldValues(ReportFilterUserSettings persistedValues, SPList spList)
         {
             if (persistedValues == null) return;
-            
+
             var web = SPContext.Current.Web;
             var list = web.Lists[ListToFilterOn];
             var field = list.Fields[FieldToFilterOn];
@@ -756,12 +747,6 @@ namespace EPMLiveWebParts
             }
             else
             {
-                //foreach (var selection in persistedValues.TitleSelections)
-                //{
-                //    var item = TitleListBox.Items.FindByValue(selection);
-                //    if (item != null) item.Selected = true;
-                //}
-
                 foreach (ListItem item in TitleListBox.Items)
                 {
                     if (persistedValues.TitleSelections.Contains(item.Value))
@@ -772,9 +757,9 @@ namespace EPMLiveWebParts
             }
         }
 
-#endregion
+        #endregion
 
-#region Persistence Methods
+        #region Persistence Methods
 
         private ReportFilterUserSettings GetPersistedSettings(SPWeb web)
         {
@@ -790,9 +775,9 @@ namespace EPMLiveWebParts
             ReportFilterUserSettings userSettings = null;
 
             SPSecurity.RunWithElevatedPrivileges(delegate
-                                                     {
-                                                         userSettings = repo.GetUserSettings(searchCriteria); 
-                                                     });
+            {
+                userSettings = repo.GetUserSettings(searchCriteria);
+            });
 
             return userSettings;
         }
@@ -802,7 +787,7 @@ namespace EPMLiveWebParts
             var repo = new ReportFilterUserSettingsRepository(web);
 
             SPSecurity.RunWithElevatedPrivileges(() => repo.PersistUserSettings(userSettings));
-            
+
             _persistedSettings = userSettings;
         }
 
@@ -838,11 +823,13 @@ namespace EPMLiveWebParts
                     returnValue.SelectedFields.Add(FieldValueAsTextBox.Text);
                     break;
                 case SPFieldType.DateTime:
-                    returnValue.SelectedFields.Add(FieldValueAsDateTimeControlBeginDate.SelectedDate.ToString("yyyy-MM-dd"));
-                    returnValue.SelectedFields.Add(FieldValueAsDateTimeControlEndDate.SelectedDate.ToString("yyyy-MM-dd"));
+                    var selectedBeginDateAsDate = DateTime.Parse(JqueryDatePickerBeginDate.Text);
+                    var selectedEndDateAsDate = DateTime.Parse(JqueryDatePickerEndDate.Text);
+                    returnValue.SelectedFields.Add(selectedBeginDateAsDate.ToString("yyyy-MM-dd"));
+                    returnValue.SelectedFields.Add(selectedEndDateAsDate.ToString("yyyy-MM-dd"));
                     break;
                 case SPFieldType.User:
-                    var usersAsArray = FieldValueAsPeopleEditor.CommaSeparatedAccounts.Split(new[] { ',' });
+                    var usersAsArray = GetSelectedPeoplePickerUsers();
                     returnValue.SelectedFields = new List<string>(usersAsArray);
                     break;
             }
@@ -850,6 +837,33 @@ namespace EPMLiveWebParts
             returnValue.IsPercentage = IsPercentageField;
 
             return returnValue;
+        }
+
+        private string[] GetSelectedPeoplePickerUsers()
+        {
+            var genericArray = new List<string>();
+            var array = FieldValueAsPeopleEditor.CommaSeparatedAccounts.Split(new[] { ',' });
+
+            foreach (var userLogin in array)
+            {
+                SPUser user = null;
+
+                try
+                {
+                    user = SPContext.Current.Web.SiteUsers[userLogin.Trim()];
+                }
+                catch (Exception)
+                {
+                    // Do nothing. User will be null and not added to the return array.
+                }
+
+                if (user != null)
+                {
+                    genericArray.Add(user.Name);
+                }
+            }
+
+            return genericArray.ToArray();
         }
 
         private List<string> GetTitlesToPersist(SPWeb web, ReportFilterSelection fieldSelection)
@@ -904,7 +918,7 @@ namespace EPMLiveWebParts
                     }
                 }
             }
-            
+
             return false;
         }
 
@@ -913,7 +927,7 @@ namespace EPMLiveWebParts
             if (!UserHasPersistedSelections(persistedSettings)) return;
 
             var web = SPContext.Current.Web;
-            
+
             var titles = QueryHelper.GetFilteredTitles(web, persistedSettings.FieldSelection);
             UpdateUsersPersistedTitlesBasedOnCurrentData(persistedSettings, web, titles);
         }
@@ -921,6 +935,7 @@ namespace EPMLiveWebParts
         private void UpdateUsersPersistedTitlesBasedOnCurrentData(ReportFilterUserSettings userSettings, SPWeb web, List<string> titles)
         {
             if (userSettings.TitleSelections.Count == 0) return;
+            if (titles == null || titles.Count == 0) return;
 
             if (ShowTitleDropDown)
             {
@@ -938,7 +953,7 @@ namespace EPMLiveWebParts
 
         #endregion
 
-#region Helper Methods
+        #region Helper Methods
 
         private void ReloadPage()
         {
@@ -955,7 +970,7 @@ namespace EPMLiveWebParts
 
         private ReportFilterUserSettings GetUserSettingsWithDefaultValues(SPSite site, SPWeb web, SPList list, SPField field)
         {
-            var fieldSelection = new ReportFilterSelection {InternalFieldName = field.InternalName, FieldNameForDisplay = field.Title};
+            var fieldSelection = new ReportFilterSelection { InternalFieldName = field.InternalName, FieldNameForDisplay = field.Title };
             fieldSelection.SelectedFields.PopulateFromCommaSeparatedString(DefaultValueForFieldFilter);
             fieldSelection.ListToFilterOn = list.ID;
             fieldSelection.FieldType = field.Type;
@@ -963,16 +978,16 @@ namespace EPMLiveWebParts
             var titlesToPersist = QueryHelper.GetFilteredTitles(web, fieldSelection);
 
             var userSettingsToReturn = new ReportFilterUserSettings
-                                           {
-                                               FieldSelection = fieldSelection,
-                                               WebId = web.ID,
-                                               SiteId = site.ID,
-                                               ListId = list.ID,
-                                               UserId = web.CurrentUser.ID.ToString(),
-                                               WebPartId = WebPartHelper.ConvertWebPartIdToGuid(ID),
-                                               CamlQueryOperator = GetCamlQueryOperator(),
-                                               TitleSelections = titlesToPersist
-                                           };
+            {
+                FieldSelection = fieldSelection,
+                WebId = web.ID,
+                SiteId = site.ID,
+                ListId = list.ID,
+                UserId = web.CurrentUser.ID.ToString(),
+                WebPartId = WebPartHelper.ConvertWebPartIdToGuid(ID),
+                CamlQueryOperator = GetCamlQueryOperator(),
+                TitleSelections = titlesToPersist
+            };
 
             return userSettingsToReturn;
         }
@@ -980,7 +995,7 @@ namespace EPMLiveWebParts
         private void GenerateMainJavascript()
         {
 
-            if(FieldToFilterOn != null && ListToFilterOn != null && ReportID != null && TitleListBox != null && FieldValueAsListBox != null)
+            if (FieldToFilterOn != null && ListToFilterOn != null && ReportID != null && TitleListBox != null && FieldValueAsListBox != null)
             {
                 //TODO: RHS - Create a server control that is a listbox containing the multiselect jquery code. That way any dev can just plop it into a page/web part.
                 CssRegistration.Register("/_layouts/epmlive/jquery.multiselect.css");
@@ -996,7 +1011,7 @@ namespace EPMLiveWebParts
                                                         })
                                                         .ajaxStop(function() {
                                                             $(this).hide();
-                                                        });                                                            
+                                                    });                                                            
 
                                                     $(function() {
                                                         Sys.WebForms.PageRequestManager.getInstance().add_endRequest(registerEpmLiveReportFilterScript);
@@ -1018,8 +1033,13 @@ namespace EPMLiveWebParts
 
                                                         $('mainReportFilterDiv').show();
 
-                                                        " + GetScriptToPopulateTitlesBasedOnSelectedFields()  
+                                                        " + GetScriptToPopulateTitlesBasedOnSelectedFields()
                                                           + @"
+                                                    });
+
+                                                    $(function() {
+                                                        $('#" + JqueryDatePickerBeginDate.ClientID + @"').datepicker();
+                                                        $('#" + JqueryDatePickerEndDate.ClientID + @"').datepicker();
                                                     });
                                                     }
 
@@ -1055,8 +1075,17 @@ namespace EPMLiveWebParts
                                                     })
                                                     .done(function(data, textStatus, jqXHR) {
                                                         $('#" + TitleListBox.ClientID + @"').empty();
+                                                        
                                                         $.each(data, function(index, val) {
-                                                                $('#" + TitleListBox.ClientID + @"').append('<option value=""' + val.title + '"">' + val.title + '</option>');
+                                                                if(val.title !== undefined)
+                                                                {                                                                
+                                                                    $('#" + TitleListBox.ClientID + @"').append('<option value=""' + val.title + '"">' + val.title + '</option>');
+                                                                }
+
+                                                                if(val.error !== undefined)
+                                                                {
+                                                                    $('#" + ErrorLabel.ClientID + @"').append(val.error + '<br>')
+                                                                }
                                                             });
                                                     })
                                                     .fail(function(jqXHR, textStatus, errorThrown) {
@@ -1075,7 +1104,7 @@ namespace EPMLiveWebParts
                                                 </script>";
 
 
-                if(!Page.ClientScript.IsClientScriptBlockRegistered(GetType(), "reportFilterWebPart" + ID))
+                if (!Page.ClientScript.IsClientScriptBlockRegistered(GetType(), "reportFilterWebPart" + ID))
                 {
                     Page.ClientScript.RegisterClientScriptBlock(GetType(), "reportFilterWebPart" + ID, initializationJavascript);
                 }
@@ -1112,18 +1141,14 @@ namespace EPMLiveWebParts
                     break;
                 case SPFieldType.DateTime:
                     arrayString = @"
-                                var startDate = new Date($('#" + FieldValueAsDateTimeControlBeginDate.ClientID + @"_Date').val());
-                                var startMonth = startDate.getMonth() + 1;
-                                var startDateString = startMonth + '/' + startDate.getDate() + '/' + startDate.getFullYear();
-                                var endDate = new Date($('#" + FieldValueAsDateTimeControlEndDate.ClientID + @"_Date').val());
-                                var endMonth = endDate.getMonth() + 1;
-                                var endDateString =  endMonth + '/' + endDate.getDate() + '/' + endDate.getFullYear();
+                                var startDateString = $('#" + JqueryDatePickerBeginDate.ClientID + @"').val();
+                                var endDateString =  $('#" + JqueryDatePickerBeginDate.ClientID + @"').val();
                                 return startDateString + ',' + endDateString;";
                     break;
                 case SPFieldType.User:
-                    arrayString = @"var arr = getPickerValue('" + FieldValueAsPeopleEditor.ClientID + @"_upLevelDiv'); 
-                                return arr.join(',');
-                               ";
+                    arrayString = @"var arr = $("".ms-inputuserfield"").text().replace(/;/g,',');
+                                    return arr;
+                                   ";
                     break;
             }
 
@@ -1151,7 +1176,7 @@ namespace EPMLiveWebParts
                                         }
                                     }
                                 };";
-                
+
             }
 
             return returnString;
@@ -1160,7 +1185,7 @@ namespace EPMLiveWebParts
         private string GetScriptToPopulateTitlesBasedOnSelectedFields()
         {
             var returnString = string.Empty;
-            
+
             if (FilterTitlesButton != null)
             {
                 returnString = @"$('[DropDownType=""Field""]').live('multiselectclose',
@@ -1181,7 +1206,7 @@ namespace EPMLiveWebParts
                                             var tags = document.getElementsByTagName('DIV'); 
                                             for (var i=0; i < tags.length; i++) { 
                                                 var tempString = tags[i].id; 
-                                                if (tempString == identifier){ 
+                                                if ((tempString.indexOf(identifier) > 0) && (tempString.indexOf('UserField_upLevelDiv') > 0)){ 
                                                     var innerSpans = tags[i].getElementsByTagName('SPAN'); 
                                                     for(var j=0; j < innerSpans.length; j++) { 
                                                         if(innerSpans[j].id == 'content') { 
