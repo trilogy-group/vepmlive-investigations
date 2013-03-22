@@ -59,9 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmailSystem.cs" />
+    <Compile Include="HighTimerClass.cs" />
     <Compile Include="IntegrationClass.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SecurityClass.cs" />
     <Compile Include="TimerClass.cs" />
     <Compile Include="TimerRunner.cs" />
     <Compile Include="TimerService.cs">
@@ -74,6 +76,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TimerService.resx">
+      <DependentUpon>TimerService.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace TimerService
 {
-    class IntegrationClass
+    class SecurityClass
     {
         private Object thisLock = new Object();
 
@@ -77,17 +77,17 @@ namespace TimerService
             }
             catch { }
 
-            logMessage("INIT", "STMR", "Starting Integration Queue");
+            logMessage("INIT", "STMR", "Starting Security Queue");
 
             int maxThreads = 5;
             try
             {
-                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("IntQueueThreads"));
+                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("SecQueueThreads"));
             }
             catch { }
             workingThreads = new WorkerThreads(maxThreads);
 
-            logMessage("INIT", "STMR", "Setting Integration Threads to: " + maxThreads);
+            logMessage("INIT", "STMR", "Setting Security Threads to: " + maxThreads);
 
 
             return true;
@@ -99,7 +99,7 @@ namespace TimerService
             {
                 DateTime dt = DateTime.Now;
 
-                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\INTLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\SECLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
 
                 swLog.WriteLine(DateTime.Now.ToString() + "\t" + type + "\t" + module + "\t" + message);
 
@@ -123,33 +123,42 @@ namespace TimerService
                         {
                             SqlConnection cn = new SqlConnection(sConn);
                             cn.Open();
-                            SqlCommand cmd = new SqlCommand("spINTGetQueue", cn);
+                            
+                            SqlCommand cmd = new SqlCommand("spSecGetQueue", cn);
                             cmd.CommandType = CommandType.StoredProcedure;
                             cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                            cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+
                             DataSet ds = new DataSet();
                             SqlDataAdapter da = new SqlDataAdapter(cmd);
                             da.Fill(ds);
 
                             foreach(DataRow dr in ds.Tables[0].Rows)
                             {
-                                RunnerData rd = new RunnerData();
-                                rd.cn = sConn;
-                                rd.dr = dr;
-                                if(startProcess(rd))
+                                try
                                 {
-                                    cmd = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn);
-                                    cmd.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
-                                    cmd.ExecuteNonQuery();
+                                    EPMLiveCore.Jobs.SecurityUpdate sec = new EPMLiveCore.Jobs.SecurityUpdate();
+                                    Guid ListUid = new Guid(dr["LIST_ID"].ToString());
+                                    int ItemID = int.Parse(dr["ITEM_ID"].ToString());
+                                    int userid = int.Parse(dr["USER_ID"].ToString());
+
+                                    using(SPSite site = new SPSite(new Guid(dr["SITE_ID"].ToString())))
+                                    {
+                                        using(SPWeb web = site.OpenWeb(new Guid(dr["WEB_ID"].ToString())))
+                                        {
+                                            sec.execute(site, web, ListUid, ItemID, userid, "");
+                                        }
+                                    }
+
                                 }
+                                catch { }
+
+                                cmd = new SqlCommand("delete from ITEMSEC where ITEM_SEC_ID=@id", cn);
+                                cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                                cmd.ExecuteNonQuery();
                             }
 
-
-                            cmd = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn);
-                            cmd.ExecuteNonQuery();
-
                             cn.Close();
-
-
                         }
 
                     }
@@ -158,68 +167,6 @@ namespace TimerService
             catch(Exception ex)
             {
                 logMessage("ERR", "RUN", ex.Message);
-            }
-        }
-
-        public bool startProcess(RunnerData dr)
-        {
-            try
-            {
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.WorkerReportsProgress = true;
-                bw.WorkerSupportsCancellation = true;
-
-                bw.DoWork += bw_DoWork;
-                //bw.ProgressChanged += bw_ProgressChanged;
-                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
-
-                bw.RunWorkerAsync(dr);
-
-                workingThreads.add(bw);
-
-                return true;
-            }
-            catch(Exception ex)
-            {
-                logMessage("ERR", "STPR", ex.Message);
-                return false;
-            }
-        }
-
-        private void bw_DoWork(object sender, DoWorkEventArgs e)
-        {
-            Thread.Sleep(2000);
-            RunnerData rd = (RunnerData)e.Argument;
-            DataRow dr = rd.dr;
-
-            try
-            {
-                EPMLiveCore.API.Integration.IntegrationCore core = new EPMLiveCore.API.Integration.IntegrationCore(new Guid(dr["SITE_ID"].ToString()), new Guid(dr["WEB_ID"].ToString()));
-                core.ExecuteEvent(dr);
-
-                SqlConnection cn = new SqlConnection(rd.cn);
-                cn.Open();
-                SqlCommand cmd = new SqlCommand("DELETE FROM INT_EVENTS WHERE INT_EVENT_ID=@id", cn);
-                cmd.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
-                cmd.ExecuteNonQuery();
-                //TODO: Remove line comment above
-                cn.Close();
-            }
-            catch(Exception ex)
-            {
-                if(ex.Message.Contains("could not be found"))
-                {
-                    SqlConnection cn = new SqlConnection(rd.cn);
-                    cn.Open();
-                    SqlCommand cmd = new SqlCommand("DELETE FROM INT_EVENTS WHERE INT_EVENT_ID=@id", cn);
-                    cmd.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
-                    cmd.ExecuteNonQuery();
-                    cn.Close();
-                }
-                else
-                {
-                    logMessage("ERR", "PROCINT", ex.Message);
-                }
             }
         }
 

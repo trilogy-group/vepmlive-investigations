@@ -73,7 +73,7 @@ namespace TimerService
         {
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\TSLOGS");
+                Directory.CreateDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS");
             }
             catch { }
 
@@ -99,7 +99,7 @@ namespace TimerService
             {
                 DateTime dt = DateTime.Now;
 
-                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERTSLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TSLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
 
                 swLog.WriteLine(DateTime.Now.ToString() + "\t" + type + "\t" + module + "\t" + message);
 

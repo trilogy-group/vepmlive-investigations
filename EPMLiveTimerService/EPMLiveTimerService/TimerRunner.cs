@@ -14,6 +14,7 @@ namespace TimerService
     public class TimerRunner
     {
         private static BackgroundWorker bw;
+        private static BackgroundWorker bwSec;
         private static BackgroundWorker bwTimerJobs;
         private static BackgroundWorker bwNotificationsJobs;
         private static BackgroundWorker bwIntegrationJobs;
@@ -34,6 +35,17 @@ namespace TimerService
                 bw.RunWorkerAsync();
 
 
+
+                //=========================Run High Priority Queue
+                bw = new BackgroundWorker();
+                bw.WorkerReportsProgress = true;
+                bw.WorkerSupportsCancellation = true;
+                
+                bw.DoWork += bw_HighDoWork;
+
+                bw.RunWorkerAsync();
+
+
                 //=========================Run TS Queue
                 bw = new BackgroundWorker();
                 bw.WorkerReportsProgress = true;
@@ -44,6 +56,18 @@ namespace TimerService
                 //bw.RunWorkerCompleted += bw_RunWorkerCompleted;
 
                 bw.RunWorkerAsync();
+
+
+                //=========================Run TS Queue
+                bwSec = new BackgroundWorker();
+                bwSec.WorkerReportsProgress = true;
+                bwSec.WorkerSupportsCancellation = true;
+
+                bwSec.DoWork += bw_SecDoWork;
+                //bw.ProgressChanged += bw_ProgressChanged;
+                //bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+
+                bwSec.RunWorkerAsync();
 
                 //=======================Run Timer Enqueue Process
                 bwTimerJobs = new BackgroundWorker();
@@ -165,6 +189,36 @@ namespace TimerService
             }
         }
 
+        static void bw_HighDoWork(object sender, DoWorkEventArgs e)
+        {
+            HighTimerClass mc = new HighTimerClass();
+            if(mc.startTimer())
+            {
+                while(true)
+                {
+                    mc.runTimer();
+                    if(bw.CancellationPending)
+                    {
+                        mc.stopTimer();
+                        e.Cancel = true;
+                        return;
+                    }
+                    GC.Collect();
+                    int poll = 30;
+                    try
+                    {
+                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("HighPollingInterval"));
+                    }
+                    catch { }
+                    Thread.Sleep(poll * 1000);
+                }
+            }
+            else
+            {
+                e.Result = -1;
+            }
+        }
+
         static void bw_TSDoWork(object sender, DoWorkEventArgs e)
         {
             TimesheetTimerClass mc = new TimesheetTimerClass();
@@ -184,6 +238,36 @@ namespace TimerService
                     try
                     {
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("TSPollingInterval"));
+                    }
+                    catch { }
+                    Thread.Sleep(poll * 1000);
+                }
+            }
+            else
+            {
+                e.Result = -1;
+            }
+        }
+
+        static void bw_SecDoWork(object sender, DoWorkEventArgs e)
+        {
+            SecurityClass mc = new SecurityClass();
+            if(mc.startTimer())
+            {
+                while(true)
+                {
+                    mc.runTimer();
+                    if(bw.CancellationPending)
+                    {
+                        mc.stopTimer();
+                        e.Cancel = true;
+                        return;
+                    }
+                    GC.Collect();
+                    int poll = 2;
+                    try
+                    {
+                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("SecPollingInterval"));
                     }
                     catch { }
                     Thread.Sleep(poll * 1000);

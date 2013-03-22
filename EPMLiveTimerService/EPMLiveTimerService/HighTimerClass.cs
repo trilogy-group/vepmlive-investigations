@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace TimerService
 {
-    class TimerClass
+    class HighTimerClass
     {
         private Object thisLock = new Object();
 
@@ -92,10 +92,10 @@ namespace TimerService
 
             logMessage("INIT", "STMR", "Starting Timer Service");
 
-            int maxThreads = 1;
+            int maxThreads = 5;
             try
             {
-                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("QueueThreads"));
+                maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("HighQueueThreads"));
             }
             catch { }
             workingThreads = new WorkerThreads(maxThreads);
@@ -126,7 +126,7 @@ namespace TimerService
             {
                 DateTime dt = DateTime.Now;
 
-                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\HTIMERLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
 
                 swLog.WriteLine(DateTime.Now.ToString() + "\t" + type + "\t" + module + "\t" + message);
 
@@ -150,7 +150,7 @@ namespace TimerService
                         {
                             SqlConnection cn = new SqlConnection(sConn);
                             cn.Open();
-                            SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority > 10 order by priority,dtcreated asc", cn);
+                            SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority <= 10 order by priority,dtcreated asc", cn);
                             DataSet ds = new DataSet();
                             SqlDataAdapter da = new SqlDataAdapter(cmd);
                             da.Fill(ds);
