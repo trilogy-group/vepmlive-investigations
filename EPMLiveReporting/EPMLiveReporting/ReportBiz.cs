@@ -12,6 +12,30 @@ namespace EPMLiveReportsAdmin
         private readonly Guid _siteId;
         private readonly Guid _webAppId;
 
+        private string _webTitle = string.Empty;
+
+        public string WebTitle
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_webTitle))
+                {
+                    using (SPSite s = new SPSite(_siteId))
+                    {
+                        using (SPWeb w = s.OpenWeb())
+                        {
+                            if (w.Exists)
+                            {
+                                _webTitle = w.Title;
+                            }
+                        }
+                    }
+                }
+
+                return _webTitle;
+            }
+        }
+
         public ReportBiz(Guid siteId)
         {
             _siteId = siteId;
@@ -134,10 +158,15 @@ namespace EPMLiveReportsAdmin
             return databases;
         }
 
-        public bool RefreshTimesheet(out string message)
+        public bool RefreshTimesheet(out string message, Guid jobUid)
         {
             var rd = new ReportData(_siteId);
             bool hasErrors = false;
+            rd.LogStatus("", 
+                "TimeSheet", 
+                "Begin refreshing time sheet data for web: " + WebTitle,
+                "Begin refreshing time sheet data for web: " + WebTitle,
+                0, 1, jobUid.ToString());
 
             DataTable tblTSData = rd.GetTSAllDataWithSchema();
 
@@ -149,7 +178,18 @@ namespace EPMLiveReportsAdmin
             }
 
             //Delete Timesheetdata start 
+            rd.LogStatus("", 
+                "TimeSheet", 
+                "Begin deleting existing time sheet data for web: " + WebTitle,
+                "Begin deleting existing time sheet data for web: " + WebTitle, 
+                0, 1, jobUid.ToString());
+
             rd.DeleteExistingTSData();
+            rd.LogStatus("",
+                "TimeSheet",
+                "Finished deleting existing time sheet data for web: " + WebTitle,
+                "Finished deleting existing time sheet data for web: " + WebTitle,
+                0, 1, jobUid.ToString());
             //End
 
             //IF performance becomes an issue, change rpttsduid to int and auto-increment. 
@@ -167,20 +207,52 @@ namespace EPMLiveReportsAdmin
             var columns = new ColumnDefCollection(tblTSData.Columns);
             string sTableName = rd.GetSafeTableName("RPTTSData");
 
+            rd.LogStatus("",
+               "TimeSheet",
+               "Recreating RPTTSData for web: " + WebTitle,
+               "Recreating RPTTSData for web: " + WebTitle,
+               0, 1, jobUid.ToString());
             if (!rd.CreateTable(sTableName, columns, true, out message))
             {
                 rd.Dispose();
                 hasErrors = true;
+                rd.LogStatus("",
+              "TimeSheet",
+              "Error occured while recreating RPTTSData for web: " + WebTitle + ".",
+              message,
+              0, 1, jobUid.ToString());
             }
+            rd.LogStatus("",
+               "TimeSheet",
+               "Finished recreating RPTTSData for web: " + WebTitle,
+               "Finished recreating RPTTSData for web: " + WebTitle,
+               0, 1, jobUid.ToString());
 
+            rd.LogStatus("", "TimeSheet", 
+                "Inserting data to RPTTSData for web: " + WebTitle,
+                "Inserting data to RPTTSData for web: " + WebTitle, 
+                0, 1, jobUid.ToString());
             if (!rd.InsertTSAllData(tblTSData, out message))
             {
                 rd.Dispose();
                 hasErrors = true;
+                rd.LogStatus("", 
+                    "TimeSheet", 
+                    "Error occurred while inserting data into RPTTSData for web: " + WebTitle, 
+                    message, 0, 3, jobUid.ToString());
             }
-
+            rd.LogStatus("", "TimeSheet",
+                "Finished inserting data to RPTTSData for web: " + WebTitle,
+                "Finished inserting data to RPTTSData for web: " + WebTitle,
+                0, 1, jobUid.ToString());
             rd.Dispose();
             //message = "Successfully refreshed timesheet data.";
+            rd.LogStatus("",
+                "TimeSheet",
+                "Finished refreshing time sheet data for web: " + WebTitle,
+                "Finished refreshing time sheet data for web: " + WebTitle,
+                0, 1, jobUid.ToString());
+
             return hasErrors;
         }
 

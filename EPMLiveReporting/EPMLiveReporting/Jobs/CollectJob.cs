@@ -126,7 +126,8 @@ namespace EPMLiveReportsAdmin.Jobs
                 try
                 {
                     string err = "";
-                    bool tErrors = epmdata.RefreshTimesheets(out err);
+                    
+                    bool tErrors = epmdata.RefreshTimesheets(out err, base.JobUid);
                     if(tErrors)
                         bErrors = true;
                     if(bErrors)
@@ -221,6 +222,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
             EPMLiveReportsAdmin.RefreshLists refreshLists = new EPMLiveReportsAdmin.RefreshLists(web, "");
             refreshLists.SaveResults(dtListResults, base.JobUid);
+            finishJob();
         }
     }
 }

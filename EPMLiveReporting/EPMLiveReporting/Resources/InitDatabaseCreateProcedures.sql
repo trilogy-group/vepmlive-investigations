@@ -1248,7 +1248,8 @@ END
 
 ')
  
- if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spGetReportListData')
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spGetReportListData')
 begin
     Print 'Creating Stored Procedure spGetReportListData'
     SET @createoralter = 'CREATE'
@@ -1279,14 +1280,25 @@ BEGIN
 	if @rollup = 1
 		begin
 
-			if @query != ''''
-				begin
-					set @query = '' WHERE (weburl='''''' + @weburl + '''''' or weburl like '''''' + @weburl + ''/%'''') AND '' + @query
-				end
-			else
-				begin
-					set @query = '' WHERE (weburl='''''' + @weburl + '''''' or weburl like '''''' + @weburl + ''/%'''')''
-				end
+			declare @tquery varchar(5000)
+
+                  if @weburl = ''/''
+                  begin 
+                        set @tquery = '' WHERE (RPTITEMGROUPS.siteid='''''' + CAST(@siteid as varchar(255)) + '''''')''
+                  end
+                  else
+                  begin
+                        set @tquery = '' WHERE (weburl='''''' + @weburl + '''''' or weburl like '''''' + @weburl + ''/%'''')''
+                  end
+      
+                  if @query != ''''
+                  begin
+                        set @query = @tquery + '' AND '' + @query
+                  end
+                  else
+                  begin
+                        set @query = @tquery 
+                  end
 
 		end
 	else
@@ -1322,9 +1334,11 @@ BEGIN
 			
 	exec(@sql)
 
+	print @sql
 
 END
 ')
+ 
 
 if not exists (select * from sys.indexes where name = 'ix_listid_itemid')
 begin

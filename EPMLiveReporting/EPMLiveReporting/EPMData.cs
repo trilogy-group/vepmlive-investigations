@@ -1956,10 +1956,10 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         /// <param name="sMessage"></param>
         /// <returns></returns>
-        public bool RefreshTimesheets(out string sMessage)
+        public bool RefreshTimesheets(out string sMessage, Guid jobUid)
         {
             ReportBiz oTimeSheet = new ReportBiz(_siteID);
-            return oTimeSheet.RefreshTimesheet(out sMessage);
+            return oTimeSheet.RefreshTimesheet(out sMessage, jobUid);
         }
 
         /// <summary>
