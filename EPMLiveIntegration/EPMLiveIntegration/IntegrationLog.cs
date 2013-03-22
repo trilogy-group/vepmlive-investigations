@@ -25,7 +25,7 @@ namespace EPMLiveIntegration
 
         public void LogMessage(string log, IntegrationLogType level)
         {
-            if (_cn.State == System.Data.ConnectionState.Closed)
+            if(_cn.State == System.Data.ConnectionState.Closed)
                 _cn.Open();
 
             SqlCommand cmdError = new SqlCommand("INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @level, @text)", _cn);

@@ -19,7 +19,7 @@ namespace EPMLiveIntegration
 
         DataTable GetItem(WebProperties WebProps, IntegrationLog log, string ItemID, DataTable Items);
 
-        Dictionary<String, String> GetDropDownValues(WebProperties WebProps, IntegrationLog log, string Property, string ParentPropertyValue);
+        Dictionary<String,String> GetDropDownValues(WebProperties WebProps, IntegrationLog log, string Property, string ParentPropertyValue);
 
         bool TestConnection(WebProperties WebProps, IntegrationLog Log, out string Message);
 
