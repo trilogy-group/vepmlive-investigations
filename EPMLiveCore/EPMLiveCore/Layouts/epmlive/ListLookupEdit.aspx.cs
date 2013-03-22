@@ -208,7 +208,8 @@ namespace EPMLiveCore.Layouts.epmlive
                                                                      assemblyName,
                                                                      className,
                                                                      new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                     SPEventReceiverType.ItemUpdated});
+                                                                                                     SPEventReceiverType.ItemUpdated,
+                                                                                                     SPEventReceiverType.ItemDeleting});
                 foreach(SPEventReceiverDefinition evt in evts)
                 {
                     evt.Delete();
@@ -216,6 +217,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 list.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
                 list.EventReceivers.Add(SPEventReceiverType.ItemUpdated, assemblyName, className);
+                list.EventReceivers.Add(SPEventReceiverType.ItemDeleting, assemblyName, className);
                 list.Update();
             }
             else if(!gSettings.BuildTeamSecurity)
@@ -227,7 +229,8 @@ namespace EPMLiveCore.Layouts.epmlive
                                                                         assemblyName,
                                                                         className,
                                                                         new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                                    SPEventReceiverType.ItemUpdated});
+                                                                                                        SPEventReceiverType.ItemUpdated,
+                                                                                                        SPEventReceiverType.ItemDeleting});
                 foreach(SPEventReceiverDefinition evt in evts)
                 {
                     evt.Delete();

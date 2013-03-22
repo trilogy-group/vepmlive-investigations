@@ -10,13 +10,13 @@ using System.Threading;
 
 namespace EPMLiveCore.Jobs
 {
-    public class SecurityUpdate : API.BaseJob
+    public class SecurityUpdate
     {
-        public void execute(SPSite site, SPWeb web, string data)
+        public void execute(SPSite site, SPWeb web, Guid ListId, int ItemId, int userid, string data)
         {
-            SPList list = web.Lists[base.ListUid];
+            SPList list = web.Lists[ListId];
 
-            SPListItem li = list.GetItemById(base.ItemID);
+            SPListItem li = list.GetItemById(ItemId);
 
             GridGanttSettings settings = new GridGanttSettings(list);
 
@@ -29,7 +29,7 @@ namespace EPMLiveCore.Jobs
             }
             catch { }
 
-            SPUser orignalUser = web.AllUsers.GetByID(base.userid);
+            SPUser orignalUser = web.AllUsers.GetByID(userid);
 
             if(isSecure)
             {
@@ -37,59 +37,57 @@ namespace EPMLiveCore.Jobs
 
                 web.AllowUnsafeUpdates = true;
 
-                
+                //#region ADD ITEM CREATOR TO TEAM BY DEFAULT
 
-                #region ADD ITEM CREATOR TO TEAM BY DEFAULT
+                //SPFieldLookup assignedTo = null;
+                //try
+                //{
+                //    assignedTo = list.Fields.GetFieldByInternalName("AssignedTo") as SPFieldLookup;
+                //}
+                //catch { }
 
-                SPFieldLookup assignedTo = null;
-                try
-                {
-                    assignedTo = list.Fields.GetFieldByInternalName("AssignedTo") as SPFieldLookup;
-                }
-                catch { }
+                //object assignedToFv = null;
+                //string sAssignedTo = string.Empty;
+                //try
+                //{
+                //    assignedToFv = li["AssignedTo"];
+                //}
+                //catch { }
+                //if(assignedToFv != null)
+                //{
+                //    sAssignedTo = assignedToFv.ToString();
+                //}
 
-                object assignedToFv = null;
-                string sAssignedTo = string.Empty;
-                try
-                {
-                    assignedToFv = li["AssignedTo"];
-                }
-                catch { }
-                if(assignedToFv != null)
-                {
-                    sAssignedTo = assignedToFv.ToString();
-                }
+                //SPFieldUserValueCollection uCol = new SPFieldUserValueCollection();
 
-                SPFieldUserValueCollection uCol = new SPFieldUserValueCollection();
+                //if(!string.IsNullOrEmpty(sAssignedTo))
+                //{
+                //    uCol = new SPFieldUserValueCollection(web, sAssignedTo);
+                //}
 
-                if(!string.IsNullOrEmpty(sAssignedTo))
-                {
-                    uCol = new SPFieldUserValueCollection(web, sAssignedTo);
-                }
+                //if(assignedTo != null)
+                //{
+                //    if(assignedTo.AllowMultipleValues)
+                //    {
+                //        uCol.Add(new SPFieldUserValue(web, orignalUser.ID, orignalUser.LoginName));
+                //        li["AssignedTo"] = uCol;
+                //    }
+                //    else
+                //    {
+                //        li["AssignedTo"] = new SPFieldUserValue(web, orignalUser.ID, orignalUser.LoginName);
+                //    }
 
-                if(assignedTo != null)
-                {
-                    if(assignedTo.AllowMultipleValues)
-                    {
-                        uCol.Add(new SPFieldUserValue(web, orignalUser.ID, orignalUser.LoginName));
-                        li["AssignedTo"] = uCol;
-                    }
-                    else
-                    {
-                        li["AssignedTo"] = new SPFieldUserValue(web, orignalUser.ID, orignalUser.LoginName);
-                    }
+                //    try
+                //    {
+                //        li.SystemUpdate();
+                //    }
+                //    catch(Exception e)
+                //    {
+                //    }
 
-                    try
-                    {
-                        li.SystemUpdate();
-                    }
-                    catch(Exception e)
-                    {
-                    }
+                //}
 
-                }
-
-                #endregion
+                //#endregion
 
                 // step 1 perform actions related to "parent item"
                 // ===============================================

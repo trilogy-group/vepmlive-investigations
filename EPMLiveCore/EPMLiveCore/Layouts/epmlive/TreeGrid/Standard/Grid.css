@@ -1,10 +1,11 @@
 .Assignment { font-style:italic; }
 .NewTask { color: #9C9C9C; }
 .SummaryTask { font-weight: bold; }
+.ExternalTask { color: #9C9C9C;  }
 .GSResHeadRow { color: #FFFFFF !important}
 .GSHeaderRow .GSCellUser { background-color:#BFC4CB; }
-.GSFootMid .GSSection .GSDataRow .GSCellUser { background-color: #FAFAFA }
-
+.GSFootMid .GSSection .GSDataRow .GSCellUser { background-color: #FFFFFF }
+.NewTaskBack { background-color: #FFFFFF !important }
 /* ------------- Base tags ------------- */
 
 .GSImage { padding-bottom:256px; }
@@ -18,7 +19,8 @@
 .GSBodyLeft, .GSBodyMid, .GSBodyRight { }
 .GSHeadLeft, .GSHeadMid, .GSHeadRight { }
 .GSFootLeft, .GSFootMid, .GSFootRight { border-top:1px solid #d0d0d0; }
-.GSHeadLeft,.GSBodyLeft,.GSFootLeft,.GSHScrollLeft { border-right:1px solid #d0d0d0; }	
+.GSHeadLeft,.GSBodyLeft,.GSHScrollLeft { border-right:1px solid #d0d0d0; }	
+.GSFootLeft {}
 .GSHeadMid,.GSBodyMid,.GSFootMid,.GSHScrollMid {  }
 .GSHeadRight,.GSBodyRight,.GSFootRight,.GSHScrollRight { border-left:1px solid #d0d0d0; border-bottom:1px solid #d0d0d0 }	
 .GSVScroll { padding-top:1px; padding-bottom:1px; } 
@@ -78,7 +80,7 @@
 .GSCellHeader,.GSCellHeaderEmpty { padding-top:1px; background-color:#DFE3E8; border-top:0px solid #ffffff; }
 .GSCellPanel,.GSCellHeaderPanel { background-color:#DFE3E8; }
 .GSCellFilterPanel { padding-left:1px; }
-.GSCellUser { background-color:#F0F0E0; }
+.GSCellUser { background-color:#FFFFFF; }
 
 .GSCellEmpty { background:#F0F0E0; border:0px none; }
 .GSCellHeaderEmpty { border:0px none; border-top:1px solid #ffffff; }

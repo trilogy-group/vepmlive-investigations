@@ -123,29 +123,35 @@ namespace EPMLiveCore
 
                             if(chkTask.Checked == true)
                             {
-                                if(!sNotificationUsers.Contains(sCurrUser))
+                                ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
+                                bool found = false;
+                                foreach(string user in arrUsers)
                                 {
-                                    sNotificationUsers += "|" + sCurrUser;
-                                    currWeb.Properties["EPMLiveNotificationUsers"] = sNotificationUsers;
-                                    currWeb.Properties.Update();
+                                    string[] userinfo = user.Replace(";#", "\n").Split('\n');
+                                    if(userinfo[0] == SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString())
+                                        found = true;
                                 }
+                                if(!found)
+                                    arrUsers.Add(sCurrUser);
+
+                                currWeb.Properties["EPMLiveNotificationUsers"] = String.Join("|", (string[])arrUsers.ToArray(typeof(string)));
+                                currWeb.Properties.Update();
                             }
                             else
                             {
-                                if(sNotificationUsers.Contains(sCurrUser))
+                                ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
+                                ArrayList arrNewUsers = new ArrayList();
+                                foreach(string user in arrUsers)
                                 {
-                                    int iPipeLocation = sNotificationUsers.IndexOf("|", sNotificationUsers.IndexOf(sCurrUser) + sCurrUser.Length) + 1;
-                                    if(iPipeLocation > 0) // has more
+                                    string[] userinfo = user.Replace(";#", "\n").Split('\n');
+                                    if(userinfo[0] != SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString() && user != "")
                                     {
-                                        sNotificationUsers = sNotificationUsers.Replace(sCurrUser + "|", "");
+                                        arrNewUsers.Add(user);
                                     }
-                                    else // last one
-                                    {
-                                        sNotificationUsers = sNotificationUsers.Replace(sCurrUser, "");
-                                    }
-                                    currWeb.Properties["EPMLiveNotificationUsers"] = sNotificationUsers;
-                                    currWeb.Properties.Update();
                                 }
+
+                                currWeb.Properties["EPMLiveNotificationUsers"] = String.Join("|", (string[])arrNewUsers.ToArray(typeof(string)));
+                                currWeb.Properties.Update();
                             }
                         }
                     }

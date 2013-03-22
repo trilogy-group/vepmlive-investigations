@@ -231,9 +231,9 @@ function ajaxPost(command) {
     };
 
     xmlhttp.send("command=" + command +
-                        "&comment=" + escape(qsComment) +
+                        "&comment=" + qsComment +
     //"&commenthtml=" + qsCommentHTML +
-                        "&newcomment=" + escape(qsNewComment) +
+                        "&newcomment=" + qsNewComment +
     //"&newcommenthtml=" + qsNewCommentHTML +
                         "&itemId=" + qsItemId +
                         "&listId=" + qsListId +

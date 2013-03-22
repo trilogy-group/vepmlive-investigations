@@ -13,7 +13,22 @@
 
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+    <link rel="stylesheet" href="../modal/modal.css" type="text/css" /> 
+    <script type="text/javascript" src="../modal/modal.js"></script>
 
+    <script language="javascript">
+
+        function Install() {
+            DisableButtons();
+            sm("dlgInstall", 150, 50);
+
+        }
+
+        function DisableButtons() {
+            document.getElementById("<%=Button1.ClientID %>").disabled = true;
+        }
+    </script>
+    
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -78,6 +93,23 @@
 	            </Template_InputFormControls>
             </wssuc:InputFormSection>
 
+             <wssuc:InputFormSection ID="InputFormSection5" Title="Author Mapping"
+	            Description=""
+	            runat="server">
+	            <Template_Description>
+	                If you would like items created in SharePoint by the integration to show as created by the real user instead of the system account, set this property.
+	            </Template_Description>
+	            <Template_InputFormControls>
+		            <wssuc:InputFormControl ID="InputFormControl5" LabelText="" runat="server">
+			                <Template_Control>
+			                    <asp:DropDownList ID="ddlSecMatch" runat="server">
+                                    <asp:ListItem Text="--Select Column--" Value=""></asp:ListItem>
+                                </asp:DropDownList>
+			                </Template_Control>
+		            </wssuc:InputFormControl>
+	            </Template_InputFormControls>
+            </wssuc:InputFormSection>
+
             <wssuc:InputFormSection ID="InputFormSection4" Title="Column Mapping"
 	            Description=""
 	            runat="server">
@@ -98,12 +130,28 @@
             <wssuc:ButtonSection ID="ButtonSection1" runat="server">
 		        <Template_Buttons>
 			        <asp:PlaceHolder ID="PlaceHolder1" runat="server">
+                        <asp:Label ID="lblError" runat="server" ForeColor="Red" Visible="false"></asp:Label>
 				        <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Settings" id="Button1" accesskey="" Width="150"/>
 			        </asp:PlaceHolder>
 		        </Template_Buttons>
 	        </wssuc:ButtonSection>
         </table>
 
+
+        <div id="dlgInstall" class="dialog">
+        <table width="100%">
+            <tr>
+                <td align="center" class="ms-sectionheader">
+                    <img src="../../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
+                    <H3 class="ms-standardheader" id="H1">Installing Integration...</h3>
+                </td>
+            </tr>
+                    
+        </table>
+    </div> 
+    <script language="javascript">
+        initmb();
+    </script>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

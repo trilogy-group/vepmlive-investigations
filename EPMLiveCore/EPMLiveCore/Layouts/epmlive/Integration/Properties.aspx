@@ -26,16 +26,21 @@
         <tr><td class="ms-linksectionheader"><h3 class="ms-standardheader">Standard Properties</h3></td></tr>
         </table></td></tr>
 
-        <wssuc:InputFormSection ID="InputFormSection2" Title="Integration Key"
+        <wssuc:InputFormSection ID="InputFormSection2" Title="Integration Keys"
 	        Description=""
 	        runat="server">
 	        <Template_Description>
 	            This key will be used when sending data into the EPM Live integration from an external source.
 	        </Template_Description>
 	        <Template_InputFormControls>
-		        <wssuc:InputFormControl ID="InputFormControl2" LabelText="" runat="server">
+		        <wssuc:InputFormControl ID="InputFormControl2" LabelText="Integration Key" runat="server">
 			            <Template_Control>
 			                <asp:Label ID="lblKey" runat="server"></asp:Label>
+			            </Template_Control>
+		        </wssuc:InputFormControl>
+                <wssuc:InputFormControl ID="InputFormControl22" LabelText="Integration ID" runat="server">
+			            <Template_Control>
+			                <asp:Label ID="lblID" runat="server"></asp:Label>
 			            </Template_Control>
 		        </wssuc:InputFormControl>
 	        </Template_InputFormControls>
@@ -50,7 +55,7 @@
                 Live Incoming - This will allow an external integrated item to send data into SharePoint<br />
                 Timed Outgoing* - This will send data out the integrated items on a timed basis<br />
                 Timed Incoming* - This will bring data in from the integrated items on a timed basis<br /><br />
-                * If both Timed Outgoing and Timed Incoming are selected, the latest data will use the date modified as the key to determine the correct data.
+                * Only 1 may be selected.
 	        </Template_Description>
 	        <Template_InputFormControls>
 		        <wssuc:InputFormControl ID="InputFormControl3" LabelText="" runat="server">
@@ -91,6 +96,26 @@
                 <wssuc:InputFormControl ID="InputFormControlDelete2" LabelText="" runat="server">
 			            <Template_Control>
 			                <asp:CheckBox ID="chkDeleteInt" runat="server" Text="Allow Deletion from Integration Source" />
+			            </Template_Control>
+		        </wssuc:InputFormControl>
+	        </Template_InputFormControls>
+        </wssuc:InputFormSection>
+
+        <wssuc:InputFormSection ID="InputFormSectionAdd" Title="Addition"
+	        Description=""
+	        runat="server">
+	        <Template_Description>
+	            Use these settings do decide whether the integration can add items to your list or to the integration source.
+	        </Template_Description>
+	        <Template_InputFormControls>
+		        <wssuc:InputFormControl ID="InputFormControlAdd1" LabelText="" runat="server">
+			            <Template_Control>
+			                <asp:CheckBox ID="chkAddList" runat="server" Text="Allow Adding to List" />
+			            </Template_Control>
+		        </wssuc:InputFormControl>
+                <wssuc:InputFormControl ID="InputFormControlAdd2" LabelText="" runat="server">
+			            <Template_Control>
+			                <asp:CheckBox ID="chkAddInt" runat="server" Text="Allow Adding to Integration Source" />
 			            </Template_Control>
 		        </wssuc:InputFormControl>
 	        </Template_InputFormControls>

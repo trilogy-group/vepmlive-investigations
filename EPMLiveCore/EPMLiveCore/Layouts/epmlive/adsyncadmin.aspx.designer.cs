@@ -49,6 +49,24 @@ namespace EPMLiveCore {
         protected global::System.Web.UI.WebControls.Label Label2;
         
         /// <summary>
+        /// inputsection_pageSize control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl inputsection_pageSize;
+        
+        /// <summary>
+        /// SizeLimitTextBox control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox SizeLimitTextBox;
+        
+        /// <summary>
         /// inputsection_fieldMapping control.
         /// </summary>
         /// <remarks>

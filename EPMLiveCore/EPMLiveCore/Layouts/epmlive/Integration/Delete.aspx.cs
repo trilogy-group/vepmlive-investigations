@@ -14,24 +14,36 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            try
-            {
-                intlistid=new Guid(Request["intlistid"]);
-            }catch{}
-            try
-            {
-                moduleid=new Guid(Request["module"]);
-            }catch{}
-
-            intcore = new API.Integration.IntegrationCore(Web.Site.ID, Web.ID);
-            intadmin = new API.Integration.IntegrationAdmin(intcore, intlistid, moduleid);
+            bool removed = false;
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                intadmin.DeleteIntegration(intlistid);
+                try
+                {
+                    intlistid=new Guid(Request["intlistid"]);
+                }catch{}
+                try
+                {
+                    moduleid=new Guid(Request["module"]);
+                }catch{}
+
+                intcore = new API.Integration.IntegrationCore(Web.Site.ID, Web.ID);
+                intadmin = new API.Integration.IntegrationAdmin(intcore, intlistid, moduleid);
+
+            
+
+            
+                string message = "";
+                if(!intadmin.DeleteIntegration(intlistid, out message))
+                {
+                    lblError.Text = "Error: " + message;
+                }
+                else
+                    removed = true;
             });
 
-            SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+            if(removed) 
+                SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
         }
     }
 }

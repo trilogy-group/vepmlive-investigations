@@ -103,11 +103,12 @@ namespace EPMLiveCore
                     {
                         try
                         {
+                            testVal = null;
                             testVal = new SPFieldLookupValue(list.GetItemById((int)r["ID"])[_parentListField].ToString());
                         }
                         catch { }
 
-                        if (testVal.LookupId == int.Parse(_parentValue))
+                        if (testVal != null && (testVal.LookupId == int.Parse(_parentValue)))
                         {
                             _sbResult.Append(r["ID"].ToString() + "," + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
                         }

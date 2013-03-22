@@ -141,6 +141,23 @@
             </template_inputformcontrols>
             </wssuc:InputFormSection>
         </asp:Panel>
+        <wssuc:InputFormSection Title="Size Limit" Description="" runat="server" Id="inputsection_pageSize">
+            <template_description>
+                Set the maximum number of groups/users that can be pulled from Active Directory.
+            </template_description>
+            <template_inputformcontrols>
+                <wssuc:InputFormControl  runat="server" >
+                     <Template_Control>
+                     <table>
+                     <tr>
+                         <td>Size Limit</td>
+                         <td><asp:TextBox runat="server" ID="SizeLimitTextBox" /></td>
+                     </tr>
+                     </table>   
+                     </Template_Control>
+                </wssuc:InputFormControl>
+            </template_inputformcontrols>
+        </wssuc:InputFormSection>
         <wssuc:InputFormSection Title="Field Mappings" Description="" runat="server" Id="inputsection_fieldMapping">
             <template_description>
                 Select which Active Directory field to map the corresponding Resource Pool field to.

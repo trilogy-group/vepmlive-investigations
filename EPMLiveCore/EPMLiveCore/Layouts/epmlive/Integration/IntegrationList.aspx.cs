@@ -40,11 +40,19 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             propertyNameListMenu.Controls.Add(testMenu3);
 
 
-            MenuItemTemplate testMenu4 = new MenuItemTemplate("Delete Integration", "/_layouts/images/delete.gif");
+            MenuItemTemplate testMenu4 = new MenuItemTemplate("View Log", "/_layouts/epmlive/images/integration/log.png");
 
-            testMenu4.ClientOnClickScript = "DeleteIntegration('%INTLISTID%');";
+            testMenu4.ClientOnClickNavigateUrl = "log.aspx?intlistid=%INTLISTID%&LIST=" + Request["List"];
 
             propertyNameListMenu.Controls.Add(testMenu4);
+
+
+
+            MenuItemTemplate testMenu5 = new MenuItemTemplate("Delete Integration", "/_layouts/images/delete.gif");
+
+            testMenu5.ClientOnClickScript = "DeleteIntegration('%INTLISTID%');";
+
+            propertyNameListMenu.Controls.Add(testMenu5);
 
 
 

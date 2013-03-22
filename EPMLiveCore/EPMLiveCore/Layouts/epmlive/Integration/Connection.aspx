@@ -13,6 +13,27 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
+    <link rel="stylesheet" href="../modal/modal.css" type="text/css" /> 
+    <script type="text/javascript" src="../modal/modal.js"></script>
+
+    <script language="javascript">
+        function CheckConnection() {
+            DisableButtons();
+            sm("dlgConnect", 150, 50);
+        }
+        function Install() {
+            DisableButtons();
+            sm("dlgInstall", 150, 50);
+            
+        }
+
+        function DisableButtons() {
+            document.getElementById("<%=Button1.ClientID %>").disabled = true;
+            if(document.getElementById("<%=Button2.ClientID %>"))
+                document.getElementById("<%=Button2.ClientID %>").disabled = true;
+        }
+    </script>
+    
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -24,6 +45,23 @@
 
     <asp:Panel ID="lblMain" runat="server">
         <table width="100%">
+            <wssuc:InputFormSection ID="InputFormSection4" Title="Re-install Integration"
+	            Description=""
+	            runat="server">
+	            <Template_Description>
+	                Click this button to re-install the integration on the remote system.
+	            </Template_Description>
+	            <Template_InputFormControls>
+		            <wssuc:InputFormControl ID="InputFormControl4" LabelText="" runat="server">
+			                <Template_Control>
+			                    <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button2_Click" Text="Re-Install" id="Button2" accesskey="" Width="150"/>
+                                <br />
+                                <asp:Label id="lblInstallError" runat="server" ForeColor="red"></asp:Label>
+			                </Template_Control>
+		            </wssuc:InputFormControl>
+	            </Template_InputFormControls>
+            </wssuc:InputFormSection>
+
             <wssuc:ButtonSection ID="ButtonSection1" runat="server">
 		        <Template_Buttons>
 			        <asp:PlaceHolder ID="PlaceHolder1" runat="server">
@@ -34,6 +72,36 @@
         </table>
         <asp:Label ID="lblError" runat="server" Color="red"></asp:Label>
     </asp:Panel>
+
+    <div id="dlgConnect" class="dialog">
+        <table width="100%">
+            <tr>
+                <td align="center" class="ms-sectionheader">
+                    <img src="../../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
+                    <H3 class="ms-standardheader" id="dlgNormalText">Checking Connection...</h3>
+                </td>
+            </tr>
+                    
+        </table>
+    </div> 
+
+
+    <div id="dlgInstall" class="dialog">
+        <table width="100%">
+            <tr>
+                <td align="center" class="ms-sectionheader">
+                    <img src="../../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
+                    <H3 class="ms-standardheader" id="H1">Installing Integration...</h3>
+                </td>
+            </tr>
+                    
+        </table>
+    </div> 
+
+    <script language="javascript">
+        initmb();
+    </script>
+
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

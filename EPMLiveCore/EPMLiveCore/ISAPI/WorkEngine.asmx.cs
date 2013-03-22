@@ -1348,6 +1348,34 @@ namespace EPMLiveCore
 
         #endregion
 
+        #region ChartWizard Methods
+
+        public static string GetListsAndViewsGridData(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(ChartWizardDataHelper.GetListsAndViewsGridData(data, oWeb));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        public static string GetListAndViewsGridLayout(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(ChartWizardDataHelper.GetListsAndViewsGridLayout(data, oWeb));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        #endregion
+
         public static string GenerateQuickLaunchFromApp(string data, SPWeb spWeb)
         {
             try

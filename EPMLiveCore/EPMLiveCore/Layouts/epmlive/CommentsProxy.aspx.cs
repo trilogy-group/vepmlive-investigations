@@ -3,6 +3,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Net;
 using EPMLiveCore;
+using System.Web;
 
 namespace EPMLiveCore
 {
@@ -120,18 +121,28 @@ namespace EPMLiveCore
 
         private void ManageFields()
         {
-            _command = !string.IsNullOrEmpty(Request["command"]) ? Request["command"] : string.Empty;
-            _comment = !string.IsNullOrEmpty(Request["comment"]) ? Request["comment"] : string.Empty;
-            _newComment = !string.IsNullOrEmpty(Request["newcomment"]) ? Request["newcomment"] : string.Empty;
-            _itemId = !string.IsNullOrEmpty(Request["itemId"]) ? Request["itemId"] : string.Empty;
-            _commentItemId = !string.IsNullOrEmpty(Request["commentItemId"]) ? Request["commentItemId"] : string.Empty;
-            _userId = !string.IsNullOrEmpty(Request["userId"]) ? Request["userId"] : string.Empty;
+            string s = Request["command"];
+            _command = !string.IsNullOrEmpty(s) ? s : string.Empty;
+
+            s = Request["comment"];
+            _comment = !string.IsNullOrEmpty(s) ? s : string.Empty;
+
+            s = Request["newcomment"];
+            _newComment = !string.IsNullOrEmpty(s) ? s : string.Empty;
+
+            s = Request["itemId"];
+            _itemId = !string.IsNullOrEmpty(s) ? s : string.Empty;
+
+            s = Request["commentItemId"];
+            _commentItemId = !string.IsNullOrEmpty(s) ? s : string.Empty;
+
+            s = Request["userId"];
+            _userId = !string.IsNullOrEmpty(s) ? s : string.Empty;
 
             if (!string.IsNullOrEmpty(Request["listId"]))
             {
                 _listId = new Guid(Request["listId"]);
             }
-
         }
 
         private void HandleAjaxCalls()

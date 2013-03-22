@@ -112,6 +112,33 @@ namespace EPMLiveCore.Layouts.epmlive.Integration {
         protected global::System.Web.UI.WebControls.DropDownList ddlIntegrationMatch;
         
         /// <summary>
+        /// InputFormSection5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl InputFormSection5;
+        
+        /// <summary>
+        /// InputFormControl5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl InputFormControl5;
+        
+        /// <summary>
+        /// ddlSecMatch control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSecMatch;
+        
+        /// <summary>
         /// InputFormSection4 control.
         /// </summary>
         /// <remarks>
@@ -155,6 +182,15 @@ namespace EPMLiveCore.Layouts.epmlive.Integration {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder PlaceHolder1;
+        
+        /// <summary>
+        /// lblError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblError;
         
         /// <summary>
         /// Button1 control.

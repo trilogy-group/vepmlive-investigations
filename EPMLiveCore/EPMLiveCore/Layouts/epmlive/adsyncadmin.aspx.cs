@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Web;
-using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using System.Diagnostics;
 using System.Collections;
@@ -67,6 +64,7 @@ namespace EPMLiveCore
 
                     InitDomain();
                     InitGroups();
+                    InitActiveDirectorySizeLimitTextBox();
                     InitResourcePoolFields();
                     InitSchedule();
                     InitExclusions();
@@ -79,7 +77,7 @@ namespace EPMLiveCore
         protected void btnRunManually_Click(object sender, EventArgs e)
         {
             int iTime;
-            string sTime = DropDownListTime.SelectedValue.ToString();
+            string sTime = DropDownListTime.SelectedValue;
             string days = GetOptions();
             iTime = 0;
             if (sTime != string.Empty)
@@ -194,7 +192,7 @@ namespace EPMLiveCore
             string entityExclusions = string.Empty;
             string days = GetOptions();
             string delete = string.Empty;
-            string sTime = DropDownListTime.SelectedValue.ToString();
+            string sTime = DropDownListTime.SelectedValue;
 
             int iScheduleType;
             int iTime;
@@ -211,8 +209,9 @@ namespace EPMLiveCore
             fieldMappings = GetFieldMappings();
             entityExclusions = GetEntityExclusions();
             delete = GetDelete();
+            var sizeLimit = GetActiveDirectorySizeLimit();
 
-            if (FinalizeSave(groups, fieldMappings, entityExclusions, delete, days, iScheduleType, iTime))
+            if (FinalizeSave(groups, fieldMappings, entityExclusions, delete, days, iScheduleType, iTime, sizeLimit))
             {
                 if(!String.IsNullOrEmpty(Request["Source"]))
                 {
@@ -225,18 +224,20 @@ namespace EPMLiveCore
             }
         }
 
-        protected bool FinalizeSave(string groups, string fieldmappings, string entityExclusions, string delete, string days, int scheduleType, int time)
+        protected bool FinalizeSave(string groups, string fieldmappings, string entityExclusions, string delete, string days, int scheduleType, int time, int sizeLimit)
         {
             SPSite site = SPContext.Current.Site;
             using(SPWeb web = site.OpenWeb(site.RootWeb.ID))
             {
-                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLIVEadgroups", groups);
-                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLIVEadfields", fieldmappings);
-                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLIVEadexclusions", entityExclusions);
-                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLIVEaddelete", delete);
-                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLIVEadscheduledays", days);
-                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLIVEadscheduletype", scheduleType.ToString());
-                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLIVEadscheduletime", time.ToString());
+                CoreFunctions.setConfigSetting(web, "EPMLIVEadgroups", groups);
+                CoreFunctions.setConfigSetting(web, "EPMLIVEadfields", fieldmappings);
+                CoreFunctions.setConfigSetting(web, "EPMLIVEadexclusions", entityExclusions);
+                CoreFunctions.setConfigSetting(web, "EPMLIVEaddelete", delete);
+                CoreFunctions.setConfigSetting(web, "EPMLIVEadscheduledays", days);
+                CoreFunctions.setConfigSetting(web, "EPMLIVEadscheduletype", scheduleType.ToString());
+                CoreFunctions.setConfigSetting(web, "EPMLIVEadscheduletime", time.ToString());
+                CoreFunctions.setConfigSetting(web, "EPMLIVEadSizeLimit", sizeLimit.ToString());
+
                 return SaveJob(time, scheduleType, days);
             }
         }
@@ -244,7 +245,7 @@ namespace EPMLiveCore
         protected string GetGroups()
         {
             string groups = string.Empty;
-            if (selections.Value != null && selections.Value != string.Empty)
+            if (!string.IsNullOrEmpty(selections.Value))
             {
                 groups = selections.Value;
             }
@@ -603,6 +604,34 @@ namespace EPMLiveCore
         protected void Page_LoadComplete(object sender, EventArgs e)
         {
             _ADSync = null;
+        }
+
+        private void InitActiveDirectorySizeLimitTextBox()
+        {
+            var savedSizeLimit = CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "EPMLIVEadSizeLimit");
+
+            if (string.IsNullOrEmpty(savedSizeLimit))
+            {
+                savedSizeLimit = "5000";
+            }
+
+            SizeLimitTextBox.Text = savedSizeLimit;
+        }
+
+        private int GetActiveDirectorySizeLimit()
+        {
+            int returnValue;
+
+            try
+            {
+                returnValue = int.Parse(SizeLimitTextBox.Text);
+            }
+            catch (Exception)
+            {
+                returnValue = 0;
+            }
+
+            return returnValue;
         }
     }
 }

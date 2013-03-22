@@ -269,6 +269,7 @@
     <Compile Include="Jobs\AdSynchJob.cs" />
     <Compile Include="Jobs\Applications\InstallAndConfigure.cs" />
     <Compile Include="Jobs\Applications\Uninstall.cs" />
+    <Compile Include="Jobs\Integration.cs" />
     <Compile Include="Jobs\Notifications.cs" />
     <Compile Include="Jobs\ResourceImportJob.cs" />
     <Compile Include="Jobs\ResourcePlan.cs" />
@@ -659,6 +660,20 @@
     <Compile Include="Layouts\epmlive\Integration\IntegrationList.aspx.designer.cs">
       <DependentUpon>IntegrationList.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Log.aspx.cs">
+      <DependentUpon>Log.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\Log.aspx.designer.cs">
+      <DependentUpon>Log.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\OpenControl.aspx.cs">
+      <DependentUpon>OpenControl.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\OpenControl.aspx.designer.cs">
+      <DependentUpon>OpenControl.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Integration\Properties.aspx.cs">
       <DependentUpon>Properties.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -938,6 +953,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReportAuth.cs" />
+    <Compile Include="ReportingData.cs" />
     <Compile Include="ReportingProxy\QueryExecutor.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsField.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsFieldControl.cs" />
@@ -1013,6 +1029,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\SalesforceApexService\Reference.cs" />
+    <Compile Include="Web References\SalesforceMetadataService\Reference.cs" />
+    <Compile Include="Web References\SalesforcePartnerService\Reference.cs" />
     <Compile Include="Web References\SSRS2005\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1420,6 +1439,51 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\FeatureActivationSvc\service.wsdl" />
+    <None Include="Web References\SalesforceApexService\apex.wsdl" />
+    <None Include="Web References\SalesforceApexService\CompileAndTestResult.datasource" />
+    <None Include="Web References\SalesforceApexService\CompileClassResult.datasource" />
+    <None Include="Web References\SalesforceApexService\CompileTriggerResult.datasource" />
+    <None Include="Web References\SalesforceApexService\ExecuteAnonymousResult.datasource" />
+    <None Include="Web References\SalesforceApexService\Reference.map" />
+    <None Include="Web References\SalesforceApexService\RunTestsResult.datasource" />
+    <None Include="Web References\SalesforceApexService\WsdlToApexResult.datasource" />
+    <None Include="Web References\SalesforceMetadataService\AsyncResult.datasource" />
+    <None Include="Web References\SalesforceMetadataService\DeployResult.datasource" />
+    <None Include="Web References\SalesforceMetadataService\DescribeMetadataResult.datasource" />
+    <None Include="Web References\SalesforceMetadataService\FileProperties.datasource" />
+    <None Include="Web References\SalesforceMetadataService\Reference.map" />
+    <None Include="Web References\SalesforceMetadataService\RetrieveResult.datasource" />
+    <None Include="Web References\SalesforceMetadataService\sfmetadata.wsdl" />
+    <None Include="Web References\SalesforcePartnerService\DeleteResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeDataCategoryGroupResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeDataCategoryGroupStructureResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeGlobalResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeLayoutResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeSearchScopeOrderResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeSObjectResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeSoftphoneLayoutResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\DescribeTabSetResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\EmptyRecycleBinResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\GetDeletedResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\GetServerTimestampResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\GetUpdatedResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\GetUserInfoResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\InvalidateSessionsResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\LeadConvertResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\LoginResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\MergeResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\ProcessResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\QueryResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\Reference.map" />
+    <None Include="Web References\SalesforcePartnerService\ResetPasswordResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\SaveResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\SearchResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\SendEmailResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\SetPasswordResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\sfpartner.wsdl" />
+    <None Include="Web References\SalesforcePartnerService\sObject.datasource" />
+    <None Include="Web References\SalesforcePartnerService\UndeleteResult.datasource" />
+    <None Include="Web References\SalesforcePartnerService\UpsertResult.datasource" />
     <None Include="Web References\SSRS2005\ActiveState.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -2857,9 +2921,13 @@
     <Content Include="Layouts\epmlive\images\integration\base.png" />
     <Content Include="Layouts\epmlive\images\integration\editcols.png" />
     <Content Include="Layouts\epmlive\images\integration\editcon.png" />
+    <Content Include="Layouts\epmlive\images\integration\log.png" />
     <Content Include="Layouts\epmlive\images\integration\office365.png" />
     <Content Include="Layouts\epmlive\images\integration\salesforce.png" />
     <Content Include="Layouts\epmlive\images\integration\sql.png" />
+    <Content Include="Layouts\epmlive\images\integration\status1.gif" />
+    <Content Include="Layouts\epmlive\images\integration\status2.gif" />
+    <Content Include="Layouts\epmlive\images\integration\status3.gif" />
     <Content Include="Layouts\epmlive\images\iReportsLibrary.png" />
     <Content Include="Layouts\epmlive\images\itemworkspace.png" />
     <Content Include="Layouts\epmlive\images\left.GIF" />
@@ -2925,6 +2993,8 @@
     <Content Include="Layouts\epmlive\Integration\Connection.aspx" />
     <Content Include="Layouts\epmlive\Integration\Delete.aspx" />
     <Content Include="Layouts\epmlive\Integration\IntegrationList.aspx" />
+    <Content Include="Layouts\epmlive\Integration\Log.aspx" />
+    <Content Include="Layouts\epmlive\Integration\OpenControl.aspx" />
     <Content Include="Layouts\epmlive\Integration\Properties.aspx" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
@@ -2943,6 +3013,7 @@
     <Content Include="Layouts\epmlive\javascripts\libraries\slimScroll.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\spjs-utility.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\WalkMe.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
     <Content Include="Layouts\epmlive\javascripts\ResourceImporter.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.5.2.js" />
@@ -3001,6 +3072,8 @@
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\img\glyphicons-halflings-white.png" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\img\glyphicons-halflings.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -3293,6 +3366,8 @@
     <None Include="Resources\txtTeamGridLayout.txt" />
     <None Include="Resources\WorkingOnGridLayout.txt" />
     <None Include="Resources\ResourceExporterVBA.txt" />
+    <None Include="Resources\ChartWizardDataSourceGridLayout.txt" />
+    <None Include="Resources\SFIntTrigger.txt" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
     <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />

@@ -236,6 +236,55 @@ namespace EPMLiveCore
             return ToPrettierName(internalName);
         }
 
+        /// <summary>
+        /// Returns the left part of a string.
+        /// </summary>
+        /// <param name="param">The string to get the Left of.</param>
+        /// <param name="length">The length of characters to return from the Left of the string.</param>
+        /// <returns>The left part of the string for the specified amount of characters.</returns>
+        public static string Left(this string param, int length)
+        {
+            var result = param.Substring(0, length);
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the right part of a string.
+        /// </summary>
+        /// <param name="param">The string to get the Right of.</param>
+        /// <param name="length">The length of characters to return from the Right of the string.</param>
+        /// <returns>The Right part of the string for the specified amount of characters.</returns>
+        public static string Right(this string param, int length)
+        {
+            var result = param.Substring(param.Length - length, length);
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the characters from the start index through to the specified length.
+        /// </summary>
+        /// <param name="param">The string to retrieve characters from.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="length">The length of characters to return.</param>
+        /// <returns>The part of the string from the start index through to the specified length.</returns>
+        public static string Mid(this string param, int startIndex, int length)
+        {
+            var result = param.Substring(startIndex, length);
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the characters from the start index through the end of the string.
+        /// </summary>
+        /// <param name="param">The string to retrieve characters from.</param>
+        /// <param name="startIndex">The start index.</param>
+        /// <returns>The part of the string from the start index through the end of the string.</returns>
+        public static string Mid(this string param, int startIndex)
+        {
+            var result = param.Substring(startIndex);
+            return result;
+        }
+
         #endregion
 
         #region SPFile Extensions

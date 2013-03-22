@@ -4,13 +4,8 @@ using System.Text;
 using System.DirectoryServices;
 using System.Collections;
 using Microsoft.SharePoint;
-using EPMLiveCore;
-using System.Management;
-using System.DirectoryServices.ActiveDirectory;
 using System.Security.Principal;
 using System.Data;
-using System.IO;
-using System.Data.Sql;
 using System.Data.SqlClient;
 using EPMLiveReportsAdmin;
 
@@ -258,6 +253,24 @@ namespace EPMLiveCore
             return li;
         }
 
+        private static int GetSizeLimit()
+        {
+            int sizeLimit;
+
+            try
+            {
+                var sizeLimitAsString = CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLIVEadSizeLimit");
+                sizeLimit = int.Parse(sizeLimitAsString);
+            }
+            catch (Exception)
+            {
+                sizeLimit = 0;
+            }
+
+            return sizeLimit;
+        }
+
+
         private void ProcessAllGroups()
         {
             List<string> allGroups = GetGroups("LDAP://" + _fullDomain); //This call initializes the groups ad path            
@@ -295,6 +308,7 @@ namespace EPMLiveCore
             {
                 objSearchADAM = new DirectorySearcher(objADAM);
                 objSearchADAM.Filter = "(&(objectClass=group))";
+                objSearchADAM.PageSize = GetSizeLimit();
                 objSearchADAM.SearchScope = SearchScope.Subtree;
                 objSearchResults = objSearchADAM.FindAll();
             }
@@ -329,6 +343,9 @@ namespace EPMLiveCore
             {
                 _ExecutionLogs.Add("     WARNING -- Location: GetGroups() -- Path:" + path + " -- Message:" + e.Message);
             }
+
+            if (objSearchResults != null) objSearchResults.Dispose();
+
             return result;
         }
 
@@ -485,6 +502,7 @@ namespace EPMLiveCore
             _adGroups = EPMLiveCore.CoreFunctions.getConfigSetting(_web, "EPMLIVEadgroups").Split('|');
             _adExclusions.AddRange(EPMLiveCore.CoreFunctions.getConfigSetting(_web, "EPMLIVEadexclusions").Split(';'));
             _deleteUser = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(_web, "EPMLIVEaddelete"));
+
             _fullDomain = GetFullDomain();
 
             foreach (string field in adFieldMappings)
@@ -510,7 +528,8 @@ namespace EPMLiveCore
             {
                 DirectoryEntry de = new DirectoryEntry("LDAP://" + _fullDomain);
                 de.AuthenticationType = AuthenticationTypes.Secure;
-                DirectorySearcher ds = new DirectorySearcher(de, "(objectClass=person)");
+                var ds = new DirectorySearcher(de, "(objectClass=person)") { PageSize = GetSizeLimit() };
+
                 if (_adGroupNameAndPath.ContainsKey(_groupName))
                 {
                     ds.Filter = "(memberOf=" + _adGroupNameAndPath[_groupName].ToString().Replace("(", "").Replace("LDAP://", "") + ")";
