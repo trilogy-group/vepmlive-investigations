@@ -29,17 +29,138 @@
         this.optTab.DeferredMultiSelect();
     }
 
+    function getAbsolutePosition(element) {
+        var r = { x: element.offsetLeft, y: element.offsetTop };
+        if (element.offsetParent) {
+            var tmp = getAbsolutePosition(element.offsetParent);
+            r.x += tmp.x;
+            r.y += tmp.y;
+        }
+        return r;
+    };
+
+
     OptimizerRibbon.prototype.handleExternalEvent = function (event) {
 
         var oRetVal = null;
 
+        var tbinx = -1;
+
+        if (event.length > 13) {
+            if (event.substr(0, 13) == "OptiClickFrom") {
+
+                tbinx = parseInt(event.substr(13));
+                event = "OptiClickFrom";
+                this.rangefld = this.usingselectedFilters[tbinx];
+            }
+        }
+
+        if (event.length > 11) {
+            if (event.substr(0, 11) == "OptiClickTo") {
+
+                tbinx = parseInt(event.substr(11));
+                this.rangefld = this.usingselectedFilters[tbinx];
+                event = "OptiClickTo";
+            }
+        }
+
+
+
+
         try {
             switch (event) {
+
+                case "OptiClickFrom":
+                case "OptiClickTo":
+
+                    var frmtxt = document.getElementById('idFromRange');
+                    var totxt = document.getElementById('idToRange');
+
+                    frmtxt.value = "";
+                    totxt.value = "";
+
+
+
+                    var ldcontainer = document.getElementById(this.rangefld.ribbonName + 'inputl');
+                    var rdcontainer = document.getElementById(this.rangefld.ribbonName + 'inputr');
+
+                    frmtxt.value = ldcontainer.value;
+                    totxt.value = rdcontainer.value;
+
+                    //                    var r = getAbsolutePosition(ldcontainer);
+
+                    //                    var xy = this.optTab.GetScreenPos(ldcontainer);
+
+
+                    if (this.EditRangeDlg == null) {
+                        this.EditRangeDlg = new dhtmlXWindows();
+                        this.EditRangeDlg.setSkin("dhx_web");
+                        this.EditRangeDlg.enableAutoViewport(false);
+                        this.EditRangeDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+                        this.EditRangeDlg.setImagePath("/_layouts/ppm/images/");
+
+
+                        var posx = 800 + (tbinx * 110);
+                        var posy = 70;
+                        this.EditRangeDlg.createWindow("winEditRangeDlgDlg", posx, posy, 300, 115);
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").setIcon("logo.ico", "logo.ico");
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").denyResize();
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").button("park").hide();
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").setModal(true);
+                        //  this.EditRangeDlg.window("winEditRangeDlgDlg").center();
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").setText(fld.FName);
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").attachObject("idEditRangeDlg");
+                    }
+                    else {
+                        this.EditRangeDlg.window("idEditRangeDlg").show();
+                    }
+
+
+                    if (event == "OptiClickFrom") {
+                        frmtxt.focus();
+                        frmtxt.select();
+                    }
+                    else {
+                        totxt.focus();
+                        totxt.select();
+                    }
+
+                    break;
+
 
                 case "OptiPreInput":
 
                     this.PreRangeInput();
                     break;
+
+
+                case "EditRange_Cancel":
+
+                    this.EditRangeDlg.window("winEditRangeDlgDlg").detachObject();
+                    this.EditRangeDlg.window("winEditRangeDlgDlg").close();
+                    this.EditRangeDlg = null;
+                    break;
+
+
+
+
+
+                case "EditRange_OK":
+
+                    this.EditRangeDlg.window("winEditRangeDlgDlg").detachObject();
+                    this.EditRangeDlg.window("winEditRangeDlgDlg").close();
+                    this.EditRangeDlg = null;
+
+                    var frmtxt = document.getElementById('idFromRange');
+                    var totxt = document.getElementById('idToRange');
+                    var ldcontainer = document.getElementById(this.rangefld.ribbonName + 'inputl');
+                    var rdcontainer = document.getElementById(this.rangefld.ribbonName + 'inputr');
+
+                    ldcontainer.value = frmtxt.value;
+                    rdcontainer.value = totxt.value;
+
+
+
 
                 case "OptiInput":
 
@@ -499,7 +620,7 @@
 
 
                 case 'OptCmtScen':
-                    if (this.notgotOptimzerFlag == false) {
+                    if (this.notgotOptimzerFlag == true) {
                         alert("No flag named 'OptimizerFlag' has been defined in PortfolioEngine - hence Commit Strategy is disabled");
 
                         break;
@@ -1385,7 +1506,7 @@
 							},
 							{
 							    items: [
-									{ type: "bigbutton", name: "Configure", img: "configure.jpg", tooltip: "Configure", onclick: "OptimizerEvent('OptEditScen');" }
+									{ type: "bigbutton", name: "Configure", img: "configure.png", tooltip: "Configure", onclick: "OptimizerEvent('OptEditScen');" }
 								]
 							},
 							{
@@ -1496,6 +1617,8 @@
                     addme.onchange = 'OptimizerEvent("OptiChange");';
                     addme.oninput = 'OptimizerEvent("OptiInput");';
                     addme.onpreinput = 'OptimizerEvent("OptiPreInput");';
+                    addme.onclickfrom = 'OptimizerEvent("OptiClickFrom' + n1 + '");';
+                    addme.onclickto = 'OptimizerEvent("OptiClickTo' + n1 + '");';
                     addme.minValue = fld.minValue;
                     addme.maxValue = fld.maxValue;
                     addme.rangeminValue = fld.rangeMinValue;
@@ -1575,7 +1698,7 @@
             addme.name = "Clear";
             addme.tooltip = "Clear Filter ";
             addme.onclick = "OptimizerEvent('OptClearFilters');";
-            addme.img = "clearfilter.jpg";
+            addme.img = "filter.png";
             addme.type = "smallbutton";
             columns[cacc].items[0] = addme;
 
@@ -1954,7 +2077,7 @@
         sInject.append('  </div>'); 
         sInject.append('  <br />');
         sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:13px;">');
-        sInject.append('	2) Enter a title for the comparison field');
+        sInject.append('	2) Enter a title for the comparison field.');
         sInject.append('  </div>');
         sInject.append('  <div>');
         sInject.append('	<input id="idOptConfNameValue" type="text" value=" " style="width:210px;text-align:left;padding:0px;margin:0px;height:20px;" />');
@@ -1962,7 +2085,7 @@
         sInject.append('  <br />');
         sInject.append('  <div>');
         sInject.append('    <div style="display:relative;vertical-align:middle;padding-bottom:13px;">');
-        sInject.append('	  3) Which fields will be used as filters');
+        sInject.append('	  3) Which fields will be used as filters?');
         sInject.append('    </div>');        
         sInject.append('    <table cellspacing="0" cellpadding="0" style="width:100%; display: block;">');
         sInject.append('        <tr>');
@@ -2043,6 +2166,9 @@
     }
 
     try {
+
+        this.EditRangeDlg = null;
+        this.rangefld = null;
 
         this.notgotOptimzerFlag = true;
         this.piIn = new Array();
@@ -2210,6 +2336,9 @@
                     this.DisplayableFields[this.DisplayableFields.length] = fld;
                 else if (fld.textVals.length == 1 && fld.textVals[0] != "")
                     this.DisplayableFields[this.DisplayableFields.length] = fld;
+                else if (fld.FTYPE == 13)
+                    this.DisplayableFields[this.DisplayableFields.length] = fld;
+                
 
             }
 

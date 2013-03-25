@@ -306,8 +306,11 @@ namespace OptmizerDataCache
 
                     xC.CreateStringAttr("Name", sn);
                     xC.CreateStringAttr("Class", "GMCellMain");
-                    xC.CreateIntAttr("CanDrag", 0); 
-                    xC.CreateIntAttr("Visible", 0);
+                    xC.CreateIntAttr("CanDrag", 0);
+
+                    if (col.fname != "Budget")
+                        xC.CreateIntAttr("Visible", 0);
+
                     xC.CreateIntAttr("ShowHint", 0);
                     xC.CreateIntAttr("CaseSensitive", 0);
                     xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
@@ -451,9 +454,16 @@ namespace OptmizerDataCache
             xI.CreateStringAttr("PISelected", " ");
 
             xI.CreateStringAttr("PIStatusButton", "Defaults");
-            xI.CreateStringAttr("PIStart", oDet.StartDate.ToString("MM/dd/yyyy"));
 
-            xI.CreateStringAttr("PIFinish", oDet.FinishDate.ToString("MM/dd/yyyy"));
+            if (oDet.StartDate == DateTime.MinValue)
+                xI.CreateStringAttr("PIStart", "");
+            else 
+                xI.CreateStringAttr("PIStart", oDet.StartDate.ToString("MM/dd/yyyy"));
+
+            if (oDet.FinishDate == DateTime.MinValue)
+                xI.CreateStringAttr("PIFinish", "");
+            else
+                xI.CreateStringAttr("PIFinish", oDet.FinishDate.ToString("MM/dd/yyyy"));
             int colid = 0;
 
             foreach (clsOptFieldDelf col in fielddef)

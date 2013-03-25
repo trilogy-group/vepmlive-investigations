@@ -438,7 +438,7 @@ namespace PortfolioEngineCore
 
             CStruct xStratagy = xStratagies.CreateSubStruct("Stratagy");
             xStratagy.CreateStringAttr("StratagyGUID", "0");
-            xStratagy.CreateStringAttr("Name", "No Strategy Selected");
+            xStratagy.CreateStringAttr("Name", "- None -");
             xStratagy.CreateStringAttr("Default", "1");
             xStratagy.CreateStringAttr("Personal", "0");
 

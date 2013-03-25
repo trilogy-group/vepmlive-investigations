@@ -521,7 +521,7 @@ namespace WorkEnginePPM
                     RPEN_Depts odept;
                     RPEN_Resource otempres;
 
-                    Dictionary<int, RPEN_Resource> rmlist;
+                    Dictionary<int, RPEN_Resource> rmlist = new Dictionary<int, RPEN_Resource>();
                     foreach (RPEN_Depts xdept in deptlist.Values)
                     {
                         string s_reslist = "";
@@ -629,24 +629,34 @@ namespace WorkEnginePPM
                             rmdata += "</table>";
                             rmlist = new Dictionary<int, RPEN_Resource>();
 
-                            foreach (RPEN_Resource ores in xdept.dept_mgrs.Values)
+                            if (xdept != null)
                             {
-                                RPEN_Delegate ordel;
-                                if (rmlist.TryGetValue(ores.id, out otempres) == false)
+                                if (xdept.dept_mgrs != null)
                                 {
-                                    rmlist.Add(ores.id, ores); // biuld up list of dept managers   
 
-                                    if (deptdllglist.TryGetValue(ores.id, out ordel) == true)
+                                    foreach (RPEN_Resource ores in xdept.dept_mgrs.Values)
                                     {
-                                        foreach (RPEN_Resource xres in ordel.wres_delg.Values)
+                                        RPEN_Delegate ordel;
+                                        if (rmlist.TryGetValue(ores.id, out otempres) == false)
                                         {
-                                            if (rmlist.TryGetValue(xres.id, out otempres) == false)
-                                                rmlist.Add(xres.id, xres);
-                                            // biuld up list of dept managers delegate  
+                                            rmlist.Add(ores.id, ores); // biuld up list of dept managers   
+
+                                            if (deptdllglist.TryGetValue(ores.id, out ordel) == true)
+                                            {
+                                                if (ordel.wres_delg != null)
+                                                {
+                                                    foreach (RPEN_Resource xres in ordel.wres_delg.Values)
+                                                    {
+                                                        if (rmlist.TryGetValue(xres.id, out otempres) == false)
+                                                            rmlist.Add(xres.id, xres);
+                                                        // biuld up list of dept managers delegate  
+                                                    }
+                                                }
+                                            }
                                         }
+
                                     }
                                 }
-
                             }
                             sStage = "10";
                             sendtousers = "";
@@ -742,7 +752,7 @@ namespace WorkEnginePPM
 
                         sendtousers = "";
 
-                        sStage = "10";
+                        sStage = "121";
                         if (pmdata != "")
                         {
                             pmdata += "</table>";

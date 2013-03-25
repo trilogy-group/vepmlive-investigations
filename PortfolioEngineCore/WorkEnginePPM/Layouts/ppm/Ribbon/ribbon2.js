@@ -1862,6 +1862,12 @@ function replaceNumberWith(obj, from) {
     try {
 
         obj.value = document.getElementById(from).value;
+
+        obj.focus();
+        obj.select();
+
+
+
     }
     catch (e) {
       //  alert(from)
@@ -1970,6 +1976,12 @@ function Ribbon(ribbonData) {
         }
         return false;
     };
+    Ribbon.prototype.GetScreenPos = function (obj) {
+
+        return Ribbon_findAbsolutePosition(obj, this.ribbonData.parent);
+
+    }
+    
     Ribbon.prototype.refreshSelect = function (id) {
         //window.setTimeout('Ribbon_set_select("' + id + '")', 100);
         Ribbon_set_select(id);
@@ -2597,6 +2609,15 @@ function Ribbon(ribbonData) {
                     if (item.onpreinput != null)
                         onpreinput = " " + item.onpreinput + ";";
 
+                    var onclickfrom = "";
+
+                    if (item.onclickfrom != null)
+                        onclickfrom = " " + item.onclickfrom + ";";
+
+                    var onclickto = "";
+
+                    if (item.onclickto != null)
+                        onclickto = " " + item.onclickto + ";";
 
                     onchange = "";
                     if (item.onchange != null)
@@ -2634,7 +2655,9 @@ function Ribbon(ribbonData) {
                     sb.append("</div>");
                     sb.append("<div style='display:block' id=" + displdiv + " >");
                     sb.append("<span " + iddispl + " class='epm-slidetitle' ");
-                    sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",1);'");
+                    //           sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",1);'");
+                    sb.append(" onclick='" + onclickfrom + "'");
+                  
                     sb.append(">" + toPrettyString(item.minValue, sprefix, spostfix) + "</span>");
                     sb.append("</div>");
                     sb.append("</td><td>");
@@ -2653,7 +2676,8 @@ function Ribbon(ribbonData) {
                     sb.append("</div>");
                     sb.append("<div style='display:block' id=" + disprdiv + " >");
                     sb.append("<span " + iddispr + " class='epm-slidetitle' ");
-                    sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",3);'");
+        //            sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",3);'");
+                    sb.append(" onclick='" + onclickto + "'");
 
                     sb.append(">" + toPrettyString(item.maxValue, sprefix, spostfix) + "</span>");
                     sb.append("</div>");

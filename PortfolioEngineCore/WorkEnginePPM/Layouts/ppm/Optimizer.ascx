@@ -376,6 +376,19 @@ border-radius: 0px;
 		</div>
 	</div>
 </div>
+<div class="modalContent" id="idEditRangeDlg" style="display:none;">
+	<div class="modalText" style="margin-top:10px;padding-right:10px;">
+		<div>
+			<input id="idFromRange" type="text"  onkeyup='extractNumber(this,2,true, null);' onkeypress='return blockNonNumbers(this, event, true, true);' value="" style="width:10em; text-align:left;" /> : <input id="idToRange" type="text"  onkeyup='extractNumber(this,2,true, null);' onkeypress='return blockNonNumbers(this, event, true, true);' value="" style="width:10em; text-align:left;" />
+		</div>
+		<div style="width:200px;float:right;">
+			<div class="button-container">
+					<a href="javascript:OptimizerEvent('EditRange_OK');" class="button-new green" style="width:75px;">OK</a>
+					<a href="javascript:OptimizerEvent('EditRange_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="modalContent" id="idDeleteStratagy" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">
 		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">

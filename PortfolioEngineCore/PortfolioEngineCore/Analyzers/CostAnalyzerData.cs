@@ -1223,7 +1223,7 @@ namespace PortfolioEngineCore
             {
 
                 sCommand = "SELECT  * From EPGP_COST_VALUES WHERE CB_ID = " + clscd.m_CB_ID.ToString() +
-                           " AND CT_ID IN (" + clscd.m_sOtherCostTypes + ") AND PROJECT_ID IN (" + clscd.m_sPids + ") AND BD_IS_SUMMARY = 0  ORDER BY PROJECT_ID, CT_ID, BC_UID";
+                           " AND CT_ID IN (" + clscd.m_sOtherCostTypes + ") AND PROJECT_ID IN (" + clscd.m_sPids + ") AND BD_IS_SUMMARY = 0  AND BC_UID <> 0 ORDER BY PROJECT_ID, CT_ID, BC_UID";
 
 
 
