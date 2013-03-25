@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 
 namespace PortfolioEngineCore
 {
-    internal class CAdmin
+    public class CAdmin
     {
         public int ApprovalCode;
         public int ProjectChargeNumberCFID;
@@ -56,6 +56,7 @@ namespace PortfolioEngineCore
         public int DefaultFTEWH;
         public int DefaultFTEHOL;
         public string WEReportingDBConnect;
+        public int ProjectResourceHoursCFID;
 
         public StatusEnum GetAdminInfo(DBAccess dba)
         {
@@ -141,6 +142,7 @@ namespace PortfolioEngineCore
                     DefaultFTEWH = DBAccess.ReadIntValue(reader["ADM_DEF_FTE_WH"]);
                     DefaultFTEHOL = DBAccess.ReadIntValue(reader["ADM_DEF_FTE_HOL"]);
                     WEReportingDBConnect = DBAccess.ReadStringValue(reader["ADM_WE_REPORTING_DB_CONNECT"]);
+                    ProjectResourceHoursCFID = DBAccess.ReadIntValue(reader["ADM_PROJ_RES_HOURS_CFID"]);
 
                     reader.Close();
                     reader = null;

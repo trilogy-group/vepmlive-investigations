@@ -61,6 +61,7 @@
     <Compile Include="Analyzers\clsCostData.cs" />
     <Compile Include="Analyzers\CostAnalyzerData.cs" />
     <Compile Include="Analyzers\ModSupport.cs" />
+    <Compile Include="Analyzers\OptimizerData.cs" />
     <Compile Include="Base\Activation.cs" />
     <Compile Include="Base\AllCore.cs" />
     <Compile Include="Base\BaseSecurity.cs" />
@@ -70,6 +71,19 @@
     <Compile Include="Base\CStruct.cs" />
     <Compile Include="Base\Database.cs" />
     <Compile Include="Base\DBAccess.cs" />
+    <Compile Include="Base\DBAccess\AdminPages.cs" />
+    <Compile Include="Base\DBAccess\Calendars.cs" />
+    <Compile Include="Base\DBAccess\CostCategories.cs" />
+    <Compile Include="Base\DBAccess\Costs.cs" />
+    <Compile Include="Base\DBAccess\CostTypes.cs" />
+    <Compile Include="Base\DBAccess\CostValues.cs" />
+    <Compile Include="Base\DBAccess\DataAccess.cs" />
+    <Compile Include="Base\DBAccess\General.cs" />
+    <Compile Include="Base\DBAccess\Groups.cs" />
+    <Compile Include="Base\DBAccess\LMR_IF.cs" />
+    <Compile Include="Base\DBAccess\PEClasses.cs" />
+    <Compile Include="Base\DBAccess\QueueManager.cs" />
+    <Compile Include="Base\DBAccess\ResourcePlanning.cs" />
     <Compile Include="Base\DBCommon.cs" />
     <Compile Include="Base\Debugger.cs" />
     <Compile Include="Base\Encrypt.cs" />

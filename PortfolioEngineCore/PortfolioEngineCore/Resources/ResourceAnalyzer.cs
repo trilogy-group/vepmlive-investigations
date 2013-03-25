@@ -430,7 +430,7 @@ namespace PortfolioEngineCore
             sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@name,VIEW_DATA = @vdata WHERE VIEW_GUID=@guid";
             SqlCommand cmd = new SqlCommand(sCommand,  _sqlConnection);
             cmd.Parameters.AddWithValue("@name", sName);
-            cmd.Parameters.AddWithValue("@vname", xView.XML());
+            cmd.Parameters.AddWithValue("@vdata", xView.XML());
             cmd.Parameters.AddWithValue("@guid", guidView);
             int nRowsAffected = cmd.ExecuteNonQuery();
 

@@ -426,6 +426,33 @@ namespace PortfolioEngineCore.PortfolioItems
         //    return "<ClosePortfolioItems Status='0'></ClosePortfolioItems>";
         }
 
+        public string CreateUpdateUpdatePortfolioItemsXML(string pids)
+        {
+
+            try
+            {
+
+                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                _sqlConnection.Open();
+
+                StatusEnum eStatus = StatusEnum.rsSuccess;
+
+                CStruct xEPKUpdate = new CStruct();
+                xEPKUpdate.Initialize("UpdatePortfolioItems");
+                ExportPIInfo(_dba, pids, xEPKUpdate);
+                xEPKUpdate.CreateInt("HRESULT", 0);
+                xEPKUpdate.CreateInt("STATUS", 0);
+                xEPKUpdate.CreateString("UserName", _username);
+
+                return xEPKUpdate.XML();
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+
+        }
+
         private int CreatePI(string sGuid, out string statusText)
         {
 

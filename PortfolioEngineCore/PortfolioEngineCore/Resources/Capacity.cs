@@ -2249,7 +2249,7 @@ namespace PortfolioEngineCore
         }
     }
 
-    internal class EPKClass01
+    public class EPKClass01
     {
 
         public static int GetEntityID(int iTable)
@@ -2599,14 +2599,14 @@ namespace PortfolioEngineCore
 
     }
 
-    internal class ComponentWeight
+    public class ComponentWeight
     {
         public int ScenarioId;
         public int ComponentId;
         public double Weight;
     }
 
-    internal class EPKPriFormula
+    public class EPKPriFormula
     {
         public int uid;
         public string name;

@@ -112,11 +112,11 @@ namespace PortfolioEngineCore
                 else
                     return "";
             }
-            //set
-            //{
-            //    if (m_oNode != null)
-            //        m_oNode.Value = value;
-            //}
+            set
+            {
+                if (m_oNode != null)
+                    m_oNode.Value = value;
+            }
         }
 
         public string InnerText
@@ -128,11 +128,11 @@ namespace PortfolioEngineCore
                 else
                     return "";
             }
-            //set
-            //{
-            //    if (m_oNode != null)
-            //        m_oNode.Value = value;
-            //}
+            set
+            {
+                if (m_oNode != null)
+                    m_oNode.InnerText = value;
+            }
         }
 
         public XmlNode GetXMLNode()

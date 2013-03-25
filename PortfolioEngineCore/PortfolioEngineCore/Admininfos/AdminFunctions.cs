@@ -39,11 +39,11 @@ namespace PortfolioEngineCore
                     switch (sFunction)
                     {
                         case "CalcCategoryRates":
-                            return CalcCategoryRates();
+                            return CalcCategoryRates(_dba);
                         case "CalcDefaultFTEs":
-                            return CalcAllDefaultFTEs();
+                            return CalcAllDefaultFTEs(_dba);
                         case "CalcRPAllAvailabilities":
-                            return CalcRPAllAvailabilities();
+                            return CalcRPAllAvailabilities(_dba);
                         case "SaveReportingConnection":
                             return SaveReportingConnection(xDataInputElement);
                         case "SubmitReportExtract":
@@ -66,22 +66,19 @@ namespace PortfolioEngineCore
         }
 
 
-        public bool CalcCategoryRates()
+        public static bool CalcCategoryRates(DBAccess dba)
         {
             SqlCommand oCommand;
             SqlDataReader reader;
             StatusEnum eStatus = StatusEnum.rsSuccess;
             string sCommand;
-
-            if (_dba.Open() != StatusEnum.rsSuccess)
-                debug.AddMessage("Open DB Error=" + _dba.FormatErrorText());            
             
             bool bResult = false;
             string sReply = "";
             try
             {
                 sCommand = "SELECT * FROM EPG_COST_CATEGORY_RATE_VALUES Order By BC_UID,BC_EFFECTIVE_DATE";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 reader = oCommand.ExecuteReader();
 
                 CategoryRate categoryrate;
@@ -112,8 +109,9 @@ namespace PortfolioEngineCore
                 if (rates != null && rates.Count > 0) categoryrates.Add(prevuid, rates);
                 reader.Close();
 
+                //  read list of calendars
                 sCommand = "SELECT * FROM EPGP_COST_BREAKDOWNS";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 reader = oCommand.ExecuteReader();
 
                 List<int> calendars = new List<int>();
@@ -124,13 +122,38 @@ namespace PortfolioEngineCore
                 }
                 reader.Close();
 
+                //  read list of Cost Categories that are added because of Major Categories and therefore have no separate rate values - Dic entry contains list for each category
+                sCommand = "Select CA_UID,BC_UID From EPGP_COST_CATEGORIES Where CA_UID>0 And CA_UID<>BC_UID Order By CA_UID";
+                oCommand = new SqlCommand(sCommand, dba.Connection);
+                reader = oCommand.ExecuteReader();
+
+                Dictionary<int,List<int>> listccs = new Dictionary<int,List<int>>();
+                List<int> ccs=new List<int>();
+                int prevCA_UID = 0;
+                while (reader.Read())
+                {
+                    int nCA_UID = DBAccess.ReadIntValue(reader["CA_UID"]);
+                    int nBC_UID = DBAccess.ReadIntValue(reader["BC_UID"]);
+                    if (prevCA_UID > 0 && prevCA_UID != nCA_UID)
+                    {
+                        listccs.Add(prevCA_UID, ccs);
+                        ccs = null;
+                    }
+                    if (ccs == null) ccs = new List<int>();
+                    prevCA_UID = nCA_UID;
+                    ccs.Add(nBC_UID);
+                }
+                if (ccs != null && ccs.Count > 0) listccs.Add(prevCA_UID, ccs); 
+                reader.Close();
+
                 Dictionary<int, Dictionary<int, PfEItem>> periodrates;  // set as a list of category rates for each period
                 Dictionary<int, PfEItem> catrates;
                 
                 foreach (int nCalID in calendars)
                 {
+                    // create a dictionary containing rates for each period for this calendar
                     sCommand = "SELECT PRD_ID,PRD_START_DATE FROM EPG_PERIODS Where CB_ID=@CalID Order by PRD_ID";
-                    oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    oCommand = new SqlCommand(sCommand, dba.Connection);
                     oCommand.Parameters.AddWithValue("@CalID", nCalID);
                     reader = oCommand.ExecuteReader();
 
@@ -147,6 +170,14 @@ namespace PortfolioEngineCore
                             List<CategoryRate> ratelist = category.Value;
                             rateitem.dValue1 = GetPeriodRate(dStartDate, rateitem.UID, ratelist);
                             catrates.Add(rateitem.UID, rateitem);
+                            // add copies of the rate tables for Cost Categories from Major Categories
+                            if (listccs.ContainsKey(rateitem.UID))
+                            {
+                                foreach (int cc in listccs[rateitem.UID])
+                                {
+                                    catrates.Add(cc, rateitem);
+                                }
+                            }
                         }
                         periodrates.Add(nPrdID, catrates);
                     }
@@ -154,9 +185,9 @@ namespace PortfolioEngineCore
 
                     // we're ready to read old records and update
                     bool bupdateOK = true;
-                    _dba.BeginTransaction();
+                    dba.BeginTransaction();
                     sCommand = "Select CB_ID,BA_BC_UID,BA_PRD_ID,BA_RATE From EPGP_COST_BREAKDOWN_ATTRIBS Where CB_ID=@CB_ID And BA_RATETYPE_UID=0 And BA_CODE_UID=0";
-                    oCommand = new SqlCommand(sCommand, _dba.Connection,_dba.Transaction);
+                    oCommand = new SqlCommand(sCommand, dba.Connection,dba.Transaction);
                     oCommand.Parameters.AddWithValue("@CB_ID", nCalID);
                     DataTable dataTable = new DataTable();
                     dataTable.Load(oCommand.ExecuteReader());
@@ -171,18 +202,18 @@ namespace PortfolioEngineCore
 
                             if (periodrates.ContainsKey(prdid))
                             {
-                                catrates = periodrates[prdid];  // does this contain every category? No only those for which there is a rate
+                                catrates = periodrates[prdid];  // does this contain every category? No only those for which there is a rate - remember rates are entered for Categories NOT Cost Categories
                                 
                                 double newrate = 0;
-                                if (catrates.ContainsKey(bcuid))
+                                if (catrates.ContainsKey(bcuid))    // this is wrong because new rates entered for Categories where as old Category Rates entered for Cost Categories
                                 {
                                     PfEItem rateitem = catrates[bcuid];
                                     rateitem.bflag = true;
                                     newrate = rateitem.dValue1;
-                                }
-                                if (newrate != oldrate)
-                                {
-                                    row["BA_RATE"] = newrate;
+                                    if (newrate != oldrate)
+                                    {
+                                        row["BA_RATE"] = newrate;
+                                    }
                                 }
                             }
                             else
@@ -196,7 +227,7 @@ namespace PortfolioEngineCore
                         {
                             sCommand = @"Update EPGP_COST_BREAKDOWN_ATTRIBS SET BA_RATE=@rate" +
                                 " Where CB_ID=@cal And BA_BC_UID=@cc And BA_PRD_ID=@period And BA_RATETYPE_UID=0 And BA_CODE_UID=0";
-                            oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                            oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                             oCommand.CommandType = CommandType.Text;
 
                             SqlParameter rate = oCommand.Parameters.Add("@rate", SqlDbType.Float);
@@ -224,7 +255,7 @@ namespace PortfolioEngineCore
                     {
                         sCommand = @"Insert Into EPGP_COST_BREAKDOWN_ATTRIBS (CB_ID,BA_RATETYPE_UID,BA_CODE_UID,BA_BC_UID,BA_PRD_ID,BA_RATE)" +
                             " Values (@cal,0,0,@cc,@period,@rate)";
-                        oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                        oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                         oCommand.CommandType = CommandType.Text;
 
                         SqlParameter cal = oCommand.Parameters.Add("@cal", SqlDbType.Int);
@@ -252,55 +283,64 @@ namespace PortfolioEngineCore
                     }
 
                     //  execute a delete to clear out possible left overs where a rate was deleted and there is no FTE either
+                    //    (?) this means any rates left over or entered in old Calendar page will remain there - which is what we want for now at least
                     if (bupdateOK)
                     {
                         sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
                             " Where (BA_FTE_CONV = 0 Or BA_FTE_CONV is NULL) And (BA_RATE = 0 Or BA_RATE is NULL)";
-                        oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                        oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                         oCommand.CommandType = CommandType.Text;
                         oCommand.ExecuteNonQuery();
                     }
 
-                    if (bupdateOK) _dba.CommitTransaction();
+                    if (bupdateOK) dba.CommitTransaction();
                 }
             }
             catch (Exception ex)
             {
                 sReply = HandleException("CalcCategoryRates", 99999, ex);
             }
-        Exit_Function:
-            bResult = (_dba.Status == StatusEnum.rsSuccess);
+
+            bResult = (dba.Status == StatusEnum.rsSuccess);
             if (bResult == false)
             {
-                sReply = HandleError("CalcCategoryRates", Status, FormatErrorText());
+                sReply = HandleError("CalcCategoryRates", (int)dba.Status, dba.FormatErrorText());
             }
             return bResult;
         }
 
-        public bool CalcRPAllAvailabilities()
+        public bool CalcAvailabilities(int calendar, string reslist)
         {
-            return CalcAvailabilities(-1, "");
+            return CalcInternalAvailabilities(_dba, -1, "");
         }
 
-        public bool CalcAvailabilities(int calendar, string reslist)
+        public static bool CalcRPAllAvailabilities(DBAccess dba)
+        {
+            return CalcInternalAvailabilities(dba, -1, "");
+        }
+
+        public static bool CalcInternalAvailabilities(DBAccess dba, int calendar, string reslist)
         {
             SqlCommand oCommand;
             SqlDataReader reader;
             StatusEnum eStatus = StatusEnum.rsSuccess;
             string sCommand;
 
-            if (_dba.Open() != StatusEnum.rsSuccess)
-                debug.AddMessage("Open DB Error=" + _dba.FormatErrorText());
+            //if (_dba.Open() != StatusEnum.rsSuccess)
+            //    debug.AddMessage("Open DB Error=" + _dba.FormatErrorText());
 
             bool bResult = false;
             string sReply = "";
 
             try
             {
+                if(dba.Connection.State != ConnectionState.Open)
+                    dba.Connection.Open();
+
                 if (calendar < 0)
                 {
                     sCommand = "SELECT ADM_PORT_COMMITMENTS_CB_ID FROM EPG_ADMIN";
-                    oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    oCommand = new SqlCommand(sCommand, dba.Connection);
                     reader = oCommand.ExecuteReader();
                     if (reader.Read())
                     {
@@ -312,7 +352,7 @@ namespace PortfolioEngineCore
 
                 // grab the Periods for the selected calendar
                 sCommand = "SELECT PRD_ID,PRD_START_DATE,PRD_FINISH_DATE FROM EPG_PERIODS WHERE CB_ID=@CalID Order By PRD_ID";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 oCommand.Parameters.AddWithValue("@CalID", calendar);
                 reader = oCommand.ExecuteReader();
 
@@ -350,7 +390,7 @@ namespace PortfolioEngineCore
                             " Left Join EPG_GROUP_MEMBERS g2 On r.WRES_ID=g2.MEMBER_UID And (g2.GROUP_ID In (Select GROUP_ID From EPG_GROUPS Where GROUP_ENTITY=11))";
                 if (reslist.Length > 0) sCommand += " INNER JOIN dbo.EPG_FN_ConvertListToTable(N'" + reslist + "') LT on r.WRES_ID=LT.TokenVal";
                 sCommand += " Where r.WRES_ID <>1 And r.WRES_INACTIVE=0 And r.WRES_IS_RESOURCE=1 And r.WRES_IS_GENERIC=0";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 reader = oCommand.ExecuteReader();
 
                 while (reader.Read())
@@ -369,12 +409,12 @@ namespace PortfolioEngineCore
 
                 // set up all info on Workhours and Holidays so we can use to calculate avail amounts (we could easily make a list of the ones we need but v. unlikely to be worth bothering)
                 sCommand = "Select * From EPG_GROUP_WEEKLYHOURS";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 DataTable dataTable1 = new DataTable();
                 dataTable1.Load(oCommand.ExecuteReader());
 
                 sCommand = "Select * From EPG_GROUP_NONWORK_HOURS Order By GROUP_ID,NWH_DATE";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 DataTable dataTable2 = new DataTable();
                 dataTable2.Load(oCommand.ExecuteReader());
 
@@ -384,7 +424,7 @@ namespace PortfolioEngineCore
                 dataTable1.Dispose();
                 dataTable2.Dispose();
 
-                _dba.BeginTransaction();
+                dba.BeginTransaction();
 
                 // get rid of the old entries for the set of resources we are calculating
                 if (reslist.Length > 0)
@@ -396,14 +436,14 @@ namespace PortfolioEngineCore
                 {
                     sCommand = "Delete From EPGP_CAPACITY_VALUES Where CB_ID=@CalID";
                 }
-                oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                 oCommand.Parameters.AddWithValue("@CalID", calendar);
                 oCommand.CommandType = CommandType.Text;
                 oCommand.ExecuteNonQuery();
 
                 sCommand = "INSERT Into EPGP_CAPACITY_VALUES (CB_ID,BD_PERIOD,WRES_ID,CS_AVAIL)" +
                             " Values (@CalID,@PerId,@WresId,@avail)";
-                oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                 oCommand.Parameters.AddWithValue("@CalID", calendar);
                 SqlParameter p_per = oCommand.Parameters.Add("@PerId", SqlDbType.Int);
                 SqlParameter p_res = oCommand.Parameters.Add("@WresId", SqlDbType.Int);
@@ -427,7 +467,7 @@ namespace PortfolioEngineCore
                         }
                     }
                 }
-                _dba.CommitTransaction();
+                dba.CommitTransaction();
                 bResult = true;
             }
             catch (Exception ex)
@@ -455,20 +495,20 @@ namespace PortfolioEngineCore
             }
         }
 
-        public bool CalcAllDefaultFTEs()
+        public static bool CalcAllDefaultFTEs(DBAccess dba)
         {
-            return CalcDefaultFTEs(-1, "");
+            return CalcDefaultFTEs(dba, -1, "");
         }
 
-        public bool CalcDefaultFTEs(int calendar, string catlist)
+        public static bool CalcDefaultFTEs(DBAccess dba,int calendar, string catlist)
         {
             SqlCommand oCommand;
             SqlDataReader reader;
             StatusEnum eStatus = StatusEnum.rsSuccess;
             string sCommand;
 
-            if (_dba.Open() != StatusEnum.rsSuccess)
-                debug.AddMessage("Open DB Error=" + _dba.FormatErrorText());
+            //if (_dba.Open() != StatusEnum.rsSuccess)
+            //    debug.AddMessage("Open DB Error=" + _dba.FormatErrorText());
 
             bool bResult = false;
             string sReply = "";
@@ -479,7 +519,7 @@ namespace PortfolioEngineCore
                 int lWH = 0;
                 int lHOL = 0;
                 sCommand = "SELECT ADM_DEF_FTE_WH,ADM_DEF_FTE_HOL FROM EPG_ADMIN";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 reader = oCommand.ExecuteReader();
                 while (reader.Read())
                 {
@@ -493,7 +533,7 @@ namespace PortfolioEngineCore
                 if (calendar < 0)
                 {
                     sCommand = "SELECT CB_ID FROM EPGP_COST_BREAKDOWNS";
-                    oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    oCommand = new SqlCommand(sCommand, dba.Connection);
                     reader = oCommand.ExecuteReader();
                     while (reader.Read())
                     {
@@ -530,7 +570,7 @@ namespace PortfolioEngineCore
                 else
                 {
                     sCommand = "Select BC_UID From EPGP_COST_CATEGORIES Where (BC_UOM <>'' And BC_UOM Is Not NULL)";
-                    oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    oCommand = new SqlCommand(sCommand, dba.Connection);
                     reader = oCommand.ExecuteReader();
                     while (reader.Read())
                     {
@@ -544,13 +584,13 @@ namespace PortfolioEngineCore
 
                 // set up info on Workhours and Holidays so we can use to calculate avail amounts 
                 sCommand = "Select * From EPG_GROUP_WEEKLYHOURS Where GROUP_ID=@ID";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 oCommand.Parameters.AddWithValue("@ID", lWH);
                 DataTable dataTable1 = new DataTable();
                 dataTable1.Load(oCommand.ExecuteReader());
 
                 sCommand = "Select * From EPG_GROUP_NONWORK_HOURS Where GROUP_ID=@ID Order By GROUP_ID,NWH_DATE";
-                oCommand = new SqlCommand(sCommand, _dba.Connection);
+                oCommand = new SqlCommand(sCommand, dba.Connection);
                 oCommand.Parameters.AddWithValue("@ID", lHOL);
                 DataTable dataTable2 = new DataTable();
                 dataTable2.Load(oCommand.ExecuteReader());
@@ -571,7 +611,7 @@ namespace PortfolioEngineCore
                 {
                     // grab the Periods for the selected calendar
                     sCommand = "SELECT PRD_ID,PRD_START_DATE,PRD_FINISH_DATE FROM EPG_PERIODS WHERE CB_ID=@CalID Order By PRD_ID";
-                    oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    oCommand = new SqlCommand(sCommand, dba.Connection);
                     oCommand.Parameters.AddWithValue("@CalID", lcal);
                     reader = oCommand.ExecuteReader();
 
@@ -597,9 +637,9 @@ namespace PortfolioEngineCore
 
                     // we've got all the info we want to write so go to it - a real pain, we shouldn't have used same record for FTE and Rate
                     bool bupdateOK = true;
-                    _dba.BeginTransaction();
+                    dba.BeginTransaction();
                     sCommand = "Select CB_ID,BA_BC_UID,BA_PRD_ID,BA_FTE_CONV From EPGP_COST_BREAKDOWN_ATTRIBS Where CB_ID=@CB_ID And BA_RATETYPE_UID=0 And BA_CODE_UID=0";
-                    oCommand = new SqlCommand(sCommand, _dba.Connection,_dba.Transaction);
+                    oCommand = new SqlCommand(sCommand, dba.Connection,dba.Transaction);
                     oCommand.Parameters.AddWithValue("@CB_ID", lcal);
                     DataTable dataTable = new DataTable();
                     dataTable.Load(oCommand.ExecuteReader());
@@ -639,7 +679,7 @@ namespace PortfolioEngineCore
                         {
                             sCommand = @"Update EPGP_COST_BREAKDOWN_ATTRIBS SET BA_FTE_CONV=@fte" +
                                 " Where CB_ID=@cal And BA_BC_UID=@cc And BA_PRD_ID=@period And BA_RATETYPE_UID=0 And BA_CODE_UID=0";
-                            oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                            oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                             oCommand.CommandType = CommandType.Text;
 
                             SqlParameter fte = oCommand.Parameters.Add("@fte", SqlDbType.Int);
@@ -667,7 +707,7 @@ namespace PortfolioEngineCore
                     {
                         sCommand = @"Insert Into EPGP_COST_BREAKDOWN_ATTRIBS (CB_ID,BA_RATETYPE_UID,BA_CODE_UID,BA_BC_UID,BA_PRD_ID,BA_FTE_CONV,BA_RATE)" +
                             " Values (@cal,0,0,@cc,@period,@fte,0)";
-                        oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                        oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                         oCommand.CommandType = CommandType.Text;
 
                         SqlParameter cal = oCommand.Parameters.Add("@cal", SqlDbType.Int);
@@ -699,12 +739,12 @@ namespace PortfolioEngineCore
                     {
                         sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
                             " Where (BA_FTE_CONV = 0 Or BA_FTE_CONV is NULL) And (BA_RATE = 0 Or BA_RATE is NULL)";
-                        oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                        oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                         oCommand.CommandType = CommandType.Text;
                         oCommand.ExecuteNonQuery();
                     }
 
-                    if (bupdateOK) _dba.CommitTransaction();
+                    if (bupdateOK) dba.CommitTransaction();
                 }
             bResult = true;
             }
@@ -923,6 +963,49 @@ namespace PortfolioEngineCore
             return bResult;
         }
 
+        public static bool SubmitJobRequest(DBAccess dba, int WresID, string sData)
+        {
+            SqlCommand oCommand;
+            string sCommand;
+
+            bool bResult = false;
+            CStruct xData = new CStruct();
+            if (xData.LoadXML(sData) == false)
+            {
+                dba.Status = StatusEnum.rsRequestInvalidParameter;
+                return false;
+            }
+
+            try
+            {
+                int nContext = xData.GetInt("JobContext", 0);
+                string sComment = xData.GetString("Comment","Job Request");
+                string sContextData = xData.GetString("Data", "No Context Data");
+
+                Guid guid = Guid.NewGuid();
+
+                sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA)"
+                   + " VALUES(@GUID,@JobContext,@JobSession,@WresID,@JobSubmitted,@JobStatus,@JobComment,@JobData)";
+                oCommand = new SqlCommand(sCommand, dba.Connection);
+                oCommand.Parameters.AddWithValue("@GUID", guid);
+                oCommand.Parameters.AddWithValue("@JobContext", nContext);
+                oCommand.Parameters.AddWithValue("@JobSession", "I'm a Session?");
+                oCommand.Parameters.AddWithValue("@WresID", WresID);
+                oCommand.Parameters.AddWithValue("@JobSubmitted", DateTime.Now);
+                oCommand.Parameters.AddWithValue("@JobStatus", 0);
+                oCommand.Parameters.AddWithValue("@JobComment", sComment);
+                oCommand.Parameters.AddWithValue("@JobData", sContextData);
+                oCommand.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                //sReply = HandleException("SubmitJobRequest", 99999, ex);
+                return false;
+            }
+            bResult = true;
+            return bResult;
+        }
 
         public bool SaveWorkEngineURL(string sData)
         {
@@ -1410,14 +1493,14 @@ namespace PortfolioEngineCore
 
         #region Private Methods ()
 
-        private double GetPeriodRate(DateTime prdstart, int catID, List<CategoryRate> rates)
+        private static double GetPeriodRate(DateTime prdstart, int catID, List<CategoryRate> rates)
         {
             double rate = 0;
             bool firstitem = true;
             foreach (CategoryRate rateitem in rates)
             {
                 if (firstitem) { firstitem = false; rate = rateitem.Rate; }
-                else if (prdstart > rateitem.EffectiveDate) rate = rateitem.Rate;
+                else if (prdstart >= rateitem.EffectiveDate) rate = rateitem.Rate;
                 else if (prdstart < rateitem.EffectiveDate) break;
             }
             return rate;

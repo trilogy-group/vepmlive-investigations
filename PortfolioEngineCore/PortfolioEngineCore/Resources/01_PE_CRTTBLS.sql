@@ -233,7 +233,9 @@ CREATE TABLE dbo.EPG_ADMIN
 	ADM_UPLOAD_SCHEDULE_METHOD tinyint,
 	ADM_DEF_FTE_WH int,
 	ADM_DEF_FTE_HOL int,
-	ADM_WE_REPORTING_DB_CONNECT nvarchar(400)
+	ADM_WE_REPORTING_DB_CONNECT nvarchar(400),
+	ADM_PROJ_RES_HOURS_CFID int
+
 )
 
                 end
@@ -254,6 +256,11 @@ else
                                 begin
                                                 Print '     Add Column ADM_WE_REPORTING_DB_CONNECT'
                                                 ALTER TABLE EPG_ADMIN ADD ADM_WE_REPORTING_DB_CONNECT nvarchar(400)
+                                end
+                                if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPG_ADMIN' and column_name = 'ADM_PROJ_RES_HOURS_CFID')
+                                begin
+                                                Print '     Add Column ADM_PROJ_RES_HOURS_CFID'
+                                                ALTER TABLE EPG_ADMIN ADD ADM_PROJ_RES_HOURS_CFID int
                                 end
                 end
 
@@ -3345,6 +3352,7 @@ CREATE TABLE dbo.EPG_PERMISSIONS
 	PERM_ID int NOT NULL,
 	PERM_LEVEL int NOT NULL,
 	PERM_NAME nvarchar(255) NOT NULL,
+	PERM_WEINCLUDE tinyint NOT NULL default 1,
 	PERM_NOTES ntext
 )
 
@@ -3352,6 +3360,11 @@ CREATE TABLE dbo.EPG_PERMISSIONS
 else
                 begin
                                 Print 'Updating Table EPG_PERMISSIONS'
+                                if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPG_PERMISSIONS' and column_name = 'PERM_WEINCLUDE')
+                                begin
+                                                Print '     Add Column PERM_WEINCLUDE'
+                                                ALTER TABLE EPG_PERMISSIONS ADD PERM_WEINCLUDE tinyint NOT NULL default 1
+                                end
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_GROUP_MEMBERS')
@@ -5349,7 +5362,7 @@ else
 --     print 'Drop Table EPGP_BURDEN_GROUPS'
 --     DROP TABLE dbo.EPGP_BURDEN_GROUPS
 --end
---
+--GO
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_BURDEN_GROUPS')
                 begin
                                 print 'Creating Table EPGP_BURDEN_GROUPS'

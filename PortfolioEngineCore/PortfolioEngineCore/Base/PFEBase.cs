@@ -79,6 +79,7 @@ namespace PortfolioEngineCore
                     SqlDataReader reader = sqlCommand.ExecuteReader();
                     if (reader.Read())
                         _userWResID = DBAccess.ReadIntValue(reader["WRES_ID"]);
+                    reader.Close();
                 }
                 _PFECN.Close();
 

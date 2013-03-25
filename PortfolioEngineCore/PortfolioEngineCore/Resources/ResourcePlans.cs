@@ -2538,7 +2538,30 @@ namespace PortfolioEngineCore
                         oCommand.ExecuteNonQuery();
                     }
                 }
-                _dba.CommitTransaction();
+
+                // V4.4 addition to update total hours to custom dec field if specified in admin
+                if (oAdmin.ProjectResourceHoursCFID > 0)
+                {
+                    string sTableName;
+                    string sFieldName;
+                    if (dbaCustomFields.GetCustomFieldNameFromID(_dba, oAdmin.ProjectResourceHoursCFID, out sTableName, out sFieldName) == StatusEnum.rsSuccess)
+                    {
+                        string sPIs = sTeamPIs;
+                        while (sPIs != "")
+                        {
+                            int lProjectID3 = vb.val(Common.GetFirstItemFromList(ref sPIs));
+                            string s = "UPDATE " + sTableName + " SET " + sFieldName + " =  (SELECT SUM(CMT_HOURS) / 100 FROM EPG_RESOURCEPLANS WHERE RP_ACTIVE_COMMITMENT = 1 AND CMT_PRIVATE = 0 AND CMT_STATUS = 256 AND PROJECT_ID = " + lProjectID3.ToString() + ") WHERE PROJECT_ID = " + lProjectID3.ToString() + "";
+                            int lRowsAffected;
+                            if (_dba.ExecuteNonQuery(s, (StatusEnum)99999, out lRowsAffected) != StatusEnum.rsSuccess)
+                                break;
+                        }
+                    }
+                }
+
+                if (_dba.Status == StatusEnum.rsSuccess)
+                    _dba.CommitTransaction();
+                else
+                _dba.RollbackTransaction();
 
                 // do a post costs for each PI NB - this is now done after synchronizeteam
                 //if (sTeamPIs != "")

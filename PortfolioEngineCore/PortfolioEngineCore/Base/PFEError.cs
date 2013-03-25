@@ -50,6 +50,7 @@ namespace PortfolioEngineCore
         UpdateListWork = 4096,
         DeleteListWork = 4097,
         DeletePIListWork = 4098,
+        PostCostValues = 4099,
         PostTimesheetData = 5001,
         GetCCRs = 5010,
         GetDepts = 5011,

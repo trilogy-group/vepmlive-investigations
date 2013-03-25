@@ -1714,6 +1714,11 @@ namespace PortfolioEngineCore
                     SqlCommand.ExecuteNonQuery();
                 }
 
+                // need to generate COST_CATEGORIES from CATEGORIES plus the Major Category Lookup
+
+                // Feb 2013 - I now need this same functionality in the new Cost Categories Admin screen 
+                //                 I'll create a function there but will leave this for now (safer) but if messing here then consider using that function
+                
                 if (MajorCategoryLookup <= 0)
                 {
                     //  just copy updated CATEGORIES into COST_CATEGORIES
@@ -1859,14 +1864,15 @@ namespace PortfolioEngineCore
 
                 transaction.Commit();
 
-                _sqlConnection.Close();
-
                 // recalc default FTEs if appropriate
-                SecurityLevels secLevel = SecurityLevels.AdminCalc;
-                PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username,
-                                                                                                _pid, _company,
-                                                                                                _dbcnstring, secLevel);
-                bool bret = pec.CalcAllDefaultFTEs();
+                //SecurityLevels secLevel = SecurityLevels.AdminCalc;
+                //PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username,
+                //                                                                                _pid, _company,
+                //                                                                                _dbcnstring, secLevel);
+                //bool bret = pec.CalcAllDefaultFTEs();
+                bool bret = AdminFunctions.CalcAllDefaultFTEs(_dba);
+
+                _sqlConnection.Close();
 
                 return true;
             }
@@ -2422,14 +2428,16 @@ namespace PortfolioEngineCore
                     // now we are told the answer to this (no point recalculating if just set OFF) so:
                     if (sDefault == "1") bCalcDefaultFTEs = true;
 
+                    //SecurityLevels secLevel = SecurityLevels.AdminCalc;
+                    //PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring, secLevel);
+                    //bool bret = pec.CalcRPAllAvailabilities();
+                    ////bool bret = pec.CalcAvailabilities(-1,"2");  // test for a single resource
+
+                    //if (bCalcDefaultFTEs == true) bret = pec.CalcAllDefaultFTEs();
+                    bool bret = AdminFunctions.CalcRPAllAvailabilities(_dba);
+                    if (bCalcDefaultFTEs == true) bret = AdminFunctions.CalcAllDefaultFTEs(_dba);
+
                     _sqlConnection.Close();
-
-                    SecurityLevels secLevel = SecurityLevels.AdminCalc;
-                    PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring, secLevel);
-                    bool bret = pec.CalcRPAllAvailabilities();
-                    //bool bret = pec.CalcAvailabilities(-1,"2");  // test for a single resource
-
-                    if (bCalcDefaultFTEs == true) bret = pec.CalcAllDefaultFTEs();
 
                     xResult.CreateIntAttr("Id", Id);
                     xstatus.CreateIntAttr("Status", 0);
@@ -3583,16 +3591,16 @@ namespace PortfolioEngineCore
                 }
 
                 if (bupdateOK) transaction.Commit();
-                _sqlConnection.Close();
 
                 // used to do this inside UpdateCategoriesFromRoles but using CC UID changes everything
                 if (bupdateOK)
                 {
-                    SecurityLevels secLevel = SecurityLevels.AdminCalc;
-                    PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username,
-                                                                                                    _pid, _company,
-                                                                                                    _dbcnstring, secLevel);
-                    bool bret = pec.CalcAllDefaultFTEs();
+                    //SecurityLevels secLevel = SecurityLevels.AdminCalc;
+                    //PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username,
+                    //                                                                                _pid, _company,
+                    //                                                                                _dbcnstring, secLevel);
+                    //bool bret = pec.CalcAllDefaultFTEs();
+                    _sqlConnection.Close();
                 }
 
             CStruct xResult = new CStruct();
@@ -4540,13 +4548,15 @@ namespace PortfolioEngineCore
                     // now we are told the answer to this (no point recalculating if just set OFF) so:
                     if (sDefault == "1") bCalcDefaultFTEs = true;
 
+                    //SecurityLevels secLevel = SecurityLevels.AdminCalc;
+                    //PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,  secLevel);
+                    //bool bret = pec.CalcRPAllAvailabilities();
+
+                    //if (bCalcDefaultFTEs == true) bret = pec.CalcAllDefaultFTEs();
+                    bool bret = AdminFunctions.CalcRPAllAvailabilities(_dba);
+                    if (bCalcDefaultFTEs == true) bret = AdminFunctions.CalcAllDefaultFTEs(_dba);
+
                     _sqlConnection.Close();
-
-                    SecurityLevels secLevel = SecurityLevels.AdminCalc;
-                    PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,  secLevel);
-                    bool bret = pec.CalcRPAllAvailabilities();
-
-                    if (bCalcDefaultFTEs == true) bret = pec.CalcAllDefaultFTEs();
 
                     xResult.CreateIntAttr("Id", Id);
                     xstatus.CreateIntAttr("Status", 0);
@@ -4560,5 +4570,24 @@ namespace PortfolioEngineCore
                 throw new PFEException((int)PFEError.UpdateWorkSchedule, exception.GetBaseMessage());
             }
         }
+
+        /// <summary>
+        /// Posts Cost Values for a CB/CT combination, optional list of PROJECT_IDs
+        /// </summary>
+        /// <param name="data">xml defn of CB and CT, optional one or more PI entries </param>
+        /// <returns></returns>
+        public bool PostCostValues(string data, out string sResult)
+        {
+            // can be called from webservice or directly from 'outside' as well as within PfE code?
+            if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+            _sqlConnection.Open();
+
+            string sCVResult;
+            bool bRet = dbaCostValues.PostCostValues(_dba, data, out sCVResult);
+            _sqlConnection.Close();
+            sResult=sCVResult;
+            return bRet;
+        }
+
     }
 }

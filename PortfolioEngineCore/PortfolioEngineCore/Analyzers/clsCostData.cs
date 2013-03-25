@@ -140,6 +140,7 @@ namespace CostDataValues
     {
         public int CB_ID;
         public int CT_ID;
+        public int CT_ind;
         public int PROJECT_ID;
         public int Internal_ID;
         public int BC_UID;
@@ -230,18 +231,18 @@ namespace CostDataValues
             zCost = new double[arraysize + 1];
             zValue = new double[arraysize + 1];
             zFTE = new double[arraysize + 1];
-
+            oCosts = new double[arraysize + 1];
+            oUnits = new double[arraysize + 1];
+            oFTE = new double[arraysize + 1];
             for (int i = 0; i <= mxdim; i++)
             {
                 zCost[i] = 0;
                 zValue[i] = 0;
+                zFTE[i] = 0;
+                oCosts[i] = 0;
+                oUnits[i] = 0;
+                oFTE[i] = 0;
             }
-
-            oCosts = new double[arraysize + 1];
-            oUnits = new double[arraysize + 1];
-            oFTE = new double[arraysize + 1];
-
-
 
             BurnDuration = new int[arraysize + 1];
             Burnrate = new double[arraysize + 1];
@@ -781,6 +782,7 @@ namespace CostDataValues
         
         public Dictionary<string, clsDetailRowData> m_detaildata = null;
         public Dictionary<string, clsDetailRowData> m_targetdata = null;
+        public Dictionary<int, clsDataItem> m_targets = null;
 
         public List<clsTargetColours> m_clsTargetColours = null; 
 

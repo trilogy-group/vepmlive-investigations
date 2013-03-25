@@ -12,6 +12,10 @@ namespace PortfolioEngineCore
         EditResources = 3028,
         ViewPortfolioItems = 3001,
         EditPortfolioItems = 3012,
+        PortAdmin = 3025,
+        Portfolio = 3011,
+        PMO = 3042,
+        DBAUtil = 3003,
         EditResourcePlans = 3026
     }
 

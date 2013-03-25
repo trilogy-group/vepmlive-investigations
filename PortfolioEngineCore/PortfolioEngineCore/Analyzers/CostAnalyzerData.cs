@@ -38,26 +38,30 @@ namespace PortfolioEngineCore
 
         public clsCostData InitalLoadData(string ticket, string sViewID, out string m_loadmsg, out int m_loaddatareturn)
         {
+            m_loaddatareturn = 0;
+
             try
             {
                 if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
                 _sqlConnection.Open();
                 
                 m_loadmsg = "";
-                m_loaddatareturn = 0;
+                m_loaddatareturn = 10;
 
                 clsCostData clscd = new clsCostData();
 
                 GrabPidsFromTickect(_sqlConnection, ticket, out clscd.m_sPids, out clscd.m_GotAllPIs, out clscd.m_PI_Count);
 
+                m_loaddatareturn = 20;
                 int lFirstP = 0;
                 int lLastP = 0;
 
                 GrabCostViewInfo(_sqlConnection, sViewID, out clscd.m_CB_ID, out clscd.m_sCostTypes, out clscd.m_sOtherCostTypes, out clscd.m_sCalcCostTypes, out lFirstP, out lLastP);
 
-   
 
-                m_loaddatareturn = 0;
+                m_loaddatareturn = 30;
+
+
 
 
                 if (clscd.m_CB_ID < 0 || clscd.m_sPids == "")
@@ -80,24 +84,35 @@ namespace PortfolioEngineCore
                 }
 
 
-
+                m_loaddatareturn = 40;
                 GrabStatus(_sqlConnection, clscd);
-
+                m_loaddatareturn = 41;
                 ReadPeriods(_sqlConnection, clscd);
+                m_loaddatareturn = 42;
                 ReadCatItems(_sqlConnection, clscd);
+                m_loaddatareturn = 43;
                 ReadCustomFields(_sqlConnection, clscd);
+                m_loaddatareturn = 44;
 
                 ReadCostTypeNames(_sqlConnection, clscd);
+                m_loaddatareturn = 45;
 
                 ReadStages(_sqlConnection, clscd);
+                m_loaddatareturn = 46;
                 ReadExtraPifields(_sqlConnection, clscd);
+                m_loaddatareturn = 47;
 
                 DateTime edate, ldate;
                 ReadPILevelData(_sqlConnection, clscd, out edate, out ldate);
+                m_loaddatareturn = 48;
                 ReadCostCustomFieldsAndData(_sqlConnection, clscd);
+                m_loaddatareturn = 49;
                 ReadBudgetBands(_sqlConnection, clscd);
+                m_loaddatareturn = 50;
                 ReadRateTable(_sqlConnection, clscd);
+                m_loaddatareturn = 51;
 
+                LoadTargets(clscd);
 
                 //int psfppid = 0;
                 //int pslppid = 0;
@@ -123,9 +138,23 @@ namespace PortfolioEngineCore
 
 
 
-
+                m_loaddatareturn = 40;
 
                 StashRateCache(clscd);
+
+                foreach (clsDetailRowData oDet in clscd.m_detaildata.Values)
+                {
+                    clsDataItem odi;
+
+                    if (clscd.m_CostTypes.TryGetValue(oDet.CT_ID, out odi) == true)
+                        oDet.CT_ind = odi.ID;
+                    else
+                    {
+                        oDet.CT_ind = -1;
+                        
+                    }
+
+                }
 
 
 
@@ -139,7 +168,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 m_loadmsg = ex.Message;
-                m_loaddatareturn = 3;
+            //    m_loaddatareturn = 3;
                 return null;
 
             }
@@ -680,6 +709,7 @@ namespace PortfolioEngineCore
                 oItem.Desc = oItem.Name;
                 oItem.bSelected = true;
                 clscd.m_CostTypes.Add(oItem.UID, oItem);
+                oItem.ID = clscd.m_CostTypes.Count;
             }
 
             reader.Close();
@@ -1003,7 +1033,6 @@ namespace PortfolioEngineCore
             clscd.m_firstperiod_data = clscd.m_max_period;
 
             clscd.m_detaildata = new Dictionary<string, clsDetailRowData>();
-            clscd.m_targetdata = new Dictionary<string, clsDetailRowData>();
 
             if (clscd.m_sCostTypes != "")
             {
@@ -1924,7 +1953,7 @@ namespace PortfolioEngineCore
             sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@name,VIEW_DATA = @vdata WHERE VIEW_GUID=@guid";
             SqlCommand cmd = new SqlCommand(sCommand, _sqlConnection);
             cmd.Parameters.AddWithValue("@name", sName);
-            cmd.Parameters.AddWithValue("@vname", xView.XML());
+            cmd.Parameters.AddWithValue("@vdata", xView.XML());
             cmd.Parameters.AddWithValue("@guid", guidView);
             int nRowsAffected = cmd.ExecuteNonQuery();
 
@@ -1942,6 +1971,356 @@ namespace PortfolioEngineCore
         {
             return "CONVERT(DATETIME, '" + dt.ToString("yyyy-MM-dd HH:mm:ss") + "', 102)";
         }
+
+        private int LoadTargets(clsCostData clscd)
+        {
+
+            if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+            _sqlConnection.Open(); 
+            
+            SqlCommand oCommand = null;
+            SqlDataReader reader = null;
+            string sCommand = "";
+            clsDetailRowData Det = null;
+            clsDetailRowData TryDet = null;
+            int xBC_SEQ = 0;
+            int xScenID = 0;
+            int Peracc;
+            clsDataItem oItem;
+
+            int retv = 0;
+
+            sCommand = "SELECT TARGET_ID, TARGET_NAME, TARGET_DESC FROM EPGP_MODEL_TARGETS WHERE CB_ID = " + clscd.m_CB_ID.ToString() + " ORDER BY TARGET_ID";
+
+            string targets = "";
+
+            oCommand = new SqlCommand(sCommand, _sqlConnection);
+            reader = oCommand.ExecuteReader();
+
+            clscd.m_targets = new Dictionary<int, clsDataItem>();
+            clscd.m_targetdata = new Dictionary<string, clsDetailRowData>();
+
+            while (reader.Read())
+            {
+
+                oItem = new clsDataItem();
+
+                oItem.UID = DBAccess.ReadIntValue(reader["TARGET_ID"]);
+                oItem.Name = DBAccess.ReadStringValue(reader["TARGET_NAME"]);
+                oItem.Desc = DBAccess.ReadStringValue(reader["TARGET_DESC"]);
+                if (targets == "")
+                    targets = oItem.UID.ToString();
+                else
+                    targets += "," + oItem.UID.ToString();
+
+                clscd.m_targets.Add(oItem.UID, oItem);
+                oItem.ID = clscd.m_targets.Count;
+            }
+            reader.Close();
+            reader = null;
+
+            if (targets == "")
+                return 0;
+
+            sCommand = "SELECT * FROM EPGP_MODEL_TARGET_DETAILS WHERE TARGET_ID IN (" + targets + ") ORDER BY TARGET_ID";
+
+            oCommand = new SqlCommand(sCommand, _sqlConnection);
+            reader = oCommand.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Det = new clsDetailRowData(clscd.m_max_period);
+
+                Det.CB_ID = clscd.m_CB_ID;
+                Det.CT_ID = DBAccess.ReadIntValue(reader["CT_ID"]);
+                Det.BC_UID = DBAccess.ReadIntValue(reader["BC_UID"]);
+                Det.BC_SEQ = DBAccess.ReadIntValue(reader["TARGET_UID"]);
+
+                Det.Scenario_ID = DBAccess.ReadIntValue(reader["TARGET_ID"]);
+
+                if (clscd.m_targets.TryGetValue(Det.Scenario_ID, out oItem) == true)
+                    Det.CT_ind = oItem.ID;
+                else
+                    Det.CT_ind = -1;
+
+                for (int i = 1; i <= 5; i++)
+                {
+                    Det.OCVal[i] = DBAccess.ReadIntValue(reader["OC_0" + i.ToString()]);
+                    Det.TXVal[i] = DBAccess.ReadStringValue(reader["TEXT_0" + i.ToString()]);
+                }
+
+                sCommand = "K" + Det.BC_SEQ.ToString() + " " + Det.Scenario_ID.ToString();
+
+                if (clscd.m_targetdata.TryGetValue(sCommand, out TryDet) == false)
+                    clscd.m_targetdata.Add(sCommand, Det);
+
+            }
+            reader.Close();
+            reader = null;
+
+
+
+            sCommand = "SELECT * FROM EPGP_MODEL_TARGET_VALUES WHERE TARGET_ID IN (" + targets + ") ORDER BY TARGET_ID,TARGET_UID";
+
+            oCommand = new SqlCommand(sCommand, _sqlConnection);
+            reader = oCommand.ExecuteReader();
+
+
+            while (reader.Read())
+            {
+
+                xBC_SEQ = DBAccess.ReadIntValue(reader["TARGET_UID"]);
+                xScenID = DBAccess.ReadIntValue(reader["TARGET_ID"]);
+
+                sCommand = "K" + xBC_SEQ.ToString() + " " + xScenID.ToString();
+
+                if (clscd.m_targetdata.TryGetValue(sCommand, out Det))
+                {
+
+                    Peracc = DBAccess.ReadIntValue(reader["BD_PERIOD"]);
+                    Det.zCost[Peracc] = DBAccess.ReadDoubleValue(reader["BD_Cost"]);
+                    Det.zValue[Peracc] = DBAccess.ReadDoubleValue(reader["BD_VALUE"]);
+                }
+            }
+            reader.Close();
+            reader = null;
+
+            return retv;
+        }
+
+        public void DeleteTarget(int iTarget)
+        {
+            string sCommand = "";
+
+            try
+            {
+                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                _sqlConnection.Open(); 
+                
+                sCommand = "Delete FROM EPGP_MODEL_TARGETS  Where TARGET_ID = " + iTarget.ToString();
+                SqlCommand cmd = new SqlCommand(sCommand, _sqlConnection);
+                cmd.ExecuteNonQuery();
+
+                sCommand = "Delete FROM EPGP_MODEL_TARGET_DETAILS  Where TARGET_ID = " + iTarget.ToString();
+                cmd = new SqlCommand(sCommand, _sqlConnection);
+                cmd.ExecuteNonQuery();
+
+                sCommand = "Delete FROM EPGP_MODEL_TARGET_VALUES  Where TARGET_ID = " + iTarget.ToString();
+                cmd = new SqlCommand(sCommand, _sqlConnection);
+                cmd.ExecuteNonQuery();
+
+
+            }
+
+            catch (Exception ex)
+            {
+            }
+
+
+        }
+
+        public void SaveTargetData(string sXML, int CB_ID, out int targetID, out string sTargetName, out bool bNewTarget)
+        {
+
+            string sCommand = "";
+            SqlDataReader reader = null;
+            SqlCommand oCommand = null;
+            SqlCommand cmd;
+
+            targetID = 0;
+            sTargetName = "";
+            bNewTarget = false;
+
+            try
+            {
+                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                _sqlConnection.Open();
+
+
+
+                CStruct xRoot = new CStruct();
+
+                if (xRoot.LoadXML(sXML) == false)
+                {
+                    return;
+                }
+
+                string sNewName = xRoot.GetStringAttr("Name");
+                string sDesc = xRoot.GetStringAttr("Desc");
+                int tID = xRoot.GetIntAttr("ID");
+
+                if (sNewName != "" && tID == 0)
+                {
+
+                    int nameCount = 0;
+                    int LocalTarget = 0;
+
+                    sCommand = "SELECT COUNT(TARGET_NAME) AS TARGET_COUNT FROM EPGP_MODEL_TARGETS WHERE TARGET_NAME = " + DBAccess.PrepareText(sNewName);
+
+                    oCommand = new SqlCommand(sCommand, _sqlConnection);
+                    reader = oCommand.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        nameCount = DBAccess.ReadIntValue(reader["TARGET_COUNT"]);
+                    }
+                    reader.Close();
+                    reader = null;
+
+                    if (nameCount != 0)
+                    {
+                        targetID = -1;
+                    }
+
+                    sCommand = "SELECT MAX(TARGET_ID) AS TARGET_ID FROM EPGP_MODEL_TARGETS";
+
+                    oCommand = new SqlCommand(sCommand, _sqlConnection);
+                    reader = oCommand.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        targetID = DBAccess.ReadIntValue(reader["TARGET_ID"]);
+                    }
+                    reader.Close();
+                    reader = null;
+
+                    ++targetID;
+                    tID = targetID;
+
+                    sCommand = "INSERT into EPGP_MODEL_TARGETS (CB_ID, TARGET_ID,WRES_ID,TARGET_NAME,TARGET_DESC) VALUES(" +
+                       CB_ID.ToString() + ", " + targetID.ToString() + "," + LocalTarget.ToString() + "," + DBAccess.PrepareText(sNewName) + "," + DBAccess.PrepareText(sDesc) + ")";
+
+
+                    cmd = new SqlCommand(sCommand, _sqlConnection);
+                    cmd.ExecuteNonQuery();
+                    //m_oDataAccess = null;
+
+                    sTargetName = sNewName;
+                    bNewTarget = true;
+                }
+                else
+                    targetID = tID;
+
+
+
+                sCommand = "DELETE FROM EPGP_MODEL_TARGET_VALUES WHERE TARGET_ID = " + tID.ToString();
+                cmd = new SqlCommand(sCommand, _sqlConnection);
+                cmd.ExecuteNonQuery();
+
+                sCommand = "DELETE FROM EPGP_MODEL_TARGET_DETAILS WHERE TARGET_ID = " + tID.ToString();
+                cmd = new SqlCommand(sCommand, _sqlConnection);
+                cmd.ExecuteNonQuery();
+
+                sCommand = "insert into EPGP_MODEL_TARGET_DETAILS (TARGET_ID,CT_ID, BC_UID, TARGET_UID, OC_01,OC_02, OC_03, OC_04, OC_05,TEXT_01,TEXT_02, TEXT_03, TEXT_04, TEXT_05) " +
+                            "VALUES(" + targetID.ToString() + ",@CT_ID, @BC_UID, @TARGET_UID, @OC_01,@OC_02, @OC_03, @OC_04, @OC_05,@TEXT_01,@TEXT_02, @TEXT_03, @TEXT_04, @TEXT_05)";
+
+                SqlCommand oCmdCF = new SqlCommand(sCommand, _sqlConnection);
+
+                SqlParameter ct_id = oCmdCF.Parameters.Add("@CT_ID", SqlDbType.Int);
+                SqlParameter bc_uid = oCmdCF.Parameters.Add("@BC_UID", SqlDbType.Int);
+                SqlParameter tar_uid = oCmdCF.Parameters.Add("@TARGET_UID", SqlDbType.Int);
+
+                SqlParameter oc1_id = oCmdCF.Parameters.Add("@OC_01", SqlDbType.Int);
+                SqlParameter oc2_id = oCmdCF.Parameters.Add("@OC_02", SqlDbType.Int);
+                SqlParameter oc3_id = oCmdCF.Parameters.Add("@OC_03", SqlDbType.Int);
+                SqlParameter oc4_id = oCmdCF.Parameters.Add("@OC_04", SqlDbType.Int);
+                SqlParameter oc5_id = oCmdCF.Parameters.Add("@OC_05", SqlDbType.Int);
+
+                SqlParameter tx1_id = oCmdCF.Parameters.Add("@TEXT_01", SqlDbType.VarChar, 255);
+                SqlParameter tx2_id = oCmdCF.Parameters.Add("@TEXT_02", SqlDbType.VarChar, 255);
+                SqlParameter tx3_id = oCmdCF.Parameters.Add("@TEXT_03", SqlDbType.VarChar, 255);
+                SqlParameter tx4_id = oCmdCF.Parameters.Add("@TEXT_04", SqlDbType.VarChar, 255);
+                SqlParameter tx5_id = oCmdCF.Parameters.Add("@TEXT_05", SqlDbType.VarChar, 255);
+
+                
+                List<CStruct> trows = xRoot.GetList("TROW");
+
+                int i = 0;
+
+               foreach (CStruct orow in trows)
+               {
+                   i = i + 1; 
+                   ct_id.Value = orow.GetIntAttr("CT_ID");
+                    tar_uid.Value = i + 1;
+                    bc_uid.Value = orow.GetIntAttr("BC_UID");
+
+                    oc1_id.Value = orow.GetIntAttr("OC1");
+                    oc2_id.Value = orow.GetIntAttr("OC2");
+                    oc3_id.Value = orow.GetIntAttr("OC3");
+                    oc4_id.Value = orow.GetIntAttr("OC4");
+                    oc5_id.Value = orow.GetIntAttr("OC5");
+
+                    tx1_id.Value = orow.GetStringAttr("TX1");
+                    tx2_id.Value = orow.GetStringAttr("TX2");
+                    tx3_id.Value = orow.GetStringAttr("TX3");
+                    tx4_id.Value = orow.GetStringAttr("TX4");
+                    tx5_id.Value = orow.GetStringAttr("TX5");
+
+                    oCmdCF.ExecuteNonQuery();
+                }
+
+                sCommand = "insert into EPGP_MODEL_TARGET_VALUES (TARGET_ID,TARGET_UID, BD_PERIOD, BD_COST, BD_VALUE) " +
+                               "VALUES(" + targetID.ToString() + ",@TARGET_UID, @BD_PERIOD, @BD_COST, @BD_VALUE)";
+
+                SqlCommand oCmdVal = new SqlCommand(sCommand, _sqlConnection);
+                SqlParameter val_tar_uid = oCmdVal.Parameters.Add("@TARGET_UID", SqlDbType.Int);
+
+                SqlParameter val_per_id = oCmdVal.Parameters.Add("@BD_PERIOD", SqlDbType.Int);
+                SqlParameter val_cost_id = oCmdVal.Parameters.Add("@BD_COST", SqlDbType.Decimal);
+                SqlParameter val_val_id = oCmdVal.Parameters.Add("@BD_VALUE", SqlDbType.Decimal);
+                val_cost_id.Precision = 25;
+                val_cost_id.Scale = 6;
+                val_val_id.Precision = 25;
+                val_val_id.Scale = 6;
+
+                i = 0;
+
+                foreach (CStruct orow in trows)
+                {
+
+                    List<CStruct> pvals = orow.GetList("Per");
+                    i = i + 1;
+
+  
+                    foreach (CStruct oper in pvals)
+                    {
+                        val_tar_uid.Value = i;
+                        val_per_id.Value = oper.GetIntAttr("ID");
+                        val_cost_id.Value = oper.GetDoubleAttr("Cost",0);
+                        val_val_id.Value = oper.GetDoubleAttr("Val", 0);
+                        oCmdVal.ExecuteNonQuery();
+                    }
+                }
+
+
+            }
+
+            catch (Exception ex)
+            {
+            }
+
+
+        }
+
+        public clsCostData ReloadTargets(int CB_ID, int max_period)
+        {
+
+            
+            clsCostData cds = new clsCostData();
+
+
+            try
+            {
+                cds.m_CB_ID = CB_ID;
+                cds.m_max_period = max_period;
+                LoadTargets(cds);
+            }
+
+            catch (Exception ex) { }
+            return cds;
+
+        }
+
 
     }
 

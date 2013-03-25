@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 
 namespace PortfolioEngineCore
 {
@@ -32,7 +33,7 @@ namespace PortfolioEngineCore
             return eStatus;
         }
 
-        public override void DBTrace(StatusEnum eStatus, TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, bool bImmediate)
+        public void DBTrace(StatusEnum eStatus, TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, bool bImmediate=false)
         {
 
             // let's see if the channel is one of the active DB trace channels
@@ -302,7 +303,28 @@ namespace PortfolioEngineCore
             }
             catch (Exception ex)
             {
-                eStatus = HandleStatusError(SeverityEnum.Exception, "SelectDataById", (StatusEnum)eStatusOnException, ex.Message.ToString());
+                eStatus = HandleStatusError(SeverityEnum.Exception, "SelectDataById", (StatusEnum)eStatusOnException, ex.Message);
+            }
+            return eStatus;
+        }
+        public StatusEnum SelectDataByName(string cmdText, string name, StatusEnum eStatusOnException, out DataTable dt)
+        {
+            StatusEnum eStatus = StatusEnum.rsSuccess;
+            dt = null;
+            try
+            {
+                SqlCommand cmd = new SqlCommand(cmdText, m_oConnection, m_oTransaction);
+                cmd.Parameters.AddWithValue("p1", name);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                dt = new DataTable();
+                dt.Load(reader);
+                reader.Close();
+                reader.Dispose();
+            }
+            catch (Exception ex)
+            {
+                eStatus = HandleStatusError(SeverityEnum.Exception, "SelectDataByName", (StatusEnum)eStatusOnException, ex.Message);
             }
             return eStatus;
         }
@@ -376,6 +398,23 @@ namespace PortfolioEngineCore
             finally
             {
                 oCommand = null;
+            }
+            return eStatus;
+        }
+
+        public StatusEnum ExecuteNonQuery(string sCommand, StatusEnum eStatusOnException, out int lRowsAffected)
+        {
+            StatusEnum eStatus = StatusEnum.rsSuccess;
+            SqlCommand oCommand = null;
+            lRowsAffected = 0;
+            try
+            {
+                oCommand = new SqlCommand(sCommand, m_oConnection, m_oTransaction);
+                lRowsAffected = oCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                eStatus = HandleStatusError(SeverityEnum.Exception, "ExecuteNonQuery", (StatusEnum)eStatusOnException, ex.Message.ToString());
             }
             return eStatus;
         }
@@ -477,6 +516,7 @@ namespace PortfolioEngineCore
             m_eStatus = eStatus;
             m_sStatusText = ex.Message.ToString();
             m_sStackTrace = ex.StackTrace.ToString();
+            EventLog.WriteEntry("DBAccess Exception", FormatErrorText(), EventLogEntryType.Error);
             return m_eStatus;
         }
 
@@ -486,6 +526,7 @@ namespace PortfolioEngineCore
             m_sStatusFunction = sFunction;
             m_eStatus = eStatus;
             m_sStatusText = sText;
+            EventLog.WriteEntry("DBAccess Error", FormatErrorText(), EventLogEntryType.Error);
             return m_eStatus;
         }
 
@@ -511,9 +552,9 @@ namespace PortfolioEngineCore
             m_oTransaction = null;
         }
 
-        public virtual void DBTrace(StatusEnum eStatus, TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, bool bImmediate)
-        {
-        }
+        //public virtual void DBTrace(StatusEnum eStatus, TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, bool bImmediate)
+        //{
+        //}
 
         static public DateTime ReadDateValue(object obj)
         {
@@ -529,7 +570,7 @@ namespace PortfolioEngineCore
             if (!obj.Equals(System.DBNull.Value))
             {
                 bIsNull = false;
-                return Convert.ToDateTime(obj);
+                try { return Convert.ToDateTime(obj); } catch { return DateTime.Parse("1901-01-01"); }
             }
             bIsNull = true;
             return DateTime.MinValue;
@@ -624,7 +665,7 @@ namespace PortfolioEngineCore
         {
             if (!obj.Equals(System.DBNull.Value))
             {
-                return Convert.ToInt32(obj);
+                 try { return Convert.ToInt32(obj); } catch{return 0;}
             }
             return 0;
         }
@@ -634,7 +675,7 @@ namespace PortfolioEngineCore
             if (!obj.Equals(System.DBNull.Value))
             {
                 bIsNull = false;
-                return Convert.ToInt32(obj);
+                try { return Convert.ToInt32(obj); } catch { return 0; }
             }
             bIsNull = true;
             return 0;
@@ -667,6 +708,17 @@ namespace PortfolioEngineCore
             //Exception_Error:
             //    eStatus = HandleException("CDbAccess.GetLastIdentityValue", 9703)
             //    GetLastIdentityValue = eStatus
+        }
+
+        public static string FormatAdminError(string severity, string location, string message, string trace = "")
+        {
+            CStruct xReply = new CStruct();
+            xReply.Initialize("error");
+            xReply.CreateString("severity", severity);
+            xReply.CreateString("location", location);
+            xReply.CreateString("message", message);
+            xReply.CreateString("trace", trace);
+            return xReply.XML();
         }
     }
 }

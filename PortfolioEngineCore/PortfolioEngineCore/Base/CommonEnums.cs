@@ -151,7 +151,7 @@ namespace PortfolioEngineCore
         DBException = 5
     }
 
-    enum GlobalPermissionsEnum
+    public enum GlobalPermissionsEnum
     {
         gpToday = 3001,       // EPK B01 Home, Delegate,
         gpUserAdmin = 3002,   // EPK A04 Manage Status Date and Non-Work Items,
@@ -451,7 +451,7 @@ namespace PortfolioEngineCore
         TaskWIDEC = 803
     }
 
-    enum FieldType
+    public enum FieldType
     {
         TypeCost = 8,
         TypeCode = 4,
@@ -463,7 +463,7 @@ namespace PortfolioEngineCore
         TypeNText = 19,
     }
 
-    enum EntityID
+    public enum EntityID
     {
         Resource = 1,
         Portfolio = 2,
@@ -471,5 +471,42 @@ namespace PortfolioEngineCore
         Project = 4,
         Task = 5,
         Unknown = 0
+    }
+
+    public enum CTEditMode
+    {
+        ctBudget = 1,
+        ctCalculated = 3,
+        ctCalculatedCumulative = 30,
+        ctTSActuals = 4,
+        ctTSActualsToDate = 40,
+        ctWEActuals = 41,
+        ctDPWork = 5,
+        ctDPForecastWork = 50,
+        ctWIWork = 6,
+        ctWIForecastWork = 60,
+        ctCommitments = 9,
+        ctForecastCommitments = 90,
+        ctCommitmentsREV = 91,
+        ctForecastCommitmentsREV = 92,
+        ctDisplay = 0,
+        ctDisplaywDetails = 101
+    }
+
+    public enum QueuedJobContext
+    {
+    qjcCustom = 0,
+    qjcImportProject = 1,
+    qjcImportLookup = 2,
+    qjcImportResources = 3,
+    qjcExecuteActiveX = 4,
+    qjcImportPIs = 5,
+    qjcImportData = 6,
+    qjcExportData = 7,
+    qjcMaintenance = 8,
+    qjcRefreshRoles = 200,
+    qjcCalcAvailability = 111,
+    qjcCalcDefaultFTEs = 112,
+    qjcTest = 100001
     }
 }

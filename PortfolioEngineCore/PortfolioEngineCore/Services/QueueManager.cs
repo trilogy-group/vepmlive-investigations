@@ -142,17 +142,19 @@ namespace PortfolioEngineCore
                             bHandled = true;
                             break;
                         case 111: // Calculate all availabilities
-                            SecurityLevels secLevel1 = SecurityLevels.AdminCalc;
-                            AdminFunctions pec1 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
-                                                                     secLevel1);
-                            bool bret1 = pec1.CalcRPAllAvailabilities();
-                            bHandled = true;
+                            //SecurityLevels secLevel1 = SecurityLevels.AdminCalc;
+                            //AdminFunctions pec1 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
+                            //                                         secLevel1);
+                            //bool bret1 = pec1.CalcRPAllAvailabilities();
+                            bool bret1 = AdminFunctions.CalcRPAllAvailabilities(_dba);
+                           bHandled = true;
                             break;
                         case 112: // Calculate Default FTEs
-                            SecurityLevels secLevel2 = SecurityLevels.AdminCalc;
-                            AdminFunctions pec2 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
-                                                                     secLevel2);
-                            bool bret2 = pec2.CalcAllDefaultFTEs();
+                            //SecurityLevels secLevel2 = SecurityLevels.AdminCalc;
+                            //AdminFunctions pec2 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
+                            //                                         secLevel2);
+                            //bool bret2 = pec2.CalcAllDefaultFTEs();
+                            bool bret2 = AdminFunctions.CalcAllDefaultFTEs(_dba);
                             bHandled = true;
                             break;
                     }
