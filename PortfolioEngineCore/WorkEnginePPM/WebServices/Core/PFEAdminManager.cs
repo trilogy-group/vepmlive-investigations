@@ -844,6 +844,56 @@ namespace WorkEnginePPM.WebServices.Core
             }
         }
 
+        /// <summary>
+        /// Posts Cost Values for a CB/CT combination
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns></returns>
+        internal string PostCostValues(string data)
+        {
+            try
+            {
+                var xInputData = new CStruct();
+                xInputData.LoadXML(data);
+                CStruct xDataInputElement = xInputData.GetSubStruct("Data");
+                if (xDataInputElement == null) throw new Exception("Cannot find the Data element.");
+
+                string sResult = "";
+                bool bUpdateOK = true;
+
+                Admininfos adminCore = GetAdminCore(SecurityLevels.Base);
+                try
+                {
+                    bUpdateOK = adminCore.PostCostValues(xDataInputElement.XML(), out sResult);
+                    bUpdateOK = true; // now whether it worked or not at a data level will be contained in the Result
+                }
+                catch (Exception exception)
+                {
+                    var SWResultElement = new XElement("Result");
+                    Utils.SetResultError(exception, ref SWResultElement);
+                    sResult = SWResultElement.Value;
+                    bUpdateOK = false;
+                }
+
+                if (bUpdateOK == false)
+                {
+                    return Response.Failure(1, sResult);
+                }
+                else
+                {
+                    return Response.Success(sResult);
+                }
+            }
+            catch (PFEException pfeException)
+            {
+                return Response.PfEFailure(pfeException);
+            }
+            catch (Exception exception)
+            {
+                return Response.Failure((int)APIError.PostCostValues, exception);
+            }
+        }
+
 
         /// <summary>
         /// Updates Holiday Schedules.

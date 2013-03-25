@@ -53,6 +53,11 @@ namespace WorkEnginePPM
 
             sProjectName = HelperFunctions.getProjectNameFromUID(Request["itemid"]);
             int i;
+            int irpemode; 
+            
+            if (int.TryParse(Request["rpemode"], out irpemode) == false)
+                irpemode = 0;
+
 
             if (string.IsNullOrEmpty((Request["listid"])))
             {
@@ -62,6 +67,7 @@ namespace WorkEnginePPM
                     LoadControl("/_layouts/ppm/ResPlanAnalyzer.ascx");
 
                 ctl.TicketVal = Request["dataid"];
+                ctl.RPEMode = irpemode;
 
                 PlaceHolder1.Controls.Add(ctl);
             }
@@ -73,15 +79,18 @@ namespace WorkEnginePPM
 
                 if (HelperFunctions.UseNonActiveXControl("resanalyzer", list) == false)
                 {
+
                     if (int.TryParse(Request["view"], out i))
-                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_ResCenter.RPAnalyzer",
+                            strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_ResCenter.RPAnalyzer",
                                                                      "<Params Ticket=\\\"" + Request["dataid"] +
+                                                                     "\\\" rpemode=\\\"" + irpemode.ToString() + "\\" +
                                                                      "\\\" ViewID=\\\"" + Request["view"] + "\\\"/>",
                                                                      "true",
                                                                      Page);
                     else
                         strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_ResCenter.RPAnalyzer",
                                                                      "<Params Ticket=\\\"" + Request["dataid"] +
+                                                                     "\\\" rpemode=\\\"" + irpemode.ToString() + "\\" +
                                                                      "\\\" ViewName=\\\"" + Request["view"] + "\\\"/>",
                                                                      "true", Page);
                     LiteralControl lit = new LiteralControl(strOutput.ToString());
@@ -94,6 +103,7 @@ namespace WorkEnginePPM
                         LoadControl("/_layouts/ppm/ResPlanAnalyzer.ascx");
 
                     ctl.TicketVal = Request["dataid"];
+                    ctl.RPEMode = irpemode;
 
                     PlaceHolder1.Controls.Add(ctl);
                 }

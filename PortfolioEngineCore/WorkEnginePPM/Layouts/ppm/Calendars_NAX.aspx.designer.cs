@@ -13,6 +13,15 @@ namespace WorkEnginePPM.Layouts.ppm {
     public partial class Calendars_NAX {
         
         /// <summary>
+        /// tgrid1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::WorkEnginePPM.TGrid tgrid1;
+        
+        /// <summary>
         /// lblGeneralError control.
         /// </summary>
         /// <remarks>
@@ -22,12 +31,12 @@ namespace WorkEnginePPM.Layouts.ppm {
         protected global::System.Web.UI.WebControls.Label lblGeneralError;
         
         /// <summary>
-        /// table1 control.
+        /// dgrid1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.Table table1;
+        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.DGrid dgrid1;
     }
 }

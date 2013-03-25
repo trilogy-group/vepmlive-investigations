@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Web.Services;
 using ClientPrioritizationDataCache;
 using System.Xml;
+using PortfolioEngineCore;
 
 
 namespace WorkEnginePPM
@@ -592,16 +593,16 @@ Exit_Function:
                 {
                     WorkEnginePPM.Integration weInt = new WorkEnginePPM.Integration();
                     xNode = weInt.execute(sContext, sXMLRequest);
-                    WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "ClientPrioritization.SendXMLToWorkEngine", "WE Request", "Context=" + sContext + "; URL=" + sURL, sXMLRequest);
+                    dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "ClientPrioritization.SendXMLToWorkEngine", "WE Request", "Context=" + sContext + "; URL=" + sURL, sXMLRequest);
                     if (xNode != null)
-                        WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "ClientPrioritization.SendXMLToWorkEngine", "WE Reply", "Context=" + sContext + "; URL=" + sURL, xNode.OuterXml.ToString());
+                        dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "ClientPrioritization.SendXMLToWorkEngine", "WE Reply", "Context=" + sContext + "; URL=" + sURL, xNode.OuterXml.ToString());
                 }
                 catch (Exception ex)
                 {
                     dba.Status = (StatusEnum)99830;
                     dba.StatusText = ex.Message;
                     dba.StackTrace = ex.StackTrace;
-                    WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "ClientPrioritization.SendXMLToWorkEngine", "Exception", ex.Message, ex.StackTrace);
+                    dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "ClientPrioritization.SendXMLToWorkEngine", "Exception", ex.Message, ex.StackTrace);
                 }
             }
             return dba.Status;

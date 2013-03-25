@@ -1,100 +1,106 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
-//using Microsoft.SharePoint;
+using System.Web.UI.WebControls;
 using Microsoft.SharePoint.WebControls;
+using PortfolioEngineCore;
+using WorkEnginePPM.ControlTemplates.WorkEnginePPM;
 
-namespace WorkEnginePPM.Layouts.ppm
+namespace WorkEnginePPM
 {
     public partial class Customfields_NAX : LayoutsPageBase
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            //buttonbar1.EventHandler("buttonbar1_event");
-            //buttonbar1.AddButton("btnAdd", "<u>A</u>dd", "", "", "alt text", "3em", "a", false);
-            //buttonbar1.AddButton("btnUpdate", "<u>M</u>odify", "", "", "alt text", "4em", "u", true);
-            //buttonbar1.AddButton("btnDelete", "<u>D</u>elete", "", "images/delete.gif", "alt text", "5em", "d", true);
-            //buttonbar1.Render();
-
-            table1.RowEventHandler("table1_row_event");
-            table1.AddColumn("", "cellSpacer");
-            table1.AddColumn("Entity", "", "width:6em;");
-            table1.AddColumn("Name", "", "width:12em;");
-            table1.AddColumn("Desc", "", "width:20em;");
-            table1.AddColumn("Data Type", "", "width:6em;");
-            table1.AddColumn("Lookup", "", "width:10em;");
-            table1.AddColumn("Table", "", "width:10em;");
-            table1.AddColumn("Field", "");
-            table1.AddColumn("", "");
-
-            string sDBConnect = WebAdmin.GetConnectionString(this.Context);
-            DBAccess dba = new DBAccess(sDBConnect);
-            if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
-
-            DataTable dt;
-            string cmdText = "SELECT FA_FIELD_ID,FA_NAME,FA_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE,FA_DESC,"
-                            + " case When (FA_TABLE_ID >100 And FA_TABLE_ID<200) Then 2 When (FA_TABLE_ID >200 And FA_TABLE_ID<300) Then 1 Else 0 End as Entity"
-                            + " FROM EPGC_FIELD_ATTRIBS"
-                            + " Where FA_TABLE_ID > 100 and FA_TABLE_ID < 300"
-                            + " ORDER BY Entity,FA_NAME";
-            dt = null;
+            DBAccess dba = null;
             try
             {
-                SqlCommand cmd = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
-                SqlDataReader reader = cmd.ExecuteReader();
+                DGrid dg = dgrid1;
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo, SecurityLevels.BaseAdmin);
+                dba = da.dba;
+                if (dba.Open() == StatusEnum.rsSuccess)
+                {
+                    dg.AddColumn(title: "Entity", width: 80, name: "ENTITY_NAME");
+                    dg.AddColumn(title: "Name", width: 180, name: "FA_NAME");
+                    dg.AddColumn(title: "Description", width: 200, name: "FA_DESC");
+                    dg.AddColumn(title: "Data Type", width: 80, name: "FA_FORMAT_NAME");
+                    dg.AddColumn(title: "Table", width: 200, name: "TABLE_NAME");
+                    dg.AddColumn(title: "Field", width: 100, name: "FIELD_NAME");
+                    dg.AddColumn(title: "Lookup", width: 80);
+                    dg.AddColumn(title: "ID", width: 50, name: "FA_FIELD_ID", isId: true);
 
-                dt = new DataTable();
-                dt.Load(reader);
-                reader.Close();
-                reader.Dispose();
+                    DataTable dt;
+                    dbaCustomFields.SelectCustomFields(dba, out dt);
+                    dba.Close();
+
+                    // add the extra columns in to the datatable
+                    DataColumn col = new DataColumn();
+                    col.DataType = System.Type.GetType("System.String");
+                    col.ColumnName = "ENTITY_NAME";
+                    col.DefaultValue = "";
+                    dt.Columns.Add(col);
+                    col = new DataColumn();
+                    col.DataType = System.Type.GetType("System.String");
+                    col.ColumnName = "FA_FORMAT_NAME";
+                    col.DefaultValue = "";
+                    dt.Columns.Add(col);
+                    col = new DataColumn();
+                    col.DataType = System.Type.GetType("System.String");
+                    col.ColumnName = "TABLE_NAME";
+                    col.DefaultValue = "";
+                    dt.Columns.Add(col);
+                    col = new DataColumn();
+                    col.DataType = System.Type.GetType("System.String");
+                    col.ColumnName = "FIELD_NAME";
+                    col.DefaultValue = "";
+                    dt.Columns.Add(col);
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        int lEntity = DBAccess.ReadIntValue(row["Entity"]);
+                        string sEntity = "";
+                        if (lEntity == 2) sEntity = "Portfolio"; else sEntity = "Resource";
+                        row["ENTITY_NAME"] = sEntity;
+
+                        int lDataType = DBAccess.ReadIntValue(row["FA_FORMAT"]);
+                        row["FA_FORMAT_NAME"] = EPKClass01.GetFieldFormat(lDataType);
+
+                        string sTable;
+                        string sField;
+                        int lTable = DBAccess.ReadIntValue(row["FA_TABLE_ID"]);
+                        int lField = DBAccess.ReadIntValue(row["FA_FIELD_IN_TABLE"]);
+                        if (EPKClass01.GetTableAndField(lTable, lField, out sTable, out sField))
+                        {
+                            row["TABLE_NAME"] = sTable;
+                            row["FIELD_NAME"] = sField;
+                        }
+                        else
+                        {
+                            row["TABLE_NAME"] = "Unknown Table";
+                            row["FIELD_NAME"] = "";
+                        }
+                    }
+                    dg.SetDataTable(dt);
+                    dg.Render();
+                }
+            }
+            catch (PFEException pex)
+            {
+                if (pex.ExceptionNumber == 9999)
+                    Response.Redirect(this.Site.Url + "/_layouts/ppm/NoPerm.aspx?requesturl='" + Request.RawUrl + "'");
+                lblGeneralError.Text = "PFE Exception : " + pex.ExceptionNumber.ToString() + " - " + pex.Message;
+                lblGeneralError.Visible = true;
             }
             catch (Exception ex)
             {
-                //eStatus = HandleStatusError(SeverityEnum.Exception, "SelectData", (StatusEnum)eStatusOnException, ex.Message.ToString());
+                lblGeneralError.Text = ex.Message;
+                lblGeneralError.Visible = true;
             }
-//            if (dbaUsers.SelectCustomFields(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
-
-            foreach (DataRow row in dt.Rows)
+            finally
             {
-                table1.AddRow(row["FA_FIELD_ID"].ToString());
-                table1.AddValue("");
-                int lEntity = DBAccess.ReadIntValue(row["Entity"]);
-                string sEntity = "";
-                if (lEntity == 1) sEntity = "Portfolio"; else sEntity = "Resource";
-                table1.AddValue(sEntity);
-                table1.AddValue(row["FA_NAME"].ToString());
-                table1.AddValue(row["FA_DESC"].ToString());
-
-                int lDataType = DBAccess.ReadIntValue(row["FA_FORMAT"]);
-                table1.AddValue(EPKClass01.GetFieldFormat(lDataType));
-
-                table1.AddValue("");  //lookup
-
-                string sTable;
-                string sField;
-                int lTable = DBAccess.ReadIntValue(row["FA_TABLE_ID"]);
-                int lField = DBAccess.ReadIntValue(row["FA_FIELD_IN_TABLE"]);
-                if (EPKClass01.GetTableAndField(lTable, lField, out sTable, out sField))
-                {
-                    table1.AddValue(sTable);
-                    table1.AddValue(sField);
-                }
-                else
-                {
-                    table1.AddValue("Unknown Table");
-                    table1.AddValue("");
-                }
-                table1.AddValue("");
+                if (dba != null)
+                    dba.Close();
             }
-            dba.Close();
-            table1.Render();
-            return;
-        Status_Error:
-            //dba.Close();
-            //table1.Render();
-            //lblGeneralError.Text = dba.FormatErrorText();
-            //lblGeneralError.Visible = true;
-            return;
         }
     }
 }

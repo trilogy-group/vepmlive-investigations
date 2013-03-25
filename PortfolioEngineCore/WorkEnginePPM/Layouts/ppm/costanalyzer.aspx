@@ -6,7 +6,7 @@
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="costanalyzer.aspx.cs" Inherits="WorkEnginePPM.costanalyzer" DynamicMasterPageFile="~masterurl/default.master" %>
-<%@ Reference Control="/_layouts/ppm/Model.ascx" %>
+<%@ Reference Control="/_layouts/ppm/CostAnalyzer.ascx" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
@@ -17,8 +17,8 @@
 <asp:PlaceHolder runat="server" ID="PlaceHolder1" />
 <script type="text/javascript">
     function Page_OnResize() {
-        if (typeof (model) != "undefined") {
-            model.SetSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
+        if (typeof (costtypeanalyzer) != "undefined") {
+            costtypeanalyzer.SetSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
         }
     }
 

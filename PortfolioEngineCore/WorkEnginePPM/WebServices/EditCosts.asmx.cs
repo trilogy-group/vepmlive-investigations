@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Web.Services;
 using System.Xml;
-using System.Data.SqlClient;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {
@@ -48,37 +47,21 @@ namespace WorkEnginePPM
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(this.Context);
-
-                DBAccess dba = new DBAccess(sDBConnect);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(this.Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess)
                 {
                     sStatus = "Open DB Error=" + dba.FormatErrorText() + "; STAGE=" + sStage;
                 }
-                int lWResID;
-
-                string s = WebAdmin.GetSPSessionString(this.Context, "WResID");
-                if (Int32.TryParse(s, out lWResID) == true)
+                if (dbaGeneral.CheckUserGlobalPermission(dba, GlobalPermissionsEnum.gpEditCostType) == false)
                 {
-                    if (WebAdmin.CheckUserGlobalPermission(dba, lWResID, GlobalPermissionsEnum.gpEditCostType) == false)
-                    {
-                        sStatus = "You do not have permission to view cost plan";
-                    }
+                    sStatus = "You do not have permission to view cost plan";
                 }
                 dba.Close();
             }
             else
                 sStatus = "AuthenticateUserAndProduct failed STAGE=" + sStage;
-
-            //try
-            //{
-            //    SPUser user = SPContext.Current.Web.CurrentUser;
-            //    sStatus += "; User=" + user.Name;
-            //}
-            //catch
-            //{
-            //    sStatus += "; exception";
-            //}
             return sStatus;
         }
 
@@ -93,9 +76,9 @@ namespace WorkEnginePPM
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                DBAccess dba = new DBAccess(sDBConnect);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(this.Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
                 DataTable dt;
                 if (dbaEditCosts.SelectPIs(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
@@ -124,9 +107,9 @@ Status_Error:
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                DBAccess dba = new DBAccess(sDBConnect);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
                 DataTable dt;
                 if (dbaEditCosts.SelectViews(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
@@ -159,9 +142,9 @@ Status_Error:
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                DBAccess dba = new DBAccess(sDBConnect);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
 
                 List<CostType> costTypesTemp = new List<CostType>();
@@ -182,12 +165,10 @@ Status_Error:
                         costTypesTemp.Add(costType);
                     }
 
-                    int lWResId;
-                    Int32.TryParse(WebAdmin.GetSPSessionString(Context, "WResID"), out lWResId);
                     // check if any CT security. If none at all then add otherwise check read and edit
                     foreach (CostType costType2 in costTypesTemp)
                     {
-                        if (CheckCostTypeSecurity(dba, lWResId, costType2) == true)
+                        if (dbaEditCosts.CheckCostTypeSecurity(dba, costType2.Id, ref costType2.EditMode) == true)
                             costTypes.Add(costType2);
                     }
                 }
@@ -195,56 +176,6 @@ Status_Error:
                 dba.Close();
             }
             return costTypes;
-        }
-
-        private bool CheckCostTypeSecurity(DBAccess dba, int lWResId, CostType costtype)
-        {
-            // check, and if required, modify CT edit/read security
-            bool bAdd = true;
-            if (lWResId != 1)
-            {
-                string sCommand =
-                    "SELECT COUNT(*) as nCount FROM EPGP_DATA_SECURITY WHERE DS_CONTEXT=2 AND DS_UID = " +
-                    costtype.Id.ToString(CultureInfo.InvariantCulture);
-                SqlCommand oCommand = new SqlCommand(sCommand, dba.Connection);
-                SqlDataReader reader = oCommand.ExecuteReader();
-                if (reader.Read() == true)
-                {
-                    int nCount = DBAccess.ReadIntValue(reader["nCount"]);
-                    reader.Close();
-                    if (nCount > 0)
-                    {
-                        sCommand =
-                            "SELECT SUM(DS_READ) AS CanRead, SUM(DS_EDIT) as CanEdit FROM EPGP_DATA_SECURITY WHERE DS_CONTEXT=2 AND DS_UID = " +
-                            costtype.Id.ToString(CultureInfo.InvariantCulture) + " AND GROUP_ID IN (select GROUP_ID from EPG_GROUP_MEMBERS where MEMBER_UID = " + lWResId.ToString(CultureInfo.InvariantCulture) + ")";
-                        oCommand = new SqlCommand(sCommand, dba.Connection);
-                        reader = oCommand.ExecuteReader();
-                        if (reader.Read() == true)
-                        {
-                            bool bIsNullRead;
-                            bool bIsNullEdit;
-                            int nCanRead = DBAccess.ReadIntValue(reader["CanRead"], out bIsNullRead);
-                            int nCanEdit = DBAccess.ReadIntValue(reader["CanEdit"], out bIsNullEdit);
-                            if ((bIsNullRead && bIsNullEdit) == false)
-                            {
-                                if (nCanEdit <= 0)
-                                {
-                                    if (nCanRead > 0)
-                                        costtype.EditMode = 0; // make sure only read perm at this point
-                                    else
-                                        bAdd = false;
-                                }
-                            }
-                            else
-                            {
-                                bAdd = false;
-                            }
-                        }
-                        reader.Close();
-                    }
-                }
-            }
-            return bAdd;
         }
 
         /// <summary>
@@ -259,9 +190,9 @@ Status_Error:
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                DBAccess dba = new DBAccess(sDBConnect);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
 
                 {
@@ -298,9 +229,9 @@ Status_Error:
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                DBAccess dba = new DBAccess(sDBConnect);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Exit_Function;
 
                 if (nViewUID > 0)
@@ -350,18 +281,15 @@ Exit_Function:
         [WebMethod(EnableSession = true)]
         public string CheckInPI(int Projectid, string Wepid)
         {
-            //string sStatus = "";
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                DBAccess dba = new DBAccess(sDBConnect);
-                dba.UserWResID = vb.val(WebAdmin.GetSPSessionString(Context, "WResID"));
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Exit_Function;
                 if (Projectid == 0 && Wepid != "")
                 {
-                    // convert wepid to ProjectID
                     if (dbaEditCosts.SelectProjectIDByExtUID(dba, Wepid, out Projectid) != StatusEnum.rsSuccess)
                         return "";
                 }
@@ -375,8 +303,6 @@ Exit_Function:
 Exit_Function:
                 dba.Close();
             }
-            //else
-            //    sStatus = "AuthenticateUserAndProduct failed STAGE=" + sStage;
 
             return "";
         }
@@ -414,19 +340,15 @@ Exit_Function:
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                dba = new DBAccess(sDBConnect);
-                dba.UserWResID = vb.val(WebAdmin.GetSPSessionString(Context, "WResID"));
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
 
                 CostType costType;
                 if (GetCostType(dba, Costtypeid, out costType) != StatusEnum.rsSuccess) goto Status_Error;
 
-                // check if any CT security. If none at all then add otherwise check read and edit
-                int lWResId;
-                Int32.TryParse(WebAdmin.GetSPSessionString(Context, "WResID"), out lWResId);
-                CheckCostTypeSecurity(dba, lWResId, costType);
+                dbaEditCosts.CheckCostTypeSecurity(dba, costType.Id, ref costType.EditMode);
 
                 DateTime dtStatusDate;
                 {
@@ -482,27 +404,17 @@ Exit_Function:
 
                 if (Projectid == 0 && Wepid != "")
                 {
-                    // convert wepid to ProjectID
                     if (dbaEditCosts.SelectProjectIDByExtUID(dba, Wepid, out Projectid) != StatusEnum.rsSuccess) goto Status_Error;
                 }
 
-                string sCommand = "SELECT PROJECT_START_DATE,PROJECT_FINISH_DATE FROM EPGP_PROJECTS WHERE PROJECT_ID = " + Projectid.ToString("0");
-                SqlCommand oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
-                SqlDataReader reader = oCommand.ExecuteReader();
+                DateTime dtStart;
+                DateTime dtFinish;
+                if (dbaEditCosts.GetProjectInfo(dba, Projectid, out dtStart, out dtFinish) != StatusEnum.rsSuccess) goto Status_Error;
 
                 int lStartPeriod = 0;
                 int lFinishPeriod = 0;
-                if (reader.Read() == true)
-                {
-                    bool bNull;
-                    DateTime dt = DBAccess.ReadDateValue(reader["PROJECT_START_DATE"], out bNull);
-                    if (!bNull)
-                        ConvertDateToPeriod(periods, dt, out lStartPeriod);
-
-                    dt = DBAccess.ReadDateValue(reader["PROJECT_FINISH_DATE"], out bNull);
-                    ConvertDateToPeriod(periods, dt, out lFinishPeriod);
-                    reader.Close();
-                }
+                ConvertDateToPeriod(periods, dtStart, out lStartPeriod);
+                ConvertDateToPeriod(periods, dtFinish, out lFinishPeriod);
 
 
                 string sCheckedoutDetails = "";
@@ -523,9 +435,6 @@ Exit_Function:
                 switch (costType.EditMode)
                 {
                     case 1:     // editable
-                        //bool bEditable = true; // only editable if CT calendar is same as view calendar or view calendar = -1
-                        //if (costType.CalendarId != nCalendarID && nCalendarID != -1) 
-                        //    bEditable = false;
                         bool bEditable = !(costType.CalendarId != nCalendarID && costType.CalendarId != -1);
                         if (Trycheckout != 0 && bEditable == true)
                         {
@@ -583,8 +492,6 @@ Status_Error:
                 bCheckedOut = (nRowsAffected == 1) ? true : false;
                 if (bCheckedOut == false)
                 {
-                    // this user hasn't been able to check out PI - so find out who has it
-                    //                "SELECT PROJECT_CHECKEDOUT,PROJECT_CHECKEDOUT_BY, PROJECT_CHECKEDOUT_DATE, EPG_RESOURCES.RES_NAME" +
                     DataTable dt;
                     if (dbaEditCosts.SelectPIDetails(dba, Projectid, out dt) != StatusEnum.rsSuccess)
                         return dba.Status;
@@ -817,15 +724,14 @@ Status_Error:
             if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
             {
                 string sXML = "";
-                string sDBConnect = WebAdmin.GetConnectionString(Context);
-
-                dba = new DBAccess(sDBConnect);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                dba = da.dba;
 
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
 
                 if (nProjectID == 0 && Wepid != "")
                 {
-                    // convert wepid to ProjectID
                     if (dbaEditCosts.SelectProjectIDByExtUID(dba, Wepid, out nProjectID) != StatusEnum.rsSuccess) goto Status_Error;
                 }
 
@@ -995,9 +901,6 @@ Status_Error:
                         costCategory.CustomTextValues[i] = DBAccess.ReadStringValue(row["TEXT_0" + si]);
                     }
 
-                    //costCategory.Status = 1; //DBAccess.ReadIntValue(reader["BC_STATUS"]);
-                    //if (costCategory.Status == 1)
-                    //    bNoStatusRows = false;
                     costCategories.Add(costCategory);
                     prev_bcuid = bcuid;
                 }
@@ -1390,20 +1293,6 @@ Status_Error:
             return dba.Status;
         }
 
-
-        //private void FlattenList(CStruct xParent, ref List<CStruct> listFlatI)
-        //{
-        //    List<CStruct> listI = xParent.GetList("I");
-        //    if (listI.Count > 0)
-        //    {
-        //        foreach (CStruct xI in listI)
-        //        {
-        //            listFlatI.Add(xI);
-        //            FlattenList(xI, ref listFlatI);
-        //        }
-        //    }
-        //}
-
         private void BuildWritableList(CStruct xB, List<CStruct> listI)
         {
             List<CStruct> list = xB.GetList("I");
@@ -1496,8 +1385,9 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public string SaveEditCostsData(string sData, int Projectid, int Costtypeid, string Viewuid, string Wepid)
         {
-            string sDBConnect = WebAdmin.GetConnectionString(Context);
-            DBAccess dba = new DBAccess(sDBConnect);
+            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            DataAccess da = new DataAccess(sBaseInfo);
+            DBAccess dba = da.dba;
 
             int nViewUID;
             Int32.TryParse(Viewuid, out nViewUID);
@@ -1902,58 +1792,20 @@ Exit_Function:
                 {
                     Integration weInt = new Integration();
                     xNode = weInt.execute(sContext, sXMLRequest);
-                    WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "EditCosts.SendXMLToWorkEngine", "WE Request", "Context=" + sContext + "; URL=" + sURL, sXMLRequest);
+                    dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "EditCosts.SendXMLToWorkEngine", "WE Request", "Context=" + sContext + "; URL=" + sURL, sXMLRequest);
                     if (xNode != null)
-                        WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "EditCosts.SendXMLToWorkEngine", "WE Reply", "Context=" + sContext + "; URL=" + sURL, xNode.OuterXml);
+                        dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "EditCosts.SendXMLToWorkEngine", "WE Reply", "Context=" + sContext + "; URL=" + sURL, xNode.OuterXml);
                 }
                 catch (Exception ex)
                 {
                     dba.Status = (StatusEnum)99830;
                     dba.StatusText = ex.Message;
                     dba.StackTrace = ex.StackTrace;
-                    WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "EditCosts.SendXMLToWorkEngine", "Exception", ex.Message, ex.StackTrace);
+                    dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "EditCosts.SendXMLToWorkEngine", "Exception", ex.Message, ex.StackTrace);
                 }
             }
             return dba.Status;
         }
-
-        ///// <summary>
-        ///// Gets the list of PIs
-        ///// </summary>
-        ///// <param name="Viewuid"></param>
-        ///// <returns>list of PIs</returns>
-//        [WebMethod(EnableSession = true)]
-//        public List<LookupItem> GetLookup(int lookupUID)
-//        {
-//            List<LookupItem> items = new List<LookupItem>();
-//            string sStage;
-//            if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
-//            {
-//                string sDBConnect = WebAdmin.GetConnectionString(this.Context);
-
-//                DBAccess dba = new DBAccess(sDBConnect);
-//                if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
-//                //DataTable dt;
-//                //if (dbaEditCosts.SelectPIs(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
-
-//                //PI pi = null;
-//                //foreach (DataRow row in dt.Rows)
-//                //{
-//                //    pi = new PI();
-//                //    pi.Id = DBAccess.ReadIntValue(row["PROJECT_ID"]);
-//                //    pi.Name = DBAccess.ReadStringValue(row["PROJECT_NAME"]);
-//                //    pis.Add(pi);
-//                //}
-//                LookupItem item;
-//                item = new LookupItem(); item.Uid = 1; item.Level = 1; item.Name = "Item1"; items.Add(item);
-//                item = new LookupItem(); item.Uid = 2; item.Level = 2; item.Name = "Item1.1"; items.Add(item);
-//                item = new LookupItem(); item.Uid = 3; item.Level = 2; item.Name = "Item1.2"; items.Add(item);
-
-//Status_Error:
-//                dba.Close();
-//            }
-//            return items;
-//        }
 
         private static string EncodeIdAndSeq(int id, int seq)
         {
@@ -2034,20 +1886,6 @@ Exit_Function:
             public int Operation;
         }
 
-        //public class LookupItem
-        //{
-        //    public int Id;
-        //    public string Name;
-        //    public int Level;
-        //}
-
-        //public class NamedRateItem
-        //{
-        //    public int Id;
-        //    public string Name;
-        //    public int Level;
-        //}
-
         public class NamedRateValue
         {
             public int Id;
@@ -2107,7 +1945,6 @@ Exit_Function:
             public bool InitializeGridLayout(int CostTypeId, int FTEMode, bool bEditable, string sCheckedoutDetails, int lStartPeriod, int lFinishPeriod)
             {
                 m_nFTEMode = FTEMode;
-                //m_bFirstPeriod = true;
                 xGrid = new CStruct();
                 xGrid.Initialize("Grid");
 
@@ -2208,8 +2045,6 @@ Exit_Function:
                 m_xDSummaryRow = xDef.CreateSubStruct("D");
                 m_xDSummaryRow.CreateStringAttr("Name", "Summary");
                 //m_xDSummaryRow.CreateStringAttr("Calculated", "1");
-
-
                 return true;
             }
 
@@ -2336,7 +2171,8 @@ Exit_Function:
                 xC.CreateStringAttr("Name", "C" + sId);
                 xC.CreateStringAttr("Type", "Float");
                 xC.CreateStringAttr("EditFormat", "0.##");
-                xC.CreateStringAttr("Format", ",0.##;<span style='color:red;'>-,0.##</span>;");
+                //xC.CreateStringAttr("Format", ",0.##;<span style='color:red;'>-,0.##</span>;");
+                xC.CreateStringAttr("Format", ",0;<span style='color:red;'>-,0</span>;");
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("MinWidth", 50);
                 xC.CreateIntAttr("Width", 70);
@@ -2383,7 +2219,8 @@ Exit_Function:
                 xC.CreateStringAttr("Name", "TC");
                 xC.CreateStringAttr("Type", "Float");
                 //xC.CreateStringAttr("Formula", m_sCFormula);
-                xC.CreateStringAttr("Format", ",#.##;<span style='color:red;'>-,#.##</span>;");
+                //xC.CreateStringAttr("Format", ",#.##;<span style='color:red;'>-,#.##</span>;");
+                xC.CreateStringAttr("Format", ",#;<span style='color:red;'>-,#</span>;");
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("MinWidth", 25);
                 xC.CreateIntAttr("Width", 90);

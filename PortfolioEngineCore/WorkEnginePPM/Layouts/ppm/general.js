@@ -6,6 +6,10 @@
         }
     }
 
+    StringBuilder.prototype.appendLine = function (value) {
+        this.strings.push(value + "\n");
+    }
+
     StringBuilder.prototype.clear = function () {
         this.strings.length = 1;
     }

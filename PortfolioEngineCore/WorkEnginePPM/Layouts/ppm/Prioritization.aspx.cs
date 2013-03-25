@@ -3,27 +3,28 @@ using System.Collections.Generic;
 using System.Data;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint.WebControls;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {
-    public class ComponentWeight
-    {
-        public int ScenarioId;
-        public int ComponentId;
-        public double Weight;
-    }
+    //public class ComponentWeight
+    //{
+    //    public int ScenarioId;
+    //    public int ComponentId;
+    //    public double Weight;
+    //}
 
-    public class EPKPriFormula
-    {
-        public int uid;
-        public string name;
-        public List<ComponentWeight> components;
+    //public class EPKPriFormula
+    //{
+    //    public int uid;
+    //    public string name;
+    //    public List<ComponentWeight> components;
 
-        public EPKPriFormula()
-        {
-            components = new List<ComponentWeight>();
-        }
-    }
+    //    public EPKPriFormula()
+    //    {
+    //        components = new List<ComponentWeight>();
+    //    }
+    //}
 
     public partial class Prioritization : LayoutsPageBase
     {
@@ -56,10 +57,14 @@ namespace WorkEnginePPM
                 buttonbar1.AddButton("btnSave", "<u>S</u>ave", "", "images/save.gif", "alt text", "7em", "s", true);
                 buttonbar1.Render();
 
-                string basePath = WebAdmin.GetBasePath();
-                //hiddenData.Value = basePath;
-                string sDBConnect = WebAdmin.GetConnectionString(basePath);
-                dba = new DBAccess(sDBConnect);
+                //string basePath = WebAdmin.GetBasePath();
+                ////hiddenData.Value = basePath;
+                //string sDBConnect = WebAdmin.GetConnectionString(basePath);
+                //dba = new DBAccess(sDBConnect);
+                //if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo);
+                dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
                 DataTable dt;
 

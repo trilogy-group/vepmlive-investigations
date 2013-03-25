@@ -1752,11 +1752,6 @@
 							},
 							{
 							    items: [
-									{ type: "bigbutton", id: "idEditRes", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }
-								]
-							},
-							{
-							    items: [
 									{ type: "bigbutton", id: "idSaveScenario", name: "Save<br/>Scenario", img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
 								]
 							},
@@ -1803,6 +1798,9 @@
 	        var cbProp = { type: "mediumtext", id: "chkRequests", name: "Show Proposed Work", tooltip: "Show Proposed Work", onclick: "dialogEvent('AnalyzerTab_chkRequests_Click');" };
 	        var cbReq = { type: "mediumtext", id: "chkOpenRequests", name: "Show Open Requirements", tooltip: "Show Open Requirements", onclick: "dialogEvent('AnalyzerTab_chkOpenRequests_Click');" };
 	        var cbNW = { type: "mediumtext", id: "chkNonWork", name: "Show Personal Time Off", tooltip: "Show Personal Time Off", onclick: "dialogEvent('AnalyzerTab_chkNonWork_Click');" };
+
+
+
 
 	        var sections = analyzerTabData.sections;
 	        var columns = null;
@@ -1860,11 +1858,6 @@
 							{
 							    items: [
 									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
-								]
-							},
-							{
-							    items: [
-									{ type: "bigbutton", id: "idEditRes1", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }
 								]
 							},
 							{
@@ -1945,6 +1938,37 @@
 				]
 	        };
 
+	        var bbEditRes = { items: [{ type: "bigbutton", id: "idEditRes", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');"}] };
+	        var bbEditRes1 = { items: [{ type: "bigbutton", id: "idEditRes1", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');"}] };
+
+	        if (this.params.RPEMode != 1) {
+	            sections = analyzerTabData.sections;
+
+	            for (var xi = 0; xi < sections.length - 1; xi++) {
+	                if (sections[xi].name == "Actions") {
+	                    columns = sections[xi].columns;
+	                    break;
+	                }
+	            }
+
+	            columns[4] = columns[3];
+	            columns[3] = columns[2];
+	            columns[2] = bbEditRes;
+
+	            sections = viewTabData.sections;
+
+	            for (var xi = 0; xi < sections.length - 1; xi++) {
+	                if (sections[xi].name == "Actions") {
+	                    columns = sections[xi].columns;
+	                    break;
+	                }
+	            }
+
+	            columns[3] = columns[2];
+	            columns[2] = columns[1];
+	            columns[1] = bbEditRes1;
+
+	        }
 
 	        var BottomTabData = {
 	            parent: "idBottomTabDiv",
@@ -2060,7 +2084,13 @@
 	        this.Tabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
 
 	        this.analyzerTab = new Ribbon(analyzerTabData);
+
+
 	        this.analyzerTab.Render();
+
+
+
+
 	        this.viewTab = new Ribbon(viewTabData);
 	        this.viewTab.Render();
 
@@ -5235,6 +5265,10 @@
 	                return;
 
 	            case "EditResPlan":
+
+	                if (this.params.RPEMode == 1)
+	                    break;
+	                
 	                this.EditResPlan();
 	                break;
 

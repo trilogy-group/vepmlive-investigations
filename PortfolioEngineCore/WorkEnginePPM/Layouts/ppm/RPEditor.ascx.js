@@ -183,6 +183,12 @@
                 case "GetImportCostPlanHours":
                     this.ApplyCostValues(result.CostValues);
                     break;
+                case "CreateTicket":
+                    var docurl = document.location.pathname.replace("rpeditor", "rpanalyzer");
+                    var weburl = docurl + "?dataid=" + result.Ticket + "&IsDlg=1&rpemode=1";
+                    var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: dialogCallbackDelegate };
+                    SP.UI.ModalDialog.showModalDialog(options);
+                    break;
                 default:
                     alert("ExecuteComplete unknown reply - " + jsonString);
                     break;
@@ -887,6 +893,11 @@
                                 items: [
                                     { type: "bigbutton", id: "ResAddBtn", name: "Add", img: "add.png", tooltip: "Add Resource", onclick: "dialogEvent('ResourcesTab_Add');", disabled: true }
                                 ]
+                            },
+                            {
+                                items: [
+                                    { type: "bigbutton", id: "ResAnalyzeBtn", name: "Analyze", img: "formatmap32x32.png", style: "top: -256px; left: -192px;position:relative;z-index:5;", tooltip: "Ananlyze", onclick: "dialogEvent('ResourcesTab_Analyze');", disabled: true }
+                                ]
                             }
                         ]
                     },
@@ -1001,7 +1012,7 @@
             this.planTabbar.setTabActive("tab_Editor");
 
             this.layout_plan.cells(const_PlanGridCell).attachObject("gridDiv_RPE");
-            
+
 
             var grid = Grids["g_RPE"];
             if (grid == null) {
@@ -1419,10 +1430,10 @@
                         if (resrow.Kind === 'Data')
                             rows[rows.length++] = resrow;
                     }
-                     if (rows.length > 0) {
-                         window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(torow, "ItemName"); }, 10);
-                         this.HandleAddSplitOrReplace(rows, torow, false);
-                     } 
+                    if (rows.length > 0) {
+                        window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(torow, "ItemName"); }, 10);
+                        this.HandleAddSplitOrReplace(rows, torow, false);
+                    }
                 }
             }
         }
@@ -1598,7 +1609,7 @@
             }
         }
         grid.SetAttribute(row, null, "Changed", 1, 0, 0);
-        if (status == const_Requirement) 
+        if (status == const_Requirement)
             this.CalculateRequirementCellValue(row, sId, 0);
     };
     RPEditor.prototype.FormatHours = function (grid, row, col, bFulfillmentMode, bEditMode) {
@@ -1727,18 +1738,18 @@
             var status = grid.GetAttribute(row, null, "Status");
             if (status != const_Project) {
                 switch (this.displayMode) {
-                case 0: // Hours
-                    sValue = this.FormatHours(grid, row, col, bFulfillmentMode, bEditMode);
-                    break;
-                case 1: // FTE 
-                    sValue = this.FormatFTE(grid, row, col, bFulfillmentMode, bEditMode);
-                    break;
-                case 2: // FTE %
-                    sValue = this.FormatFTEPct(grid, row, col, bFulfillmentMode, bEditMode);
-                    break;
-                case 3: // FTE conversion
-                    sValue = this.FormatFTEConv(grid, row, col);
-                    break;
+                    case 0: // Hours
+                        sValue = this.FormatHours(grid, row, col, bFulfillmentMode, bEditMode);
+                        break;
+                    case 1: // FTE 
+                        sValue = this.FormatFTE(grid, row, col, bFulfillmentMode, bEditMode);
+                        break;
+                    case 2: // FTE %
+                        sValue = this.FormatFTEPct(grid, row, col, bFulfillmentMode, bEditMode);
+                        break;
+                    case 3: // FTE conversion
+                        sValue = this.FormatFTEConv(grid, row, col);
+                        break;
                 }
             }
         }
@@ -1802,8 +1813,8 @@
             }
         }
         return snewVal;
-    }; 
-    RPEditor.prototype.round = function(number, precision) {
+    };
+    RPEditor.prototype.round = function (number, precision) {
         precision = Math.abs(parseInt(precision)) || 0;
         var coefficient = Math.pow(10, precision);
         return Math.round(number * coefficient) / coefficient;
@@ -1949,8 +1960,8 @@
                 plangrid.SetAttribute(childplanrow, null, "CCRoleParent_UID", ccroleParentUid, 0, 0);
                 plangrid.SetAttribute(childplanrow, null, "Role_UID", roleUid, 0, 0);
                 plangrid.SetAttribute(childplanrow, null, "Dept_UID", deptUid, 0, 0);
-                plangrid.SetAttribute(childplanrow, null, "PendingRes_UID", wresId, 0, 0);
-                plangrid.SetAttribute(childplanrow, null, "PendingRes_Name", resName, 0, 0);
+                plangrid.SetAttribute(childplanrow, "PendingRes_UID", null, wresId, 0, 0);
+                plangrid.SetAttribute(childplanrow, "PendingRes_Name", null, resName, 0, 0);
 
                 plangrid.SetValue(childplanrow, "Project_Name", projectName, 1);
                 plangrid.SetValue(childplanrow, "CCRole_Name", ccroleName, 1);
@@ -2150,39 +2161,42 @@
             row = grid.GetNext(row);
         }
     };
-    RPEditor.prototype.findPos = function (el) {
-        for (var lx = 0, ly = 0;
-         el != null;
-         lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
-        return { x: lx, y: ly };
+    RPEditor.prototype.OnResizeInternal = function (event) {
+        try {
+            var body = document.body;
+            this.Width = body.offsetWidth;
+            this.Height = body.offsetHeight - 5;
+            this.OnResize();
+            if (this.initialized == true)
+                this.GridsOnSectionResize(this.plangrid, 2, 0);
+        }
+        catch (e) {
+            this.HandleException("OnResizeInternal", e);
+        }
     };
     RPEditor.prototype.OnResize = function (event) {
-        var lHeight = this.Height;
-        var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
-        if (lHeight > 300) {
-            divLayout.style.height = (lHeight - 12) + "px";
-        }
-        var lWidth = this.Width;
-        if (lWidth > 300) {
-            divLayout.style.width = lWidth + "px";
-        }
+        try {
+            var lHeight = this.Height;
+            var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
+            if (lHeight > 300) {
+                divLayout.style.height = lHeight + "px";
+            }
+            var lWidth = this.Width;
+            if (lWidth > 300) {
+                divLayout.style.width = lWidth + "px";
+            }
 
-        if (this.layout != null) {
-            this.layout.cont.obj._offsetTop = 0;
-            this.layout.cont.obj._offsetHeight = 0;
-            this.layout.cont.obj._offsetLeft = 0;
-            this.layout.cont.obj._offsetWidth = 0;
-            this.layout.setSizes();
+            if (this.layout != null) {
+                this.layout.cont.obj._offsetTop = 0;
+                this.layout.cont.obj._offsetHeight = 0;
+                this.layout.cont.obj._offsetLeft = 0;
+                this.layout.cont.obj._offsetWidth = 0;
+                this.layout.setSizes();
+            }
         }
-    };
-    RPEditor.prototype.SetSize = function (nWidth, nHeight) {
-        var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
-        var pos = this.findPos(divLayout);
-        this.Width = nWidth - pos.x;
-        this.Height = nHeight - pos.y;
-        this.OnResize();
-        if (this.initialized == true)
-            this.GridsOnSectionResize(this.plangrid, 2, 0);
+        catch (e) {
+            this.HandleException("OnResize", e);
+        }
     };
     RPEditor.prototype.SavePlan = function (bChangePrivateToPublic) {
         //document.body.style.cursor = 'wait';
@@ -2328,6 +2342,11 @@
         catch (e) {
             this.HandleException("CommitPlanRow - " + event, e);
         }
+    };
+    RPEditor.prototype.dialogCallback = function (dialogResult, returnValue) {
+//        if (dialogResult) {
+//            window.location.href = window.location.href;
+//        }
     };
     RPEditor.prototype.externalEvent = function (event) {
         try {
@@ -2614,6 +2633,20 @@
                     } else {
                         var rows = this.GetSelDataRows(this.resgrid);
                         this.HandleAddSplitOrReplace(rows, this.planrow, true);
+                    }
+                    break;
+                case "ResourcesTab_Analyze":
+                    if (this.resourcesTab.isItemDisabled("ResAnalyzeBtn") == true) {
+                        var resrows = this.GetSelDataRows(this.resgrid);
+                        if (resrows == null || resrows.length == 0)
+                            alert("One or more candidate rows must be selected");
+                    } else {
+                        var resuids = this.GetSelectedCandidateUids(this.resgrid);
+                        var sb = new StringBuilder();
+                        sb.append('<Execute Function="CreateTicket" Context="ResourceAnalyzer">');
+                        sb.append('<Data>' + resuids + '</Data>');
+                        sb.append('</Execute>');
+                        this.ExecuteJSON(sb.toString(), "GeneralFunctions");
                     }
                     break;
                 case "ResourcesTab_Match":
@@ -3203,16 +3236,16 @@
             if (html == null) html = "";
             el.innerHTML = html;
             dhxLayout.cells("a").attachObject(el);
-//            var title = this.plangrid.GetAttribute(planrow, null, "RowEventTitle");
-//            if (title == null)
-//                dhxLayout.cells("b").setText("Type below to add a comment");
-//            else
-//                dhxLayout.cells("b").setText("Pending Notification : " + title);
-//            this.noteEditor = dhxLayout.cells("b").attachEditor();
-//            var html = this.plangrid.GetAttribute(planrow, null, "RowEventHtml");
-//            if (html == null) html = "";
-//            this.noteEditor.setContent(html);
-//            this.noteEditor.init();
+            //            var title = this.plangrid.GetAttribute(planrow, null, "RowEventTitle");
+            //            if (title == null)
+            //                dhxLayout.cells("b").setText("Type below to add a comment");
+            //            else
+            //                dhxLayout.cells("b").setText("Pending Notification : " + title);
+            //            this.noteEditor = dhxLayout.cells("b").attachEditor();
+            //            var html = this.plangrid.GetAttribute(planrow, null, "RowEventHtml");
+            //            if (html == null) html = "";
+            //            this.noteEditor.setContent(html);
+            //            this.noteEditor.init();
             dlg.show();
             window.setTimeout("var el=document.getElementById('idDivRowEventsHtml'); el.scrollTop = el.scrollHeight;", 200);
         }
@@ -3481,7 +3514,7 @@
         var bFilter = this.resourcesTab.getButtonState("idResourcesTab_ShowFilters");
         var bGrouping = this.resourcesTab.getButtonState("idResourcesTab_ShowGrouping");
 
-        
+
 
         var sResGrid = this.BuildGridInf("g_Res", bFilter, bGrouping);
 
@@ -3673,6 +3706,20 @@
         }
         return selrows;
     };
+    RPEditor.prototype.GetSelectedCandidateUids = function (resgrid) {
+        var s = "";
+        var rows = resgrid.GetSelRows();
+        if (rows == null || rows.length == 0)
+            return s;
+        for (var r = 0; r < rows.length; r++) {
+            var resrow = rows[r];
+            if (resrow.Kind == "Data") {
+                if (s != "") s += ",";
+                s += resgrid.GetAttribute(resrow, null, "Res_UID");
+            }
+        }
+        return s;
+    };
     RPEditor.prototype.CanDelete = function (grid, row) {
         if (this.NegotiationMode != true) return true;
         if (grid.GetAttribute(row, null, "Private") == 1) return true;
@@ -3859,6 +3906,12 @@
         }
         else {
             this.resourcesTab.disableItem("ResAddBtn");
+        }
+        if (resrows != null && resrows.length > 0) {
+            this.resourcesTab.enableItem("ResAnalyzeBtn");
+        }
+        else {
+            this.resourcesTab.disableItem("ResAnalyzeBtn");
         }
     };
     RPEditor.prototype.InitialisePlanGrid = function () {
@@ -4150,30 +4203,30 @@
             sTip = "Private";
         } else {
             switch (status) {
-            case const_Requirement:
-                sClass = "rp-requirement";
-                break;
-            case const_Commitment:
-                if (activeCommitment == null)
-                    activeCommitment = grid.GetAttribute(row, null, "ActiveCommitment");
+                case const_Requirement:
+                    sClass = "rp-requirement";
+                    break;
+                case const_Commitment:
+                    if (activeCommitment == null)
+                        activeCommitment = grid.GetAttribute(row, null, "ActiveCommitment");
 
-                if (activeCommitment != 0) {
-                    if (this.HasPending(grid, row, 1)) {
-                        sClass = "rp-renegotiate";
-                        sTip = "Renegotiate";
+                    if (activeCommitment != 0) {
+                        if (this.HasPending(grid, row, 1)) {
+                            sClass = "rp-renegotiate";
+                            sTip = "Renegotiate";
+                        } else {
+                            sClass = "rp-commitment";
+                            sTip = "Active Commitment";
+                        }
                     } else {
-                        sClass = "rp-commitment";
-                        sTip = "Active Commitment";
+                        sClass = "rp-negotiate";
+                        sTip = "Negotiate";
                     }
-                } else {
-                    sClass = "rp-negotiate";
-                    sTip = "Negotiate";
-                }
-                break;
-            case const_CommitmentCancelled:
-                sClass = "rp-cancelled";
-                sTip = "Cancelled";
-                break;
+                    break;
+                case const_CommitmentCancelled:
+                    sClass = "rp-cancelled";
+                    sTip = "Cancelled";
+                    break;
             }
         }
         if (sClass != "") {
@@ -4384,7 +4437,7 @@
         }
         if (bRefresh == true) grid.RefreshRow(row);
     };
-    RPEditor.prototype.HandleAddSplitOrReplace = function (resrows, planrow,  buttonPress) {
+    RPEditor.prototype.HandleAddSplitOrReplace = function (resrows, planrow, buttonPress) {
         if (resrows == null || resrows.length == 0) {
             return;
         }
@@ -4798,7 +4851,7 @@
             alert("Match function requires a selected plan row with a role and a department");
             return;
         }
-        
+
         var plangrid = this.plangrid;
         var resgrid = this.resgrid;
         var planrow = this.planrow;
@@ -4884,7 +4937,7 @@
                                             hourssatisfied += requiredhours;
                                         }
                                         else {
-                                            if (remaininghours > 0) 
+                                            if (remaininghours > 0)
                                                 hourssatisfied += remaininghours;
                                         }
                                     }
@@ -4927,8 +4980,7 @@
         // Resource must have a cost category role
         var ccroleUid = resgrid.GetAttribute(resrow, null, "CCRole_UID");
         var planccroleUid = plangrid.GetAttribute(planrow, null, "CCRole_UID");
-        if (ccroleUid == null || ccroleUid == 0)
-        {
+        if (ccroleUid == null || ccroleUid == 0) {
             if (balert) {
                 alert("The selected resource does not have a valid cost category role");
             }
@@ -5114,9 +5166,11 @@
         var const_CommitmentCancelled = 512;
 
         var loadDelegate = MakeDelegate(this, this.OnLoad);
+        var resizeDelegate = MakeDelegate(this, this.OnResizeInternal);
         var beforeUnloadDelegate = MakeDelegate(this, this.OnBeforeUnload);
         var unloadDelegate = MakeDelegate(this, this.OnUnload);
         var ExecuteCompleteDelegate = MakeDelegate(this, this.ExecuteComplete);
+        var dialogCallbackDelegate = MakeDelegate(this, this.dialogCallback);
 
         var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
         var GridsOnFocusDelegate = MakeDelegate(this, this.GridsOnFocus);
@@ -5144,20 +5198,22 @@
         var GridsOnTipDelegate = MakeDelegate(this, this.GridsOnTip);
         var GridsOnDataSendDelegate = MakeDelegate(this, this.GridsOnDataSend);
         var GridsOnAfterColumnsChangedDelegate = MakeDelegate(this, this.GridsOnAfterColumnsChanged);
-        
+
         var dlg_OnCloseDelegate = MakeDelegate(this, this.dlg_OnClose);
-        
+
         var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);
-        
+
         if (document.addEventListener != null) { // e.g. Firefox
             window.addEventListener("load", loadDelegate, true);
             window.addEventListener("beforeunload", beforeUnloadDelegate, true);
             window.addEventListener("unload", unloadDelegate, true);
+            window.addEventListener("resize", resizeDelegate, true);
         }
         else { // e.g. IE
             window.attachEvent("onload", loadDelegate);
             window.attachEvent("onbeforeunload", beforeUnloadDelegate);
             window.attachEvent("onunload", unloadDelegate);
+            window.attachEvent("onresize", resizeDelegate);
         }
     }
     catch (e) {

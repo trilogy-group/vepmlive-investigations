@@ -100,11 +100,8 @@
     <Compile Include="Core\Entities\PersonalItem.cs" />
     <Compile Include="Core\Entities\Role.cs" />
     <Compile Include="Core\Entities\WorkSchedule.cs" />
-    <Compile Include="Core\LMR_IF.cs" />
     <Compile Include="Core\ResourceManagement\PFEResourceField.cs" />
     <Compile Include="Core\ResourceManagement\Utilities.cs" />
-    <Compile Include="CStruct.cs" />
-    <Compile Include="DBAccess.cs" />
     <Compile Include="Delegates\Delegates.cs" />
     <Compile Include="EditableFieldDisplay.cs" />
     <Compile Include="EPKIntegrationEvents.cs" />
@@ -143,6 +140,9 @@
     <Compile Include="Layouts\ppm\calendarform.aspx.designer.cs">
       <DependentUpon>calendarform.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\Calendars.ashx.cs">
+      <DependentUpon>Calendars.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Calendars.aspx.cs">
       <DependentUpon>Calendars.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -178,12 +178,22 @@
     <Compile Include="Layouts\ppm\costanalyzer.aspx.designer.cs">
       <DependentUpon>costanalyzer.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\CostCategories.ashx.cs">
+      <DependentUpon>CostCategories.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\CostCategories.aspx.cs">
       <DependentUpon>CostCategories.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategories.aspx.designer.cs">
       <DependentUpon>CostCategories.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\CostCategories_NAX.aspx.cs">
+      <DependentUpon>CostCategories_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\CostCategories_NAX.aspx.designer.cs">
+      <DependentUpon>CostCategories_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategoryRoles.aspx.cs">
       <DependentUpon>CostCategoryRoles.aspx</DependentUpon>
@@ -199,12 +209,32 @@
     <Compile Include="Layouts\ppm\costs.aspx.designer.cs">
       <DependentUpon>costs.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\CostTypeCustomFields.ashx.cs">
+      <DependentUpon>CostTypeCustomFields.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\CostTypeCustomFields.aspx.cs">
+      <DependentUpon>CostTypeCustomFields.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\CostTypeCustomFields.aspx.designer.cs">
+      <DependentUpon>CostTypeCustomFields.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\CostTypes.ashx.cs">
+      <DependentUpon>CostTypes.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Costtypes.aspx.cs">
       <DependentUpon>Costtypes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Costtypes.aspx.designer.cs">
       <DependentUpon>Costtypes.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\CostTypes_NAX.aspx.cs">
+      <DependentUpon>CostTypes_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\CostTypes_NAX.aspx.designer.cs">
+      <DependentUpon>CostTypes_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Costviews.aspx.cs">
       <DependentUpon>Costviews.aspx</DependentUpon>
@@ -219,6 +249,9 @@
     </Compile>
     <Compile Include="Layouts\ppm\CustomFieldForm.aspx.designer.cs">
       <DependentUpon>CustomFieldForm.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Customfields.ashx.cs">
+      <DependentUpon>Customfields.ashx</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Customfields.aspx.cs">
       <DependentUpon>Customfields.aspx</DependentUpon>
@@ -299,6 +332,9 @@
     <Compile Include="Layouts\ppm\grouppermissionform.aspx.designer.cs">
       <DependentUpon>grouppermissionform.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\GroupPermissions.ashx.cs">
+      <DependentUpon>GroupPermissions.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Grouppermissions.aspx.cs">
       <DependentUpon>Grouppermissions.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -355,6 +391,27 @@
     <Compile Include="Layouts\ppm\Models.aspx.designer.cs">
       <DependentUpon>Models.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\NoPerm.aspx.cs">
+      <DependentUpon>NoPerm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\NoPerm.aspx.designer.cs">
+      <DependentUpon>NoPerm.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Optimizer.ascx.cs">
+      <DependentUpon>Optimizer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Optimizer.ascx.designer.cs">
+      <DependentUpon>Optimizer.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\optimizer.aspx.cs">
+      <DependentUpon>optimizer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\optimizer.aspx.designer.cs">
+      <DependentUpon>optimizer.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\PageRequest.ashx.cs">
       <DependentUpon>PageRequest.ashx</DependentUpon>
     </Compile>
@@ -365,12 +422,22 @@
     <Compile Include="Layouts\ppm\Postcostoptions.aspx.designer.cs">
       <DependentUpon>Postcostoptions.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\PostCostValues.ashx.cs">
+      <DependentUpon>PostCostValues.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Postcostvalues.aspx.cs">
       <DependentUpon>Postcostvalues.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Postcostvalues.aspx.designer.cs">
       <DependentUpon>Postcostvalues.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\PostCostValues_NAX.aspx.cs">
+      <DependentUpon>PostCostValues_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\PostCostValues_NAX.aspx.designer.cs">
+      <DependentUpon>PostCostValues_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Prioritization.aspx.cs">
       <DependentUpon>Prioritization.aspx</DependentUpon>
@@ -379,7 +446,6 @@
     <Compile Include="Layouts\ppm\Prioritization.aspx.designer.cs">
       <DependentUpon>Prioritization.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\ppm\Prioritization.cs" />
     <Compile Include="Layouts\ppm\prioritize.aspx.cs">
       <DependentUpon>prioritize.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -401,12 +467,22 @@
     <Compile Include="Layouts\ppm\Pri_FormulasForm.aspx.designer.cs">
       <DependentUpon>Pri_FormulasForm.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\QueueManager.ashx.cs">
+      <DependentUpon>QueueManager.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Queuemanager.aspx.cs">
       <DependentUpon>Queuemanager.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Queuemanager.aspx.designer.cs">
       <DependentUpon>Queuemanager.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Queuemanager_NAX.aspx.cs">
+      <DependentUpon>Queuemanager_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Queuemanager_NAX.aspx.designer.cs">
+      <DependentUpon>Queuemanager_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Ratelist.aspx.cs">
       <DependentUpon>Ratelist.aspx</DependentUpon>
@@ -436,6 +512,13 @@
     <Compile Include="Layouts\ppm\RPAdmin.aspx.designer.cs">
       <DependentUpon>RPAdmin.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\RPAdmin_NAX.aspx.cs">
+      <DependentUpon>RPAdmin_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\RPAdmin_NAX.aspx.designer.cs">
+      <DependentUpon>RPAdmin_NAX.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\rpanalyzer.aspx.cs">
       <DependentUpon>rpanalyzer.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -443,12 +526,22 @@
     <Compile Include="Layouts\ppm\rpanalyzer.aspx.designer.cs">
       <DependentUpon>rpanalyzer.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\RPCustomFields.ashx.cs">
+      <DependentUpon>RPCustomFields.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\RPCustomfields.aspx.cs">
       <DependentUpon>RPCustomfields.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\RPCustomfields.aspx.designer.cs">
       <DependentUpon>RPCustomfields.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\RPCustomFields_NAX.aspx.cs">
+      <DependentUpon>RPCustomFields_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\RPCustomFields_NAX.aspx.designer.cs">
+      <DependentUpon>RPCustomFields_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\RPEditor.ascx.cs">
       <DependentUpon>RPEditor.ascx</DependentUpon>
@@ -534,12 +627,26 @@
     <Compile Include="Layouts\ppm\Tools\Buttonbar.ascx.designer.cs">
       <DependentUpon>Buttonbar.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\Tools\DGrid.ascx.cs">
+      <DependentUpon>DGrid.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Tools\DGrid.ascx.designer.cs">
+      <DependentUpon>DGrid.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Tools\Table.ascx.cs">
       <DependentUpon>Table.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Tools\Table.ascx.designer.cs">
       <DependentUpon>Table.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Tools\TGrid.ascx.cs">
+      <DependentUpon>TGrid.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Tools\TGrid.ascx.designer.cs">
+      <DependentUpon>TGrid.ascx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\upgradedb.aspx.cs">
       <DependentUpon>upgradedb.aspx</DependentUpon>
@@ -609,7 +716,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebServices\ModelCache.cs" />
-    <Compile Include="WebServices\PEClasses.cs" />
+    <Compile Include="WebServices\OptGrids.cs" />
+    <Compile Include="WebServices\Optimizer.asmx.cs">
+      <DependentUpon>Optimizer.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebServices\OptimizerDataCache.cs" />
     <Compile Include="WebServices\PortfolioEngine.asmx.cs">
       <DependentUpon>PortfolioEngine.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -639,9 +751,6 @@
     <None Include="Delegates\Delegates.webpart" />
     <None Include="Delegates\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ffa6f2ec-d7a8-4c6b-ad03-00f45c8c2bd6}</SharePointProjectItemId>
-    </None>
-    <None Include="DHTML\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{de5c5e48-71a2-4bc4-b947-151b88bcfc93}</SharePointProjectItemId>
     </None>
     <None Include="EPMLiveLists.snk" />
     <None Include="Events\DataSync\DepartmentSyncEvent\SharePointProjectItem.spdata">
@@ -674,10 +783,19 @@
     <None Include="Features\PFEEvents\PFEEvents.feature">
       <FeatureId>{7682a2aa-15ef-4e40-b49e-a6f8581d53c8}</FeatureId>
     </None>
+    <None Include="Layouts\ppm\Calendars.ashx" />
+    <None Include="Layouts\ppm\CostCategories.ashx" />
+    <None Include="Layouts\ppm\CostTypeCustomFields.ashx" />
+    <None Include="Layouts\ppm\CostTypes.ashx" />
+    <None Include="Layouts\ppm\Customfields.ashx" />
     <None Include="Layouts\ppm\DBARequest.ashx" />
     <None Include="Layouts\ppm\EPKCSRequest.ashx" />
     <None Include="Layouts\ppm\EPKRequest.ashx" />
+    <None Include="Layouts\ppm\GroupPermissions.ashx" />
     <None Include="Layouts\ppm\PageRequest.ashx" />
+    <None Include="Layouts\ppm\PostCostValues.ashx" />
+    <None Include="Layouts\ppm\QueueManager.ashx" />
+    <None Include="Layouts\ppm\RPCustomFields.ashx" />
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{baef277f-bfda-4978-ac17-78e4cab7f183}</SharePointProjectItemId>
     </None>
@@ -725,54 +843,6 @@
   <ItemGroup>
     <Content Include="CONTROLTEMPLATES\PFEResourcePermissionsField.ascx" />
     <Content Include="Delegates\Elements.xml" />
-    <Content Include="DHTML\windows\dhtmlxcommon.js" />
-    <Content Include="DHTML\windows\dhtmlxcontainer.js" />
-    <Content Include="DHTML\windows\dhtmlxwindows.css" />
-    <Content Include="DHTML\windows\dhtmlxwindows.js" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\active\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\active\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\active\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\active\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\buttons.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\inactive\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\inactive\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\inactive\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_black\inactive\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\active\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\active\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\active\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\active\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\buttons.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\inactive\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\inactive\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\inactive\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_blue\inactive\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\active\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\active\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\active\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\active\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\buttons.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_skyblue\statusbar_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\active\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\active\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\active\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\active\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\buttons.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\inactive\header_bg.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_blank.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_normal.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\inactive\progress.gif" />
-    <Content Include="DHTML\windows\imgs\dhxwins_dhx_web\statusbar_bg.gif" />
-    <Content Include="DHTML\windows\skins\dhtmlxwindows_dhx_black.css" />
-    <Content Include="DHTML\windows\skins\dhtmlxwindows_dhx_blue.css" />
-    <Content Include="DHTML\windows\skins\dhtmlxwindows_dhx_epm.css" />
-    <Content Include="DHTML\windows\skins\dhtmlxwindows_dhx_rpeditor.css" />
-    <Content Include="DHTML\windows\skins\dhtmlxwindows_dhx_skyblue.css" />
-    <Content Include="DHTML\windows\skins\dhtmlxwindows_dhx_web.css" />
     <Content Include="Events\DataSync\DepartmentSyncEvent\Elements.xml" />
     <Content Include="Events\DataSync\HolidayScheduleSyncEvent\Elements.xml" />
     <Content Include="Events\DataSync\HolidaySyncEvent\Elements.xml" />
@@ -787,6 +857,56 @@
     <Content Include="Features\PFEEvents\PFEEvents.Template.xml">
       <DependentUpon>PFEEvents.feature</DependentUpon>
     </Content>
+    <Content Include="Layouts\epmlive\DHTML\windows\dhtmlxcommon.js" />
+    <Content Include="Layouts\epmlive\DHTML\windows\dhtmlxcontainer.js" />
+    <Content Include="Layouts\epmlive\DHTML\windows\dhtmlxwindows.css" />
+    <Content Include="Layouts\epmlive\DHTML\windows\dhtmlxwindows.js" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\active\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\active\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\active\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\active\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\inactive\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\inactive\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\inactive\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_black\inactive\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\active\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\active\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\active\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\active\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\inactive\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\inactive\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\inactive\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_blue\inactive\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\active\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\active\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\active\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\active\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\inactive\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_skyblue\statusbar_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\header_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_blank.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_normal.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\progress.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\statusbar_bg.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\skins\dhtmlxwindows_dhx_admin.css" />
+    <Content Include="Layouts\epmlive\DHTML\windows\skins\dhtmlxwindows_dhx_black.css" />
+    <Content Include="Layouts\epmlive\DHTML\windows\skins\dhtmlxwindows_dhx_blue.css" />
+    <Content Include="Layouts\epmlive\DHTML\windows\skins\dhtmlxwindows_dhx_epm.css" />
+    <Content Include="Layouts\epmlive\DHTML\windows\skins\dhtmlxwindows_dhx_rpeditor.css" />
+    <Content Include="Layouts\epmlive\DHTML\windows\skins\dhtmlxwindows_dhx_skyblue.css" />
+    <Content Include="Layouts\epmlive\DHTML\windows\skins\dhtmlxwindows_dhx_web.css" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_dgrid.css" />
     <Content Include="Layouts\ppm\AddList.aspx" />
     <Content Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx" />
     <Content Include="Layouts\ppm\CAB\WE_Client.CAB" />
@@ -799,9 +919,12 @@
     <Content Include="Layouts\ppm\CostAnalyzer.ascx.js" />
     <Content Include="Layouts\ppm\costanalyzer.aspx" />
     <Content Include="Layouts\ppm\CostCategories.aspx" />
+    <Content Include="Layouts\ppm\CostCategories_NAX.aspx" />
     <Content Include="Layouts\ppm\CostCategoryRoles.aspx" />
     <Content Include="Layouts\ppm\costs.aspx" />
+    <Content Include="Layouts\ppm\CostTypeCustomFields.aspx" />
     <Content Include="Layouts\ppm\Costtypes.aspx" />
+    <Content Include="Layouts\ppm\CostTypes_NAX.aspx" />
     <Content Include="Layouts\ppm\Costviews.aspx" />
     <Content Include="Layouts\ppm\CustomFieldForm.aspx" />
     <Content Include="Layouts\ppm\Customfields.aspx" />
@@ -832,12 +955,14 @@
     <Content Include="Layouts\ppm\Images\Candidates.gif" />
     <Content Include="Layouts\ppm\Images\capscenariosl20x20.png" />
     <Content Include="Layouts\ppm\Images\categories.png" />
+    <Content Include="Layouts\ppm\Images\clearfilter.jpg" />
     <Content Include="Layouts\ppm\Images\clearsort.gif" />
     <Content Include="Layouts\ppm\Images\CLOSE.GIF" />
     <Content Include="Layouts\ppm\Images\close32.gif" />
     <Content Include="Layouts\ppm\Images\CollapseAll.gif" />
     <Content Include="Layouts\ppm\Images\Commitment.gif" />
     <Content Include="Layouts\ppm\Images\CommitmentCancelled.gif" />
+    <Content Include="Layouts\ppm\Images\configure.jpg" />
     <Content Include="Layouts\ppm\Images\Copy of formatmap16x16.png" />
     <Content Include="Layouts\ppm\Images\Copy of formatmap32x32.png" />
     <Content Include="Layouts\ppm\Images\CopyCostValues.gif" />
@@ -862,6 +987,8 @@
     <Content Include="Layouts\ppm\Images\Green.gif" />
     <Content Include="Layouts\ppm\Images\GridDet.gif" />
     <Content Include="Layouts\ppm\Images\grouping.gif" />
+    <Content Include="Layouts\ppm\Images\Heart.gif" />
+    <Content Include="Layouts\ppm\Images\HeartBroke.gif" />
     <Content Include="Layouts\ppm\Images\Help.gif" />
     <Content Include="Layouts\ppm\Images\import.png" />
     <Content Include="Layouts\ppm\Images\ImportHours.gif" />
@@ -876,6 +1003,7 @@
     <Content Include="Layouts\ppm\Images\Note32.png" />
     <Content Include="Layouts\ppm\Images\NoteMail.gif" />
     <Content Include="Layouts\ppm\Images\Offer.gif" />
+    <Content Include="Layouts\ppm\Images\optimizer.png" />
     <Content Include="Layouts\ppm\Images\PMApproved.gif" />
     <Content Include="Layouts\ppm\Images\PMRejected.gif" />
     <Content Include="Layouts\ppm\Images\Print.gif" />
@@ -916,6 +1044,11 @@
     <Content Include="Layouts\ppm\Images\Spread.gif" />
     <Content Include="Layouts\ppm\Images\Submit32.gif" />
     <Content Include="Layouts\ppm\Images\TotalColumnsl20x20.png" />
+    <Content Include="Layouts\ppm\Images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="Layouts\ppm\Images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="Layouts\ppm\Images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="Layouts\ppm\Images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="Layouts\ppm\Images\ui-icons_ef8c08_256x240.png" />
     <Content Include="Layouts\ppm\Images\UnsubmittedOffer.gif" />
     <Content Include="Layouts\ppm\Images\UnsubmittedRequest.gif" />
     <Content Include="Layouts\ppm\Images\ViewDefault.gif" />
@@ -930,13 +1063,21 @@
     <Content Include="Layouts\ppm\ModelExportExcel.aspx" />
     <Content Include="Layouts\ppm\Modelgrouping.aspx" />
     <Content Include="Layouts\ppm\Models.aspx" />
+    <Content Include="Layouts\ppm\NoPerm.aspx" />
+    <Content Include="Layouts\ppm\Optimizer.ascx" />
+    <Content Include="Layouts\ppm\Optimizer.ascx.css" />
+    <Content Include="Layouts\ppm\Optimizer.ascx.js" />
+    <Content Include="Layouts\ppm\optimizer.aspx" />
+    <Content Include="Layouts\ppm\Optimizer.js" />
     <Content Include="Layouts\ppm\Postcostoptions.aspx" />
     <Content Include="Layouts\ppm\Postcostvalues.aspx" />
+    <Content Include="Layouts\ppm\PostCostValues_NAX.aspx" />
     <Content Include="Layouts\ppm\Prioritization.aspx" />
     <Content Include="Layouts\ppm\prioritize.aspx" />
     <Content Include="Layouts\ppm\Pri_ComponentsForm.aspx" />
     <Content Include="Layouts\ppm\Pri_FormulasForm.aspx" />
     <Content Include="Layouts\ppm\Queuemanager.aspx" />
+    <Content Include="Layouts\ppm\Queuemanager_NAX.aspx" />
     <Content Include="Layouts\ppm\Ratelist.aspx" />
     <Content Include="Layouts\ppm\Resourcerates.aspx" />
     <Content Include="Layouts\ppm\ResPlanAnalyzer.ascx" />
@@ -954,9 +1095,11 @@
     <Content Include="Layouts\ppm\Ribbon\ribbon2.css" />
     <Content Include="Layouts\ppm\Ribbon\ribbon2.js" />
     <Content Include="Layouts\ppm\RPAdmin.aspx" />
+    <Content Include="Layouts\ppm\RPAdmin_NAX.aspx" />
     <Content Include="Layouts\ppm\rpaExportExcel.aspx" />
     <Content Include="Layouts\ppm\rpanalyzer.aspx" />
     <Content Include="Layouts\ppm\RPCustomfields.aspx" />
+    <Content Include="Layouts\ppm\RPCustomFields_NAX.aspx" />
     <Content Include="Layouts\ppm\RPEditor.ascx" />
     <Content Include="Layouts\ppm\RPEditor.ascx.css" />
     <Content Include="Layouts\ppm\RPEditor.ascx.js" />
@@ -972,15 +1115,24 @@
     <Content Include="Layouts\ppm\Styles\bootstrap.css" />
     <Content Include="Layouts\ppm\Styles\bootstrap.min.css" />
     <Content Include="Layouts\ppm\Styles\Dialog.css" />
+    <Content Include="Layouts\ppm\Styles\DialogNew.css" />
     <Content Include="Layouts\ppm\Styles\Form.css" />
+    <Content Include="Layouts\ppm\Styles\jqueryui.css" />
     <Content Include="Layouts\ppm\Styles\overload.dhtmlx.css" />
     <Content Include="Layouts\ppm\Styles\Page.css" />
     <Content Include="Layouts\ppm\TestSingleSite.aspx" />
     <Content Include="Layouts\ppm\Tools\Buttonbar.ascx" />
     <Content Include="Layouts\ppm\Tools\Buttonbar.css" />
+    <Content Include="Layouts\ppm\Tools\DGrid.ascx" />
+    <Content Include="Layouts\ppm\Tools\DGrid.ascx.js" />
+    <Content Include="Layouts\ppm\Tools\jsfunctions.js" />
     <Content Include="Layouts\ppm\Tools\Table.ascx" />
     <Content Include="Layouts\ppm\Tools\Table.ascx.js" />
     <Content Include="Layouts\ppm\Tools\Table.css" />
+    <Content Include="Layouts\ppm\Tools\TGrid.ascx" />
+    <Content Include="Layouts\ppm\Tools\TGrid.ascx.js" />
+    <Content Include="Layouts\ppm\Tools\toolbar.css" />
+    <Content Include="Layouts\ppm\Tools\toolbar.js" />
     <Content Include="Layouts\ppm\upgradedb.aspx" />
     <Content Include="Layouts\ppm\workitems.aspx" />
     <Content Include="MyTasks\Elements.xml" />
@@ -1112,6 +1264,9 @@
     <Content Include="WebServices\Model.asmx" />
     <Content Include="WebServices\modeldisco.aspx" />
     <Content Include="WebServices\modelwsdl.aspx" />
+    <Content Include="WebServices\Optimizer.asmx" />
+    <Content Include="WebServices\Optimizerdisco.aspx" />
+    <Content Include="WebServices\Optimizerwsdl.aspx" />
     <Content Include="WebServices\PortfolioEngine.asmx" />
     <Content Include="WebServices\PortfolioEnginedisco.aspx" />
     <Content Include="WebServices\PortfolioEnginewsdl.aspx" />

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WorkEnginePPM.Layouts.ppm {
+namespace WorkEnginePPM {
     
     
     public partial class Customfields_NAX {
@@ -22,12 +22,12 @@ namespace WorkEnginePPM.Layouts.ppm {
         protected global::System.Web.UI.WebControls.Label lblGeneralError;
         
         /// <summary>
-        /// table1 control.
+        /// dgrid1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.Table table1;
+        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.DGrid dgrid1;
     }
 }

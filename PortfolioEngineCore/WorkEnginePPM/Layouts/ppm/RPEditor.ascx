@@ -56,6 +56,15 @@
 <script src="/_layouts/ppm/rpeditor.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 
+<style type="text/css">
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        overflow: hidden;
+    }
+</style>
+
 <div id="idEditorTabDiv"></div>
 <div id="idViewTabDiv"></div>
 <div id="idResourcesTabDiv"></div>
@@ -289,7 +298,6 @@
 <div id="gridDiv_Res" style="width:100%;overflow:auto;display:none;"></div>
 
 <div id="gridDiv_ResWork" style="width:100%;overflow:auto;display:none;"></div>
-
 <div id="idtemp" style="display:none;">
     <table style="margin:5px;">
         <tr>
@@ -313,7 +321,7 @@
 </div>
 <div id="<%=ClientID%>mainDiv">
     <div id="veil" style="display:none;"></div>
-    <div id="<%=ClientID%>layoutDiv" style="position: relative; width: 100%; height: 500px;"></div>
+    <div id="<%=ClientID%>layoutDiv" style="position: relative; width: 100%; height: 100%;"></div>
 </div> 
 <script type="text/javascript">
     function addResourcesDlg_DialogEvent(action) { rpeditor.addResourcesDlg_DialogEvent(action); }

@@ -1,124 +1,311 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
+<%@ Register src="Tools/DGrid.ascx" tagname="DGridUserControl" tagprefix="dg1" %>
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
-<%@ Register src="Tools/Table.ascx" tagname="TableUserControl" tagprefix="t1" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="grouppermissions_NAX.aspx.cs" Inherits="WorkEnginePPM.Layouts.ppm.grouppermissions_NAX" DynamicMasterPageFile="~masterurl/default.master" %>
-
-
+<%@ Reference Control="/_layouts/ppm/tools/DGrid.ascx" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+<script src="tools/jsfunctions.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="styles/form.css"/>
+<script type="text/javascript" src="/_layouts/epmlive/TreeGrid/GridE.js"></script>
 <script src="general.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="ribbon/ribbon2.css" />
-<script src="ribbon/ribbon2.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="styles/dialognew.css" />
+<link rel="stylesheet" type="text/css" href="tools/toolbar.css" />
+<script src="tools/toolbar.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.css" />
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_admin.css" />
+<script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
+<script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
+<script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
+
 <style type="text/css">
 .ms-cui-tabBody {
     border-bottom: 0 !important;
+}
+BODY #s4-workspace {
+    height: 100% !important;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    overflow: hidden;
 }
 </style>
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+<div class="modalContent" id="idGroupPermissionsDlg" style="display:none;">
+    <input id="idGroupPermissionsDlgMode" type="hidden" value="" />
+    <div>
+        <table width="100%" cellspacing="0">
+            <tr>
+                <td style="height:1px;" width="250" class="topcell"></td>
+                <td style="height:1px;" class="topcell"></td>
+            </tr>
+            <tr style="display:none;">
+                <td width="250" class="descriptioncell">
+                    Field Id
+                </td>
+                <td class="controlcell">
+                    <input type="text" id="txtId" />
+                </td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                    Group Name
+                </td>
+                <td class="controlcell">
+                     <input type="text" id="txtName" style="width:400px;" />
+               </td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                    Group Description
+                </td>
+                <td class="controlcell">
+                      <input type="text" id="txtDesc" style="width:400px;" />
+               </td>
+            </tr>
+            <tr>
+                 <td width="250" class="descriptioncell">
+                    Permissions
+                </td>
+                <td  class="controlcell" style="vertical-align:top; ">
+                     <div id='idtg1' style="width:400px; height:350px;"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+	<div style="float:right;">
+		<div class="button-container" >
+			<input type="button" class="epmliveButton" value="OK" onclick="groupPermissionsDlg_event('ok');"/>
+			<input type="button" class="epmliveButton" value="Cancel" onclick="groupPermissionsDlg_event('cancel');"/>
+		</div>
+	</div>
+</div>
+<div class="modalContent" id="idGroupMembersDlg" style="display:none;">
+    <div style="width:260px; height:250px;">
+        <dg1:DGridUserControl id="dgrid2" runat="server"/>
+    </div>
+	<div style="float:right;">
+		<div class="button-container" >
+			<input type="button" class="epmliveButton" value="Close" onclick="groupMembersDlg_event('cancel');"/>
+		</div>
+	</div>
+</div>
 <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
-<div id="idEditorTabDiv"></div>
-<t1:TableUserControl id="table1" runat="server" />
+<div id="idToolbarDiv"></div>
+<dg1:DGridUserControl id="dgrid1" runat="server" />
 
 <script type="text/javascript">
-
-    var editorTabData = 
-    {
-        parent: "idEditorTabDiv",
+    var toobarData = {
+        parent: "idToolbarDiv",
         style: "display:none;",
         imagePath: "images/",
-        showstate: "false",
-        sections: [
-        {
-            name: "Actions",
-            tooltip: "Actions",
-            columns: [
-                {
-                    items: [
-                        { type: "bigbutton", name: "Add", img: "plus.png", tooltip: "Add", onclick: "dialogEvent('btnAdd');" }
-                    ]
-                },
-                {
-                    items: [
-                        { type: "bigbutton", id: "btnModify", name: "Modify", img: "delete32.png", tooltip: "Modify", onclick: "dialogEvent('btnModify');", disabled: true }
-                    ]
-                },
-                {
-                    items: [
-                        { type: "bigbutton", id: "btnDelete", name: "Delete", img: "delete32.png", tooltip: "Delete", onclick: "dialogEvent('btnDelete');", disabled: true }
-                    ]
-                }
-            ]
-        }
+        items: [
+            { type: "button", name: "Add", img: "addresource.gif", tooltip: "Add", width: "80px", onclick: "toolbar_event('btnAdd');" },
+            { type: "button", id: "btnModify", name: "Modify", img: "editview.gif", tooltip: "Modify", width: "80px", onclick: "return toolbar_event('btnModify');", disabled: true },
+            { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar_event('btnDelete');", disabled: true },
+            { type: "button", id: "btnMembers", name: "Members", img: "Add.png", tooltip: "Group Members", width: "80px", onclick: "return toolbar_event('btnMembers');", disabled: true }
         ]
     };
 
-    var editorTab = new Ribbon(editorTabData);
-    editorTab.Render();
-
+    var treegridData;
+    var toolbar = new Toolbar(toobarData);
+    
+    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1_selectedRow = 0;
     var OnLoad = function (event) {
+        toolbar.Render();
+        dgrid1.addEventListener("onRowSelect", dgrid1_OnRowSelect);
+        OnResize();
+    };
+
+    function dgrid1_OnRowSelect(rowid, cellindex) {
+        dgrid1_selectedRow = rowid;
+        toolbar.enableItem("btnModify");
+        toolbar.enableItem("btnDelete");
+        toolbar.enableItem("btnMembers");
     };
 
     var OnResize = function (event) {
-        var obj = document.getElementById("idTableDiv");
-        var xy = findAbsolutePosition(obj);
-        document.getElementById("idTableDiv").style.height = (document.documentElement.clientHeight - xy[1] - 5) + "px";
+        var top = dgrid1.GetTop();
+        var newHeight = document.documentElement.clientHeight - top - 5;
+        dgrid1.SetHeight(newHeight);
     };
 
-    function dialogEvent(action) {
+    function SendRequest(sXML) {
+         sURL = "./GroupPermissions.ashx";
+         return jsf_sendRequest(sURL, sXML);
+    };
+
+    function toolbar_event(event) {
         var sRowId = "";
         var sMode = "";
-        switch (action) {
+        var sDlgTitle = "";
+        document.getElementById('idGroupPermissionsDlgMode').value = event;
+        switch (event) {
             case "btnAdd":
-                sMode = "Add";
-                sRowId = 0;
+                GetGroupPermissions("Add", "Add Permission Group", 0);
                 break;
             case "btnModify":
-                sMode = "Modify";
-                sRowId = table1.GetSelectedRowId();
+                 if (toolbar.isItemDisabled("btnModify") == true) {
+                    alert("Select a row to enable the Modify button");
+                    return false;
+                }
+                GetGroupPermissions("Modify", "Modify Group Permissions", dgrid1_selectedRow);
                 break;
             case "btnDelete":
-                sMode = "Delete";
-                sRowId = table1.GetSelectedRowId();
+                if (toolbar.isItemDisabled("btnDelete") == true) {
+                    alert("Select a row to enable the Delete button");
+                    return false;
+                }
+                GetGroupPermissions("Delete", "Delete Permission Group, are you sure?", dgrid1_selectedRow);
+                break;
+            case "btnMembers":
+                if (toolbar.isItemDisabled("btnMembers") == true) {
+                    alert("Select a row to enable the Members button");
+                    return false;
+                }
+                GetGroupMembers(dgrid1_selectedRow);
                 break;
         }
-        var options = { url: "grouppermissionform.aspx?id=" + sRowId + "&mode=" + sMode, showMaximized: false, allowMaximize: false, showClose: false, dialogReturnValueCallback: NewItemCallback };
-        SP.UI.ModalDialog.showModalDialog(options);
-    }
-    function NewItemCallback(dialogResult, returnValue) {
+    };
+    function GetGroupPermissions(sMode, sDlgTitle, sRowId) {
+        var sRequest = '<request function="GroupPermissionsRequest" context="GetGroupPermissionsInfo"><data><![CDATA[' + sRowId + ']]></data></request>';
+        var jsonString = SendRequest(sRequest);
+        var json = JSON_ConvertString(jsonString);
+        if (json.reply != null) {
+            if (jsf_alertError(json.reply.error) == true)
+                return false;
+        }
+
+        document.getElementById('txtId').value = json.reply.groupPermissions.groupid;
+        document.getElementById('txtName').value = json.reply.groupPermissions.name;
+        document.getElementById('txtDesc').value = json.reply.groupPermissions.notes;
+        treegridData = json.reply.groupPermissions.treegridData;
+        DisposeGrids();
+        var grid = TreeGrid("<treegrid debug='0' sync='1' Data_Script='treegridData' ></treegrid>", "idtg1");
+
+        DisplayDialog(570, 540, sDlgTitle, "winGroupPermissionsDlg", "idGroupPermissionsDlg", true, false);
+   };
+   function GetGroupMembers(sRowId) {
+        var sRequest = '<request function="GroupPermissionsRequest" context="GetGroupMembersInfo"><data><![CDATA[' + sRowId + ']]></data></request>';
+        var jsonString = SendRequest(sRequest);
+        var json = JSON_ConvertString(jsonString);
+        if (json.reply != null) {
+            if (jsf_alertError(json.reply.error) == true)
+                return false;
+        }
+
+        var dgrid2 = window.<%=dgrid2.UID%>;
+
+        var columnData = json.reply.groupMembers.columnData;
+        var tableData = json.reply.groupMembers.tableData;
+        dgrid2.Initialize(columnData, tableData);
+        dgrid2.SetHeight(250);
+        //dgrid2.SetWidth(260);
+        var groupName = dgrid1.GetCellValue(sRowId, "GROUP_NAME");
+
+        DisplayDialog(300, 360, "Members for Group " + groupName, "winGroupMembersDlg", "idGroupMembersDlg", true, false);
+   };
+   function NewItemCallback(dialogResult, returnValue) {
         if (dialogResult) {
             window.location.href = window.location.href;
         }
+   };
+    
+    function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
+        var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
+        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        return dlg;
     };
 
-    function table1_row_event(sControlId, sEvent, sRowId) {
-        table1.RowEvent(sControlId, sEvent, sRowId);
-        switch (sEvent) {
-            case "onclick":
-                if (editorTab != null) {
-                    editorTab.enableItem("btnModify");
-                    editorTab.enableItem("btnDelete");
+    function CloseDialog (idWindow) {
+        jsf_closeDialog(thiswins, idWindow)
+    };
+
+    var groupPermissionsDlg_event = function (event) {
+       var action = document.getElementById('idGroupPermissionsDlgMode').value;
+       switch (event) {
+            case "ok":
+                switch (action) {
+                    case "btnAdd":
+                    case "btnModify":
+                        //alert(action + ".OK");
+                        var s = Grids[0].GetXmlData("Data,AllCols");
+                        var sb = new StringBuilder();
+                        sb.append('<request function="GroupPermissionsRequest" context="UpdateGroupPermissionsInfo">');
+                        sb.append('<data');
+                        sb.append(' groupid="' + document.getElementById('txtId').value + '"');
+                        sb.append(' name="' + jsf_xml(document.getElementById('txtName').value) + '"');
+                        sb.append(' notes="' + jsf_xml(document.getElementById('txtDesc').value) + '"');
+                        sb.append('>');
+                        sb.append('<treegridData><![CDATA[' + s + ']]></treegridData>');
+                        sb.append('</data>');
+                        sb.append('</request>'); 
+                        var sRequest = sb.toString();
+                        var jsonString = SendRequest(sRequest);
+                        var json = JSON_ConvertString(jsonString);
+                        if (json.reply != null) {
+                            if (jsf_alertError(json.reply.error) == true)
+                                return false;
+                        }
+                        if (action == "btnModify") {
+                        var sRowId = dgrid1_selectedRow;
+                        }
+                        if (action == "btnAdd") {
+                            sRowId = json.reply.groupPermissions.groupid;
+                            dgrid1.addRow(sRowId);
+                        }
+                        var val = document.getElementById('txtName').value;
+                        dgrid1.SetCellValue(sRowId, "GROUP_NAME", val);
+                        dgrid1.SetCellValue(sRowId, "GROUP_NOTES", document.getElementById('txtDesc').value);
+                        break;
+                    case "btnDelete":
+                        //alert("btnDelete.OK");
+                        var s = Grids[0].GetXmlData("Data,AllCols");
+                        var sb = new StringBuilder();
+                        sb.append('<request function="GroupPermissionsRequest" context="DeleteGroupPermission">');
+                        sb.append('<data');
+                        sb.append(' groupid="' + document.getElementById('txtId').value + '"');
+                        sb.append(' name="' + jsf_xml(document.getElementById('txtName').value) + '"');
+                        sb.append(' notes="' + jsf_xml(document.getElementById('txtDesc').value) + '"');
+                        sb.append('>');
+                        sb.append('<treegridData><![CDATA[' + s + ']]></treegridData>');
+                        sb.append('</data>');
+                        sb.append('</request>'); 
+                        var sRequest = sb.toString();
+                        var jsonString = SendRequest(sRequest);
+                        var json = JSON_ConvertString(jsonString);
+                        if (json.reply != null) {
+                            if (jsf_alertError(json.reply.error) == true)
+                                return false;
+                        }
+                        // if deleted  then remove row from grid
+                        var sRowId = dgrid1_selectedRow;
+                        dgrid1.deleteRow(sRowId);
+                        break;
                 }
+                CloseDialog('winGroupPermissionsDlg');
+                break;
+            case "cancel":
+                CloseDialog('winGroupPermissionsDlg');
                 break;
         }
     };
-    findAbsolutePosition = function (obj) {
-        var curleftx = 0;
-        var curtopy = 0;
-        if (obj.offsetParent) {
-            do {
-                curleftx += obj.offsetLeft;
-                curtopy += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-        }
-        return [curleftx, curtopy];
+    var groupMembersDlg_event = function (event) {
+        CloseDialog('winGroupMembersDlg');
     };
+    var thiswins = new dhtmlXWindows();
+    thiswins.setImagePath("/_layouts/ppm/images/");
+    thiswins.setSkin("dhx_web");
 
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", OnLoad, true);

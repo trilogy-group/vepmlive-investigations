@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using WorkEnginePPM;
+using PortfolioEngineCore;
 
 
 namespace ClientPrioritizationDataCache

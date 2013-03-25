@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Web;
 using System.Web.Services;
-using Microsoft.Win32;
 using System.Security.Principal;
 using PortfolioEngineCore;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace WorkEnginePPM
 {
@@ -60,9 +60,9 @@ namespace WorkEnginePPM
                     //bool.TryParse(WebAdmin.GetSPSessionString(Context,"IsAuthenticated"), out bAuthenticated);
                     //if (bAuthenticated)
                     {
-                        WebAdmin.DBTrace((StatusEnum) 0, TraceChannelEnum.WebServices, "WebService.XMLRequest",
-                                         "Request",
-                                         sContext, sRequest);
+                        //WebAdmin.DBTrace((StatusEnum) 0, TraceChannelEnum.WebServices, "WebService.XMLRequest",
+                        //                 "Request",
+                        //                 sContext, sRequest);
                         string s = "";
                         //string userName = WebAdmin.GetSPSessionString(Context,"userName");
                         //string sWResID = WebAdmin.GetSPSessionString(Context,"WResID");
@@ -180,8 +180,8 @@ namespace WorkEnginePPM
                                 }
                             }
                         //}
-                        WebAdmin.DBTrace((StatusEnum) 0, TraceChannelEnum.WebServices, "WebService.XMLRequest", "Reply",
-                                         sContext, s);
+                        //WebAdmin.DBTrace((StatusEnum) 0, TraceChannelEnum.WebServices, "WebService.XMLRequest", "Reply",
+                        //                 sContext, s);
                         return s;
                     }
                 }
@@ -199,15 +199,15 @@ namespace WorkEnginePPM
             string s = "";
             switch (sItem)
             {
-                case "BasePath":
-                    s += WebAdmin.GetSPSessionString(Context,"basePath");
-                    break;
-                case "WResID":
-                    s += WebAdmin.GetSPSessionString(Context,"WResID");
-                    break;
-                case "UserName":
-                    s += WebAdmin.GetSPSessionString(Context,"userName");
-                    break;
+                //case "BasePath":
+                //    s += WebAdmin.GetSPSessionString(Context,"basePath");
+                //    break;
+                //case "WResID":
+                //    s += WebAdmin.GetSPSessionString(Context,"WResID");
+                //    break;
+                //case "UserName":
+                //    s += WebAdmin.GetSPSessionString(Context,"userName");
+                //    break;
                 case "SessionInfo":
                     s += WebAdmin.GetSPSessionString(Context,"SessionInfo");
                     break;
@@ -247,27 +247,29 @@ namespace WorkEnginePPM
 
         private static string HandleError(string sContext, string sError)
         {
-            WorkEnginePPM.CStruct xReply = new WorkEnginePPM.CStruct();
+            CStruct xReply = new CStruct();
             xReply.Initialize("Reply");
             xReply.CreateString("Error", "WebService.asmx Context=" + sContext + "; Error=" + sError + ";");
             xReply.CreateString("HRESULT", "0");
             xReply.CreateString("STATUS", "91111");
 
             string s = xReply.XML();
-            WebAdmin.DBTrace((StatusEnum)91111, TraceChannelEnum.WebServices, "WebService.HandleError", "Reply", sContext, s);
+            //WebAdmin.DBTrace((StatusEnum)91111, TraceChannelEnum.WebServices, "WebService.HandleError", "Reply", sContext, s);
+            EventLog.WriteEntry("DBAccess HandleError", s, EventLogEntryType.Error);
             return s;
         }
 
         private static string HandleException(Exception ex, string sContext)
         {
-            WorkEnginePPM.CStruct xReply = new WorkEnginePPM.CStruct();
+            CStruct xReply = new CStruct();
             xReply.Initialize("Reply");
-            xReply.CreateString("Error", "WebService.asmx Context=" + sContext + "; Exception=" + ex.Message.ToString() + ";");
+            xReply.CreateString("Error", "WebService.asmx Context=" + sContext + "; Exception=" + ex.Message + ";");
             xReply.CreateString("HRESULT", "0");
             xReply.CreateString("STATUS", "99812");
 
             string s = xReply.XML();
-            WebAdmin.DBTrace((StatusEnum)99812, TraceChannelEnum.WebServices, "WebService.HandleException", "Reply", sContext, s);
+            //WebAdmin.DBTrace((StatusEnum)99812, TraceChannelEnum.WebServices, "WebService.HandleException", "Reply", sContext, s);
+            EventLog.WriteEntry("WebService HandleException", s, EventLogEntryType.Error);
             return s;
         }
     }

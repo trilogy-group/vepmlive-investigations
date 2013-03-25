@@ -185,6 +185,17 @@ namespace WorkEnginePPM
                 string sFunction = xExecute.GetStringAttr("Function");
                 switch (sFunction)
                 {
+                    case "CreateTicket":
+                    {
+                        //CStruct xTicket = xExecute.GetSubStruct("CreateTicket");
+                        string sGuid = dbaGeneral.CreateTicket(dba, xExecute.GetString("Data"));
+
+                        CStruct xReply = BuildResultXML(sFunction, (int)dba.Status);
+                        xReply.CreateStringAttr("Context", xExecute.GetStringAttr("Context"));
+                        xReply.CreateStringAttr("Ticket", sGuid);
+                        sReply = xReply.XML();
+                        break;
+                    }
                     case "SynchronizeTeam":
                     {
                         CStruct xSynchronizeTeam = xExecute.GetSubStruct("SynchronizeTeam");
@@ -267,17 +278,17 @@ namespace WorkEnginePPM
             try
             {
                 Integration weInt = new Integration();
-                WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "WE Request", "Context=" + sContext, sXMLRequest);
+                dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "WE Request", "Context=" + sContext, sXMLRequest);
                 xNode = weInt.execute(sContext, sXMLRequest);
                 if (xNode != null)
-                    WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "WE Reply", "Context=" + sContext, xNode.OuterXml);
+                    dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "WE Reply", "Context=" + sContext, xNode.OuterXml);
             }
             catch (Exception ex)
             {
                 dba.Status = (StatusEnum)99830;
                 dba.StatusText = ex.Message;
                 dba.StackTrace = ex.StackTrace;
-                WebAdmin.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "Exception", ex.Message, ex.StackTrace);
+                dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "Exception", ex.Message, ex.StackTrace);
             }
             return dba.Status;
         }
@@ -610,6 +621,8 @@ namespace WorkEnginePPM
                             }
                         }
 
+                        sStage = "9";
+
 
                         if (rmdata != "")
                         {
@@ -635,7 +648,7 @@ namespace WorkEnginePPM
                                 }
 
                             }
-
+                            sStage = "10";
                             sendtousers = "";
 
                             foreach (RPEN_Resource xres in rmlist.Values)
@@ -659,6 +672,8 @@ namespace WorkEnginePPM
                             s_reslist = rpn.CreateTicket(s_reslist);
 
                             surl = "/ppm/rpeditor.aspx?dataid=" + s_reslist + "&isresource=1&IsDlg=0";
+
+                            sStage = "11";
 
                             QueueItemMessage(12, "", "RM Message", curuser, rmdata, sendtousers, siteRoot,
                                                 surl);
@@ -723,7 +738,7 @@ namespace WorkEnginePPM
                             }
                         }
 
-
+                        sStage = "12";
 
                         sendtousers = "";
 
@@ -761,7 +776,7 @@ namespace WorkEnginePPM
                             //        surl = "/epmlive/workplanner.aspx?listid=" + extids[1];
                             //    }
                             //}
-
+                            sStage = "13";
                             QueueItemMessage(13, opi.extid, "PM Message", curuser, pmdata, sendtousers, siteRoot, surl);
                         }
                     }

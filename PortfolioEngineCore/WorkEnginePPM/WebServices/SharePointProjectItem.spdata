@@ -26,5 +26,11 @@
     <ProjectItemFile Source="WebService.asmx" Target="ISAPI\" Type="RootFile" />
     <ProjectItemFile Source="webservicewsdl.aspx" Target="ISAPI\" Type="RootFile" />
     <ProjectItemFile Source="webservicedisco.aspx" Target="ISAPI\" Type="RootFile" />
+    <ProjectItemFile Source="CostAnalyzer.asmx" Target="ISAPI\" Type="RootFile" />
+    <ProjectItemFile Source="CostAnalyzerdisco.aspx" Target="ISAPI\" Type="RootFile" />
+    <ProjectItemFile Source="CostAnalyzerwsdl.aspx" Target="ISAPI\" Type="RootFile" />
+    <ProjectItemFile Source="Optimizer.asmx" Target="ISAPI\" Type="RootFile" />
+    <ProjectItemFile Source="Optimizerdisco.aspx" Target="ISAPI\" Type="RootFile" />
+    <ProjectItemFile Source="Optimizerwsdl.aspx" Target="ISAPI\" Type="RootFile" />
   </Files>
 </ProjectItem>

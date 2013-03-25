@@ -8,6 +8,7 @@ using System.Data;
 using System.Xml;
 using System.Text;
 using Microsoft.SharePoint.WebControls;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {
@@ -33,8 +34,11 @@ namespace WorkEnginePPM
                 {
                     //pnlNoUrl.Visible = false;
                     //lblUrl.Text = url;
-                    populateSharePointFields();
-                    populateFieldMap();
+                    string sBaseInfo = WebAdmin.BuildBaseInfo(this.Context);
+                    DataAccess da = new DataAccess(sBaseInfo);
+                    DBAccess dba = da.dba;
+                    populateSharePointFields(dba);
+                    populateFieldMap(dba);
                 }
                 //else
                 //{
@@ -43,14 +47,14 @@ namespace WorkEnginePPM
             }
         }
 
-        private void populateSharePointFields()
+        private void populateSharePointFields(DBAccess dba)
         {
             dtFields.Columns.Add("internalname");
             dtFields.Columns.Add("displayname");
             dtFields.Rows.Add(new object[] { "", "--- Select Field ---" });
 
             XmlNode ndSettings = null;
-            if (LMR_IF.ExecuteProcess("GetAvailableFields", "<Fields Key=\"EPK\" List=\"Resources\"/>", out ndSettings) == false) goto ExecuteProcess_Error;
+            if (ExecuteProcess("GetAvailableFields", "<Fields Key=\"EPK\" List=\"Resources\"/>", out ndSettings) == false) goto ExecuteProcess_Error;
             if (ndSettings.Attributes["Status"].Value != "0")
             {
                 lblGeneralError.Text = "Unable to retrieve Fields: " + ndSettings.SelectSingleNode("Error").InnerText;
@@ -77,20 +81,37 @@ ExecuteProcess_Error:
             lblGeneralError.Visible = true;
         }
 
-        private void populateFieldMap()
+        private static bool ExecuteProcess(string sContext, string sXMLRequest, out XmlNode xNode)
         {
-            DataTable dtEPKFields = LMR_IF.getResourceFields();
+            xNode = null;
+            return ExecuteProcessEx("", sContext, sXMLRequest, out xNode);
+            return false;
+        }
+
+        private static bool ExecuteProcessEx(string sURL, string sContext, string sXMLRequest, out XmlNode xNode)
+        {
+            xNode = null;
+            bool b = true;
+            Integration integration = new Integration();
+            xNode = integration.execute(sContext, sXMLRequest);
+            integration = null;
+            return b;
+        }
+
+        private void populateFieldMap(DBAccess dba)
+        {
+            DataTable dtEPKFields = LMR_IF.getResourceFields(dba);
             dtEPKFields.Columns.Add("spField");
 
             XmlNode ndResPoolUrl = null;
-            if (LMR_IF.ExecuteProcess("getresourcepoolurl", "", out ndResPoolUrl) == false) goto ExecuteProcess_Error;
+            if (ExecuteProcess("getresourcepoolurl", "", out ndResPoolUrl) == false) goto ExecuteProcess_Error;
             if (ndResPoolUrl.InnerText != "")
             {
                 lblResPoolUrl.Text = ndResPoolUrl.InnerText;
 
                 string sUrl = ndResPoolUrl.InnerText; // +"/_vti_bin/Integration.asmx";
                 XmlNode ndSettings = null;
-                if (LMR_IF.ExecuteProcessEx(sUrl, "GetSettings", "<Settings Key=\"EPK\"/>", out ndSettings) == false) goto ExecuteProcess_Error;
+                if (ExecuteProcessEx(sUrl, "GetSettings", "<Settings Key=\"EPK\"/>", out ndSettings) == false) goto ExecuteProcess_Error;
                 XmlNode ndFields = ndSettings.SelectSingleNode("resourcefields");
                 if (ndFields != null)
                 {
@@ -126,6 +147,7 @@ ExecuteProcess_Error:
         protected void btnSave_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
+            DataTable dt = new DataTable();
             foreach (GridViewRow gvr in GridView1.Rows)
             {
                 if (gvr.RowType == DataControlRowType.DataRow)
@@ -139,11 +161,21 @@ ExecuteProcess_Error:
                         sb.Append(ddl.SelectedValue);
                         sb.Append(",");
                         sb.Append(1);
+
+                        DataRow dr = dt.NewRow();
+                        int nID;
+                        Int32.TryParse(gvr.Cells[2].Text, out nID);
+                        dr["EPKID"] = nID;
+                        dr["WEID"] = 0;
+                        dr["WEName"] = ddl.SelectedValue;
                     }
                 }
             }
 
-            if (LMR_IF.saveResourceFieldMappings(GridView1) == false) goto ExecuteProcess_Error;
+            string sBaseInfo = WebAdmin.BuildBaseInfo(this.Context);
+            DataAccess da = new DataAccess(sBaseInfo);
+            DBAccess dba = da.dba;
+            if (LMR_IF.saveResourceFieldMappings(dba, dt) == false) goto ExecuteProcess_Error;
 
 
             StringBuilder sbSend = new StringBuilder("<Settings Key=\"EPK\">");
@@ -153,7 +185,7 @@ ExecuteProcess_Error:
             sbSend.Append("</Settings>");
 
             XmlNode ndSettings = null;
-            if (LMR_IF.ExecuteProcess("SetSettings", sbSend.ToString(), out ndSettings) == false) goto ExecuteProcess_Error;
+            if (ExecuteProcess("SetSettings", sbSend.ToString(), out ndSettings) == false) goto ExecuteProcess_Error;
 
             if (ndSettings.Attributes["Status"].Value == "0")
             {

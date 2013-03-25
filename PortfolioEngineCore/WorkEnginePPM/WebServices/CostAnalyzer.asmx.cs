@@ -171,7 +171,7 @@ namespace WorkEnginePPM
 
             string sEchoReplyMessage = "";
             string sReplyMessage = "";
-
+            CStruct xResult = BuildResultXML("GetCostData", 0);
 
             WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
 
@@ -185,6 +185,16 @@ namespace WorkEnginePPM
 
 
             clsda = cda.InitalLoadData(sTicket, ViewID, out smsg, out retcode);
+
+            if (clsda == null)
+            {
+
+                xResult = BuildResultXML("CostAnalyzer.CALoadData at " + retcode.ToString(), 99999);
+                CStruct xError = xResult.CreateSubStruct("Error");
+                xError.CreateIntAttr("ID", 100);
+                xError.CreateStringAttr("Value", smsg);
+                return xResult.XML();
+            }
 
             datacache.GrabCAData(clsda);
 
@@ -213,8 +223,8 @@ namespace WorkEnginePPM
                                     //sErrStage = "O031";
                                     //RAData.StashCapacityReloadXML(xSaveParms.XML());
 
-                                    //sErrStage = "O032";
-                                    //sTotal = RAData.GetTotalsData(true);
+                                    sErrStage = "O032";
+                                    sTotal = datacache.GetTotalsData();
 
                                     //sErrStage = "O033";
 
@@ -234,7 +244,8 @@ namespace WorkEnginePPM
  
             //sReply = "<Error Value='GetResourceValues failed - " + sEchoReplyMessage + "'/>";  //  stuck here as a test
             
-            CStruct xResult = BuildResultXML("GetCostData", 0);
+
+            CStruct Extradata;
 
             if (sPeriods != "")
                 xResult.AppendXML(sPeriods);
@@ -244,7 +255,11 @@ namespace WorkEnginePPM
                 xResult.AppendXML(sDispMode);
             if (sViews != "")
                 xResult.AppendXML(sViews);
-
+            if (sTotal != "")
+            {
+                Extradata = xResult.CreateSubStruct("TotalsConfiguration");
+                Extradata.CreateStringAttr("Value", sTotal);
+            }
             
 
             //xResult.AppendXML(sReply);
@@ -252,7 +267,7 @@ namespace WorkEnginePPM
             //    xResult.AppendXML(sViews);
 
 
-            CStruct Extradata;
+
 
             //Extradata = xResult.CreateSubStruct("TotalsConfiguration");
             //Extradata.CreateStringAttr("Value", sTotal);
@@ -326,6 +341,11 @@ namespace WorkEnginePPM
             return s;
         }
 
+        public static string GetTargetGrid(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+            string s = datacache.GetTargetGrid();
+            return s;
+        }
         public static string GetTotalsConfiguration(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
         {
 
@@ -346,6 +366,9 @@ namespace WorkEnginePPM
             
 
             datacache.SetTotalsData(xData);
+
+   
+
             return "";
         } 
         
@@ -355,7 +378,7 @@ namespace WorkEnginePPM
 
             CStruct xResult = BuildResultXML("GetCompareCostTypeList", 0);
             xResult.AppendXML(datacache.GetCompareCostTypeList());
-            return xResult.XML(); 
+            return xResult.XML();
         }
 
         public static string SetCompareCostTypeList(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
@@ -572,6 +595,125 @@ namespace WorkEnginePPM
             return xResult.XML();
         }
 
+
+
+        public static string GetTargetList(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+
+
+
+            CStruct xResult = BuildResultXML("GetTargetList", 0);
+            xResult.AppendXML(datacache.GetTargetList());
+            return xResult.XML();
+        }
+
+        public static string DeleteTarget(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+            string shmt = ""; 
+            
+            try
+            {
+                int tarID = int.Parse(sXML);
+
+
+
+                bool bdtatabasedelete = datacache.DeleteTarget(tarID, out shmt);
+
+                if (bdtatabasedelete)
+                {
+
+
+                    WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+
+
+                    PortfolioEngineCore.CostAnalyzerData cda = new CostAnalyzerData(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+
+                    cda.DeleteTarget(tarID);
+ 
+                }
+
+
+
+            }
+            catch (Exception ex) { }
+
+            CStruct xResult = BuildResultXML("DeleteTarget", 0);
+
+            CStruct Extradata = xResult.CreateSubStruct("HeatMapText");
+            Extradata.CreateStringAttr("Value", shmt); 
+            return xResult.XML();           
+
+        }
+
+
+
+        public static string GetClientSideCalcData(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+
+
+
+            CStruct xResult = BuildResultXML("GetTargetList", 0);
+            xResult.AppendXML(datacache.RatesAndCategory());
+            return xResult.XML();
+        }
+
+
+        public static string GetTargetTotalsData(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+
+
+
+            CStruct xResult = BuildResultXML("GetTargetTotalsData", 0);
+            xResult.AppendXML(datacache.GetTargetTotalsData());
+            return xResult.XML();
+        }
+
+        public static string PrepareTargetData(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+
+
+
+            CStruct xResult = BuildResultXML("GetTargetData", 0);
+            xResult.AppendXML(datacache.PrepareTargetData(sXML));
+            return xResult.XML();
+        }
+
+
+        public static string SaveTargetData(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+
+
+
+            CStruct xResult = BuildResultXML("SaveTarget", 0);
+            CStruct Extradata = new CStruct();
+            Extradata.Initialize("SaveTarget");
+            CStruct Extradata1 = Extradata.CreateSubStruct("Target");
+
+
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+
+
+            PortfolioEngineCore.CostAnalyzerData cda = new CostAnalyzerData(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+
+            int targetID;
+            string sTargetName;
+            bool bNewTarget;
+            cda.SaveTargetData(sXML, datacache.Get_CB_ID(), out targetID, out sTargetName, out bNewTarget);
+
+            if (targetID > 0)
+            {
+                clsCostData clsda = cda.ReloadTargets(datacache.Get_CB_ID(), datacache.Get_MaxPeriods());
+                datacache.RefreshTargets(clsda);
+
+
+            }
+
+            Extradata1.CreateIntAttr("Value", targetID);
+            xResult.AppendXML(Extradata.XML());
+            return xResult.XML();
+        }
+            
         private static CStruct BuildResultXML(string sContext = "", int nStatus = 0)
         {
             CStruct xResult = new CStruct();

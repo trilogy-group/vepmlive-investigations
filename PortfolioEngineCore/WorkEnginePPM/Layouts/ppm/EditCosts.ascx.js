@@ -773,15 +773,17 @@
                 }
             case "SaveBtn":
                 {
-                    document.body.style.cursor = 'wait';
-                    this.ShowWorkingPopup("divSaving");
-                    this.DisableButtons(false);
-                    for (var n = 0; n < this.CostTypes.length; n++) {
-                        var g = Grids["g_" + this.CostTypes[n].Id];
-                        if (g != null) {
-                            if (g.CostsAreEditable == 1) {
-                                if ((g.HasChanges() & (1 << 0)) != 0) {
-                                    g.Save();
+                    if (this.editorTab.isItemDisabled("SaveBtn") != true) {
+                        document.body.style.cursor = 'wait';
+                        this.ShowWorkingPopup("divSaving");
+                        this.DisableButtons(false);
+                        for (var n = 0; n < this.CostTypes.length; n++) {
+                            var g = Grids["g_" + this.CostTypes[n].Id];
+                            if (g != null) {
+                                if (g.CostsAreEditable == 1) {
+                                    if ((g.HasChanges() & (1 << 0)) != 0) {
+                                        g.Save();
+                                    }
                                 }
                             }
                         }

@@ -1,0 +1,89 @@
+﻿.toolbar-table-div
+{
+height:35px;
+padding-top: 2px;
+padding-bottom: 2px;
+padding-left:2px;
+padding-right:2px;
+}
+
+
+.toolbar-table
+{
+font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+font-size: 11px;
+height:31px;
+border-collapse: collapse;
+table-layout:fixed;
+}
+
+.toolbar-item-td
+{
+border: 1px solid #ABABAB;
+margin: 2px 0px 2px 0px;
+}
+
+.toolbar-button-disabled
+{
+    opacity: 0.3;
+}
+
+.toolbar-button {
+min-width: 0px;
+padding-left:15px;
+padding-right:15px;
+white-space: nowrap;
+cursor: pointer;
+color: #777;
+border-width: 0px 0px;
+margin:0px;
+background-color:#ffffff;
+height:31px;
+width:100%;
+    
+}
+
+.toolbar-button:hover
+{
+    border-color: #92C0E0;
+    background-color: #E6F2FA;
+    cursor:pointer;
+}
+
+.toolbar-button-disabled:hover
+{
+    background-color: transparent;
+    border-color: transparent;
+    cursor: default;
+}
+
+.toolbar-button:active
+{
+border-color: #2A8DD4;
+background-color: #92C0E0;
+    cursor:pointer;
+}
+.toolbar-button-disabled:active {
+    background-color: transparent;
+}
+
+.toolbar-button-link
+{
+font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+color: #262626;
+text-transform: uppercase;
+text-decoration: none;
+}
+
+.toolbar-button-image {
+margin: 0px 5px 0px 0px;
+height: 16px;
+width: 16px;
+}
+
+input[type="button"], input[type="reset"], input[type="submit"], button {
+font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+font-size: 11px;
+color: #777;
+}
+

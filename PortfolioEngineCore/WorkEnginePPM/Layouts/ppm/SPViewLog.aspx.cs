@@ -37,12 +37,28 @@ namespace WorkEnginePPM
             }
         }
 
+        private static bool ExecuteProcess(string sContext, string sXMLRequest, out XmlNode xNode)
+        {
+            xNode = null;
+            return ExecuteProcessEx("", sContext, sXMLRequest, out xNode);
+        }
+
+        private static bool ExecuteProcessEx(string sURL, string sContext, string sXMLRequest, out XmlNode xNode)
+        {
+            xNode = null;
+            bool b = true;
+            Integration integration = new Integration();
+            xNode = integration.execute(sContext, sXMLRequest);
+            integration = null;
+            return b;
+        }
+
         private void populateStatus()
         {
             XmlNode ndStatus = null;
-            if (LMR_IF.ExecuteProcess("GetTimerStatus", "<Status Schedule=\"10\"/>", out ndStatus) == false)
+            if (ExecuteProcess("GetTimerStatus", "<Status Schedule=\"10\"/>", out ndStatus) == false)
             {
-                lblGeneralError.Text = "Error GetTimerStatus : " + LMR_IF.LastError;
+                lblGeneralError.Text = "Error populateStatus : GetTimerStatus";
                 lblGeneralError.Visible = true;
                 return;
             }

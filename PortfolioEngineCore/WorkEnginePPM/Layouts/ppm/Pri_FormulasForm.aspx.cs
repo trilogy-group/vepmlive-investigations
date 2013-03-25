@@ -7,16 +7,17 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {
     public partial class Pri_FormulasForm : LayoutsPageBase
     {
-        private List<int> c_formulas = null;
-        public List<int> Formulas
-        {
-            get { return c_formulas; }
-        }
+        //private List<int> c_formulas = null;
+        //public List<int> Formulas
+        //{
+        //    get { return c_formulas; }
+        //}
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -91,13 +92,19 @@ namespace WorkEnginePPM
         {
             DBAccess dba = null;
 
-
             // Stick selected formulas into collection
-            c_formulas = new List<int>();
+            DataTable dtFormulas = new DataTable();
             foreach (ListItem li in lstFormulas.Items)
             {
-                c_formulas.Add(Int32.Parse(li.Value));
+                DataRow row = dtFormulas.NewRow();
+                row["Formula"] = Int32.Parse(li.Value);
+                dtFormulas.Rows.Add(row);
             }
+            //c_formulas = new List<int>();
+            //foreach (ListItem li in lstFormulas.Items)
+            //{
+            //    c_formulas.Add(Int32.Parse(li.Value));
+            //}
 
             string sDBConnect = WebAdmin.GetConnectionString(this.Context);
             dba = new DBAccess(sDBConnect);
@@ -114,7 +121,7 @@ namespace WorkEnginePPM
 
 
             int lRowsAffected;
-            if (dbaPrioritz.UpdateFormulas(dba, this, out lRowsAffected) != StatusEnum.rsSuccess) goto Exit_Function;
+            if (dbaPrioritz.UpdateFormulas(dba, dtFormulas, out lRowsAffected) != StatusEnum.rsSuccess) goto Exit_Function;
 
             //ClientScript.RegisterStartupScript(this.GetType(), "CT_Script", "OnFormulasSavedOK();", true);
         Exit_Function:

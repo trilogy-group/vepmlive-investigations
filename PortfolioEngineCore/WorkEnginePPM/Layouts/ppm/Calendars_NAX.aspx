@@ -1,143 +1,353 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
-<%@ Register src="Tools/Table.ascx" tagname="TableUserControl" tagprefix="t1" %>
-<%@ Import Namespace="Microsoft.SharePoint" %>
+<%@ Register src="Tools/DGrid.ascx" tagname="DGridUserControl" tagprefix="dg1" %>
+<%@ Register src="Tools/TGrid.ascx" tagname="TGridUserControl" tagprefix="tg1" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Calendars_NAX.aspx.cs" Inherits="WorkEnginePPM.Layouts.ppm.Calendars_NAX" DynamicMasterPageFile="~masterurl/default.master" %>
+<%@ Reference Control="/_layouts/ppm/tools/DGrid.ascx" %>
+<%@ Reference Control="/_layouts/ppm/tools/TGrid.ascx" %>
 
-
-<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+<asp:Content ID="Content1" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+<script src="tools/jsfunctions.js" type="text/javascript"></script>
 <script src="general.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="ribbon/ribbon2.css" />
-<script src="ribbon/ribbon2.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="styles/form.css" />
+<link rel="stylesheet" type="text/css" href="styles/dialognew.css" />
+<link rel="stylesheet" type="text/css" href="tools/toolbar.css" />
+<script src="tools/toolbar.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.css" />
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_admin.css" />
+<script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
+<script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
+<script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
 <style type="text/css">
 .ms-cui-tabBody {
     border-bottom: 0 !important;
 }
+BODY #s4-workspace {
+    height: 100% !important;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    overflow: hidden;
+}
 </style>
 </asp:Content>
 
-<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+<asp:Content ID="Content2" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+<div style="display: block;" >
+<div class="modalContent" id="idCalendarDlg" style="display:none;">
+    <input id="idCalendarDlgMode" type="hidden" value="" />
+    <div id="idToolbar2Div"></div>
+	<div style="margin-top:10px;padding-right:10px;">
+		<div style="padding-bottom:3px;">
+            <table width="100%" cellspacing="0">
+                <tr>
+                    <td style="height:1px;" width="250" class="topcell"></td>
+                    <td style="height:1px;" class="topcell"></td>
+                </tr>
+                <tr style="display:none;">
+                    <td width="250" class="descriptioncell">
+                        Field Id
+                    </td>
+                    <td class="controlcell">
+                        <input type="text" id="txtId" />
+                    </td>
+                </tr>
+                <tr>
+                    <td width="250" class="descriptioncell">
+                        Field Name
+                    </td>
+                    <td class="controlcell">
+                        <input type="text" id="txtName" style="Width:400px;"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="250" class="descriptioncell" style="vertical-align:top;" >
+                        Periods
+                    </td>
+                    <td class="controlcell" style="Width:400px;">
+                       <tg1:TGridUserControl id="tgrid1" runat="server" />
+                    </td>
+               </tr>
+            </table>
+		</div>
+		<div style="float:right;">
+			<div class="button-container" >
+			    <input id="idOKButton" type="button" class="epmliveButton" value="OK" onclick="calendarDlg_event('ok');"/>
+			    <input type="button" class="epmliveButton" value="Cancel" onclick="calendarDlg_event('cancel');"/>
+			</div>
+		</div>
+	</div>
+</div>
+
 <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
-<div id="idEditorTabDiv"></div>
-<t1:TableUserControl id="table1" runat="server" />
-
+<div id="idToolbarDiv"></div>
+<dg1:DGridUserControl id="dgrid1" runat="server" />
+</div>
 <script type="text/javascript">
-
-    var editorTabData =
-    {
-        parent: "idEditorTabDiv",
+    var toolbarData = {
+        parent: "idToolbarDiv",
         style: "display:none;",
         imagePath: "images/",
-        showstate: "false",
-        sections: [
-        {
-            name: "Actions",
-            tooltip: "Actions",
-            columns: [
-                {
-                    items: [
-                        { type: "bigbutton", name: "Add", img: "plus.png", tooltip: "Add", onclick: "dialogEvent('btnAdd');" }
-                    ]
-                },
-                {
-                    items: [
-                        { type: "bigbutton", id: "btnModify", name: "Modify", img: "delete32.png", tooltip: "Modify", onclick: "dialogEvent('btnModify');", disabled: true }
-                    ]
-                },
-                {
-                    items: [
-                        { type: "bigbutton", id: "btnDelete", name: "Delete", img: "delete32.png", tooltip: "Delete", onclick: "dialogEvent('btnDelete');", disabled: true }
-                    ]
-                }
-            ]
-        }
+        items: [
+            { type: "button", name: "Add", img: "addresource.gif", tooltip: "Add", width: "80px", onclick: "toolbar_event('btnAdd');" },
+            { type: "button", id: "btnModify", name: "Modify", img: "editview.gif", tooltip: "Modify", width: "80px", onclick: "return toolbar_event('btnModify');", disabled: true },
+            { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar_event('btnDelete');", disabled: true }
+        ]
+    };
+    var toolbar2Data = {
+        parent: "idToolbar2Div",
+        style: "display:none;",
+        imagePath: "images/",
+        items: [
+            { type: "button", name: "Add", img: "addresource.gif", tooltip: "Add", width: "80px", onclick: "toolbar2_event('btnAdd2');" },
+            { type: "button", id: "btnInsert2", name: "Insert", img: "editview.gif", tooltip: "Modify", width: "80px", onclick: "return toolbar2_event('btnInsert2');", disabled: true },
+            { type: "button", id: "btnDelete2", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar2_event('btnDelete2');", disabled: true }
         ]
     };
 
-    var editorTab = new Ribbon(editorTabData);
-    editorTab.Render();
+    var toolbar = new Toolbar(toolbarData);
+    var toolbar2 = new Toolbar(toolbar2Data);
+    
+    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1_selectedRow = 0;
+    var tgrid1_selectedRow = 0;
 
-    var OnLoad = function (event) {
+    function OnLoad(event) {
+        toolbar.Render();
+        dgrid1.addEventListener("onRowSelect", dgrid1_OnRowSelect);
+        OnResize();
     };
 
-    var OnResize = function (event) {
-        var obj = document.getElementById("idTableDiv");
-        var xy = findAbsolutePosition(obj);
-        document.getElementById("idTableDiv").style.height = (document.documentElement.clientHeight - xy[1] - 5) + "px";
+    function dgrid1_OnRowSelect(rowid, cellindex) {
+        dgrid1_selectedRow = rowid;
+        toolbar.enableItem("btnModify");
+        toolbar.enableItem("btnDelete");
     };
 
-    function dialogEvent(action) {
-        var sRowId = "";
-        var sMode = "";
-        switch (action) {
-            case "btnAdd":
-                sMode = "Add";
-                sRowId = 0;
-                break;
-            case "btnModify":
-                sMode = "Modify";
-                sRowId = table1.GetSelectedRowId();
-                break;
-            case "btnDelete":
-                sMode = "Delete";
-                sRowId = table1.GetSelectedRowId();
-                break;
-        }
-        var options = { url: "calendarform.aspx?id=" + sRowId + "&mode=" + sMode, showMaximized: false, allowMaximize: false, showClose: false, dialogReturnValueCallback: NewItemCallback };
-        SP.UI.ModalDialog.showModalDialog(options);
-    }
-    function NewItemCallback(dialogResult, returnValue) {
-        if (dialogResult) {
-            window.location.href = window.location.href;
-        }
+    function tgrid1_OnClickCell(grid, row, col) {
+        tgrid1_selectedRow = row;
+        toolbar2.enableItem("btnInsert2");
+        toolbar2.enableItem("btnDelete2");
     };
 
-    function table1_row_event(sControlId, sEvent, sRowId) {
-        table1.RowEvent(sControlId, sEvent, sRowId);
-        switch (sEvent) {
-            case "onclick":
-                if (editorTab != null) {
-                    editorTab.enableItem("btnModify");
-                    editorTab.enableItem("btnDelete");
+    function OnResize(event) {
+        var top = dgrid1.GetTop();
+        var newHeight = document.documentElement.clientHeight - top - 5;
+        dgrid1.SetHeight(newHeight);
+    };
+    
+    function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
+        var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
+        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        return dlg;
+    };
+
+    function CloseDialog (idWindow) {
+        jsf_closeDialog(thiswins, idWindow)
+    };
+
+    function SendRequest(sXML) {
+         sURL = "./Calendars.ashx";
+         return jsf_sendRequest(sURL, sXML);
+    };
+    function toolbar2_event(event) {
+        var tgrid1 = window['<%=tgrid1.UID%>'];
+        var dlgTitle = "";
+        switch (event) {
+           case "btnInsert2":
+           case "btnAdd2":
+                var newrow;
+                if (event == "btnInsert2") {
+                    newrow = tgrid1.grid.AddRow(null, tgrid1_selectedRow, true);
                 }
+                else {
+                    newrow = tgrid1.grid.AddRow(null, null, true);
+                }
+                var prevrow = newrow.previousSibling;
+                var start = null;
+                var finish = null;
+                var id = 0;
+                if (prevrow != null) {
+                    start = tgrid1.GetCellValue(prevrow, "PRD_START_DATE");
+                    finish = tgrid1.GetCellValue(prevrow, "PRD_FINISH_DATE");
+                    id = parseInt(tgrid1.GetCellValue(prevrow, "PRD_ID"));
+                    if (start != null && finish != null) {
+                        var const_day = 86400000;
+                        tgrid1.SetCellValue(newrow, "PRD_START_DATE", finish + const_day);
+                        tgrid1.SetCellValue(newrow, "PRD_FINISH_DATE", finish + (finish - start) + const_day);
+                    }
+                    tgrid1.SetCellValue(newrow, "PRD_ID", (id+1));
+                    tgrid1.SetCellValue(newrow, "PRD_NAME", "Period" + (id+1).toString());
+                }
+                else {
+                    var nextrow = newrow.nextSibling;
+                    if (nextrow != null) {
+                        start = tgrid1.GetCellValue(nextrow, "PRD_START_DATE");
+                        finish = tgrid1.GetCellValue(nextrow, "PRD_FINISH_DATE");
+                        id = parseInt(tgrid1.GetCellValue(nextrow, "PRD_ID"));
+                        if (start != null && finish != null) {
+                            var const_day = 86400000;
+                            tgrid1.SetCellValue(newrow, "PRD_FINISH_DATE", start - const_day);
+                            tgrid1.SetCellValue(newrow, "PRD_START_DATE", start - (finish - start) - const_day);
+                        }
+                    }
+                    tgrid1.SetCellValue(newrow, "PRD_ID", (id-1));
+                    tgrid1.SetCellValue(newrow, "PRD_NAME", "Period" + (id-1).toString());
+                }
+                tgrid1_selectedRow = newrow;
+                tgrid1.Focus(newrow, 'PRD_NAME');
+                break;
+          case "btnDelete2":
+               tgrid1.grid.DeleteRow(tgrid1_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
+               break;
+        }
+        return false;
+    };
+    function toolbar_event(event) {
+        var sRowId = "";
+        document.getElementById('idCalendarDlgMode').value = event;
+        var dlgTitle = "";
+       switch (event) {
+           case "btnModify":
+                if (toolbar.isItemDisabled("btnModify") == true) {
+                    alert("Select a row to enable the Modify button");
+                    return false;
+                }
+                dlgTitle = "Modify Calendar";
+                sRowId = dgrid1_selectedRow;
+                GetCalendarInfo(event, dlgTitle, sRowId);
+                break;
+          case "btnAdd":
+                sRowId = "-1";
+                dlgTitle = "Add Calendar";
+                GetCalendarInfo(event, dlgTitle, sRowId);
+                break;
+          case "btnDelete":
+                if (toolbar.isItemDisabled("btnDelete") == true) {
+                    alert("Select a row to enable the Delete button");
+                    return false;
+                }
+                sRowId = dgrid1_selectedRow;
+                GetCalendarInfo(event, "Delete Calendar, are you sure?", sRowId);
+               break;
+        }
+        return false;
+    };
+    function GetCalendarInfo(sMode, sDlgTitle, sRowId) {
+        var sRequest = '<request function="CalendarRequest" context="ReadCalendarInfo"><data><![CDATA[' + sRowId + ']]></data></request>';
+        var jsonString = SendRequest(sRequest);
+        var json = JSON_ConvertString(jsonString);
+        if (json.reply != null) {
+            if (jsf_alertError(json.reply.error) == true)
+                return false;
+        }
+        document.getElementById('txtId').value = json.reply.calendar.calendarid;
+        document.getElementById('txtName').value = json.reply.calendar.name;
+        toolbar2.Render();
+        var tgrid1 = window['<%=tgrid1.UID%>'];
+        tgrid1.Initialize(json.reply.calendar.tgridData);
+        tgrid1.SetWidth(400);
+        tgrid1.SetHeight(350);
+        tgrid1.addEventListener("OnClickCell", tgrid1_OnClickCell);
+        if (sMode == "btnDelete") {
+             document.getElementById('idOKButton').value = "Delete";
+         }
+        else {
+            document.getElementById('idOKButton').value = "Save";
+        }
+
+        DisplayDialog(570, 550, sDlgTitle, "winCalendarDlg", "idCalendarDlg", true, false);
+   };
+
+    function calendarDlg_event(event) {
+        switch (event) {
+            case "ok":
+                var action = document.getElementById('idCalendarDlgMode').value;
+                switch (action) {
+                    case "btnAdd":
+                    case "btnModify":
+                        //alert("btnModify.OK");
+                        var sb = new StringBuilder();
+                        var tgrid1 = window['<%=tgrid1.UID%>'];
+                        tgrid1.grid.EndEdit(true);
+                        sb.append('<request function="CalendarRequest" context="UpdateCalendarInfo">');
+                        sb.append('<data');
+                        sb.append(' calendarid="' + document.getElementById('txtId').value + '"');
+                        sb.append(' name="' + jsf_xml(document.getElementById('txtName').value) + '"');
+                        sb.append('>');
+                        sb.append('<![CDATA[' + tgrid1.GetXmlData() + ']]>');
+                        sb.append('</data>');
+                        sb.append('</request>'); 
+                        var sRequest = sb.toString();
+                        var jsonString = SendRequest(sRequest);
+                        var json = JSON_ConvertString(jsonString);
+                        if (json.reply != null) {
+                            if (jsf_alertError(json.reply.error) == true)
+                                return false;
+                        }
+                        if (action == "btnModify") {
+                            var sRowId = dgrid1_selectedRow;
+                        }
+                        if (action == "btnAdd") {
+                            sRowId = json.reply.calendar.calendarid;
+                            dgrid1.addRow(sRowId);
+                        }
+                        dgrid1.SetCellValue(sRowId, "CB_ID", json.reply.calendar.calendarid);
+                        dgrid1.SetCellValue(sRowId, "CB_NAME", json.reply.calendar.name);
+                        break;
+                    case "btnDelete":
+                        //alert("btnDelete.OK");
+                        var sb = new StringBuilder();
+                        var tgrid1 = window['<%=tgrid1.UID%>'];
+                        sb.append('<request function="CalendarRequest" context="DeleteCalendarInfo">');
+                        sb.append('<data');
+                        sb.append(' calendarid="' + document.getElementById('txtId').value + '"');
+                        sb.append(' name="' + jsf_xml(document.getElementById('txtName').value) + '"');
+                        sb.append('>');
+                        sb.append('<![CDATA[' + tgrid1.GetXmlData() + ']]>');
+                        sb.append('</data>');
+                        sb.append('</request>'); 
+                        var sRequest = sb.toString();
+                        var jsonString = SendRequest(sRequest);
+                        var json = JSON_ConvertString(jsonString);
+                        if (json.reply != null) {
+                            if (jsf_alertError(json.reply.error) == true)
+                                return false;
+                        }
+                        // if deleted  then remove row from grid
+                        var sRowId = dgrid1_selectedRow;
+                        dgrid1.deleteRow(sRowId);
+                      break;
+                }
+                CloseDialog('winCalendarDlg');
+                break;
+            case "cancel":
+                CloseDialog('winCalendarDlg');
                 break;
         }
     };
-    findAbsolutePosition = function (obj) {
-        var curleftx = 0;
-        var curtopy = 0;
-        if (obj.offsetParent) {
-            do {
-                curleftx += obj.offsetLeft;
-                curtopy += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-        }
-        return [curleftx, curtopy];
-    };
+
+    var thiswins = new dhtmlXWindows();
+    thiswins.setImagePath("/_layouts/ppm/images/");
+    thiswins.setSkin("dhx_web");
 
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", OnLoad, true);
         window.addEventListener("resize", OnResize, true);
-        //window.addEventListener("beforeunload", beforeUnloadDelegate, true);
-        //window.addEventListener("unload", unloadDelegate, true);
     }
     else { // e.g. IE
         window.attachEvent("onload", OnLoad);
         window.attachEvent("onresize", OnResize);
-        //window.attachEvent("onbeforeunload", beforeUnloadDelegate);
-        //window.attachEvent("onunload", unloadDelegate);
     }
 </script>
 </asp:Content>
 
-<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+<asp:Content ID="Content3" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
 Calendars
 </asp:Content>
 
-<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
+<asp:Content ID="Content4" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
 Calendars
 </asp:Content>

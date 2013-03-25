@@ -785,6 +785,21 @@ namespace WorkEnginePPM
             return response;
         }
 
+        [PublicAPI(true)]
+        [Description("This function Posts Cost Values for a CB/CT combination")]
+        // [SampleInOut(SIO.UpdateResourcesIn, SIO.UpdateResourcesOut)]
+        public static string PostCostValues(string data)
+        {
+            string response;
+
+            using (var pfeadminmanager = new PFEAdminManager(_spWeb))
+            {
+                response = pfeadminmanager.PostCostValues(data);
+            }
+
+            return response;
+        }
+
         #endregion
 
         #region Data Sync

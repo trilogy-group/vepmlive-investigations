@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Data;
 using System.Xml;
 using System.Text;
@@ -38,12 +33,28 @@ namespace WorkEnginePPM
             }
         }
 
+        private static bool ExecuteProcess(string sContext, string sXMLRequest, out XmlNode xNode)
+        {
+            xNode = null;
+            return ExecuteProcessEx("", sContext, sXMLRequest, out xNode);
+        }
+
+        private static bool ExecuteProcessEx(string sURL, string sContext, string sXMLRequest, out XmlNode xNode)
+        {
+            xNode = null;
+            bool b = true;
+            Integration integration = new Integration();
+            xNode = integration.execute(sContext, sXMLRequest);
+            integration = null;
+            return b;
+        }
+
         private void populateStatus()
         {
             XmlNode ndSettings = null;
-            if (LMR_IF.ExecuteProcess("GetSettings", "<Settings Key=\"EPK\" Schedule=\"10\"/>", out ndSettings) == false)
+            if (ExecuteProcess("GetSettings", "<Settings Key=\"EPK\" Schedule=\"10\"/>", out ndSettings) == false)
             {
-                lblGeneralError.Text = "Error SetSettings : " + LMR_IF.LastError;
+                lblGeneralError.Text = "Error populateStatus : GetSettings";
                 lblGeneralError.Visible = true;
                 return;
             }
@@ -58,9 +69,9 @@ namespace WorkEnginePPM
                 }
 
                 XmlNode ndStatus = null;
-                if (LMR_IF.ExecuteProcess("GetTimerStatus", "<Status Schedule=\"10\"/>", out ndStatus) == false)
+                if (ExecuteProcess("GetTimerStatus", "<Status Schedule=\"10\"/>", out ndStatus) == false)
                 {
-                    lblGeneralError.Text = "Error GetTimerStatus : " + LMR_IF.LastError;
+                    lblGeneralError.Text = "Error populateStatus : GetTimerStatus";
                     lblGeneralError.Visible = true;
                     return;
                 }
@@ -110,9 +121,9 @@ namespace WorkEnginePPM
             sb.Append("</Settings>");
 
             XmlNode ndSettings = null;
-            if (LMR_IF.ExecuteProcess("SetSettings", sb.ToString(), out ndSettings) == false)
+            if (ExecuteProcess("SetSettings", sb.ToString(), out ndSettings) == false)
             {
-                lblGeneralError.Text = "Error SetSettings : " + LMR_IF.LastError;
+                lblGeneralError.Text = "Error btnSave_Click : SetSettings";
                 lblGeneralError.Visible = true;
                 return;
             }
@@ -137,9 +148,9 @@ namespace WorkEnginePPM
         protected void btnRunNow_Click(object sender, EventArgs e)
         {
             XmlNode ndStatus = null;
-            if (LMR_IF.ExecuteProcess("RunTimer", "<Settings Key=\"EPK\" Schedule=\"10\"/>", out ndStatus) == false)
+            if (ExecuteProcess("RunTimer", "<Settings Key=\"EPK\" Schedule=\"10\"/>", out ndStatus) == false)
             {
-                lblGeneralError.Text = "Error RunTimer : " + LMR_IF.LastError;
+                lblGeneralError.Text = "Error btnRunNow_Click : RunTimer";
                 lblGeneralError.Visible = true;
                 return;
             }

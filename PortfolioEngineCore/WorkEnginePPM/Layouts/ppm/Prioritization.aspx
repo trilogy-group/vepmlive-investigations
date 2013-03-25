@@ -368,11 +368,11 @@ background-color: #92C0E0;
 
         var options = { url: weburl, width: 800, height: 600, showClose: false, dialogReturnValueCallback: mycallback };
 
-        //SP.UI.ModalDialog.showModalDialog(options);
-        //var mymodal = document.getElementById("myModal");
-        //mymodal.style.display = "block";
-        //mymodal.modal('show');
-        //$("#myModal").modal();
+        SP.UI.ModalDialog.showModalDialog(options);
+        var mymodal = document.getElementById("myModal");
+        mymodal.style.display = "block";
+        mymodal.modal('show');
+        $("#myModal").modal();
         showModal();
     }
 //    function hideModal() {

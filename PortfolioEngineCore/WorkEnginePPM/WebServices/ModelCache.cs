@@ -6,6 +6,8 @@ using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Linq;
 using WorkEnginePPM;
+//using WorkEnginePPM_old;
+using PortfolioEngineCore;
 
 using System.Text;
 using System.Data;
@@ -176,13 +178,13 @@ namespace ModelDataCache
     }
     static class ModelErrorHandling
     {
-        static public void HandleStatusError(SqlConnection oDataAccess, SeverityEnum eSeverity, string sFunction, StatusEnum eStatus, string sText, int UserWResID, string sSessionInfo)
+        static public void HandleStatusError(SqlConnection oDataAccess, PortfolioEngineCore.SeverityEnum eSeverity, string sFunction, PortfolioEngineCore.StatusEnum eStatus, string sText, int UserWResID, string sSessionInfo)
         {
-            DBTrace(oDataAccess, eStatus, TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), UserWResID, sSessionInfo);
+            DBTrace(oDataAccess, eStatus, PortfolioEngineCore.TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), UserWResID, sSessionInfo);
             return;
         }
 
-        static void DBTrace(SqlConnection oDataAccess, StatusEnum eStatus, TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, int UserWResID, string sSessionInfo)
+        static void DBTrace(SqlConnection oDataAccess, PortfolioEngineCore.StatusEnum eStatus, PortfolioEngineCore.TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, int UserWResID, string sSessionInfo)
         {
             CStruct xTraceMessages = new CStruct();
             xTraceMessages.Initialize("TraceMessages");
@@ -1057,6 +1059,10 @@ namespace ModelDataCache
             foreach (SortFieldDefn sng in DetCol)
             {
                 string sn = sng.name.Replace(" ", "");
+
+                sn = sn.Replace("\r", "");
+                sn = sn.Replace("\n", "");
+
                 string h1 = " ";
                 string h2 = " ";
                 int isp = sng.name.IndexOf(" ");
@@ -1360,6 +1366,10 @@ namespace ModelDataCache
             {
                 string sn = sng.name.Replace(" ", "");
 
+
+                sn = sn.Replace("\r", "");
+                sn = sn.Replace("\n", "");
+
                 //if (bCellhtml)
                 //{
 
@@ -1610,6 +1620,11 @@ namespace ModelDataCache
             foreach (SortFieldDefn sng in TotCol)
             {
                 string sn = sng.name.Replace(" ", "");
+
+
+                sn = sn.Replace("\r", "");
+                sn = sn.Replace("\n", "");
+
                 string h1 = " ";
                 string h2 = " ";
                 int isp = sng.name.IndexOf(" ");
@@ -1765,6 +1780,8 @@ namespace ModelDataCache
             {
                 string sn = sng.name.Replace(" ", "");
 
+                sn = sn.Replace("\r", "");
+                sn = sn.Replace("\n", "");
 
 
                 if (sng.fid == (int)FieldIDs.SD_FID)
@@ -9224,7 +9241,7 @@ namespace ModelDataCache
                     }
                     catch (Exception ex)
                     {
-                        ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveVersion", (StatusEnum)99826, ex.Message.ToString(), 0, "");
+                        ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveVersion", (PortfolioEngineCore.StatusEnum)99826, ex.Message.ToString(), 0, "");
                     }
 
 
@@ -9236,7 +9253,7 @@ namespace ModelDataCache
                     }
                     catch (Exception ex)
                     {
-                        ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveVersion", (StatusEnum)99825, ex.Message.ToString(), 0, "");
+                        ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveVersion", (PortfolioEngineCore.StatusEnum)99825, ex.Message.ToString(), 0, "");
                     }
 
                     try
@@ -9247,7 +9264,7 @@ namespace ModelDataCache
                     }
                     catch (Exception ex)
                     {
-                        ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveVersion", (StatusEnum)99824, ex.Message.ToString(), 0, "");
+                        ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveVersion", (PortfolioEngineCore.StatusEnum)99824, ex.Message.ToString(), 0, "");
                     }
 
                     sCommand = "insert into EPGP_MODEL_PROJECT_DATES (MODEL_UID, MODEL_VERSION_UID,  PROJECT_ID, PROJECT_START_DATE, PROJECT_FINISH_DATE,PROJECT_SELECTED) " +
@@ -9290,7 +9307,7 @@ namespace ModelDataCache
 
                     catch (Exception ex)
                     {
-                        ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveVersion", (StatusEnum)99823, ex.Message.ToString(), 0, "");
+                        ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveVersion", (PortfolioEngineCore.StatusEnum)99823, ex.Message.ToString(), 0, "");
                     }
 
                     try
@@ -9354,7 +9371,7 @@ namespace ModelDataCache
 
                     catch (Exception ex)
                     {
-                        ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveVersion", (StatusEnum)99822, ex.Message.ToString(), 0, "");
+                        ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveVersion", (PortfolioEngineCore.StatusEnum)99822, ex.Message.ToString(), 0, "");
                     }
 
                     try
@@ -9408,7 +9425,7 @@ namespace ModelDataCache
 
                     catch (Exception ex)
                     {
-                        ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveVersion", (StatusEnum)99822, ex.Message.ToString(), 0, "");
+                        ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveVersion", (PortfolioEngineCore.StatusEnum)99822, ex.Message.ToString(), 0, "");
                     }
 
 
@@ -9512,7 +9529,7 @@ namespace ModelDataCache
 
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "DeleteTarget", (StatusEnum)99821, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "DeleteTarget", (PortfolioEngineCore.StatusEnum)99821, ex.Message.ToString(), 0, "");
             }
 
 
@@ -9617,7 +9634,7 @@ namespace ModelDataCache
 
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "CreateTarget", (StatusEnum)99820, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "CreateTarget", (PortfolioEngineCore.StatusEnum)99820, ex.Message.ToString(), 0, "");
             }
 
             return ret;
@@ -9971,7 +9988,7 @@ namespace ModelDataCache
 
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "PrepareTargetData", (StatusEnum)99819, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "PrepareTargetData", (PortfolioEngineCore.StatusEnum)99819, ex.Message.ToString(), 0, "");
             }
 
             //m_oDataAccess = null;
@@ -10113,7 +10130,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveTargetData", (StatusEnum)99818, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveTargetData", (PortfolioEngineCore.StatusEnum)99818, ex.Message.ToString(), 0, "");
             }
 
 
@@ -10125,7 +10142,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveTargetData", (StatusEnum)99817, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveTargetData", (PortfolioEngineCore.StatusEnum)99817, ex.Message.ToString(), 0, "");
             }
 
             try
@@ -10212,7 +10229,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveTargetData", (StatusEnum)99816, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveTargetData", (PortfolioEngineCore.StatusEnum)99816, ex.Message.ToString(), 0, "");
             }
             //m_oDataAccess = null;
         }
@@ -10294,7 +10311,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "DeleteUserViewData", (StatusEnum)99815, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "DeleteUserViewData", (PortfolioEngineCore.StatusEnum)99815, ex.Message.ToString(), 0, "");
             }
 
             LoadUserViews(oDataAccess);
@@ -10318,7 +10335,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "RenameUserViewData", (StatusEnum)99999, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "RenameUserViewData", (PortfolioEngineCore.StatusEnum)99999, ex.Message.ToString(), 0, "");
             }
 
             LoadUserViews(oDataAccess);
@@ -10343,7 +10360,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveUserViewData", (StatusEnum)99814, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveUserViewData", (PortfolioEngineCore.StatusEnum)99814, ex.Message.ToString(), 0, "");
             }
 
 
@@ -10358,7 +10375,7 @@ namespace ModelDataCache
             }
             catch (Exception ex)
             {
-                ModelErrorHandling.HandleStatusError(oDataAccess, SeverityEnum.Exception, "SaveUserViewData", (StatusEnum)99813, ex.Message.ToString(), 0, "");
+                ModelErrorHandling.HandleStatusError(oDataAccess, PortfolioEngineCore.SeverityEnum.Exception, "SaveUserViewData", (PortfolioEngineCore.StatusEnum)99813, ex.Message.ToString(), 0, "");
             }
 
             try

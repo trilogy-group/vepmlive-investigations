@@ -5,6 +5,7 @@ using WorkEnginePPM;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using PortfolioEngineCore;
 
 namespace PPM
 {
@@ -17,92 +18,45 @@ namespace PPM
         {
             get { return false; }
         }
-
         public void ProcessRequest(HttpContext context)
         {
-            context.Server.ScriptTimeout = 86400;
+            const string this_class = "PPM.PageRequest";
+            string s = "";
             StreamReader sr = new StreamReader(context.Request.InputStream);
             string sRequest = sr.ReadToEnd();
-
-            if (sRequest.Length == 0)
-            {
-                context.Response.ContentType = "text/xml; charset=utf-8";
-                context.Response.Write(CStruct.ConvertXMLToJSON("<Reply><HRESULT>0</HRESULT><Error>Zero Length Request String</Error><STATUS>8</STATUS></Reply>"));
-                return;
-            }
-            
-            if (context.User.Identity.IsAuthenticated == false)
-            {
-                context.Response.ContentType = "text/xml; charset=utf-8";
-                context.Response.Write(CStruct.ConvertXMLToJSON("<Reply><HRESULT>0</HRESULT><Error>User Not Authenticated</Error><STATUS>8</STATUS></Reply>"));
-                return;
-            }
-            
-            if (context.Session == null)
-            {
-                context.Response.ContentType = "text/xml; charset=utf-8";
-                context.Response.Write(CStruct.ConvertXMLToJSON("<Reply><HRESULT>0</HRESULT><Error>Session not initialized</Error><STATUS>8</STATUS></Reply>"));
-                return;
-            }
-
-            string sStage;
-            if (WebAdmin.AuthenticateUserAndProduct(context, out sStage) != true)
-            {
-                context.Response.ContentType = "text/xml; charset=utf-8";
-                context.Response.Write(CStruct.ConvertXMLToJSON("<Reply><HRESULT>0</HRESULT><Error>" + sStage +
-                                        "</Error><STATUS>8</STATUS></Reply>"));
-                return;
-            }
-
-            //string connectionString = WebAdmin.GetConnectionString(context);
-            //string sWResID = WebAdmin.GetSPSessionString(context, "WResID");
-            //string userName = WebAdmin.GetSPSessionString(context, "userName");
-            //string port = WebAdmin.GetSPSessionString(context, "port");
-            ////IntPtr token = ((WindowsIdentity)context.User.Identity).Token;
-            //IntPtr token = (IntPtr) 0;
-            //string sXML = WebAdmin.BuildProductInfoString(context, basePath, port, connectionString, userName,
-            //                                                sWResID, token);
-
-            string s = "";
             try
             {
-                CStruct xPageRequest = new CStruct();
-                if (xPageRequest.LoadXML(sRequest))
+                context.Server.ScriptTimeout = 86400;
+                s = WebAdmin.CheckRequest(context, this_class, sRequest);
+                if (s == "")
                 {
-                    string sFunction = xPageRequest.GetStringAttr("function");
-                    string sContext = xPageRequest.GetStringAttr("context");
-                    try
+                    CStruct xPageRequest = new CStruct();
+                    if (xPageRequest.LoadXML(sRequest))
                     {
-                        Assembly assemblyInstance = Assembly.GetExecutingAssembly();
-                        Type thisClass = assemblyInstance.GetType("PPM.PageRequest", true, true);
-                        MethodInfo m = thisClass.GetMethod(sFunction);
-                        object result = m.Invoke(null, new object[] { context, xPageRequest.InnerText });
-                        s = BuildReply(sFunction, sContext, result.ToString());
+                        string sFunction = xPageRequest.GetStringAttr("function");
+                        string sRequestContext = xPageRequest.GetStringAttr("context");
+                        try
+                        {
+                            Assembly assemblyInstance = Assembly.GetExecutingAssembly();
+                            Type thisClass = assemblyInstance.GetType(this_class, true, true);
+                            MethodInfo m = thisClass.GetMethod(sFunction);
+                            CStruct xData = xPageRequest.GetSubStruct("data");
+                            object result = m.Invoke(null, new object[] { context, sRequestContext, xData });
+                            s = WebAdmin.BuildReply(this_class, sFunction, sRequestContext, result.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            s = WebAdmin.BuildReply(this_class, sFunction, sRequestContext, WebAdmin.FormatError("exception", this_class + ".ProcessRequest", ex.Message, "1"));
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        //return HandleError("Execute", 99999, string.Format("Error executing function: {0}", ex.Message));
-                    }
-                    //switch (sSender)
-                    //{
-                    //    case "Prioritization":
-                    //        string sPageXML = xPageRequest.InnerText;
-                    //        s = PPM.Prioritization.SaveWeightData(basePath, sPageXML);
-                    //        break;
-                    //}
                 }
             }
             catch (Exception ex)
             {
-                s = HandleException("ProcessRequest", 99999, ex);
+                s = WebAdmin.BuildReply(this_class, this_class + ".ProcessRequest", sRequest, WebAdmin.FormatError("exception", this_class + ".ProcessRequest", ex.Message, "1"));
             }
             context.Response.ContentType = "text/xml; charset=utf-8";
             context.Response.Write(CStruct.ConvertXMLToJSON(s));
-        }
-
-        private string BuildReply(string sFunction, string sContext, string sReply)
-        {
-            return "<PageRequest function=\"" + sFunction + "\" context=\"" + sContext + "\" ><![CDATA[\"" + sReply + "\"]]></PageRequest>";
         }
 
         public static string Prioritization(HttpContext Context, string sXML)
@@ -113,7 +67,7 @@ namespace PPM
             //PortfolioEngineCore.ResourcePlans rp = new PortfolioEngineCore.ResourcePlans(sBaseInfo);
             try
             {
-                sReply = PPM.Prioritization.SaveWeightData(basePath, sXML);
+                sReply = PPM.Prioritization.SaveWeightData(Context, basePath, sXML);
                 //rp.HandleRequest(sXML, out sReply);
             }
             catch (Exception ex)
@@ -158,7 +112,7 @@ namespace PPM
 
     internal class Prioritization
     {
-        public static string SaveWeightData(string sContextInfo, string sData)
+        public static string SaveWeightData(HttpContext Context, string sContextInfo, string sData)
         {
             string sReply = "";
             try
@@ -172,8 +126,11 @@ namespace PPM
                 else
                 {
                     //WebAdmin.
-                    string sDBConnect = WebAdmin.GetConnectionString(sContextInfo);
-                    DBAccess dba = new DBAccess(sDBConnect);
+                    //string sDBConnect = WebAdmin.GetConnectionString(sContextInfo);
+                    //DBAccess dba = new DBAccess(sDBConnect);
+                    string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                    DataAccess da = new DataAccess(sBaseInfo);
+                    DBAccess dba = da.dba;
                     if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
 
                     DataTable dt;
@@ -227,7 +184,7 @@ namespace PPM
 
         public static string HandleException(Exception ex)
         {
-            return "Prioritization Exception : " + ex.Message.ToString();
+            return "Prioritization Exception : " + ex.Message;
         }
     }
 

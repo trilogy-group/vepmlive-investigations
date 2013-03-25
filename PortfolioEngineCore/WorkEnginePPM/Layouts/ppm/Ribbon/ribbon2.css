@@ -1,17 +1,4 @@
-﻿.ms-cui-img-cont-float {
-    display: inline-block;
-}
-
-.ms-cui-img-container, .ms-cui-img-cont-float {
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
-    position: relative;
-    text-align: left;
-    z-index: 10;
-}
-
-.ms-cui-ribbon, .ms-cui-menu, .ms-cui-toolbar-toolbar {
+﻿.ms-cui-ribbon, .ms-cui-menu, .ms-cui-toolbar-toolbar {
     color: #6C6E70;
     font-family:Segoe UI,Tahoma,Verdana,sans-serif;
     font-size: 8pt;
@@ -1053,16 +1040,16 @@ a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hov
     border-color: #C28A30;
 }
 .ms-cui-ctl-large:hover, a.ms-cui-ctl-lowerlarge:hover, .ms-cui-ctl-light-hoveredOver, .ms-cui-ctl-medium:hover, .ms-cui-ctl:hover, .ms-cui-mrusb-selecteditem.ms-cui-ctl-light-hoveredOver a, .ms-cui-ctl-thin:hover {
-    background-color: #FDEEB3;
-    border-color: #F1C43F !important;
+    /*background-color: #FDEEB3;
+    border-color: #F1C43F !important;*/
 }
 .ms-cui-ctl-on:hover {
     background-color: #FFED95 !important;
     border-color: #C28A30 !important;
 }
 .ms-cui-ctl-mousedown, .ms-cui-ctl-large:active, .ms-cui-ctl-lowerlarge:active, .ms-cui-ctl-medium:active, .ms-cui-ctl:active, .ms-cui-ctl-a1:active, .ms-cui-ctl-a2:active, .ms-cui-ctl-thin:active {
-    background-color: #F6C867 !important;
-    border-color: #C28A30 !important;
+    /*background-color: #F6C867 !important;
+    border-color: #C28A30 !important;*/
 }
 .ms-cui-ctl-large .ms-cui-ctl-a2 {
     border-top: 0 none !important;
@@ -1986,4 +1973,151 @@ ul.ms-cui-menusection-items li.ms-cui-menusection-items {
     float: none;
 }
 :first-child + html[dir="rtl"] .menu-horizontal li.static .additional-background {
+}
+.epm-slider { position: relative; width: 105px; float:right;  -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -o-user-select: none; user-select: none; height: 15px; display: inline-block; }
+.epm-slider .epm-slider-scale { background-color: #ffffff; height: 10px; border-radius: 5px; border: 1px solid #aaa; width: 100px; margin-top: 3px; float: right; display: inline-block; top: -10px;}
+.epm-slider .epm-slider-scalemiddle { background-color: #cdcdcd; height: 10px; border-radius: 5px; border: 1px solid #aaa; width: 10px; position: absolute; top: 4px;}
+.epm-slider .epm-slider-scale .epm-slider-buttonmin { width: 6px; border-radius: 1px; border: 1px solid #adadad; height: 20px; position: relative; top: -6px; left: 0px; background-color: #efefef; cursor: pointer; }
+.epm-slider .epm-slider-scale .epm-slider-buttonmin:hover { border-color: #777; background-color: #eee;  }
+.epm-slider .epm-slider-scale .epm-slider-buttonmax { width: 6px; border-radius: 1px; border: 1px solid #adadad; height: 20px; position: relative; top: -1px; left: 0px; background-color: #efefef; cursor: pointer; }
+.epm-slider .epm-slider-scale .epm-slider-buttonmax .epm-slider-divies { border-left: 1px solid #adadad; border-right: 1px solid #adadad; position: relative; left: 3px; top: 3px; width: 4px; height: 10px; }
+.epm-slider .epm-slider-scale .epm-slider-buttonmax:hover { border-color: #777; background-color: #eee;  }
+.epm-slider .epm-slider-scale .epm-slider-tooltip { width: 24px; height: 10px; position: absolute; top: 23px; left: 0px; text-align: center; font-size: 13px;margin-left:-10px;color: #23272C;font-family: Segoe UI,Tahoma,Verdana,sans-serif; }
+.epm-slider .epm-slider-scale .epm-slider-minval { width: 24px; height: 2px; position: relative; top: 0px; left: 0px; text-align: center; font-size: 8px; color: #aaa; display: none;}
+.epm-slider .epm-slider-scale .epm-slider-maxval { width: 24px; height: 2px; position: relative; top: 0px; left: 0px; text-align: center; font-size: 8px; color: #aaa; display: none;}
+.epm-slidetitle 
+{ 
+height: 14px; 
+position: relative; 
+top: -1px; 
+left: 0px; 
+text-align: left!important; 
+color: #23272C;
+font-family: Segoe UI,Tahoma,Verdana,sans-serif;
+font-size: 8pt;
+}
+
+.epm-ribbontitletextlj { 
+height: 14px; 
+position: relative; 
+top: -1px; 
+left: 0px; 
+text-align: left!important; 
+color: #23272C;
+font-family: Segoe UI,Tahoma,Verdana,sans-serif;
+font-size: 13px;
+}
+.epm-ribbontitletextrj 
+{ 
+height: 14px; 
+position: relative; 
+left: 0px; 
+text-align: right!important; 
+color: #23272C;
+font-family: Segoe UI,Tahoma,Verdana,sans-serif;
+font-size: 13px;
+
+}
+
+
+.epm-ribbontitletextcj { height: 14px; position: relative; top: -1px; left: 4px; text-align: center!important; font-size: 12px;  }
+
+.epm-progressbar {
+    padding-top: 4px;
+}
+.epm-progressbar .epm-progress-bar {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  position: relative;
+  height: 16px;
+  padding-right: 2px;
+  background-color:#F8F8F8;
+  border:1px solid #E0E0E0;
+}
+
+.epm-progressbar .epm-progress {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 15px;  
+  background-color: #74d04c;
+  
+}
+
+.epm-progressbar .epm-label {
+  font-size: 12px;
+  position: absolute;
+  padding-right: 8px;  
+  padding-left: 4px;
+  padding-top: 3px;
+  font-family: "Segoe UI",Tahoma,Verdana,sans-serif !important;
+ // color: #FF0000;
+  top:-3px;
+  white-space: nowrap;
+}
+
+.ui-widget {
+    font-family: "Segoe UI",Tahoma,Verdana,sans-serif !important;
+    font-size: 12px !important;
+}
+.ui-widget .ui-widget {
+    font-size: 12px !important;
+}
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+    font-family: "Segoe UI",Tahoma,Verdana,sans-serif !important;
+    font-size: 12px !important;
+}
+.ui-multiselect {text-align:left;width:120px !important; }
+.ui-multiselect span.ui-icon { float:right }
+.ui-multiselect-single .ui-multiselect-checkboxes input { position:absolute !important; top: auto !important; left:-9999px; }
+.ui-multiselect-single .ui-multiselect-checkboxes label { padding:5px !important }
+
+.ui-multiselect-header { margin-bottom:3px; padding:3px 0 3px 4px }
+.ui-multiselect-header ul { font-size:12px }
+.ui-multiselect-header ul li { float:left; padding:0 10px 0 0 }
+.ui-multiselect-header a { text-decoration:none }
+.ui-multiselect-header a:hover { text-decoration:underline }
+.ui-multiselect-header span.ui-icon { float:left }
+.ui-multiselect-header li.ui-multiselect-close { float:right; text-align:right; padding-right:0 }
+
+.ui-multiselect-menu { display:none; padding:3px; position:absolute; z-index:10000; text-align: left;width:170px !important; }
+.ui-multiselect-checkboxes { position:relative /* fixes bug in IE6/7 */; overflow-y:scroll }
+.ui-multiselect-checkboxes label { cursor:default; display:block; border:1px solid transparent; padding:3px 1px }
+.ui-multiselect-checkboxes label input { position:relative; top:1px }
+.ui-multiselect-checkboxes li { clear:both; font-size:13px; padding-right:3px }
+.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label { text-align:center; font-weight:bold; border-bottom:1px solid }
+.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label a { display:block; padding:3px; margin:1px 0; text-decoration:none }
+
+/* remove label borders in IE6 because IE6 does not support transparency */
+* html .ui-multiselect-checkboxes label { border:none }
+
+.optRangeInput
+{
+    border: 1px solid #ABABAB;
+    background-color: rgba(255,255,255,1) !important;
+    opacity: 1 !important;
+    color: #444444;
+    color: inherit;
+    font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-size:11px;
+    vertical-align: top;
+    outline: none;
+    width:80px;
+    position: absolute;
+    top: 20px;
+    float: left;
+    z-index: 10000;
+    
+}
+
+.optRangeInput:hover
+{
+    border: 1px solid;
+    border-color:#92C0E0;
+}
+
+.optRangeInput:focus
+{
+    border: 1px solid;
+    border-color:#92C0E0;
 }

@@ -27,7 +27,10 @@
             Grids.OnStartDragCell = GridsOnStartDragCellDelegate;
             Grids.OnEndDragCell = GridsOnEndDragCellDelegate;
             Grids.OnMoveDragCell = GridsOnMoveDragCellDelegate;
- 
+            Grids.OnClick = GridsOnClickDelegate;
+
+            Grids.OnCreateGroup = GridsOnCreateGroupDelegate;
+
             Grids.OnRenderStart = GridsOnRenderStartDelegate;
             Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
 
@@ -44,9 +47,9 @@
             WorkEnginePPM.CostAnalyzer.ExecuteJSON("CALoadData", s, LoadCostDataCompleteDelegate);
 
 
-         }
+        }
         catch (e) {
-            alert("Resource Analyzer OnLoad Exception");
+            alert("Cost Analyzer OnLoad Exception");
         }
     }
 
@@ -193,13 +196,22 @@
         var sTopGrid = this.BuildGridInf("g_1", this.AnalyzerFilterschecked, this.AnalyzeGroupingchecked, this.AnalyzerTabisCollapsed);
 
         var sBottomGrid = this.BuildGridInf("bottomg_1", this.TotalFilterschecked, this.TotalGroupingchecked, this.TotalTabisCollapsed);
+        var ssbf = (this.AnalyzerShowBarschecked ? "1" : "0");
+        var shdf = (this.AnalyzerHideDetailschecked ? "1" : "0");
+
+        this.SelectDetails_OKOnClick(false);
+        this.SetSelectedMode(false);
 
         var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
                 + isViewDefault + '" Personal="' + isViewPersonal + '">'
                 + sTopGrid
                 + sBottomGrid
                 + '<OtherData>'
+                + this.DetailsSettings
+                + this.ModeSettings
+                + this.TotalsColumnSettings
                 + '</OtherData>'
+                + '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '"/>'
 				+ '</View>';
 
         if (bConvToJSON != true)
@@ -673,7 +685,7 @@
         }
     }
 
-    CostAnalyzer.prototype.RenameResourceAnalyzerViewComplete = function (jsonString) {
+    CostAnalyzer.prototype.RenameCostAnalyzerViewComplete = function (jsonString) {
         try {
             var jsonObject = JSON_ConvertString(jsonString);
             if (JSON_ValidateServerResult(jsonObject)) {
@@ -696,7 +708,7 @@
             }
         }
         catch (e) {
-            this.HandleException("RenameResourceAnalyzerViewComplete", e);
+            this.HandleException("RenameCostAnalyzerViewComplete", e);
         }
     }
 
@@ -729,7 +741,7 @@
                 this.SetTotals.enableAutoViewport(false);
                 this.SetTotals.attachViewportTo(this.params.ClientID + "mainDiv");
                 this.SetTotals.setImagePath(this.imagePath);
-                this.SetTotals.createWindow("winTotDlg", 20, 30, 500, 300);
+                this.SetTotals.createWindow("winTotDlg", 20, 30, 600, 500);
                 this.SetTotals.window("winTotDlg").setIcon("logo.ico", "logo.ico");
                 this.SetTotals.window("winTotDlg").allowMove();
                 this.SetTotals.window("winTotDlg").denyResize();
@@ -755,17 +767,74 @@
                 this.TotalsData = jsonObject.Result.TotalsConfiguration;
 
 
+                var selAvail = document.getElementById('idSelTotAvailCols');
                 var selSelected = document.getElementById('idSelSelectedCols');
-               
-                selSelected.options.length = 0;
+                var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+                var selHeatMap = document.getElementById('idSelHeatmap');
+                var selHeatMapColour = document.getElementById('idSelHeatmapColour');
+
+                this.TotSelectedOrder = new Array();
+
+                var titem;
+
+                if (this.TotalsData.SelectedOrderItems.Item.length == undefined)
+                    this.TotSelectedOrder[0] = 0;
+                else {
+
+                    for (i = 0; i < this.TotalsData.SelectedOrderItems.Item.length; i++) {
+                        titem = this.TotalsData.SelectedOrderItems.Item[i];
+                        this.TotSelectedOrder[i] = titem.ItemID;
+                    }
+                }
+
+                this.TotAddSel = null;
+                this.TotRemSel = null;
+
+                chkEnableHeatMap.checked = (this.TotalsData.EnableHeatMap.Value == 1);
+
+                window.setTimeout(this.FinishTotalsDelegate, 10);
+
+
+                //                var selSelected = document.getElementById('idSelSelectedCols');
+                //               
+                //                selSelected.options.length = 0;
+
+                var topt1 = document.getElementById('toption1');
+                var topt2 = document.getElementById('toption2');
+                var topt3 = document.getElementById('toption3');
+                var topt4 = document.getElementById('toption4');
+                var topt5 = document.getElementById('toption5');
+
 
 
                 for (var n = 0; n < this.TotalsData.FIELD.length; n++) {
                     var fld = this.TotalsData.FIELD[n];
                     var Id = fld.ID;
-                    var Name = fld.Name;
                     var Selb = fld.Selected;
-                    selSelected.options[n] = new Option(Name, Id, Selb == 1, Selb == 1);
+
+                    switch (Id) {
+                        case "1":
+                            topt1.checked = (Selb == 1);
+                            break;
+                        case "2":
+                            topt2.checked = (Selb == 1);
+                            break;
+                        case "4":
+                            topt3.checked = (Selb == 1);
+                            break;
+                        case "11":
+                            topt4.checked = (Selb == 1);
+                            break;
+                        case "8":
+                            topt5.checked = (Selb == 1);
+                            break;
+
+                        default:
+                            break;
+
+
+                    }
+
                 }
             }
         }
@@ -782,29 +851,427 @@
 
     }
 
-    CostAnalyzer.prototype.SelectTotals_OKOnClick = function (iApply) {
-        if (iApply == 1) {
-            var selSelected = document.getElementById('idSelSelectedCols');
+    CostAnalyzer.prototype.FinishTotals = function () {
+        if (this.TotalsLoading == true)
+            return;
 
-            var sb = new StringBuilder();
-            sb.append("<TotalsConfiguration>");
+        var selAvail = document.getElementById('idSelTotAvailCols');
+        var selSelected = document.getElementById('idSelSelectedCols');
 
-            var sbDataxml = new StringBuilder();
+        var moveupbtn = document.getElementById('idSelectedColsMoveUp');
+        var movedownbtn = document.getElementById('idSelectedColsMoveDown');
+
+        var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+        var selHeatMap = document.getElementById('idSelHeatmap');
+        var selHeatMapColour = document.getElementById('idSelHeatmapColour');
+
+        this.selectedHeatMapColour = selHeatMapColour;
+
+        selAvail.options.length = 0;
+        selSelected.options.length = 0;
+        selHeatMap.options.length = 0;
+
+
+        this.addbtndisabled = (this.TotAddSel == null);
+        this.setNewButtonDisable('idTotButtonAdd', this.addbtndisabled);
+
+        this.rembtndisabled = (this.TotRemSel == null);
+        this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
+
+        selHeatMap.disabled = !chkEnableHeatMap.checked;
+        selHeatMapColour.disabled = !chkEnableHeatMap.checked;
+
+        var i;
+        var item;
+        var j = 0;
+
+        var temparr = new Array();
+
+        for (i = 0; i < this.TotSelectedOrder.length; i++) {
+            temparr[j++] = this.TotSelectedOrder[i];
+        }
+        this.TotSelectedOrder = temparr;
+
+
+
+        n1 = 0;
+        var bSel = false;
+
+        var bfound = false;
+        var selval;
+
+
+
+        for (i = 0; i < this.TotSelectedOrder.length; i++) {
+            for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+                item = this.TotalsData.ColumnOptions.ColumnOption[j];
+                if (item.ColumnID == this.TotSelectedOrder[i]) {
+                    bSel = false;
+
+                    if (this.TotRemSel != null)
+                        bSel = (item.ColumnID == this.TotRemSel);
+
+                    bfound |= bSel;
+
+                    if (bSel)
+                        selval = n1;
+
+                    selSelected.options[n1] = new Option(item.Name, item.ColumnID, bSel, bSel);
+
+                    if (item.ColumnID == 0) {
+                        var opt = selSelected.options[n1];
+
+                        opt.style.color = "#CCCCCC";    // "LightGrey";
+                    }
+
+                    ++n1;
+                    item.Selected = 1;
+                    break;
+                }
+            }
+        }
+
+
+
+        if (bfound == false) {
+            this.TotRemSel = null;
+            moveupbtn.disabled = true;
+            movedownbtn.disabled = true;
+        }
+        else if (selSelected.options.length <= 1) {
+            moveupbtn.disabled = true;
+            movedownbtn.disabled = true;
+        }
+        else {
+
+            if (selval == 0) {
+                moveupbtn.disabled = true;
+                movedownbtn.disabled = false;
+            }
+            else if (selval == (selSelected.options - 1)) {
+                moveupbtn.disabled = false;
+                movedownbtn.disabled = true;
+            }
+            else {
+                moveupbtn.disabled = false;
+                movedownbtn.disabled = false;
+            }
+        }
+        bfound = false;
+
+
+        n1 = 0;
+        for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+            item = this.TotalsData.ColumnOptions.ColumnOption[j];
+            if (item.Selected == 0) {
+                bSel = false;
+
+
+
+                if (this.TotAddSel != null)
+                    bSel = (item.ColumnID == this.TotAddSel);
+
+                bfound |= bSel;
+
+                selAvail.options[n1++] = new Option(item.Name, item.ColumnID, bSel, bSel);
+            }
+        }
+
+        n1 = 0;
+
+        var usesel = this.TotalsData.EnableHeatField.Value;
+
+        for (i = 0; i < this.TotalsData.ColumnOptions.ColumnOption.length; i++) {
+            item = this.TotalsData.ColumnOptions.ColumnOption[i];
+            item.Selected = 0;
+
+            if (item.ColumnID != 0) {
+                selHeatMap.options[n1++] = new Option(item.Name, item.ColumnID, item.ColumnID == usesel, item.ColumnID == usesel);
+            }
+
+        }
+
+
+
+        if (bfound == false)
+            this.TotAddSel = null;
+
+
+
+
+    }
+
+
+
+    CostAnalyzer.prototype.TotalsCols_ButtonClick = function (iDir) {
+        var selAvail = document.getElementById('idSelTotAvailCols');
+        var selSelected = document.getElementById('idSelSelectedCols');
+        var i;
+        var j;
+        var item;
+
+        if (iDir == 1) {
+            var iRemColID;
+
+            for (i = 0; i <= selSelected.options.length - 1; i++) {
+                if (selSelected.options[i].selected == true) {
+                    if (selSelected.options[i].value == 0) {    // the remove button should be disabled for the totals column - but this is here for belt and braces
+                        alert("You cannot remove the Total column from the Selected colulmns");
+                        return;
+                    }
+
+                    iRemColID = selSelected.options[i].value;
+
+                    if (selSelected.options.length == 2) {
+                        this.TotRemSel = null;
+                    }
+                    else if (i == selSelected.options.length - 1)
+                        selSelected.options[i - 1].selected = true;
+                    else
+                        selSelected.options[i + 1].selected = true;
+
+                    selSelected.remove(i);
+                    break;
+                }
+            }
+
+            for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+                item = this.TotalsData.ColumnOptions.ColumnOption[j];
+                if (item.ColumnID == iRemColID) {
+
+                    item.Selected = 0;
+                    this.TotAddSel = item.ColumnID;
+                    break;
+                }
+            }
+
+            var temparr = new Array();
+
+            for (i = 0; i <= this.TotSelectedOrder.length - 1; i++) {
+
+                if (this.TotSelectedOrder[i] != iRemColID) {
+                    temparr[temparr.length] = this.TotSelectedOrder[i];
+                }
+            }
+
+            this.TotSelectedOrder = temparr;
 
             for (i = 0; i <= selSelected.options.length - 1; i++) {
 
                 if (selSelected.options[i].selected == true) {
-                    var fID = selSelected.options[i].value;
-                    sbDataxml.append("<Item ");
-                    sbDataxml.append("ID='");
-                    sbDataxml.append(fID);
-                    sbDataxml.append("'/>");
-                    sb.append(sbDataxml.toString())
+                    this.TotRemSel = selSelected.options[i].value;
+                    break
                 }
             }
 
 
+            window.setTimeout(this.FinishTotalsDelegate, 10);
+            return;
+
+        }
+
+        // iDir = 0 - so Add a column to the selected list...
+
+        for (i = 0; i <= selAvail.options.length - 1; i++) {
+
+            if (selAvail.options[i].selected == true) {
+                var iAddColID = selAvail.options[i].value;
+
+                if (selAvail.options.length == 1) {
+                    this.TotAddSel = null;
+                }
+                else if (i == selAvail.options.length - 1)
+                    selAvail.options[i - 1].selected = true;
+                else
+                    selAvail.options[i + 1].selected = true;
+
+                selAvail.remove(i);
+
+                for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+                    item = this.TotalsData.ColumnOptions.ColumnOption[j];
+                    if (item.ColumnID == iAddColID) {
+
+                        item.Selected == 1;
+
+                        this.TotSelectedOrder[this.TotSelectedOrder.length] = item.ColumnID;
+
+                        this.TotRemSel = item.ColumnID;
+                        break;
+                    }
+                }
+
+
+                break;
+            }
+        }
+
+        for (i = 0; i <= selAvail.options.length - 1; i++) {
+
+            if (selAvail.options[i].selected == true) {
+                this.TotAddSel = selAvail.options[i].value;
+                break
+            }
+        }
+
+
+        window.setTimeout(this.FinishTotalsDelegate, 10);
+        return;
+
+
+
+    }
+
+    CostAnalyzer.prototype.TotalsSelColsMove_ButtonClick = function (iallezup) {
+        var selSelected = document.getElementById('idSelSelectedCols');
+        var moveupbtn = document.getElementById('idSelectedColsMoveUp');
+        var movedownbtn = document.getElementById('idSelectedColsMoveDown');
+
+        var i;
+        var selival;
+        var swapval;
+
+
+        for (i = 0; i <= selSelected.options.length; i++) {
+
+            if (selSelected.options[i].selected == true) {
+                selival = i;
+                break;
+            }
+        }
+
+        if (iallezup == 1) {
+            if (selival == 0)
+                return;
+
+            swapval = this.TotSelectedOrder[selival];
+            this.TotSelectedOrder[selival] = this.TotSelectedOrder[selival - 1];
+            this.TotSelectedOrder[selival - 1] = swapval;
+        }
+        else {
+            if (selival == selSelected.options.length - 1)
+                return;
+
+            swapval = this.TotSelectedOrder[selival];
+            this.TotSelectedOrder[selival] = this.TotSelectedOrder[selival + 1];
+            this.TotSelectedOrder[selival + 1] = swapval;
+        }
+
+        window.setTimeout(this.FinishTotalsDelegate, 10);
+
+    }
+
+    CostAnalyzer.prototype.SelectTotals_OKOnClick = function (iApply) {
+        if (iApply == 1) {
+
+            var selAvail = document.getElementById('idSelTotAvailCols');
+            var selSelected = document.getElementById('idSelSelectedCols');
+            var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+            var selHeatMap = document.getElementById('idSelHeatmap');
+            var selHeatMapColour = document.getElementById('idSelHeatmapColour');
+            var topt1 = document.getElementById('toption1');
+            var topt2 = document.getElementById('toption2');
+            var topt3 = document.getElementById('toption3');
+            var topt4 = document.getElementById('toption4');
+            var topt5 = document.getElementById('toption5');
+
+
+            var sb = new StringBuilder();
+            sb.append("<TotalsConfiguration>");
+
+
+
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append("<EnableHeatMap Value='");
+            sbDataxml.append((chkEnableHeatMap.checked ? "1" : "0"));
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
+
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append("<EnableHeatField Value='");
+            sbDataxml.append(selHeatMap.value);
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
+
+            this.selectedHeatMapColour = selHeatMapColour.value;
+
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<HeatFieldColour Value='");
+            sbDataxml.append(selHeatMapColour.value);
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
+
+
+            var bgotfield = false;
+
+
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<FIELD ID='1' Selected='" + (topt1.checked ? "1" : "0") + "'/>");
+            sb.append(sbDataxml.toString());
+            bgotfield |= topt1.checked;
+
+
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<FIELD ID='2' Selected='" + (topt2.checked ? "1" : "0") + "'/>");
+            sb.append(sbDataxml.toString());
+            bgotfield |= topt2.checked;
+
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<FIELD ID='4' Selected='" + (topt3.checked ? "1" : "0") + "'/>");
+            sb.append(sbDataxml.toString());
+            bgotfield |= topt3.checked;
+
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<FIELD ID='11' Selected='" + (topt4.checked ? "1" : "0") + "'/>");
+            sb.append(sbDataxml.toString());
+            bgotfield |= topt4.checked;
+
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<FIELD ID='8' Selected='" + (topt5.checked ? "1" : "0") + "'/>");
+            sb.append(sbDataxml.toString());
+            bgotfield |= topt5.checked;
+
+
+            if (bgotfield == false) {
+                alert("You must select at least one file to group on");
+                return;
+            }
+
+
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<SelectedOrderItems>");
+
+            if (chkEnableHeatMap.checked) {
+                var w = selHeatMap.selectedIndex;
+                var selected_text = selHeatMap.options[w].text;
+                this.heatmapText = selected_text;
+
+            }
+            else
+                this.heatmapText = "";
+
+            document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
+
+            var i;
+            var j;
+            for (i = 0; i < this.TotSelectedOrder.length; i++) {
+                sbDataxml.append("<Item ");
+                sbDataxml.append("ItemID='");
+
+                j = this.TotSelectedOrder[i];
+
+                if (j == 0)
+                    sbDataxml.append("0");
+                else
+                    sbDataxml.append(j);
+
+                sbDataxml.append("'/>");
+            }
+
+            sbDataxml.append("</SelectedOrderItems>");
+            sb.append(sbDataxml.toString());
+
             sb.append("</TotalsConfiguration>");
+
 
             this.TotalsColumnSettings = sb.toString();
             this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
@@ -839,86 +1306,17 @@
 
 
 
-    CostAnalyzer.prototype.SetCompareCostTypeListComplete = function (jsonString) {
-
-        try {
-
-            this.heatmapText = "";
-            var jsonObject = JSON_ConvertString(jsonString);
-            if (JSON_ValidateServerResult(jsonObject)) {
-                this.heatmapText = jsonObject.Result.HeatMapText.Value;
-            }
-            document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
-            RefreshBottomGrid();
-        }
-
-        catch (e) {
-            alert("Cost Analyzer  SetCompareCostTypeListComplete error " + e.toString());
-
-        }
-    }
-
     CostAnalyzer.prototype.SetTotalsDataComplete = function () {
 
         try {
-                RefreshBottomGrid();
-            }
-        
+            RefreshBottomGrid();
+        }
+
         catch (e) {
             alert("Cost Analyzer  SetTotalsDataComplete error " + e.toString());
 
         }
     }
-
-    CostAnalyzer.prototype.SelectCTCmp = function (iApply) {
-        if (iApply == 1) {
-            var selSelected = document.getElementById('idSelectCTCmp');
-            this.bdoingCmp = false;
-
-            var sb = new StringBuilder();
-            sb.append("<CTCMP>");
-
-            var sbDataxml = new StringBuilder();
-
-            for (i = 0; i <= selSelected.options.length - 1; i++) {
-
-                if (selSelected.options[i].selected == true) {
-                    var fID = selSelected.options[i].value;
-                    this.bdoingCmp = true;
-                    sbDataxml.append("<Item ");
-                    sbDataxml.append("ID='");
-                    sbDataxml.append(fID);
-                    sbDataxml.append("'/>");
-                    sb.append(sbDataxml.toString())
-                }
-            }
-
-
-            sb.append("</CTCMP>");
-
-            this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
-
-            var gview = this.stashgridsettings.View.bottomg_1;
-            gview.Cols = null;
-            gview.LeftCols = null;
-            gview.RightCols = null;
-
-            this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
-            this.stashgridsettings = null;
-            //            }
-
-            WorkEnginePPM.CostAnalyzer.ExecuteJSON("SetCompareCostTypeList", sb.toString(), this.SetCompareCostTypeListCompleteDelegate);
-
-            this.FlashTargetMenuStuff();
-
-        }
-
-
-        this.CostTypeDlg.window("winCostTypeDlg").detachObject();
-        this.CostTypeDlg.window("winCostTypeDlg").close();
-        this.CostTypeDlg = null;
-    }
-
 
 
     CostAnalyzer.prototype.SetChangeViewComplete = function (jsonString) {
@@ -926,23 +1324,27 @@
         try {
             var jsonObject = JSON_ConvertString(jsonString);
             if (JSON_ValidateServerResult(jsonObject)) {
-                this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
+                this.CTsPresent = jsonObject.Result.ViewData.CostTypes;
+                this.CTsPresent.CostType = JSON_GetArray(this.CTsPresent, "CostType");
 
-                this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
-                this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
+                this.ModeSettings = jsonObject.Result.ViewData.DisplayMode;
+                //                    this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
 
-                var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
+                //                    this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
+                //                    this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
+                this.heatmapText = "";
 
-//                var wsel = document.getElementById("idAnalyzerTab_SelMode");
-//                wsel.selectedIndex = wmode - 1;
+                try {
+                    this.heatmapText = this.heatmapText = jsonObject.Result.ViewData.HeatMapText.Value;
+                }
+                catch (e) { }
 
-
-                this.DetailsData = jsonObject.Result.ViewData.WorkDetails;
-
-                var wselectedItem = wsel.options[wsel.selectedIndex];
-
-//                this.flashRibbonSelect("idAnalyzerTab_SelMode");
+                //                    this.DetailsData = jsonObject.Result.ViewData.WorkDetails;   // the next two lines are needed to flash the proper state of the totals buttons on the top grid 
                 this.flashTotalsButtons();
+                this.FlashDisplayMode();
+
+                document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
+                this.TotalsColumnSettings = jsonObject.Result.ViewData.TotalsConfiguration.Value;
 
                 this.stashgridsettings = null;
 
@@ -956,7 +1358,7 @@
     }
 
 
-    CostAnalyzer.prototype.SelectDetails_OKOnClick = function () {
+    CostAnalyzer.prototype.SelectDetails_OKOnClick = function (issueServerRequest) {
 
         var sb = new StringBuilder();
         sb.append("<CTDetails>");
@@ -977,7 +1379,7 @@
             sb.append(sbDataxml.toString());
         }
 
- 
+
 
 
 
@@ -988,10 +1390,14 @@
         sb.append("</CTDetails>");
 
         this.DetailsSettings = sb.toString();
+
+        if (issueServerRequest == false)
+            return;
+
         try {
             this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
         }
-        catch(e) {
+        catch (e) {
         }
         WorkEnginePPM.CostAnalyzer.Execute("SetCTDetails", sb.toString());
 
@@ -999,7 +1405,7 @@
     }
 
 
-    CostAnalyzer.prototype.SetSelectedMode = function () {
+    CostAnalyzer.prototype.SetSelectedMode = function (issueServerRequest) {
         try {
 
             var sb = new StringBuilder();
@@ -1010,38 +1416,42 @@
             sbDataxml.append((this.viewTab.getButtonState("chksQuantity") ? "1" : "0"));
             sbDataxml.append("'/>");
             sb.append(sbDataxml.toString());
-            
+
             sbDataxml = new StringBuilder();
             sbDataxml.append("<FTE Value='");
             sbDataxml.append((this.viewTab.getButtonState("chksFTE") ? "1" : "0"));
             sbDataxml.append("'/>");
             sb.append(sbDataxml.toString());
-           
+
             sbDataxml = new StringBuilder();
             sbDataxml.append("<COST Value='");
             sbDataxml.append((this.viewTab.getButtonState("chksCost") ? "1" : "0"));
             sbDataxml.append("'/>");
             sb.append(sbDataxml.toString());
-           
+
             sbDataxml = new StringBuilder();
             sbDataxml.append("<DECOST Value='");
             sbDataxml.append((this.viewTab.getButtonState("chksDecCosts") ? "1" : "0"));
             sbDataxml.append("'/>");
             sb.append(sbDataxml.toString());
-   
+
 
             sb.append("</ShowDetails>");
 
             this.ModeSettings = sb.toString();
+
+            if (issueServerRequest == false)
+                return;
+
             try {
                 this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
             }
             catch (e) {
             }
             WorkEnginePPM.CostAnalyzer.Execute("SetDisplayMode", sb.toString());
-
+            this.ShowWorkingPopup("divLoading");
             RefreshBothGrids();
- 
+
             return true;
 
         }
@@ -1100,10 +1510,10 @@
                         tooltip: "Plan Actions",
                         columns: [
                             {
-                                 items: [
+                                items: [
                                     { type: "bigbutton", name: "Close", img: "formatmap32x32.png", style: "top: -448px; left: -288px;position:relative;", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
                                 ]
-                             }
+                            }
                         ]
                     },
                     {
@@ -1192,8 +1602,8 @@
                 imagePath: this.imagePath,
                 sections: [
                      {
-                        name: "View Management",
-                        columns: [
+                         name: "View Management",
+                         columns: [
                             {
                                 items: [
                                     { type: "smallbutton", id: "SaveViewBtn", name: "Save View", img: "createview.gif", tooltip: "Save View", onclick: "dialogEvent('AnalyzerTab_SaveView');" },
@@ -1239,14 +1649,14 @@
                                     { type: "mediumtext", id: "chksFTE", name: "Show FTEs", tooltip: "Show FTEs", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed2');" },
                                     { type: "mediumtext", id: "chksCost", name: "Show Costs", tooltip: "Show Costs", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed3');" }
                                 ]
-                           },
+                            },
                            {
                                items: [
                                     { type: "mediumtext", id: "chksDecCosts", name: "Show Decimal Places in Costs", tooltip: "Show Decimal Places in Costs", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed4');" }
                                  ]
-                            }
+                           }
                          ]
-                    },
+                     },
                        {
                            name: "Periods",
                            columns: [
@@ -1291,10 +1701,17 @@
                             },
                             {
                                 items: [
-                                    { type: "mediumbutton", id: "CTCmpBtn", name: "Compare<br/> Totals", img: "capscenariosl20x20.png", tooltip: "Compare Totals against Cost Type", onclick: "dialogEvent('CTCmpBtn');" }
-                               ]
+                                    { type: "smallbutton", id: "CreateTargetBtn", name: "Create Target", img: "createview.gif", tooltip: "Create Target", onclick: "dialogEvent('CreateTargetBtn');" },
+                                    { type: "smallbutton", id: "EditTargetBtn", name: "Edit Target", img: "editview.gif", tooltip: "Edit Target", onclick: "dialogEvent('EditTargetBtn');" }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "smallbutton", id: "DeleteTargetBtn", name: "Delete Target", img: "delete.gif", tooltip: "Delete Target", onclick: "dialogEvent('DeleteTargetBtn');" },
+                                    { type: "smallbutton", id: "CopyTargetBtn", name: "Copy Target", img: "formatmap16x16.png", style: "top: -48px; left: -192px;position:relative;", tooltip: "Copy Target", onclick: "dialogEvent('CopyTargetBtn');" }
+                                ]
                             }
-                         ]
+                        ]
                     },
                     {
                         name: "Options",
@@ -1472,18 +1889,37 @@
                 var ct = this.CTsPresent.CostType[n1];
                 var cSel = ct.Sel;
                 var cbuttonID = ct.ButtonID
-                
+
                 if (cSel == 1)
                     this.analyzerTab.setButtonStateOn(cbuttonID);
                 else
                     this.analyzerTab.setButtonStateOff(cbuttonID);
-   
+
             }
 
         }
         catch (e) { }
     }
 
+    CostAnalyzer.prototype.ShowWorkingPopup = function (divid) {
+        //        var veil = document.getElementById("veil");
+        //        veil.style.display = "block";
+        var div = $('#' + divid);
+        var win = $(window);
+        div.css('top', (win.height() - div.height()) / 2);
+        div.css('left', (win.width() - div.width()) / 2);
+        div.show();
+        var veil = $('#veil');
+        this.burkka == true;
+        veil.show();
+    };
+    CostAnalyzer.prototype.HideWorkingPopup = function (divid) {
+        var div = $('#' + divid);
+        div.hide();
+        var veil = $('#veil');
+        this.burkka = false;
+        veil.hide();
+    };
 
     CostAnalyzer.prototype.LoadCostDataComplete = function (result) {
         try {
@@ -1511,6 +1947,11 @@
 
                 this.UsingPeriods = jsonObject.Result.Periods;
                 this.CTsPresent = jsonObject.Result.CostTypes;
+                this.CTsPresent.CostType = JSON_GetArray(this.CTsPresent, "CostType");
+
+                this.TotalsData = jsonObject.Result.TotalsConfiguration;
+
+
                 this.ModeSettings = jsonObject.Result.DisplayMode;
 
                 //                this.TargetData = jsonObject.Result.Targets;
@@ -1519,7 +1960,7 @@
 
                 //                this.TotalsData = jsonObject.Result.TotalsConfiguration.TotalsConfiguration;
 
-                //                this.TotalsColumnSettings = jsonObject.Result.TotalsConfiguration.Value;
+                this.TotalsColumnSettings = jsonObject.Result.TotalsConfiguration.Value;
 
                 //                this.DetailsSettings = jsonObject.Result.DetailsConfiguration.Value;
                 //                this.DetailsData = jsonObject.Result.DetailsConfiguration.WorkDetails;
@@ -1585,6 +2026,9 @@
             if (this.refreshIconsInTotGrid != null)
                 window.setTimeout(HandleRerenderDelegate, 400);
         }
+
+        if (grid.id == "et_1")
+            this.EditGrid = grid;
     }
 
 
@@ -1600,11 +2044,38 @@
     }
 
 
+    CostAnalyzer.prototype.FlashDisplayMode = function () {
+        try {
+
+            if (this.ModeSettings.QTY.Value != "0")
+                this.viewTab.setButtonStateOn("chksQuantity");
+            else
+                this.viewTab.setButtonStateOff("chksQuantity");
+
+
+            if (this.ModeSettings.FTE.Value != "0")
+                this.viewTab.setButtonStateOn("chksFTE");
+            else
+                this.viewTab.setButtonStateOff("chksFTE");
+
+            if (this.ModeSettings.COST.Value != "0")
+                this.viewTab.setButtonStateOn("chksCost");
+            else
+                this.viewTab.setButtonStateOff("chksCost");
+
+            if (this.ModeSettings.DECOST.Value != "0")
+                this.viewTab.setButtonStateOn("chksDecCosts");
+            else
+                this.viewTab.setButtonStateOff("chksDecCosts");
+
+        }
+        catch (e) { }
+    }
     CostAnalyzer.prototype.PopulateUI = function () {
 
         try {
             this.selectedView = null;
- 
+
 
             this.TotalGroupingchecked = false;
             this.TotalFilterschecked = false;
@@ -1613,32 +2084,7 @@
             this.AnalyzerFilterschecked = false;
             this.AnalyzeGroupingchecked = false;
 
-            try {
-                
-                   if (this.ModeSettings.QTY.Value != "0")
-                        this.viewTab.setButtonStateOn("chksQuantity");
-                    else
-                        this.viewTab.setButtonStateOff("chksQuantity");
-                      
-                 
-                   if (this.ModeSettings.FTE.Value != "0")
-                        this.viewTab.setButtonStateOn("chksFTE");
-                    else
-                        this.viewTab.setButtonStateOff("chksFTE");
-                                      
-                   if (this.ModeSettings.COST.Value != "0")
-                        this.viewTab.setButtonStateOn("chksCost");
-                    else
-                        this.viewTab.setButtonStateOff("chksCost");
-                                      
-                   if (this.ModeSettings.DECOST.Value != "0")
-                        this.viewTab.setButtonStateOn("chksDecCosts");
-                    else
-                        this.viewTab.setButtonStateOff("chksDecCosts");
-                                            
-            }
-            catch(e) {}
-
+            this.FlashDisplayMode();
 
 
             this.selectedView != null
@@ -1673,6 +2119,13 @@
             }
 
 
+            if (selectviews.options.length == 0) {
+                selectviews.options[selectviews.options.length] = new Option("--No Views--", "-1", false, false);
+                this.flashRibbonSelect("idAnalyzerTab_SelView");
+            }
+
+
+
             if (this.selectedView != null)
                 WorkEnginePPM.CostAnalyzer.ExecuteJSON("ApplyCostAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, this.CreateTopGridDelegate);
             else
@@ -1702,23 +2155,36 @@
 
                 var jsonObject = JSON_ConvertString(jsonString);
                 if (JSON_ValidateServerResult(jsonObject)) {
-//                    this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
 
-//                    this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
-//                    this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
-                      this.heatmapText = "";
 
-//                    try {
-//                        this.heatmapText = this.TotalsGridSettingsData.HeatMap.HeatMapText;
-//                    }
-//                    catch (e) { }
+                    this.CTsPresent = jsonObject.Result.ViewData.CostTypes;
+                    this.CTsPresent.CostType = JSON_GetArray(this.CTsPresent, "CostType");
 
-//                    this.DetailsData = jsonObject.Result.ViewData.WorkDetails;   // the next two lines are needed to flash the proper state of the totals buttons on the top grid 
-//                    this.flashTotalsButtons()
+                    this.ModeSettings = jsonObject.Result.ViewData.DisplayMode;
+                    //                    this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
+
+                    //                    this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
+                    //                    this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
+                    this.heatmapText = "";
+
+                    try {
+                        this.heatmapText = jsonObject.Result.ViewData.HeatMapText.Value;
+
+                    }
+                    catch (e) { }
+
+                    //                    this.DetailsData = jsonObject.Result.ViewData.WorkDetails;   // the next two lines are needed to flash the proper state of the totals buttons on the top grid 
+                    this.flashTotalsButtons();
+                    this.FlashDisplayMode();
 
                     document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
 
-//                    var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
+                    this.TotalsColumnSettings = jsonObject.Result.ViewData.TotalsConfiguration.Value;
+
+
+                    document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
+
+                    //                    var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
 
                 }
             }
@@ -1731,7 +2197,7 @@
             sbDataxml.append(']]>');
 
             var sb = new StringBuilder();
-            sb.append("<treegrid debug='0' sync='0' ");
+            sb.append("<treegrid  SuppressMessage='3' debug='0' sync='0' ");
             sb.append(" Export_Url='rpaExportExcel.aspx'");
             sb.append(" data_url='" + this.Webservice + "'");
             sb.append(" data_method='Soap'");
@@ -1743,7 +2209,10 @@
             sb.append("</treegrid>");
 
             this.DetGrid = TreeGrid(sb.toString(), "gridDiv_1", "g_1");
+
+            this.initialized = true;
             this.OnResize();
+            this.ShowWorkingPopup("divLoading");
         }
         catch (e) {
             this.HandleException("CreateTopGrid", e);
@@ -1755,42 +2224,380 @@
         }
     }
 
+    CostAnalyzer.prototype.GrabRateTable = function (trow) {
+        if (trow.m_rt != 0) {
+            for (var i = 0; i < this.CSDataCache.NamedRates.length; i++) {
+                if (this.CSDataCache.NamedRates[i].UID == trow.BC_UID)
+                    return this.CSDataCache.NamedRates[i].Rate;
 
+            }
+
+        }
+        else {
+            for (i = 0; i < this.CSDataCache.Categories.length; i++) {
+                if (this.CSDataCache.Categories[i].UID == trow.BC_UID)
+                    return this.CSDataCache.Categories[i].Rate;
+            }
+
+        }
+
+
+        return null;
+    }
+
+
+    CostAnalyzer.prototype.ChangeTargetCostType = function (Row, cat) {
+
+        this.EditGrid = Grids["et_1"];
+        var trow;
+        trow = this.CSTargetCache.targetRows[Row.id - 1];
+
+        trow.BC_UID = cat.UID
+        trow.Cat_Name = cat.Name;
+        trow.FullCatName = cat.FullName;
+        trow.BC_ROLE_UID = cat.Role_UID;
+        trow.Role_Name = cat.Role_Name;
+        trow.MC_Val = cat.MC_UID;
+        trow.MC_Name = cat.MC_Val;
+        trow.sUoM = cat.UoM;
+
+
+        var rt = this.GrabRateTable(trow);
+
+        var arows = this.EditGrid.Rows;
+        var grow = arows[Row];
+
+        if (rt != null) {
+            for (var per = 1; per < trow.zCost.length; per++) {
+                trow.zCost[per].Value = trow.zValue[per].Value * rt[per].Value;
+
+                if (cat.FTE[per].Value == 0)
+                    trow.zFTE[per].Value = 0;
+                else
+                    trow.zFTE[per].Value = (trow.zValue[per].Value * 100) / cat.FTE[per].Value;
+
+
+            }
+
+        }
+
+    }
+
+    CostAnalyzer.prototype.HandleTargetEdit = function (Row, Col, value) {
+
+        this.EditGrid = Grids["et_1"];
+
+        if (Col == "Select")
+            return;
+
+        if (Col.charAt(0) == "P") {
+            var per, sCol, trow;
+
+            sCol = Col.substr(1, Col.length - 2);
+            per = parseInt(sCol);
+
+            trow = this.CSTargetCache.targetRows[parseInt(Row.id) - 1];
+
+            if (Col.charAt(Col.length - 1) == "C") {
+                trow.zCost[per].Value = parseFloat(value);
+                return;
+            }
+
+
+            var cat = null;
+            for (var j = 0; j < this.CSDataCache.Categories.length; j++) {
+
+                if (this.CSDataCache.Categories[j].UID == trow.BC_UID) {
+                    cat = this.CSDataCache.Categories[j];
+                    break;
+                }
+            }
+
+            if (this.etShowingFTEs == true) {
+                trow.zFTE[per].Value = parseFloat(value);
+                if (cat != null)
+                    trow.zValue[per].Value = (parseFloat(value) * cat.FTEConv[per].Value) / 100;
+            }
+            else
+                trow.zValue[per].Value = parseFloat(value);
+
+            var rt = this.GrabRateTable(trow);
+
+            if (rt == null)
+                trow.zCost[per].Value = 0;
+            else
+                trow.zCost[per].Value = trow.zValue[per].Value * rt[per].Value;
+
+
+            if (cat != null && this.etShowingFTEs == false) {
+
+                if (cat.FTE[per].Value == 0)
+                    trow.zFTE[per].Value = 0;
+                else
+                    trow.zFTE[per].Value = (trow.zValue[per].Value * 100) / cat.FTE[per].Value;
+
+            }
+
+
+            sCol = Col.substr(0, Col.length - 1) + "C";
+
+
+            this.EditGrid.SetString(Row, sCol, trow.zCost[per].Value, 1);
+
+
+            return;
+        }
+
+        RefreshTargetGrid();
+
+    }
+
+    CostAnalyzer.prototype.PopulateTargetTexts = function (row, oDet) {
+
+        this.EditGrid = Grids["et_1"];
+        this.EditGrid.SetString(row, "CostType", oDet.CT_Name, 1);
+        this.EditGrid.SetString(row, "CostCategory", oDet.FullCatName, 1);
+        this.EditGrid.SetString(row, "MajorCategory", oDet.MC_Name, 1);
+        this.EditGrid.SetString(row, "Role", oDet.Role_Name, 1);
+        this.EditGrid.SetString(row, "NamedRate", oDet.m_rt_name, 1);
+
+
+
+        for (var i = 0; i < this.CSDataCache.CustomFields.length; i++) {
+            var stxt, oc;
+
+            oc = this.CSDataCache.CustomFields[i];
+
+            if (oc.FieldID < 11810)
+                stxt = oDet.Text_OCVal[oc.FieldID - 11800].Value;
+            else
+                stxt = oDet.TXVal[oc.FieldID - 11810].Value;
+
+            this.EditGrid.SetString(row, oc.Name, stxt, 1);
+
+        }
+
+
+    }
+
+    CostAnalyzer.prototype.FlashTargetData = function () {
+
+        this.EditGrid = Grids["et_1"];
+
+        var trow, grow, cat, xrow;
+        var arows = this.EditGrid.Rows;
+        var oc;
+        var xi;
+        var grouping = this.EditGrid.Group;
+
+
+        for (var i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+            trow = this.CSTargetCache.targetRows[i];
+
+            grow = arows[trow.RID]
+
+
+
+            this.EditGrid.SetAttribute(grow, "Select", "Type", "Bool", 1);
+            this.EditGrid.SetAttribute(grow, "Select", "CanEdit", 1, 1);
+            this.EditGrid.SetAttribute(grow, "CostType", "Button", "Defaults", 1, 0);
+            this.EditGrid.SetAttribute(grow, "CostCategory", "Button", "Defaults", 1, 0);
+            this.EditGrid.SetString(grow, "Select", "0", 1);
+
+            for (xi = 0; xi < this.CSDataCache.CustomFields.length; xi++) {
+                oc = this.CSDataCache.CustomFields[xi];
+
+                if (oc.jsonMenu == "") {
+                    this.EditGrid.SetAttribute(grow, oc.Name, "Button", "", 1);
+                    this.EditGrid.SetAttribute(grow, oc.Name, "CanEdit", 1, 1);
+                }
+                else {
+
+                    this.EditGrid.SetAttribute(grow, oc.Name, "CanEdit", 0, 1);
+                    this.EditGrid.SetAttribute(grow, oc.Name, "Button", "Defaults", 1, 0);
+                }
+
+            }
+
+
+
+
+
+            this.PopulateTargetTexts(grow, trow);
+
+            cat = null;
+            for (var j = 0; j < this.CSDataCache.Categories.length; j++) {
+
+                if (this.CSDataCache.Categories[j].UID == trow.BC_UID) {
+                    cat = this.CSDataCache.Categories[j];
+                    break;
+                }
+            }
+
+            var qe = 1;
+            var ce = 1;
+
+
+            if (cat != null) {
+                if (cat.UoM == "")
+                    qe = 0;
+                else
+                    ce = 0;
+            }
+            else
+                qe = 0;
+
+            for (var per = 1; per <= this.CSDataCache.numberPeriods; per++) {
+                var x = "P" + per.toString() + "V";
+
+                this.EditGrid.SetAttribute(grow, x, "CanEdit", qe, 1);
+
+                if (cat != null) {
+                    if (this.etShowingFTEs == true) {
+                        if (cat.FTE[per].Value != 0)
+                            trow.zFTE[per].Value = (trow.zValue[per].Value * 100) / cat.FTE[per].Value;
+                        else
+                            trow.zFTE[per].Value = 0;
+                        this.EditGrid.SetString(grow, x, trow.zFTE[per].Value, 1);
+                    }
+                    else
+                        this.EditGrid.SetString(grow, x, trow.zValue[per].Value, 1);
+                }
+                else if (trow.bGroupRow == true) {
+                    if (this.etShowingFTEs == true)
+                        this.EditGrid.SetString(grow, x, trow.zFTE[per].Value, 1);
+                    else
+                        this.EditGrid.SetString(grow, x, trow.zValue[per].Value, 1);
+                }
+                else
+                    this.EditGrid.SetString(grow, x, 0, 1);
+
+                x = "P" + per.toString() + "C";
+                this.EditGrid.SetString(grow, x, trow.zCost[per].Value, 1);
+                this.EditGrid.SetAttribute(grow, x, "CanEdit", ce, 1);
+
+            }
+        }
+        this.EditGrid.DoGrouping(grouping)
+        this.EditGrid.Render();
+    }
+
+
+
+    var RefreshTargetGrid = function () {
+
+        try {
+
+
+            window.setTimeout(HandleTargetRefreshDelegate, 100);
+        }
+
+        catch (e) {
+        }
+    }
+
+    CostAnalyzer.prototype.HandleTargetRefresh = function () {
+
+        try {
+             this.FlashTargetData();
+        }
+        catch (e) {
+
+        }
+
+    }
     // >>>>>>>>>>>  Grid event handlers
 
     CostAnalyzer.prototype.GridsOnValueChanged = function (grid, row, col, val) {
-        if (grid.id != "et_1")
-            return val;
+        if (grid.id == "et_1") {
+
+            this.EditGrid = Grids["et_1"];
+            if (col == "CostCategory") {
+
+                for (i = 0; i < this.CSDataCache.Categories.length; i++) {
+                    if (this.CSDataCache.Categories[i].UID == val) {
+
+                        var cat = this.CSDataCache.Categories[i];
+
+                        this.ChangeTargetCostType(row, cat);
+
+                        return cat.FullName;
+                    }
+                }
+
+                return val;
+            }
+
+            if (col == "CostType") {
+
+                trow = this.CSTargetCache.targetRows[row.id - 1];
+                for (i = 0; i < this.CSDataCache.CostTypes.length; i++) {
+                    if (this.CSDataCache.CostTypes[i].Id == val) {
+
+                        var ct = this.CSDataCache.CostTypes[i];
+
+                        trow.CT_ID = val;
+                        trow.CT_Name = ct.Name;
+
+                        return ct.Name;
+                    }
+                }
+
+                trow.CT_ID = 0;
+                trow.CT_Name = "";
+
+                return "";
 
 
-        if (col.charAt(0) !== "P")
-            return val;
 
-        var s = col.substr(1);
-        var i = s.indexOf("V");
+            }
 
-        if (i === -1)
-            return val;
 
-        var per = s.substr(0, i);
 
-        i = row.id - 1;
-        trow = this.CapScenData[i];
-        frow = this.CostCatFTEData[i];
+            for (i = 0; i < this.CSDataCache.CustomFields.length; i++) {
+                var lk, oc;
 
-        fval = frow.FTEs[per - 1].Value
+                oc = this.CSDataCache.CustomFields[i];
 
-        if (this.CSHourMode == true) {
-            if (fval != 0)
-                trow.FTEs[per - 1].Value = val / fval;
-            else
-                trow.FTEs[per - 1].Value = 0;
+                if (oc.Name == col) {
+                    trow = this.CSTargetCache.targetRows[row.id - 1];
 
-            trow.Hours[per - 1].Value = val;
-        }
-        else {
-            trow.Hours[per - 1].Value = fval * val;
-            trow.FTEs[per - 1].Value = val;
+                    if (oc.jsonMenu == "") {
+                        trow.TXVal[oc.FieldID - 11810] = val;
+                        return val;
+
+                    }
+
+                    for (var xi = 0; xi < oc.LookUp.length; xi++) {
+                        lk = oc.LookUp[xi];
+
+                        if (lk.UID == val) {
+
+
+
+
+                            if (oc.FieldID < 11810) {
+                                trow.Text_OCVal[oc.FieldID - 11800].Value = lk.Name;
+                                trow.OCVal[oc.FieldID - 11800].Value = val;
+                            }
+
+                            else {
+                                if (oc.UseFullName == 1) {
+                                    trow.TXVal[oc.FieldID - 11810].Value = lk.FullName;
+                                    return lk.FullName;
+                                }
+                                else
+                                    trow.TXVal[oc.FieldID - 11810].Value = lk.Name;
+                            }
+
+                            return lk.Name;
+                        }
+                    }
+                }
+
+            }
+
+
         }
 
 
@@ -1800,6 +2607,10 @@
     }
 
     CostAnalyzer.prototype.GridsOnAfterValueChanged = function (Grid, Row, Col, value) {
+        if (Grid.id == "et_1") {
+            this.HandleTargetEdit(Row, Col, value)
+            return value;
+        }
 
         if (Grid.id == "g_1" && Col == "Select") {
             var sb = new StringBuilder();
@@ -1818,6 +2629,19 @@
             return;
         }
     }
+
+
+    CostAnalyzer.prototype.GridsOnClick = function (grid, row, col, x, y, event) {
+
+        if (grid.id == "et_1") {
+            this.csrow = null;
+
+            if (row.childNodes.length == 0)
+                this.csrow = row;
+
+        }
+    }
+
 
     CostAnalyzer.prototype.GridsOnClickCell = function (grid, row, col) {
 
@@ -1840,8 +2664,13 @@
         }
 
 
-        if (grid.id == "et_1")
-            this.csrow = row;
+        if (grid.id == "et_1") {
+            this.csrow = null;
+            
+            if (row.childNodes.length == 0)
+                this.csrow = row;
+
+        }
     }
 
     CostAnalyzer.prototype.GetGridRow = function (Grid, row) {
@@ -1908,6 +2737,9 @@
             if (selectView.selectedIndex >= 0) {
                 var selectedItem = selectView.options[selectView.selectedIndex];
                 if (selectedItem.value != null) {
+                    if (selectedItem.value == -1)
+                        return null;
+
                     if (this.Views != null) {
                         for (var i = 0; i < this.Views.length; i++) {
                             var view = this.Views[i];
@@ -1944,7 +2776,7 @@
         this.AnalyzerDeleteViewDlg = null;
     }
 
-    CostAnalyzer.prototype.DeleteResourceAnalyzerViewComplete = function (jsonString) {
+    CostAnalyzer.prototype.DeleteCostAnalyzerViewComplete = function (jsonString) {
         try {
             var jsonObject = JSON_ConvertString(jsonString);
             if (JSON_ValidateServerResult(jsonObject)) {
@@ -1997,13 +2829,32 @@
 
     CostAnalyzer.prototype.GridsOnReady = function (grid, start) {
         try {
+            if (grid.id == "et_1") {
+
+                this.EditGrid = Grids["et_1"];
+                if (this.EditGridInit)
+                    this.hideGrouping(grid);
+
+                this.EditGridInit = false;
+            }
+
 
             if (grid.id == "g_1")
                 this.topgridready = true;
 
-            if (grid.id == "bottomg_1")
-                this.bottomgridready = true;
 
+            if (grid.id == "bottomg_1") {
+                if (this.bottomgridfirstready == false) {
+                    this.HideWorkingPopup("divLoading");
+                    bottomgridfirstready = true;
+                }
+
+
+                this.bottomgridready = true;
+            }
+
+            if (this.bottomgridready == true && this.burkka == true)
+                this.HideWorkingPopup("divLoading");
 
             if (this.doTopApply == false && this.doBottomApply == false && this.stashgridsettings != null && (grid.id == "g_1" || grid.id == "bottomg_1")) {
 
@@ -2057,7 +2908,7 @@
                     sbDataxml.append(']]>');
 
                     sb = new StringBuilder();
-                    sb.append("<treegrid debug='0' sync='0' ");
+                    sb.append("<treegrid  SuppressMessage='3' debug='0' sync='0' ");
                     sb.append(" Export_Url='rpaExportExcel.aspx'");
                     sb.append(" data_url='" + this.Webservice + "'");
                     sb.append(" data_method='Soap'");
@@ -2078,7 +2929,7 @@
 
                 if (this.selectedView != null && this.doTopApply == true)
                     this.ApplyGridView(grid.id, this.selectedView, true);
-                else if(this.doTopApply == true) {
+                else if (this.doTopApply == true) {
                     this.flashGridView(grid.id, true)
                 }
 
@@ -2221,10 +3072,31 @@
     CostAnalyzer.prototype.GridsOnGetDefaultColor = function (grid, row, col, r, g, b) {
         if (grid.id == "et_1") {
 
-            if (this.EditGrid.GetAttribute(row, col, "CanEdit") == "0")
-                return 0xDADCDD;
+ 			if (row.Kind != "Data" || grid.Cols[col] == null)
+				return null;
 
-            return null;
+			if (row.childNodes.length > 0)
+				return null;  // "rgb(128,128,128)";
+
+			if (col == "MajorCategory" || col == "Role")
+				return null;  // "rgb(128,128,128)";
+
+			var bEditable = false;
+			var sCanEdit = grid.GetAttribute(row, col, "CanEdit");
+
+			if (sCanEdit == "1")
+				bEditable = true;
+			else {
+				if (typeof (grid.GetAttribute(row, col, "Defaults")) != "undefined")
+					bEditable = true;
+			}
+
+			if (bEditable == true) {
+
+				return "rgb(255,255,255)";
+			}
+			else
+				return null;  // "rgb(128,128,128)";
 
         }
 
@@ -2233,11 +3105,73 @@
             if (row.id == "Filter")
                 return null;
 
-
-
             if (row.Kind == "Data") {
 
-  
+                if (col == "Select") {
+                    var xfp = grid.GetValue(row, "xinterenalPeriodMin");
+                    var xlp = grid.GetValue(row, "xinterenalPeriodMax");
+                    var xtp = this.UsingPeriods.Period.length;   //  grid.GetValue(row, "xinterenalPeriodTotal");
+                    var xas = "";
+
+                    if (this.AnalyzerShowBarschecked == false) {
+                        for (var xo = 1; xo <= 3; ++xo) {
+                            for (var xi = 1; xi <= xtp; ++xi) {
+                                xas = "P" + xi.toString() + "C" + xo.toString();
+                                grid.SetString(row, xas + "HtmlPrefix", "", 1);
+                                grid.SetString(row, xas + "HtmlPostfix", "", 1);
+                            }
+                        }
+
+                    }
+                    else {
+                        if (xfp != 0) {
+                            for (var xo = 1; xo <= 3; ++xo) {
+                                for (var xi = 1; xi < xfp; ++xi) {
+                                    xas = "P" + xi.toString() + "C" + xo.toString();
+                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+                                    //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                                }
+                            }
+
+
+                            for (var xo = 1; xo <= 3; ++xo) {
+                                for (var xi = xfp; xi <= xlp; ++xi) {
+
+                                    xas = "P" + xi.toString() + "C" + xo.toString();
+
+
+                                    //	                                                        if (xfp == xlp)
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngSingleCell", 1);
+                                    //	                                                        else if (xi == xfp)
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngLeftCell", 1);
+                                    //	                                                        else if (xi == xlp)
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngRightCell", 1);
+                                    //	                                                        else
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngMiddleCell", 1);
+
+
+                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='white'>", 1);
+                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+
+
+                                }
+                            }
+
+                            for (var xo = 1; xo <= 3; ++xo) {
+                                for (var xi = xlp + 1; xi <= xtp; ++xi) {
+                                    xas = "P" + xi.toString() + "C" + xo.toString();
+                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+                                    //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+
                 if (grid.Cols[col].Sec == 2 && col.substr(0, 1) == "P" && this.AnalyzerShowBarschecked == true) {
                     var fp = grid.GetValue(row, "xinterenalPeriodMin");
                     var lp = grid.GetValue(row, "xinterenalPeriodMax");
@@ -2254,7 +3188,7 @@
 
 
 
-                        return 0x00F800;
+                        return 0x0072C6;
                     }
 
                     if (row.firstChild == null)
@@ -2331,6 +3265,7 @@
 
             return this.groupColour;
         }
+
 
         if (row.firstChild == null)
             return null;
@@ -2498,6 +3433,19 @@
 
     }
 
+    CostAnalyzer.prototype.GridsOnCreateGroup = function (grid, row, group, col) {
+        if (grid.id == "et_1") {
+            grid.ExpandAll(null, 0, 3);
+
+            window.setTimeout(HandleExpandAllDelegate, 100);
+        }
+
+    }
+
+    CostAnalyzer.prototype.HandleExpandAll = function () {
+            this.EditGrid.ExpandAll(null, 0, 3);
+
+    }
 
     CostAnalyzer.prototype.GridsOnStartDragCell = function (grid, row, col, shtml) {
 
@@ -3058,64 +4006,6 @@
         }
 
     }
-    CostAnalyzer.prototype.GetCTListComplete = function (jsonString) {
-
-        try {
-
- 
-
-            if (this.CostTypeDlg == null) {
-                this.CostTypeDlg = new dhtmlXWindows();
-                this.CostTypeDlg.setSkin("dhx_web");
-                this.CostTypeDlg.enableAutoViewport(false);
-                this.CostTypeDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-                this.CostTypeDlg.setImagePath("/_layouts/ppm/images/");
-                this.CostTypeDlg.createWindow("winCostTypeDlg", 20, 30, 500, 300);
-                this.CostTypeDlg.window("winCostTypeDlg").setIcon("logo.ico", "logo.ico");
-                this.CostTypeDlg.window("winCostTypeDlg").denyResize();
-                this.CostTypeDlg.window("winCostTypeDlg").button("park").hide();
-                this.CostTypeDlg.window("winCostTypeDlg").setModal(true);
-                this.CostTypeDlg.window("winCostTypeDlg").center();
-                this.CostTypeDlg.window("winCostTypeDlg").setText("Totals v Cost Types Comparison");
-                this.CostTypeDlg.window("winCostTypeDlg").attachEvent("onClose", function (win) { CostTypeDlg_OnCloseDelegate(); return true; });
-                this.CostTypeDlg.window("winCostTypeDlg").attachObject("idCTCmpDlgObj");
-
-                var jsonObject = JSON_ConvertString(jsonString);
-                if (JSON_ValidateServerResult(jsonObject)) {
-                    this.CTCmpData = jsonObject.Result.CTCmpConfiguration;
-
-
-                    var selSelected = document.getElementById('idSelectCTCmp');
-
-                    selSelected.options.length = 0;
-
-
-                    for (var n = 0; n < this.CTCmpData.CostType.length; n++) {
-                        var fld = this.CTCmpData.CostType[n];
-                        var Id = fld.ID;
-                        var Name = fld.Name;
-                        var Selb = fld.Selected;
-                        selSelected.options[n] = new Option(Name, Id, Selb == 1, Selb == 1);
-                    }
-                }
-
-
-
-            }
-            else {
-                this.CostTypeDlg.window("winCostTypeDlg").show();
-            }
-
-        }
-        catch (e) {
-            this.HandleException("GetCTListComplete", e);
-        }
-    }
-
-    CostAnalyzer.prototype.CostTypeDlg_OnClose = function () {
-        this.CostTypeDlg.window("winCostTypeDlg").detachObject();
-        this.CostTypeDlg = null;
-    }
 
 
     CostAnalyzer.prototype.SetViewChanged = function (selindex) {
@@ -3199,7 +4089,7 @@
                 this.FilterDifferent = true;
             }
 
-            WorkEnginePPM.CostAnalyzer.ExecuteJSON("ApplyResourceAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, SetChangeViewCompleteDelegate);
+            WorkEnginePPM.CostAnalyzer.ExecuteJSON("ApplyCostAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, SetChangeViewCompleteDelegate);
         }
     }
 
@@ -3295,7 +4185,9 @@
                     else
                         this.analyzerTab.setButtonStateOff(cbuttonID);
 
-                    this.SelectDetails_OKOnClick();
+                    this.SelectDetails_OKOnClick(true);
+
+                    this.ShowWorkingPopup("divLoading");
                     return;
                 }
 
@@ -3464,8 +4356,10 @@
 
                 case "AnalyzerTab_RenameView":
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
-                    if (selectView != null && selectView.selectedIndex >= 0) {
-                        var view = this.GetSelectedView();
+
+                    var view = this.GetSelectedView();
+                    if (view != null) {
+
                         this.selectedView = view;
                         var selectedItem = selectView.options[selectView.selectedIndex];
                         document.getElementById("id_RenameView_Name").value = selectedItem.text;
@@ -3507,15 +4401,19 @@
                         var view = this.GetSelectedView();
                         this.selectedView = view;
                         var selectedItem = selectView.options[selectView.selectedIndex];
-                        document.getElementById("id_SaveView_Name").value = selectedItem.text;
+                        if (view != null)
+                            document.getElementById("id_SaveView_Name").value = selectedItem.text;
+
                         var bDefault = false;
                         //    Joe wants the default for default to be off EVEN for the defaiult view 
                         //                       if (view.Default != 0)
                         //                           bDefault = true;
                         document.getElementById("id_SaveView_Default").checked = bDefault;
                         var bPersonal = false;
-                        if (view.Personal != 0)
-                            bPersonal = true;
+                        if (view != null) {
+                            if (view.Personal != 0)
+                                bPersonal = true;
+                        }
                         document.getElementById("id_SaveView_Personal").checked = bPersonal;
                     }
 
@@ -3545,12 +4443,19 @@
                 case "AnalyzerTab_DeleteView":
                     document.getElementById("id_DeleteView_Name").value = "";
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
-                    if (selectView != null && selectView.selectedIndex >= 0) {
-                        var view = this.GetSelectedView();
+
+                    var view = this.GetSelectedView();
+                    if (view != null) {
+
                         this.selectedView = view;
                         var selectedItem = selectView.options[selectView.selectedIndex];
                         document.getElementById("id_DeleteView_Name").value = selectedItem.text;
                     }
+                    else {
+                        alert("No views have been saved to be deleted!");
+                        break;
+                    }
+
 
                     if (this.AnalyzerDeleteViewDlg == null) {
                         this.AnalyzerDeleteViewDlg = new dhtmlXWindows();
@@ -3617,7 +4522,7 @@
                     sbd.append(dataXml);
                     sbd.append('</Execute>');
 
-                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("RenameResourceAnalyzerView", sbd.toString(), RenameResourceAnalyzerViewCompleteDelegate);
+                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("RenameCostAnalyzerView", sbd.toString(), RenameCostAnalyzerViewCompleteDelegate);
                     break;
 
                 case "SaveView_Cancel":
@@ -3668,8 +4573,8 @@
                     else
                         this.viewTab.setButtonStateOff("chksQuantity");
 
-                    this.SetSelectedMode();
-                     break;
+                    this.SetSelectedMode(true);
+                    break;
 
                 case "AnalyzerTab_SelMode_Changed2":
                     if (this.viewTab.getButtonState("chksQuantity") == false && this.viewTab.getButtonState("chksCost") == false)
@@ -3680,7 +4585,7 @@
                     else
                         this.viewTab.setButtonStateOff("chksFTE");
 
-                    this.SetSelectedMode();
+                    this.SetSelectedMode(true);
                     break;
                 case "AnalyzerTab_SelMode_Changed3":
                     if (this.viewTab.getButtonState("chksQuantity") == false && this.viewTab.getButtonState("chksFTE") == false)
@@ -3691,20 +4596,20 @@
                     else
                         this.viewTab.setButtonStateOff("chksCost");
 
-                    this.SetSelectedMode();
+                    this.SetSelectedMode(true);
                     break;
 
                 case "AnalyzerTab_SelMode_Changed4":
 
                     if (this.viewTab.getButtonState("chksCost") != true)
                         return;
-                    
+
                     if (this.viewTab.getButtonState("chksDecCosts") != true)
                         this.viewTab.setButtonStateOn("chksDecCosts");
                     else
                         this.viewTab.setButtonStateOff("chksDecCosts");
 
-                    this.SetSelectedMode();
+                    this.SetSelectedMode(true);
                     break;
 
                 case "AnalyzerTab_ExporttoExcel":
@@ -3760,11 +4665,6 @@
                     break;
 
 
-                case "CTCmpBtn":
-
-                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("GetCompareCostTypeList", "", GetCTListCompleteDelegate);
-
-                    break;
 
                 case "TotalsTab_GridHelpBtn":
                     this.DisplayGridExplaination();
@@ -3805,13 +4705,6 @@
                     this.SelectTotals_OKOnClick(0);
                     break;
 
-                case "SelectCTCmp_OK":
-                    this.SelectCTCmp(1);
-                    break;
-
-                case "SelectCTCmp_Cancel":
-                    this.SelectCTCmp(0);
-                    break;
 
                 case "TotalsTab_SelectColumns":
                     grid = Grids["bottomg_1"];
@@ -3857,6 +4750,96 @@
 
                     break;
 
+                case "TotalAddCol_Click":
+                    if (this.addbtndisabled != true)
+                        this.TotalsCols_ButtonClick(0);
+
+                    break;
+
+                case "TotalRemoveCol_Click":
+
+                    if (this.rembtndisabled != true)
+                        this.TotalsCols_ButtonClick(1);
+
+                    break;
+
+                case "TotalEnableAdd":
+                    var selAvail = document.getElementById('idSelTotAvailCols');
+
+
+                    this.addbtndisabled = false;
+                    this.setNewButtonDisable('idTotButtonAdd', false);
+
+
+                    for (i = 0; i <= selAvail.options.length - 1; i++) {
+
+                        if (selAvail.options[i].selected == true) {
+                            this.TotAddSel = selAvail.options[i].value;
+                            break;
+                        }
+                    }
+
+                    break;
+
+                case "TotalEnableRemove":
+                    var selSelected = document.getElementById('idSelSelectedCols');
+                    var selival = 0;
+
+                    for (i = 0; i <= selSelected.options.length; i++) {
+
+                        if (selSelected.options[i].selected == true) {
+                            selival = i;
+                            this.TotRemSel = selSelected.options[i].value;
+
+                            this.rembtndisabled = (selSelected.options[i].value == 0);
+                            this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
+                            break;
+                        }
+                    }
+
+                    var moveupbtn = document.getElementById('idSelectedColsMoveUp');
+                    var movedownbtn = document.getElementById('idSelectedColsMoveDown');
+
+                    if (selSelected.options.length <= 1) {
+                        moveupbtn.disabled = true;
+                        movedownbtn.disabled = true;
+                    }
+                    else {
+                        moveupbtn.disabled = false;
+                        movedownbtn.disabled = false;
+                    }
+
+                    if (selival == 0)
+                        moveupbtn.disabled = true;
+                    else if (selival = (selSelected.options.length - 1))
+                        movedownbtn.disabled = true;
+
+                    break;
+
+                case "TotalSelectMoveUp":
+
+                    this.TotalsSelColsMove_ButtonClick(1);
+                    break;
+
+                case "TotalSelectMoveDown":
+
+                    this.TotalsSelColsMove_ButtonClick(0);
+                    break;
+
+                case "TotalHeatMap_Click":
+                    if (this.TotalsLoading == true)
+                        return;
+
+
+                    var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+                    var selHeatMap = document.getElementById('idSelHeatmap');
+                    var selHeatMapColour = document.getElementById('idSelHeatmapColour');
+                    selHeatMap.disabled = !chkEnableHeatMap.checked;
+                    selHeatMapColour.disabled = !chkEnableHeatMap.checked;
+
+                    break;
+
+
                 case "DeleteView_OK":
 
 
@@ -3865,15 +4848,79 @@
                         var selectedItem = selectView.options[selectView.selectedIndex];
                         var deleteViewGuid = selectedItem.value;
                         var sbd = new StringBuilder();
-                        sbd.append('<Execute Function="DeleteResourceAnalyzerView">');
+                        sbd.append('<Execute Function="DeleteCostAnalyzerView">');
                         sbd.append('<View ViewGUID="' + XMLValue(deleteViewGuid) + '" />');
                         sbd.append('</Execute>');
 
-                        WorkEnginePPM.CostAnalyzer.ExecuteJSON("DeleteResourceAnalyzerView", sbd.toString(), DeleteResourceAnalyzerViewCompleteDelegate);
+                        WorkEnginePPM.CostAnalyzer.ExecuteJSON("DeleteCostAnalyzerView", sbd.toString(), DeleteCostAnalyzerViewCompleteDelegate);
                     }
                     break;
 
-   
+                case "CreateTargetBtn":
+                    this.DoingEdit = false;
+                    this.DoingDelete = false;
+                    this.DoingCopy = false;
+                    this.DoingCreate = true;
+                    this.SaveAsSet = true;
+
+
+                    this.GoDoEdit(0, "Create Target");
+
+
+                    break;
+
+                case "EditTargetBtn":
+                    this.DoingEdit = true;
+                    this.DoingDelete = false;
+                    this.DoingCopy = false;
+                    this.DoingCreate = false;
+                    this.SaveAsSet = false;
+                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("GetTargetList", "", GetTargetsListCompleteDelegate);
+                    break;
+
+                case "DeleteTargetBtn":
+                    this.DoingEdit = false;
+                    this.DoingDelete = true;
+                    this.DoingCopy = false;
+                    this.DoingCreate = false;
+                    this.SaveAsSet = false;
+                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("GetTargetList", "", GetTargetsListCompleteDelegate);
+                    break;
+                case "CopyTargetBtn":
+                    this.DoingEdit = false;
+                    this.DoingDelete = false;
+                    this.DoingCopy = true;
+                    this.DoingCreate = false;
+                    this.SaveAsSet = true;
+                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("GetTargetList", "", GetTargetsListCompleteDelegate);
+                    break;
+
+                case "SelectEditTarget_OK":
+                    this.EditTargetDone(1);
+                    break;
+
+                case "SelectEditTarget_Cancel":
+                    this.EditTargetDone(0);
+                    break;
+
+                case "SelectDeleteTarget_OK":
+                    this.DeleteTargetDone(1);
+                    break;
+
+                case "SelectDeleteTarget_Cancel":
+                    this.DeleteTargetDone(0);
+                    break;
+
+                case "SelectCopyTarget_OK":
+                    this.CopyTargetDone(1);
+                    break;
+
+                case "SelectCopyTarget_Cancel":
+                    this.CopyTargetDone(0);
+                    break;
+
+
+
                 default:
                     alert("unhandled external event - " + event);
                     break;
@@ -3905,18 +4952,9 @@
         }
 
 
-        var htt;
-        var htb;
-
-        htt = this.layout.cells(this.mainArea).getHeight();
-        htb = this.layout_totals.cells(this.totalsGridArea).getHeight();
-
-        this.layout_totals.cells(this.totalsGridArea).setHeight(100);
-        this.layout.cells(this.mainArea).setHeight(htt / 2);
+        grid.Render();
 
 
-        this.layout_totals.cells(this.totalsGridArea).setHeight(htb);
-        this.layout.cells(this.mainArea).setHeight(htt);
     }
 
 
@@ -4009,18 +5047,6 @@
 
         }
 
-        var htt;
-        var htb;
-
-        htt = this.layout.cells(this.mainArea).getHeight();
-        htb = this.layout_totals.cells(this.totalsGridArea).getHeight();
-
-        this.layout_totals.cells(this.totalsGridArea).setHeight(100);
-        this.layout.cells(this.mainArea).setHeight(htt / 2);
-
-
-        this.layout_totals.cells(this.totalsGridArea).setHeight(htb);
-        this.layout.cells(this.mainArea).setHeight(htt);
     }
 
     CostAnalyzer.prototype.showGrouping = function (grid) {
@@ -4037,6 +5063,10 @@
             case "bottomg_1":
                 this.TotalGroupingchecked = true;
                 this.totTab.setButtonStateOn("idTotTab_ShowGrouping");
+                break;
+            case "et_1":
+                this.TargetGroupingchecked = true;
+                this.EditTab.setButtonStateOn("Grp");
                 break;
         }
     }
@@ -4066,6 +5096,10 @@
             case "bottomg_1":
                 this.TotalGroupingchecked = false;
                 this.totTab.setButtonStateOff("idTotTab_ShowGrouping");
+                break;
+            case "et_1":
+                this.TargetGroupingchecked = false;
+                this.EditTab.setButtonStateOff("Grp");
                 break;
         }
     }
@@ -4150,7 +5184,7 @@
             sbDataxml.append(']]>');
 
             sb = new StringBuilder();
-            sb.append("<treegrid debug='0' sync='0' ");
+            sb.append("<treegrid  SuppressMessage='3' debug='0' sync='0' ");
             sb.append(" data_url='" + this.Webservice + "'");
             sb.append(" data_method='Soap'");
             sb.append(" data_function='Execute'")
@@ -4242,11 +5276,1303 @@
         }
     }
 
+    // targets
 
+    CostAnalyzer.prototype.GetTargetsListComplete = function (jsonString) {
+
+        try {
+
+
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+
+                this.TargetList = JSON_GetArray(jsonObject.Result.Targets, "Target");
+                if (this.TargetList.length != 0) {
+
+                    if (this.DoingEdit == true)
+                        this.DoEdit();
+                    else if (this.DoingDelete == true)
+                        this.DoDelete();
+                    else if (this.DoingCopy == true)
+                        this.DoCopy();
+                    //                    this.DoingCreate = false;
+                    return;
+                }
+
+            }
+        }
+        catch (e) {
+
+        }
+
+
+        if (this.DoingDelete == true)
+            alert("No Targets have been defined  or are available to delete");
+        else if (this.DoingEdit == false)
+            alert("No Targets have been defined or are available to edit");
+        else
+            alert("No Targets have been defined or are available to copy");
+    }
+
+
+    CostAnalyzer.prototype.DoEdit = function () {
+        try {
+            if (this.SelectEditDlg == null) {
+
+                this.SelectEditDlg = new dhtmlXWindows();
+                this.SelectEditDlg.setSkin("dhx_web");
+                this.SelectEditDlg.enableAutoViewport(false);
+                this.SelectEditDlg.attachViewportTo(this.clientID + "mainDiv");
+                this.SelectEditDlg.setImagePath(this.imagePath);
+
+                this.SelectEditDlg.createWindow("winEditTarDlg", 20, 30, 250, 125);
+
+                this.SelectEditDlg.window("winEditTarDlg").setIcon("logo.ico", "logo.ico");
+                this.SelectEditDlg.window("winEditTarDlg").allowMove();
+                this.SelectEditDlg.window("winEditTarDlg").denyResize();
+                this.SelectEditDlg.window("winEditTarDlg").setModal(true);
+                this.SelectEditDlg.window("winEditTarDlg").center();
+
+
+                this.SelectEditDlg.window("winEditTarDlg").setText("Select which Target to Edit");
+
+                this.SelectEditDlg.window("winEditTarDlg").attachObject("idEditTargetDlgObj");
+                this.SelectEditDlg.window("winEditTarDlg").button("close").disable();
+                this.SelectEditDlg.window("winEditTarDlg").button("park").hide();
+
+                var select = document.getElementById('idSelEditTarget');
+
+
+
+                for (var n = 0; n < this.TargetList.length; n++) {
+                    var Id = this.TargetList[n].ID;
+                    var Name = this.TargetList[n].Name;
+                    select.options[n] = new Option(Name, Id, n == 0, n == 0);
+                }
+
+
+
+            }
+            else
+                this.SelectEditDlg.window("winEditTarDlg").show();
+        }
+
+        catch (e) {
+            alert("error 1");
+        }
+    }
+
+    CostAnalyzer.prototype.EditTargetDone = function (iDoEdit) {
+
+        this.SelectEditDlg.window("winEditTarDlg").detachObject()
+        this.SelectEditDlg.window("winEditTarDlg").close();
+        this.SelectEditDlg = null;
+
+        if (iDoEdit == 1) {
+            var editsel = document.getElementById('idSelEditTarget');
+            var ID = editsel.options[editsel.selectedIndex].value;
+            var sName = editsel.options[editsel.selectedIndex].text;
+
+
+            this.GoDoEdit(ID, "Edit Target : " + sName);
+            
+
+        }
+
+    }
+
+
+    CostAnalyzer.prototype.DoDelete = function () {
+        try {
+            if (this.SelectDelDlg == null) {
+
+                this.SelectDelDlg = new dhtmlXWindows();
+                this.SelectDelDlg.setSkin("dhx_web");
+                this.SelectDelDlg.enableAutoViewport(false);
+                this.SelectDelDlg.attachViewportTo(this.clientID + "mainDiv");
+                this.SelectDelDlg.setImagePath(this.imagePath);
+
+                this.SelectDelDlg.createWindow("winDelTarDlg", 20, 30, 250, 125);
+
+                this.SelectDelDlg.window("winDelTarDlg").setIcon("logo.ico", "logo.ico");
+                this.SelectDelDlg.window("winDelTarDlg").allowMove();
+                this.SelectDelDlg.window("winDelTarDlg").denyResize();
+                this.SelectDelDlg.window("winDelTarDlg").setModal(true);
+                this.SelectDelDlg.window("winDelTarDlg").center();
+
+
+                this.SelectDelDlg.window("winDelTarDlg").setText("Select which Target to Delete");
+
+                this.SelectDelDlg.window("winDelTarDlg").attachObject("idDeleteTargetDlgObj");
+                this.SelectDelDlg.window("winDelTarDlg").button("close").disable();
+                this.SelectDelDlg.window("winDelTarDlg").button("park").hide();
+
+                var select = document.getElementById('idSelDelTarget');
+
+
+
+                for (var n = 0; n < this.TargetList.length; n++) {
+                    var Id = this.TargetList[n].ID;
+                    var Name = this.TargetList[n].Name;
+                    select.options[n] = new Option(Name, Id, n == 0, n == 0);
+                }
+
+
+
+            }
+            else
+                this.SelectDelDlg.window("winDelTarDlg").show();
+        }
+
+        catch (e) {
+            alert("error 1");
+        }
+    }
+
+    CostAnalyzer.prototype.DeleteTargetDone = function (iDoDelete) {
+        if (iDoDelete == 1) {
+            var delsel = document.getElementById('idSelDelTarget');
+            var ID = delsel.options[delsel.selectedIndex].value;
+            var sName = delsel.options[delsel.selectedIndex].text;
+
+
+
+            this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+            this.stashgridsettings = null;
+            //            }
+
+            WorkEnginePPM.CostAnalyzer.ExecuteJSON("DeleteTarget", ID.toString(), GetTargetDeleteCompleteDelegate);
+        }
+
+
+
+        this.SelectDelDlg.window("winDelTarDlg").detachObject()
+        this.SelectDelDlg.window("winDelTarDlg").close();
+        this.SelectDelDlg = null;
+
+    }
+
+    CostAnalyzer.prototype.GetTargetDeleteComplete = function (jsonString) {
+
+        try {
+
+
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+
+                this.heatmapText = jsonObject.Result.HeatMapText.Value;
+                document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
+
+            }
+        } catch (e) {
+
+        }
+
+        RefreshBottomGrid();
+
+
+    }
+
+    CostAnalyzer.prototype.DoCopy = function () {
+        try {
+            if (this.SelectCopyDlg == null) {
+
+                this.SelectCopyDlg = new dhtmlXWindows();
+                this.SelectCopyDlg.setSkin("dhx_web");
+                this.SelectCopyDlg.enableAutoViewport(false);
+                this.SelectCopyDlg.attachViewportTo(this.clientID + "mainDiv");
+                this.SelectCopyDlg.setImagePath(this.imagePath);
+
+                this.SelectCopyDlg.createWindow("winCopyTarDlg", 20, 30, 250, 125);
+
+                this.SelectCopyDlg.window("winCopyTarDlg").setIcon("logo.ico", "logo.ico");
+                this.SelectCopyDlg.window("winCopyTarDlg").allowMove();
+                this.SelectCopyDlg.window("winCopyTarDlg").denyResize();
+                this.SelectCopyDlg.window("winCopyTarDlg").setModal(true);
+                this.SelectCopyDlg.window("winCopyTarDlg").center();
+
+
+                this.SelectCopyDlg.window("winCopyTarDlg").setText("Select which Target to Copy");
+
+                this.SelectCopyDlg.window("winCopyTarDlg").attachObject("idCopyTargetDlgObj");
+                this.SelectCopyDlg.window("winCopyTarDlg").button("close").disable();
+                this.SelectCopyDlg.window("winCopyTarDlg").button("park").hide();
+
+                var select = document.getElementById('idSelCopyTarget');
+
+
+
+                for (var n = 0; n < this.TargetList.length; n++) {
+                    var Id = this.TargetList[n].ID;
+                    var Name = this.TargetList[n].Name;
+                    select.options[n] = new Option(Name, Id, n == 0, n == 0);
+                }
+
+
+
+            }
+            else
+                this.SelectCopyDlg.window("winCopyTarDlg").show();
+        }
+
+        catch (e) {
+            alert("error 1");
+        }
+    }
+
+    CostAnalyzer.prototype.CopyTargetDone = function (iDoEdit) {
+
+        this.SelectCopyDlg.window("winCopyTarDlg").detachObject()
+        this.SelectCopyDlg.window("winCopyTarDlg").close();
+        this.SelectCopyDlg = null;
+
+
+        if (iDoEdit) {
+            var copysel = document.getElementById('idSelCopyTarget');
+            var ID = copysel.options[copysel.selectedIndex].value;
+            var sName = copysel.options[copysel.selectedIndex].text;
+
+            this.GoDoEdit(ID, "Copy Target : " + sName);
+        }
+
+    }
+
+    CostAnalyzer.prototype.GoDoEdit = function (id, name) {
+
+        try {
+
+
+
+            if (this.dlgEditTarget == null) {
+                this.dlgEditTarget = new dhtmlXWindows();
+                this.dlgEditTarget.setSkin("dhx_web");
+                this.dlgEditTarget.enableAutoViewport(false);
+                this.dlgEditTarget.attachViewportTo(this.clientID + "mainDiv");
+                this.dlgEditTarget.setImagePath(this.imagePath);
+
+
+
+                this.dlgEditTarget.createWindow("winEditTargetDlg", 0, 0, this.Width - 30, this.Height - 50);
+
+                this.dlgEditTarget.window("winEditTargetDlg").setIcon("logo.ico", "logo.ico");
+                this.dlgEditTarget.window("winEditTargetDlg").allowMove();
+                //		this.dlgEditTarget.window("winEditTargetDlg").allowResize();
+                this.dlgEditTarget.window("winEditTargetDlg").setModal(true);
+                this.dlgEditTarget.window("winEditTargetDlg").keepInViewport(true);
+                this.dlgEditTarget.window("winEditTargetDlg").showHeader();
+                this.dlgEditTarget.window("winEditTargetDlg").progressOn();
+                this.dlgEditTarget.window("winEditTargetDlg").center();
+
+
+                this.dlgEditTarget.window("winEditTargetDlg").setText(name);
+                this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditTargetDlg");
+                this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
+                this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
+                //               this.dlgEditTarget.window("winEditTargetDlg").attachEvent("onFocus", layoutOnResizeFinishDelegate);
+
+                this.EditTargetid = id;
+
+
+
+                if (this.CSDataCache == null) {
+
+                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("GetClientSideCalcData","",GetClientSideCalcDataCompleteDelegate);
+                }
+                else {
+
+                    WorkEnginePPM.CostAnalyzer.ExecuteJSON("PrepareTargetData", this.EditTargetid, GetTargetDataCompleteDelegate);
+                }
+
+            }
+            else
+                this.dlgEditTarget.window("winEditTargetDlg").show();
+        }
+
+        catch (e) {
+            alert("error 1");
+        }
+
+    }
+
+    CostAnalyzer.prototype.FlipFTEQtyTargetCostType = function (bFTE) {
+
+        this.EditGrid = Grids["et_1"];
+        var trow, grow, cat;
+        var arows = this.EditGrid.Rows;
+        var hRow = arows["Header"];
+
+        if (this.CSTargetCache.targetRows.length == 0) {
+
+            try {
+
+                var rt = this.CSDataCache.Categories[0].Rate;
+                for (var per = 1; per < rt.length; per++) {
+                    var x = "P" + per.toString() + "V";
+
+                    if (bFTE == true)
+                        this.EditGrid.SetString(hRow, x, " FTE", 1);
+                    else
+                        this.EditGrid.SetString(hRow, x, " QTY", 1);
+                }
+
+                return;
+
+            }
+            catch (e) { }
+        }
+
+
+        for (var i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+            trow = this.CSTargetCache.targetRows[i];
+            grow = arows[trow.RID];
+
+            cat = null;
+            for (var j = 0; j < this.CSDataCache.Categories.length; j++) {
+
+                if (this.CSDataCache.Categories[j].UID == trow.BC_UID) {
+                    cat = this.CSDataCache.Categories[j];
+                    break;
+                }
+            }
+
+            var rt = this.GrabRateTable(trow);
+
+            if (rt != null) {
+                for (var per = 1; per < rt.length; per++) {
+                    var x = "P" + per.toString() + "V";
+
+                    if (i == 0) {
+                        if (bFTE == true)
+                            this.EditGrid.SetString(hRow, x, " FTE", 1);
+                        else
+                            this.EditGrid.SetString(hRow, x, " QTY", 1);
+                    }
+
+                    if (bFTE == true) {
+                        if (cat.FTE[per].Value != 0)
+                            trow.zFTE[per].Value = (trow.zValue[per].Value * 100) / cat.FTE[per].Value;
+                        else
+                            trow.zFTE[per] = 0;
+                        this.EditGrid.SetString(grow, x, trow.zFTE[per].Value, 1);
+                    }
+                    else
+                        this.EditGrid.SetString(grow, x, trow.zValue[per].Value, 1);
+
+                }
+            }
+        }
+    }
+
+
+
+    CostAnalyzer.prototype.GetClientSideCalcDataComplete = function (jsonString) {
+
+        var jsonObject = JSON_ConvertString(jsonString);
+        if (JSON_ValidateServerResult(jsonObject)) {
+
+            this.CSDataCache = jsonObject.Result.RatesAndCategories;
+
+            this.CSDataCache.Periods = JSON_GetArray(this.CSDataCache.Periods, "Period");
+            this.CSDataCache.Categories = JSON_GetArray(this.CSDataCache.Categories, "Category");
+            this.CSDataCache.CostTypes = JSON_GetArray(this.CSDataCache.CostTypes, "CostType");
+            this.CSDataCache.CustomFields = JSON_GetArray(this.CSDataCache.CustomFields, "CustomField");
+            this.CSDataCache.NamedRates = JSON_GetArray(this.CSDataCache.NamedRates, "NamedRate");
+
+
+            for (var i = 0; i < this.CSDataCache.Categories.length; i++) {
+               var x = this.CSDataCache.Categories[i];
+
+               x.Rate = JSON_GetArray(x, "Rate");
+               x.FTE = JSON_GetArray(x, "FTE");
+            }
+
+            for (var i = 0; i < this.CSDataCache.CustomFields.length; i++) {
+               var x = this.CSDataCache.CustomFields[i];
+
+               x.LookUps = JSON_GetArray(x, "LookUp");
+            }
+
+       }
+
+
+        WorkEnginePPM.CostAnalyzer.ExecuteJSON("PrepareTargetData", this.EditTargetid, GetTargetDataCompleteDelegate);
+    }
+    CostAnalyzer.prototype.GetTargetDataComplete = function (jsonString) {
+
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+
+                this.CSTargetCache = jsonObject.Result;
+                this.CSTargetCache.targetRows = JSON_GetArray(jsonObject.Result.TargetData, "targetRows");
+                for (var i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+                    var x = this.CSTargetCache.targetRows[i];
+                    
+                    x.RID = parseInt(x.RID);
+                    this.maxTargetRID = x.RID;
+                    
+                    x.OCVal = JSON_GetArray(x, "OCVal");
+                    x.Text_OCVal = JSON_GetArray(x, "Text_OCVal");
+                    x.TXVal = JSON_GetArray(x, "TXVal");
+
+                    x.zCost = JSON_GetArray(x, "zCost");
+                    x.zValue = JSON_GetArray(x, "zValue");
+                    x.zFTE = JSON_GetArray(x, "zFTE");
+
+
+
+                }
+
+                this.etShowingFTEs = false;
+            }
+
+        }
+        catch (e) { }
+
+
+        var TarRibonData = {
+            parent: "ribbonbarEdiTarDiv",
+            style: "display:none;",
+            imagePath: this.imagePath,
+            showstate: "false",
+            sections: [
+                     { name: "General",
+                         columns: [
+                            {
+                                items: [
+                                    { type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "editTargetEvent('etCloseBtn');" }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "bigbutton", id: "idTargetSave", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "editTargetEvent('etSaveBtn');" }
+                                ]
+                            }
+                        ]
+                     },
+                      { name: "Tools",
+                        columns: [
+                            {
+                                items: [
+                                     { type: "mediumtext", id: "idTargetFTE", name: "Show FTE", tooltip: "Swap between FTEs and Hours", onclick: "editTargetEvent('Edit_SelMode_Changed');" },
+									 { type: "smallbutton", id: "SpreadBtn", name: "Allocate Values", img: "spread.gif", tooltip: "Allocate Values", onclick: "editTargetEvent('etSpread');" },
+                                     { type: "smallbutton", id: "LoadUpBtn", name: "Populate Totals", img: "spread.gif", tooltip: "Populate Totals", onclick: "editTargetEvent('etPopBtn');" }
+                                ]
+                            },
+                            {
+                                items: [
+                                     { type: "smallbutton", id: "TarAppendRow", name: "Append Row", img: "ps16x16.png", style: "top: -128px;left: -64px;position:relative;", tooltip: "Append Row", onclick: "editTargetEvent('etInsBtn');" },
+                                     { type: "smallbutton", id: "TarDelRowsBtn", name: "Delete Selected Rows", img: "delete.gif", tooltip: "Delete Selected Rows", onclick: "editTargetEvent('etDelBtn');" },
+                                       { type: "smallbutton", id: "Grp", name: "Group Rows", img: "grouping.gif", tooltip: "Group Rows", onclick: "editTargetEvent('etGrpBtn');" }
+                              ]
+                            }
+                        ]
+                    }
+
+                 ]
+        };
+
+
+
+        this.EditTab = new Ribbon(TarRibonData);
+
+        if (this.SaveAsSet)
+             this.EditTab.SetItemName("idTargetSave", "Save As");
+        this.EditTab.Render();
+
+        //	    this.ettoolbar = new dhtmlXToolbarObject(this.toolbarEditTargetData);
+        //	    this.ettoolbar.attachEvent("onClick", ettoolbarOnClickDelegate);
+
+        //	    this.ettoolbar.hideItem("etQTYBtn");
+
+
+        //	    document.getElementById('idEditGridDiv').style.height = (this.Height - 120) + "px";
+        //	
+        
+
+
+
+        var sbDataxml = new StringBuilder();
+        sbDataxml.append('<![CDATA[');
+        sbDataxml.append('<Execute Function="GetTargetGrid">');
+        sbDataxml.append('</Execute>');
+        sbDataxml.append(']]>');
+
+        var sb = new StringBuilder();
+        sb.append("<treegrid  SuppressMessage='3' debug='0' sync='0' ");
+        sb.append(" data_url='" + this.Webservice + "'");
+        sb.append(" data_method='Soap'");
+        sb.append(" data_function='Execute'")
+        sb.append(" data_namespace='WorkEnginePPM'");
+        sb.append(" data_param_Function='GetTargetGrid'");
+        sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+        sb.append(" >");
+        sb.append("</treegrid>");
+
+        this.EditGridInit = true;
+
+        this.EditGrid = TreeGrid(sb.toString(), "idEditTargetGridDiv", "et_1");
+
+        this.csrow = null;
+
+        //        var sHTML1 = "<treegrid debug='0' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetTargetGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetTargetGridData' data_namespace='WorkEnginePPM' data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
+        //        this.EditGrid = TreeGrid(sHTML1, "idEditGridDiv", "et_1");
+
+
+    }
+
+    CostAnalyzer.prototype.CloseEditTarget = function () {
+
+        this.dlgEditTarget.window("winEditTargetDlg").detachObject();
+        this.dlgEditTarget.window("winEditTargetDlg").close();
+        this.dlgEditTarget = null;
+
+
+
+        this.EditGrid.Dispose();
+        this.EditGrid = null;
+
+
+    }
+
+
+    CostAnalyzer.prototype.TargetDeleteRows = function () {
+        this.EditGrid = Grids["et_1"];
+        var trow, grow, cat;
+        var arows = this.EditGrid.Rows;
+
+        var grouping = this.EditGrid.Group;
+
+        var cnt = 0;
+        var dcnt = 0;
+        var i;
+
+        for (var i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+            trow = this.CSTargetCache.targetRows[i];
+            grow = arows[trow.RID];
+
+            if (this.EditGrid.GetString(grow, "Select") != "1")
+                cnt++;
+            else {
+                dcnt++;
+            }
+
+        }
+
+        if (dcnt == 0)
+            return;
+
+        var narr = new Array(cnt);
+        var darr = new Array(dcnt);
+
+
+
+        cnt = 0;
+        dcnt = 0;
+
+
+        for (var i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+            trow = this.CSTargetCache.targetRows[i];
+            grow = arows[trow.RID];
+
+
+            if (this.EditGrid.GetString(grow, "Select") != "1") {
+                narr[cnt++] = trow;
+            }
+            else {
+                darr[dcnt++] = trow;
+            }
+
+        }
+
+        this.CSTargetCache.targetRows = narr;
+
+        for (i = 0; i < darr.length; i++) {
+            trow = darr[i];
+            grow = arows[trow.RID];
+
+            this.EditGrid.RemoveRow(grow);
+        }
+
+        // this.FlashTargetData();
+        this.EditGrid.DoGrouping(grouping)
+        this.EditGrid.Render();
+
+
+    }
+
+    CostAnalyzer.prototype.CreateNewTargetRow = function () {
+
+
+        var newobj = new Object();
+        var i;
+
+        this.maxTargetRID = this.maxTargetRID + 1;
+
+        newobj.CT_ID = 0;
+        newobj.BC_UID = 0;
+        newobj.BC_ROLE_UID = 0;
+        newobj.BC_SEQ = 0;
+
+        newobj.CAT_UID = 0;
+        newobj.m_rt = 0;
+
+
+        newobj.MC_Val = "";
+        newobj.m_rt_name = "";
+
+        newobj.CT_Name = "";
+        newobj.Cat_Name = "";
+        newobj.Role_Name = "";
+        newobj.MC_Name = "";
+        newobj.FullCatName = "";
+        newobj.CC_Name = "";
+        newobj.FullCCName = "";
+        newobj.FullCCName = "";
+        newobj.sUoM = "";
+        newobj.bGroupRow = false;
+        newobj.Grouping = "";
+        newobj.RID = this.maxTargetRID;
+
+
+        newobj.OCVal = new Array(6);
+        newobj.Text_OCVal = new Array(6);
+        newobj.TXVal = new Array(6);
+
+        for (i = 0; i < 6; i++) {
+            newobj.OCVal[i] = new Object();
+            newobj.Text_OCVal[i] = new Object();
+            newobj.TXVal[i] = new Object();
+
+            newobj.OCVal[i].Value = 0;
+            newobj.Text_OCVal[i].Value = "";
+            newobj.TXVal[i].Value = "";
+        }
+
+        var nump = this.CSDataCache.numberPeriods;
+
+        newobj.zCost = new Array(nump);
+        newobj.zValue = new Array(nump);
+        newobj.zFTE = new Array(nump);
+
+        for (i = 0; i <= nump; i++) {
+            newobj.zCost[i] = new Object();
+            newobj.zValue[i] = new Object();
+            newobj.zFTE[i] = new Object();
+            
+            newobj.zCost[i].Value = 0.0;
+            newobj.zValue[i].Value = 0.0;
+            newobj.zFTE[i].Value = 0.0;
+        }
+
+        return newobj;
+    }
+
+    CostAnalyzer.prototype.SaveTarget = function (sNewName) {
+
+
+        var sb = new StringBuilder();
+        sb.append("<SaveTarget ");
+
+        if (sNewName == "")
+            sb.append("ID='" + this.EditTargetid + "' >");
+        else
+            sb.append("Name='" + sNewName + "' >");
+
+        for (var i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+            trow = this.CSTargetCache.targetRows[i];
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append('<TROW ');
+            sbDataxml.append(" CT_ID='" + trow.CT_ID + "'");
+            sbDataxml.append(" BC_UID='" + trow.BC_UID + "'");
+            sbDataxml.append(" OC1='" + trow.OCVal[1].Value + "'");
+            sbDataxml.append(" OC2='" + trow.OCVal[2].Value + "'");
+            sbDataxml.append(" OC3='" + trow.OCVal[3].Value + "'");
+            sbDataxml.append(" OC4='" + trow.OCVal[4].Value + "'");
+            sbDataxml.append(" OC5='" + trow.OCVal[5].Value + "'");
+            sbDataxml.append(" TX1='" + trow.TXVal[1].Value + "'");
+            sbDataxml.append(" TX2='" + trow.TXVal[2].Value + "'");
+            sbDataxml.append(" TX3='" + trow.TXVal[3].Value + "'");
+            sbDataxml.append(" TX4='" + trow.TXVal[4].Value + "'");
+            sbDataxml.append(" TX5='" + trow.TXVal[5].Value + "'");
+
+
+            sbDataxml.append('>');
+
+            var nump = this.CSDataCache.numberPeriods;
+
+            for (xi = 0; xi <= nump; xi++) {
+
+                var vc = trow.zCost[xi].Value;
+                var vv = trow.zValue[xi].Value;
+                
+                if (vc != 0 || vv != 0) {
+                    sbDataxml.append("<Per ID='" + xi + "'");
+                    sbDataxml.append(" Cost='" + vc + "'");
+                    sbDataxml.append(" Val='" + vv + "' />");
+                }
+                
+
+            }
+
+            
+            sbDataxml.append('</TROW>');
+            sb.append(sbDataxml.toString());
+
+
+        }
+
+        sb.append("</SaveTarget>");
+
+
+        WorkEnginePPM.CostAnalyzer.ExecuteJSON("SaveTargetData", sb.toString(), SaveTargetDataCompleteDelegate);
+
+
+    }
+
+
+
+
+    CostAnalyzer.prototype.SaveTargetDataComplete = function (jsonString) {
+
+        var xTar = 0;
+        var jsonObject = JSON_ConvertString(jsonString);
+        if (JSON_ValidateServerResult(jsonObject))
+            xTar = jsonObject.Result.SaveTarget.Target.Value
+
+
+        if (xTar == 0) {
+            alert("The save failed");
+            return;
+        }
+
+        if (xTar == 0) {
+            alert("A target of that name already exists");
+            return;
+        }
+
+        alert("Target has been saved");
+        this.EditTargetid = xTar;
+
+
+        this.SaveAsSet = false;
+        this.EditTab.SetItemName("idTargetSave", "Save");
+        this.EditTab.Render();
+
+        RefreshBottomGrid();
+                  
+    }
+
+	
+    CostAnalyzer.prototype.PopulateTarget = function () {
+        WorkEnginePPM.CostAnalyzer.ExecuteJSON("GetTargetTotalsData", "", GetTargetTotalsDataCompleteDelegate);
+
+
+    }
+
+    CostAnalyzer.prototype.GetTargetTotalsDataComplete = function (jsonString) {
+
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+
+                var totals = jsonObject.Result;
+                totals.totalRows = JSON_GetArray(jsonObject.Result.TargetTotalData, "totalRows");
+                for (var i = 0; i < totals.totalRows.length; i++) {
+                    var x = totals.totalRows[i];
+
+                    x.OCVal = JSON_GetArray(x, "OCVal");
+                    x.Text_OCVal = JSON_GetArray(x, "Text_OCVal");
+                    x.TXVal = JSON_GetArray(x, "TXVal");
+
+                    x.zCost = JSON_GetArray(x, "zCost");
+                    x.zValue = JSON_GetArray(x, "zValue");
+                    x.zFTE = JSON_GetArray(x, "zFTE");
+
+
+
+                }
+
+
+                this.EditGrid = Grids["et_1"];
+                var trow, grow;
+                var arows = this.EditGrid.Rows;
+
+                var nump = this.CSDataCache.numberPeriods;
+                var i;
+
+                var cnt = 0;
+
+
+                var narr = new Array(this.CSTargetCache.targetRows.length + 1);
+
+                cnt = 0;
+
+
+                for (i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+                    narr[cnt++] = this.CSTargetCache.targetRows[i];
+                }
+
+                for (var xi = 0; xi < totals.totalRows.length; xi++) {
+                    var xt = totals.totalRows[xi];
+
+                    trow = this.CreateNewTargetRow();
+
+                    trow.CT_ID = xt.CT_ID;
+                    trow.BC_UID = xt.BC_UID;
+                    trow.BC_ROLE_UID = xt.BC_ROLE_UID;
+
+                    trow.CAT_UID = xt.CAT_UID;
+
+
+                    trow.MC_Val = xt.MC_Val;
+
+                    trow.CT_Name = xt.CT_Name;
+                    trow.Cat_Name = xt.Cat_Name;
+                    trow.Role_Name = xt.Role_Name;
+                    trow.MC_Name = xt.MC_Name;
+                    trow.FullCatName = xt.FullCatName;
+                    trow.CC_Name = xt.CC_Name;
+                    trow.FullCCName = xt.FullCCName;
+                    trow.sUoM = xt.sUoM;
+
+                    for (i = 0; i < 6; i++) {
+
+                        trow.OCVal[i].Value = xt.OCVal[i].Value;
+                        trow.Text_OCVal[i].Value = xt.OCVal[i].Value;
+                        trow.TXVal[i].Value = xt.OCVal[i].Value;
+                    }
+
+                    var nump = this.CSDataCache.numberPeriods;
+
+
+                    for (i = 0; i <= nump; i++) {
+
+                        trow.zCost[i].Value = xt.zCost[i].Value;
+                        trow.zValue[i].Value = xt.zCost[i].Value;
+                        trow.zFTE[i].Value = xt.zCost[i].Value;
+                    }
+
+
+
+                    narr[cnt++] = trow;
+
+
+                    grow = this.EditGrid.AddRow(null, null, true, trow.RID, "Leaf");
+
+
+                    for (i = 1; i <= nump; i++) {
+                        var x = "P" + i.toString() + "V";
+                        this.EditGrid.SetString(grow, x, 0, 1);
+                        this.EditGrid.SetAttribute(grow, x, "CanEdit", 0, 1);
+
+
+                        x = "P" + i.toString() + "C";
+                        this.EditGrid.SetString(grow, x, 0, 1);
+                        this.EditGrid.SetAttribute(grow, x, "CanEdit", 1, 1);
+
+                    }
+                    grow.NoColorState = 1;
+
+
+
+                }
+                this.CSTargetCache.targetRows = narr;
+                this.FlashTargetData();
+
+
+
+            }
+
+        }
+        catch (e) { }
+
+    }
+
+    CostAnalyzer.prototype.TargetAddRow = function () {
+        this.EditGrid = Grids["et_1"];
+        var trow, grow;
+        var arows = this.EditGrid.Rows;
+
+        var nump = this.CSDataCache.numberPeriods;
+        var i;
+
+        var cnt = 0;
+
+
+        var narr = new Array(this.CSTargetCache.targetRows.length + 1);
+
+        cnt = 0;
+
+
+        for (i = 0; i < this.CSTargetCache.targetRows.length; i++) {
+            narr[cnt++] = this.CSTargetCache.targetRows[i];
+        }
+
+        trow = this.CreateNewTargetRow();
+        narr[cnt++] = trow;
+        this.CSTargetCache.targetRows = narr;
+
+
+        grow = this.EditGrid.AddRow(null, null, true, trow.RID, "Leaf");
+
+        grow.NoColorState = 1;
+
+
+
+        for (i = 1; i <= nump; i++) {
+            var x = "P" + i.toString() + "V";
+            this.EditGrid.SetString(grow, x, 0, 1);
+            this.EditGrid.SetAttribute(grow, x, "CanEdit", 0, 1);
+
+
+            x = "P" + i.toString() + "C";
+            this.EditGrid.SetString(grow, x, 0, 1);
+            this.EditGrid.SetAttribute(grow, x, "CanEdit", 1, 1);
+
+        }
+
+
+        this.FlashTargetData();
+
+        this.EditGrid.ScrollIntoView(grow, "Select");
+        var btmp;
+        btmp = this.EditGrid.Update();
+        this.EditGrid.ScrollIntoView(grow, "Select");
+     }
+
+    CostAnalyzer.prototype.GetSaveTargetName = function () {
+             if (this.dlgSaveTargetAs == null) {
+                this.dlgSaveTargetAs = new dhtmlXWindows();
+                this.dlgSaveTargetAs.setSkin("dhx_web");
+                this.dlgSaveTargetAs.enableAutoViewport(false);
+                this.dlgSaveTargetAs.attachViewportTo(this.clientID + "mainDiv");
+                this.dlgSaveTargetAs.setImagePath(this.imagePath);
+
+
+
+                this.dlgSaveTargetAs.createWindow("winSaveAsTargetDlg", 20, 30, 245, 130);
+
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").setIcon("logo.ico", "logo.ico");
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").allowMove();
+                //		this.dlgSaveTargetAs.window("winSaveAsTargetDlg").allowResize();
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").setModal(true);
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").keepInViewport(true);
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").showHeader();
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").progressOn();
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").center();
+
+
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").setText(name);
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").attachObject("idSaveTargetDlg");
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").button("close").disable();
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").button("park").hide();
+                //               this.dlgSaveTargetAs.window("winSaveAsTargetDlg").attachEvent("onFocus", layoutOnResizeFinishDelegate);
+
+
+                if (this.DoingCreate)
+                    this.dlgSaveTargetAs.window("winSaveAsTargetDlg").setText("Create Target");
+                else {
+                    this.dlgSaveTargetAs.window("winSaveAsTargetDlg").setText("Create Copy of Target");
+                   
+                }
+
+                this.DoingEdit = false;
+                this.DoingDelete = false;
+                this.DoingCopy = false;
+                this.DoingCreate = true;
+
+                document.getElementById("txtCostTargetName").value = "";
+            }
+            else
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").show();
+        }
+
+        CostAnalyzer.prototype.GoDoSpread = function () {
+
+            if (this.csrow == null) {
+                alert("No Cost Target detail row has been selected");
+                return;
+            }
+
+            if (this.dlgSpreadDlg == null) {
+                this.dlgSpreadDlg = new dhtmlXWindows();
+                this.dlgSpreadDlg.setSkin("dhx_web");
+                this.dlgSpreadDlg.enableAutoViewport(false);
+                this.dlgSpreadDlg.attachViewportTo(this.clientID + "mainDiv");
+                this.dlgSpreadDlg.setImagePath(this.imagePath);
+
+                this.dlgSpreadDlg.createWindow("winSpreadDlg", 20, 30, 275, 245);
+
+                this.dlgSpreadDlg.window("winSpreadDlg").setIcon("logo.ico", "logo.ico");
+                this.dlgSpreadDlg.window("winSpreadDlg").allowMove();
+                this.dlgSpreadDlg.window("winSpreadDlg").allowResize();
+                this.dlgSpreadDlg.window("winSpreadDlg").setModal(true);
+
+                this.dlgSpreadDlg.window("winSpreadDlg").showHeader();
+                this.dlgSpreadDlg.window("winSpreadDlg").progressOn();
+                this.dlgSpreadDlg.window("winSpreadDlg").center();
+
+
+                this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate Hours");
+                this.dlgSpreadDlg.window("winSpreadDlg").attachObject("idSpreadDlgObj");
+                this.dlgSpreadDlg.window("winSpreadDlg").button("close").disable();
+                this.dlgSpreadDlg.window("winSpreadDlg").button("park").hide();
+
+            }
+            else
+                this.dlgSpreadDlg.window("winSpreadDlg").show();
+
+            var itemName = this.EditGrid.GetString(this.csrow, "CostCategory");
+
+
+            this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate " + (this.etShowingFTEs == false ? "Hours" : "FTEs") + " to " + itemName);
+            //                dlg.setText("Allocate " + sUnits + " to " + itemName);
+            //  
+
+
+
+            var sUnits = "";
+            var sValue = "";
+
+
+            if (this.etShowingFTEs == false) {
+                sUnits = "Hours";
+                sValue = "100";
+            }
+            else {
+                sUnits = "FTE";
+                sValue = "1";
+            }
+
+            var units = document.getElementById('idSpreadUnits');
+            units.innerHTML = sUnits;
+
+            document.getElementById("idSpreadAmount").value = sValue;
+
+            var from = document.getElementById('idSpreadStartPeriod');
+            var to = document.getElementById('idSpreadFinishPeriod');
+
+            if (from.options.length == 0) {
+                from.options.length = 0;
+                to.options.length = 0;
+
+                for (var c = 0; c < this.CSDataCache.Periods.length; c++) {
+                    var per = this.CSDataCache.Periods[c];
+                    from.options[c] = new Option(per.Name, per.ID);
+                    to.options[c] = new Option(per.Name, per.ID);
+                }
+                from.options.selectedIndex = 0;
+                to.options.selectedIndex = to.options.length - 1;
+            }
+        }
+
+        CostAnalyzer.prototype.spreadDlg_Apply = function () {
+            var amount = document.getElementById("idSpreadAmount").value;
+            if (isNaN(amount)) {
+                alert("Amount : '" + amount + "' is not a number");
+                return;
+            }
+            var copy = document.getElementById("idSpreadCopy").checked;
+            //var spread = document.getElementById("idSpreadPeriods").checked;
+            var select = document.getElementById("idSpreadStartPeriod");
+            startPeriod = parseInt(select.options[select.selectedIndex].value);
+            select = document.getElementById("idSpreadFinishPeriod");
+            finishPeriod = parseInt(select.options[select.selectedIndex].value);
+            var clearPeriods = document.getElementById("idSpreadClearPeriods").checked;
+
+
+            var grid = this.EditGrid;
+            var row = this.csrow;
+
+            var jval = ValidateStringAsNumber(amount, 10, 2, false, "");
+            var val = jval.value;
+            if (copy == 0)
+                val = val / (finishPeriod - startPeriod + 1);
+
+
+            if (row != null) {
+
+                trow = this.CSTargetCache.targetRows[row.id - 1];
+                var rt = this.GrabRateTable(trow);
+
+
+                var cat = null;
+                for (var j = 0; j < this.CSDataCache.Categories.length; j++) {
+
+                    if (this.CSDataCache.Categories[j].UID == trow.BC_UID) {
+                        cat = this.CSDataCache.Categories[j];
+                        break;
+                    }
+                }
+
+
+                var gval;
+
+
+                for (var per = 1; per <= this.CSDataCache.Periods.length; per++) {
+                    fval = cat.FTE[per].Value;
+
+
+                    var x = "P" + per.toString() + "V";
+                    var xc = "P" + per.toString() + "C";
+
+                    if (per < startPeriod && clearPeriods != 0) {
+                        trow.zFTE[per - 1].Value = 0;
+                        trow.zValue[per - 1].Value = 0;
+                        trow.zCost[per - 1].Value = 0;
+                        this.EditGrid.SetString(row, x, 0, 1)
+                        this.EditGrid.SetString(row, xc, 0, 1)
+                    }
+
+                    if (per > finishPeriod && clearPeriods != 0) {
+                        trow.zFTE[per - 1].Value = 0;
+                        trow.zValue[per - 1].Value = 0;
+                        trow.zCost[per - 1].Value = 0;
+                        this.EditGrid.SetString(row, x, 0, 1)
+                        this.EditGrid.SetString(row, xc, 0, 1)
+                    }
+
+
+
+                    if (per >= startPeriod && per <= finishPeriod) {
+                        gval = val;
+
+                        if (this.etShowingFTEs == false) {
+                            if (fval != 0)
+                                trow.zFTE[per - 1].Value = val / fval;
+                            else
+                                trow.zFTE[per - 1].Value = 0;
+
+                            trow.zValue[per - 1].Value = val;
+                        }
+                        else {
+                            trow.zValue[per - 1].Value = val * fval;
+                            if (fval != 0)
+                                trow.zFTE[per - 1].Value = val;
+                            else {
+                                gval = 0;
+                                trow.zFTE[per - 1].Value = 0;
+                            }
+                        }
+                        this.EditGrid.SetString(row, x, gval, 1)
+
+                        gval = trow.zValue[per - 1].Value * rt[per].Value;
+
+                        trow.zCost[per - 1].Value = gval;
+                        this.EditGrid.SetString(row, xc, gval, 1)
+
+                    }
+
+                }
+            }
+        }
+
+
+
+        CostAnalyzer.prototype.edittTargetEvent = function (id, data) {
+            this.EditGrid = Grids["et_1"];
+
+
+            if (id == "Edit_SelMode_Changed") {
+
+                if (this.EditTab.getButtonState("idTargetFTE") != true) {
+                    this.EditTab.setButtonStateOn("idTargetFTE");
+                    this.FlipFTEQtyTargetCostType(true);
+                    this.etShowingFTEs = true;
+                } else {
+                    this.EditTab.setButtonStateOff("idTargetFTE");
+                    this.FlipFTEQtyTargetCostType(false);
+                    this.etShowingFTEs = false;
+                }
+
+
+            }
+
+            if (id == "etCloseBtn") {
+                this.CloseEditTarget();
+            } else if (id == "etSaveBtn" && this.SaveAsSet == true) {
+                this.GetSaveTargetName();
+            } else if (id == "etSaveBtn") {
+                this.SaveTarget("");
+            } else if (id == "etPopBtn") {
+                this.PopulateTarget();
+            } else if (id == "etTestBtn") {
+                this.ChangeTargetCostType(13, 3);
+            } else if (id == "etInsBtn") {
+
+                this.TargetAddRow();
+            } else if (id == "etDelBtn") {
+                this.TargetDeleteRows();
+            } else if (id == "etGrpBtn") {
+                if (this.TargetGroupingchecked == false)
+                    this.showGrouping(this.EditGrid);
+                else {
+                    this.hideGrouping(this.EditGrid);
+
+                }
+
+                this.EditGrid.Render();
+            } else if (id == "etSpread") {
+                this.GoDoSpread();
+            } else if (id == "etSaveAs_Cancel") {
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").detachObject();
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").close();
+                this.dlgSaveTargetAs = null;
+
+            } else if (id == "etSaveAs_OK") {
+
+
+                var sname = document.getElementById("txtCostTargetName").value;
+
+                if (sname == "") {
+                    alert("You must enter a Cost Target Name value");
+                    return;
+                }
+
+
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").detachObject();
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").close();
+                this.dlgSaveTargetAs = null;
+                this.dlgEditTarget.window("winEditTargetDlg").setText("Edit Target : " + sname);
+
+  
+                this.SaveTarget(sname);
+
+                
+            } else if (id == "spreadDlg_Close") {
+
+
+                this.dlgSpreadDlg.window("winSpreadDlg").setModal(false);
+                this.dlgSpreadDlg.window("winSpreadDlg").hide();
+                this.dlgSpreadDlg.window("winSpreadDlg").detachObject();
+                this.dlgSpreadDlg = null;
+
+            }
+            else if (id == "spreadDlg_Apply")
+            {
+
+                this.spreadDlg_Apply();
+
+            }
+        }
 
     try {
         // Initialised fields
         this.dlgShowGridEx = null;
+        this.SelectEditDlg = null;
+        this.SelectCopyDlg = null;
+        this.dlgEditTarget = null;
+        this.dlgSaveTargetAs = null;
+
+        this.SaveAsSet = false;
+
+        this.maxTargetRID = 0;
+
+        this.EditGridInit = false;
+        this.TargetGroupingchecked = false;
+
+        this.CSDataCache = null;
 
         this.TotMaxed = false;
         this.groupColour = 0xF8F8F8;
@@ -4284,8 +6610,6 @@
         this.SelectedMode = 0;
         this.HaveDragChanges = false;
 
-
-        this.CostTypeDlg = null;
 
         this.params = params;
         this.TotSelectedOrder = null;
@@ -4360,7 +6684,7 @@
         this.CapScens = null;
         this.SelectedCapScen = 0;
 
-        this.dlgEditTarget = null; 
+        this.dlgEditTarget = null;
         this.EditGrid = null;
         this.dlgSpreadDlg = null;
         this.csrow = null;
@@ -4380,7 +6704,9 @@
         this.selectedHeatMapColour = "1";
 
         this.deferredhidedetails = false;
-        this.CTCmpData = null;
+        this.bottomgridfirstready = false;
+
+        this.burkka = false;
 
 
         var loadDelegate = MakeDelegate(this, this.OnLoad);
@@ -4392,21 +6718,22 @@
         this.deferedExternalEventDelegate = MakeDelegate(this, this.deferedExternalEvent);
         this.deferedsetFocusDelegate = MakeDelegate(this, this.deferedsetFocus);
 
-
+        this.TotalsDataXML = "";
         var LoadCostDataCompleteDelegate = MakeDelegate(this, this.LoadCostDataComplete);
 
         this.GetTotalsDataCompleteDelegate = MakeDelegate(this, this.GetTotalsDataComplete);
         this.SetTotalsDataCompleteDelegate = MakeDelegate(this, this.SetTotalsDataComplete);
         this.CreateTopGridDelegate = MakeDelegate(this, this.CreateTopGrid);
 
-        var GetCTListCompleteDelegate = MakeDelegate(this, this.GetCTListComplete);
-
         var SaveCostAnalyzerViewCompleteDelegate = MakeDelegate(this, this.SaveCostAnalyzerViewComplete);
-        var RenameResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.RenameResourceAnalyzerViewComplete);
+        var RenameCostAnalyzerViewCompleteDelegate = MakeDelegate(this, this.RenameCostAnalyzerViewComplete);
 
         this.LastFilterString = "";
 
         this.FinishTotalsDelegate = MakeDelegate(this, this.FinishTotals);
+
+        var GetClientSideCalcDataCompleteDelegate = MakeDelegate(this, this.GetClientSideCalcDataComplete);
+        var GetTargetDataCompleteDelegate = MakeDelegate(this, this.GetTargetDataComplete);
 
         var GridsOnGetDefaultColorDelegate = MakeDelegate(this, this.GridsOnGetDefaultColor);
         var GridsOnStartDragCellDelegate = MakeDelegate(this, this.GridsOnStartDragCell);
@@ -4418,21 +6745,33 @@
         var GridsOnAfterValueChangedDelegate = MakeDelegate(this, this.GridsOnAfterValueChanged);
         var GridsOnUpdatedDelegate = MakeDelegate(this, this.GridsOnUpdated);
         var SetChangeViewCompleteDelegate = MakeDelegate(this, this.SetChangeViewComplete);
-        var DeleteResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.DeleteResourceAnalyzerViewComplete);
+        var DeleteCostAnalyzerViewCompleteDelegate = MakeDelegate(this, this.DeleteCostAnalyzerViewComplete);
         var GridsOnAfterColResizeDelegate = MakeDelegate(this, this.GridsOnAfterColResize);
         var GridsOnClickCellDelegate = MakeDelegate(this, this.GridsOnClickCell);
+        var GridsOnCreateGroupDelegate = MakeDelegate(this, this.GridsOnCreateGroup);
+        var HandleExpandAllDelegate = MakeDelegate(this, this.HandleExpandAll);
+        var GetTargetTotalsDataCompleteDelegate = MakeDelegate(this, this.GetTargetTotalsDataComplete);
+        var GridsOnClickDelegate = MakeDelegate(this, this.GridsOnClick);
+        SaveTargetDataCompleteDelegate = MakeDelegate(this, this.SaveTargetDataComplete);
+        
 
+        this.DoingEdit = false;
+        this.DoingDelete = false;
+        this.DoingCopy = false;
+        this.DoingCreate = false;
+        this.SelectDelDlg = null;
 
-        GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
+        var GetTargetsListCompleteDelegate = MakeDelegate(this, this.GetTargetsListComplete);
+
+        var GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
         var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
 
-        this.SetCompareCostTypeListCompleteDelegate = MakeDelegate(this, this.SetCompareCostTypeListComplete);
+        var GetTargetDeleteCompleteDelegate = MakeDelegate(this, this.GetTargetDeleteComplete);
+
 
         var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
         var AnalyzerViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerViewDlg_OnClose);
         var AnalyzerDeleteViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerDeleteViewDlg_OnClose);
-
-        var CostTypeDlg_OnCloseDelegate = MakeDelegate(this, this.CostTypeDlg_OnClose);
 
         this.CapacityScenarios = null;
 
@@ -4443,6 +6782,7 @@
         var HandleRerenderDelegate = MakeDelegate(this, this.HandleRerender);
         var HandleRerenderChecksDelegate = MakeDelegate(this, this.HandleRerenderChecks);
         var HandleRerenderRollupsDelegate = MakeDelegate(this, this.HandleRerenderRollups);
+        var HandleTargetRefreshDelegate = MakeDelegate(this, this.HandleTargetRefresh);
 
         this.dragStack = new Array();
         this.dragLevel = 0;

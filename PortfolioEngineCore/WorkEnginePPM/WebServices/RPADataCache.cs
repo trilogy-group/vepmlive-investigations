@@ -5,6 +5,7 @@ using System.Xml;
 using System.Linq;
 using WorkEnginePPM;
 using ResourceValues;
+using PortfolioEngineCore;
 
 
 namespace RPADataCache

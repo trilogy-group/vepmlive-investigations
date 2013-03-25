@@ -138,6 +138,9 @@
                                 <tr>
                                     <td><input type="checkbox" name="ribbons" value="prioritization"  <%if(arrMenus.Contains("prioritization")){%>checked<%}%>/> Prioritization</td>
                                 </tr>
+                                <tr>
+                                    <td><input type="checkbox" name="ribbons" value="optimizer"  <%if(arrMenus.Contains("optimizer")){%>checked<%}%>/> Optimizer</td>
+                                </tr>
                             </table>
 				         </Template_Control>
 			        </wssuc:InputFormControl>

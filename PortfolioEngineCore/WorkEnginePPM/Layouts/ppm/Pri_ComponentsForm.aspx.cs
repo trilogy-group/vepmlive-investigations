@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {
@@ -92,10 +93,14 @@ namespace WorkEnginePPM
 
 
             // Stick selected components into collection
-            c_components = new List<int>();
+            DataTable dtComponents = new DataTable();
+            //c_components = new List<int>();
             foreach (ListItem li in lstComponents.Items)
             {
-                c_components.Add(Int32.Parse(li.Value));
+                DataRow row = dtComponents.NewRow();
+                row["ComponentValue"] = Int32.Parse(li.Value);
+                dtComponents.Rows.Add(row);
+                //c_components.Add(Int32.Parse(li.Value));
             }
 
             string sDBConnect = WebAdmin.GetConnectionString(this.Context);
@@ -103,7 +108,7 @@ namespace WorkEnginePPM
             if (dba.Open() != StatusEnum.rsSuccess) goto Exit_Function;
 
             int lRowsAffected;
-            if (dbaPrioritz.UpdateComponents(dba, this, out lRowsAffected) != StatusEnum.rsSuccess) goto Exit_Function;
+            if (dbaPrioritz.UpdateComponents(dba, dtComponents, out lRowsAffected) != StatusEnum.rsSuccess) goto Exit_Function;
 
             //ClientScript.RegisterStartupScript(this.GetType(), "CT_Script", "OnComponentsSavedOK();", true);
         Exit_Function:

@@ -222,7 +222,21 @@ padding-right:5px;
 color:#535353;
 }
 
+#veil {
+display:none;
+position:absolute;
+left:0px;
+top:0px;
+width:100%;
+height:100%;
+filter:alpha(opacity=30);
+opacity:0.3;
+-moz-opacity:0.3;
+-khtml-opacity:0.3;
+z-index:997;
+background:gray;
 
+}
 
 </style>
 
@@ -279,9 +293,17 @@ border-radius: 0px;
 <div id="idAnalyzerTabDiv"></div>    
 <div id="idViewTabDiv"></div>
 <div id="idBottomTabDiv"></div>
+<div id="divLoading" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
+    <img style="margin: 30px 10px; vertical-align: middle" title="Loading..." alt="Loading..." src="../images/PROGRESS-CIRCLE-24.GIF"/>
+    <span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Loading...</span>
+</div>
+<div id="divSaving" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
+    <img style="margin: 30px 10px; vertical-align: middle" title="Saving..." alt="Saving..." src="../images/PROGRESS-CIRCLE-24.GIF"/>
+    <span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Saving...</span>
+</div>
 <div id="<%=ClientID%>mainDiv">
-<div id="<%=ClientID%>layoutDiv" 
-        style="position: relative; width: 100%; height: 650px; top: 0px; left: 0px; display:block"></div>
+   <div id="veil" style="display:none;"></div>
+   <div id="<%=ClientID%>layoutDiv" style="position: relative; width: 100%; height: 650px; top: 0px; left: 0px; display:block"></div>
 </div>
 <div class="modalContent" id="idFCandPerDlgObj" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">
@@ -436,8 +458,8 @@ border-radius: 0px;
     </div>
 	<div style="width:200px;float:right;">
 		<div class="button-container">
-        	<a onclick="javascript:dialogEvent('spreadDlg_Apply');" class="button-new green" style="width:75px;">Apply</a>
-        	<a onclick="javascript:dialogEvent('spreadDlg_Close');" class="button-new silver" style="width:75px;">Close</a>
+        	<a onclick="javascript:editTargetEvent('spreadDlg_Apply');" class="button-new green" style="width:75px;">Apply</a>
+        	<a onclick="javascript:editTargetEvent('spreadDlg_Close');" class="button-new silver" style="width:75px;">Close</a>
 		</div>
 	</div>
 </div>
@@ -507,53 +529,190 @@ border-radius: 0px;
     <table id="TotalsGridTable" width="100%"  cellspacing="0">
           <tr >
             <td>
-                <br/>Select which fields you want to agrregate the totals too :<br/>
+                <br/>1. Select which fields you want to aggregate the totals too :<br/>
             </td>
         </tr>
         <tr >
             <td>
                 <br/>
             </td>
-        </tr>       
+        </tr>   
         <tr >
-            <td style="width:160px;padding-right:10px;">
-            <select style="width:200px;height:140px;padding:0px;margin:0px;border:1px solid #CCCCCC;" size="10" id="idSelSelectedCols" name="idSelSelectedCols" multiple="multiple" /> 
+            <td>
+               <input type="checkbox" id="toption1" value="Portfolio Item"> Portfolio Item
             </td>
-        </tr>
+        </tr>   
+        <tr >
+            <td>
+               <input type="checkbox" id="toption2" value="Cost Types"> Cost Types
+            </td>
+        </tr>   
+        <tr >
+            <td>
+               <input type="checkbox" id="toption3" value="Cost Categories"> Cost Categories
+            </td>
+        </tr>   
+        <tr >
+            <td>
+               <input type="checkbox" id="toption4" value="Category"> Category
+            </td>
+        </tr>   
+        <tr >
+            <td>
+               <input type="checkbox" id="toption5" value="Role"> Role
+            </td>
+        </tr>   
      </table>
+     <br/>
+  	<div style="display:relative;vertical-align:middle;padding-bottom:13px;">
+			2) Select which columns will be displayed
+	</div>
+		
+	<div>
+      <table cellspacing='0' cellpadding='0' style='width:100%; display: block;'>
+                <tr>
+                    <td style="padding-bottom:3px;">Available Columns</td>
+                    <td> </td>
+                    <td style="padding-left:10px;padding-bottom:3px;">Selected Columns</td>
+                </tr>
+                <tr>
+                    <td style="width:160px;padding-right:10px;">
+                        <select style="width:200px;height:140px;padding:0px;margin:0px;border:1px solid #CCCCCC;" size="10" id="idSelTotAvailCols" name="idSelTotAvailCols" onchange="dialogEvent('TotalEnableAdd');" ondblclick="dialogEvent('TotalAddCol_Click');"/> 
+                    </td>
+                     <td width='30px' align='center'>
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="button-containerVert">
+        				                <a href="javascript:dialogEvent('TotalAddCol_Click');" class="button-new silver" style="width:75px;" id="idTotButtonAdd">Add ></a>
+        			
+				                    </div>
+                                </td>
+                            </tr>
+                            
+                           <tr>
+                                <td>
+				                    <div class="button-containerVert">
+        				                <a href="javascript:dialogEvent('TotalRemoveCol_Click');" class="button-new silver" style="width:75px;" id="idTotButtonRemove">< Remove</a>
+				                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width:160px;padding-left:10px;">
+                        <select style="width:200px;height:140px;padding:0px;margin:0px;border:1px solid #CCCCCC;" size="10" id="idSelSelectedCols" name="idSelSelectedCols" onchange="dialogEvent('TotalEnableRemove');"  ondblclick="dialogEvent('TotalRemoveCol_Click');"/> 
+                    </td>
+                    <td width='20px' align='center' style="padding-left:5px;">
+                        <table>
+                            <tr>
+                                 <td id="idSelectedColsMoveUp" class='bb_buttonframe' onclick="dialogEvent('TotalSelectMoveUp');" style='padding-top: 3px; padding-left: 2px;'>
+                                 <img style='cursor:pointer;' class='bb_buttonimage' src='/_layouts/ppm/images/Arrow Up Lg.gif' alt=''/>
+                                </td>
+                            </tr>
+                            
+                           <tr>
+                                <td id="idSelectedColsMoveDown" class='bb_buttonframe' onclick="dialogEvent('TotalSelectMoveDown');" style='padding-top: 3px; padding-left: 2px;'>
+                                 <img style='cursor:pointer;' class='bb_buttonimage' src='/_layouts/ppm/images/Arrow Down Lg.gif' alt=''/>
+                                 </td>
+                            </tr>
+                        </table>
+                    </td>
+ 
+               </tr>
+            </table>
+            <br />
+            <table cellspacing='0' cellpadding='0' style='width:100%; display: block;'>
+               <tr><td class='bb_buttonframe'><input type="checkbox" id="idEnableHeatMap" onclick="dialogEvent('TotalHeatMap_Click');" style="padding:0px;margin:0px;" />&nbsp;<font style="vertical-align:middle">Enable Heatmap</font></tr>
+               <tr><td><br></td></tr>
+               <tr>
+                 <td>If Totals from the top grid are greater than </td>
+                 <td style="padding-top:3px;">
+                   <select id="idSelHeatmap" name="idSelHeatmap" style="vertical-align:middle;padding:0px;margin:0px 4px 0px 4px;"></select>
+                 </td>
+                 <td> display </td>
+                 <td style="padding-top:3px;">
+                   <select id="idSelHeatmapColour" name="idSelHeatmapColour" style="vertical-align:middle;padding:0px;margin:0px 4px 0px 4px;">
+                          <option value="1">Red</option>
+                          <option value="2">Green</option>
+                   </select>
+                </td>
+              </tr>
+             </table>
+     </div>
      <div class="button-container">
          <a href="javascript:dialogEvent('SelectTotals_OK');" class="button-new green" style="width:75px;">OK</a>
          <a href="javascript:dialogEvent('SelectTotals_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
      </div>
 </div>
-<div id="idCTCmpDlgObj" class="modalContent" style="display:none;">
-    <table id="idCTCmpGridTable" width="100%"  cellspacing="0">
-       <tr >
-            <td>
-                <br/>Select which Cost Types you want to compare the totals too :<br/>
-            </td>
-         </tr>
-         <tr >
-            <td>
-                <br/>
-            </td>
+<div id="idEditTargetDlgObj" class="modalContent" style="display:none;">
+    <table id="EditTarTable" width="100%"  cellspacing="0">
+         <tr>
+             <td  >
+                <select id="idSelEditTarget">
+                </select>
+           </td>
         </tr>
-        <tr >
-            <td style="width:160px;padding-right:10px;">
-            <select style="width:200px;height:140px;padding:0px;margin:0px;border:1px solid #CCCCCC;" size="10" id="idSelectCTCmp" name="idSelectCTCmp" multiple="multiple" /> 
-            </td>
-        </tr>     </table>
-    <div class="button-container">
-        <a href="javascript:dialogEvent('SelectCTCmp_OK');" class="button-new green" style="width:75px;">OK</a>
-        <a href="javascript:dialogEvent('SelectCTCmp_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
-    </div>
+        <tr><td><br /></td></tr>
+     </table>
+     <div class="button-container">
+         <a href="javascript:dialogEvent('SelectEditTarget_OK');" class="button-new green" style="width:75px;">OK</a>
+         <a href="javascript:dialogEvent('SelectEditTarget_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+     </div>
 </div>
+<div id="idDeleteTargetDlgObj" class="modalContent" style="display:none;">
+    <table id="DelTarTable" width="100%"  cellspacing="0">
+         <tr>
+             <td  >
+                <select id="idSelDelTarget">
+                </select>
+           </td>
+        </tr>
+        <tr><td><br /></td></tr>
+     </table>
+     <div class="button-container">
+         <a href="javascript:dialogEvent('SelectDeleteTarget_OK');" class="button-new green" style="width:75px;">OK</a>
+         <a href="javascript:dialogEvent('SelectDeleteTarget_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+     </div>
+</div>
+<div id="idCopyTargetDlgObj" class="modalContent" style="display:none;">
+    <table id="CopyTarTable" width="100%"  cellspacing="0">
+         <tr>
+             <td  >
+                <select id="idSelCopyTarget">
+                </select>
+           </td>
+        </tr>
+        <tr><td><br /></td></tr>
+     </table>
+     <div class="button-container">
+         <a href="javascript:dialogEvent('SelectCopyTarget_OK');" class="button-new green" style="width:75px;">OK</a>
+         <a href="javascript:dialogEvent('SelectCopyTarget_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+     </div>
+</div>
+<div id="idEditTargetDlg" class="modalContent" style="display:none;">
+   <div id="ribbonbarEdiTarDiv"></div>
+   <div id="idEditTargetGridDiv"></div>
+</div>
+<div id="idSaveTargetDlg" class="modalContent" style="display:none;">
+    <div class="modalText" style="margin-top:5px;padding-right:10px;">
+    		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
+			Cost Target Name:
+		</div>
+		<div><input id="txtCostTargetName" type="text" value=" " style="width:210px;text-align:left;padding:0px;margin:0px;height:20px;" /></div>
+		<div style="width:200px;margin-left:10px;margin-top:3px;">
+			<div style="padding-top:10px;">
+        			<a href="javascript:editTargetEvent('etSaveAs_OK');" class="button-new green" style="width:75px;">OK</a>
+        			<a href="javascript:editTargetEvent('etSaveAs_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+			</div>
+   		</div>
+    </div>
 <div id="gridDiv_1" style="width:100%;height:100%;overflow:auto;"></div>
 <div id="gridDiv_Totals" style="width:100%;overflow:auto;"></div>
 <div id="toolbarDataObjectDiv"></div>
 
 <script type="text/javascript">
     function dialogEvent(action) { costtypeanalyzer.externalEvent(action); }
+    function editTargetEvent(action) { costtypeanalyzer.edittTargetEvent(action); }
     function deferCallbackAction(deferaction) { costtypeanalyzer.deferExternalEvent(deferaction); }
     
     var params = {};

@@ -8,6 +8,7 @@ using System.Xml;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {

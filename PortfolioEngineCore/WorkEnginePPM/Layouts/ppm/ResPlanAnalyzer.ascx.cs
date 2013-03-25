@@ -44,10 +44,18 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
 
 
         private string m_sTicket = "";
+
         public string TicketVal
         {
             get { return m_sTicket; }
             set { m_sTicket = value; }
+        }
+
+        private int m_rpemode = 0;
+        public int RPEMode
+        {
+            get { return m_rpemode; }
+            set { m_rpemode = value; }
         }
         public string Webservice
         {

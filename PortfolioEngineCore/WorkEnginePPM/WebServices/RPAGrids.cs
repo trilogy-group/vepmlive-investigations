@@ -5,6 +5,7 @@ using System.Xml;
 using System.Linq;
 using WorkEnginePPM;
 using ResourceValues;
+using PortfolioEngineCore;
 
 
 namespace RPADataCache
@@ -350,6 +351,10 @@ namespace RPADataCache
                         sn = sn.Replace(" ", "");
                         string snv = col.m_dispname.Replace("/n", "\n");
 
+                        sn = sn.Replace(" ", "");
+                        sn = sn.Replace("\r", "");
+                        sn = sn.Replace("\n", "");
+
                         xC = xCols.CreateSubStruct("C");
 
                         xC.CreateStringAttr("Name", sn);
@@ -630,6 +635,8 @@ namespace RPADataCache
                     string sn = col.m_realname.Replace("/n", "");
                     sn = sn.Replace(" ", "");
 
+                    sn = sn.Replace("\r", "");
+                    sn = sn.Replace("\n", "");
 
                     switch (col.m_id)
                     {
@@ -1295,6 +1302,11 @@ namespace RPADataCache
                     {
                         string sn = col.m_realname.Replace("/n", "");
                         sn = sn.Replace(" ", "");
+
+
+                        sn = sn.Replace("\r", "");
+                        sn = sn.Replace("\n", "");
+
                         string snv = col.m_dispname.Replace("/n", "\n");
 
                         if (col.m_id == RPConstants.TGRID_TOTRESRES_ID)
@@ -1630,6 +1642,9 @@ namespace RPADataCache
                     {
                         string sn = col.m_realname.Replace("/n", "");
                         sn = sn.Replace(" ", "");
+
+                        sn = sn.Replace("\r", "");
+                        sn = sn.Replace("\n", "");
 
                         if (col.m_id == RPConstants.TGRID_TOTRESRES_ID)
                             sn = "ResOrRole";

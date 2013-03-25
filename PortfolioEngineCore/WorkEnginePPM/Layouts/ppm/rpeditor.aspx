@@ -21,20 +21,6 @@
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
 <asp:PlaceHolder runat="server" ID="PlaceHolder1" />
-<script type="text/javascript">
-    function Page_OnResize() {
-        if (typeof (rpeditor) != "undefined" && rpeditor != null) {
-            rpeditor.SetSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
-        }
-    }
-
-    if (document.addEventListener != null) { // e.g. Firefox
-        window.addEventListener("resize", Page_OnResize, true);
-    }
-    else { // e.g. IE
-        window.attachEvent("onresize", Page_OnResize);
-    }
-</script>
 
 </asp:Content>
 
