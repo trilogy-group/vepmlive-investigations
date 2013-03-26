@@ -259,242 +259,248 @@
 		return false;
 	}
 	Optimizer.prototype.ApplyGridView = function (gridId, view, bRender) {
-		try {
+	    try {
 
-			var grid = Grids[gridId];
-			var gridView = view[gridId];
-			var allCols = new Array();
+	        var grid = Grids[gridId];
+	        var gridView = view[gridId];
+	        var allCols = new Array();
 
-			var gcols = grid.GetCols();
+	        var gcols = grid.GetCols();
 
 
-			if (gridView.LeftCols !== null) {
-				var leftCols = gridView.LeftCols.split(',');
+	        if (gridView.LeftCols !== null) {
+	            var leftCols = gridView.LeftCols.split(',');
+	            if (gridView.LeftCols != "") {
 
-				for (var c in leftCols) {
-					var cv = leftCols[c].split(':');
-					var col = cv[0];
 
-					if (this.DoesColExist(gcols, col) == true) {
+	                for (var c in leftCols) {
+	                    var cv = leftCols[c].split(':');
+	                    var col = cv[0];
 
-						Array.add(allCols, col);
+	                    if (this.DoesColExist(gcols, col) == true) {
 
-						try {
-							var width = cv[1] - grid.Cols[col].Width;
+	                        Array.add(allCols, col);
 
-							//                        if (col === 'Edit') {
-							//                            if ($.browser.msie && parseInt($.browser.version) <= 8) {
-							//                                width = 23;
-							//                            }
-							//                        }
+	                        try {
+	                            var width = cv[1] - grid.Cols[col].Width;
 
-							if (width !== 0) {
-								grid.SetWidth(col, width);
-							}
-						} catch (e) {
-						}
+	                            //                        if (col === 'Edit') {
+	                            //                            if ($.browser.msie && parseInt($.browser.version) <= 8) {
+	                            //                                width = 23;
+	                            //                            }
+	                            //                        }
 
-						grid.MoveCol(col, 0, 1, 1);
-					}
-				}
-			}
+	                            if (width !== 0) {
+	                                grid.SetWidth(col, width);
+	                            }
+	                        } catch (e) {
+	                        }
 
+	                        grid.MoveCol(col, 0, 1, 1);
+	                    }
+	                }
+	            }
+	        }
 
-			if (gridView.Cols !== null) {
-				var cols = gridView.Cols.split(',');
 
-				for (var c in cols) {
-					var cv = cols[c].split(':');
-					var col = cv[0];
+	        if (gridView.Cols !== null) {
+	            var cols = gridView.Cols.split(',');
+	            if (gridView.Cols != "") {
 
-					if (this.DoesColExist(gcols, col) == true) {
 
-						Array.add(allCols, col);
+	                for (var c in cols) {
+	                    var cv = cols[c].split(':');
+	                    var col = cv[0];
 
-						try {
-							var width = cv[1] - grid.Cols[col].Width;
-							if (width !== 0) {
-								grid.SetWidth(col, width);
-							}
-						} catch (e) {
-						}
+	                    if (this.DoesColExist(gcols, col) == true) {
 
-						grid.MoveCol(col, 1, 1, 1);
-					}
-				}
-				for (var i = 0; i < gcols.length; i++) {
-					if (grid.Cols[gcols[i]].Sec == 2)
-						break;
+	                        Array.add(allCols, col);
 
-					if (grid.Cols[gcols[i]].Sec == 1) {
-						var xfound = false;
-						for (var j = 0; j < allCols.length; j++) {
-							if (allCols[j] === gcols[i])
-								xfound = true;
-						}
+	                        try {
+	                            var width = cv[1] - grid.Cols[col].Width;
+	                            if (width !== 0) {
+	                                grid.SetWidth(col, width);
+	                            }
+	                        } catch (e) {
+	                        }
 
-						if (!xfound)
-							grid.MoveCol(gcols[i], 1, 1, 1);
-					}
-				}
+	                        grid.MoveCol(col, 1, 1, 1);
+	                    }
+	                }
+	                for (var i = 0; i < gcols.length; i++) {
+	                    if (grid.Cols[gcols[i]].Sec == 2)
+	                        break;
 
+	                    if (grid.Cols[gcols[i]].Sec == 1) {
+	                        var xfound = false;
+	                        for (var j = 0; j < allCols.length; j++) {
+	                            if (allCols[j] === gcols[i])
+	                                xfound = true;
+	                        }
 
-			}
+	                        if (!xfound)
+	                            grid.MoveCol(gcols[i], 1, 1, 1);
+	                    }
+	                }
+	            }
 
 
+	        }
 
-			var groupCols = grid.Group.split(',');
 
-//			try { grid.DoGrouping(null); } catch (e) { };
-//			try {
-//				for (var i = 0; i < groupCols.length; i++) {
-//					grid.HideCol(groupCols[i]);
-//				}
-//			} catch (e) { };
 
+	        var groupCols = grid.Group.split(',');
 
-			try {
-				if (gridView.Cols !== null) {
-					var vCols = grid.GetCols('Visible');
-					vCols = vCols.concat(groupCols);
+	        //			try { grid.DoGrouping(null); } catch (e) { };
+	        //			try {
+	        //				for (var i = 0; i < groupCols.length; i++) {
+	        //					grid.HideCol(groupCols[i]);
+	        //				}
+	        //			} catch (e) { };
 
-					var mainCols = [];
 
-	//				var bhadFirstPer = false;
+	        try {
+	            if (gridView.Cols !== null) {
+	                var vCols = grid.GetCols('Visible');
+	                vCols = vCols.concat(groupCols);
 
-					for (var i = 0; i < vCols.length; i++) {
+	                var mainCols = [];
 
-//						if (vCols[i] === "P1C1")
-//							bhadFirstPer = true;
+	                //				var bhadFirstPer = false;
 
-//						if (bhadFirstPer) {
+	                for (var i = 0; i < vCols.length; i++) {
 
-//							var per, sCol;
+	                    //						if (vCols[i] === "P1C1")
+	                    //							bhadFirstPer = true;
 
-//							sCol = vCols[i].substr(1, vCols[i].length - 2);
-//							per = parseInt(sCol);
+	                    //						if (bhadFirstPer) {
 
-//							if (per >= StartID && per <= FinishID)
-//								allCols.push(vCols[i]);
-//							else {
-//								mainCols.push(vCols[i]);
-//							}
+	                    //							var per, sCol;
 
-//						} else {
+	                    //							sCol = vCols[i].substr(1, vCols[i].length - 2);
+	                    //							per = parseInt(sCol);
 
-							var found = false;
-							for (var j = 0; j < allCols.length; j++) {
-								if (allCols[j] === vCols[i]) {
-									found = true;
-								}
-//							}
+	                    //							if (per >= StartID && per <= FinishID)
+	                    //								allCols.push(vCols[i]);
+	                    //							else {
+	                    //								mainCols.push(vCols[i]);
+	                    //							}
 
-							if (!found) {
-								mainCols.push(vCols[i]);
-							}
-						}
-					}
+	                    //						} else {
 
+	                    var found = false;
+	                    for (var j = 0; j < allCols.length; j++) {
+	                        if (allCols[j] === vCols[i]) {
+	                            found = true;
+	                        }
+	                        //							}
 
-					if (allCols.length > 0)
-						grid.ChangeColsVisibility(allCols, mainCols, 0);
-				} else {
-					this.flashGridView(gridId, false);
-				}
-			}
-			catch (e) { }
+	                        if (!found) {
+	                            mainCols.push(vCols[i]);
+	                        }
+	                    }
+	                }
 
 
-//			try {
-//				if (gridView['Filters'] === '') {
-//					grid.ChangeFilter('', '', '', 0, 0, null);
-//				} else {
-//					var filters = gridView['Filters'].split('|');
+	                if (allCols.length > 0)
+	                    grid.ChangeColsVisibility(allCols, mainCols, 0);
+	            } else {
+	                this.flashGridView(gridId, false);
+	            }
+	        }
+	        catch (e) { }
 
-//					if (filters[0] === '1') {
-//						this.showFilters(grid);
-//					} else {
-//						this.hideFilters(grid);
-//					}
 
-//					filters[1] = filters[1].replace(",", ":");
+	        //			try {
+	        //				if (gridView['Filters'] === '') {
+	        //					grid.ChangeFilter('', '', '', 0, 0, null);
+	        //				} else {
+	        //					var filters = gridView['Filters'].split('|');
 
-//					var filter = filters[1].split(':');
+	        //					if (filters[0] === '1') {
+	        //						this.showFilters(grid);
+	        //					} else {
+	        //						this.hideFilters(grid);
+	        //					}
 
-//					var colvals = new Array();
-//					var valvals = new Array();
-//					var opvals = new Array();
+	        //					filters[1] = filters[1].replace(",", ":");
 
-//					if (filter.length > 2) {
-//						var xi = 0;
+	        //					var filter = filters[1].split(':');
 
-//						for (var xj = 0; xj < filter.length; xj++) {
-//							++xi;
-//							if (xi == 1)
-//								colvals[colvals.length] = filter[xj];
+	        //					var colvals = new Array();
+	        //					var valvals = new Array();
+	        //					var opvals = new Array();
 
-//							else if (xi == 2)
-//								valvals[valvals.length] = filter[xj];
+	        //					if (filter.length > 2) {
+	        //						var xi = 0;
 
-//							else {
-//								opvals[opvals.length] = filter[xj];
-//								xi = 0;
-//							}
-//						}
+	        //						for (var xj = 0; xj < filter.length; xj++) {
+	        //							++xi;
+	        //							if (xi == 1)
+	        //								colvals[colvals.length] = filter[xj];
 
-//						try { grid.ChangeFilter(colvals, valvals, opvals, 0, 0, null); } catch (e) { };
+	        //							else if (xi == 2)
+	        //								valvals[valvals.length] = filter[xj];
 
-//					}
+	        //							else {
+	        //								opvals[opvals.length] = filter[xj];
+	        //								xi = 0;
+	        //							}
+	        //						}
 
+	        //						try { grid.ChangeFilter(colvals, valvals, opvals, 0, 0, null); } catch (e) { };
 
+	        //					}
 
-//				}
-//			}
-//			catch (e) { }
 
 
-//			try {
-//				grid.ChangeSort(gridView['Sorting']);
-//			} catch (e) { }
-//			
+	        //				}
+	        //			}
+	        //			catch (e) { }
 
 
+	        //			try {
+	        //				grid.ChangeSort(gridView['Sorting']);
+	        //			} catch (e) { }
+	        //			
 
-//			if (gridView['Grouping'] === '') {
-//				try { grid.DoGrouping(null); } catch (e) { };
-//			} else {
-//				var grouping = gridView['Grouping'].split('|');
 
-//				if (grouping[0] === '1') {
-//					this.showGrouping(grid);
-//				} else {
-//					this.hideGrouping(grid);
-//				}
 
-///				try {
+	        //			if (gridView['Grouping'] === '') {
+	        //				try { grid.DoGrouping(null); } catch (e) { };
+	        //			} else {
+	        //				var grouping = gridView['Grouping'].split('|');
 
-//				    grid.DoGrouping("PISelected");
-//				}
-//				catch (e) { };
-		    
+	        //				if (grouping[0] === '1') {
+	        //					this.showGrouping(grid);
+	        //				} else {
+	        //					this.hideGrouping(grid);
+	        //				}
 
-//				    this.hideGrouping(grid);
-//				    this.hideFilters(grid);
+	        ///				try {
 
-//				    grid.ExpandAll(null, 0, 3);
+	        //				    grid.DoGrouping("PISelected");
+	        //				}
+	        //				catch (e) { };
 
-//			}
 
-			try {
-//				if (bRender)
-//					grid.Render();
-			}
-			catch (e) { };
+	        //				    this.hideGrouping(grid);
+	        //				    this.hideFilters(grid);
 
+	        //				    grid.ExpandAll(null, 0, 3);
 
-		} catch (e) {
-			this.HandleException("ApplyGridView", e);
-		}
+	        //			}
+
+	        try {
+	            //				if (bRender)
+	            //					grid.Render();
+	        }
+	        catch (e) { };
+
+
+	    } catch (e) {
+	        this.HandleException("ApplyGridView", e);
+	    }
 	}
 	Optimizer.prototype.flashGridView = function (gridId, bDoRender) {
 		try {

@@ -29,16 +29,6 @@
         this.optTab.DeferredMultiSelect();
     }
 
-    function getAbsolutePosition(element) {
-        var r = { x: element.offsetLeft, y: element.offsetTop };
-        if (element.offsetParent) {
-            var tmp = getAbsolutePosition(element.offsetParent);
-            r.x += tmp.x;
-            r.y += tmp.y;
-        }
-        return r;
-    };
-
 
     OptimizerRibbon.prototype.handleExternalEvent = function (event) {
 
@@ -99,15 +89,12 @@
                         this.EditRangeDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.EditRangeDlg.setImagePath("/_layouts/ppm/images/");
 
-
-                        var posx = 800 + (tbinx * 110);
-                        var posy = 70;
-                        this.EditRangeDlg.createWindow("winEditRangeDlgDlg", posx, posy, 300, 115);
+                        this.EditRangeDlg.createWindow("winEditRangeDlgDlg", 20, 30, 300, 115);
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setIcon("logo.ico", "logo.ico");
                         this.EditRangeDlg.window("winEditRangeDlgDlg").denyResize();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").button("park").hide();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setModal(true);
-                        //  this.EditRangeDlg.window("winEditRangeDlgDlg").center();
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").center();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setText(fld.FName);
                         this.EditRangeDlg.window("winEditRangeDlgDlg").attachObject("idEditRangeDlg");
                     }
@@ -1046,11 +1033,17 @@
        return val.html();
    }
 
-    OptimizerRibbon.prototype.GetPosMinVal = function (sID) {
+   OptimizerRibbon.prototype.GetPosMinVal = function (sID) {
 
        var container = $("#" + sID).parent();
        var val = container.find('.epm-slider-buttonmin');
-       return val.css('left');
+
+       var xvl = val.css('left');
+
+       if (xvl == -1)
+           xvl = 0;
+
+       return xvl;
 
    }
     OptimizerRibbon.prototype.GetPosMaxVal = function (sID) {
@@ -2332,14 +2325,16 @@
                     }
                 }
 
-                if (fld.textVals.length > 1)
-                    this.DisplayableFields[this.DisplayableFields.length] = fld;
-                else if (fld.textVals.length == 1 && fld.textVals[0] != "")
-                    this.DisplayableFields[this.DisplayableFields.length] = fld;
-                else if (fld.FTYPE == 13)
-                    this.DisplayableFields[this.DisplayableFields.length] = fld;
-                
+                if (fld.FOPTFLAG != 1) {
 
+                    if (fld.textVals.length > 1)
+                        this.DisplayableFields[this.DisplayableFields.length] = fld;
+                    else if (fld.textVals.length == 1 && fld.textVals[0] != "")
+                        this.DisplayableFields[this.DisplayableFields.length] = fld;
+                    else if (fld.FTYPE == 13)
+                        this.DisplayableFields[this.DisplayableFields.length] = fld;
+
+                }
             }
 
         }

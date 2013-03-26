@@ -71,20 +71,10 @@
             container.find('.epm-slider-buttonmax').css('left', currentMaxVal);
             container.find('.epm-slider-buttonmin').css('left', '0px');
             container.find('.epm-slider-scalemiddle').width(currentMaxVal);
-            container.find('.epm-slider-scalemiddle').css('left', '0px');
+            container.find('.epm-slider-scalemiddle').css('left', '2px');
             container.find('.epm-slider-minval').html(rangeminVal);
             container.find('.epm-slider-maxval').html(rangemaxVal);
 
-
-
-            //            if (rangeminVal > minVal) {
-            //                lnewPos = Math.round((rangeminVal / lupperBound) * 100, 0);
-            //                currentMinVal = lnewPos;
-            //                currentMaxVal = currentMaxVal - (lnewPos);
-
-            //                container.find('.epm-slider-buttonmin').css("left", locationnewPos);
-            //                container.find('.epm-slider-buttonmax').css("left", currentMaxVal);
-            //            }
 
 
             if (posmaxVal == undefined || posminVal == undefined) {
@@ -94,6 +84,9 @@
                 posminVal = 0;
 
             }
+
+            if (posminVal == 0)
+                posminVal = -1;
 
             container.find('.epm-slider-buttonmin').css("left", posminVal);
             container.find('.epm-slider-buttonmax').css("left", posmaxVal);
@@ -172,11 +165,16 @@
                     currentMaxVal = currentMaxVal - (newPos - currentMinVal);
 
                     currentMinVal = newPos
-                    container.find('.epm-slider-buttonmin').css("left", newPos);
+
+                    if (newPos != 0)
+                        container.find('.epm-slider-buttonmin').css("left", newPos);
+                    else
+                        container.find('.epm-slider-buttonmin').css("left", -1);
+
                     container.find('.epm-slider-buttonmax').css("left", currentMaxVal);
 
                     container.find('.epm-slider-scalemiddle').width(currentMaxVal);
-                    container.find('.epm-slider-scalemiddle').css('left', newPos);
+                    container.find('.epm-slider-scalemiddle').css('left', newPos + 2);
 
                     container.find('.epm-slider-tooltip').html(dispVal);
                     container.find('.epm-slider-minval').html(dispVal);
@@ -1881,44 +1879,44 @@ function replaceWithPretty(obj, from, sprefix, spostfix) {
 
 
 function popupInput(sRoot, mode) {
-    if (mode == 0) {
-        document.getElementById(sRoot + "inputldiv").style.display = "none";
-        document.getElementById(sRoot + "displdiv").style.display = "block";
-        document.getElementById(sRoot + "inputrdiv").style.display = "none";
-        document.getElementById(sRoot + "disprdiv").style.display = "block";
+    return;
+
+    // dont remove this code lest they change their mind about how data kenty should work on the sliders
+
+//    if (mode == 0) {
+//        document.getElementById(sRoot + "inputldiv").style.display = "none";
+//        document.getElementById(sRoot + "displdiv").style.display = "block";
+//        document.getElementById(sRoot + "inputrdiv").style.display = "none";
+//        document.getElementById(sRoot + "disprdiv").style.display = "block";
 
 
 
-    }
-    else if (mode == 1) {
-        document.getElementById(sRoot + "inputldiv").style.display = "block";
-        //      document.getElementById(sRoot + "displdiv").style.display = "none";
-        document.getElementById(sRoot + "inputrdiv").style.display = "none";
-        document.getElementById(sRoot + "disprdiv").style.display = "block";
-   //     window.setTimeout('document.getElementById(sRoot + "inputldiv").focus();', 100);
-        window.setTimeout('document.getElementById("' + sRoot + 'inputl").focus();', 100);
-         
-        // $("#" + sRoot + "inputldiv").focus();
-    } 
-    else if (mode == 2) {
-        document.getElementById(sRoot + "inputldiv").style.display = "none";
-        document.getElementById(sRoot + "displdiv").style.display = "block";
-        document.getElementById(sRoot + "inputrdiv").style.display = "none";
-        document.getElementById(sRoot + "disprdiv").style.display = "block";
+//    }
+//    else if (mode == 1) {
+//        document.getElementById(sRoot + "inputldiv").style.display = "block";
+//        //      document.getElementById(sRoot + "displdiv").style.display = "none";
+//        document.getElementById(sRoot + "inputrdiv").style.display = "none";
+//        document.getElementById(sRoot + "disprdiv").style.display = "block";
+//   //     window.setTimeout('document.getElementById(sRoot + "inputldiv").focus();', 100);
+//        window.setTimeout('document.getElementById("' + sRoot + 'inputl").focus();', 100);
+//         
+//        // $("#" + sRoot + "inputldiv").focus();
+//    } 
+//    else if (mode == 2) {
+//        document.getElementById(sRoot + "inputldiv").style.display = "none";
+//        document.getElementById(sRoot + "displdiv").style.display = "block";
+//        document.getElementById(sRoot + "inputrdiv").style.display = "none";
+//        document.getElementById(sRoot + "disprdiv").style.display = "block";
 
-    } 
-    else if (mode == 3) {
-        document.getElementById(sRoot + "inputldiv").style.display = "none";
-        document.getElementById(sRoot + "displdiv").style.display = "block";
-        document.getElementById(sRoot + "inputrdiv").style.display = "block";
+//    } 
+//    else if (mode == 3) {
+//        document.getElementById(sRoot + "inputldiv").style.display = "none";
+//        document.getElementById(sRoot + "displdiv").style.display = "block";
+//        document.getElementById(sRoot + "inputrdiv").style.display = "block";
 
-        window.setTimeout('document.getElementById("' + sRoot + 'inputr").focus();', 100);
-        //       document.getElementById(sRoot + "disprdiv").style.display = "none";
-
-  //      $("#" + sRoot + "inputrdiv").focus();
-
-        
-    }
+//        window.setTimeout('document.getElementById("' + sRoot + 'inputr").focus();', 100);
+//        
+//    }
 
 }
 
@@ -1945,7 +1943,9 @@ function toPrettyString(A, sprefix, spostfix) {
     b = parseFloat(b).toFixed(2); //in case we get 0.0, we pad it out to 0.00
     a = a.toLocaleString();//put in commas - IE also puts in .00, so we'll get 12,345,678.00
     //if IE (our number ends in .00)
-    if(a.lastIndexOf('.00') == (a.length - 3))
+
+    var xp = a.lastIndexOf('.00')
+    if (a.lastIndexOf('.00') == (a.length - 3) && xp != -1)
     {
         a=a.substr(0, a.length-3); //delete the .00
     }
@@ -2653,13 +2653,13 @@ function Ribbon(ribbonData) {
                     sb.append(" onkeypress='return blockNonNumbers(this, event, true, true);'");
                     sb.append("  />");
                     sb.append("</div>");
-                    sb.append("<div style='display:block' id=" + displdiv + " >");
-                    sb.append("<span " + iddispl + " class='epm-slidetitle' ");
+ //                   sb.append("<div style='display:block; cursor:pointer;' id=" + displdiv + " >");
+                    sb.append("<span " + iddispl + " class='epm-slidetitle' style='cursor:pointer;' ");
                     //           sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",1);'");
                     sb.append(" onclick='" + onclickfrom + "'");
                   
                     sb.append(">" + toPrettyString(item.minValue, sprefix, spostfix) + "</span>");
-                    sb.append("</div>");
+ //                   sb.append("</div>");
                     sb.append("</td><td>");
 
 
@@ -2674,13 +2674,13 @@ function Ribbon(ribbonData) {
                     sb.append(" onkeypress='return blockNonNumbers(this, event, true, true);'");
                     sb.append("  />");
                     sb.append("</div>");
-                    sb.append("<div style='display:block' id=" + disprdiv + " >");
-                    sb.append("<span " + iddispr + " class='epm-slidetitle' ");
+         //           sb.append("<div style='display:block; cursor:pointer;' id=" + disprdiv + " >");
+                    sb.append("<span " + iddispr + " class='epm-slidetitle' style='cursor:pointer;'");
         //            sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",3);'");
                     sb.append(" onclick='" + onclickto + "'");
 
                     sb.append(">" + toPrettyString(item.maxValue, sprefix, spostfix) + "</span>");
-                    sb.append("</div>");
+//                    sb.append("</div>");
 
 
 
