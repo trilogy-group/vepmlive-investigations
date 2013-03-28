@@ -1,4 +1,4 @@
-﻿/// <version>4.3.3.1152012</version>
+﻿/// <version>4.4.0.32813</version>
 /// <reference path="references/knockout-1.2.1.debug.js" />
 /// <reference path="references/jquery-1.7.1.js" />
 
