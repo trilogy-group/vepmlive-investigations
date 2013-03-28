@@ -507,7 +507,7 @@ namespace EPMLiveCore.Integrations.Salesforce
                     double dValue;
                     if (double.TryParse(oValue.ToString(), out dValue))
                     {
-                        dataRow[percentField] = dValue;
+                        dataRow[percentField] = dValue/100;
                     }
                 }
 

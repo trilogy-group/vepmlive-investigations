@@ -1,5 +1,5 @@
 <Grid>
-	<Cfg Code="GTACCNPSQEBSLC" Version="4.3.2.120412" />
+	<Cfg Code="GTACCNPSQEBSLC" Version="4.4.0.32713" />
 	<Cfg SuppressCfg="1" Style="GS" />
 	<Cfg MainCol="Title" NameCol="Title" />
 	<Cfg ConstWidth="0" />
