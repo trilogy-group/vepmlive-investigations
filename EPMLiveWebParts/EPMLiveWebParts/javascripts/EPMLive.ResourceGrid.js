@@ -561,7 +561,7 @@ function registerEpmLiveResourceGridScript() {
 
                 if (!grid.getColWidth) {
                     grid.getColWidth = function (c) {
-                        if (c) {
+                        if (c && this.Cols[c]) {
                             var w = this.Cols[c].Width;
 
                             if (!$$$.utils.isInt(w)) {
@@ -597,11 +597,17 @@ function registerEpmLiveResourceGridScript() {
                         width = col.width - currentColWidth;
                     } else {
                         width = -currentColWidth;
-                        gridCol.RelWidth = col.width;
+
+                        if (gridCol) {
+                            gridCol.RelWidth = col.width;
+                        }
                     }
 
                     if (width !== 0) {
-                        gridCol.Width += width;
+                        if (gridCol) {
+                            gridCol.Width += width;
+                        }
+
                         grid.Update();
                     }
 
@@ -610,8 +616,8 @@ function registerEpmLiveResourceGridScript() {
                     allCols.push(colName);
                 }
 
-                grid.Render();
                 grid.Update();
+                grid.Render();
 
                 var groupCols = grid.Group.split(',');
 
@@ -704,6 +710,12 @@ function registerEpmLiveResourceGridScript() {
                     $$.actions.resetEasyScroll();
                     window.setTimeout(function () { $$.firstLoad = false; }, 2000);
                 }
+
+                window.setTimeout(function () {
+                    var g = $$.grid.g();
+                    g.Update();
+                    g.Render();
+                }, 10);
             },
 
             load: function () {
@@ -1512,8 +1524,15 @@ function registerEpmLiveResourceGridScript() {
 
                 options.title = 'Import Resources';
                 options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
+                options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
 
                 window.SP.UI.ModalDialog.showModalDialog(options);
+            },
+
+            onImportResourcesCompleted: function (result, value) {
+                if (result === 1) {
+                    $$.grid.reload();
+                }
             },
 
             canExport: function () {
@@ -1582,9 +1601,17 @@ function registerEpmLiveResourceGridScript() {
                 }
             }
 
-            var profilePicCol = cols['ProficePic'];
+            var profilePicCol = cols['ProfilePic'];
+            if (!profilePicCol) {
+                if (!cols.length) {
+                    try {
+                        profilePicCol = cols.ProfilePic;
+                    } catch (e) {
+                    }
+                }
+            }
 
-            if (profilePicCol !== undefined && !cols['ProfilePic']) {
+            if (profilePicCol !== undefined) {
                 grid.SetAttribute(null, 'ProfilePic', 'Visible', '0', 0);
                 grid.Rerender();
             }
@@ -1653,6 +1680,8 @@ function registerEpmLiveResourceGridScript() {
                 if (col !== 'Panel' && col !== 'Title') {
                     return '';
                 }
+            } else if (grid.Cols[col] && grid.Cols[col].Type === 'Lines') {
+                return val;
             }
         };
 
