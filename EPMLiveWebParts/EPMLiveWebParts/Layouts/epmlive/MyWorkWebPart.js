@@ -134,6 +134,16 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
 
             MyWorkGrid.lastClickedCell = cell;
         }
+
+        if (row.Def.Name === 'Group' && col === 'Title') {
+            if (row.Expanded === 1) {
+                grid.Collapse(row);
+            } else {
+                grid.Expand(row);
+            }
+
+            return true;
+        }
     }
 };
 
@@ -228,6 +238,8 @@ Grids.OnGetHtmlValue = function (grid, row, col, val) {
             }
         } else if (row.Def.Name === 'Group' && col !== 'Complete') {
             return '';
+        } else if (grid.Cols[col] && grid.Cols[col].Type === 'Lines') {
+            return val;
         }
 
         return null;
@@ -270,11 +282,12 @@ Grids.OnLoaded = function (grid) {
                 MyWorkGrid.winHeight = height;
 
                 grid.Update();
+                grid.Render();
             }
         });
 
-        grid.Render();
         grid.Update();
+        grid.Render();
 
         $('html').click(function () {
             var g = window.Grids[MyWorkGrid.gridId];
@@ -385,6 +398,7 @@ function calculateDueColor(col, row) {
     }
 
     if (cssClass !== '' && col === 'Complete') cssClass = 'MWG_OverDue_Completed';
+    if (cssClass === '' && col === 'Complete') cssClass = 'MWG_UnCompletedRow_Normal';
 
     return cssClass;
 }
@@ -1346,8 +1360,8 @@ var MyWorkGrid = {
                 }
             }
 
-            grid.Render();
             grid.Update();
+            grid.Render();
 
             var groupCols = grid.Group.split(',');
 
@@ -1417,6 +1431,7 @@ var MyWorkGrid = {
                 grid.SetWidth('Edit', 25);
             }
 
+            grid.Update();
             grid.Render();
 
             grid.Cols['Title'].RelWidth = 1;
@@ -1438,6 +1453,12 @@ var MyWorkGrid = {
             configureTitleCol(grid);
 
             RefreshCommandUI();
+
+            window.setTimeout(function () {
+                var g = Grids[MyWorkGrid.gridId];
+                g.Update();
+                g.Render();
+            }, 10);
         } catch (e) {
         }
     },
@@ -1910,7 +1931,10 @@ var MyWorkGrid = {
                     cssClass = 'MWG_CommentRead_Completed';
                 }
 
-                document.getElementById('MWG_CommentCount_' + params.row.id).className = cssClass;
+                try {
+                    document.getElementById('MWG_CommentCount_' + params.row.id).className = cssClass;
+                } catch (e) {
+                }
             }
         });
     },
@@ -1967,7 +1991,11 @@ var MyWorkGrid = {
                     }
                 }
 
-                document.getElementById('MWG_CommentCount_' + params.row.id).className = cssClass;
+                try {
+                    document.getElementById('MWG_CommentCount_' + params.row.id).className = cssClass;
+                } catch (e) {
+                }
+
                 if (completed) {
                     markRowCompleted(params.grid, params.row);
                 }
