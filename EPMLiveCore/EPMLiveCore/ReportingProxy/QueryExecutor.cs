@@ -9,11 +9,11 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.ReportingProxy
 {
-    internal class QueryExecutor : ReportingProxyBase
+    public class QueryExecutor : ReportingProxyBase
     {
         #region Constructors (1) 
 
-        internal QueryExecutor(SPWeb spWeb) : base(spWeb)
+        public QueryExecutor(SPWeb spWeb) : base(spWeb)
         {
         }
 
@@ -88,7 +88,7 @@ namespace EPMLiveCore.ReportingProxy
             return dataTable;
         }
 
-        // Internal Methods (6) 
+        // public Methods (6) 
 
         /// <summary>
         ///     Executes the epm live non query.
@@ -96,7 +96,7 @@ namespace EPMLiveCore.ReportingProxy
         /// <param name="query">The query.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        internal void ExecuteEpmLiveNonQuery(string query, IDictionary<string, object> parameters)
+        public void ExecuteEpmLiveNonQuery(string query, IDictionary<string, object> parameters)
         {
             ExecuteNonQuery(query, parameters, "GetEPMLiveConnection");
         }
@@ -107,7 +107,7 @@ namespace EPMLiveCore.ReportingProxy
         /// <param name="query">The query.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        internal DataTable ExecuteEpmLiveQuery(string query, IDictionary<string, object> parameters)
+        public DataTable ExecuteEpmLiveQuery(string query, IDictionary<string, object> parameters)
         {
             return ExecuteQuery(query, parameters, CommandType.Text, "GetEPMLiveConnection");
         }
@@ -118,7 +118,7 @@ namespace EPMLiveCore.ReportingProxy
         /// <param name="storedProcName">Name of the stored proc.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        internal DataTable ExecuteEpmLiveStoredProc(string storedProcName, IDictionary<string, object> parameters)
+        public DataTable ExecuteEpmLiveStoredProc(string storedProcName, IDictionary<string, object> parameters)
         {
             return ExecuteQuery(storedProcName, parameters, CommandType.StoredProcedure, "GetEPMLiveConnection");
         }
@@ -128,7 +128,7 @@ namespace EPMLiveCore.ReportingProxy
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="parameters">The parameters.</param>
-        internal void ExecuteReportingDBNonQuery(string query, IDictionary<string, object> parameters)
+        public void ExecuteReportingDBNonQuery(string query, IDictionary<string, object> parameters)
         {
             ExecuteNonQuery(query, parameters, "GetClientReportingConnection");
         }
@@ -139,7 +139,7 @@ namespace EPMLiveCore.ReportingProxy
         /// <param name="query">The query.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        internal DataTable ExecuteReportingDBQuery(string query, IDictionary<string, object> parameters)
+        public DataTable ExecuteReportingDBQuery(string query, IDictionary<string, object> parameters)
         {
             return ExecuteQuery(query, parameters, CommandType.Text, "GetClientReportingConnection");
         }
@@ -150,11 +150,23 @@ namespace EPMLiveCore.ReportingProxy
         /// <param name="storedProcName">Name of the stored proc.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        internal DataTable ExecuteReportingDBStoredProc(string storedProcName, IDictionary<string, object> parameters)
+        public DataTable ExecuteReportingDBStoredProc(string storedProcName, IDictionary<string, object> parameters)
         {
             return ExecuteQuery(storedProcName, parameters, CommandType.StoredProcedure, "GetClientReportingConnection");
         }
 
+        /// <summary>
+        /// Get mapped list's reporting db table name.
+        /// </summary>
+        /// <param name="listName"></param>
+        /// <returns>name of table name</returns>
+        public string GetTableName(string listName)
+        {
+            object reportingDataClass = GetReportDataClass();
+            MethodInfo mGetTaleName = reportingDataClass.GetType().GetMethod("GetTableName");
+            object oListName = mGetTaleName.Invoke(reportingDataClass, new object[] { listName });
+            return oListName.ToString();
+        }
         #endregion Methods 
     }
 }
