@@ -2900,20 +2900,6 @@ namespace EPMLiveCore
             return result;
         }
 
-        public static string GetFullAssemblyVersion()
-        {
-            string result = string.Empty;
-            try
-            {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-                result = string.Join(".", new string[] { fvi.ProductMajorPart.ToString(), fvi.ProductMinorPart.ToString(), fvi.ProductBuildPart.ToString(), fvi.ProductPrivatePart.ToString() });
-            }
-            catch { }
-
-            return result;
-        }
-
 
 
         //public static string GetTempDirectory(SPWeb web)
