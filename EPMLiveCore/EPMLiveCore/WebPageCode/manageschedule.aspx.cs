@@ -40,7 +40,7 @@ namespace EPMLiveCore
                     web.AllowUnsafeUpdates = true;
                     SPList lstProjectCenter = web.Lists[CoreFunctions.getConfigSetting(web, "EPMLiveProjectCenter")];
 
-                    SPListItem listItem = lstProjectCenter.Items.GetItemById(int.Parse(projectId));
+                    SPListItem listItem = lstProjectCenter.GetItemById(int.Parse(projectId));
 
                     lblProjectName.Text = listItem.Title;
 

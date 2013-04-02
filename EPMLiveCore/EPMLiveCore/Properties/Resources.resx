@@ -175,4 +175,22 @@
   <data name="SFIntTrigger" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SFIntTrigger.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="_0Tables01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\0Tables01.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_0Tables02" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\0Tables02.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_1Views01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\1Views01.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_2SPs01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\2SPs01.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_9Data01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\9Data01.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_9Data02" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\9Data02.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
 </root>

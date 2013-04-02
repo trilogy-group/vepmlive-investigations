@@ -61,6 +61,143 @@ namespace EPMLiveCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 
+        ///---------------TABLE: EPMLive_Log----------------------
+        ///if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = &apos;EPMLive_Log&apos; and column_name = &apos;timerjobuid&apos;)
+        ///begin
+        ///
+        ///	if exists (select table_name from INFORMATION_SCHEMA.tables where table_name = &apos;EPMLive_Log&apos;)
+        ///	begin
+        ///		DROP TABLE EPMLive_log
+        ///		Print &apos;     Dropping EPM Live Log&apos;
+        ///	end
+        ///	
+        ///
+        ///end
+        ///
+        ///if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = &apos;EPMLive_Log&apos;)
+        ///	begin
+        ///		print &apos;Creating  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _0Tables01 {
+            get {
+                return ResourceManager.GetString("_0Tables01", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ---------------TABLE: TSUSER----------------------
+        ///
+        ///if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = &apos;TSUSER&apos;)
+        ///	begin
+        ///		print &apos;Creating Table TSUSER&apos;
+        ///		
+        ///		CREATE TABLE [dbo].[TSUSER](
+        ///			[TSUSERUID] [uniqueidentifier] NULL DEFAULT (newid()),
+        ///			[SITE_UID] [uniqueidentifier] NULL,
+        ///			[USER_ID] [int] NULL,
+        ///			[USERNAME] [varchar](255) NULL,
+        ///			[NAME] [varchar](255) NULL
+        ///		) ON [PRIMARY]
+        ///				
+        ///	end
+        ///else
+        ///	begin
+        ///		Print &apos;Updating Table TSUSER&apos;
+        ///
+        ///		
+        ///		
+        ///	end
+        ///-- [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _0Tables02 {
+            get {
+                return ResourceManager.GetString("_0Tables02", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to declare @createoralter varchar(10)
+        ///------------------------------View: vwMeta---------------------------
+        ///if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = &apos;vwMeta&apos;)
+        ///begin
+        ///    Print &apos;Creating View vwMeta&apos;
+        ///    SET @createoralter = &apos;CREATE&apos;
+        ///end
+        ///else
+        ///begin
+        ///    Print &apos;Updating View vwMeta&apos;
+        ///    SET @createoralter = &apos;ALTER&apos;
+        ///end
+        ///exec(@createoralter + &apos; VIEW dbo.vwMeta
+        ///AS
+        ///SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], d [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _1Views01 {
+            get {
+                return ResourceManager.GetString("_1Views01", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to declare @createoralter varchar(10)
+        ///if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = &apos;Split&apos;)
+        ///begin
+        ///    Print &apos;Creating Function Split&apos;
+        ///    SET @createoralter = &apos;CREATE&apos;
+        ///end
+        ///else
+        ///begin
+        ///    Print &apos;Updating Function Split&apos;
+        ///    SET @createoralter = &apos;ALTER&apos;
+        ///end
+        ///exec(@createoralter + &apos; FUNCTION [dbo].[Split]
+        ///(
+        ///@ItemList NVARCHAR(MAX),
+        ///@delimiter CHAR(2)
+        ///)
+        ///RETURNS @IDTable TABLE (Item NVARCHAR(255) collate database_default )
+        ///AS
+        ///BEGIN
+        ///DECLARE @tempItemList  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _2SPs01 {
+            get {
+                return ResourceManager.GetString("_2SPs01", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to if not exists (select emailid from EMAILTEMPLATES where emailid = 2)
+        ///begin
+        ///    INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (2,&apos;Build Team Grant&apos;,&apos;You have been granted access to a WorkEngine site&apos;,&apos;&lt;html&gt;
+        ///&lt;body&gt;
+        ///&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot;&gt;
+        ///&lt;tr&gt;
+        ///&lt;td style=&quot;font-size:20px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif&quot;&gt;{CurUser_Name} has granted you access to the &lt;u&gt;&lt;a href=&quot;{SiteUrl}&quot; style=&quot;font-size:20px;color:#3366CC;&quot;&gt;{SiteName}&lt;/a&gt;&lt;/ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _9Data01 {
+            get {
+                return ResourceManager.GetString("_9Data01", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 52)
+        ///begin
+        ///    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (52,&apos;EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5&apos;,&apos;EPMLiveCore.Jobs.Applications.Uninstall&apos;,&apos;Application Uninstall&apos;,3)
+        ///end
+        ///else
+        ///begin
+        ///    UPDATE TIMERJOBTYPES SET NetAssembly=&apos;EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5&apos;, NetClass=&apos;EPMLiveCore.Jobs.Applications.U [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _9Data02 {
+            get {
+                return ResourceManager.GetString("_9Data02", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.3.1&quot; /&gt;
         ///	&lt;Cfg SuppressCfg=&quot;1&quot;/&gt; &lt;!-- Base settings, suppresses saving configuration to cookies --&gt;
@@ -150,16 +287,17 @@ namespace EPMLiveCore.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
-        ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.3.2.120412&quot; /&gt;
+        ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.4.0.32713&quot; /&gt;
         ///	&lt;Cfg SuppressCfg=&quot;1&quot; Style=&quot;GS&quot; /&gt;
         ///	&lt;Cfg MainCol=&quot;Title&quot; NameCol=&quot;Title&quot; /&gt;
         ///	&lt;Cfg ConstWidth=&quot;0&quot; /&gt;
-        ///	&lt;Cfg NoVScroll=&quot;1&quot; /&gt;
+        ///	&lt;Cfg NoVScroll=&quot;0&quot; /&gt;
         ///	&lt;Cfg Undo=&quot;0&quot; /&gt;
         ///	&lt;Cfg NumberId=&quot;1&quot; FullId=&quot;0&quot; IdChars=&quot;1234567890&quot; AddFocusCol=&quot;Title&quot; /&gt;
         ///	&lt;Cfg Searching=&quot;1&quot; /&gt;
         ///	&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;1&quot; SelectClass=&quot;0&quot; /&gt;
-        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;20&quot; MaxRowHeight=&quot;20&quot; MidWidth=&quot;300&quot; MenuColumnsSort=&quot;1&quot; StandardFilter=&quot;2&quot; /&gt;        /// [rest of string was truncated]&quot;;.
+        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;20&quot; MaxRowHeight=&quot;20&quot; MidWidth=&quot;300&quot; MenuColumnsSort=&quot;1&quot; StandardFilter=&quot;2&quot; /&gt;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MyWorkGridLayout {
             get {

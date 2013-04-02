@@ -30,7 +30,21 @@ namespace EPMLiveCore
         protected CheckBox chkIntegrated;
         protected TextBox txtUsername;
         protected TextBox txtPassword;
-        
+        protected Button btnUpgrade;
+        protected Label lblVersion;
+        protected Button btnInstallDB;
+
+        protected InputFormControl con1;
+        protected InputFormControl con2;
+        protected InputFormControl con3;
+
+        protected string sCoreStatus;
+        protected string sWPStatus;
+        protected string sTSStatus;
+        protected string sDashboardStatus;
+        protected string sPFEStatus;
+
+        protected string webappid;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -49,11 +63,12 @@ namespace EPMLiveCore
         {
             try
             {
+                
                 txtConnString.Text = "";
                 //string sVal =  
                 SPWebApplication webApp = WebApplicationSelector1.CurrentItem;
                 //SPWebService.ContentService.WebApplications[new Guid(DropDownList1.SelectedValue)];
-                
+                webappid = webApp.Id.ToString();
                 //SPIisSettings iis = webApp.IisSettings[SPUrlZone.Default];
                 string sConn = CoreFunctions.getConnectionString(webApp.Id);
                 //if (File.Exists(iis.Path + "\\web.config"))
@@ -66,11 +81,44 @@ namespace EPMLiveCore
                         //txtConnString.Text = nConnStr.Attributes["connectionString"].Value;
                         txtConnString.Text = sConn;
                         lblStatusDyn.Text = "Active";
+
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            try
+                            {
+                                SqlConnection cn = new SqlConnection(sConn);
+                                cn.Open();
+
+                                SqlCommand cmd = new SqlCommand("SELECT TOP 1 VERSION FROM VERSIONS order by dtInstalled DESC", cn);
+                                SqlDataReader dr = cmd.ExecuteReader();
+                                string curVersion = "";
+                                if(dr.Read())
+                                {
+                                    curVersion = dr.GetString(0);
+                                }
+                                dr.Close();
+                                cn.Close();
+                                lblVersion.Text = curVersion;
+                                if(curVersion != CoreFunctions.GetFullAssemblyVersion())
+                                {
+                                    btnUpgrade.Visible = true;
+                                    
+                                    lblVersion.BackColor = Color.Red;
+                                }
+
+                            }
+                            catch(Exception ex)
+                            {
+                                lblStatusDyn.Text = "Error: " + ex.Message;
+                            }
+                        });
                     }
                     else
                     {
                         lblStatusDyn.Text = "No connection string configured.";
-                        lblStatusDyn.BackColor = System.Drawing.Color.Red;
+                        con1.Visible = false;
+                        con3.Visible = false;
+                        btnInstallDB.Visible = true;
                     }
                 //}
                 //else
@@ -84,6 +132,32 @@ namespace EPMLiveCore
                     {
                         txtUsername.Text = _chrono.Username;
                     }
+                
+                if(SPFarm.Local.Solutions[new Guid("55aca119-d7c7-494a-b5a7-c3ade07d06eb")].DeployedWebApplications.Contains(webApp))
+                    sCoreStatus = "Deployed";
+                else
+                    sCoreStatus = "Not Deployed";
+
+                if(SPFarm.Local.Solutions[new Guid("98e5c373-e1a0-45ce-8124-30c203cd8003")].DeployedWebApplications.Contains(webApp))
+                    sWPStatus = "Deployed";
+                else
+                    sWPStatus = "Not Deployed";
+
+                if(SPFarm.Local.Solutions[new Guid("1858d521-0375-4a61-9281-f5210854bc12")].DeployedWebApplications.Contains(webApp))
+                    sTSStatus = "Deployed";
+                else
+                    sTSStatus = "Not Deployed";
+
+                if(SPFarm.Local.Solutions[new Guid("160f5e32-b93f-4682-95bc-6db38233535a")].DeployedWebApplications.Contains(webApp))
+                    sDashboardStatus = "Deployed";
+                else
+                    sDashboardStatus = "Not Deployed";
+
+                if(SPFarm.Local.Solutions[new Guid("5a3fe24c-2dc5-4a1c-aec1-6ce942825ceb")].DeployedWebApplications.Contains(webApp))
+                    sPFEStatus = "Deployed";
+                else
+                    sPFEStatus = "Not Deployed";
+
            }
             catch (Exception exception)
             {
@@ -103,6 +177,36 @@ namespace EPMLiveCore
                 
             }
             catch { }
+        }
+
+        protected void btnUpgrade_Click(object sender, EventArgs e)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                SPWebApplication webApp = WebApplicationSelector1.CurrentItem;
+                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(webApp.Id));
+                cn.Open();
+
+                SqlCommand cmd = new SqlCommand(Properties.Resources._0Tables01, cn);
+                cmd.ExecuteNonQuery();
+                cmd = new SqlCommand(Properties.Resources._0Tables02, cn);
+                cmd.ExecuteNonQuery();
+                cmd = new SqlCommand(Properties.Resources._1Views01, cn);
+                cmd.ExecuteNonQuery();
+                cmd = new SqlCommand(Properties.Resources._2SPs01, cn);
+                cmd.ExecuteNonQuery();
+                cmd = new SqlCommand(Properties.Resources._9Data01, cn);
+                cmd.ExecuteNonQuery();
+                cmd = new SqlCommand(Properties.Resources._9Data02, cn);
+                cmd.ExecuteNonQuery();
+                cmd = new SqlCommand("INSERT INTO VERSIONS (VERSION, DTINSTALLED) VALUES (@version, GETDATE())", cn);
+                cmd.Parameters.AddWithValue("@version", CoreFunctions.GetFullAssemblyVersion());
+                cmd.ExecuteNonQuery();
+                cn.Close();
+
+                Response.Redirect("/_admin/epmlive/wcsettings.aspx?WebApplicationId=" + webApp.Id);
+            });
+            
         }
 
         protected void Button1_Click(object sender, EventArgs e)

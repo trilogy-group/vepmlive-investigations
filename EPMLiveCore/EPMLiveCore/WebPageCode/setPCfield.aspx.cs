@@ -34,7 +34,7 @@ namespace EPMLiveCore
                     list.Update();
                 }
 
-                SPListItem li = list.Items.GetItemById(int.Parse(Request["ID"]));
+                SPListItem li = list.GetItemById(int.Parse(Request["ID"]));
 
                 li[Request["Field"]] = Request["Value"];
 

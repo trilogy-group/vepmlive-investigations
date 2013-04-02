@@ -17,8 +17,145 @@
 <asp:Content ID="Content2" ContentPlaceHolderId="PlaceHolderPageDescription" runat="server">
     Use this page to set your WorkEngine settings for each web application.
 </asp:Content>
+<asp:Content ID="Content5" ContentPlaceHolderId="PlaceHolderAdditionalPageHead" runat="server">
+
+    <script src="/_layouts/epmlive/DHTML/xajax/dhtmlxcommon.js" type="text/javascript"></script>
+
+    <script language="javascript">
+        var divInstall;
+        var divRemove;
+        var divDatabase;
+        var btnDoCreate;
+        var divInstallDB; 
+
+        var txtServer;
+        var txtDatabase;
+        var txtDBUsername;
+        var txtDBPassword;
+
+        function InstallSolutions() {
+
+            if(!divInstall)
+                divInstall = document.getElementById("divInstall");
+
+            divInstall.style.display = "";
+
+            var options = { html: divInstall, width: 300, height: 80, allowMaximize: false, showClose: true };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+
+            dhtmlxAjax.get("/_admin/epmlive/installsolutions.aspx?WEBAPP=<%=webappid %>", DoneInstall);
+        }
+
+        function RemoveSolutions() {
+
+            if (!divRemove)
+                divRemove = document.getElementById("divRemove");
+
+            divRemove.style.display = "";
+
+            var options = { html: divRemove, width: 300, height: 80, allowMaximize: false, showClose: true };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+
+            dhtmlxAjax.get("/_admin/epmlive/removesolutions.aspx?WEBAPP=<%=webappid %>", DoneInstall);
+        }
+
+        function DoneInstall(var1) {
+            if (var1.xmlDoc.responseText.trim() != "Success")
+                alert(var1.xmlDoc.responseText);
+            location.href = location.href;
+        }
+
+        function CreateDatabase() {
+            if (!divDatabase) {
+                divDatabase = document.getElementById("divDatabase");
+                divDatabase.style.display = "";
+                btnDoCreate = document.getElementById("btnDoCreate");
+                txtServer = document.getElementById("txtServer");
+                txtDatabase = document.getElementById("txtDatabase");
+                txtDBUsername = document.getElementById("txtDBUsername");
+                txtDBPassword = document.getElementById("txtDBPassword");
+            }
+
+            var options = { html: divDatabase, width: 400, height: 400, allowMaximize: false, showClose: true };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+        }
+
+        function DoCreateDatabase() {
+
+            btnDoCreate.disabled = "disabled";
+
+
+            if (!divInstallDB)
+                divInstallDB = document.getElementById("divInstallDB");
+
+            divInstallDB.style.display = "";
+
+            var options = { html: divInstallDB, width: 300, height: 80, allowMaximize: false, showClose: true };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+
+            
+            dhtmlxAjax.get("/_admin/epmlive/createdatabase.aspx?WEBAPP=<%=webappid %>&Server=" + txtServer.value + "&DB=" + txtDatabase.value + "&username=" + txtDBUsername.value + "&Password=" + txtDBPassword.value, DoneInstall);
+
+        }
+
+    </script>
+
+</asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderId="PlaceHolderMain" runat="server">
-	<asp:Panel ID="pnlAdmin" runat="server">
+	
+    <div id="divInstall" style="padding:10px; display:none;">
+        <br />
+        Please waiting while the solutions are being installed. This may take a few minutes.
+        <br />
+    </div>
+
+    <div id="divRemove" style="padding:10px; display:none;">
+        <br />
+        Please waiting while the solutions are being removed. This may take a few minutes.
+        <br />
+    </div>
+
+    <div id="divInstallDB" style="padding:10px; display:none;">
+        <br />
+        Please waiting while the database is created.
+        <br />
+    </div>
+
+    <div id="divDatabase" style="padding:10px; display:none;">
+        
+        <table width="100%">
+            <tr>
+                <td>Server:</td>
+                <td><input type="text" id="txtServer" /></td>
+            </tr>
+            <tr>
+                <td>Database:</td>
+                <td><input type="text" id="txtDatabase" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">Leave section below blank to use trusted authentication (Recommended)</td>
+            </tr>
+            <tr>
+                <td>Username:</td>
+                <td><input type="text" id="txtDBUsername" /></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" id="txtDBPassword" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="button" onclick="DoCreateDatabase()" id="btnDoCreate" value="Create"/></td>
+            </tr>
+        </table>
+
+    </div>
+    
+    <asp:Panel ID="pnlAdmin" runat="server">
 	
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 	<wssuc:InputFormSection Title="Web Application"
@@ -34,6 +171,87 @@
 
 	</wssuc:InputFormSection>
 	
+    <tr><td colspan="2"><table class="ms-toolbar" width="100%" cellpadding="3" style="height:20px">
+    <tr><td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">Solution Deployment</h3></td></tr>
+    </table></td></tr>
+
+    <tr>
+        <td colspan="2">
+            <table width="400">
+                <tr>
+                    <td>Solution</td>
+                    <td>Status</td>
+                </tr>
+                <tr>
+                    <td>Core</td>
+                    <td><%=sCoreStatus %></td>
+                </tr>
+                <tr>
+                    <td>WebParts</td>
+                    <td><%=sWPStatus %></td>
+                </tr>
+                <tr>
+                    <td>Timesheets</td>
+                    <td><%=sTSStatus %></td>
+                </tr>
+                <tr>
+                    <td>Dashboards</td>
+                    <td><%=sDashboardStatus %></td>
+                </tr>
+                 <tr>
+                    <td>PortfolioEngine</td>
+                    <td><%=sPFEStatus %></td>
+                </tr>
+            </table>
+
+            <br />
+            
+        <TABLE width="100%"><TBODY>
+        <TR>
+        <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><A id=A1 class=ms-addnew href="javascript:InstallSolutions()">Install Solutions</A> </TD>
+        </tr><tr>
+        <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><A id=A2 class=ms-addnew href="javascript:RemoveSolutions()">Remove Solutions</A> </TD>
+        </TR>
+        </TBODY></TABLE>
+        </td>
+    </tr>
+
+
+    <tr><td colspan="2"><table class="ms-toolbar" width="100%" cellpadding="3" style="height:20px">
+    <tr><td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">Database</h3></td></tr>
+    </table></td></tr>
+    <wssuc:InputFormSection Title="Connection String"
+		Description=""
+		runat="server">
+		<Template_Description>
+		    Enter the connection string which you would like to use to connect to the EPMLIVE database.<br /><br />
+		    Ex: Server=SERVERNAME;Database=epmlive;Trusted_Connection=True
+		</Template_Description>
+		<Template_InputFormControls>
+			<wssuc:InputFormControl LabelText="Connection String:" runat="server" width="100%" ID="con1">
+				 <Template_Control>
+				    <asp:TextBox ID="txtConnString" runat="server" Height="100" Width ="390" TextMode="MultiLine" CssClass="ms-input"></asp:TextBox>
+				 </Template_Control>
+		    </wssuc:InputFormControl>
+		    <wssuc:InputFormControl LabelText="Status:" runat="server" width="100%" ID="con2">
+				 <Template_Control>
+                    <asp:Label ID="lblStatusDyn" runat="server" Text="" Font-Size="X-Small" BorderStyle="None" Width="390px" BackColor="white"></asp:Label>
+                    <asp:Button ID="btnInstallDB" runat="server" onClientClick="CreateDatabase();return false;" Visible="false" Text="Create Database"/>
+				 </Template_Control>
+		    </wssuc:InputFormControl>
+            <wssuc:InputFormControl LabelText="Version:" runat="server" width="100%" ID="con3">
+				 <Template_Control>
+                    <asp:Label ID="lblVersion" runat="server" Text="" Font-Size="X-Small" BorderStyle="None" Width="390px" BackColor="white"></asp:Label>
+                    <asp:Button ID="btnUpgrade" runat="server" onClick="btnUpgrade_Click" Visible="false" Text="Upgrade"/>
+				 </Template_Control>
+		    </wssuc:InputFormControl>
+		</Template_InputFormControls>
+
+	</wssuc:InputFormSection>
+
+    <tr><td colspan="2"><table class="ms-toolbar" width="100%" cellpadding="3" style="height:20px">
+    <tr><td class="ms-linksectionheader" colspan="2"><h3 class="ms-standardheader">Reporting</h3></td></tr>
+    </table></td></tr>
 	<wssuc:InputFormSection Title="Reporting Services Configuration"
 		Description=""
 		runat="server">
@@ -73,27 +291,7 @@
 		    </wssuc:InputFormControl>
 		</Template_InputFormControls>
 	</wssuc:InputFormSection>
-	<wssuc:InputFormSection Title="Workgroup Connection String"
-		Description=""
-		runat="server">
-		<Template_Description>
-		    Enter the connection string which you would like to use to connect to the EPMLIVE database.<br /><br />
-		    Ex: Server=SERVERNAME;Database=epmlive;Trusted_Connection=True
-		</Template_Description>
-		<Template_InputFormControls>
-			<wssuc:InputFormControl LabelText="Connection String:" runat="server" width="100%">
-				 <Template_Control>
-				    <asp:TextBox ID="txtConnString" runat="server" Height="100" Width ="390" TextMode="MultiLine" CssClass="ms-input"></asp:TextBox>
-				 </Template_Control>
-		    </wssuc:InputFormControl>
-		    <wssuc:InputFormControl LabelText="Status:" runat="server" width="100%">
-				 <Template_Control>
-                    <asp:Label ID="lblStatusDyn" runat="server" Text="" Font-Size="X-Small" BorderStyle="None" Width="390px" BackColor="white"></asp:Label>
-				 </Template_Control>
-		    </wssuc:InputFormControl>
-		</Template_InputFormControls>
-
-	</wssuc:InputFormSection>
+	
 	</asp:Panel>
 
 	<wssuc:ButtonSection runat="server">
