@@ -1201,6 +1201,10 @@
     <None Include="EPMLiveMasterTopLevel\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{3a9c4efe-9c87-4864-93c5-f41679e2c83a}</SharePointProjectItemId>
     </None>
+    <None Include="EPMLiveMasterV5Blue\EPMLiveMasterV5Blue.master" />
+    <None Include="EPMLiveMasterV5Blue\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{cbbb302f-1089-43ba-a173-8f12c3803e21}</SharePointProjectItemId>
+    </None>
     <None Include="EPMLiveMasterWorkspace\EPMLive.master" />
     <None Include="EPMLiveMasterWorkspace\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{d8014760-23a3-4741-bb87-fb55984ffa83}</SharePointProjectItemId>
@@ -1270,6 +1274,9 @@
     </None>
     <None Include="Features\EPMLiveMasterTopLevel\EPMLiveMasterTopLevel.feature">
       <FeatureId>{24e8341d-126a-4e34-bff8-a6de75cc9489}</FeatureId>
+    </None>
+    <None Include="Features\EPMLiveMasterV5Blue\EPMLiveMasterV5Blue.feature">
+      <FeatureId>{a961d46c-4926-4450-bfb0-280e0bbd044b}</FeatureId>
     </None>
     <None Include="Features\EPMLiveMasterWorkspace\EPMLiveMasterWorkspace.feature">
       <FeatureId>{486f402b-54f9-46e1-b33c-bd7f7c3662e2}</FeatureId>
@@ -1750,6 +1757,7 @@
     <Content Include="EPMLiveMasterTopLevel\Elements.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="EPMLiveMasterV5Blue\Elements.xml" />
     <Content Include="EPMLiveMasterWorkspace\Elements.xml" />
     <Content Include="EPMLiveMultiAppDelegate\Elements.xml" />
     <Content Include="EPMLiveOutlineCodesList\Elements.xml" />
@@ -1795,6 +1803,9 @@
     </Content>
     <Content Include="Features\EPMLiveMasterTopLevel\EPMLiveMasterTopLevel.Template.xml">
       <DependentUpon>EPMLiveMasterTopLevel.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveMasterV5Blue\EPMLiveMasterV5Blue.Template.xml">
+      <DependentUpon>EPMLiveMasterV5Blue.feature</DependentUpon>
     </Content>
     <Content Include="Features\EPMLiveMasterWorkspace\EPMLiveMasterWorkspace.Template.xml">
       <DependentUpon>EPMLiveMasterWorkspace.feature</DependentUpon>
@@ -3373,12 +3384,12 @@
     <None Include="Resources\ResourceExporterVBA.txt" />
     <None Include="Resources\ChartWizardDataSourceGridLayout.txt" />
     <None Include="Resources\SFIntTrigger.txt" />
-    <None Include="Resources\0Tables01.sql" />
-    <None Include="Resources\0Tables02.sql" />
-    <None Include="Resources\1Views01.sql" />
-    <None Include="Resources\2SPs01.sql" />
-    <None Include="Resources\9Data01.sql" />
-    <None Include="Resources\9Data02.sql" />
+    <Content Include="Resources\0Tables01.sql" />
+    <Content Include="Resources\0Tables02.sql" />
+    <Content Include="Resources\1Views01.sql" />
+    <Content Include="Resources\2SPs01.sql" />
+    <Content Include="Resources\9Data01.sql" />
+    <Content Include="Resources\9Data02.sql" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
     <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />
