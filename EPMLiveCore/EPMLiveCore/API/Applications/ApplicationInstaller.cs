@@ -336,10 +336,10 @@ namespace EPMLiveCore.API
         private void iInstallFeatures()
         {
             XmlNode ndFeatures = appDef.ApplicationXml.FirstChild.SelectSingleNode("Features");
-            if(ndFeatures != null)
+            if (ndFeatures != null)
             {
                 int ParentMessageId = 0;
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
                     ParentMessageId = addMessage(0, "Checking Features", "", 0);
                 }
@@ -354,30 +354,38 @@ namespace EPMLiveCore.API
                 float max = ListNdFeatures.Count;
                 float counter = 0;
 
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite site = new SPSite(oWeb.Site.ID))
+                    using (SPSite site = new SPSite(oWeb.Site.ID))
                     {
-                        foreach(SPFeatureDefinition def in site.WebApplication.Farm.FeatureDefinitions)
+                        foreach (SPFeatureDefinition def in site.WebApplication.Farm.FeatureDefinitions)
                         {
-                            ArrInstalledFarmFeatures.Add(def.Id, def);
+                            if (def.CompatibilityLevel == 14)
+                                ArrInstalledFarmFeatures14.Add(def.Id, def);
+                            else
+                                ArrInstalledFarmFeatures15.Add(def.Id, def);
                         }
 
-                        foreach(SPFeatureDefinition def in site.FeatureDefinitions )
+                        foreach (SPFeatureDefinition def in site.FeatureDefinitions)
                         {
-                            ArrInstalledSiteFeatures.Add(def.Id, def);
+                            if (def.CompatibilityLevel == 14)
+                                ArrInstalledSiteFeatures14.Add(def.Id, def);
+                            else
+                                ArrInstalledSiteFeatures15.Add(def.Id, def);
                         }
                     }
                 });
 
-                foreach(XmlNode ndFeature in ListNdFeatures)
+                foreach (XmlNode ndFeature in ListNdFeatures)
                 {
                     string FeatureId = getAttribute(ndFeature, "ID");
                     string sFeatureName = getAttribute(ndFeature, "Name");
-                    if(FeatureId != "")
+                    if (FeatureId != "")
                     {
                         try
                         {
@@ -386,22 +394,35 @@ namespace EPMLiveCore.API
                             bool.TryParse(getAttribute(ndFeature, "IncludedInSolutions"), out bIncluded);
 
                             Guid gFeatureId = new Guid(FeatureId);
-                            if(ArrInstalledFarmFeatures.ContainsKey(gFeatureId))
+                            if (ArrInstalledFarmFeatures15.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures15[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
 
                             }
-                            else if(ArrInstalledSiteFeatures.ContainsKey(gFeatureId))
+                            else if (ArrInstalledFarmFeatures14.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures14[gFeatureId];
+
+                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
+
+                            }
+                            else if (ArrInstalledSiteFeatures15.ContainsKey(gFeatureId))
+                            {
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures15[gFeatureId];
+
+                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
+                            }
+                            else if (ArrInstalledSiteFeatures14.ContainsKey(gFeatureId))
+                            {
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures14[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
                             }
                             else
                             {
-                                if(bIncluded && bVerifyOnly)
+                                if (bIncluded && bVerifyOnly)
                                 {
                                     addMessage(ErrorLevels.NoError, (sFeatureName == "") ? FeatureId : sFeatureName, "", ParentMessageId);
                                 }
@@ -411,7 +432,7 @@ namespace EPMLiveCore.API
                                 }
                             }
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             addMessage(ErrorLevels.Error, (sFeatureName == "") ? FeatureId : sFeatureName, "Error: " + ex.Message, ParentMessageId);
                         }

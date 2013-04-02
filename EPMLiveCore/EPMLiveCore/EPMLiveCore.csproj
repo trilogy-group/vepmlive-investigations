@@ -13,14 +13,14 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>EPM Live Deployment</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"</PostDeploymentCommand>
-    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore</PreDeploymentCommand>
+    <PostDeploymentCommand>
+    </PostDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,6 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -52,9 +54,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files (x86)\Open XML SDK\V2.0\lib\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\EPMLiveIntegration\v4.0_1.0.0.0__9f4da00116c38ec5\EPMLiveIntegration.dll</HintPath>
+    <Reference Include="EPMLiveIntegration">
+      <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveReportsAdmin">
       <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
@@ -65,8 +66,6 @@
     <Reference Include="EPMLiveWorkPlanner">
       <HintPath>..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\bin\Debug\EPMLiveWorkPlanner.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
@@ -254,9 +253,6 @@
     <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManager.cs" />
     <Compile Include="Infrastructure\WEFeatures.cs" />
     <Compile Include="IntegrateEvents\IntegrateEvents.cs" />
-    <Compile Include="Integrations\Office365\Infrastructure\Extensions.cs" />
-    <Compile Include="Integrations\Office365\Infrastructure\O365Service.cs" />
-    <Compile Include="Integrations\Office365\Integrator.cs" />
     <Compile Include="Integrations\Salesforce\Integrator.cs" />
     <Compile Include="Integrations\Salesforce\SalesforceAuthResponse.cs" />
     <Compile Include="Integrations\Salesforce\SalesforceServiceResponse.cs" />
@@ -3540,21 +3536,17 @@
     <VisualStudio>
       <FlavorProperties GUID="{BB1F664B-9266-4fd6-B973-E1E44974B511}">
         <DeploymentConfigurations>
-          <DeploymentConfiguration Name="EPM Live Deployment">
-            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
-            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
+          <DeploymentConfiguration Name="New Deployment Configuration">
+            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.RetractSolution;Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.AddSolution;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand;Microsoft.VisualStudio.SharePoint.ActivateFeatures;Microsoft.VisualStudio.SharePoint.RecycleApplicationPool</DeploymentSteps>
+            <RetractionSteps>
+            </RetractionSteps>
           </DeploymentConfiguration>
         </DeploymentConfigurations>
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>"%25ProgramFiles%25\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" -i "$(TargetPath)" /f
-net stop "WorkEngine Timer"
-net start "WorkEngine Timer"
-iisreset</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>"%25ProgramFiles%25\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" -u "$(TargetName)" /f</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>
