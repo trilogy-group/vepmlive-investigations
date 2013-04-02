@@ -249,7 +249,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
             //Prepares an XmlDocument object used to load the ribbon
             XmlDocument ribbonExtensions = new XmlDocument();
-
+            
             //WorkPlanner Tab
             ribbonExtensions.LoadXml(Properties.Resources.txtBuildTeamTab);
             ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,

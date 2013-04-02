@@ -45,7 +45,8 @@ BuildTeamPageComponent.PageComponent.prototype = {
     },
     getGlobalCommands: function () {
         ULS_SP();
-        var $arr = getGlobalCommands();
+        var $arr = ['Ribbon.BuildTeam.SaveButton', 'Ribbon.BuildTeam.SaveCloseButton', 'Ribbon.BuildTeam.CloseButton', 'Ribbon.BuildTeam.ShowPool', 'Ribbon.BuildTeam.AddResource', 'Ribbon.BuildTeam.AddResColumns', 'Ribbon.BuildTeam.AddTeamColumns', 'Ribbon.BuildTeam.Assignments', 'Ribbon.BuildTeam.DisplayReports', 'Ribbon.BuildTeam.AddToTeam', 'Ribbon.BuildTeam.RemoveFromTeam'];
+
         Array.add($arr, "Ribbon.BuildTeam.DisplayReports");
         Array.add($arr, "Ribbon.BuildTeam.PopulateReports");
         Array.add($arr, "Ribbon.BuildTeam.ShowReport");
