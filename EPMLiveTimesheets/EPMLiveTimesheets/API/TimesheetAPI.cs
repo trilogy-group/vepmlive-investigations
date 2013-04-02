@@ -1576,8 +1576,8 @@ namespace TimeSheets
             catch { }
             SPUser user = GetUser(web, sUserId);
             sUserId = user.ID.ToString();
-            string sUsername = EPMLiveCore.CoreFunctions.GetRealUserName(web.CurrentUser.LoginName, web.Site);
-
+            //string sUsername = EPMLiveCore.CoreFunctions.GetRealUserName(web.CurrentUser.LoginName, web.Site);
+            string sUsername = web.CurrentUser.LoginName;
 
             XmlDocument docData = new XmlDocument();
             docData.LoadXml("<Grid><Cfg TimesheetUID=\"\"/><Body><B></B></Body></Grid>");
@@ -2214,7 +2214,7 @@ namespace TimeSheets
 
             SqlCommand cmd = new SqlCommand("select top 1 ts_uid from TSTIMESHEET where period_id < @period and site_uid=@siteid and username=@username order by period_id desc", cn);
             cmd.Parameters.AddWithValue("@period", period);
-            cmd.Parameters.AddWithValue("@username", EPMLiveCore.CoreFunctions.GetRealUserName(user.LoginName, web.Site));
+            cmd.Parameters.AddWithValue("@username", user.LoginName);
             cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
 
             Guid copyfromtsuid = Guid.Empty;
@@ -2232,7 +2232,7 @@ namespace TimeSheets
             cmd.Parameters.AddWithValue("@tsuid", tsuid);
             cmd.Parameters.AddWithValue("@period", period);
             cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-            cmd.Parameters.AddWithValue("@username", EPMLiveCore.CoreFunctions.GetRealUserName(user.LoginName, web.Site));
+            cmd.Parameters.AddWithValue("@username", user.LoginName);
             cmd.Parameters.AddWithValue("@resourcename", user.Name);
             cmd.ExecuteNonQuery();
 

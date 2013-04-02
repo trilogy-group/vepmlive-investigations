@@ -314,15 +314,16 @@ function ChangeView(grid, view) {
     var oVisible = new Object();
 
     for (var oViewCol in oViewCols) {
-        var oViewColInfo = oViewCols[oViewCol].split('|');
+        if (oViewCol != "indexOf") {
+            var oViewColInfo = oViewCols[oViewCol].split('|');
 
-        oVisible[oViewColInfo[0]] = new Object();
+            oVisible[oViewColInfo[0]] = new Object();
 
-        if (oViewColInfo.length > 1)
-            oVisible[oViewColInfo[0]].Width = oViewColInfo[1];
-        else
-            oVisible[oViewColInfo[0]].Width = "";
-
+            if (oViewColInfo.length > 1)
+                oVisible[oViewColInfo[0]].Width = oViewColInfo[1];
+            else
+                oVisible[oViewColInfo[0]].Width = "";
+        }
     }
 
     //Cols
@@ -605,7 +606,8 @@ function CheckApproveStatus(gridid) {
 
 Grids.OnFocus = function (grid, row, col, x, y, event) {
 
-    curRow = row;
+    if(!curRow)
+        curRow = row;
 
     DoPopUp(grid, row, col);
 
@@ -1103,7 +1105,10 @@ Grids.OnGetHtmlValue = function (grid, row, col, val) {
 
                 var diff = dtNow.getTime() - dt.getTime();
 
-                return GetTimeDisplay(diff);
+                if (diff < 0)
+                    return "0m";
+                else
+                    return GetTimeDisplay(diff);
 
             }
         }
