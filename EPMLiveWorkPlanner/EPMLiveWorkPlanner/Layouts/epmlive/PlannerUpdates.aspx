@@ -73,7 +73,7 @@
 
             grid.ActionCalcOn();
 
-            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, acceptString);
+            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, acceptString);
 
             hm("dlgProcessing");
         }
@@ -302,7 +302,7 @@
                 }
                 var options = { html: divDetail, width: 500, height: 300, title: "Task Details", dialogReturnValueCallback: temp };
 
-                SP.UI.ModalDialog.showModalDialog(options);
+                parent.SP.UI.ModalDialog.showModalDialog(options);
 
                 Grids.UpdateDetail.Rerender();
             }
@@ -393,7 +393,7 @@
             </p>
             <p style="float:right">
                 <input type="button" value="Process" onclick="javascript:ProcessUpdates();"/> 
-                <input type="button" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" /> 
+                <input type="button" value="Cancel" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" /> 
             </p>
             <div style="clear: both;"></div>
         </div>

@@ -464,17 +464,19 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     }
                     else
                     {
-                        if(!String.IsNullOrEmpty(Request["setdefault"]))
-                        {
-                            try
-                            {
-                                if(bool.Parse(Request["setdefault"]))
-                                    setDefault(web);
-                            }
-                            catch { }
-                        }
+                        
 
                         pnlDone.Visible = true;
+                    }
+
+                    if(!String.IsNullOrEmpty(Request["setdefault"]))
+                    {
+                        try
+                        {
+                            if(bool.Parse(Request["setdefault"]))
+                                setDefault(web);
+                        }
+                        catch { }
                     }
                 }
             }

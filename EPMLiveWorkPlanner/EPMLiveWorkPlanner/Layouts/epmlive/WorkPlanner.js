@@ -2906,6 +2906,9 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
         }
     }
 
+    if (isMilestone) {
+        grid.SetValue(row, "StartDate", new Date(grid.Cols["G"].GanttBase).valueOf(), 1, 0);
+    }
     //ApplyDefaults(grid, newrow, isMilestone, isSummary);
     
     setParentDef(grid, newrow);
@@ -4344,6 +4347,7 @@ function AddExternalTask(dialogResult, returnValue) {
         grid.SetValue(newRow, "IsExternal", 1, 1, 0);
         grid.SetValue(newRow, "Predecessors", "", 1, 0);
         grid.SetValue(newRow, "Descendants", "", 1, 0);
+        grid.SetValue(newRow, "PercentComplete", ntRow["PercentComplete"], 1, 0);
 
         grid.ActionCalcOn();
     }

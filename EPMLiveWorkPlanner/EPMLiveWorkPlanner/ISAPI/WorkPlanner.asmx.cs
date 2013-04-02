@@ -147,12 +147,12 @@ namespace EPMLiveWorkPlanner
             Hashtable hshUserFields = new Hashtable();
 
             SPQuery query = new SPQuery();
-            query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + ProjectID + "</Value></Eq></Where>";
+            query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + ProjectID + "</Value></Eq></Where><OrderBy><FieldRef Name='taskorder'/></OrderBy>";
 
             SPListItemCollection lic = oList.GetItems(query);
 
-            ArrayList arrFields = new ArrayList();
-            arrFields.Add("ID");
+            Hashtable arrFields = new Hashtable();
+            arrFields.Add("ID", null);
 
             foreach(SPField field in oList.Fields)
             {
@@ -160,20 +160,20 @@ namespace EPMLiveWorkPlanner
                     hshUserFields.Add(field.InternalName + "ID", field.InternalName);
 
                 if(!field.Hidden && isValidField(field.InternalName, false) && field.Reorderable)        
-                    arrFields.Add(field.InternalName);
+                    arrFields.Add(field.InternalName, field);
             }
 
             doc.FirstChild.AppendChild(ndBody1);
 
             SPList list = oWeb.Lists.TryGetList(sListTaskCenter);
 
-            foreach(string sField in arrFields)
+            foreach(DictionaryEntry de in arrFields)
             {
-                if(sField != "Title" && sField != "ID")
+                if(de.Key.ToString() != "Title" && de.Key.ToString() != "ID")
                 {
                     XmlNode ndCol = doc.CreateNode(XmlNodeType.Element, "C", doc.NamespaceURI);
                     attr = doc.CreateAttribute("Name");
-                    attr.Value = sField;
+                    attr.Value = de.Key.ToString();
                     ndCol.Attributes.Append(attr);
                     attr = doc.CreateAttribute("Visible");
                     attr.Value = "0";
@@ -193,8 +193,15 @@ namespace EPMLiveWorkPlanner
                 attr.Value = "Task";
                 ndI.Attributes.Append(attr);
 
-                foreach(string col in arrFields)
+                foreach(DictionaryEntry de in arrFields)
                 {
+                    string col = de.Key.ToString();
+                    SPField field = null;
+                    try
+                    {
+                        field = (SPField)de.Value;
+                    }
+                    catch { }
                     if(col == "ID")
                     {
                         attr = doc.CreateAttribute("id");
@@ -234,11 +241,49 @@ namespace EPMLiveWorkPlanner
                         else
                         {
                             attr = doc.CreateAttribute(col);
-                            try
+
+                            switch(field.Type)
                             {
-                                attr.Value = li[col].ToString();
+                                case SPFieldType.Boolean:
+                                    try
+                                    {
+                                        if(li[col].ToString() == "True")
+                                            attr.Value = "1";
+                                        else
+                                            attr.Value = "0";
+                                    }
+                                    catch { }
+                                    break;
+                                case SPFieldType.Number:
+                                    SPFieldNumber num = (SPFieldNumber)field;
+                                    if(num.ShowAsPercentage)
+                                    {
+                                        try
+                                        {
+                                            attr.Value = (float.Parse(li[col].ToString()) * 100).ToString();
+                                        }
+                                        catch { }
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            attr.Value = li[col].ToString();
+                                        }
+                                        catch { }
+
+                                    }
+                                    break;
+                                default:
+                                    try
+                                    {
+                                        attr.Value = li[col].ToString();
+                                    }
+                                    catch { }
+                                    break;
                             }
-                            catch { }
+                            
+                            
                             ndI.Attributes.Append(attr);
                         }
                     }
@@ -3033,6 +3078,7 @@ namespace EPMLiveWorkPlanner
             XmlAttribute attrDef;
 
             XmlNode ndTaskDef = docOut.SelectSingleNode("//Def/D[@Name='Task']");
+            XmlNode ndMSDef = docOut.SelectSingleNode("//Def/D[@Name='Milestone']");
 
             foreach(SPField oField in oListTaskCenter.Fields)
             {
@@ -3057,6 +3103,7 @@ namespace EPMLiveWorkPlanner
                                     attrDef = docOut.CreateAttribute(oField.InternalName);
                                     attrDef.Value = sDefault.Replace("\"", "'");
                                     ndTaskDef.Attributes.Append(attrDef);
+                                    ndMSDef.Attributes.Append(attrDef);
                                 }
                                 //if(sDefault != "0" && sDefault != ".00")
                                 //sDefaults += oField.InternalName + ":\"" + sDefault.Replace("\"", "'") + "\",";
@@ -3068,6 +3115,7 @@ namespace EPMLiveWorkPlanner
                                     attrDef = docOut.CreateAttribute(oField.InternalName);
                                     attrDef.Value = sDefault.Replace("\"", "'");
                                     ndTaskDef.Attributes.Append(attrDef);
+                                    ndMSDef.Attributes.Append(attrDef);
                                 }
                             }
                             else
@@ -3075,7 +3123,7 @@ namespace EPMLiveWorkPlanner
                                 attrDef = docOut.CreateAttribute(oField.InternalName);
                                 attrDef.Value = sDefault.Replace("\"", "'");
                                 ndTaskDef.Attributes.Append(attrDef);
-
+                                ndMSDef.Attributes.Append(attrDef);
                             }
                         }
                     }

@@ -22,13 +22,14 @@
     <div id="editorObj" style="width: 590px; height: 350px; border: #909090 1px solid;"></div>
     <br />
     <input type="button" value="Save" onclick="save();" class="ms-ButtonHeightWidth" />&nbsp;
-    <input type="button" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" />
+    <input type="button" value="Cancel" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-
+ButtonHeightWidth" />
 
     <script language="javascript">
 
         function save() {
             parent.SetRichTextHtml(editor.getContent());
-            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
         }
 
         function load() {
@@ -42,7 +43,6 @@
         _spBodyOnLoadFunctionNames.push("load");
     </script>
 </asp:Content>
-
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
 Application Page
 </asp:Content>

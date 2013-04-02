@@ -191,6 +191,7 @@
     </Compile>
     <Compile Include="Layouts\epmlive\WorkPlanLinkTask.aspx.cs">
       <DependentUpon>WorkPlanLinkTask.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\WorkPlanLinkTask.aspx.designer.cs">
       <DependentUpon>WorkPlanLinkTask.aspx.cs</DependentUpon>
