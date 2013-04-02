@@ -730,7 +730,7 @@ namespace EPMLiveCore.API.Integration
                 if(dr["TYPE"].ToString() == "1")//Update
                 {
                     SPList list = _web.Lists[new Guid(dr["LIST_ID"].ToString())];
-                    SPListItem li = list.Items.GetItemById(int.Parse(dr["ITEM_ID"].ToString()));
+                    SPListItem li = list.GetItemById(int.Parse(dr["ITEM_ID"].ToString()));
 
                     DataSet dsItem = GetDataSet(list, dr["COL_ID"].ToString(), Guid.Empty);
 
@@ -1029,7 +1029,7 @@ namespace EPMLiveCore.API.Integration
                             string intid = dr["ID"].ToString();
 
 
-                            SPListItem li = list.Items.GetItemById(itemid);
+                            SPListItem li = list.GetItemById(itemid);
                             string curcolidval = "";
                             try
                             {

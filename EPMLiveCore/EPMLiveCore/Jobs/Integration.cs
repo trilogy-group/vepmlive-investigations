@@ -17,7 +17,7 @@ namespace EPMLiveCore.Jobs
 
             try
             {
-                Guid intlistid = new Guid(data);
+                Guid intlistid = new Guid(base.key);
 
                 API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(site.ID, web.ID);
                 Hashtable hshParms = new Hashtable();
