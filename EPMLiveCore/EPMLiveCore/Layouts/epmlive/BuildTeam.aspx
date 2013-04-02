@@ -37,6 +37,7 @@
      {
          background-color: #FFFFFF !important
      }
+     #s4-ribbonrow{ height:140px !important}
     </style>
 
     <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
@@ -320,6 +321,8 @@
 	ExecuteOrDelayUntilScriptLoaded(doLoad, 'sp.ui.dialog.js');
 
         <%=sDisable %>
+
+        document.getElementsByTagName("html")[0].className = "ms-dialog";
     </script>
 </asp:Content>
 

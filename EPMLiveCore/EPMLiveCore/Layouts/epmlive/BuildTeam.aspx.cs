@@ -263,7 +263,7 @@ namespace EPMLiveCore.Layouts.epmlive
             ribbon.Minimized = false;
             ribbon.CommandUIVisible = true;
             const string initialTabId = "Ribbon.BuildTeam";
-
+            
             if(!ribbon.IsTabAvailable(initialTabId))
                 ribbon.MakeTabAvailable(initialTabId);
 
