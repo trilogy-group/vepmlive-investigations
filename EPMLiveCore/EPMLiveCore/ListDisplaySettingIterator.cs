@@ -1173,7 +1173,7 @@ namespace EPMLiveCore
                 // Add EPMLive custom entity picker control to 
                 // lookup fields
 
-                AddEntityPickersToLookups();
+                //AddEntityPickersToLookups();
             }
             else
                 base.CreateChildControls();
