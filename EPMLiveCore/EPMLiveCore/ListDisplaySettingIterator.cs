@@ -823,10 +823,15 @@ namespace EPMLiveCore
 
                             try
                             {
-                                if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Choice)
-                                    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].ClientID);
-                                else
-                                    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].Controls[1].ClientID);
+                                SPField f = ((Microsoft.SharePoint.WebControls.CompositeField)tc.Controls[1]).Field;
+                                string fname = f.InternalName + "_" + f.Id.ToString() + "_$" + f.TypeAsString + "Field";
+
+                                dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, fname);
+
+                                //if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Choice)
+                                //    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].ClientID);
+                                //else
+                                //    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].Controls[1].ClientID);
                             }
                             catch { }
 
@@ -1048,6 +1053,8 @@ namespace EPMLiveCore
                         catch { }
                         writer.WriteLine("}");
 
+                        writer.WriteLine("function InitFields(){");
+
                         try
                         {
                             writer.WriteLine("document.getElementById('" + dControls["Generic"] + "').onclick = function() {cleanupfields();};");
@@ -1060,6 +1067,7 @@ namespace EPMLiveCore
                         catch { }
 
                         writer.WriteLine("cleanupfields();");
+                        writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
 
                         if (isOnline)
                         {
