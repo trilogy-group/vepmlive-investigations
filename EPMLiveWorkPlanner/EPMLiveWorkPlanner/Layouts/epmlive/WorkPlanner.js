@@ -2907,7 +2907,7 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
     }
 
     if (isMilestone) {
-        grid.SetValue(row, "StartDate", new Date(grid.Cols["G"].GanttBase).valueOf(), 1, 0);
+        grid.SetValue(newrow, "StartDate", new Date(grid.Cols["G"].GanttBase).valueOf(), 1, 0);
     }
     //ApplyDefaults(grid, newrow, isMilestone, isSummary);
     
