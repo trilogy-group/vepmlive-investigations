@@ -1,4 +1,5 @@
-<%@ Assembly Name="EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5"%><%@ Page Language="C#" Inherits="EPMLiveWebParts.ribbonjs"%><%@ OutputCache Location="None" VaryByParam="None" %>
+<%@ Assembly Name="EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5"%><%@ Page Language="C#" Inherits="EPMLiveWebParts.ribbonjs"  ContentType="application/x-javascript"%><%@ OutputCache Location="None" VaryByParam="None" %>
+
 Type.registerNamespace('ContextualTabWebPart');
 
 function viewProps(lid, vid, vps){
