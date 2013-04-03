@@ -30,7 +30,7 @@ namespace EPMLiveCore.ReportingProxy
         /// <param name="parameters">The parameters.</param>
         /// <param name="connectionType">Type of the connection.</param>
         /// <returns></returns>
-        private void ExecuteNonQuery(string query, IEnumerable<KeyValuePair<string, object>> parameters,
+        public void ExecuteNonQuery(string query, IEnumerable<KeyValuePair<string, object>> parameters,
                                      string connectionType)
         {
             object epmDataClass = GetEpmDataClass();
@@ -62,7 +62,7 @@ namespace EPMLiveCore.ReportingProxy
         /// <param name="commandType">Type of the command.</param>
         /// <param name="connectionType">Type of the connection.</param>
         /// <returns></returns>
-        private DataTable ExecuteQuery(string query, IEnumerable<KeyValuePair<string, object>> parameters,
+        public DataTable ExecuteQuery(string query, IEnumerable<KeyValuePair<string, object>> parameters,
                                        CommandType commandType, string connectionType)
         {
             object epmDataClass = GetEpmDataClass();
