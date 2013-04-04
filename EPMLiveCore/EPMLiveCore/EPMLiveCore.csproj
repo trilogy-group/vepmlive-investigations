@@ -1093,7 +1093,9 @@
     <Compile Include="WebPageCode\checkurl.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebPageCode\createdatabase.aspx.cs" />
+    <Compile Include="WebPageCode\createdatabase.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\CreateWorkspace.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1115,7 +1117,9 @@
     <Compile Include="WebPageCode\getworkspacexml.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebPageCode\installsolutions.aspx.cs" />
+    <Compile Include="WebPageCode\installsolutions.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\ListDisplayPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1137,7 +1141,9 @@
     <Compile Include="WebPageCode\refreshpc.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebPageCode\removesolutions.aspx.cs" />
+    <Compile Include="WebPageCode\removesolutions.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\reportlist.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -2928,6 +2934,7 @@
     <Content Include="Layouts\epmlive\images\deleteteam.png" />
     <Content Include="Layouts\epmlive\images\down.gif" />
     <Content Include="Layouts\epmlive\images\dropdown2.gif" />
+    <Content Include="Layouts\epmlive\images\epmlive-header.png" />
     <Content Include="Layouts\epmlive\images\epmlive-logo.png" />
     <Content Include="Layouts\epmlive\images\error.png" />
     <Content Include="Layouts\epmlive\images\feedback.gif" />
