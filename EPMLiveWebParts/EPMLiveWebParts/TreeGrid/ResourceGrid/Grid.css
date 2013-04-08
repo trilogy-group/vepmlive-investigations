@@ -81,7 +81,7 @@
 /* HEADER CELL */
 .GSCellHeader,.GSCellHeaderEmpty {
     background-color:#FFFFFF; border-top:0px solid #ffffff;color: #777777;
-    font-size: 0.85em;
+    font-size: 12px;
     font-weight: normal;
     text-align: left;    
     vertical-align: middle;

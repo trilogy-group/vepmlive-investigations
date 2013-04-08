@@ -1368,6 +1368,8 @@ function registerEpmLiveResourceGridScript() {
                 if (resourceFinder.is(":visible")) {
                     $$.actions.hideEasyScroll(false);
                 } else {
+                    if ($$.resources.length === 0) return false;
+                    
                     var ribbonButton = $('#RibbonContainer').find('a[title="Find Resource"]');
                     if (ribbonButton.length) ribbonButton = ribbonButton[0];
 

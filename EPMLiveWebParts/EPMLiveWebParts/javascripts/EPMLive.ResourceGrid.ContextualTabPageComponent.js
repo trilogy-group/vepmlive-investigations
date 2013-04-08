@@ -104,11 +104,12 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'ResourceGrid.Cmd.ShowHideGrouping':
             case 'ResourceGrid.Cmd.ShowHideGrouping.Query':
             case 'ResourceGrid.Cmd.ClearSort':
-            case 'ResourceGrid.Cmd.Find':
-            case 'ResourceGrid.Cmd.Find.Query':
             case 'ResourceGrid.Cmd.MyResources':
             case 'ResourceGrid.Cmd.MyResources.Query':
                 return true;
+            case 'ResourceGrid.Cmd.Find':
+            case 'ResourceGrid.Cmd.Find.Query':
+                return $$.resources.length > 0;
             case 'ResourceGrid.Cmd.Export':
                 return $$.actions.canExport();
             case 'ResourceGrid.Cmd.Import':
