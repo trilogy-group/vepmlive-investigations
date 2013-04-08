@@ -7,6 +7,7 @@
 <%@ Register TagPrefix="epm" TagName="EPMLiveJS" src="~/_controltemplates/EPMLiveJS.ascx" %>
 <%@ Register TagPrefix="epm" TagName="EPMLiveNotifications" src="~/_controltemplates/EPMLiveNotifications.ascx" %>
 <%@ Register TagPrefix="epm" TagName="TemplateVersoning" src="~/_controltemplates/TemplateVersoning.ascx" %>
+<%@ Register TagPrefix="epm" TagName="Statusbar" src="~/_controltemplates/EPMLiveStatusbar.ascx" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <SharePoint:SPHtmlTag dir="<%$Resources:wss,multipages_direction_dir_value%>" ID="SPHtmlTag" runat="server" >
@@ -689,6 +690,9 @@
  aria-live="polite" aria-relevant="all">
   <div id="notificationArea" class="ms-notif-box"></div>
 	<SharePoint:AjaxDelta id="DeltaPageStatusBar" BlockElement="true" runat="server">
+	    <!-- Statusbar -->
+        <epm:Statusbar runat="server"></epm:Statusbar>
+        <!-- // Statusbar -->
 		<div id="pageStatusBar"></div>
 	</SharePoint:AjaxDelta>
 	<SharePoint:AjaxDelta id="DeltaPlaceHolderMain" BlockElement="true" IsMainContent="true" runat="server">

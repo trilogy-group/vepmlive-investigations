@@ -13,14 +13,17 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>Munjal%27s Deploy Config</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <PostDeploymentCommand>
-    </PostDeploymentCommand>
+"%25ProgramFiles%25\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" -i "%24%28TargetPath%29" /f
+net stop "WorkEngine Timer"
+net start "WorkEngine Timer"</PostDeploymentCommand>
+    <PreDeploymentCommand>"%25ProgramFiles%25\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" -u "%24%28TargetName%29" /f</PreDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -3570,6 +3573,10 @@
             <DeploymentSteps>Microsoft.VisualStudio.SharePoint.RetractSolution;Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.AddSolution;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand;Microsoft.VisualStudio.SharePoint.ActivateFeatures;Microsoft.VisualStudio.SharePoint.RecycleApplicationPool</DeploymentSteps>
             <RetractionSteps>
             </RetractionSteps>
+          </DeploymentConfiguration>
+          <DeploymentConfiguration Name="Munjal's Deploy Config">
+            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
+            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
           </DeploymentConfiguration>
         </DeploymentConfigurations>
       </FlavorProperties>
