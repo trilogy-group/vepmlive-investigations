@@ -19,11 +19,10 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>
-"%25ProgramFiles%25\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" -i "%24%28TargetPath%29" /f
+    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
 net stop "WorkEngine Timer"
 net start "WorkEngine Timer"</PostDeploymentCommand>
-    <PreDeploymentCommand>"%25ProgramFiles%25\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" -u "%24%28TargetName%29" /f</PreDeploymentCommand>
+    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore</PreDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

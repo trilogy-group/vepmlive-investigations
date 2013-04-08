@@ -21,18 +21,7 @@
                 };
 
                 theStatusbar.cssClass = k.dependentObservable(function () {
-                    switch (this.color()) {
-                        case 'blue':
-                            return 's4-status-s1';
-                        case 'green':
-                            return 's4-status-s2';
-                        case 'yellow':
-                            return 's4-status-s3';
-                        case 'red':
-                            return 's4-status-s4';
-                        default:
-                            return '';
-                    }
+                    return 'ms-status-' + this.color();
                 }, theStatusbar);
 
                 theStatusbar.append = function (title, message, icon, align) {
