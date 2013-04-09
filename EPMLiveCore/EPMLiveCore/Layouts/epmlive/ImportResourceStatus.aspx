@@ -42,6 +42,10 @@
 		.accordion-inner {
 		    height: 285px !important;
 		}
+
+        .ms-core-overlay {
+            overflow: hidden !important;
+        }
 	</style>
 	
 	<!--[if IE]>
