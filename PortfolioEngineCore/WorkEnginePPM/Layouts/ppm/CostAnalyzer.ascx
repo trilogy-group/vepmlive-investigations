@@ -270,7 +270,6 @@ border-radius: 0px;
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxtabbar.js" type="text/javascript"></script>
 
-<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xtoolbar/skins/dhtmlxlayout_dhx_skyblue.css" />
 <script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxtoolbar.js" type="text/javascript"></script>
 
@@ -286,7 +285,6 @@ border-radius: 0px;
 
 <script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
 
-<link rel="stylesheet" type="text/css" href="/_layouts/ppm/CostAnalyzer.ascx.css" />
 <script src="/_layouts/ppm/CostAnalyzer.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css" />

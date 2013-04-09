@@ -814,16 +814,26 @@
                         if (errors.Value != "") {
 
                             alert("Error: " + errors.Value);
-                            if (SP.UI.DialogResult)
-                                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+                            if (parent.SP.UI.DialogResult)
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
                             else
-                                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
                             return;
                         }
                     }
                 }
 
+                if (jsonObject.Result.OptData.Optimizer.Permissions.Allowed == 0) {
+
+                    alert("You do not have the Global Permission set to access this functionality!");
+
+                    if (parent.SP.UI.DialogResult)
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                    else
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                    return;
+                }
 
 
                 this.optimalprime = new OptimizerRibbon(jsonObject.Result.OptData.Optimizer, this.params, "idOptDlg");
@@ -851,10 +861,10 @@
         }
         catch (e) {
             this.HandleException("LoadOptimizerDataComplete", e);
-            if (SP.UI.DialogResult)
-                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
             else
-                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
         }
     }
@@ -912,10 +922,10 @@
 	    }
 	    catch (e) {
 	        this.HandleException("PopulateUI", e);
-	        if (SP.UI.DialogResult)
-	            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	        else
-	            SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 	    }
 	}
@@ -958,10 +968,10 @@
 	    }
 	    catch (e) {
 	        this.HandleException("CreateTopGrid", e);
-	        if (SP.UI.DialogResult)
-	            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	        else
-	            SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 	    }
 	}
@@ -1583,10 +1593,10 @@
 
                                 if (item.isSel == true) {
                                     //        grid.SetString(row, "PISelected", "Selected", 1);
-                                    grid.MoveRow(row, selr, null, false);
+                                    grid.MoveRow(row, selr, null, true);
                                 } else {
                                     //          grid.SetString(row, "PISelected", "Unselected", 1);
-                                    grid.MoveRow(row, unselr, null, false);
+                                    grid.MoveRow(row, unselr, null, true);
                                 }
                             }
                         }
@@ -1597,6 +1607,7 @@
 
                     grid.Render();
                     WorkEnginePPM.Optimizer.Execute(oRep.Action, oRep.Data);
+                    window.setTimeout(this.ffDeferedRenderDelegate, 100);
 
 
                 }
@@ -1608,7 +1619,10 @@
         }
     }
 
-
+    Optimizer.prototype.ffDeferedRender = function (event) {
+        var grid = Grids["g_1"];
+        grid.Render();
+    }
 	Optimizer.prototype.externalEvent = function (event) {
 
 	    try {
@@ -1861,10 +1875,10 @@
 
 
 	            case "AnalyzerTab_Close":
-	                if (SP.UI.DialogResult)
-	                    SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	                if (parent.SP.UI.DialogResult)
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	                else
-	                    SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 	                return;
 
 
@@ -2157,6 +2171,7 @@ try {
 
 		this.deferevent = "";
 		this.deferedExternalEventDelegate = MakeDelegate(this, this.deferedExternalEvent);
+		this.ffDeferedRenderDelegate = MakeDelegate(this, this.ffDeferedRender);
 
 		
 		

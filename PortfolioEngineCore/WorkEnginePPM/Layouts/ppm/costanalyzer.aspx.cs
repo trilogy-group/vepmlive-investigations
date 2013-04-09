@@ -37,16 +37,33 @@ namespace WorkEnginePPM
             }
             else
             {
-                WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl)LoadControl("/_layouts/ppm/CostAnalyzer.ascx");
+                bool useneewone = true;
 
-                ctl.TicketVal = Request["dataid"];
+                if (useneewone)
+                {
+                    WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl)LoadControl("/_layouts/ppm/CostAnalyzer.ascx");
+                    ctl.TicketVal = Request["dataid"];
 
-                if (int.TryParse(Request["view"], out i))
-                    ctl.ViewIDVal = Request["view"];
+                    if (int.TryParse(Request["view"], out i))
+                        ctl.ViewIDVal = Request["view"];
+                    else
+                        ctl.ViewNameVal = Request["view"];
+
+                    PlaceHolder1.Controls.Add(ctl);
+                }
                 else
-                    ctl.ViewNameVal = Request["view"];
+                {
+                    WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl)LoadControl("/_layouts/ppm/Model.ascx");
 
-                PlaceHolder1.Controls.Add(ctl);
+                    ctl.TicketVal = Request["dataid"];
+
+                    if (int.TryParse(Request["view"], out i))
+                        ctl.ViewIDVal = Request["view"];
+                    else
+                        ctl.ViewNameVal = Request["view"];
+
+                    PlaceHolder1.Controls.Add(ctl);
+                }
             }
         }
     }

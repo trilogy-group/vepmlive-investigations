@@ -83,10 +83,10 @@
 		    alert("Cost View Specified did not exist");
 
 
-		    if (SP.UI.DialogResult)
-		        SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+		    if (parent.SP.UI.DialogResult)
+		        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 		    else
-		        SP.UI.ModalDialog.commonModalDialogClose(0, '');
+		        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 			return;
 
@@ -115,10 +115,10 @@
 	   if (result.length == 0) {
 		   alert("No Models have been defined - please contact your administrator");
 
-		   if (SP.UI.DialogResult)
-			   SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+		   if (parent.SP.UI.DialogResult)
+			   parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 		   else
-			   SP.UI.ModalDialog.commonModalDialogClose(0, '');
+			   parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
 		   return;
@@ -131,10 +131,10 @@
             if (xName == "***PermsisionsCheck***") {
  	            alert("You do not have the Global Permission set to access this functionality!");
 
-	            if (SP.UI.DialogResult)
-	                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	            if (parent.SP.UI.DialogResult)
+	                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	            else
-	                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
                 return;               
             }
 
@@ -266,10 +266,10 @@
 
 	    if (bRet == true) {
 
-	        if (SP.UI.DialogResult)
-	            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	        else
-	            SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
 	        return;
@@ -872,10 +872,10 @@
 
         if (action == 0) {
 
-            if (SP.UI.DialogResult)
-                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
             else
-                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
             return;
@@ -1268,10 +1268,10 @@
 
 		}
 
-		if (SP.UI.DialogResult)
-			SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+		if (parent.SP.UI.DialogResult)
+			parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 		else
-			SP.UI.ModalDialog.commonModalDialogClose(0, '');
+			parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
 	}
@@ -2617,10 +2617,10 @@
 
 
 	    if (id == "CloseBtn") {
-	        if (SP.UI.DialogResult)
-	            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	        else
-	            SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
 	        return;

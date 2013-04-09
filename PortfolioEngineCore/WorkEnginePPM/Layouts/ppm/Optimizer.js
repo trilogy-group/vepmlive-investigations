@@ -90,7 +90,7 @@
                         this.EditRangeDlg.setImagePath("/_layouts/ppm/images/");
 
                         this.EditRangeDlg.createWindow("winEditRangeDlgDlg", 20, 30, 300, 115);
-                        this.EditRangeDlg.window("winEditRangeDlgDlg").setIcon("logo.ico", "logo.ico");
+  //                      this.EditRangeDlg.window("winEditRangeDlgDlg").setIcon("logo.ico", "logo.ico");
                         this.EditRangeDlg.window("winEditRangeDlgDlg").denyResize();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").button("park").hide();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setModal(true);
@@ -277,6 +277,7 @@
                     this.applyFilters();
                     this.updateProgressRibbon();
 
+                    var sInList = "";
 
                     for (var c = 0; c < this.piIn.length; c++) {
                         item = this.piIn[c];
@@ -405,7 +406,7 @@
                         this.DeleteStratDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.DeleteStratDlg.setImagePath("/_layouts/ppm/images/");
                         this.DeleteStratDlg.createWindow("winDeleteStratDlg", 20, 30, 280, 157);
-                        this.DeleteStratDlg.window("winDeleteStratDlg").setIcon("logo.ico", "logo.ico");
+  //                      this.DeleteStratDlg.window("winDeleteStratDlg").setIcon("logo.ico", "logo.ico");
                         this.DeleteStratDlg.window("winDeleteStratDlg").denyResize();
                         this.DeleteStratDlg.window("winDeleteStratDlg").button("park").hide();
                         this.DeleteStratDlg.window("winDeleteStratDlg").setModal(true);
@@ -441,6 +442,29 @@
                 case "DeleteOptimizerStratagyComplete":
                     this.DeleteOptimizerStratagyComplete(this.passbackresult);
 
+                    this.doApplyStratagy();
+                    var sJSON = this.getOptimizerRibbonJSON();
+
+                    this.optTab.updateRibbonData(sJSON);
+                    this.optTab.ReRender();
+                    this.flashCurrentStratagies();
+
+                    window.setTimeout(this.flashTabRibbonDelegate, 100);
+
+
+                    this.applyFilters();
+                    this.updateProgressRibbon();
+
+                    var sInList = "";
+                    for (var c = 0; c < this.piIn.length; c++) {
+                        item = this.piIn[c];
+                        sInList += " " + item.ID;
+                    }
+
+
+                    oRetVal = this.constructReturnRequest("OptiChange", "UpdateFilteredList", sInList);
+
+
                 case "DeleteStratagy_Cancel":
                     this.DeleteStratDlg.window("winDeleteStratDlg").setModal(false);
                     this.DeleteStratDlg.window("winDeleteStratDlg").hide();
@@ -475,7 +499,7 @@
                         this.SaveStratDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.SaveStratDlg.setImagePath("/_layouts/ppm/images/");
                         this.SaveStratDlg.createWindow("winSaveStratDlg", 20, 30, 280, 192);
-                        this.SaveStratDlg.window("winSaveStratDlg").setIcon("logo.ico", "logo.ico");
+ //                       this.SaveStratDlg.window("winSaveStratDlg").setIcon("logo.ico", "logo.ico");
                         this.SaveStratDlg.window("winSaveStratDlg").denyResize();
                         this.SaveStratDlg.window("winSaveStratDlg").button("park").hide();
                         this.SaveStratDlg.window("winSaveStratDlg").setModal(true);
@@ -558,7 +582,7 @@
                         this.RenameStratDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.RenameStratDlg.setImagePath("/_layouts/ppm/images/");
                         this.RenameStratDlg.createWindow("winRenameStratDlg", 20, 30, 280, 142);
-                        this.RenameStratDlg.window("winRenameStratDlg").setIcon("logo.ico", "logo.ico");
+ //                       this.RenameStratDlg.window("winRenameStratDlg").setIcon("logo.ico", "logo.ico");
                         this.RenameStratDlg.window("winRenameStratDlg").denyResize();
                         this.RenameStratDlg.window("winRenameStratDlg").button("park").hide();
                         this.RenameStratDlg.window("winRenameStratDlg").setModal(true);
@@ -632,10 +656,18 @@
                     var dataXml = '<SetOptimizerFlag In="' + sInList + '" Out="' + sOutList + '" />';
 
 
-                    oRetVal = this.constructReturnRequest("RaiseEvent", "CommitOptimizerStratagy", dataXml);
+                    oRetVal = this.constructReturnRequest("RaiseEventJSON", "CommitOptimizerStratagy", dataXml);
 
-
+                    oRetVal.Passback = true;
+                    oRetVal.PassbackFunction = "CommitComplete";
                     break;
+
+                case 'CommitComplete':
+                    alert("Commit Strategy Completed");
+                    break;
+
+
+  
                 default:
                     alert("unhandled Optimizer event - " + event);
                     break;
@@ -884,6 +916,7 @@
 
 
         var strat = this.currStratagy;
+        this.usingselectedFilters = new Array();
 
         if (strat == null)
             return;
@@ -910,9 +943,15 @@
         }
 
 
-        this.usingselectedFilters = new Array();
+
 
         var xfie = JSON_GetArray(strat.Fields, "Field");
+
+        for (i = 0; i < this.DisplayableFields.length; i++) {
+            var item = this.DisplayableFields[i];
+            item.selected = false;
+        }
+
 
         for (var c = 0; c < xfie.length; c++) {
             for (var fi = 0; fi < this.Fields.length; fi++) {
@@ -920,6 +959,7 @@
 
                 if (fld.FID == xfie[c].FID) {
                     this.usingselectedFilters[this.usingselectedFilters.length] = fld;
+                    fld.selected = true;
 
                     if (fld.isNumeric == false) {
                         for (var xi = 0; xi < fld.bSelVals.length; xi++) {
@@ -1725,8 +1765,8 @@
                 this.OptDlg.enableAutoViewport(false);
                 this.OptDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                 this.OptDlg.setImagePath(this.imagePath);
-                this.OptDlg.createWindow("winOptDlg", 20, 30, 570, 437);
-                this.OptDlg.window("winOptDlg").setIcon("logo.ico", "logo.ico");
+                this.OptDlg.createWindow("winOptDlg", 20, 30, 594, 453);
+ //               this.OptDlg.window("winOptDlg").setIcon("logo.ico", "logo.ico");
                 this.OptDlg.window("winOptDlg").allowMove();
                 this.OptDlg.window("winOptDlg").denyResize();
                 this.OptDlg.window("winOptDlg").setModal(true);
@@ -1852,7 +1892,7 @@
                 selval = i;
 
             selSelected.options[i] = new Option(item.FName, item.FID, bSel, bSel);
-            selSelected.options[i].style.color = "#000000";
+            selSelected.options[i].style.color = "#444444";
         }
 
         if (bfound == false) {
@@ -1895,7 +1935,7 @@
                 bfound |= bSel;
 
                 selAvail.options[n1] = new Option(item.FName, item.FID, bSel, bSel);
-                selAvail.options[n1++].style.color = "#000000";
+                selAvail.options[n1++].style.color = "#444444";
             }
         }
 
@@ -2062,22 +2102,23 @@
         var sInject = new StringBuilder();
             
         sInject.append('<div class="modalText" style="margin-top:10px;padding-right:10px;">');
-        sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:13px;">');
-        sInject.append('	1) Which field will be totalled and used to compare to the manually entered value?');
+        sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:20x;padding-left:12px!important;">');
+        sInject.append('	1) Which field will be totalled and used to compare to the manually entered value?<br>');
+        sInject.append('<br>');
         sInject.append('  </div>');
-        sInject.append('  <div>');
+        sInject.append('  <div style="padding-left:12px!important;">');
         sInject.append('    <select id="idOptConfTotalField" name="idOptTotalField" style="vertical-align:middle;padding:0px;margin:0px;" ></select>');
         sInject.append('  </div>'); 
         sInject.append('  <br />');
-        sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:13px;">');
+        sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:20px;padding-left:12px!important;">');
         sInject.append('	2) Enter a title for the comparison field.');
         sInject.append('  </div>');
-        sInject.append('  <div>');
+        sInject.append('  <div style="padding-left:12px!important;">');
         sInject.append('	<input id="idOptConfNameValue" type="text" value=" " style="width:210px;text-align:left;padding:0px;margin:0px;height:20px;" />');
         sInject.append('  </div>');
         sInject.append('  <br />');
-        sInject.append('  <div>');
-        sInject.append('    <div style="display:relative;vertical-align:middle;padding-bottom:13px;">');
+        sInject.append('  <div style="padding-left:12px!important;">');
+        sInject.append('    <div style="display:relative;vertical-align:middle;padding-bottom:20px;">');
         sInject.append('	  3) Which fields will be used as filters?');
         sInject.append('    </div>');        
         sInject.append('    <table cellspacing="0" cellpadding="0" style="width:100%; display: block;">');

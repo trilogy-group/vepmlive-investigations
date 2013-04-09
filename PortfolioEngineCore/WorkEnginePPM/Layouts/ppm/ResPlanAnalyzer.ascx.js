@@ -730,10 +730,10 @@
 
 					alert("You do not have the Global Permission set to access this functionality!");
 
-					if (SP.UI.DialogResult)
-						SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+					if (parent.SP.UI.DialogResult)
+						parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 					else
-						SP.UI.ModalDialog.commonModalDialogClose(0, '');
+						parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
 					return;
@@ -755,10 +755,10 @@
 				if (cal_arr.length == 0) {
 					alert("No Fiscal Calendars have been defined - please contact your administrator");
 
-					if (SP.UI.DialogResult)
-						SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+					if (parent.SP.UI.DialogResult)
+						parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 					else
-						SP.UI.ModalDialog.commonModalDialogClose(0, '');
+						parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
 					return;
@@ -825,10 +825,10 @@
 		catch (e) {
 			alert("Resource Analyzer  GetCalendarInfoComplete error " + e.toString());
 
-			if (SP.UI.DialogResult)
-				SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+			if (parent.SP.UI.DialogResult)
+				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 			else
-				SP.UI.ModalDialog.commonModalDialogClose(0, '');
+				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 		}
 
 		return;
@@ -880,10 +880,10 @@
 
 		if (iCancel == 1) {
 
-			if (SP.UI.DialogResult)
-				SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+			if (parent.SP.UI.DialogResult)
+				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 			else
-				SP.UI.ModalDialog.commonModalDialogClose(0, '');
+				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
 			return;
@@ -2258,10 +2258,10 @@
 						if (errors.Value != "") {
 
 							alert("Error: " + errors.Value);
-							if (SP.UI.DialogResult)
-								SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+							if (parent.SP.UI.DialogResult)
+								parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 							else
-								SP.UI.ModalDialog.commonModalDialogClose(0, '');
+								parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 							return;
 						}
@@ -2324,10 +2324,10 @@
 		}
 		catch (e) {
 			this.HandleException("LoadResPlanDataComplete", e);
-			if (SP.UI.DialogResult)
-				SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+			if (parent.SP.UI.DialogResult)
+				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 			else
-				SP.UI.ModalDialog.commonModalDialogClose(0, '');
+				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 		}
 	}
@@ -2451,10 +2451,10 @@
 		}
 		catch (e) {
 			this.HandleException("PopulateUI", e);
-			if (SP.UI.DialogResult)
-				SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+			if (parent.SP.UI.DialogResult)
+				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 			else
-				SP.UI.ModalDialog.commonModalDialogClose(0, '');
+				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 		}
 	}
@@ -2527,10 +2527,10 @@
 	    }
 	    catch (e) {
 	        this.HandleException("CreateTopGrid", e);
-	        if (SP.UI.DialogResult)
-	            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	        else
-	            SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 	    }
 	}
@@ -5265,10 +5265,10 @@
 
 
 	            case "AnalyzerTab_Close":
-	                if (SP.UI.DialogResult)
-	                    SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+	                if (parent.SP.UI.DialogResult)
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
 	                else
-	                    SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 	                return;
 
 	            case "EditResPlan":
@@ -6363,7 +6363,7 @@
 
 		var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: mycallback };
 
-		SP.UI.ModalDialog.showModalDialog(options);
+		parent.SP.UI.ModalDialog.showModalDialog(options);
 
 	}
 

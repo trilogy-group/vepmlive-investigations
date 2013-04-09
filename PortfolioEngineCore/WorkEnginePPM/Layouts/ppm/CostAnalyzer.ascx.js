@@ -1264,8 +1264,12 @@
 
                 j = this.TotSelectedOrder[i];
 
-                if (j == 0)
+                if (j == 0) {
                     sbDataxml.append("0");
+                    this.TotalsGridTotalsCol = i + 1;
+                        
+
+                }
                 else
                     sbDataxml.append(j);
 
@@ -1939,16 +1943,27 @@
                         if (errors.Value != "") {
 
                             alert("Error: " + errors.Value);
-                            if (SP.UI.DialogResult)
-                                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+                            if (parent.SP.UI.DialogResult)
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
                             else
-                                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
                             return;
                         }
                     }
                 }
 
+
+                if (jsonObject.Result.Perms.Value == 0) {
+                
+  	                alert("You do not have the Global Permission set to access this functionality!");
+
+	                if (parent.SP.UI.DialogResult)
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	                else
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                    return;               
+                }
 
                 this.UsingPeriods = jsonObject.Result.Periods;
                 this.CTsPresent = jsonObject.Result.CostTypes;
@@ -1959,7 +1974,7 @@
 
                 this.ModeSettings = jsonObject.Result.DisplayMode;
 
-                //                this.TargetData = jsonObject.Result.Targets;
+                this.TargetData = jsonObject.Result.Targets;
                 var views = jsonObject.Result.Views;
                 this.Views = JSON_GetArray(views, "View");
 
@@ -2009,10 +2024,10 @@
         }
         catch (e) {
             this.HandleException("LoadCostDataComplete", e);
-            if (SP.UI.DialogResult)
-                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
             else
-                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
         }
     }
@@ -2139,10 +2154,10 @@
         }
         catch (e) {
             this.HandleException("PopulateUI", e);
-            if (SP.UI.DialogResult)
-                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
             else
-                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
         }
     }
@@ -2166,7 +2181,7 @@
                     this.CTsPresent.CostType = JSON_GetArray(this.CTsPresent, "CostType");
 
                     this.ModeSettings = jsonObject.Result.ViewData.DisplayMode;
-                    //                    this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
+                    //this.TotalsGridSettingsData = jsonObject.Result.TotalsGridSetting;
 
                     //                    this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
                     //                    this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
@@ -2174,6 +2189,9 @@
 
                     try {
                         this.heatmapText = jsonObject.Result.ViewData.HeatMapText.Value;
+
+                        this.TotalsGridTotalsCol = jsonObject.Result.ViewData.HeatMapCol.Value;
+                        
 
                     }
                     catch (e) { }
@@ -2221,10 +2239,10 @@
         }
         catch (e) {
             this.HandleException("CreateTopGrid", e);
-            if (SP.UI.DialogResult)
-                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
             else
-                SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
         }
     }
@@ -2301,7 +2319,19 @@
             sCol = Col.substr(1, Col.length - 2);
             per = parseInt(sCol);
 
-            trow = this.CSTargetCache.targetRows[parseInt(Row.id) - 1];
+            var trow = null;
+
+            for (var xi = 0; xi < this.CSTargetCache.targetRows.length; xi++) {
+                if (this.CSTargetCache.targetRows[xi].RID == Row.id) {
+                    trow = this.CSTargetCache.targetRows[xi];
+                    break;
+                }
+
+            }
+
+            if (trow == null)
+                return;
+
 
             if (Col.charAt(Col.length - 1) == "C") {
                 trow.zCost[per].Value = parseFloat(value);
@@ -2573,8 +2603,8 @@
 
                     }
 
-                    for (var xi = 0; xi < oc.LookUp.length; xi++) {
-                        lk = oc.LookUp[xi];
+                    for (var xi = 0; xi < oc.LookUps.length; xi++) {
+                        lk = oc.LookUps[xi];
 
                         if (lk.UID == val) {
 
@@ -3310,31 +3340,31 @@
                 var retval = this.TargetBackground(cv, hmv);
                 var bdoit = false;
 
-                if (this.selectedHeatMapColour == 1)
-                    bdoit = (this.tarlev < childrenMaxhmVal && childrenMaxhmVal != "")
-                else
-                    bdoit = (this.tarlev > childrenMinhmVal && childrenMinhmVal != "")
+//                if (this.selectedHeatMapColour == 1)
+//                    bdoit = (this.tarlev < childrenMaxhmVal && childrenMaxhmVal != "")
+//                else
+//                    bdoit = (this.tarlev > childrenMinhmVal && childrenMinhmVal != "")
 
 
-                if (bdoit == true) {
-                    var rowicon = grid.GetString(row, "IconFlag");
+//                if (bdoit == true) {
+//                    var rowicon = grid.GetString(row, "IconFlag");
 
-                    if (rowicon != '/_layouts/ppm/images/Yellow.gif') {
+//                    if (rowicon != '/_layouts/ppm/images/Yellow.gif') {
 
-                        grid.SetAttribute(row, "IconFlag", null, '/_layouts/ppm/images/Yellow.gif', 1);
+//                        grid.SetAttribute(row, "IconFlag", null, '/_layouts/ppm/images/Yellow.gif', 1);
 
-                        if (this.refreshIconsInTotGrid == null) {
-                            this.refreshIconsInTotGrid = new Array();
-                            window.setTimeout(HandleRerenderDelegate, 600);
+//                        if (this.refreshIconsInTotGrid == null) {
+//                            this.refreshIconsInTotGrid = new Array();
+//                            window.setTimeout(HandleRerenderDelegate, 600);
 
-                        }
-
-
-                        this.refreshIconsInTotGrid[this.refreshIconsInTotGrid.length] = row;
+//                        }
 
 
-                    }
-                }
+//                        this.refreshIconsInTotGrid[this.refreshIconsInTotGrid.length] = row;
+
+
+//                    }
+//                }
 
 
                 //	            if (this.tarlev < childrenMaxhmVal) 
@@ -4547,10 +4577,10 @@
 
 
                 case "AnalyzerTab_Close":
-                    if (SP.UI.DialogResult)
-                        SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+                    if (parent.SP.UI.DialogResult)
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
                     else
-                        SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
                     return;
 
 
@@ -5694,7 +5724,7 @@
             for (var i = 0; i < this.CSDataCache.CustomFields.length; i++) {
                var x = this.CSDataCache.CustomFields[i];
 
-               x.LookUps = JSON_GetArray(x, "LookUp");
+               x.LookUps = JSON_GetArray(x.LookUps, "LookUp");
             }
 
        }
@@ -6154,8 +6184,8 @@
                     for (i = 0; i <= nump; i++) {
 
                         trow.zCost[i].Value = xt.zCost[i].Value;
-                        trow.zValue[i].Value = xt.zCost[i].Value;
-                        trow.zFTE[i].Value = xt.zCost[i].Value;
+                        trow.zValue[i].Value = xt.zValue[i].Value;
+                        trow.zFTE[i].Value = xt.zFTE[i].Value;
                     }
 
 
@@ -6164,6 +6194,8 @@
 
 
                     grow = this.EditGrid.AddRow(null, null, true, trow.RID, "Leaf");
+
+                    trow.RID = grow.id;
 
 
                     for (i = 1; i <= nump; i++) {
@@ -6222,6 +6254,9 @@
         grow = this.EditGrid.AddRow(null, null, true, trow.RID, "Leaf");
 
         grow.NoColorState = 1;
+
+
+        trow.RID = grow.id;
 
 
 
