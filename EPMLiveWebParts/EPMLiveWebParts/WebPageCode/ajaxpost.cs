@@ -59,7 +59,7 @@ namespace EPMLiveWebParts
                 }
 
                 //GridUtilities.InitViewFields();
-                SPListItem li = gd.List.Items.GetItemById(int.Parse(Request["itemid"].ToString()));
+                SPListItem li = gd.List.GetItemById(int.Parse(Request["itemid"].ToString()));
                 ArrayList imgs = new ArrayList();
                 if (Request["imgs"].ToString() != string.Empty)
                 {

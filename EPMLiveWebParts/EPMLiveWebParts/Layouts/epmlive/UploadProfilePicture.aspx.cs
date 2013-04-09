@@ -105,7 +105,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             var userInformationList = SPContext.Current.Web.SiteUserInfoList;
             var user = SPContext.Current.Web.CurrentUser;
-            var userItem = userInformationList.Items.GetItemById(user.ID);
+            var userItem = userInformationList.GetItemById(user.ID);
 
             userItem["Picture"] = pictureUrl;
             userItem.Update();

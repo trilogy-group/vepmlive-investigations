@@ -318,7 +318,7 @@ namespace EPMLiveWebParts
                             w = site.OpenWeb(new Guid(Request["webid"]));
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
-                                SPListItem li = list.Items.GetItemById(int.Parse(Request["itemid"]));
+                                SPListItem li = list.GetItemById(int.Parse(Request["itemid"]));
                                 data = getplannerlist(w, li);
                             }
                             break;
@@ -493,7 +493,7 @@ namespace EPMLiveWebParts
                             try
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
-                                SPListItem li = list.Items.GetItemById(int.Parse(Request["ID"]));
+                                SPListItem li = list.GetItemById(int.Parse(Request["ID"]));
                                 url = li["WorkspaceUrl"].ToString();
                             }
                             catch { }

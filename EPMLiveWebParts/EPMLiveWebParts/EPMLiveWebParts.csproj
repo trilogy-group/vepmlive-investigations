@@ -13,7 +13,7 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>EPM Live Deployment</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -48,9 +48,8 @@
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\EPM Live Core\v4.0_1.0.0.0__9f4da00116c38ec5\EPM Live Core.dll</HintPath>
+    <Reference Include="EPM Live Core">
+      <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveReportsAdmin">
       <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>

@@ -2706,7 +2706,7 @@ namespace EPMLiveWebParts
                 {
                     foreach (SPListItem li in lookupList.GetItems(lookupList.Views[new Guid(view)]))
                     {
-                        SPListItem litemp = lookupList.Items.GetItemById(li.ID);
+                        SPListItem litemp = lookupList.GetItemById(li.ID);
                         data += "\n" + litemp.ID + ";#" + litemp[field].ToString();
                     }
                 }
