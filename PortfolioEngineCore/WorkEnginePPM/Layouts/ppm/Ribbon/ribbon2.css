@@ -2121,3 +2121,8 @@ font-size: 13px;
     border: 1px solid;
     border-color:#92C0E0;
 }
+
+SliderRangeTextDiv{
+ cursor:pointer;
+ cursor:hand;
+ }

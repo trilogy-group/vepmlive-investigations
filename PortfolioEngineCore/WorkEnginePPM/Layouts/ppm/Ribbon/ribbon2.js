@@ -2653,13 +2653,16 @@ function Ribbon(ribbonData) {
                     sb.append(" onkeypress='return blockNonNumbers(this, event, true, true);'");
                     sb.append("  />");
                     sb.append("</div>");
- //                   sb.append("<div style='display:block; cursor:pointer;' id=" + displdiv + " >");
+                    //                   sb.append("<div style='display:block; cursor:pointer;' id=" + displdiv + " >");
+                    sb.append("<div class='SliderRangeTextDiv'>");
+
+                    
                     sb.append("<span " + iddispl + " class='epm-slidetitle' style='cursor:pointer;' ");
                     //           sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",1);'");
                     sb.append(" onclick='" + onclickfrom + "'");
                   
                     sb.append(">" + toPrettyString(item.minValue, sprefix, spostfix) + "</span>");
- //                   sb.append("</div>");
+                    sb.append("</div>");
                     sb.append("</td><td>");
 
 
@@ -2675,6 +2678,8 @@ function Ribbon(ribbonData) {
                     sb.append("  />");
                     sb.append("</div>");
          //           sb.append("<div style='display:block; cursor:pointer;' id=" + disprdiv + " >");
+                    sb.append("<div class='SliderRangeTextDiv'>");
+
                     sb.append("<span " + iddispr + " class='epm-slidetitle' style='cursor:pointer;'");
         //            sb.append(" onclick='" + onpreinput + "popupInput(" + rawidq + ",3);'");
                     sb.append(" onclick='" + onclickto + "'");
