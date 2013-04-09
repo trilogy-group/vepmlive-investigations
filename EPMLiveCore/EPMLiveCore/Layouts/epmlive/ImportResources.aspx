@@ -45,58 +45,6 @@
 			z-index: 2;
 		}
 
-		.epmliveinput {
-			padding: 5px;
-			background-color: rgba(255, 255, 255, 0.85);
-			border: 1px solid #ABABAB;
-			color: #444444;
-			color: inherit;
-			font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-			font-size:13px;
-			vertical-align: middle;
-			outline: none;
-		}
-
-		.epmliveinput:hover {
-			border-color:#92C0E0;
-		}
-		
-		.epmlivebutton {
-			min-width: 6em;
-			padding: 7px 10px;
-			border: 1px solid #ABABAB;
-			background-color: #FDFDFD;
-			background-color: #FDFDFD;
-			font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-			font-size: 11px;
-			color: #444;
-			-webkit-border-radius: 0;
-			-moz-border-radius: 0;
-			border-radius: 0;
-		}
-
-		.epmlivebutton:hover {
-			border-color: #92C0E0;
-			background-color: #E6F2FA;
-			cursor:pointer;
-		}
-
-		.epmlivebutton:active {
-			border-color: #2A8DD4;
-			background-color: #92C0E0;
-			cursor:pointer;
-		}
-
-		.epmlivebutton-primary {
-			background-color: #0072C6;
-			color: #FFFFFF;
-			margin-bottom: 0;
-		}
-
-		.epmlivebutton-primary:hover {
-			background-color: #0067B0 !important;
-		}
-
 		.form-import {
 			max-width: 600px;
 			padding: 30px;
@@ -140,6 +88,10 @@
 			width: 730px;
 			margin-bottom: 50px;
 		}
+
+        .ms-core-overlay {
+            overflow: hidden !important;
+        }
 	</style>
 	
 	<!--[if IE]>
@@ -170,8 +122,8 @@
 					<div class="fileinputs">
 						<asp:FileUpload ID="FileUpload" CssClass="fileinput" runat="server" />
 						<div class="fakefile">
-							<input type="text" class="epmliveinput" />
-							<input type="button" class="epmlivebutton" value="Upload" />
+							<input type="text" />
+							<input type="button" value="Upload" />
 						</div>
 					</div>
 					<span class="help-inline">
@@ -181,8 +133,8 @@
 				  </div>
 				</div>
 				<div class="form-actions">
-					<asp:Button ID="ImportButton" runat="server" Text="Import" CssClass="epmlivebutton epmlivebutton-primary" OnClick="ImportButtonOnClick" />
-					<input type="button" value="Cancel" style="margin-left: 5px;margin-bottom: 0;" class="epmlivebutton" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel); return false;"/>
+					<asp:Button ID="ImportButton" runat="server" Text="Import" OnClick="ImportButtonOnClick" />
+					<input type="button" value="Cancel" style="margin-left: 5px;" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel); return false;"/>
 				</div>
 			</div>
 		</div>

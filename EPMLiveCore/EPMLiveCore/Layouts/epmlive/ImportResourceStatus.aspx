@@ -42,42 +42,6 @@
 		.accordion-inner {
 		    height: 285px !important;
 		}
-		
-		.epmlivebutton {
-			min-width: 6em;
-			padding: 7px 10px;
-			border: 1px solid #ABABAB;
-			background-color: #FDFDFD;
-			background-color: #FDFDFD;
-			font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-			font-size: 11px;
-			color: #444;
-			-webkit-border-radius: 0;
-			-moz-border-radius: 0;
-			border-radius: 0;
-		}
-
-		.epmlivebutton:hover {
-			border-color: #92C0E0;
-			background-color: #E6F2FA;
-			cursor:pointer;
-		}
-
-		.epmlivebutton:active {
-			border-color: #2A8DD4;
-			background-color: #92C0E0;
-			cursor:pointer;
-		}
-
-		.epmlivebutton-primary {
-			background-color: #0072C6;
-			color: #FFFFFF;
-			margin-bottom: 0;
-		}
-
-		.epmlivebutton-primary:hover {
-			background-color: #0067B0 !important;
-		}
 	</style>
 	
 	<!--[if IE]>
@@ -174,7 +138,7 @@
 			</div>
 		  </div>
 		</div>
-		<input type="button" value="Close" class="epmlivebutton" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK); return false;" style="float: right; position: relative; top: -5px;">
+		<input type="button" value="Close" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK); return false;" style="float: right; position: relative; top: -5px;">
 	</asp:Panel>
 </asp:Content>
 
