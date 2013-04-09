@@ -176,10 +176,23 @@ namespace PortfolioEngineCore
 
         public string OptimizerLoadData(string sPIListIn)
         {
+            bool bPMOAdmin = false; 
+            
             try
             {
                 if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
                 _sqlConnection.Open();
+
+
+
+                if (_userWResID == 1)
+                {
+                    bPMOAdmin = true;
+                }
+                else
+                {
+                    bPMOAdmin = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpBudgetAnalyzer);
+                }
                 
                  if (sPIListIn == "")
                      return "";
@@ -203,12 +216,17 @@ namespace PortfolioEngineCore
 
             CStruct xRoot = new CStruct();
             CStruct xCurrency;
+            CStruct xPerms;
             CStruct xFields;
             CStruct xField;
             CStruct xPIS;
             CStruct xPI;
 
             xRoot.Initialize("Optimizer");
+            xPerms = xRoot.CreateSubStruct("Permissions");
+            xPerms.CreateIntAttr("Allowed", (bPMOAdmin == true ? 1 : 0));
+
+
             xCurrency = xRoot.CreateSubStruct("Currency");
             xCurrency.CreateIntAttr("Pos", m_curr_pos);
             xCurrency.CreateIntAttr("Digits", m_curr_digits);

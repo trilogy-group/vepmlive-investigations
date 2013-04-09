@@ -48,7 +48,20 @@ namespace PortfolioEngineCore
                 m_loadmsg = "";
                 m_loaddatareturn = 10;
 
+                bool bPMOAdmin = false;
+                if (_userWResID == 1)
+                {
+                    bPMOAdmin = true;
+                }
+                else
+                {
+                    bPMOAdmin = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpProjectVerCenter);
+                }
+               // if (bPMOAdmin) RVClass.gpPMOAdmin = 1; else RVClass.gpPMOAdmin = 0;
+
                 clsCostData clscd = new clsCostData();
+
+                clscd.m_gPOPerm = (bPMOAdmin == true ? 1 : 0);
 
                 GrabPidsFromTickect(_sqlConnection, ticket, out clscd.m_sPids, out clscd.m_GotAllPIs, out clscd.m_PI_Count);
 
@@ -153,6 +166,8 @@ namespace PortfolioEngineCore
                         oDet.CT_ind = -1;
                         
                     }
+
+                    PerformCalcs(oDet, clscd);
 
                 }
 
@@ -1618,6 +1633,74 @@ namespace PortfolioEngineCore
                 }
             }
         }
+
+        private void PerformCalcs(clsDetailRowData odet, clsCostData clscd)
+        {
+
+            if (odet.sUoM == "")
+            {
+                for (int i = 1; i <= clscd.m_max_period; i++)
+                {
+                    odet.zValue[i] = 0;
+                    odet.zFTE[i] = 0;
+                }
+                return;
+            }
+            else 
+            {
+                for (int i = 1; i <= clscd.m_max_period; i++)
+                {
+                    odet.zFTE[i] = 0;
+                }
+            }
+
+            string sKey = "";
+            clsRateFTECache oRF = null;
+            clsCatItemData oCat = null;
+
+            double[] rates = null, fte = null;
+
+            sKey = "K" + odet.BC_UID.ToString() + " " + odet.m_rt.ToString();
+
+            if (clscd.m_ratecache.TryGetValue(sKey, out oRF))
+            {
+                rates = oRF.zRate;
+                fte = oRF.zFTE;
+            }
+            else if (clscd.m_CostCat.TryGetValue(odet.BC_UID, out oCat))
+            {
+                rates = oCat.Rates;
+                fte = oCat.FTEConv;
+            }
+
+ //           if (rates == null)
+ //           {
+
+ //               for (int i = 1; i <= clscd.m_max_period; i++)
+ //               {
+ ////                   odet.zCost[i] = 0;
+ //               }
+ //               return;
+ //           }
+
+
+ //           for (int i = 1; i <= clscd.m_max_period; i++)
+ //           {
+ ////               odet.zCost[i] = odet.zValue[i] * rates[i];
+ //           }
+
+            if (fte == null)
+                return;
+
+            for (int i = 1; i <= clscd.m_max_period; i++)
+            {
+                if (fte[i] != 0)
+                    odet.zFTE[i] = (odet.zValue[i] / fte[i]) * 100;
+                else
+                    odet.zFTE[i] = 0;
+            }
+         }
+
         private void GetCFFieldName(int lTableID, int lFieldID, out string sTable, out string sField)
         {
             switch ((CustomFieldDBTable)lTableID)
@@ -2241,7 +2324,7 @@ namespace PortfolioEngineCore
                {
                    i = i + 1; 
                    ct_id.Value = orow.GetIntAttr("CT_ID");
-                    tar_uid.Value = i + 1;
+                    tar_uid.Value = i;
                     bc_uid.Value = orow.GetIntAttr("BC_UID");
 
                     oc1_id.Value = orow.GetIntAttr("OC1");

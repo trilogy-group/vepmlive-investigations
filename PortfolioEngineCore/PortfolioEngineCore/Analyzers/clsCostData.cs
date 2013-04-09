@@ -792,6 +792,8 @@ namespace CostDataValues
         public int m_firstperiod_data = 0;
         public int m_lastperiod_data = 0;
 
+        public int m_gPOPerm = 0;
+
         private double StripDBL(ref string sin)
         {
             int i = 0;
