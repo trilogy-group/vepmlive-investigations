@@ -98,7 +98,8 @@ function reloadUILogic() {
 
 function AutosizeDialog() {
     //resize dialog if we are in one    
-    var dlg = SP.UI.ModalDialog.get_childDialog();
+    
+    var dlg = parent.SP.UI.ModalDialog.get_childDialog();
     if (dlg != null) {
         try {
             dlg.autoSize();
@@ -122,7 +123,7 @@ function OpenDataSourceGrid() {
         showClose: false,
         dialogReturnValueCallback: SetDataSource
     };
-    SP.UI.ModalDialog.showModalDialog(options);
+    parent.SP.UI.ModalDialog.showModalDialog(options);
 }
 
 function SetDataSource(result, value) {
@@ -408,7 +409,7 @@ function ManageDataEntryFields() {
 }
 
 function CancelWizard() {
-    SP.UI.ModalDialog.commonModalDialogClose(0, '');
+    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 }
 
 function SaveChartProps() {
@@ -426,11 +427,11 @@ function SaveChartProps() {
         url: 'UpdateWebPart.aspx',
         data: BuildChartPropObj(),
         success: function () {
-            SP.UI.ModalDialog.commonModalDialogClose(1, '');
+            parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
         },
         error: function () {
             alert('Oops, there was an error!');
-            SP.UI.ModalDialog.commonModalDialogClose(-1, '');
+            parent.SP.UI.ModalDialog.commonModalDialogClose(-1, '');
         }
     });
 }
@@ -474,7 +475,7 @@ function BuildChartPropObj() {
     ChartProps.sPropChartShowSeriesLabels = $('#' + cbShowXAxisLabelsClientId).is(":checked");
     ChartProps.sPropChartShowGridlines = $('#' + cbShowGridLinesClientId).is(":checked");
     ChartProps.sPropChartShowLegend = $('#' + cbShowLegendClientId).is(":checked");
-    var args = SP.UI.ModalDialog.get_childDialog().get_args();
+    var args = parent.SP.UI.ModalDialog.get_childDialog().get_args();
     ChartProps.sWpPagePath = args.wpPagePath;
     ChartProps.sWpId = args.wpId;
     return ChartProps;
