@@ -767,14 +767,16 @@ function GetData() {
                     else {
                         $.getScript('/_layouts/epmlive/slimScroll.js', function () {
                             $('#commentsWebPartMainContainer').slimScroll({ height: '300px', size: '10px', wheelStep: 5 });
-                        });
+                        }, true);
 
-                        $('#commentsWebPartMainContainer').endlessScroll({
-                            callback:
-                            function () {
-                                BeginGetMoreCommentsByNotification();
-                            }
-                        });
+                        $.getScript('/_layouts/epmlive/jquery.endless-scroll.js', function () {
+                            $('#commentsWebPartMainContainer').endlessScroll({
+                                callback:
+                                function () {
+                                    BeginGetMoreCommentsByNotification();
+                                }
+                            });
+                        }, true);
 
                         //                        $.getScript('/_layouts/epmlive/TextBoxAutoGrow.js', function () {
                         //                            $('.tbComment').autogrow();
