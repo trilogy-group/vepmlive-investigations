@@ -25,6 +25,30 @@ namespace CADataCache
         private CStruct[] m_xLevels = new CStruct[64];
         private int m_nLevel = 0;
 
+        private string RemoveNastyCharacters(string sn) {
+
+            string retsn = "";
+            string sNastyChars = "!@#$%^&*()_+-={}[]|:;'?/~`";
+
+            sn = sn.Replace(" ", "");
+            sn = sn.Replace("'", "");      
+            sn = sn.Replace("\r", "");
+            sn = sn.Replace("\n", "");
+            sn = sn.Replace("\"", "");
+            sn = sn.Replace("\\", "");
+
+            for (int i = 0; i < sn.Length; i++)
+            { 
+                string sx = sn.Substring(i,1);
+
+                if (sNastyChars.IndexOf(sx) == -1)
+                    retsn += sx;
+            }
+
+            return retsn;
+
+        }
+
 
         public bool InitializeGridLayout(List<clsColDisp> Cols, int gpPMOAdmin)
         {
@@ -265,15 +289,12 @@ namespace CADataCache
                 {
 
 
-                    string sn = col.m_realname.Replace("/n", "");
-                    sn = sn.Replace(" ", "");
+                    string sn = RemoveNastyCharacters(col.m_realname);
+
                     string snv = col.m_dispname.Replace("/n", "\n");
 
                     sn = "zX" + sn;
 
-                    sn = sn.Replace(" ", "");
-                    sn = sn.Replace("\r", "");
-                    sn = sn.Replace("\n", "");
 
                     xC = xCols.CreateSubStruct("C");
 
@@ -640,16 +661,12 @@ namespace CADataCache
 
             foreach (clsColDisp sng in Cols)
             {
-                string sn = sng.m_dispname.Replace(" ", "");
 
-
+                string sn = RemoveNastyCharacters(sng.m_realname);
 
 
                 sn = "zX" + sn;
 
-                sn = sn.Replace(" ", "");
-                sn = sn.Replace("\r", "");
-                sn = sn.Replace("\n", "");
 
                 if (sng.m_id == (int)FieldIDs.SD_FID)
                 {
@@ -883,6 +900,31 @@ namespace CADataCache
         private CStruct[] m_xLevels = new CStruct[64];
         private int m_nLevel = 0;
 
+        private string RemoveNastyCharacters(string sn)
+        {
+
+            string retsn = "";
+            string sNastyChars = "!@#$%^&*()_+-={}[]|:;'?/~`";
+
+            sn = sn.Replace(" ", "");
+            sn = sn.Replace("'", "");
+            sn = sn.Replace("\r", "");
+            sn = sn.Replace("\n", "");
+            sn = sn.Replace("\"", "");
+            sn = sn.Replace("\\", "");
+
+            for (int i = 0; i < sn.Length; i++)
+            {
+                string sx = sn.Substring(i, 1);
+
+                if (sNastyChars.IndexOf(sx) == -1)
+                    retsn += sx;
+            }
+
+            return retsn;
+
+        }
+
 
         public bool InitializeGridLayout(List<clsColDisp> Cols, int gpPMOAdmin)
         {
@@ -1040,18 +1082,13 @@ namespace CADataCache
             {
                 try
                 {
+                    string sn = RemoveNastyCharacters(col.m_realname);
 
 
-                    string sn = col.m_realname.Replace("/n", "");
-                    sn = sn.Replace(" ", "");
                     string snv = col.m_dispname.Replace("/n", "\n");
-
                     sn = "zX" + sn;
 
-                    sn = sn.Replace(" ", "");
-                    sn = sn.Replace("\r", "");
-                    sn = sn.Replace("\n", "");
-
+ 
                     xC = xCols.CreateSubStruct("C");
 
                     xC.CreateStringAttr("Name", sn);
@@ -1173,12 +1210,17 @@ namespace CADataCache
 
             return true;
         }
-        public void AddPeriodColumn(string sId, string sName, bool bUseFTE, List<CATGRow> disp, int gpPMOAdmin, bool bUseQTY, bool bUseCost)
+        public void AddPeriodColumn(string sId, string sName, bool bUseFTE, List<CATGRow> disp, int gpPMOAdmin, bool bUseQTY, bool bUseCost, bool bUseHeatmap)
         {
 
 
             CStruct xC = null;
             int cnt = 0;
+
+            string sSumFunc = "(Row.id == 'Filter' ? '' : sum())";
+            string sMaxFunc = "(Row.id == 'Filter' ? '' : max())";
+            string sMinFunc = "(Row.id == 'Filter' ? '' : min())";
+   
 
             foreach (CATGRow ot in disp)
             {
@@ -1201,6 +1243,34 @@ namespace CADataCache
                 ++spn;
 
             spn *= cnt;
+
+            if (bUseHeatmap)
+            {
+                m_xHeader1.CreateStringAttr("P" + sId + "H", sName + "\nHeatMap");
+                xC = m_xPeriodCols.CreateSubStruct("C");
+                xC.CreateStringAttr("Name", "P" + sId + "H");
+                xC.CreateStringAttr("Type", "Float");
+                xC.CreateStringAttr("Format", ",0.##");
+                xC.CreateIntAttr("Visible", 0);
+                xC.CreateIntAttr("CanSort", 0);
+                xC.CreateIntAttr("CanMove", 0);
+                xC.CreateIntAttr("ShowHint", 0);
+                xC.CreateStringAttr("Align", "Right");
+                xC.CreateIntAttr("CanSelect", 0);
+                xC.CreateIntAttr("CanHide", 0);
+
+                m_xDefTree.CreateStringAttr("P" + sId + "H" + "Formula", sSumFunc);   //"sum()");
+                m_xDefTree.CreateStringAttr("P" + sId + "H" + "Format", ",#.##");
+
+
+                m_xDefNode.CreateStringAttr("P" + sId + "H" + "Formula", "");
+
+
+                xC.CreateIntAttr("MinWidth", 45);
+                xC.CreateIntAttr("Width", 65);
+                spn *= 2;
+            }
+
 
             cnt = 0;
 
@@ -1228,7 +1298,42 @@ namespace CADataCache
                             m_xHeader1.CreateStringAttr("P" + sId + cpref + cnt.ToString(), " ");
 
 
+                        if (bUseHeatmap)
+                        {
+                            m_xHeader1.CreateStringAttr("X" + sId + cpref + cnt.ToString(), " ");
+                            m_xHeader2.CreateStringAttr("X" + sId + cpref + cnt.ToString(), sName + ot.Name + "HeatMap");
 
+
+                            m_xHeader1.CreateStringAttr("Y" + sId + cpref + cnt.ToString(), " ");
+                            m_xHeader2.CreateStringAttr("Y" + sId + cpref + cnt.ToString(), sName + ot.Name + "HeatMap");
+
+
+                            xC = m_xPeriodCols.CreateSubStruct("C");
+                            xC.CreateStringAttr("Name", "X" + sId + "C" + cnt.ToString());
+                            xC.CreateIntAttr("ShowHint", 0);
+                            xC.CreateStringAttr("Type", "Float");
+                            xC.CreateStringAttr("Format", ",0.##");
+                            xC.CreateIntAttr("CanSort", 0);
+                            xC.CreateIntAttr("CanMove", 0);
+                            xC.CreateStringAttr("Align", "Right");
+                            xC.CreateIntAttr("Visible", 0);
+                            xC.CreateIntAttr("CanSelect", 0);
+                            xC.CreateIntAttr("CanHide", 0);
+
+                            xC = m_xPeriodCols.CreateSubStruct("C");
+                            xC.CreateStringAttr("Name", "Y" + sId + "C" + cnt.ToString());
+                            xC.CreateIntAttr("ShowHint", 0);
+                            xC.CreateStringAttr("Type", "Float");
+                            xC.CreateStringAttr("Format", ",0.##");
+                            xC.CreateIntAttr("CanSort", 0);
+                            xC.CreateIntAttr("CanMove", 0);
+                            xC.CreateStringAttr("Align", "Right");
+                            xC.CreateIntAttr("Visible", 0);
+                            xC.CreateIntAttr("CanSelect", 0);
+                            xC.CreateIntAttr("CanHide", 0);
+                        }
+
+                
 
                         //if (bUseQTY)
                         //{
@@ -1335,6 +1440,12 @@ namespace CADataCache
 
                             xC.CreateStringAttr("Align", "Right");
 
+                            m_xDefTree.CreateStringAttr("X" + sId + cpref + cnt.ToString() + "Format", "##");
+                            m_xDefTree.CreateStringAttr("X" + sId + cpref + cnt.ToString() + "Formula", sMaxFunc);   //"sum()");
+                            m_xDefTree.CreateStringAttr("Y" + sId + cpref + cnt.ToString() + "Format", "##");
+                            m_xDefTree.CreateStringAttr("Y" + sId + cpref + cnt.ToString() + "Formula", sMinFunc);   //"sum()");
+
+
                             string sFunc = "(Row.id == 'Filter' ? '' : sum())";
                             m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "Formula", sFunc);
                             //"sum()");
@@ -1348,6 +1459,9 @@ namespace CADataCache
 
                             m_xDefNode.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
                             m_xDefTree.CreateStringAttr("P" + sId + cpref + cnt.ToString() + "ClassInner", "");
+
+                            m_xDefNode.CreateStringAttr("X" + sId + cpref + cnt.ToString() + "Formula", "");
+                            m_xDefNode.CreateStringAttr("Y" + sId + cpref + cnt.ToString() + "Formula", "");
 
                             xC.CreateIntAttr("MinWidth", 45);
                             xC.CreateIntAttr("Width", 65);
@@ -1383,8 +1497,69 @@ namespace CADataCache
             return true;
         }
 
-        public void AddDetailRow(clsDetailRowData oDet, clsDetailRowData otDet, List<clsTargetColours> TargetColours, int rID, bool ShowFTEs, List<clsColDisp> Cols, List<CATGRow> disp, bool bUseQTY, bool bUseCost, bool bshowcostdec, bool bshowRemaining, CATotRow oTotalRow, bool bDoHeatMap, int heatmapind, int heatmapcolur)
+        public void AddDetailRow(clsDetailRowData oDet, clsDetailRowData otDet, List<clsTargetColours> TargetColours, int rID, bool ShowFTEs, List<clsColDisp> Cols, List<CATGRow> disp, bool bUseQTY, bool bUseCost, bool bshowcostdec, bool bshowRemaining, CATotRow oTotalRow, bool bDoHeatMap, int heatmapind, int heatmapcolur, bool bDoZeroRowCleverStuff)
         {
+            bool bDoIt = true;
+            int cnt = 0;
+            string cpref = "";
+            clsDetailRowData xDet;
+            int maxp = oDet.zFTE.Length - 1;
+
+            oTotalRow.bUsed = false;
+
+            if (bDoZeroRowCleverStuff)
+            {
+                bDoIt = false;
+
+                for (int i = 1; i <= maxp; i++)
+                {
+                    if (bDoIt)
+                        break;
+
+                    try
+                    {
+
+                        foreach (CATGRow ot in disp)
+                        {
+                            if (ot.bUse)
+                            {
+                                ++cnt;
+
+                                if (ot.index < 0)
+                                    xDet = oTotalRow.m_targets[-ot.index];
+                                else
+                                    xDet = oTotalRow.m_totals[ot.index];
+
+
+                                double dcost = xDet.zCost[i];
+
+                                    
+                                if (dcost != 0)
+                                {
+                                    bDoIt = true;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+
+
+            }
+
+
+            if (bDoIt == false)
+                return;
+
+
+
+            oTotalRow.bUsed = true;
+
             CStruct xIParent = m_xLevels[0];
             CStruct xI = xIParent.CreateSubStruct("I");
 
@@ -1404,11 +1579,12 @@ namespace CADataCache
 
             foreach (clsColDisp sng in Cols)
             {
-                string sn = sng.m_dispname.Replace(" ", "");
 
+                string sn = RemoveNastyCharacters(sng.m_dispname);
                 sn = "zX" + sn;
 
                 sn = sn.Replace(" ", "");
+                sn = sn.Replace("'", "");
                 sn = sn.Replace("\r", "");
                 sn = sn.Replace("\n", "");
 
@@ -1473,7 +1649,7 @@ namespace CADataCache
 
             }
 
-            int maxp = oDet.zFTE.Length - 1;
+
 
 
 
@@ -1583,18 +1759,26 @@ namespace CADataCache
             xI.CreateIntAttr("xinterenalPeriodTotal", maxp);
 
 
-            int cnt = 0;
-            string cpref = "";
 
             double p1 = 0;
             double t1 = 0;
             string rgb = "";
 
-            clsDetailRowData xDet;
+
 
             for (int i = 1; i <= maxp; i++)
             {
                 cnt = 0;
+
+                if (bDoHeatMap == true)
+                {
+                    if (heatmapind < 0)
+                        t1 = oTotalRow.m_targets[-heatmapind].zCost[i];
+                    else
+                        t1 = oTotalRow.m_totals[heatmapind].zCost[i];
+
+                    xI.CreateDoubleAttr("P" + i.ToString() + "H", t1);
+                }
                 foreach (CATGRow ot in disp)
                 {
                     if (ot.bUse)
@@ -1608,93 +1792,51 @@ namespace CADataCache
 
                         cpref = "C";
 
-                        //if (bUseQTY)
-                        //{
 
-                        //    p1 = oDet.zValue[i];
-                        //    t1 = otDet.zValue[i];
+                        double dcost = xDet.zCost[i];
+                        int tlev = 0;
 
-                        //    if (t1 == 0 && p1 == 0)
-                        //        rgb = TargetBackground(t1, 1, TargetColours);
-                        //    else
-                        //        rgb = TargetBackground(t1, p1, TargetColours);
+                        if (ot.fid == 0 && bDoHeatMap == true)
+                        {
+                            p1 = xDet.zCost[i];
 
-                        //    if (bshowRemaining)
-                        //        p1 = t1 - p1;
-
-                        //    if (p1 != double.MinValue)
-                        //        xI.CreateDoubleAttr("P" + i.ToString() + cpref + cnt.ToString(), p1);
-
-                        //    if (rgb != "")
-                        //        xI.CreateStringAttr("P" + i.ToString() + cpref + cnt.ToString() + "Color", rgb);
-
-                        //    ++cnt;
-                        //}
+                            if (heatmapind < 0)
+                                t1 = oTotalRow.m_targets[-heatmapind].zCost[i];
+                            else
+                                t1 = oTotalRow.m_totals[heatmapind].zCost[i];
 
 
-                        //if (ShowFTEs)
-                        //{
-                        //    p1 = oDet.zFTE[i];
-                        //    t1 = otDet.zFTE[i];
+                            if (bshowRemaining)
+                                dcost = t1 - p1;
+                        }
+
+                        if (bshowcostdec == false)
+                            dcost = Math.Floor(dcost);
+
+                        if (xDet.zCost[i] != double.MinValue)
+                            xI.CreateDoubleAttr("P" + i.ToString() + cpref + cnt.ToString(), dcost);
+
+                        if (ot.fid == 0 && bDoHeatMap == true)
+                        {
+
+                            if (t1 == 0 && p1 == 0)
+                                rgb = TargetBackground(t1, 1, TargetColours, out tlev, heatmapcolur);
+                            else
+                                rgb = TargetBackground(p1, t1, TargetColours, out tlev, heatmapcolur);
 
 
+                            xI.CreateIntAttr("X" + i.ToString() + cpref + cnt.ToString(), tlev);
 
-                        //    if (t1 == 0 && p1 == 0)
-                        //        rgb = TargetBackground(t1, 1, TargetColours);
-                        //    else
-                        //        rgb = TargetBackground(t1, p1, TargetColours);
+                            if (tlev <= 0)
+                                tlev = 0;
 
-                        //    if (bshowRemaining)
-                        //        p1 = t1 - p1;
-
-                        //    if (oDet.zFTE[i] != double.MinValue)
-                        //        xI.CreateDoubleAttr("P" + i.ToString() + cpref + cnt.ToString(), p1);
-
-                        //    if (rgb != "")
-                        //        xI.CreateStringAttr("P" + i.ToString() + cpref + cnt.ToString() + "Color", rgb);
-
-                        //    ++cnt;
-                        //}
-                        //if (bUseCost)
-                        //{
-
-                            double dcost = xDet.zCost[i];
-                            int tlev = 0;
-
-                            if (ot.fid == 0 && bDoHeatMap == true)
-                            {
-                                p1 = xDet.zCost[i];
-
-                                if (heatmapind < 0)
-                                    t1 = oTotalRow.m_targets[-heatmapind].zCost[i];
-                                else
-                                    t1 = oTotalRow.m_totals[heatmapind].zCost[i];
+                            xI.CreateIntAttr("Y" + i.ToString() + cpref + cnt.ToString(), tlev);
 
 
-                                if (bshowRemaining)
-                                    dcost = t1 - p1;
-                            }
+                            if (rgb != "")
+                                xI.CreateStringAttr("P" + i.ToString() + cpref + cnt.ToString() + "Color", rgb);
+                        }
 
-                            if (bshowcostdec == false)
-                                dcost = Math.Floor(dcost);
-
-                            if (xDet.zCost[i] != double.MinValue)
-                                xI.CreateDoubleAttr("P" + i.ToString() + cpref + cnt.ToString(), dcost);
-
-                            if (ot.fid == 0 && bDoHeatMap == true)
-                            {
-
-                                if (t1 == 0 && p1 == 0)
-                                    rgb = TargetBackground(t1, 1, TargetColours, out tlev, heatmapcolur);
-                                else
-                                    rgb = TargetBackground(t1, p1, TargetColours, out tlev, heatmapcolur);
-
-
-                                if (rgb != "")
-                                    xI.CreateStringAttr("P" + i.ToString() + cpref + cnt.ToString() + "Color", rgb);
-                            }
-
-                        // }
                     }
                 }
             }

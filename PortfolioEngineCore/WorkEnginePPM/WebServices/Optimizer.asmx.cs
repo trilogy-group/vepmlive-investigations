@@ -494,7 +494,9 @@ namespace WorkEnginePPM
             WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
             PortfolioEngineCore.OptimizerData opt = new OptimizerData(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
             PortfolioEngineCore.PortfolioItems.PortfolioItems  pcpi = new PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
-
+            
+            CStruct xResult = BuildResultXML("CommitOptimizerStratagy", 0);
+            sReply = xResult.XML();
             try
             {
                 CStruct xExecute = new CStruct();
@@ -517,7 +519,7 @@ namespace WorkEnginePPM
                 if (sField != "")
                 {
 
-                    if (sIn != "" && sOut != "")
+                    if (sIn != "" || sOut != "")
                     {
                         opt.CommitOptimizerStratagy(sField, sIn, sOut);
 
@@ -542,11 +544,12 @@ namespace WorkEnginePPM
             //        sReply = HandleError("CommitOptimizerStratagy", opt.Status, opt.FormatErrorText());
             //    }
             //    else
-                    sReply = "";
+
+
             }
             catch (Exception ex)
             {
-                sReply = HandleException("RenameOptimizerStratagy", 99999, ex, "");
+                sReply = HandleException("CommitOptimizerStratagy", 99999, ex, "");
             }
             return sReply;
         }

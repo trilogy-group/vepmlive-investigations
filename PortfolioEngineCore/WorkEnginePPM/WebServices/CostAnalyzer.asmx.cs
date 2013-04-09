@@ -144,7 +144,7 @@ namespace WorkEnginePPM
         {
 
             CStruct xRoot = new CStruct();
-            string sReply = "";
+            string sTargets = "";
             string sViews = "";
             string sTotal = "";
             string sDetails = "";
@@ -173,6 +173,7 @@ namespace WorkEnginePPM
             string sReplyMessage = "";
             CStruct xResult = BuildResultXML("GetCostData", 0);
 
+  
             WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
 
 
@@ -195,6 +196,12 @@ namespace WorkEnginePPM
                 xError.CreateStringAttr("Value", smsg);
                 return xResult.XML();
             }
+            CStruct xPerms = xResult.CreateSubStruct("Perms");
+            xPerms.CreateIntAttr("Value", clsda.m_gPOPerm);
+            if (clsda.m_gPOPerm == 0)
+            {
+                return xResult.XML();
+            }
 
             datacache.GrabCAData(clsda);
 
@@ -204,6 +211,8 @@ namespace WorkEnginePPM
 
             sPeriods = datacache.GetPeriodsData();
             sCTNames  = datacache.GetCostTypeNameData();
+
+            sTargets = datacache.GetTargetRGBData();
             
                                     // sErrStage = "O027";
                                     //RAData.GrabRAData(resValues, lw, "", resValues.ResExamView, StartID, CalID, out sErrStage);
@@ -247,6 +256,8 @@ namespace WorkEnginePPM
 
             CStruct Extradata;
 
+            if (sTargets != "")
+                xResult.AppendXML(sTargets);
             if (sPeriods != "")
                 xResult.AppendXML(sPeriods);
             if (sCTNames != "")

@@ -44,6 +44,7 @@ namespace CADataCache
         public bool m_def_fld;
         public bool m_unselectable;
 
+
     }
     [Serializable()]
     class CATGRow
@@ -60,6 +61,7 @@ namespace CADataCache
     {
         public clsDetailRowData[] m_totals;
         public clsDetailRowData[] m_targets;
+        public bool bUsed;
 
         public CATotRow(int arrsize, int tarrsize, int persize)
         {
@@ -543,7 +545,7 @@ namespace CADataCache
             CATotRow otrow;
             string sKey;
 
-            foreach (clsDetailRowData odet in m_clnsort)
+            foreach (clsDetailRowData odet in m_clsda.m_detaildata.Values)   //m_clnsort)
             {
 
                 sKey = BuildTotalsKey(odet);
@@ -731,7 +733,7 @@ namespace CADataCache
             foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
             {
                 i++;
-                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TotSelectedOrder, 0, bUseQTY, bUseCosts);
+                oGrid.AddPeriodColumn(oPer.PeriodID.ToString(), oPer.PeriodName, bShowFTEs, TotSelectedOrder, 0, bUseQTY, bUseCosts, m_use_heatmap);
             }
 
             oGrid.FinalizeGridLayout();
@@ -758,7 +760,7 @@ namespace CADataCache
 
 
                     oGrid.AddDetailRow(oDet, otDet, m_clsda.m_clsTargetColours, ++i, bShowFTEs, m_bottomgridcln, TotSelectedOrder, bUseQTY, bUseCosts,
-                                       m_show_rhs_dec_costs, bsrem, xTot, m_use_heatmap, m_heatmapcol, m_use_heatmapColour);
+                                       m_show_rhs_dec_costs, bsrem, xTot, m_use_heatmap, m_heatmapcol, m_use_heatmapColour, true);
 
                     //    m_cln_pis.TryGetValue(oDet.ProjectID, out oPIData);
                     //    oGrid.AddDetailRow(oDet, m_detdispcln, m_cResVals, m_maj_Cat_lookup, oPIData, ++i, m_DispMode, displist, m_cResVals.TargetColors);
@@ -890,9 +892,9 @@ namespace CADataCache
                         rowid = int.Parse(xrowid.Substring(1));
 
 
-                    if (rowid >= 0 && rowid < m_clnsort.Count)
+                    if (rowid > 0 && rowid <= m_clnsort.Count)
                     {
-                        clsDetailRowData oDet = m_clnsort[rowid];
+                        clsDetailRowData oDet = m_clnsort[rowid - 1];
                         oDet.bSelected = bSel;
                     }
                 }
@@ -1215,10 +1217,7 @@ namespace CADataCache
                     GetDetFieldValue(odet, lFid, out lVal, out sVal);
 
 
-                    if (lFid <= 11810 && lFid != (int)FieldIDs.MC_FID)
-                        sKey = sKey + " " + lVal.ToString();
-                    else
-                        sKey = sKey + " " + sVal;
+                    sKey = sKey + " " + lVal.ToString() + " " + sVal;
                 }
             }
 
@@ -1257,7 +1256,7 @@ namespace CADataCache
                     sVal = "None";
             }
             else if (fid == (int)FieldIDs.CAT_FID)
-                lVal = odet.CAT_UID;
+                sVal = odet.CC_Name;
             else if (fid >= 11800 && fid <= 11810)
             {
                 lVal = odet.OCVal[fid - 11800];
@@ -1287,7 +1286,7 @@ namespace CADataCache
             else if (fid == (int)FieldIDs.MC_FID)
                 odet.MC_Val = sVal;
             else if (fid == (int)FieldIDs.CAT_FID)
-                odet.CAT_UID = lVal;
+                odet.CC_Name = sVal;
             else if (fid >= 11800 && fid <= 11810)
             {
                 odet.OCVal[fid - 11800] = lVal;
@@ -1311,128 +1310,132 @@ namespace CADataCache
 
             foreach (clsDataItem oi in m_TotalRoot)
             {
-                if (bFirstPass == true)
+                if (oi.bSelected == true)
                 {
-                    lFid = oi.UID;
-
-                    GetDetFieldValue(odet, lFid, out lVal, out sVal);
-                    SetTotalDetFieldValue(otot, lFid, lVal, sVal);
-
-                    if (lFid == (int)FieldIDs.BC_FID)
+                    if (bFirstPass == true)
                     {
-                        otot.Cat_Name = odet.Cat_Name;
-                        otot.FullCatName = odet.FullCatName;
-                    }
+                        lFid = oi.UID;
 
-                    else if (lFid == (int)FieldIDs.CAT_FID)
-                    {
-                        otot.CC_Name = odet.CC_Name;
-                        otot.FullCCName = odet.FullCCName;
-                    }
+                        GetDetFieldValue(odet, lFid, out lVal, out sVal);
+                        SetTotalDetFieldValue(otot, lFid, lVal, sVal);
 
-                    else if (lFid >= 11801 && lFid <= 11805)
-                        otot.Text_OCVal[lFid - 11800] = odet.Text_OCVal[lFid - 11800];
-
-                    else if (lFid >= 11811 && lFid <= 11815)
-                        otot.TXVal[lFid - 11810] = odet.TXVal[lFid - 11810];
-
-                    else if (lFid == (int)FieldIDs.SCEN_FID)
-                    {
-                        otot.Scen_Name = odet.Scen_Name;
-                    }
-
-                    else if (lFid == (int)FieldIDs.CT_FID)
-                    {
-                        otot.CT_Name = odet.CT_Name;
-                    }
-
-                    else if (lFid == (int)FieldIDs.BC_ROLE)
-                    {
-                        otot.Role_Name = odet.Role_Name;
-                    }
-
-
-                    else if (lFid == (int)FieldIDs.PI_FID)
-                    {
-                        otot.PI_Name = odet.PI_Name;
-
-                        //     if (bPid)
-                        otot.Internal_ID = odet.Internal_ID;
-                    }
-                    else
-                    {
-                        lFid = oi.ID;
-
-                        if (lFid >= (int)FieldIDs.PI_USE_EXTRA && lFid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                        if (lFid == (int)FieldIDs.BC_FID)
                         {
-                            otot.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA] = odet.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA];
-                        }
-                     }
-
-
-                }
-                else
-                {
-                    int tlVal;
-                    string tsVal;
-
-                    lFid = oi.UID;
-
-                    GetDetFieldValue(otot, lFid, out tlVal, out tsVal);
-                    GetDetFieldValue(odet, lFid, out lVal, out sVal);
-
-                    Boolean bSame = ((lVal == tlVal) && (sVal == tsVal));
-
-                    if (bSame == false)
-                    {
-
-                        if (lFid == (int) FieldIDs.BC_FID)
-                        {
-                            otot.Cat_Name = "";
-                            otot.FullCatName = "";
+                            otot.Cat_Name = odet.Cat_Name;
+                            otot.FullCatName = odet.FullCatName;
                         }
 
                         else if (lFid == (int)FieldIDs.CAT_FID)
                         {
-                            otot.CC_Name = "";
-                            otot.FullCCName = "";
+                            otot.CC_Name = odet.CC_Name;
+                            otot.FullCCName = odet.FullCCName;
                         }
 
                         else if (lFid >= 11801 && lFid <= 11805)
-                            otot.Text_OCVal[lFid - 11800] = "";
+                            otot.Text_OCVal[lFid - 11800] = odet.Text_OCVal[lFid - 11800];
 
                         else if (lFid >= 11811 && lFid <= 11815)
-                            otot.TXVal[lFid - 11810] = "";
+                            otot.TXVal[lFid - 11810] = odet.TXVal[lFid - 11810];
 
+                        else if (lFid == (int)FieldIDs.SCEN_FID)
+                        {
+                            otot.Scen_Name = odet.Scen_Name;
+                        }
 
                         else if (lFid == (int)FieldIDs.CT_FID)
                         {
-                            otot.CT_Name = "";
+                            otot.CT_Name = odet.CT_Name;
                         }
 
                         else if (lFid == (int)FieldIDs.BC_ROLE)
                         {
-                            otot.Role_Name = "";
+                            otot.Role_Name = odet.Role_Name;
                         }
 
 
                         else if (lFid == (int)FieldIDs.PI_FID)
                         {
-                            otot.PI_Name = "";
+                            otot.PI_Name = odet.PI_Name;
 
                             //     if (bPid)
-                            otot.Internal_ID = 0;
+                            otot.Internal_ID = odet.Internal_ID;
                         }
-
-                        else {
+                        else
+                        {
                             lFid = oi.ID;
 
                             if (lFid >= (int)FieldIDs.PI_USE_EXTRA && lFid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
                             {
-                                otot.m_PI_Format_Extra_data[lFid - (int) FieldIDs.PI_USE_EXTRA] = "";
+                                otot.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA] = odet.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA];
                             }
-                       }
+                        }
 
+
+                    }
+                    else
+                    {
+                        int tlVal;
+                        string tsVal;
+
+                        lFid = oi.UID;
+
+                        GetDetFieldValue(otot, lFid, out tlVal, out tsVal);
+                        GetDetFieldValue(odet, lFid, out lVal, out sVal);
+
+                        Boolean bSame = ((lVal == tlVal) && (sVal == tsVal));
+
+                        if (bSame == false)
+                        {
+
+                            if (lFid == (int)FieldIDs.BC_FID)
+                            {
+                                otot.Cat_Name = "";
+                                otot.FullCatName = "";
+                            }
+
+                            else if (lFid == (int)FieldIDs.CAT_FID)
+                            {
+                                otot.CC_Name = "";
+                                otot.FullCCName = "";
+                            }
+
+                            else if (lFid >= 11801 && lFid <= 11805)
+                                otot.Text_OCVal[lFid - 11800] = "";
+
+                            else if (lFid >= 11811 && lFid <= 11815)
+                                otot.TXVal[lFid - 11810] = "";
+
+
+                            else if (lFid == (int)FieldIDs.CT_FID)
+                            {
+                                otot.CT_Name = "";
+                            }
+
+                            else if (lFid == (int)FieldIDs.BC_ROLE)
+                            {
+                                otot.Role_Name = "";
+                            }
+
+
+                            else if (lFid == (int)FieldIDs.PI_FID)
+                            {
+                                otot.PI_Name = "";
+
+                                //     if (bPid)
+                                otot.Internal_ID = 0;
+                            }
+
+                            else
+                            {
+                                lFid = oi.ID;
+
+                                if (lFid >= (int)FieldIDs.PI_USE_EXTRA && lFid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                                {
+                                    otot.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA] = "";
+                                }
+                            }
+
+                        }
                     }
                 }
 
@@ -1875,11 +1878,6 @@ namespace CADataCache
                             SetDisplayMode(oWork);
 
 
-                        oWork = OtherData.GetSubStruct("ShowDetails");
-                        if (oWork != null)
-                            SetDisplayMode(oWork);
-
-
 
                         //oWork = OtherData.GetSubStruct("WorkDisplayMode");
                         //if (oWork != null)
@@ -1892,9 +1890,28 @@ namespace CADataCache
                     CStruct Extradata;
                     Extradata = xReply.CreateSubStruct("TotalsConfiguration");
                     Extradata.CreateStringAttr("Value", GetTotalsData());
+   //                 Extradata.AppendXML(GetTotalsData());
 
                     Extradata = xReply.CreateSubStruct("HeatMapText");
-                    Extradata.CreateStringAttr("Value", m_heatmap_text);
+                    Extradata.CreateStringAttr("Value", m_heatmap_text);  
+
+
+                    int icnt = 0;
+
+                    foreach (CATGRow otg in TotSelectedOrder)
+                    {
+                        if (otg.bUse)
+                        {
+                            ++icnt;
+                            if (otg.fid == 0)
+                            {
+                                Extradata = xReply.CreateSubStruct("HeatMapCol");
+                                Extradata.CreateIntAttr("Value", icnt);
+                                break;
+                            }
+                        }
+                    }
+
 
                    
 
@@ -2249,8 +2266,8 @@ namespace CADataCache
                     xLoopUp.CreateIntAttr("UID", oi.UID);
                     xLoopUp.CreateIntAttr("Level", oi.Level);
 
-                    xLoopUp.CreateStringAttr("Name", "z" + oi.Name);
-                    xLoopUp.CreateStringAttr("FullName", "z" + oi.FullName);
+                    xLoopUp.CreateStringAttr("Name", oi.Name);
+                    xLoopUp.CreateStringAttr("FullName", oi.FullName);
 
                     xLoopUp.CreateBooleanAttr("InActive", oi.InActive);
 
@@ -2479,51 +2496,55 @@ namespace CADataCache
 
                 foreach (CATotRow xTot in m_total_rows.Values)
                 {
-                    clsDetailRowData oDet = xTot.m_totals[0];
- 
 
-                    xNode = xRoot.CreateSubStruct("totalRows");
-
-  
-
-
-                    xNode.CreateIntAttr("CT_ID", oDet.CT_ID);
-                    xNode.CreateIntAttr("BC_UID", oDet.BC_UID);
-                    xNode.CreateIntAttr("BC_ROLE_UID", oDet.BC_ROLE_UID);
-                    xNode.CreateIntAttr("BC_SEQ", oDet.BC_SEQ);
-                    xNode.CreateIntAttr("CAT_UID", oDet.CAT_UID);
-
-                    xNode.CreateStringAttr("MC_Val", oDet.MC_Val);
-                    xNode.CreateStringAttr("CT_Name", oDet.CT_Name);
-                    xNode.CreateStringAttr("Cat_Name", oDet.Cat_Name);
-                    xNode.CreateStringAttr("Role_Name", oDet.Role_Name);
-                    xNode.CreateStringAttr("MC_Name", oDet.MC_Name);
-                    xNode.CreateStringAttr("FullCatName", oDet.FullCatName);
-                    xNode.CreateStringAttr("CC_Name", oDet.CC_Name);
-                    xNode.CreateStringAttr("FullCCName", oDet.FullCCName);
-                    xNode.CreateIntAttr("m_rt", 0);
-
-                    for (int xi = 0; xi <= 5; xi++)
+                    if (xTot.bUsed == true)
                     {
-                        CStruct xCF = xNode.CreateSubStruct("OCVal");
-                        xCF.CreateIntAttr("Value", oDet.OCVal[xi]);
-                        xCF = xNode.CreateSubStruct("Text_OCVal");
-                        xCF.CreateStringAttr("Value", oDet.Text_OCVal[xi]);
-                        xCF = xNode.CreateSubStruct("TXVal");
-                        xCF.CreateStringAttr("Value", oDet.TXVal[xi]);
-                    }
-
-                    for (int xi = 0; xi <= m_clsda.m_Periods.Count; xi++)
-                    {
-
-                        CStruct xDV = xNode.CreateSubStruct("zCost");
-                        xDV.CreateDoubleAttr("Value", oDet.zCost[xi]);
-                        xDV = xNode.CreateSubStruct("zValue");
-                        xDV.CreateDoubleAttr("Value", oDet.zValue[xi]);
-                        xDV = xNode.CreateSubStruct("zFTE");
-                        xDV.CreateDoubleAttr("Value", oDet.zFTE[xi]);
+                        clsDetailRowData oDet = xTot.m_totals[0];
 
 
+                        xNode = xRoot.CreateSubStruct("totalRows");
+
+
+
+
+                        xNode.CreateIntAttr("CT_ID", oDet.CT_ID);
+                        xNode.CreateIntAttr("BC_UID", oDet.BC_UID);
+                        xNode.CreateIntAttr("BC_ROLE_UID", oDet.BC_ROLE_UID);
+                        xNode.CreateIntAttr("BC_SEQ", oDet.BC_SEQ);
+                        xNode.CreateIntAttr("CAT_UID", oDet.CAT_UID);
+
+                        xNode.CreateStringAttr("MC_Val", oDet.MC_Val);
+                        xNode.CreateStringAttr("CT_Name", oDet.CT_Name);
+                        xNode.CreateStringAttr("Cat_Name", oDet.Cat_Name);
+                        xNode.CreateStringAttr("Role_Name", oDet.Role_Name);
+                        xNode.CreateStringAttr("MC_Name", oDet.MC_Name);
+                        xNode.CreateStringAttr("FullCatName", oDet.FullCatName);
+                        xNode.CreateStringAttr("CC_Name", oDet.CC_Name);
+                        xNode.CreateStringAttr("FullCCName", oDet.FullCCName);
+                        xNode.CreateIntAttr("m_rt", 0);
+
+                        for (int xi = 0; xi <= 5; xi++)
+                        {
+                            CStruct xCF = xNode.CreateSubStruct("OCVal");
+                            xCF.CreateIntAttr("Value", oDet.OCVal[xi]);
+                            xCF = xNode.CreateSubStruct("Text_OCVal");
+                            xCF.CreateStringAttr("Value", oDet.Text_OCVal[xi]);
+                            xCF = xNode.CreateSubStruct("TXVal");
+                            xCF.CreateStringAttr("Value", oDet.TXVal[xi]);
+                        }
+
+                        for (int xi = 0; xi <= m_clsda.m_Periods.Count; xi++)
+                        {
+
+                            CStruct xDV = xNode.CreateSubStruct("zCost");
+                            xDV.CreateDoubleAttr("Value", oDet.zCost[xi]);
+                            xDV = xNode.CreateSubStruct("zValue");
+                            xDV.CreateDoubleAttr("Value", oDet.zValue[xi]);
+                            xDV = xNode.CreateSubStruct("zFTE");
+                            xDV.CreateDoubleAttr("Value", oDet.zFTE[xi]);
+
+
+                        }
                     }
                 }
 
@@ -2575,6 +2596,34 @@ namespace CADataCache
 
 
         }
+
+        public string GetTargetRGBData()
+        {
+            CStruct xRoot = new CStruct();
+            CStruct xTarget;
+            int maxid = -100;
+
+            xRoot.Initialize("Targets");
+
+            foreach (clsTargetColours oTar in m_clsda.m_clsTargetColours)
+            {
+                xTarget = xRoot.CreateSubStruct("Target");
+                xTarget.CreateIntAttr("ID", oTar.ID);
+                xTarget.CreateIntAttr("RGB", oTar.rgb_val);
+                xTarget.CreateDoubleAttr("Lowval", oTar.low_val);
+                xTarget.CreateDoubleAttr("Hival", oTar.high_val);
+                if (oTar.ID > maxid && oTar.high_val != 0)
+                    maxid = oTar.ID;
+            }
+
+            xTarget = xRoot.CreateSubStruct("MaxTargetID");
+            xTarget.CreateIntAttr("Value", maxid);
+
+
+            return xRoot.XML();
+
+        }
+
 
     }
 }
