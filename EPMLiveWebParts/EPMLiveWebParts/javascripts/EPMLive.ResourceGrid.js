@@ -1053,7 +1053,7 @@ function registerEpmLiveResourceGridScript() {
             loadRibbon: function() {
                 SP.SOD.executeOrDelayUntilScriptLoaded(function() {
                     var selectTab = function (tabId) {
-                        window._ribbonStartInit('Ribbon.ResourceGridTab', false, null);
+                        window._ribbonStartInit(tabId, false, null);
                     };
                     
                     var pm = SP.Ribbon.PageManager.get_instance();
@@ -1067,11 +1067,6 @@ function registerEpmLiveResourceGridScript() {
 
                     if (!ribbon) {
                         if (typeof (window._ribbonStartInit) === 'function') {
-                            selectTab('Ribbon.ResourceGridTab');
-                        }
-                    } else {
-                        var selectedRibbonTab = ribbon.get_selectedTabId();
-                        if (selectedRibbonTab !== 'Ribbon.ResourceGridTab' && selectedRibbonTab !== 'Ribbon.ResourceGridViewTab') {
                             selectTab('Ribbon.ResourceGridTab');
                         }
                     }
