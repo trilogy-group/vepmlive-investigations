@@ -2,6 +2,7 @@
 using System.Web.UI;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using System.Collections;
 
 namespace WorkEnginePPM
 {
@@ -14,7 +15,7 @@ namespace WorkEnginePPM
             EPMLiveCore.Act act = new EPMLiveCore.Act(Web);
 
             int activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.PortfolioEngine);
-            if(activation != 0)
+            if (activation != 0)
             {
                 strOutput = act.translateStatus(activation);
                 LiteralControl lit = new LiteralControl(strOutput.ToString());
@@ -23,8 +24,9 @@ namespace WorkEnginePPM
             }
 
             int i;
-            
+
             SPList list = Web.Lists[new Guid(Request["listid"])];
+
 
             if (HelperFunctions.UseNonActiveXControl("costanalyzer", list) == false)
             {
@@ -37,7 +39,29 @@ namespace WorkEnginePPM
             }
             else
             {
-                bool useneewone = true;
+                bool useneewone = false;
+
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    try
+                    {
+                        string sListName = list.Title;
+
+                        using (SPSite site = new SPSite(Web.Site.ID))
+                        {
+                            SPWeb rootWeb = site.RootWeb;
+
+                            string menus = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "epk" + sListName.Replace(" ", "") + "_menus");
+
+                            ArrayList arrMenus = new ArrayList(menus.Split('|'));
+
+                            if (arrMenus.Contains("costanalyzerv2"))
+                                useneewone = true;
+                        }
+                    }
+                    catch { }
+                });
 
                 if (useneewone)
                 {
