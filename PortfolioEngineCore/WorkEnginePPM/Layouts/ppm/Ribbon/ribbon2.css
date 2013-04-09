@@ -2126,3 +2126,7 @@ SliderRangeTextDiv{
  cursor:pointer;
  cursor:hand;
  }
+
+.ms-cui-tabContainer {
+    z-index: 0!important; 
+}
