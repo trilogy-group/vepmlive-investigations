@@ -1050,6 +1050,35 @@ function registerEpmLiveResourceGridScript() {
             easyScrollOn: false,
             myResourcesOn: false,
 
+            loadRibbon: function() {
+                SP.SOD.executeOrDelayUntilScriptLoaded(function() {
+                    var selectTab = function (tabId) {
+                        window._ribbonStartInit('Ribbon.ResourceGridTab', false, null);
+                    };
+                    
+                    var pm = SP.Ribbon.PageManager.get_instance();
+
+                    var ribbon = null;
+                    
+                    try {
+                        ribbon = pm.get_ribbon();
+                    } catch(e) {
+                    }
+
+                    if (!ribbon) {
+                        if (typeof (window._ribbonStartInit) === 'function') {
+                            selectTab('Ribbon.ResourceGridTab');
+                        }
+                    } else {
+                        var selectedRibbonTab = ribbon.get_selectedTabId();
+                        if (selectedRibbonTab !== 'Ribbon.ResourceGridTab' && selectedRibbonTab !== 'Ribbon.ResourceGridViewTab') {
+                            selectTab('Ribbon.ResourceGridTab');
+                        }
+                    }
+                    
+                }, 'sp.ribbon.js');
+            },
+			
             dataTicketRequest: function () {
                 var grid = $$.grid.g();
 
@@ -1548,7 +1577,8 @@ function registerEpmLiveResourceGridScript() {
 
         window.Grids.OnClick = function (grid, row, col, x, y, evt) {
             $$.actions.hideEasyScroll(true);
-
+			$$.actions.loadRibbon();
+			
             if (row.Kind === 'Data' && row.Def.Name === 'R') {
                 var status;
 
