@@ -14,7 +14,6 @@ body:nth-of-type(1) div.gridbox_dhx_skyblue table.hdr tr{
 */
 }
 div.gridbox table td:hover {
-	background-Color:#F8F8F8;
 	border-left: 0px;
 	border-right: 1px solid #C6C6C6;
 }
