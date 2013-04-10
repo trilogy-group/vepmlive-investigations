@@ -1393,23 +1393,27 @@ function registerEpmLiveResourceGridScript() {
                     $$.actions.hideEasyScroll(false);
                 } else {
                     if ($$.resources.length === 0) return false;
-                    
-                    var ribbonButton = $('#RibbonContainer').find('a[title="Find Resource"]');
-                    if (ribbonButton.length) ribbonButton = ribbonButton[0];
 
-                    var rButton = $(ribbonButton);
-                    var offset = rButton.offset();
+                    var ribbonButton = document.getElementById('Ribbon.ResourceGrid.Actions.Find-Large');
+                    if (!ribbonButton) {
+                        ribbonButton = document.getElementById('Ribbon.ResourceGrid.Actions.Find-Small');
+                    }
 
-                    resourceFinder.css({ top: offset.top + rButton.height() });
-                    resourceFinder.css({ left: offset.left + (rButton.width() / 2) - 31 });
+                    if (ribbonButton) {
+                        var rButton = $(ribbonButton);
+                        var offset = rButton.offset();
 
-                    $('#EPMLiveResourceGridSelector').val('');
+                        resourceFinder.css({ top: offset.top + rButton.height() });
+                        resourceFinder.css({ left: offset.left + (rButton.width() / 2) - 31 });
 
-                    resourceFinder.show();
+                        $('#EPMLiveResourceGridSelector').val('');
 
-                    $('#EPMLiveResourceGridSelector').focus();
+                        resourceFinder.show();
 
-                    $$.actions.easyScrollOn = true;
+                        $('#EPMLiveResourceGridSelector').focus();
+
+                        $$.actions.easyScrollOn = true;
+                    }
                 }
 
                 return $$.actions.easyScrollOn;
@@ -1576,7 +1580,7 @@ function registerEpmLiveResourceGridScript() {
 
 			var cellClass = evt.explicitOriginalTarget.className;
             
-			if (cellClass.indexOf('GSPanel') !== -1 || cellClass.indexOf('GSCellPanel') !== -1) {
+			if (cellClass && (cellClass.indexOf('GSPanel') !== -1 || cellClass.indexOf('GSCellPanel') !== -1)) {
 			    if (cellClass.indexOf('GSPanelSelect') !== -1) {
 			        grid.GetSelRows().length === 0 ? grid.SelectAllRows(1) : grid.SelectAllRows(0);
 			    } else {

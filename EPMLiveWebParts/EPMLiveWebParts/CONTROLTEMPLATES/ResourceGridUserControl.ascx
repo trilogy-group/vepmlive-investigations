@@ -67,7 +67,7 @@
         
         .watermark {
             font-size: 13px !important;
-            top: -3px !important;
+            top: 6px !important;
         }
         
         #EPMLiveResourceGridSelector {
