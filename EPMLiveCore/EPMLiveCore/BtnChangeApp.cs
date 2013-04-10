@@ -164,7 +164,7 @@ namespace EPMLiveCore
 
                 // html for actual menu
                 // ===================================================
-                writer.Write("<div id=\"divChangeAppMenu\" style=\"Z-INDEX: 103; POSITION: absolute; WIDTH: 159px; VISIBILITY: visible; TOP: 30px; LEFT: 13px\" dir=\"ltr\" class=\"ms-core-menu-box ms-core-defaultFont ms-shadow\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid4\" flipped=\"false\" LeftForBackIframe=\"13\" TopForBackIframe=\"30\">");
+                writer.Write("<div id=\"divChangeAppMenu\" style=\"z-index: 103; position: absolute; width: 159px; display:none; top: 30px; left: 13px\" dir=\"ltr\" class=\"ms-core-menu-box ms-core-defaultFont ms-shadow\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid4\" flipped=\"false\" LeftForBackIframe=\"13\" TopForBackIframe=\"30\">");
                 writer.Write("<div id=\"divChangeAppMenuAsync\">");
                 // loading div
                 // ========================================
