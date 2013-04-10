@@ -406,6 +406,12 @@ Exit_Function:
                 {
                     if (dbaEditCosts.SelectProjectIDByExtUID(dba, Wepid, out Projectid) != StatusEnum.rsSuccess) goto Status_Error;
                 }
+                if (Projectid == 0)
+                {
+                    dba.Status = StatusEnum.rsProjectNotFound;
+                    dba.StatusText = "Project not found for WEPID " + Wepid;
+                    goto Status_Error;
+                }
 
                 DateTime dtStart;
                 DateTime dtFinish;
