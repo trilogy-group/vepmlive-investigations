@@ -1576,7 +1576,7 @@ function registerEpmLiveResourceGridScript() {
 
 			var cellClass = evt.explicitOriginalTarget.className;
             
-			if (cellClass.indexOf('GSPanel') !== -1) {
+			if (cellClass.indexOf('GSPanel') !== -1 || cellClass.indexOf('GSCellPanel') !== -1) {
 			    if (cellClass.indexOf('GSPanelSelect') !== -1) {
 			        grid.GetSelRows().length === 0 ? grid.SelectAllRows(1) : grid.SelectAllRows(0);
 			    } else {
