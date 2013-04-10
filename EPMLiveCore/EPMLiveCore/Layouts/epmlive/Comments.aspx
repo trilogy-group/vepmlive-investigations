@@ -174,10 +174,10 @@
                 var subDivHeight = $('.commentsContainer').height();
                 if (commentDivHeight > 72) {
                     var diff = (commentDivHeight - 72);
-                    $('.commentsContainer').height(300 - diff);
+                    $('.commentsContainer').height(230 - diff);
                 }
                 else {
-                    $('.commentsContainer').height(300);
+                    $('.commentsContainer').height(230);
                 }
 
             });

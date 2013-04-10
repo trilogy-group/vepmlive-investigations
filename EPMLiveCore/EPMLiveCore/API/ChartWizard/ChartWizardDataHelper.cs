@@ -24,24 +24,32 @@ namespace EPMLiveCore.API
 
                 foreach (DataRow r in dtMappedLists.Rows)
                 {
-                    string sListName = r["ListName"].ToString(); 
+                    string sListName = r["ListName"].ToString();
                     string sListId = r["RPTListId"].ToString();
 
                     SPList list = null;
-                    
+
                     try
                     {
                         list = oWeb.Lists[new Guid(sListId)];
                     }
-                    catch {}
+                    catch { }
 
                     if (list != null)
                     {
                         XmlNode ndNewList = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
 
-                        XmlAttribute nattr = docOut.CreateAttribute("NoColorState");
-                        nattr.Value = "1";
-                        ndNewList.Attributes.Append(nattr);
+                        XmlAttribute aIsParent = docOut.CreateAttribute("IsParent");
+                        aIsParent.Value = "1";
+                        ndNewList.Attributes.Append(aIsParent);
+
+                        XmlAttribute aCanSelect = docOut.CreateAttribute("CanSelect");
+                        aCanSelect.Value = "0";
+                        ndNewList.Attributes.Append(aCanSelect);
+
+                        XmlAttribute nNoColor = docOut.CreateAttribute("NoColor");
+                        nNoColor.Value = "1";
+                        ndNewList.Attributes.Append(nNoColor);
 
                         XmlAttribute aTitle = docOut.CreateAttribute("Title");
                         aTitle.Value = list.Title;
@@ -59,14 +67,22 @@ namespace EPMLiveCore.API
                         aGuid.Value = list.ID.ToString();
                         ndNewList.Attributes.Append(aGuid);
 
-                        foreach (SPView v in list.Views)
-                        {
-                            if (v.Hidden)
-                            {
-                                continue;
-                            }
+                        List<SPView> lvs = (from SPView v in list.Views
+                                            where !v.Hidden
+                                            orderby v.Title
+                                            select v).ToList();
 
+                        foreach (SPView v in lvs)
+                        {
                             XmlNode ndNewView = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
+
+                            XmlAttribute af = docOut.CreateAttribute("CanFocus");
+                            af.Value = "1";
+                            ndNewView.Attributes.Append(af);
+
+                            XmlAttribute aSel = docOut.CreateAttribute("CanSelect");
+                            aSel.Value = "1";
+                            ndNewView.Attributes.Append(aSel);
 
                             XmlAttribute viewTitle = docOut.CreateAttribute("Title");
                             viewTitle.Value = v.Title;
@@ -88,7 +104,7 @@ namespace EPMLiveCore.API
                             viewQuery.Value = v.Query;
                             ndNewView.Attributes.Append(viewQuery);
 
-                            ndNewList.AppendChild(ndNewView);
+                            ndBody.AppendChild(ndNewView);
                         }
 
                         ndBody.AppendChild(ndNewList);
@@ -109,7 +125,7 @@ namespace EPMLiveCore.API
         {
             DataTable result = new DataTable();
             QueryExecutor qExec = new QueryExecutor(SPContext.Current.Web);
-            string sql = @"SELECT ListName, RPTListId FROM RPTList WHERE TableName IN (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES)";
+            string sql = @"SELECT ListName, RPTListId FROM RPTList WHERE TableName IN (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES) ORDER BY ListName";
             result = qExec.ExecuteReportingDBQuery(sql, new Dictionary<string, object>());
             return result;
         }

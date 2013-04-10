@@ -34,9 +34,9 @@ namespace EPMLiveCore
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            ScriptLink.RegisterScriptAfterUI(this.Page, "SP.Core.js", false, false);
-            ScriptLink.RegisterScriptAfterUI(this.Page, "SP.js", false, false);
-            ScriptLink.RegisterScriptAfterUI(this.Page, "SP.UI.Dialog.js", false, false);
+            //ScriptLink.RegisterScriptAfterUI(this.Page, "SP.Core.js", false, false);
+            //ScriptLink.RegisterScriptAfterUI(this.Page, "SP.js", false, false);
+            //ScriptLink.RegisterScriptAfterUI(this.Page, "SP.UI.Dialog.js", false, false);
             EnsureCommentsListExist();
             ManageFields();
             AddCommentersFields();

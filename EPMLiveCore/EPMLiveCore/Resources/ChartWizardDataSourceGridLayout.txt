@@ -5,41 +5,40 @@
 	<Cfg ConstWidth='0' />
 	<Cfg Undo='0' />
 	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' />
-	<Cfg Searching='1' Selecting='0' Deleting='0' />
-	<Cfg StaticCursor='1' Dragging='0' SelectingCells='0' SelectClass='0' />
+	<Cfg Searching='0' Selecting="1" Deleting='0' />
+	<Cfg StaticCursor='1' Dragging='0' SelectClass='0' SelectingCells="1"/>
 	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MaxRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2' />
 	<Cfg Paging='2' AllPages='1' PageLength='10' MaxPages='20' NoPager='1' ChildParts='2' />
 	<Cfg Editing='0' />
 	<Cfg NoVScroll='1' />
 	<Def>
-		<D Name='C' Width='375' />
-		<D Name='R' Wrap='0' ShowHint='0' NoColorState='1' Height='30' />
-		<D Name='R' HoverCell='Color' HoverRow='Color' FocusRow='Color' FocusCell='' FocusRow='Background' />
-		<D Name='Group' HoverCell='' HoverRow='' FocusCell='' FocusRow='Color' NoColorState='1' />
+		<D Name='C' Width='320' />
+		<D Name="R" Wrap="0" ShowHint="0"  Height="30" />
+		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Background" />
+		<D Name="R" Class="ChildRow" />
+		<D Name="Group" HoverCell="" HoverRow="" FocusCell="" FocusRow="" />
 	</Def>
 	<Toolbar Visible='0' />
 	<Panel Delete='0' Visible='0' CanHide='0' HoverCell='Color' HoverRow='Color' />
 	<Header Visible='0' />
 	<Head>
-	<Filter CanEdit='1' HoverRow='' HoverCell='' FocusRow='' FocusCell='' Visible='0'/>
+		<Filter Visible='0' CanEdit='1' HoverRow='' HoverCell='' FocusRow='' FocusCell='' />
 	</Head>
 	<Solid>
-	<Group Visible='0'/>
-	<I id='NoData' Html='No resource found.' />
+		<Group Visible='0'/>
+		<I id='NoData' Html='No data source found.' />
 	</Solid>
 	<Lang>
-	<Text StartErr='Fatal error! &lt;br/&gt;Resource grid cannot render' />
+		<Text StartErr='Fatal error! &lt;br/&gt;Resource grid cannot render' />
 	</Lang>
 	<LeftCols>
-	<C Name='Title' CanGroup='0' CanHide='0' />
-	<C Name='Guid' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
-	<C Name='ParentListTitle' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
-	<C Name='ParentListGuid' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
-	<C Name='Query' Visible='0' Type='Html' CanFilter='0' CanGroup='0' CanSort='0' VarHeight='1' />
+		<C Name='Title' CanGroup='0' CanHide='0' />
+		<C Name='Guid' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
+		<C Name='ParentListTitle' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
+		<C Name='ParentListGuid' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
+		<C Name='Query' Visible='0' Type='Html' CanFilter='0' CanGroup='0' CanSort='0' VarHeight='1' />
 	</LeftCols>
-	<Cols>
-    
-	</Cols>
+	<Cols />
 	<RightCols />
 	<Header Title='Display Name' />
 	<Cfg id='cwdatagrid' CSS='/sites/debugging/_layouts/epmlive/treegrid/chartwizard/grid.css' Style='GS' />

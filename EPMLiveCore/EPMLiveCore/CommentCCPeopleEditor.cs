@@ -58,8 +58,6 @@ namespace EPMLiveCore
 
         protected override void OnPreRender(EventArgs e)
         {
-            this.UpLevelDiv.Attributes["style"] = "height:10px;";
-            //ScriptLink.Register(Page, "/_layouts/epmlive/jQueryLibrary/jquery-1.6.2.min.js", false);
             ScriptLink.Register(Page, "/_layouts/epmlive/CCPeopleEditorAutoComplete.js", false);
             // we are sharing style sheets between this control and GenericEntityPicker
             this.Page.ClientScript.RegisterClientScriptBlock(GetType(), "_WEPeopleEditorStyle_", "<link href=\"/_layouts/epmlive/GenericEntityPickerStyle.css\" rel=\"stylesheet\" type=\"text/css\" />", false);
@@ -110,7 +108,6 @@ namespace EPMLiveCore
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
-
         }
     }
 }

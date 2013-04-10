@@ -61,7 +61,13 @@ function Init() {
                         $('#' + browseId).css('cursor', 'pointer');
 
                         // set div style
-                        $('#' + controlProps.wePeopleEditorDivID).css('padding', '5px 2px');
+                        if (!$('#' + controlProps.wePeopleEditorDivID).hasClass('epmliveinput')) {
+                            $('#' + controlProps.wePeopleEditorDivID).addClass('epmliveinput');
+                        }
+                        $('#' + controlProps.wePeopleEditorDivID).css('padding-top', '5px');
+                        $('#' + controlProps.wePeopleEditorDivID).css('padding-right', '5px');
+                        $('#' + controlProps.wePeopleEditorDivID).css('padding-bottom', '10px');
+                        $('#' + controlProps.wePeopleEditorDivID).css('padding-left', '5px');
                         $('#' + controlProps.wePeopleEditorDivID).css('margin-top', '5px');
                         $('#' + controlProps.wePeopleEditorDivID).css('height', 'auto');
                         $('#' + controlProps.wePeopleEditorDivID).css('max-height', '48px');
