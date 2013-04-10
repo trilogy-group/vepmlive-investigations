@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace WorkEnginePPM
 {
-    public partial class costanalyzer : LayoutsPageBase
+    public partial class CostAnalyzerASPX : LayoutsPageBase
     {
         protected string strOutput;
 

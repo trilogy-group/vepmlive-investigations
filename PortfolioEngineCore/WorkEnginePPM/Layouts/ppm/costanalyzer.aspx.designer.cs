@@ -10,7 +10,7 @@
 namespace WorkEnginePPM {
     
     
-    public partial class costanalyzer {
+    public partial class CostAnalyzerASPX {
         
         /// <summary>
         /// PlaceHolder1 control.
