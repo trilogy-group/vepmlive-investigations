@@ -68,7 +68,7 @@
         var s = result.toString();
         if (s != "") {
             alert(s);
-            window.setTimeout("SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');", 100);
+            window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
             return;
         }
         if ((this.params.ProjectID <= 0 && this.params.WEPID == "") || this.params.ViewUID <= 0)
@@ -379,150 +379,154 @@
     };
     EditCosts.prototype.OnGetCostTypesComplete = function (result) {
         this.CostTypes = result;
+        try {
 
+            var editorTabData = {
+                parent: "idEditorTabDiv",
+                style: "display:none;",
+                showstate: "true",
+                initialstate: "expanded",
+                onstatechange: "ribbonEvent('Ribbon_Toggle');",
+                imagePath: this.imagePath,
+                sections: [
+                    {
+                        name: "Plan Actions",
+                        tooltip: "Plan Actions",
+                        columns: [
+                            {
+                                items: [
+                                    { type: "bigbutton", id: "SaveBtn", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "ribbonEvent('SaveBtn');", disabled: true }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "ribbonEvent('CloseBtn');" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Tools",
+                        tooltip: "Tools",
+                        columns: [
+                            {
+                                items: [
+                                    { type: "smallbutton", id: "CategoriesBtn", name: "Categories", img: "categories.png", tooltip: "Re-add removed category rows", onclick: "ribbonEvent('CategoriesBtn');", disabled: true },
+                                    { type: "smallbutton", id: "DetailBtn", name: "Detail", img: "detail.png", tooltip: "Add a child detail row", onclick: "ribbonEvent('DetailBtn');", disabled: true },
+                                    { type: "smallbutton", id: "RemoveBtn", name: "Delete", img: "delete.png", tooltip: "Remove selected category rows from display", onclick: "ribbonEvent('RemoveBtn');", disabled: true }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "text", name: "Displayed Values:" },
+                                    { type: "select", id: "DisplayedValues", onchange: "ribbonEvent('DisplayedValues');", options: "<option value='0'>UoMs</option><option value='1'>FTEs</option>", width: "55px" }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "smallbutton", id: "ToolsBtn", name: "Tools", img: "spread.gif", tooltip: "Show Tools dialog for Move, Grow and Shrink operations", onclick: "ribbonEvent('ToolsBtn');", disabled: true },
+                                    { type: "smallbutton", id: "ShowRefBtn", name: "Show Reference", img: "reference.png", tooltip: "Show/Hide Reference Area", onclick: "ribbonEvent('ShowRefBtn');", disabled: false },
+                                    { type: "smallbutton", id: "CopyBtn", name: "Copy", img: "copyrow.gif", tooltip: "Copy values up from selected reference cost type", onclick: "ribbonEvent('CopyBtn');" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Periods",
+                        columns: [
+                            {
+                                items: [
+                                    { type: "text", name: "From Period:" },
+                                    { type: "select", id: "idViewTab_FromPeriod", onchange: "ribbonEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "text", name: " ", width: "10px" }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "text", name: "To Period:" },
+                                    { type: "select", id: "idViewTab_ToPeriod", onchange: "ribbonEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            };
 
-        var editorTabData = {
-            parent: "idEditorTabDiv",
-            style: "display:none;",
-            showstate: "true",
-            initialstate: "expanded",
-            onstatechange: "ribbonEvent('Ribbon_Toggle');",
-            imagePath: this.imagePath,
-            sections: [
-                {
-                    name: "Plan Actions",
-                    tooltip: "Plan Actions",
-                    columns: [
-                        {
-                            items: [
-                                { type: "bigbutton", id: "SaveBtn", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "ribbonEvent('SaveBtn');", disabled: true }
-                            ]
-                        },
-                        {
-                            items: [
-                                { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "ribbonEvent('CloseBtn');" }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Tools",
-                    tooltip: "Tools",
-                    columns: [
-                        {
-                            items: [
-                                { type: "smallbutton", id: "CategoriesBtn", name: "Categories", img: "categories.png", tooltip: "Re-add removed category rows", onclick: "ribbonEvent('CategoriesBtn');", disabled: true },
-                                { type: "smallbutton", id: "DetailBtn", name: "Detail", img: "detail.png", tooltip: "Add a child detail row", onclick: "ribbonEvent('DetailBtn');", disabled: true },
-                                { type: "smallbutton", id: "RemoveBtn", name: "Delete", img: "delete.png", tooltip: "Remove selected category rows from display", onclick: "ribbonEvent('RemoveBtn');", disabled: true }
-                            ]
-                        },
-                        {
-                            items: [
-                                { type: "text", name: "Displayed Values:" },
-                                { type: "select", id: "DisplayedValues", onchange: "ribbonEvent('DisplayedValues');", options: "<option value='0'>UoMs</option><option value='1'>FTEs</option>", width: "55px" }
-                            ]
-                        },
-                        {
-                            items: [
-                                { type: "smallbutton", id: "ToolsBtn", name: "Tools", img: "spread.gif", tooltip: "Show Tools dialog for Move, Grow and Shrink operations", onclick: "ribbonEvent('ToolsBtn');", disabled: true },
-                                { type: "smallbutton", id: "ShowRefBtn", name: "Show Reference", img: "reference.png", tooltip: "Show/Hide Reference Area", onclick: "ribbonEvent('ShowRefBtn');", disabled: false },
-                                { type: "smallbutton", id: "CopyBtn", name: "Copy", img: "copyrow.gif", tooltip: "Copy values up from selected reference cost type", onclick: "ribbonEvent('CopyBtn');" }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Periods",
-                    columns: [
-                        {
-                            items: [
-                                { type: "text", name: "From Period:" },
-                                { type: "select", id: "idViewTab_FromPeriod", onchange: "ribbonEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
-                            ]
-                        },
-                        {
-                            items: [
-                                { type: "text", name: " ", width: "10px" }
-                            ]
-                        },
-                        {
-                            items: [
-                                { type: "text", name: "To Period:" },
-                                { type: "select", id: "idViewTab_ToPeriod", onchange: "ribbonEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
-                            ]
-                        }
-                    ]
+            this.editorTab = new Ribbon(editorTabData);
+            this.editorTab.Render();
+
+            this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "3E", "dhx_skyblue");
+            this.layout._minHeight = 18;
+            this.layout.cells(this.ribbonArea).setText("Ribbon Area");
+            this.layout.cells(this.ribbonArea).hideHeader();
+            this.layout.cells(this.ribbonArea).setHeight(92);
+            this.layout.cells(this.ribbonArea).fixSize(false, true);
+
+            this.layout.cells(this.ribbonArea).attachObject(document.getElementById(this.editorTab.getRibbonDiv()));
+            this.layout.cells(this.mainArea).setText("Main Area");
+            this.layout.cells(this.mainArea).hideHeader();
+            this.layout.cells(this.referenceArea).setText("Reference Area");
+            this.layout.cells(this.referenceArea).hideHeader();
+
+            this.tabbar = this.layout.cells(this.mainArea).attachTabbar();
+            this.tabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
+            this.tabbar.enableAutoReSize();
+            this.tabbar.setStyle("winDflt");
+            this.tabbar.setSkinColors("#EEEEEE", "#FFFFFF");
+
+            this.tabbar_ref = this.layout.cells(this.referenceArea).attachTabbar();
+            this.tabbar_ref.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
+            this.tabbar_ref.enableAutoReSize();
+            this.tabbar_ref.setStyle("winDflt");
+            this.tabbar_ref.setSkinColors("#EEEEEE", "#FFFFFF");
+
+            if (this.CostTypes == null) {
+                alert("edit costs : CostTypes is null");
+            }
+            else if (this.CostTypes.length <= 0) {
+                alert("edit costs : No CostTypes returned");
+            }
+            else {
+                for (var n = 0; n < this.CostTypes.length; n++) {
+                    var costtypeId = this.CostTypes[n].Id;
+                    var costtypeName = this.CostTypes[n].Name;
+                    this.tabbar.addTab("tab_" + costtypeId, costtypeName);
+                    this.tabbar.setContentHTML("tab_" + costtypeId, "<div id='gridDiv_" + costtypeId + "'></div>");
+                    this.tabbar_ref.addTab("reftab_" + costtypeId, costtypeName);
+                    this.tabbar_ref.setContentHTML("reftab_" + costtypeId, "<div id='bottomgridDiv_" + costtypeId + "'></div>");
                 }
-            ]
-        };
+            }
 
-        this.editorTab = new Ribbon(editorTabData);
-        this.editorTab.Render();
+            this.tabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
+            this.tabbar_ref.attachEvent("onSelect", function (id) { tabbarRefOnSelectDelegate(id, arguments); return true; });
 
-        this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "3E", "dhx_skyblue");
-        this.layout._minHeight = 18;
-        this.layout.cells(this.ribbonArea).setText("Ribbon Area");
-        this.layout.cells(this.ribbonArea).hideHeader();
-        this.layout.cells(this.ribbonArea).setHeight(92);
-        this.layout.cells(this.ribbonArea).fixSize(false, true);
+            this.initialized = true;
+            this.OnResize();
 
-        this.layout.cells(this.ribbonArea).attachObject(document.getElementById(this.editorTab.getRibbonDiv()));
-        this.layout.cells(this.mainArea).setText("Main Area");
-        this.layout.cells(this.mainArea).hideHeader();
-        this.layout.cells(this.referenceArea).setText("Reference Area");
-        this.layout.cells(this.referenceArea).hideHeader();
-
-        this.tabbar = this.layout.cells(this.mainArea).attachTabbar();
-        this.tabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
-        this.tabbar.enableAutoReSize();
-        this.tabbar.setStyle("winDflt");
-        this.tabbar.setSkinColors("#EEEEEE", "#FFFFFF");
-
-        this.tabbar_ref = this.layout.cells(this.referenceArea).attachTabbar();
-        this.tabbar_ref.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
-        this.tabbar_ref.enableAutoReSize();
-        this.tabbar_ref.setStyle("winDflt");
-        this.tabbar_ref.setSkinColors("#EEEEEE", "#FFFFFF");
-
-        if (this.CostTypes == null) {
-            alert("edit costs : CostTypes is null");
-        }
-        else if (this.CostTypes.length <= 0) {
-            alert("edit costs : No CostTypes returned");
-        }
-        else {
+            var bAllowNamedRates = false;
             for (var n = 0; n < this.CostTypes.length; n++) {
-                var costtypeId = this.CostTypes[n].Id;
-                var costtypeName = this.CostTypes[n].Name;
-                this.tabbar.addTab("tab_" + costtypeId, costtypeName);
-                this.tabbar.setContentHTML("tab_" + costtypeId, "<div id='gridDiv_" + costtypeId + "'></div>");
-                this.tabbar_ref.addTab("reftab_" + costtypeId, costtypeName);
-                this.tabbar_ref.setContentHTML("reftab_" + costtypeId, "<div id='bottomgridDiv_" + costtypeId + "'></div>");
+                if (this.CostTypes[n].AllowNamedRates != false) {
+                    bAllowNamedRates = true;
+                    break;
+                }
             }
+
+            if (bAllowNamedRates)
+                WorkEnginePPM.EditCosts.GetNamedRates(getNamedRatesCompleteDelegate);
+            else
+                WorkEnginePPM.EditCosts.GetPeriods(this.params.ViewUID, getPeriodsCompleteDelegate);
+
+            this.layout.cells(this.referenceArea).collapse();
+            this.referenceAreaCollapsed = true;
+            this.editorTab.hideItem("CopyBtn");
         }
-
-        this.tabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
-        this.tabbar_ref.attachEvent("onSelect", function (id) { tabbarRefOnSelectDelegate(id, arguments); return true; });
-
-        this.initialized = true;
-        this.OnResize();
-
-        var bAllowNamedRates = false;
-        for (var n = 0; n < this.CostTypes.length; n++) {
-            if (this.CostTypes[n].AllowNamedRates != false) {
-                bAllowNamedRates = true;
-                break;
-            }
+        catch (e) {
+            alert(e.toString());
         }
-
-        if (bAllowNamedRates)
-            WorkEnginePPM.EditCosts.GetNamedRates(getNamedRatesCompleteDelegate);
-        else
-            WorkEnginePPM.EditCosts.GetPeriods(this.params.ViewUID, getPeriodsCompleteDelegate);
-
-        this.layout.cells(this.referenceArea).collapse();
-        this.referenceAreaCollapsed = true;
-        this.editorTab.hideItem("CopyBtn");
     };
     EditCosts.prototype.OnGetNamedRatesComplete = function (result) {
         this.NamedRateValues = result;
@@ -798,10 +802,10 @@
                         b = window.confirm("You have unsaved changes.\n\nAre you sure you want to exit without saving?");
                     if (b) {
                         this.ExitConfirmed = true;
-                        if (SP.UI.DialogResult)
-                            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+                        if (parent.SP.UI.DialogResult)
+                            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
                         else
-                            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, '');
+                            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, '');
                     }
                     break;
                 }
