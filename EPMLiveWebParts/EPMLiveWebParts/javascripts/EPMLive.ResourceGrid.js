@@ -1573,8 +1573,16 @@ function registerEpmLiveResourceGridScript() {
         window.Grids.OnClick = function (grid, row, col, x, y, evt) {
             $$.actions.hideEasyScroll(true);
 			$$.actions.loadRibbon();
-			
-            if (row.Kind === 'Data' && row.Def.Name === 'R') {
+
+			var cellClass = evt.explicitOriginalTarget.className;
+            
+			if (cellClass.indexOf('GSPanel') !== -1) {
+			    if (cellClass.indexOf('GSPanelSelect') !== -1) {
+			        grid.GetSelRows() ? grid.SelectAllRows(0) : grid.SelectAllRows(1);
+			    } else {
+			        grid.SelectRow(row, !row.Selected);
+			    }
+			} else if (row.Kind === 'Data' && row.Def.Name === 'R') {
                 var status;
 
                 if ((evt.shiftKey && evt.ctrlKey) || (!evt.shiftKey && !evt.ctrlKey)) {

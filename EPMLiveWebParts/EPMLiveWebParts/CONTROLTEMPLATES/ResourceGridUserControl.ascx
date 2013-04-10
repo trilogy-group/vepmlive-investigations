@@ -133,6 +133,8 @@
             background-image: url(<%= WebUrl %>/_layouts/epmlive/treegrid/resourcegrid/blackcheck.png) !important;
             background-position: center center !important;
             background-repeat: no-repeat !important;
+            cursor: pointer;
+            cursor: hand;
         }
         
         .EPMLiveResourceGridPanelHoveredSelected {
@@ -140,6 +142,8 @@
             background-position: center center !important;
             background-color: #0072C6 !important;
             border-right-color: rgba(156, 206, 240, 0.5) !important;
+            cursor: pointer;
+            cursor: hand;
         }
         
         .ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br {
