@@ -12,77 +12,37 @@ namespace EPMLiveCore
         private string _requestUrl = string.Empty;
         private int _btnChangeAppCurrentAppId = -1;
         private const string LIST_ITEM_HTML =
-            "<li id=\"{0}\"class=\"ms-MenuUIULItem\" type=\"option\" menugroupid=\"100\" description=\"{1}\"" +
-                        "text=\"{2}\"" +
+            "<li id=\"{0}\" class=\"ms-core-menu-item\" type=\"option\" menugroupid=\"100\" description=\"{1}\" text=\"{2}\"" +
                         "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
                         "text_original=\"{2}\" description_original=\"{1}\">" +
-                        "<div class=\"ms-MenuUIULItem\" menugroupid=\"100\" description=\"{1}\"" +
-                            "text=\"{2}\"" +
-                            "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-                            "text_original=\"{2}\" description_original=\"{1}\"" +
-                            "onmouseover=\"javascript:this.className='ms-MenuUIULItemHover';\" onmouseout=\"javascript:this.className='ms-MenuUIULItem';\">" +
-                            "<a class=\"ms-MenuUIULLink\" href=\"{4}\" onclick=\"{5}\" >" +
-                                "<span style=\"white-space: nowrap\" class=\"ms-MenuUIIcon\" align=\"center\">" +
-                                    "<img class=\"ms-MenuUIULImg\" title=\"\" alt=\"\" src=\"{3}\" width=\"16\" height=\"16\">" +
-                                "</span>" +
-                                "<span style=\"WHITE-SPACE: nowrap\" class=\"ms-MenuUILabel\">" +
-                                    "<span style=\"white-space: normal\">{2}</span><br>" +
-            //"<span style=\"white-space: normal\" class=\"ms-menuitemdescription\">{1}</span>" +
-                                    "<span></span>" +
-                                "</span>" +
-                                "<span style=\"width: auto; display: none; white-space: nowrap; cssfloat: left\" class=\"ms-MenuUIAccessKey\"></span>" +
-                                "<span style=\"display: none; white-space: nowrap\" class=\"ms-MenuUISubmenuArrow\"></span>" +
-                            "</a>" +
-                        "</div>" +
+                        "<a class=\"ms-core-menu-link\" href=\"{4}\" onclick=\"{5}\" >" +
+                            "<div class=\"ms-hide\">" +
+	                            "<img id=\"mp1_0_0_ICON\" title=\"\" alt=\"\" src=\"/_layouts/15/images/menuprofile.gif?rev=23\" width=\"32\" height=\"32\">" +
+                            "</div>" +
+                            "<div id=\"zz2_ID_PersonalInformation\" class=\"ms-core-menu-label\">" +
+	                            "<span class=\"ms-core-menu-title\">{2}</span>" +
+	                            "<span></span>" +
+                            "</div>" +
+                            "<span class=\"ms-accessible\"></span>" +
+                            "<div></div>" +
+                        "</a>" +
                     "</li>";
-
-        private const string LIST_ITEM_HTML_NO_ICON =
-           "<li id=\"{0}\"class=\"ms-MenuUIULItem\" type=\"option\" menugroupid=\"100\" description=\"{1}\"" +
-                       "text=\"{2}\"" +
-                       "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-                       "text_original=\"{2}\" description_original=\"{1}\">" +
-                       "<div class=\"ms-MenuUIULItem\" menugroupid=\"100\" description=\"{1}\"" +
-                           "text=\"{2}\"" +
-                           "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-                           "text_original=\"{2}\" description_original=\"{1}\"" +
-                           "onmouseover=\"javascript:this.className='ms-MenuUIULItemHover';\" onmouseout=\"javascript:this.className='ms-MenuUIULItem';\">" +
-                           "<a class=\"ms-MenuUIULLink\" href=\"{4}\" onclick=\"{5}\" >" +
-                               "<span style=\"white-space: nowrap\" class=\"ms-MenuUIIcon\" align=\"center\">" +
-                               "</span>" +
-                               "<span style=\"WHITE-SPACE: nowrap\" class=\"ms-MenuUILabel\">" +
-                                   "<span style=\"white-space: normal\">{2}</span><br>" +
-            //"<span style=\"white-space: normal\" class=\"ms-menuitemdescription\">{1}</span>" +
-                                   "<span></span>" +
-                               "</span>" +
-                               "<span style=\"width: auto; display: none; white-space: nowrap; cssfloat: left\" class=\"ms-MenuUIAccessKey\"></span>" +
-                               "<span style=\"display: none; white-space: nowrap\" class=\"ms-MenuUISubmenuArrow\"></span>" +
-                           "</a>" +
-                       "</div>" +
-                   "</li>";
-
+        
         private const string LIST_ITEM_HTML_NEW_WIN =
-            "<li id=\"{0}\"class=\"ms-MenuUIULItem\" type=\"option\" menugroupid=\"100\" description=\"{1}\"" +
-                        "text=\"{2}\"" +
+            "<li id=\"{0}\"class=\"ms-core-menu-item\" type=\"option\" menugroupid=\"100\" description=\"{1}\" text=\"{2}\"" +
                         "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
                         "text_original=\"{2}\" description_original=\"{1}\">" +
-                        "<div class=\"ms-MenuUIULItem\" menugroupid=\"100\" description=\"{1}\"" +
-                            "text=\"{2}\"" +
-                            "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-                            "text_original=\"{2}\" description_original=\"{1}\"" +
-                            "onmouseover=\"javascript:this.className='ms-MenuUIULItemHover';\" onmouseout=\"javascript:this.className='ms-MenuUIULItem';\">" +
-                            "<a class=\"ms-MenuUIULLink\" href=\"{4}\" onclick=\"{5}\" target=\"_blank\" >" +
-                                "<span style=\"white-space: nowrap\" class=\"ms-MenuUIIcon\" align=\"center\">" +
-                                    "<img class=\"ms-MenuUIULImg\" title=\"\" alt=\"\" src=\"{3}\" width=\"16\" height=\"16\">" +
-                                "</span>" +
-                                "<span style=\"WHITE-SPACE: nowrap\" class=\"ms-MenuUILabel\">" +
-                                    "<span style=\"white-space: normal\">{2}</span><br>" +
-            //"<span style=\"white-space: normal\" class=\"ms-menuitemdescription\">{1}</span>" +
-                                    "<span></span>" +
-                                "</span>" +
-                                "<span style=\"width: auto; display: none; white-space: nowrap; cssfloat: left\" class=\"ms-MenuUIAccessKey\"></span>" +
-                                "<span style=\"display: none; white-space: nowrap\" class=\"ms-MenuUISubmenuArrow\"></span>" +
-                            "</a>" +
-                        "</div>" +
+                        "<a class=\"ms-core-menu-link\" href=\"{4}\" onclick=\"{5}\" target=\"_blank\" >" +
+                            "<div class=\"ms-hide\">" +
+	                            "<img id=\"mp1_0_0_ICON\" title=\"\" alt=\"\" src=\"/_layouts/15/images/menuprofile.gif?rev=23\" width=\"32\" height=\"32\">" +
+                            "</div>" +
+                            "<div id=\"zz2_ID_PersonalInformation\" class=\"ms-core-menu-label\">" +
+	                            "<span class=\"ms-core-menu-title\">{2}</span>" +
+	                            "<span></span>" +
+                            "</div>" +
+                            "<span class=\"ms-accessible\"></span>" +
+                            "<div></div>" +
+                        "</a>" +
                     "</li>";
 
         protected void Page_Load(object sender, EventArgs e)
@@ -119,8 +79,7 @@ namespace EPMLiveCore
             SPSite cSite = SPContext.Current.Site;
             SPWeb cWeb = SPContext.Current.Web;
             bool hasItems = false;
-            itemsHtml.Append("<ul class=\"ms-MenuUIUL\" style=\"width:253px;\">");
-            //itemsHtml.Append("<li class=\"ms-MenuUIULItem\"><div style=\"background-color: #F0F2F5 !important;border-bottom: 1px solid #E2E4E7;color: #4C535C;font-weight: bold !important;padding: 4px 2px !important;\"><span style=\"margin-left:5px\">Lists</span></div></li>");
+            itemsHtml.Append("<ul class=\"ms-core-menu-list\">");
             string html = BuildListSection();
             hasItems = !string.IsNullOrEmpty(html) ? true : false;
 
@@ -133,9 +92,9 @@ namespace EPMLiveCore
 
             if (isCurrentUserRolesGreaterOrEqualThan("Design"))
             {
-                itemsHtml.Append("<li class=ms-MenuUIULItem type=\"separator\"><div class=\"ms-MenuUISeparator\" type=\"separator\">&nbsp;</div></li>");
+                itemsHtml.Append("<li id=\"mp1_0_2\" class=\"ms-core-menu-separator\" type=\"separator\" type=\"separator\"><hr class=\"ms-core-menu-separatorHr\"></li>");
                 itemsHtml.Append(string.Format(LIST_ITEM_HTML, "MenuItem_CreateCom", "Create Community", "Create Community", "/_layouts/epmlive/images/addcommunity16.gif", "#", onclick));
-                itemsHtml.Append("<li class=ms-MenuUIULItem type=\"separator\"><div class=\"ms-MenuUISeparator\" type=\"separator\">&nbsp;</div></li>");
+                itemsHtml.Append("<li id=\"mp1_0_2\" class=\"ms-core-menu-separator\" type=\"separator\" type=\"separator\"><hr class=\"ms-core-menu-separatorHr\"></li>");
                 itemsHtml.Append(string.Format(LIST_ITEM_HTML_NEW_WIN, "MenuItem_AddApp", "Add App", "Add App", "/_layouts/epmlive/images/installapplication16.gif", "http://market.epmlive.com/?source=" + SPContext.Current.Web.Url, ""));
             }
 
@@ -196,7 +155,7 @@ namespace EPMLiveCore
                                         ConstructOnClick(homePageUrl, (listItems[i]).ID.ToString()) :
                                         ConstructOnClick(ew.Url, (listItems[i]).ID.ToString());
 
-                                    itemsHtml.Append(string.Format(LIST_ITEM_HTML_NO_ICON, "MenuItem" + i, description, itemText, imageUrl, linkUrl, onclick));
+                                    itemsHtml.Append(string.Format(LIST_ITEM_HTML, "MenuItem" + i, description, itemText, imageUrl, linkUrl, onclick));
                                 }
 
                             }

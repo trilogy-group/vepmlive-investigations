@@ -576,7 +576,7 @@ namespace EPMLiveCore.API
                 q.Query = "<Where><And><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + targetListId.ToString("D") + "</Value></Eq><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">" + itemId + "</Value></Eq></And></Where>";
                 SPListItemCollection itemsColl = commentsList.GetItems(q);
                 int commentCount = (itemsColl.HasItems()) ? itemsColl.Count : 0;
-                SPListItem item = targetList.Items.GetItemById(Convert.ToInt32(itemId));
+                SPListItem item = targetList.GetItemById(Convert.ToInt32(itemId));
 
                 SPField testFld = null;
                 try
@@ -609,7 +609,7 @@ namespace EPMLiveCore.API
                                     fldCC.Update();
                                     newTargetList.Update();
                                     web.Update();
-                                    SPListItem newItem = newTargetList.Items.GetItemById(Convert.ToInt32(itemId));
+                                    SPListItem newItem = newTargetList.GetItemById(Convert.ToInt32(itemId));
                                     newItem[newTargetList.Fields.GetFieldByInternalName("CommentCount").Id] = commentCount;
                                     newItem.SystemUpdate();
                                 }
@@ -630,7 +630,7 @@ namespace EPMLiveCore.API
                             {
                                 web.AllowUnsafeUpdates = true;
                                 SPList newTargetList = web.Lists[targetListId];
-                                SPListItem newItem = newTargetList.Items.GetItemById(Convert.ToInt32(itemId));
+                                SPListItem newItem = newTargetList.GetItemById(Convert.ToInt32(itemId));
                                 newItem[targetList.Fields.GetFieldByInternalName("CommentCount").Id] = commentCount;
                                 newItem.SystemUpdate();
                             }

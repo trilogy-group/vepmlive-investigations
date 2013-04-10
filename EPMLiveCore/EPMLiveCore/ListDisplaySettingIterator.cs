@@ -1107,9 +1107,6 @@ namespace EPMLiveCore
         {
             if (isFeatureActivated)
             {
-
-
-
                 try
                 {
                     for (int i = 0; i < Fields.Count; i++)
@@ -1177,7 +1174,9 @@ namespace EPMLiveCore
                 }
                 catch { }
                 // prepopulate lookup fields with query string values
-                InsertLookupValueByQueryString();
+
+                // InsertLookupValueByQueryString();
+
                 // Add EPMLive custom entity picker control to 
                 // lookup fields
 
@@ -1185,6 +1184,7 @@ namespace EPMLiveCore
             }
             else
                 base.CreateChildControls();
+
         }
 
         private void InsertLookupValueByQueryString()

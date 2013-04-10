@@ -140,43 +140,32 @@ namespace EPMLiveCore
                 
                 // render button
                 // =====================================================
-                writer.Write("<a id=\"lnkChangeApp\" style=\"height: 15px;" +
-                                                            "color: #FFFFFF;" +
-                                                            "padding-top: 1px;" +
-                                                            "padding-right: 10px;" +
-                                                            "padding-bottom: 4px;" +
-                                                            "padding-left: 5px;" +
-                                                            "vertical-align: middle;" +
-                                                            "border-top-color: transparent;" +
-                                                            "border-right-color: transparent;" +
-                                                            "border-bottom-color: transparent;" +
-                                                            "border-left-color: transparent;" +
-                                                            "border-top-width: 1px;" +
-                                                            "border-right-width: 1px;" +
-                                                            "border-bottom-width: 1px;" +
-                                                            "border-left-width: 1px;" +
-                                                            "border-top-style: solid;" +
-                                                            "border-right-style: solid;" +
-                                                            "border-bottom-style: solid;" +
-                                                            "border-left-style: solid;" +
-                                                            "display: inline-block;" +
-                                                            "white-space: nowrap;\"" +
-                                                            "onmouseover=\"this.style.color = '#FFFFFF';\"" +
-                                                            "onmouseout=\"this.style.color = '#FFFFFF';\"" +
-                                                            "href=\"#\"" +
-                                                            "onclick=\"ToggleChangeAppMenu();return false;\">");
-                //writer.Write("<span onlick=\"document.getElementById('lnkChangeApp').click()\" style=\"background-image:url('/_layouts/images/menu-down.gif'); background-position: right 5px; background-repeat: no-repeat; padding-right:12px;\">");
+                writer.Write("<div>");
+                writer.Write("<span title='Open Menu' class='ms-menu-althov ms-welcome-root' style='white-space: nowrap;' hoverinactive='ms-menu-althov ms-welcome-root' hoveractive='ms-menu-althov-active ms-welcome-root ms-welcome-hover'>");
+                writer.Write("<a id=\"lnkChangeApp\" class=\"ms-core-menu-root\" href=\"#\" onclick=\"ToggleChangeAppMenu();return false;\">");
+             
                 writer.Write("<span onlick=\"document.getElementById('lnkChangeApp').click()\">");
                 writer.Write(string.Format("<span onlick=\"document.getElementById('lnkChangeApp').click()\" id=\"spnChangeAppText\" >{0}</span>", appTitle));
                 writer.Write("</span>");
-                writer.Write("<SPAN style=\"POSITION: relative; WIDTH: 5px; DISPLAY: inline-block; HEIGHT: 3px; OVERFLOW: hidden; margin-left: 5px;\" class=\"s4-clust ms-viewselector-arrow\"><IMG style=\"POSITION: absolute; BORDER-RIGHT-WIDTH: 0px; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; TOP: -491px !important; LEFT: 0px !important\" alt=\"Open Menu\" src=\"/_layouts/images/fgimg.png\"></SPAN>");
+ 
+                writer.Write("<span style=\"POSITION: relative; WIDTH: 7px; DISPLAY: inline-block; HEIGHT: 4px; OVERFLOW: hidden\" class=\"s4-clust ms-viewselector-arrow ms-menu-stdarw ms-core-menu-arrow\">" +
+                             "<img style=\"POSITION: absolute; TOP: -259px !important; LEFT: -95px !important\" alt=\"Open Menu\" src=\"/_layouts/15/images/spcommon.png?rev=23\">" +
+                             "</span>");
+
+
+                writer.Write("<span style=\"POSITION: relative; WIDTH: 7px; DISPLAY: inline-block; HEIGHT: 4px; OVERFLOW: hidden\" class=\"s4-clust ms-core-menu-arrow ms-viewselector-arrow ms-menu-hovarw\">" +
+                             "<img style=\"POSITION: absolute; TOP: -259px !important; LEFT: -86px !important\" alt=\"Open Menu\" src=\"/_layouts/15/images/spcommon.png?rev=23\">" +
+                             "</span>");
+                
+                
                 writer.Write("</a>");
+                writer.Write("</span>");
+                writer.Write("</div>");
 
                 // html for actual menu
                 // ===================================================
-                writer.Write("<div id=\"divChangeAppMenu\" style=\"z-index: 103; position: absolute; display:none; max-height:450px; overflow-x:hidden;overflow-y:auto;\" dir=\"ltr\" class=\"ms-MenuUIPopupBody ms-MenuUIPopupScreen\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid6\" flipped=\"false\" leftforbackiframe=\"834\" topforbackiframe=\"29\">");
-                writer.Write("<div style=\"overflow: visible\" class=\"ms-MenuUIPopupInner\" isinner=\"true\">");
-                writer.Write("<div id=\"divChangeAppMenuAsync\" class=\"ms-MenuUI\" style=\"width:254px\">");
+                writer.Write("<div id=\"divChangeAppMenu\" style=\"Z-INDEX: 103; POSITION: absolute; WIDTH: 159px; VISIBILITY: visible; TOP: 30px; LEFT: 13px\" dir=\"ltr\" class=\"ms-core-menu-box ms-core-defaultFont ms-shadow\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid4\" flipped=\"false\" LeftForBackIframe=\"13\" TopForBackIframe=\"30\">");
+                writer.Write("<div id=\"divChangeAppMenuAsync\">");
                 // loading div
                 // ========================================
                 writer.Write("<div id=\"divChangeAppLoading\" style=\"width: 100%; text-align: center;padding-top:5px;padding-bottom:5px;\">");
@@ -184,7 +173,6 @@ namespace EPMLiveCore
                 writer.Write("Loading...");
                 writer.Write("</div>");
                 // =========================================
-                writer.Write("</div>");
                 writer.Write("</div>");
                 writer.Write("</div>");
             }

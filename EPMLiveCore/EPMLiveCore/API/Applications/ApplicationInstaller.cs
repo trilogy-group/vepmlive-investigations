@@ -790,7 +790,7 @@ namespace EPMLiveCore.API
                     {
                         if(iCommunity != 0)
                         {
-                            SPListItem oLiCommunity = oAppList.Items.GetItemById(iCommunity);
+                            SPListItem oLiCommunity = oAppList.GetItemById(iCommunity);
 
                             ArrayList arrCurQuickLaunch = new ArrayList();
                             ArrayList arrCurTopNav = new ArrayList();

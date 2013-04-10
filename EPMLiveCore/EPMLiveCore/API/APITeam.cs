@@ -1480,7 +1480,7 @@ namespace EPMLiveCore.API
                             try
                             {
                                 itemid = int.Parse(InputDoc.FirstChild.Attributes["ItemId"].Value);
-                                oLi = oList.Items.GetItemById(itemid);
+                                oLi = oList.GetItemById(itemid);
                             }
                             catch { }
                         }
