@@ -48,11 +48,11 @@
                         if (Grids['cwdatagrid'].FRow != undefined) {
                             selectedListAndView = Grids['cwdatagrid'].FRow['ParentListTitle'] + ' > ' + Grids['cwdatagrid'].FRow['Title'];
                         }
-                        SP.UI.ModalDialog.commonModalDialogClose(1, selectedListAndView);
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(1, selectedListAndView);
                     }
 
                     function CancelDataSelect() {
-                        SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
                     }
 
                 </script>
