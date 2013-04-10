@@ -225,12 +225,14 @@ namespace EPMLiveWebParts
 
             if (!inDebugMode) return;
 
-            var keywords = new[] {"Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page"};
+            var keywords = new[] {"Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page", "Event"};
             var info = new List<string> {"Error", "Problem"};
 
             foreach (string keyword in epmDebug.Split(',').Select(k => k.ToLower()))
             {
-                info.AddRange(keyword.Equals("all") ? keywords : keywords.Where(k => keyword.Equals(k.ToLower())));
+                info.AddRange(keyword.Equals("all")
+                                  ? keywords.Where(k => !k.Equals("Event"))
+                                  : keywords.Where(k => keyword.Equals(k.ToLower())));
             }
 
             _debugTag = string.Format(@"debug=""{0}""", string.Join(",", info.Distinct().ToArray()));

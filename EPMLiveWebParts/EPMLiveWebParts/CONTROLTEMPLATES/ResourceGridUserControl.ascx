@@ -101,6 +101,8 @@
             font-weight: bold;
             height: 22px;
             padding-bottom: 3px;
+            cursor: pointer;
+            cursor: hand;
         }
         
         .EPMLiveResourceGridGroupTitle > a {

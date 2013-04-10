@@ -715,6 +715,8 @@ function registerEpmLiveResourceGridScript() {
                     var g = $$.grid.g();
                     g.Update();
                     g.Render();
+
+                    $$.actions.configureGroupActions(g);
                 }, 10);
             },
 
@@ -1571,6 +1573,33 @@ function registerEpmLiveResourceGridScript() {
 
             canImport: function () {
                 return !$$.importInProgress && $$.userIsSiteAdmin;
+            },
+            
+            configureGroupActions: function(grid) {
+                $('.EPMLiveResourceGridGroupTitle').click(function () {
+                    try {
+                        var row = $(this).parent();
+                        if (row) {
+                            row = row[0];
+                            if (row) {
+                                var attributes = row.attributes;
+                                for (var a in attributes) {
+                                    if (attributes.hasOwnProperty(a)) {
+                                        var attr = attributes[a];
+                                        if (attr.name === 'onmousemove') {
+                                            row = grid.Rows[attr.value.split('"')[1]];
+                                            if (row.Expanded === 1) {
+                                                grid.Collapse(row);
+                                            } else {
+                                                grid.Expand(row);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (e) { }
+                });
             }
         };
 
@@ -1623,6 +1652,12 @@ function registerEpmLiveResourceGridScript() {
                     window.RefreshCommandUI();
 
                     return true;
+                } else if (col === 'Title') {
+                    if (row.Expanded === 1) {
+                        grid.Collapse(row);
+                    } else {
+                        grid.Expand(row);
+                    }
                 }
             } else if (row.Kind === 'Header' && col === 'Panel') {
                 window.setTimeout(function () {
@@ -1661,6 +1696,11 @@ function registerEpmLiveResourceGridScript() {
 
             $$.views.load();
             $$.reports.load();
+
+            $('.EPMLiveResourceGridGroupTitle').click(function() {
+                var ele = $(this);
+                var i = 0;
+            });
         };
 
         window.Grids.OnUpdated = function (grid) {
