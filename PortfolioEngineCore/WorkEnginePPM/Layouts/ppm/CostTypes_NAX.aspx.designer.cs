@@ -31,13 +31,13 @@ namespace WorkEnginePPM {
         protected global::WorkEnginePPM.TGrid tgrid2;
         
         /// <summary>
-        /// dgridCostTotals control.
+        /// tgridCostTotals control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.DGrid dgridCostTotals;
+        protected global::WorkEnginePPM.TGrid tgridCostTotals;
         
         /// <summary>
         /// tgridSecurity control.

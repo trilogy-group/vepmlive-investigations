@@ -137,9 +137,9 @@ html, body {
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", id: "btnTest", name: "Test", img: "editview.gif", tooltip: "Test", width: "60px", onclick: "return toolbar_event('btnTest');" },
-            { type: "button", id: "btnRefresh", name: "Refresh", img: "editview.gif", tooltip: "Refresh", width: "80px", onclick: "return toolbar_event('btnRefresh');" },
-            { type: "button", id: "btnCheck", name: "Check", img: "heart.gif", tooltip: "Check QueueManager Status", width: "80px", onclick: "return toolbar_event('btnCheck');" }
+            { type: "button", id: "btnTest", name: "TEST", img: "formatmap16x16_2.png", style: "top: -254px; left: -270px;", tooltip: "Test", onclick: "return toolbar_event('btnTest');" },
+            { type: "button", id: "btnRefresh", name: "REFRESH", img: "refresh.png", tooltip: "Refresh", onclick: "return toolbar_event('btnRefresh');" },
+            { type: "button", id: "btnCheck", name: "CHECK", img: "heart.gif", tooltip: "Check QueueManager Status", onclick: "return toolbar_event('btnCheck');" }
         ]
     };
 

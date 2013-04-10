@@ -127,7 +127,7 @@ namespace PortfolioEngineCore
                     switch (lContext)
                     {
                         case 100: // Report to Reporting DB
-
+                            SetJobStarted();
                             CAdmin oAdmin = new CAdmin();
                             if (oAdmin.GetAdminInfo(_dba) == StatusEnum.rsSuccess)
                             {
@@ -146,6 +146,7 @@ namespace PortfolioEngineCore
                             //AdminFunctions pec1 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
                             //                                         secLevel1);
                             //bool bret1 = pec1.CalcRPAllAvailabilities();
+                            SetJobStarted();
                             bool bret1 = AdminFunctions.CalcRPAllAvailabilities(_dba);
                            bHandled = true;
                             break;
@@ -154,6 +155,7 @@ namespace PortfolioEngineCore
                             //AdminFunctions pec2 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
                             //                                         secLevel2);
                             //bool bret2 = pec2.CalcAllDefaultFTEs();
+                            SetJobStarted();
                             bool bret2 = AdminFunctions.CalcAllDefaultFTEs(_dba);
                             bHandled = true;
                             break;
@@ -170,6 +172,29 @@ namespace PortfolioEngineCore
                 _dba.HandleException("ManageQueue", (StatusEnum) 99999, ex);
             }
             return bHandled;
+        }
+
+        public bool SetJobStarted()
+        {
+            bool bSuccess = false;
+            try
+            {
+                if (m_guidJob != Guid.Empty)
+                {
+                    const string sCommand =
+                        "UPDATE EPG_JOBS SET JOB_STARTED = @JOB_STARTED, JOB_STATUS = 1 WHERE JOB_STARTED IS null AND JOB_GUID = @JOB_GUID";
+                    SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                    oCommand.Parameters.AddWithValue("@JOB_STARTED", DateTime.Now);
+                    //oCommand.Parameters.AddWithValue("JOB_COMMENT", "Job Completed by C# QM");
+                    oCommand.Parameters.AddWithValue("@JOB_GUID", m_guidJob);
+                    bSuccess = (oCommand.ExecuteNonQuery() != 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                _dba.HandleException("SetJobStarted", (StatusEnum)99999, ex);
+            }
+            return bSuccess;
         }
 
         public bool SetJobCompleted()

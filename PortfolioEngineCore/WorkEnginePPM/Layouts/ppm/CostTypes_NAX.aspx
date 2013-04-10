@@ -154,7 +154,7 @@ html, body {
 </div>
 <div class="modalContent" id="idCostTotalsDlg" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
-        <div style="display:block;"><dg1:DGridUserControl id="dgridCostTotals" runat="server" /></div>
+        <div style="display:block;"><tg1:TGridUserControl id="tgridCostTotals" runat="server" /></div>
 		<div style="float:right;">
 			<div class="button-container" >
 			    <input type="button" class="epmliveButton" value="OK" onclick="costtotalsDlg_event('ok');"/>
@@ -165,16 +165,6 @@ html, body {
 </div>
 <div class="modalContent" id="idSecurityDlg" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
-        <table cellspacing="0" cellpadding="0">
-            <tr style="display:none;">
-                <td width="250" class="descriptioncell">
-                    Field Id
-                </td>
-                <td class="controlcell">
-                    <input type="text" id="Text1" />
-                </td>
-            </tr>
-        </table>
         <div style="display:block;"><tg1:TGridUserControl id="tgridSecurity" runat="server" /></div>
 		<div style="float:right;">
 			<div class="button-container" >
@@ -296,14 +286,12 @@ html, body {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
                 }
-                var dgridCostTotals = window.<%=dgridCostTotals.UID%>;
-                var columnData = json.reply.costTotals.columnData;
+                var tgridCostTotals = window.<%=tgridCostTotals.UID%>;
                 var tableData = json.reply.costTotals.tableData;
-                dgridCostTotals.Initialize(columnData, tableData);
-                dgridCostTotals.SetHeight(250);
-                dgridCostTotals.grid.enableLightMouseNavigation(true);
-                dgridCostTotals.grid.enableKeyboardSupport(true);
-                DisplayDialog(470, 380, "Cost Totals for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winCostTotalsDlg", "idCostTotalsDlg", true, false);
+                tgridCostTotals.Initialize(tableData);
+                tgridCostTotals.SetWidth(420);
+                tgridCostTotals.SetHeight(250);
+                DisplayDialog(450, 350, "Cost Totals for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winCostTotalsDlg", "idCostTotalsDlg", true, false);
                 break;
             case "btnSecurity":
                 if (toolbar.isItemDisabled("btnSecurity") == true) {
@@ -643,8 +631,8 @@ html, body {
         }
     };
     var costtotalsDlg_event = function (event) {
-        var dgridCostTotals = window.<%=dgridCostTotals.UID%>;
-        dgridCostTotals.grid.editStop();
+        var tgridCostTotals = window.<%=tgridCostTotals.UID%>;
+        tgridCostTotals.EndEdit();
         var sRowId = dgrid1_selectedRow;
         switch (event) {
             case "ok":
@@ -653,9 +641,9 @@ html, body {
                 sb.append('<data');
                 sb.append(' CT_ID="' + sRowId + '"');
                 sb.append('>');
-                sb.append('<dgridCostTotals>');
-                sb.append('<![CDATA[' + dgridCostTotals.GetXmlData() + ']]>');
-                sb.append('</dgridCostTotals>');
+                sb.append('<tgridCostTotals>');
+                sb.append('<![CDATA[' + tgridCostTotals.GetXmlData() + ']]>');
+                sb.append('</tgridCostTotals>');
                 sb.append('</data>');
                 sb.append('</request>');
                 var sRequest = sb.toString();
@@ -674,6 +662,8 @@ html, body {
         }
     };
     var securityDlg_event = function (event) {
+        var tgridSecurity = window['<%=tgridSecurity.UID%>'];
+        tgridSecurity.EndEdit();
         switch (event) {
             case "ok":
                 var sb = new StringBuilder();
@@ -681,7 +671,6 @@ html, body {
                 sb.append('<data');
                 sb.append(' CT_ID="' + document.getElementById('txtId').value + '"');
                 sb.append('>');
-                var tgridSecurity = window['<%=tgridSecurity.UID%>'];
                 sb.append('<tgridSecurity>');
                 sb.append('<![CDATA[' + tgridSecurity.GetXmlData() + ']]>');
                 sb.append('</tgridSecurity>');

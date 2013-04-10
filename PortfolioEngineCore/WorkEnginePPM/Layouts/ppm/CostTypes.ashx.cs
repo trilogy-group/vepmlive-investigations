@@ -82,7 +82,7 @@ namespace WorkEnginePPM
         private static void InitializeSecurityColumns(_TGrid tg)
         {
             tg.AddColumn(title: "ID", width: 50, name: "GROUP_ID", isId: true, hidden: true);
-            tg.AddColumn(title: "Permission Group", width: 150, name: "GROUP_NAME", maincol: true, editable: false);
+            tg.AddColumn(title: "Permission Group", width: 156, name: "GROUP_NAME", maincol: true, editable: false);
             tg.AddColumn(title: "Read", width: 50, name: "DS_READ", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
             tg.AddColumn(title: "Edit", width: 50, name: "DS_EDIT", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
         }
@@ -291,12 +291,12 @@ namespace WorkEnginePPM
                 {
                     CStruct xCostTotals = new CStruct();
                     xCostTotals.Initialize("costTotals");
+                    _TGrid tg = new _TGrid();
+                    tg.AddColumn(title: "ID", width: 50, name: "CB_ID", isId: true, hidden: true);
+                    tg.AddColumn(title: "Calendar", width: 200, name: "CB_NAME", type: _TGrid.Type.text, maincol: true, editable: false);
+                    _TGrid.TCol col = tg.AddColumn(title: "Total Field", width: 218, name: "BUDGET_TOTAL_FIELD", editable: true, type: _TGrid.Type.combo);
                     DataTable dt;
                     dbaCostTypes.SelectBudgetTotalList(dba, out dt);
-                    _DGrid dg = new _DGrid();
-                    dg.AddColumn(title: "ID", width: 50, name: "CB_ID", isId: true, hidden: true, type: _DGrid.Type.number);
-                    dg.AddColumn(title: "Calendar", width: 200, name: "CB_NAME");
-                    _DGrid.DCol col = dg.AddColumn(title: "Total Field", width: 200, name: "BUDGET_TOTAL_FIELD", editable: true, type: _DGrid.Type.combo);
                     col.AddKeyValuePair(0, "[None]");
                     foreach (DataRow row in dt.Rows)
                     {
@@ -304,11 +304,9 @@ namespace WorkEnginePPM
                     }
                     
                     dbaCostTypes.SelectCostTotalsInfo(dba, nCTId, out dt);
-                    dg.SetDataTable(dt);
-                    string columnData;
+                    tg.SetDataTable(dt);
                     string tableData;
-                    dg.Build(out columnData, out tableData);
-                    xCostTotals.CreateString("columnData", columnData);
+                    tg.Build(out tableData);
                     xCostTotals.CreateString("tableData", tableData);
                     sReply = xCostTotals.XML();
 
@@ -324,7 +322,7 @@ namespace WorkEnginePPM
         private static string UpdateCostTotalsInfo(HttpContext Context, CStruct xData)
         {
             int nCTID = xData.GetIntAttr("CT_ID");
-            string sdgridCostTotals = xData.GetString("dgridCostTotals");
+            string stgridCostTotals = xData.GetString("tgridCostTotals");
             string sReply = "";
 
             string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
@@ -334,12 +332,19 @@ namespace WorkEnginePPM
             {
                 try
                 {
-                    _DGrid dg = new _DGrid();
-                    dg.AddColumn(title: "ID", width: 50, name: "CB_ID", isId: true, hidden: true, type: _DGrid.Type.number);
-                    dg.AddColumn(title: "Name", width: 200, name: "CB_NAME");
-                    dg.AddColumn(title: "Total Field", width: 200, name: "BUDGET_TOTAL_FIELD", editable: true, type: _DGrid.Type.combo);
-                    dg.SetXmlData(sdgridCostTotals);
-                    DataTable dt = dg.GetDataTable();
+                    _TGrid tg = new _TGrid();
+                    tg.AddColumn(title: "ID", width: 50, name: "CB_ID", isId: true, hidden: true);
+                    tg.AddColumn(title: "Calendar", width: 200, name: "CB_NAME", type: _TGrid.Type.text, maincol: true, editable: false);
+                    _TGrid.TCol col = tg.AddColumn(title: "Total Field", width: 210, name: "BUDGET_TOTAL_FIELD", editable: true, type: _TGrid.Type.combo);
+                    DataTable dt;
+                    //dbaCostTypes.SelectBudgetTotalList(dba, out dt);
+                    //col.AddKeyValuePair(0, "[None]");
+                    //foreach (DataRow row in dt.Rows)
+                    //{
+                    //    col.AddKeyValuePair(DBAccess.ReadIntValue(row["FA_FIELD_ID"]), DBAccess.ReadStringValue(row["FA_NAME"]));
+                    //}
+                    tg.SetXmlData(stgridCostTotals);
+                    dt = tg.GetDataTable();
 
                     if (dbaCostTypes.UpdateCostTotalsInfo(dba, nCTID, dt, out sReply) != StatusEnum.rsSuccess)
                     {

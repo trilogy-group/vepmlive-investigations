@@ -30,10 +30,11 @@ namespace WorkEnginePPM
             number,
             integer,
             checkbox,
-            date
+            date,
+            combo
         }
 
-        private class TCol
+        public class TCol
         {
             public string title;
             public _TGrid.Type type;
@@ -44,9 +45,16 @@ namespace WorkEnginePPM
             public bool maincol;
             public bool mainlevelcol;
             public bool hidden;
+            public System.Collections.Generic.Dictionary<int, string> dicCombo = null;
+            public void AddKeyValuePair(int key, string value)
+            {
+                if (dicCombo == null)
+                    dicCombo = new Dictionary<int, string>();
+                dicCombo.Add(key, value);
+            }
         }
 
-        public bool AddColumn(string title, int width, Type type = Type.text, _TGrid.Align align = _TGrid.Align.left, string name = "", bool editable = false, bool isId = false, bool maincol = false, bool mainlevelcol = false, bool hidden = false)
+        public _TGrid.TCol AddColumn(string title, int width, Type type = Type.text, _TGrid.Align align = _TGrid.Align.left, string name = "", bool editable = false, bool isId = false, bool maincol = false, bool mainlevelcol = false, bool hidden = false)
         {
             TCol col = new TCol();
             col.title = title;
@@ -62,7 +70,7 @@ namespace WorkEnginePPM
             col.maincol = maincol;
             col.mainlevelcol = mainlevelcol;
             col.hidden = hidden;
-            return true;
+            return col;
         }
         public void SetDataTable(DataTable dt)
         {
@@ -240,10 +248,19 @@ namespace WorkEnginePPM
                 if (col.hidden == false)
                 {
                     xC = xCols.CreateSubStruct("C");
-                    xC.CreateStringAttr("Name", col.name);
+                    if (col.type == Type.combo)
+                    {
+                        xC.CreateStringAttr("Name", col.name + "_value");
+                        xColHeader.CreateStringAttr(col.name + "_value", col.title);
+                        xC.CreateIntAttr("CanEdit", col.editable ? 2 : 0);
+                    }
+                    else
+                    {
+                        xC.CreateStringAttr("Name", col.name);
+                        xColHeader.CreateStringAttr(col.name, col.title);
+                        xC.CreateBooleanAttr("CanEdit", col.editable);
+                    }
                     xC.CreateIntAttr("Width", col.width);
-                    xColHeader.CreateStringAttr(col.name, col.title);
-                    xC.CreateBooleanAttr("CanEdit", col.editable);
                     xC.CreateBooleanAttr("Visible", true);
                     //xC.CreateIntAttr("MinWidth", 50);
                     //xC.CreateIntAttr("CanMove", 0);
@@ -273,6 +290,24 @@ namespace WorkEnginePPM
                         case _TGrid.Type.date:
                             xC.CreateStringAttr("Type", "Date");
                             xC.CreateStringAttr("Format", "M/d/yyyy");
+                            break;
+                        case _TGrid.Type.combo:
+                            xC.CreateStringAttr("Type", "Text");
+                            //xC.CreateIntAttr("CanEdit", 2);
+                            if (col.dicCombo != null)
+                            {
+                                string sJSON = "";
+                                foreach (KeyValuePair<int, string> item in col.dicCombo)
+                                {
+                                    if (sJSON != "")
+                                        sJSON += ",";
+                                    sJSON += "{Name:'" + item.Key + "',Text:'" + item.Value + "',Value:'" + item.Key + "'}";
+                                }
+                                xC.CreateStringAttr("Defaults", "{Items:[" + sJSON + "]}");
+                                xC.CreateStringAttr("Button", "Defaults");
+                                xC.CreateStringAttr("ValueField", col.name);
+                                xC.CreateIntAttr("MinWidth", 30);
+                            }
                             break;
                         default:
                             xC.CreateStringAttr("Type", "Text");
@@ -326,6 +361,20 @@ namespace WorkEnginePPM
                                 case _TGrid.Type.checkbox:
                                     s = DBAccess.ReadStringValue(row[col.name]);
                                     //s = "0";
+                                    break;
+                                case _TGrid.Type.combo:
+                                    if (col.dicCombo != null)
+                                    {
+                                        bool bIsNull;
+                                        s = DBAccess.ReadStringValue(row[col.name]);
+                                        int key = DBAccess.ReadIntValue(row[col.name], out bIsNull);
+                                        if (bIsNull == false)
+                                        {
+                                            string sval = "Unknown";
+                                            col.dicCombo.TryGetValue(key, out sval);
+                                            xI.CreateStringAttr(col.name + "_value", sval);
+                                        }
+                                    }
                                     break;
                                 default:
                                     s = DBAccess.ReadStringValue(row[col.name]);
@@ -387,7 +436,7 @@ namespace WorkEnginePPM
             }
         }
 
-        public bool AddColumn(string title, int width, _TGrid.Type type = _TGrid.Type.text, _TGrid.Align align = _TGrid.Align.left, string name = "", bool editable = false, bool isId = false, bool maincol = false, bool mainlevelcol = false, bool hidden = false)
+        public _TGrid.TCol AddColumn(string title, int width, _TGrid.Type type = _TGrid.Type.text, _TGrid.Align align = _TGrid.Align.left, string name = "", bool editable = false, bool isId = false, bool maincol = false, bool mainlevelcol = false, bool hidden = false)
         {
             return _tgrid.AddColumn(title, width, type, align, name, editable, isId, maincol, mainlevelcol, hidden);
         }

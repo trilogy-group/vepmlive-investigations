@@ -10,12 +10,37 @@
     };
 
     TGrid.prototype.OnLoad = function (event) {
-//        this.grid.setImagePath(this.params.ImagePath); //path to images required by grid
-//        this.grid.setSkin(this.params.Skin);
-        if (jsf_isEmpty(this.params.Data) == false)
-            this.Initialize(this.params.Data);
+        //        this.grid.setImagePath(this.params.ImagePath); //path to images required by grid
+        //        this.grid.setSkin(this.params.Skin);
+        //Grids.OnValueChanged = GridsOnValueChangedDelegate;
+        var s = document.getElementById(this.params.DataTag).value;
+        if (jsf_isEmpty(s) == false)
+            this.Initialize(null);
     };
-
+    TGrid.prototype.GridsOnValueChanged = function (grid, row, col, val) {
+        var snewVal = val;
+        var def = grid.GetAttribute(null, col, "Defaults");
+        var valueField = grid.GetAttribute(null, col, "ValueField");
+        if (def != null && def != "" && valueField != null) {
+            var list = JSON_ConvertString(def);
+            if (list != null && list.Items != null) {
+                var items = list.Items;
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].Value == val) {
+                        snewVal = items[i].Text;
+                        grid.SetAttribute(row, null, valueField, val, 0, 0);
+                        break;
+                    }
+                }
+            }
+        }
+        return snewVal;
+    };
+    TGrid.prototype.GetNamePrefix = function (name) {
+        // ids in form of g_1
+        var s = name.split("_");
+        return s[0];
+    };
     TGrid.prototype.Initialize = function (data) {
         //        if (jsf_isEmpty(columns) == false)
         //            this.params.Columns = columns;
@@ -25,10 +50,13 @@
         //        this.grid.parse(this.params.Data);
         //        this.grid = TreeGrid("<treegrid debug='0' sync='1' Data_Script='treegridData' ></treegrid>", "idtg2");
         //var treegridData = data;
+        if (data != null)
+            document.getElementById(this.params.DataTag).value = data;
         if (this.grid != null)
             this.grid.Dispose();
         this.grid = null;
-        this.grid = TreeGrid("<treegrid debug='0' sync='1' Data_Data='" + data + "' ></treegrid>", this.params.treegrid_div, this.params.tg_id);
+        this.grid = TreeGrid("<treegrid debug='1' sync='1' Data_Tag='" + this.params.DataTag + "' ></treegrid>", this.params.treegrid_div, this.params.tg_id);
+        SetEvent("OnValueChanged", this.params.tg_id, this.GridsOnValueChanged);
     };
 
     TGrid.prototype.addEventListener = function (eventName, eventFunction) {
@@ -38,9 +66,17 @@
     TGrid.prototype.grid = function () {
         return this.grid;
     };
+    TGrid.prototype.EndEdit = function () {
+        if (this.grid != null) {
+            this.grid.EndEdit(true);
+            this.grid.CloseDialog();
+        }
+    }
     TGrid.prototype.GetXmlData = function () {
-        if (this.grid != null)
+        this.EndEdit();
+        if (this.grid != null) {
             return this.grid.GetXmlData("Data");
+        }
         return "";
     };
 
@@ -107,6 +143,7 @@
     this.params = params;
     this.focusrow = null;
     this.focuscol = null;
+    var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
     var loadDelegate = this.MakeDelegate(this, this.OnLoad);
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", loadDelegate, true);

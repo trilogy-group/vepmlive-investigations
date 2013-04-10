@@ -22,9 +22,8 @@
         params.treegrid_div = "<%=ClientID%>_treegrid_div";
         params.tg_id = 'tg_<%=UID%>';
         params.tg_uid = '<%=UID%>';
-        params.Data = document.getElementById('<%=hiddenTableData.ClientID%>').value;
+        params.DataTag = '<%=hiddenTableData.ClientID%>';
         window['<%=UID%>'] = new TGrid(params);
-        document.getElementById('<%=hiddenTableData.ClientID%>').value = "";
     }
     catch (e) {
         alert("TGrid ascx Initialization : " + e.toString());
