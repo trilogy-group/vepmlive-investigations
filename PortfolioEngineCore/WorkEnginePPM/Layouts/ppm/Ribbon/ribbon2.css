@@ -405,7 +405,8 @@
 }
 .ms-cui-disabled .ms-cui-img-container, .ms-cui-disabled .ms-cui-img-cont-float, .ms-cui-disabled .ms-cui-jewel-left, .ms-cui-disabled .ms-cui-jewel-middle, .ms-cui-disabled .ms-cui-jewel-right {
     background-color: #FFFFFF !important;
-    opacity: 0.3;
+    /*opacity: 0.3;*/
+    filter: gray(enabled=true) alpha(opacity=50);
 }
 .ms-cui-disabled .ms-cui-jewel-middle .ms-cui-jewel-label {
     color: #FFFFFF !important;
