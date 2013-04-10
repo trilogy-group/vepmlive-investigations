@@ -321,7 +321,7 @@
 </div>
 <div id="<%=ClientID%>mainDiv">
     <div id="veil" style="display:none;"></div>
-    <div id="<%=ClientID%>layoutDiv" style="position: relative; width: 100%; height: 100%;"></div>
+	<div id="<%=ClientID%>layoutDiv" style="position: relative; width: 100%; height: 650px; top: 0px; left: 0px; display:block"></div>
 </div> 
 <script type="text/javascript">
     function addResourcesDlg_DialogEvent(action) { rpeditor.addResourcesDlg_DialogEvent(action); }

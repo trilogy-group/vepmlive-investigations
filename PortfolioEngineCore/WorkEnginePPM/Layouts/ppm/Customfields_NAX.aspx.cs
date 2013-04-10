@@ -23,7 +23,7 @@ namespace WorkEnginePPM
                     dg.AddColumn(title: "Entity", width: 80, name: "ENTITY_NAME");
                     dg.AddColumn(title: "Name", width: 180, name: "FA_NAME");
                     dg.AddColumn(title: "Description", width: 200, name: "FA_DESC");
-                    dg.AddColumn(title: "Data Type", width: 80, name: "FA_FORMAT_NAME");
+                    dg.AddColumn(title: "Field Type", width: 80, name: "FA_FORMAT_NAME");
                     dg.AddColumn(title: "Table", width: 200, name: "TABLE_NAME");
                     dg.AddColumn(title: "Field", width: 100, name: "FIELD_NAME");
                     dg.AddColumn(title: "Lookup", width: 80);

@@ -16,90 +16,81 @@
 	<link id="pageStyles" href="styles/page.css" type="text/css" rel="stylesheet" />
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <div style="display:none;">
-        <asp:Button ID="btnSave" runat="server" Text="Button" OnClick="btnSave_Click" /></div>
-    <table width="100%">
-        <tr id="idWorkspaceArea">
-	        <td style="width:100%; vertical-align:top;">
-            <div>
-                <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
-                <div id="idToolbarDiv"></div>
-                <asp:Panel runat="server" ID="pnlMain">
-                    <table width="100%" cellspacing="0">
-                        <tr valign="top">
-                            <td width="450" class="controlcell">
-                                <b>Departments</b><br />
-                                Select the lookup to be used in Resource Planning.
-                            </td>
-                            <td class="controlcell">
-                                <asp:DropDownList ID="ddlDepartments" OnChange="ddlChanged('ddlDepartments');" runat="server"></asp:DropDownList>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <td width="450" class="controlcell">
-                                <b>Resource Roles</b><br />
-                                Select the lookup to be used for Resource Roles.
-                            </td>
-                            <td class="controlcell">
-                                <asp:DropDownList ID="ddlResourceRoles" OnChange="ddlChanged('ddlResourceRoles');" runat="server"></asp:DropDownList>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <td width="450" class="controlcell">
-                                <b>Resource Planning Calendar</b><br />
-                                Select the period calendar on which the resource plans will be based.
-                            </td>
-                            <td class="controlcell">
-                                <asp:DropDownList ID="ddlCalendar" OnChange="ddlChanged('ddlCalendar');" runat="server"></asp:DropDownList>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <td width="450" class="controlcell">
-                                <b>Resource Planning Display Mode</b><br />
-                                Select the default data input and display mode to be used for Resource Planning.
-                            </td>
-                            <td class="controlcell">
-                                <asp:DropDownList ID="ddldisplayMode" OnChange="ddlChanged('ddldisplayMode');" runat="server"></asp:DropDownList>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <td width="450" class="controlcell">
-                                <b>Resource Planning Operation Mode</b><br />
-                                Select the operation mode.
-                            </td>
-                            <td class="controlcell">
-                                <asp:DropDownList ID="ddlOperationMode" OnChange="ddlChanged('ddlOperationMode');" runat="server"></asp:DropDownList>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <td width="450" class="controlcell">
-                                <b>Resource Planning Total Hours</b><br />
-                                Select the custom field to store Total Hours.
-                            </td>
-                            <td class="controlcell">
-                                <asp:DropDownList ID="ddlTotalHours" OnChange="ddlChanged('ddlTotalHours');" runat="server"></asp:DropDownList>
-                            </td>
-                        </tr>
-                    </table>
-                </asp:Panel>
-                <!--<asp:Panel runat="server" ID="pnlNoUrl">
-                    The Integration URL has not been set. <a href="SPIntegration.aspx">Click here</a> to set.
-                </asp:Panel>-->
-            </div>
-            </td>
-        </tr>
-    </table>
+    <div style="display:none;"><asp:Button ID="btnSave" runat="server" Text="Button" OnClick="btnSave_Click" /></div>
+    <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
+    <div id="idToolbarDiv"></div>
+    <div>
+        <asp:Panel runat="server" ID="pnlMain">
+            <table width="100%" cellspacing="0">
+                <tr valign="top">
+                    <td width="450" class="controlcell">
+                        <b>Departments</b><br />
+                        Select the lookup to be used in Resource Planning.
+                    </td>
+                    <td class="controlcell">
+                        <asp:DropDownList ID="ddlDepartments" OnChange="ddlChanged('ddlDepartments');" runat="server"></asp:DropDownList>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <td width="450" class="controlcell">
+                        <b>Resource Roles</b><br />
+                        Select the lookup to be used for Resource Roles.
+                    </td>
+                    <td class="controlcell">
+                        <asp:DropDownList ID="ddlResourceRoles" OnChange="ddlChanged('ddlResourceRoles');" runat="server"></asp:DropDownList>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <td width="450" class="controlcell">
+                        <b>Resource Planning Calendar</b><br />
+                        Select the period calendar on which the resource plans will be based.
+                    </td>
+                    <td class="controlcell">
+                        <asp:DropDownList ID="ddlCalendar" OnChange="ddlChanged('ddlCalendar');" runat="server"></asp:DropDownList>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <td width="450" class="controlcell">
+                        <b>Resource Planning Display Mode</b><br />
+                        Select the default data input and display mode to be used for Resource Planning.
+                    </td>
+                    <td class="controlcell">
+                        <asp:DropDownList ID="ddldisplayMode" OnChange="ddlChanged('ddldisplayMode');" runat="server"></asp:DropDownList>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <td width="450" class="controlcell">
+                        <b>Resource Planning Operation Mode</b><br />
+                        Select the operation mode.
+                    </td>
+                    <td class="controlcell">
+                        <asp:DropDownList ID="ddlOperationMode" OnChange="ddlChanged('ddlOperationMode');" runat="server"></asp:DropDownList>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <td width="450" class="controlcell">
+                        <b>Resource Planning Total Hours</b><br />
+                        Select the custom field to store Total Hours.
+                    </td>
+                    <td class="controlcell">
+                        <asp:DropDownList ID="ddlTotalHours" OnChange="ddlChanged('ddlTotalHours');" runat="server"></asp:DropDownList>
+                    </td>
+                </tr>
+            </table>
+        </asp:Panel>
+    </div>
+
 <script type="text/javascript">
-    var toobarData = {
+    var toolbarData = {
         parent: "idToolbarDiv",
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", name: "Save", img: "addresource.gif", tooltip: "Save", width: "80px", onclick: "toolbar_event('btnSave');" }
+            { type: "button", name: "SAVE", img: "formatmap16x16_2.png", style: "top: -127px; left: -91px;", tooltip: "Save",  onclick: "toolbar_event('btnSave');" }
         ]
     };
     var selected = {};
-    var toolbar = new Toolbar(toobarData);
+    var toolbar = new Toolbar(toolbarData);
     var OnLoad = function (event) {
         toolbar.Render();
         var ddl = document.getElementById('<%=ddlDepartments.ClientID%>');
@@ -137,11 +128,12 @@
                     sb.appendLine("Press 'OK' to save your changes if you are certain");
                     var s = sb.toString();
                     var r = confirm (s);
-                    if (r != true)
+                    if (r != true) {
                         ddl.selectedIndex = selected.departmentIndex;
+                    }
                 }
                 break;
-            case "ddlCalendar":
+            case "ddlCalendar":
                 var ddl = document.getElementById('<%=ddlCalendar.ClientID%>');
                 if (ddl != null && ddl.selectedIndex >= 0 && selected.calendarIndex != ddl.selectedIndex) {
                     var sb = new StringBuilder("");
@@ -159,10 +151,9 @@
                 }
                 break;
             default:
-                //alert ("ddlChanged-" + ddlName);
                 break;
         }
-     };
+    };
 
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", OnLoad, true);

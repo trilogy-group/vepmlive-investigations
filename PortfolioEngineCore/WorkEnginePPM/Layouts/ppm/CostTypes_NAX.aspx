@@ -52,10 +52,6 @@ html, body {
 	<div style="margin-top:10px;padding-right:10px;">
 		<div style="padding-bottom:3px;">
             <table cellspacing="0">
-                <tr>
-                    <td style="height:1px;" class="topcell"></td>
-                    <td style="height:1px;" class="topcell"></td>
-                </tr>
                 <tr style="display:none;">
                     <td class="descriptioncell">Field Id</td>
                     <td class="controlcell"><input type="text" id="txtId" /></td>
@@ -147,7 +143,7 @@ html, body {
 				</tr>
             </table>
         </div>
-        <div id="idDeleteWarning" style="color:red; display:none;"><a>Are you sure, all data will be cleared?</a></div>
+        <div id="idDeleteWarning" style="width:300px; color:red; display:none;"><a>Are you sure, all data will be cleared?</a></div>
 		<div style="float:right;">
 			<div class="button-container" >
 			    <input id="idOKButton" type="button" class="epmliveButton" value="OK" onclick="costtypeDlg_event('ok');"/>
@@ -169,19 +165,16 @@ html, body {
 </div>
 <div class="modalContent" id="idSecurityDlg" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
-		<div style="padding-bottom:3px;">
-            <table width="100%" cellspacing="0">
-                <tr style="display:none;">
-                    <td width="250" class="descriptioncell">
-                        Field Id
-                    </td>
-                    <td class="controlcell">
-                        <input type="text" id="Text1" />
-                    </td>
-                </tr>
-            </table>
-		</div>
-
+        <table cellspacing="0" cellpadding="0">
+            <tr style="display:none;">
+                <td width="250" class="descriptioncell">
+                    Field Id
+                </td>
+                <td class="controlcell">
+                    <input type="text" id="Text1" />
+                </td>
+            </tr>
+        </table>
         <div style="display:block;"><tg1:TGridUserControl id="tgridSecurity" runat="server" /></div>
 		<div style="float:right;">
 			<div class="button-container" >
@@ -204,11 +197,11 @@ html, body {
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", id: "btnAdd", name: "Add", img: "addresource.gif", tooltip: "Add", width: "80px", onclick: "toolbar_event('btnAdd');" },
-            { type: "button", id: "btnModify", name: "Modify", img: "addresource.gif", tooltip: "Modify", width: "80px", onclick: "toolbar_event('btnModify');", disabled: true },
-            { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar_event('btnDelete');", disabled: true },
-            { type: "button", id: "btnCostTotals", name: "Cost Totals", img: "addresource.gif", tooltip: "Cost Totals", width: "80px", onclick: "toolbar_event('btnCostTotals');", disabled: true },
-            { type: "button", id: "btnSecurity", name: "Security", img: "addresource.gif", tooltip: "Security", width: "80px", onclick: "toolbar_event('btnSecurity');", disabled: true }
+            { type: "button", name: "ADD", img: "formatmap16x16_2.png", style: "top: -90px; left: -216px;", tooltip: "Add", onclick: "toolbar_event('btnAdd');" },
+            { type: "button", id: "btnModify", name: "MODIFY", img: "formatmap16x16_2.png", style: "top: -243px; left: -55px;", tooltip: "Modify", onclick: "return toolbar_event('btnModify');", disabled: true },
+            { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
+            { type: "button", id: "btnCostTotals", name: "COST TOTALS", img: "formatmap16x16_2.png", style: "top: -90px; left: -289px;", tooltip: "Cost Totals",  onclick: "toolbar_event('btnCostTotals');", disabled: true },
+            { type: "button", id: "btnSecurity", name: "SECURITY", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Security", onclick: "toolbar_event('btnSecurity');", disabled: true }
         ]
     };
 
@@ -225,24 +218,52 @@ html, body {
 
     function dgrid1_OnRowSelect(rowid, cellindex) {
         dgrid1_selectedRow = rowid;
-        toolbar.enableItem("btnModify");
-        toolbar.enableItem("btnDelete");
-        toolbar.enableItem("btnCostTotals");
-        toolbar.enableItem("btnSecurity");
+        if (rowid != null && rowid > 0) {
+            toolbar.enableItem("btnModify");
+            toolbar.enableItem("btnDelete");
+            toolbar.enableItem("btnCostTotals");
+            toolbar.enableItem("btnSecurity");
+        }
+        else {
+            toolbar.disableItem("btnModify");
+            toolbar.disableItem("btnDelete");
+            toolbar.disableItem("btnCostTotals");
+            toolbar.disableItem("btnSecurity");
+        }
     };
 
     function OnResize(event) {
         var top = dgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top - 5;
         dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - 5;
+        dgrid1.SetWidth(newWidth);
     };
-
-    function DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
+    function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        ResizeDialog(idWindow, idAttachObj);
+        window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
     };
-
+    function ResizeDialog(idWindow, idAttachObj) {
+        var obj = document.getElementById(idAttachObj);
+        var width = GetMaxWidth(obj) + 20;
+        var height = obj.offsetHeight;
+        var win = thiswins.window(idWindow);
+        win.setDimension(width + 13, height + 110);
+    };
+    function GetMaxWidth(obj) {
+        var width = 0;
+        var childDivs = obj.childNodes;
+        for( i=0; i< childDivs.length; i++ )
+        {
+            var childDiv = childDivs[i];
+            if (childDiv.offsetWidth > width)
+                width = childDiv.offsetWidth;
+        }
+        return width;
+    };
     function SetDialogHeight(idWindow, newHeight) {
         var dimension = thiswins.window(idWindow).getDimension();
         thiswins.window(idWindow).setDimension(dimension[0], newHeight);
@@ -301,9 +322,9 @@ html, body {
                 document.getElementById('txtId').value = costtype.CT_ID;
                 var tgridSecurity = window['<%=tgridSecurity.UID%>'];
                 tgridSecurity.Initialize(costtype.tgridSecurity);
-                tgridSecurity.SetWidth(250);
+                tgridSecurity.SetWidth(260);
                 tgridSecurity.SetHeight(180);
-                DisplayDialog(300, 300, "Security for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winSecurityDlg", "idSecurityDlg", true, false);
+                DisplayDialog(300, 270, "Security for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winSecurityDlg", "idSecurityDlg", true, false);
                 break;
             case "btnModify":
                 if (toolbar.isItemDisabled("btnModify") == true) {
@@ -348,6 +369,7 @@ html, body {
                 tgrid2.Initialize(costtype.tgridData);
                 tgrid2.SetWidth(440);
                 tgrid2.SetHeight(150);
+                tgrid2.addEventListener("OnClick", tgrid2_OnClick);
 
                 var select = document.getElementById("idFrmFields");
                 select.options.length = 0;
@@ -413,11 +435,49 @@ html, body {
         }
         return false;
     };
+    function tgrid2_OnClick(grid, row, col) {
+        if (col == "BC_UID_incl") {
+            if (row.firstChild != null)
+                window.setTimeout("SetChildrenCheckboxStates('" + row.id + "');", 10);
+            if (row.Level > 0) {
+                window.setTimeout("SetParentCheckboxStates('" + row.id + "');", 10);
+            }
+        }
+    };
+    function SetChildrenCheckboxStates(rowid) {
+        var tgrid2 = window['<%=tgrid2.UID%>'];
+        var grid = tgrid2.grid;
+        var row = grid.GetRowById(rowid);
+        if (row != null) {
+            var childrow = row.firstChild;
+            var cb = grid.GetAttribute(row, "BC_UID_incl", null);
+            while (childrow != null) {
+                grid.SetAttribute(childrow, null, "BC_UID_incl", cb, 1, 0);
+                if (childrow.firstChild != null)
+                    window.setTimeout("SetChildrenCheckboxStates('" + childrow.id + "');", 10);
+                childrow = childrow.nextSibling;
+            }
+        }
+    };
+    function SetParentCheckboxStates(rowid) {
+        var tgrid2 = window['<%=tgrid2.UID%>'];
+        var grid = tgrid2.grid;
+        var row = grid.GetRowById(rowid);
+        if (row != null && row.Level > 0) {
+            var cb = grid.GetAttribute(row, "BC_UID_incl", null);
+            if (cb == "1") {
+                var parentRow = row.parentNode;
+                grid.SetAttribute(parentRow, null, "BC_UID_incl", cb, 1, 0);
+                if (parentRow.Level > 0)
+                    window.setTimeout("SetParentCheckboxStates('" + parentRow.id + "');", 10);
+            }
+        }
+    };
     function AddColumnToFormula() {
         var select = document.getElementById("idFrmFields");
         if (select.selectedIndex >= 0){
             var formula = document.getElementById("idFormula");
-            insertAtCursor(formula, select.options[select.selectedIndex].innerText);
+            insertAtCursor(formula, select.options[select.selectedIndex].innerHTML);
         }
    };
    function insertAtCursor(myField, myValue) {
@@ -428,11 +488,13 @@ html, body {
             sel.text = myValue;
         }
         //MOZILLA/NETSCAPE support
-        else if (myField.selectionStart || myField.selectionStart == '0') {
+        else if (myField.selectionStart != myField.selectionEnd && typeof myField.selectionEnd != "undefined") {
+            //alert (myField.selectionStart + "::" + myField.selectionEnd);
             var startPos = myField.selectionStart;
             var endPos = myField.selectionEnd;
             myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
         } else {
+            //alert (myField.value + ":" + myValue);
             myField.value += myValue;
         }
     };
@@ -526,6 +588,7 @@ html, body {
                         // if deleted clear data from row
                         var sRowId = dgrid1_selectedRow;
                         dgrid1.deleteRow(sRowId);
+                        dgrid1_OnRowSelect(0);
                         break;
                 }
                 CloseDialog('winCosttypeDlg');

@@ -137,7 +137,7 @@ html, body {
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", id: "btnTest", name: "Test", img: "editview.gif", tooltip: "Test", width: "80px", onclick: "return toolbar_event('btnTest');" },
+            { type: "button", id: "btnTest", name: "Test", img: "editview.gif", tooltip: "Test", width: "60px", onclick: "return toolbar_event('btnTest');" },
             { type: "button", id: "btnRefresh", name: "Refresh", img: "editview.gif", tooltip: "Refresh", width: "80px", onclick: "return toolbar_event('btnRefresh');" },
             { type: "button", id: "btnCheck", name: "Check", img: "heart.gif", tooltip: "Check QueueManager Status", width: "80px", onclick: "return toolbar_event('btnCheck');" }
         ]
@@ -184,6 +184,8 @@ html, body {
         var top = dgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top - 5;
         dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - 5;
+        dgrid1.SetWidth(newWidth);
     };
     
     function  DisplayDialog (left, top, width, height, title, idWindow, idAttachObj, bModal, bResize) {

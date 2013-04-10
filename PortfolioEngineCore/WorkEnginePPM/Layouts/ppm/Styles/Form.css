@@ -4,38 +4,33 @@
 .topcell
 {
     vertical-align: top;
-    border-bottom: 1px solid silver;
+    /*border-bottom: 1px solid silver;*/
     padding: 0px;
-    border-bottom-color: #D8D8D8;
+    /*border-bottom-color: #D8D8D8;*/
                 
 }
 
 .descriptioncell
 {
-    /*font-family: Arial, Verdana, Helvetica, sans-serif;
-    font-size: 12px;*/
 	font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
 	font-size:13px;
 	font-weight:300;
 	color:#777;
     vertical-align: top;
-    border-bottom: 1px solid silver;
+    /*border-bottom: 1px solid silver;*/
     padding: 5px;
-    border-bottom-color: #D8D8D8;
+    /*border-bottom-color: #D8D8D8;*/
 }
 .controlcell
 {
-    /*font-family:  Arial, Verdana, Helvetica, sans-serif;
-    font-size: 12px;*/
 	font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
 	font-size:13px;
 	font-weight:300;
 	color:#777;
     vertical-align: top;
-    border-bottom: 1px solid silver;
+    /*border-bottom: 1px solid silver;*/
     padding: 5px;
-    border-bottom-color: #D8D8D8;
-    /*background-color: #EBF3FF;*/
+    /*border-bottom-color: #D8D8D8;*/
 }
 .button
 {

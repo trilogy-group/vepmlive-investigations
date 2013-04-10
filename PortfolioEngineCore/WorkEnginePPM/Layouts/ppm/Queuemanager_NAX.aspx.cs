@@ -36,17 +36,18 @@ namespace WorkEnginePPM
                     col.AddKeyValuePair(111, "Calc Availability");
                     col.AddKeyValuePair(112, "Calc Default FTEs");
                     col.AddKeyValuePair(100001, "Test");
-                    dg.AddColumn(title: "User Name", width: 180, name: "RES_NAME");
+                    dg.AddColumn(title: "Comment", width: 200, name: "JOB_COMMENT");
                     dg.AddColumn(title: "Submitted", width: 160, name: "JOB_SUBMITTED");
                     dg.AddColumn(title: "Started", width: 160, name: "JOB_STARTED");
                     dg.AddColumn(title: "Completed", width: 160, name: "JOB_COMPLETED");
-                    dg.AddColumn(title: "Error Code", width: 80, name: "JOB_ERRORCODE");
                     col = dg.AddColumn(title: "Status", width: 140, name: "JOB_STATUS");
                     col.AddKeyValuePair(-2, "Completed with Errors");
                     col.AddKeyValuePair(-1, "Completed");
                     col.AddKeyValuePair(0, "Not Started");
                     col.AddKeyValuePair(1, "Started");
-                    dg.AddColumn(title: "Comment", width: 200, name: "JOB_COMMENT");
+                    dg.AddColumn(title: "Error", width: 40, name: "JOB_ERRORCODE");
+                    dg.AddColumn(title: "Status Message", width: 200, name: "JMG_MESSAGE");
+                    dg.AddColumn(title: "User Name", width: 180, name: "RES_NAME");
 
                     DataTable dt;
                     DateTime dtTo = DateTime.Now;

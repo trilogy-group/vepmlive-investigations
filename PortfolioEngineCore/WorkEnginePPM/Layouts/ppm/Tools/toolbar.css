@@ -39,8 +39,6 @@ border-width: 0px 0px;
 margin:0px;
 background-color:#ffffff;
 height:31px;
-width:100%;
-    
 }
 
 .toolbar-button:hover
@@ -76,11 +74,18 @@ text-decoration: none;
 }
 
 .toolbar-button-image {
-margin: 0px 5px 0px 0px;
-height: 16px;
-width: 16px;
+	position: absolute;
+    margin: 0px 5px 0px 0px;
+	overflow: hidden;
 }
 
+.toolbar-button-image-span{margin-top:5px;margin-right:3px;margin-bottom:4px;margin-left:0px;position:relative;overflow:hidden;text-align:left;z-index:10;height: 16px;
+width: 16px;
+display:inline-block;
+}.toolbar-button-image-span img{position:absolute;z-index:5;}
+.toolbar-button-image-span-2{margin-top:7px;margin-right:2px;margin-bottom:0px;margin-left:0px;position:relative;overflow:hidden;display:inline-block;
+vertical-align: top;
+}
 input[type="button"], input[type="reset"], input[type="submit"], button {
 font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
 font-size: 11px;

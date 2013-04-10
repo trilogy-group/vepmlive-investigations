@@ -39,55 +39,53 @@ html, body {
 <div class="modalContent" id="idCustomfieldDlg" style="display:none;">
     <input id="idCustomfieldDlgMode" type="hidden" value="" />
 	<div style="margin-top:10px;padding-right:10px;">
-		<div style="padding-bottom:3px;">
-            <table width="100%" cellspacing="0">
-                <tr>
-                    <td style="height:1px;" width="250" class="topcell"></td>
-                    <td style="height:1px;" class="topcell"></td>
-                </tr>
-                <tr style="display:none;">
-                    <td width="250" class="descriptioncell">
-                        Field Id
-                    </td>
-                    <td class="controlcell">
-                        <input type="text" id="txtId" />
-                    </td>
-                </tr>
-                <tr>
-                    <td width="250" class="descriptioncell">
-                        <label for="txtName">Name</label>
-                    </td>
-                    <td class="controlcell">
-                        <input type="text" id="txtName" style="width:200px;" />
-                    </td>
-                </tr>
-                <tr>
-                    <td width="250" class="descriptioncell">
-                        Lookup Table</td>
-                    <td class="controlcell">
-                        <select id="idLookups" style="width:206px;"  onchange="customfieldDlg_event('lookupChanged');"></select>
-                   </td>
-                </tr>
-                <tr>
-                    <td width="250" class="descriptioncell">
-                        <label for="cbLeafOnly">Restrict selection to leaf entries</label>
-                    </td>
-                    <td class="controlcell">
-                        <input type="checkbox" id="cbLeafOnly" />
-                    </td>
-                </tr>
-                <tr>
-                    <td width="250" class="descriptioncell">
-                        <label for="cbUseFullName">Use Full Name</label>
-                    </td>
-                    <td class="controlcell">
-                        <input type="checkbox" id="cbUseFullName" />
-                    </td>
-                </tr>
-            </table>
-		</div>
+        <table cellspacing="0">
+            <tr>
+                <td style="height:1px;" width="250" class="topcell"></td>
+                <td style="height:1px;" class="topcell"></td>
+            </tr>
+            <tr style="display:none;">
+                <td width="250" class="descriptioncell">
+                    Field Id
+                </td>
+                <td class="controlcell">
+                    <input type="text" id="txtId" />
+                </td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                    <label for="txtName">Name</label>
+                </td>
+                <td class="controlcell">
+                    <input type="text" id="txtName" style="width:200px;" />
+                </td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                    Lookup Table</td>
+                <td class="controlcell">
+                    <select id="idLookups" style="width:206px;"  onchange="customfieldDlg_event('lookupChanged');"></select>
+                </td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                    <label for="cbLeafOnly">Restrict selection to leaf entries</label>
+                </td>
+                <td class="controlcell">
+                    <input type="checkbox" id="cbLeafOnly" />
+                </td>
+            </tr>
+            <tr>
+                <td width="250" class="descriptioncell">
+                    <label for="cbUseFullName">Use Full Name</label>
+                </td>
+                <td class="controlcell">
+                    <input type="checkbox" id="cbUseFullName" />
+                </td>
+            </tr>
+        </table>
         <div style="display:block;"><tg1:TGridUserControl id="tgrid2" runat="server" /></div>
-        <div id="idDeleteWarning" style="color:red; padding:10px; display:none;"><a>Are you sure, all data will be cleared?</a></div>
+        <div id="idDeleteWarning" style="width:300px; color:red; padding:10px; display:none;"><a>Are you sure, all data will be cleared?</a></div>
 		<div style="float:right;">
 			<div class="button-container" >
 			    <input id="idOKButton" type="button" class="epmliveButton" value="OK" onclick="customfieldDlg_event('ok');"/>
@@ -110,8 +108,8 @@ html, body {
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", id: "btnModify", name: "Modify", img: "addresource.gif", tooltip: "Modify", width: "80px", onclick: "toolbar_event('btnModify');", disabled: true },
-            { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar_event('btnDelete');", disabled: true }
+            { type: "button", id: "btnModify", name: "MODIFY", img: "formatmap16x16_2.png", style: "top: -243px; left: -55px;", tooltip: "Modify", onclick: "return toolbar_event('btnModify');", disabled: true },
+            { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true }
         ]
     };
 
@@ -140,12 +138,34 @@ html, body {
         var top = dgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top - 5;
         dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - 5;
+        dgrid1.SetWidth(newWidth);
     };
 
-    function DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
+    function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        ResizeDialog(idWindow, idAttachObj);
+        window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
+    };
+    function ResizeDialog(idWindow, idAttachObj) {
+        var obj = document.getElementById(idAttachObj);
+        var width = GetMaxWidth(obj) + 20;
+        var height = obj.offsetHeight;
+        var win = thiswins.window(idWindow);
+        win.setDimension(width + 13, height + 110);
+    };
+    function GetMaxWidth(obj) {
+        var width = 0;
+        var childDivs = obj.childNodes;
+        for( i=0; i< childDivs.length; i++ )
+        {
+            var childDiv = childDivs[i];
+            if (childDiv.offsetWidth > width)
+                width = childDiv.offsetWidth;
+        }
+        return width;
     };
 
     function CloseDialog (idWindow) {
@@ -203,7 +223,7 @@ html, body {
                 }
                 var tgrid2 = window['<%=tgrid2.UID%>'];
                 tgrid2.Initialize(json.reply.customfield.tgridData);
-                tgrid2.SetWidth(380);
+                tgrid2.SetWidth(365);
                 tgrid2.SetHeight(150);
                 document.getElementById('idDeleteWarning').style.display = "none";
                 document.getElementById('idOKButton').value = "Save";
@@ -243,7 +263,7 @@ html, body {
                 document.getElementById('cbUseFullName').checked = (customfield.FA_USEFULLNAME == 1);
                 var tgrid2 = window['<%=tgrid2.UID%>'];
                 tgrid2.Initialize(json.reply.customfield.tgridData);
-                tgrid2.SetWidth(380);
+                tgrid2.SetWidth(365);
                 tgrid2.SetHeight(150);
                 document.getElementById('idDeleteWarning').style.display = "block";
                 document.getElementById('idOKButton').value = "Delete";

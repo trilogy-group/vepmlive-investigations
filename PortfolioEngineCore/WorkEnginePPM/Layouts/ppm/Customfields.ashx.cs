@@ -218,26 +218,19 @@ namespace WorkEnginePPM
                 int nFieldType = xData.GetIntAttr("FA_FORMAT");
                 string sFormula = xData.GetStringAttr("formula");
                 try
-                {
-                    if (sFormula != "")
-                    {
-                        sReply = dbaCustomFields.ValidateAndSaveCustomFieldFormula(dba, nFieldId, ref sFormula, true);
-                        if (sReply != "")
-                        {
-                            dba.Close();
-                            return sReply;
-                        }
-                    }
-                    
-                    
-                    
+                {                    
                     if (dbaCustomFields.UpdateCustomFieldInfo(dba, nEntity, nFieldType, ref nFieldId, sFieldName, sFieldDesc, out sReply) != StatusEnum.rsSuccess)
                     {
                         if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "Customfields.UpdateCustomFieldInfo", dba.StatusText);
                     }
                     else
                     {
-                        sReply = ReadCustomFieldInfo(dba, nFieldId);
+                        //if (sFormula != "")  // wasn't replaccing with new empty formula
+                        sReply = dbaCustomFields.ValidateAndSaveCustomFieldFormula(dba, nFieldId, ref sFormula, true);
+                        if (sReply == "")
+                        {
+                            sReply = ReadCustomFieldInfo(dba, nFieldId);
+                        }
                     }
                 }
                 catch (Exception ex)

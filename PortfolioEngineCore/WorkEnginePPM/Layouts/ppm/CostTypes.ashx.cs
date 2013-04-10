@@ -82,7 +82,7 @@ namespace WorkEnginePPM
         private static void InitializeSecurityColumns(_TGrid tg)
         {
             tg.AddColumn(title: "ID", width: 50, name: "GROUP_ID", isId: true, hidden: true);
-            tg.AddColumn(title: "Name", width: 150, name: "GROUP_NAME", maincol: true, editable: false);
+            tg.AddColumn(title: "Permission Group", width: 150, name: "GROUP_NAME", maincol: true, editable: false);
             tg.AddColumn(title: "Read", width: 50, name: "DS_READ", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
             tg.AddColumn(title: "Edit", width: 50, name: "DS_EDIT", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
         }
@@ -295,7 +295,7 @@ namespace WorkEnginePPM
                     dbaCostTypes.SelectBudgetTotalList(dba, out dt);
                     _DGrid dg = new _DGrid();
                     dg.AddColumn(title: "ID", width: 50, name: "CB_ID", isId: true, hidden: true, type: _DGrid.Type.number);
-                    dg.AddColumn(title: "Name", width: 200, name: "CB_NAME");
+                    dg.AddColumn(title: "Calendar", width: 200, name: "CB_NAME");
                     _DGrid.DCol col = dg.AddColumn(title: "Total Field", width: 200, name: "BUDGET_TOTAL_FIELD", editable: true, type: _DGrid.Type.combo);
                     col.AddKeyValuePair(0, "[None]");
                     foreach (DataRow row in dt.Rows)

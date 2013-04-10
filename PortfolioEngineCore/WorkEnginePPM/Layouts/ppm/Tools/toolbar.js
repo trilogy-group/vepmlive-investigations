@@ -107,18 +107,28 @@
             if (item.style != null)
                 style = item.style;
             var itemstyle = "";
-            if (style != "" || width != "")
-                itemstyle = " style='" + width + style + "' ";
+//            if (style != "" || width != "")
+//                itemstyle = " style='" + width + style + "' ";
+            if (style != "")
+                itemstyle = " style='" + style + "' ";
 
             switch (item.type) {
                 case "button":
                     item.className = "toolbar-button";
                     classname = item.className + classdisabled;
-                    sb.append("<td class='toolbar-item-td' " + itemstyle + ">");
+                    sb.append("<td class='toolbar-item-td' >");
                     sb.append("<a class='toolbar-button-link' >");
                     sb.append("<button" + id + " type='button' title='" + itemname + "' class='" + classname + "' " + onclick + ">");
-                    sb.append("<img style='vertical-align: middle;' class='toolbar-button-image' alt='" + itemname + "' src='" + this.toolbarData.imagePath + item.img + "'/>");
-                    sb.append("<span style='vertical-align: middle;' >" + itemname + "</span>");
+                    //sb.append("<span>");
+                    sb.append("<span class='toolbar-button-image-span'>");
+                    sb.append("<img alt='' src='" + this.toolbarData.imagePath + item.img + "' " + itemstyle + "/>");
+                    sb.append("</span>");
+                    //sb.append("</span>");
+                    //sb.append("<span class='ms-cui-ctl-mediumlabel'>" + itemname + "</span>");
+
+//                    sb.append("<img style='vertical-align: middle;' class='toolbar-button-image' alt='" + itemname + "' src='" + this.toolbarData.imagePath + item.img + "'/>");
+                    sb.append("<span class='toolbar-button-image-span-2' >" + itemname + "</span>");
+
                     sb.append("</button>");
                     sb.append("</a>");
                     sb.append("</td>");

@@ -729,7 +729,10 @@ namespace WorkEnginePPM
 
 
                                         otempres = opi.PMdlg.wres_res;
-                                        pmlist.Add(otempres.id, otempres);
+
+                                        if (otempres != null)
+                                            pmlist.Add(otempres.id, otempres);
+
                                         foreach (RPEN_Resource xtempres in opi.PMdlg.wres_delg.Values)
                                         {
                                             pmlist.Add(xtempres.id, xtempres);

@@ -35,72 +35,65 @@ html, body {
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 <div class="modalContent" id="idCustomfieldDlg" style="display:none;">
     <input id="idCustomfieldDlgMode" type="hidden" value="" />
-	<div>
-        <table style="width:100%;" cellspacing="0" cellpadding="0">
-            <tr>
-                <td style="height:1px;" class="topcell"></td>
-                <td style="height:1px;" class="topcell"></td>
-            </tr>
-            <tr style="display:none;">
-                <td class="descriptioncell">
-                    Field Id
-                </td>
-                <td class="controlcell">
-                    <input type="text" id="txtId" />
-                </td>
-            </tr>
-            <tr>
-                <td class="descriptioncell">
-                    Entity</td>
-                <td class="controlcell">
-                    <select id="idEntity" style="width:206px;" onchange="idEntity_OnChange();">
-                        <option value='2'>Portfolio</option><option value='1'>Resource</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td class="descriptioncell">
-                    <label for="txtName">Field Name</label>
-                </td>
-                <td class="controlcell">
-                    <input type="text" id="txtName" style="width:200px;" />
-                </td>
-            </tr>
-            <tr>
-                <td class="descriptioncell">
-                    Field Description
-                </td>
-                <td class="controlcell">
-                        <input type="text" id="txtDesc" style="Width:200px;"/>
-                </td>
-            </tr>
-            <tr>
-                <td class="descriptioncell">
-                    Field Type</td>
-                <td class="controlcell">
-                    <select id="idFieldType" style="width:206px;" onchange="idFieldType_OnChange();">
-                        <option value='9'>Text</option>
-                        <option value='3'>Number (optional calculation)</option>
-                        <option value='8'>Cost (optional calculation)</option>
-                        <option value='13'>Flag</option>
-                        <option value='1'>Date</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-	</div>
-    <div id="idFormulaBox" style="display:none; padding-top: 10px; padding-bottom: 10px;">
-		<table style="width:100%;" border="0" cellspacing="0">
+    <table cellspacing="0" cellpadding="0">
+        <tr>
+            <td style="height:1px;" class="topcell"></td>
+            <td style="height:1px;" class="topcell"></td>
+        </tr>
+        <tr style="display:none;">
+            <td class="descriptioncell">
+                Field Id
+            </td>
+            <td class="controlcell">
+                <input type="text" id="txtId" />
+            </td>
+        </tr>
+        <tr>
+            <td class="descriptioncell">
+                Entity</td>
+            <td class="controlcell">
+                <select id="idEntity" style="width:206px;" onchange="idEntity_OnChange();">
+                    <option value='2'>Portfolio</option><option value='1'>Resource</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="descriptioncell">
+                <label for="txtName">Field Name</label>
+            </td>
+            <td class="controlcell">
+                <input type="text" id="txtName" style="width:200px;" />
+            </td>
+        </tr>
+        <tr>
+            <td class="descriptioncell">
+                Field Description
+            </td>
+            <td class="controlcell">
+                    <input type="text" id="txtDesc" style="Width:200px;"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="descriptioncell">
+                Field Type</td>
+            <td class="controlcell">
+                <select id="idFieldType" style="width:206px;" onchange="idFieldType_OnChange();">
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div id="idFormulaBox" style="width:416px; display:none; padding-top: 10px; padding-bottom: 10px;">
+		<table border="0" cellspacing="0">
 			<tr>
 				<td class="ms-propertysheet"> <label for="idFormula">Formula (optional):</label><!-- --> </td>
                 <td class="ms-propertysheet"> <label for="idFrmFields">Insert Column:</label><!-- --> </td>
 			</tr>
 			<tr>
 				<td class="ms-propertysheet" nowrap="nowrap">
-					<textarea  class="ms-formula" name="Formula" style="height: 95px !important; width: 200px !important; padding: 3px;" rows="5" cols="24" id="idFormula" dir="ltr"></textarea>
+					<textarea  class="ms-formula" name="Formula" style="height: 95px !important; width: 200px; padding: 3px;" rows="5" cols="24" id="idFormula" dir="ltr"></textarea>
 				</td>
 				<td>
-					<select name="FrmFields" size="7" id="idFrmFields" style="width: 200px !important; padding: 3px;" ondblclick="javascript:AddColumnToFormula()" >
+					<select name="FrmFields" size="7" id="idFrmFields" style="width: 200px; padding: 3px;" ondblclick="javascript:AddColumnToFormula();" >
 					</select>
 				</td>
 			</tr>
@@ -114,7 +107,7 @@ html, body {
 			</tr>
         </table>
     </div>
-    <div id="idDeleteWarning" style="color:red; display:none;"><a>Are you sure, all data will be cleared?</a></div>
+    <div id="idDeleteWarning" style="width:300px; color:red; display:none;"><a>Are you sure, all data will be cleared?</a></div>
 	<div class="button-container" >
 		<input id="idOKButton" type="button" class="epmliveButton" value="OK" onclick="customfieldDlg_event('ok');"/>
 		<input type="button" class="epmliveButton" value="Cancel" onclick="customfieldDlg_event('cancel');"/>
@@ -126,21 +119,17 @@ html, body {
 <dg1:DGridUserControl id="dgrid1" runat="server" />
 </div>
 <script type="text/javascript">
-    var shortDlgHeight = 250;
-    var tallDlgHeight = 420;
     var toobarData = {
         parent: "idToolbarDiv",
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", name: "Add", img: "addresource.gif", tooltip: "Add", width: "80px", onclick: "toolbar_event('btnAdd');" },
-            { type: "button", id: "btnModify", name: "Modify", img: "editview.gif", tooltip: "Modify", width: "80px", onclick: "return toolbar_event('btnModify');", disabled: true },
-            { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar_event('btnDelete');", disabled: true }
+            { type: "button", name: "ADD", img: "formatmap16x16_2.png", style: "top: -90px; left: -216px;", tooltip: "Add", onclick: "toolbar_event('btnAdd');" },
+            { type: "button", id: "btnModify", name: "MODIFY", img: "formatmap16x16_2.png", style: "top: -243px; left: -55px;", tooltip: "Modify", onclick: "return toolbar_event('btnModify');", disabled: true },
+            { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true }
         ]
     };
-
     var toolbar = new Toolbar(toobarData);
-    
     var dgrid1 = window.<%=dgrid1.UID%>;
     var dgrid1_selectedRow = 0;
     var OnLoad = function (event) {
@@ -148,7 +137,6 @@ html, body {
         dgrid1.addEventListener("onRowSelect", dgrid1_OnRowSelect);
         OnResize();
     };
-    
     function idFieldType_OnChange() {
         var entity=document.getElementById('idEntity').value;
         var fieldtype=document.getElementById('idFieldType').value;
@@ -156,14 +144,34 @@ html, body {
         var formulaBox = document.getElementById('idFormulaBox');
         if (entity == 2 && (fieldtype==3 || fieldtype==8)) {
             formulaBox.style.display = 'block';
-            SetDialogHeight("winCustomfieldDlg", tallDlgHeight);
         }
         else {
             formulaBox.style.display = 'none';
-            SetDialogHeight("winCustomfieldDlg", shortDlgHeight);
+        }
+        ResizeDialog("winCustomfieldDlg", "idCustomfieldDlg");
+    };
+    function PopulateFieldTypes(entity) {
+        var select = document.getElementById("idFieldType");
+        select.options.length = 0;
+        if (entity == 2) {
+            select.options[select.options.length] = new Option("Text", "9");
+            select.options[select.options.length] = new Option("Number (optional calculation)", "3");
+            select.options[select.options.length] = new Option("Cost (optional calculation)", "8");
+            select.options[select.options.length] = new Option("Flag", "13");
+            select.options[select.options.length] = new Option("Date", "1");
+        }
+        else {
+            select.options[select.options.length] = new Option("Text", "9");
+            select.options[select.options.length] = new Option("Number", "3");
+            select.options[select.options.length] = new Option("Cost", "8");
+            select.options[select.options.length] = new Option("Flag", "13");
+            select.options[select.options.length] = new Option("Date", "1");
         }
     };
+
     function idEntity_OnChange() {
+        var entity=document.getElementById('idEntity').value;
+        PopulateFieldTypes(entity);
         idFieldType_OnChange();
     };
     function SelectAll(id) {
@@ -181,28 +189,41 @@ html, body {
             toolbar.disableItem("btnDelete");
         }
     };
-
     var OnResize = function (event) {
         var top = dgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top - 5;
         dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - 5;
+        dgrid1.SetWidth(newWidth);
     };
-    
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        ResizeDialog(idWindow, idAttachObj);
+        window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
     };
-    
-    function  SetDialogHeight(idWindow, newHeight) {
-        var dimension = thiswins.window(idWindow).getDimension();
-        thiswins.window(idWindow).setDimension(dimension[0], newHeight);
+    function ResizeDialog(idWindow, idAttachObj) {
+        var obj = document.getElementById(idAttachObj);
+        var width = GetMaxWidth(obj) + 20;
+        var height = obj.offsetHeight;
+        var win = thiswins.window(idWindow);
+        win.setDimension(width + 13, height + 110);
     };
-
+    function GetMaxWidth(obj) {
+        var width = 0;
+        var childDivs = obj.childNodes;
+        for( i=0; i< childDivs.length; i++ )
+        {
+            var childDiv = childDivs[i];
+            if (childDiv.offsetWidth > width)
+                width = childDiv.offsetWidth;
+        }
+        return width;
+    };
     function CloseDialog (idWindow) {
         jsf_closeDialog(thiswins, idWindow)
     };
-
     function SendRequest(sXML) {
          sURL = "./Customfields.ashx";
          return jsf_sendRequest(sURL, sXML);
@@ -212,8 +233,7 @@ html, body {
         if (val == null)
             return "";
         return val.toString();
-    }
-
+    };
     function toolbar_event(event) {
         var sRowId = "";
         document.getElementById('idCustomfieldDlgMode').value = event;
@@ -243,10 +263,13 @@ html, body {
                 document.getElementById('txtName').value = GetStringFromValue(json.reply.customfield.FA_NAME);
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.customfield.FA_DESC);
                 var entity = json.reply.customfield.ENTITY_ID;
+                PopulateFieldTypes(entity);
                 document.getElementById('idEntity').value = entity;
-                document.getElementById('idEntity').disabled = bModify;
                 var fieldFormat = json.reply.customfield.FA_FORMAT;
                 document.getElementById('idFieldType').value = fieldFormat;
+                document.getElementById('txtName').disabled = false;
+                document.getElementById('txtDesc').disabled = false;
+                document.getElementById('idEntity').disabled = bModify;
                 document.getElementById('idFieldType').disabled = bModify;
 
                 document.getElementById('idDeleteWarning').style.display = "none";
@@ -265,17 +288,17 @@ html, body {
                     }
                 }
                 var formulaBox = document.getElementById('idFormulaBox');
-                formulaBox.value="";
+                document.getElementById('idFormula').value = "";
+                //formulaBox.value="";
                 if (entity == 2 && (fieldFormat == 3 || fieldFormat == 8)) {
                     formulaBox.style.display = 'block';
                     var sFormula = GetStringFromValue(json.reply.customfield.formula);
                     document.getElementById('idFormula').value = sFormula;
-                    DisplayDialog(445, tallDlgHeight, dlgTitle, "winCustomfieldDlg", "idCustomfieldDlg", true, false);
                 }
                 else {
                     formulaBox.style.display = 'none';
-                    DisplayDialog(445, shortDlgHeight, dlgTitle, "winCustomfieldDlg", "idCustomfieldDlg", true, false);
                 }
+                DisplayDialog(445, 350, dlgTitle, "winCustomfieldDlg", "idCustomfieldDlg", true, false);
                 break;
             case "btnDelete":
                 if (toolbar.isItemDisabled("btnDelete") == true) {
@@ -290,14 +313,16 @@ html, body {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
                 }
+                var entity = json.reply.customfield.ENTITY_ID;
+                PopulateFieldTypes(entity);
                 document.getElementById('txtId').value = json.reply.customfield.FA_FIELD_ID;
                 document.getElementById('txtName').value = GetStringFromValue(json.reply.customfield.FA_NAME);
-                document.getElementById('txtName').disabled = true;
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.customfield.FA_DESC);
-                document.getElementById('txtDesc').disabled = true;
-                document.getElementById('idEntity').value = json.reply.customfield.ENTITY_ID;
-                document.getElementById('idEntity').disabled = true;
+                document.getElementById('idEntity').value = entity;
                 document.getElementById('idFieldType').value = json.reply.customfield.FA_FORMAT;
+                document.getElementById('txtName').disabled = true;
+                document.getElementById('txtDesc').disabled = true;
+                document.getElementById('idEntity').disabled = true;
                 document.getElementById('idFieldType').disabled = true;
                 
                 document.getElementById('idDeleteWarning').style.display = "block";
@@ -305,16 +330,16 @@ html, body {
 
                 var formulaBox = document.getElementById('idFormulaBox');
                 formulaBox.style.display = 'none';
-                DisplayDialog(445, shortDlgHeight+10, "Delete Custom Field - " + json.reply.customfield.FA_NAME, "winCustomfieldDlg", "idCustomfieldDlg", true, false);
+                DisplayDialog(445, 360, "Delete Custom Field - " + json.reply.customfield.FA_NAME, "winCustomfieldDlg", "idCustomfieldDlg", true, false);
                 break;
         }
         return false;
     };
     function AddColumnToFormula() {
         var select = document.getElementById("idFrmFields");
-        if (select.selectedIndex >= 0){
+        if (select != null && select.selectedIndex >= 0){
             var formula = document.getElementById("idFormula");
-            insertAtCursor(formula, select.options[select.selectedIndex].innerText);
+            insertAtCursor(formula, select.options[select.selectedIndex].innerHTML);
         }
    };
    function insertAtCursor(myField, myValue) {
@@ -325,11 +350,13 @@ html, body {
             sel.text = myValue;
         }
         //MOZILLA/NETSCAPE support
-        else if (myField.selectionStart || myField.selectionStart == '0') {
+        else if (myField.selectionStart != myField.selectionEnd && typeof myField.selectionEnd != "undefined") {
+            //alert (myField.selectionStart + "::" + myField.selectionEnd);
             var startPos = myField.selectionStart;
             var endPos = myField.selectionEnd;
             myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
         } else {
+            //alert (myField.value + ":" + myValue);
             myField.value += myValue;
         }
     };

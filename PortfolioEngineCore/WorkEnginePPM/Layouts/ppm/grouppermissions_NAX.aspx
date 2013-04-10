@@ -109,10 +109,10 @@ html, body {
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", name: "Add", img: "addresource.gif", tooltip: "Add", width: "80px", onclick: "toolbar_event('btnAdd');" },
-            { type: "button", id: "btnModify", name: "Modify", img: "editview.gif", tooltip: "Modify", width: "80px", onclick: "return toolbar_event('btnModify');", disabled: true },
-            { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar_event('btnDelete');", disabled: true },
-            { type: "button", id: "btnMembers", name: "Members", img: "Add.png", tooltip: "Group Members", width: "80px", onclick: "return toolbar_event('btnMembers');", disabled: true }
+            { type: "button", name: "ADD", img: "formatmap16x16_2.png", style: "top: -90px; left: -216px;", tooltip: "Add", onclick: "toolbar_event('btnAdd');" },
+            { type: "button", id: "btnModify", name: "MODIFY", img: "formatmap16x16_2.png", style: "top: -243px; left: -55px;", tooltip: "Modify", onclick: "return toolbar_event('btnModify');", disabled: true },
+            { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
+            { type: "button", id: "btnMembers", name: "MEMBERS", img: "formatmap16x16_2.png", style: "top: -90px; left: -252px;", tooltip: "Group Members", onclick: "return toolbar_event('btnMembers');", disabled: true }
         ]
     };
 
@@ -129,15 +129,24 @@ html, body {
 
     function dgrid1_OnRowSelect(rowid, cellindex) {
         dgrid1_selectedRow = rowid;
-        toolbar.enableItem("btnModify");
-        toolbar.enableItem("btnDelete");
-        toolbar.enableItem("btnMembers");
+        if (rowid != null && rowid > 0) {
+            toolbar.enableItem("btnModify");
+            toolbar.enableItem("btnDelete");
+            toolbar.enableItem("btnMembers");
+        }
+        else {
+            toolbar.disableItem("btnModify");
+            toolbar.disableItem("btnDelete");
+            toolbar.disableItem("btnMembers");
+        }
     };
 
     var OnResize = function (event) {
         var top = dgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top - 5;
         dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - 5;
+        dgrid1.SetWidth(newWidth);
     };
 
     function SendRequest(sXML) {
@@ -267,6 +276,8 @@ html, body {
                         var val = document.getElementById('txtName').value;
                         dgrid1.SetCellValue(sRowId, "GROUP_NAME", val);
                         dgrid1.SetCellValue(sRowId, "GROUP_NOTES", document.getElementById('txtDesc').value);
+                        dgrid1.reapplySort();
+                        dgrid1.selectRow(sRowId);
                         break;
                     case "btnDelete":
                         //alert("btnDelete.OK");
@@ -291,7 +302,8 @@ html, body {
                         // if deleted  then remove row from grid
                         var sRowId = dgrid1_selectedRow;
                         dgrid1.deleteRow(sRowId);
-                        break;
+                        dgrid1_OnRowSelect(0);
+                   break;
                 }
                 CloseDialog('winGroupPermissionsDlg');
                 break;

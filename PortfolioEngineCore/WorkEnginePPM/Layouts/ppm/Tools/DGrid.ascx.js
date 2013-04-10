@@ -50,11 +50,13 @@
     DGrid.prototype.SetHeight = function (h) {
         var div = document.getElementById(params.grid_div);
         div.style.height = h + "px";
+        this.grid.setSizes();
     };
 
     DGrid.prototype.SetWidth = function (w) {
         var div = document.getElementById(params.grid_div);
         div.style.width = w + "px";
+        this.grid.setSizes();
     };
 
     DGrid.prototype.findAbsolutePosition = function (obj) {
