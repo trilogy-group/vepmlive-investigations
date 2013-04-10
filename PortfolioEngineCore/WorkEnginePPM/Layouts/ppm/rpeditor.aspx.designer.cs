@@ -10,7 +10,7 @@
 namespace WorkEnginePPM {
     
     
-    public partial class rpeditor {
+    public partial class RPEditorASPX {
         
         /// <summary>
         /// PlaceHolder1 control.

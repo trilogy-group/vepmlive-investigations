@@ -81,19 +81,19 @@
                 alert(result.Message);
             switch (parseInt(result.Status)) {
                 case 50: /* rsSecurityAccessDenied */
-                    window.setTimeout("SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');", 100);
+                    window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
                     return;
                 case 51: /* rsSecurityNoProjects */
-                    window.setTimeout("SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');", 100);
+                    window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
                     return;
                 case 52: /* rsSecurityNoResources */
-                    window.setTimeout("SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');", 100);
+                    window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
                     return;
             }
             var error = result.Error;
             if (error != null) {
                 alert(error.Value);
-                window.setTimeout("SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');", 100);
+                window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
                 return;
             }
             var func = result.Function;
@@ -187,7 +187,7 @@
                     var docurl = document.location.pathname.replace("rpeditor", "rpanalyzer");
                     var weburl = docurl + "?dataid=" + result.Ticket + "&IsDlg=1&rpemode=1";
                     var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: dialogCallbackDelegate };
-                    SP.UI.ModalDialog.showModalDialog(options);
+                    parent.SP.UI.ModalDialog.showModalDialog(options);
                     break;
                 default:
                     alert("ExecuteComplete unknown reply - " + jsonString);
@@ -702,7 +702,7 @@
                 }
             } else {
                 alert("No Cost Category Roles have been configured.\n\nPlease contact your System Administrator for more information.");
-                window.setTimeout("SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');", 100);
+                window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
                 return;
             }
 
@@ -2415,10 +2415,10 @@
                         }
                         if (b) {
                             this.ExitConfirmed = true;
-                            if (SP.UI.DialogResult)
-                                SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+                            if (parent.SP.UI.DialogResult)
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
                             else
-                                SP.UI.ModalDialog.commonModalDialogClose(1, '');
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
                         }
                         break;
                     }

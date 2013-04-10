@@ -34,7 +34,7 @@ using Microsoft.SharePoint.WebControls;
 
 namespace WorkEnginePPM
 {
-    public partial class rpeditor : LayoutsPageBase
+    public partial class RPEditorASPX : LayoutsPageBase
     {
         protected string strOutput = "";
         protected string RPETitle = "";
