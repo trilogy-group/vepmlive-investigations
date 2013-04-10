@@ -437,14 +437,16 @@ namespace PortfolioEngineCore.PortfolioItems
 
                 StatusEnum eStatus = StatusEnum.rsSuccess;
 
-                CStruct xEPKUpdate = new CStruct();
-                xEPKUpdate.Initialize("UpdatePortfolioItems");
-                ExportPIInfo(_dba, pids, xEPKUpdate);
-                xEPKUpdate.CreateInt("HRESULT", 0);
-                xEPKUpdate.CreateInt("STATUS", 0);
-                xEPKUpdate.CreateString("UserName", _username);
+                //CStruct xEPKUpdate = new CStruct();
+                //xEPKUpdate.Initialize("UpdatePortfolioItems");
+                string sXML;
+                dbaUsers.ExportPIInfo(_dba, pids, out sXML);
+                //xEPKUpdate.CreateInt("HRESULT", 0);
+                //xEPKUpdate.CreateInt("STATUS", 0);
+                //xEPKUpdate.CreateString("UserName", _username);
 
-                return xEPKUpdate.XML();
+                //return xEPKUpdate.XML();
+                return sXML;
             }
             catch (Exception ex)
             {

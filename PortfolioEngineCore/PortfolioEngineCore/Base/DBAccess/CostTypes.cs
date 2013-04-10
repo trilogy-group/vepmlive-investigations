@@ -158,13 +158,13 @@ namespace PortfolioEngineCore
                     sFieldName = sFieldName.Trim();
                     if (sFieldName.Length == 0)
                     {
-                        sReply = DBAccess.FormatAdminError("error", "Customfields.UpdateCostTypeCustomFieldInfo", "Please enter a Field Name");
+                        sReply = DBAccess.FormatAdminError("error", "CostTypes.UpdateCostTypeCustomFieldInfo", "Please enter a Field Name");
                         return StatusEnum.rsRequestCannotBeCompleted;
                     }
                     //  a Code field MUST have a Lookup
                     if (nFieldId < 11810 && nLookupID == 0)
                     {
-                        sReply = DBAccess.FormatAdminError("error", "Customfields.UpdateCostTypeCustomFieldInfo", "You must specify a lookup table for any Code field");
+                        sReply = DBAccess.FormatAdminError("error", "CostTypes.UpdateCostTypeCustomFieldInfo", "You must specify a lookup table for any Code field");
                         return StatusEnum.rsRequestCannotBeCompleted;
                     }
 
@@ -713,6 +713,15 @@ namespace PortfolioEngineCore
             sReply = "";
             try
             {
+                // check if CT can be deleted
+                string sdeletemessage;
+                if (CanDeleteCostType(dba, nCTId, out sdeletemessage) != StatusEnum.rsSuccess) return dba.Status;
+                if (sdeletemessage.Length > 0)
+                {
+                    sReply = DBAccess.FormatAdminError("error", "Customfields.DeleteCustomField", "This Cost Type cannot be deleted, it is currently used as follows:" + "\n" + "\n" + sdeletemessage);
+                    return StatusEnum.rsRequestCannotBeCompleted;
+                }
+
                 // get info for group to be deleted
                 {
                     cmdText = "SELECT CT_ID, CT_NAME FROM EPGP_COST_TYPES Where CT_ID=@p1";
@@ -791,6 +800,34 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 sReply = DBAccess.FormatAdminError("exception", "CostTypes.DeleteCostType", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
+
+        public static StatusEnum CanDeleteCostType(DBAccess dba, int nCTId, out string sReply)
+        {
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            sReply = "";
+            try
+            {
+                // check if CT can be deleted
+                oCommand = new SqlCommand("EPG_SP_ReadUsedCT", dba.Connection);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.Parameters.AddWithValue("@CTID", nCTId);
+                reader = oCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    sReply += DBAccess.ReadStringValue(reader["Type"]) + ": ";
+                    sReply += DBAccess.ReadStringValue(reader["Name"]) + "\n";
+                }
+                reader.Close();
+                return StatusEnum.rsSuccess;
+            }
+            catch (Exception ex)
+            {
+                sReply = DBAccess.FormatAdminError("exception", "CostTypes.CanDeleteCostType", ex.Message);
                 return StatusEnum.rsRequestCannotBeCompleted;
             }
         }

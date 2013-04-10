@@ -39,7 +39,7 @@ namespace PortfolioEngineCore
                         return StatusEnum.rsRequestCannotBeCompleted;
                     }
                     //  a Code field MUST have a Lookup
-                    if (nFieldId < 11810 && nLookupID == 0)
+                    if (nFieldId >= 9305 && nLookupID == 0)
                     {
                         sReply = DBAccess.FormatAdminError("error", "dbaResourcePlanning.UpdateCustomFieldInfo", "You must specify a lookup table for any Code field");
                         return StatusEnum.rsRequestCannotBeCompleted;
@@ -63,6 +63,55 @@ namespace PortfolioEngineCore
                     oCommand.Parameters.AddWithValue("@pUSEFULLNAME", nUseFullName);
                     oCommand.ExecuteNonQuery();
 
+                    // need to update default RP view which isn't available to the user in WE so slightly different update than PfE original
+                    // if field already exists then update the name if necessary
+                    string sExistingTitle = "";
+                    cmdText = "SELECT FIELD_TITLE From EPG_VIEW_FIELDS WHERE FIELD_ID = @p1";
+                    DataTable dt;
+                    if (dba.SelectDataById(cmdText, nFieldId, (StatusEnum)99999, out dt) != StatusEnum.rsSuccess)
+                    {
+                        sReply = DBAccess.FormatAdminError("exception", "ResourcePlanning.UpdateCustomFieldInfo", dba.StatusText);
+                        return StatusEnum.rsRequestCannotBeCompleted;
+                    }
+                    else if (dt.Rows.Count > 0)
+                    {
+                        DataRow row = dt.Rows[0];
+                        sExistingTitle = DBAccess.ReadStringValue(row["FIELD_TITLE"]);
+                        if (sExistingTitle != sFieldName)
+                        {
+                            cmdText = "UPDATE EPG_VIEW_FIELDS SET FIELD_TITLE=@pFIELD_NAME WHERE FIELD_ID = @pFIELDID";
+                            oCommand = new SqlCommand(cmdText, dba.Connection);
+                            oCommand.Parameters.AddWithValue("@pFIELD_NAME", sFieldName);
+                            oCommand.Parameters.AddWithValue("@pFIELDID", nFieldId);
+                            oCommand.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        // need to add, first determine new colid then insert
+                        int lNextColID = 0;
+                        cmdText = "Select MAX(FIELD_COL_ID) as Max_ColID From EPG_VIEW_FIELDS Where VIEW_UID=101";
+                        oCommand = new SqlCommand(cmdText, dba.Connection);
+                        SqlDataReader reader = oCommand.ExecuteReader();
+                        if (reader.Read())
+                            lNextColID = DBAccess.ReadIntValue(reader["Max_ColID"]) + 1;
+                        else
+                            lNextColID = 1;
+                        reader.Close();
+
+                        cmdText = "INSERT Into EPG_VIEW_FIELDS (VIEW_UID,FIELD_ID,FIELD_COL_ID,FIELD_TITLE,FIELD_ALIGN,FIELD_HIDDEN,FIELD_FROZEN)"
+                           + " Values(101,@pFIELDID,@pColId,@pTitle,@pAlign,@pHidden,@pFrozen)";
+                        oCommand = new SqlCommand(cmdText, dba.Connection);
+                        oCommand.Parameters.AddWithValue("@pFIELDID", nFieldId);
+                        oCommand.Parameters.AddWithValue("@pColId", lNextColID);
+                        oCommand.Parameters.AddWithValue("@pTitle", sFieldName);
+                        oCommand.Parameters.AddWithValue("@pAlign", 0);
+                        oCommand.Parameters.AddWithValue("@pHidden", 0);
+                        oCommand.Parameters.AddWithValue("@pFrozen", 0);
+                        oCommand.ExecuteNonQuery();
+                    }
+
+
                 }
                 return StatusEnum.rsSuccess;
             }
@@ -83,6 +132,13 @@ namespace PortfolioEngineCore
                 oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
                 oCommand.Parameters.AddWithValue("@pFIELDID", nFieldId);
                 oCommand.ExecuteNonQuery();
+
+                // remove also from Default RP View which is a fixed thing in WE environment
+                cmdText = "DELETE FROM EPG_VIEW_FIELDS WHERE VIEW_UID=101 and FIELD_ID = @pFIELDID";
+                oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                oCommand.Parameters.AddWithValue("@pFIELDID", nFieldId);
+                oCommand.ExecuteNonQuery();
+
                 return StatusEnum.rsSuccess;
             }
             catch (Exception ex)

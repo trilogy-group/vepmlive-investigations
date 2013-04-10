@@ -251,6 +251,13 @@ namespace PortfolioEngineCore
                         oCommand.Parameters.AddWithValue("@pField", nField);
                         int lRowsAffected = oCommand.ExecuteNonQuery();
                     }
+                    // Delete any CALCs or CALC components
+                    cmdText = "DELETE FROM EPGP_CALCS Where CL_RESULT=@pField1 Or CL_COMPONENT=@pField2";
+                    oCommand = new SqlCommand(cmdText, dba.Connection);
+                    oCommand.Parameters.AddWithValue("@pField1", nFieldId);
+                    oCommand.Parameters.AddWithValue("@pField2", nFieldId);
+                    oCommand.ExecuteNonQuery();
+
                     // Delete the CF itself
                     cmdText = "DELETE FROM EPGC_FIELD_ATTRIBS Where FA_FIELD_ID=@pField";
                     oCommand = new SqlCommand(cmdText, dba.Connection);
@@ -464,7 +471,14 @@ namespace PortfolioEngineCore
             string sError = "";
             sFormula = sFormula.Trim();
             if (sFormula == string.Empty)
+            {
+                if (bSave)
+                {
+                    int lRowsAffected;
+                    dbaCustomFields.DeleteCustomFieldFormula(dba, nFieldId, out  lRowsAffected);
+                }
                 goto Exit_Function;
+            }
 
             // read in the valid operands (other than constants)
             DataTable dt;
