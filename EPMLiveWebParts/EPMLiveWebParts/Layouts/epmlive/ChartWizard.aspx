@@ -15,8 +15,8 @@
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <%--external css and scripts--%>
-    <link rel="stylesheet" type="text/css" href="stylesheets/libraries/bootstrap/css/bootstrap.min.css" />
-    <script type="text/javascript" src="javascripts/libraries/bootstrap.min.js"></script>
+    <%--<link rel="stylesheet" type="text/css" href="stylesheets/libraries/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="javascripts/libraries/bootstrap.min.js"></script>--%>
     <script type="text/javascript">
         var gridurl = '<%=_GridUrl%>';
         var tbSelectedListAndViewClientId = '<%=tbSelectedListAndView.ClientID%>';
@@ -24,6 +24,14 @@
     <script type="text/javascript" src="/_layouts/epmlive/javascripts/ChartWizard.js"></script>
     <link href="/_layouts/epmlive/styles/ChartWizard/ChartWizardStyle.css" rel="Stylesheet"
         type="text/css" />
+
+    <style>
+        .ms-bodyareacell, .s4-ba
+        {
+            padding-bottom: 0px !important;
+        }
+    </style>
+
     <%--Pages that contains the three steps--%>
     <asp:UpdatePanel runat="server" ID="upMain">
         <ContentTemplate>
@@ -35,13 +43,14 @@
                         Select a Data Source
                     </div>
                     <div>
-                        <div style="vertical-align: middle">
-                            <asp:TextBox ID="tbSelectedListAndView" runat="server" Width="365px" CssClass="floatLeft"></asp:TextBox>
-                            <input id="Button1" type="button" class="epmliveButton" style="margin-left: 5px;float:right;height:30px"
-                                onclick="OpenDataSourceGrid();return false;" value="..." />
-                            <%-- <a class="epmliveButton" style="width: 100px; height: 50px; margin-left: 0px;" onclick="OpenDataSourceGrid();return false;">
-                                <span>...</span>
-                            </a>--%>
+                        <div style="width:100%">
+                            <div style="float:left;width:83%;">
+                                <asp:TextBox ID="tbSelectedListAndView" runat="server" style="height:24px;width:100%;padding-top:5px;padding-left:5px;padding-right:5px;" Enabled="false"></asp:TextBox>
+                            </div>
+                            <div style="float:right;width:12%">
+                                <input id="Button1" type="button" class="epmliveButton" style="height:35px;min-width:0px !important;width:100%;"
+                                    onclick="OpenDataSourceGrid(); return false;" value="..." />
+                            </div>
                         </div>
                         <asp:TextBox ID="tbListTitle" runat="server" Style="display: none" />
                         <asp:TextBox ID="tbViewTitle" runat="server" Style="display: none" />
@@ -62,7 +71,7 @@
                                             Area
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/Area.png" class="imagedropshadow"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/Area.png" class="imagedropshadow"
                                                 style="height: 40px;" />
                                         </td>
                                     </tr>
@@ -71,7 +80,7 @@
                                             Area Clustered
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/AreaClustered.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/AreaClustered.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -80,7 +89,7 @@
                                             Bar
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/Bar.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/Bar.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -89,7 +98,7 @@
                                             Bar Clustered
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/BarClustered.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/BarClustered.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -98,7 +107,7 @@
                                             Bar Stacked
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/BarStacked.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/BarStacked.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -107,7 +116,7 @@
                                             Bar Stacked 100%
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/Bar100.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/Bar100.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -116,7 +125,7 @@
                                             Bubble
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/Bubble.png" class="imagedropshadow"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/Bubble.png" class="imagedropshadow"
                                                 style="height: 40px;" />
                                         </td>
                                     </tr>
@@ -125,7 +134,7 @@
                                             Column
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/Column.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/Column.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -134,7 +143,7 @@
                                             Column Clustered
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/ColumnClustered.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/ColumnClustered.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -143,7 +152,7 @@
                                             Column Stacked
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/ColumnStacked.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/ColumnStacked.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -152,7 +161,7 @@
                                             Column Stacked 100%
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/Column100.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/Column100.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -161,7 +170,7 @@
                                             Donut
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/donut.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/donut.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -170,7 +179,7 @@
                                             Line
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/line.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/line.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -179,7 +188,7 @@
                                             Line Clustered
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/lineclustered.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/lineclustered.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -188,7 +197,7 @@
                                             Pie
                                         </td>
                                         <td class="thumbImg">
-                                            <img src="http://dl.dropbox.com/u/47201778/ChartIcons/pie.png" style="height: 40px;"
+                                            <img src="/_layouts/epmlive/images/ChartWizard/pie.png" style="height: 40px;"
                                                 class="imagedropshadow" />
                                         </td>
                                     </tr>
@@ -201,42 +210,44 @@
                             <div style="width: 360px; text-align: right;">
                                 <div class="rotate" id="dynamicY">
                                     Y Values</div>
-                                <img src="http://dl.dropbox.com/u/47201778/ChartIcons/AreaClustered.png" id="chartImage" />
+                                <img src="/_layouts/epmlive/images/ChartWizard/AreaClustered.png" id="chartImage" style="width:360px" />
                             </div>
                         </div>
-                        <div id="step2RightCol">
+                        <div id="step2RightCol" class="chartWizardTxt">
                             <%--aggregate column--%>
                             <asp:Panel runat="server" ID="pnlAggDdl" class="topDdl">
                                 <span style="padding-left: 0px;">Aggregation Type</span>
-                                <telerik:RadComboBox ID="rcbAgg" runat="server" MaxHeight="180" Width="170" Skin="Metro" />
+                                <telerik:RadComboBox ID="rcbAgg" runat="server" MaxHeight="180" Width="170" Skin="Metro" style="margin-top:5px;margin-bottom:5px" />
                             </asp:Panel>
                             <%--x column--%>
                             <asp:Panel runat="server" ID="pnlXDdl" class="topDdl">
                                 <span style="padding-left: 0px;">X Value (Category)</span>
-                                <telerik:RadComboBox ID="rcbXField" runat="server" MaxHeight="180" Width="170" Skin="Metro" />
+                                <telerik:RadComboBox ID="rcbXField" runat="server" MaxHeight="180" Width="170" Skin="Metro" style="margin-top:5px;margin-bottom:5px" />
+                                <telerik:RadComboBox ID="rcbXNum" runat="server" MaxHeight="180" Width="170" Skin="Metro" style="margin-top:5px;margin-bottom:5px" />
+                                <telerik:RadComboBox ID="rcbXNonNum" runat="server" MaxHeight="180" Width="170" Skin="Metro" style="margin-top:5px;margin-bottom:5px" />
                             </asp:Panel>
                             <%--y columns--%>
                             <asp:Panel runat="server" ID="pnlYDdl" class="topDdl" Style="height: 100px; width: 170px">
                                 <span id="spnYVal" style="padding-left: 0px;">Y Value (Series)</span>
-                                <telerik:RadComboBox ID="rcbYNumSingle" runat="server" MaxHeight="180" Width="170" Skin="Metro" />
+                                <telerik:RadComboBox ID="rcbYNumSingle" runat="server" MaxHeight="180" Width="170" Skin="Metro" style="margin-top:5px;margin-bottom:5px"/>
                                 <%--Checkbox DDL--%>
                                 <telerik:RadComboBox ID="rcbYNumMulti" runat="server" MaxHeight="180" Width="170" CheckBoxes="true"
-                                    DropDownAutoWidth="Enabled" Skin="Metro" />
+                                    DropDownAutoWidth="Enabled" Skin="Metro" style="margin-top:5px;margin-bottom:5px"/>
                                 <telerik:RadComboBox ID="rcbYNonNumSingle" runat="server" MaxHeight="180" Width="170"
-                                    Skin="Metro" />
+                                    Skin="Metro" style="margin-top:5px;margin-bottom:5px"/>
                                 <%--Checkbox DDL--%>
                                 <telerik:RadComboBox ID="rcbYNonNumMulti" runat="server" MaxHeight="180" Width="170"
-                                    CheckBoxes="true" DropDownAutoWidth="Enabled" Skin="Metro" />
+                                    CheckBoxes="true" DropDownAutoWidth="Enabled" Skin="Metro" style="margin-top:5px;margin-bottom:5px"/>
                                 <span style="padding-left: 0px;">Y Value Format</span>
                                 <telerik:RadComboBox ID="rcbYAxisFormat" runat="server" MaxHeight="180" Width="170"
-                                    Skin="Metro" />
+                                    Skin="Metro" style="margin-top:5px;margin-bottom:5px"/>
                             </asp:Panel>
                             <%--z column--%>
                             <asp:Panel runat="server" ID="pnlZDdl" class="topDdl" Style="height: 100px; width: 170px;">
                                 <span style="padding-left: 0px;">Z Value (Size Value)</span>
-                                <telerik:RadComboBox ID="rcbZField" runat="server" MaxHeight="180" Width="170" Skin="Metro" />
+                                <telerik:RadComboBox ID="rcbZField" runat="server" MaxHeight="180" Width="170" Skin="Metro" style="margin-top:5px;margin-bottom:5px"/>
                                 <span style="padding-left: 0px;">Group By</span>
-                                <telerik:RadComboBox ID="rcbGroupBy" runat="server" MaxHeight="180" Width="170" Skin="Metro" />
+                                <telerik:RadComboBox ID="rcbGroupBy" runat="server" MaxHeight="180" Width="170" Skin="Metro" style="margin-top:5px;margin-bottom:5px"/>
                             </asp:Panel>
                         </div>
                     </div>
@@ -246,7 +257,7 @@
                     <div class="wizardLabel">
                         Additional Properties
                     </div>
-                    <div>
+                    <div class="chartWizardTxt">
                         <table style="text-align: left">
                             <%--chart title--%>
                             <tr>
@@ -254,7 +265,7 @@
                                     <asp:Label ID="Label5" runat="server" Text="Chart Title"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:TextBox ID="tbChartTitle" runat="server" Width="230px"></asp:TextBox>
+                                    <asp:TextBox ID="tbChartTitle" runat="server" style="width: 230px; height: 20px; padding-top: 5px; padding-left: 5px;"></asp:TextBox>
                                 </td>
                             </tr>
                             <%--palette--%>
@@ -263,16 +274,18 @@
                                     <asp:Label ID="Label1" runat="server" Text="Palette"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:DropDownList ID="ddlPalette" runat="server" Width="245px">
-                                        <asp:ListItem Text="Color 1" Value="Color1" />
-                                        <asp:ListItem Text="Color 2" Value="Color2" />
-                                        <asp:ListItem Text="Blue" Value="Blue" />
-                                        <asp:ListItem Text="Red" Value="Red" />
-                                        <asp:ListItem Text="Yellow" Value="Yellow" />
-                                        <asp:ListItem Text="Green" Value="Green" />
-                                        <asp:ListItem Text="Gray" Value="Gray" />
-                                        <asp:ListItem Text="Violet" Value="Violet" />
-                                    </asp:DropDownList>
+                                    <telerik:RadComboBox ID="ddlPalette" runat="server" MaxHeight="180" Width="170" Skin="Metro">
+                                        <Items>
+                                            <telerik:RadComboBoxItem Text="Color 1" Value="Color1" />
+                                            <telerik:RadComboBoxItem Text="Color 2" Value="Color2" />
+                                            <telerik:RadComboBoxItem Text="Blue" Value="Blue" />
+                                            <telerik:RadComboBoxItem Text="Red" Value="Red" />
+                                            <telerik:RadComboBoxItem Text="Yellow" Value="Yellow" />
+                                            <telerik:RadComboBoxItem Text="Green" Value="Green" />
+                                            <telerik:RadComboBoxItem Text="Gray" Value="Gray" />
+                                            <telerik:RadComboBoxItem Text="Violet" Value="Violet" />
+                                        </Items>
+                                    </telerik:RadComboBox>
                                 </td>
                             </tr>
                             <%--Legend Position--%>
@@ -281,12 +294,14 @@
                                     <asp:Label ID="Label6" runat="server" Text="Legend Position"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:DropDownList ID="ddlLegendPosition" runat="server" Width="245px">
-                                        <asp:ListItem Text="Left" Value="Left" />
-                                        <asp:ListItem Text="Top" Value="Top" />
-                                        <asp:ListItem Text="Right" Value="Right" />     
-                                        <asp:ListItem Text="Bottom" Value="Bottom" />                                               
-                                    </asp:DropDownList>
+                                    <telerik:RadComboBox ID="ddlLegendPosition" runat="server" MaxHeight="180" Width="170" Skin="Metro">
+                                        <Items>
+                                            <telerik:RadComboBoxItem Text="Left" Value="Left" />
+                                            <telerik:RadComboBoxItem Text="Top" Value="Top" />
+                                            <telerik:RadComboBoxItem Text="Right" Value="Right" />     
+                                            <telerik:RadComboBoxItem Text="Bottom" Value="Bottom" />                                               
+                                        </Items>
+                                    </telerik:RadComboBox>
                                 </td>
                             </tr>
                         </table>
@@ -294,21 +309,21 @@
                     <div style="clear: both">
                     </div>
                     <%--show grid lines--%>
-                    <div>
+                    <div class="chartWizardTxt">
                         <asp:CheckBox ID="cbShowGridLines" runat="server" />
                         <asp:Label ID="Label2" runat="server" Text="Show Grid Lines"></asp:Label>
                     </div>
                     <div style="clear: both">
                     </div>
                     <%--show x axis labels--%>
-                    <div>
+                    <div class="chartWizardTxt">
                         <asp:CheckBox ID="cbShowXAxisLabels" runat="server" />
                         <asp:Label ID="Label3" runat="server" Text="Show X Axis Labels"></asp:Label>
                     </div>
                     <div style="clear: both">
                     </div>
                     <%--show legend--%>
-                    <div>
+                    <div class="chartWizardTxt">
                         <asp:CheckBox ID="cbShowLegend" runat="server" />
                         <asp:Label ID="Label4" runat="server" Text="Show Legend"></asp:Label>
                     </div>
@@ -326,19 +341,19 @@
                 <%--pagination control section--%>
                 <div id="divButtons" style="text-align: right;margin-top:15px; padding-right:10px;">
                     <input id="btnBack" type="button" class="epmliveButtonDisabled" style="margin-left: 0px;"
-                        onclick="Back();return false;" value="&larr; Back" />
+                        onclick="Back(); return false;" value="&larr; Back" />
                     <%-- <a href="#" id="btnBack" class="epmliveButton" style="width: 100px; height: 50px; margin-left: 0px; display:none;" onclick="Previous();return false;">
                         &larr; <span>Back</span> </a>--%>
                     <input id="btnNext" type="button" class="epmliveButtonDisabled" style="margin-left: 5px;"
-                        onclick="Next();return false;" value="Next &rarr;" />
+                        onclick="Next(); return false;" value="Next &rarr;" />
                     <%-- <a href="#" id="btnNext" class="epmliveButton" style="width: 100px; height: 50px; margin-right: 0px;" onclick="Next();return false;">
                         <span>Next</span> &rarr;</a>--%>
                     <input id="btnSave" type="button" class="epmliveButtonDisabled" style="margin-left: 5px; display:none"
-                        onclick="SaveChartProps();return false;" value="Save" />
+                        onclick="SaveChartProps(); return false;" value="Save" />
                     <%-- <a href="#" id="btnSave" class="epmliveButton" style="width: 100px; height: 50px; display: none;" onclick="SaveChartProps();return false;">
                                 <span>Save</span></a> --%>
                     <input id="btnCancel" type="button" class="epmliveButton" style="margin-left: 5px;"
-                        onclick="CancelWizard();return false;" value="Cancel" />
+                        onclick="CancelWizard(); return false;" value="Cancel" />
                     <%--<a href="#" id="btnCancel" class="epmliveButton" style="width: 100px; height: 50px" onclick="CancelWizard();return false;">
                             <span>Cancel</span> </a>--%>
                 </div>

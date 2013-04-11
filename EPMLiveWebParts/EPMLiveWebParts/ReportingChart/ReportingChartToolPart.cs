@@ -34,6 +34,8 @@ namespace EPMLiveWebParts.ReportingChart
         protected DropDownList SeriesValueLabelPositionDropDownList;
         protected DropDownList FrameColorDropDownList;
         protected DropDownList XaxisFieldDropDownList;
+        protected DropDownList ddlXaxisFieldNum;
+        protected DropDownList ddlXaxisFieldNonNum;
         protected DropDownList ddlYaxisFieldNum;
         protected DropDownList ddlYaxisFieldNonNum;
         protected DropDownList ZaxisFieldDropDownList;
@@ -86,6 +88,8 @@ namespace EPMLiveWebParts.ReportingChart
             ListsDropDownList = new DropDownList();
             ViewsDropDownList = new DropDownList();
             XaxisFieldDropDownList = new DropDownList();
+            ddlXaxisFieldNum = new DropDownList();
+            ddlXaxisFieldNonNum = new DropDownList();
             AggregateTypeHtmlSelect = new HtmlSelect();
             YaxisFormatDropDownList = new DropDownList();
             LegendPositionDropDownList = new DropDownList();
@@ -174,27 +178,12 @@ namespace EPMLiveWebParts.ReportingChart
             chartWp.PropChartSelectedPaletteName = ChartPaletteStyleDropDownList.SelectedValue;
             chartWp.PropChartSelectedListTitle = ListsDropDownList.SelectedItem.Text;
             chartWp.PropChartSelectedViewTitle = ViewsDropDownList.SelectedItem.Text;
-            //chartWp.PropChartView3D = ShowIn3DCheckBox.Checked;
-            //chartWp.PropChartShowBubbleChartInputsInWebPart = ShowBubbleChartInputsInWebPart.Checked;
             chartWp.PropChartShowGridlines = ShowGridlinesCheckBox.Checked;
             chartWp.PropChartShowSeriesLabels = ShowLabelsCheckBox.Checked;
-            //chartWp.PropChartShowZeroValueData = ShowZeroValueDataCheckBox.Checked;
-            //chartWp.PropBubbleChartColorField = BubbleChartColorFieldDropDownList.SelectedValue;
             chartWp.PropChartAggregationType = AggregateTypeHtmlSelect.Value;
-            chartWp.PropChartXaxisField = XaxisFieldDropDownList.SelectedValue;
-            chartWp.PropChartXaxisFieldLabel = XaxisFieldDropDownList.SelectedItem.Text;
+            SetXAxisField(chartWp);
             SetYAxisField(chartWp);
-
-            //if (YaxisFieldAsDropDownList.SelectedItem != null)
-            //{
-            //    chartWp.PropChartYaxisFieldLabel = YaxisFieldAsDropDownList.SelectedItem.Text;
-            //}
-
-            chartWp.PropChartZaxisFieldLabel = ZaxisFieldDropDownList.SelectedItem.Text;
-            if (ZaxisFieldDropDownList.SelectedItem != null)
-            {
-                chartWp.PropChartZaxisField = ZaxisFieldDropDownList.SelectedValue;
-            }
+            SetZAxisField(chartWp);
 
             if (BubbleGroupByDropDownList.SelectedItem != null)
             {
@@ -206,6 +195,65 @@ namespace EPMLiveWebParts.ReportingChart
             chartWp.PropChartLegendPosition = LegendPositionDropDownList.SelectedValue;
 
             chartWp.RebuildControlTree();
+        }
+
+        private void SetXAxisField(ReportingChart chartWp)
+        {
+            string sChartTypeVal = Enum.GetName(typeof(ChartType), chartWp.PropChartType);
+            string sAggType = chartWp.PropChartAggregationType;
+
+            if (sChartTypeVal == "Area" || sChartTypeVal == "Bar" || sChartTypeVal == "Column" || sChartTypeVal == "Line")
+            {
+                if (sAggType == "Count")
+                {
+                    // set x fld based on combined x axis fld 
+                    chartWp.SetXFieldValue(XaxisFieldDropDownList.SelectedValue);
+                    chartWp.SetXFieldLabel(XaxisFieldDropDownList.SelectedItem.Text);
+                }
+                else if (sAggType == "Sum" || sAggType == "Avg")
+                {
+                    // non-numerical
+                    chartWp.SetXFieldValue(ddlXaxisFieldNonNum.SelectedValue);
+                    chartWp.SetXFieldLabel(ddlXaxisFieldNonNum.SelectedItem.Text);
+
+                }
+            }
+            else if (sChartTypeVal.Contains("_Clustered") || sChartTypeVal.Contains("_Stacked") || sChartTypeVal.Contains("_100Percent"))
+            {
+                if (sAggType == "Count")
+                {
+                    // set x fld based on combined x axis fld 
+                    chartWp.SetXFieldValue(XaxisFieldDropDownList.SelectedValue);
+                    chartWp.SetXFieldLabel(XaxisFieldDropDownList.SelectedItem.Text);
+                }
+                else if (sAggType == "Sum" || sAggType == "Avg")
+                {
+                    // non-numerical
+                    chartWp.SetXFieldValue(ddlXaxisFieldNonNum.SelectedValue);
+                    chartWp.SetXFieldLabel(ddlXaxisFieldNonNum.SelectedItem.Text);
+                }
+            }
+            else if (sChartTypeVal.Contains("Pie") || sChartTypeVal.Contains("Donut"))
+            {
+                if (sAggType == "Count")
+                {
+                    // set x fld based on combined x axis fld 
+                    chartWp.SetXFieldValue(XaxisFieldDropDownList.SelectedValue);
+                    chartWp.SetXFieldLabel(XaxisFieldDropDownList.SelectedItem.Text);
+                }
+                else if (sAggType == "Sum" || sAggType == "Avg")
+                {
+                    // non-numerical
+                    chartWp.SetXFieldValue(ddlXaxisFieldNonNum.SelectedValue);
+                    chartWp.SetXFieldLabel(ddlXaxisFieldNonNum.SelectedItem.Text);
+                }
+            }
+            else if (sChartTypeVal.Contains("Bubble"))
+            {
+                // numerical
+                chartWp.SetXFieldValue(ddlXaxisFieldNum.SelectedValue);
+                chartWp.SetXFieldLabel(ddlXaxisFieldNum.SelectedItem.Text);
+            }
         }
 
         private void SetYAxisField(ReportingChart chartWp)
@@ -259,14 +307,23 @@ namespace EPMLiveWebParts.ReportingChart
                 else if (sAggType == "Sum" || sAggType == "Avg")
                 {
                     chartWp.SetYFieldsValues(new[] { ddlYaxisFieldNum.SelectedValue });
-                    chartWp.SetYFieldsLabels(new[] { ddlYaxisFieldNum.SelectedValue });
+                    chartWp.SetYFieldsLabels(new[] { ddlYaxisFieldNum.SelectedItem.Text });
                 }
             }
             else if (sChartTypeVal.Contains("Bubble"))
             {
                 // 1 Y Field (Num)
                 chartWp.SetYFieldsValues(new[] { ddlYaxisFieldNum.SelectedValue });
-                chartWp.SetYFieldsLabels(new[] { ddlYaxisFieldNum.SelectedValue });
+                chartWp.SetYFieldsLabels(new[] { ddlYaxisFieldNum.SelectedItem.Text });
+            }
+        }
+
+        private void SetZAxisField(ReportingChart chartWp)
+        {
+            chartWp.PropChartZaxisFieldLabel = ZaxisFieldDropDownList.SelectedItem.Text;
+            if (ZaxisFieldDropDownList.SelectedItem != null)
+            {
+                chartWp.PropChartZaxisField = ZaxisFieldDropDownList.SelectedValue;
             }
         }
 
@@ -341,9 +398,9 @@ namespace EPMLiveWebParts.ReportingChart
                 }
                 SortListControlItems(ViewsDropDownList);
 
-                if (ViewsDropDownList.Items.FindByValue(chart.PropChartSelectedViewTitle) != null)
+                if (ViewsDropDownList.Items.FindByText(chart.PropChartSelectedViewTitle) != null)
                 {
-                    ViewsDropDownList.Items.FindByValue(chart.PropChartSelectedViewTitle).Selected = true;
+                    ViewsDropDownList.Items.FindByText(chart.PropChartSelectedViewTitle).Selected = true;
                 }
             }
         }
@@ -410,8 +467,137 @@ namespace EPMLiveWebParts.ReportingChart
 
             #region RENDER X AXIS
             output.Write("<tr><td>");
-            output.Write("Category (X axis)<br>");
-            XaxisFieldDropDownList.RenderControl(output);
+
+            if (sChartTypeVal == "Area" || sChartTypeVal == "Bar" || sChartTypeVal == "Column" || sChartTypeVal == "Line")
+            {
+                if (sAggType == "Count")
+                {
+                    output.Write("<div id='XaxisSection_full'>");
+                    output.Write("Category (X axis)<br>");
+                    XaxisFieldDropDownList.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                    output.Write("Value (X axis)<br>");
+                    ddlXaxisFieldNum.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
+                    output.Write("Category (X axis)<br>");
+                    ddlXaxisFieldNonNum.RenderControl(output);
+                    output.Write("</div>");
+                }
+                else if (sAggType == "Sum" || sAggType == "Avg")
+                {
+                    output.Write("<div id='XaxisSection_full' style='display:none'>");
+                    output.Write("Category (X axis)<br>");
+                    XaxisFieldDropDownList.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                    output.Write("Value (X axis)<br>");
+                    ddlXaxisFieldNum.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
+                    output.Write("Category (X axis)<br>");
+                    ddlXaxisFieldNonNum.RenderControl(output);
+                    output.Write("</div>");
+                }
+            }
+            // MULTI SERIES
+            else if (sChartTypeVal.Contains("_Clustered") || sChartTypeVal.Contains("_Stacked") || sChartTypeVal.Contains("_100Percent"))
+            {
+                if (sAggType == "Count")
+                {
+                    output.Write("<div id='XaxisSection_full' style='display:none'>");
+                    output.Write("Category (X axis)<br>");
+                    XaxisFieldDropDownList.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                    output.Write("Value (X axis)<br>");
+                    ddlXaxisFieldNum.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
+                    output.Write("Category (X axis)<br>");
+                    ddlXaxisFieldNonNum.RenderControl(output);
+                    output.Write("</div>");
+                }
+                else if (sAggType == "Sum" || sAggType == "Avg")
+                {
+                    output.Write("<div id='XaxisSection_full' style='display:none'>");
+                    output.Write("Category (X axis)<br>");
+                    XaxisFieldDropDownList.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                    output.Write("Value (X axis)<br>");
+                    ddlXaxisFieldNum.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
+                    output.Write("Category (X axis)<br>");
+                    ddlXaxisFieldNonNum.RenderControl(output);
+                    output.Write("</div>");
+                }
+            }
+            else if (sChartTypeVal.Contains("Pie") || sChartTypeVal.Contains("Donut"))
+            {
+                if (sAggType == "Count")
+                {
+                    output.Write("<div id='XaxisSection_full'>");
+                    output.Write("Category (X axis)<br>");
+                    XaxisFieldDropDownList.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                    output.Write("Value (X axis)<br>");
+                    ddlXaxisFieldNum.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
+                    output.Write("Category (X axis)<br>");
+                    ddlXaxisFieldNonNum.RenderControl(output);
+                    output.Write("</div>");
+                }
+                else if (sAggType == "Sum" || sAggType == "Avg")
+                {
+                    output.Write("<div id='XaxisSection_full' style='display:none'>");
+                    output.Write("Category (X axis)<br>");
+                    XaxisFieldDropDownList.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_num' style='display:none'>");
+                    output.Write("Value (X axis)<br>");
+                    ddlXaxisFieldNum.RenderControl(output);
+                    output.Write("</div>");
+
+                    output.Write("<div id='XaxisSection_ddl_nonnum'>");
+                    output.Write("Category (X axis)<br>");
+                    ddlXaxisFieldNonNum.RenderControl(output);
+                    output.Write("</div>");
+                }
+            }
+            else if (sChartTypeVal.Contains("Bubble"))
+            {
+                output.Write("<div id='XaxisSection_full' style='display:none'>");
+                output.Write("Category (X axis)<br>");
+                XaxisFieldDropDownList.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_num'>");
+                output.Write("Value (X axis)<br>");
+                ddlXaxisFieldNum.RenderControl(output);
+                output.Write("</div>");
+
+                output.Write("<div id='XaxisSection_ddl_nonnum' style='display:none'>");
+                output.Write("Category (X axis)<br>");
+                ddlXaxisFieldNonNum.RenderControl(output);
+                output.Write("</div>");
+            }
+
             output.Write("</td></tr>");
             #endregion
 
@@ -567,11 +753,11 @@ namespace EPMLiveWebParts.ReportingChart
             LegendPositionDropDownList.RenderControl(output);
             output.Write("</td></tr>");
 
-            output.Write("<tr><td>");
-            output.Write("<input type='button' value='reload' onclick='ReloadChartAjax();' />");
-            var chartWp = (ReportingChart)ParentToolPane.SelectedWebPart;
-            output.Write("<script type='text/javascript'> function ReloadChartAjax() { __doPostBack('" + chartWp.UpdatePanelClientId + "', ''); } </script>");
-            output.Write("</td></tr>");
+            //output.Write("<tr><td>");
+            //output.Write("<input type='button' value='reload' onclick='ReloadChartAjax();' />");
+            //var chartWp = (ReportingChart)ParentToolPane.SelectedWebPart;
+            //output.Write("<script type='text/javascript'> function ReloadChartAjax() { __doPostBack('" + chartWp.UpdatePanelClientId + "', ''); } </script>");
+            //output.Write("</td></tr>");
 
             output.Write("</td></tr></table>");
             output.Write("</div>");
@@ -582,18 +768,21 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write("<script type=\"text/javascript\">");
             output.Write("function ctype_agg_change() ");
             output.Write("{");
-            output.Write(" var aggSec = document.getElementById(\"aggTypeSec\"); ");
-            output.Write(" aggSec.style.display = (cType != 'Bubble') ? '' : 'none'; ");
             output.Write(" var cTypeDdl = document.getElementById(\"" + ChartTypeDropDownList.ClientID + "\"); ");
             output.Write(" var cType = cTypeDdl.options[cTypeDdl.selectedIndex].value; ");
             output.Write(" var aggreDdl = document.getElementById(\"" + AggregateTypeHtmlSelect.ClientID + "\"); ");
             output.Write(" var aggVal = aggreDdl.options[aggreDdl.selectedIndex].value; ");
+            output.Write(" var aggSec = document.getElementById(\"aggTypeSec\"); ");
+            output.Write(" aggSec.style.display = (cType != 'Bubble') ? '' : 'none'; ");
             // SHOW Z ONLY WHEN CONFIGURATING BUBBLE CHARTS
             output.Write(" document.getElementById(\"ZaxisSection\").style.display = (cType == 'Bubble') ? '' : 'none'; ");
             output.Write(" if (cType == \"Area\" || cType == \"Bar\" || cType == \"Column\" || cType == \"Line\") { ");
             output.Write("     if (aggVal == \"Count\") { ");
             // NO Y VALUE
             output.Write("      try{ ");
+            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
@@ -605,6 +794,9 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
             // 1 Y VALUE (NUMERICAL)
             output.Write("      try{ ");
+            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"\"; ");
@@ -618,6 +810,9 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write("     if (aggVal == \"Count\") { ");
             // 1 Y VALUE (NON NUMERICAL)
             output.Write("      try{ ");
+            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
@@ -629,6 +824,9 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
             // MORE THAN 1 Y VALUE (Numerical)
             output.Write("      try{ ");
+            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_cbl_num\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_cbl_nonnum\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"\"; ");
@@ -642,6 +840,9 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write("     if (aggVal == \"Count\") { ");
             // NO Y VALUE
             output.Write("      try{ ");
+            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
@@ -653,6 +854,9 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write("     } else if (aggVal == \"Sum\" || aggVal == \"Avg\"){ ");
             // 1 Y VALUE (Numerical)
             output.Write("      try{ ");
+            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
@@ -665,6 +869,9 @@ namespace EPMLiveWebParts.ReportingChart
             output.Write(" } else if (cType == \"Bubble\" ) { ");
             // 1 Y VALUE (NUMERICAL)
             output.Write("      try{ ");
+            output.Write("         document.getElementById(\"XaxisSection_full\").style.display = \"none\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_num\").style.display = \"\"; ");
+            output.Write("         document.getElementById(\"XaxisSection_ddl_nonnum\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_num\").style.display = \"\"; ");
             output.Write("         document.getElementById(\"YaxisSection_ddl_nonnum\").style.display = \"none\"; ");
             output.Write("         document.getElementById(\"YaxisSection_cbl\").style.display = \"none\"; ");
@@ -702,6 +909,12 @@ namespace EPMLiveWebParts.ReportingChart
             #region CREATE X AXIS
             XaxisFieldDropDownList.EnableViewState = true;
             Controls.Add(XaxisFieldDropDownList);
+
+            ddlXaxisFieldNum.EnableViewState = true;
+            Controls.Add(ddlXaxisFieldNum);
+
+            ddlXaxisFieldNonNum.EnableViewState = true;
+            Controls.Add(ddlXaxisFieldNonNum);
 
             XaxisLabelRotationAngleTextBox.Text = "0";
             XaxisLabelRotationAngleTextBox.Width = 35;
@@ -1005,6 +1218,9 @@ namespace EPMLiveWebParts.ReportingChart
             // sort
             SortListControlItems(ChartTypeDropDownList);
 
+            // attach client side function
+            ChartTypeDropDownList.Attributes.Add("onChange", "ctype_agg_change()");
+
             // set value
             string sType = Enum.GetName(typeof(ChartType), chart.PropChartType);
 
@@ -1012,8 +1228,6 @@ namespace EPMLiveWebParts.ReportingChart
             {
                 ChartTypeDropDownList.SelectedValue = sType;
             }
-
-            ChartTypeDropDownList.Attributes.Add("onChange", "ctype_agg_change()");
         }
 
         private void SetupCheckBoxes(ReportingChart chart)
@@ -1040,6 +1254,8 @@ namespace EPMLiveWebParts.ReportingChart
                 return;
 
             XaxisFieldDropDownList.Items.Clear();
+            ddlXaxisFieldNum.Items.Clear();
+            ddlXaxisFieldNonNum.Items.Clear();
             cblYaxisFieldNum.Items.Clear();
             ddlYaxisFieldNum.Items.Clear();
             ZaxisFieldDropDownList.Items.Clear();
@@ -1047,7 +1263,9 @@ namespace EPMLiveWebParts.ReportingChart
             ddlYaxisFieldNonNum.Items.Clear();
             BubbleGroupByDropDownList.Items.Clear();
             ChartPaletteStyleDropDownList.Items.Clear();
-            
+
+            ReportingChart rc = (ReportingChart)ParentToolPane.SelectedWebPart;
+
             // fill color paletWte ddl
             ChartPaletteStyleDropDownList.Items.AddRange(new ListItem[] {
                 new ListItem("Color 1", "Color1"),
@@ -1069,8 +1287,9 @@ namespace EPMLiveWebParts.ReportingChart
                 string sFldColType = fld["ColumnType"].ToString();
 
                 if (sFldSharePointType == "Attachments" || sFldInternalName == "Order" ||
-                    sFldSharePointType == "File" || sFldInternalName == "MetaInfo" ||
-                    sFldSharePointType == "Computed")
+                    sFldSharePointType == "File" || sFldInternalName == "Metainfo" ||
+                    sFldSharePointType == "Computed" || sFldSharePointType == "Guid" ||
+                    sFldSharePointType == "Counter" || sFldSharePointType == "Note")
                     continue;
 
                 var liX = new ListItem(sFldDisplayName, sFldInternalName);
@@ -1078,10 +1297,16 @@ namespace EPMLiveWebParts.ReportingChart
                     XaxisFieldDropDownList.Items.Add(liX);
 
                 // numeric
-                if (sFldSharePointType == "Currency" || sFldSharePointType == "Number" ||
-                    sFldColType == "Integer" || sFldColType == "Int" || sFldColType == "Float")
+                if ((sFldSharePointType == "Calculated" && sFldColType == "Float") ||
+                    (sFldSharePointType == "Calculated" && sFldColType == "Int") ||
+                    sFldSharePointType == "Currency" ||
+                    sFldSharePointType == "Integer" ||
+                    sFldSharePointType == "Number")
                 {
                     var liNum = new ListItem(sFldDisplayName, sFldInternalName);
+
+                    if (!ddlXaxisFieldNum.Items.Contains(liNum))
+                        ddlXaxisFieldNum.Items.Add(liNum);
 
                     if (!cblYaxisFieldNum.Items.Contains(liNum))
                         cblYaxisFieldNum.Items.Add(liNum);
@@ -1096,6 +1321,9 @@ namespace EPMLiveWebParts.ReportingChart
                 else
                 {
                     var liNonNum = new ListItem(sFldDisplayName, sFldInternalName);
+
+                    if (!ddlXaxisFieldNonNum.Items.Contains(liNonNum))
+                        ddlXaxisFieldNonNum.Items.Add(liNonNum);
 
                     if (!cblYaxisFieldNonNum.Items.Contains(liNonNum))
                         cblYaxisFieldNonNum.Items.Add(liNonNum);
@@ -1124,7 +1352,14 @@ namespace EPMLiveWebParts.ReportingChart
                 new ListItem("Bottom", "Bottom")
             });
 
+            if (LegendPositionDropDownList.Items.FindByText(rc.PropChartLegendPosition) != null)
+            {
+                LegendPositionDropDownList.Items.FindByText(rc.PropChartLegendPosition).Selected = true;
+            }
+
             SortListControlItems(XaxisFieldDropDownList);
+            SortListControlItems(ddlXaxisFieldNum);
+            SortListControlItems(ddlXaxisFieldNonNum);
             // sort numeric fields
             SortListControlItems(cblYaxisFieldNum);
             SortListControlItems(ddlYaxisFieldNum);
@@ -1136,12 +1371,22 @@ namespace EPMLiveWebParts.ReportingChart
             SortListControlItems(BubbleChartColorFieldDropDownList);
             SortListControlItems(ChartPaletteStyleDropDownList);
 
-            ReportingChart rc = (ReportingChart)ParentToolPane.SelectedWebPart;
+
             if (!string.IsNullOrEmpty(rc.PropChartXaxisField))
             {
                 if (XaxisFieldDropDownList.Items.FindByValue(rc.PropChartXaxisField) != null)
                 {
                     XaxisFieldDropDownList.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
+                }
+
+                if (ddlXaxisFieldNum.Items.FindByValue(rc.PropChartXaxisField) != null)
+                {
+                    ddlXaxisFieldNum.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
+                }
+
+                if (ddlXaxisFieldNonNum.Items.FindByValue(rc.PropChartXaxisField) != null)
+                {
+                    ddlXaxisFieldNonNum.Items.FindByValue(rc.PropChartXaxisField).Selected = true;
                 }
             }
 

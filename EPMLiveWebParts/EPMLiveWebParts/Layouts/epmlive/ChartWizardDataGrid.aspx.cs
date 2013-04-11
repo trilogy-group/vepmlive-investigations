@@ -70,7 +70,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
     public static class ExtensionMethods
     {
-        
+
         /// <summary>
         /// Generates MD5 hash for the specified value.
         /// </summary>

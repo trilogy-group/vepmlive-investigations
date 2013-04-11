@@ -1,6 +1,4 @@
-﻿var reloadScriptTimeoutId = '';
-
-function OnPageLoad() {
+﻿function OnPageLoad() {
     $(function () {
         $.getScript('/_layouts/epmlive/javascripts/libraries/slimScroll.js', function () {
             $('.chartThumbWrapper').slimScroll({ height: '250px', size: '10px' });
@@ -33,6 +31,7 @@ function OnPageLoad() {
         $('#' + ddlYNumMultiClientId).css('display', 'none');
         $('#' + ddlYNonNumMultiClientId).css('display', 'none');
 
+        $('#' + pnlXDdlClientId).css('display', 'none');
         $('#' + pnlZFieldClientId).css('display', 'none');
         $('#' + pnlYDdlClientId).css('display', 'none');
 
@@ -42,63 +41,13 @@ function OnPageLoad() {
         else {
             DimNextBtn();
         }
+
     });
 }
 ExecuteOrDelayUntilScriptLoaded(OnPageLoad, 'EPMLive.js');
 
-function reloadScript() {
-    reloadScriptTimeoutId = setInterval(function () { reloadUILogic(); }, 1000);
-}
-
-function reloadUILogic() {
-    if ($('.chartThumbWrapper').parent().attr('class') != 'slimScrollDiv') {
-        $('.chartThumbWrapper').slimScroll({ height: '250px', size: '10px' });
-    }
-
-    $('#thumbTable tr').hover(function () {
-        $(this).addClass('thumbRowHover');
-    }, function () {
-        $(this).removeClass('thumbRowHover');
-    });
-
-    $(".thumbRow").click(function () {
-        $(".thumbRow").removeClass("thumbRowSelected");
-        $(".thumbLabel").css("color", "#444444");
-        $(this).addClass('thumbRowSelected');
-        $(this).find(".thumbLabel").css("color", "#ffffff");
-        $("#chartImage").attr("src", $(this).find(".imagedropshadow").attr("src"));
-
-        var gType = $(this).attr('graphType');
-        $('#' + tbChartTypeClientId).val(gType);
-        ManageUI();
-    });
-
-    $('#trColumn').trigger('click');
-    // set all checkbox ddl width
-    $('#' + ddlYNumMultiClientId + ' table').css('width', '170px');
-    $('#' + ddlYNonNumMultiClientId + ' table').css('width', '170px');
-
-    $('#' + ddlYNonNumSingleClientId).css('display', 'none');
-    $('#' + ddlYNumMultiClientId).css('display', 'none');
-    $('#' + ddlYNonNumMultiClientId).css('display', 'none');
-
-    $('#' + pnlZFieldClientId).css('display', 'none');
-    $('#' + pnlYDdlClientId).css('display', 'none');
-
-    if ($('#' + tbSelectedListAndViewClientId).val()) {
-        LightNextBtn();
-    }
-    else {
-        DimNextBtn();
-    }
-
-    clearTimeout(reloadScriptTimeoutId);
-
-}
-
 function AutosizeDialog() {
     //resize dialog if we are in one    
-    
     var dlg = parent.SP.UI.ModalDialog.get_childDialog();
     if (dlg != null) {
         try {
@@ -117,8 +66,7 @@ function AutosizeDialog() {
 function OpenDataSourceGrid() {
     var options = {
         url: gridurl,
-        width: 400,
-        height: 515,
+        width: 350,
         allowMaximize: false,
         showClose: false,
         dialogReturnValueCallback: SetDataSource
@@ -131,16 +79,14 @@ function SetDataSource(result, value) {
 
         $('#' + tbSelectedListAndViewClientId).val(value);
 
+        Sys.WebForms.PageRequestManager.getInstance().add_endRequest(ReloadScript);
         __doPostBack(updatePnlClientId, '');
-        reloadScript();
-
-        if ($('#' + tbSelectedListAndViewClientId).val()) {
-            LightNextBtn();
-        }
-        else {
-            DimNextBtn();
-        }
     }
+}
+
+function ReloadScript() {
+    ExecuteOrDelayUntilScriptLoaded(OnPageLoad, 'EPMLive.js');
+    Sys.WebForms.PageRequestManager.getInstance().remove_endRequest(ReloadScript);
 }
 
 function LightNextBtn() {
@@ -232,7 +178,7 @@ function ManageButtons(page) {
     $('#btnNext').removeClass();
     $('#btnCancel').removeClass();
     $('#btnSave').removeClass();
-    
+
     switch (page) {
         case 1:
             $('#btnBack').addClass('epmliveButtonDisabled');
@@ -315,20 +261,25 @@ function ManageDataEntryFields() {
     // CONFIGURE UI BASED ON CHART TYPE AND AGGREGATION 
     if (chartType == "Area" || chartType == "Bar" || chartType == "Column" || chartType == "Line") {
         if (aggType == "Count") {
-            // NO Y VALUE
+            // X NUM + NON-NUM, NO Y VALUE
             try {
+                // X Field
+                $('#' + pnlXDdlClientId).css('display', '');
+                $('#' + ddlXFieldClientId).css('display', '');
+                $('#' + ddlXNumClientId).css('display', 'none');
+                $('#' + ddlXNonNumClientId).css('display', 'none');
+                // Y Field
                 $('#' + pnlYDdlClientId).css('display', 'none');
-                //                $('#spnYVal').css('display', 'none');
-                //                $('#' + ddlYNumSingleClientId).css('display', 'none');
-                //                $('#' + ddlYNumMultiClientId).css('display', 'none');
-                //                $('#' + ddlYNonNumSingleClientId).css('display', 'none');
-                //                $('#' + ddlYNonNumMultiClientId).css('display', 'none');
-
-                $('#' + ddlYAxisFormatClientId).css('display', 'none');
             } catch (e) { }
         } else if (aggType == "Sum" || aggType == "Avg") {
-            // 1 Y VALUE (NUMERICAL)
+            // X NON-NUM, 1 Y VALUE (NUMERICAL)
             try {
+                // X Field
+                $('#' + pnlXDdlClientId).css('display', '');
+                $('#' + ddlXFieldClientId).css('display', 'none');
+                $('#' + ddlXNumClientId).css('display', 'none');
+                $('#' + ddlXNonNumClientId).css('display', '');
+                // Y Field
                 $('#' + pnlYDdlClientId).css('display', '');
                 $('#spnYVal').text('Y Value');
                 $('#spnYVal').css('display', '');
@@ -342,8 +293,14 @@ function ManageDataEntryFields() {
         }
     } else if (chartType.indexOf("_Clustered") != -1 || chartType.indexOf("_Stacked") != -1 || chartType.indexOf("_100Percent") != -1) {
         if (aggType == "Count") {
-            // 1 Y VALUE (NON NUMERICAL)
+            // X NON-NUM, NO Y VALUE
             try {
+                // X Field
+                $('#' + pnlXDdlClientId).css('display', '');
+                $('#' + ddlXFieldClientId).css('display', 'none');
+                $('#' + ddlXNumClientId).css('display', 'none');
+                $('#' + ddlXNonNumClientId).css('display', '');
+                // Y Field
                 $('#' + pnlYDdlClientId).css('display', '');
                 $('#spnYVal').text('Y Value');
                 $('#spnYVal').css('display', '');
@@ -355,8 +312,14 @@ function ManageDataEntryFields() {
                 $('#' + ddlYAxisFormatClientId).css('display', '');
             } catch (e) { }
         } else if (aggType == "Sum" || aggType == "Avg") {
-            // MORE THAN 1 Y VALUE (Numerical)
+            // X NON-NUM, MORE THAN 1 Y VALUE (Numerical)
             try {
+                // X Field
+                $('#' + pnlXDdlClientId).css('display', '');
+                $('#' + ddlXFieldClientId).css('display', 'none');
+                $('#' + ddlXNumClientId).css('display', 'none');
+                $('#' + ddlXNonNumClientId).css('display', '');
+                // Y Field
                 $('#' + pnlYDdlClientId).css('display', '');
                 $('#spnYVal').text('Y Value(series)');
                 $('#spnYVal').css('display', '');
@@ -370,19 +333,25 @@ function ManageDataEntryFields() {
         }
     } else if (chartType == "Pie" || chartType == "Donut") {
         if (aggType == "Count") {
-            // NO Y VALUE
+            // X NUM + NON-NUM, NO Y VALUE
             try {
+                // X Field
+                $('#' + pnlXDdlClientId).css('display', '');
+                $('#' + ddlXFieldClientId).css('display', '');
+                $('#' + ddlXNumClientId).css('display', 'none');
+                $('#' + ddlXNonNumClientId).css('display', 'none');
+                // Y Field
                 $('#' + pnlYDdlClientId).css('display', 'none');
-                //                $('#spnYVal').css('display', 'none');
-                //                $('#' + ddlYNumSingleClientId).css('display', 'none');
-                //                $('#' + ddlYNumMultiClientId).css('display', 'none');
-                //                $('#' + ddlYNonNumSingleClientId).css('display', 'none');
-                //                $('#' + ddlYNonNumMultiClientId).css('display', 'none');
-                //                $('#' + ddlYAxisFormatClientId).css('display', 'none');
             } catch (e) { }
         } else if (aggType == "Sum" || aggType == "Avg") {
-            // 1 Y VALUE (Numerical)
+            // X NON-NUM, 1 Y VALUE (Numerical)
             try {
+                // X Field
+                $('#' + pnlXDdlClientId).css('display', '');
+                $('#' + ddlXFieldClientId).css('display', 'none');
+                $('#' + ddlXNumClientId).css('display', 'none');
+                $('#' + ddlXNonNumClientId).css('display', '');
+                // Y Field
                 $('#' + pnlYDdlClientId).css('display', '');
                 $('#spnYVal').text('Y Value');
                 $('#spnYVal').css('display', '');
@@ -394,8 +363,14 @@ function ManageDataEntryFields() {
             } catch (e) { }
         }
     } else if (chartType == "Bubble") {
-        // 1 Y VALUE (NUMERICAL)
+        // X NUM, 1 Y VALUE (NUMERICAL)
         try {
+            // X Field
+            $('#' + pnlXDdlClientId).css('display', '');
+            $('#' + ddlXFieldClientId).css('display', 'none');
+            $('#' + ddlXNumClientId).css('display', '');
+            $('#' + ddlXNonNumClientId).css('display', 'none');
+            // Y Field
             $('#' + pnlYDdlClientId).css('display', '');
             $('#spnYVal').text('Y Value');
             $('#spnYVal').css('display', '');
@@ -463,15 +438,15 @@ function BuildChartPropObj() {
     ChartProps.sChartTitle = $('#' + tbChartTitleClientId).val();
     ChartProps.sChartType = $('#' + tbChartTypeClientId).val();
     ChartProps.sPropChartAggregationType = $('#' + ddlAggClientId).val();
-    ChartProps.sPropChartSelectedPaletteName = $('#' + ddlPaletteClientId).val();
+    ChartProps.sPropChartSelectedPaletteName = $find(ddlPaletteClientId)._value;
     ChartProps.sPropChartSelectedListTitle = $('#' + tbListTitleClientId).val();
     ChartProps.sPropChartSelectedViewTitle = $('#' + tbViewTitleClientId).val();
-    ChartProps.sPropChartXaxisField = $find(ddlXFieldClientId)._value;
+    ChartProps.sPropChartXaxisField = GetXValue();
     ChartProps.sPropChartYaxisField = GetYValue();
     ChartProps.sPropYaxisFormat = $('#' + ddlYAxisFormatClientId).val();
-    ChartProps.sPropLegendPosition = $('#' + ddlLegendPositionClientId).val();
+    ChartProps.sPropLegendPosition = $find(ddlLegendPositionClientId)._value;
     ChartProps.sPropChartZaxisField = GetZValue();
-    ChartProps.sPropBubbleChartGroupBy = $('#' + ddlGroupByClientId).val();
+    ChartProps.sPropBubbleChartGroupBy = $find(ddlGroupByClientId)._value;
     ChartProps.sPropChartShowSeriesLabels = $('#' + cbShowXAxisLabelsClientId).is(":checked");
     ChartProps.sPropChartShowGridlines = $('#' + cbShowGridLinesClientId).is(":checked");
     ChartProps.sPropChartShowLegend = $('#' + cbShowLegendClientId).is(":checked");
@@ -538,6 +513,27 @@ function GetYValue() {
     return yVal;
 }
 
+function GetXValue() {
+    var aggType = $('#' + ddlAggClientId).val();
+    var chartType = $('#' + tbChartTypeClientId).val();
+    var xVal = '';
+    if (chartType == "Area" || chartType == "Bar" || chartType == "Column" || chartType == "Line") {
+        if (aggType == "Count") {
+            xVal = $find(ddlXFieldClientId)._value;
+        } else if (aggType == "Sum" || aggType == "Avg") {
+            xVal = $find(ddlXNonNumClientId)._value;
+        }
+    } else if (chartType.indexOf("_Clustered") != -1 || chartType.indexOf("_Stacked") != -1 || chartType.indexOf("_100Percent") != -1) {
+        xVal = $find(ddlXNonNumClientId)._value;
+    } else if (chartType == "Pie" || chartType == "Donut") {
+        xVal = $find(ddlXNonNumClientId)._value;
+    } else if (chartType == "Bubble") {
+        xVal = $find(ddlXNumClientId)._value;
+    }
+
+    return xVal;
+}
+
 function GetZValue() {
     var zField = '';
     var chartType = $('#' + tbChartTypeClientId).val();
@@ -566,7 +562,7 @@ function ValidatePage2() {
 
         } else if (aggType == "Sum" || aggType == "Avg") {
             // NEED 1 X, 1 OR MORE Y VALUE
-            var xVal = $find(ddlXFieldClientId)._value;
+            var xVal = $find(ddlXNonNumClientId)._value;
             var yVal = $find(ddlYNumSingleClientId)._value;
             if (xVal != "None" && yVal != "None") {
                 isValid = true;
@@ -582,7 +578,7 @@ function ValidatePage2() {
             }
         } else if (aggType == "Sum" || aggType == "Avg") {
             // NEED 1 X, 1 OR MORE Y VALUE (NUMERICAL)
-            var xVal = $find(ddlXFieldClientId)._value;
+            var xVal = $find(ddlXNonNumClientId)._value;
             var checkedItems = $find(ddlYNumMultiClientId).get_checkedItems();
             if (xVal != "None" && checkedItems.length > 0) {
                 isValid = true;
@@ -597,7 +593,7 @@ function ValidatePage2() {
             }
         } else if (aggType == "Sum" || aggType == "Avg") {
             // NEED 1 X, 1 OR MORE Y VALUE (NUMERICAL)
-            var xVal = $find(ddlXFieldClientId)._value;
+            var xVal = $find(ddlXNonNumClientId)._value;
             var checkedItems = $find(ddlYNumMultiClientId).get_checkedItems();
             if (xVal != "None" && checkedItems.length > 0) {
                 isValid = true;
@@ -605,7 +601,7 @@ function ValidatePage2() {
         }
     } else if (chartType == "Bubble") {
         // 1 X, 1 Y, AND 1 Z (ALL NUMERICAL)
-        var xVal = $find(ddlXFieldClientId)._value;
+        var xVal = $find(ddlXNumClientId)._value;
         var yVal = $find(ddlYNumSingleClientId)._value;
         var zVal = $find(ddlZFieldClientId)._value;
         if (xVal != "None" && yVal != "None" && zVal != "None") {

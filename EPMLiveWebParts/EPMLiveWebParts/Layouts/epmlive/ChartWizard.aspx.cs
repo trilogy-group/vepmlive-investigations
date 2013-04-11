@@ -38,8 +38,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
         private string sPropChartAggregationType { get; set; }
         private string sPropChartLegendPosition { get; set; }
 
-        protected string _GridUrl = (SPContext.Current.Web.ServerRelativeUrl == "/") ? "" : (SPContext.Current.Web.ServerRelativeUrl) + @"/_layouts/epmlive/ChartWizardDataGrid.aspx";
-        protected string _CSSUrl = (SPContext.Current.Web.ServerRelativeUrl == "/") ? "" : (SPContext.Current.Web.ServerRelativeUrl) + @"/_layouts/epmlive/styles/ChartWizard/ChartWizardStyle.css";
+        protected string _GridUrl = SPContext.Current.Web.Url + @"/_layouts/epmlive/ChartWizardDataGrid.aspx";
+        protected string _CSSUrl = SPContext.Current.Web.Url + @"/_layouts/epmlive/styles/ChartWizard/ChartWizardStyle.css";
 
         private void GetListAndViewName()
         {
@@ -98,10 +98,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 DataTable dt = GetListColumns(oList.ID);
                 // FILL IN 'NONE SELECTED' OPTION FIRST
                 if (rcbXField.Items.FindItemByValue("None") == null)
-                {
-                    var liX = new RadComboBoxItem("None", "None");
-                    rcbXField.Items.Add(liX);
-                }
+                    rcbXField.Items.Add(new RadComboBoxItem("None", "None"));
+
+                if (rcbXNum.Items.FindItemByValue("None") == null)
+                    rcbXNum.Items.Add(new RadComboBoxItem("None", "None"));
+
+                if (rcbXNonNum.Items.FindItemByValue("None") == null)
+                    rcbXNonNum.Items.Add(new RadComboBoxItem("None", "None"));
 
                 if (rcbYNumSingle.Items.FindItemByValue("None") == null)
                     rcbYNumSingle.Items.Add(new RadComboBoxItem("None", "None"));
@@ -129,8 +132,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     string sFldColType = fld["ColumnType"].ToString();
 
                     if (sFldSharePointType == "Attachments" || sFldInternalName == "Order" ||
-                        sFldSharePointType == "File" || sFldInternalName == "MetaInfo" ||
-                        sFldSharePointType == "Computed")
+                        sFldSharePointType == "File" || sFldInternalName == "Metainfo" ||
+                        sFldSharePointType == "Computed" || sFldSharePointType == "Guid" ||
+                        sFldSharePointType == "Counter" || sFldSharePointType == "Note")
                         continue;
 
                     if (rcbXField.Items.FindItemByValue(sFldInternalName) == null)
@@ -140,9 +144,15 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     }
 
                     // numeric
-                    if (sFldSharePointType == "Currency" || sFldSharePointType == "Number" ||
-                        sFldColType == "Integer" || sFldColType == "Int" || sFldColType == "Float")
+                    if ((sFldSharePointType == "Calculated" && sFldColType == "Float") ||
+                        (sFldSharePointType == "Calculated" && sFldColType == "Int") ||
+                        sFldSharePointType == "Currency" ||
+                        sFldSharePointType == "Integer" ||
+                        sFldSharePointType == "Number")
                     {
+                        if (rcbXNum.Items.FindItemByValue(sFldInternalName) == null)
+                            rcbXNum.Items.Add(new RadComboBoxItem(sFldDisplayName, sFldInternalName));
+
                         if (rcbYNumSingle.Items.FindItemByValue(sFldInternalName) == null)
                             rcbYNumSingle.Items.Add(new RadComboBoxItem(sFldDisplayName, sFldInternalName));
 
@@ -155,6 +165,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     // non-numeric
                     else
                     {
+                        if (rcbXNonNum.Items.FindItemByValue(sFldInternalName) == null)
+                            rcbXNonNum.Items.Add(new RadComboBoxItem(sFldDisplayName, sFldInternalName));
+
                         if (rcbYNonNumSingle.Items.FindItemByValue(sFldInternalName) == null)
                             rcbYNonNumSingle.Items.Add(new RadComboBoxItem(sFldDisplayName, sFldInternalName));
 
@@ -170,7 +183,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
             #endregion
         }
 
-
         protected void WriteControlClientIds()
         {
             ClientScript.RegisterClientScriptBlock(this.GetType(), "_CtrlClientIds_",
@@ -181,7 +193,10 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 "var tbViewTitleClientId = '" + tbViewTitle.ClientID + "';" +
                 "var pnlAggClientId = '" + pnlAggDdl.ClientID + "';" +
                 "var ddlAggClientId = '" + rcbAgg.ClientID + "';" +
+                "var pnlXDdlClientId = '" + pnlXDdl.ClientID + "';" +
                 "var ddlXFieldClientId = '" + rcbXField.ClientID + "';" +
+                "var ddlXNumClientId = '" + rcbXNum.ClientID + "';" +
+                "var ddlXNonNumClientId = '" + rcbXNonNum.ClientID + "';" +
                 "var pnlYDdlClientId = '" + pnlYDdl.ClientID + "';" +
                 "var ddlYNumSingleClientId = '" + rcbYNumSingle.ClientID + "';" +
                 "var ddlYNonNumSingleClientId = '" + rcbYNonNumSingle.ClientID + "';" +
@@ -205,6 +220,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             rcbAgg.OnClientSelectedIndexChanged = "ManageUI";
             rcbXField.OnClientSelectedIndexChanged = "ManageUI";
+            rcbXNum.OnClientSelectedIndexChanged = "ManageUI";
+            rcbXNonNum.OnClientSelectedIndexChanged = "ManageUI";
             rcbYNumSingle.OnClientSelectedIndexChanged = "ManageUI";
             rcbYNumMulti.OnClientItemChecked = "ManageUI";
             rcbZField.OnClientSelectedIndexChanged = "ManageUI";
@@ -224,7 +241,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
             GetListAndViewName();
             FillData();
         }
-
 
         #region HELPER METHODS
         private DataTable GetListColumns(Guid id)

@@ -28,6 +28,7 @@ namespace EPMLiveWebParts.ReportingChart
     {
         #region Fields
         private static string CURRENCY_SYMBOL = SPContext.Current.Web.Locale.NumberFormat.CurrencySymbol;
+        private static string NULL_CATEGORY_TEXT = "No Value Specified";
         public static char Separator = '|';
         protected Literal ScriptTagHolder = new Literal();
         protected DataTable ChartData;
@@ -291,19 +292,26 @@ namespace EPMLiveWebParts.ReportingChart
             XAxisLabels = new List<string>();
             YAxisLabel = string.Empty;
 
-            
+
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "__KendoCultureJS__", "$(function () { kendo.culture('" + SPContext.Current.Web.Locale.ToString() + "'); });", true);
-
             // add kendo culture js reference
-            ScriptReference srKendo = new ScriptReference();
-            srKendo.Path = "/_layouts/epmlive/javascripts/libraries/Kendo/cultures/kendo.culture." + SPContext.Current.Web.Locale.ToString() + ".min.js";
-            ScriptManager.GetCurrent(this.Page).Scripts.Add(srKendo);
+            //ScriptReference srKendo = new ScriptReference();
+            //srKendo.Path = SPContext.Current.Web.Url + "/_layouts/epmlive/javascripts/libraries/Kendo/cultures/kendo.culture." + SPContext.Current.Web.Locale.ToString() + ".min.js";
+            //ScriptManager.GetCurrent(this.Page).Scripts.Add(srKendo);
+
+            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "__KendoCultureJS__",
+                @"$(function () { 
+                    $.getScript('" + SPContext.Current.Web.Url + "/_layouts/epmlive/javascripts/libraries/Kendo/cultures/kendo.culture." + SPContext.Current.Web.Locale.ToString() + @".min.js', function(){
+                        if (kendo){
+                            kendo.culture('" + SPContext.Current.Web.Locale.ToString() + @"');
+                        }
+                    }, true);
+                });", true);
         }
 
         protected override void CreateChildControls()
@@ -315,9 +323,33 @@ namespace EPMLiveWebParts.ReportingChart
             BuildYAxisItemLabels();
         }
 
+
+
         public override void RenderControl(HtmlTextWriter writer)
         {
             base.RenderControl(writer);
+
+            if (!string.IsNullOrEmpty(Width) && !string.IsNullOrEmpty(Height))
+            {
+                int h = (int)(new Unit(Height).Value);
+                int w = (int)(new Unit(Width).Value);
+
+                Page.ClientScript.RegisterStartupScript(GetType(), "__RepaintChart__",
+                                       @"function repaintChart() {
+                                            var radChart = $find('" + RadChartClientId + @"');
+                                            if (radChart){
+                                                radChart.set_height('" + (h - 30).ToString() + @"');
+                                                radChart.set_width('" + (w - 30).ToString() + @"');
+                                                radChart.repaint();
+                                            }
+                                            else{
+                                                setTimeout(repaintChart, 1000);
+                                            }      
+                                        }
+                    
+                                        repaintChart();", true);
+
+            }
 
             if (string.IsNullOrEmpty(PropChartSelectedListTitle))
             {
@@ -337,7 +369,7 @@ namespace EPMLiveWebParts.ReportingChart
                                         } 
                                     }
 
-                                    var options = {url: """ + ((SPContext.Current.Web.ServerRelativeUrl == "/") ? "" : SPContext.Current.Web.ServerRelativeUrl) + @"/_layouts/epmlive/ChartWizard.aspx"", 
+                                    var options = {url: """ + SPContext.Current.Web.Url + @"/_layouts/epmlive/ChartWizard.aspx"", 
                                                     dialogReturnValueCallback:myCallback, 
                                                     showClose: false,
                                                     allowMaximize: false,
@@ -424,6 +456,8 @@ namespace EPMLiveWebParts.ReportingChart
             c.ChartTitle.Appearance.TextStyle.FontSize = 18;
             c.ChartTitle.Appearance.TextStyle.FontFamily = "Arial";
 
+
+
             c.Legend.Appearance.Visible = PropChartShowLegend;
             c.Legend.Appearance.Position = !string.IsNullOrEmpty(PropChartLegendPosition) ?
                 (Telerik.Web.UI.HtmlChart.ChartLegendPosition)Enum.Parse(typeof(Telerik.Web.UI.HtmlChart.ChartLegendPosition), PropChartLegendPosition) : Telerik.Web.UI.HtmlChart.ChartLegendPosition.Bottom;
@@ -488,6 +522,13 @@ namespace EPMLiveWebParts.ReportingChart
 
             _radChart.PlotArea.XAxis.LabelsAppearance.Visible = PropChartShowSeriesLabels;
 
+            if (MainChartType != ChartType.Bar &&
+                MainChartType != ChartType.Bar_Stacked &&
+                MainChartType != ChartType.Bar_Clustered &&
+                MainChartType != ChartType.Bar_100Percent)
+            {
+                _radChart.PlotArea.XAxis.LabelsAppearance.RotationAngle = 315;
+            }
         }
 
         private void BuildYAxisItemLabels()
@@ -514,6 +555,14 @@ namespace EPMLiveWebParts.ReportingChart
             }
 
             _radChart.PlotArea.YAxis.LabelsAppearance.Visible = true;
+
+            if (MainChartType == ChartType.Bar ||
+                MainChartType == ChartType.Bar_Stacked ||
+                MainChartType == ChartType.Bar_Clustered ||
+                MainChartType == ChartType.Bar_100Percent)
+            {
+                _radChart.PlotArea.YAxis.LabelsAppearance.RotationAngle = 315;
+            }
         }
 
         /// <summary>
@@ -641,13 +690,13 @@ namespace EPMLiveWebParts.ReportingChart
                 if (PropYaxisFormat == "Currency")
                 {
                     sArea.LabelsAppearance.DataFormatString = "{0:c}";
-                    sArea.TooltipsAppearance.DataFormatString = sArea.Name + " = {0:c}";
+                    sArea.TooltipsAppearance.DataFormatString = "{0:c}";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
                     sArea.LabelsAppearance.DataFormatString = "{0:p}";
                     sArea.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.LineAndScatterLabelsPosition.Above;
-                    sArea.TooltipsAppearance.DataFormatString = sArea.Name + " = {0:p}";
+                    sArea.TooltipsAppearance.DataFormatString = "{0:p}";
                 }
                 _radChart.PlotArea.Series.Add(sArea);
             }
@@ -682,12 +731,12 @@ namespace EPMLiveWebParts.ReportingChart
                 if (PropYaxisFormat == "Currency")
                 {
                     sBar.LabelsAppearance.DataFormatString = "{0:c}";
-                    sBar.TooltipsAppearance.DataFormatString = sBar.Name + " = {0:c}";
+                    sBar.TooltipsAppearance.DataFormatString = "{0:c}";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
                     sBar.LabelsAppearance.DataFormatString = "{0:p}";
-                    sBar.TooltipsAppearance.DataFormatString = sBar.Name + " = {0:p}";
+                    sBar.TooltipsAppearance.DataFormatString = "{0:p}";
                 }
 
                 if (MainChartType.ToString().Contains("_Stacked") || MainChartType.ToString().Contains("_100Percent"))
@@ -732,12 +781,12 @@ namespace EPMLiveWebParts.ReportingChart
                 if (PropYaxisFormat == "Currency")
                 {
                     sCol.LabelsAppearance.DataFormatString = "{0:c}";
-                    sCol.TooltipsAppearance.DataFormatString = sCol.Name + " = {0:c}";
+                    sCol.TooltipsAppearance.DataFormatString = "{0:c}";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
                     sCol.LabelsAppearance.DataFormatString = "{0:p}";
-                    sCol.TooltipsAppearance.DataFormatString = sCol.Name + " = {0:p}";
+                    sCol.TooltipsAppearance.DataFormatString = "{0:p}";
                 }
 
                 if (MainChartType.ToString().Contains("_Stacked") || MainChartType.ToString().Contains("_100Percent"))
@@ -780,12 +829,12 @@ namespace EPMLiveWebParts.ReportingChart
                 if (PropYaxisFormat == "Currency")
                 {
                     sLine.LabelsAppearance.DataFormatString = "{0:c}";
-                    sLine.TooltipsAppearance.DataFormatString = sLine.Name + " = {0:c}";
+                    sLine.TooltipsAppearance.DataFormatString = "{0:c}";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
                     sLine.LabelsAppearance.DataFormatString = "{0:p}";
-                    sLine.TooltipsAppearance.DataFormatString = sLine.Name + " = {0:p}";
+                    sLine.TooltipsAppearance.DataFormatString = "{0:p}";
                 }
 
 
@@ -806,12 +855,12 @@ namespace EPMLiveWebParts.ReportingChart
                 if (PropYaxisFormat == "Currency")
                 {
                     sPie.LabelsAppearance.DataFormatString = "{0:c}";
-                    sPie.TooltipsAppearance.DataFormatString = sPie.Name + " = {0:c}";
+                    sPie.TooltipsAppearance.DataFormatString = "{0:c}";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
                     sPie.LabelsAppearance.DataFormatString = "{0:p}";
-                    sPie.TooltipsAppearance.DataFormatString = sPie.Name + " = {0:c}";
+                    sPie.TooltipsAppearance.DataFormatString = "{0:p}";
                 }
 
                 _radChart.PlotArea.Series.Add(sPie);
@@ -906,11 +955,6 @@ namespace EPMLiveWebParts.ReportingChart
                             sDonut.LabelsAppearance.DataFormatString = "{0:p}";
                             sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieLabelsPosition.Column;
                             sDonut.TooltipsAppearance.DataFormatString = sDonut.Name + " = {0:p}";
-                            break;
-                        default:
-                            sDonut.LabelsAppearance.DataFormatString = "{0}";
-                            sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieLabelsPosition.Column;
-                            sDonut.TooltipsAppearance.DataFormatString = sDonut.Name + " = {0}";
                             break;
                     }
                 }
@@ -1030,30 +1074,61 @@ namespace EPMLiveWebParts.ReportingChart
 
         #region HELPER METHODS (GETTING SERIES ITEMS)
 
+        /// <summary>
+        /// Get data for bubble graph.
+        /// NOTE: X, Y and Z should be numeric fields, groupBy is non numeric, similar to categories.
+        /// </summary>
+        /// <param name="dtRaw"></param>
+        /// <param name="category"></param>
+        /// <param name="series"></param>
+        /// <param name="valueFld"></param>
+        /// <param name="groupBy"></param>
+        /// <returns></returns>
         private Dictionary<string, List<SeriesItem>> GetDataForBubbleSeries(DataTable dtRaw, string category, string series, string valueFld, string groupBy)
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result = new List<SeriesItem>();
             XAxisLabels.Clear();
 
-            if (!string.IsNullOrEmpty(series) && valueFld != "-- None Selected --" && !string.IsNullOrEmpty(groupBy))
+            if (!string.IsNullOrEmpty(series) && !string.IsNullOrEmpty(valueFld) && !string.IsNullOrEmpty(groupBy))
             {
-                List<string> distinctGrps = (from DataRow r in dtRaw.AsEnumerable() where r[groupBy] != DBNull.Value select r[groupBy].ToString().Trim()).Distinct().ToList();
+                string sGroupBySQLCol = GetSQLColNameIfLookup(groupBy);
+                List<string> distinctGrps = (from DataRow r in dtRaw.AsEnumerable()
+                                             select (r[sGroupBySQLCol] != DBNull.Value) ?
+                                                        r[sGroupBySQLCol].ToString().Trim() : NULL_CATEGORY_TEXT).Distinct().ToList();
 
                 foreach (string grp in distinctGrps)
                 {
                     result = new List<SeriesItem>();
-                    var tempGrp = (from DataRow r in dtRaw.AsEnumerable()
-                                   where r[series] != DBNull.Value && r[valueFld] != DBNull.Value && r[groupBy] != DBNull.Value && r[groupBy].ToString().Trim() == grp
-                                   select new[] { r[category], r[series], r[valueFld], r["Title"] }).ToArray();
-
-                    foreach (object[] oTemp in tempGrp)
+                    if (grp != NULL_CATEGORY_TEXT)
                     {
-                        SeriesItem si = new SeriesItem(
-                            decimal.Round(decimal.Parse(oTemp[0].ToString()), 2),
-                            decimal.Round(decimal.Parse(oTemp[1].ToString()), 2)) { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
-                        si.TooltipValue = oTemp[3].ToString();
-                        result.Add(si);
+                        var tempGrp = (from DataRow r in dtRaw.AsEnumerable()
+                                       where r[series] != DBNull.Value && r[valueFld] != DBNull.Value && r[sGroupBySQLCol] != DBNull.Value && r[sGroupBySQLCol].ToString().Trim() == grp
+                                       select new[] { r[category], r[series], r[valueFld], r["Title"] }).ToArray();
+
+                        foreach (object[] oTemp in tempGrp)
+                        {
+                            SeriesItem si = new SeriesItem(
+                                decimal.Round(decimal.Parse(oTemp[0].ToString()), 2),
+                                decimal.Round(decimal.Parse(oTemp[1].ToString()), 2)) { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
+                            si.TooltipValue = oTemp[3].ToString();
+                            result.Add(si);
+                        }
+                    }
+                    else
+                    {
+                        var tempGrp = (from DataRow r in dtRaw.AsEnumerable()
+                                       where r[series] != DBNull.Value && r[valueFld] != DBNull.Value && r[sGroupBySQLCol] == DBNull.Value
+                                       select new[] { r[category], r[series], r[valueFld], r["Title"] }).ToArray();
+
+                        foreach (object[] oTemp in tempGrp)
+                        {
+                            SeriesItem si = new SeriesItem(
+                                decimal.Round(decimal.Parse(oTemp[0].ToString()), 2),
+                                decimal.Round(decimal.Parse(oTemp[1].ToString()), 2)) { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
+                            si.TooltipValue = oTemp[3].ToString();
+                            result.Add(si);
+                        }
                     }
                     container.Add(GetFldDispNameFromIntName(grp), result);
                 }
@@ -1062,32 +1137,20 @@ namespace EPMLiveWebParts.ReportingChart
             return container;
         }
 
-        //private List<SeriesItem> GetDataForScatterSeries(DataTable dtRaw, string category, string series)
-        //{
-        //    List<SeriesItem> result = new List<SeriesItem>();
-        //    var rx = (from DataRow r in dtRaw.AsEnumerable()
-        //              where r[category] != DBNull.Value && r[series] != DBNull.Value
-        //              select new[] { r[category], r[series] }).ToArray();
-        //    foreach (object[] o in rx)
-        //    {
-        //        result.Add(new SeriesItem(decimal.Parse(o[0].ToString()), decimal.Parse(o[1].ToString())));
-        //    }
-        //    return result;
-        //}
-
         private Dictionary<string, List<SeriesItem>> GetCountDataForPieSeries(DataTable dtRaw, string category)
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result = new List<SeriesItem>();
-            category = TranslateIfLookup(category);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
             var rx = (from DataRow r in dtRaw.AsEnumerable()
-                      group r by r[category] into gr
-                      select new[] { gr.Key, gr.Count() }).ToArray();
+                      group r by r[sCatSQLCol] into gr
+                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), gr.Count() }).ToArray();
 
             foreach (object[] o in rx)
             {
                 SeriesItem st = new SeriesItem(decimal.Round(decimal.Parse(o[1].ToString()), 2));
-                st.Name = GetFldDispNameFromIntName(o[0].ToString());
+                st.Name = o[0].ToString();
+                st.TooltipValue = o[0].ToString();
                 result.Add(st);
             }
             container.Add(GetFldDispNameFromIntName(category), result);
@@ -1098,17 +1161,19 @@ namespace EPMLiveWebParts.ReportingChart
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result = new List<SeriesItem>();
-            category = TranslateIfLookup(category);
-            series = TranslateIfLookup(series);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
+            string sSeriesSQLCol = GetSQLColNameIfLookup(series);
             var rx = (from DataRow r in dtRaw.AsEnumerable()
-                      where r[series] != DBNull.Value
-                      group r by r[category] into gr
-                      select new[] { gr.Key, gr.Sum(x => int.Parse(x[series].ToString())) }).ToArray();
+                      where r[sSeriesSQLCol] != DBNull.Value
+                      group r by r[sCatSQLCol] into gr
+                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                                        gr.Sum(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
             foreach (object[] o in rx)
             {
                 SeriesItem st = new SeriesItem(decimal.Round(decimal.Parse(o[1].ToString()), 2));
-                st.Name = GetFldDispNameFromIntName(o[0].ToString());
+                st.Name = o[0].ToString();
+                st.TooltipValue = o[0].ToString();
                 result.Add(st);
             }
             container.Add(GetFldDispNameFromIntName(series), result);
@@ -1120,16 +1185,18 @@ namespace EPMLiveWebParts.ReportingChart
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result = new List<SeriesItem>();
-            category = TranslateIfLookup(category);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
+            string sSeriesSQLCol = GetSQLColNameIfLookup(series);
             var rx = (from DataRow r in dtRaw.AsEnumerable()
-                      where r[series] != DBNull.Value
-                      group r by r[category] into gr
-                      select new[] { gr.Key, gr.Average(x => int.Parse(x[series].ToString())) }).ToArray();
+                      where r[sSeriesSQLCol] != DBNull.Value
+                      group r by r[sCatSQLCol] into gr
+                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), gr.Average(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
             foreach (object[] o in rx)
             {
                 SeriesItem st = new SeriesItem(decimal.Round(decimal.Parse(o[1].ToString()), 2));
-                st.Name = GetFldDispNameFromIntName(o[0].ToString());
+                st.Name = o[0].ToString();
+                st.TooltipValue = o[0].ToString();
                 result.Add(st);
             }
 
@@ -1147,22 +1214,27 @@ namespace EPMLiveWebParts.ReportingChart
         {
             Dictionary<string, List<SeriesItem>> result = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> lsTemp = new List<SeriesItem>();
-            category = TranslateIfLookup(category);
-            List<string> distinctCats = (from r in dtRaw.AsEnumerable() where r[category] != DBNull.Value select r[category].ToString().Trim()).Distinct().ToList();
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (!string.IsNullOrEmpty(r[sCatSQLCol].ToString()) ?
+                                             r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
             // add x axis labels
             XAxisLabels.Clear();
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(GetFldDispNameFromIntName(cat));
+                XAxisLabels.Add(cat);
             }
 
             var rx = (from DataRow r in dtRaw.AsEnumerable()
-                      group r by r[category] into gr
-                      select new[] { gr.Key, gr.Count() }).ToArray();
+                      group r by r[sCatSQLCol] into gr
+                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), gr.Count() }).ToArray();
 
             foreach (object[] o in rx)
             {
-                lsTemp.Add(new SeriesItem(decimal.Round(decimal.Parse(o[1].ToString()), 2)));
+                SeriesItem st = new SeriesItem(decimal.Round(decimal.Parse(o[1].ToString()), 2));
+                st.Name = o[0].ToString();
+                st.TooltipValue = o[0].ToString();
+                lsTemp.Add(st);
             }
 
             result.Add(GetFldDispNameFromIntName(category), lsTemp);
@@ -1185,16 +1257,18 @@ namespace EPMLiveWebParts.ReportingChart
             {
                 return listContainer;
             }
-            category = TranslateIfLookup(category);
-            series = TranslateIfLookup(series);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
+            string sSeriesSQLCol = GetSQLColNameIfLookup(series);
             List<SeriesItem> lSeries;
-            List<string> distinctCats = (from r in dtRaw.AsEnumerable() where r[category] != DBNull.Value select r[category].ToString().Trim()).Distinct().ToList();
-            List<string> distinctSeriesVals = (from r in dtRaw.AsEnumerable() where r[series] != DBNull.Value select r[series].ToString().Trim()).Distinct().ToList();
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (!string.IsNullOrEmpty(r[sCatSQLCol].ToString()) ?
+                                             r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
+            List<string> distinctSeriesVals = (from r in dtRaw.AsEnumerable() where r[sSeriesSQLCol] != DBNull.Value select r[sSeriesSQLCol].ToString().Trim()).Distinct().ToList();
             // add x axis labels
             XAxisLabels.Clear();
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(GetFldDispNameFromIntName(cat));
+                XAxisLabels.Add(cat);
             }
 
             string sVal = string.Empty;
@@ -1203,13 +1277,23 @@ namespace EPMLiveWebParts.ReportingChart
                 lSeries = new List<SeriesItem>();
                 foreach (string cat in distinctCats)
                 {
-                    string rowCount = (from r in dtRaw.AsEnumerable()
-                                       where r[category] != DBNull.Value && r[series] != DBNull.Value
-                                       && r[category].ToString().Trim() == cat && r[series].ToString().Trim() == seriesVal
-                                       select r).ToList().Count().ToString();
-                    lSeries.Add(new SeriesItem(decimal.Round(decimal.Parse(rowCount), 2)));
+                    if (cat != NULL_CATEGORY_TEXT)
+                    {
+                        string rowCount = (from r in dtRaw.AsEnumerable()
+                                           where r[sCatSQLCol] != DBNull.Value && r[sSeriesSQLCol] != DBNull.Value
+                                           && r[sCatSQLCol].ToString().Trim() == cat && r[sSeriesSQLCol].ToString().Trim() == seriesVal
+                                           select r).ToList().Count().ToString();
+                        lSeries.Add(new SeriesItem(decimal.Round(decimal.Parse(rowCount), 2)));
+                    }
+                    else
+                    {
+                        string rowCount = (from r in dtRaw.AsEnumerable()
+                                           where r[sCatSQLCol] == DBNull.Value && r[sSeriesSQLCol] != DBNull.Value && r[sSeriesSQLCol].ToString().Trim() == seriesVal
+                                           select r).ToList().Count().ToString();
+                        lSeries.Add(new SeriesItem(decimal.Round(decimal.Parse(rowCount), 2)));
+                    }
                 }
-                listContainer.Add(GetFldDispNameFromIntName(seriesVal), lSeries);
+                listContainer.Add(seriesVal, lSeries);
             }
 
             return listContainer;
@@ -1229,16 +1313,18 @@ namespace EPMLiveWebParts.ReportingChart
             {
                 return listContainer;
             }
-            category = TranslateIfLookup(category);
-            series = TranslateIfLookup(series);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
+            string sSeriesSQLCol = GetSQLColNameIfLookup(series);
             List<SeriesItem> lSeries;
-            List<string> distinctCats = (from r in dtRaw.AsEnumerable() where r[category] != DBNull.Value select r[category].ToString().Trim()).Distinct().ToList();
-            List<string> distinctSeriesVals = (from r in dtRaw.AsEnumerable() where r[series] != DBNull.Value select r[series].ToString().Trim()).Distinct().ToList();
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (!string.IsNullOrEmpty(r[sCatSQLCol].ToString()) ?
+                                             r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
+            List<string> distinctSeriesVals = (from r in dtRaw.AsEnumerable() where r[sSeriesSQLCol] != DBNull.Value select r[sSeriesSQLCol].ToString().Trim()).Distinct().ToList();
             // add x axis labels
             XAxisLabels.Clear();
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(GetFldDispNameFromIntName(cat));
+                XAxisLabels.Add(cat);
             }
 
             DataTable tbCatAndSeriesTotal = new DataTable();
@@ -1247,16 +1333,32 @@ namespace EPMLiveWebParts.ReportingChart
 
             foreach (string cat in distinctCats)
             {
-                decimal catTotal = 0;
-                foreach (string s in distinctSeriesVals)
+                if (cat != NULL_CATEGORY_TEXT)
                 {
-                    int rx = (from DataRow r in dtRaw.AsEnumerable()
-                              where r[category] != DBNull.Value && r[series] != DBNull.Value && r[category].ToString().Trim() == cat && r[series].ToString().Trim() == s
-                              select r).Count();
+                    decimal catTotal = 0;
+                    foreach (string s in distinctSeriesVals)
+                    {
+                        int rx = (from DataRow r in dtRaw.AsEnumerable()
+                                  where r[sCatSQLCol] != DBNull.Value && r[sSeriesSQLCol] != DBNull.Value && r[sCatSQLCol].ToString().Trim() == cat && r[sSeriesSQLCol].ToString().Trim() == s
+                                  select r).Count();
 
-                    catTotal += rx;
+                        catTotal += rx;
+                    }
+                    tbCatAndSeriesTotal.Rows.Add(cat, catTotal);
                 }
-                tbCatAndSeriesTotal.Rows.Add(cat, catTotal);
+                else
+                {
+                    decimal nullCatTotal = 0;
+                    foreach (string s in distinctSeriesVals)
+                    {
+                        int rx = (from DataRow r in dtRaw.AsEnumerable()
+                                  where r[sCatSQLCol] == DBNull.Value && r[sSeriesSQLCol] != DBNull.Value && r[sSeriesSQLCol].ToString().Trim() == s
+                                  select r).Count();
+
+                        nullCatTotal += rx;
+                    }
+                    tbCatAndSeriesTotal.Rows.Add(cat, nullCatTotal);
+                }
             }
 
             string sVal = string.Empty;
@@ -1265,16 +1367,30 @@ namespace EPMLiveWebParts.ReportingChart
                 lSeries = new List<SeriesItem>();
                 foreach (string cat in distinctCats)
                 {
-                    decimal dRowCount = (from r in dtRaw.AsEnumerable()
-                                         where r[category] != DBNull.Value && r[series] != DBNull.Value && r[category].ToString() == cat && r[series].ToString() == seriesVal
-                                         select r).ToList().Count();
-                    decimal dCatTotal = decimal.Parse(tbCatAndSeriesTotal.Select("Category = '" + cat + "'").First()["CategoryTotal"].ToString());
-                    lSeries.Add(
-                        new SeriesItem(
-                            decimal.Round(dRowCount / dCatTotal, 2)
-                            ));
+                    if (cat != NULL_CATEGORY_TEXT)
+                    {
+                        decimal dRowCount = (from r in dtRaw.AsEnumerable()
+                                             where r[sCatSQLCol] != DBNull.Value && r[sSeriesSQLCol] != DBNull.Value && r[sCatSQLCol].ToString() == cat && r[sSeriesSQLCol].ToString() == seriesVal
+                                             select r).ToList().Count();
+                        decimal dCatTotal = decimal.Parse(tbCatAndSeriesTotal.Select("Category = '" + cat + "'").First()["CategoryTotal"].ToString());
+                        lSeries.Add(
+                            new SeriesItem(
+                                decimal.Round(dRowCount / dCatTotal, 2)
+                                ));
+                    }
+                    else
+                    {
+                        decimal dRowCount = (from r in dtRaw.AsEnumerable()
+                                             where r[sCatSQLCol] == DBNull.Value && r[sSeriesSQLCol] != DBNull.Value && r[sSeriesSQLCol].ToString() == seriesVal
+                                             select r).ToList().Count();
+                        decimal dCatTotal = decimal.Parse(tbCatAndSeriesTotal.Select("Category = '" + cat + "'").First()["CategoryTotal"].ToString());
+                        lSeries.Add(
+                            new SeriesItem(
+                                decimal.Round(dRowCount / dCatTotal, 2)
+                                ));
+                    }
                 }
-                listContainer.Add(GetFldDispNameFromIntName(seriesVal), lSeries);
+                listContainer.Add(seriesVal, lSeries);
             }
 
             return listContainer;
@@ -1291,26 +1407,32 @@ namespace EPMLiveWebParts.ReportingChart
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result;
-            category = TranslateIfLookup(category);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
-            List<string> distinctCats = (from r in dtRaw.AsEnumerable() where r[category] != DBNull.Value select r[category].ToString().Trim()).Distinct().ToList();
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (!string.IsNullOrEmpty(r[sCatSQLCol].ToString()) ?
+                                             r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
             XAxisLabels.Clear();
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(GetFldDispNameFromIntName(cat));
+                XAxisLabels.Add(cat);
             }
             YAxisLabel = "Sum";
             string[] yFields = rawMultiSeries.Split('|');
 
             foreach (string series in yFields)
             {
+                string sSeriesSQLCol = GetSQLColNameIfLookup(series);
                 if (!string.IsNullOrEmpty(series))
                 {
                     result = new List<SeriesItem>();
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
-                              where r[series] != DBNull.Value
-                              group r by r[category] into gr
-                              select new[] { gr.Key, gr.Sum(x => int.Parse(x[series].ToString())) }).ToArray();
+                              where r[sSeriesSQLCol] != DBNull.Value
+                              group r by r[sCatSQLCol] into gr
+                              select new[] { 
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                                  gr.Sum(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
+
                     foreach (object[] o in rx)
                     {
                         result.Add(
@@ -1337,13 +1459,14 @@ namespace EPMLiveWebParts.ReportingChart
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result;
-            category = TranslateIfLookup(category);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
-            List<string> distinctCats = (from r in dtRaw.AsEnumerable() where r[category] != DBNull.Value select r[category].ToString().Trim()).Distinct().ToList();
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (r[sCatSQLCol] != DBNull.Value) ? r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT).Distinct().ToList();
             XAxisLabels.Clear();
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(GetFldDispNameFromIntName(cat));
+                XAxisLabels.Add(cat);
             }
             YAxisLabel = "Sum";
             string[] yFields = rawMultiSeries.Split('|');
@@ -1354,32 +1477,56 @@ namespace EPMLiveWebParts.ReportingChart
 
             foreach (string cat in distinctCats)
             {
-                decimal catTotal = 0;
-                foreach (string series in yFields)
+                if (cat != NULL_CATEGORY_TEXT)
                 {
-                    if (!string.IsNullOrEmpty(series))
+                    decimal catTotal = 0;
+                    foreach (string series in yFields)
                     {
-                        var rx = (from DataRow r in dtRaw.AsEnumerable()
-                                  where r[category] != DBNull.Value && r[series] != DBNull.Value && r[category].ToString().Trim() == cat
-                                  group r by r[category] into gr
-                                  select new[] { gr.Sum(x => System.Math.Abs(decimal.Parse(x[series].ToString()))) }).First();
+                        string sSeriesSQLCol = GetSQLColNameIfLookup(series);
+                        if (!string.IsNullOrEmpty(sSeriesSQLCol))
+                        {
+                            var rx = (from DataRow r in dtRaw.AsEnumerable()
+                                      where r[sSeriesSQLCol] != DBNull.Value && r[sCatSQLCol].ToString().Trim() == cat
+                                      group r by r[sCatSQLCol] into gr
+                                      select new[] { gr.Sum(x => System.Math.Abs(decimal.Parse(x[sSeriesSQLCol].ToString()))) }).First();
 
-                        catTotal += rx[0];
+                            catTotal += rx[0];
+                        }
                     }
+                    tbCatAndSeriesTotal.Rows.Add(cat, catTotal);
                 }
+                else
+                {
+                    decimal nullCatTotal = 0;
+                    foreach (string series in yFields)
+                    {
+                        string sSeriesSQLCol = GetSQLColNameIfLookup(series);
+                        if (!string.IsNullOrEmpty(sSeriesSQLCol))
+                        {
+                            var rx = (from DataRow r in dtRaw.AsEnumerable()
+                                      where r[sSeriesSQLCol] != DBNull.Value && r[sCatSQLCol] == DBNull.Value
+                                      group r by r[sCatSQLCol] into gr
+                                      select new[] { gr.Sum(x => System.Math.Abs(decimal.Parse(x[sSeriesSQLCol].ToString()))) }).First();
 
-                tbCatAndSeriesTotal.Rows.Add(cat, catTotal);
+                            nullCatTotal += rx[0];
+                        }
+                    }
+                    tbCatAndSeriesTotal.Rows.Add(cat, nullCatTotal);
+                }
             }
 
             foreach (string series in yFields)
             {
-                if (!string.IsNullOrEmpty(series))
+                string sSeriesSQLCol = GetSQLColNameIfLookup(series);
+                if (!string.IsNullOrEmpty(sSeriesSQLCol))
                 {
                     result = new List<SeriesItem>();
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
-                              where r[category] != DBNull.Value && r[series] != DBNull.Value
-                              group r by r[category] into gr
-                              select new[] { gr.Key, gr.Sum(x => decimal.Parse(x[series].ToString())) }).ToArray();
+                              where r[sSeriesSQLCol] != DBNull.Value
+                              group r by r[sCatSQLCol] into gr
+                              select new[] { 
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                                  gr.Sum(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
                     // foreach total
                     foreach (object[] r in rx)
@@ -1408,25 +1555,30 @@ namespace EPMLiveWebParts.ReportingChart
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result;
-            category = TranslateIfLookup(category);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
-            List<string> distinctCats = (from r in dtRaw.AsEnumerable() where r[category] != DBNull.Value select r[category].ToString().Trim()).Distinct().ToList();
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (!string.IsNullOrEmpty(r[sCatSQLCol].ToString()) ?
+                                             r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
             XAxisLabels.Clear();
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(GetFldDispNameFromIntName(cat));
+                XAxisLabels.Add(cat);
             }
             YAxisLabel = "Average";
             string[] yFields = rawMultiSeries.Split('|');
             foreach (string series in yFields)
             {
+                string sSeriesSQLCol = GetSQLColNameIfLookup(series);
                 if (!string.IsNullOrEmpty(series))
                 {
                     result = new List<SeriesItem>();
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
-                              where r[series] != DBNull.Value
-                              group r by r[category] into gr
-                              select new[] { gr.Key, gr.Average(x => int.Parse(x[series].ToString())) }).ToArray();
+                              where r[sSeriesSQLCol] != DBNull.Value
+                              group r by r[sCatSQLCol] into gr
+                              select new[] { 
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                                  gr.Average(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
                     foreach (object[] o in rx)
                     {
                         SeriesItem it = new SeriesItem(decimal.Round(decimal.Parse(o[1].ToString()), 2));
@@ -1451,13 +1603,15 @@ namespace EPMLiveWebParts.ReportingChart
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
             List<SeriesItem> result;
-            category = TranslateIfLookup(category);
+            string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
-            List<string> distinctCats = (from r in dtRaw.AsEnumerable() where r[category] != DBNull.Value select r[category].ToString().Trim()).Distinct().ToList();
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (!string.IsNullOrEmpty(r[sCatSQLCol].ToString()) ?
+                                             r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
             XAxisLabels.Clear();
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(GetFldDispNameFromIntName(cat));
+                XAxisLabels.Add(cat);
             }
             YAxisLabel = "Average";
             string[] yFields = rawMultiSeries.Split('|');
@@ -1468,33 +1622,57 @@ namespace EPMLiveWebParts.ReportingChart
 
             foreach (string cat in distinctCats)
             {
-                decimal catTotalOfAverage = 0;
-                foreach (string series in yFields)
+                if (cat != NULL_CATEGORY_TEXT)
                 {
-                    if (!string.IsNullOrEmpty(series))
+                    decimal catTotalOfAverage = 0;
+                    foreach (string series in yFields)
                     {
-                        var rx = (from DataRow r in dtRaw.AsEnumerable()
-                                  where r[category] != DBNull.Value && r[series] != DBNull.Value && r[category].ToString().Trim() == cat
-                                  group r by r[category] into gr
-                                  select new[] { gr.Average(x => System.Math.Abs(decimal.Parse(x[series].ToString()))) }).First();
+                        string sSeriesSQLCol = GetSQLColNameIfLookup(series);
+                        if (!string.IsNullOrEmpty(sSeriesSQLCol))
+                        {
+                            var rx = (from DataRow r in dtRaw.AsEnumerable()
+                                      where r[sCatSQLCol] != DBNull.Value && r[sSeriesSQLCol] != DBNull.Value && r[sCatSQLCol].ToString().Trim() == cat
+                                      group r by r[sCatSQLCol] into gr
+                                      select new[] { gr.Average(x => System.Math.Abs(decimal.Parse(x[sSeriesSQLCol].ToString()))) }).First();
 
-                        catTotalOfAverage += rx[0];
+                            catTotalOfAverage += rx[0];
+                        }
                     }
+                    tbCatAndTotalOfAvg.Rows.Add(cat, catTotalOfAverage);
                 }
+                else
+                {
+                    decimal nullCatTotalOfAverage = 0;
+                    foreach (string series in yFields)
+                    {
+                        string sSeriesSQLCol = GetSQLColNameIfLookup(series);
+                        if (!string.IsNullOrEmpty(sSeriesSQLCol))
+                        {
+                            var rx = (from DataRow r in dtRaw.AsEnumerable()
+                                      where r[sCatSQLCol] == DBNull.Value && r[sSeriesSQLCol] != DBNull.Value
+                                      group r by r[sCatSQLCol] into gr
+                                      select new[] { gr.Average(x => System.Math.Abs(decimal.Parse(x[sSeriesSQLCol].ToString()))) }).First();
 
-                tbCatAndTotalOfAvg.Rows.Add(cat, catTotalOfAverage);
+                            nullCatTotalOfAverage += rx[0];
+                        }
+                    }
+                    tbCatAndTotalOfAvg.Rows.Add(cat, nullCatTotalOfAverage);
+                }
             }
 
             foreach (string series in yFields)
             {
-                if (!string.IsNullOrEmpty(series))
+                string sSeriesSQLCol = GetSQLColNameIfLookup(series);
+                if (!string.IsNullOrEmpty(sSeriesSQLCol))
                 {
                     result = new List<SeriesItem>();
                     // get average for each series
                     var rx = (from DataRow r in dtRaw.AsEnumerable()
-                              where r[category] != DBNull.Value && r[series] != DBNull.Value
-                              group r by r[category] into gr
-                              select new[] { gr.Key, gr.Average(x => int.Parse(x[series].ToString())) }).ToArray();
+                              where r[sSeriesSQLCol] != DBNull.Value
+                              group r by r[sCatSQLCol] into gr
+                              select new[] { 
+                                  (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
+                                  gr.Average(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
                     foreach (object[] r in rx)
                     {
@@ -1551,17 +1729,17 @@ namespace EPMLiveWebParts.ReportingChart
         public void RebuildControlTree()
         {
             Controls.Clear();
-            SetChartWidthAndHeight();
             CreateChildControls();
         }
 
-        private void SetChartWidthAndHeight()
+        public void SetXFieldValue(string xFld)
         {
-            if (!string.IsNullOrEmpty(Width) && !string.IsNullOrEmpty(Height))
-            {
-                _radChart.Width = (int)(new Unit(Width).Value);
-                _radChart.Height = (int)(new Unit(Height).Value);
-            }
+            PropChartXaxisField = string.IsNullOrEmpty(xFld) ? "" : xFld;
+        }
+
+        public void SetXFieldLabel(string xFld)
+        {
+            PropChartXaxisFieldLabel = string.IsNullOrEmpty(xFld) ? "" : xFld;
         }
 
         public void SetYFieldsValues(string[] yFields)
@@ -1655,7 +1833,7 @@ namespace EPMLiveWebParts.ReportingChart
             return isLookup;
         }
 
-        private string TranslateIfLookup(string intName)
+        private string GetSQLColNameIfLookup(string intName)
         {
             string lookupColName = intName;
             if (IsLookupCol(intName))

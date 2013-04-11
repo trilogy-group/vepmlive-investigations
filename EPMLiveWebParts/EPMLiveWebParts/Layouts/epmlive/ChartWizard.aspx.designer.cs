@@ -94,6 +94,24 @@ namespace EPMLiveWebParts.Layouts.epmlive {
         protected global::Telerik.Web.UI.RadComboBox rcbXField;
         
         /// <summary>
+        /// rcbXNum control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox rcbXNum;
+        
+        /// <summary>
+        /// rcbXNonNum control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox rcbXNonNum;
+        
+        /// <summary>
         /// pnlYDdl control.
         /// </summary>
         /// <remarks>
@@ -208,7 +226,7 @@ namespace EPMLiveWebParts.Layouts.epmlive {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlPalette;
+        protected global::Telerik.Web.UI.RadComboBox ddlPalette;
         
         /// <summary>
         /// Label6 control.
@@ -226,7 +244,7 @@ namespace EPMLiveWebParts.Layouts.epmlive {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlLegendPosition;
+        protected global::Telerik.Web.UI.RadComboBox ddlLegendPosition;
         
         /// <summary>
         /// cbShowGridLines control.

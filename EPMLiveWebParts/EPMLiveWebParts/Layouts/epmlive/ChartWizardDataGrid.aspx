@@ -13,13 +13,20 @@
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <link rel="stylesheet" type="text/css" href="stylesheets/libraries/bootstrap/css/bootstrap.min.css" />
-    <script src="javascripts/libraries/bootstrap.min.js" type="text/javascript"></script>
+    <%--<link rel="stylesheet" type="text/css" href="stylesheets/libraries/bootstrap/css/bootstrap.min.css" />--%>
+    <%--<script src="javascripts/libraries/bootstrap.min.js" type="text/javascript"></script>--%>
     <%--style--%>
+    <style>
+        .ms-bodyareacell, .s4-ba
+        {
+            padding-bottom: 0px !important;
+        }        
+        
+    </style>
     <link href="<%=_CSSUrl %>" rel="Stylesheet" type="text/css" />
-    <div style="height: 470px; overflow:hidden">
-        <div id="dataGrid">
-            <div id="ListsAndViewsGrid" style="display:none">
+    <div style="overflow:hidden;width:335px;height:470px;" >
+        <div id="dataGrid" >
+            <div id="ListsAndViewsGrid" style="display:none;overflow:hidden;">
                 <script type="text/javascript">
                     var loadListsAndViewsGrid = function () {
                         $(function () {
@@ -29,31 +36,43 @@
                     ExecuteOrDelayUntilScriptLoaded(loadListsAndViewsGrid, 'EPMLive.js');
 
                     Grids.OnRenderFinish = function (grid) {
-                       
+
                         $.getScript('/_layouts/epmlive/javascripts/libraries/slimScroll.js', function () {
-                            $('#dataGrid').slimScroll({ height: '415px', size: '10px' });
+                            $('#dataGrid').slimScroll({ height: '415px', width: '330px', size: '10px' });
                         }, true);
 
                         $('#ListsAndViewsGrid').css('display', '');
                         $('#divButtons').css('display', '');
                         $('#divLoading').css('display', 'none');
+
+
                     }
 
                     Grids.OnClick = function (grid, row, col, x, y, evt) {
-                        status = grid.SelectRow(row, !row.Selected);
+                        grid.ActionClearSelection();
+                        var status = grid.SelectRow(row, !row.Selected);
+
+                        if (row.Expanded == 1) {
+                            grid.Collapse(row);
+                        }
+                        else {
+                            //grid.CollapseAll();
+                            grid.Expand(row);
+                        }
                     }
 
                     function ReturnSelectedView() {
                         var selectedListAndView = "";
-                        if (Grids['cwdatagrid'].FRow != undefined) {
-                            selectedListAndView = Grids['cwdatagrid'].FRow['ParentListTitle'] + ' > ' + Grids['cwdatagrid'].FRow['Title'];
+                        if (Grids['cwdatagrid'].GetSelRows().length > 0) {
+                            selectedListAndView = Grids['cwdatagrid'].GetSelRows()[0]['ParentListTitle'] + ' > ' + Grids['cwdatagrid'].GetSelRows()[0]['Title'];
                         }
-                        parent.SP.UI.ModalDialog.commonModalDialogClose(1, selectedListAndView);
+                        SP.UI.ModalDialog.commonModalDialogClose(1, selectedListAndView);
                     }
 
                     function CancelDataSelect() {
-                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                        SP.UI.ModalDialog.commonModalDialogClose(0, '');
                     }
+
 
                 </script>
             </div>
@@ -66,9 +85,9 @@
         <div style="clear: both">
         </div>
         <div id="divButtons" style="text-align: right; padding-right: 10px;margin-top:15px;display:none">
-            <input type="button" class="epmliveButton" onclick="ReturnSelectedView();return false;"
+            <input type="button" class="epmliveButton" onclick="ReturnSelectedView(); return false;"
                 value="OK" />
-            <input type="button" class="epmliveButton" style="margin-left: 5px" onclick="CancelDataSelect();return false;"
+            <input type="button" class="epmliveButton" style="margin-left: 5px" onclick="CancelDataSelect(); return false;"
                 value="Cancel" />
         </div>
     </div>
