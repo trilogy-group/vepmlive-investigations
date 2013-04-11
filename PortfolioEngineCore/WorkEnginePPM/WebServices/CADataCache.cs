@@ -2382,6 +2382,8 @@ namespace CADataCache
                     }
                 }
 
+                m_editTargetList = AggreagteDuplicateRows(m_editTargetList);
+
                 int xcnt = 0;
 
                 foreach (clsDetailRowData oDet in m_editTargetList)
@@ -2484,6 +2486,77 @@ namespace CADataCache
 
         }
 
+        private  List<clsDetailRowData> AggreagteDuplicateRows( List<clsDetailRowData> datain)
+        {
+            if (datain == null)
+                return null;
+
+            List<clsDetailRowData> rval = new List<clsDetailRowData>();
+            Dictionary<string, clsDetailRowData> hashtab = new Dictionary<string, clsDetailRowData>();
+
+
+            foreach (clsDetailRowData inDet in datain)
+            {
+                clsDetailRowData oDet = new clsDetailRowData(m_clsda.m_max_period);
+                clsDetailRowData xDet;       
+                CStruct xNode = new CStruct();
+                string scmp;
+                
+                oDet.CopyData(inDet);
+
+
+                xNode.Initialize("TRow");
+
+                xNode.CreateIntAttr("CT_ID", oDet.CT_ID);
+                xNode.CreateIntAttr("BC_UID", oDet.BC_UID);
+                xNode.CreateIntAttr("BC_ROLE_UID", oDet.BC_ROLE_UID);
+                xNode.CreateIntAttr("BC_SEQ", oDet.BC_SEQ);
+                xNode.CreateIntAttr("CAT_UID", oDet.CAT_UID);
+
+                xNode.CreateStringAttr("MC_Val", oDet.MC_Val);
+                xNode.CreateStringAttr("CT_Name", oDet.CT_Name);
+                xNode.CreateStringAttr("Cat_Name", oDet.Cat_Name);
+                xNode.CreateStringAttr("Role_Name", oDet.Role_Name);
+                xNode.CreateStringAttr("MC_Name", oDet.MC_Name);
+                xNode.CreateStringAttr("FullCatName", oDet.FullCatName);
+                xNode.CreateStringAttr("CC_Name", oDet.CC_Name);
+                xNode.CreateStringAttr("FullCCName", oDet.FullCCName);
+                xNode.CreateIntAttr("m_rt", 0);
+
+                for (int xi = 0; xi <= 5; xi++)
+                {
+                    CStruct xCF = xNode.CreateSubStruct("OCVal");
+                    xCF.CreateIntAttr("Value", oDet.OCVal[xi]);
+                    xCF = xNode.CreateSubStruct("Text_OCVal");
+                    xCF.CreateStringAttr("Value", oDet.Text_OCVal[xi]);
+                    xCF = xNode.CreateSubStruct("TXVal");
+                    xCF.CreateStringAttr("Value", oDet.TXVal[xi]);
+                }
+
+                scmp = xNode.XML();
+
+                if (hashtab.TryGetValue(scmp, out xDet) == true)
+                {
+                    for (int xi = 0; xi <= m_clsda.m_Periods.Count; xi++)
+                    {
+
+                        xDet.zCost[xi] += oDet.zCost[xi];
+                        xDet.zValue[xi] += oDet.zValue[xi];
+                        xDet.zFTE[xi] += oDet.zFTE[xi];
+                    }
+                }
+                else
+                {
+
+                    hashtab.Add(scmp,oDet);
+                    rval.Add(oDet);
+                }
+
+            }
+
+            return rval;
+        }
+
         public String GetTargetTotalsData()
         {
             try
@@ -2494,57 +2567,69 @@ namespace CADataCache
                 CStruct xNode;
                 xRoot.Initialize("TargetTotalData");
 
+
+                List<clsDetailRowData> tarrows = new List<clsDetailRowData>();
+
+
                 foreach (CATotRow xTot in m_total_rows.Values)
                 {
 
                     if (xTot.bUsed == true)
                     {
-                        clsDetailRowData oDet = xTot.m_totals[0];
+                        tarrows.Add(xTot.m_totals[0]);
+                    }
+                }
 
+
+
+                tarrows = AggreagteDuplicateRows(tarrows);
+
+                foreach (clsDetailRowData oDet in tarrows)
+                {
 
                         xNode = xRoot.CreateSubStruct("totalRows");
 
 
 
 
-                        xNode.CreateIntAttr("CT_ID", oDet.CT_ID);
-                        xNode.CreateIntAttr("BC_UID", oDet.BC_UID);
-                        xNode.CreateIntAttr("BC_ROLE_UID", oDet.BC_ROLE_UID);
-                        xNode.CreateIntAttr("BC_SEQ", oDet.BC_SEQ);
-                        xNode.CreateIntAttr("CAT_UID", oDet.CAT_UID);
+                    xNode.CreateIntAttr("CT_ID", oDet.CT_ID);
+                    xNode.CreateIntAttr("BC_UID", oDet.BC_UID);
+                    xNode.CreateIntAttr("BC_ROLE_UID", oDet.BC_ROLE_UID);
+                    xNode.CreateIntAttr("BC_SEQ", oDet.BC_SEQ);
+                    xNode.CreateIntAttr("CAT_UID", oDet.CAT_UID);
 
-                        xNode.CreateStringAttr("MC_Val", oDet.MC_Val);
-                        xNode.CreateStringAttr("CT_Name", oDet.CT_Name);
-                        xNode.CreateStringAttr("Cat_Name", oDet.Cat_Name);
-                        xNode.CreateStringAttr("Role_Name", oDet.Role_Name);
-                        xNode.CreateStringAttr("MC_Name", oDet.MC_Name);
-                        xNode.CreateStringAttr("FullCatName", oDet.FullCatName);
-                        xNode.CreateStringAttr("CC_Name", oDet.CC_Name);
-                        xNode.CreateStringAttr("FullCCName", oDet.FullCCName);
-                        xNode.CreateIntAttr("m_rt", 0);
+                    xNode.CreateStringAttr("MC_Val", oDet.MC_Val);
+                    xNode.CreateStringAttr("CT_Name", oDet.CT_Name);
+                    xNode.CreateStringAttr("Cat_Name", oDet.Cat_Name);
+                    xNode.CreateStringAttr("Role_Name", oDet.Role_Name);
+                    xNode.CreateStringAttr("MC_Name", oDet.MC_Name);
+                    xNode.CreateStringAttr("FullCatName", oDet.FullCatName);
+                    xNode.CreateStringAttr("CC_Name", oDet.CC_Name);
+                    xNode.CreateStringAttr("FullCCName", oDet.FullCCName);
+                    xNode.CreateIntAttr("m_rt", 0);
 
-                        for (int xi = 0; xi <= 5; xi++)
-                        {
-                            CStruct xCF = xNode.CreateSubStruct("OCVal");
-                            xCF.CreateIntAttr("Value", oDet.OCVal[xi]);
-                            xCF = xNode.CreateSubStruct("Text_OCVal");
-                            xCF.CreateStringAttr("Value", oDet.Text_OCVal[xi]);
-                            xCF = xNode.CreateSubStruct("TXVal");
-                            xCF.CreateStringAttr("Value", oDet.TXVal[xi]);
-                        }
+                    for (int xi = 0; xi <= 5; xi++)
+                    {
+                        CStruct xCF = xNode.CreateSubStruct("OCVal");
+                        xCF.CreateIntAttr("Value", oDet.OCVal[xi]);
+                        xCF = xNode.CreateSubStruct("Text_OCVal");
+                        xCF.CreateStringAttr("Value", oDet.Text_OCVal[xi]);
+                        xCF = xNode.CreateSubStruct("TXVal");
+                        xCF.CreateStringAttr("Value", oDet.TXVal[xi]);
+                    }
 
-                        for (int xi = 0; xi <= m_clsda.m_Periods.Count; xi++)
-                        {
+                    for (int xi = 0; xi <= m_clsda.m_Periods.Count; xi++)
+                    {
 
-                            CStruct xDV = xNode.CreateSubStruct("zCost");
-                            xDV.CreateDoubleAttr("Value", oDet.zCost[xi]);
-                            xDV = xNode.CreateSubStruct("zValue");
-                            xDV.CreateDoubleAttr("Value", oDet.zValue[xi]);
-                            xDV = xNode.CreateSubStruct("zFTE");
-                            xDV.CreateDoubleAttr("Value", oDet.zFTE[xi]);
+                        CStruct xDV = xNode.CreateSubStruct("zCost");
+                        xDV.CreateDoubleAttr("Value", oDet.zCost[xi]);
+                        xDV = xNode.CreateSubStruct("zValue");
+                        xDV.CreateDoubleAttr("Value", oDet.zValue[xi]);
+                        xDV = xNode.CreateSubStruct("zFTE");
+                        xDV.CreateDoubleAttr("Value", oDet.zFTE[xi]);
 
 
-                        }
+
                     }
                 }
 

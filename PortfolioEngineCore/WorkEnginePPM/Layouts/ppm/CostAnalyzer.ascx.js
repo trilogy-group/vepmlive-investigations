@@ -2268,12 +2268,32 @@
         return null;
     }
 
+    CostAnalyzer.prototype.GetTargetRow = function (Row) {
+
+        var trow = null;
+
+        for (var xi = 0; xi < this.CSTargetCache.targetRows.length; xi++) {
+            if (this.CSTargetCache.targetRows[xi].RID == Row.id) {
+                trow = this.CSTargetCache.targetRows[xi];
+                break;
+            }
+
+        }
+
+
+        return trow;
+    }
+
+
 
     CostAnalyzer.prototype.ChangeTargetCostType = function (Row, cat) {
 
         this.EditGrid = Grids["et_1"];
         var trow;
-        trow = this.CSTargetCache.targetRows[Row.id - 1];
+        trow = this.GetTargetRow(Row);
+
+        if (trow == null)
+            return;
 
         trow.BC_UID = cat.UID
         trow.Cat_Name = cat.Name;
@@ -2565,7 +2585,12 @@
 
             if (col == "CostType") {
 
-                trow = this.CSTargetCache.targetRows[row.id - 1];
+                trow = this.GetTargetRow(row);
+
+                if (trow == null)
+                    return;
+
+
                 for (i = 0; i < this.CSDataCache.CostTypes.length; i++) {
                     if (this.CSDataCache.CostTypes[i].Id == val) {
 
@@ -2595,7 +2620,12 @@
                 oc = this.CSDataCache.CustomFields[i];
 
                 if (oc.Name == col) {
-                    trow = this.CSTargetCache.targetRows[row.id - 1];
+                    trow = this.GetTargetRow(row);
+
+                    if (trow == null)
+                        return;
+
+
 
                     if (oc.jsonMenu == "") {
                         trow.TXVal[oc.FieldID - 11810] = val;
