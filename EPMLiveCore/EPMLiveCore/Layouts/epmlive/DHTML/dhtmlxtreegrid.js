@@ -230,7 +230,7 @@ dhtmlXGridObject.prototype.kidsXmlFile = "";
 */
 dhtmlXGridObject.prototype.sortTreeRows = function (col, type, order) {
     var amet = "getValue";
-    if (this.cells5({ parentNode: { grid: this} }, this.getColType(col)).getDate) { //FIXME! move inside cells5 in 2.2
+    if (this.cells5({ parentNode: { grid: this } }, this.getColType(col)).getDate) { //FIXME! move inside cells5 in 2.2
         amet = "getDate";
         type = "str";
     }
@@ -403,6 +403,369 @@ function eXcell_tree(cell) {
         return this.cell.parentNode.valTag.innerHTML;
     }
 }
+
+dhtmlXGridObject.prototype.hovermenuout = function (oRow, clear) {
+
+    row = this.getRowById(oRow.id);
+
+    var node = oRow.firstChild;
+    if (this._curMenuRow != null && row.idd == this._curMenuRow.id && !clear) {
+        return;
+    }
+    while (node != null) {
+        if (node.id == "menuDiv") {
+            if (node.isShow == "true")
+                break;
+            node = node.firstChild;
+        }
+        if (node.id == "menuA") {
+            node = node.firstChild;
+
+            node.style.visibility = "hidden";
+            node.parentNode.parentNode.style.background = "";
+            node.parentNode.parentNode.style.borderRight = "";
+            node.parentNode.parentNode.style.borderLeft = "";
+
+            break;
+        }
+        node = node.nextSibling;
+    }
+    this._curHover = false;
+}
+
+dhtmlXGridObject.prototype.hovermenu = function (oRow) {
+
+    row = this.getRowById(oRow.id);
+
+    var node = oRow.firstChild;
+
+    if (row._locked) {
+
+        if (this.getUserData(row.idd, "itemid") != "" && this.getUserData(row.idd, "itemid") != null) {
+
+            while (node != null) {
+
+                if (node.id == "menuDiv") {
+                    node = node.firstChild;
+                }
+                if (node.id == "menuA") {
+                    node = node.firstChild;
+
+                    node.style.visibility = "";
+                    node.style.display = "";
+                    //change made to remove missing image error in browser consoles
+                    //node.parentNode.parentNode.style.background = "url(selbg-6B8E0DB5.png?ctag) #e4ecf5 repeat-x left top";
+                    node.parentNode.parentNode.style.borderRight = "#366092 1px solid";
+                    node.parentNode.parentNode.style.borderLeft = "#366092 1px solid";
+                    break;
+                }
+                node = node.nextSibling;
+            }
+        }
+    }
+    this._curHover = true;
+}
+
+dhtmlXGridObject.prototype.clearmenus = function () {
+
+    if (!this._curHover) {
+        var menu = document.getElementById("gridmenu" + this._gridid);
+        menu.style.display = "none";
+        try {
+
+            this._curMenuRow.firstChild.isShow = "false";
+            var hiderow = this._curMenuRow;
+            this._curMenuRow = null;
+            this.hovermenuout(hiderow, true);
+
+        } catch (e) { }
+    }
+}
+
+var postBackGrid;
+
+function TGgetSingleItem(grid, siteid, webid, listid, itemid, rowid) {
+    postBackGrid = grid;
+
+    var val = SP.UI.Notify.addNotification("Updating Saved Row...", false, "", null);
+
+    dhtmlxAjax.post(grid._singleItemUrl, "siteid=" + siteid + "&webid=" + webid + "&listid=" + listid + "&itemid=" + itemid + "&rowid=" + rowid, grid.getSingleItemResponse);
+}
+
+dhtmlXGridObject.prototype.gridactioncallback = function (dialogResult, returnValue) {
+    //if (dialogResult == 1) {
+    var weburl = curGrid.getUserData(curRow, "SiteUrl");
+    var listid = curGrid.getUserData(curRow, "listid");
+    var itemid = curGrid.getUserData(curRow, "itemid");
+    var webid = curGrid.getUserData(curRow, "webid");
+    var siteid = curGrid.getUserData(curRow, "siteid");
+
+    TGgetSingleItem(curGrid, siteid, webid, listid, itemid, curRow);
+    //}
+}
+
+
+dhtmlXGridObject.prototype.getSingleItemResponse = function (loader) {
+
+    if (loader.xmlDoc.responseText != null) {
+        var xmlDoc = loader.xmlDoc.responseXML;
+        for (var i = 0; i < xmlDoc.childNodes.length; i++) {
+            var rowXml = xmlDoc.childNodes[i];
+            postBackGrid.setRowValues(rowXml);
+        }
+    }
+    else
+        alert("Response contains no XML");
+}
+
+dhtmlXGridObject.prototype.setRowValues = function (rowsXml) {
+    for (var i = 0; i < rowsXml.childNodes.length; i++) {
+        this.setRowValue(rowsXml.childNodes[i])
+    }
+}
+
+dhtmlXGridObject.prototype.setRowValue = function (rowXml) {
+    var rowId = rowXml.getAttribute("id")
+
+    var cellCounter = 0;
+
+    for (var i = 0; i < rowXml.childNodes.length; i++) {
+        if (rowXml.childNodes[i].nodeName == "userdata") {
+            if (rowXml.childNodes[i].firstChild != null)
+                this.setUserData(rowId, rowXml.childNodes[i].getAttribute("name"), rowXml.childNodes[i].firstChild.nodeValue);
+        }
+        else if (rowXml.childNodes[i].nodeName == "cell") {
+            if (!this._editmode) {
+                if (this.getColType(cellCounter) != "tree")
+                    this.setCellExcellType(rowId, cellCounter, "ro");
+
+                this.lockRow(rowId, true);
+            }
+
+            var cellval = "";
+            var celltype = "";
+            try {
+                celltype = rowXml.childNodes[i].getAttribute("type");
+            } catch (e) { }
+
+
+            if (rowXml.childNodes[i].childNodes.length > 0) {
+                cellval = rowXml.childNodes[i].firstChild.nodeValue;
+            }
+
+            if (celltype == "combo")
+                this.cells(rowId, cellCounter).setValue(rowXml.childNodes[i]);
+            else
+                this.cells(rowId, cellCounter).setValue(cellval);
+            cellCounter++;
+        }
+    }
+}
+
+dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
+
+    var planner = "";
+    var subaction = "";
+    var ind = action.indexOf("planner:");
+    if (ind == 0) {
+        planner = action.substr(8);
+        action = "GoToPlanner";
+    }
+
+
+    var taskplanner = "";
+    var ind = action.indexOf("taskplanner:");
+    if (ind == 0) {
+        taskplanner = action.substr(12);
+        action = "GoToTaskPlanner";
+    }
+
+    var ind = action.indexOf(":");
+    if (ind > 0) {
+        subaction = action.substr(ind + 1);
+        action = action.substr(0, ind);
+    }
+
+    var weburl = this.getUserData(this._curMenuRow.id, "SiteUrl");
+    var webid = this.getUserData(this._curMenuRow.id, "webid");
+    var listid = this.getUserData(this._curMenuRow.id, "listid");
+    var itemid = this.getUserData(this._curMenuRow.id, "itemid");
+
+    if (this._useparent) {
+        var parentid = this.getUserData(this._curMenuRow.id, "parentitemid");
+        if (parentid && parentid != "") {
+            var newids = parentid.toString().split(".");
+            webid = newids[0];
+            listid = newids[1];
+            itemid = newids[2];
+        }
+    }
+
+    if (weburl == "/")
+        weburl = "";
+
+    if (action == "epkcommand")
+        weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&subaction=" + subaction + "&view=" + this._viewname + "&Source=" + document.location.href;
+    else
+        weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&subaction=" + subaction + "&Source=" + escape(document.location.href);
+
+    if (planner != "")
+        weburl += "&planner=" + planner;
+
+    if (taskplanner != "")
+        weburl += "&planner=" + taskplanner;
+
+    if (action == "createworkspace" && this._hasTemplateList) {
+        newAppPopup(listid, itemid);
+    }
+    else if (actiontype == "99") {
+        if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
+            var id = SP.UI.Notify.addNotification("Deleting Item...", true, "", null);
+
+            setTimeout("epmlive_doDelete('" + id + "','" + weburl + "',curGrid,'" + this._curMenuRow.id + "')", 10);
+        }
+    }
+    else if (actiontype == "1") {
+        location.href = weburl;
+    }
+    else if (actiontype == "2") {
+        window.open(weburl + "&IsDlg=1", '', config = 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+    }
+    else if (actiontype == "3") {
+        window.open(weburl + "&IsDlg=1", '', config = 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+    }
+    else if (actiontype == "5") {
+        curRow = this._curMenuRow.id;
+        curGrid = this;
+        var options = { url: weburl, width: 600, height: 500, dialogReturnValueCallback: this.gridactioncallback };
+        SP.UI.ModalDialog.showModalDialog(options);
+    }
+    else if (actiontype == "6") {
+        var options = { url: weburl, showMaximized: true };
+        SP.UI.ModalDialog.showModalDialog(options);
+    }
+    else {
+        curRow = this._curMenuRow.id;
+        curGrid = this;
+        var options = { url: weburl, width: 700, dialogReturnValueCallback: this.gridactioncallback };
+        SP.UI.ModalDialog.showModalDialog(options);
+    }
+    this._curHover = false;
+    this.clearmenus();
+
+}
+
+dhtmlXGridObject.prototype.getFullTop = function (obj) {
+
+    var posY = obj.offsetTop;
+
+    while (obj.offsetParent) {
+
+        posY = posY + obj.offsetParent.offsetTop;
+
+        if (obj == document.getElementsByTagName('body')[0]) { break }
+        else { obj = obj.offsetParent; }
+    }
+
+    return posY;
+}
+
+dhtmlXGridObject.prototype.getFullLeft = function (obj) {
+
+    var posX = obj.offsetLeft;
+
+    while (obj.offsetParent && obj.className != "objbox") {
+
+        posX = posX + obj.offsetParent.offsetLeft;
+
+        if (obj == document.getElementsByTagName('body')[0]) { break }
+        else { obj = obj.offsetParent; }
+    }
+
+    return posX;
+}
+
+
+
+dhtmlXGridObject.prototype.hovermenushow = function (dd, cell) {
+
+
+    var row = dd.parentNode;
+    curRowId = row.id;
+    curGrid = this;
+    if (this.getUserData(row.id, "itemid") == "" || this.getUserData(row.id, "itemid") == null)
+        return;
+
+    if (this._curMenuRow != null && row.id != this._curMenuRow.id) {
+        this.hovermenuout(this._curMenuRow, true);
+    }
+
+    if (this._curMenuRow != null && row.id == this._curMenuRow.id) {
+        this._curMenuRow = null;
+        var menu = document.getElementById("gridmenu" + this._gridid);
+        menu.style.display = "none";
+        return;
+    }
+
+    var siteurl = this.getUserData(row.id, "SiteUrl");
+    var listid = this.getUserData(row.id, "listid");
+    var itemid = this.getUserData(row.id, "itemid");
+    var webid = this.getUserData(row.id, "webid");
+
+    if (this._useparent) {
+        var parentid = this.getUserData(row.id, "parentitemid");
+        if (parentid && parentid != "") {
+            var newids = parentid.toString().split(".");
+            webid = newids[0];
+            listid = newids[1];
+            itemid = newids[2];
+        }
+    }
+
+    var weburl = siteurl + "/_layouts/epmlive/gridaction.aspx?action=GetContextMenus&grid=" + this._gridid + "&webid=" + webid + "&listid=" + listid + "&id=" + itemid + "&rollups=" + this._brollups + "&requestlist=" + this._requestList + "&popups=" + this._usepopup;
+
+    var data = dhtmlxAjax.getSync(weburl);
+    var sData = data.xmlDoc.responseText.trim();
+
+    var menu = document.getElementById("gridmenu" + this._gridid);
+
+    menu.style.display = "";
+    menu.style.position = "absolute";
+
+    var expandoffset = 0
+
+    try {
+        expandoffset = document.getElementById("expandIcon").offsetWidth;
+    } catch (e) { }
+
+    //    menu.style.left = (dd.offsetParent.offsetLeft + dd.offsetLeft + expandoffset - 163) + "px";
+    menu.style.left = this.getFullLeft(dd) - 163 + "px";
+    menu.style.top = (dd.offsetParent.offsetTop + dd.offsetParent.offsetParent.offsetTop + row.offsetHeight - this.objBox.scrollTop) + "px";
+
+    try {
+        this._curMenuRow.firstChild.isShow = "false";
+        this.hovermenuout(this._curMenuRow);
+    } catch (e) { }
+
+    row.firstChild.isShow = "true";
+
+
+
+    var showMenus = this.getUserData(row.id, "viewMenus").split(',');
+
+    var node = menu.firstChild;
+
+    var lastSep;
+
+    node.innerHTML = sData;
+
+    this._curMenuRow = row;
+
+    try {
+        var e = (event || window.event)
+        e.cancelBubble = true;
+    } catch (e1) { }
+}
 /**
 *   @desc: set value of grid item
 *   @param: val  - new value (for treegrid this method only used while adding new rows)
@@ -424,6 +787,9 @@ eXcell_tree.prototype.setValue = function (valAr) {
         return this.setLabel(valAr);
 
 
+    var rid = this.cell.parentNode.idd;
+    var row = this.grid._h2.get[rid];
+
     if ((this.grid._tgc.imgURL == null) || (this.grid._tgc.imgURL != this.grid.imgURL)) {
         var _tgc = {};
         _tgc.spacer = "<img src='" + this.grid.imgURL + "blank.gif'  align='absmiddle' class='space'>";
@@ -433,24 +799,33 @@ eXcell_tree.prototype.setValue = function (valAr) {
         _tgc.plus = _tgc.imst + "plus.gif" + _tgc.imact;
         _tgc.minus = _tgc.imst + "minus.gif" + _tgc.imact;
         _tgc.blank = _tgc.imst + "blank.gif" + _tgc.imact;
-        _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; white-space : nowrap; height:" + (_isIE ? 20 : 18) + "px;'>";
 
-        _tgc.itemim = "' align='absmiddle' " + (this.grid._img_height ? (" height=\"" + this.grid._img_height + "\"") : "") + (this.grid._img_width ? (" width=\"" + this.grid._img_width + "\"") : "") + " ><span " + (_isFF ? "style='position:relative; top:2px;'" : "") + "id='nodeval'>";
+        var itemid = this.grid.getUserData(rid, "itemid");
 
-        _tgc.menu = "<span style='float:right' style='z-index:99'><A onfocus='return false;' title='Open Menu' onclick='return false;' href='javascript:;'><IMG style='' alt='Open Menu' src='/_layouts/images/ecbarw.png' width=7 height=4></A></span>";
+        if (this.grid._enableCMenus && itemid != "") {
+            _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; position: relative; nowrap; height:" + (_isIE ? 20 : 18) + "px;' onmouseout=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenuout(this);\" onmouseover=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenu(this);\" id='" + this.cell.parentNode.idd + "'>";
+            //_tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;'><SPAN>&nbsp;</SPAN><A id='menuA' onfocus='return false;' title='Open Menu' onclick='return false;' href='javascript:;'><IMG id='menuImg' class='ms-ellipsis-icon' style='visibility: hidden' alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23' width=7 height=4 border=0></A><SPAN>&nbsp;</SPAN></DIV>";
+            _tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;' class='ms-list-itemLink'><A style='top: -5px;' href='' class='ms-lstItmLinkAnchor ms-ellipsis-a'><IMG class=ms-ellipsis-icon alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23'></A></DIV>";
+        }
+        else {
+            _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; white-space : nowrap; height:" + (_isIE ? 20 : 18) + "px;'>";
+            _tgc.menu = "";
+        }
+
+        _tgc.itemim = "' align='absmiddle' " + (this.grid._img_height ? (" height=\"" + this.grid._img_height + "\"") : "") + (this.grid._img_width ? (" width=\"" + this.grid._img_width + "\"") : "") + " ><span " + (_isFF ? "style='position:relative; top:2px';z-index=-1" : "z-index=-1") + "id='nodeval'>";
+
+
 
         _tgc.close = "</span>";
 
         _tgc.closeClose = "</div>";
-
 
         this.grid._tgc = _tgc;
     }
     var _h2 = this.grid._h2;
     var _tgc = this.grid._tgc;
 
-    var rid = this.cell.parentNode.idd;
-    var row = this.grid._h2.get[rid];
+
 
     if (this.grid.kidsXmlFile || this.grid._slowParse) {
         row.has_kids = (row.has_kids || (this.cell.parentNode._attrs["xmlkids"] && (row.state != "minus")));
@@ -480,9 +855,12 @@ eXcell_tree.prototype.setValue = function (valAr) {
     html.push(row.label);
 
     html.push(_tgc.close);
+
     html.push(_tgc.menu);
+
+
     html.push(_tgc.closeClose);
-    
+
 
 
     this.cell.innerHTML = html.join("");
