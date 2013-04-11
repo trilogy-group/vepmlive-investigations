@@ -5,4 +5,4 @@
 <DIV id=ID_MngPerms class=ms-core-menu-label><SPAN class=ms-core-menu-title>#title#</SPAN><SPAN></SPAN></DIV><SPAN class=ms-accessible></SPAN>
 <DIV></DIV>
 </A>
-</LI>
+</LI> 
