@@ -2745,7 +2745,7 @@ namespace EPMLiveWebParts
 
             }
 
-            output.Write("<div id=\"gridmenu" + sFullGridId + "\" style=\"position:absolute;left:0px;display:none;\" class=\"ms-MenuUIPopupBody ms-MenuUIPopupScreen\">");
+            /*output.Write("<div id=\"gridmenu" + sFullGridId + "\" style=\"position:absolute;left:0px;display:none;\" class=\"ms-MenuUIPopupBody ms-MenuUIPopupScreen\">");
             output.Write("<div class=\"ms-MenuUIPopupInner\" style=\"overflow: visible;\" isInner=\"true\">");
             output.Write("<div class=\"ms-MenuUI\" style=\"width: 177px;\">");
             output.Write("<ul class=\"ms-MenuUIUL\" style=\"width: 173px;\">");
@@ -2753,7 +2753,15 @@ namespace EPMLiveWebParts
             output.Write("</ul>");
             output.Write("</div>");
             output.Write("</div>");
+            output.Write("</div>");*/
+
+            output.Write("<div id=\"gridmenu" + sFullGridId + "\" style=\"position:absolute;left:0px;display:none;\" class=\"js-callout-mainElement ms-core-defaultFont  ms-alignLeft ms-shadow\">");
+            output.Write("<ul class=\"ms-core-menu-list\" style=\"width: 173px;\">");
+            //output.Write(Properties.Resources.txtGridMenus.Replace("#gridfunc#", "mygrid" + sFullGridId + ".menuaction(this);"));
+            output.Write("</ul>");
             output.Write("</div>");
+            
+
 
             //===================================
 
