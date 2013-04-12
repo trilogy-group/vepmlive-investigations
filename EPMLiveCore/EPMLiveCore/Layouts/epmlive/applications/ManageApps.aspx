@@ -19,7 +19,9 @@
 
                 var options = { url: surl, width: 700, showClose: false, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
 
-                SP.UI.ModalDialog.showModalDialog(options);
+                SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+
+
             }
         }
 
