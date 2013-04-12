@@ -36,7 +36,7 @@
     <script src="DHTML/xgrid/dhtmlxgrid.js"></script>
     <script src="DHTML/xgrid/dhtmlxgridcell.js"></script>
     <script src="DHTML/xtreegrid/dhtmlxtreegrid.js"></script>
-    <script src="DHTML/dhtmlxajax.js"></script>
+    
     <script src="newapp.js"></script>
     <script type="text/javascript" src="jQueryLibrary/jquery-1.5.2.js"></script>
     <script src="javascripts/libraries/jquery-ui.min.js" type="text/javascript"></script>

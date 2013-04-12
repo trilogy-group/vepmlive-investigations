@@ -25,7 +25,7 @@
 <asp:Content ID="Content3" ContentPlaceHolderId="PlaceHolderMain" runat="server">
 
 <script src="DHTML/xgrid/dhtmlxcommon.js"></script>
-<script src="DHTML/dhtmlxajax.js"></script>
+
 <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
 <script type="text/javascript" src="modal/modal.js"></script>
 

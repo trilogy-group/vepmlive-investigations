@@ -127,7 +127,7 @@
       >
 	</CustomAction>
 	<CustomAction
-		  ScriptSrc="epmlive/dhtml/dhtmlxajax.js"
+		  ScriptSrc="epmlive/dhtml/xgrid/dhtmlxcommon.js"
 		  Location="ScriptLink"
 		  Sequence="100"
       >

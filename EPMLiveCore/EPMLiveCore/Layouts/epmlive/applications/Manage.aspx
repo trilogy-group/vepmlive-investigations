@@ -9,7 +9,7 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
-    <script src="../DHTML/dhtmlxajax.js" type="text/javascript"></script>
+    <script src="../DHTML/xgrid/dhtmlxcommon.js" type="text/javascript"></script>
 
     <script language="javascript">
 

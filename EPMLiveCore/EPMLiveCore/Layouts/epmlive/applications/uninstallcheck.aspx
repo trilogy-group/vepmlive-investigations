@@ -27,7 +27,7 @@
 
     <link href="Applications.css" rel="stylesheet" type="text/css" />
 
-    <script src="../DHTML/dhtmlxajax.js" type="text/javascript"></script>
+    <script src="../DHTML/xgrid/dhtmlxcommon.js" type="text/javascript"></script>
 
 </asp:Content>
 

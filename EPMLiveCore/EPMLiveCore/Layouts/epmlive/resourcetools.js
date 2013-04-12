@@ -1,7 +1,7 @@
 ﻿/// <reference name="MicrosoftAjax.js" />
 /// <reference path="file://C:/Program Files/Common Files/Microsoft Shared/Web Server Extensions/14/TEMPLATE/LAYOUTS/SP.core.debug.js" />
 /// <reference path="file://C:/Program Files/Common Files/Microsoft Shared/Web Server Extensions/14/TEMPLATE/LAYOUTS/SP.debug.js" />
-/// <reference path="file://C:/Program Files/Common Files/Microsoft Shared/Web Server Extensions/14/TEMPLATE/LAYOUTS/epmlive/dhtml/dhtmlxajax.js" />
+/// <reference path="file://C:/Program Files/Common Files/Microsoft Shared/Web Server Extensions/14/TEMPLATE/LAYOUTS/epmlive/dhtml/xgrid/dhtmlxcommon.js" />
 
 function getResToolsEnabled() {
 
