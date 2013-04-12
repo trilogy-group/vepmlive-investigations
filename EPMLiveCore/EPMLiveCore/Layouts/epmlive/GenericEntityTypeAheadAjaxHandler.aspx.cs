@@ -120,7 +120,14 @@ namespace EPMLiveCore
                 SPList list = SPContext.Current.Web.Lists[_listID];
                 SPQuery query = new SPQuery();
                 query.Query = "";
-                query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' />";
+                if (_field.Contains("ID"))
+                {
+                    query.ViewFields = "<FieldRef Name='ID' />";
+                }
+                else
+                {
+                    query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' />";
+                }
                 query.ViewFieldsOnly = true;
                 SPListItemCollection items = list.GetItems(query);
                 DataTable dt = items.GetDataTable();
