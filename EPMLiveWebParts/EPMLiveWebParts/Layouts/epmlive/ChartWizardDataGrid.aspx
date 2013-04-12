@@ -66,11 +66,11 @@
                         if (Grids['cwdatagrid'].GetSelRows().length > 0) {
                             selectedListAndView = Grids['cwdatagrid'].GetSelRows()[0]['ParentListTitle'] + ' > ' + Grids['cwdatagrid'].GetSelRows()[0]['Title'];
                         }
-                        SP.UI.ModalDialog.commonModalDialogClose(1, selectedListAndView);
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(1, selectedListAndView);
                     }
 
                     function CancelDataSelect() {
-                        SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
                     }
 
 
