@@ -109,17 +109,84 @@ namespace EPMLiveCore
             return null;
         }
 
+        //protected override void Render(HtmlTextWriter writer)
+        //{
+        //    this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_LookupFieldsPropsArray_",
+        //        "if (!_LookupFieldsPropsArray) { var _LookupFieldsPropsArray = new Array(); }", true);
+        //    string sSingleSelectLookupVal = string.Empty;
+        //    if (!this.MultiSelect && this.Entities.Count == 1)
+        //    {
+        //        sSingleSelectLookupVal = (this.Entities[0] as PickerEntity).Key;
+        //    }
+        //    this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_LookupFieldsPropsArray_Edit_" + this.ClientID,
+        //        "<script>" +
+        //        "if (_LookupFieldsPropsArray) { " +
+        //        "   var lookupFieldProp_" + propBag.Field + " = { FieldName : '" + propBag.Field + "', " +
+        //        "                                                    ControlType: '" + propBag.ControlType + "', " +
+        //        "                                                    FieldInfo:    { LookupWebId: '" + propBag.LookupWebID.ToString() + "', " +
+        //        "                                                                    LookupListId: '" + propBag.LookupListID.ToString() + "', " +
+        //        "                                                                    LookupFieldId: '" + propBag.LookupFieldSourceFieldID.ToString() + "', " +
+        //        "                                                                    LookupField: '" + propBag.LookupFieldInternalName + "'}, " +
+        //        "                                                    Required: '" + propBag.Required.ToString() + "', " +
+        //        "                                                    RequiredErrorTextAreaId: '" + requiredErrTxtId + "', " +
+        //        "                                                    ControlInfo:  { GenericEntityDivId: '" + this.ClientID + "_upLevelDiv', " +
+        //        "                                                                    GenericEntityDivIdRoot: '" + this.ClientID + "'," +
+        //        "                                                                    GenericEntityCheckNameId: '" + this.ClientID + "_checkNames'," +
+        //        "                                                                    CurWebURL: '" + SPContext.Current.Web.Url + "', " +
+        //        "                                                                    IsMultiSelect: " + propBag.IsMultiSelect.ToLower() + ", " +
+        //        "                                                                    SourceDropDownID: '" + propBag.SourceDropDownID + "', " +
+        //        "                                                                    SourceControlId: '" + propBag.SourceControlID + "', " +
+        //        "                                                                    SelectCandidateId: '" + propBag.SelectCandidateID + "', " +
+        //        "                                                                    AddButtonId: '" + propBag.AddButtonID + "', " +
+        //        "                                                                    RemoveButtonId: '" + propBag.RemoveButtonID + "', " +
+        //        "                                                                    SelectResultId: '" + propBag.SelectResultID + "', " +
+        //        "                                                                    SearchText: '', " +
+        //        "                                                                    SingleSelectLookupVal: '" + sSingleSelectLookupVal + "', " +
+        //        "                                                                    SingleSelectDisplayVal: '', " +
+        //        "                                                                    CandidateIndex: '-1', " +
+        //        "                                                                    AutoCompleteDivId : 'autoCompleteDiv_" + this.ClientID + "', " +
+        //        "                                                                    BrowseLinkOnClick : '', " +
+        //        "                                                                    AddItemLinkOnClick : '', " +
+        //        "                                                                    ShowAllDdlOnClick: '' }, " +
+        //        "                                                    Parent: '" + propBag.Parent + "', " +
+        //        "                                                    ParentListField: '" + propBag.ParentListField + "', " +
+        //        "                                                    CachedValue: ''};" +
+        //        "  var arrLength = _LookupFieldsPropsArray.length; " +
+        //        "  _LookupFieldsPropsArray[arrLength] = lookupFieldProp_" + propBag.Field + "; " +
+        //        "  }</script>", false);
+
+        //    this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityEditorJS_", "<script src='/_layouts/epmlive/javascripts/GenericEntityEditor.js'></script>", false);
+        //    this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityPickerStyle_", "<link href=\"/_layouts/epmlive/GenericEntityPickerStyle.css\" rel=\"stylesheet\" type=\"text/css\" />", false);
+
+        //    if (this.Entities.Count == 0 && propBag.Parent != "")
+        //    {
+        //        this.Page.ClientScript.RegisterClientScriptBlock(GetType(), "_hideControls_",
+        //            "function HideControl_" + this.ClientID + "(){ " +
+        //            "   if ($('#" + this.ClientID + "_upLevelDiv').length > 0){ " +
+        //            "       $('#" + this.ClientID + "_upLevelDiv').prop('disabled', true); " +
+        //            "   } else { " +
+        //            "       setTimeout(HideControl_" + this.ClientID + ", 500); " +
+        //            "   } " +
+        //            "} " +
+
+        //            "$(document).ready(function () { " +
+        //                "HideControl_" + this.ClientID + "();" +
+        //            "});", true);
+        //    }
+
+        //    base.Render(writer);
+        //}
+
         protected override void OnPreRender(EventArgs e)
         {
-            //ScriptLink.Register(Page, "/_layouts/epmlive/jQueryLibrary/jquery-1.6.2.min.js", false);
-
-            Page.ClientScript.RegisterClientScriptBlock(GetType(), "_LookupFieldsPropsArray_",
-                "if (!_LookupFieldsPropsArray) { var _LookupFieldsPropsArray = new Array(); }", true);
+            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_LookupFieldsPropsArray_" + this.ClientID,
+                "<script>if (!_LookupFieldsPropsArray) { var _LookupFieldsPropsArray = new Array(); }</script>", false);
             string sSingleSelectLookupVal = string.Empty;
-            if (!this.MultiSelect && this.Entities.Count == 1){
+            if (!this.MultiSelect && this.Entities.Count == 1)
+            {
                 sSingleSelectLookupVal = (this.Entities[0] as PickerEntity).Key;
             }
-            this.Page.ClientScript.RegisterClientScriptBlock(GetType(), "_LookupFieldsPropsArray_Edit_" + this.ClientID,
+            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_LookupFieldsPropsArray_Edit_" + this.ClientID,
                 "<script>" +
                 "if (_LookupFieldsPropsArray) { " +
                 "   var lookupFieldProp_" + propBag.Field + " = { FieldName : '" + propBag.Field + "', " +
@@ -156,14 +223,13 @@ namespace EPMLiveCore
                 "  _LookupFieldsPropsArray[arrLength] = lookupFieldProp_" + propBag.Field + "; " +
                 "  }</script>", false);
 
-            ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/GenericEntityEditor.js", false);
-            //this.Page.ClientScript.RegisterClientScriptBlock(GetType(), "_GenericEntityScript_", "<script>$(document).ready(function(){$.getScript('" + SPContext.Current.Web.Url + "/_layouts/epmlive/javascripts/GenericEntityEditor.js');});</script>", false);
-            this.Page.ClientScript.RegisterClientScriptBlock(GetType(), "_GenericEntityPickerStyle_", "<link href=\"/_layouts/epmlive/GenericEntityPickerStyle.css\" rel=\"stylesheet\" type=\"text/css\" />", false);
+            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityEditorJS_", "<script src='/_layouts/epmlive/javascripts/GenericEntityEditor.js'></script>", false);
+            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityPickerStyle_", "<link href=\"/_layouts/epmlive/GenericEntityPickerStyle.css\" rel=\"stylesheet\" type=\"text/css\" />", false);
 
             base.OnPreRender(e);
 
             if (this.Entities.Count == 0 && propBag.Parent != "")
-            {   
+            {
                 this.Page.ClientScript.RegisterClientScriptBlock(GetType(), "_hideControls_",
                     "function HideControl_" + this.ClientID + "(){ " +
                     "   if ($('#" + this.ClientID + "_upLevelDiv').length > 0){ " +
@@ -178,7 +244,7 @@ namespace EPMLiveCore
                     "});", true);
             }
 
-             
+
         }
 
         //protected override PickerEntity[] ResolveErrorBySearch(string unresolvedText)

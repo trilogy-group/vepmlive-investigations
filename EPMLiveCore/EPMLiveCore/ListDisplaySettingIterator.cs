@@ -305,23 +305,23 @@ namespace EPMLiveCore
                     if (Web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                     {
                         ArrayList arr = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKLists").ToLower().Split(','));
-                        if(arr.Contains(list.Title.ToLower()))
+                        if (arr.Contains(list.Title.ToLower()))
                         {
                             string menus = "";
                             menus = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_menus");
-                            if(menus == "")
+                            if (menus == "")
                                 menus = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKMenus");
 
                             ArrayList arrButtons = new ArrayList(menus.Split('|'));
 
                             string noactivex = "";
                             noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_nonactivexs");
-                            if(noactivex == "")
+                            if (noactivex == "")
                                 noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "epknonactivexs");
 
                             ArrayList arrActivex = new ArrayList(menus.Split('|'));
 
-                            if(arrButtons.Contains("costs"))
+                            if (arrButtons.Contains("costs"))
                             {
                                 ribbonExtensions = new XmlDocument();
                                 ribbonExtensions.LoadXml(@"<Button
@@ -336,9 +336,9 @@ namespace EPMLiveCore
                                 ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
                             }
 
-                            if(arrButtons.Contains("resplan"))
+                            if (arrButtons.Contains("resplan"))
                             {
-                                if(arrActivex.Contains("resplan"))
+                                if (arrActivex.Contains("resplan"))
                                 {
                                     ribbonExtensions = new XmlDocument();
                                     ribbonExtensions.LoadXml(@"<Button
@@ -445,11 +445,11 @@ namespace EPMLiveCore
 
                     DisplayFormRedirect = gSettings.DisplayFormRedirect;
 
-                    if(DisplayFormRedirect && ControlMode == SPControlMode.New)
+                    if (DisplayFormRedirect && ControlMode == SPControlMode.New)
                     {
                         SPContext.Current.FormContext.OnSaveHandler += new EventHandler(CustomHandler);
                     }
-                    else if(!string.IsNullOrEmpty(Page.Request["Source"]))
+                    else if (!string.IsNullOrEmpty(Page.Request["Source"]))
                         RedirectUrl = Page.Request["Source"];
                     //string strDisplay = CoreFunctions.getListSetting(List, "DisplaySettings");
                     //string[] strGeneral = CoreFunctions.getListSetting(List, "GeneralSettings").Split('\n');
@@ -520,9 +520,10 @@ namespace EPMLiveCore
                                         try
                                         {
                                             ActivationType = int.Parse(ds.Tables[0].Rows[0][0].ToString());
-                                        }catch{}
+                                        }
+                                        catch { }
 
-                                        if(ActivationType != 3)
+                                        if (ActivationType != 3)
                                         {
                                             cmd = new SqlCommand("2010SP_GetSiteAccountNums", cn);
                                             cmd.CommandType = CommandType.StoredProcedure;
@@ -531,7 +532,7 @@ namespace EPMLiveCore
 
                                             SqlDataReader dr = cmd.ExecuteReader();
 
-                                            if(dr.Read())
+                                            if (dr.Read())
                                             {
                                                 max = dr.GetInt32(0);
                                                 count = dr.GetInt32(1);
@@ -539,12 +540,12 @@ namespace EPMLiveCore
 
                                                 barcolor = "";
 
-                                                if(width > 100)
+                                                if (width > 100)
                                                     width = 100;
 
-                                                if((max - count) <= 1)
+                                                if ((max - count) <= 1)
                                                     barcolor = "FF0000";
-                                                else if((max - count) < 5)
+                                                else if ((max - count) < 5)
                                                     barcolor = "FFFF00";
                                                 else
                                                     barcolor = "009900";
@@ -567,7 +568,7 @@ namespace EPMLiveCore
 
                                             SqlDataReader dr = cmd.ExecuteReader();
 
-                                            if(dr.Read())
+                                            if (dr.Read())
                                             {
                                                 ownerusername = dr.GetString(13);
                                                 ownername = dr.GetString(5);
@@ -622,10 +623,6 @@ namespace EPMLiveCore
         {
             if (isFeatureActivated)
             {
-
-
-
-
                 if (base.ControlMode == SPControlMode.Display)
                 {
                     string editURL = base.List.Forms[PAGETYPE.PAGE_EDITFORM].Url;
@@ -636,8 +633,6 @@ namespace EPMLiveCore
                     {
                         extraParams += "&isDlg=" + Page.Request["IsDlg"];
                     }
-
-
 
                     writer.WriteLine("<script language=\"javascript\">");
                     writer.WriteLine("WETitle = \"" + base.ListItem.Title.Replace("\"", "&quot;") + "\";");
@@ -671,7 +666,7 @@ namespace EPMLiveCore
                 }
                 catch { }
                 bool isadmin = SPContext.Current.Web.CurrentUser.IsSiteAdmin;
-                if(isOnline && isResList)
+                if (isOnline && isResList)
                 {
                     if (!isadmin && !disablerequests)
                     {
@@ -685,7 +680,7 @@ namespace EPMLiveCore
                     }
                     else
                     {
-                        if(ActivationType != 3)
+                        if (ActivationType != 3)
                         {
                             if (count >= max && max != -1 && billingtype != 2)
                             {
@@ -739,6 +734,16 @@ namespace EPMLiveCore
                 #endregion
 
                 #region processControls
+
+                // add field control to lookups
+                //foreach (SPField f in Fields)
+                //{
+                //    if (f.Type == SPFieldType.Lookup)
+                //    {
+                //        AddTypeAheadFieldControls(f);
+                //    }
+                //}
+
                 foreach (System.Web.UI.Control tc in base.Controls)
                 {
                     try
@@ -772,35 +777,36 @@ namespace EPMLiveCore
                         }
                         else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Lookup)
                         {
-                            tc.Controls[0].RenderControl(writer);
+                            //tc.Controls[0].RenderControl(writer);
 
-                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
-                            {
-                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
-                                {
-                                    // NOTE: tc.Controls[1].Controls[0].Controls[i].Controls[0] is the lookup field,
-                                    // so we are clearing the lookup field's child control and inserting our own
-                                    foreach (Control c in tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls)
-                                    {
-                                        if (c is DropDownList)
-                                        {
-                                            string sVal = ((DropDownList)c).SelectedValue;
-                                            SPFieldLookup lookup = ((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field as SPFieldLookup;
-                                            //tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls.Add(picker);
-                                            //tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls.Add(new TextBox());
-                                            break;
-                                        }
-                                    }
-                                }
+                            //for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            //{
+                            //if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                            //{
+                            //    // NOTE: tc.Controls[1].Controls[0].Controls[i].Controls[0] is the lookup field,
+                            //    // so we are clearing the lookup field's child control and inserting our own
+                            //    foreach (Control c in tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls)
+                            //    {
+                            //        if (c is DropDownList)
+                            //        {
+                            //            string sVal = ((DropDownList)c).SelectedValue;
+                            //            SPFieldLookup lookup = ((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field as SPFieldLookup;
+                            //            //tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls.Add(picker);
+                            //            //tc.Controls[1].Controls[0].Controls[i].Controls[0].Controls.Add(new TextBox());
+                            //            break;
+                            //        }
+                            //    }
+                            //}
+                            //    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
 
-                                tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
-                            }
+                            //}
 
-                            for (int j = 2; j < tc.Controls.Count; j++)
-                            {
-                                tc.Controls[j].RenderControl(writer);
-                            }
-
+                            //for (int j = 2; j < tc.Controls.Count; j++)
+                            //{
+                            //    tc.Controls[j].RenderControl(writer);
+                            //}
+                           
+                            tc.RenderControl(writer);
                         }
                         else if (arrwpFields.Contains(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName) && (bool)arrwpFields[((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName])
                         {
@@ -1071,7 +1077,7 @@ namespace EPMLiveCore
 
                         if (isOnline)
                         {
-                            if(dControls.ContainsKey("Generic"))
+                            if (dControls.ContainsKey("Generic"))
                             {
                                 writer.WriteLine("function PreSaveAction(){");
                                 writer.WriteLine("  if(!document.getElementById('" + dControls["Generic"] + "').checked){");
@@ -1175,10 +1181,15 @@ namespace EPMLiveCore
                 catch { }
                 // prepopulate lookup fields with query string values
 
-                // InsertLookupValueByQueryString();
+                InsertLookupValueByQueryString();
 
                 // Add EPMLive custom entity picker control to 
                 // lookup fields
+
+                foreach (SPField f in Fields)
+                {
+                    AddTypeAheadFieldControls(f);
+                }
 
                 //AddEntityPickersToLookups();
             }
@@ -1325,6 +1336,357 @@ namespace EPMLiveCore
             return result;
         }
 
+
+        private SPFieldLookupValueCollection GetQueryStringLookupVal(SPField fld)
+        {
+            if (string.IsNullOrEmpty(lookupField) || !fld.InternalName.Equals(lookupField))
+            {
+                return null;
+            }
+
+            SPFieldLookupValueCollection result = new SPFieldLookupValueCollection();
+            // assume single lookup
+            bool valIsMulti = false;
+            List<int> ids = new List<int>();
+            if (!string.IsNullOrEmpty(this.lookupValue))
+            {
+                valIsMulti = this.lookupValue.Contains(',');
+                if (valIsMulti)
+                {
+                    string[] sIds = this.lookupValue.Split(',');
+                    foreach (string s in sIds)
+                    {
+                        if (!string.IsNullOrEmpty(s.Trim()))
+                        {
+                            ids.Add(int.Parse(s));
+                        }
+                    }
+                }
+            }
+
+            SPFieldLookup lookupFld = fld as SPFieldLookup;
+            bool isMulti = lookupFld.AllowMultipleValues;
+
+            // insert single value to single lookup field
+            if (!isMulti && !valIsMulti)
+            {
+                int itemId;
+                if (int.TryParse(lookupValue.Trim(), out itemId))
+                {
+                    result.Add(new SPFieldLookupValue(itemId, GetLookupItemValue(lookupFld, itemId)));
+                }
+            }
+            // insert multi lookup value to multi lookup field
+            else if (isMulti && valIsMulti)
+            {
+                foreach (int id in ids)
+                {
+                    result.Add(new SPFieldLookupValue(id, GetLookupItemValue(lookupFld, id)));
+                }
+            }
+            return result;
+        }
+
+        private void AddTypeAheadFieldControls(SPField fld)
+        {
+            if (mode == SPControlMode.New || mode == SPControlMode.Edit)
+            {
+                // this represents a comma separated list of lookup field internal names to modify
+                EnhancedLookupConfigValuesHelper valueHelper = null;
+                string unprocessedModCandidates = string.Empty;
+                GridGanttSettings gSettings = new GridGanttSettings(this.list);
+
+                try
+                {
+                    string rawValue = gSettings.Lookups;
+                    //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
+                    valueHelper = new EnhancedLookupConfigValuesHelper(rawValue);
+                }
+                catch { }
+
+                if (valueHelper == null)
+                {
+                    return;
+                }
+
+
+                bool isEnhanced = valueHelper.ContainsKey(fld.InternalName);
+                bool isParent = valueHelper.IsParentField(fld.InternalName);
+
+                if (!isEnhanced && !isParent)
+                {
+                    return;
+                }
+
+                LookupConfigData lookupData = valueHelper.GetFieldData(fld.InternalName);
+
+                if (isParent && !isEnhanced)
+                {
+                    SPFieldLookup lookupFld = fld as SPFieldLookup;
+                    if (!lookupFld.AllowMultipleValues)
+                    {
+                        CascadingLookupRenderControl ctrl = new CascadingLookupRenderControl();
+                        if (lookupData == null)
+                        {
+                            lookupData = new LookupConfigData();
+                            lookupData.IsParent = true;
+                        }
+                        ctrl.LookupData = lookupData;
+                        ctrl.LookupField = lookupFld;
+
+                        string customValue =
+                        "<Data>" +
+                        "<Param key=\"SPFieldType\">SPFieldUser</Param>" +
+                        "<Param key=\"ParentWebID\">" + lookupFld.ParentList.ParentWeb.ID.ToString() + "</Param>" +
+                        "<Param key=\"LookupWebID\">" + lookupFld.LookupWebId.ToString() + "</Param>" +
+                        "<Param key=\"LookupListID\">" + lookupFld.LookupList + "</Param>" +
+                        "<Param key=\"LookupFieldInternalName\">" + lookupFld.LookupField + "</Param>" +
+                        "<Param key=\"LookupFieldID\">" + lookupFld.Id + "</Param>" +
+                        "<Param key=\"IsMultiSelect\">" + lookupFld.AllowMultipleValues.ToString() + "</Param>" +
+                        "<Param key=\"ListID\">" + this.ListId.ToString() + "</Param>" +
+                        "<Param key=\"ItemID\">" + this.ItemId.ToString() + "</Param>" +
+                        "<Param key=\"Required\">" + lookupFld.Required + "</Param>" +
+                        GenerateControlDataForLookupField(fld, lookupFld.AllowMultipleValues) +
+                        "</Data>";
+
+                        ctrl.CustomProperty = customValue;
+                        FormField ff = this.GetFormFieldByField(fld);
+                        ff.Parent.Controls.AddAfter(ff, ctrl);
+                    }
+                }
+                else if (isParent && isEnhanced)
+                {
+                    if (lookupData.Type == "2")
+                    {
+                        #region INSERT EPMLIVE GENERIC PICKER CONTROL
+
+                        picker = new GenericEntityEditor();
+                        SPFieldLookup lookupFld = fld as SPFieldLookup;
+                        picker.MultiSelect = lookupFld.AllowMultipleValues;
+
+                        string customValue =
+                            "<Data>" +
+                            "<Param key=\"SPFieldType\"></Param>" +
+                            "<Param key=\"ParentWebID\">" + lookupFld.ParentList.ParentWeb.ID.ToString() + "</Param>" +
+                            "<Param key=\"LookupWebID\">" + lookupFld.LookupWebId.ToString() + "</Param>" +
+                            "<Param key=\"LookupListID\">" + lookupFld.LookupList + "</Param>" +
+                            "<Param key=\"LookupFieldInternalName\">" + lookupFld.LookupField + "</Param>" +
+                            "<Param key=\"LookupFieldID\">" + lookupFld.Id + "</Param>" +
+                            "<Param key=\"IsMultiSelect\">" + lookupFld.AllowMultipleValues.ToString() + "</Param>" +
+                            "<Param key=\"ListID\">" + this.ListId.ToString() + "</Param>" +
+                            "<Param key=\"ItemID\">" + this.ItemId.ToString() + "</Param>" +
+                            GenerateControlDataForLookupField(fld, lookupFld.AllowMultipleValues) +
+                            "<Param key=\"Field\">" + lookupData.Field + "</Param>" +
+                            "<Param key=\"ControlType\">" + lookupData.Type + "</Param>" +
+                            "<Param key=\"Parent\">" + lookupData.Parent + "</Param>" +
+                            "<Param key=\"ParentListField\">" + lookupData.ParentListField + "</Param>" +
+                            "<Param key=\"Required\">" + lookupFld.Required.ToString() + "</Param>" +
+                            "</Data>";
+
+                        SPFieldLookupValueCollection lookupValCol = null;
+
+                        if (mode == SPControlMode.New)
+                        {
+                            lookupValCol = GetQueryStringLookupVal(fld);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                lookupValCol = new SPFieldLookupValueCollection(this.ListItem[lookupFld.Id].ToString());
+                            }
+                            catch { }
+                        }
+
+                        if (lookupValCol != null && lookupValCol.Count > 0)
+                        {
+                            ArrayList alItems = new ArrayList();
+                            PickerEntity entity;
+                            foreach (SPFieldLookupValue v in lookupValCol)
+                            {
+                                entity = new PickerEntity();
+                                entity.Key = v.LookupId.ToString();
+                                entity.DisplayText = v.LookupValue;
+                                entity.IsResolved = true;
+                                alItems.Add(entity);
+                            }
+                            picker.UpdateEntities(alItems);
+                        }
+
+                        picker.CustomProperty = customValue;
+                        
+                        FormField ff = this.GetFormFieldByField(fld);
+                        ff.Parent.Controls.AddAfter(ff, picker);
+
+                        #endregion
+                    }
+                    else if (lookupData.Type == "1")
+                    {
+                        #region INSERT MODIFIED SP CONTROL
+
+                        SPFieldLookup lookupFld = fld as SPFieldLookup;
+                        if (!lookupFld.AllowMultipleValues)
+                        {
+                            CascadingLookupRenderControl cclrCtrl = new CascadingLookupRenderControl();
+                            cclrCtrl.LookupData = lookupData;
+                            cclrCtrl.LookupField = lookupFld;
+
+                            string customValue =
+                            "<Data>" +
+                            "<Param key=\"SPFieldType\">SPFieldUser</Param>" +
+                            "<Param key=\"ParentWebID\">" + lookupFld.ParentList.ParentWeb.ID.ToString() + "</Param>" +
+                            "<Param key=\"LookupWebID\">" + lookupFld.LookupWebId.ToString() + "</Param>" +
+                            "<Param key=\"LookupListID\">" + lookupFld.LookupList + "</Param>" +
+                            "<Param key=\"LookupFieldInternalName\">" + lookupFld.LookupField + "</Param>" +
+                            "<Param key=\"LookupFieldID\">" + lookupFld.Id + "</Param>" +
+                            "<Param key=\"IsMultiSelect\">" + lookupFld.AllowMultipleValues.ToString() + "</Param>" +
+                            "<Param key=\"ListID\">" + this.ListId.ToString() + "</Param>" +
+                            "<Param key=\"ItemID\">" + this.ItemId.ToString() + "</Param>" +
+                            "<Param key=\"Required\">" + lookupFld.Required + "</Param>" +
+                            GenerateControlDataForLookupField(fld, lookupFld.AllowMultipleValues) +
+                            "</Data>";
+
+                            cclrCtrl.CustomProperty = customValue;
+                            
+                            FormField ff = this.GetFormFieldByField(fld);
+                            ff.Parent.Controls.AddAfter(ff, cclrCtrl);
+                        }
+
+                        #endregion
+                    }
+                }
+                else if (!isParent && isEnhanced)
+                {
+                    if (lookupData.Type == "2")
+                    {
+                        #region INSERT EPMLIVE GENERIC PICKER CONTROL
+
+                        picker = new GenericEntityEditor();
+                        SPFieldLookup lookupFld = fld as SPFieldLookup;
+                        picker.MultiSelect = lookupFld.AllowMultipleValues;
+
+                        string customValue =
+                            "<Data>" +
+                            "<Param key=\"SPFieldType\">SPFieldUser</Param>" +
+                            "<Param key=\"ParentWebID\">" + lookupFld.ParentList.ParentWeb.ID.ToString() + "</Param>" +
+                            "<Param key=\"LookupWebID\">" + lookupFld.LookupWebId.ToString() + "</Param>" +
+                            "<Param key=\"LookupListID\">" + lookupFld.LookupList + "</Param>" +
+                            "<Param key=\"LookupFieldInternalName\">" + lookupFld.LookupField + "</Param>" +
+                            "<Param key=\"LookupFieldID\">" + lookupFld.Id + "</Param>" +
+                            "<Param key=\"IsMultiSelect\">" + lookupFld.AllowMultipleValues.ToString() + "</Param>" +
+                            "<Param key=\"ListID\">" + this.ListId.ToString() + "</Param>" +
+                            "<Param key=\"ItemID\">" + this.ItemId.ToString() + "</Param>" +
+                            GenerateControlDataForLookupField(fld, lookupFld.AllowMultipleValues) +
+                            "<Param key=\"Field\">" + lookupData.Field + "</Param>" +
+                            "<Param key=\"ControlType\">" + lookupData.Type + "</Param>" +
+                            "<Param key=\"Parent\">" + lookupData.Parent + "</Param>" +
+                            "<Param key=\"ParentListField\">" + lookupData.ParentListField + "</Param>" +
+                            "<Param key=\"Required\">" + lookupFld.Required.ToString() + "</Param>" +
+                            "</Data>";
+
+                        SPFieldLookupValueCollection lookupValCol = null;
+
+                        if (mode == SPControlMode.New)
+                        {
+                            lookupValCol = GetQueryStringLookupVal(fld);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                lookupValCol = new SPFieldLookupValueCollection(this.ListItem[lookupFld.Id].ToString());
+                            }
+                            catch { }
+                        }
+
+                        if (lookupValCol != null && lookupValCol.Count > 0)
+                        {
+                            ArrayList alItems = new ArrayList();
+                            PickerEntity entity;
+                            foreach (SPFieldLookupValue v in lookupValCol)
+                            {
+                                entity = new PickerEntity();
+                                entity.Key = v.LookupId.ToString();
+                                entity.DisplayText = v.LookupValue;
+                                entity.IsResolved = true;
+                                alItems.Add(entity);
+                            }
+                            picker.UpdateEntities(alItems);
+                        }
+
+                        picker.CustomProperty = customValue;
+                        
+                        FormField ff = this.GetFormFieldByField(fld);
+                        ff.Parent.Controls.AddAfter(ff, picker);
+                        
+
+                        #endregion
+                    }
+                    else if (lookupData.Type == "1")
+                    {
+                        #region INSERT MODIFIED SP CONTROL
+
+                        SPFieldLookup lookupFld = fld as SPFieldLookup;
+                        if (!lookupFld.AllowMultipleValues)
+                        {
+                            CascadingLookupRenderControl cclrCtrl = new CascadingLookupRenderControl();
+                            cclrCtrl.LookupData = lookupData;
+                            cclrCtrl.LookupField = lookupFld;
+
+                            string customValue =
+                            "<Data>" +
+                            "<Param key=\"SPFieldType\">SPFieldUser</Param>" +
+                            "<Param key=\"ParentWebID\">" + lookupFld.ParentList.ParentWeb.ID.ToString() + "</Param>" +
+                            "<Param key=\"LookupWebID\">" + lookupFld.LookupWebId.ToString() + "</Param>" +
+                            "<Param key=\"LookupListID\">" + lookupFld.LookupList + "</Param>" +
+                            "<Param key=\"LookupFieldInternalName\">" + lookupFld.LookupField + "</Param>" +
+                            "<Param key=\"LookupFieldID\">" + lookupFld.Id + "</Param>" +
+                            "<Param key=\"IsMultiSelect\">" + lookupFld.AllowMultipleValues.ToString() + "</Param>" +
+                            "<Param key=\"ListID\">" + this.ListId.ToString() + "</Param>" +
+                            "<Param key=\"ItemID\">" + this.ItemId.ToString() + "</Param>" +
+                            "<Param key=\"Required\">" + lookupFld.Required + "</Param>" +
+                            GenerateControlDataForLookupField(fld, lookupFld.AllowMultipleValues) +
+                            "</Data>";
+
+                            cclrCtrl.CustomProperty = customValue;
+                            
+                            FormField ff = this.GetFormFieldByField(fld);
+                            ff.Parent.Controls.AddAfter(ff, cclrCtrl);
+                        }
+                        else
+                        {
+                            CascadingMultiLookupRenderControl cclrCtrl = new CascadingMultiLookupRenderControl();
+                            cclrCtrl.LookupData = lookupData;
+                            cclrCtrl.LookupField = lookupFld;
+
+                            string customValue =
+                            "<Data>" +
+                            "<Param key=\"SPFieldType\">SPFieldUser</Param>" +
+                            "<Param key=\"ParentWebID\">" + lookupFld.ParentList.ParentWeb.ID.ToString() + "</Param>" +
+                            "<Param key=\"LookupWebID\">" + lookupFld.LookupWebId.ToString() + "</Param>" +
+                            "<Param key=\"LookupListID\">" + lookupFld.LookupList + "</Param>" +
+                            "<Param key=\"LookupFieldInternalName\">" + lookupFld.LookupField + "</Param>" +
+                            "<Param key=\"LookupFieldID\">" + lookupFld.Id + "</Param>" +
+                            "<Param key=\"IsMultiSelect\">" + lookupFld.AllowMultipleValues.ToString() + "</Param>" +
+                            "<Param key=\"ListID\">" + this.ListId.ToString() + "</Param>" +
+                            "<Param key=\"ItemID\">" + this.ItemId.ToString() + "</Param>" +
+                            "<Param key=\"Required\">" + lookupFld.Required + "</Param>" +
+                            GenerateControlDataForLookupField(fld, lookupFld.AllowMultipleValues) +
+                            "</Data>";
+
+                            cclrCtrl.CustomProperty = customValue;
+
+                            FormField ff = this.GetFormFieldByField(fld);
+                            ff.Parent.Controls.AddAfter(ff, cclrCtrl);                        
+                        }
+
+                        #endregion
+                    }
+                }
+            }
+        }
+
+
         private void AddEntityPickersToLookups()
         {
             if (mode == SPControlMode.New || mode == SPControlMode.Edit)
@@ -1363,7 +1725,6 @@ namespace EPMLiveCore
                     if (isParent && !isEnhanced)
                     {
                         SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
-                        Control renderedControl = GetControl(fld);
                         if (!lookupFld.AllowMultipleValues)
                         {
                             CascadingLookupRenderControl ctrl = new CascadingLookupRenderControl();
@@ -1391,7 +1752,7 @@ namespace EPMLiveCore
                             "</Data>";
 
                             ctrl.CustomProperty = customValue;
-                            renderedControl.Parent.Controls.Add(ctrl);
+                            fld.Controls.Add(ctrl);
                         }
                     }
                     else if (isParent && isEnhanced)
@@ -1454,8 +1815,7 @@ namespace EPMLiveCore
                             }
 
                             picker.CustomProperty = customValue;
-                            Control renderedControl = GetControl(fld);
-                            renderedControl.Parent.Controls.Add(picker);
+                            fld.Controls.Add(picker);
 
                             #endregion
                         }
@@ -1464,7 +1824,6 @@ namespace EPMLiveCore
                             #region INSERT MODIFIED SP CONTROL
 
                             SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
-                            Control renderedControl = GetControl(fld);
                             if (!lookupFld.AllowMultipleValues)
                             {
                                 CascadingLookupRenderControl cclrCtrl = new CascadingLookupRenderControl();
@@ -1487,7 +1846,7 @@ namespace EPMLiveCore
                                 "</Data>";
 
                                 cclrCtrl.CustomProperty = customValue;
-                                renderedControl.Parent.Controls.Add(cclrCtrl);
+                                fld.Controls.Add(cclrCtrl);
                             }
 
                             #endregion
@@ -1553,8 +1912,7 @@ namespace EPMLiveCore
                             }
 
                             picker.CustomProperty = customValue;
-                            Control renderedControl = GetControl(fld);
-                            renderedControl.Parent.Controls.Add(picker);
+                            fld.Controls.Add(picker);
 
                             #endregion
                         }
@@ -1563,7 +1921,6 @@ namespace EPMLiveCore
                             #region INSERT MODIFIED SP CONTROL
 
                             SPFieldLookup lookupFld = fld.Field as SPFieldLookup;
-                            Control renderedControl = GetControl(fld);
                             if (!lookupFld.AllowMultipleValues)
                             {
                                 CascadingLookupRenderControl cclrCtrl = new CascadingLookupRenderControl();
@@ -1586,7 +1943,7 @@ namespace EPMLiveCore
                                 "</Data>";
 
                                 cclrCtrl.CustomProperty = customValue;
-                                renderedControl.Parent.Controls.Add(cclrCtrl);
+                                fld.Controls.Add(cclrCtrl);
                             }
                             else
                             {
@@ -1610,7 +1967,7 @@ namespace EPMLiveCore
                                 "</Data>";
 
                                 cclrCtrl.CustomProperty = customValue;
-                                renderedControl.Parent.Controls.Add(cclrCtrl);
+                                fld.Controls.Add(cclrCtrl);
                             }
 
                             #endregion
@@ -1631,10 +1988,10 @@ namespace EPMLiveCore
             if (isMulti)
             {
                 // need control id for the addbutton, removeButton, selectCandidate, selectResult controls
-                sbResult.Append("<Param key=\"SelectCandidateID\">" + sourceFld.Controls[0].Controls[0].Controls[3].ClientID.ToString() + "</Param>" +
-                                "<Param key=\"AddButtonID\">" + sourceFld.Controls[0].Controls[0].Controls[5].ClientID.ToString() + "</Param>" +
-                                "<Param key=\"RemoveButtonID\">" + sourceFld.Controls[0].Controls[0].Controls[7].ClientID.ToString() + "</Param>" +
-                                "<Param key=\"SelectResultID\">" + sourceFld.Controls[0].Controls[0].Controls[9].ClientID.ToString() + "</Param>");
+                sbResult.Append("<Param key=\"SelectCandidateID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_SelectCandidate") + "</Param>" +
+                                "<Param key=\"AddButtonID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_AddButton") + "</Param>" +
+                                "<Param key=\"RemoveButtonID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_RemoveButton") + "</Param>" +
+                                "<Param key=\"SelectResultID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_SelectResult") + "</Param>");
 
             }
             // in the case of a single select
@@ -1642,8 +1999,35 @@ namespace EPMLiveCore
             // controls id to post back data
             else
             {
-                sbResult.Append("<Param key=\"SourceDropDownID\">" + sourceFld.Controls[0].Controls[0].ClientID.ToString() + "</Param>");
-                sbResult.Append("<Param key=\"SourceControlID\">" + sourceFld.Controls[0].Controls[1].ClientID.ToString() + "</Param>");
+                sbResult.Append("<Param key=\"SourceDropDownID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_$" + sourceFld.Field.Type.ToString()) + "</Param>");
+                sbResult.Append("<Param key=\"SourceControlID\">" + (sourceFld.Field.InternalName + "_" + sourceFld.Field.Id.ToString() + "_$" + sourceFld.Field.Type.ToString()) + "</Param>");
+            }
+
+            return sbResult.ToString();
+        }
+
+        private string GenerateControlDataForLookupField(SPField fld, bool isMulti)
+        {
+            StringBuilder sbResult = new StringBuilder();
+            // in the case of multi select
+            // we need the ids of four controls
+            // to post back data
+            if (isMulti)
+            {
+                // need control id for the addbutton, removeButton, selectCandidate, selectResult controls
+                sbResult.Append("<Param key=\"SelectCandidateID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_SelectCandidate") + "</Param>" +
+                                "<Param key=\"AddButtonID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_AddButton") + "</Param>" +
+                                "<Param key=\"RemoveButtonID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_RemoveButton") + "</Param>" +
+                                "<Param key=\"SelectResultID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_SelectResult") + "</Param>");
+
+            }
+            // in the case of a single select
+            // we just need the input or the dropdown
+            // controls id to post back data
+            else
+            {
+                sbResult.Append("<Param key=\"SourceDropDownID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_$" + fld.Type.ToString()) + "</Param>");
+                sbResult.Append("<Param key=\"SourceControlID\">" + (fld.InternalName + "_" + fld.Id.ToString() + "_$" + fld.Type.ToString()) + "</Param>");
             }
 
             return sbResult.ToString();
@@ -1700,14 +2084,14 @@ namespace EPMLiveCore
                         switch (field.InternalName)
                         {
                             case "ResourceLevel":
-                                if(Web.CurrentUser.IsSiteAdmin || EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower() == ownerusername.ToLower())
+                                if (Web.CurrentUser.IsSiteAdmin || EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower() == ownerusername.ToLower())
                                 {
                                     Act act = new Act(Web);
                                     int actType = 0;
 
                                     ArrayList Levels = act.GetLevelsFromSite(out actType, "");
 
-                                    if(actType > 2)
+                                    if (actType > 2)
                                     {
                                         return false;
                                     }
@@ -1729,7 +2113,7 @@ namespace EPMLiveCore
                                         return false;
                                     else
                                         return true;
-                                    
+
                                 }
                                 return false;
                             case "Title":
@@ -1772,7 +2156,7 @@ namespace EPMLiveCore
                                 else
                                     return true;
                             case "Approved":
-                                if(field.ParentList.Fields.ContainsFieldWithInternalName("ResourceLevel"))
+                                if (field.ParentList.Fields.ContainsFieldWithInternalName("ResourceLevel"))
                                     return true;
                                 else
                                 {
@@ -1782,7 +2166,7 @@ namespace EPMLiveCore
                                         approved = this.ListItem["Approved"].ToString();
                                     }
                                     catch { }
-                                    if(SPContext.Current.Web.UserIsSiteAdmin && approved == "False" && this.mode != SPControlMode.New)
+                                    if (SPContext.Current.Web.UserIsSiteAdmin && approved == "False" && this.mode != SPControlMode.New)
                                         return false;
                                     else
                                         return true;
@@ -1987,6 +2371,11 @@ namespace EPMLiveCore
 
     public static class ListFieldIteratorExtensions
     {
+        public static FormField GetFormFieldByField(this ListFieldIterator listFieldIterator, SPField field)
+        {
+            return GetFormField(listFieldIterator, GetFormFields(listFieldIterator), field);
+        }
+
         public static List<FormField> GetFormFieldByType(this ListFieldIterator listFieldIterator, Type fieldType)
         {
             return GetFormField(listFieldIterator, GetFormFields(listFieldIterator), fieldType);
@@ -2004,6 +2393,20 @@ namespace EPMLiveCore
             }
 
             return fields;
+        }
+
+        public static FormField GetFormField(this ListFieldIterator listFieldITerator, List<FormField> formFields, SPField field)
+        {
+            FormField ff = (from form in formFields
+                            where form.Field.Equals(field)
+                            select form).FirstOrDefault();
+
+            if (ff == null)
+            {
+                throw new Exception("Could not find form field for field: " + field.ToString());
+            }
+
+            return ff;
         }
 
         public static List<FormField> GetFormFields(this ListFieldIterator listFieldIterator)
