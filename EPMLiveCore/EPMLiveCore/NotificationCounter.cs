@@ -22,13 +22,13 @@ namespace EPMLiveCore
             writer.Write(@"<link href=""{0}/_layouts/epmlive/stylesheets/notifications.css"" rel=""stylesheet"" type=""text/css"" />", url);
 
             writer.Write(@"
-                <div id=""EPMLiveNotificationCounter"" class=""s4-trc-container-menu"" 
+                <div id=""EPMLiveNotificationCounter"" class=""ms-qatbutton"" 
                     data-bind=""style: { background: epmLiveNotifications.notificationCounterColor(), fontWeight: epmLiveNotifications.notificationCounterFontWeight() }"" 
-                    style=""top: -3.5px; background: none repeat scroll 0% 0% rgb(84, 113, 148);"">
+                    style=""background: #666666;"">
                     <span id=""EPMLiveNotificationCount"" data-bind=""text: epmLiveNotifications.totalNewNotifications()"">&nbsp;</span>
                 </div>");
 
-            writer.Write(@"<div id=""EPMLiveNotificationCounterScreen"" class=""s4-trc-container-menu"" style=""height: 44px; width: 44px; top: -12px; left: -40px;"">&nbsp;</div>");
+            writer.Write(@"<div id=""EPMLiveNotificationCounterScreen"" class=""ms-qatbutton"" style=""height: 44px; width: 44px; top: -12px; left: -40px;"">&nbsp;</div>");
 
             writer.Write(@"
                 <script type=""text/javascript""> 

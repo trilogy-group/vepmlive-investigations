@@ -7,7 +7,8 @@
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveJS.ascx.cs" Inherits="EPMLiveCore.ControlTemplates.EPMLiveJS" %>
 
-<script src="<%= WebUrl %>/_layouts/epmlive/javascripts/libraries/jquery.min.js" type="text/javascript"></script>
+<script src="<%= WebUrl %>/_layouts/15/epmlive/javascripts/libraries/jquery.min.js" type="text/javascript"></script>
+<script src="<%= WebUrl %>/_layouts/15/epmlive/javascripts/EPMLive.Notifications.js?v=<%= EPMFileVersion %>" type="text/javascript"></script>
 
 <script type="text/javascript">
     function initializeEPMLiveJS() {
