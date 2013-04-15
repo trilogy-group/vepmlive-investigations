@@ -832,6 +832,9 @@ namespace EPMLiveCore
                                 SPField f = ((Microsoft.SharePoint.WebControls.CompositeField)tc.Controls[1]).Field;
                                 string fname = f.InternalName + "_" + f.Id.ToString() + "_$" + f.TypeAsString + "Field";
 
+                                if(f.Type == SPFieldType.User)
+                                    fname = f.InternalName + "_" + f.Id.ToString() + "_$ClientPeoplePicker";
+
                                 dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, fname);
 
                                 //if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Choice)

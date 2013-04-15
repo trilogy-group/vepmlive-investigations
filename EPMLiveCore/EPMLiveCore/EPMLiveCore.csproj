@@ -19,10 +19,10 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
-net stop "WorkEngine Timer"
-net start "WorkEngine Timer"</PostDeploymentCommand>
-    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore</PreDeploymentCommand>
+    <PostDeploymentCommand>
+    </PostDeploymentCommand>
+    <PreDeploymentCommand>
+    </PreDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

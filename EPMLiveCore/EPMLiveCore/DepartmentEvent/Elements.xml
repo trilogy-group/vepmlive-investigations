@@ -5,14 +5,14 @@
         <Name>DepartmentEventItemAdding</Name>
         <Type>ItemAdding</Type>
         <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
-        <Class>EPMLiveCore.DepartmentEvent.DepartmentEvent</Class>
+        <Class>EPMLiveCore.DepartmentEvent</Class>
         <SequenceNumber>10000</SequenceNumber>
       </Receiver>
       <Receiver>
         <Name>DepartmentEventItemUpdating</Name>
         <Type>ItemUpdating</Type>
         <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
-        <Class>EPMLiveCore.DepartmentEvent.DepartmentEvent</Class>
+        <Class>EPMLiveCore.DepartmentEvent</Class>
         <SequenceNumber>10000</SequenceNumber>
       </Receiver>
 
