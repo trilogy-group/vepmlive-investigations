@@ -1118,6 +1118,33 @@ namespace EPMLiveCore.API
             return dataTables;
         }
 
+        private static string GetExampleDateFormat(SPWeb web, string yearLabel, string monthLabel, string dayLabel)
+        {
+            string format = string.Empty;
+
+            SPContext context = SPContext.GetContext(web);
+
+            SPRegionalSettings spRegionalSettings = context.Web.CurrentUser.RegionalSettings ?? context.RegionalSettings;
+
+            string dateSeparator = spRegionalSettings.DateSeparator;
+            var calendarOrderType = (SPCalendarOrderType) spRegionalSettings.DateFormat;
+
+            switch (calendarOrderType)
+            {
+                case SPCalendarOrderType.MDY:
+                    format = monthLabel + dateSeparator + dayLabel + dateSeparator + yearLabel;
+                    break;
+                case SPCalendarOrderType.DMY:
+                    format = dayLabel + dateSeparator + monthLabel + dateSeparator + yearLabel;
+                    break;
+                case SPCalendarOrderType.YMD:
+                    format = yearLabel + dateSeparator + monthLabel + dateSeparator + dayLabel;
+                    break;
+            }
+
+            return format;
+        }
+
         /// <summary>
         ///     Gets the grid safe value.
         /// </summary>
@@ -3023,26 +3050,36 @@ namespace EPMLiveCore.API
 
                 XElement xElement = xDocument.Element("ListItem");
 
+                string siteUrl = xElement.Element("Site").Attribute("URL").Value;
+                string webId = xElement.Element("Web").Attribute("ID").Value;
+                string listId = xElement.Element("List").Attribute("ID").Value;
+
                 myWorkElement.Add(new XElement("Item"));
                 myWorkElement.Element("Item").Add(new XAttribute("ID", xElement.Element("Item").Attribute("ID").Value));
 
                 myWorkElement.Add(new XElement("List"));
-                myWorkElement.Element("List").Add(new XAttribute("ID", xElement.Element("List").Attribute("ID").Value));
+                myWorkElement.Element("List").Add(new XAttribute("ID", listId));
 
                 myWorkElement.Add(new XElement("Web"));
-                myWorkElement.Element("Web").Add(new XAttribute("ID", xElement.Element("Web").Attribute("ID").Value));
+                myWorkElement.Element("Web").Add(new XAttribute("ID", webId));
 
                 myWorkElement.Add(new XElement("Site"));
                 myWorkElement.Element("Site").Add(new XAttribute("ID", xElement.Element("Site").Attribute("ID").Value));
-                myWorkElement.Element("Site")
-                             .Add(new XAttribute("URL", xElement.Element("Site").Attribute("URL").Value));
+                myWorkElement.Element("Site").Add(new XAttribute("URL", siteUrl));
 
                 myWorkElement.Add(new XElement("Fields"));
                 XElement fieldsElement = myWorkElement.Element("Fields");
 
                 foreach (XElement field in xElement.Element("Fields").Elements("Field"))
                 {
-                    var element = new XElement("Field", new XCData(GetGridSafeValue(field)));
+                    var value = GetGridSafeValue(field);
+
+                    if (field.Attribute("Type").Value.Contains("Date"))
+                    {
+                        value = DateTime.Parse(value).ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                    }
+
+                    var element = new XElement("Field", new XCData(value));
                     element.Add(new XAttribute("Name", Utils.ToGridSafeFieldName(field.Attribute("Name").Value)));
 
                     fieldsElement.Add(element);
@@ -3115,7 +3152,7 @@ namespace EPMLiveCore.API
 
                     return string.Empty;
                 case "Date":
-                    string dateFormat = SPUtility.GetExampleDateFormat(spWeb, "yyyy", "M", "d");
+                    string dateFormat = GetExampleDateFormat(spWeb, "yyyy", "M", "d");
                     return format.Equals("DateOnly") ? dateFormat : string.Format("{0} h:mm tt", dateFormat);
                 default:
                     return string.Empty;
@@ -3398,12 +3435,20 @@ namespace EPMLiveCore.API
                     string name = element.Attribute("Name").Value;
                     string value = GetGridSafeValue(element);
 
+                    DateTime dateTime = DateTime.MinValue;
+
+                    if (element.Attribute("Type").Value.Contains("Date"))
+                    {
+                        dateTime = DateTime.Parse(value);
+                        value = dateTime.ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                    }
+
                     var xElement = new XElement("Field", new XCData(value));
                     xElement.Add(new XAttribute("Name", Utils.ToGridSafeFieldName(name)));
 
                     if (name.Equals(DUE_DATE_FIELD) && !string.IsNullOrEmpty(value))
                     {
-                        var dueDayElement = new XElement("Field", new XCData(DateTime.Parse(value).ToFriendlyDate()));
+                        var dueDayElement = new XElement("Field", new XCData(dateTime.ToFriendlyDate()));
                         dueDayElement.Add(new XAttribute("Name", DUE_DAY_FIELD));
 
                         fieldsElement.Add(dueDayElement);
