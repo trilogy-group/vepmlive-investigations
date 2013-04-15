@@ -96,8 +96,8 @@ namespace CADataCache
 
         private string m_heatmap_text = "";
 
-        private bool   bShowFTEs = true;
-        private bool   bUseQTY = true;
+        private bool   bShowFTEs = false;
+        private bool   bUseQTY = false;
         private bool   bUseCosts = true;
         private bool  m_show_rhs_dec_costs = true;
 
@@ -136,6 +136,14 @@ namespace CADataCache
         {
 
             m_clsda = clsda;
+            bool bdefsel = true;
+
+            foreach (clsDataItem oItem in m_clsda.m_CostTypes.Values)
+            {
+                oItem.bSelected = bdefsel;
+                bdefsel = false;
+            }
+
 
             setupdispcolns();
             ReDrawGrid();
@@ -2510,7 +2518,6 @@ namespace CADataCache
                 xNode.CreateIntAttr("CT_ID", oDet.CT_ID);
                 xNode.CreateIntAttr("BC_UID", oDet.BC_UID);
                 xNode.CreateIntAttr("BC_ROLE_UID", oDet.BC_ROLE_UID);
-                xNode.CreateIntAttr("BC_SEQ", oDet.BC_SEQ);
                 xNode.CreateIntAttr("CAT_UID", oDet.CAT_UID);
 
                 xNode.CreateStringAttr("MC_Val", oDet.MC_Val);
