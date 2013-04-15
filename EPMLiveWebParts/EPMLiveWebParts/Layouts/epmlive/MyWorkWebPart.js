@@ -90,6 +90,7 @@ Grids.OnFocus = function(grid, row, col, orow, ocol, pagepos) {
 
 Grids.OnClick = function (grid, row, col, x, y, event) {
     if (grid.id === window.allWorkGridId) {
+        MyWorkGrid.loadRibbon();
 
         MyWorkGrid.hidePivotMenu();
         $('#MWG_Search').blur();
@@ -2886,6 +2887,30 @@ var MyWorkGrid = {
                 ele.removeClass('MWG_SearchProcessing');
             }
         });
+    },
+    
+    loadRibbon: function () {
+        SP.SOD.executeOrDelayUntilScriptLoaded(function () {
+            var selectTab = function (tabId) {
+                window._ribbonStartInit(tabId, false, null);
+            };
+
+            var pm = SP.Ribbon.PageManager.get_instance();
+
+            var ribbon = null;
+
+            try {
+                ribbon = pm.get_ribbon();
+            } catch (e) {
+            }
+
+            if (!ribbon) {
+                if (typeof (window._ribbonStartInit) === 'function') {
+                    selectTab('Ribbon.MyWorkTab');
+                }
+            }
+
+        }, 'sp.ribbon.js');
     }
 };
 
