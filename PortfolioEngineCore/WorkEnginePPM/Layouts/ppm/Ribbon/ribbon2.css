@@ -1,4 +1,4 @@
-﻿.ms-cui-ribbon, .ms-cui-menu, .ms-cui-toolbar-toolbar {
+﻿lowerlarge.ms-cui-ribbon, .ms-cui-menu, .ms-cui-toolbar-toolbar {
     color: #6C6E70;
     font-family:Segoe UI,Tahoma,Verdana,sans-serif;
     font-size: 8pt;
@@ -187,8 +187,8 @@
 .ms-cui-tabBodyLower {
     /*background: url("./images/bgximg-B3C644FE.png") repeat-x scroll 0 -882px #FFFFFF;*/
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#EFEFEF'); /* for IE */
-	background: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#EFEFEF)); /* for webkit browsers */
-	background: -moz-linear-gradient(top,  #FFFFFF,  #EFEFEF); /* for firefox 3.6+ */ 
+    background: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#EFEFEF)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #FFFFFF,  #EFEFEF); /* for firefox 3.6+ */ 
     border-bottom: 1px solid #898D92;
     border-style: solid;
     border-width: 0 0 1px;
@@ -1040,17 +1040,14 @@ a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hov
     background-color: #FFED95;
     border-color: #C28A30;
 }
-.ms-cui-ctl-large:hover, a.ms-cui-ctl-lowerlarge:hover, .ms-cui-ctl-light-hoveredOver, .ms-cui-ctl-medium:hover, .ms-cui-ctl:hover, .ms-cui-mrusb-selecteditem.ms-cui-ctl-light-hoveredOver a, .ms-cui-ctl-thin:hover {
-    /*background-color: #FDEEB3;
-    border-color: #F1C43F !important;*/
-}
+
 .ms-cui-ctl-on:hover {
     background-color: #FFED95 !important;
     border-color: #C28A30 !important;
 }
 .ms-cui-ctl-mousedown, .ms-cui-ctl-large:active, .ms-cui-ctl-lowerlarge:active, .ms-cui-ctl-medium:active, .ms-cui-ctl:active, .ms-cui-ctl-a1:active, .ms-cui-ctl-a2:active, .ms-cui-ctl-thin:active {
-    /*background-color: #F6C867 !important;
-    border-color: #C28A30 !important;*/
+    background-color: #F6C867 !important;
+    border-color: #C28A30 !important;
 }
 .ms-cui-ctl-large .ms-cui-ctl-a2 {
     border-top: 0 none !important;
