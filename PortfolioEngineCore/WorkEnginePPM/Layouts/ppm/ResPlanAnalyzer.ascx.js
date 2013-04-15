@@ -3044,54 +3044,60 @@
 	                var xtp = this.UsingPeriods.Period.length;   //  grid.GetValue(row, "xinterenalPeriodTotal");
 	                var xas = "";
 
-	                if (this.AnalyzerShowBarschecked == false) {
-	                    for (var xi = 1; xi <= xtp; ++xi) {
-	                        xas = "P" + xi.toString() + "C1";
-	                        grid.SetString(row, xas + "HtmlPrefix", "", 1);
-	                        grid.SetString(row, xas + "HtmlPostfix", "", 1);
-	                        grid.SetString(row, xas + "ClassInner", "", 1);
-	                    }
+	                var cv = grid.GetValue(row, "P1C1HtmlPrefix");
 
+	                if (this.AnalyzerShowBarschecked == false) {
+	                    if (cv != "") {
+
+	                        for (var xi = 1; xi <= xtp; ++xi) {
+	                            xas = "P" + xi.toString() + "C1";
+	                            grid.SetString(row, xas + "HtmlPrefix", "", 1);
+	                            grid.SetString(row, xas + "HtmlPostfix", "", 1);
+	                            grid.SetString(row, xas + "ClassInner", "", 1);
+	                        }
+	                    }
 	                }
 	                else {
-	                    if (xfp != 0) {
+	                    if (cv == "") {
+	                        if (xfp != 0) {
 
-	                        for (var xi = 1; xi < xfp; ++xi) {
-	                            xas = "P" + xi.toString() + "C1";
-	                            grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
-	                            grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
-//	                            grid.SetString(row, xas + "ClassInner", "", 1);
+	                            for (var xi = 1; xi < xfp; ++xi) {
+	                                xas = "P" + xi.toString() + "C1";
+	                                grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+	                                grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+	                                //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+	                            }
+
+
+	                            for (var xi = xfp; xi <= xlp; ++xi) {
+
+	                                xas = "P" + xi.toString() + "C1";
+
+
+	                                //	                                                        if (xfp == xlp)
+	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngSingleCell", 1);
+	                                //	                                                        else if (xi == xfp)
+	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngLeftCell", 1);
+	                                //	                                                        else if (xi == xlp)
+	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngRightCell", 1);
+	                                //	                                                        else
+	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngMiddleCell", 1);
+
+
+	                                grid.SetString(row, xas + "HtmlPrefix", "<font color='white'>", 1);
+	                                grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+
+
+	                            }
+
+	                            for (var xi = xlp + 1; xi <= xtp; ++xi) {
+	                                xas = "P" + xi.toString() + "C1";
+	                                grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+	                                grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+	                                //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+	                            }
+
 	                        }
-
-
-	                        for (var xi = xfp; xi <= xlp; ++xi) {
-
-	                            xas = "P" + xi.toString() + "C1";
-
-
-//	                                                        if (xfp == xlp)
-//	                                                            grid.SetString(row, xas + "ClassInner", "GMngSingleCell", 1);
-//	                                                        else if (xi == xfp)
-//	                                                            grid.SetString(row, xas + "ClassInner", "GMngLeftCell", 1);
-//	                                                        else if (xi == xlp)
-//	                                                            grid.SetString(row, xas + "ClassInner", "GMngRightCell", 1);
-//	                                                        else
-//	                                                            grid.SetString(row, xas + "ClassInner", "GMngMiddleCell", 1);
-
-
-	                            grid.SetString(row, xas + "HtmlPrefix", "<font color='white'>", 1);
-	                            grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
-
-
-	                        }
-
-	                        for (var xi = xlp + 1; xi <= xtp; ++xi) {
-	                            xas = "P" + xi.toString() + "C1";
-	                            grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
-	                            grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
-//	                            grid.SetString(row, xas + "ClassInner", "", 1);
-	                        }
-
 	                    }
 	                }
 	            }

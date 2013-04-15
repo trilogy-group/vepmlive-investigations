@@ -1245,10 +1245,13 @@
             sbDataxml = new StringBuilder();
             sbDataxml.append("<SelectedOrderItems>");
 
+            this.bdoingCmp == false;
+
             if (chkEnableHeatMap.checked) {
                 var w = selHeatMap.selectedIndex;
                 var selected_text = selHeatMap.options[w].text;
                 this.heatmapText = selected_text;
+                this.bdoingCmp == true
 
             }
             else
@@ -1267,7 +1270,7 @@
                 if (j == 0) {
                     sbDataxml.append("0");
                     this.TotalsGridTotalsCol = i + 1;
-                        
+
 
                 }
                 else
@@ -1304,7 +1307,7 @@
 
             WorkEnginePPM.CostAnalyzer.Execute("SetTotalsConfiguration", sb.toString(), this.SetTotalsDataCompleteDelegate);
 
-
+            this.FlashTargetMenuStuff();
 
         }
 
@@ -1516,7 +1519,7 @@
                 sections: [
                     {
                         name: "Actions",
-                        tooltip: "Plan Actions",
+                        tooltip: "Actions",
                         columns: [
                             {
                                 items: [
@@ -1587,7 +1590,7 @@
                     addme.name = "Show " + cName;
                     addme.tooltip = "Show " + cName;
                     addme.onclick = "dialogEvent('" + cEvent + "');";
-
+                    addme.disabled = (ct.Sel == false);
 
                     columns[cacc].items[xacc++] = addme;
 
@@ -1610,6 +1613,17 @@
                 onstatechange: "dialogEvent('TopRibbon_Toggle');",
                 imagePath: this.imagePath,
                 sections: [
+                    {
+                        name: "Actions",
+                        tooltip: "Actions",
+                        columns: [
+                            {
+                                items: [
+                                    { type: "bigbutton", name: "Close", img: "formatmap32x32.png", style: "top: -448px; left: -288px;position:relative;", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
+                                ]
+                            }
+                        ]
+                    },
                      {
                          name: "View Management",
                          columns: [
@@ -1654,8 +1668,8 @@
                             },
                             {
                                 items: [
-                                    { type: "mediumtext", id: "chksQuantity", name: "Show Quantity", tooltip: "Show Quantity", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed1');" },
-                                    { type: "mediumtext", id: "chksFTE", name: "Show FTEs", tooltip: "Show FTEs", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed2');" },
+                                    { type: "mediumtext", id: "chksQuantity", name: "Show Quantity", tooltip: "Show Quantity", disabled: true, onclick: "dialogEvent('AnalyzerTab_SelMode_Changed1');" },
+                                    { type: "mediumtext", id: "chksFTE", name: "Show FTEs", tooltip: "Show FTEs", disabled: true,  onclick: "dialogEvent('AnalyzerTab_SelMode_Changed2');" },
                                     { type: "mediumtext", id: "chksCost", name: "Show Costs", tooltip: "Show Costs", onclick: "dialogEvent('AnalyzerTab_SelMode_Changed3');" }
                                 ]
                             },
@@ -1745,7 +1759,6 @@
                             },
                             {
                                 items: [
-                                    { type: "smallbutton", id: "ShowTotChk", name: "Show Remaining", img: "ps16x16.png", style: "top: -112px; left: -64px;position:relative;", tooltip: "Show Totals or Remaining", onclick: "dialogEvent('ShowTotBtn');" },
                                      { type: "smallbutton", id: "TargetLegend", name: "Legend", img: "ps16x16.png", style: "top: -128px; left: -176px;position:relative;", tooltip: "Legend", onclick: "dialogEvent('TotalsTab_TarLegBtn');" }
                                 ]
 
@@ -1784,7 +1797,7 @@
             };
 
             //,{ type: "smallbutton", id: "GridExplain", name: "Grid Explaination", img: "help.gif", tooltip: "Grid Explaination", onclick: "dialogEvent('TotalsTab_GridHelpBtn');" }
-
+            //                        { type: "smallbutton", id: "ShowTotChk", name: "Show Remaining", img: "ps16x16.png", style: "top: -112px; left: -64px;position:relative;", tooltip: "Show Totals or Remaining", onclick: "dialogEvent('ShowTotBtn');" },
 
             this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "3E", "dhx_skyblue");
             this.layout.cells(this.mainRibbonArea).setText("Analyzer");
@@ -2191,14 +2204,20 @@
                         this.heatmapText = jsonObject.Result.ViewData.HeatMapText.Value;
 
                         this.TotalsGridTotalsCol = jsonObject.Result.ViewData.HeatMapCol.Value;
-                        
+
+
+
 
                     }
                     catch (e) { }
 
                     //                    this.DetailsData = jsonObject.Result.ViewData.WorkDetails;   // the next two lines are needed to flash the proper state of the totals buttons on the top grid 
                     this.flashTotalsButtons();
+
+                    this.bdoingCmp == (this.heatmapText != "");
+
                     this.FlashDisplayMode();
+                    this.FlashTargetMenuStuff();
 
                     document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
 
@@ -3137,31 +3156,31 @@
     CostAnalyzer.prototype.GridsOnGetDefaultColor = function (grid, row, col, r, g, b) {
         if (grid.id == "et_1") {
 
- 			if (row.Kind != "Data" || grid.Cols[col] == null)
-				return null;
+            if (row.Kind != "Data" || grid.Cols[col] == null)
+                return null;
 
-			if (row.childNodes.length > 0)
-				return null;  // "rgb(128,128,128)";
+            if (row.childNodes.length > 0)
+                return null;  // "rgb(128,128,128)";
 
-			if (col == "MajorCategory" || col == "Role")
-				return null;  // "rgb(128,128,128)";
+            if (col == "MajorCategory" || col == "Role")
+                return null;  // "rgb(128,128,128)";
 
-			var bEditable = false;
-			var sCanEdit = grid.GetAttribute(row, col, "CanEdit");
+            var bEditable = false;
+            var sCanEdit = grid.GetAttribute(row, col, "CanEdit");
 
-			if (sCanEdit == "1")
-				bEditable = true;
-			else {
-				if (typeof (grid.GetAttribute(row, col, "Defaults")) != "undefined")
-					bEditable = true;
-			}
+            if (sCanEdit == "1")
+                bEditable = true;
+            else {
+                if (typeof (grid.GetAttribute(row, col, "Defaults")) != "undefined")
+                    bEditable = true;
+            }
 
-			if (bEditable == true) {
+            if (bEditable == true) {
 
-				return "rgb(255,255,255)";
-			}
-			else
-				return null;  // "rgb(128,128,128)";
+                return "rgb(255,255,255)";
+            }
+            else
+                return null;  // "rgb(128,128,128)";
 
         }
 
@@ -3176,64 +3195,78 @@
                     var xfp = grid.GetValue(row, "xinterenalPeriodMin");
                     var xlp = grid.GetValue(row, "xinterenalPeriodMax");
                     var xtp = this.UsingPeriods.Period.length;   //  grid.GetValue(row, "xinterenalPeriodTotal");
+
+                    var lcn = grid.GetLastCol(2);
+                    var nsc = parseInt(lcn.charAt(lcn.length - 1));
                     var xas = "";
+                    var cv = grid.GetValue(row, "P1C1HtmlPrefix");
 
                     if (this.AnalyzerShowBarschecked == false) {
-                        for (var xo = 1; xo <= 3; ++xo) {
-                            for (var xi = 1; xi <= xtp; ++xi) {
-                                xas = "P" + xi.toString() + "C" + xo.toString();
-                                grid.SetString(row, xas + "HtmlPrefix", "", 1);
-                                grid.SetString(row, xas + "HtmlPostfix", "", 1);
+
+
+                        if (cv != "") {
+
+                            for (var xo = 1; xo <= nsc; ++xo) {
+                                for (var xi = 1; xi <= xtp; ++xi) {
+
+                                    xas = "P" + xi.toString() + "C" + xo.toString();
+
+                                    grid.SetString(row, xas + "HtmlPrefix", "", 1);
+                                    grid.SetString(row, xas + "HtmlPostfix", "", 1);
+                                }
                             }
                         }
 
                     }
                     else {
-                        if (xfp != 0) {
-                            for (var xo = 1; xo <= 3; ++xo) {
-                                for (var xi = 1; xi < xfp; ++xi) {
-                                    xas = "P" + xi.toString() + "C" + xo.toString();
-                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
-                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
-                                    //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                        if (cv == "") {
+                            if (xfp != 0) {
+                                for (var xo = 1; xo <= nsc; ++xo) {
+                                    for (var xi = 1; xi < xfp; ++xi) {
+                                        xas = "P" + xi.toString() + "C" + xo.toString();
+                                        grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+                                        grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+                                        //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                                    }
                                 }
-                            }
 
 
-                            for (var xo = 1; xo <= 3; ++xo) {
-                                for (var xi = xfp; xi <= xlp; ++xi) {
+                                for (var xo = 1; xo <= nsc; ++xo) {
+                                    for (var xi = xfp; xi <= xlp; ++xi) {
 
-                                    xas = "P" + xi.toString() + "C" + xo.toString();
-
-
-                                    //	                                                        if (xfp == xlp)
-                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngSingleCell", 1);
-                                    //	                                                        else if (xi == xfp)
-                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngLeftCell", 1);
-                                    //	                                                        else if (xi == xlp)
-                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngRightCell", 1);
-                                    //	                                                        else
-                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngMiddleCell", 1);
+                                        xas = "P" + xi.toString() + "C" + xo.toString();
 
 
-                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='white'>", 1);
-                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+                                        //	                                                        if (xfp == xlp)
+                                        //	                                                            grid.SetString(row, xas + "ClassInner", "GMngSingleCell", 1);
+                                        //	                                                        else if (xi == xfp)
+                                        //	                                                            grid.SetString(row, xas + "ClassInner", "GMngLeftCell", 1);
+                                        //	                                                        else if (xi == xlp)
+                                        //	                                                            grid.SetString(row, xas + "ClassInner", "GMngRightCell", 1);
+                                        //	                                                        else
+                                        //	                                                            grid.SetString(row, xas + "ClassInner", "GMngMiddleCell", 1);
 
 
+                                        grid.SetString(row, xas + "HtmlPrefix", "<font color='white'>", 1);
+                                        grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+
+
+                                    }
                                 }
-                            }
 
-                            for (var xo = 1; xo <= 3; ++xo) {
-                                for (var xi = xlp + 1; xi <= xtp; ++xi) {
-                                    xas = "P" + xi.toString() + "C" + xo.toString();
-                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
-                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
-                                    //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                                for (var xo = 1; xo <= nsc; ++xo) {
+                                    for (var xi = xlp + 1; xi <= xtp; ++xi) {
+                                        xas = "P" + xi.toString() + "C" + xo.toString();
+                                        grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+                                        grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+                                        //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                                    }
                                 }
-                            }
 
+                            }
                         }
                     }
+
                 }
 
 
@@ -3248,8 +3281,6 @@
 
                     if (peridtg >= fp && peridtg <= lp) {
 
-                        //var cls = grid.GetAttribute(row, col, "ClassInner");
-                        //        grid.SetAttribute(row, col, "ClassInner", "GMngBodyRight", 1);
 
 
 
@@ -3357,44 +3388,48 @@
 
             var perid = s.substr(0, i);
             var subper = s.substr(i + 1);
-            var childrenMaxhmVal = grid.GetValue(row, "X" + s);
-            var childrenMinhmVal = grid.GetValue(row, "Y" + s);
-            var myhmVal;
 
-            var hmcol = "P" + perid + "H";
-
-            var hmv = grid.GetValue(row, hmcol);
-            var cv = grid.GetValue(row, col);
 
             if (subper == this.TotalsGridTotalsCol) {
+
+                var childrenMaxhmVal = grid.GetValue(row, "X" + s);
+                var childrenMinhmVal = grid.GetValue(row, "Y" + s);
+                var myhmVal;
+
+                var hmcol = "P" + perid + "H";
+
+                var hmv = grid.GetValue(row, hmcol);
+                var cv = grid.GetValue(row, col);
+
+
                 var retval = this.TargetBackground(cv, hmv);
                 var bdoit = false;
 
-//                if (this.selectedHeatMapColour == 1)
-//                    bdoit = (this.tarlev < childrenMaxhmVal && childrenMaxhmVal != "")
-//                else
-//                    bdoit = (this.tarlev > childrenMinhmVal && childrenMinhmVal != "")
+                //                if (this.selectedHeatMapColour == 1)
+                //                    bdoit = (this.tarlev < childrenMaxhmVal && childrenMaxhmVal != "")
+                //                else
+                //                    bdoit = (this.tarlev > childrenMinhmVal && childrenMinhmVal != "")
 
 
-//                if (bdoit == true) {
-//                    var rowicon = grid.GetString(row, "IconFlag");
+                //                if (bdoit == true) {
+                //                    var rowicon = grid.GetString(row, "IconFlag");
 
-//                    if (rowicon != '/_layouts/ppm/images/Yellow.gif') {
+                //                    if (rowicon != '/_layouts/ppm/images/Yellow.gif') {
 
-//                        grid.SetAttribute(row, "IconFlag", null, '/_layouts/ppm/images/Yellow.gif', 1);
+                //                        grid.SetAttribute(row, "IconFlag", null, '/_layouts/ppm/images/Yellow.gif', 1);
 
-//                        if (this.refreshIconsInTotGrid == null) {
-//                            this.refreshIconsInTotGrid = new Array();
-//                            window.setTimeout(HandleRerenderDelegate, 600);
+                //                        if (this.refreshIconsInTotGrid == null) {
+                //                            this.refreshIconsInTotGrid = new Array();
+                //                            window.setTimeout(HandleRerenderDelegate, 600);
 
-//                        }
-
-
-//                        this.refreshIconsInTotGrid[this.refreshIconsInTotGrid.length] = row;
+                //                        }
 
 
-//                    }
-//                }
+                //                        this.refreshIconsInTotGrid[this.refreshIconsInTotGrid.length] = row;
+
+
+                //                    }
+                //                }
 
 
                 //	            if (this.tarlev < childrenMaxhmVal) 
@@ -4025,21 +4060,21 @@
 
     CostAnalyzer.prototype.FlashTargetMenuStuff = function () {
 
-        if (this.bdoingCmp == false) {
+//        if (this.bdoingCmp == false) {
 
-            this.totTab.disableItem("ShowTotChk");
-            this.totTab.disableItem("TargetLegend");
+//            this.totTab.disableItem("ShowTotChk");
+//            this.totTab.disableItem("TargetLegend");
 
-            this.totTab.hideItem("ShowTotChk");
-            this.totTab.hideItem("TargetLegend");
-            return;
-        }
+//            this.totTab.hideItem("ShowTotChk");
+//            this.totTab.hideItem("TargetLegend");
+//            return;
+//        }
 
 
-        this.totTab.showItem("ShowTotChk");
-        this.totTab.showItem("TargetLegend");
-        this.totTab.enableItem("ShowTotChk");
-        this.totTab.enableItem("TargetLegend");
+//        this.totTab.showItem("ShowTotChk");
+//        this.totTab.showItem("TargetLegend");
+//        this.totTab.enableItem("ShowTotChk");
+//        this.totTab.enableItem("TargetLegend");
 
     }
 
@@ -6111,7 +6146,7 @@
             return;
         }
 
-        if (xTar == 0) {
+        if (xTar == -1) {
             alert("A target of that name already exists");
             return;
         }
@@ -6204,8 +6239,8 @@
                     for (i = 0; i < 6; i++) {
 
                         trow.OCVal[i].Value = xt.OCVal[i].Value;
-                        trow.Text_OCVal[i].Value = xt.OCVal[i].Value;
-                        trow.TXVal[i].Value = xt.OCVal[i].Value;
+                        trow.Text_OCVal[i].Value = xt.Text_OCVal[i].Value;
+                        trow.TXVal[i].Value = xt.TXVal[i].Value;
                     }
 
                     var nump = this.CSDataCache.numberPeriods;
