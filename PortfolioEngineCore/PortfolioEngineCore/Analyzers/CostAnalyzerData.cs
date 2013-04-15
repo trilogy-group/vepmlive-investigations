@@ -49,7 +49,7 @@ namespace PortfolioEngineCore
                 m_loaddatareturn = 10;
 
                 bool bPMOAdmin = false;
-                if (_userWResID == 1)
+                if (_userWResID <= 1 )
                 {
                     bPMOAdmin = true;
                 }
@@ -155,8 +155,15 @@ namespace PortfolioEngineCore
 
                 StashRateCache(clscd);
 
+
+                Dictionary<string, clsDetailRowData> nonzero = new Dictionary<string, clsDetailRowData>();
+
                 foreach (clsDetailRowData oDet in clscd.m_detaildata.Values)
                 {
+
+                    if (oDet.HasValues)
+                        nonzero.Add(oDet.m_dict_key, oDet);
+
                     clsDataItem odi;
 
                     if (clscd.m_CostTypes.TryGetValue(oDet.CT_ID, out odi) == true)
@@ -172,7 +179,7 @@ namespace PortfolioEngineCore
                 }
 
 
-
+                clscd.m_detaildata = nonzero;
 
 
                 return clscd;
@@ -1081,6 +1088,8 @@ namespace PortfolioEngineCore
                     Det.m_rt = DBAccess.ReadIntValue(reader["RT_UID"]);
                     Det.bSelected = true;
                     sCommand = "K" + Det.CT_ID.ToString() + " " + Det.PROJECT_ID.ToString() + " " + Det.BC_UID.ToString() + " " + Det.BC_SEQ.ToString() + " " + Det.Scenario_ID.ToString();
+                    Det.m_dict_key = sCommand;
+
 
                     if (clscd.m_detaildata.TryGetValue(sCommand, out TryDet) == false)
                         clscd.m_detaildata.Add(sCommand, Det);
@@ -1152,6 +1161,7 @@ namespace PortfolioEngineCore
                             Det.m_rt = DBAccess.ReadIntValue(reader["RT_UID"]);
 
                             sCommand = "K" + oi.UID.ToString() + " " + Det.PROJECT_ID.ToString() + " " + Det.BC_UID.ToString() + " " + Det.Scenario_ID.ToString();
+                            Det.m_dict_key = sCommand;
 
                             if (clscd.m_detaildata.TryGetValue(sCommand, out TryDet) == false)
                                 clscd.m_detaildata.Add(sCommand, Det);
@@ -1194,6 +1204,7 @@ namespace PortfolioEngineCore
                     if (clscd.m_detaildata.TryGetValue(sCommand, out Det) == false)
                     {
                         Det = new clsDetailRowData(clscd.m_max_period);
+                        Det.m_dict_key = sCommand;
 
                         Det.CT_ID = DBAccess.ReadIntValue(reader["CT_ID"]);
                         Det.PROJECT_ID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
@@ -1217,6 +1228,7 @@ namespace PortfolioEngineCore
 
                     Det.zCost[Peracc] = DBAccess.ReadDoubleValue(reader["BD_Cost"]);
                     Det.zValue[Peracc] = DBAccess.ReadDoubleValue(reader["BD_VALUE"]);
+
 
                     if (Det.zCost[Peracc] != 0 || Det.zValue[Peracc] != 0)
                     {
@@ -1259,6 +1271,7 @@ namespace PortfolioEngineCore
                     if (clscd.m_detaildata.TryGetValue(sCommand, out Det) == false)
                     {
                         Det = new clsDetailRowData(clscd.m_max_period);
+                        Det.m_dict_key = sCommand;
 
                         Det.CT_ID = DBAccess.ReadIntValue(reader["CT_ID"]);
                         Det.PROJECT_ID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
@@ -1343,6 +1356,7 @@ namespace PortfolioEngineCore
                             if (clscd.m_detaildata.TryGetValue(sCommand, out Det) == false)
                             {
                                 Det = new clsDetailRowData(clscd.m_max_period);
+                                Det.m_dict_key = sCommand;
 
                                 Det.CT_ID = xCT_ID;
                                 Det.PROJECT_ID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
@@ -1467,6 +1481,30 @@ namespace PortfolioEngineCore
 
             clscd.m_clsTargetColours = new List<clsTargetColours>();
 
+            sCommand = "SELECT BUDSP_UID, BAND_ID, BAND_BOT,BAND_TOP,BAND_BACKCOLOR,BAND_NAME FROM EPGT_VIEW_BUDSPEC_BAND WHERE BUDSP_UID = 1 ORDER BY BAND_ID";
+
+            oCommand = new SqlCommand(sCommand, oDataAccess);
+            reader = oCommand.ExecuteReader();
+
+            while (reader.Read())
+            {
+                TarCol = new clsTargetColours();
+
+                TarCol.ID = DBAccess.ReadIntValue(reader["BAND_ID"]);
+                TarCol.rgb_val = DBAccess.ReadIntValue(reader["BAND_BACKCOLOR"]);
+                TarCol.low_val = DBAccess.ReadDoubleValue(reader["BAND_BOT"]);
+                TarCol.high_val = DBAccess.ReadDoubleValue(reader["BAND_TOP"]);
+                TarCol.Desc = DBAccess.ReadStringValue(reader["BAND_NAME"]);
+
+                clscd.m_clsTargetColours.Add(TarCol);
+
+            }
+            reader.Close();
+            reader = null;
+
+            if (clscd.m_clsTargetColours.Count != 0)
+                return;
+  
 
             sCommand = "SELECT BUDSP_UID, BAND_ID, BAND_BOT,BAND_TOP,BAND_BACKCOLOR,BAND_NAME FROM EPGT_VIEW_BUDSPEC_BAND WHERE BUDSP_UID = 0 ORDER BY BAND_ID";
 
@@ -1894,7 +1932,7 @@ namespace PortfolioEngineCore
             xRPE.Initialize("Views");
 
             //string sCommand = "SELECT VIEW_GUID,VIEW_NAME,VIEW_PERSONAL,VIEW_DEFAULT FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
-            string sCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=33000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
+            string sCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=33000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_NAME";
 
             SqlCommand oCommand = new SqlCommand(sCommand, _sqlConnection);
             SqlDataReader reader = oCommand.ExecuteReader();
@@ -2073,7 +2111,7 @@ namespace PortfolioEngineCore
 
             int retv = 0;
 
-            sCommand = "SELECT TARGET_ID, TARGET_NAME, TARGET_DESC FROM EPGP_MODEL_TARGETS WHERE CB_ID = " + clscd.m_CB_ID.ToString() + " ORDER BY TARGET_ID";
+            sCommand = "SELECT TARGET_ID, TARGET_NAME, TARGET_DESC FROM EPGP_MODEL_TARGETS WHERE CB_ID = " + clscd.m_CB_ID.ToString() + " ORDER BY TARGET_NAME";
 
             string targets = "";
 
@@ -2253,6 +2291,7 @@ namespace PortfolioEngineCore
                     if (nameCount != 0)
                     {
                         targetID = -1;
+                        return;
                     }
 
                     sCommand = "SELECT MAX(TARGET_ID) AS TARGET_ID FROM EPGP_MODEL_TARGETS";

@@ -211,6 +211,9 @@ namespace CostDataValues
 
         public string[] m_PI_Format_Extra_data;
 
+        public string m_dict_key = "";
+
+
         public clsDetailRowData(int arraysize)
         {
             PI_Name = "";
