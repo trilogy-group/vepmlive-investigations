@@ -31,7 +31,7 @@ namespace EPMLiveCore.Integrations.Salesforce
 
         #region Constructors (2) 
 
-        internal SfService(string username, string password, string securityToken)
+        internal SfService(string username, string password, string securityToken, bool isSandbox)
         {
             _username = username;
             _password = password;
@@ -40,7 +40,6 @@ namespace EPMLiveCore.Integrations.Salesforce
             _additionalAssignedToField = _appNamespace + "__Additional_Assigned_To__c";
 
             ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
-
 
             var collection = new NameValueCollection
                 {
@@ -54,7 +53,11 @@ namespace EPMLiveCore.Integrations.Salesforce
                     {"password", _password + _securityToken}
                 };
 
-            using (var webClient = new WebClient {BaseAddress = "https://login.salesforce.com/services/oauth2/token"})
+            using (var webClient = new WebClient
+                {
+                    BaseAddress =
+                        string.Format("https://{0}.salesforce.com/services/oauth2/token", (isSandbox ? "test" : "login"))
+                })
             {
                 byte[] bytes = webClient.UploadValues(string.Empty, "POST", collection);
 
@@ -63,7 +66,7 @@ namespace EPMLiveCore.Integrations.Salesforce
             }
 
             // Validating "ModifyAllData" permission. Use of the Metadata API requires a user with the ModifyAllData permission.
-            _sfMedadataService = new SfMedadataService(_username, _password, _securityToken, _appNamespace);
+            _sfMedadataService = new SfMedadataService(_username, _password, _securityToken, _appNamespace, isSandbox);
         }
 
         ~SfService()
@@ -75,14 +78,14 @@ namespace EPMLiveCore.Integrations.Salesforce
 
         #region Properties (1) 
 
-        public string AppNamespace
+        internal string AppNamespace
         {
             get { return _appNamespace; }
         }
 
         #endregion Properties 
 
-        #region Methods (14) 
+        #region Methods (17) 
 
         // Public Methods (1) 
 
@@ -107,7 +110,81 @@ namespace EPMLiveCore.Integrations.Salesforce
             }
         }
 
-        // Private Methods (3) 
+        // Private Methods (5) 
+
+        private void FillItemsTable(string objectName, DataTable items, IEnumerable<sObject> resultItems,
+                                    List<string> fields)
+        {
+            Field[] objFields = _sfMedadataService.GetFields(objectName);
+
+            foreach (sObject sObject in resultItems)
+            {
+                DataRow dataRow = items.NewRow();
+
+                foreach (
+                    string columnName in from DataColumn dataColumn in items.Columns select dataColumn.ColumnName)
+                {
+                    if (columnName.ToLower().Equals("id"))
+                    {
+                        dataRow[columnName] = sObject.Id;
+                    }
+                    else
+                    {
+                        string name = columnName;
+                        foreach (XmlElement xmlElement in sObject.Any.Where(e => e.LocalName.Equals(name)))
+                        {
+                            dataRow[columnName] = xmlElement.InnerText;
+                        }
+                    }
+                }
+
+                items.Rows.Add(dataRow);
+            }
+
+            IEnumerable<string> userFields = from objField in objFields
+                                             where
+                                                 fields.Contains(objField.name) &&
+                                                 objField.type == fieldType.reference &&
+                                                 objField.referenceTo.Contains("User")
+                                             select objField.name;
+
+            var userIds = new List<string>();
+            var userCols = new List<string>();
+
+            foreach (DataRow dataRow in items.Rows)
+            {
+                foreach (string field in userFields as string[] ?? userFields.ToArray())
+                {
+                    string id = dataRow[field].ToString();
+                    if (string.IsNullOrEmpty(id)) continue;
+
+                    if (!userCols.Contains(field)) userCols.Add(field);
+
+                    string sId = "'" + id + "'";
+                    if (!userIds.Contains(sId)) userIds.Add(sId);
+                }
+            }
+
+            if (userIds.Count <= 0) return;
+
+            string query = string.Format(@"SELECT Id, Email FROM User WHERE Id IN ({0})",
+                                         string.Join(",", userIds.ToArray()));
+            IEnumerable<sObject> sfUsers = _sfMedadataService.ExecuteQuery(query);
+
+            foreach (sObject sObject in sfUsers)
+            {
+                foreach (DataRow dataRow in items.Rows)
+                {
+                    DataRow row = dataRow;
+                    sObject o = sObject;
+
+                    foreach (string col in userCols.Where(col => row[col].ToString().Equals(o.Id)))
+                    {
+                        dataRow[col] = sObject.Any[1].InnerText;
+                    }
+                }
+            }
+        }
 
         private void FillObjectFields(DataTable items, List<string> fields)
         {
@@ -118,6 +195,20 @@ namespace EPMLiveCore.Integrations.Salesforce
                          .Where(c => !c.ToLower().Equals("id") && !fields.Contains(c)))
             {
                 fields.Add(col);
+            }
+        }
+
+        private bool LookupItemExists(string itemId, string objectName)
+        {
+            try
+            {
+                _sfMedadataService.ExecuteQuery(string.Format(@"SELECT Id FROM {0} WHERE Id = '{1}' LIMIT 1", objectName,
+                                                              itemId));
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -179,7 +270,7 @@ namespace EPMLiveCore.Integrations.Salesforce
             return true;
         }
 
-        // Internal Methods (9) 
+        // Internal Methods (10) 
 
         internal DeleteResult[] DeleteObjectItemsById(string[] ids)
         {
@@ -225,6 +316,24 @@ namespace EPMLiveCore.Integrations.Salesforce
             return _sfMedadataService.GetFields(obj);
         }
 
+        internal void GetObjectItems(string objectName, DataTable items, DateTime lastSyncDateTime)
+        {
+            var fields = new List<string>();
+            FillObjectFields(items, fields);
+
+            lastSyncDateTime = DateTime.SpecifyKind(lastSyncDateTime.ToUniversalTime(), DateTimeKind.Utc);
+
+            string query =
+                string.Format(
+                    @"SELECT Id,{0} FROM {1} WHERE CreatedDate > {2} OR LastModifiedDate > {2} OR SystemModstamp > {2}",
+                    string.Join(",", fields.ToArray()), objectName,
+                    lastSyncDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fff+0000"));
+
+            IEnumerable<sObject> resultItems = _sfMedadataService.ExecuteQuery(query);
+
+            FillItemsTable(objectName, items, resultItems, fields);
+        }
+
         internal void GetObjectItemsById(string objectName, string itemIds, DataTable items)
         {
             var fields = new List<string>();
@@ -242,78 +351,13 @@ namespace EPMLiveCore.Integrations.Salesforce
                                          string.Join(",", idlist.ToArray()));
 
             IEnumerable<sObject> resultItems = _sfMedadataService.ExecuteQuery(query);
-            Field[] objFields = _sfMedadataService.GetFields(objectName);
 
-            foreach (sObject sObject in resultItems)
-            {
-                DataRow dataRow = items.NewRow();
-
-                foreach (
-                    string columnName in from DataColumn dataColumn in items.Columns select dataColumn.ColumnName)
-                {
-                    if (columnName.ToLower().Equals("id"))
-                    {
-                        dataRow[columnName] = sObject.Id;
-                    }
-                    else
-                    {
-                        string name = columnName;
-                        foreach (XmlElement xmlElement in sObject.Any.Where(e => e.LocalName.Equals(name)))
-                        {
-                            dataRow[columnName] = xmlElement.InnerText;
-                        }
-                    }
-                }
-
-                items.Rows.Add(dataRow);
-            }
-
-            IEnumerable<string> userFields = from objField in objFields
-                                             where
-                                                 fields.Contains(objField.name) &&
-                                                 objField.type == fieldType.reference &&
-                                                 objField.referenceTo.Contains("User")
-                                             select objField.name;
-
-            var userIds = new List<string>();
-            var userCols = new List<string>();
-
-            foreach (DataRow dataRow in items.Rows)
-            {
-                foreach (string field in userFields as string[] ?? userFields.ToArray())
-                {
-                    string id = dataRow[field].ToString();
-                    if (string.IsNullOrEmpty(id)) continue;
-
-                    if (!userCols.Contains(field)) userCols.Add(field);
-
-                    string sId = "'" + id + "'";
-                    if (!userIds.Contains(sId)) userIds.Add(sId);
-                }
-            }
-
-            if (userIds.Count <= 0) return;
-
-            query = string.Format(@"SELECT Id, Email FROM User WHERE Id IN ({0})",
-                                  string.Join(",", userIds.ToArray()));
-            IEnumerable<sObject> sfUsers = _sfMedadataService.ExecuteQuery(query);
-
-            foreach (sObject sObject in sfUsers)
-            {
-                foreach (DataRow dataRow in items.Rows)
-                {
-                    DataRow row = dataRow;
-                    sObject o = sObject;
-
-                    foreach (string col in userCols.Where(col => row[col].ToString().Equals(o.Id)))
-                    {
-                        dataRow[col] = sObject.Any[1].InnerText;
-                    }
-                }
-            }
+            FillItemsTable(objectName, items, resultItems, fields);
         }
 
-        internal void InstallIntegration(string integrationKey, string apiUrl, string webName, string webUrl, Guid integrationId, string objectName, bool incomingEnabled, bool outgoingEnabled, bool allowDeletion)
+        internal void InstallIntegration(string integrationKey, string apiUrl, string webName, string webUrl,
+                                         Guid integrationId, string objectName, bool incomingEnabled,
+                                         bool outgoingEnabled, bool allowDeletion)
         {
             _sfMedadataService.InstallTrigger(objectName);
             _sfMedadataService.ConfigureRemoteSite(apiUrl);
@@ -363,7 +407,7 @@ namespace EPMLiveCore.Integrations.Salesforce
             }
         }
 
-        internal Dictionary<UpsertKind, SaveResult> UpsertItems(string objectName, DataTable items)
+        internal List<Dictionary<UpsertKind, SaveResult>> UpsertItems(string objectName, DataTable items)
         {
             var fields = new List<string>();
             FillObjectFields(items, fields);
@@ -373,6 +417,8 @@ namespace EPMLiveCore.Integrations.Salesforce
             var percentFields = new List<string>();
             var dateFields = new List<string>();
             var timeFields = new List<string>();
+
+            var lookupFieldObjects = new Dictionary<string, string>();
 
             Field[] objFields = _sfMedadataService.GetFields(objectName);
             foreach (Field objField in objFields)
@@ -391,6 +437,10 @@ namespace EPMLiveCore.Integrations.Salesforce
                         else
                         {
                             lookupFields.Add(fieldName);
+                            if (!lookupFieldObjects.ContainsKey(fieldName))
+                            {
+                                lookupFieldObjects.Add(fieldName, objField.referenceTo[0]);
+                            }
                         }
                         break;
                     case fieldType.percent:
@@ -439,14 +489,17 @@ namespace EPMLiveCore.Integrations.Salesforce
                 }
             }
 
+            string userEmail = string.Empty;
+
             if (emailList.Count > 0)
             {
                 try
                 {
                     IEnumerable<sObject> sfUsers =
                         _sfMedadataService.ExecuteQuery(
-                            string.Format("SELECT Id, Email, Name FROM User WHERE Email IN ({0})",
-                                          string.Join(",", emailList.ToArray())));
+                            string.Format(
+                                "SELECT Id, Email, Name, Username FROM User WHERE Email IN ({0}) OR Username = '{1}'",
+                                string.Join(",", emailList.ToArray()), _username));
 
                     foreach (sObject sObject in sfUsers)
                     {
@@ -455,6 +508,11 @@ namespace EPMLiveCore.Integrations.Salesforce
 
                         userEmailIdMap.Add(email, sObject.Id);
                         userEmailNameMap.Add(email, sObject.Any[2].InnerText);
+
+                        if (sObject.Any[3].InnerText.Equals(_username))
+                        {
+                            userEmail = email;
+                        }
                     }
                 }
                 catch
@@ -476,6 +534,16 @@ namespace EPMLiveCore.Integrations.Salesforce
                         {
                             value = userEmailIdMap[email];
                         }
+                        else if (userField.ToLower().Equals("ownerid"))
+                        {
+                            try
+                            {
+                                value = userEmailIdMap[userEmail];
+                            }
+                            catch
+                            {
+                            }
+                        }
                     }
 
                     dataRow[userField] = value;
@@ -490,13 +558,23 @@ namespace EPMLiveCore.Integrations.Salesforce
                     }
                 }
 
-                foreach (string lookupField in from lookupField in lookupFields
-                                               let oValue = dataRow[lookupField]
-                                               where oValue != null && oValue != DBNull.Value
-                                               where oValue.ToString().Contains(";#")
-                                               select lookupField)
+                foreach (string lookupField in lookupFields)
                 {
-                    dataRow[lookupField] = null;
+                    object oValue = dataRow[lookupField];
+                    if (oValue != null && oValue != DBNull.Value)
+                    {
+                        if (oValue.ToString().Contains(";#")) dataRow[lookupField] = null;
+                    }
+
+                    oValue = dataRow[lookupField];
+
+                    if (oValue != null && oValue != DBNull.Value)
+                    {
+                        if (!LookupItemExists(oValue.ToString(), lookupFieldObjects[lookupField]))
+                        {
+                            dataRow[lookupField] = null;
+                        }
+                    }
                 }
 
                 foreach (string percentField in percentFields)

@@ -109,7 +109,7 @@ namespace EPMLiveCore.Integrations.Salesforce
                             DiplayName = field.label,
                             type = TranslateFieldType(field.type),
                             DefaultListColumn =
-                                GetMatchingListColumn(field.label, field.name, listName, sfService.AppNamespace)
+                                GetMatchingListColumn(field.label, field.name, sfService.AppNamespace)
                         });
             }
             catch (Exception e)
@@ -187,7 +187,19 @@ namespace EPMLiveCore.Integrations.Salesforce
 
         public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynch)
         {
-            throw new NotImplementedException();
+            try
+            {
+                SfService sfService = GetSfService(webProps);
+                sfService.GetObjectItems((string) webProps.Properties["Object"], items, lastSynch);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage("Scheduled Pull. " + e.Message, e.Message.StartsWith("No records found")
+                                                                   ? IntegrationLogType.Warning
+                                                                   : IntegrationLogType.Error);
+            }
+
+            return items;
         }
 
         public bool RemoveIntegration(WebProperties webProps, IntegrationLog log, out string message,
@@ -247,43 +259,46 @@ namespace EPMLiveCore.Integrations.Salesforce
 
                 int index = 0;
 
-                foreach (var pair in sfService.UpsertItems((string) webProps.Properties["Object"], items))
+                foreach (var result in sfService.UpsertItems((string) webProps.Properties["Object"], items))
                 {
-                    SaveResult upsertResult = pair.Value;
+                    foreach (var pair in result)
+                    {
+                        SaveResult upsertResult = pair.Value;
 
-                    string sfId = upsertResult.id;
-                    string spid;
+                        string sfId = upsertResult.id;
+                        string spid;
 
-                    try
-                    {
-                        spid = idMap[sfId];
-                    }
-                    catch
-                    {
-                        spid = items.Rows[index]["SPID"].ToString();
-                    }
-
-                    if (upsertResult.success)
-                    {
-                        transactionTable.AddRow(spid, sfId,
-                                                pair.Key == UpsertKind.INSERT
-                                                    ? TransactionType.INSERT
-                                                    : TransactionType.UPDATE);
-                    }
-                    else
-                    {
-                        transactionTable.AddRow(spid, sfId, TransactionType.FAILED);
-                        if (upsertResult.errors.Any())
+                        try
                         {
-                            Error[] errors = upsertResult.errors;
+                            spid = idMap[sfId];
+                        }
+                        catch
+                        {
+                            spid = items.Rows[index]["SPID"].ToString();
+                        }
 
-                            for (int i = 0; i < errors.Count(); i++)
+                        if (upsertResult.success)
+                        {
+                            transactionTable.AddRow(spid, sfId,
+                                                    pair.Key == UpsertKind.INSERT
+                                                        ? TransactionType.INSERT
+                                                        : TransactionType.UPDATE);
+                        }
+                        else
+                        {
+                            transactionTable.AddRow(spid, sfId, TransactionType.FAILED);
+                            if (upsertResult.errors.Any())
                             {
-                                log.LogMessage(
-                                    string.Format(
-                                        "Could not insert / update record with Salesforce ID: {0}, SharePoint ID: {1}. Status code: {2}. Message: {3}. Fields: {4}",
-                                        sfId, spid, errors[i].statusCode, errors[i].message,
-                                        string.Join(",", errors[i].fields)), IntegrationLogType.Warning);
+                                Error[] errors = upsertResult.errors;
+
+                                for (int i = 0; i < errors.Count(); i++)
+                                {
+                                    log.LogMessage(
+                                        string.Format(
+                                            "Could not insert / update record with Salesforce ID: {0}, SharePoint ID: {1}. Status code: {2}. Message: {3}. Fields: {4}",
+                                            sfId, spid, errors[i].statusCode, errors[i].message,
+                                            string.Join(",", errors[i].fields)), IntegrationLogType.Warning);
+                                }
                             }
                         }
                     }
@@ -323,7 +338,7 @@ namespace EPMLiveCore.Integrations.Salesforce
         }
 
         private static void GetAuthParameters(WebProperties webProps, out string username, out string password,
-                                              out string securityToken)
+                                              out string securityToken, out bool isSandbox)
         {
             username = webProps.Properties["Username"].ToString();
             if (string.IsNullOrEmpty(username)) throw new Exception("Please provide the username.");
@@ -333,10 +348,18 @@ namespace EPMLiveCore.Integrations.Salesforce
 
             securityToken = webProps.Properties["SecurityToken"].ToString();
             if (string.IsNullOrEmpty(securityToken)) throw new Exception("Please provide the security token.");
+
+            try
+            {
+                isSandbox = bool.Parse(webProps.Properties["Sandbox"].ToString());
+            }
+            catch
+            {
+                isSandbox = false;
+            }
         }
 
-        private string GetMatchingListColumn(string displayName, string internalName, string listName,
-                                             string appNamespace)
+        private string GetMatchingListColumn(string displayName, string internalName, string appNamespace)
         {
             switch (internalName)
             {
@@ -358,10 +381,11 @@ namespace EPMLiveCore.Integrations.Salesforce
             string username;
             string password;
             string securityToken;
+            bool isSandbox;
 
-            GetAuthParameters(webProps, out username, out password, out securityToken);
+            GetAuthParameters(webProps, out username, out password, out securityToken, out isSandbox);
 
-            return new SfService(username, password, securityToken);
+            return new SfService(username, password, securityToken, isSandbox);
         }
 
         private static Type TranslateFieldType(fieldType type)

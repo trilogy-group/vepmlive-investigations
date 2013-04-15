@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -33,10 +32,16 @@ namespace EPMLiveCore.Integrations.Salesforce
 
         #region Constructors (2) 
 
-        internal SfMedadataService(string username, string password, string securityToken, string appNamespace)
+        internal SfMedadataService(string username, string password, string securityToken, string appNamespace, bool isSandbox)
         {
             _appNamespace = appNamespace;
             _sforceService = new SforceService();
+
+            if (isSandbox)
+            {
+                _sforceService.Url = "https://test.salesforce.com/services/Soap/u/27.0";
+            }
+
             _loginResult = _sforceService.login(username, password + securityToken);
 
             _sforceService.Url = _loginResult.serverUrl;
@@ -279,7 +284,8 @@ namespace EPMLiveCore.Integrations.Salesforce
             }
         }
 
-        internal Dictionary<UpsertKind, SaveResult> UpsertItems(string objectName, DataTable items, bool hasEpmLiveId)
+        internal List<Dictionary<UpsertKind, SaveResult>> UpsertItems(string objectName, DataTable items,
+                                                                      bool hasEpmLiveId)
         {
             var objectsToInsert = new List<sObject>();
             var objectsToUpdate = new List<sObject>();
@@ -352,22 +358,20 @@ namespace EPMLiveCore.Integrations.Salesforce
                 }
             }
 
-            var upsertResults = new Dictionary<UpsertKind, SaveResult>();
+            var upsertResults = new List<Dictionary<UpsertKind, SaveResult>>();
 
             if (objectsToInsert.Count > 0)
             {
-                foreach (SaveResult saveResult in _sforceService.create(objectsToInsert.ToArray()))
-                {
-                    upsertResults.Add(UpsertKind.INSERT, saveResult);
-                }
+                upsertResults.AddRange(
+                    _sforceService.create(objectsToInsert.ToArray())
+                                  .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.INSERT, r}}));
             }
 
             if (objectsToUpdate.Count > 0)
             {
-                foreach (SaveResult saveResult in _sforceService.update(objectsToUpdate.ToArray()))
-                {
-                    upsertResults.Add(UpsertKind.UPDATE, saveResult);
-                }
+                upsertResults.AddRange(
+                    _sforceService.update(objectsToUpdate.ToArray())
+                                  .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.INSERT, r}}));
             }
 
             return upsertResults;
