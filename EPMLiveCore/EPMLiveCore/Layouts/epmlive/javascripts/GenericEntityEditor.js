@@ -1089,7 +1089,7 @@ function GEInit() {
                             // so we're going to set the new
                             // dropdown value
                             else {
-                                var lookupDdlId = controlProps.ControlInfo.SourceControlId.substr(0, controlProps.ControlInfo.SourceControlId.lastIndexOf('_')) + '_Lookup';
+                                
                                 if ((controlProps.Required == 'True'
                                 && $('#' + controlProps.ControlInfo.GenericEntityDivId).html().indexOf('SPAN') == -1
                                 && $('#' + controlProps.ControlInfo.GenericEntityDivId).html().indexOf('span') == -1) ||
@@ -1105,36 +1105,36 @@ function GEInit() {
                                 else {
                                     if ($('#' + controlProps.ControlInfo.GenericEntityDivId).find('#divEntityData').length > 0) {
                                         var entityKey = $('#' + controlProps.ControlInfo.GenericEntityDivId).find('#divEntityData').first().attr('key');
-                                        if (entityKey != $('#' + lookupDdlId).val()) {
-                                            if (!($('#' + lookupDdlId).find('option[value=' + entityKey + ']').length > 0)) {
-                                                var index = CheckIfDataExists(controlProps);
-                                                var cachedata = GetCachedData(index);
-                                                var keyValPairs = cachedata.split(';#');
-                                                var newOpt = '';
-                                                if (!keyValPairs.length) {
-                                                    keyValPairs = [keyValPairs];
-                                                }
+                                        if (entityKey != $('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').val()) {
+                                            if (!($('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').find('option[value=' + entityKey + ']').length > 0)) {
+                                                //var index = CheckIfDataExists(controlProps);
+                                                //var cachedata = GetCachedData(index);
+                                                //var keyValPairs = cachedata.split(';#');
+                                                //var newOpt = '';
+                                                //if (!keyValPairs.length) {
+                                                //    keyValPairs = [keyValPairs];
+                                                //}
 
-                                                if (keyValPairs.length > 0) {
-                                                    for (k in keyValPairs) {
-                                                        var pair = keyValPairs[k];
-                                                        if (pair.split(',')[0] == controlProps.ControlInfo.SingleSelectLookupVal) {
-                                                            newOpt = pair;
-                                                        }
-                                                    }
-                                                }
+                                                //if (keyValPairs.length > 0) {
+                                                //    for (k in keyValPairs) {
+                                                //        var pair = keyValPairs[k];
+                                                //        if (pair.split(',')[0] == controlProps.ControlInfo.SingleSelectLookupVal) {
+                                                //            newOpt = pair;
+                                                //        }
+                                                //    }
+                                                //}
 
-                                                var opt = "<option value='" + newOpt.split(',')[0] + "'>" + newOpt.split(',')[1] + "</option>";
-                                                $('#' + controlProps.ControlInfo.SourceDropDownID).append(opt);
+                                                //var opt = "<option value='" + newOpt.split(',')[0] + "'>" + newOpt.split(',')[1] + "</option>";
+                                                //$('#' + controlProps.ControlInfo.SourceDropDownID).append(opt);
                                                 //$('#' + lookupDdlId).val(controlProps.ControlInfo.SingleSelectLookupVal);
                                             }
                                             else {
-                                                $('#' + lookupDdlId).val(entityKey)
+                                                $('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').val(entityKey)
                                             }
                                         }
                                     }
                                     else {
-                                        $('#' + lookupDdlId).val(0)
+                                        $('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').val(0)
                                     }
 
                                     //                                if (controlProps.ControlInfo.SingleSelectLookupVal != '' &&
