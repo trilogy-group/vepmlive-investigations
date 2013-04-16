@@ -19,8 +19,10 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
-    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"</PostDeploymentCommand>
+    <PreDeploymentCommand>
+    </PreDeploymentCommand>
+    <PostDeploymentCommand>
+    </PostDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -1160,7 +1162,10 @@
     <Content Include="Layouts\epmlive\images\editcosts.png" />
     <Content Include="Layouts\epmlive\images\editcosts16.png" />
     <Content Include="Layouts\epmlive\images\find_icon.png" />
+    <Content Include="Layouts\epmlive\images\gridactions.png" />
     <Content Include="Layouts\epmlive\images\gridfilter.gif" />
+    <Content Include="Layouts\epmlive\images\gridfilter.png" />
+    <Content Include="Layouts\epmlive\images\gridsettings.png" />
     <Content Include="Layouts\epmlive\images\iReportsLibrary.png" />
     <Content Include="Layouts\epmlive\images\loader1.gif" />
     <Content Include="Layouts\epmlive\images\manageaccount.gif" />
@@ -1218,6 +1223,7 @@
     <Content Include="Layouts\epmlive\images\mywork\save-row.png" />
     <Content Include="Layouts\epmlive\images\mywork\unflagged-completed.png" />
     <Content Include="Layouts\epmlive\images\mywork\unflagged.png" />
+    <Content Include="Layouts\epmlive\images\newitem5.png" />
     <Content Include="Layouts\epmlive\images\purchase.png" />
     <Content Include="Layouts\epmlive\images\reportwizard.png" />
     <Content Include="Layouts\epmlive\images\resplan.gif" />

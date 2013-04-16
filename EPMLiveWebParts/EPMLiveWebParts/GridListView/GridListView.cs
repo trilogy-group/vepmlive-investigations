@@ -791,6 +791,12 @@ namespace EPMLiveWebParts
         }
         #endregion
 
+
+        Control RptControls;
+        Control RightRptControls;
+        Control ActionMenu;
+        Control SettingMenu;
+
         public GridListView()
         {
             boolUseDefaults = true;
@@ -811,15 +817,32 @@ namespace EPMLiveWebParts
                     WebPartRibbonTab ribbonItemTab = new WebPartRibbonTab();
                     WebPartRibbonTab ribbonListTab = new WebPartRibbonTab();
                     //Create the contextual group object and initialize its values.
-                    contextualGroup.Id = "Ribbon.ListContextualGroup";
-                    contextualGroup.Command = "ListContextualGroup";
-                    contextualGroup.VisibilityContext = "CustomContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
 
-                    ribbonItemTab.Id = "Ribbon.ListItem";
-                    ribbonItemTab.VisibilityContext = "GridViewListItemContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+                    //if (SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.List.BaseType == SPBaseType.DocumentLibrary)
+                    //{
+                    //    contextualGroup.Id = "Ribbon.LibraryContextualGroup";
+                    //    contextualGroup.Command = "LibraryContextualGroup";
+                    //    contextualGroup.VisibilityContext = "CustomContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
 
-                    ribbonListTab.Id = "Ribbon.List";
-                    ribbonListTab.VisibilityContext = "GridViewListContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+                    //    ribbonItemTab.Id = "Ribbon.Document";
+                    //    ribbonItemTab.VisibilityContext = "GridViewListItemContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+
+                    //    ribbonListTab.Id = "Ribbon.Library";
+                    //    ribbonListTab.VisibilityContext = "GridViewListContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+                    //}
+                    //else
+                    //{
+
+                        contextualGroup.Id = "Ribbon.ListContextualGroup";
+                        contextualGroup.Command = "ListContextualGroup";
+                        contextualGroup.VisibilityContext = "CustomContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+
+                        ribbonItemTab.Id = "Ribbon.ListItem";
+                        ribbonItemTab.VisibilityContext = "GridViewListItemContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+
+                        ribbonListTab.Id = "Ribbon.List";
+                        ribbonListTab.VisibilityContext = "GridViewListContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+                    //}
 
                     info.ContextualGroups.Add(contextualGroup);
                     info.Tabs.Add(ribbonItemTab);
@@ -1257,9 +1280,15 @@ namespace EPMLiveWebParts
                             //    initialTabId = "Ribbon.List";
                             //if (!ribbon.IsTabAvailable(initialTabId))
                             //    ribbon.MakeTabAvailable(initialTabId);
-                            ribbon.InitialTabId = "Ribbon.ListItem";
+                            if (SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.List.BaseType == SPBaseType.DocumentLibrary)
+                                ribbon.InitialTabId = "Ribbon.Document";    
+                            else
+                                ribbon.InitialTabId = "Ribbon.ListItem";
 
-                            ribbon.MakeContextualGroupInitiallyVisible("Ribbon.ListContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
+                            if (SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.List.BaseType == SPBaseType.DocumentLibrary)
+                                ribbon.MakeContextualGroupInitiallyVisible("Ribbon.LibraryContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
+                            else
+                                ribbon.MakeContextualGroupInitiallyVisible("Ribbon.ListContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
                         }
 
 
@@ -1885,11 +1914,16 @@ namespace EPMLiveWebParts
                     toolbar.RenderContext = context;
 
                     Controls.Add(toolbar);
+                    
 
                     foreach(Control control in toolbar.Controls)
                     {
                         processControls(control, list.Title, list.ID.ToString(), view.ID.ToString(), PropMyDefaultControl, this.ID, sFullGridId, hideNew);
                     }
+
+                    //RightRptControls.Controls.Add(ActionMenu);
+                    //RightRptControls.Controls.Add(SettingMenu);
+                    
                 }
 
                 //if(newGridMode.ToLower() == "gantt")
@@ -1921,9 +1955,20 @@ namespace EPMLiveWebParts
 
         private void processControls(Control parentControl, string listname, string listid, string viewid, string defaultcontrol, string webpartid, string ZoneIndex, bool hideNew)
         {
+            
+
             foreach (Control childControl in parentControl.Controls)
             {
-                if(childControl.ToString() == "System.Web.UI.WebControls.HyperLink")
+                if (childControl.ID == "RightRptControls")
+                {
+                    RightRptControls = childControl;
+                }
+                if (childControl.ID == "RptControls")
+                {
+                    RptControls = childControl;
+                }
+
+                else if(childControl.ToString() == "System.Web.UI.WebControls.HyperLink")
                 {
                     if(childControl.ID == "imgZoomIn")
                     {
@@ -1964,6 +2009,9 @@ namespace EPMLiveWebParts
                 }
                 if (childControl.ToString().ToUpper() == "MICROSOFT.SHAREPOINT.WEBCONTROLS.NEWMENU")
                 {
+                    NewMenu menu = (NewMenu)childControl;
+                    
+
                     if (hideNew)
                     {
                         childControl.Visible = false;
@@ -1973,7 +2021,8 @@ namespace EPMLiveWebParts
 
                         if(hasList)
                         {
-                            NewMenu menu = (NewMenu)childControl;
+                            
+                            
                             try
                             {
                                 Microsoft.SharePoint.WebControls.MenuItemTemplate mnu = menu.GetMenuItem("New0");
@@ -1991,7 +2040,7 @@ namespace EPMLiveWebParts
                         }
                         else
                         {
-                            NewMenu menu = (NewMenu)childControl;
+                            //NewMenu menu = (NewMenu)childControl;
                             try
                             {
                                 Microsoft.SharePoint.WebControls.MenuItemTemplate mnu = menu.GetMenuItem("New0");
@@ -2010,7 +2059,7 @@ namespace EPMLiveWebParts
                     }
                     else if(listname != "Project Center" && listname != "Project Center Rollup" && rollupLists != "" && !disableNewButtonModification)
                     {
-                        NewMenu menu = (NewMenu)childControl;
+                        //NewMenu menu = (NewMenu)childControl;
                         try
                         {
                             menu.GetMenuItem("New0").Visible = false;
@@ -2033,7 +2082,7 @@ namespace EPMLiveWebParts
                     }
                     else
                     {
-                        NewMenu menu = (NewMenu)childControl;
+                        //NewMenu menu = (NewMenu)childControl;
                         MenuItemTemplate template = menu.GetMenuItem("New0");
                         try
                         {
@@ -2047,11 +2096,31 @@ namespace EPMLiveWebParts
                             }
                         }catch{}
                     }
+
+                    menu.MenuControl.Text = "new item";
+                    menu.MenuControl.ImageUrl = "/_layouts/epmlive/images/newitem5.png";
+                    menu.MenuControl.ImageSpanCssClass = "ms-list-addnew-imgSpan20";
+                    menu.MenuControl.TextCssClass = "ms-textXLarge";
+
+                }
+                if (childControl.ToString().ToUpper() == "MICROSOFT.SHAREPOINT.WEBCONTROLS.SETTINGSMENU")
+                {
+                    SettingMenu = childControl;
+                    SettingsMenu menu = (SettingsMenu)childControl;
+                    menu.MenuControl.Text = "";
+                    menu.MenuControl.ImageUrl = "/_layouts/epmlive/images/gridsettings.png";
+                    menu.MenuControl.ArrowImageUrl = "";
                 }
 
                 if (childControl.ToString().ToUpper() == "MICROSOFT.SHAREPOINT.WEBCONTROLS.ACTIONSMENU")
                 {
+                    ActionMenu = childControl;
                     ActionsMenu menu = (ActionsMenu)childControl;
+
+                    menu.MenuControl.Text = "";
+                    menu.MenuControl.ImageUrl = "/_layouts/epmlive/images/gridactions.png";
+                    menu.MenuControl.ArrowImageUrl = "";
+
                     if (rollupLists != "")
                     {
                         try { menu.GetMenuItem("EditInGridButton").Visible = false; }
@@ -2223,7 +2292,13 @@ namespace EPMLiveWebParts
                     web.Site.CatchAccessDeniedException = false;
                     //EnsureChildControls();
                     output.WriteLine("<style>");
-                    output.WriteLine(".ms-menutoolbar {display:;}");
+                    output.WriteLine(".ms-menutoolbar {display:; border-bottom: #FFFFFF 1px solid !important; height: 25px !important; padding-bottom: 15px}");
+                    output.WriteLine(".ms-menutoolbar .ms-splitbuttontext { padding-left: 0px !important}");
+                    output.WriteLine(".ms-splitbuttonhover {  }");
+                    output.WriteLine(".ms-splitbuttonhover .ms-splitbuttondropdown { border: none !important; padding-right: 2px !important;}");
+                    output.WriteLine(".ms-splitbuttonhover .ms-splitbuttontext { border: none !important; border-bottom: #FFFFFF 1px solid !important; padding-left: 0px !important; padding-right: 7px !important; }");
+                    output.WriteLine(".ms-list-addnew-imgSpan20 { width: 23px !important; height: 24px !important}");
+                    
                     output.WriteLine("</style>");
 
                     if (list != null && view != null)
@@ -2256,7 +2331,8 @@ namespace EPMLiveWebParts
                                     Panel pnl = new Panel();
                                     pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" style=\"height:100%\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:mygrid" + sFullGridId + ".toggleSearch();\">"));
                                     //pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" style=\"height:100%\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:mygrid" + sFullGridId + ".switchFilter('fA" + sFullGridId + "');\">"));
-                                    pnl.Controls.Add(new LiteralControl("<a id=\"fA" + sFullGridId + "\"><img src=\"/_layouts/epmlive/images/gridfilter.gif\" border=\"0\" align=\"absmiddle\" > Show Search</a>"));
+                                    pnl.Controls.Add(new LiteralControl("<a id=\"fA" + sFullGridId + "\"><img src=\"/_layouts/epmlive/images/gridfilter.png\" border=\"0\" align=\"absmiddle\" ></a>"));
+                                    //pnl.Controls.Add(new LiteralControl("<a id=\"fA" + sFullGridId + "\"><img src=\"/_layouts/epmlive/images/gridfilter.gif\" border=\"0\" align=\"absmiddle\" > Show Search</a>"));
                                     pnl.Controls.Add(new LiteralControl("</div></td></tr></table>"));
 
                                     toolbar.Controls[0].Controls[1].Controls[0].Controls.AddAt(toolbar.Controls[0].Controls[1].Controls[0].Controls.Count - 1, pnl);
@@ -3640,6 +3716,7 @@ namespace EPMLiveWebParts
 
         private void addNewButton(HtmlTextWriter output, SPWeb web)
         {
+            return;
             if((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
             {
                 output.WriteLine(@"<table width=""100%"">");
