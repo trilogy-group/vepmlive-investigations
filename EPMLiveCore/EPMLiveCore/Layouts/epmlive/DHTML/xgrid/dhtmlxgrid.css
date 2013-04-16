@@ -35,7 +35,6 @@ div.gridbox table.hdr td div.hdrcell{
 div.gridbox table.obj td {
 	border: 1px solid;
 	border-color : white Gray Gray white;
-	font-family:Arial;
 	font-size:12px;
     -moz-user-select:none;
     -moz-user-select:-moz-none;   
@@ -51,7 +50,7 @@ div.gridbox table.obj th, div.gridbox table.hdr th{
 	}
 
 div.gridbox table.row20px tr  td{
-    height:20px;
+    height:30px;
     white-space: nowrap;
     padding:0px;
 }
@@ -443,10 +442,15 @@ div.gridbox_modern table.hdr .filter{
 	padding-left:0px !important;
 	text-align:center;
 }
+
+div.gridbox_modern table.obj td a {
+	color: #444
+}
+
 div.gridbox_modern table.obj td {
 	border: 0px solid;
-	font-family:Tahoma;
-	font-size:11px;
+
+	font-size:13px;
 	padding-right:4px;
 	padding-left:4px;
 }
@@ -469,8 +473,7 @@ background-color:#EAF5FF !important;
 div.gridbox_modern table.obj tr.rowselected td{
 	/*background-color:#9ac2e5;  EPM Live Mod in 4.3.1 */
 	background-color:#C4E3FF;
-	border-top:1px solid #96CEFF !important;	
-    border-bottom:1px solid #96CEFF !important;
+
 	color:black;
 	}
 div.gridbox_modern table.obj tr.rowselected td.cellselected, div.gridbox table.obj td.cellselected {
