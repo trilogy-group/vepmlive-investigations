@@ -17,8 +17,8 @@ div.gridbox table.hdr td:hover {
 	border-right: 1px solid #F0F0F0;
 }
 div.gridbox table.hdr td {
-	font-family:Verdana, Helvetica, sans-serif;
-	font-size: 8pt;
+	
+	font-size: 0.85em;
 	background-Color:#FFFFFF;
 	text-align: center;
 	margin:0px;
@@ -428,10 +428,10 @@ div.gridbox_modern table.hdr{
 }
 
 div.gridbox_modern table.hdr td {
-	font-family:Verdana, Helvetica, sans-serif;
-	font-size: 8pt;
+
+	font-size: 0.85em;
 	line-height: 1.2;
-	color: #003759;
+	color: #777;
 	vertical-align:top;
 	text-align:left;
 }
