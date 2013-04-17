@@ -77,16 +77,16 @@ namespace EPMLiveCore
             this.ParentWebID = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("ParentWebID")) ? new Guid(_xmlDataMgr.GetPropVal("ParentWebID")) : Guid.Empty ;
             this.LookupWebID = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("LookupWebID")) ? new Guid(_xmlDataMgr.GetPropVal("LookupWebID")) : Guid.Empty ;
             this.LookupListID = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("LookupListID")) ? new Guid(_xmlDataMgr.GetPropVal("LookupListID")) : Guid.Empty ;
-            this.LookupFieldInternalName = _xmlDataMgr.GetPropVal("LookupFieldInternalName");
+            this.LookupFieldInternalName = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("LookupFieldInternalName")) ? _xmlDataMgr.GetPropVal("LookupFieldInternalName") : "";
             this.LookupFieldSourceFieldID = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("LookupFieldID")) ? new Guid(_xmlDataMgr.GetPropVal("LookupFieldID")) : Guid.Empty;
             this.ListID = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("ListID")) ? new Guid(_xmlDataMgr.GetPropVal("ListID")) : Guid.Empty;
-            this.ItemID = int.Parse(_xmlDataMgr.GetPropVal("ItemID"));
-            this.IsMultiSelect = _xmlDataMgr.GetPropVal("IsMultiSelect");
-            this.ControlType = _xmlDataMgr.GetPropVal("ControlType");
-            this.Parent = _xmlDataMgr.GetPropVal("Parent");
-            this.ParentListField = _xmlDataMgr.GetPropVal("ParentListField");
-            this.Field = _xmlDataMgr.GetPropVal("Field");
-            this.Required = bool.Parse(_xmlDataMgr.GetPropVal("Required"));
+            this.ItemID = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("ItemID")) ? int.Parse(_xmlDataMgr.GetPropVal("ItemID")) : -99;
+            this.IsMultiSelect = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("IsMultiSelect")) ? _xmlDataMgr.GetPropVal("IsMultiSelect") : "false";
+            this.ControlType = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("ControlType")) ? _xmlDataMgr.GetPropVal("ControlType") : "";
+            this.Parent = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("Parent")) ? _xmlDataMgr.GetPropVal("Parent") : "";
+            this.ParentListField = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("ParentListField")) ? _xmlDataMgr.GetPropVal("ParentListField") : "";
+            this.Field = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("Field")) ? _xmlDataMgr.GetPropVal("Field") : "";
+            this.Required = !string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("Required")) ? bool.Parse(_xmlDataMgr.GetPropVal("Required")) : false;
 
             if (bool.Parse(IsMultiSelect))
             {

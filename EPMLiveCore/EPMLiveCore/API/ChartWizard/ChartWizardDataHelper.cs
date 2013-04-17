@@ -47,10 +47,6 @@ namespace EPMLiveCore.API
                         aCanSelect.Value = "0";
                         ndNewList.Attributes.Append(aCanSelect);
 
-                        XmlAttribute nNoColor = docOut.CreateAttribute("NoColor");
-                        nNoColor.Value = "1";
-                        ndNewList.Attributes.Append(nNoColor);
-
                         XmlAttribute aTitle = docOut.CreateAttribute("Title");
                         aTitle.Value = list.Title;
                         ndNewList.Attributes.Append(aTitle);
@@ -104,7 +100,7 @@ namespace EPMLiveCore.API
                             viewQuery.Value = v.Query;
                             ndNewView.Attributes.Append(viewQuery);
 
-                            ndBody.AppendChild(ndNewView);
+                            ndNewList.AppendChild(ndNewView);
                         }
 
                         ndBody.AppendChild(ndNewList);
