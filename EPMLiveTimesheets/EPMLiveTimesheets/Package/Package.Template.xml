@@ -1,3 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Solution xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Assemblies>
+    <Assembly Location="TimeSheets.dll" DeploymentTarget="GlobalAssemblyCache">
+      <SafeControls>
+        <SafeControl Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="TimeSheets" TypeName="*" />
+      </SafeControls>
+    </Assembly>
+  </Assemblies>
 </Solution>

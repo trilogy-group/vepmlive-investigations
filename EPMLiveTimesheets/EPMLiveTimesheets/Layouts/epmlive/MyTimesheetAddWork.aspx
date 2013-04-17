@@ -14,6 +14,11 @@
     <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
     <script type="text/javascript" src="modal/modal.js"></script>
     <script src="MyTimesheetAddWork.js"> </script>
+
+    <style>
+        #s4-ribbonrow{ height:140px !important}
+    </style>
+
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -66,7 +71,7 @@
 
 
         }
-
+        document.getElementsByTagName("html")[0].className = "ms-dialog";
     </script>
 
 </asp:Content>

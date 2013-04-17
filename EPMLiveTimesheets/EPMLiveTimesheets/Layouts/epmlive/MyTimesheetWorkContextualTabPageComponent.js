@@ -60,7 +60,7 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
     },
     getGlobalCommands: function () {
         ULS_SP();
-        var $arr = getGlobalCommands();
+        var $arr = [];
         Array.add($arr, 'Ribbon.MyTimesheetWork.AllWork.Query');
         Array.add($arr, 'Ribbon.MyTimesheetWork.PopulateViewDropDown');
         Array.add($arr, 'Ribbon.MyTimesheetWork.QueryCurrentView');
