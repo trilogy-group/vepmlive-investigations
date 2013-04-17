@@ -303,6 +303,21 @@ namespace TimeSheets
 
         protected override void RenderWebPart(HtmlTextWriter output)
         {
+            if (SPContext.Current.ViewContext.View != null)
+            {
+                foreach (System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
+                {
+                    try
+                    {
+                        if (wp.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" || wp.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
+                        {
+                            wp.Visible = false;
+                        }
+                    }
+                    catch { }
+                }
+            }
+
             if (activation != 0)
             {
                 output.Write(act.translateStatus(activation));
