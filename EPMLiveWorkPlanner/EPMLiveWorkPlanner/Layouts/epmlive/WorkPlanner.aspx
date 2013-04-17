@@ -77,6 +77,19 @@
     }
     
     #mbox{background-color:#FFFFFF; padding:0px !important; border:2px solid #FFF;}
+
+
+    #sideNavBox {
+        display: none;
+    }
+    #contentBox {
+        margin-left: 0px;
+    }
+    .ms-fullscreenmode #contentBox
+    {
+        margin-left: 0;
+    }
+
 </style>
 
 </asp:Content>
