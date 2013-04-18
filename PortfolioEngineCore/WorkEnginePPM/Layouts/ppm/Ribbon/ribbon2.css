@@ -1045,6 +1045,12 @@ a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hov
     background-color: #FFED95 !important;
     border-color: #C28A30 !important;
 }
+
+.ms-cui-ctl-large:hover, a.ms-cui-ctl-lowerlarge:hover, .ms-cui-ctl-light-hoveredOver, .ms-cui-ctl-medium:hover, .ms-cui-ctl:hover, .ms-cui-mrusb-selecteditem.ms-cui-ctl-light-hoveredOver a, .ms-cui-ctl-thin:hover {
+    background-color: #FDEEB3;
+    border-color: #F1C43F !important;
+}
+
 .ms-cui-ctl-mousedown, .ms-cui-ctl-large:active, .ms-cui-ctl-lowerlarge:active, .ms-cui-ctl-medium:active, .ms-cui-ctl:active, .ms-cui-ctl-a1:active, .ms-cui-ctl-a2:active, .ms-cui-ctl-thin:active {
     background-color: #F6C867 !important;
     border-color: #C28A30 !important;
@@ -2128,3 +2134,4 @@ SliderRangeTextDiv{
 .ms-cui-tabContainer {
     z-index: 0!important; 
 }
+

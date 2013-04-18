@@ -136,6 +136,16 @@ namespace WorkEnginePPM
         }
 
 
+        public static string GetTopGrid(HttpContext Context, string sXML, ModelCache ModelData)
+        {
+            return ModelData.GetTopGrid();
+        }
+        public static string GetBottomGrid(HttpContext Context, string sXML, ModelCache ModelData)
+        {
+            return ModelData.GetBottomGrid();
+        }
+
+
         /// <summary>
         /// Builds xml to drive the layout of the CostType grid
         /// </summary>

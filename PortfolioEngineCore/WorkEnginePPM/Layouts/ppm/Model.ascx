@@ -236,7 +236,21 @@ padding-right:5px;
 color:#535353;
 }
 
+#veil {
+display:none;
+position:absolute;
+left:0px;
+top:0px;
+width:100%;
+height:100%;
+filter:alpha(opacity=30);
+opacity:0.3;
+-moz-opacity:0.3;
+-khtml-opacity:0.3;
+z-index:997;
+background:gray;
 
+}
 
 </style>
 
@@ -286,7 +300,16 @@ border-radius: 0px;
 <div id="idRibbonDiv"></div>
 <div id="idViewTabDiv"></div>
 <div id="idBottomRibbonDiv"></div>
+<div id="divLoading" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
+    <img style="margin: 30px 10px; vertical-align: middle" title="Loading..." alt="Loading..." src="../images/PROGRESS-CIRCLE-24.GIF"/>
+    <span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Loading...</span>
+</div>
+<div id="divSaving" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
+    <img style="margin: 30px 10px; vertical-align: middle" title="Saving..." alt="Saving..." src="../images/PROGRESS-CIRCLE-24.GIF"/>
+    <span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Saving...</span>
+</div>
 <div id="<%=ClientID%>mainDiv">
+<div id="veil" style="display:none;"></div>
 <div id="<%=ClientID%>layoutDiv" 
         style="position: relative; width: 100%; height: 650px; top: 0px; left: 0px; display:block"></div>
 </div>

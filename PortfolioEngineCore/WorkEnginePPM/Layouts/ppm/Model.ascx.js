@@ -19,7 +19,7 @@
 	Model.prototype.OnLoad = function (event) {
 	    WorkEnginePPM.Model.set_path(this.Webservice);
 	    Grids.OnAfterValueChanged = GridsOnAfterValueChangedDelegate;
-	    Grids.OnRenderStart = GridsOnRenderStartDelegate;
+//	    Grids.OnRenderStart = GridsOnRenderStartDelegate;
 	    Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
 	    Grids.OnGanttChanged = GridsOnGanttChangedDelegate;
 	    Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
@@ -727,11 +727,6 @@
 
 
 
-	    var sHTML1 = "<treegrid debug='0' Export_Url='ModelExportExcel.aspx'  Export_Param_File = 'modelexport.xls' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetTopGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetTopGridData' data_namespace='WorkEnginePPM' data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
-	    this.DetGrid = TreeGrid(sHTML1, "gridDiv_1", "g_1");
-	    var sHTML2 = "<treegrid debug='0' Export_Url='ModelExportExcel.aspx'  Export_Param_File = 'modelexport.xls' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetBottomGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetBottomGridData' data_namespace='WorkEnginePPM'  data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
-	    this.TotGrid = TreeGrid(sHTML2, "bottomgridDiv_1", "bottomg_1");
-
 
 	    this.FlashTargetMenuStuff();
 
@@ -762,9 +757,20 @@
 	    PingSessionData();
 
 
+//	    var sHTML1 = "<treegrid SuppressMessage='3' debug='0' Export_Url='ModelExportExcel.aspx'  Export_Param_File = 'modelexport.xls' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetTopGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetTopGridData' data_namespace='WorkEnginePPM' data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
+//	   // this.DetGrid = TreeGrid(sHTML1, "gridDiv_1", "g_1");
+
+	    this.ShowWorkingPopup("divLoading");
+
+
+
+//	    var sHTML2 = "<treegrid SuppressMessage='3' debug='0' Export_Url='ModelExportExcel.aspx'  Export_Param_File = 'modelexport.xls' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetBottomGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetBottomGridData' data_namespace='WorkEnginePPM'  data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
+//	    //	    this.TotGrid = TreeGrid(sHTML2, "bottomgridDiv_1", "bottomg_1");
+
 
 
 	}
+
 
 
 
@@ -825,8 +831,36 @@
 	        else selectText.textContent = this.CurrUserView;
 	    }
 
+        if (this.DetGrid == null)
+            window.setTimeout(DeferedGridCreateDelegate, 200);
+
+
 	}
 
+	Model.prototype.DeferedGridCreate = function () {
+
+        this.stashgridsettings = null;
+	    var sbDataxml = new StringBuilder();
+	    sbDataxml.append('<![CDATA[');
+	    sbDataxml.append('<Execute Function="GetTopGrid">');
+	    sbDataxml.append('</Execute>');
+	    sbDataxml.append(']]>');
+
+	    var sb = new StringBuilder();
+	    sb.append("<treegrid  SuppressMessage='3' debug='0' sync='0' ");
+	    sb.append(" Export_Url='ModelExportExcel.aspx'");
+	    sb.append(" data_url='" + this.Webservice + "'");
+	    sb.append(" data_method='Soap'");
+	    sb.append(" data_function='Execute'")
+	    sb.append(" data_namespace='WorkEnginePPM'");
+	    sb.append(" data_param_Ticket='" + this.TicketVal + "'");
+	    sb.append(" data_param_Function='GetTopGrid'");
+	    sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+	    sb.append(" >");
+	    sb.append("</treegrid>");
+
+	    this.DetGrid = TreeGrid(sb.toString(), "gridDiv_1", "g_1");
+    }
 
 	Model.prototype.RemoveUserViewData = function () {
 	    
@@ -981,6 +1015,8 @@
 				this.ZoomTo = this.LastSelZoomTo;
 
 			this.DetGridDoRender = true;
+
+			this.ShowWorkingPopup("divLoading");
 
 			if (this.DetGrid != null)
 				this.DetGrid.Reload(null);
@@ -1222,7 +1258,7 @@
 	            this.ZoomTo = this.LastSelZoomTo;
 
 	        this.DetGridDoRender = true;
-
+	        this.ShowWorkingPopup("divLoading");
 	        if (this.DetGrid != null)
 	            this.DetGrid.Reload(null);
 	        if (this.TotGrid != null)
@@ -1729,6 +1765,7 @@
 			WorkEnginePPM.Model.SetColumnOrder(this.TicketVal, this.ColData);
 
 			this.ZoomTo = this.LastSelZoomTo;
+			this.ShowWorkingPopup("divLoading");
 			if (this.DetGrid != null)
 				this.DetGrid.Reload(null);
 			if (this.TotGrid != null)
@@ -1907,6 +1944,8 @@
 			if (this.GanttShowing == true)
 				this.ZoomTo = this.LastSelZoomTo;
 			this.DetGridDoRender = true;
+
+			this.ShowWorkingPopup("divLoading");
 			if (this.TotGrid != null)
 				this.TotGrid.Reload(null);
 			if (this.DetGrid != null)
@@ -2280,6 +2319,8 @@
 					this.ZoomTo = this.LastSelZoomTo;
 
 				this.DetGridDoRender = true;
+
+				this.ShowWorkingPopup("divLoading");
 				if (this.TotGrid != null)
 					this.TotGrid.Reload(null);
 				if (this.DetGrid != null)
@@ -2482,6 +2523,8 @@
 
 	    this.bdoingCmp = (this.SnGData.TotalsCmp == 1);
 	    this.FlashTargetMenuStuff();
+
+	    this.ShowWorkingPopup("divLoading");
 
 	    if (this.DetGrid != null)
 	        this.DetGrid.Reload(null);
@@ -2968,6 +3011,8 @@
 
 	    else if (id == "LoadBtn") {
 	        WorkEnginePPM.Model.DoLoadVersion(this.TicketVal);
+
+	        this.ShowWorkingPopup("divLoading");
 	        if (this.DetGrid != null)
 	            this.DetGrid.Reload(null);
 	        if (this.TotGrid != null)
@@ -3427,7 +3472,9 @@
 	
 	 Model.prototype.HandleBothRefresh = function () {
 
-		try {
+	     try {
+
+	         this.ShowWorkingPopup("divLoading");
 			if (this.TotGrid != null)
 				this.TotGrid.Reload(null);
 
@@ -5114,14 +5161,21 @@
 //        }
    }
 
-   Model.prototype.GridsOnRenderStart = function (grid) {
-	   grid.SetStyle(this.params.GridStyle, this.params.GridCSS, false);
-   }
+//   Model.prototype.GridsOnRenderStart = function (grid) {
+//       //	   grid.SetStyle(this.params.GridStyle, this.params.GridCSS, false);
+
+//       var i = 1;
+//   }
 
 
    Model.prototype.GridsOnRenderFinish = function (grid) {
 
        var i;
+
+       if (grid.id == "bottomg_1") {
+           if (this.burkka == true)
+               this.HideWorkingPopup("divLoading");
+       }
 
        if (grid.id == "f_1")
            this.FilterGrid = grid;
@@ -5150,53 +5204,55 @@
        if (grid.id == "g_1") {
            this.DetGrid = grid;
 
-           try {
+           if (this.GanttShowing == true) {
+               try {
 
-               if (this.firstdate == null && this.GanttShowing == true) {
+                   if (this.firstdate == null) {
 
-                   var xrows = grid.Rows;
+                       var xrows = grid.Rows;
 
-                   for (var r in xrows) {
-                       var row = xrows[r];
+                       for (var r in xrows) {
+                           var row = xrows[r];
 
 
-                       if (row != null) {
-                           if (row.Kind == "Data") {
+                           if (row != null) {
+                               if (row.Kind == "Data") {
 
-                               var sdt = grid.GetString(row, "Start");
-                               var dateParts = sdt.split("/");
+                                   var sdt = grid.GetString(row, "Start");
+                                   var dateParts = sdt.split("/");
 
-                               var dt = new Date(dateParts[2], (dateParts[0] - 1), dateParts[1]);
+                                   var dt = new Date(dateParts[2], (dateParts[0] - 1), dateParts[1]);
 
-                               if (this.firstdate == null)
-                                   this.firstdate = dt;
-                               else if (this.firstdate > dt)
-                                   this.firstdate = dt;
+                                   if (this.firstdate == null)
+                                       this.firstdate = dt;
+                                   else if (this.firstdate > dt)
+                                       this.firstdate = dt;
 
+                               }
                            }
                        }
+
                    }
-
                }
-           }
-           catch (ex) { }
+               catch (ex) { }
 
 
-           if (this.GanttShowing == true && this.ZoomTo != "") {
-               this.DetGrid.ChangeZoom(this.ZoomTo);
-               
+               if (this.ZoomTo != "") {
+                   this.DetGrid.ChangeZoom(this.ZoomTo);
 
-               var selectZoom = document.getElementById("idGanttZoom");
 
-	           selectZoom.selectedIndex = this.ZoomTo.substr(4, 1) - 1;
-               this.viewBar.refreshSelect("idGanttZoom");
+                   var selectZoom = document.getElementById("idGanttZoom");
 
-               this.ZoomString = this.ZoomTo;
+                   selectZoom.selectedIndex = this.ZoomTo.substr(4, 1) - 1;
+                   this.viewBar.refreshSelect("idGanttZoom");
 
-               //               if (this.firstdate != null)
-               //                   this.DetGrid.ScrollToDate(this.firstdate);
-               //               
-               this.ZoomTo = "";
+                   this.ZoomString = this.ZoomTo;
+
+                   //               if (this.firstdate != null)
+                   //                   this.DetGrid.ScrollToDate(this.firstdate);
+                   //               
+                   this.ZoomTo = "";
+               }
            }
        }
 
@@ -5320,15 +5376,65 @@
     }
 
     Model.prototype.GridsOnReady = function (grid, start) {
+        if (grid.id == "g_1" && this.TotGrid == null) {
+
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append('<![CDATA[');
+            sbDataxml.append('<Execute Function="GetBottomGrid">');
+            sbDataxml.append('</Execute>');
+            sbDataxml.append(']]>');
+
+            var sb = new StringBuilder();
+            sb.append("<treegrid  SuppressMessage='3' debug='0' sync='0' ");
+            sb.append(" Export_Url='ModelExportExcel.aspx'");
+            sb.append(" data_url='" + this.Webservice + "'");
+            sb.append(" data_method='Soap'");
+            sb.append(" data_function='Execute'")
+            sb.append(" data_namespace='WorkEnginePPM'");
+            sb.append(" data_param_Ticket='" + this.TicketVal + "'");
+            sb.append(" data_param_Function='GetBottomGrid'");
+            sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+            sb.append(" >");
+            sb.append("</treegrid>");
+
+            this.TotGrid = TreeGrid(sb.toString(), "bottomgridDiv_1", "bottomg_1");
+
+         }
+
+
+
 
         try {
             if (grid.id == "bottomg_1") {
                 this.OnResize();
+
             }
         }
         catch (e) {
         }
     }
+
+
+    Model.prototype.ShowWorkingPopup = function (divid) {
+        //        var veil = document.getElementById("veil");
+        //        veil.style.display = "block";
+        var div = $('#' + divid);
+        var win = $(window);
+        div.css('top', (win.height() - div.height()) / 2);
+        div.css('left', (win.width() - div.width()) / 2);
+        div.show();
+        var veil = $('#veil');
+        this.burkka = true;
+        veil.show();
+    };
+    Model.prototype.HideWorkingPopup = function (divid) {
+        var div = $('#' + divid);
+        div.hide();
+        var veil = $('#veil');
+        this.burkka = false;
+        veil.hide();
+    };
+
 
     Model.prototype.tabbarOnSelect = function (id, data) {
         if (this.ribbonBar.isCollapsed() == true) {
@@ -5424,6 +5530,8 @@
 
         this.ModelViewDlg = null;
 
+        this.burkka = false;
+
 		var loadDelegate = MakeDelegate(this, this.OnLoad);
 		var GetModelsCompleteDelegate = MakeDelegate(this, this.GetModelsComplete);
 		var GetLoadSelectVersionCompleteDelegate = MakeDelegate(this, this.GetLoadSelectVersionComplete);
@@ -5432,7 +5540,8 @@
 		var layoutOnResizeFinishDelegate = MakeDelegate(this, this.layoutOnResizeFinish);
 		var toolbarOnClickDelegate = MakeDelegate(this, this.toolbarOnClick);
 		var ettoolbarOnClickDelegate = MakeDelegate(this, this.ettoolbarOnClick);
-
+		var DeferedGridCreateDelegate = MakeDelegate(this, this.DeferedGridCreate);
+		
 		var GridsOnAfterValueChangedDelegate = MakeDelegate(this, this.GridsOnAfterValueChanged);
 		var BarMovedCompleteDelegate = MakeDelegate(this, this.BarMovedComplete);
 
@@ -5459,7 +5568,7 @@
 		var DoShowGanttCompleteDelegate = MakeDelegate(this, this.DoShowGanttComplete);
 		var CreateTargetCompleteDelegate = MakeDelegate(this, this.CreateTargetComplete);
 		var GetVersionTargetCompleteDelegate = MakeDelegate(this, this.GetVersionTargetComplete);
-		var GridsOnRenderStartDelegate = MakeDelegate(this, this.GridsOnRenderStart);
+//		var GridsOnRenderStartDelegate = MakeDelegate(this, this.GridsOnRenderStart);
 
 		var GetClientSideCalcDataCompleteDelegate = MakeDelegate(this, this.GetClientSideCalcDataComplete);
 		var GetTargetDataCompleteDelegate =  MakeDelegate(this, this.GetTargetDataComplete);
