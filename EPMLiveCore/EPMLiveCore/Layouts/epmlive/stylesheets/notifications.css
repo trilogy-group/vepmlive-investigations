@@ -2,7 +2,6 @@
     color: white;
     width: 25px;
     height: 25px;
-    left: 17px;
     line-height: 25px;
     text-align: center;
     position: relative !important;
@@ -33,7 +32,7 @@
     border-top: none;
     font-family: Arial;
     font-size: 13px;
-    top: 95px !important;
+    top: 62px !important;
 }
 
 .EPMLiveNotificationsHeader {

@@ -44,10 +44,7 @@
         <SharePoint:CssRegistration ID="CssRegistration1" Name="Themable/corev15.css" runat="server" />
         <style type="text/css">
             .ms-breadcrumb-top { display: none; }
-            
-           #searchInputBox {  margin-bottom: 3px !important;  }
-            
-          
+            #searchInputBox { margin-bottom: 3px !important; }
         </style>
         <script type="text/javascript">
             function Openlink(link) {
@@ -60,9 +57,9 @@
         <SharePoint:SPNoScript ID="SPNoScript1" runat="server"/>
         <SharePoint:SPClientIDGenerator ID="SPClientIDGenerator1" runat="server" ServerControlID="DeltaPlaceHolderMain;DeltaPlaceHolderPageTitleInTitleArea;DeltaPlaceHolderUtilityContent" />
         <SharePoint:SharePointForm ID="SharePointForm1" runat="server" onsubmit="if (typeof(_spFormOnSubmitWrapper) != 'undefined') {return _spFormOnSubmitWrapper();} else {return true;}">
-            <script type="text/javascript"> var submitHook = function () { return false; };
+            <script type="text/javascript"> var submitHook = function() { return false; };
                 theForm._spOldSubmit = theForm.submit;
-                theForm.submit = function () {
+                theForm.submit = function() {
                     if (!submitHook()) {
                         this._spOldSubmit();
                     }
@@ -113,7 +110,7 @@
                         <div class="ms-tableRow">
                             <div style="padding-left: 20px; padding-top: 2px;">
                                 <asp:ContentPlaceHolder id="PlaceHolderPageTitleInTitleAreaCustom" runat="server" Visible="true">
-									<SharePoint:ProjectProperty ID="ProjectProperty2" Property="Title" runat="server"/>
+                                    <SharePoint:ProjectProperty ID="ProjectProperty2" Property="Title" runat="server"/>
                                 </asp:ContentPlaceHolder>
                             </div>
                             <div class="ms-tableCell ms-verticalAlignMiddle">
@@ -128,15 +125,12 @@
                     </div>
                 </div>
                 <div id="suiteBarRight">
-                    <SharePoint:AjaxDelta runat="server" id="DeltaSuiteBarRight" CssClass="ms-core-deltaSuiteBarRight" BlockElement="true">
-                        
-                        
-                            
+                    <SharePoint:AjaxDelta runat="server" id="DeltaSuiteBarRight" CssClass="ms-core-deltaSuiteBarRight" BlockElement="true">   
                         <div id="suiteBarButtons">
                             <span id="ms-helpSearchInput" style="display: inline-block;">
                                 <SharePoint:AjaxDelta id="DeltaPlaceHolderSearchArea" BlockElement="true" CssClass="ms-mpSearchBox ms-floatRight" runat="server" style="display: none; width: 240px;">
                                     <asp:ContentPlaceHolder id="PlaceHolderSearchArea" runat="server">
-										<div id="searchInputBox">
+                                        <div id="searchInputBox">
                                             <SharePoint:DelegateControl ID="DelegateControl4" runat="server" ControlId="SmallSearchInputBox" />
                                         </div>
                                     </asp:ContentPlaceHolder>
@@ -172,6 +166,11 @@
                                     $("#ms-helpSearch").hide();
                                 }
                             </script>
+                            <!-- Notification Counter -->
+                            <span style="display: inline-block; position: relative; top: -12px; width: 30px;">
+                                <epm:NotificationCounter runat="server"></epm:NotificationCounter>
+                            </span>
+                            <!-- // Notification Counter -->
                             <span id="ms-helpSupport">
                                 <SharePoint:ThemedClusteredHoverImage
                                     runat="server"
@@ -340,10 +339,10 @@
                             </span>
                         </div>
                         <div id="welcomeMenuBox"> 	
-                        	<wssuc:Welcome id="IdWelcome" runat="server" EnableViewState="false" />
+                            <wssuc:Welcome id="IdWelcome" runat="server" EnableViewState="false" />
                         </div>
                         <div id="welcomeMenuBox"> 					
-                                <epm:BtnChangeApp ID="BtnChangeApp1" runat="server"></epm:BtnChangeApp>				
+                            <epm:BtnChangeApp ID="BtnChangeApp1" runat="server"></epm:BtnChangeApp>				
                         </div>
                     </SharePoint:AjaxDelta>
                 </div>
@@ -369,11 +368,6 @@
                                         Location="TabRowRight"
                                         ID="RibbonTabRowRight"
                                         CssClass="s4-trc-container s4-notdlg ms-core-defaultFont">
-					
-                                        <!-- Notification Counter -->
-                                        <epm:NotificationCounter runat="server"></epm:NotificationCounter>
-                                        <!-- // Notification Counter -->
-	                
                                         <SharePoint:SPSharePromotedActionButton ID="SPSharePromotedActionButton1" runat="server"/>
                                         <SharePoint:DelegateControl ID="DelegateControl5" runat="server" ControlId="PromotedActions" AllowMultipleControls="true" />
                                         <SharePoint:SPSyncPromotedActionButton ID="SPSyncPromotedActionButton1" runat="server"/>
@@ -458,7 +452,7 @@
                         </div>
                         <SharePoint:AjaxDelta id="DeltaSPNavigation" runat="server">
                             <asp:ContentPlaceHolder ID="SPNavigation" runat="server">
-								<SharePoint:DelegateControl runat="server" ControlId="PublishingConsole" Id="PublishingConsoleDelegate" />
+                                <SharePoint:DelegateControl runat="server" ControlId="PublishingConsole" Id="PublishingConsoleDelegate" />
                             </asp:ContentPlaceHolder>
                         </SharePoint:AjaxDelta>
                     </div>
@@ -470,8 +464,8 @@
                                 ChildrenAsTriggers="false"
                                 runat="server">
                                 <ContentTemplate>
-									<WebPartPages:WebPartAdder ID="WebPartAdder" runat="server" />
-								</ContentTemplate>
+                                    <WebPartPages:WebPartAdder ID="WebPartAdder" runat="server" />
+                                </ContentTemplate>
                                 <Triggers>
                                     <asp:PostBackTrigger ControlID="WebPartAdder" />
                                 </Triggers>
@@ -555,7 +549,7 @@
                                                 </Template_Controls>
                                             </SharePoint:DelegateControl>
                                             <asp:ContentPlaceHolder id="PlaceHolderTopNavBar" runat="server">
-												<SharePoint:AspMenu
+                                                <SharePoint:AspMenu
                                                     ID="TopNavigationMenu"
                                                     Runat="server"
                                                     EnableViewState="false"
@@ -574,7 +568,7 @@
                                     <h1 id="pageTitle" class="ms-core-pageTitle">
                                         <SharePoint:AjaxDelta id="DeltaPlaceHolderPageTitleInTitleArea" runat="server">
                                             <asp:ContentPlaceHolder id="PlaceHolderPageTitleInTitleArea" runat="server">
-												<SharePoint:SPTitleBreadcrumb ID="SPTitleBreadcrumb1"
+                                                <SharePoint:SPTitleBreadcrumb ID="SPTitleBreadcrumb1"
                                                                               runat="server"
                                                                               RenderCurrentNodeAsLink="true"
                                                                               SiteMapProvider="SPContentMapProvider"
@@ -606,7 +600,7 @@
                              class="ms-dialogHidden ms-forceWrap ms-noList">
                             <SharePoint:AjaxDelta id="DeltaPlaceHolderLeftNavBar" BlockElement="true" CssClass="ms-core-navigation" role="navigation" runat="server">
                                 <asp:ContentPlaceHolder id="PlaceHolderLeftNavBar" runat="server">
-									<a id="startNavigation" name="startNavigation" tabIndex="-1"></a>
+                                    <a id="startNavigation" name="startNavigation" tabIndex="-1"></a>
                                     <asp:ContentPlaceHolder id="PlaceHolderLeftNavBarTop" runat="server" />
                                     <asp:ContentPlaceHolder id="PlaceHolderQuickLaunchTop" runat="server" />
                                     <asp:ContentPlaceHolder id="PlaceHolderLeftNavBarDataSource" runat="server" />
@@ -620,26 +614,11 @@
                                             ContainedControl="QuickLaunch"
                                             EnableViewState="false">
                                             <SharePoint:DelegateControl ID="DelegateControl6" runat="server" ControlId="QuickLaunchDataSource">
-											
-											
-											
-											
-											
-											
-											
-											
-											
-											
-											
-											
-											
-											
-											
                                                 <Template_Controls>
                                                     <asp:SiteMapDataSource SiteMapProvider="SPNavigationProvider" ShowStartingNode="False" id="QuickLaunchSiteMap" StartingNodeUrl="sid:1025" runat="server" />
                                                 </Template_Controls>
                                             </SharePoint:DelegateControl>
-											<SharePoint:AspMenu id="V4QuickLaunchMenu" runat="server" EnableViewState="false" DataSourceId="QuickLaunchSiteMap" UseSimpleRendering="true" Orientation="Vertical" StaticDisplayLevels="3" AdjustForShowStartingNode="true" MaximumDynamicDisplayLevels="0" SkipLinkText="" />
+                                            <SharePoint:AspMenu id="V4QuickLaunchMenu" runat="server" EnableViewState="false" DataSourceId="QuickLaunchSiteMap" UseSimpleRendering="true" Orientation="Vertical" StaticDisplayLevels="3" AdjustForShowStartingNode="true" MaximumDynamicDisplayLevels="0" SkipLinkText="" />
                                         </SharePoint:SPNavigationManager>
                                         <SharePoint:SPNavigationManager
                                             id="TreeViewNavigationManagerV4"
@@ -678,7 +657,7 @@
                                             </SharePoint:DelegateControl>
                                         </SharePoint:SPNavigationManager>
                                         <asp:ContentPlaceHolder id="PlaceHolderQuickLaunchBottom" runat="server">
-											<div class="ms-core-listMenu-verticalBox">
+                                            <div class="ms-core-listMenu-verticalBox">
                                                 <SharePoint:ClusteredSPLinkButton
                                                     runat="server"
                                                     id="idNavLinkViewAll"
@@ -709,7 +688,7 @@
                         </div>
                         <SharePoint:AjaxDelta id="DeltaFormDigest" BlockElement="true" runat="server">
                             <asp:ContentPlaceHolder id="PlaceHolderFormDigest" runat="server">
-								<SharePoint:FormDigest ID="FormDigest1" runat="server"/>
+                                <SharePoint:FormDigest ID="FormDigest1" runat="server"/>
                             </asp:ContentPlaceHolder>
                         </SharePoint:AjaxDelta>
                         <asp:ContentPlaceHolder id="PlaceHolderSiteName" runat="server" Visible="false" />
@@ -733,7 +712,7 @@
         </SharePoint:SharePointForm>
         <SharePoint:AjaxDelta id="DeltaPlaceHolderUtilityContent" runat="server">
             <asp:ContentPlaceHolder id="PlaceHolderUtilityContent" runat="server">
-				<!-- EPMLive JS -->
+                <!-- EPMLive JS -->
                 <epm:EPMLiveJS runat="server"></epm:EPMLiveJS>
                 <!-- // EPMLive JS -->
                 <!-- EPMLiveNotifications -->
@@ -753,7 +732,7 @@
             var uvOptions = {};
 
             function UVLoad() {
-                (function () {
+                (function() {
                     var uv = document.createElement('script');
                     uv.type = 'text/javascript';
                     uv.async = true;
@@ -767,7 +746,7 @@
         </script>
         <script type="text/javascript">
             function initializeToolTip() {
-                $.getScript("/_layouts/epmlive/javascripts/libraries/tooltip.js", function () {
+                $.getScript("/_layouts/epmlive/javascripts/libraries/tooltip.js", function() {
                     $("[rel=tooltipbottom]").tooltip({ 'placement': 'bottom', 'delay': 100 });
                     $("[rel=tooltiptop]").tooltip({ 'placement': 'top', 'delay': 400 });
                 });
@@ -778,7 +757,7 @@
         </script>
         <script type="text/javascript">
 
-            $(document).click(function (event) {
+            $(document).click(function(event) {
                 if ($("#DeltaPlaceHolderSearchArea").is(":visible")) {
                     $("#DeltaPlaceHolderSearchArea").hide("slide", { direction: "right" }, 300);
                 }
@@ -790,7 +769,7 @@
                     $("#DeltaPlaceHolderSearchArea").hide("slide", { direction: "right" }, 300);
                 } else {
                     $("#DeltaPlaceHolderSearchArea").show("slide", { direction: "right" }, 300);
-                    setTimeout(function () {
+                    setTimeout(function() {
                         $("#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox").focus();
                     }, 300);
                 }
@@ -799,9 +778,7 @@
         </script>
         
         <script type="text/javascript">
-
             $('#ms-help').hide();
-
         </script>
     </body>
 </SharePoint:SPHtmlTag>

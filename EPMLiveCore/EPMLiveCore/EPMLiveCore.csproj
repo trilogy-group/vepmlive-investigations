@@ -238,6 +238,7 @@
     <Compile Include="GlobalResourceHelper.cs" />
     <Compile Include="GlobalResources\MultiAppNavigationResources.Designer.cs" />
     <Compile Include="GlobalResources\WorkEngineLookupPickerResources.Designer.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GridGanttSettings.cs" />
     <Compile Include="Infrastructure\BaseClasses\BaseManager.cs" />
     <Compile Include="Infrastructure\BaseClasses\ReportingProxyBase.cs" />
