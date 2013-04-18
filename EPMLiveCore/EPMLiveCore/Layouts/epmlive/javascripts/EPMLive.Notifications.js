@@ -427,10 +427,6 @@
                 var topBarHeight = $(".ms-cui-ribbonTopBars").height();
 
                 var notificationCounter = $("#EPMLiveNotificationCounter");
-                var span = $(notificationCounter.parent());
-                span.css("float", "left");
-                span.css("position", "relative");
-                span.css("top", "-2.50px");
 
                 notificationCounter.css("top", -((topBarHeight - notificationCounter.height()) / 2) + 6);
                 notificationCounter.show();
@@ -443,7 +439,7 @@
                 notificationCounterScreen.width(topBarHeight);
 
                 notificationCounterScreen.css("top", 0);
-                notificationCounterScreen.css("left", -15);
+                notificationCounterScreen.css("left", -32);
                 $(notificationCounterScreen).fadeTo(1, 0);
 
                 notificationCounterScreen.hover(
@@ -500,6 +496,6 @@
             };
         }(window.epmLiveNotifications = window.epmLiveNotifications || {}, epmLive, window.jQuery, ko));
     }
-    
+
     ExecuteOrDelayUntilScriptLoaded(executeEpmLiveNotifications, 'EPMLive.js');
 })();
