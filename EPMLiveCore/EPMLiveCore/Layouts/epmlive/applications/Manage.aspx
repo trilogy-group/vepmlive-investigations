@@ -39,7 +39,7 @@
 
             var options = { url: url, width: 700, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
         }
 
@@ -49,7 +49,7 @@
 
             var options = { url: url, width: 600, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
         }
 
@@ -59,7 +59,7 @@
 
             var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
         }
 
@@ -69,7 +69,7 @@
 
             var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
         }
 
@@ -79,7 +79,7 @@
 
             var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
         }
 
