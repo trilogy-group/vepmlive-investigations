@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
+using EPMLiveCore;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -40,11 +41,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
             if (ClientScript.IsStartupScriptRegistered("CloseDialog")) return;
             
             var javascript = @"
-                                ExecuteOrDelayUntilScriptLoaded(closeModal, ""sp.js"");                                
-
+                                //ExecuteOrDelayUntilScriptLoaded(closeModal, ""sp.js"");                                
+                                
+                                SP.SOD.executeFunc('sp.js', 'SP.ClientContext', closeModal);
+                                
                                 function closeModal(){                                
                                     var imageUrl = '#IMAGEURL#';
-                                    SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, imageUrl);
+                                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, imageUrl);
                                 }
                               ".Replace("#IMAGEURL#", pictureUrl);
 
@@ -53,8 +56,18 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private string GetPictureFileName()
         {
-            var loginName = EPMLiveCore.CoreFunctions.GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName, SPContext.Current.Site);
+            var loginName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
             return string.Format("{0}{1}", loginName, Path.GetExtension(PictureFileUpload.FileName));
+        }
+
+        private string GetCleanUserName(string loginName)
+        {
+            var indexForGettingEverythingAfterPipe = loginName.IndexOf("|") + 1;
+            var loginNameWithDomain = loginName.Mid(indexForGettingEverythingAfterPipe);
+            var indexForGettingEverythingAfterDomain = loginNameWithDomain.IndexOf("\\") + 1;
+            var loginNameWithoutDomain = loginNameWithDomain.Mid(indexForGettingEverythingAfterDomain);
+
+            return loginNameWithoutDomain;
         }
 
         private static SPFolder GetDocumentLibrary(string documentLibraryName)
@@ -93,13 +106,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
             pictureDocumentLibrary.Files.Add(pictureFileName, pictureFileBytes, true);
             pictureDocumentLibrary.Update();
         }
-
-        //private static string GetLoginNameWithoutDomain()
-        //{
-        //    var loginName = SPContext.Current.Web.CurrentUser.LoginName;
-        //    var stop = loginName.IndexOf("\\");
-        //    return (stop > -1) ? loginName.Substring(stop + 1, loginName.Length - stop - 1) : loginName;
-        //}
 
         private static void UpdatePictureUrlInSiteUserInfoList(string pictureUrl)
         {

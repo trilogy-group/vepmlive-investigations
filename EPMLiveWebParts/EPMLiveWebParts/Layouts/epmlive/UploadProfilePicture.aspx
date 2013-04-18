@@ -51,9 +51,8 @@
 </style>
 
 <script type="text/javascript">
-
     function closeDialog() {
-        SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, null);    
+        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, null);    
     }
 
 </script>
