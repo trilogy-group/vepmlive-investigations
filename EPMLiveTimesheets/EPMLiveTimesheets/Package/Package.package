@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="155a4887-be9b-4623-81a7-17e574003e71" solutionId="155a4887-be9b-4623-81a7-17e574003e71" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveTimesheets" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="155a4887-be9b-4623-81a7-17e574003e71" solutionId="1858d521-0375-4a61-9281-f5210854bc12" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveTimesheets" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <features>
     <featureReference itemId="9773496d-0cc9-45f0-8f89-5b8f12d220db" />
   </features>
