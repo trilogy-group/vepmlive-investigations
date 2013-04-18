@@ -247,7 +247,7 @@ function registerTemplateVersoningScript() {
             var element = document.createElement('div');
             element.innerHTML = $('#EPMLiveTemplateVersoningSavePrompt').html();
 
-            var options = window.SP.UI.$create_DialogOptions();
+            var options = parent.SP.UI.$create_DialogOptions();
 
             options.title = 'Save Template';
             options.html = element;
@@ -256,7 +256,7 @@ function registerTemplateVersoningScript() {
             options.allowMaximize = false;
             options.showClose = false;
 
-            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+            parent.SP.UI.ModalDialog.showModalDialog(options);
         };
 
         getTemplateInformation();

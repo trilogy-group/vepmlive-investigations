@@ -98,7 +98,7 @@ color: white;
 
 				var options = { url: surl, width: 500, height: 250, showClose: true };
 
-				SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+				parent.SP.UI.ModalDialog.showModalDialog(options);
 
 			}
 
