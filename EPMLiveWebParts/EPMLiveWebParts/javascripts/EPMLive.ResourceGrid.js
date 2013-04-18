@@ -1605,7 +1605,7 @@ function registerEpmLiveResourceGridScript() {
             }
         };
 
-        window.Grids.OnClick = function (grid, row, col, x, y, evt) {
+        window.Grids.OnClick = function(grid, row, col, x, y, evt) {
             $$.actions.loadRibbon();
             $$.actions.hideEasyScroll(true);
 
@@ -1754,7 +1754,7 @@ function registerEpmLiveResourceGridScript() {
 
             grid.Update();
             grid.Render();
-            
+
             $$.actions.loadRibbon();
         };
 
