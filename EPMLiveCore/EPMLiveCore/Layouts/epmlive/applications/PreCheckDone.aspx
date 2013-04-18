@@ -63,7 +63,7 @@
 
         var options = { url: surl, width: 400, showClose: true};
 
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
 
 </script>

@@ -16,7 +16,7 @@ function PopupWorkspaceListWP() {
         dialogReturnValueCallback: WorkspaceListCallBack
     };
 
-    SP.UI.ModalDialog.showModalDialog(options);
+    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 }
 
 function WorkspaceListCallBack(dialogResult, returnVal) {

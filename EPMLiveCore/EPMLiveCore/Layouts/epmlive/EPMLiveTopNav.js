@@ -13,7 +13,7 @@ function TopNavInit() {
                                     dialogReturnValueCallback: TopNavCallBackMethod
                                 };
 
-                                SP.UI.ModalDialog.showModalDialog(options);
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                                 return false;
                             });
         }
@@ -30,7 +30,7 @@ function TopNavInit() {
                                     dialogReturnValueCallback: TopNavCallBackMethod
                                 };
 
-                                SP.UI.ModalDialog.showModalDialog(options);
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                                 return false;
                             });
         }
@@ -47,7 +47,7 @@ function TopNavInit() {
                                     dialogReturnValueCallback: TopNavCallBackMethod
                                 };
 
-                                SP.UI.ModalDialog.showModalDialog(options);
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                                 return false;
                             });
         }
@@ -56,10 +56,10 @@ function TopNavInit() {
 
     window.TopNavCallBackMethod = function(result, value) {
         switch (result) {
-            case 'ok':
+            case '1':
                 window.location.reload();
                 break;
-            case 'cancel':
+            case '0':
                 break;
         }
     }
@@ -73,7 +73,7 @@ function TopNavInit() {
             dialogReturnValueCallback: TopNavCallBackMethod
         };
 
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         return false;
     }
 }

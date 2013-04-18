@@ -82,15 +82,15 @@
 
             $('#btnSelect').click(function () {
                 if (!$("#hdnSelectedWorkspaceUrl").val().trim().length) {
-                    SP.UI.ModalDialog.commonModalDialogClose(2, '');
+                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, '');
                 }
                 else {
-                    SP.UI.ModalDialog.commonModalDialogClose(1, $("#hdnSelectedWorkspaceUrl").val());
+                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, $("#hdnSelectedWorkspaceUrl").val());
                 }
             });
 
             $('#btnCancel').click(function () {
-                SP.UI.ModalDialog.commonModalDialogClose(2, '');
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, '');
             });
 
         });

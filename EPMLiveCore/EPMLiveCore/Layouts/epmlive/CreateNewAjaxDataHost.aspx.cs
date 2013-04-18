@@ -130,7 +130,7 @@ namespace EPMLiveCore
                         {
                             linkUrl = "#";
                             string createNewWorkspaceUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/createnewworkspace.aspx?list=" + cWeb.Lists[i].ID.ToString("B") + "&type=site&source=" + _requestUrl;
-                            onclick = "javascript:HideLayers();var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                            onclick = "javascript:HideLayers();var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                         }
                         // check for roll up lists
                         // not a pop up
@@ -149,7 +149,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } }; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
                         else
@@ -160,7 +160,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } }; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
 
@@ -230,7 +230,7 @@ namespace EPMLiveCore
                         {
                             linkUrl = "#";
                             string createNewWorkspaceUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/createnewworkspace.aspx?list=" + cWeb.Lists[i].ID.ToString("B") + "&type=site&source=" + _requestUrl;
-                            onclick = "javascript:var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                            onclick = "javascript:var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                         }
                         // check for roll up lists
                         // not a pop up
@@ -249,7 +249,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } }; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
                         else
@@ -260,7 +260,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } }; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
 

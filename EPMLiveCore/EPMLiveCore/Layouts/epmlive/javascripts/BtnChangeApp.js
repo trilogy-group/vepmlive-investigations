@@ -71,7 +71,7 @@ function OpenUrlWithModal(url, title) {
         dialogReturnValueCallback: ChangeToNewCommunity
     };
 
-    SP.UI.ModalDialog.showModalDialog(options);
+    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     return false;
 }
 

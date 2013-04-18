@@ -134,7 +134,7 @@
 				</div>
 				<div class="form-actions">
 					<asp:Button ID="ImportButton" runat="server" Text="Import" OnClick="ImportButtonOnClick" />
-					<input type="button" value="Cancel" style="margin-left: 5px;" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel); return false;"/>
+					<input type="button" value="Cancel" style="margin-left: 5px;" onclick="SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', SP.UI.DialogResult.cancel); return false;"/>
 				</div>
 			</div>
 		</div>

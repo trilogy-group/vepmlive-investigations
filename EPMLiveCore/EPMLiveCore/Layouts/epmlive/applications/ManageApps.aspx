@@ -17,7 +17,7 @@
             if (confirm('Are you sure you want to Uninstall that Applicaton?')) {
                 var surl = "uninstallcheck.aspx?isdlg=1&appID=" + id;
 
-                var options = { url: surl, width: 700, showClose: false, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+                var options = { url: surl, width: 700, showClose: false, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } };
 
                 SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 

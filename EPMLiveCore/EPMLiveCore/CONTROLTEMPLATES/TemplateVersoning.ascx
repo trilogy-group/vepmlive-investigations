@@ -15,7 +15,7 @@
 
     <input id="EpmLiveTemplateVersoningSaveButton" type="button" target="_self" class="ms-ButtonHeightWidth" onclick="window.epmLiveTemplateVersoning.saveTemplate(); return false;" value="Save Template" style="float:left;width:90px;margin-right:5px;">
 
-    <input id="EpmLiveTemplateVersoningCancelButton" type="button" target="_self" class="ms-ButtonHeightWidth" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel); return false;" value="Close" style="float:left;width:90px;">
+    <input id="EpmLiveTemplateVersoningCancelButton" type="button" target="_self" class="ms-ButtonHeightWidth" onclick="SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', SP.UI.DialogResult.cancel); return false;" value="Close" style="float:left;width:90px;">
 
     <div id="EpmLiveTemplateVersoningSaveStatus" style="color:#0072BC;font-size:15px;font-weight:bold;margin-left:10px;height: 24px;line-height: 24px;">
         <img src="/_layouts/images/progress-circle-24.gif" style="display: none;float:left;margin: 0 5px;" id="EpmLiveTemplateVersoningSaveStatusProgress"/>

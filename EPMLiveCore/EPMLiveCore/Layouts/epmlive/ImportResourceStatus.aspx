@@ -142,7 +142,7 @@
 			</div>
 		  </div>
 		</div>
-		<input type="button" value="Close" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK); return false;" style="float: right; position: relative; top: -5px;">
+		<input type="button" value="Close" onclick="SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', parent.SP.UI.DialogResult.OK); return false;" style="float: right; position: relative; top: -5px;">
 	</asp:Panel>
 </asp:Content>
 

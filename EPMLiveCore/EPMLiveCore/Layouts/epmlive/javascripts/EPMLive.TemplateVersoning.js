@@ -256,7 +256,7 @@ function registerTemplateVersoningScript() {
             options.allowMaximize = false;
             options.showClose = false;
 
-            window.SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         };
 
         getTemplateInformation();

@@ -439,7 +439,7 @@
                 dialogReturnValueCallback: Function.createDelegate(null, $$.HandleChangeParentUrlReturn)
             };
 
-            window.SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         });
 
         if (window.defaultCreateNew == 'online' || window.newItemNameLwrCs == 'template') {
@@ -1313,7 +1313,6 @@
                                 $('#spanMainLoading').html("You are now being redirected...");
                                 $('#div_loading_msg').css('display', 'none');
                                 var t = setTimeout("window.parent.location.href = redirectURL;", 3000);
-                                //SP.UI.ModalDialog.commonModalDialogClose(1, url);
                             }
                             else {
                                 var msgFail = $xml.find("Result").text();
@@ -1567,7 +1566,6 @@
                                 $('#spanMainLoading').html("You are now being redirected...");
                                 $('#div_loading_msg').css('display', 'none');
                                 var t2 = setTimeout("window.parent.location.href = redirectURL;", 3000);
-                                //SP.UI.ModalDialog.commonModalDialogClose(1, url);
                             }
                             else {
                                 var msgFail = $xml.find("Result").text();
@@ -2457,7 +2455,7 @@
                                     $('#linkNewWorkspace').trigger('click');
                                 }
                                 else {
-                                    window.SP.UI.ModalDialog.commonModalDialogClose(0, currentWebUrl);
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 0, currentWebUrl);
                                 }
                             }
                             else {
@@ -2795,7 +2793,7 @@
                 height: 500
             };
         }
-        window.SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         return false;
     }
 

@@ -164,7 +164,7 @@
                         $(function () {
                             window.setTimeout(function () {
                                 alert($('input[title=DaysHoursBreakdownErrorTextBox]').first().val());
-                                window.SP.UI.ModalDialog.commonModalDialogClose(window.SP.UI.DialogResult.cancel);
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', window.SP.UI.DialogResult.cancel);
                             }, 500);
                         });
                     }

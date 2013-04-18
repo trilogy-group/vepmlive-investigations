@@ -25,9 +25,9 @@
 
         var wurl = "users.aspx?feature=" + feature;
 
-        var options = { url: wurl, width: 400, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+        var options = { url: wurl, width: 400, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } };
 
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
     }
 
@@ -35,9 +35,9 @@
 
         var wurl = "usersv2.aspx?feature=" + feature;
 
-        var options = { url: wurl, width: 400, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+        var options = { url: wurl, width: 400, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } };
 
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
     }
 

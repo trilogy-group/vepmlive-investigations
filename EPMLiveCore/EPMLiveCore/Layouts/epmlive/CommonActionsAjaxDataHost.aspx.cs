@@ -175,7 +175,7 @@ namespace EPMLiveCore
                         if (isPopup)
                         {   
                             string popupUrl = linkUrl;
-                            onclick = "javascript:var options = { url:'" + linkUrl + "', title: '" + itemText + "' }; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                            onclick = "javascript:var options = { url:'" + linkUrl + "', title: '" + itemText + "' }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             linkUrl = "#";
                         }
                     }

@@ -42,7 +42,7 @@
 
             var options = { html: divInstall, width: 300, height: 80, allowMaximize: false, showClose: true };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
             dhtmlxAjax.get("/_admin/epmlive/installsolutions.aspx?WEBAPP=<%=webappid %>", DoneInstall);
         }
@@ -56,7 +56,7 @@
 
             var options = { html: divRemove, width: 300, height: 80, allowMaximize: false, showClose: true };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
             dhtmlxAjax.get("/_admin/epmlive/removesolutions.aspx?WEBAPP=<%=webappid %>", DoneInstall);
         }
@@ -80,7 +80,7 @@
 
             var options = { html: divDatabase, width: 400, height: 400, allowMaximize: false, showClose: true };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
         function DoCreateDatabase() {
@@ -95,7 +95,7 @@
 
             var options = { html: divInstallDB, width: 300, height: 80, allowMaximize: false, showClose: true };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
             
             dhtmlxAjax.get("/_admin/epmlive/createdatabase.aspx?WEBAPP=<%=webappid %>&Server=" + txtServer.value + "&DB=" + txtDatabase.value + "&username=" + txtDBUsername.value + "&Password=" + txtDBPassword.value, DoneInstall);

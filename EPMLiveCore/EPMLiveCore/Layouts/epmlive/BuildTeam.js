@@ -32,7 +32,7 @@ function Assignments() {
 
         var options = { url: surl, showMaximized: true, title: "Assignment Planner" };
 
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
     //_layouts/epmlive/AssignmentPlanner.aspx?resources=7,5,19,6&IsDlg=1
 
@@ -130,7 +130,7 @@ function RemoveResource()
 function AddResourcePool() {
     var options = { url: newResUrl, width: 800, height: 600, title: "Add Resource", dialogReturnValueCallback: onAddResourcePool };
 
-    SP.UI.ModalDialog.showModalDialog(options);
+    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 }
 
 function onAddResourcePool(dialogResult, returnValue) {
@@ -215,7 +215,7 @@ function ShowUserPopup(spaccount) {
 
     var options = { url: url, width: 650, height: 600, title: "User Information" };
 
-    SP.UI.ModalDialog.showModalDialog(options);
+    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
 }
 

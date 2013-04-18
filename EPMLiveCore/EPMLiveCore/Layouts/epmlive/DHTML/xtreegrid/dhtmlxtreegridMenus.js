@@ -632,13 +632,13 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
         curRow = this._curMenuRow.id;
         curGrid = this;
         var options = { url: weburl, width: 600, height: 500, dialogReturnValueCallback: this.gridactioncallback };
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
     else {
         curRow = this._curMenuRow.id;
         curGrid = this;
         var options = { url: weburl, width: 700, dialogReturnValueCallback: this.gridactioncallback };
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
     this._curHover = false;
     this.clearmenus();

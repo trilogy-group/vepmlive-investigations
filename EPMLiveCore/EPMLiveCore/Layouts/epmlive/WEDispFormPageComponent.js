@@ -106,7 +106,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
             if (WEDLG == "1") {
                 var options = { url: weburl, width: 700, dialogReturnValueCallback: this.NewItemCallback };
-                SP.UI.ModalDialog.showModalDialog(options);
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
             }
             else {
                 location.href = weburl;
@@ -149,7 +149,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
             var options = { url: tUrl, title: 'Create', allowMaximize: false, width: 800, height: 600, dialogReturnValueCallback: Function.createDelegate(null, HandleCreateNewWorkspaceCreate) };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
             function HandleCreateNewWorkspaceCreate(result, value) {
                 if (result == '1') {
@@ -168,7 +168,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         else if (commandId === 'Ribbon.ListForm.Display.Manage.BuildTeam') {
             var options = { url: WEWebUrl + "/_layouts/epmlive/buildteam.aspx?listid=" + WEListId + "&id=" + WEItemId, title: "Build Team", showMaximized: true, dialogReturnValueCallback: this.NewItemCallback };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKCost') {
             var FullId = WEWebId + "." + WEListId + "." + WEItemId;
@@ -177,7 +177,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
             var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback: this.NewItemCallback };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRP') {
             var FullId = WEWebId + "." + WEListId + "." + WEItemId;
@@ -186,7 +186,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
             var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback: this.NewItemCallback };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRPM') {
             this.epkmulti('rpeditor');
@@ -214,7 +214,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
             var weburl = listInfo[0] + "/_layouts/epmlive/gridaction.aspx?action=linkeditems&list=" + listInfo[3] + "&field=" + listInfo[1] + "&LookupFieldList=" + listInfo[2] + "&Source=" + document.location.href;
             var options = { url: weburl, showMaximized: true };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else {
             alert(ticket);
@@ -242,7 +242,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
         var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback: myCallback };
 
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
 }
 

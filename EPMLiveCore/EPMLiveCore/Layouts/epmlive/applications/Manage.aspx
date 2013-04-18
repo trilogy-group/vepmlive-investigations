@@ -37,7 +37,7 @@
 
             var url = "<%=sWebUrl %>/lists/installed%20applications/editform.aspx?isdlg=1&ID=" + id;
 
-            var options = { url: url, width: 700, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+            var options = { url: url, width: 700, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
 
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
@@ -47,7 +47,7 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/applications/addcommunity.aspx";
 
-            var options = { url: url, width: 600, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+            var options = { url: url, width: 600, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
 
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
@@ -57,7 +57,7 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/customquiklnch.aspx?isdlg=1&AppID=" + id;
 
-            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
 
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
@@ -67,7 +67,7 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/customtopnav.aspx?isdlg=1&AppID=" + id;
 
-            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
 
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
@@ -77,7 +77,7 @@
 
             var url = "<%=sWebUrl %>/_layouts/epmlive/applications/ManageApps.aspx?isdlg=1&AppID=" + id;
 
-            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.UI.ModalDialog.RefreshPage(dialogResult) } };
+            var options = { url: url, width: 800, showClose: true, dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult); } };
 
             SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 

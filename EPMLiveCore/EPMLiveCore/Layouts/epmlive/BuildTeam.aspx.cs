@@ -216,7 +216,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
             if(Request["isDlg"] == "1")
             {
-                sClose = "SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');";
+                sClose = "SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', SP.UI.DialogResult.OK, '');";
             }
             else
             {

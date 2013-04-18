@@ -11,7 +11,7 @@ function OpenCommentsDialog() {
         height: 500
     };
 
-    SP.UI.ModalDialog.showModalDialog(options);
+    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 }
 
 function GetCommentsUrl() {

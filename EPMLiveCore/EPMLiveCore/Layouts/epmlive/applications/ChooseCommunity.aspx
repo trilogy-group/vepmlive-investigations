@@ -20,7 +20,7 @@
 
             var options = { url: "AddCommunity.aspx", width: 500, showClose: true, dialogReturnValueCallback: onAddCommunity };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 
         }
         

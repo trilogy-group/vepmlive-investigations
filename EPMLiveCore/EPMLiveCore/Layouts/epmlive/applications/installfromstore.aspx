@@ -27,8 +27,7 @@
 
                 var options = { url: surl, width: 700, title: "Install Application", dialogReturnValueCallback: InstallAppClose };
 
-                SP.UI.ModalDialog.showModalDialog(options);
-            
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
             }
 
         

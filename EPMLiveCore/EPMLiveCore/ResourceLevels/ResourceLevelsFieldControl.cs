@@ -106,7 +106,7 @@ namespace EPMLiveCore
                 {
                     string url = Web.ServerRelativeUrl;
                     if(url == "/") url = "";
-                    return Level.name + " <a style=\"\" href=\"javascript:void(0);\" onclick=\"SP.UI.ModalDialog.showModalDialog({url: '" + url + "/_layouts/epmlive/manageaccount.aspx',width: 800,height: 600});\"><img src=\"/_layouts/epmlive/images/purchaseaccounts.png\" border=\"0\"></a>";
+                    return Level.name + " <a style=\"\" href=\"javascript:void(0);\" onclick=\"var options={url: '" + url + "/_layouts/epmlive/manageaccount.aspx',width: 800,height: 600}; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);\"><img src=\"/_layouts/epmlive/images/purchaseaccounts.png\" border=\"0\"></a>";
                 }
 
             }

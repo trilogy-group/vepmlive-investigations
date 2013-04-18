@@ -1517,11 +1517,11 @@ function GEInit() {
                 width: 650,
                 height: 500,
                 dialogReturnValueCallback: function (dialogResult) {
-                    SP.UI.ModalDialog.RefreshPage(dialogResult);
+                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult);
                 }
             };
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
         function UnescapeHTML(escapedHTML) {

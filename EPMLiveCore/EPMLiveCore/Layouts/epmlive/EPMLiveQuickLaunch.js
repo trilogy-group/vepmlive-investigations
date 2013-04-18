@@ -14,7 +14,7 @@ function QuikLnchInit() {
                                     dialogReturnValueCallback: QuickLaunchCallBackMethod
                                 };
 
-                                SP.UI.ModalDialog.showModalDialog(options);
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                                 return false;
                             });
         }
@@ -31,7 +31,7 @@ function QuikLnchInit() {
                                     dialogReturnValueCallback: QuickLaunchCallBackMethod
                                 };
 
-                                SP.UI.ModalDialog.showModalDialog(options);
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                                 return false;
                             });
         }
@@ -48,7 +48,7 @@ function QuikLnchInit() {
                                     dialogReturnValueCallback: QuickLaunchCallBackMethod
                                 };
 
-                                SP.UI.ModalDialog.showModalDialog(options);
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                                 return false;
                             });
         }
@@ -57,10 +57,10 @@ function QuikLnchInit() {
 
     window.QuickLaunchCallBackMethod = function (result, value) {
         switch (result) {
-            case 'ok':
-                SP.UI.ModalDialog.RefreshPage(SP.UI.DialogResult.OK);
+            case '1':
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', SP.UI.DialogResult.OK);
                 break;
-            case 'cancel':
+            case '0':
                 break;
         }
     }
@@ -74,7 +74,7 @@ function QuikLnchInit() {
             dialogReturnValueCallback: QuickLaunchCallBackMethod
         };
 
-        SP.UI.ModalDialog.showModalDialog(options);
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         return false;
     }
 

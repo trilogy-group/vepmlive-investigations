@@ -127,7 +127,7 @@ namespace EPMLiveCore
             {
                 BtnDelete.OnClientClick = "AsyncDeleteNode(); return false;";
                 BtnOk.OnClientClick = "AsyncUpdateNode(); return false;";
-                BtnCancel.OnClientClick = "SP.UI.ModalDialog.commonModalDialogClose('cancel', ''); return false;";
+                BtnCancel.OnClientClick = "SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', '0', ''); return false;";
             }
         }
 

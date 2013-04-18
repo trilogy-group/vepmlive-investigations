@@ -12,8 +12,7 @@
 
     <script language="javascript">
         function Close() {
-            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, ''); 
-
+            SP.SOD.execute('SP.UI.dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', SP.UI.DialogResult.cancel, ''); 
         }
     </script>
 

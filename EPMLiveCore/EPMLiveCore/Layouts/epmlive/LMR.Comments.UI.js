@@ -140,7 +140,7 @@ function ajaxPost(command) {
                     if (oJson.Result.Status == "1") {
                         alert(oJson.Result.Error.Text);
                         $('#divLoadingIcon').fadeOut('slow');
-                        SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', SP.UI.DialogResult.OK, '');
                     }
                     else {
                         var commentItemId = oJson.Result.Comments.CommentItem.Comment.itemId;

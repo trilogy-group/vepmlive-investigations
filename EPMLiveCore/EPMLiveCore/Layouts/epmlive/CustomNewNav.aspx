@@ -125,7 +125,7 @@ function DeleteNodeConfirmation()
 
             $.post(webUrl + asyncNavActionsUrl, postData, function (data) {
                 if (data.indexOf('success') != -1) {
-                    SP.UI.ModalDialog.commonModalDialogClose('ok', '');
+                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', '1', '');
                     return false;
                 }
                 else {
