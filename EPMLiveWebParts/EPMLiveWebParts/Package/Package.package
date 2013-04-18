@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="63be2884-bd6d-488f-8262-10956685a873" solutionId="63be2884-bd6d-488f-8262-10956685a873" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveWebParts" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="63be2884-bd6d-488f-8262-10956685a873" solutionId="98e5c373-e1a0-45ce-8124-30c203cd8003" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveWebParts" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <assemblies>
     <customAssembly location="Telerik.Web.UI.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Telerik.Web.UI.dll" />
     <customAssembly location="Telerik.Web.UI.Skins.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Telerik.Web.UI.Skins.dll" />
