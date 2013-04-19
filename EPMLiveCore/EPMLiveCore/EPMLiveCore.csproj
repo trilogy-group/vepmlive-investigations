@@ -13,16 +13,18 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>Munjal%27s Deploy Config</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>
-    </PostDeploymentCommand>
-    <PreDeploymentCommand>
-    </PreDeploymentCommand>
+    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
+
+iisreset
+net stop "WorkEngine Timer"
+net start "WorkEngine Timer"</PostDeploymentCommand>
+    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore</PreDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -273,6 +275,13 @@
     <Compile Include="Jobs\AdSynchJob.cs" />
     <Compile Include="Jobs\Applications\InstallAndConfigure.cs" />
     <Compile Include="Jobs\Applications\Uninstall.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\IUpgradeStep.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeHelper.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeStep.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeUtilities.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\44Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
     <Compile Include="Jobs\Integration.cs" />
     <Compile Include="Jobs\Notifications.cs" />
     <Compile Include="Jobs\ResourceImportJob.cs" />
@@ -755,6 +764,10 @@
     <Compile Include="Layouts\epmlive\notificationsadmin.aspx.designer.cs">
       <DependentUpon>notificationsadmin.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\PerformUpgrade.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\PerformUpgrade.aspx.designer.cs" />
     <Compile Include="Layouts\epmlive\permissions.aspx.cs">
       <DependentUpon>permissions.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -881,6 +894,14 @@
     <Compile Include="Layouts\epmlive\unsealfields.aspx.designer.cs">
       <DependentUpon>unsealfields.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Upgrade.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgrade.aspx.designer.cs" />
+    <Compile Include="Layouts\epmlive\UpgradeResult.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs" />
     <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
       <DependentUpon>proxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3067,6 +3088,7 @@
     <Content Include="Layouts\epmlive\notificationsadmin.aspx" />
     <Content Include="Layouts\epmlive\openprojectplan.aspx" />
     <Content Include="Layouts\epmlive\outlooksynch.aspx" />
+    <Content Include="Layouts\epmlive\PerformUpgrade.aspx" />
     <Content Include="Layouts\epmlive\permissions.aspx" />
     <Content Include="Layouts\epmlive\prjsetng.aspx" />
     <Content Include="Layouts\epmlive\publishersettings.aspx" />
@@ -3344,6 +3366,8 @@
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\TreeN.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\VScroll.gif" />
     <Content Include="Layouts\epmlive\unsealfields.aspx" />
+    <Content Include="Layouts\epmlive\Upgrade.aspx" />
+    <Content Include="Layouts\epmlive\UpgradeResult.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />
@@ -3583,7 +3607,11 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
-del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
