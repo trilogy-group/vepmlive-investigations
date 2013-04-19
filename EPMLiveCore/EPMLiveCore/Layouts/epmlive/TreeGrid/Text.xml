@@ -1,5 +1,5 @@
 <Grid>
-   <Cfg TextVersion="90001"/>
+   <Cfg TextVersion="90205"/>
    <Lang>
       
 <!-- All alert / confirm non HTML texts -->
@@ -47,7 +47,8 @@ V7_1=""
    PrintReady="Grid is ready to print&#x0a;Choose Print Preview option in menu to update page size&#x0a;Or choose Print option or press Ctrl+P to print directly"
    PrintCloseWindow="&#x0a;After print is finished, you can close this page"
    PrintCloseTag="&#x0a;After print is finished, you can click to the grid to return"
-
+V9_2=""
+   PivotReload="Do you want to re-create the pivot grid?"
 	/>
     
     
@@ -193,12 +194,15 @@ V9_0=""
    PrintMarginWidth="Page margin width (mm)"
    PrintMarginHeight="Page margin height (mm)"
    PrintPageSize="Page size"
-   PrintPageSizes="Auto,26000,26000,Letter (8.5x11in),215.9,279.4,Legal (8.5x14in),215.9,355.6,Ledger (11x17in),279.4,431.8,A0 - (841x1189),841,1189,A1 - (841x1189),594,841,A2 - (420x594),420,594,A3 - (297x420),297,420,A4 - (210x297),210,297,A5 - (148x210),148,210,A6 - (105x148),105,148,A7 - (74x105),74,105,A8 - (52x74),52,74,A9 - (37x52),37,52,B0 - (1000x1414),1000,1414,B1 - (707x1000),707,1000,B2 - (500x707),500,707,B3 - (353x500),353,500,B4 - (250x353),250,353,B5 - (176x250),176,250"
+   PrintPageSizes="Auto,26000,26000,Letter (8.5x11in),215.9,279.4,Legal (8.5x14in),215.9,355.6,Ledger (11x17in),279.4,431.8,A0 - (841x1189),841,1189,A1 - (594x841),594,841,A2 - (420x594),420,594,A3 - (297x420),297,420,A4 - (210x297),210,297,A5 - (148x210),148,210,A6 - (105x148),105,148,A7 - (74x105),74,105,A8 - (52x74),52,74,A9 - (37x52),37,52,B0 - (1000x1414),1000,1414,B1 - (707x1000),707,1000,B2 - (500x707),500,707,B3 - (353x500),353,500,B4 - (250x353),250,353,B5 - (176x250),176,250"
    PrintPageOrientation="Page orientation"
    PrintPageOrientations="Portrait,Landscape"
    PrintResults="Print size is %d x %d pages"
    PDFText=""
    PDFTexts="Image only,Selectable text,Embedded fonts"
+V9_2=""
+   ExpandCols="Expanding columns"
+   CollapseCols="Collapsing columns"
  	/>
 
 
@@ -332,6 +336,8 @@ V7_0=""
    MoveChildrenChanged="Value changed due children constraints"
    NewGanttRunStop="Add new stop here"
    GanttCorrectExclude="The object starts or ends on holiday, do you want to correct it?"
+V9_2=""
+   SplitGanttFlow="Split the real flow bar"
    />      
 
 

@@ -2,20 +2,21 @@
    
 	<!-- Basic grid configuration -->
    <Cfg
-      DefaultsVersion="90001"
+      DefaultsVersion="90205"
       
 		AutoVersion="1" SuppressCfg="0" DefaultCfg="3" DefaultCfgMenu="1"
       
 		Editing="1" Adding="1" Deleting="1"	ShowDeleted="1" Copying="1" Selecting="1" SelectingCells="0" DynamicSpan="0"
 		Dragging="1" Dropping="1" ShowDrag="1" DragObject="1" ExpandOnDrag="1" ScrollOnDrag="50" ScrollColOnDrag="100" NoScrollAfterExpand="1"
       ScrollOnButton="20" ScrollOnBody="200" ScrollColOnButton="10" ScrollColOnBody="100" TouchScroll="2"
-      ColResizing="1" ColMoving="1"
+      ColResizing="1" ColMoving="1" SectionResizing="1"
 		Sorting="1"	Sorted="1" AutoSort="0" SortIcons="1" MaxSort="3"
 		Grouping="1" Grouped="1" MaxGroupLength="0" GroupChangeMoved="1" GroupMoveFree="1"
 		Filtering="1" Filtered="1"
 		Searching="1" Searched="1" SearchFocused="3" SearchNotFound="800" SearchExpand="1" SearchMaxMark="3"
 		Calculated="1"
       DetailOn="1" DetailRowsVisible="3"
+      PivotUpdate="3" PivotMaxCols="100"
       CopyPasteTree="0" CopyPasteInternal="0"
       CopySelected="1" CopyFocused="1" CopyCols="1" CopyEdit="1"
       Pasting="1" PasteSelected="1" PasteFocused="8" PasteCols="4" PasteTree="2"
@@ -33,12 +34,12 @@
 		CacheTimeout="10"
       ChangesUpdate="1"
 		ExportCols="2" ExportFormat="1" ExportType="Indent,Expanded" ExportRows="500" CSVValueSeparator=";" CSVRowSeparator="&#x0a;" CSVQuote='"' CSVLevel='#'
-		PrintCols="2" PrintRows="50" PrintFiltered="0" PrintExpanded="0" PrintIcons="1" PrintPrint="1" PrintLocation="0" PrintGanttSplit="1" PrintGanttSplitMin="100" PrintVarHeight="1"
+		PrintCols="2" PrintRows="50" PrintFiltered="0" PrintExpanded="0" PrintIcons="1" PrintPrint="1" PrintLocation="0" PrintGanttSplit="1" PrintGanttSplitMin="100" PrintVarHeight="1" PrintPageRootMin="10"
       PrintPageWidth="643" PrintPageHeight="971" PrintPageSize="8" PrintPageOrientation="0" PrintDPI="96" PrintDefaultDPI="96" PrintMinDPI="96" PrintMarginWidth="40" PrintMarginHeight="40" PrintPaddingWidth="0" PrintPaddingHeight="0"
       ExportPDFCols="2" PDFFitPage="0" PDFText="1"
       ExpandAllLoaded="0" ExpandAllLevels="3"
       
-      AbsoluteCursors="5" BorderCursors="2"
+      AbsoluteCursors="" BorderCursors="2"
       FocusWholeRow="0" TabStop="1"
 		Hover="2"
       ExactSize="1" ConstWidth="4"
@@ -65,6 +66,7 @@
       OnMouseOverContent="ShowHint" OnMouseOverCaption="ShowHint"
       OnMouseOverHeaderLeft="CursorResize" OnMouseOverHeaderRight="CursorResize" OnMouseOverPagerHeaderLeft="CursorResize" OnMouseOverPagerHeaderRight="CursorResize"
       OnMouseOverHScrollLeft="CursorResize" OnMouseOverHScrollRight="CursorResize"
+      OnMouseOverLeftSplitter="CursorResize" OnMouseOverRightSplitter="CursorResize"
       OnMouseOverButton="CursorPointer"
       OnMouseOverPanel="CursorPointer"
       OnMouseOverSide="CursorPointer"
@@ -169,10 +171,13 @@
       OnShiftDragRow="FillCells"
       OnDragHScrollLeft="SectionResize"
       OnDragHScrollRight="SectionResize"
+      OnDragLeftSplitter="SectionResize"
+      OnDragRightSplitter="SectionResize"
 
       OnDragGantt="ResizeGanttMain OR MoveGanttMain OR ResizeGanttFlow OR MoveGanttFlow OR ResizeGanttRun OR MoveGanttRun OR MoveGanttFlag OR MoveGanttPoint OR MoveGanttConstraint OR MoveGanttBase OR MoveGanttFinish OR CreateGanttMain OR CreateGanttFlow OR CreateGanttRun OR DragGanttDependency"
       OnCtrlClickGantt="DeleteGanttConstraint OR DeleteGanttFlag OR DeleteGanttPoint OR DeleteGanttFlow OR DeleteGanttMain OR DeleteGanttDependency OR DeleteGanttBase OR DeleteGanttFinish"
       OnDblClickGantt="EditGanttFlag OR EditGanttResource OR EditGanttText OR EditGanttFlowText OR EditGanttRun OR EditGanttDependencyLag OR NewGanttMilestone OR NewGanttFlowMilestone OR NewGanttRunMilestone OR NewGanttRunStop OR NewGanttFlag OR NewGanttPoint"
+      OnShiftClickGantt="SplitGanttFlow"
       OnCtrlRightClickGantt="SetGanttPercent OR SetGanttFlowPercent OR SetGanttRunPercent" 
       OnShiftRightClickGantt="EditGanttPercent OR EditGanttFlowPercent OR EditGanttRunPercent"
       OnRightClickGantt="GanttMenu,1"
@@ -229,8 +234,8 @@
 		KeyCodes7="Num0=96,Num1=97,Num2=98,Num3=99,Num4=100,Num5=101,Num6=102,Num7=103,Num8=104,Num9=105"
 		KeyCodes8="CapsLock=20,ScrollLock=145,NumLock=144"
       
-		EdgeSize="5" GanttSize="5" DragSize="5" ClickSize="5" GridSize="20"
-      EdgeSizeTouch="20" GanttSizeTouch="1000" DragSizeTouch="5" ClickSizeTouch="20" GridSizeTouch="40"
+		EdgeSize="5" GanttSize="5" DragSize="5" ClickSize="5" GridSize="20" GanttSizeOver="0"
+      EdgeSizeTouch="20" GanttSizeTouch="1000" DragSizeTouch="5" ClickSizeTouch="20" GridSizeTouch="40" GanttSizeOverTouch="0"
       />
    
 	<!-- Default rows and column -->
@@ -298,16 +303,16 @@
       <!-- Default column for type Gantt -->
       <D Name="Gantt" Def="C" MenuName="Gantt chart"
          CanSort="0" CanEdit="0" CanResize="0" CanFilter="0" CanCopyPaste="0" CanGroup="0" CanSearch="0" WidthPad="" ShowHint="0" CanDrag="0"
-         GanttOrder="Chart,Availability,Constraints,Run,Main,Flow,Mark,Dependency,Format,Flags,Points" GanttObject="Main" GanttFormatObject="Last" GanttFlowJoin="1" GanttResizeBeforeMove="2"
+         GanttOrder="Chart,Availability,Constraints,Run,Main,Flow,Mark,Dependency,Format,Flags,Points" GanttObject="Main" GanttFormatObject="Last" GanttFormat="*GanttResources*" GanttFlowJoin="1" GanttResizeBeforeMove="2"
          GanttSize="" GanttWidth="18" GanttUnits="d" GanttLeft="0" GanttRight="0" MaxWidth="10000" GanttRoundUnits="0"
-         GanttDataUnits="d" GanttEndLast="1" GanttResourcesAssign="4" GanttPointsShift="3" GanttAvailabilityFormat="0.##"
+         GanttDataUnits="d" GanttLastUnit="" GanttResourcesAssign="4" GanttPointsShift="3" GanttAvailabilityFormat="0.##"
          GanttHover="1" GanttEdit="All" GanttResizeDelete="1" GanttUseConstraints="2" GanttShowConstraints="1"
          GanttSmoothZoom="1" GanttHideExclude="0" GanttChangeExclude="0" GanttMaxExclude="10000000" GanttBase="" GanttBaseCanEdit="2" GanttFinish="" GanttFinishCanEdit="1"
          GanttCheck="4" GanttCheckTime="1000" GanttCheckExclude="1" GanttStrict="1" GanttBasePreferred="0" GanttFinishPreferred="0" GanttEditStartMove="1" GanttMinSlack="0" GanttErrSlack="0" GanttSeparateSlack="0" GanttShowBounds="1"
-         GanttCheckDependencies="2" GanttCorrectDependencies="2" GanttIncorrectDependencies="1" GanttCorrectDependenciesFixed="0" GanttAllDependencies="2" GanttFixComplete="0"
+         GanttCheckDependencies="2" GanttCorrectDependencies="2" GanttIncorrectDependencies="1" GanttCorrectDependenciesFixed="0" GanttAllDependencies="2" GanttFixComplete="0" GanttMaxCorrectingLoops="40"
          GanttRunResize="Resize" GanttRunMove="Slide" GanttRunAdjust="Shift" GanttRunAdjustStart="Slip" GanttRunAdjustCorrect="Slip" GanttRunError="Sort"
          GanttRunNew="0.0001,Box" GanttRunNewStart="0.0001,Box" GanttRunGroupHover="1" GanttRunStates="1" GanttRunCorrectFixed="0" GanttRunMilestones="1"
-         GanttMenu="DelGanttConstraint,SplitGanttConstraint,ChangeGanttConstraint,DelGanttFlag,EditGanttFlag,ChooseGanttFlagIcon,DelGanttPoint,DelGanttFlowPart,SetGanttFlowPercent,EditGanttFlowPercent,EditGanttFlowText,DelGanttMilestone,SetGanttMilestone,DelGanttMain,SetGanttPercent,EditGanttPercent,EditGanttText,DelGanttRunPart,EditGanttRun,EditGanttRunTip,ChooseGanttRunType,-,DelGanttRunGroup,DelGanttRunGroupAll,ChooseGanttRunGroupType,ChooseGanttRunGroupAllType,-,SetGanttRunMilestone,SetGanttRunPercent,EditGanttRunPercent,EditGanttRunText,-,EditGanttResource,GanttDepLagChange,-,DelGanttDep,DelAllGanttDep,DelGanttMainDep,DelGanttMainBar,DelGanttFlow,DelGanttRun,DelGanttFlags,DelGanttPoints,DelGanttConstraints,DelGanttAll,-,NewGanttFlag,NewGanttPoint,NewGanttConstraint,NewGanttMilestone,NewGanttEndMilestone,NewGanttFlowMilestone,NewGanttFlowEndMilestone,NewGanttRunMilestone,NewGanttRunStop,-,SetGanttBase,DelGanttBase,SetGanttFinish,DelGanttFinish,CorrectRelatedDependencies,CorrectAllDependencies"
+         GanttMenu="DelGanttConstraint,SplitGanttConstraint,ChangeGanttConstraint,DelGanttFlag,EditGanttFlag,ChooseGanttFlagIcon,DelGanttPoint,DelGanttFlowPart,SplitGanttFlow,SetGanttFlowPercent,EditGanttFlowPercent,EditGanttFlowText,DelGanttMilestone,SetGanttMilestone,DelGanttMain,SetGanttPercent,EditGanttPercent,EditGanttText,DelGanttRunPart,EditGanttRun,EditGanttRunTip,ChooseGanttRunType,-,DelGanttRunGroup,DelGanttRunGroupAll,ChooseGanttRunGroupType,ChooseGanttRunGroupAllType,-,SetGanttRunMilestone,SetGanttRunPercent,EditGanttRunPercent,EditGanttRunText,-,EditGanttResource,GanttDepLagChange,-,DelGanttDep,DelAllGanttDep,DelGanttMainDep,DelGanttMainBar,DelGanttFlow,DelGanttRun,DelGanttFlags,DelGanttPoints,DelGanttConstraints,DelGanttAll,-,NewGanttFlag,NewGanttPoint,NewGanttConstraint,NewGanttMilestone,NewGanttEndMilestone,NewGanttFlowMilestone,NewGanttFlowEndMilestone,NewGanttRunMilestone,NewGanttRunStop,-,SetGanttBase,DelGanttBase,SetGanttFinish,DelGanttFinish,CorrectRelatedDependencies,CorrectAllDependencies"
          />
    </DefCols>
 
