@@ -251,7 +251,7 @@ font-size:16px;
                     </p>
 
                     <p class="wizText" style="margin-bottom:5px;"><asp:RadioButton ID="rdoYes" runat="server" Checked="true" GroupName="rdoDone" style="margin-right:3px;" /><span style="margin-bottom:4px;">Yes</span</p>
-                    <p class="wizText" style="margin-bottom:0px;"><asp:RadioButton ID="rdoNo" runat="server" GroupName="rdoDone" style="margin-right:3px;/> No</p>
+                    <p class="wizText" style="margin-bottom:0px;"><asp:RadioButton ID="rdoNo" runat="server" GroupName="rdoDone" style="margin-right:3px;"/> No</p>
                 </td>
             </tr>
             <tr>
