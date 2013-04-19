@@ -188,6 +188,10 @@
             overflow-y: auto; 
             overflow-x: hidden;
         }
+
+        .ms-webpartPage-root {
+            border-spacing: 0 !important;
+        }
     </style>
     
     <div id="EPMLoader" style="display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
