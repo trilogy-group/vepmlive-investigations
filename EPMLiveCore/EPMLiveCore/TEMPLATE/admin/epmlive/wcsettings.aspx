@@ -292,7 +292,7 @@
 		</Template_InputFormControls>
 	</wssuc:InputFormSection>
 	
-	</asp:Panel>
+	
 
 	<wssuc:ButtonSection runat="server">
 		<Template_Buttons>
@@ -302,5 +302,5 @@
 		</Template_Buttons>
 	</wssuc:ButtonSection>
     </table>
-
+    </asp:Panel>
 </asp:Content>
