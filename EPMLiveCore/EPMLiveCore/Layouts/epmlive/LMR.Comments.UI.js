@@ -77,7 +77,7 @@ function ajaxPost(command) {
             setTimeout('SP.UI.Notify.removeNotification(notifyId)', 300);
             $('#commentItem_PlaceHolder').after(loadingHtml);
             $('#postBtn').removeClass('epmliveButton-emphasize');
-            $('#postBtn').addClass('epmliveButton-disabled')
+            $('#postBtn').addClass('epmliveButton-disabled');
             $('#postBtn').attr('disabled', true);
             break;
         case "ReadComment":
@@ -96,10 +96,10 @@ function ajaxPost(command) {
             break;
     }
 
-    var qsItemId = $('#hdnItemId').val();
-    var qsListId = $('#hdnListId').val();
-    var qsCommentItemId = $('#hdnCommentItemId').val();
-    var qsUserId = $('#hdnUserId').val();
+    var qsItemId = $('#' + hdnItemId).val();
+    var qsListId = $('#' + hdnListId).val();
+    var qsCommentItemId = $('#' + hdnCommentItemId).val();
+    var qsUserId = $('#' + hdnUserId).val();
 
     //    var withBRs = $('#brText').html();
     //    var textWithBreaks = withBRs.replace(/\<br\>/gi, '\r');
@@ -113,10 +113,10 @@ function ajaxPost(command) {
     var subDivHeight = $('.commentsContainer').height();
     if (commentDivHeight > 72) {
         var diff = (commentDivHeight - 72);
-        $('.commentsContainer').height(300 - diff);
+        $('.commentsContainer').height(230 - diff);
     }
     else {
-        $('.commentsContainer').height(300);
+        $('.commentsContainer').height(230);
     }
 
     var newContentBoxId = '#socialCommentInputBox_' + qsCommentItemId;
@@ -186,14 +186,14 @@ function ajaxPost(command) {
 
                         var btnPostId = '#btnCommentItemEdit_' + commentItemId;
                         $(btnPostId).click(function () {
-                            $('#hdnCommentItemId').val(commentItemId);
+                            $('#' + hdnCommentItemId).val(commentItemId);
                             EnterEditMode(commentItemId);
                             return false;
                         });
 
                         var btnDeleteId = '#btnCommentItemDelete_' + commentItemId;
                         $(btnDeleteId).click(function () {
-                            $('#hdnCommentItemId').val(commentItemId);
+                            $('#' + hdnCommentItemId).val(commentItemId);
                             ajaxPost('DeleteComment');
                             return false;
                         });
@@ -208,7 +208,7 @@ function ajaxPost(command) {
                         alert("Error");
                     }
                     else {
-                        var commentItemId2 = '#commentItem_' + $('#hdnCommentItemId').val();
+                        var commentItemId2 = '#commentItem_' + $('#' + hdnCommentItemId).val();
                         $(commentItemId2).remove();
                     }
                     break;
@@ -217,10 +217,10 @@ function ajaxPost(command) {
                         alert("Error");
                     }
                     else {
-                        var divOrigCommentId = '#commentItem_' + $('#hdnCommentItemId').val();
+                        var divOrigCommentId = '#commentItem_' + $('#' + hdnCommentItemId).val();
                         $(divOrigCommentId).css('display', '');
-                        $(divOrigCommentId).find('#divComment_' + $('#hdnCommentItemId').val()).html(qsNewComment);
-                        var divCommentId = '#divCommentEdit_' + $('#hdnCommentItemId').val();
+                        $(divOrigCommentId).find('#divComment_' + $('#' + hdnCommentItemId).val()).html(qsNewComment);
+                        var divCommentId = '#divCommentEdit_' + $('#' + hdnCommentItemId).val();
                         $(divCommentId).remove();
                     }
                     break

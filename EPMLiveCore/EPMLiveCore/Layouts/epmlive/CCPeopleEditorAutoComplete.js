@@ -315,7 +315,7 @@ function Init() {
                                 var tempHtml = $(this).html();
                                 var loadingDiv = "<img id=\"imgLoading\" src=\"/_layouts/epmlive/images/LoadingBar.gif\" style=\"vertical-align: middle;float:left;margin-left:5px;margin-top: 2px;\" /><div id=\"divSavingUser\" style=\"float:left;margin-left:5px;color:gray;\">Loading...</div> ";
                                 $(this).html(loadingDiv);
-                                var postData = { users: newUsers, listid: listId, itemid: itemId, weburl: curWebUrl };
+                                var postData = { users: newUsers, listid: hdnListId, itemid: hdnItemId, weburl: curWebUrl };
                                 $.post(window.curWebURL + "/_layouts/epmlive/commentersupdate.aspx", postData, function (data) {
                                     if (data.trim() == 'success') {
 

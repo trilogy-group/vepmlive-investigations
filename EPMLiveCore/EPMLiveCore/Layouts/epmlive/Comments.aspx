@@ -1,24 +1,23 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
-<%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls"
-    Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
-<%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages"
-    Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="epm" TagName="EPMLiveJS" Src="~/_controltemplates/EPMLiveJS.ascx" %>
 <%@ Register TagPrefix="epm" Namespace="EPMLiveCore" Assembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Comments.aspx.cs" Inherits="EPMLiveCore.Comments" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Comments.aspx.cs" Inherits="EPMLiveCore.Comments" DynamicMasterPageFile="~masterurl/default.master"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html id="Html1" dir="<%$Resources:wss, multipages_direction_dir_value%>" runat="server">
-<head>
-    <title>Comments for Item: "<%=_itemTitle %>" on List:
-        <%=_listTitle %></title>
-    <meta http-equiv="Content-Style-Type" content="text/css">
+<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+
+</asp:Content>
+
+<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+    <%--STYLE LINKS--%>
+    <link href="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/SocialData.css" rel="Stylesheet" type="text/css" />
+    <link href="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/Comments.UI.css" rel="Stylesheet" type="text/css" />
     <style type="text/css">
         <!--
         html,body{
@@ -121,14 +120,10 @@
         }
 
     </style>
-    <SharePoint:ScriptLink ID="ScriptLink1" Localizable="true" Name="init.js" runat="server"
-        Defer="false" />
-    <SharePoint:ScriptLink ID="ScriptLink2" Localizable="true" Name="core.js" runat="server"
-        Defer="false" />
-    <link href="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/SocialData.css" rel="Stylesheet"
-        type="text/css" />
-    <link href="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/Comments.UI.css" rel="Stylesheet"
-        type="text/css" />
+    <%--SCRIPT LINKS--%>
+    <epm:epmlivejs id="EPMLiveJS1" runat="server"></epm:epmlivejs>
+    <script type="text/javascript" src="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/jQueryLibrary/jquery-1.5.2.js"></script>
+    <script type="text/javascript" src="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/LMR.Comments.UI.js"></script>
     <script type="text/javascript">
         var curWebUrl = "<%=_webUrl %>";
         var userPictureUrl = "<%=_userPictureUrl %>";
@@ -138,13 +133,17 @@
         var notifyId = ' ';
         var userHasPerm = "<%=_hasPerm %>";
         var itemTitle = "<%=_itemTitle %>";
-        var listId = "<%=_listId %>";
-        var itemId = "<%=_itemId %>";
         var authorid = "<%=_authorId %>";
         var assigneeids = "<%=_assigneeIds %>";
 
+        var hdnItemId = "<%=hdnItemId.ClientID %>";
+        var hdnCommentItemId = "<%=hdnCommentItemId.ClientID %>";
+        var hdnListId = "<%=hdnListId.ClientID %>";
+        var hdnUserId = "<%=hdnUserId.ClientID %>";
+       
+
         $(function () {
-            
+
             $("#tbCommentInput").bind('paste', function () {
                 var value = $(this).text();
                 if (value.length > 0) {
@@ -182,29 +181,11 @@
 
             });
 
-          
+
 
         });
     </script>
-    <script type="text/javascript" src="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/jQueryLibrary/jquery-1.5.2.js"></script>
-    <script type="text/javascript" src="<%= SPContext.Current.Web.Url %>/_layouts/EPMLive/LMR.Comments.UI.js"></script>
-</head>
-<body style="margin: 0px; width: 100%;" onload="javascript:if (typeof(_spBodyOnLoadWrapper) != 'undefined') _spBodyOnLoadWrapper();">
-    <form id="Form1" runat="server" style="100%">
-    <SharePoint:FormDigest ID="FormDigest1" runat="server" />
-    <script type="text/jscript">
-        function ULS0CX() { var o = new Object; o.ULSTeamName = "SharePoint Portal Server"; o.ULSFileName = "Comments.aspx"; return o; }
-
-        function DisableOnEditableRegionFocus() {
-            ULS0CX: ;
-            RTE.CanvasEvents.onEditableRegionFocus = function (sender, args) { };
-        }
-        ExecuteOrDelayUntilScriptLoaded(DisableOnEditableRegionFocus, "sp.ui.rte.js");
-
-        
-    </script>
-    <SharePoint:CssLink ID="CssLink1" runat="server" />
-    <epm:epmlivejs id="EPMLiveJS1" runat="server"></epm:epmlivejs>
+    
     <div id="notificationArea" class="s4-noti">
     </div>
     <div class="newCommentInputBox" style="margin-bottom: 10px">
@@ -225,7 +206,7 @@
                         <span>CC:</span>
                     </td>
                     <td>
-                        <epm:commentccpeopleeditor runat="server" id="CCPeopleEditor" />
+                        <epm:CommentCCPeopleEditor ID="CCPeopleEditor" runat="server" />
                     </td>
                 </tr>
                 <tr>
@@ -238,7 +219,7 @@
                 <tr>
                     <td style="vertical-align: top; height: 25px; padding: 0px 8px 0px 8px;" colspan="2">
                         <div style="width: 100%; padding" class="ms-socialCommentLoading">
-                            <input id="postBtn" class="epmliveButton epmliveButton-disabled" style="margin-top: 5px;" title="Post" onclick="javaScript:if ($('#tbCommentInput').text().length > 0){ajaxPost('CreateComment');};"
+                            <input id="postBtn" class="epmliveButton epmliveButton-disabled" style="margin-top: 5px;" title="Post" onclick="javaScript: if ($('#tbCommentInput').text().length > 0) { ajaxPost('CreateComment'); };"
                                 value="Post" type="button" />
                         </div>
                     </td>
@@ -312,8 +293,7 @@
             </tbody>
         </table>
     </div>
-    <div style="clear: both; width: 100%">
-    </div>
+    <div style="clear: both; width: 100%"></div>
     <div>
         <asp:Panel CssClass="commentsContainer" ID="pnlCommentsContainer" runat="server">
         </asp:Panel>
@@ -322,6 +302,16 @@
     <input type="hidden" id="hdnListId" runat="server" value="" />
     <input type="hidden" id="hdnCommentItemId" runat="server" value="" />
     <input type="hidden" id="hdnUserId" runat="server" value="" />
-    </form>
-</body>
-</html>
+</asp:Content>
+
+<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+    Comments for Item: "<%=_itemTitle %>" on List: <%=_listTitle %>
+</asp:Content>
+
+<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
+
+</asp:Content>
+
+
+   
+    

@@ -4,21 +4,18 @@
 	<Cfg MainCol='Title' NameCol='Title' />
 	<Cfg ConstWidth='0' />
 	<Cfg Undo='0' />
-	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' />
 	<Cfg Searching='0' Selecting="1" Deleting='0' />
-	<Cfg StaticCursor='1' Dragging='0' SelectClass='0' SelectingCells="1"/>
-	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MaxRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2' />
+	<Cfg StaticCursor='1' Dragging='0' />
+	<Cfg NoTreeLines='1' />
 	<Cfg Editing='0' />
 	<Cfg NoVScroll='1' />
 	<Def>
 		<D Name='C' Width='320' />
-		<D Name="R" Wrap="0" ShowHint="0"  Height="30" />
-		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Background" />
-		<D Name="R" Class="ChildRow" />
-		<D Name="Group" HoverCell="" HoverRow="" FocusCell="" FocusRow="" />
+		<D Name="R" Height="30" />
+		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="Background" FocusRow="Background" />
 	</Def>
 	<Toolbar Visible='0' />
-	<Panel Delete='0' Visible='0' CanHide='0' HoverCell='Color' HoverRow='Color' />
+	<Panel Visible='0' />
 	<Header Visible='0' />
 	<Head>
 		<Filter Visible='0' CanEdit='1' HoverRow='' HoverCell='' FocusRow='' FocusCell='' />

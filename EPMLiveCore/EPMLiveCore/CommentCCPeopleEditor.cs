@@ -26,34 +26,34 @@ namespace EPMLiveCore
             base.OnLoad(e);
         }
 
-        public override Microsoft.SharePoint.WebControls.PickerEntity ValidateEntity(Microsoft.SharePoint.WebControls.PickerEntity entity)
-        {
-            try
-            {
-                if (SPContext.Current.List == null || SPContext.Current.List.Title != "Resources")
-                {
-                    this.ValidateResolvedEntity = false;
-                    entity = base.ValidateEntity(entity);
+        //public override Microsoft.SharePoint.WebControls.PickerEntity ValidateEntity(Microsoft.SharePoint.WebControls.PickerEntity entity)
+        //{
+        //    try
+        //    {
+        //        if (SPContext.Current.List == null || SPContext.Current.List.Title != "Resources")
+        //        {
+        //            this.ValidateResolvedEntity = false;
+        //            entity = base.ValidateEntity(entity);
 
-                    XmlDocument docTeam = new XmlDocument();
-                    docTeam.LoadXml(WorkEngineAPI.GetTeam("<Filter Column='SharePointAccount' Value='" + entity.DisplayText + "'/>", SPContext.Current.Web));
-                    if (docTeam.FirstChild.SelectSingleNode("//Team/Member") == null)
-                        entity.IsResolved = false;
-                    else
-                    {
-                        if (docTeam.FirstChild.SelectSingleNode("//Team/Member").Attributes["Username"].Value.ToLower() != entity.EntityData["AccountName"].ToString().ToLower())
-                        {
-                            entity.IsResolved = false;
-                        }
-                    }
-                }
-                else
-                    entity = base.ValidateEntity(entity);
+        //            XmlDocument docTeam = new XmlDocument();
+        //            docTeam.LoadXml(WorkEngineAPI.GetTeam("<Filter Column='SharePointAccount' Value='" + entity.DisplayText + "'/>", SPContext.Current.Web));
+        //            if (docTeam.FirstChild.SelectSingleNode("//Team/Member") == null)
+        //                entity.IsResolved = false;
+        //            else
+        //            {
+        //                if (docTeam.FirstChild.SelectSingleNode("//Team/Member").Attributes["Username"].Value.ToLower() != entity.EntityData["AccountName"].ToString().ToLower())
+        //                {
+        //                    entity.IsResolved = false;
+        //                }
+        //            }
+        //        }
+        //        else
+        //            entity = base.ValidateEntity(entity);
 
-            }
-            catch { }
-            return entity;
-        }
+        //    }
+        //    catch { }
+        //    return entity;
+        //}
 
 
         protected override void OnPreRender(EventArgs e)
@@ -108,6 +108,7 @@ namespace EPMLiveCore
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
+            this.AugmentEntitiesFromUserInfo = true;
         }
     }
 }

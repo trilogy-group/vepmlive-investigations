@@ -43,6 +43,14 @@ namespace EPMLiveCore.API
                         aIsParent.Value = "1";
                         ndNewList.Attributes.Append(aIsParent);
 
+                        //XmlAttribute aBackground = docOut.CreateAttribute("Background");
+                        //aBackground.Value = "#FFF";
+                        //ndNewList.Attributes.Append(aBackground);
+
+                        XmlAttribute aNoColor = docOut.CreateAttribute("NoColor");
+                        aNoColor.Value = "2";
+                        ndNewList.Attributes.Append(aNoColor);
+
                         XmlAttribute aCanSelect = docOut.CreateAttribute("CanSelect");
                         aCanSelect.Value = "0";
                         ndNewList.Attributes.Append(aCanSelect);

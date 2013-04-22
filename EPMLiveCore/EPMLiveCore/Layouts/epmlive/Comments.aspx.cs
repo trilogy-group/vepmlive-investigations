@@ -15,9 +15,7 @@ using EPMLiveCore.API;
 namespace EPMLiveCore
 {
     public partial class Comments : LayoutsPageBase
-    {
-        public Guid _ListId;
-        public int _ItemId;
+    {   
         protected string _hasPerm;
         protected string _webUrl;
         protected string _userProfileUrl;
@@ -62,8 +60,8 @@ namespace EPMLiveCore
                 {
                     using (SPWeb ew = es.OpenWeb())
                     {
-                        SPList l = ew.Lists.GetList(_ListId, true, true, true);
-                        SPListItem i = l.GetItemById(_ItemId);
+                        SPList l = ew.Lists.GetList(new Guid(_listId), true, true, true);
+                        SPListItem i = l.GetItemById(int.Parse(_itemId));
                         string raw = string.Empty;
                         try
                         {
@@ -121,7 +119,8 @@ namespace EPMLiveCore
             });
 
             //(this.Page.FindControl(_wpeId) as WEPeopleEditor).CommaSeparatedAccounts = users;
-            CCPeopleEditor.CommaSeparatedAccounts = users;
+            //CCPeopleEditor.CommaSeparatedAccounts = users;
+            
         }
 
         private void SetTOPeople()
@@ -135,8 +134,8 @@ namespace EPMLiveCore
                 {
                     using (SPWeb ew = es.OpenWeb())
                     {
-                        SPList l = ew.Lists.GetList(_ListId, true, true, true);
-                        SPListItem i = l.GetItemById(_ItemId);
+                        SPList l = ew.Lists.GetList(new Guid(_listId), true, true, true);
+                        SPListItem i = l.GetItemById(int.Parse(_itemId));
                         SPFieldLookupValue author = null;
                         try
                         {
@@ -249,22 +248,22 @@ namespace EPMLiveCore
 
             if (!string.IsNullOrEmpty(Request.Params["listId"]))
             {
-                _ListId = new Guid(Request.Params["listId"]);
-                hdnListId.Value = _ListId.ToString("D");
                 _listId = Request.Params["listId"];
+                hdnListId.Value = _listId;
             }
 
             if (!string.IsNullOrEmpty(Request.Params["itemid"]))
-            {
-                _ItemId = Convert.ToInt32(Request.Params["itemid"]);
-                hdnItemId.Value = _ItemId.ToString();
+            {   
                 _itemId = Request.Params["itemid"];
+                hdnItemId.Value = _itemId.ToString();
+                hdnCommentItemId.Value = _itemId.ToString();
+                
             }
 
             if (!string.IsNullOrEmpty(Request.Params["listId"]))
             {
-                SPList list = currentWeb.Lists[_ListId];
-                SPListItem item = list.GetItemById(_ItemId);
+                SPList list = currentWeb.Lists[new Guid(_listId)];
+                SPListItem item = list.GetItemById(int.Parse(_itemId));
                 _listTitle = SPHttpUtility.HtmlEncode(list.Title);
                 _itemTitle = (item[item.Fields.GetFieldByInternalName("Title").Id] != null) ? SPHttpUtility.HtmlEncode(item[item.Fields.GetFieldByInternalName("Title").Id].ToString()) : string.Empty;
             }
@@ -385,7 +384,7 @@ namespace EPMLiveCore
                     using (SPWeb tempWeb = tempSite.OpenWeb())
                     {
                         tempWeb.AllowUnsafeUpdates = true;
-                        SPList originList = tempWeb.Lists[_ListId];
+                        SPList originList = tempWeb.Lists[new Guid(_listId)];
                         // add commenters field
                         SPField fldCommenters = null;
                         try
@@ -442,7 +441,7 @@ namespace EPMLiveCore
 
                         if (originList != null)
                         {
-                            originListItem = originList.GetItemById(_ItemId);
+                            originListItem = originList.GetItemById(int.Parse(_itemId));
                         }
 
                         if (originListItem != null)
@@ -523,8 +522,8 @@ namespace EPMLiveCore
             // notice the display none css property
             pnlCommentsContainer.Controls.Add(new LiteralControl("<div style=\"float:left;width:100%\"> <table class=\"ms-socialCommentItem\" style=\" display: none;\" id=\"commentItem_PlaceHolder\"></table></div>"));
             SPQuery q = new SPQuery();
-            //q.Query = "<Where><And><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + _ListId.ToString("D") + "</Value></Eq><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">" + _ItemId + "</Value></Eq></And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
-            q.Query = "<Where><And><Or><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + _ListId.ToString("D") + "</Value></Eq><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + _ListId.ToString("B") + "</Value></Eq></Or><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">" + _ItemId + "</Value></Eq></And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy></Query>";
+            //q.Query = "<Where><And><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + _listId.ToString("D") + "</Value></Eq><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">" + _itemId + "</Value></Eq></And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
+            q.Query = "<Where><And><Or><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + new Guid(_listId).ToString("D") + "</Value></Eq><Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + new Guid(_listId).ToString("B") + "</Value></Eq></Or><Eq><FieldRef Name=\"ItemId\" /><Value Type=\"Text\">" + _itemId + "</Value></Eq></And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy></Query>";
             
             if (commentsList != null)
             {
