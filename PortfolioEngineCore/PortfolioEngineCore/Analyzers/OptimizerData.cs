@@ -660,7 +660,7 @@ namespace PortfolioEngineCore
             int i = 0;
             m_stages = new Dictionary<int, string>();
 
-            sCommand = "SELECT SELECT  ADM_CURRENCY_DIGITS, ADM_CURRENCY_POSITION, ADM_CURRENCY_SYMBOL FROM  EPG_ADMIN";
+            sCommand = "SELECT ADM_CURRENCY_DIGITS, ADM_CURRENCY_POSITION, ADM_CURRENCY_SYMBOL FROM  EPG_ADMIN";
 
             oCommand = new SqlCommand(sCommand, oDataAccess);
             reader = oCommand.ExecuteReader();
