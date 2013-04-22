@@ -3540,7 +3540,8 @@ else if (@SelectMode = 1)
   From EPGC_FIELD_ATTRIBS 
   Where FA_TABLE_ID in (201,202,203,205) And (FA_FIELD_ID In (Select BUDGET_TOTAL_FIELD from EPGP_BREAKDOWN_COST_TYPES)
    or FA_FIELD_ID In (Select DISTINCT CL_RESULT from EPGP_CALCS) 
-   or FA_FIELD_ID In (Select ADM_PROJ_RES_HOURS_CFID from EPG_ADMIN))
+   or FA_FIELD_ID In (Select ADM_PROJ_RES_HOURS_CFID from EPG_ADMIN)
+   or (FA_NAME=''OptimizerFlag'' and FA_FORMAT=13))
   ORDER BY FIELD_NAME
 else if (@SelectMode = 2)
  SELECT FIELD_ID,FIELD_NAME,FIELD_FORMAT 
@@ -3551,6 +3552,8 @@ else if (@SelectMode = 2)
   From EPGC_FIELD_ATTRIBS 
   Where FA_TABLE_ID in (201,202,203,205) 
      And (FA_FIELD_ID NOT In (Select BUDGET_TOTAL_FIELD from EPGP_BREAKDOWN_COST_TYPES) and FA_FIELD_ID NOT In (Select DISTINCT CL_RESULT from EPGP_CALCS))
+     And FA_FIELD_ID Not In (Select ADM_PROJ_RES_HOURS_CFID from EPG_ADMIN)
+     And Not (FA_NAME =''OptimizerFlag'' and FA_FORMAT=13) 
      And FA_FORMAT <> 4
   ORDER BY FIELD_NAME
 else if (@SelectMode = 3)
