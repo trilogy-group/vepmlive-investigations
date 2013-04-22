@@ -453,20 +453,6 @@
     <Compile Include="Layouts\ppm\prioritize.aspx.designer.cs">
       <DependentUpon>prioritize.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\ppm\Pri_ComponentsForm.aspx.cs">
-      <DependentUpon>Pri_ComponentsForm.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\ppm\Pri_ComponentsForm.aspx.designer.cs">
-      <DependentUpon>Pri_ComponentsForm.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\ppm\Pri_FormulasForm.aspx.cs">
-      <DependentUpon>Pri_FormulasForm.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\ppm\Pri_FormulasForm.aspx.designer.cs">
-      <DependentUpon>Pri_FormulasForm.aspx.cs</DependentUpon>
-    </Compile>
     <Compile Include="Layouts\ppm\QueueManager.ashx.cs">
       <DependentUpon>QueueManager.ashx</DependentUpon>
     </Compile>
@@ -1074,8 +1060,6 @@
     <Content Include="Layouts\ppm\PostCostValues_NAX.aspx" />
     <Content Include="Layouts\ppm\Prioritization.aspx" />
     <Content Include="Layouts\ppm\prioritize.aspx" />
-    <Content Include="Layouts\ppm\Pri_ComponentsForm.aspx" />
-    <Content Include="Layouts\ppm\Pri_FormulasForm.aspx" />
     <Content Include="Layouts\ppm\Queuemanager.aspx" />
     <Content Include="Layouts\ppm\Queuemanager_NAX.aspx" />
     <Content Include="Layouts\ppm\Ratelist.aspx" />

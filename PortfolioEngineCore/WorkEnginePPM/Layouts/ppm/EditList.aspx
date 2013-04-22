@@ -124,6 +124,9 @@
                                     <td><input type="checkbox" name="nonactivexs" value="costanalyzer" <%if(arrNonActiveXs.Contains("costanalyzer")){%>checked<%}%>/> Non Active-X</td>
                                 </tr>
                                 <tr>
+                                    <td><input type="checkbox" name="ribbons" value="costanalyzerv2" <%if(arrMenus.Contains("costanalyzerv2")){%>checked<%}%>/> Cost Analyzer V2</td>
+                                </tr>
+                                <tr>
                                     <td><input type="checkbox" name="ribbons" value="modeler"  <%if(arrMenus.Contains("modeler")){%>checked<%}%>/> Modeler</td>
                                     <td><input type="checkbox" name="nonactivexs" value="modeler" <%if(arrNonActiveXs.Contains("modeler")){%>checked<%}%>/> Non Active-X</td>
                                 </tr>
