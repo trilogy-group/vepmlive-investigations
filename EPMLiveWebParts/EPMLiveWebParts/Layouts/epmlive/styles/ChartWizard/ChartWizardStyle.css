@@ -27,7 +27,7 @@
 
 .selectButton
 {
-    min-width: 6em;
+    min-width: 45px;
     padding-bottom: 3px;
     border: 1px solid #ABABAB;
     background-color: #FDFDFD;
@@ -40,7 +40,7 @@
 
 .wizardButton
 {
-    min-width: 6em;
+    min-width: 45px;
     padding: 7px 10px;
     border: 1px solid #ABABAB;
     background-color: #FDFDFD;
@@ -150,6 +150,7 @@
 {
     font-family: "Segoe UI Light" , "Segoe UI" ,Segoe,Tahoma,Helvetica,Arial,sans-serif;
     font-size: 24px;
+    font-weight: 300;
     color: #444444;
     margin-bottom: 15px;
     height: 30px;
@@ -212,7 +213,7 @@
 
 .epmliveButton
 {
-    min-width: 6em;
+    min-width: 45px;
     padding: 7px 10px;
     border: 1px solid #ABABAB;
     background-color: #FDFDFD;
@@ -264,12 +265,12 @@
     border-color: #E1E1E1;
     color: #B1B1B1;
     cursor: default;
-    min-width: 6em;
+    min-width: 45px;
     padding: 7px 10px;
     border: 1px solid #ABABAB;
     margin-left: 10px;
     font-family: "Segoe UI" , "Segoe" ,Tahoma,Helvetica,Arial,sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     border-color: #E1E1E1;
 }
 
@@ -282,4 +283,10 @@
 .floatLeft
 {
     float:left;
+}
+
+.chartWizardTxt
+{
+    font-family: "Segoe UI Light" , "Segoe UI" , Segoe, Tahoma, Helvetica, Arial, sans-serif;
+    font-size: 14px;
 }

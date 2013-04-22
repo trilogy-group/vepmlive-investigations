@@ -48,7 +48,7 @@
                                 <asp:TextBox ID="tbSelectedListAndView" runat="server" style="height:24px;width:100%;padding-top:5px;padding-left:5px;padding-right:5px;" Enabled="false"></asp:TextBox>
                             </div>
                             <div style="float:right;width:12%">
-                                <input id="Button1" type="button" class="epmliveButton" style="height:35px;min-width:0px !important;width:100%;"
+                                <input id="Button1" type="button" class="epmliveButton" style="height:35px;min-width:0px !important;width:100%;margin-left: 0px !important;"
                                     onclick="OpenDataSourceGrid(); return false;" value="..." />
                             </div>
                         </div>
@@ -339,7 +339,7 @@
                 <div style="clear: both">
                 </div>
                 <%--pagination control section--%>
-                <div id="divButtons" style="text-align: right;margin-top:15px; padding-right:10px;">
+                <div id="divButtons" style="text-align: right;margin-top:15px;">
                     <input id="btnBack" type="button" class="epmliveButtonDisabled" style="margin-left: 0px;"
                         onclick="Back(); return false;" value="&larr; Back" />
                     <%-- <a href="#" id="btnBack" class="epmliveButton" style="width: 100px; height: 50px; margin-left: 0px; display:none;" onclick="Previous();return false;">

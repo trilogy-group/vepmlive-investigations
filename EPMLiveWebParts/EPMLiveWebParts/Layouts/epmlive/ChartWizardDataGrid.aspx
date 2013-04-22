@@ -27,16 +27,15 @@
     <div style="overflow:hidden;width:335px;height:470px;" >
         <div id="dataGrid" >
             <div id="ListsAndViewsGrid" style="display:none;overflow:hidden;">
-                <script type="text/javascript">
-                    var loadListsAndViewsGrid = function () {
-                        $(function () {
-                            var grid = window.TreeGrid('<treegrid Data_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Data_Timeout="0" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Function="GetListsAndViewsGridData" Data_Param_Dataxml="<%= DataXml %>" Layout_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Layout_Timeout="0" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Function="GetListAndViewsGridLayout" Layout_Param_Dataxml="<%= LayoutXml %>" SuppressMessage="3" ></treegrid>', 'ListsAndViewsGrid');
+                 <script type="text/javascript">
+                     var loadListsAndViewsGrid = function () {
+                         $(function () {
+                             var grid = window.TreeGrid('<treegrid Data_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Data_Timeout="0" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Function="GetListsAndViewsGridData" Data_Param_Dataxml="<%= DataXml %>" Layout_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Layout_Timeout="0" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Function="GetListAndViewsGridLayout" Layout_Param_Dataxml="<%= LayoutXml %>" SuppressMessage="3" Debug="" ></treegrid>', 'ListsAndViewsGrid');
                         });
                     };
                     ExecuteOrDelayUntilScriptLoaded(loadListsAndViewsGrid, 'EPMLive.js');
 
                     Grids.OnRenderFinish = function (grid) {
-
                         $.getScript('/_layouts/epmlive/javascripts/libraries/slimScroll.js', function () {
                             $('#dataGrid').slimScroll({ height: '415px', width: '330px', size: '10px' });
                         }, true);
@@ -44,19 +43,15 @@
                         $('#ListsAndViewsGrid').css('display', '');
                         $('#divButtons').css('display', '');
                         $('#divLoading').css('display', 'none');
-
-
                     }
 
                     Grids.OnClick = function (grid, row, col, x, y, evt) {
                         grid.ActionClearSelection();
                         var status = grid.SelectRow(row, !row.Selected);
-
                         if (row.Expanded == 1) {
                             grid.Collapse(row);
                         }
                         else {
-                            //grid.CollapseAll();
                             grid.Expand(row);
                         }
                     }

@@ -58,7 +58,7 @@
 .GSHeaderDrag,.GSHeaderGroup,.GSCellUser,.GSCellEmpty,.GSCellHeaderEmpty { 
 	/*border-top:0px solid #ffffff; border-bottom:1px solid #B1B5BA; border-left:0px solid #ffffff; border-right:1px solid #B1B5BA; EPM */
 	border-top:0px solid #ffffff; border-bottom:none; border-left:0px solid #ffffff; border-right:none;
-	vertical-align:top; white-space:nowrap; overflow:hidden; overflow:auto!IE; height:auto; background-color: white !important;
+	vertical-align:top; white-space:nowrap; overflow:hidden; overflow:auto!IE; height:auto;
 	}
 .GSCellHeaderPanel { padding-top:2px; }
 
