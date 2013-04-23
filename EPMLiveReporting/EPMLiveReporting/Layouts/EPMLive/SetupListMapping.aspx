@@ -33,14 +33,14 @@
             var w = document.getElementById(x);
             var z = document.getElementById(y);
 
-            var chkAllTable = z.childNodes[0];
-            var fieldTable = w.childNodes[0];
-            var allChecked = fieldTable.childNodes[0].childNodes[0].childNodes[0].checked;
+            var chkAllTable = z.childNodes[1];
+            var fieldTable = w.childNodes[1];
+            var allChecked = fieldTable.childNodes[0].childNodes[1].childNodes[0].checked;
 
-            for (var i = 0; i < chkAllTable.childNodes.length; i++) 
+            for (var i = 0; i < chkAllTable.childNodes.length - 1; i++) 
             {
-                var currentTd = chkAllTable.childNodes[i].childNodes[0];
-                var listControl = currentTd.childNodes[0];
+                
+                var listControl = chkAllTable.childNodes[i].childNodes[1].childNodes[0].childNodes[0];
                 
                 if (allChecked == true) 
                 {
@@ -54,12 +54,12 @@
 
             if (allChecked == false) 
             {
-                fieldTable.childNodes[0].childNodes[1].childNodes[0].innerHTML = "Check All";
+                fieldTable.childNodes[0].childNodes[2].childNodes[0].innerText = "Check All";
             }
 
             if (allChecked == true) 
             {
-                fieldTable.childNodes[0].childNodes[1].childNodes[0].innerHTML = "Uncheck All";
+                fieldTable.childNodes[0].childNodes[2].childNodes[0].innerHTML = "Uncheck All";
             }
 
 
