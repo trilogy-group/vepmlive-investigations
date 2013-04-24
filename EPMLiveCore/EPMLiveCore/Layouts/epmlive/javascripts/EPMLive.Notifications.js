@@ -435,11 +435,8 @@
                 $(notificationCounterScreen).hide();
 
                 notificationCounterScreen.css("background", "#fff");
-                notificationCounterScreen.height(topBarHeight);
-                notificationCounterScreen.width(topBarHeight);
 
                 notificationCounterScreen.css("top", 0);
-                notificationCounterScreen.css("left", -32);
                 $(notificationCounterScreen).fadeTo(1, 0);
 
                 notificationCounterScreen.hover(

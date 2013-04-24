@@ -28,15 +28,7 @@ namespace EPMLiveCore
                     <span id=""EPMLiveNotificationCount"" data-bind=""text: epmLiveNotifications.totalNewNotifications()"">&nbsp;</span>
                 </div>");
 
-            writer.Write(@"<div id=""EPMLiveNotificationCounterScreen"" class=""ms-qatbutton"" style=""height: 44px; width: 44px; top: -12px; left: -40px;"">&nbsp;</div>");
-
-            writer.Write(@"
-                <script type=""text/javascript""> 
-                    function setNotificationRibbonHeight() {
-                        $('#RibbonContainer-TabRowRight').height($('.ms-cui-topBar2').height()); 
-                    }
-                    ExecuteOrDelayUntilScriptLoaded(setNotificationRibbonHeight, 'jquery.min.js'); 
-                </script>");
+            writer.Write(@"<div id=""EPMLiveNotificationCounterScreen"" class=""ms-qatbutton"" style=""height: 27px; width: 30px; top: -12px; left: -28px;"">&nbsp;</div>");
         }
 
         #endregion Methods 
