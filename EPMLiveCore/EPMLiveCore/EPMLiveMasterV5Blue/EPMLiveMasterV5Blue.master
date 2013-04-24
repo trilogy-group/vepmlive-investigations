@@ -45,6 +45,25 @@
         <style type="text/css">
             .ms-breadcrumb-top { display: none; }
             #searchInputBox {  margin-bottom: 3px !important;  }
+            .ms-menubuttonactivehover{
+                border:1px solid #E6F2FB;
+                background-color:#E6F2FB;
+                margin-top:0px !important;
+                padding-top:5px !important;
+                margin-bottom:0px !important;
+                padding-bottom:1px !important;
+
+            }
+            .ms-buttonactivehover{
+                border:1px solid #E6F2FB;
+                background-color:#E6F2FB;
+            }
+            .ms-core-menu-buttonIcon
+            {
+                padding:0px;
+                margin:0px;
+            }
+
         </style>
         <script type="text/javascript">
             function Openlink(link) {
@@ -780,6 +799,7 @@
         </script>
         <script type="text/javascript">
             $('#ms-help').hide();
+            $('#fA0Main').find('img').css("margin-top", "-8px");
         </script>
     </body>
 </SharePoint:SPHtmlTag>
