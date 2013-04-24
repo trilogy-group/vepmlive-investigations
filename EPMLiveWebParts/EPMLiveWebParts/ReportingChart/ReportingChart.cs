@@ -975,6 +975,11 @@ namespace EPMLiveWebParts.ReportingChart
             SPWeb w = SPContext.Current.Web;
             SPList l = w.Lists.TryGetList(PropChartSelectedListTitle);
             sQuery = ReportingData.GetReportQuery(w, l, l.Views[PropChartSelectedViewTitle].Query, out sOrderBy);
+            // check if list actually exists in reporting db
+            if (!string.IsNullOrEmpty(sOrderBy) && !ColExistsInListReportingDB(sOrderBy, l.Title))
+            {
+                sOrderBy = string.Empty;
+            }
             tbListData = ReportingData.GetReportingData(w, l.Title, false, sQuery, sOrderBy);
 
             string sChartTypeVal = Enum.GetName(typeof(ChartType), PropChartType);
@@ -1092,10 +1097,22 @@ namespace EPMLiveWebParts.ReportingChart
 
             if (!string.IsNullOrEmpty(series) && !string.IsNullOrEmpty(valueFld) && !string.IsNullOrEmpty(groupBy))
             {
-                string sGroupBySQLCol = GetSQLColNameIfLookup(groupBy);
-                List<string> distinctGrps = (from DataRow r in dtRaw.AsEnumerable()
-                                             select (r[sGroupBySQLCol] != DBNull.Value) ?
-                                                        r[sGroupBySQLCol].ToString().Trim() : NULL_CATEGORY_TEXT).Distinct().ToList();
+                List<string> distinctGrps = new List<string>();
+                string sGroupBySQLCol = string.Empty;
+                if (groupBy.ToLower() == "none")
+                {
+                    sGroupBySQLCol = "Title";
+                    distinctGrps = (from DataRow r in dtRaw.AsEnumerable()
+                                    select (r[sGroupBySQLCol] != DBNull.Value) ?
+                                    r[sGroupBySQLCol].ToString().Trim() : NULL_CATEGORY_TEXT).Distinct().ToList();
+                }
+                else
+                {
+                    sGroupBySQLCol = GetSQLColNameIfLookup(groupBy);
+                    distinctGrps = (from DataRow r in dtRaw.AsEnumerable()
+                                    select (r[sGroupBySQLCol] != DBNull.Value) ?
+                                    r[sGroupBySQLCol].ToString().Trim() : NULL_CATEGORY_TEXT).Distinct().ToList();
+                }
 
                 foreach (string grp in distinctGrps)
                 {
@@ -1708,6 +1725,11 @@ namespace EPMLiveWebParts.ReportingChart
                 {
                     string sOrderBy = string.Empty;
                     string query = ReportingData.GetReportQuery(spWeb, list, view.Query, out sOrderBy);
+                    // check if list actually exists in reporting db
+                    if (!string.IsNullOrEmpty(sOrderBy) && !ColExistsInListReportingDB(sOrderBy, list.Title))
+                    {
+                        sOrderBy = string.Empty;
+                    }
                     r = ReportingData.GetReportingData(spWeb, listName, true, query, sOrderBy);
                 }
             }
@@ -1815,6 +1837,21 @@ namespace EPMLiveWebParts.ReportingChart
                 result = qExec.ExecuteReportingDBQuery(sql, new Dictionary<string, object>());
             }
             return result;
+        }
+
+        private bool ColExistsInListReportingDB(string colName, string listName)
+        {
+            bool exists = false;
+            DataTable dt = GetListColumns(listName);
+            foreach (DataColumn dc in dt.Columns)
+            {
+                if (dc.ColumnName == colName)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            return exists;
         }
 
         private bool IsLookupCol(string intName)
