@@ -118,9 +118,7 @@ namespace EPMLiveCore
                 }
             });
 
-            //(this.Page.FindControl(_wpeId) as WEPeopleEditor).CommaSeparatedAccounts = users;
-            //CCPeopleEditor.CommaSeparatedAccounts = users;
-            
+            CCPeopleEditor.CommaSeparatedAccounts = users;
         }
 
         private void SetTOPeople()
