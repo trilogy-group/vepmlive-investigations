@@ -25,7 +25,7 @@ namespace EPMLiveCore
                 <div id=""EPMLiveNotificationCounter"" class=""ms-qatbutton"" 
                     data-bind=""style: { background: epmLiveNotifications.notificationCounterColor(), fontWeight: epmLiveNotifications.notificationCounterFontWeight() }"" 
                     style=""background: #666666;"">
-                    <span id=""EPMLiveNotificationCount"" data-bind=""text: epmLiveNotifications.totalNewNotifications()"">&nbsp;</span>
+                    <span id=""EPMLiveNotificationCount"" data-bind=""text: epmLiveNotifications.totalNewNotifications() > 99 ? '99+' : epmLiveNotifications.totalNewNotifications()"">&nbsp;</span>
                 </div>");
 
             writer.Write(@"<div id=""EPMLiveNotificationCounterScreen"" class=""ms-qatbutton"" style=""height: 27px; width: 30px; top: -12px; left: -28px;"">&nbsp;</div>");
