@@ -190,14 +190,6 @@
         }
     </style>
     
-    <script type="text/javascript">
-        function initializeEPMLoader() {
-            window.epmLiveResourceGrid.loader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
-        }
-
-        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, "sp.js");
-    </script>
-    
     <div class="callout border-callout">
         <input id="EPMLiveResourceGridSelector" type="text"/>
         <b class="border-notch notch"></b>
@@ -207,6 +199,12 @@
     <div id="EPMResourceGrid" class="rg-clear-fix" style="width:100%;height:800px;">
          <script type="text/javascript">
              function initializeResourceGridWP() {
+                 function initializeEpmLoader() {
+                     epmLiveResourceGrid.loader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
+                 }
+
+                 SP.SOD.executeOrDelayUntilScriptLoaded(initializeEpmLoader, "sp.js");
+                 
                  $.getScript('<%= WebUrl %>/_layouts/epmlive/javascripts/libraries/jquery.watermark.js', function() {
                      epmLiveResourceGrid.views.userHasGlobalViewModificationPermission = <%= CurrentUserHasDesignerPermission.ToString(CultureInfo.InvariantCulture).ToLower() %>;
                      epmLiveResourceGrid.autoFocus = <%= AutoFocus.ToString(CultureInfo.InvariantCulture).ToLower() %>;
