@@ -36,27 +36,12 @@
         }
     </style>
 
-    <div id="MWG_Loader_<%= WebPartId %>" class="EPMLoader" style="display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: relative; background-color: rgb(255, 255, 255); width: 150px;">
-        <img style="margin: 30px 10px; vertical-align: middle" title="Loading..." alt="Loading..." src="<%= WebUrl %>/_layouts/IMAGES/PROGRESS-CIRCLE-24.GIF"/>
-        <span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Loading...</span>
-    </div>
-
     <script type="text/javascript">
         function initializeEPMLoader() {
-            $(function() {
-                var loader = $('#MWG_Loader_<%= WebPartId %>');
-                var div = $('#WebPart<%= Qualifier %>');
-
-                var topOffset = ((div.height() - loader.height()) / 2) - 100;
-
-                loader.css('top', topOffset >= 250 ? topOffset : 250);
-                loader.css('left', (div.width() - loader.width()) / 2);
-
-                loader.show();
-            });
+            window.myWorkLoader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
         }
 
-        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, "jquery.min.js");
+        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, "sp.js");
     </script>
     
     <div id="MWG_Header" style="display: <%= ShowToolbar ? "block" : "none" %>">

@@ -1726,7 +1726,7 @@ function registerEpmLiveResourceGridScript() {
                 $('#WebPart' + $$.webpartQualifier).height(maxHeight);
             }
 
-            $('#EPMLoader').hide();
+            $$.loader.close();
 
             var win = $(window);
 
