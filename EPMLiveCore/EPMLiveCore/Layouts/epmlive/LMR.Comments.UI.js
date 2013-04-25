@@ -126,15 +126,22 @@ function ajaxPost(command) {
         qsNewComment = $(newContentBoxId).html();
     }
 
+    var commentData = {
+        command: command,
+        comment: qsComment,
+        newcomment: qsNewComment,
+        itemId: qsItemId,
+        listId: qsListId,
+        commentItemId: qsCommentItemId,
+        userId: qsUserId
+    };
 
-    xmlhttp.open("POST", curWebUrl, true);
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4) {
-            // evaluate Json object that comes back from web service
-            var oJson = eval('(' + UnescapeHTMLtoXML(xmlhttp.responseText) + ')');
-
+    $.ajax({
+        url: curWebUrl,
+        type: 'post',
+        dataType: 'text',
+        success: function (xml) {
+            var oJson = window.epmLive.parseJson(xml);
             switch (command) {
                 case "CreateComment":
                     if (oJson.Result.Status == "1") {
@@ -158,7 +165,7 @@ function ajaxPost(command) {
 
                         $('#commentItem_' + commentItemId).find('#lnkUserProfile').attr('href', userProfileUrl);
                         $('#commentItem_' + commentItemId).find('#lnkUserProfile').text(currentUserLoginName);
-                        $('#commentItem_' + commentItemId).find('#spanCreatedDate').text(oJson.Result.Comments.CommentItem.Comment.createdDate);
+                        $('#commentItem_' + commentItemId).find('#spanCreatedDate').text(oJson.Result.Comments.CommentItem.Comment['@createdDate']);
 
                         $('#commentItem_' + commentItemId).find('#imgUserProfile').attr('id', 'imgUserProfile_' + commentItemId);
                         $('#commentItem_' + commentItemId).find('#imgUserProfile_' + commentItemId).attr('src', userPictureUrl);
@@ -227,18 +234,12 @@ function ajaxPost(command) {
                 default:
                     break;
             }
+        },
+        data: commentData,
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
         }
-    };
-
-    xmlhttp.send("command=" + command +
-                        "&comment=" + qsComment +
-    //"&commenthtml=" + qsCommentHTML +
-                        "&newcomment=" + qsNewComment +
-    //"&newcommenthtml=" + qsNewCommentHTML +
-                        "&itemId=" + qsItemId +
-                        "&listId=" + qsListId +
-                        "&commentItemId=" + qsCommentItemId +
-                        "&userId=" + qsUserId);
+    });
 
     // clear text box
     $('#tbCommentInput').html("");

@@ -38,7 +38,8 @@ namespace EPMLiveCore
             //workEngineSvc.Url = currentSite.MakeFullUrl(currentWeb.ServerRelativeUrl) + "/_vti_bin/workengine.asmx";
             //svcCallResult = workEngineSvc.Execute("CreateComment", xmlData);
             svcCallResult = WorkEngineAPI.CreateComment(xmlData, currentWeb);
-            Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
+            //Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
+            Response.Output.WriteLine(svcCallResult);
         }
 
         private void UpdateComment()
@@ -64,7 +65,8 @@ namespace EPMLiveCore
 
             svcCallResult = WorkEngineAPI.UpdateComment(xmlData, currentWeb);
 
-            Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
+            //Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
+            Response.Output.WriteLine(svcCallResult);
         }
 
         private void ReadComment()
@@ -90,7 +92,8 @@ namespace EPMLiveCore
 
             svcCallResult = WorkEngineAPI.ReadComment(xmlData, currentWeb);
 
-            Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
+            //Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
+            Response.Output.WriteLine(svcCallResult);
         }
 
         private void DeleteComment()
@@ -115,8 +118,8 @@ namespace EPMLiveCore
             //}
 
             svcCallResult = WorkEngineAPI.DeleteComment(xmlData, currentWeb);
-            Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
-
+            //Response.Output.WriteLine(JSONUtil.ConvertXmlToJson(svcCallResult, ""));
+            Response.Output.WriteLine(svcCallResult);
         }
 
         private void ManageFields()
