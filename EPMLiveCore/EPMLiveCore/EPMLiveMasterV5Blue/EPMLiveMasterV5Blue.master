@@ -700,6 +700,7 @@
                                 </asp:ContentPlaceHolder>
                             </SharePoint:AjaxDelta>
                         </div>
+                        <script type="text/javascript">$('.ms-listMenu-editLink').hide();</script>
                         <div id="contentBox"
                              aria-live="polite" aria-relevant="all">
                             <div id="notificationArea" class="ms-notif-box"></div>
@@ -782,6 +783,7 @@
                 }
 
                 $('#fA0Main').find('img').css("margin-top", "-8px");
+                
                 if ($("#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox").length == 0) {
                     $("#ms-helpSearch").hide();
                 }
