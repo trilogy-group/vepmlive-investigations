@@ -67,10 +67,6 @@
             #suiteBarButtons {
                 height: 25px !important;   
             }
-
-            #ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox {
-                margin-left: 5px !important;   
-            }
         </style>
         <script type="text/javascript">
             function Openlink(link) {
@@ -790,6 +786,8 @@
                 
                 if ($("#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox").length == 0) {
                     $("#ms-helpSearch").hide();
+                } else {
+                    $('#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox').css('margin-left', '5px');
                 }
             }
 
