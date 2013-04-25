@@ -910,7 +910,7 @@ namespace EPMLiveWebParts.ReportingChart
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sBubble = new BubbleSeries();
-                sBubble.Name = list.Key;
+                sBubble.Name = !string.IsNullOrEmpty(list.Key) ? list.Key.Replace("'", @"\'") : string.Empty;
                 sBubble.Items.AddRange(list.Value);
                 if (!string.IsNullOrEmpty(PropYaxisFormat))
                 {
@@ -1128,7 +1128,7 @@ namespace EPMLiveWebParts.ReportingChart
                             SeriesItem si = new SeriesItem(
                                 decimal.Round(decimal.Parse(oTemp[0].ToString()), 2),
                                 decimal.Round(decimal.Parse(oTemp[1].ToString()), 2)) { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
-                            si.TooltipValue = oTemp[3].ToString();
+                            si.TooltipValue = oTemp[3].ToString().Replace("'", @"\'");
                             result.Add(si);
                         }
                     }
@@ -1143,7 +1143,7 @@ namespace EPMLiveWebParts.ReportingChart
                             SeriesItem si = new SeriesItem(
                                 decimal.Round(decimal.Parse(oTemp[0].ToString()), 2),
                                 decimal.Round(decimal.Parse(oTemp[1].ToString()), 2)) { SizeValue = decimal.Round(decimal.Parse(oTemp[2].ToString()), 2) };
-                            si.TooltipValue = oTemp[3].ToString();
+                            si.TooltipValue = oTemp[3].ToString().Replace("'", @"\'");
                             result.Add(si);
                         }
                     }
