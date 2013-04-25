@@ -184,7 +184,6 @@
                                     AccessKey=""
                                     ToolTip="Search" />
                             </span>
-
                             <span id="ms-helpSupport">
                                 <SharePoint:ThemedClusteredHoverImage
                                     runat="server"
@@ -706,7 +705,7 @@
                             <div id="notificationArea" class="ms-notif-box"></div>
                             <SharePoint:AjaxDelta id="DeltaPageStatusBar" BlockElement="true" runat="server">
                                 <!-- Statusbar -->
-                                <epm:Statusbar />
+                                <epm:Statusbar runat="server"></epm:Statusbar>
                                 <!-- // Statusbar -->
                                 <div id="pageStatusBar"></div>
                             </SharePoint:AjaxDelta>
@@ -742,22 +741,23 @@
         <SharePoint:AjaxDelta id="DeltaPlaceHolderUtilityContent" runat="server">
             <asp:ContentPlaceHolder id="PlaceHolderUtilityContent" runat="server">
 				<!-- EPMLive JS -->
-                <epm:EPMLiveJS />
+                <epm:EPMLiveJS runat="server"></epm:EPMLiveJS>
                 <!-- // EPMLive JS -->
                 <!-- EPMLiveNotifications -->
-                <epm:EPMLiveNotifications />
+                <epm:EPMLiveNotifications runat="server"></epm:EPMLiveNotifications>
                 <!-- // EPMLiveNotifications -->		    
                 <!-- Template Versoning -->
-                <epm:TemplateVersoning />
+                <epm:TemplateVersoning runat="server"></epm:TemplateVersoning>
                 <!-- // Template Versoning -->
             </asp:ContentPlaceHolder>
         </SharePoint:AjaxDelta>
         <SharePoint:ScriptBlock ID="ScriptBlock2" runat="server">
             var g_Workspace = "s4-workspace";
         </SharePoint:ScriptBlock>
-
+	
+        <!-- // Template Versoning -->
         <script type="text/javascript">
-            function epmLivePostLoadTasks() {
+            function epmLiveTweaks() {
                 $.getScript("/_layouts/epmlive/javascripts/libraries/tooltip.js", function () {
                     $("[rel=tooltipbottom]").tooltip({ 'placement': 'bottom', 'delay': 100 });
                     $("[rel=tooltiptop]").tooltip({ 'placement': 'top', 'delay': 400 });
@@ -782,13 +782,12 @@
                 }
 
                 $('#fA0Main').find('img').css("margin-top", "-8px");
-                
                 if ($("#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox").length == 0) {
                     $("#ms-helpSearch").hide();
                 }
             }
 
-            ExecuteOrDelayUntilScriptLoaded(epmLivePostLoadTasks, 'jquery.min.js');
+            ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
             
             var uvOptions = {};
 
