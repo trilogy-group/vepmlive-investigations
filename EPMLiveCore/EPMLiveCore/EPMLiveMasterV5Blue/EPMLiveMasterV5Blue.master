@@ -67,6 +67,10 @@
             #suiteBarButtons {
                 height: 25px !important;   
             }
+
+            #ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox {
+                margin-left: 5px !important;   
+            }
         </style>
         <script type="text/javascript">
             function Openlink(link) {
@@ -758,6 +762,18 @@
 	
         <!-- // Template Versoning -->
         <script type="text/javascript">
+            function openSearch(e) {
+                e.stopPropagation();
+                if ($("#DeltaPlaceHolderSearchArea").is(":visible")) {
+                    $("#DeltaPlaceHolderSearchArea").hide("slide", { direction: "right" }, 300);
+                } else {
+                    $("#DeltaPlaceHolderSearchArea").show("slide", { direction: "right" }, 300);
+                    setTimeout(function () {
+                        $("#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox").focus();
+                    }, 300);
+                }
+            }
+            
             function epmLiveTweaks() {
                 $.getScript("/_layouts/epmlive/javascripts/libraries/tooltip.js", function () {
                     $("[rel=tooltipbottom]").tooltip({ 'placement': 'bottom', 'delay': 100 });
@@ -769,18 +785,6 @@
                         $("#DeltaPlaceHolderSearchArea").hide("slide", { direction: "right" }, 300);
                     }
                 });
-
-                function openSearch(e) {
-                    e.stopPropagation();
-                    if ($("#DeltaPlaceHolderSearchArea").is(":visible")) {
-                        $("#DeltaPlaceHolderSearchArea").hide("slide", { direction: "right" }, 300);
-                    } else {
-                        $("#DeltaPlaceHolderSearchArea").show("slide", { direction: "right" }, 300);
-                        setTimeout(function () {
-                            $("#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox").focus();
-                        }, 300);
-                    }
-                }
 
                 $('#fA0Main').find('img').css("margin-top", "-8px");
                 
