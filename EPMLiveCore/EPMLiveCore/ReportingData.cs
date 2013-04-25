@@ -69,7 +69,12 @@ namespace EPMLiveCore
 
             foreach(XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
             {
-                orderby += "," + nd.Attributes["Name"].Value;
+
+                string orderField = nd.Attributes["Name"].Value;
+                if (orderField == "ID")
+                    orderField = "ItemID";
+
+                orderby += "," + orderField;
                 try
                 {
                     if(nd.Attributes["Ascending"].Value.ToLower() == "false")
