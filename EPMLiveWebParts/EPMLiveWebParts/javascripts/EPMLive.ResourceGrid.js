@@ -1179,6 +1179,16 @@ function registerEpmLiveResourceGridScript() {
                         dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null, func), funcParams)
                     };
                 }
+                
+                if (title === 'Assignment Planner') {
+                    var frame = document.createElement('iframe');
+                    frame.setAttribute('src', url);
+                    frame.setAttribute('width', '99%');
+                    frame.setAttribute('height', '98%');
+
+                    options.url = null;
+                    options.html = frame;
+                }
 
                 window.SP.UI.ModalDialog.showModalDialog(options);
             },

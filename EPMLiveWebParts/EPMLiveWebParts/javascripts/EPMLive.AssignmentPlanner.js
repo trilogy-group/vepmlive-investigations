@@ -1574,3 +1574,8 @@
 }
 
 ExecuteOrDelayUntilScriptLoaded(registerAssignmentPlannerScript, 'EPMLive.js');
+
+try {
+    window.parent.getElementById('suiteBar').style.display = 'none';
+    window.parent.getElementById('sideNavBox').style.display = 'none';
+} catch(e) { }
