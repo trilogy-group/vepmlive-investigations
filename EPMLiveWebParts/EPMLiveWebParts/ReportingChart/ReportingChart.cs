@@ -917,13 +917,13 @@ namespace EPMLiveWebParts.ReportingChart
                     switch (PropYaxisFormat)
                     {
                         case "Currency":
-                            sBubble.TooltipsAppearance.DataFormatString = PropChartZaxisFieldLabel + " = {0:c} <br/>" + PropChartXaxisFieldLabel + " = {1:c} <br/>" + PropChartYaxisFieldLabel + " = {2:c} <br/>Title = {3}";
+                            sBubble.TooltipsAppearance.DataFormatString = PropChartXaxisFieldLabel + " = {0:c} <br/>" + PropChartYaxisFieldLabel + " = {1:c} <br/>" + PropChartZaxisFieldLabel + " = {2:c} <br/>Title = {3}";
                             break;
                         case "Percentage":
-                            sBubble.TooltipsAppearance.DataFormatString = PropChartZaxisFieldLabel + " = {0:p} <br/>" + PropChartXaxisFieldLabel + " = {1:p} <br/>" + PropChartYaxisFieldLabel + " = {2:p} <br/>Title = {3}";
+                            sBubble.TooltipsAppearance.DataFormatString = PropChartXaxisFieldLabel + " = {0:p} <br/>" + PropChartYaxisFieldLabel + " = {1:p} <br/>" + PropChartZaxisFieldLabel + " = {2:p} <br/>Title = {3}";
                             break;
                         default:
-                            sBubble.TooltipsAppearance.DataFormatString = PropChartZaxisFieldLabel + " = {0} <br/>" + PropChartXaxisFieldLabel + " = {1} <br/>" + PropChartYaxisFieldLabel + " = {2} <br/>Title = {3}";
+                            sBubble.TooltipsAppearance.DataFormatString = PropChartXaxisFieldLabel + " = {0} <br/>" + PropChartYaxisFieldLabel + " = {1} <br/>" + PropChartZaxisFieldLabel + " = {2} <br/>Title = {3}";
                             break;
                     }
                 }
