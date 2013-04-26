@@ -3358,7 +3358,8 @@ namespace EPMLiveWebParts
             }
             output.WriteLine("mygrid" + sFullGridId + ".enableSmartRendering(true);");
             output.Write("mygrid" + sFullGridId + ".enableSmartXMLParsing(true);");
-
+            output.Write("mygrid" + sFullGridId + ".setAwaitedRowHeight(30);");
+            
             output.Write("mygrid" + sFullGridId + ".setImageSize(1,1);");
             output.Write("mygrid" + sFullGridId + "._editmode = " + inEditMode.ToString().ToLower() + ";");
             output.Write("mygrid" + sFullGridId + ".enableEditEvents(true,false,false);");
