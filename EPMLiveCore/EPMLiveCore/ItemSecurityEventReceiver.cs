@@ -12,7 +12,7 @@ namespace EPMLiveCore
 {
     public class ItemSecurityEventReceiver : SPItemEventReceiver
     {
-        
+
 
 
         public override void ItemAdded(SPItemEventProperties properties)
@@ -20,12 +20,12 @@ namespace EPMLiveCore
             AddTimerJob(properties);
         }
 
-        
+
 
         public override void ItemUpdated(SPItemEventProperties properties)
         {
             //if(System.Diagnostics.Process.GetCurrentProcess().ProcessName != "TimerService")
-                AddTimerJob(properties);
+            AddTimerJob(properties);
         }
 
         private void AddTimerJob(SPItemEventProperties properties)
@@ -58,7 +58,7 @@ namespace EPMLiveCore
 
                 SPUser orignalUser = properties.Web.AllUsers.GetByID(properties.CurrentUserId);
 
-                if(isSecure)
+                if (isSecure)
                 {
                     SPListItem li = properties.ListItem;
 
@@ -80,35 +80,20 @@ namespace EPMLiveCore
                         assignedToFv = li["AssignedTo"];
                     }
                     catch { }
-                    if(assignedToFv != null)
+                    if (assignedToFv != null)
                     {
                         sAssignedTo = assignedToFv.ToString();
                     }
 
-                    SPFieldUserValueCollection uCol = new SPFieldUserValueCollection();
-
-                    if(!string.IsNullOrEmpty(sAssignedTo))
+                    if (string.IsNullOrEmpty(sAssignedTo))
                     {
-                        uCol = new SPFieldUserValueCollection(properties.Web, sAssignedTo);
-                    }
-
-                    if(assignedTo != null)
-                    {
-                        if(assignedTo.AllowMultipleValues)
-                        {
-                            uCol.Add(new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName));
-                            li["AssignedTo"] = uCol;
-                        }
-                        else
-                        {
-                            li["AssignedTo"] = new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName);
-                        }
+                        li["AssignedTo"] = new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName);
 
                         try
                         {
                             li.SystemUpdate();
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                         }
 
@@ -122,7 +107,7 @@ namespace EPMLiveCore
         private string GetSafeGroupTitle(string grpName)
         {
             string result = string.Empty;
-            if(!string.IsNullOrEmpty(grpName))
+            if (!string.IsNullOrEmpty(grpName))
             {
                 result = grpName;
                 result = result.Replace("\"", "")
@@ -154,7 +139,7 @@ namespace EPMLiveCore
             SPListItem _listItem = properties.ListItem;
 
             List<SPGroup> grps = new List<SPGroup>();
-            foreach(SPRoleAssignment ra in _listItem.RoleAssignments)
+            foreach (SPRoleAssignment ra in _listItem.RoleAssignments)
             {
                 if (ra.Member is SPGroup && ra.Member.Name.Contains(_listItem.Title))
                 {
@@ -180,7 +165,7 @@ namespace EPMLiveCore
                     }
                 });
             }
-            
+
         }
 
     }
