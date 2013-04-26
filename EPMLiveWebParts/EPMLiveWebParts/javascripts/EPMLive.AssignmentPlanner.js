@@ -1575,7 +1575,5 @@
 
 ExecuteOrDelayUntilScriptLoaded(registerAssignmentPlannerScript, 'EPMLive.js');
 
-try {
-    window.parent.getElementById('suiteBar').style.display = 'none';
-    window.parent.getElementById('sideNavBox').style.display = 'none';
-} catch(e) { }
+document.getElementsByTagName("html")[0].className = 'ms-dialog';
+document.getElementById('s4-ribbonrow').style.height = '140px';

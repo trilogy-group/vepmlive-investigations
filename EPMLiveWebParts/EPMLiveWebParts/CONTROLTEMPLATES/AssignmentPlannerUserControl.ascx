@@ -33,6 +33,10 @@
         img.AP_Flag {
             cursor: pointer;
         }
+
+        #s4-ribbonrow {
+            height:140px !important
+        }
     </style>
 
     <div id="epmLiveAssignmentPlanner" style="width:100%;height:100%;">
