@@ -52,7 +52,7 @@ Grids.OnGetSortValue = function(grid, row, col, val) {
 
 Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
-        window.myWorkLoader.close();
+        document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
 
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
 
@@ -637,7 +637,7 @@ function doActionOnItem(gridId, action) {
         var webId = row['WebID'];
         var siteUrl = row['SiteURL'];
 
-        showSharePointPopup(siteUrl + '/_layouts/epmlive/myworkgridaction.aspx?IsDlg=1&action=' + action + '&webid=' + webId + '&listid='
+        showSharePointPopup(siteUrl + '/_layouts/epmlive/myworkgridaction.aspx?action=' + action + '&webid=' + webId + '&listid='
             + listId + '&ID=' + itemId, null, true, true, MyWorkGrid.reloadCommentCount, { grid: grid, itemId: itemId, listId: listId, webId: webId, siteUrl: siteUrl, siteId: row['SiteID'], row: row }, 600, 500);
 
         return;

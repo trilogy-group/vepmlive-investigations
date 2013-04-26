@@ -43,7 +43,7 @@ namespace EPMLiveCore
 
                         using (SPWeb spWeb = spSite.OpenWeb(new Guid(Request.QueryString["webid"])))
                         {
-                            redirectUrl = string.Format(@"{0}/_layouts/epmlive/comments.aspx?listid={1}&itemid={2}",
+                            redirectUrl = string.Format(@"{0}/_layouts/epmlive/comments.aspx?listid={1}&itemid={2}&IsDlg=1",
                                                         spWeb.SafeServerRelativeUrl(), Request.QueryString["listid"],
                                                         Request.QueryString["ID"]);
                         }
