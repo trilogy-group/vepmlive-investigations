@@ -41,7 +41,7 @@ namespace EPMLiveCore
 
                     browseControl.Parent.Controls.Add(addItemButton);
                     Image dropImg = new Image();
-                    dropImg.ImageUrl = "/_layouts/epmlive/images/dropdown2.gif";
+                    dropImg.ImageUrl = "/_layouts/epmlive/images/dropdown2.png";
                     dropImg.Attributes["id"] = propBag.Field + "_ddlShowAll";
                     dropImg.Attributes["style"] = "margin-left: -5px;";
                     browseControl.Parent.Controls.AddAt(0, dropImg);
