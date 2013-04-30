@@ -36,12 +36,60 @@
         }
     </style>
 
+    <div id="MWG_Loader_<%= WebPartId %>" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
+        <div class="ms-dlgBorder" style="width: 365px; height: 144px;">
+            <input type="button" value="Wrap focus to the end of the dialog" class="ms-accessible">
+            <div class="ms-hidden">
+                <span id="dlgTitleBtns" class="ms-dlgTitleBtns">
+                    <a class="ms-dlgCloseBtn" title="Maximize" href="javascript:;">
+                        <span style="padding:8px;height:16px;width:16px;display:inline-block">
+                            <span class="s4-clust" style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;">
+                                <img class="ms-dlgCloseBtnImg" style="left:-0px !important;top:-661px !important;position:absolute;" alt="Maximize" src="/_layouts/15/images/fgimg.png?rev=23">
+                            </span>
+                        </span>
+                    </a>
+                </span>
+                <h1 title="Dialog" class="ms-dlgTitleText ms-accentText ms-dlg-heading" id="dialogTitleSpan" style="width: 0px;">Dialog</h1>
+            </div>
+            <div class="ms-dlgFrameContainer">
+                <div style="width: 327px; height: 133px;">
+                    <div style="padding: 39px 0px 30px;">
+                        <div class="ms-dlgLoadingTextDiv ms-alignCenter">
+                            <span style="padding-top: 6px; padding-right: 10px;">
+                                <img src="/_layouts/15/images/gears_anv4.gif?rev=23" title="This animation indicates the operation is in progress. Click to remove this animated image.">
+                            </span>
+                            <span class="ms-core-pageTitle ms-accentText">Working on it...</span>
+                        </div>
+                        <div class="ms-textXLarge ms-alignCenter"></div>
+                    </div>
+                </div>
+            </div>
+            <input type="button" value="Wrap focus to the beginning of the dialog" class="ms-accessible">
+        </div>
+    </div>
+
     <script type="text/javascript">
         function initializeEPMLoader() {
-            window.myWorkLoader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
+            $(function() {
+                if (document.location.href.toLowerCase().indexOf('mywork.aspx') !== -1) {
+                    function showLoading() {
+                        window.myWorkLoader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
+                    }
+
+                    SP.SOD.executeOrDelayUntilScriptLoaded(showLoading, "sp.js");
+                } else {
+                    var loader = $('#MWG_Loader_<%= WebPartId %>');
+                    var div = $('#WebPart<%= Qualifier %>');
+
+                    loader.css('top', (div.height() - loader.height()) / 2);
+                    loader.css('left', (div.width() - loader.width()) / 2);
+
+                    loader.show();   
+                }
+            });
         }
 
-        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, "sp.js");
+        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, "jquery.min.js");
     </script>
     
     <div id="MWG_Header" style="display: <%= ShowToolbar ? "block" : "none" %>">
