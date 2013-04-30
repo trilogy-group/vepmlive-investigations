@@ -19,10 +19,10 @@ namespace EPMLiveWebParts
     {
         #region Fields (4) 
 
-        protected string WcReportId = "Resource Work vs. Capacity".Md5();
-        protected string WebUrl = SPContext.Current.Web.SafeServerRelativeUrl();
         private string _debugTag;
         private string _webPartHeight;
+        protected string WcReportId = "Resource Work vs. Capacity".Md5();
+        protected string WebUrl = SPContext.Current.Web.SafeServerRelativeUrl();
 
         #endregion Fields 
 
@@ -174,7 +174,8 @@ namespace EPMLiveWebParts
                 string temp;
                 if (!IsInDebugMode(out temp))
                 {
-                    string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+                    string fileVersion =
+                        FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
 
                     if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
                     {

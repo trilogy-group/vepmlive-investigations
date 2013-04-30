@@ -1736,7 +1736,11 @@ function registerEpmLiveResourceGridScript() {
                 $('#WebPart' + $$.webpartQualifier).height(maxHeight);
             }
 
-            $$.loader.close();
+            if ($$.loader) {
+                $$.loader.close();
+            } else {
+                $('#ResourceGridLoader').hide();
+            }
 
             var win = $(window);
 
