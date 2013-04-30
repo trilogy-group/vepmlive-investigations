@@ -33,6 +33,7 @@ namespace EPMLiveCore
                         if (!string.IsNullOrEmpty(urlWelcome))
                         {
                             url = es.MakeFullUrl(urlWelcome);
+                            url = SPHttpUtility.UrlKeyValueDecode(url);
                         }
                     }
                 }
@@ -45,7 +46,7 @@ namespace EPMLiveCore
         {   
             appHelper = new AppSettingsHelper();
             int communityId = -1;
-            string currentUrl = HttpContext.Current.Request.Url.ToString();
+            string currentUrl = SPHttpUtility.UrlKeyValueDecode(HttpContext.Current.Request.Url.ToString());
             if (UrlIsHomePage(currentUrl, out communityId) && appHelper.CurrentAppId != communityId)
             {
                 appHelper.SetCurrentAppId(communityId);
@@ -91,7 +92,7 @@ namespace EPMLiveCore
 
                                 if (currentUrl.Equals(GetWelcomePage()) &&
                                     !string.IsNullOrEmpty(urlVal.Url) &&
-                                    urlVal.Url != currentUrl)
+                                    SPHttpUtility.UrlKeyValueDecode(urlVal.Url) != currentUrl)
                                 {
                                     string sUrl = string.Empty;
                                     if (urlVal.Url.StartsWith("/"))
@@ -100,7 +101,7 @@ namespace EPMLiveCore
                                     }
                                     else
                                     {
-                                        sUrl = urlVal.Url;
+                                        sUrl = SPHttpUtility.UrlKeyValueDecode(urlVal.Url);
                                     }
 
                                     SPUtility.Redirect(sUrl, SPRedirectFlags.Static, HttpContext.Current);
@@ -206,7 +207,8 @@ namespace EPMLiveCore
                                 try { valUrl = new SPFieldUrlValue(i["HomePage"].ToString()); }
                                 catch { }
 
-                                if (valUrl != null && url == valUrl.Url)
+                                if (valUrl != null && 
+                                    url.ToLower() == SPHttpUtility.UrlKeyValueDecode(valUrl.Url).ToLower())
                                 {
                                     isHomePage = true;
                                     matchId = int.Parse(i["ID"].ToString());
