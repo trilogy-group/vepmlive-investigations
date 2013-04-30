@@ -2598,7 +2598,7 @@ namespace EPMLiveCore.API
 
                     foreach (XElement field in item.Element("Fields").Elements("Field"))
                     {
-                        string name = field.Attribute("Name").Value;
+                        string name = Utils.ToGridSafeFieldName(field.Attribute("Name").Value);
                         string value = GetGridSafeValue(field);
 
                         if (name.Equals(DUE_DATE_FIELD) && !string.IsNullOrEmpty(value))
