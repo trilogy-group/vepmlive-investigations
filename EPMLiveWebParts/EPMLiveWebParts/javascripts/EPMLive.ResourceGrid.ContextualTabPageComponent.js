@@ -109,7 +109,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 return true;
             case 'ResourceGrid.Cmd.Find':
             case 'ResourceGrid.Cmd.Find.Query':
-                return $$.resources.length > 0;
+                return $$.resources && $$.resources.length > 0;
             case 'ResourceGrid.Cmd.Export':
                 return $$.actions.canExport();
             case 'ResourceGrid.Cmd.Import':

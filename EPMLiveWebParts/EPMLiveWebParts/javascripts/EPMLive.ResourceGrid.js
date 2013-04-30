@@ -1680,6 +1680,8 @@ function registerEpmLiveResourceGridScript() {
                     window.RefreshCommandUI();
                 }, 100);
             }
+            
+            window.RefreshCommandUI();
         };
 
         window.Grids.OnColumnsChanged = function(grid, cols, count) {
@@ -1737,6 +1739,7 @@ function registerEpmLiveResourceGridScript() {
             }
 
             if ($$.loader) {
+                $$$.utils.fireEvent(document.getElementById('MSOZoneCell_WebPart' + $$.webpartQualifier), 'mouseup');
                 $$.loader.close();
             } else {
                 $('#ResourceGridLoader').hide();

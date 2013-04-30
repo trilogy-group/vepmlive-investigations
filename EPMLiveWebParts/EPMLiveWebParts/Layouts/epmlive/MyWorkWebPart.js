@@ -54,6 +54,15 @@ Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
         if (window.myWorkLoader) {
             window.myWorkLoader.close();
+            window.setTimeout(function () {
+                window.epmLive.utils.fireEvent(document.getElementById('MSOZoneCell_WebPart' + myWorkWebPartQualifier), 'mouseup');
+                window.setTimeout(function () {
+                    try {
+                        window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+                    } catch (e) {
+                    }
+                }, 500);
+            }, 500);
         } else {
             document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
         }
@@ -2897,6 +2906,8 @@ var MyWorkGrid = {
         SP.SOD.executeOrDelayUntilScriptLoaded(function () {
             var selectTab = function (tabId) {
                 window._ribbonStartInit(tabId, false, null);
+                window.SelectRibbonTab(tabId, true);
+                window.RefreshCommandUI();
             };
 
             var pm = SP.Ribbon.PageManager.get_instance();
@@ -2909,8 +2920,14 @@ var MyWorkGrid = {
             }
 
             if (!ribbon) {
-                if (typeof (window._ribbonStartInit) === 'function') {
+                if (typeof(window._ribbonStartInit) === 'function') {
                     selectTab('Ribbon.MyWorkTab');
+                }
+            } else {
+                var selectedTab = $('#RibbonContainer_activeTabId').val();
+                if (selectedTab !== 'Ribbon.MyWorkTab' && selectedTab !== 'Ribbon.MyWorkViewsTab') {
+                    window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+                    window.RefreshCommandUI();
                 }
             }
 
