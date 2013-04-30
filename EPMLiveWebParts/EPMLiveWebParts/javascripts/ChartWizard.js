@@ -526,7 +526,12 @@ function GetXValue() {
     } else if (chartType.indexOf("_Clustered") != -1 || chartType.indexOf("_Stacked") != -1 || chartType.indexOf("_100Percent") != -1) {
         xVal = $find(ddlXNonNumClientId)._value;
     } else if (chartType == "Pie" || chartType == "Donut") {
-        xVal = $find(ddlXNonNumClientId)._value;
+        if (aggType == "Count") {
+            xVal = $find(ddlXFieldClientId)._value;
+        }
+        else {
+            xVal = $find(ddlXNonNumClientId)._value;
+        }
     } else if (chartType == "Bubble") {
         xVal = $find(ddlXNumClientId)._value;
     }
