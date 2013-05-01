@@ -28,7 +28,7 @@ namespace EPMLiveCore
             mainPanel.Controls.Add(new LiteralControl("<div id=\"grid" + this.UniqueID + "\" style=\"width:100%;display:none;\" ></div>\r\n\r\n"));
 
             mainPanel.Controls.Add(new LiteralControl("<div  width=\"100%\" id=\"loadinggrid" + this.UniqueID + "\" align=\"center\">"));
-            mainPanel.Controls.Add(new LiteralControl("<img src=\"/_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Items..."));
+            mainPanel.Controls.Add(new LiteralControl("<img src=\"/_layouts/15/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Items..."));
             mainPanel.Controls.Add(new LiteralControl("</div>"));
 
             mainPanel.Controls.Add(new LiteralControl("<script>"));

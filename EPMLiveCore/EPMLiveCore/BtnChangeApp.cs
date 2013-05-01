@@ -170,7 +170,7 @@ namespace EPMLiveCore
                 // loading div
                 // ========================================
                 writer.Write("<div id=\"divChangeAppLoading\" style=\"width: 100%; text-align: center;padding-top:5px;padding-bottom:5px;\">");
-                writer.Write("<img src=\"/_layouts/images/gears_anv4.gif\" style=\"vertical-align: middle\" />");
+                writer.Write("<img src=\"/_layouts/15/images/gears_anv4.gif\" style=\"vertical-align: middle\" />");
                 writer.Write("Loading...");
                 writer.Write("</div>");
                 // =========================================

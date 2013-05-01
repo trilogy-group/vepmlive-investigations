@@ -106,7 +106,7 @@
                     Filter By:</div>
                 <asp:Panel runat="server" ID="pnlFilterBy" CssClass="linkPanel">
                     <div id="divLocalTempGalFilterLoadingGif">
-                        <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle" />
+                        <img src="/_layouts/15/images/gears_anv4.gif" style="vertical-align: middle" />
                         <span id="span1">Loading...</span>
                     </div>
                 </asp:Panel>
@@ -117,7 +117,7 @@
                     Filter By:</div>
                 <asp:Panel runat="server" ID="pnlEPMLiveFilterBy" CssClass="linkPanel">
                     <div id="divOnlineSolStoreFilterLoadingGif">
-                        <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle" />
+                        <img src="/_layouts/15/images/gears_anv4.gif" style="vertical-align: middle" />
                         <span id="span2">Loading...</span>
                     </div>
                 </asp:Panel>
@@ -128,7 +128,7 @@
                     Filter By:</div>
                 <asp:Panel runat="server" ID="pnlSolGalFilterBy" CssClass="linkPanel">
                     <div id="divSPSolGalFilterLoadingGif">
-                        <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle" />
+                        <img src="/_layouts/15/images/gears_anv4.gif" style="vertical-align: middle" />
                         <span id="span3">Loading...</span>
                     </div>
                 </asp:Panel>
@@ -148,7 +148,7 @@
             </div>
             <%--loading gif for loading EPMLive.com templates--%>
             <div id="divLoad_LoadingOnlineTemps" style="width: 100%; text-align: center;">
-                <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle" />
+                <img src="/_layouts/15/images/gears_anv4.gif" style="vertical-align: middle" />
                 Loading templates...
             </div>
             <div id="divOnlineTempsHolder" class="divOnlineTempsHolder" style="display: none">
@@ -275,7 +275,7 @@
                     Select Workspace
                 </h3>
                 <div style="width: 100%" id="loadinggrid" align="center">
-                    <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle;" />
+                    <img src="/_layouts/15/images/gears_anv4.gif" style="vertical-align: middle;" />
                     Loading Workspaces...
                 </div>
                 <div style="overflow-y: auto">
@@ -410,7 +410,7 @@
     </script>
     <%--loading gif--%>
     <div id="divLoad_CreateWorkspace" style="display: none; width: 100%; text-align: center;">
-        <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle" />
+        <img src="/_layouts/15/images/gears_anv4.gif" style="vertical-align: middle" />
         <span id="spanMainLoading">Creating project...</span>
     </div>
     <div id="div_loading_msg" style="display: none; width: 100%; text-align: center;">

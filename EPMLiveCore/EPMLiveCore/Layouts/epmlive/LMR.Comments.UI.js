@@ -11,7 +11,7 @@ $(function () {
 });
 
 var loadingHtml = "<div id=\"divLoadingIcon\" style=\"width:100%; vertical-align: middle; white-space: nowrap; background-color: rgb(255, 255, 255);padding-top:10px;padding-bottom:20px;\">" +
-                    "<IMG style=\"margin-left:230px; margin-right:10px; vertical-align: middle\" title=\"Working...\" alt=\"Working...\" src=\"/_layouts/images/progress-circle-24.gif\">" +
+                    "<IMG style=\"margin-left:230px; margin-right:10px; vertical-align: middle\" title=\"Working...\" alt=\"Working...\" src=\"/_layouts/15/images/gears_anv4.gif\">" +
                     "<SPAN style=\"TEXT-ALIGN: center; WHITE-SPACE: nowrap; COLOR: black; VERTICAL-ALIGN: middle; OVERFLOW: hidden;font-family:Verdana;font-size:12px;color:#686868;\">Working...</SPAN>" +
                   "</div>";
 
