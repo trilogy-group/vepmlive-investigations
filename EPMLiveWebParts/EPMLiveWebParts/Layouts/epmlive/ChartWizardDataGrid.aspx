@@ -74,7 +74,7 @@
         </div>
 
         <div id="divLoading" style="width: 100%; text-align: center; margin-top:250px">
-            <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle" />
+            <img src="/_layouts/15/images/gears_anv4.gif" style="vertical-align: middle" />
             <span id="spanMainLoading" class="loadingText">Loading...</span>
         </div>
         <div style="clear: both">

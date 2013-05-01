@@ -769,7 +769,7 @@ function GetData() {
                             $('#commentsWebPartMainContainer').slimScroll({ height: '300px', size: '10px', wheelStep: 5 });
                         }, true);
 
-                        $.getScript('/_layouts/epmlive/jquery.endless-scroll.js', function () {
+                        $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
                             $('#commentsWebPartMainContainer').endlessScroll({
                                 callback:
                                 function () {

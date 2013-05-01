@@ -132,7 +132,7 @@ namespace EPMLiveWebParts
             output.Write("<div id=\"grid" + this.UniqueID + "\" style=\"width:100%;display:none;\" ></div>\r\n\r\n");
 
             output.Write("<div  width=\"100%\" id=\"loadinggrid" + this.UniqueID + "\" align=\"center\">");
-            output.Write("<img src=\"_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Items...");
+            output.Write("<img src=\"_layouts/15/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Items...");
             output.Write("</div>");
 
             output.Write("<script>");

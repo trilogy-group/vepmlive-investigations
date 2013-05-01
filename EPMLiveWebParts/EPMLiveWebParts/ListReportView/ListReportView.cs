@@ -298,12 +298,12 @@ namespace EPMLiveWebParts
 
             htmlBuilder.Append("<div id=\"grid" + this.UniqueID + "\" style=\"display:none;margin-top:10px\"  ></div>\r\n\r\n");
             htmlBuilder.Append("<div  width=\"100%\" id=\"loadinggrid" + this.UniqueID + "\" >");
-            htmlBuilder.Append("<img src=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Items...");
+            htmlBuilder.Append("<img src=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/15/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Items...");
             htmlBuilder.Append("</div>");
 
             htmlBuilder.Append("<div id=\"gridSsrs" + this.UniqueID + "\"  style=\"display:none\" ></div>\r\n\r\n");
             htmlBuilder.Append("<div  width=\"100%\" id=\"loadinggridSsrs" + this.UniqueID + "\" style=\"padding-top:20px;\">");
-            htmlBuilder.Append("<img src=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading SSRS Items...");
+            htmlBuilder.Append("<img src=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/15/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading SSRS Items...");
             htmlBuilder.Append("</div>");
 
             htmlBuilder.Append("<script>");

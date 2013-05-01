@@ -21,7 +21,7 @@ namespace EPMLiveWebParts.Comments
         #region constant strings
 
         const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" style=\"width: 100%; text-align: center;\">" +
-                                        "<img src=\"/_layouts/images/gears_anv4.gif\" style=\"vertical-align: middle\" />" +
+                                        "<img src=\"/_layouts/15/images/gears_anv4.gif\" style=\"vertical-align: middle\" />" +
                                         "<span id=\"spanMainLoading\">Loading comments...</span>" +
                                     "</div>";
 
