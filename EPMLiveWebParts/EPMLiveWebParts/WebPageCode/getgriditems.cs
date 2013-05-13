@@ -1048,18 +1048,18 @@ namespace EPMLiveWebParts
                                                     catch { }
                                                     if(commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
                                                     {
-                                                        val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                        val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                                     }
                                                     else
                                                     {
-                                                        val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+                                                        val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
                                                     }
                                                 }
                                                 else
-                                                    val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                    val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                             }
                                             else
-                                                val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                         }
                                     }
                                     catch { }
@@ -1882,18 +1882,18 @@ namespace EPMLiveWebParts
                                                 catch { }
                                                 if(commentersread.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()))
                                                 {
-                                                    displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                    displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                                 }
                                                 else
                                                 {
-                                                    displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+                                                    displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
                                                 }
                                             }
                                             else
-                                                displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                         }
                                         else
-                                            displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                            displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                     }
                                 }
                                 catch { }
