@@ -1092,6 +1092,10 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetDataForBubbleSeries(DataTable dtRaw, string category, string series, string valueFld, string groupBy)
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return container;
+            }
             List<SeriesItem> result = new List<SeriesItem>();
             XAxisLabels.Clear();
 
@@ -1157,6 +1161,10 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetCountDataForPieSeries(DataTable dtRaw, string category)
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return container;
+            }
             List<SeriesItem> result = new List<SeriesItem>();
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             var rx = (from DataRow r in dtRaw.AsEnumerable()
@@ -1177,6 +1185,10 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetSumDataForPieSeries(DataTable dtRaw, string category, string series)
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return container;
+            }
             List<SeriesItem> result = new List<SeriesItem>();
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             string sSeriesSQLCol = GetSQLColNameIfLookup(series);
@@ -1184,7 +1196,7 @@ namespace EPMLiveWebParts.ReportingChart
                       where r[sSeriesSQLCol] != DBNull.Value
                       group r by r[sCatSQLCol] into gr
                       select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
-                                        gr.Sum(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
+                                        gr.Sum(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
             foreach (object[] o in rx)
             {
@@ -1201,13 +1213,17 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetAvgDataForPieSeries(DataTable dtRaw, string category, string series)
         {
             Dictionary<string, List<SeriesItem>> container = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return container;
+            }
             List<SeriesItem> result = new List<SeriesItem>();
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             string sSeriesSQLCol = GetSQLColNameIfLookup(series);
             var rx = (from DataRow r in dtRaw.AsEnumerable()
                       where r[sSeriesSQLCol] != DBNull.Value
                       group r by r[sCatSQLCol] into gr
-                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), gr.Average(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
+                      select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), gr.Average(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
             foreach (object[] o in rx)
             {
@@ -1230,6 +1246,10 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetCountDataForSingleSeries(DataTable dtRaw, string category)
         {
             Dictionary<string, List<SeriesItem>> result = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return result;
+            }
             List<SeriesItem> lsTemp = new List<SeriesItem>();
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             List<string> distinctCats = (from r in dtRaw.AsEnumerable()
@@ -1423,6 +1443,11 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetSumDataForMultiSeries(DataTable dtRaw, string category, string rawMultiSeries)
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return listContainer;
+            }
+
             List<SeriesItem> result;
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
@@ -1448,7 +1473,7 @@ namespace EPMLiveWebParts.ReportingChart
                               group r by r[sCatSQLCol] into gr
                               select new[] { 
                                   (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
-                                  gr.Sum(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
+                                  gr.Sum(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
                     foreach (object[] o in rx)
                     {
@@ -1475,6 +1500,10 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetSumDataForMultiSeriesInPercentage(DataTable dtRaw, string category, string rawMultiSeries)
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return listContainer;
+            }
             List<SeriesItem> result;
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
@@ -1571,6 +1600,10 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetAvgDataForMultiSeries(DataTable dtRaw, string category, string rawMultiSeries)
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return listContainer;
+            }
             List<SeriesItem> result;
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
@@ -1595,7 +1628,7 @@ namespace EPMLiveWebParts.ReportingChart
                               group r by r[sCatSQLCol] into gr
                               select new[] { 
                                   (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
-                                  gr.Average(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
+                                  gr.Average(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
                     foreach (object[] o in rx)
                     {
                         SeriesItem it = new SeriesItem(decimal.Round(decimal.Parse(o[1].ToString()), 2));
@@ -1619,6 +1652,10 @@ namespace EPMLiveWebParts.ReportingChart
         private Dictionary<string, List<SeriesItem>> GetAvgDataForMultiSeriesInPercentage(DataTable dtRaw, string category, string rawMultiSeries)
         {
             Dictionary<string, List<SeriesItem>> listContainer = new Dictionary<string, List<SeriesItem>>();
+            if (dtRaw == null || dtRaw.Rows.Count == 0)
+            {
+                return listContainer;
+            }
             List<SeriesItem> result;
             string sCatSQLCol = GetSQLColNameIfLookup(category);
             // add x axis labels
@@ -1689,7 +1726,7 @@ namespace EPMLiveWebParts.ReportingChart
                               group r by r[sCatSQLCol] into gr
                               select new[] { 
                                   (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), 
-                                  gr.Average(x => int.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
+                                  gr.Average(x => decimal.Parse(x[sSeriesSQLCol].ToString())) }).ToArray();
 
                     foreach (object[] r in rx)
                     {
@@ -1877,7 +1914,6 @@ namespace EPMLiveWebParts.ReportingChart
             {
                 lookupColName += "Text";
             }
-
             return lookupColName;
         }
 
