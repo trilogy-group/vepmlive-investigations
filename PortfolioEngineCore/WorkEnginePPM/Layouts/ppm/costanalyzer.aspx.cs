@@ -27,8 +27,33 @@ namespace WorkEnginePPM
 
             SPList list = Web.Lists[new Guid(Request["listid"])];
 
+            bool useneewone = false;
+            
+            ArrayList arrMenus = new ArrayList();
 
-            if (HelperFunctions.UseNonActiveXControl("costanalyzer", list) == false)
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                try
+                {
+                    string sListName = list.Title;
+
+                    using (SPSite site = new SPSite(Web.Site.ID))
+                    {
+                        SPWeb rootWeb = site.RootWeb;
+
+                        string menus = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "epk" + sListName.Replace(" ", "") + "_menus");
+
+                        arrMenus = new ArrayList(menus.Split('|'));
+
+                        if (arrMenus.Contains("costanalyzerv2"))
+                            useneewone = true;
+                    }
+                }
+                catch { }
+            });
+
+
+            if (!arrMenus.Contains("costanalyzerv2") && HelperFunctions.UseNonActiveXControl("costanalyzer", list) == false)
             {
                 if (int.TryParse(Request["view"], out i))
                     strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRModeler.LMR_WE_Model", "<Params Ticket=\\\"" + Request["dataid"] + "\\\"  ViewID=\\\"" + Request["view"] + "\\\"/>", "true", Page);
@@ -39,30 +64,7 @@ namespace WorkEnginePPM
             }
             else
             {
-                bool useneewone = false;
-
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    try
-                    {
-                        string sListName = list.Title;
-
-                        using (SPSite site = new SPSite(Web.Site.ID))
-                        {
-                            SPWeb rootWeb = site.RootWeb;
-
-                            string menus = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "epk" + sListName.Replace(" ", "") + "_menus");
-
-                            ArrayList arrMenus = new ArrayList(menus.Split('|'));
-
-                            if (arrMenus.Contains("costanalyzerv2"))
-                                useneewone = true;
-                        }
-                    }
-                    catch { }
-                });
-
+                
                 if (useneewone)
                 {
                     WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl)LoadControl("/_layouts/ppm/CostAnalyzer.ascx");
