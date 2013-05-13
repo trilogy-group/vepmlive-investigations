@@ -1974,16 +1974,19 @@ namespace EPMLiveWebParts
                     {
                         HyperLink hl = (HyperLink)childControl;
                         hl.NavigateUrl = "Javascript:GanttZoomIn('" + sFullGridId + "');";
+                        hl.Target = "_self";
                     }
                     if(childControl.ID == "imgZoomOut")
                     {
                         HyperLink hl = (HyperLink)childControl;
                         hl.NavigateUrl = "Javascript:GanttZoomOut('" + sFullGridId + "');";
+                        hl.Target = "_self";
                     }
                     if(childControl.ID == "hlGanttScrollTo")
                     {
                         HyperLink hl = (HyperLink)childControl;
                         hl.NavigateUrl = "Javascript:GanttScrollTo('" + sFullGridId + "');";
+                        hl.Target = "_self";
                     }
                 }
                 if (childControl.ToString() == "System.Web.UI.WebControls.Label")
