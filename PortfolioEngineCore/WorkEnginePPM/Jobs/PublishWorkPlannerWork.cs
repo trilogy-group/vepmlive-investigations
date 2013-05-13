@@ -48,6 +48,8 @@ namespace WorkEnginePPM.Jobs
 
                 int counter = 0;
 
+                DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<GetResources><Columns>EXTID</Columns></GetResources>", web);
+
                 foreach(SPListItem li in lic)
                 {
                     string assignedto = "";
@@ -59,8 +61,6 @@ namespace WorkEnginePPM.Jobs
                     if(assignedto != "")
                     {
                         SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedto);
-
-                        DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<GetResources><Columns>EXTID</Columns></GetResources>", web);
 
                         ArrayList arrResourceExtId = new ArrayList();
 
