@@ -1185,7 +1185,7 @@ namespace EPMLiveWebParts
             sb.Append("<Group Id=\"Ribbon.ListItem.EPMLiveAnalyze\" Sequence=\"42\" Command=\"EPMLiveAnalyzeGroup\" Description=\"\" Title=\"Analyze\" Template=\"Ribbon.Templates.Flexible2\">");
             sb.Append("<Controls Id=\"Ribbon.ListItem.EPMLiveAnalyze.Controls\">");
             bool hasAction = false;
-            if (arrButtons.Contains("costanalyzer"))
+            if (arrButtons.Contains("costanalyzer") || arrButtons.Contains("costanalyzerv2"))
             {
                 hasAction = true;
                 sb.Append(@"<Button
