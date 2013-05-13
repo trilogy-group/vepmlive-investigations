@@ -409,7 +409,9 @@ namespace EPMLiveCore
         {
             if (SaveButton.SaveItem(SPContext.Current, false, ""))
             {
-                RedirectUrl = String.Concat(List.ParentWeb.ServerRelativeUrl, "/", List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl);
+                string sUrl = (List.ParentWeb.ServerRelativeUrl == "/") ? "" : List.ParentWeb.ServerRelativeUrl;
+
+                RedirectUrl = String.Concat(sUrl, "/", List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl); 
             }
         }
 
