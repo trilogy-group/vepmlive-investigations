@@ -4429,6 +4429,7 @@ namespace EPMLiveWorkPlanner
                             format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
                         }
                     }catch{}
+                    EditFormat = format;
                     break;
                 case SPFieldType.Number:
                     if(oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
