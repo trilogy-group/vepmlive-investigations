@@ -56,7 +56,7 @@
 	            Description=""
 	            runat="server">
 	            <Template_Description>
-	                This column maps the SharePoint ID into the Integration Item. This is optional and required if you want the integration item to have information about SharePoint.
+	                This column maps the SharePoint ID into the Integration Item. This is optional, but is required if you want the integration item to have information about the SharePoint item.
 	            </Template_Description>
 	            <Template_InputFormControls>
 		            <wssuc:InputFormControl ID="InputFormControl3" LabelText="" runat="server">

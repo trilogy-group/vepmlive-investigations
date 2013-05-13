@@ -77,6 +77,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
 
                 pnlColumns.Controls.Add(new LiteralControl("<table>"));
+                pnlColumns.Controls.Add(new LiteralControl("<tr><td><b>SharePoint Column</b></td><td><b>Integration Column</b></td></tr>"));
 
                 SortedList sl = new SortedList();
                 foreach(SPField field in List.Fields)
