@@ -270,7 +270,7 @@ namespace TimeSheets
                 if(sUserId == dr["SPID"].ToString())
                     sCurrentDelegate = dr["Title"].ToString();
 
-                sDelegates = dr["SPID"].ToString() + "|" + dr["Title"].ToString() + "^";
+                sDelegates += dr["SPID"].ToString() + "|" + dr["Title"].ToString() + "^";
             }
 
             sDelegates = sDelegates.Trim('^');
