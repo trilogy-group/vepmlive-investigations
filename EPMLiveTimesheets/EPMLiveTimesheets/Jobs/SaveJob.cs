@@ -32,7 +32,7 @@ namespace TimeSheets
             {
                 SPField f = li.ParentList.Fields.GetFieldByInternalName(field);
 
-                switch(f.Type)
+                switch (f.Type)
                 {
                     case SPFieldType.Number:
                     case SPFieldType.Currency:
@@ -51,11 +51,11 @@ namespace TimeSheets
 
             ArrayList arrPeriods = TimesheetAPI.GetPeriodDaysArray(cn, settings, web, period);
 
-            foreach(XmlNode ndDate in ndRow.SelectNodes("Hours/Date"))
+            foreach (XmlNode ndDate in ndRow.SelectNodes("Hours/Date"))
             {
                 DateTime dt = DateTime.Parse(ndDate.Attributes["Value"].Value);
 
-                if(arrPeriods.Contains(dt))
+                if (arrPeriods.Contains(dt))
                 {
                     SqlCommand cmd = new SqlCommand("DELETE FROM TSITEMHOURS where TS_ITEM_UID=@id and TS_ITEM_DATE=@dt", cn);
                     cmd.Parameters.AddWithValue("@id", id);
@@ -67,7 +67,7 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@dt", dt);
                     cmd.ExecuteNonQuery();
 
-                    foreach(XmlNode ndTime in ndDate.SelectNodes("Time"))
+                    foreach (XmlNode ndTime in ndDate.SelectNodes("Time"))
                     {
                         string hours = iGetAttribute(ndTime, "Hours");
                         string type = "0";
@@ -87,7 +87,7 @@ namespace TimeSheets
                     }
 
                     XmlNode ndNotes = ndDate.SelectSingleNode("Notes");
-                    if(ndNotes != null)
+                    if (ndNotes != null)
                     {
                         cmd = new SqlCommand("INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)", cn);
                         cmd.Parameters.AddWithValue("@id", id);
@@ -113,14 +113,14 @@ namespace TimeSheets
 
             ArrayList fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)).Split(','));
 
-            foreach(string field in fields)
+            foreach (string field in fields)
             {
-                if(field == "")
+                if (field == "")
                     continue;
 
                 string newValue = iGetValue(li, field);
 
-                if(newValue != "")
+                if (newValue != "")
                 {
                     SPField oField = null;
                     try
@@ -129,12 +129,12 @@ namespace TimeSheets
                     }
                     catch { }
 
-                    if(oField != null)
+                    if (oField != null)
                     {
 
                         DataRow[] drTs = ds.Tables[0].Select("ColumnName='" + field + "'");
 
-                        if(drTs.Length > 0)
+                        if (drTs.Length > 0)
                         {
                             cmd = new SqlCommand("UPDATE TSMETA SET ColumnValue=@val where TSMETA_UID=@muid", cn);
                             cmd.Parameters.AddWithValue("@val", newValue);
@@ -163,16 +163,16 @@ namespace TimeSheets
                 }
             }
 
-            if(recurse)
+            if (recurse)
             {
-                
+
                 try
                 {
                     SPFieldLookup ProjectField = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
 
                     SPFieldLookupValue lv = new SPFieldLookupValue(li[ProjectField.Id].ToString());
 
-                    
+
                     SPList pList = list.ParentWeb.Lists[new Guid(ProjectField.LookupList)];
                     SPListItem pLi = pList.GetItemById(lv.LookupId);
 
@@ -191,11 +191,11 @@ namespace TimeSheets
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             da.Fill(ds);
 
-            foreach(string field in settings.TimesheetFields)
+            foreach (string field in settings.TimesheetFields)
             {
                 string newValue = iGetAttribute(ndRow, field);
 
-                if(newValue != "")
+                if (newValue != "")
                 {
                     SPField oField = null;
                     try
@@ -204,12 +204,12 @@ namespace TimeSheets
                     }
                     catch { }
 
-                    if(oField != null)
+                    if (oField != null)
                     {
 
                         DataRow[] drTs = ds.Tables[0].Select("ColumnName='" + field + "'");
 
-                        if(drTs.Length > 0)
+                        if (drTs.Length > 0)
                         {
                             cmd = new SqlCommand("UPDATE TSMETA SET ColumnValue=@val where TSMETA_UID=@muid", cn);
                             cmd.Parameters.AddWithValue("@val", newValue);
@@ -241,7 +241,7 @@ namespace TimeSheets
         {
             string id = iGetAttribute(ndRow, "UID");
 
-            if(id != "")
+            if (id != "")
             {
                 DataRow[] drItem = dtItems.Select("TS_ITEM_UID='" + id + "'");
 
@@ -253,21 +253,21 @@ namespace TimeSheets
 
                     string itemtypeid = iGetAttribute(ndRow, "ItemTypeID");
 
-                    if(itemtypeid == "")
+                    if (itemtypeid == "")
                         itemtypeid = "1";
 
-                    if(webid != "")
+                    if (webid != "")
                     {
-                        if(listid != "")
+                        if (listid != "")
                         {
-                            if(itemid != "")
+                            if (itemid != "")
                             {
 
 
                                 try
                                 {
 
-                                    using(SPWeb web = site.OpenWeb(new Guid(webid)))
+                                    using (SPWeb web = site.OpenWeb(new Guid(webid)))
                                     {
                                         SPListItem li = null;
 
@@ -281,7 +281,7 @@ namespace TimeSheets
                                             }
                                             catch { }
 
-                                            if(li != null)
+                                            if (li != null)
                                             {
                                                 int projectid = 0;
                                                 string project = "";
@@ -296,12 +296,12 @@ namespace TimeSheets
 
 
 
-                                                if(drItem.Length > 0)
+                                                if (drItem.Length > 0)
                                                 {
                                                     SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid where ts_item_uid=@uid", cn);
                                                     cmd.Parameters.AddWithValue("@uid", id);
                                                     cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
-                                                    if(projectid == 0)
+                                                    if (projectid == 0)
                                                     {
                                                         cmd.Parameters.AddWithValue("@project", DBNull.Value);
                                                         cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
@@ -333,12 +333,12 @@ namespace TimeSheets
                                                     cmd.Parameters.AddWithValue("@list", list.Title);
                                                     cmd.Parameters.AddWithValue("@itemtype", itemtypeid);
 
-                                                    if(projectlist == "")
+                                                    if (projectlist == "")
                                                         cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
                                                     else
                                                         cmd.Parameters.AddWithValue("@projectlistid", projectlist);
 
-                                                    if(projectid == 0)
+                                                    if (projectid == 0)
                                                     {
                                                         cmd.Parameters.AddWithValue("@project", DBNull.Value);
                                                         cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
@@ -353,32 +353,32 @@ namespace TimeSheets
 
                                                 ProcessTimesheetHours(id, ndRow, cn, settings, web, period);
 
-                                                if(WorkList != null)
+                                                if (WorkList != null)
                                                     ProcessTimesheetFields(id, ndRow, cn, settings);
 
-                                                if(Editable)
+                                                if (Editable)
                                                 {
                                                     //PROCESS LI
                                                 }
 
                                                 ProcessListFields(id, ndRow, cn, settings, li, true, list);
 
-                                                if(liveHours)
+                                                if (liveHours)
                                                     processLiveHours(li, list.ID);
 
-                                                if(Editable)
+                                                if (Editable)
                                                     li.Update();
                                                 else
                                                     li.SystemUpdate();
                                             }
                                         }
-                                        catch(Exception ex)
+                                        catch (Exception ex)
                                         {
                                             bErrors = true;
                                             sErrors += "Item (" + id + ") Error: " + ex.Message;
                                         }
 
-                                        
+
                                     }
 
                                 }
@@ -405,12 +405,12 @@ namespace TimeSheets
                         sErrors += "Item (" + id + ") missing web id";
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     bErrors = true;
                     sErrors += "Item (" + id + ") Error x2: " + ex.Message;
                 }
-                if(drItem.Length > 0)
+                if (drItem.Length > 0)
                 {
                     dtItems.Rows.Remove(drItem[0]);
                 }
@@ -449,7 +449,7 @@ namespace TimeSheets
 
                 int userid = 0;
 
-                if(dr.Read())
+                if (dr.Read())
                 {
                     userid = dr.GetInt32(0);
                 }
@@ -457,7 +457,7 @@ namespace TimeSheets
 
                 try
                 {
-                    if(docTimesheet.FirstChild.Attributes["Editable"].Value == "1")
+                    if (docTimesheet.FirstChild.Attributes["Editable"].Value == "1")
                         Editable = true;
                 }
                 catch { }
@@ -466,11 +466,11 @@ namespace TimeSheets
 
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
 
-                if(userid != 0)
+                if (userid != 0)
                 {
                     SPUser user = TimesheetAPI.GetUser(site.RootWeb, userid.ToString());
 
-                    if(user.ID != userid)
+                    if (user.ID != userid)
                     {
                         bErrors = true;
                         sErrors = "You do not have access to edit that timesheet.";
@@ -500,7 +500,7 @@ namespace TimeSheets
                         cmd = new SqlCommand("SELECT period_id FROM TSTIMESHEET WHERE TS_UID=@tsuid", cn);
                         cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
                         SqlDataReader drts = cmd.ExecuteReader();
-                        if(drts.Read())
+                        if (drts.Read())
                         {
                             period = drts.GetInt32(0).ToString();
                         }
@@ -512,17 +512,17 @@ namespace TimeSheets
                         float count = 0;
                         float total = ndItems.Count;
 
-                        foreach(XmlNode ndItem in ndItems)
+                        foreach (XmlNode ndItem in ndItems)
                         {
 
                             ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours);
 
-                            
+
 
                             count++;
                             float pct = count / total * 100;
 
-                            if(pct >= percent + 10)
+                            if (pct >= percent + 10)
                             {
                                 cmd = new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn);
                                 cmd.Parameters.AddWithValue("@queueuid", QueueUid);
@@ -534,15 +534,15 @@ namespace TimeSheets
                         }
 
 
-                        foreach(DataRow drDelItem in dtItems.Rows)
+                        foreach (DataRow drDelItem in dtItems.Rows)
                         {
                             cmd = new SqlCommand("DELETE FROM TSITEM where TS_ITEM_UID=@uid", cn);
                             cmd.Parameters.AddWithValue("@uid", drDelItem["TS_ITEM_UID"].ToString());
                             cmd.ExecuteNonQuery();
                         }
 
-                        if(liveHours)
-                            sErrors += SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, false);
+                        if (liveHours)
+                            sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
                     }
                 }
                 else
@@ -553,33 +553,234 @@ namespace TimeSheets
                 cn.Close();
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 bErrors = true;
                 sErrors = "Error: " + ex.Message;
             }
         }
 
+        public static string processActualWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
+        {
+            string error = "";
+            //SPSecurity.RunWithElevatedPrivileges(delegate()
+            //{
+            //using (SPSite site = new SPSite(s.ID, s.SystemAccount.UserToken))
+            {
+                //string sql = "SELECT * FROM vwTSItemHoursByTS where ts_uid=@ts_uid order by web_uid,list_uid";
+                //if(!bApprovalScreen)
+                //    sql = "SELECT * FROM vwTSItemHoursByMyTS where ts_uid=@ts_uid order by web_uid,list_uid";
+
+
+                SqlCommand cmd = new SqlCommand("spTSGetProjectsHours", cn);
+                cmd.Parameters.AddWithValue("@TSUID", tsuid);
+                cmd.Parameters.AddWithValue("@approved", bApproved);
+                cmd.CommandType = CommandType.StoredProcedure;
+                DataSet dsProjects = new DataSet();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dsProjects);
+
+                //cmd = new SqlCommand(sql, cn);
+                //cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                //SqlDataReader dr = cmd.ExecuteReader();
+
+                Guid webGuid = new Guid();
+                Guid listGuid = new Guid();
+                SPWeb iWeb = null;
+                SPList iList = null;
+                /*while (dr.Read())
+                {
+                    try
+                    {
+                        Guid wGuid = new Guid(dr["WEB_UID"].ToString());
+                        Guid lGuid = new Guid(dr["LIST_UID"].ToString());
+
+                        if (webGuid != wGuid)
+                        {
+                            try
+                            {
+                                if (iWeb != null)
+                                {
+                                    iWeb.Close();
+                                    iWeb = site.OpenWeb(wGuid);
+                                }
+                                else
+                                    iWeb = site.OpenWeb(wGuid);
+                                webGuid = iWeb.ID;
+                            }
+                            catch { }
+                        }
+                        if (iWeb != null)
+                        {
+                            if (listGuid != lGuid)
+                            {
+                                iList = iWeb.Lists[lGuid];
+                                listGuid = iList.ID;
+                            }
+                            iWeb.AllowUnsafeUpdates = true;
+                            SPListItem li = null;
+                            try
+                            {
+                                li = iList.GetItemById(int.Parse(dr["ITEM_ID"].ToString()));
+                            }
+                            catch { }
+                            if (li != null)
+                            {
+                                //If the project server feature is not active and it is in approval mode then process actual work.
+                                if (iWeb.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null && bApprovalScreen)
+                                {
+                                    SPField f = null;
+                                    try
+                                    {
+                                        f = iList.Fields.GetFieldByInternalName("TimesheetHours");
+                                    }
+                                    catch { }
+                                    if (f != null)
+                                    {
+                                        li[f.Id] = dr["TotalHours"].ToString();
+
+                                        li.Update();
+
+                                        //processProject(dsProjects, wGuid, iWeb);
+                                        
+                                    }
+                                }
+                                else
+                                {
+                                    SPField f = null;
+                                    try
+                                    {
+                                        f = iList.Fields.GetFieldByInternalName("TimesheetHours");
+                                    }
+                                    catch { }
+                                    if (f != null)
+                                    {
+                                        string taskuid = "";
+                                        try
+                                        {
+                                            taskuid = li["taskuid"].ToString();
+                                        }
+                                        catch { }
+                                        //if the item has a taskuid (Meaning this item is a Project Task)
+                                        if (taskuid != "" && taskuid.Contains("."))
+                                        {
+                                            string login = "";
+                                            try
+                                            {
+                                                SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)li[iList.Fields.GetFieldByInternalName("AssignedTo").Id];
+                                                if (uvc.Count > 0)
+                                                {
+                                                    login = uvc[0].User.LoginName.ToLower();
+                                                }
+                                            }
+                                            catch { }
+                                            if (login != "")//if we found a user
+                                            {
+                                                if (login == SPContext.Current.Web.CurrentUser.LoginName.ToLower())
+                                                {
+                                                    li[f.Id] = dr["SubmittedHours"].ToString();
+                                                    li.Update();
+                                                    //processProject(dsProjects, wGuid, iWeb);
+                                                }
+                                            }
+                                        }
+                                        else if (bApprovalScreen)//otherwise it must be in approval mode
+                                        {
+                                            li[f.Id] = dr["TotalHours"].ToString();
+                                            li.Update();
+                                            //processProject(dsProjects, wGuid, iWeb);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+                    catch (Exception exception)
+                    {
+                        error += "Error: " + exception.Message + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
+                    }
+                }
+
+
+                dr.Close();
+                */
+                foreach (DataRow drProject in dsProjects.Tables[0].Rows)
+                {
+                    try
+                    {
+                        Guid wGuid = new Guid(drProject["WEB_UID"].ToString());
+                        Guid lGuid = new Guid(drProject["PROJECT_LIST_UID"].ToString());
+
+                        if (webGuid != wGuid)
+                        {
+                            try
+                            {
+                                if (iWeb != null)
+                                {
+                                    iWeb.Close();
+                                    iWeb = site.OpenWeb(wGuid);
+                                }
+                                else
+                                    iWeb = site.OpenWeb(wGuid);
+                                webGuid = iWeb.ID;
+                            }
+                            catch { }
+                        }
+                        if (iWeb != null)
+                        {
+                            if (listGuid != lGuid)
+                            {
+                                iList = iWeb.Lists[lGuid];
+                                listGuid = iList.ID;
+                            }
+                            iWeb.AllowUnsafeUpdates = true;
+                            string project = drProject["Project_id"].ToString();
+                            if (project != "0")
+                            {
+                                try
+                                {
+                                    SPListItem liProject = iList.GetItemById(int.Parse(project));
+                                    liProject["TimesheetHours"] = drProject["Hours"].ToString();
+                                    liProject.SystemUpdate();
+                                }
+                                catch { }
+                            }
+                        }
+
+                    }
+                    catch (Exception exception)
+                    {
+                        error += "Error: " + exception.Message + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
+                    }
+                }
+
+            }
+            //});\
+            return error;
+        }
+
         private void processLiveHours(SPListItem li, Guid listguid)
         {
-            
+
             double hours = 0;
             try
             {
 
-                if(li != null)
+                if (li != null)
                 {
                     cn.Open();
                     SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn);
                     cmdHours.Parameters.AddWithValue("@listuid", listguid);
                     cmdHours.Parameters.AddWithValue("@itemid", li.ID);
                     SqlDataReader dr1 = cmdHours.ExecuteReader();
-                    if(dr1.Read())
-                        if(!dr1.IsDBNull(0))
+                    if (dr1.Read())
+                        if (!dr1.IsDBNull(0))
                             hours = dr1.GetDouble(0);
                     dr1.Close();
 
                     li["TimesheetHours"] = hours;
+                    li.SystemUpdate();
                     cn.Close();
                 }
             }
