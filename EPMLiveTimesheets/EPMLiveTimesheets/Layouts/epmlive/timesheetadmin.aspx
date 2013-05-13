@@ -789,7 +789,8 @@
 	            hdnTSFields.value = sFields;
 	        }
 
-	        switchList(); 
+	        _spBodyOnLoadFunctionNames.push("switchList");
+	        //switchList(); 
 
 
 	        function clearLoader(id) {
