@@ -2997,6 +2997,14 @@ namespace PortfolioEngineCore
                     dataTable2.Dispose();
 
 
+                    // delete all the Time Off entries for this resource before add in new ones - this was changed May 2013 for V4.4.1 and does make more sense
+                    SqlTransaction transaction = _sqlConnection.BeginTransaction();
+                    sCommand = "DELETE FROM EPG_NONWORK_HOURS Where WRES_ID=@WresId";
+                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
+                    SqlCommand.Parameters.AddWithValue("@WresId", WresId);
+                    SqlCommand.Transaction = transaction;
+                    SqlCommand.ExecuteNonQuery();
+
                     List<CStruct> listcats = xResource.GetList("Category");
                     foreach (CStruct xSelCat in listcats)
                     {
@@ -3013,6 +3021,7 @@ namespace PortfolioEngineCore
                         // check if Non Work item exists
                         sCommand = "Select 'found' where EXISTS (Select NWI_ID From EPG_NONWORK_ITEMS Where NWI_ID=@Id)";
                         SqlCommand = new SqlCommand(sCommand, _sqlConnection);
+                        SqlCommand.Transaction = transaction;
                         SqlCommand.Parameters.AddWithValue("@Id", CatId);
                         SqlReader = SqlCommand.ExecuteReader();
                         if (SqlReader.Read())
@@ -3025,14 +3034,6 @@ namespace PortfolioEngineCore
                         {
                             List<CStruct> listItems = xSelCat.GetList("Item");
                             int nTotalRows = 0;
-
-                            SqlTransaction transaction = _sqlConnection.BeginTransaction();
-                            sCommand = "DELETE FROM EPG_NONWORK_HOURS Where NWI_ID=@NWI_uid And WRES_ID=@WresId";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Parameters.AddWithValue("@NWI_uid", CatId);
-                            SqlCommand.Parameters.AddWithValue("@WresId", WresId);
-                            SqlCommand.Transaction = transaction;
-                            SqlCommand.ExecuteNonQuery();
 
                             foreach (CStruct xSelItem in listItems)
                             {
@@ -3067,13 +3068,13 @@ namespace PortfolioEngineCore
                             CStruct xStatus = xCatResult.CreateSubStruct("Result");
                             if (bCatUpdateOK && bCatUpdateOKAsIs)
                             {
-                                transaction.Commit();
+                                //transaction.Commit();
                                 xStatus.CreateIntAttr("Status", 0);
                             }
                             else if (bCatUpdateOK)
                             {
                                 //transaction.Rollback();
-                                transaction.Commit();
+                                //transaction.Commit();
                                 xStatus.CreateIntAttr("Status", 0);
                                 xStatus.CreateCDataSection(string.Format(@"Hours adjusted for this category, rows inserted for this category = {0:0}", nTotalRows));
                             }
@@ -3085,6 +3086,7 @@ namespace PortfolioEngineCore
                             xStatus.CreateCDataSection(string.Format(@"Invalid category"));
                         }
                     }
+                    transaction.Commit();
                 }
                 _sqlConnection.Close();
 
@@ -4582,10 +4584,11 @@ namespace PortfolioEngineCore
             if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
             _sqlConnection.Open();
 
-            string sCVResult;
-            bool bRet = dbaCostValues.PostCostValues(_dba, data, out sCVResult);
+            string sCVResult="";
+            //bool bRet = dbaCostValues.PostCostValues(_dba, data, out sCVResult);
             _sqlConnection.Close();
             sResult=sCVResult;
+            bool bRet = true;
             return bRet;
         }
 

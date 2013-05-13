@@ -389,71 +389,71 @@
                 onstatechange: "ribbonEvent('Ribbon_Toggle');",
                 imagePath: this.imagePath,
                 sections: [
-                    {
-                        name: "Plan Actions",
-                        tooltip: "Plan Actions",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "SaveBtn", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "ribbonEvent('SaveBtn');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "ribbonEvent('CloseBtn');" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Tools",
-                        tooltip: "Tools",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "CategoriesBtn", name: "Categories", img: "categories.png", tooltip: "Re-add removed category rows", onclick: "ribbonEvent('CategoriesBtn');", disabled: true },
-                                    { type: "smallbutton", id: "DetailBtn", name: "Detail", img: "detail.png", tooltip: "Add a child detail row", onclick: "ribbonEvent('DetailBtn');", disabled: true },
-                                    { type: "smallbutton", id: "RemoveBtn", name: "Delete", img: "delete.png", tooltip: "Remove selected category rows from display", onclick: "ribbonEvent('RemoveBtn');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "text", name: "Displayed Values:" },
-                                    { type: "select", id: "DisplayedValues", onchange: "ribbonEvent('DisplayedValues');", options: "<option value='0'>UoMs</option><option value='1'>FTEs</option>", width: "55px" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "ToolsBtn", name: "Tools", img: "spread.gif", tooltip: "Show Tools dialog for Move, Grow and Shrink operations", onclick: "ribbonEvent('ToolsBtn');", disabled: true },
-                                    { type: "smallbutton", id: "ShowRefBtn", name: "Show Reference", img: "reference.png", tooltip: "Show/Hide Reference Area", onclick: "ribbonEvent('ShowRefBtn');", disabled: false },
-                                    { type: "smallbutton", id: "CopyBtn", name: "Copy", img: "copyrow.gif", tooltip: "Copy values up from selected reference cost type", onclick: "ribbonEvent('CopyBtn');" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Periods",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "text", name: "From Period:" },
-                                    { type: "select", id: "idViewTab_FromPeriod", onchange: "ribbonEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "text", name: " ", width: "10px" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "text", name: "To Period:" },
-                                    { type: "select", id: "idViewTab_ToPeriod", onchange: "ribbonEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                {
+                    name: "Plan Actions",
+                    tooltip: "Plan Actions",
+                    columns: [
+                        {
+                            items: [
+                                { type: "bigbutton", id: "SaveBtn", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "ribbonEvent('SaveBtn');", disabled: true }
+                            ]
+                        },
+                        {
+                            items: [
+                                { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "ribbonEvent('CloseBtn');" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "Tools",
+                    tooltip: "Tools",
+                    columns: [
+                        {
+                            items: [
+                                { type: "smallbutton", id: "CategoriesBtn", name: "Categories", img: "categories.png", tooltip: "Re-add removed category rows", onclick: "ribbonEvent('CategoriesBtn');", disabled: true },
+                                { type: "smallbutton", id: "DetailBtn", name: "Detail", img: "detail.png", tooltip: "Add a child detail row", onclick: "ribbonEvent('DetailBtn');", disabled: true },
+                                { type: "smallbutton", id: "RemoveBtn", name: "Delete", img: "delete.png", tooltip: "Remove selected category rows from display", onclick: "ribbonEvent('RemoveBtn');", disabled: true }
+                            ]
+                        },
+                        {
+                            items: [
+                                { type: "text", name: "Displayed Values:" },
+                                { type: "select", id: "DisplayedValues", onchange: "ribbonEvent('DisplayedValues');", options: "<option value='0'>UoMs</option><option value='1'>FTEs</option>", width: "55px" }
+                            ]
+                        },
+                        {
+                            items: [
+                                { type: "smallbutton", id: "ToolsBtn", name: "Tools", img: "spread.gif", tooltip: "Show Tools dialog for Move, Grow and Shrink operations", onclick: "ribbonEvent('ToolsBtn');", disabled: true },
+                                { type: "smallbutton", id: "ShowRefBtn", name: "Show Reference", img: "reference.png", tooltip: "Show/Hide Reference Area", onclick: "ribbonEvent('ShowRefBtn');", disabled: false },
+                                { type: "smallbutton", id: "CopyBtn", name: "Copy", img: "copyrow.gif", tooltip: "Copy values up from selected reference cost type", onclick: "ribbonEvent('CopyBtn');" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "Periods",
+                    columns: [
+                        {
+                            items: [
+                                { type: "text", name: "From Period:" },
+                                { type: "select", id: "idViewTab_FromPeriod", onchange: "ribbonEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
+                            ]
+                        },
+                        {
+                            items: [
+                                { type: "text", name: " ", width: "10px" }
+                            ]
+                        },
+                        {
+                            items: [
+                                { type: "text", name: "To Period:" },
+                                { type: "select", id: "idViewTab_ToPeriod", onchange: "ribbonEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
+                            ]
+                        }
+                    ]
+                }
+            ]
             };
 
             this.editorTab = new Ribbon(editorTabData);
@@ -584,7 +584,8 @@
             this.UpdateButtonsAsync();
         }
     };
-    EditCosts.prototype.GridsOnReady = function(grid, start) {
+    EditCosts.prototype.GridsOnReady = function (grid, start) {
+        grid.Rendering = true;
         if (this.startPeriod == null) {
             this.startPeriod = grid.StartPeriod;
             this.finishPeriod = grid.FinishPeriod;
@@ -599,10 +600,9 @@
         }
         this.UpdateAllCalculatedCells(grid);
         this.CalculateGridTotals(grid, false);
-    };
-    EditCosts.prototype.GridsOnRenderFinish = function (grid) {
         this.SetGridColsVisibility(grid);
-        if (grid.RowCount > 0) {
+        //if (grid.RowCount > 0) {
+        if (grid.GetFirst(null, 0) != null) {
             var rootid = this.GetRootIdFromIdName(grid.id);
             var costtype = this.GetCostTypeFromId(rootid);
             if (costtype != null) {
@@ -629,6 +629,9 @@
         if (grid.CheckedoutDetails != null && grid.CheckedoutDetails != "") {
             alert(grid.CheckedoutDetails);
         }
+        grid.Rendering = false;
+    };
+    EditCosts.prototype.GridsOnRenderFinish = function (grid) {
         this.HideWorkingPopup("divLoading");
         this.UpdateButtonsAsync();
     };
@@ -1489,7 +1492,8 @@
         return t;
     };
     EditCosts.prototype.SetCellsEditStatus = function (grid) {
-        if (grid.RowCount > 0) {
+        //if (grid.RowCount > 0) {
+        if (grid.GetFirst(null, 0) != null) {
             var row = grid.GetFirst(null, 0);
             while (row != null) {
                 var bPossibleEdit = true;

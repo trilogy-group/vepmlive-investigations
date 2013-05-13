@@ -131,7 +131,7 @@
                                     <td><input type="checkbox" name="nonactivexs" value="modeler" <%if(arrNonActiveXs.Contains("modeler")){%>checked<%}%>/> Non Active-X</td>
                                 </tr>
                                 <tr>
-                                    <td><input type="checkbox" name="ribbons" value="resplan"  <%if(arrMenus.Contains("resplan")){%>checked<%}%>/> Capacity Planner</td>
+                                    <td><input type="checkbox" name="ribbons" value="resplan"  <%if(arrMenus.Contains("resplan")){%>checked<%}%>/> Resource Planner</td>
                                     <td><input type="checkbox" name="nonactivexs" value="resplan" <%if(arrNonActiveXs.Contains("resplan")){%>checked<%}%>/> Non Active-X</td>
                                 </tr>
                                 <tr>

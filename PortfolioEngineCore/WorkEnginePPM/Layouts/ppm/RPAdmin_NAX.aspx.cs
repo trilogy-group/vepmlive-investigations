@@ -108,15 +108,13 @@ namespace WorkEnginePPM
                     li.Selected = true;
                 ddlTotalHours.Items.Add(li);
             }
-
-            Exit_Function:
-            return;
+Exit_Function:
+            if (dba.Status != StatusEnum.rsSuccess)
+            {
+                lblGeneralError.Text = "Status Error " + ((int) dba.Status).ToString() + " : " + dba.StatusText;
+                lblGeneralError.Visible = true;
+            }
         }
-//            return;
-//Exit_Function:
-//            lblGeneralError.Text = LMR_IF.LastError;
-//            lblGeneralError.Visible = true;
-//        }
 
         private static void AddItemToList(DropDownList ddl, string name, int id, int selectedId)
         {

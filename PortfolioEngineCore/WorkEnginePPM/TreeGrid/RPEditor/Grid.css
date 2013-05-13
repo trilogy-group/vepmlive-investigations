@@ -22,12 +22,12 @@ table.dhtmlxLayoutPolyContainer_dhx_skyblue td.dhtmlxLayoutPolySplitterHorInacti
 
 .GMColorFocusedCell 
 { 
-background-color:#CCEBFF;
+background-color:#FFFFFF;
 }
 
 .GMClassFocusedCell 
 { 
-background-color:#CCEBFF;
+background-color:#FFFFFF;
 }
 
 /*.GMFocusRowBackground 
@@ -37,13 +37,13 @@ filter:alpha(opacity=10);
 background:#A5E1FF; 
 }*/
 
-.GMFocusRowBackground
+/*.GMFocusRowBackground
 {
 opacity:0.1;
 background-color:#A5E1FF;
 filter:alpha(opacity=10);
 }
-
+*/
 .GMColorDefault { background-color:#FFFFFF; }
 
 

@@ -1216,6 +1216,7 @@
                         this.OnResize();
 
                     }
+                    this.SetPlanRowsEditStatus();
                 }
             }
             else if (grid.id == "g_Res") {
@@ -1237,7 +1238,7 @@
     RPEditor.prototype.GridsOnRenderFinish = function (grid) {
         if (this.initialized != true) {
             if (grid.id == "g_RPE") {
-                this.SetPlanRowsEditStatus();
+                //this.SetPlanRowsEditStatus();
             }
             else if (grid.id == "g_Res") {
                 this.SetPaddingWidth();
@@ -1940,14 +1941,26 @@
                 var ccroleUid = plangrid.GetAttribute(planrow, null, "CCRole_UID");
                 var ccroleParentUid = plangrid.GetAttribute(planrow, null, "CCRoleParent_UID");
                 var ccroleName = plangrid.GetAttribute(planrow, null, "CCRole_Name");
+                var ccroleParentName = plangrid.GetAttribute(planrow, null, "CCRoleParent_Name");
+                if (ccroleUid == null || ccroleUid == 0) {
+                    ccroleUid = resgrid.GetAttribute(resrow, null, "CCRole_UID");
+                    ccroleParentUid = resgrid.GetAttribute(resrow, null, "CCRoleParent_UID");
+                    plangrid.SetAttribute(childplanrow, null, "CCRoleParent_UIDChanged", 1, 0, 0);
+                    ccroleName = resgrid.GetAttribute(resrow, null, "CCRole_Name");
+                    ccroleParentName = resgrid.GetAttribute(resrow, null, "CCRoleParent_Name");
+                }
                 var roleUid = plangrid.GetAttribute(planrow, null, "Role_UID");
                 var roleName = plangrid.GetAttribute(planrow, null, "Role_Name");
+                if (roleUid == null || roleUid == 0) {
+                    roleUid = resgrid.GetAttribute(resrow, null, "Role_UID");
+                    roleName = resgrid.GetAttribute(resrow, null, "Role_Name");
+                }
                 // backlog 657 - take the dept of the resource being added
                 var deptUid = 0;
                 var deptName = "";
                 if (deptUid == null || deptUid == 0) {
-                    deptUid = plangrid.GetAttribute(resrow, null, "Dept_UID");
-                    deptName = plangrid.GetAttribute(resrow, null, "Dept_Name");
+                    deptUid = resgrid.GetAttribute(resrow, null, "Dept_UID");
+                    deptName = resgrid.GetAttribute(resrow, null, "Dept_Name");
                 }
                 var wresId = resgrid.GetAttribute(resrow, null, "Res_UID");
                 var resName = resgrid.GetAttribute(resrow, null, "Res_Name");
@@ -1965,6 +1978,7 @@
 
                 plangrid.SetValue(childplanrow, "Project_Name", projectName, 1);
                 plangrid.SetValue(childplanrow, "CCRole_Name", ccroleName, 1);
+                plangrid.SetValue(childplanrow, "CCRoleParent_Name", ccroleParentName, 1);
                 plangrid.SetValue(childplanrow, "Role_Name", roleName, 1);
                 plangrid.SetValue(childplanrow, "Dept_Name", deptName, 1);
                 this.SetResNamesColumn(plangrid, childplanrow, status);
@@ -2561,6 +2575,7 @@
                         this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
                         this.ShowHidePeriods(this.plangrid);
                         this.ShowHidePeriods(this.resgrid);
+                        this.UpdateButtonsAsync();
                     }
                     break;
                 case "ViewTab_SaveView":
@@ -2600,6 +2615,7 @@
                     this.InitialiseResourceGrid();
                     this.RefreshResourcePeriods();
                     this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
+                    this.UpdateButtonsAsync();
                     break;
                 case "SaveView_OK":
                     this.DisplaySaveViewDialogOK();
@@ -2650,7 +2666,11 @@
                     }
                     break;
                 case "ResourcesTab_Match":
+                    var resgrid = Grids["g_Res"];
+                    resgrid.Rendering = true;
                     this.HandleMatch();
+                    resgrid.Rendering = false;
+                    resgrid.RenderBody();
                     break;
                 case "ResourcesTab_Select_Changed":
                     var select = document.getElementById("idResourcesTab_Select");
@@ -2678,6 +2698,7 @@
                     var selectedItem = selectShowMe.options[selectShowMe.selectedIndex];
                     this.ResourceDisplayMode = selectedItem.value;
                     this.RefreshResourcePeriods();
+                    this.UpdateButtonsAsync();
                     break;
                 case "ResourcesTab_ShowGrouping_Click":
                     var stateOn = this.resourcesTab.getButtonState("idResourcesTab_ShowGrouping");
@@ -2702,6 +2723,7 @@
                     }
                     this.InitialiseResourceGrid();
                     this.RefreshResourcePeriods();
+                    this.UpdateButtonsAsync();
                     break;
                 case "ResourcesTab_RemoveSorting_Click":
                     Grids["g_Res"].ChangeSort('');
@@ -2829,50 +2851,54 @@
         }
     };
     RPEditor.prototype.ShowSelectedResourceGroup = function () {
+        var resgrid = this.resgrid;
+        resgrid.Rendering = true;
         switch (this.ResourcesSelectMode) {
             case 0: // show all
-                var row = this.resgrid.GetFirst(null, 0);
+                resgrid.ChangeColsVisibility([], ["Match"], 0);
+                var row = resgrid.GetFirst(null, 0);
                 while (row != null) {
-                    this.resgrid.ShowRow(row);
-                    row = this.resgrid.GetNext(row);
+                    resgrid.SetAttribute(row, "Match", null, 0, 0, 0);
+                    resgrid.ShowRow(row, true);
+                    row = resgrid.GetNext(row);
                 }
-                this.resgrid.ChangeColsVisibility([], ["Match"], 0);
-                row = this.resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(this.resgrid, row);
+                resgrid.SortRows();
+                row = resgrid.GetFirst(null, 0);
+                this.HideUnusedGroupRows(resgrid, row);
                 break;
             case 1: // show generic
-                var row = this.resgrid.GetFirst(null, 0);
+                var row = resgrid.GetFirst(null, 0);
                 while (row != null) {
-                    if (this.resgrid.GetAttribute(row, null, "IsGeneric") != 0) this.resgrid.ShowRow(row); else this.resgrid.HideRow(row);
-                    row = this.resgrid.GetNext(row);
+                    if (resgrid.GetAttribute(row, null, "IsGeneric") != 0) resgrid.ShowRow(row, true); else resgrid.HideRow(row, true);
+                    row = resgrid.GetNext(row);
                 }
-                this.resgrid.HideCol("Match");
-                row = this.resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(this.resgrid, row);
+                resgrid.HideCol("Match");
+                row = resgrid.GetFirst(null, 0);
+                this.HideUnusedGroupRows(resgrid, row);
                 break;
             case 2: // show plan
                 var resarr = this.GetPlanResourceArray();
-                var row = this.resgrid.GetFirst(null, 0);
+                var row = resgrid.GetFirst(null, 0);
                 while (row != null) {
-                    var resuid = this.resgrid.GetAttribute(row, null, "Res_UID");
-                    if (resarr[resuid] != null) this.resgrid.ShowRow(row); else this.resgrid.HideRow(row);
-                    row = this.resgrid.GetNext(row);
+                    var resuid = resgrid.GetAttribute(row, null, "Res_UID");
+                    if (resarr[resuid] != null) resgrid.ShowRow(row, true); else resgrid.HideRow(row, true);
+                    row = resgrid.GetNext(row);
                 }
-                this.resgrid.HideCol("Match");
-                row = this.resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(this.resgrid, row);
+                resgrid.HideCol("Match");
+                row = resgrid.GetFirst(null, 0);
+                this.HideUnusedGroupRows(resgrid, row);
                 break;
             case 3: // show team
                 var resarr = this.GetPlanResourceArray();
-                var row = this.resgrid.GetFirst(null, 0);
+                var row = resgrid.GetFirst(null, 0);
                 while (row != null) {
-                    var resuid = this.resgrid.GetAttribute(row, null, "Res_UID");
-                    if (this.resgrid.GetAttribute(row, null, "InTeam") != null || resarr[resuid] != null) this.resgrid.ShowRow(row); else this.resgrid.HideRow(row);
-                    row = this.resgrid.GetNext(row);
+                    var resuid = resgrid.GetAttribute(row, null, "Res_UID");
+                    if (resgrid.GetAttribute(row, null, "InTeam") != null || resarr[resuid] != null) resgrid.ShowRow(row, true); else resgrid.HideRow(row, true);
+                    row = resgrid.GetNext(row);
                 }
-                this.resgrid.HideCol("Match");
-                row = this.resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(this.resgrid, row);
+                resgrid.HideCol("Match");
+                row = resgrid.GetFirst(null, 0);
+                this.HideUnusedGroupRows(resgrid, row);
                 break;
             case 4: // match
                 this.HandleMatch();
@@ -2881,6 +2907,9 @@
                 alert("unknown resource select mode - '" + this.ResourcesSelectMode + "'");
                 break;
         }
+        resgrid.Rendering = false;
+        if (this.initialized == true)
+            resgrid.RenderBody();
     };
     RPEditor.prototype.HideUnusedGroupRows = function (grid, row) {
         var bUsed = false;
@@ -2889,9 +2918,9 @@
             if (stype.substr(0, 2) === "GR") {
                 var childrow = row.firstChild;
                 if (this.HideUnusedGroupRows(grid, childrow) == false) {
-                    grid.HideRow(row);
+                    grid.HideRow(row, true);
                 } else {
-                    grid.ShowRow(row);
+                    grid.ShowRow(row, true);
                     bUsed = true;
                 }
             } else if (row.Visible != 0) {
@@ -4312,14 +4341,17 @@
         return null;
     };
     RPEditor.prototype.RefreshResourcePeriods = function () {
-        var grid = Grids["g_Res"];
-
-        var row = grid.GetFirst(null, 0);
+        var resgrid = Grids["g_Res"];
+        resgrid.Rendering = true;
+        var row = resgrid.GetFirst(null, 0);
         while (row != null) {
-            this.RefreshResourceRowPeriods(grid, row, true);
-            row = grid.GetNext(row);
+            this.RefreshResourceRowPeriods(resgrid, row, false);
+            row = resgrid.GetNext(row);
         }
-        grid.Calculate(1, 0);
+        resgrid.Rendering = false;
+        if (this.initialized == true)
+            resgrid.RenderBody();
+        resgrid.Calculate(1, 0);
     };
     RPEditor.prototype.CalculateResourceRowCommitted = function (resuid, resrow) {
         var plangrid = this.plangrid;
@@ -4877,9 +4909,8 @@
         var planrowresuid = plangrid.GetAttribute(planrow, null, "Res_UID");
         var resrow = resgrid.GetFirst(null, 0);
         while (resrow != null) {
-            resgrid.SetAttribute(resrow, null, "Match", null, 1, 0);
             if (this.CanMatchResourceToPlanRow(planrow, resrow, false, false) == false) {
-                resgrid.HideRow(resrow);
+                resgrid.HideRow(resrow, true);
             } else {
                 var match = 0;
                 var planroleUid = plangrid.GetAttribute(planrow, null, "Role_UID");
@@ -4946,21 +4977,24 @@
                             }
                         }
                     }
-                    match += ((50.0 * hourssatisfied) / hourstotal);
+                    if (hourstotal > 0)
+                        match += ((50.0 * hourssatisfied) / hourstotal);
+                    else
+                        match += 50.0;
                 }
                 if (match > 0) {
-                    resgrid.SetAttribute(resrow, null, "Match", match, 1, 0);
-                    resgrid.ShowRow(resrow);
+                    resgrid.SetAttribute(resrow, "Match", null, match, 1, 0);
+                    resgrid.ShowRow(resrow, true);
                 }
                 else
-                    resgrid.HideRow(resrow);
+                    resgrid.HideRow(resrow, true);
             }
+            //resgrid.SetAttribute(resrow, null, "Match", null, 1, 0);
             resrow = resgrid.GetNext(resrow);
         }
 
-
-        resgrid.ShowCol("Match");
         resgrid.ChangeSort("Match");
+        resgrid.ShowCol("Match");
         resgrid.SortClick("Match", 1);
         var select = document.getElementById("idResourcesTab_Select");
         this.ResourcesSelectMode = 4;
@@ -5057,7 +5091,8 @@
     };
     RPEditor.prototype.SetPlanRowsEditStatus = function () {
         var plangrid = this.plangrid;
-        if (plangrid.RowCount > 0) {
+        //if (plangrid.RowCount > 0) {
+        if (plangrid.GetFirst(null, 0) != null) {
             var row = plangrid.GetFirst(null, 0);
             while (row != null) {
                 this.SetPlanRowEditStatus(row);

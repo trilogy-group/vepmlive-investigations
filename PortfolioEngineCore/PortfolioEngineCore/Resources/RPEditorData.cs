@@ -69,7 +69,8 @@ namespace PortfolioEngineCore
             // setting this causes grid to scroll back to top when resized
             //xCfg.CreateIntAttr("ShowVScroll", 1);
             xCfg.CreateIntAttr("ConstHeight", 1); // If set to 1, updates height of grid to fill whole main tag. It does not modify main tag height, see MaxHeight.
-            xCfg.CreateIntAttr("SelectingCells", 1);
+            xCfg.CreateIntAttr("Selecting", 0);
+            xCfg.CreateIntAttr("SelectingCells", 0);
             xCfg.CreateStringAttr("DragCursor", "w-resize");
             xCfg.CreateIntAttr("StaticCursor", 1);
 
