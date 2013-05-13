@@ -81,7 +81,7 @@ namespace EPMLiveCore
             {
                 SPList list = SPContext.Current.Web.Lists[_listID];
                 SPQuery query = new SPQuery();
-                query.Query = "";
+                query.Query = "<Where><Eq><FieldRef Name='" + _parentListField + "' LookupId='TRUE'/><Value Type='Lookup'>" + int.Parse(_parentValue).ToString() + "</Value></Eq></Where>";
                 if (_field.Contains("ID") || _parentListField.Contains("ID"))
                 {
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='" + _parentListField + "' />";
@@ -92,26 +92,14 @@ namespace EPMLiveCore
                 }
                 query.ViewFieldsOnly = true;
                 SPListItemCollection items = list.GetItems(query);
-                DataTable dt = items.GetDataTable();
-                _sbResult = new StringBuilder();
-                SPFieldLookupValue testVal = null;
-
-                if (dt != null)
+                if (items.Count > 0)
                 {
-                    DataRow[] results = dt.Select("", _field + " ASC");
-                    foreach (DataRow r in results)
-                    {
-                        try
-                        {
-                            testVal = null;
-                            testVal = new SPFieldLookupValue(list.GetItemById((int)r["ID"])[_parentListField].ToString());
-                        }
-                        catch { }
+                    DataTable dt = items.GetDataTable();
+                    _sbResult = new StringBuilder();
 
-                        if (testVal != null && (testVal.LookupId == int.Parse(_parentValue)))
-                        {
-                            _sbResult.Append(r["ID"].ToString() + "," + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                        }
+                    foreach (DataRow r in dt.Rows)
+                    {
+                        _sbResult.Append(r["ID"].ToString() + "," + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
                     }
                 }
             }
@@ -120,14 +108,7 @@ namespace EPMLiveCore
                 SPList list = SPContext.Current.Web.Lists[_listID];
                 SPQuery query = new SPQuery();
                 query.Query = "";
-                if (_field.Contains("ID"))
-                {
-                    query.ViewFields = "<FieldRef Name='ID' />";
-                }
-                else
-                {
-                    query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' />";
-                }
+                query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' />";
                 query.ViewFieldsOnly = true;
                 SPListItemCollection items = list.GetItems(query);
                 DataTable dt = items.GetDataTable();
