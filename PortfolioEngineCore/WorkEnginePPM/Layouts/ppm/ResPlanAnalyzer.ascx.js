@@ -1,205 +1,205 @@
 ﻿function ResPlanAnalyzer(thisID, params) {
-	// NB Constructor code at end of function
-	var MakeDelegate = function (target, method) {
-		if (method === null) {
-			throw ("Method not found");
-		}
+    // NB Constructor code at end of function
+    var MakeDelegate = function (target, method) {
+        if (method === null) {
+            throw ("Method not found");
+        }
 
-		return function () {
-			return method.apply(target, arguments);
-		}
-	}
+        return function () {
+            return method.apply(target, arguments);
+        }
+    }
 
-	//  General page settings
-
-
-	ResPlanAnalyzer.prototype.OnLoad = function (event) {
-		try {
-
-			Grids.OnValueChanged = GridsOnValueChangedDelegate;
-			Grids.OnAfterValueChanged = GridsOnAfterValueChangedDelegate;
-
-			Grids.OnFilterFinish = GridsOnFilterFinishDelegate;
-			Grids.OnClickCell = GridsOnClickCellDelegate;
-			Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
-			Grids.OnReady = GridsOnReadyDelegate;
-			Grids.OnAfterColResize = GridsOnAfterColResizeDelegate;
-			Grids.OnStartDragCell = GridsOnStartDragCellDelegate;
-			Grids.OnEndDragCell = GridsOnEndDragCellDelegate;
-			Grids.OnMoveDragCell = GridsOnMoveDragCellDelegate;
-			Grids.OnMouseDown = GridsOnMouseDownDelegate;
-			
-  
-			Grids.OnRenderStart = GridsOnRenderStartDelegate;
-			Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
+    //  General page settings
 
 
+    ResPlanAnalyzer.prototype.OnLoad = function (event) {
+        try {
 
-			Grids.OnUpdated = GridsOnUpdatedDelegate;
+            Grids.OnValueChanged = GridsOnValueChangedDelegate;
+            Grids.OnAfterValueChanged = GridsOnAfterValueChangedDelegate;
 
-
-			WorkEnginePPM.ResPlanAnalyzer.set_path(this.params.Webservice);
-
-
-			WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
-		}
-		catch (e) {
-			alert("Resource Analyzer OnLoad Exception");
-		}
-	}
-
-	ResPlanAnalyzer.prototype.OnUnload = function (event) {
-		if (this.Dirty && this.ExitConfirmed == false)
-			event.returnValue = "You have unsaved changes.\n\nAre you sure you want to exit without saving?";
-		this.ExitConfirmed = false;
-	}
+            Grids.OnFilterFinish = GridsOnFilterFinishDelegate;
+            Grids.OnClickCell = GridsOnClickCellDelegate;
+            Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
+            Grids.OnReady = GridsOnReadyDelegate;
+            Grids.OnAfterColResize = GridsOnAfterColResizeDelegate;
+            Grids.OnStartDragCell = GridsOnStartDragCellDelegate;
+            Grids.OnEndDragCell = GridsOnEndDragCellDelegate;
+            Grids.OnMoveDragCell = GridsOnMoveDragCellDelegate;
+            Grids.OnMouseDown = GridsOnMouseDownDelegate;
 
 
-	ResPlanAnalyzer.prototype.OnResize = function (event) {
-		if (this.initialized == true) {
-			//var toolbarDataObjectDiv = document.getElementById("toolbarDataObjectDiv");
-			var lHeight = this.Height;
-			var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
-			if (lHeight > 400) {
-				divLayout.style.height = (lHeight /*- toolbarDataObjectDiv.offsetHeight*/ - 12) + "px";
-
-				var lsplit = Math.floor((lHeight - 200) / 2);
-
-				if (this.TotMaxed == false) {
-			
-					this.layout.cells(this.mainArea).setHeight(lsplit - 12);
-
-					this.layout_totals.cells(this.totalsGridArea).setHeight(lsplit - 12);
-				}
-
-		}
-			var lWidth = this.Width;
-			if (lWidth > 300) {
-				divLayout.style.width = lWidth + "px";
-			}
-
-			this.layout.cont.obj._offsetTop = 0;
-			this.layout.cont.obj._offsetHeight = 0;
-			this.layout.cont.obj._offsetLeft = 0;
-			this.layout.cont.obj._offsetWidth = 0;
-
-
-			this.layout.setSizes();
-			
-			if (this.dlgEditTarget != null) 
-				this.dlgEditTarget.window("winEditTargetDlg").setDimension(this.Width, this.Height);
-		}
-	}
+            Grids.OnRenderStart = GridsOnRenderStartDelegate;
+            Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
 
 
 
-	ResPlanAnalyzer.prototype.HandlePingSession = function () {
-		try {
-			WorkEnginePPM.ResPlanAnalyzer.Execute("RASessionPing", "");
-			this.PingSessionData();
-		}
-		catch (e) {
-
-		}
-
-	}
-
-	ResPlanAnalyzer.prototype.PingSessionData = function () {
-
-		try {
+            Grids.OnUpdated = GridsOnUpdatedDelegate;
 
 
-			window.setTimeout(HandlePingSessionData, 1000 * 60);
-		}
-
-		catch (e) {
-		}
-	}
+            WorkEnginePPM.ResPlanAnalyzer.set_path(this.params.Webservice);
 
 
-	ResPlanAnalyzer.prototype.SetSize = function (nWidth, nHeight) {
+            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
+        }
+        catch (e) {
+            alert("Resource Analyzer OnLoad Exception");
+        }
+    }
 
-		if (this.Width == nWidth && this.Height == nHeight)
-			return;
-
-		this.Width = nWidth;
-		this.Height = nHeight;
-		this.OnResize();
-	}
-
-	ResPlanAnalyzer.prototype.xmlStringToJson = function (xmlstring) {
-
-		var xml;
-
-		if (window.DOMParser) {
-			parser = new DOMParser();
-			xml = parser.parseFromString(xmlstring, "text/xml");
-		}
-		else // Internet Explorer
-		{
-			xml = new ActiveXObject("Microsoft.XMLDOM");
-			xml.async = false;
-			xml.loadXML(xmlstring);
-		}
-
-		return this.xmlToJson(xml);
+    ResPlanAnalyzer.prototype.OnUnload = function (event) {
+        if (this.Dirty && this.ExitConfirmed == false)
+            event.returnValue = "You have unsaved changes.\n\nAre you sure you want to exit without saving?";
+        this.ExitConfirmed = false;
+    }
 
 
-	}
+    ResPlanAnalyzer.prototype.OnResize = function (event) {
+        if (this.initialized == true) {
+            //var toolbarDataObjectDiv = document.getElementById("toolbarDataObjectDiv");
+            var lHeight = this.Height;
+            var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
+            if (lHeight > 400) {
+                divLayout.style.height = (lHeight /*- toolbarDataObjectDiv.offsetHeight*/ - 12) + "px";
 
-	ResPlanAnalyzer.prototype.xmlToJson = function (xml) {
+                var lsplit = Math.floor((lHeight - 200) / 2);
 
-		// Create the return object
-		var obj = {};
+                if (this.TotMaxed == false) {
 
-		if (xml.nodeType == 1) { // element
-			// do attributes
-			if (xml.attributes.length > 0) {
-				for (var j = 0; j < xml.attributes.length; j++) {
-					var attribute = xml.attributes.item(j);
-					obj[attribute.nodeName] = attribute.nodeValue;
-				}
-			}
-		} else if (xml.nodeType == 3) { // text
-			obj = xml.nodeValue;
-		}
+                    this.layout.cells(this.mainArea).setHeight(lsplit - 12);
 
-		// do children
-		if (xml.hasChildNodes()) {
-			for (var i = 0; i < xml.childNodes.length; i++) {
-				var item = xml.childNodes.item(i);
-				var nodeName = item.nodeName;
-				if (typeof (obj[nodeName]) == "undefined") {
-					obj[nodeName] = this.xmlToJson(item);
-				} else {
-					if (typeof (obj[nodeName].length) == "undefined") {
-						var old = obj[nodeName];
-						obj[nodeName] = [];
-						obj[nodeName].push(old);
-					}
-					obj[nodeName].push(this.xmlToJson(item));
-				}
-			}
-		}
-		return obj;
-	};
+                    this.layout_totals.cells(this.totalsGridArea).setHeight(lsplit - 12);
+                }
 
-	ResPlanAnalyzer.prototype.BuildViewInf = function (viewGUID, viewName, isViewDefault, isViewPersonal, bConvToJSON) {
-		if (isViewDefault == true) isViewDefault = 1; else if (isViewDefault == false) isViewDefault = 0;
-		if (isViewPersonal == true) isViewPersonal = 1; else if (isViewPersonal == false) isViewPersonal = 0;
+            }
+            var lWidth = this.Width;
+            if (lWidth > 300) {
+                divLayout.style.width = lWidth + "px";
+            }
 
-		var sTopGrid = this.BuildGridInf("g_1", this.AnalyzerFilterschecked, this.AnalyzeGroupingchecked, this.AnalyzerTabisCollapsed);
-
-		var sBottomGrid = this.BuildGridInf("bottomg_1", this.TotalFilterschecked, this.TotalGroupingchecked, this.TotalTabisCollapsed);
+            this.layout.cont.obj._offsetTop = 0;
+            this.layout.cont.obj._offsetHeight = 0;
+            this.layout.cont.obj._offsetLeft = 0;
+            this.layout.cont.obj._offsetWidth = 0;
 
 
-		// need to get details xml, totals xml, mode settings 
+            this.layout.setSizes();
 
-		var ssbf = (this.AnalyzerShowBarschecked ? "1" : "0");
-		var shdf = (this.AnalyzerHideDetailschecked ? "1" : "0");
-			
+            if (this.dlgEditTarget != null)
+                this.dlgEditTarget.window("winEditTargetDlg").setDimension(this.Width, this.Height);
+        }
+    }
 
-		var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
+
+
+    ResPlanAnalyzer.prototype.HandlePingSession = function () {
+        try {
+            WorkEnginePPM.ResPlanAnalyzer.Execute("RASessionPing", "");
+            this.PingSessionData();
+        }
+        catch (e) {
+
+        }
+
+    }
+
+    ResPlanAnalyzer.prototype.PingSessionData = function () {
+
+        try {
+
+
+            window.setTimeout(HandlePingSessionData, 1000 * 60);
+        }
+
+        catch (e) {
+        }
+    }
+
+
+    ResPlanAnalyzer.prototype.SetSize = function (nWidth, nHeight) {
+
+        if (this.Width == nWidth && this.Height == nHeight)
+            return;
+
+        this.Width = nWidth;
+        this.Height = nHeight;
+        this.OnResize();
+    }
+
+    ResPlanAnalyzer.prototype.xmlStringToJson = function (xmlstring) {
+
+        var xml;
+
+        if (window.DOMParser) {
+            parser = new DOMParser();
+            xml = parser.parseFromString(xmlstring, "text/xml");
+        }
+        else // Internet Explorer
+        {
+            xml = new ActiveXObject("Microsoft.XMLDOM");
+            xml.async = false;
+            xml.loadXML(xmlstring);
+        }
+
+        return this.xmlToJson(xml);
+
+
+    }
+
+    ResPlanAnalyzer.prototype.xmlToJson = function (xml) {
+
+        // Create the return object
+        var obj = {};
+
+        if (xml.nodeType == 1) { // element
+            // do attributes
+            if (xml.attributes.length > 0) {
+                for (var j = 0; j < xml.attributes.length; j++) {
+                    var attribute = xml.attributes.item(j);
+                    obj[attribute.nodeName] = attribute.nodeValue;
+                }
+            }
+        } else if (xml.nodeType == 3) { // text
+            obj = xml.nodeValue;
+        }
+
+        // do children
+        if (xml.hasChildNodes()) {
+            for (var i = 0; i < xml.childNodes.length; i++) {
+                var item = xml.childNodes.item(i);
+                var nodeName = item.nodeName;
+                if (typeof (obj[nodeName]) == "undefined") {
+                    obj[nodeName] = this.xmlToJson(item);
+                } else {
+                    if (typeof (obj[nodeName].length) == "undefined") {
+                        var old = obj[nodeName];
+                        obj[nodeName] = [];
+                        obj[nodeName].push(old);
+                    }
+                    obj[nodeName].push(this.xmlToJson(item));
+                }
+            }
+        }
+        return obj;
+    };
+
+    ResPlanAnalyzer.prototype.BuildViewInf = function (viewGUID, viewName, isViewDefault, isViewPersonal, bConvToJSON) {
+        if (isViewDefault == true) isViewDefault = 1; else if (isViewDefault == false) isViewDefault = 0;
+        if (isViewPersonal == true) isViewPersonal = 1; else if (isViewPersonal == false) isViewPersonal = 0;
+
+        var sTopGrid = this.BuildGridInf("g_1", this.AnalyzerFilterschecked, this.AnalyzeGroupingchecked, this.AnalyzerTabisCollapsed);
+
+        var sBottomGrid = this.BuildGridInf("bottomg_1", this.TotalFilterschecked, this.TotalGroupingchecked, this.TotalTabisCollapsed);
+
+
+        // need to get details xml, totals xml, mode settings 
+
+        var ssbf = (this.AnalyzerShowBarschecked ? "1" : "0");
+        var shdf = (this.AnalyzerHideDetailschecked ? "1" : "0");
+
+
+        var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
 				+ isViewDefault + '" Personal="' + isViewPersonal + '">'
 				+ sTopGrid
 				+ sBottomGrid
@@ -209,1540 +209,1567 @@
 				+ this.DisplayMode
 				+ '</OtherData>'
 				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '"/>'
-				+'</View>';
+				+ '</View>';
 
-		if (bConvToJSON != true)
-			return dataXml;
-
-
-		return this.xmlStringToJson(dataXml);
-
-	}
-
-	ResPlanAnalyzer.prototype.BuildGridInf = function (gridId, showFilter, showGrouping, ribbonExpanded) {
-		if (showFilter == true) showFilter = 1; else if (showFilter == false) showFilter = 0;
-		if (showGrouping == true) showGrouping = 1; else if (showGrouping == false) showGrouping = 0;
-		var grid = Grids[gridId];
-		var leftCols = '';
-		var cols = '';
-		var rightCols = '';
-
-		var rexpanded = 1;
-
-		if (ribbonExpanded == false)
-			rexpanded = 0;
-
-		var visibleCols = grid.GetCols("Visible");
-		for (var i = 0; i < visibleCols.length; i++) {
-			var colName = visibleCols[i];
-			var c = grid.Cols[colName];
-
-			if (c.Sec === 0) {
-				leftCols += ',' + colName + ':' + c.Width;
-			} else if (c.Sec === 1) {
-				cols += ',' + colName + ':' + c.Width;
-			} else if (c.Sec === 2) {
-				rightCols += ',' + colName + ':' + c.Width;
-			}
-		}
-
-		try {
-			leftCols = leftCols.substr(1);
-		} catch (e) {
-		}
-
-		try {
-			cols = cols.substr(1);
-		} catch (e) {
-		}
-
-		try {
-			rightCols = rightCols.substr(1);
-		} catch (e) {
-		}
+        if (bConvToJSON != true)
+            return dataXml;
 
 
-		var filterRow = grid.GetRowById('Filter');
-		var filters = '';
-		if (filterRow !== null) {
-			for (var col in grid.Cols) {
-				var cell = filterRow[col + 'Filter'];
+        return this.xmlStringToJson(dataXml);
 
-				if (cell !== undefined) {
-					if (cell !== 0) {
-						filters += ',' + col + ':' + filterRow[col] + ':' + cell;
-					}
-				}
-			}
-		}
+    }
 
-		if (filters.length > 0) {
-			filters = filters.substr(1);
-		}
+    ResPlanAnalyzer.prototype.BuildGridInf = function (gridId, showFilter, showGrouping, ribbonExpanded) {
+        if (showFilter == true) showFilter = 1; else if (showFilter == false) showFilter = 0;
+        if (showGrouping == true) showGrouping = 1; else if (showGrouping == false) showGrouping = 0;
+        var grid = Grids[gridId];
+        var leftCols = '';
+        var cols = '';
+        var rightCols = '';
+
+        var rexpanded = 1;
+
+        if (ribbonExpanded == false)
+            rexpanded = 0;
+
+        var visibleCols = grid.GetCols("Visible");
+        for (var i = 0; i < visibleCols.length; i++) {
+            var colName = visibleCols[i];
+            var c = grid.Cols[colName];
+
+            if (c.Sec === 0) {
+                leftCols += ',' + colName + ':' + c.Width;
+            } else if (c.Sec === 1) {
+                cols += ',' + colName + ':' + c.Width;
+            } else if (c.Sec === 2) {
+                rightCols += ',' + colName + ':' + c.Width;
+            }
+        }
+
+        try {
+            leftCols = leftCols.substr(1);
+        } catch (e) {
+        }
+
+        try {
+            cols = cols.substr(1);
+        } catch (e) {
+        }
+
+        try {
+            rightCols = rightCols.substr(1);
+        } catch (e) {
+        }
+
+
+        var filterRow = grid.GetRowById('Filter');
+        var filters = '';
+        if (filterRow !== null) {
+            for (var col in grid.Cols) {
+                var cell = filterRow[col + 'Filter'];
+
+                if (cell !== undefined) {
+                    if (cell !== 0) {
+                        filters += ',' + col + ':' + filterRow[col] + ':' + cell;
+                    }
+                }
+            }
+        }
+
+        if (filters.length > 0) {
+            filters = filters.substr(1);
+        }
 
 
 
-		filters = showFilter + '|' + filters;
+        filters = showFilter + '|' + filters;
 
-		var grouping = showGrouping + '|' + grid.Group;
+        var grouping = showGrouping + '|' + grid.Group;
 
-		var sorting = grid.Sort;
+        var sorting = grid.Sort;
 
-		var dataXml = '<' + XMLValue(gridId) + ' LeftCols="' + XMLValue(leftCols) + '" Cols="' + XMLValue(cols) + '" RightCols="'
+        var dataXml = '<' + XMLValue(gridId) + ' LeftCols="' + XMLValue(leftCols) + '" Cols="' + XMLValue(cols) + '" RightCols="'
 					+ XMLValue(rightCols) + '" Filters="' + XMLValue(filters) + '" Grouping="' + grouping + '" Sorting="' + sorting + '" RibbonExpanded="' + rexpanded + '"/>';
-		return dataXml;
-	}
+        return dataXml;
+    }
 
-	ResPlanAnalyzer.prototype.DoesColExist = function (allcols, thiscol) {
-		try {
-			for (var c in allcols) {
-				var cn = allcols[c];
+    ResPlanAnalyzer.prototype.DoesColExist = function (allcols, thiscol) {
+        try {
+            for (var c in allcols) {
+                var cn = allcols[c];
 
-				if (cn == thiscol)
-					return true;
-			}
-		} catch (e) {
+                if (cn == thiscol)
+                    return true;
+            }
+        } catch (e) {
 
-		}
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	ResPlanAnalyzer.prototype.ApplyGridView = function (gridId, view, bRender) {
-	    try {
+    ResPlanAnalyzer.prototype.ApplyGridView = function (gridId, view, bRender) {
+        try {
 
-	        var grid = Grids[gridId];
-	        var gridView = view[gridId];
-	        var allCols = new Array();
+            var grid = Grids[gridId];
+            var gridView = view[gridId];
+            var allCols = new Array();
 
-	        var gcols = grid.GetCols();
+            var gcols = grid.GetCols();
 
-	        var p1c1ind = 0;
+            var p1c1ind = 0;
 
 
-	        var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
-	        var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
+            var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
+            var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
-	        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
-	        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+            var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+            var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
-	        for (var i = 0; i < gcols.length; i++) {
-	            if (gcols[i] == "P1C1") {
-	                p1c1ind = i;
-	                break;
-	            }
-	        }
+            for (var i = 0; i < gcols.length; i++) {
+                if (gcols[i] == "P1C1") {
+                    p1c1ind = i;
+                    break;
+                }
+            }
 
 
-	        if (gridView.LeftCols !== null) {
-	            var leftCols = gridView.LeftCols.split(',');
+            if (gridView.LeftCols !== null) {
+                var leftCols = gridView.LeftCols.split(',');
 
 
-	            if (gridView.LeftCols != "") {
+                if (gridView.LeftCols != "") {
 
 
-	                for (var c in leftCols) {
-	                    var cv = leftCols[c].split(':');
-	                    var col = cv[0];
+                    for (var c in leftCols) {
+                        var cv = leftCols[c].split(':');
+                        var col = cv[0];
 
-	                    if (this.DoesColExist(gcols, col) == true) {
+                        if (this.DoesColExist(gcols, col) == true) {
 
-	                        Array.add(allCols, col);
+                            Array.add(allCols, col);
 
-	                        try {
-	                            var width = cv[1] - grid.Cols[col].Width;
+                            try {
+                                var width = cv[1] - grid.Cols[col].Width;
 
-	                            //                        if (col === 'Edit') {
-	                            //                            if ($.browser.msie && parseInt($.browser.version) <= 8) {
-	                            //                                width = 23;
-	                            //                            }
-	                            //                        }
+                                //                        if (col === 'Edit') {
+                                //                            if ($.browser.msie && parseInt($.browser.version) <= 8) {
+                                //                                width = 23;
+                                //                            }
+                                //                        }
 
-	                            if (width !== 0) {
-	                                grid.SetWidth(col, width);
-	                            }
-	                        } catch (e) {
-	                        }
+                                if (width !== 0) {
+                                    grid.SetWidth(col, width);
+                                }
+                            } catch (e) {
+                            }
 
-	                        grid.MoveCol(col, 0, 1, 1);
-	                    }
-	                }
-	            }
-	        }
+                            grid.MoveCol(col, 0, 1, 1);
+                        }
+                    }
+                }
+            }
 
 
-	        if (gridView.Cols !== null) {
-	            var cols = gridView.Cols.split(',');
+            if (gridView.Cols !== null) {
+                var cols = gridView.Cols.split(',');
 
-	            if (gridView.Cols != "") {
-	                for (var c in cols) {
-	                    var cv = cols[c].split(':');
-	                    var col = cv[0];
+                if (gridView.Cols != "") {
+                    for (var c in cols) {
+                        var cv = cols[c].split(':');
+                        var col = cv[0];
 
-	                    if (this.DoesColExist(gcols, col) == true) {
+                        if (this.DoesColExist(gcols, col) == true) {
 
-	                        Array.add(allCols, col);
+                            Array.add(allCols, col);
 
-	                        try {
-	                            var width = cv[1] - grid.Cols[col].Width;
-	                            if (width !== 0) {
-	                                grid.SetWidth(col, width);
-	                            }
-	                        } catch (e) {
-	                        }
+                            try {
+                                var width = cv[1] - grid.Cols[col].Width;
+                                if (width !== 0) {
+                                    grid.SetWidth(col, width);
+                                }
+                            } catch (e) {
+                            }
 
-	                        grid.MoveCol(col, 1, 1, 1);
-	                    }
-	                }
-	                for (var i = 0; i < gcols.length; i++) {
-	                    if (grid.Cols[gcols[i]].Sec == 2)
-	                        break;
+                            grid.MoveCol(col, 1, 1, 1);
+                        }
+                    }
+                    for (var i = 0; i < gcols.length; i++) {
+                        if (grid.Cols[gcols[i]].Sec == 2)
+                            break;
 
-	                    if (grid.Cols[gcols[i]].Sec == 1) {
-	                        var xfound = false;
-	                        for (var j = 0; j < allCols.length; j++) {
-	                            if (allCols[j] === gcols[i])
-	                                xfound = true;
-	                        }
+                        if (grid.Cols[gcols[i]].Sec == 1) {
+                            var xfound = false;
+                            for (var j = 0; j < allCols.length; j++) {
+                                if (allCols[j] === gcols[i])
+                                    xfound = true;
+                            }
 
-	                        if (!xfound)
-	                            grid.MoveCol(gcols[i], 1, 1, 1);
-	                    }
-	                }
-	            }
+                            if (!xfound)
+                                grid.MoveCol(gcols[i], 1, 1, 1);
+                        }
+                    }
+                }
 
 
-	        }
+            }
 
 
 
-	        var groupCols = grid.Group.split(',');
+            var groupCols = grid.Group.split(',');
 
-	        try { grid.DoGrouping(null); } catch (e) { };
-	        try {
-	            for (var i = 0; i < groupCols.length; i++) {
-	                grid.HideCol(groupCols[i]);
-	            }
-	        } catch (e) { };
+            try { grid.DoGrouping(null); } catch (e) { };
+            try {
+                for (var i = 0; i < groupCols.length; i++) {
+                    grid.HideCol(groupCols[i]);
+                }
+            } catch (e) { };
 
 
-	        try {
-	            if (gridView.Cols !== null) {
-	                var vCols = grid.GetCols('Visible');
-	                vCols = vCols.concat(groupCols);
+            try {
+                if (gridView.Cols !== null) {
+                    var vCols = grid.GetCols('Visible');
+                    vCols = vCols.concat(groupCols);
 
-	                var mainCols = [];
+                    var mainCols = [];
 
-	                var bhadFirstPer = false;
+                    var bhadFirstPer = false;
 
-	                for (var i = 0; i < vCols.length; i++) {
+                    for (var i = 0; i < vCols.length; i++) {
 
-	                    if (vCols[i] === "P1C1")
-	                        bhadFirstPer = true;
+                        if (vCols[i] === "P1C1")
+                            bhadFirstPer = true;
 
-	                    if (bhadFirstPer) {
+                        if (bhadFirstPer) {
 
-	                        var per, sCol;
+                            var per, sCol;
 
-	                        sCol = vCols[i].substr(1, vCols[i].length - 2);
-	                        per = parseInt(sCol);
+                            sCol = vCols[i].substr(1, vCols[i].length - 2);
+                            per = parseInt(sCol);
 
-	                        if (per >= StartID && per <= FinishID)
-	                            allCols.push(vCols[i]);
-	                        else {
-	                            mainCols.push(vCols[i]);
-	                        }
+                            if (per >= StartID && per <= FinishID)
+                                allCols.push(vCols[i]);
+                            else {
+                                mainCols.push(vCols[i]);
+                            }
 
-	                    } else {
+                        } else {
 
-	                        var found = false;
-	                        for (var j = 0; j < allCols.length; j++) {
-	                            if (allCols[j] === vCols[i]) {
-	                                found = true;
-	                            }
-	                        }
+                            var found = false;
+                            for (var j = 0; j < allCols.length; j++) {
+                                if (allCols[j] === vCols[i]) {
+                                    found = true;
+                                }
+                            }
 
-	                        if (!found) {
-	                            mainCols.push(vCols[i]);
-	                        }
-	                    }
-	                }
+                            if (!found) {
+                                mainCols.push(vCols[i]);
+                            }
+                        }
+                    }
 
 
-	                if (allCols.length > 0)
-	                    grid.ChangeColsVisibility(allCols, mainCols, 0);
-	            } else {
-	                this.flashGridView(gridId, false);
-	            }
-	        }
-	        catch (e) { }
+                    if (allCols.length > 0)
+                        grid.ChangeColsVisibility(allCols, mainCols, 0);
+                } else {
+                    this.flashGridView(gridId, false);
+                }
+            }
+            catch (e) { }
 
 
-	        try {
-	            if (gridView['Filters'] === '') {
-	                grid.ChangeFilter('', '', '', 0, 0, null);
-	            } else {
-	                var filters = gridView['Filters'].split('|');
+            try {
+                if (gridView['Filters'] === '') {
+                    grid.ChangeFilter('', '', '', 0, 0, null);
+                } else {
+                    var filters = gridView['Filters'].split('|');
 
-	                if (filters[0] === '1') {
-	                    this.showFilters(grid);
-	                } else {
-	                    this.hideFilters(grid);
-	                }
+                    if (filters[0] === '1') {
+                        this.showFilters(grid);
+                    } else {
+                        this.hideFilters(grid);
+                    }
 
-	                filters[1] = filters[1].replace(",", ":");
+                    filters[1] = filters[1].replace(",", ":");
 
-	                var filter = filters[1].split(':');
+                    var filter = filters[1].split(':');
 
-	                var colvals = new Array();
-	                var valvals = new Array();
-	                var opvals = new Array();
+                    var colvals = new Array();
+                    var valvals = new Array();
+                    var opvals = new Array();
 
-	                if (filter.length > 2) {
-	                    var xi = 0;
+                    if (filter.length > 2) {
+                        var xi = 0;
 
-	                    for (var xj = 0; xj < filter.length; xj++) {
-	                        ++xi;
-	                        if (xi == 1)
-	                            colvals[colvals.length] = filter[xj];
+                        for (var xj = 0; xj < filter.length; xj++) {
+                            ++xi;
+                            if (xi == 1)
+                                colvals[colvals.length] = filter[xj];
 
-	                        else if (xi == 2)
-	                            valvals[valvals.length] = filter[xj];
+                            else if (xi == 2)
+                                valvals[valvals.length] = filter[xj];
 
-	                        else {
-	                            opvals[opvals.length] = filter[xj];
-	                            xi = 0;
-	                        }
-	                    }
+                            else {
+                                opvals[opvals.length] = filter[xj];
+                                xi = 0;
+                            }
+                        }
 
-	                    try { grid.ChangeFilter(colvals, valvals, opvals, 0, 0, null); } catch (e) { };
+                        try { grid.ChangeFilter(colvals, valvals, opvals, 0, 0, null); } catch (e) { };
 
-	                }
+                    }
 
 
 
-	            }
-	        }
-	        catch (e) { }
+                }
+            }
+            catch (e) { }
 
 
-	        try {
-	            grid.ChangeSort(gridView['Sorting']);
-	        } catch (e) { }
+            try {
+                grid.ChangeSort(gridView['Sorting']);
+            } catch (e) { }
 
 
 
 
-	        if (gridView['Grouping'] === '') {
-	            try { grid.DoGrouping(null); } catch (e) { };
-	        } else {
-	            var grouping = gridView['Grouping'].split('|');
+            if (gridView['Grouping'] === '') {
+                try { grid.DoGrouping(null); } catch (e) { };
+            } else {
+                var grouping = gridView['Grouping'].split('|');
 
-	            if (grouping[0] === '1') {
-	                this.showGrouping(grid);
-	            } else {
-	                this.hideGrouping(grid);
-	            }
+                if (grouping[0] === '1') {
+                    this.showGrouping(grid);
+                } else {
+                    this.hideGrouping(grid);
+                }
 
-	            try { grid.DoGrouping(grouping[1]); } catch (e) { };
-	        }
+                try { grid.DoGrouping(grouping[1]); } catch (e) { };
+            }
 
-	        try {
-	            if (bRender)
-	                grid.Render();
-	        }
-	        catch (e) { };
+            try {
+                if (bRender)
+                    grid.Render();
+            }
+            catch (e) { };
 
 
-	    } catch (e) {
-	        this.HandleException("ApplyGridView", e);
-	    }
-	}
+        } catch (e) {
+            this.HandleException("ApplyGridView", e);
+        }
+    }
 
-	ResPlanAnalyzer.prototype.flashGridView = function (gridId, bDoRender) {
-		try {
+    ResPlanAnalyzer.prototype.flashGridView = function (gridId, bDoRender) {
+        try {
 
-			var grid = Grids[gridId];
-			var allCols = new Array();
+            var grid = Grids[gridId];
+            var allCols = new Array();
 
-			var gcols = grid.GetCols();
-			var vCols = grid.GetCols('Visible');
+            var gcols = grid.GetCols();
+            var vCols = grid.GetCols('Visible');
 
-			var p1c1ind = 0;
+            var p1c1ind = 0;
 
 
-			var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
-			var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
+            var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
+            var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
-			var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
-			var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+            var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+            var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
-			for (var i = 0; i < gcols.length; i++) {
-				if (gcols[i] == "P1C1") {
-					p1c1ind = i;
-					break;
-				}
-			}
+            for (var i = 0; i < gcols.length; i++) {
+                if (gcols[i] == "P1C1") {
+                    p1c1ind = i;
+                    break;
+                }
+            }
 
-			for (var i = 0; i < vCols.length; i++) {
-				if (grid.Cols[vCols[i]].Sec < 2) 
-					Array.add(allCols, vCols[i]);
-				else
-					break;
-			}
+            for (var i = 0; i < vCols.length; i++) {
+                if (grid.Cols[vCols[i]].Sec < 2)
+                    Array.add(allCols, vCols[i]);
+                else
+                    break;
+            }
 
 
-			var mainCols = [];
-			var bhadFirstPer = false;
+            var mainCols = [];
+            var bhadFirstPer = false;
 
-			for (var i = 0; i < gcols.length; i++) {
+            for (var i = 0; i < gcols.length; i++) {
 
-				if (gcols[i] === "P1C1")
-					bhadFirstPer = true;
+                if (gcols[i] === "P1C1")
+                    bhadFirstPer = true;
 
-				if (bhadFirstPer) {
+                if (bhadFirstPer) {
 
-					var per, sCol;
+                    var per, sCol;
 
 
-					sCol = gcols[i].substr(1, gcols[i].length - 2);
-					
-					if (gcols[i].charAt(0) != "P")
-						 mainCols.push(gcols[i]);
-					else if (sCol.indexOf("C") == -1)
-						mainCols.push(gcols[i]);
-					else {
-						per = parseInt(sCol);
+                    sCol = gcols[i].substr(1, gcols[i].length - 2);
 
-						if (per >= StartID && per <= FinishID)
-							allCols.push(gcols[i]);
-						else
-							mainCols.push(gcols[i]);
-					}
-				}
-				else {
+                    if (gcols[i].charAt(0) != "P")
+                        mainCols.push(gcols[i]);
+                    else if (sCol.indexOf("C") == -1)
+                        mainCols.push(gcols[i]);
+                    else {
+                        per = parseInt(sCol);
 
-					var found = false;
-					for (var j = 0; j < allCols.length; j++) {
-						if (allCols[j] === gcols[i]) {
-							found = true;
-						}
-					}
+                        if (per >= StartID && per <= FinishID)
+                            allCols.push(gcols[i]);
+                        else
+                            mainCols.push(gcols[i]);
+                    }
+                }
+                else {
 
-					if (!found)
-						mainCols.push(gcols[i]);
-				}
-			}
+                    var found = false;
+                    for (var j = 0; j < allCols.length; j++) {
+                        if (allCols[j] === gcols[i]) {
+                            found = true;
+                        }
+                    }
 
+                    if (!found)
+                        mainCols.push(gcols[i]);
+                }
+            }
 
-			if (allCols.length > 0)
-				grid.ChangeColsVisibility(allCols, mainCols, 0);
-	  
-			try {
-				if (bDoRender == true)
-					grid.Render();
-			}
-			catch (e) { };
 
+            if (allCols.length > 0)
+                grid.ChangeColsVisibility(allCols, mainCols, 0);
 
-		}       
-		catch (e) {
-			this.HandleException("ApplyGridView", e);
-		}
-	}
+            try {
+                if (bDoRender == true)
+                    grid.Render();
+            }
+            catch (e) { };
 
-   
-	ResPlanAnalyzer.prototype.SaveResourceAnalyzerViewComplete = function (jsonString) {
-		try {
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				var view = jsonObject.Result.View;
 
-				var bFound = false;
-				var select = document.getElementById("idAnalyzerTab_SelView");
-				for (var i = 0; i < select.options.length; i++) {
-					if (select.options[i].value == view.ViewGUID) {
-						select.options[i].text = view.Name;
-						bFound = true;
-						this.Views[i] = view;
-						break;
-					}
-				}
-				if (bFound == false) {
-					select.options[select.options.length] = new Option(view.Name, view.ViewGUID, true, true);
+        }
+        catch (e) {
+            this.HandleException("ApplyGridView", e);
+        }
+    }
 
-					this.Views.push(view);
-				}
 
-				if (select.options.length == 0)
-					select.disabled = true;
-				else
-					select.disabled = false;
+    ResPlanAnalyzer.prototype.SaveResourceAnalyzerViewComplete = function (jsonString) {
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+                var view = jsonObject.Result.View;
 
-				this.SetViewChanged(null);
+                var bFound = false;
+                var select = document.getElementById("idAnalyzerTab_SelView");
+                for (var i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value == view.ViewGUID) {
+                        select.options[i].text = view.Name;
+                        bFound = true;
+                        this.Views[i] = view;
+                        break;
+                    }
+                }
+                if (bFound == false) {
+                    select.options[select.options.length] = new Option(view.Name, view.ViewGUID, true, true);
 
-				this.externalEvent('SaveView_Cancel');
+                    this.Views.push(view);
+                }
 
-			}
-		}
-		catch (e) {
-			this.HandleException("SaveResourceAnalyzerViewComplete", e);
-		}
-	}
+                if (select.options.length == 0)
+                    select.disabled = true;
+                else
+                    select.disabled = false;
 
-	ResPlanAnalyzer.prototype.RenameResourceAnalyzerViewComplete = function (jsonString) {
-		try {
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				var view = jsonObject.Result.View;
+                this.SetViewChanged(null);
 
-				var bFound = false;
-				var select = document.getElementById("idAnalyzerTab_SelView");
-				for (var i = 0; i < select.options.length; i++) {
-					if (select.options[i].value == view.ViewGUID) {
-						select.options[i].text = view.Name;
-						bFound = true;
-						break;
-					}
-				}
+                this.externalEvent('SaveView_Cancel');
 
-				this.SetViewChanged(null);
+            }
+        }
+        catch (e) {
+            this.HandleException("SaveResourceAnalyzerViewComplete", e);
+        }
+    }
 
-				this.externalEvent('SaveView_Cancel');
+    ResPlanAnalyzer.prototype.RenameResourceAnalyzerViewComplete = function (jsonString) {
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+                var view = jsonObject.Result.View;
 
-			}
-		}
-		catch (e) {
-			this.HandleException("RenameResourceAnalyzerViewComplete", e);
-		}
-	}
+                var bFound = false;
+                var select = document.getElementById("idAnalyzerTab_SelView");
+                for (var i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value == view.ViewGUID) {
+                        select.options[i].text = view.Name;
+                        bFound = true;
+                        break;
+                    }
+                }
 
-	// >>>>Calendar and periods selection
+                this.SetViewChanged(null);
 
-	ResPlanAnalyzer.prototype.GetCalendarInfoComplete = function (jsonString) {
+                this.externalEvent('SaveView_Cancel');
 
-		try {
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				this.ficalInfo = jsonObject.Result.ResourceAnalyzerCalendars;
+            }
+        }
+        catch (e) {
+            this.HandleException("RenameResourceAnalyzerViewComplete", e);
+        }
+    }
 
-				if (this.ficalInfo.Security.Value != "1") {
+    // >>>>Calendar and periods selection
 
-					alert("You do not have the Global Permission set to access this functionality!");
+    ResPlanAnalyzer.prototype.GetCalendarInfoComplete = function (jsonString) {
 
-					if (parent.SP.UI.DialogResult)
-						parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-					else
-						parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+                this.ficalInfo = jsonObject.Result.ResourceAnalyzerCalendars;
 
+                if (this.ficalInfo.Security.Value != "1") {
 
-					return;
-				}
+                    alert("You do not have the Global Permission set to access this functionality!");
 
+                    if (parent.SP.UI.DialogResult)
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                    else
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-				var CalList = document.getElementById('idCalList');
-				var FromList = document.getElementById('idPerFromList');
-				var ToList = document.getElementById('idPerToList');
-				var LastCal = null;
 
-				this.CmtCal = this.ficalInfo.Calendars.CmtCal.Value;
-				CalList.options.length = 0;
-				FromList.options.length = 0;
-				ToList.options.length = 0;
+                    return;
+                }
 
-				var cal_arr = JSON_GetArray(this.ficalInfo.Calendars, "Calendar");
 
-				if (cal_arr.length == 0) {
-					alert("No Fiscal Calendars have been defined - please contact your administrator");
+                var CalList = document.getElementById('idCalList');
+                var FromList = document.getElementById('idPerFromList');
+                var ToList = document.getElementById('idPerToList');
+                var LastCal = null;
 
-					if (parent.SP.UI.DialogResult)
-						parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-					else
-						parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                this.CmtCal = this.ficalInfo.Calendars.CmtCal.Value;
+                CalList.options.length = 0;
+                FromList.options.length = 0;
+                ToList.options.length = 0;
 
+                var cal_arr = JSON_GetArray(this.ficalInfo.Calendars, "Calendar");
 
-					return;
-				}
+                if (cal_arr.length == 0) {
+                    alert("No Fiscal Calendars have been defined - please contact your administrator");
 
+                    if (parent.SP.UI.DialogResult)
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                    else
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-				if (this.selectCalendarAndPeriods == null) {
-					this.selectCalendarAndPeriods = new dhtmlXWindows();
-					this.selectCalendarAndPeriods.setSkin("dhx_web");
-					this.selectCalendarAndPeriods.enableAutoViewport(false);
-					this.selectCalendarAndPeriods.attachViewportTo(this.params.ClientID + "mainDiv");   // ("layoutDiv");
-					this.selectCalendarAndPeriods.setImagePath("/_layouts/ppm/images/");
-					//                   this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 175);
-					this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 120);
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").setIcon("logo.ico", "logo.ico");
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").allowMove();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").denyResize();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").setModal(true);
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").center();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").setText("Select Analyzer Periods");
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").attachObject("idFCandPerDlgObj");
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").button("close").disable();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").button("park").hide();
-					//      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
 
-				}
-				else
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").show();
+                    return;
+                }
 
 
-				for (var n = 0; n < cal_arr.length; n++) {
-					var cal = cal_arr[n];
-					var Id = cal.calID;
-					var Name = cal.calName;
-					CalList.options[n] = new Option(Name, Id, Id == this.ficalInfo.LastUserData.lastCalID, Id == this.ficalInfo.LastUserData.lastCalID);
-					if (Id == this.ficalInfo.LastUserData.lastCalID)
-						LastCal = cal;
-				}
+                if (this.selectCalendarAndPeriods == null) {
+                    this.selectCalendarAndPeriods = new dhtmlXWindows();
+                    this.selectCalendarAndPeriods.setSkin("dhx_web");
+                    this.selectCalendarAndPeriods.enableAutoViewport(false);
+                    this.selectCalendarAndPeriods.attachViewportTo(this.params.ClientID + "mainDiv");   // ("layoutDiv");
+                    this.selectCalendarAndPeriods.setImagePath("/_layouts/ppm/images/");
+                    //                   this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 175);
+                    this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 120);
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").setIcon("logo.ico", "logo.ico");
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").allowMove();
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").denyResize();
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").setModal(true);
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").center();
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").setText("Select Analyzer Periods");
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").attachObject("idFCandPerDlgObj");
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").button("close").disable();
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").button("park").hide();
+                    //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
 
-				if (LastCal == null) {
-					LastCal = cal_arr[0];
-					this.ficalInfo.LastUserData.lastCalID = LastCal.calID;
-				}
+                }
+                else
+                    this.selectCalendarAndPeriods.window("winFCandPerDlg").show();
 
-				if (LastCal == null)
-					return;
 
-				this.UsingPeriods = LastCal.Periods;
+                for (var n = 0; n < cal_arr.length; n++) {
+                    var cal = cal_arr[n];
+                    var Id = cal.calID;
+                    var Name = cal.calName;
+                    CalList.options[n] = new Option(Name, Id, Id == this.ficalInfo.LastUserData.lastCalID, Id == this.ficalInfo.LastUserData.lastCalID);
+                    if (Id == this.ficalInfo.LastUserData.lastCalID)
+                        LastCal = cal;
+                }
 
-				if (LastCal.Periods != null) {
+                if (LastCal == null) {
+                    LastCal = cal_arr[0];
+                    this.ficalInfo.LastUserData.lastCalID = LastCal.calID;
+                }
 
-					for (var n1 = 0; n1 < LastCal.Periods.Period.length; n1++) {
-						var per = LastCal.Periods.Period[n1];
-						var perId = per.perID;
-						var perName = per.perName;
+                if (LastCal == null)
+                    return;
 
-						FromList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastStartPerID, perId == this.ficalInfo.LastUserData.lastStartPerID);
-						ToList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastFinishPerID, perId == this.ficalInfo.LastUserData.lastFinishPerID);
-					}
-				}
-			}
-		}
+                this.UsingPeriods = LastCal.Periods;
 
-		catch (e) {
-			alert("Resource Analyzer  GetCalendarInfoComplete error " + e.toString());
+                if (LastCal.Periods != null) {
 
-			if (parent.SP.UI.DialogResult)
-				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-			else
-				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
-		}
+                    for (var n1 = 0; n1 < LastCal.Periods.Period.length; n1++) {
+                        var per = LastCal.Periods.Period[n1];
+                        var perId = per.perID;
+                        var perName = per.perName;
 
-		return;
-	}
+                        FromList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastStartPerID, perId == this.ficalInfo.LastUserData.lastStartPerID);
+                        ToList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastFinishPerID, perId == this.ficalInfo.LastUserData.lastFinishPerID);
+                    }
+                }
+            }
+        }
 
-	ResPlanAnalyzer.prototype.SelectCalendar_Change = function () {
-		var CalList = document.getElementById('idCalList');
-		var FromList = document.getElementById('idPerFromList');
-		var ToList = document.getElementById('idPerToList');
-		var Cal = null;
+        catch (e) {
+            alert("Resource Analyzer  GetCalendarInfoComplete error " + e.toString());
 
-		FromList.options.length = 0;
-		ToList.options.length = 0;
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+            else
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+        }
 
-		var CalID = CalList.options[CalList.selectedIndex].value;
-		this.ficalInfo.LastUserData.lastCalID = CalID;
-		this.ficalInfo.LastUserData.lastStartPerID = -1;
-		this.ficalInfo.LastUserData.lastFinishPerID = -1;
+        return;
+    }
 
-		for (var n = 0; n < this.ficalInfo.Calendars.Calendar.length; n++) {
-			Cal = this.ficalInfo.Calendars.Calendar[n];
-			if (CalID == Cal.calID)
-				break;
-		}
+    ResPlanAnalyzer.prototype.SelectCalendar_Change = function () {
+        var CalList = document.getElementById('idCalList');
+        var FromList = document.getElementById('idPerFromList');
+        var ToList = document.getElementById('idPerToList');
+        var Cal = null;
 
-		if (Cal.Periods == null)
-			return;
+        FromList.options.length = 0;
+        ToList.options.length = 0;
 
-		if (Cal.Periods.Period == null)
-			return;
+        var CalID = CalList.options[CalList.selectedIndex].value;
+        this.ficalInfo.LastUserData.lastCalID = CalID;
+        this.ficalInfo.LastUserData.lastStartPerID = -1;
+        this.ficalInfo.LastUserData.lastFinishPerID = -1;
 
+        for (var n = 0; n < this.ficalInfo.Calendars.Calendar.length; n++) {
+            Cal = this.ficalInfo.Calendars.Calendar[n];
+            if (CalID == Cal.calID)
+                break;
+        }
 
-		this.UsingPeriods = Cal.Periods;
+        if (Cal.Periods == null)
+            return;
 
-		for (var n1 = 0; n1 < Cal.Periods.Period.length; n1++) {
-			var per = Cal.Periods.Period[n1];
-			var perId = per.perID;
-			var perName = per.perName;
+        if (Cal.Periods.Period == null)
+            return;
 
-			FromList.options[n1] = new Option(perName, perId, n1 == 0, n1 == 0);
-			ToList.options[n1] = new Option(perName, perId, n1 == (Cal.Periods.Period.length - 1), n1 == (Cal.Periods.Period.length - 1));
-		}
 
-	}
+        this.UsingPeriods = Cal.Periods;
 
+        for (var n1 = 0; n1 < Cal.Periods.Period.length; n1++) {
+            var per = Cal.Periods.Period[n1];
+            var perId = per.perID;
+            var perName = per.perName;
 
-	ResPlanAnalyzer.prototype.SelectFiscalDlg_OKOnClick = function (iCancel) {
+            FromList.options[n1] = new Option(perName, perId, n1 == 0, n1 == 0);
+            ToList.options[n1] = new Option(perName, perId, n1 == (Cal.Periods.Period.length - 1), n1 == (Cal.Periods.Period.length - 1));
+        }
 
+    }
 
-		if (iCancel == 1) {
 
-			if (parent.SP.UI.DialogResult)
-				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-			else
-				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+    ResPlanAnalyzer.prototype.SelectFiscalDlg_OKOnClick = function (iCancel) {
 
 
-			return;
-		}
+        if (iCancel == 1) {
 
-		var CalList = document.getElementById('idCalList');
-		var FromList = document.getElementById('idPerFromList');
-		var ToList = document.getElementById('idPerToList');
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+            else
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
-		if (this.ficalInfo.LastUserData.lastCalID == -1) {
-			alert("No fiscal calendar has been selected!");
-			return;
-		}
+            return;
+        }
 
-		if (FromList.length == 0) {
+        var CalList = document.getElementById('idCalList');
+        var FromList = document.getElementById('idPerFromList');
+        var ToList = document.getElementById('idPerToList');
 
-			alert("The fiscal calendar selected does not have any periods defined!");
-			return;
 
-		}
+        if (this.ficalInfo.LastUserData.lastCalID == -1) {
+            alert("No fiscal calendar has been selected!");
+            return;
+        }
 
-		//        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
-		//        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
-		var per = this.UsingPeriods.Period[0];
-		StartID = per.perID;
-		var per = this.UsingPeriods.Period[this.UsingPeriods.Period.length - 1];
-		FinishID = per.perID;
+        if (FromList.length == 0) {
 
-		//        if (StartID >= FinishID) {
+            alert("The fiscal calendar selected does not have any periods defined!");
+            return;
 
-		//            alert("The From period must be before the To period");
-		//            return;
-		//        }
+        }
 
+        //        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+        //        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+        var per = this.UsingPeriods.Period[0];
+        StartID = per.perID;
+        var per = this.UsingPeriods.Period[this.UsingPeriods.Period.length - 1];
+        FinishID = per.perID;
 
-		this.ficalInfo.LastUserData.lastStartPerID = StartID;
-		this.ficalInfo.LastUserData.lastFinishPerID = FinishID;
+        //        if (StartID >= FinishID) {
 
-		this.selectCalendarAndPeriods.window("winFCandPerDlg").detachObject()
-		this.selectCalendarAndPeriods.window("winFCandPerDlg").close();
-		this.selectCalendarAndPeriods = null;
+        //            alert("The From period must be before the To period");
+        //            return;
+        //        }
 
 
-		this.analyzerCalID = parseInt(this.ficalInfo.LastUserData.lastCalID);
+        this.ficalInfo.LastUserData.lastStartPerID = StartID;
+        this.ficalInfo.LastUserData.lastFinishPerID = FinishID;
 
-		var s = this.BuildLoadInf(this.params.TicketVal, this.ficalInfo.LastUserData.lastCalID, StartID, FinishID);
+        this.selectCalendarAndPeriods.window("winFCandPerDlg").detachObject()
+        this.selectCalendarAndPeriods.window("winFCandPerDlg").close();
+        this.selectCalendarAndPeriods = null;
 
 
-		WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("RALoadData", s, LoadResPlanDataCompleteDelegate);
+        this.analyzerCalID = parseInt(this.ficalInfo.LastUserData.lastCalID);
 
-	}
+        var s = this.BuildLoadInf(this.params.TicketVal, this.ficalInfo.LastUserData.lastCalID, StartID, FinishID);
 
-	ResPlanAnalyzer.prototype.BuildLoadInf = function (sTicket, CalID, StartID, FinishID) {
 
-		var dataXml = '<Load Ticket="' + sTicket + '" CalID="' + CalID + '" StartID="' + StartID + '" FinishID="' + FinishID + '">' + '</Load>';
-		return dataXml;
-	}
+        WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("RALoadData", s, LoadResPlanDataCompleteDelegate);
 
+    }
 
-	// >>>>>> Totals area
+    ResPlanAnalyzer.prototype.BuildLoadInf = function (sTicket, CalID, StartID, FinishID) {
 
+        var dataXml = '<Load Ticket="' + sTicket + '" CalID="' + CalID + '" StartID="' + StartID + '" FinishID="' + FinishID + '">' + '</Load>';
+        return dataXml;
+    }
 
-	ResPlanAnalyzer.prototype.GetTotals = function () {
-		WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetTotalsColumnsConfiguration", "", this.GetTotalsDataCompleteDelegate);
-	}
 
-	ResPlanAnalyzer.prototype.GetTotalsDataComplete = function (jsonString) {
+    // >>>>>> Totals area
 
-		try {
-			if (this.SetTotals == null) {
 
+    ResPlanAnalyzer.prototype.GetTotals = function () {
+        WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetTotalsColumnsConfiguration", "", this.GetTotalsDataCompleteDelegate);
+    }
 
+    ResPlanAnalyzer.prototype.GetTotalsDataComplete = function (jsonString) {
 
-				this.SetTotals = new dhtmlXWindows();
-				this.SetTotals.setSkin("dhx_web");
+        try {
+            if (this.SetTotals == null) {
 
-				this.SetTotals.enableAutoViewport(false);
-				this.SetTotals.attachViewportTo(this.params.ClientID + "mainDiv");
-				this.SetTotals.setImagePath(this.imagePath);
-				this.SetTotals.createWindow("winTotDlg", 20, 30, 570, 510);
-				this.SetTotals.window("winTotDlg").setIcon("logo.ico", "logo.ico");
-				this.SetTotals.window("winTotDlg").allowMove();
-				this.SetTotals.window("winTotDlg").denyResize();
-				this.SetTotals.window("winTotDlg").setModal(true);
-				this.SetTotals.window("winTotDlg").center();
-				this.SetTotals.window("winTotDlg").setText("Totals Column Configuration");
-				this.SetTotals.window("winTotDlg").attachObject("idTotalsColsDlg");
-				this.SetTotals.window("winTotDlg").button("close").disable();
-				this.SetTotals.window("winTotDlg").button("park").hide();
 
-				//       document.getElementById("dhxMainCont").style.border = "none";
 
-				this.TotalsLoading = true;
+                this.SetTotals = new dhtmlXWindows();
+                this.SetTotals.setSkin("dhx_web");
 
-			}
-			else
-				this.SetTotals.window("winTotDlg").show();
+                this.SetTotals.enableAutoViewport(false);
+                this.SetTotals.attachViewportTo(this.params.ClientID + "mainDiv");
+                this.SetTotals.setImagePath(this.imagePath);
+                this.SetTotals.createWindow("winTotDlg", 20, 30, 570, 510);
+                this.SetTotals.window("winTotDlg").setIcon("logo.ico", "logo.ico");
+                this.SetTotals.window("winTotDlg").allowMove();
+                this.SetTotals.window("winTotDlg").denyResize();
+                this.SetTotals.window("winTotDlg").setModal(true);
+                this.SetTotals.window("winTotDlg").center();
+                this.SetTotals.window("winTotDlg").setText("Totals Column Configuration");
+                this.SetTotals.window("winTotDlg").attachObject("idTotalsColsDlg");
+                this.SetTotals.window("winTotDlg").button("close").disable();
+                this.SetTotals.window("winTotDlg").button("park").hide();
 
+                //       document.getElementById("dhxMainCont").style.border = "none";
 
+                this.TotalsLoading = true;
 
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				this.TotalsData = jsonObject.Result.TotalsConfiguration;
+            }
+            else
+                this.SetTotals.window("winTotDlg").show();
 
-				var rbtotByRole = document.getElementById('idTotalsByRole');
-				var rbtotByRes = document.getElementById('idTotalsByRes');
-				var selRoleMode = document.getElementById('idSelRoleView');
-				var selAvail = document.getElementById('idSelTotAvailCols');
-				var selSelected = document.getElementById('idSelSelectedCols');
-				var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
-				var selHeatMap = document.getElementById('idSelHeatmap');
-				var selHeatMapColour = document.getElementById('idSelHeatmapColour');
 
-				if (this.TotalsData.RoleMode.Value == 2)
-					selRoleMode.selectedIndex = 1;
-				else
-					selRoleMode.selectedIndex = 0;
 
-				if (this.TotalsData.TotalByRole.Value == 1) {
-					rbtotByRole.checked = true;
-					rbtotByRes.checked = false;
-					selRoleMode.disabled = false;
-					this.bottomgridbyrole = true;
-				}
-				else {
-					rbtotByRes.checked = true;
-					rbtotByRole.checked = false;
-					selRoleMode.disabled = true;
-					this.bottomgridbyrole = false;
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+                this.TotalsData = jsonObject.Result.TotalsConfiguration;
 
-				}
+                var rbtotByRole = document.getElementById('idTotalsByRole');
+                var rbtotByRes = document.getElementById('idTotalsByRes');
+                var selRoleMode = document.getElementById('idSelRoleView');
+                var selAvail = document.getElementById('idSelTotAvailCols');
+                var selSelected = document.getElementById('idSelSelectedCols');
+                var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+                var selHeatMap = document.getElementById('idSelHeatmap');
+                var selHeatMapColour = document.getElementById('idSelHeatmapColour');
 
-				chkEnableHeatMap.checked = (this.TotalsData.EnableHeatMap.Value == 1);
+                if (this.TotalsData.RoleMode.Value == 2)
+                    selRoleMode.selectedIndex = 1;
+                else
+                    selRoleMode.selectedIndex = 0;
 
+                if (this.TotalsData.TotalByRole.Value == 1) {
+                    rbtotByRole.checked = true;
+                    rbtotByRes.checked = false;
+                    selRoleMode.disabled = false;
+                    this.bottomgridbyrole = true;
+                }
+                else {
+                    rbtotByRes.checked = true;
+                    rbtotByRole.checked = false;
+                    selRoleMode.disabled = true;
+                    this.bottomgridbyrole = false;
 
-				this.TotSelectedOrder = new Array();
+                }
 
-				var titem;
+                chkEnableHeatMap.checked = (this.TotalsData.EnableHeatMap.Value == 1);
 
-				if (this.TotalsData.SelectedOrderItems.Item.length == undefined)
-					this.TotSelectedOrder[0] = 0;
-				else {
 
-					for (i = 0; i < this.TotalsData.SelectedOrderItems.Item.length; i++) {
-						titem = this.TotalsData.SelectedOrderItems.Item[i];
-						this.TotSelectedOrder[i] = titem.ItemID;
-					}
-				}
+                this.TotSelectedOrder = new Array();
 
-				this.TotAddSel = null;
-				this.TotRemSel = null;
+                var titem;
 
-				window.setTimeout(this.FinishTotalsDelegate, 10);
+                if (this.TotalsData.SelectedOrderItems.Item.length == undefined)
+                    this.TotSelectedOrder[0] = 0;
+                else {
 
-			}
-		}
-		catch (e) {
-			alert("Resource Analyzer  GetTotalsDataComplete error " + e.toString());
+                    for (i = 0; i < this.TotalsData.SelectedOrderItems.Item.length; i++) {
+                        titem = this.TotalsData.SelectedOrderItems.Item[i];
+                        this.TotSelectedOrder[i] = titem.ItemID;
+                    }
+                }
 
-			if (this.SetTotals != null) {
-				this.SetTotals.window("winTotDlg").detachObject()
-				this.SetTotals.window("winTotDlg").close();
-				this.SetTotals = null;
-			}
-		}
-		this.TotalsLoading = false;
+                this.TotAddSel = null;
+                this.TotRemSel = null;
 
-	}
+                window.setTimeout(this.FinishTotalsDelegate, 10);
 
- 
-	ResPlanAnalyzer.prototype.ChangeTotalsOptions = function () 
-	{
-		if (this.TotalsLoading == true)
-			return;
+            }
+        }
+        catch (e) {
+            alert("Resource Analyzer  GetTotalsDataComplete error " + e.toString());
 
-		window.setTimeout(FinishTotalsDelegate, 10);
-	}
+            if (this.SetTotals != null) {
+                this.SetTotals.window("winTotDlg").detachObject()
+                this.SetTotals.window("winTotDlg").close();
+                this.SetTotals = null;
+            }
+        }
+        this.TotalsLoading = false;
 
-	ResPlanAnalyzer.prototype.FinishTotals = function () {
-		if (this.TotalsLoading == true)
-			return;
+    }
 
-		var rbtotByRole = document.getElementById('idTotalsByRole');
-		var rbtotByRes = document.getElementById('idTotalsByRes');
-		var selRoleMode = document.getElementById('idSelRoleView');
-		var selAvail = document.getElementById('idSelTotAvailCols');
-		var selSelected = document.getElementById('idSelSelectedCols');
-		var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
-		var selHeatMap = document.getElementById('idSelHeatmap');
-		var selHeatMapColour = document.getElementById('idSelHeatmapColour');
 
-		this.selectedHeatMapColour = selHeatMapColour;
+    ResPlanAnalyzer.prototype.ChangeTotalsOptions = function () {
+        if (this.TotalsLoading == true)
+            return;
 
-		var moveupbtn = document.getElementById('idSelectedColsMoveUp');
-		var movedownbtn = document.getElementById('idSelectedColsMoveDown');
+        window.setTimeout(FinishTotalsDelegate, 10);
+    }
 
+    ResPlanAnalyzer.prototype.FinishTotals = function () {
+        if (this.TotalsLoading == true)
+            return;
 
+        var rbtotByRole = document.getElementById('idTotalsByRole');
+        var rbtotByRes = document.getElementById('idTotalsByRes');
+        var selRoleMode = document.getElementById('idSelRoleView');
+        var selAvail = document.getElementById('idSelTotAvailCols');
+        var selSelected = document.getElementById('idSelSelectedCols');
+        var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+        var selHeatMap = document.getElementById('idSelHeatmap');
+        var selHeatMapColour = document.getElementById('idSelHeatmapColour');
 
-		selRoleMode.disabled = !rbtotByRole.checked;
-		selHeatMap.disabled = !chkEnableHeatMap.checked;
+        this.selectedHeatMapColour = selHeatMapColour;
 
-		selHeatMapColour.disabled = !chkEnableHeatMap.checked;
+        var moveupbtn = document.getElementById('idSelectedColsMoveUp');
+        var movedownbtn = document.getElementById('idSelectedColsMoveDown');
 
-		selAvail.options.length = 0;
-		selSelected.options.length = 0;
-		selHeatMap.options.length = 0;
 
-		this.addbtndisabled = (this.TotAddSel == null);
-		this.setNewButtonDisable('idTotButtonAdd', this.addbtndisabled);
 
-		this.rembtndisabled = (this.TotRemSel == null);
-		this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
+        selRoleMode.disabled = !rbtotByRole.checked;
+        selHeatMap.disabled = !chkEnableHeatMap.checked;
 
-		var i;
-		var item;
-		var j = 0;
+        selHeatMapColour.disabled = !chkEnableHeatMap.checked;
 
-		if (rbtotByRole.checked == false) {
-			var temparr = new Array();
+        selAvail.options.length = 0;
+        selSelected.options.length = 0;
+        selHeatMap.options.length = 0;
 
-			for (i = 0; i < this.TotSelectedOrder.length; i++) {
-				if (this.TotSelectedOrder[i] <= 0)
-					temparr[j++] = this.TotSelectedOrder[i];
-			}
-			this.TotSelectedOrder = temparr;
+        this.addbtndisabled = (this.TotAddSel == null);
+        this.setNewButtonDisable('idTotButtonAdd', this.addbtndisabled);
 
-			if (this.TotalsData.EnableHeatField.Value > 0)
-				this.TotalsData.EnableHeatField.Value = -6;
-		}
+        this.rembtndisabled = (this.TotRemSel == null);
+        this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
 
-		var n1 = 0;
-		var usesel = this.TotalsData.EnableHeatField.Value;
+        var i;
+        var item;
+        var j = 0;
 
-		for (i = 0; i < this.TotalsData.ColumnOptions.ColumnOption.length; i++) {
-			item = this.TotalsData.ColumnOptions.ColumnOption[i];
-			item.Selected = 0;
+        if (rbtotByRole.checked == false) {
+            var temparr = new Array();
 
-			if (item.ColumnID != 0) {
-				if (item.ColumnID != -7 && item.ColumnID != -8) {
+            for (i = 0; i < this.TotSelectedOrder.length; i++) {
+                if (this.TotSelectedOrder[i] <= 0)
+                    temparr[j++] = this.TotSelectedOrder[i];
+            }
+            this.TotSelectedOrder = temparr;
 
-					if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0))
-						selHeatMap.options[n1++] = new Option(item.Name, item.ColumnID, item.ColumnID == usesel, item.ColumnID == usesel);
-				}
-			}
+            if (this.TotalsData.EnableHeatField.Value > 0)
+                this.TotalsData.EnableHeatField.Value = -6;
+        }
 
-		}
+        var n1 = 0;
+        var usesel = this.TotalsData.EnableHeatField.Value;
 
-		n1 = 0;
-		var bSel = false;
+        for (i = 0; i < this.TotalsData.ColumnOptions.ColumnOption.length; i++) {
+            item = this.TotalsData.ColumnOptions.ColumnOption[i];
+            item.Selected = 0;
 
-		var bfound = false;
-		var selval;
+            if (item.ColumnID != 0) {
+                if (item.ColumnID != -7 && item.ColumnID != -8) {
 
-		for (i = 0; i < this.TotSelectedOrder.length; i++) {
-			for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
-				item = this.TotalsData.ColumnOptions.ColumnOption[j];
-				if (item.ColumnID == this.TotSelectedOrder[i]) {
-					bSel = false;
+                    if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0))
+                        selHeatMap.options[n1++] = new Option(item.Name, item.ColumnID, item.ColumnID == usesel, item.ColumnID == usesel);
+                }
+            }
 
-					if (this.TotRemSel != null)
-						bSel = (item.ColumnID == this.TotRemSel);
+        }
 
-					bfound |= bSel;
+        n1 = 0;
+        var bSel = false;
 
-					if (bSel)
-						selval = n1;
+        var bfound = false;
+        var selval;
 
-					selSelected.options[n1] = new Option(item.Name, item.ColumnID, bSel, bSel);
+        for (i = 0; i < this.TotSelectedOrder.length; i++) {
+            for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+                item = this.TotalsData.ColumnOptions.ColumnOption[j];
+                if (item.ColumnID == this.TotSelectedOrder[i]) {
+                    bSel = false;
 
-					if (item.ColumnID == 0) {
-						var opt = selSelected.options[n1];
+                    if (this.TotRemSel != null)
+                        bSel = (item.ColumnID == this.TotRemSel);
 
-						opt.style.color = "#CCCCCC";    // "LightGrey";
-					}
+                    bfound |= bSel;
 
-					++n1;
-					item.Selected = 1;
-					break;
-				}
-			}
-		}
+                    if (bSel)
+                        selval = n1;
 
+                    selSelected.options[n1] = new Option(item.Name, item.ColumnID, bSel, bSel);
 
-		selHeatMapColour.value = this.TotalsData.HeatFieldColour.Value;
+                    if (item.ColumnID == 0) {
+                        var opt = selSelected.options[n1];
 
-		if (bfound == false) {
-			this.TotRemSel = null;
-			moveupbtn.disabled = true;
-			movedownbtn.disabled = true;
-		}
-		else if (selSelected.options.length <= 1) {
-			moveupbtn.disabled = true;
-			movedownbtn.disabled = true;
-		}
-		else {
+                        opt.style.color = "#CCCCCC";    // "LightGrey";
+                    }
 
-			if (selval == 0) {
-				moveupbtn.disabled = true;
-				movedownbtn.disabled = false;
-			}
-			else if (selval == (selSelected.options - 1)) {
-				moveupbtn.disabled = false;
-				movedownbtn.disabled = true;
-			}
-			else {
-				moveupbtn.disabled = false;
-				movedownbtn.disabled = false;
-			}
-		}
-		bfound = false;
+                    ++n1;
+                    item.Selected = 1;
+                    break;
+                }
+            }
+        }
 
 
-		n1 = 0;
-		for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
-			item = this.TotalsData.ColumnOptions.ColumnOption[j];
-			if (item.Selected == 0) {
-				bSel = false;
+        selHeatMapColour.value = this.TotalsData.HeatFieldColour.Value;
 
+        if (bfound == false) {
+            this.TotRemSel = null;
+            moveupbtn.disabled = true;
+            movedownbtn.disabled = true;
+        }
+        else if (selSelected.options.length <= 1) {
+            moveupbtn.disabled = true;
+            movedownbtn.disabled = true;
+        }
+        else {
 
+            if (selval == 0) {
+                moveupbtn.disabled = true;
+                movedownbtn.disabled = false;
+            }
+            else if (selval == (selSelected.options - 1)) {
+                moveupbtn.disabled = false;
+                movedownbtn.disabled = true;
+            }
+            else {
+                moveupbtn.disabled = false;
+                movedownbtn.disabled = false;
+            }
+        }
+        bfound = false;
 
 
-				if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0 && item.ColumnID != -8)) {
-					if (this.TotAddSel != null)
-						bSel = (item.ColumnID == this.TotAddSel);
+        n1 = 0;
+        for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+            item = this.TotalsData.ColumnOptions.ColumnOption[j];
+            if (item.Selected == 0) {
+                bSel = false;
 
-					bfound |= bSel;
 
-					selAvail.options[n1++] = new Option(item.Name, item.ColumnID, bSel, bSel);
-				}
-			}
-		}
 
-		if (bfound == false)
-			this.TotAddSel = null;
 
+                if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0 && item.ColumnID != -8)) {
+                    if (this.TotAddSel != null)
+                        bSel = (item.ColumnID == this.TotAddSel);
 
+                    bfound |= bSel;
 
+                    selAvail.options[n1++] = new Option(item.Name, item.ColumnID, bSel, bSel);
+                }
+            }
+        }
 
-	}
+        if (bfound == false)
+            this.TotAddSel = null;
 
 
-	ResPlanAnalyzer.prototype.TotalsCols_ButtonClick = function (iDir) {
-		var selAvail = document.getElementById('idSelTotAvailCols');
-		var selSelected = document.getElementById('idSelSelectedCols');
-		var i;
-		var j;
-		var item;
 
-		if (iDir == 1) {
-			var iRemColID;
 
-			for (i = 0; i <= selSelected.options.length - 1; i++) {
-				if (selSelected.options[i].selected == true) {
-					if (selSelected.options[i].value == 0) {    // the remove button should be disabled for the totals column - but this is here for belt and braces
-						alert("You cannot remove the Total column from the Selected colulmns");
-						return;
-					}
+    }
 
-					iRemColID = selSelected.options[i].value;
 
-					if (selSelected.options.length == 2) {
-						this.TotRemSel = null;
-					}
-					else if (i == selSelected.options.length - 1)
-						selSelected.options[i - 1].selected = true;
-					else
-						selSelected.options[i + 1].selected = true;
+    ResPlanAnalyzer.prototype.TotalsCols_ButtonClick = function (iDir) {
+        var selAvail = document.getElementById('idSelTotAvailCols');
+        var selSelected = document.getElementById('idSelSelectedCols');
+        var i;
+        var j;
+        var item;
 
-					selSelected.remove(i);
-					break;
-				}
-			}
+        if (iDir == 1) {
+            var iRemColID;
 
-			for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
-				item = this.TotalsData.ColumnOptions.ColumnOption[j];
-				if (item.ColumnID == iRemColID) {
+            for (i = 0; i <= selSelected.options.length - 1; i++) {
+                if (selSelected.options[i].selected == true) {
+                    if (selSelected.options[i].value == 0) {    // the remove button should be disabled for the totals column - but this is here for belt and braces
+                        alert("You cannot remove the Total column from the Selected colulmns");
+                        return;
+                    }
 
-					item.Selected = 0;
-					this.TotAddSel = item.ColumnID;
-					break;
-				}
-			}
+                    iRemColID = selSelected.options[i].value;
 
-			var temparr = new Array();
+                    if (selSelected.options.length == 2) {
+                        this.TotRemSel = null;
+                    }
+                    else if (i == selSelected.options.length - 1)
+                        selSelected.options[i - 1].selected = true;
+                    else
+                        selSelected.options[i + 1].selected = true;
 
-			for (i = 0; i <= this.TotSelectedOrder.length - 1; i++) {
+                    selSelected.remove(i);
+                    break;
+                }
+            }
 
-				if (this.TotSelectedOrder[i] != iRemColID) {
-					temparr[temparr.length] = this.TotSelectedOrder[i];
-				}
-			}
+            for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+                item = this.TotalsData.ColumnOptions.ColumnOption[j];
+                if (item.ColumnID == iRemColID) {
 
-			this.TotSelectedOrder = temparr;
+                    item.Selected = 0;
+                    this.TotAddSel = item.ColumnID;
+                    break;
+                }
+            }
 
-			for (i = 0; i <= selSelected.options.length - 1; i++) {
+            var temparr = new Array();
 
-				if (selSelected.options[i].selected == true) {
-					this.TotRemSel = selSelected.options[i].value;
-					break
-				}
-			}
+            for (i = 0; i <= this.TotSelectedOrder.length - 1; i++) {
 
+                if (this.TotSelectedOrder[i] != iRemColID) {
+                    temparr[temparr.length] = this.TotSelectedOrder[i];
+                }
+            }
 
-			window.setTimeout(this.FinishTotalsDelegate, 10);
-			return;
+            this.TotSelectedOrder = temparr;
 
-		}
+            for (i = 0; i <= selSelected.options.length - 1; i++) {
 
-		// iDir = 0 - so Add a column to the selected list...
+                if (selSelected.options[i].selected == true) {
+                    this.TotRemSel = selSelected.options[i].value;
+                    break
+                }
+            }
 
-		for (i = 0; i <= selAvail.options.length - 1; i++) {
 
-			if (selAvail.options[i].selected == true) {
-				var iAddColID = selAvail.options[i].value;
+            window.setTimeout(this.FinishTotalsDelegate, 10);
+            return;
 
-				if (selAvail.options.length == 1) {
-					this.TotAddSel = null;
-				}
-				else if (i == selAvail.options.length - 1)
-					selAvail.options[i - 1].selected = true;
-				else
-					selAvail.options[i + 1].selected = true;
+        }
 
-				selAvail.remove(i);
+        // iDir = 0 - so Add a column to the selected list...
 
-				for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
-					item = this.TotalsData.ColumnOptions.ColumnOption[j];
-					if (item.ColumnID == iAddColID) {
+        for (i = 0; i <= selAvail.options.length - 1; i++) {
 
-						item.Selected == 1;
+            if (selAvail.options[i].selected == true) {
+                var iAddColID = selAvail.options[i].value;
 
-						this.TotSelectedOrder[this.TotSelectedOrder.length] = item.ColumnID;
+                if (selAvail.options.length == 1) {
+                    this.TotAddSel = null;
+                }
+                else if (i == selAvail.options.length - 1)
+                    selAvail.options[i - 1].selected = true;
+                else
+                    selAvail.options[i + 1].selected = true;
 
-						this.TotRemSel = item.ColumnID;
-						break;
-					}
-				}
+                selAvail.remove(i);
 
+                for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
+                    item = this.TotalsData.ColumnOptions.ColumnOption[j];
+                    if (item.ColumnID == iAddColID) {
 
-				break;
-			}
-		}
+                        item.Selected == 1;
 
-		for (i = 0; i <= selAvail.options.length - 1; i++) {
+                        this.TotSelectedOrder[this.TotSelectedOrder.length] = item.ColumnID;
 
-			if (selAvail.options[i].selected == true) {
-				this.TotAddSel = selAvail.options[i].value;
-				break
-			}
-		}
+                        this.TotRemSel = item.ColumnID;
+                        break;
+                    }
+                }
 
 
-		window.setTimeout(this.FinishTotalsDelegate, 10);
-		return;
+                break;
+            }
+        }
 
+        for (i = 0; i <= selAvail.options.length - 1; i++) {
 
+            if (selAvail.options[i].selected == true) {
+                this.TotAddSel = selAvail.options[i].value;
+                break
+            }
+        }
 
-	}
 
-	ResPlanAnalyzer.prototype.TotalsSelColsMove_ButtonClick = function (iallezup) {
-		var selSelected = document.getElementById('idSelSelectedCols');
-		var moveupbtn = document.getElementById('idSelectedColsMoveUp');
-		var movedownbtn = document.getElementById('idSelectedColsMoveDown');
+        window.setTimeout(this.FinishTotalsDelegate, 10);
+        return;
 
-		var i;
-		var selival;
-		var swapval;
 
 
-		for (i = 0; i <= selSelected.options.length; i++) {
+    }
 
-			if (selSelected.options[i].selected == true) {
-				selival = i;
-				break;
-			}
-		}
+    ResPlanAnalyzer.prototype.TotalsSelColsMove_ButtonClick = function (iallezup) {
+        var selSelected = document.getElementById('idSelSelectedCols');
+        var moveupbtn = document.getElementById('idSelectedColsMoveUp');
+        var movedownbtn = document.getElementById('idSelectedColsMoveDown');
 
-		if (iallezup == 1) {
-			if (selival == 0)
-				return;
+        var i;
+        var selival;
+        var swapval;
 
-			swapval = this.TotSelectedOrder[selival];
-			this.TotSelectedOrder[selival] = this.TotSelectedOrder[selival - 1];
-			this.TotSelectedOrder[selival - 1] = swapval;
-		}
-		else {
-			if (selival == selSelected.options.length - 1)
-				return;
 
-			swapval = this.TotSelectedOrder[selival];
-			this.TotSelectedOrder[selival] = this.TotSelectedOrder[selival + 1];
-			this.TotSelectedOrder[selival + 1] = swapval;
-		}
+        for (i = 0; i <= selSelected.options.length; i++) {
 
-		window.setTimeout(this.FinishTotalsDelegate, 10);
+            if (selSelected.options[i].selected == true) {
+                selival = i;
+                break;
+            }
+        }
 
-	}
+        if (iallezup == 1) {
+            if (selival == 0)
+                return;
 
-	ResPlanAnalyzer.prototype.SelectTotals_OKOnClick = function (iApply) {
-		if (iApply == 1) {
+            swapval = this.TotSelectedOrder[selival];
+            this.TotSelectedOrder[selival] = this.TotSelectedOrder[selival - 1];
+            this.TotSelectedOrder[selival - 1] = swapval;
+        }
+        else {
+            if (selival == selSelected.options.length - 1)
+                return;
 
+            swapval = this.TotSelectedOrder[selival];
+            this.TotSelectedOrder[selival] = this.TotSelectedOrder[selival + 1];
+            this.TotSelectedOrder[selival + 1] = swapval;
+        }
 
-			var rbtotByRole = document.getElementById('idTotalsByRole');
-			var selRoleMode = document.getElementById('idSelRoleView');
-			var selAvail = document.getElementById('idSelTotAvailCols');
-			var selSelected = document.getElementById('idSelSelectedCols');
-			var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
-			var selHeatMap = document.getElementById('idSelHeatmap');
-			var selHeatMapColour = document.getElementById('idSelHeatmapColour');
+        window.setTimeout(this.FinishTotalsDelegate, 10);
 
+    }
 
-			var sb = new StringBuilder();
-			sb.append("<TotalsConfiguration>");
+    ResPlanAnalyzer.prototype.SelectTotals_OKOnClick = function (iApply) {
+        if (iApply == 1) {
 
-			var sbDataxml = new StringBuilder();
-			sbDataxml.append("<TotalByRole Value='");
-			sbDataxml.append((rbtotByRole.checked ? "1" : "0"));
-			sbDataxml.append("'/>");
-			sb.append(sbDataxml.toString());
 
-			var sbDataxml = new StringBuilder();
-			sbDataxml.append("<RoleMode Value='");
-			sbDataxml.append(selRoleMode.value);
-			sbDataxml.append("'/>");
-			sb.append(sbDataxml.toString());
+            var rbtotByRole = document.getElementById('idTotalsByRole');
+            var selRoleMode = document.getElementById('idSelRoleView');
+            var selAvail = document.getElementById('idSelTotAvailCols');
+            var selSelected = document.getElementById('idSelSelectedCols');
+            var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+            var selHeatMap = document.getElementById('idSelHeatmap');
+            var selHeatMapColour = document.getElementById('idSelHeatmapColour');
 
-			var sbDataxml = new StringBuilder();
-			sbDataxml.append("<EnableHeatMap Value='");
-			sbDataxml.append((chkEnableHeatMap.checked ? "1" : "0"));
-			sbDataxml.append("'/>");
-			sb.append(sbDataxml.toString());
 
-			var sbDataxml = new StringBuilder();
-			sbDataxml.append("<EnableHeatField Value='");
-			sbDataxml.append(selHeatMap.value);
-			sbDataxml.append("'/>");
-			sb.append(sbDataxml.toString());
+            var sb = new StringBuilder();
+            sb.append("<TotalsConfiguration>");
 
-			this.selectedHeatMapColour = selHeatMapColour.value;
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append("<TotalByRole Value='");
+            sbDataxml.append((rbtotByRole.checked ? "1" : "0"));
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
 
-			var sbDataxml = new StringBuilder();
-			sbDataxml.append("<HeatFieldColour Value='");
-			sbDataxml.append(selHeatMapColour.value);
-			sbDataxml.append("'/>");
-			sb.append(sbDataxml.toString());
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append("<RoleMode Value='");
+            sbDataxml.append(selRoleMode.value);
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
 
-			sbDataxml = new StringBuilder();
-			sbDataxml.append("<SelectedOrderItems>");
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append("<EnableHeatMap Value='");
+            sbDataxml.append((chkEnableHeatMap.checked ? "1" : "0"));
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
 
-			if (chkEnableHeatMap.checked) {
-				var w = selHeatMap.selectedIndex;
-				var selected_text = selHeatMap.options[w].text;
-				this.heatmapText = selected_text;
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append("<EnableHeatField Value='");
+            sbDataxml.append(selHeatMap.value);
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
 
-			}
-			else
-				this.heatmapText = "";
+            this.selectedHeatMapColour = selHeatMapColour.value;
 
-			document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append("<HeatFieldColour Value='");
+            sbDataxml.append(selHeatMapColour.value);
+            sbDataxml.append("'/>");
+            sb.append(sbDataxml.toString());
 
-			var i;
-			var j;
-			for (i = 0; i < this.TotSelectedOrder.length; i++) {
-				sbDataxml.append("<Item ");
-				sbDataxml.append("ItemID='");
+            sbDataxml = new StringBuilder();
+            sbDataxml.append("<SelectedOrderItems>");
 
-				j = this.TotSelectedOrder[i];
+            if (chkEnableHeatMap.checked) {
+                var w = selHeatMap.selectedIndex;
+                var selected_text = selHeatMap.options[w].text;
+                this.heatmapText = selected_text;
 
-				if (j == 0)
-					sbDataxml.append("0");
-				else
-					sbDataxml.append(j);
+            }
+            else
+                this.heatmapText = "";
 
-				sbDataxml.append("'/>");
-			}
+            document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
 
-			sbDataxml.append("</SelectedOrderItems>");
-			sb.append(sbDataxml.toString());
+            var i;
+            var j;
+            for (i = 0; i < this.TotSelectedOrder.length; i++) {
+                sbDataxml.append("<Item ");
+                sbDataxml.append("ItemID='");
 
-			sb.append("</TotalsConfiguration>");
+                j = this.TotSelectedOrder[i];
 
-			this.TotalsColumnSettings = sb.toString();
+                if (j == 0)
+                    sbDataxml.append("0");
+                else
+                    sbDataxml.append(j);
 
+                sbDataxml.append("'/>");
+            }
 
-			this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
+            sbDataxml.append("</SelectedOrderItems>");
+            sb.append(sbDataxml.toString());
 
-			var gview = this.stashgridsettings.View.bottomg_1;
-			gview.Cols = null;
-			gview.LeftCols = null;
-			gview.RightCols = null;
+            sb.append("</TotalsConfiguration>");
 
-			if (this.bottomgridbyrole != rbtotByRole.checked) {
-				gview.Grouping = "";
-				gview.Filters = "";
-				gview.Sorting = "";
+            this.TotalsColumnSettings = sb.toString();
 
-			}
-			else {
 
-				this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
-				this.stashgridsettings = null;
-			}
+            this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
 
-			WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SetTotalsColumnsConfiguration", sb.toString(), this.SetTotalsDataCompleteDelegate);
+            var gview = this.stashgridsettings.View.bottomg_1;
+            gview.Cols = null;
+            gview.LeftCols = null;
+            gview.RightCols = null;
 
+            if (this.bottomgridbyrole != rbtotByRole.checked) {
+                gview.Grouping = "";
+                gview.Filters = "";
+                gview.Sorting = "";
 
+            }
+            else {
 
-		}
+                this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+                this.stashgridsettings = null;
+            }
 
-		this.SetTotals.window("winTotDlg").detachObject();
-		this.SetTotals.window("winTotDlg").close();
-		this.SetTotals = null;
+            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SetTotalsColumnsConfiguration", sb.toString(), this.SetTotalsDataCompleteDelegate);
 
 
 
-	}
+        }
 
+        this.SetTotals.window("winTotDlg").detachObject();
+        this.SetTotals.window("winTotDlg").close();
+        this.SetTotals = null;
 
-	ResPlanAnalyzer.prototype.SetTotalsDataComplete = function (jsonString) {
 
-		try {
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				this.TotalsGridSettingsData = jsonObject.Result.TotalsGridSetting;
 
-				this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
-				this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
-				
-				this.heatmapText = "";
+    }
 
-				try {
-					this.heatmapText = this.TotalsGridSettingsData.HeatMap.HeatMapText;
-				}
-				catch (e) { }
 
-				  RefreshBottomGrid();
-			}
-		}
-		catch (e) {
-			alert("Resource Analyzer  SetTotalsDataComplete error " + e.toString());
+    ResPlanAnalyzer.prototype.SetTotalsDataComplete = function (jsonString) {
 
-		}
-	}
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+                this.TotalsGridSettingsData = jsonObject.Result.TotalsGridSetting;
 
-	ResPlanAnalyzer.prototype.SetChangeViewComplete = function (jsonString) {
+                this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
+                this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
 
-		try {
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
+                this.heatmapText = "";
 
-				this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
-				this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
-				
-				var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
+                try {
+                    this.heatmapText = this.TotalsGridSettingsData.HeatMap.HeatMapText;
+                }
+                catch (e) { }
 
-				var wsel = document.getElementById("idAnalyzerTab_SelMode");
-				wsel.selectedIndex = wmode - 1;
+                RefreshBottomGrid();
+            }
+        }
+        catch (e) {
+            alert("Resource Analyzer  SetTotalsDataComplete error " + e.toString());
 
+        }
+    }
 
-				this.DetailsData = jsonObject.Result.ViewData.WorkDetails;
-  
-				 var wselectedItem = wsel.options[wsel.selectedIndex];
+    ResPlanAnalyzer.prototype.SetChangeViewComplete = function (jsonString) {
 
-				this.flashRibbonSelect("idAnalyzerTab_SelMode");
-				this.flashTotalsButtons();
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+                this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
 
-				this.stashgridsettings = null;
+                this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
+                this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
 
-				RefreshBothGrids();
-			}
-		}
-		catch (e) {
-			alert("Resource Analyzer  SetChangeViewComplete error " + e.toString());
+                var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
 
-		}
-	}
+                var wsel = document.getElementById("idAnalyzerTab_SelMode");
+                wsel.selectedIndex = wmode - 1;
 
 
+                this.DetailsData = jsonObject.Result.ViewData.WorkDetails;
 
+                var wselectedItem = wsel.options[wsel.selectedIndex];
 
-	ResPlanAnalyzer.prototype.SelectDetails_OKOnClick = function () {
+                this.flashRibbonSelect("idAnalyzerTab_SelMode");
+                this.flashTotalsButtons();
 
+                this.stashgridsettings = null;
 
-		var chkAct = false;
-		var chkReq = false;
-		var chkMSP = false;
-		var chkOpen = false;
-		var chkNWI = false;
-		var chkOReq = false;
-		
+                RefreshBothGrids();
+            }
+        }
+        catch (e) {
+            alert("Resource Analyzer  SetChangeViewComplete error " + e.toString());
 
-   
+        }
+    }
 
-		try {
-				chkAct = this.analyzerTab.getButtonState("chkActual");
-				chkReq = this.analyzerTab.getButtonState("chkCommit");
-				chkMSP = this.analyzerTab.getButtonState("chkMSP");
-				chkNWI = this.analyzerTab.getButtonState("chkNonWork");
-				chkOReq = this.analyzerTab.getButtonState("chkOpenRequests");
-				chkOpen = this.analyzerTab.getButtonState("chkRequests");
-  
-   
-		}
-		catch(e) {}
 
 
-		var sb = new StringBuilder();
-		sb.append("<WorkDetails>");
 
-		var sbDataxml = new StringBuilder();
-		sbDataxml.append("<ActualWork Value='");
-		sbDataxml.append((chkAct == true ? "1" : "0"));
-		sbDataxml.append("'/>");
-		sb.append(sbDataxml.toString());
+    ResPlanAnalyzer.prototype.SelectDetails_OKOnClick = function () {
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append("<ProposedWork Value='");
-		sbDataxml.append((chkOpen == true ? "1" : "0"));
-		sbDataxml.append("'/>");
-		sb.append(sbDataxml.toString());
 
+        var chkAct = false;
+        var chkReq = false;
+        var chkMSP = false;
+        var chkOpen = false;
+        var chkNWI = false;
+        var chkOReq = false;
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append("<ScheduledWork Value='");
-		sbDataxml.append((chkMSP== true ? "1" : "0"));
-		sbDataxml.append("'/>");
-		sb.append(sbDataxml.toString());
 
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append("<CommittedWork Value='");
-		sbDataxml.append((chkReq == true ? "1" : "0"));
-		sbDataxml.append("'/>");
-		sb.append(sbDataxml.toString());
 
+        try {
+            chkAct = this.analyzerTab.getButtonState("chkActual");
+            chkReq = this.analyzerTab.getButtonState("chkCommit");
+            chkMSP = this.analyzerTab.getButtonState("chkMSP");
+            chkNWI = this.analyzerTab.getButtonState("chkNonWork");
+            chkOReq = this.analyzerTab.getButtonState("chkOpenRequests");
+            chkOpen = this.analyzerTab.getButtonState("chkRequests");
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append("<PersonalWork Value='");
-		sbDataxml.append((chkNWI == true ? "1" : "0"));
-		sbDataxml.append("'/>");
-		sb.append(sbDataxml.toString());
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append("<OpenRequestWork Value='");
-		sbDataxml.append((chkOReq == true ? "1" : "0"));
-		sbDataxml.append("'/>");
-		sb.append(sbDataxml.toString());
-		
-		sb.append("</WorkDetails>");
+        }
+        catch (e) { }
 
-		this.DetailsSettings = sb.toString();
-		this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
-		WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDetails", sb.toString());
 
-		RefreshBothGrids();
-	}
+        var sb = new StringBuilder();
+        sb.append("<WorkDetails>");
 
+        var sbDataxml = new StringBuilder();
+        sbDataxml.append("<ActualWork Value='");
+        sbDataxml.append((chkAct == true ? "1" : "0"));
+        sbDataxml.append("'/>");
+        sb.append(sbDataxml.toString());
 
-	ResPlanAnalyzer.prototype.SetSelectedMode = function (selindex) {
-		try {
-			var selectView = document.getElementById("idAnalyzerTab_SelMode");
+        sbDataxml = new StringBuilder();
+        sbDataxml.append("<ProposedWork Value='");
+        sbDataxml.append((chkOpen == true ? "1" : "0"));
+        sbDataxml.append("'/>");
+        sb.append(sbDataxml.toString());
 
-			if (selindex != null) {
 
-				if (selectView.selectedIndex == (selindex - 1)) {
-					return false;
-				}   
-				
-				selectView.selectedIndex = selindex - 1;
-			}
+        sbDataxml = new StringBuilder();
+        sbDataxml.append("<ScheduledWork Value='");
+        sbDataxml.append((chkMSP == true ? "1" : "0"));
+        sbDataxml.append("'/>");
+        sb.append(sbDataxml.toString());
 
-			//           if (selectView.selectedIndex >= 0) {
-			var selectedItem = selectView.options[selectView.selectedIndex];
 
-			
-			if (selectedItem.value != null) {
+        sbDataxml = new StringBuilder();
+        sbDataxml.append("<CommittedWork Value='");
+        sbDataxml.append((chkReq == true ? "1" : "0"));
+        sbDataxml.append("'/>");
+        sb.append(sbDataxml.toString());
 
 
-				var sb = new StringBuilder();
-				sb.append("<WorkDisplayMode Mode='");
-				sb.append(selectedItem.value);
-				sb.append("' />");
+        sbDataxml = new StringBuilder();
+        sbDataxml.append("<PersonalWork Value='");
+        sbDataxml.append((chkNWI == true ? "1" : "0"));
+        sbDataxml.append("'/>");
+        sb.append(sbDataxml.toString());
 
-				this.SelectedMode = selectedItem.value;
+        sbDataxml = new StringBuilder();
+        sbDataxml.append("<OpenRequestWork Value='");
+        sbDataxml.append((chkOReq == true ? "1" : "0"));
+        sbDataxml.append("'/>");
+        sb.append(sbDataxml.toString());
 
-				this.DisplayMode = sb.toString();
-				this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
-				WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDisplayMode", sb.toString());
+        sb.append("</WorkDetails>");
 
-				return true;
-			}
-			//           }
-		}
-		catch (e) {
-			this.HandleException("GetSelectedMode", e);
-		}
-		return null;
-	}
+        this.DetailsSettings = sb.toString();
+        this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
+        WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDetails", sb.toString());
 
+        RefreshBothGrids();
+    }
 
 
+    ResPlanAnalyzer.prototype.SetSelectedMode = function (selindex) {
+        try {
+            var selectView = document.getElementById("idAnalyzerTab_SelMode");
 
+            if (selindex != null) {
 
-	// >>>> Showing initalizing the grids and menus
+                if (selectView.selectedIndex == (selindex - 1)) {
+                    return false;
+                }
 
-	var RefreshBothGrids = function () {
+                selectView.selectedIndex = selindex - 1;
+            }
 
-		try {
+            //           if (selectView.selectedIndex >= 0) {
+            var selectedItem = selectView.options[selectView.selectedIndex];
 
 
-			window.setTimeout(HandleRefreshBothDelegate, 400);
-		}
+            if (selectedItem.value != null) {
 
-		catch (e) {
-		}
-	}
 
-	ResPlanAnalyzer.prototype.HandleBothRefresh = function () {
+                var sb = new StringBuilder();
+                sb.append("<WorkDisplayMode Mode='");
+                sb.append(selectedItem.value);
+                sb.append("' />");
 
-		try {
-			if (this.DetGrid != null)
-				this.DetGrid.Reload(null);
+                this.SelectedMode = selectedItem.value;
 
-			if (this.FilterDifferent == false)
-				RefreshBottomGrid();
+                this.DisplayMode = sb.toString();
+                this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
+                WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDisplayMode", sb.toString());
 
-			this.FilterDifferent = false;
-		}
-		catch (e) {
+                return true;
+            }
+            //           }
+        }
+        catch (e) {
+            this.HandleException("GetSelectedMode", e);
+        }
+        return null;
+    }
 
-		}
 
-	}
 
 
-	ResPlanAnalyzer.prototype.InitializeLayout = function () {
-	    try {
 
+    // >>>> Showing initalizing the grids and menus
 
+    var RefreshBothGrids = function () {
 
-	        var negmode = this.DetailsData.NegMode.Value;
-	        var showpersonal = this.DetailsData.ShowPersonal.Value;
-	        var showopen = this.DetailsData.ShowOpenReq.Value;
+        try {
 
 
+            window.setTimeout(HandleRefreshBothDelegate, 400);
+        }
 
+        catch (e) {
+        }
+    }
 
+    ResPlanAnalyzer.prototype.HandleBothRefresh = function () {
 
+        try {
+            if (this.DetGrid != null) {
+                //	            this.DetGrid.Reload(null);
+                this.DetGrid = Grids["g_1"];
+                this.DetGrid.Dispose();
+                this.DetGrid = null;
 
-	        var analyzerTabData = {
-	            parent: "idAnalyzerTabDiv",
-	            style: "display:none;",
-	            showstate: "true",
-	            initialstate: "expanded",
-	            onstatechange: "dialogEvent('TopRibbon_Toggle');",
-	            imagePath: this.imagePath,
-	            sections: [
+
+                this.stashgridsettings = null;
+                var sbDataxml = new StringBuilder();
+                sbDataxml.append('<![CDATA[');
+                sbDataxml.append('<Execute Function="GetResourceAnalyzerData">');
+                sbDataxml.append('</Execute>');
+                sbDataxml.append(']]>');
+
+                var sb = new StringBuilder();
+                sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
+                sb.append(" Export_Url='rpaExportExcel.aspx'");
+                sb.append(" data_url='" + this.Webservice + "'");
+                sb.append(" data_method='Soap'");
+                sb.append(" data_function='Execute'")
+                sb.append(" data_namespace='WorkEnginePPM'");
+                sb.append(" data_param_Function='GetResourceAnalyzerData'");
+                sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+                sb.append(" >");
+                sb.append("</treegrid>");
+
+                this.DetGrid = TreeGrid(sb.toString(), "gridDiv_1", "g_1");
+                this.doTopApply = true;
+
+            }
+
+            if (this.FilterDifferent == false)
+                RefreshBottomGrid();
+
+            this.FilterDifferent = false;
+        }
+        catch (e) {
+
+        }
+
+    }
+
+
+    ResPlanAnalyzer.prototype.InitializeLayout = function () {
+        try {
+
+
+
+            var negmode = this.DetailsData.NegMode.Value;
+            var showpersonal = this.DetailsData.ShowPersonal.Value;
+            var showopen = this.DetailsData.ShowOpenReq.Value;
+
+
+
+
+
+
+            var analyzerTabData = {
+                parent: "idAnalyzerTabDiv",
+                style: "display:none;",
+                showstate: "true",
+                initialstate: "expanded",
+                onstatechange: "dialogEvent('TopRibbon_Toggle');",
+                imagePath: this.imagePath,
+                sections: [
 					{
 					    name: "Actions",
 					    tooltip: "Plan Actions",
@@ -1750,24 +1777,24 @@
 							{
 							    items: [
 									{ type: "bigbutton", id: "SaveBtn", name: "Publish", img: "Publish.png", tooltip: "Publish", onclick: "dialogEvent('AnalyzerTab_SaveDrag');", disabled: true }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "bigbutton", name: "Close", img: "formatmap32x32.png", style: "top: -448px; left: -288px;position:relative;", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "bigbutton", id: "idSaveScenario", name: "Save<br/>Scenario", img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "bigbutton", id: "UndoBtn", name: "Undo", img: "formatmap32x32.png", style: "top: -416px; left: -96px;position:relative;", tooltip: "Undo", onclick: "dialogEvent('AnalyzerTab_UnDoDrag');", disabled: true }
-								]
+							    ]
 							}
-						]
+					    ]
 					},
 					{
 					    name: "Total Details",
@@ -1778,7 +1805,7 @@
 									{ type: "mediumtext", id: "chkCommit", name: "Show Committed Work", tooltip: "Show Committed Work", onclick: "dialogEvent('AnalyzerTab_chkCommit_Click');" },
 									{ type: "mediumtext", id: "chkMSP", name: "Show Scheduled Work", tooltip: "Show Scheduled Work", onclick: "dialogEvent('AnalyzerTab_chkMSP_Click');" },
 									{ type: "mediumtext", id: "chkActual", name: "Show Timesheet Actuals", tooltip: "Show Timesheet Actuals", onclick: "dialogEvent('AnalyzerTab_chkActual_Click');" }
-								]
+						       ]
 
 						   }]
 					},
@@ -1789,96 +1816,96 @@
 						   {
 						       items: [
 									{ type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "formatmap32x32.png", style: "top: -352px; left: 0px;position:relative;", tooltip: "Export to Excel", onclick: "dialogEvent('AnalyzerTab_ExporttoExcel');" }
-								]
+						       ]
 						   },
 						   {
 						       items: [
 									{ type: "bigbutton", id: "idPrintTop", name: "Print", img: "ps32x32.png", style: "top: -287px; left: -128px;position:relative;", tooltip: "Print", onclick: "dialogEvent('AnalyzerTab_Print');" }
-								]
+						       ]
 						   }
-						]
+					    ]
 					}
-				]
-	        };
+                ]
+            };
 
 
-	        var cbProp = { type: "mediumtext", id: "chkRequests", name: "Show Proposed Work", tooltip: "Show Proposed Work", onclick: "dialogEvent('AnalyzerTab_chkRequests_Click');" };
-	        var cbReq = { type: "mediumtext", id: "chkOpenRequests", name: "Show Open Requirements", tooltip: "Show Open Requirements", onclick: "dialogEvent('AnalyzerTab_chkOpenRequests_Click');" };
-	        var cbNW = { type: "mediumtext", id: "chkNonWork", name: "Show Personal Time Off", tooltip: "Show Personal Time Off", onclick: "dialogEvent('AnalyzerTab_chkNonWork_Click');" };
-
-
-
-
-	        var sections = analyzerTabData.sections;
-	        var columns = null;
-
-	        for (var xi = 0; xi < sections.length - 1; xi++) {
-	            if (sections[xi].name == "Total Details") {
-	                columns = sections[xi].columns;
-	                break;
-	            }
-	        }
-
-	        if (columns != null) {
-	            addedcol = 0;
-
-	            if (negmode != "1") {
-	                if (addedcol == 0) {
-	                    columns[1] = new Object;
-	                    columns[1].items = new Array;
-	                }
-	                columns[1].items[addedcol++] = cbProp;
-	            }
-
-
-	            if (showopen == "1") {
-	                if (addedcol == 0) {
-	                    columns[1] = new Object;
-	                    columns[1].items = new Array;
-	                }
-	                columns[1].items[addedcol++] = cbReq;
-	            }
-
-	            if (showpersonal == "1") {
-	                if (addedcol == 0) {
-	                    columns[1] = new Object;
-	                    columns[1].items = new Array;
-	                }
-	                columns[1].items[addedcol++] = cbNW;
-	            }
-
-	        }
+            var cbProp = { type: "mediumtext", id: "chkRequests", name: "Show Proposed Work", tooltip: "Show Proposed Work", onclick: "dialogEvent('AnalyzerTab_chkRequests_Click');" };
+            var cbReq = { type: "mediumtext", id: "chkOpenRequests", name: "Show Open Requirements", tooltip: "Show Open Requirements", onclick: "dialogEvent('AnalyzerTab_chkOpenRequests_Click');" };
+            var cbNW = { type: "mediumtext", id: "chkNonWork", name: "Show Personal Time Off", tooltip: "Show Personal Time Off", onclick: "dialogEvent('AnalyzerTab_chkNonWork_Click');" };
 
 
 
-	        var viewTabData = {
-	            parent: "idViewTabDiv",
-	            style: "display:none;",
-	            showstate: "true",
-	            initialstate: "expanded",
-	            onstatechange: "dialogEvent('TopRibbon_Toggle');",
-	            imagePath: this.imagePath,
-	            sections: [
+
+            var sections = analyzerTabData.sections;
+            var columns = null;
+
+            for (var xi = 0; xi < sections.length - 1; xi++) {
+                if (sections[xi].name == "Total Details") {
+                    columns = sections[xi].columns;
+                    break;
+                }
+            }
+
+            if (columns != null) {
+                addedcol = 0;
+
+                if (negmode != "1") {
+                    if (addedcol == 0) {
+                        columns[1] = new Object;
+                        columns[1].items = new Array;
+                    }
+                    columns[1].items[addedcol++] = cbProp;
+                }
+
+
+                if (showopen == "1") {
+                    if (addedcol == 0) {
+                        columns[1] = new Object;
+                        columns[1].items = new Array;
+                    }
+                    columns[1].items[addedcol++] = cbReq;
+                }
+
+                if (showpersonal == "1") {
+                    if (addedcol == 0) {
+                        columns[1] = new Object;
+                        columns[1].items = new Array;
+                    }
+                    columns[1].items[addedcol++] = cbNW;
+                }
+
+            }
+
+
+
+            var viewTabData = {
+                parent: "idViewTabDiv",
+                style: "display:none;",
+                showstate: "true",
+                initialstate: "expanded",
+                onstatechange: "dialogEvent('TopRibbon_Toggle');",
+                imagePath: this.imagePath,
+                sections: [
 					{
 					    name: "Actions",
 					    columns: [
 							{
 							    items: [
 									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "bigbutton", id: "idSaveScenario1", name: "Save<br/>Scenario", img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "bigbutton", id: "UndoBtn2", name: "Undo", img: "formatmap32x32.png", style: "top: -416px; left: -96px;position:relative;", tooltip: "Undo", onclick: "dialogEvent('AnalyzerTab_UnDoDrag');", disabled: true }
-								]
+							    ]
 							}
 
-						]
+					    ]
 					},
 					{
 					    name: "View Management",
@@ -1888,20 +1915,20 @@
 									{ type: "smallbutton", id: "SaveViewBtn", name: "Save View", img: "createview.gif", tooltip: "Save View", onclick: "dialogEvent('AnalyzerTab_SaveView');" },
 									{ type: "smallbutton", id: "RenameViewBtn", name: "Rename View", img: "editview.gif", tooltip: "Rename View", onclick: "dialogEvent('AnalyzerTab_RenameView');" },
 									{ type: "smallbutton", id: "DeleteViewBtn", name: "Delete View", img: "deleteview.gif", tooltip: "Delete View", onclick: "dialogEvent('AnalyzerTab_DeleteView');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "smallbutton", id: "idAnalyzerShowFilters", name: "Show Filters", img: "showhidefilters-16.png", tooltip: "Show Filters", onclick: "dialogEvent('AnalyzerTab_ShowFilters_Click');" },
 									{ type: "smallbutton", id: "idAnalyzerShowGrouping", name: "Show Grouping", img: "grouping.gif", tooltip: "Show Grouping", onclick: "dialogEvent('AnalyzerTab_ShowGrouping_Click');" },
 									{ type: "smallbutton", id: "idViewTab_RemoveSorting", name: "Clear Sorting", img: "clearsort.gif", tooltip: "Remove Sorting", onclick: "dialogEvent('AnalyzerTab_RemoveSorting_Click');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "smallbutton", id: "idAnalyzerShowBars", name: "Show Bars", img: "ps16x16.png", style: "top: -192px; left: -16px;position:relative;", tooltip: "Show Bars", onclick: "dialogEvent('AnalyzerTab_ShowBars_Click');" },
 									{ type: "smallbutton", id: "idAnalyzerHideDetails", name: "Hide Details", img: "ps16x16.png", style: "top: -112px; left: -64px;position:relative;", tooltip: "Hide Details", onclick: "dialogEvent('AnalyzerTab_HideDetails_Click');" }
-								 ]
+							    ]
 							},
 							{
 							    items: [
@@ -1909,21 +1936,21 @@
 									{ type: "smallbutton", id: "idAnalyzerExpandAll", name: "Expand All", img: "ExpandAll.gif", tooltip: "Expand All", onclick: "dialogEvent('AnalyzerTab_ExpandAll');" },
 									{ type: "smallbutton", id: "idAnalyzerCollapsAll", name: "Collapse All", img: "CollapseAll.gif", tooltip: "Collapse All", onclick: "dialogEvent('AnalyzerTab_CollapseAll');" }
 
-							   ]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "text", name: "Current View:" },
-									{ type: "text", name: "Displayed Values:"}]
+									{ type: "text", name: "Displayed Values:" }]
 							},
 							{
 							    items: [
 
 									{ type: "select", id: "idAnalyzerTab_SelView", onchange: "dialogEvent('AnalyzerTab_SelView_Changed');", width: "100px" },
 									{ type: "select", id: "idAnalyzerTab_SelMode", onchange: "dialogEvent('AnalyzerTab_SelMode_Changed');", width: "100px" }
-							   ]
+							    ]
 							}
-						 ]
+					    ]
 					},
 					   {
 					       name: "Periods",
@@ -1932,73 +1959,73 @@
 						       items: [
 									{ type: "text", name: "From Period:" },
 									{ type: "text", name: "To Period:" }
-								]
+						       ]
 						   },
 				           {
 				               items: [
 							        { type: "select", id: "idAnalyzerTab_FromPeriod", onchange: "dialogEvent('AnalyzerTab_FromPeriod_Changed');", width: "100px" },
 									{ type: "select", id: "idAnalyzerTab_ToPeriod", onchange: "dialogEvent('AnalyzerTab_ToPeriod_Changed');", width: "100px" }
-								]
+				               ]
 				           }
-						]
+					       ]
 					   }
-				]
-	        };
+                ]
+            };
 
-	        var bbEditRes = { items: [{ type: "bigbutton", id: "idEditRes", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');"}] };
-	        var bbEditRes1 = { items: [{ type: "bigbutton", id: "idEditRes1", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');"}] };
+            var bbEditRes = { items: [{ type: "bigbutton", id: "idEditRes", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }] };
+            var bbEditRes1 = { items: [{ type: "bigbutton", id: "idEditRes1", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }] };
 
-	        if (this.params.RPEMode != 1) {
-	            sections = analyzerTabData.sections;
+            if (this.params.RPEMode != 1) {
+                sections = analyzerTabData.sections;
 
-	            for (var xi = 0; xi < sections.length - 1; xi++) {
-	                if (sections[xi].name == "Actions") {
-	                    columns = sections[xi].columns;
-	                    break;
-	                }
-	            }
+                for (var xi = 0; xi < sections.length - 1; xi++) {
+                    if (sections[xi].name == "Actions") {
+                        columns = sections[xi].columns;
+                        break;
+                    }
+                }
 
-	            columns[4] = columns[3];
-	            columns[3] = columns[2];
-	            columns[2] = bbEditRes;
+                columns[4] = columns[3];
+                columns[3] = columns[2];
+                columns[2] = bbEditRes;
 
-	            sections = viewTabData.sections;
+                sections = viewTabData.sections;
 
-	            for (var xi = 0; xi < sections.length - 1; xi++) {
-	                if (sections[xi].name == "Actions") {
-	                    columns = sections[xi].columns;
-	                    break;
-	                }
-	            }
+                for (var xi = 0; xi < sections.length - 1; xi++) {
+                    if (sections[xi].name == "Actions") {
+                        columns = sections[xi].columns;
+                        break;
+                    }
+                }
 
-	            columns[3] = columns[2];
-	            columns[2] = columns[1];
-	            columns[1] = bbEditRes1;
+                columns[3] = columns[2];
+                columns[2] = columns[1];
+                columns[1] = bbEditRes1;
 
-	        }
+            }
 
-	        var BottomTabData = {
-	            parent: "idBottomTabDiv",
-	            style: "display:none;",
-	            showstate: "true",
-	            initialstate: "expanded",
-	            onstatechange: "dialogEvent('TotalRibbon_Toggle');",
-	            imagePath: this.imagePath,
-	            sections: [
+            var BottomTabData = {
+                parent: "idBottomTabDiv",
+                style: "display:none;",
+                showstate: "true",
+                initialstate: "expanded",
+                onstatechange: "dialogEvent('TotalRibbon_Toggle');",
+                imagePath: this.imagePath,
+                sections: [
 					{
 					    name: "Actions",
 					    columns: [
 							{
 							    items: [
 									{ type: "mediumbutton", id: "idTotCol", name: "Total<br/> Column", img: "TotalColumnsl20x20.png", tooltip: "Total Columns", onclick: "dialogEvent('TotalsTab_SelectTotalColumns');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "mediumbutton", id: "idTotCol", name: "Capacity<br/> Scenarios", img: "capscenariosl20x20.png", tooltip: "Capacity Scenarios", onclick: "dialogEvent('AnalyzerTab_CapScen');" }
-								]
+							    ]
 							}
-						 ]
+					    ]
 					},
 					{
 					    name: "Options",
@@ -2007,27 +2034,27 @@
 							    items: [
 									{ type: "smallbutton", id: "idTotTab_ShowFilters", name: "Show Filters", img: "showhidefilters-16.png", tooltip: "Show Filters", onclick: "dialogEvent('TotalsTab_ShowFilters_Click');" },
 									{ type: "smallbutton", id: "idTotTab_ShowGrouping", name: "Show Grouping", img: "grouping.gif", tooltip: "Show Grouping", onclick: "dialogEvent('TotalsTab_ShowGrouping_Click');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "smallbutton", id: "idTotTab_RemSort", name: "Remove Sorting", img: "sort-16.png", tooltip: "Remove Sorting", onclick: "dialogEvent('TotalsTab_RemoveSorting_Click');" },
 									{ type: "smallbutton", id: "idTotTab_SelCol", name: "Select Columns", img: "formatmap16x16.png", style: "top: -224px; left: -128px;position:relative;", tooltip: "Select Columns", onclick: "dialogEvent('TotalsTab_SelectColumns');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "smallbutton", id: "idTotExpandAll", name: "Expand All", img: "ExpandAll.gif", tooltip: "Expand All", onclick: "dialogEvent('TotalsTab_ExpandAll');" },
 									{ type: "smallbutton", id: "idTotCollapsAll", name: "Collapse All", img: "CollapseAll.gif", tooltip: "Collapse All", onclick: "dialogEvent('TotalsTab_CollapseAll');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									 { type: "smallbutton", id: "TargetLegend", name: "Legend", img: "ps16x16.png", style: "top: -128px; left: -176px;position:relative;", tooltip: "Legend", onclick: "dialogEvent('TotalsTab_TarLegBtn');" }
-								]
+							    ]
 
 							}
-						]
+					    ]
 					},
 					{
 					    name: "Share",
@@ -2036,14 +2063,14 @@
 						   {
 						       items: [
 									{ type: "mediumbutton", id: "idExportExcelBot", name: "Export<br/> to Excel", img: "exportexcel20x20.png", tooltip: "Export to Excel", onclick: "dialogEvent('TotalsTab_ExporttoExcel');" }
-								]
+						       ]
 						   },
 						   {
 						       items: [
 									{ type: "mediumbutton", id: "idPrintBot", name: "Print", img: "printl20x20.png", tooltip: "Print", onclick: "dialogEvent('TotalTab_Print');" }
-								]
+						       ]
 						   }
-						]
+					    ]
 					},
 					{
 					    name: "Comparison",
@@ -2052,136 +2079,136 @@
 							    items: [
 								  { type: "text", name: "Comparison Data", disabled: true },
 								  { type: "text", id: "idTotCompVal", name: "       ", disabled: true, width: "200px" }
-							   ]
+							    ]
 							}
-						]
+					    ]
 					}
 
-				]
-	        };
+                ]
+            };
 
-	        //,{ type: "smallbutton", id: "GridExplain", name: "Grid Explaination", img: "help.gif", tooltip: "Grid Explaination", onclick: "dialogEvent('TotalsTab_GridHelpBtn');" }
-
-
-	        this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "3E", "dhx_skyblue");
-	        this.layout.cells(this.mainRibbonArea).setText("Analyzer");
-	        this.layout.cells(this.mainArea).setText("Main Area");
-	        this.layout.cells(this.totalsArea).setText("Total Area");
-
-	        this.layout.cells(this.mainRibbonArea).hideHeader();
-	        this.layout.cells(this.mainArea).hideHeader();
-	        this.layout.cells(this.totalsArea).hideHeader();
-	        this.layout_totals = this.layout.cells(this.totalsArea).attachLayout("2E", "dhx_skyblue");
-	        this.layout_totals.cells(this.totalsRibbonArea).setText("Totals");
-	        this.layout_totals.cells(this.totalsGridArea).setText("Total Grid Area");
-	        this.layout_totals.cells(this.totalsRibbonArea).hideHeader();
-	        this.layout_totals.cells(this.totalsGridArea).hideHeader();
-	        this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
-	        this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
+            //,{ type: "smallbutton", id: "GridExplain", name: "Grid Explaination", img: "help.gif", tooltip: "Grid Explaination", onclick: "dialogEvent('TotalsTab_GridHelpBtn');" }
 
 
-	        //	        this.tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
+            this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "3E", "dhx_skyblue");
+            this.layout.cells(this.mainRibbonArea).setText("Analyzer");
+            this.layout.cells(this.mainArea).setText("Main Area");
+            this.layout.cells(this.totalsArea).setText("Total Area");
+
+            this.layout.cells(this.mainRibbonArea).hideHeader();
+            this.layout.cells(this.mainArea).hideHeader();
+            this.layout.cells(this.totalsArea).hideHeader();
+            this.layout_totals = this.layout.cells(this.totalsArea).attachLayout("2E", "dhx_skyblue");
+            this.layout_totals.cells(this.totalsRibbonArea).setText("Totals");
+            this.layout_totals.cells(this.totalsGridArea).setText("Total Grid Area");
+            this.layout_totals.cells(this.totalsRibbonArea).hideHeader();
+            this.layout_totals.cells(this.totalsGridArea).hideHeader();
+            this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
+            this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
 
 
-
-	        this.layout.cells(this.mainArea).attachObject("gridDiv_1");
-
-
-	        this.Tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
-	        this.Tabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
-
-	        this.analyzerTab = new Ribbon(analyzerTabData);
-
-
-	        this.analyzerTab.Render();
+            //	        this.tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
 
 
 
+            this.layout.cells(this.mainArea).attachObject("gridDiv_1");
 
-	        this.viewTab = new Ribbon(viewTabData);
-	        this.viewTab.Render();
 
-	        this.totTab = new Ribbon(BottomTabData);
-	        this.totTab.Render();
+            this.Tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
+            this.Tabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
 
-	        //this.planTabbar.setSkin("dark_blue");
-	        this.Tabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
-	        this.Tabbar.enableAutoReSize();
-	        this.Tabbar.addTab("tab_Display", "Analyzer", 70);
-	        this.Tabbar.setContent("tab_Display", this.analyzerTab.getRibbonDiv());
-	        this.Tabbar.addTab("tab_View", "View", 70);
-	        this.Tabbar.setContent("tab_View", this.viewTab.getRibbonDiv());
+            this.analyzerTab = new Ribbon(analyzerTabData);
 
-	        this.layout_totals.cells(this.totalsRibbonArea).attachObject(document.getElementById(this.totTab.getRibbonDiv()));
 
-	        this.layout_totals.cells(this.totalsGridArea).attachObject("gridDiv_Totals");
-
-	        this.layout.cells(this.mainArea).setHeight(200);
+            this.analyzerTab.Render();
 
 
 
-	        this.layout.cells(this.mainRibbonArea).setHeight(120);
+
+            this.viewTab = new Ribbon(viewTabData);
+            this.viewTab.Render();
+
+            this.totTab = new Ribbon(BottomTabData);
+            this.totTab.Render();
+
+            //this.planTabbar.setSkin("dark_blue");
+            this.Tabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
+            this.Tabbar.enableAutoReSize();
+            this.Tabbar.addTab("tab_Display", "Analyzer", 70);
+            this.Tabbar.setContent("tab_Display", this.analyzerTab.getRibbonDiv());
+            this.Tabbar.addTab("tab_View", "View", 70);
+            this.Tabbar.setContent("tab_View", this.viewTab.getRibbonDiv());
+
+            this.layout_totals.cells(this.totalsRibbonArea).attachObject(document.getElementById(this.totTab.getRibbonDiv()));
+
+            this.layout_totals.cells(this.totalsGridArea).attachObject("gridDiv_Totals");
+
+            this.layout.cells(this.mainArea).setHeight(200);
 
 
-	        this.layout.cells(this.mainRibbonArea).setHeight(120);
-	        this.layout.cells(this.mainRibbonArea).fixSize(false, true);
-	        this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
 
-	        this.layout_totals._minHeight = 18;
-	        this.layout._minHeight = 18;
-
-	        var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
-	        var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
-
-	        document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
+            this.layout.cells(this.mainRibbonArea).setHeight(120);
 
 
-	        if (this.initDataStart == 0)
-	            this.initDataStart = 1;
+            this.layout.cells(this.mainRibbonArea).setHeight(120);
+            this.layout.cells(this.mainRibbonArea).fixSize(false, true);
+            this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
 
-	        if (this.initDataFinish == 0)
-	            this.initDataFinish = this.UsingPeriods.Period.length;
+            this.layout_totals._minHeight = 18;
+            this.layout._minHeight = 18;
 
-	        this.initDataStart = this.initDataStart - 1;
-	        this.initDataFinish = this.initDataFinish - 1;
+            var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
+            var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
-
-	        for (var n1 = 0; n1 < this.UsingPeriods.Period.length; n1++) {
-	            var per = this.UsingPeriods.Period[n1];
-	            var perId = per.perID;
-	            var perName = per.perName;
-
-	            FromList.options[n1] = new Option(perName, perId, n1 == this.initDataStart, n1 == this.initDataStart);
-	            ToList.options[n1] = new Option(perName, perId, n1 == this.initDataFinish, n1 == this.initDataFinish);
-
-	            if (n1 == 0)
-	                this.PerStart = perId;
-
-	            this.PerEnd = perId;
-
-	        }
-
-	        this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
-	        this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
-
-	        this.flashTotalsButtons();
-
-	        this.Tabbar.setTabActive("tab_Display");
+            document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
 
 
-	        if (this.analyzerCalID != this.CmtCal) {
+            if (this.initDataStart == 0)
+                this.initDataStart = 1;
 
-	            this.analyzerTab.disableItem("idSaveScenario");
-	            this.viewTab.disableItem("idSaveScenario1");
-	        }
+            if (this.initDataFinish == 0)
+                this.initDataFinish = this.UsingPeriods.Period.length;
+
+            this.initDataStart = this.initDataStart - 1;
+            this.initDataFinish = this.initDataFinish - 1;
 
 
-	    }
-	    catch (e) {
-	        alert("ResPlanAnalyzer InitializeLayout Exception");
-	    }
-	}
-    
+            for (var n1 = 0; n1 < this.UsingPeriods.Period.length; n1++) {
+                var per = this.UsingPeriods.Period[n1];
+                var perId = per.perID;
+                var perName = per.perName;
+
+                FromList.options[n1] = new Option(perName, perId, n1 == this.initDataStart, n1 == this.initDataStart);
+                ToList.options[n1] = new Option(perName, perId, n1 == this.initDataFinish, n1 == this.initDataFinish);
+
+                if (n1 == 0)
+                    this.PerStart = perId;
+
+                this.PerEnd = perId;
+
+            }
+
+            this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
+            this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+
+            this.flashTotalsButtons();
+
+            this.Tabbar.setTabActive("tab_Display");
+
+
+            if (this.analyzerCalID != this.CmtCal) {
+
+                this.analyzerTab.disableItem("idSaveScenario");
+                this.viewTab.disableItem("idSaveScenario1");
+            }
+
+
+        }
+        catch (e) {
+            alert("ResPlanAnalyzer InitializeLayout Exception");
+        }
+    }
+
     ResPlanAnalyzer.prototype.ShowWorkingPopup = function (divid) {
         //        var veil = document.getElementById("veil");
         //        veil.style.display = "block";
@@ -2193,445 +2220,445 @@
         var veil = $('#veil');
         veil.show();
     };
-    
+
     ResPlanAnalyzer.prototype.HideWorkingPopup = function (divid) {
         var div = $('#' + divid);
         div.hide();
         var veil = $('#veil');
         veil.hide();
     };
-    
-	ResPlanAnalyzer.prototype.flashTotalsButtons = function () {
-		
-		try {
-			if (this.DetailsData.ActualWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkActual");
-			else {
-				this.analyzerTab.setButtonStateOff("chkActual");
-			}
 
+    ResPlanAnalyzer.prototype.flashTotalsButtons = function () {
 
-			if (this.DetailsData.ProposedWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkRequests");
-			else {
-				this.analyzerTab.setButtonStateOff("chkRequests");
-			}
+        try {
+            if (this.DetailsData.ActualWork.Value == "1")
+                this.analyzerTab.setButtonStateOn("chkActual");
+            else {
+                this.analyzerTab.setButtonStateOff("chkActual");
+            }
 
-			if (this.DetailsData.ScheduledWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkMSP");
-			else {
-				this.analyzerTab.setButtonStateOff("chkMSP");
-			}
 
-			if (this.DetailsData.CommittedWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkCommit");
-			else {
-				this.analyzerTab.setButtonStateOff("chkCommit");
-			}
+            if (this.DetailsData.ProposedWork.Value == "1")
+                this.analyzerTab.setButtonStateOn("chkRequests");
+            else {
+                this.analyzerTab.setButtonStateOff("chkRequests");
+            }
 
-			if (this.DetailsData.PersonalWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkNonWork");
-			else {
-				this.analyzerTab.setButtonStateOff("chkNonWork");
-			}
+            if (this.DetailsData.ScheduledWork.Value == "1")
+                this.analyzerTab.setButtonStateOn("chkMSP");
+            else {
+                this.analyzerTab.setButtonStateOff("chkMSP");
+            }
 
-			if (this.DetailsData.OpenRequestWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkOpenRequest");
-			else {
-				this.analyzerTab.setButtonStateOff("chkOpenRequest");
-			}
-		}
-		catch(e) {}
-	}
+            if (this.DetailsData.CommittedWork.Value == "1")
+                this.analyzerTab.setButtonStateOn("chkCommit");
+            else {
+                this.analyzerTab.setButtonStateOff("chkCommit");
+            }
 
+            if (this.DetailsData.PersonalWork.Value == "1")
+                this.analyzerTab.setButtonStateOn("chkNonWork");
+            else {
+                this.analyzerTab.setButtonStateOff("chkNonWork");
+            }
 
-	ResPlanAnalyzer.prototype.LoadResPlanDataComplete = function (result) {
-		try {
-			var jsonObject = JSON_ConvertString(result);
-			if (JSON_ValidateServerResult(jsonObject)) {
+            if (this.DetailsData.OpenRequestWork.Value == "1")
+                this.analyzerTab.setButtonStateOn("chkOpenRequest");
+            else {
+                this.analyzerTab.setButtonStateOff("chkOpenRequest");
+            }
+        }
+        catch (e) { }
+    }
 
-				var errors = jsonObject.Result.Error;
 
-				if (errors != undefined) {
-					if (errors != null) {
+    ResPlanAnalyzer.prototype.LoadResPlanDataComplete = function (result) {
+        try {
+            var jsonObject = JSON_ConvertString(result);
+            if (JSON_ValidateServerResult(jsonObject)) {
 
-						if (errors.Value != "") {
+                var errors = jsonObject.Result.Error;
 
-							alert("Error: " + errors.Value);
-							if (parent.SP.UI.DialogResult)
-								parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-							else
-								parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                if (errors != undefined) {
+                    if (errors != null) {
 
-							return;
-						}
-					}
-				}
+                        if (errors.Value != "") {
 
+                            alert("Error: " + errors.Value);
+                            if (parent.SP.UI.DialogResult)
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                            else
+                                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-				this.TargetData = jsonObject.Result.Targets;
-				var views = jsonObject.Result.Views;
-				this.Views = JSON_GetArray(views, "View");
+                            return;
+                        }
+                    }
+                }
 
-				this.TotalsData = jsonObject.Result.TotalsConfiguration.TotalsConfiguration;
 
-				this.fromresource = jsonObject.Result.FromResGrid.Value;
+                this.TargetData = jsonObject.Result.Targets;
+                var views = jsonObject.Result.Views;
+                this.Views = JSON_GetArray(views, "View");
 
-				this.TotalsColumnSettings = jsonObject.Result.TotalsConfiguration.Value;
+                this.TotalsData = jsonObject.Result.TotalsConfiguration.TotalsConfiguration;
 
-				this.DetailsSettings = jsonObject.Result.DetailsConfiguration.Value;
-				this.DetailsData = jsonObject.Result.DetailsConfiguration.WorkDetails;
+                this.fromresource = jsonObject.Result.FromResGrid.Value;
 
-				this.DisplayMode = jsonObject.Result.DisplayMode.Value;
-				this.PMOAdmin = jsonObject.Result.gpPMOAdmin.Value;
+                this.TotalsColumnSettings = jsonObject.Result.TotalsConfiguration.Value;
 
-				var LoadingDataReply = jsonObject.Result.LoadingDataReply;
+                this.DetailsSettings = jsonObject.Result.DetailsConfiguration.Value;
+                this.DetailsData = jsonObject.Result.DetailsConfiguration.WorkDetails;
 
-				this.ticketvalue = jsonObject.Result.TicketValue.Value;
-				this.ticketreturns = jsonObject.Result.TicketReturns.Value;
+                this.DisplayMode = jsonObject.Result.DisplayMode.Value;
+                this.PMOAdmin = jsonObject.Result.gpPMOAdmin.Value;
 
-				this.loadedDataCount = jsonObject.Result.DetailsLoaded.Value;
+                var LoadingDataReply = jsonObject.Result.LoadingDataReply;
 
-				try {
-					this.initDataStart = parseInt(jsonObject.Result.PeriodRange.Start);
-					this.initDataFinish = parseInt(jsonObject.Result.PeriodRange.Finish);
-				}
-				catch (e) {
+                this.ticketvalue = jsonObject.Result.TicketValue.Value;
+                this.ticketreturns = jsonObject.Result.TicketReturns.Value;
 
-				}
+                this.loadedDataCount = jsonObject.Result.DetailsLoaded.Value;
 
-				this.heatmapText = "";
+                try {
+                    this.initDataStart = parseInt(jsonObject.Result.PeriodRange.Start);
+                    this.initDataFinish = parseInt(jsonObject.Result.PeriodRange.Finish);
+                }
+                catch (e) {
 
-				try {
-				    this.heatmapText = jsonObject.Result.HeatMapText.Value;
-				    this.NegMode = (jsonObject.Result.NegMode.Value == "1");
-				}
-	            catch (e) { }
+                }
 
+                this.heatmapText = "";
 
+                try {
+                    this.heatmapText = jsonObject.Result.HeatMapText.Value;
+                    this.NegMode = (jsonObject.Result.NegMode.Value == "1");
+                }
+                catch (e) { }
 
-				if (LoadingDataReply.Value !== "")
-					alert(LoadingDataReply.Value);
 
-				this.InitializeLayout();
 
-				window.setTimeout(HandlePopulateUI, 200);
+                if (LoadingDataReply.Value !== "")
+                    alert(LoadingDataReply.Value);
 
+                this.InitializeLayout();
 
+                window.setTimeout(HandlePopulateUI, 200);
 
-				this.PingSessionData();
-			}
-		}
-		catch (e) {
-			this.HandleException("LoadResPlanDataComplete", e);
-			if (parent.SP.UI.DialogResult)
-				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-			else
-				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-		}
-	}
 
+                this.PingSessionData();
+            }
+        }
+        catch (e) {
+            this.HandleException("LoadResPlanDataComplete", e);
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+            else
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-	ResPlanAnalyzer.prototype.GridsOnMouseDown = function (grid, row, col, x, y, event) {
-		 return false;
-	}
+        }
+    }
 
 
-	ResPlanAnalyzer.prototype.GridsOnMouseOver = function (grid, row, col, orow, ocol, event) {
-//        if (row == null)
-//            return;
+    ResPlanAnalyzer.prototype.GridsOnMouseDown = function (grid, row, col, x, y, event) {
+        return false;
+    }
 
-//        if (col == null)
-//            return;
 
-//        if (row.Kind != "Header")
-//            return;
+    ResPlanAnalyzer.prototype.GridsOnMouseOver = function (grid, row, col, orow, ocol, event) {
+        //        if (row == null)
+        //            return;
 
+        //        if (col == null)
+        //            return;
 
-//        var bMove = grid.GetAttribute(row, col, "CanMove");
+        //        if (row.Kind != "Header")
+        //            return;
 
-//        if (bMove != "0")
-//            return;
 
-//        event.explicitOriginalTarget.style.cursor = "default";
+        //        var bMove = grid.GetAttribute(row, col, "CanMove");
 
+        //        if (bMove != "0")
+        //            return;
 
+        //        event.explicitOriginalTarget.style.cursor = "default";
 
 
 
-	}
 
 
-	ResPlanAnalyzer.prototype.GridsOnRenderStart = function (grid) {
-		if (grid.id == "bottomg_1")
-			this.refreshIconsInTotGrid = null;
+    }
 
-		return false;
-	}
-	ResPlanAnalyzer.prototype.GridsOnRenderFinish = function (grid) {
-		if (grid.id == "bottomg_1") {
-			this.TotGrid = grid;
-			if (this.refreshIconsInTotGrid != null)
-				window.setTimeout(HandleRerenderDelegate, 400);
-		}
-	}
 
+    ResPlanAnalyzer.prototype.GridsOnRenderStart = function (grid) {
+        if (grid.id == "bottomg_1")
+            this.refreshIconsInTotGrid = null;
 
-	ResPlanAnalyzer.prototype.HandleRerender = function () {
+        return false;
+    }
+    ResPlanAnalyzer.prototype.GridsOnRenderFinish = function (grid) {
+        if (grid.id == "bottomg_1") {
+            this.TotGrid = grid;
+            if (this.refreshIconsInTotGrid != null)
+                window.setTimeout(HandleRerenderDelegate, 400);
+        }
+    }
 
-		if (this.refreshIconsInTotGrid != null) {
-			for (var i = 0; i < this.refreshIconsInTotGrid.length; i++) {
-				this.TotGrid.RefreshCell(this.refreshIconsInTotGrid[i], "IconFlag");
-			}
-			this.refreshIconsInTotGrid = null;
-		}
 
-	}
+    ResPlanAnalyzer.prototype.HandleRerender = function () {
 
+        if (this.refreshIconsInTotGrid != null) {
+            for (var i = 0; i < this.refreshIconsInTotGrid.length; i++) {
+                this.TotGrid.RefreshCell(this.refreshIconsInTotGrid[i], "IconFlag");
+            }
+            this.refreshIconsInTotGrid = null;
+        }
 
-	ResPlanAnalyzer.prototype.PopulateUI = function () {
+    }
 
-		try {
-			this.selectedView = null;
-			var select = document.getElementById("idAnalyzerTab_SelMode");
 
-			this.SelectedMode = 1;
-			select.options.length = 0;
-			select.options[0] = new Option("Hours", 1, true, true);
-			select.options[1] = new Option("FTE", 2, false, false);
-			select.options[2] = new Option("FTE Percent", 3, false, false);
-			select.options[3] = new Option("FTE Conversion", 4, false, false);
+    ResPlanAnalyzer.prototype.PopulateUI = function () {
 
+        try {
+            this.selectedView = null;
+            var select = document.getElementById("idAnalyzerTab_SelMode");
 
-			var selectedItem = select.options[select.selectedIndex];
+            this.SelectedMode = 1;
+            select.options.length = 0;
+            select.options[0] = new Option("Hours", 1, true, true);
+            select.options[1] = new Option("FTE", 2, false, false);
+            select.options[2] = new Option("FTE Percent", 3, false, false);
+            select.options[3] = new Option("FTE Conversion", 4, false, false);
 
-			this.flashRibbonSelect("idAnalyzerTab_SelMode");
 
-			this.TotalGroupingchecked = false;
-			this.TotalFilterschecked = false;
+            var selectedItem = select.options[select.selectedIndex];
 
+            this.flashRibbonSelect("idAnalyzerTab_SelMode");
 
-			this.AnalyzerFilterschecked = false;
-			this.AnalyzeGroupingchecked = false;
+            this.TotalGroupingchecked = false;
+            this.TotalFilterschecked = false;
 
 
-			var selectviews = document.getElementById("idAnalyzerTab_SelView");
-			selectviews.options.length = 0;
-			for (var i = 0; i < this.Views.length; i++) {
-				var view = this.Views[i];
+            this.AnalyzerFilterschecked = false;
+            this.AnalyzeGroupingchecked = false;
 
 
-				if (this.bapplyDefView == true || view.Default == 0)
-					selectviews.options[selectviews.options.length] = new Option(view.Name, view.ViewGUID, false, false);
-				else {
+            var selectviews = document.getElementById("idAnalyzerTab_SelView");
+            selectviews.options.length = 0;
+            for (var i = 0; i < this.Views.length; i++) {
+                var view = this.Views[i];
 
-					this.bapplyDefView = (view.Default == 1)
-					selectviews.options[selectviews.options.length] = new Option(view.Name, view.ViewGUID, this.bapplyDefView, this.bapplyDefView);
-				}
-			}
 
+                if (this.bapplyDefView == true || view.Default == 0)
+                    selectviews.options[selectviews.options.length] = new Option(view.Name, view.ViewGUID, false, false);
+                else {
 
-			if (selectviews.options.length == 0)
-				selectviews.disabled = true;
-			else
-				selectviews.disabled = false;
+                    this.bapplyDefView = (view.Default == 1)
+                    selectviews.options[selectviews.options.length] = new Option(view.Name, view.ViewGUID, this.bapplyDefView, this.bapplyDefView);
+                }
+            }
 
-			this.selectedView = this.GetSelectedView();
-			this.bapplyDefView = true;   // this stops the autoselection next time through this code if there was no default view previously defined
 
-			this.SetViewChanged(null);
+            if (selectviews.options.length == 0)
+                selectviews.disabled = true;
+            else
+                selectviews.disabled = false;
 
+            this.selectedView = this.GetSelectedView();
+            this.bapplyDefView = true;   // this stops the autoselection next time through this code if there was no default view previously defined
 
-			if (this.selectedView != null)
-				WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("ApplyResourceAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, this.CreateTopGridDelegate);
-			else
-				this.CreateTopGridDelegate("");
+            this.SetViewChanged(null);
 
-		}
-		catch (e) {
-			this.HandleException("PopulateUI", e);
-			if (parent.SP.UI.DialogResult)
-				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-			else
-				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-		}
-	}
+            if (this.selectedView != null)
+                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("ApplyResourceAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, this.CreateTopGridDelegate);
+            else
+                this.CreateTopGridDelegate("");
 
-	ResPlanAnalyzer.prototype.CreateTopGrid = function (jsonString) {
+        }
+        catch (e) {
+            this.HandleException("PopulateUI", e);
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+            else
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-	    try {
+        }
+    }
 
-	        if (jsonString == undefined || jsonString == "") {
-	            this.TotalsGridSettingsData = null;
+    ResPlanAnalyzer.prototype.CreateTopGrid = function (jsonString) {
 
-	            this.TotalsGridSupressHeatmap = 0;
-	        }
-	        else {
+        try {
 
-	            var jsonObject = JSON_ConvertString(jsonString);
-	            if (JSON_ValidateServerResult(jsonObject)) {
-	                this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
+            if (jsonString == undefined || jsonString == "") {
+                this.TotalsGridSettingsData = null;
 
-	                this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
-	                this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
-	                this.heatmapText = "";
+                this.TotalsGridSupressHeatmap = 0;
+            }
+            else {
 
-	                try {
-	                    this.heatmapText = this.TotalsGridSettingsData.HeatMap.HeatMapText;
-	                }
-	                catch (e) { }
+                var jsonObject = JSON_ConvertString(jsonString);
+                if (JSON_ValidateServerResult(jsonObject)) {
+                    this.TotalsGridSettingsData = jsonObject.Result.ViewData.TotalsGridSetting;
 
-	                this.DetailsData = jsonObject.Result.ViewData.WorkDetails;   // the next two lines are needed to flash the proper state of the totals buttons on the top grid 
-	                this.flashTotalsButtons()
+                    this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
+                    this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
+                    this.heatmapText = "";
 
-	                document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
+                    try {
+                        this.heatmapText = this.TotalsGridSettingsData.HeatMap.HeatMapText;
+                    }
+                    catch (e) { }
 
-	                var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
+                    this.DetailsData = jsonObject.Result.ViewData.WorkDetails;   // the next two lines are needed to flash the proper state of the totals buttons on the top grid 
+                    this.flashTotalsButtons()
 
-	                var wsel = document.getElementById("idAnalyzerTab_SelMode");
-	                wsel.selectedIndex = wmode - 1;
+                    document.getElementById("idTotCompVal").innerHTML = this.heatmapText;
 
-	                this.flashRibbonSelect("idAnalyzerTab_SelMode");
+                    var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
 
+                    var wsel = document.getElementById("idAnalyzerTab_SelMode");
+                    wsel.selectedIndex = wmode - 1;
 
+                    this.flashRibbonSelect("idAnalyzerTab_SelMode");
 
-	            }
-	        }
 
-	        this.stashgridsettings = null;
-	        var sbDataxml = new StringBuilder();
-	        sbDataxml.append('<![CDATA[');
-	        sbDataxml.append('<Execute Function="GetResourceAnalyzerData">');
-	        sbDataxml.append('</Execute>');
-	        sbDataxml.append(']]>');
 
-	        var sb = new StringBuilder();
-	        sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
-	        sb.append(" Export_Url='rpaExportExcel.aspx'");
-	        sb.append(" data_url='" + this.Webservice + "'");
-	        sb.append(" data_method='Soap'");
-	        sb.append(" data_function='Execute'")
-	        sb.append(" data_namespace='WorkEnginePPM'");
-	        sb.append(" data_param_Function='GetResourceAnalyzerData'");
-	        sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
-	        sb.append(" >");
-	        sb.append("</treegrid>");
+                }
+            }
 
-	        this.DetGrid = TreeGrid(sb.toString(), "gridDiv_1", "g_1");
-	        this.initialized = true;
-	        this.OnResize();
-	        this.ShowWorkingPopup("divLoading");
+            this.stashgridsettings = null;
+            var sbDataxml = new StringBuilder();
+            sbDataxml.append('<![CDATA[');
+            sbDataxml.append('<Execute Function="GetResourceAnalyzerData">');
+            sbDataxml.append('</Execute>');
+            sbDataxml.append(']]>');
 
-	    }
-	    catch (e) {
-	        this.HandleException("CreateTopGrid", e);
-	        if (parent.SP.UI.DialogResult)
-	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-	        else
-	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+            var sb = new StringBuilder();
+            sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
+            sb.append(" Export_Url='rpaExportExcel.aspx'");
+            sb.append(" data_url='" + this.Webservice + "'");
+            sb.append(" data_method='Soap'");
+            sb.append(" data_function='Execute'")
+            sb.append(" data_namespace='WorkEnginePPM'");
+            sb.append(" data_param_Function='GetResourceAnalyzerData'");
+            sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+            sb.append(" >");
+            sb.append("</treegrid>");
 
-	    }
-	}
+            this.DetGrid = TreeGrid(sb.toString(), "gridDiv_1", "g_1");
+            this.initialized = true;
+            this.OnResize();
+            this.ShowWorkingPopup("divLoading");
 
+        }
+        catch (e) {
+            this.HandleException("CreateTopGrid", e);
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+            else
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
-	// >>>>>>>>>>>  Grid event handlers
+        }
+    }
 
-	ResPlanAnalyzer.prototype.GridsOnValueChanged = function (grid, row, col, val) {
-		if (grid.id != "et_1")
-			return val;
 
+    // >>>>>>>>>>>  Grid event handlers
 
-		if (col.charAt(0) !== "P")
-			return val;
+    ResPlanAnalyzer.prototype.GridsOnValueChanged = function (grid, row, col, val) {
+        if (grid.id != "et_1")
+            return val;
 
-		var s = col.substr(1);
-		var i = s.indexOf("V");
 
-		if (i === -1)
-			return val;
+        if (col.charAt(0) !== "P")
+            return val;
 
-		var per = s.substr(0, i);
+        var s = col.substr(1);
+        var i = s.indexOf("V");
 
-		i = row.id - 1;
-		trow = this.CapScenData[i];
-		frow = this.CostCatFTEData[i];
+        if (i === -1)
+            return val;
 
-		fval = frow.FTEs[per - 1].Value
+        var per = s.substr(0, i);
 
-		if (this.CSHourMode == true) {
-			if (fval != 0)
-				trow.FTEs[per - 1].Value = val / fval;
-			else
-				trow.FTEs[per - 1].Value = 0;
+        i = row.id - 1;
+        trow = this.CapScenData[i];
+        frow = this.CostCatFTEData[i];
 
-			trow.Hours[per - 1].Value = val;
-		}
-		else {
-			trow.Hours[per - 1].Value = fval * val;
-			trow.FTEs[per - 1].Value = val;
-		}
+        fval = frow.FTEs[per - 1].Value
 
+        if (this.CSHourMode == true) {
+            if (fval != 0)
+                trow.FTEs[per - 1].Value = val / fval;
+            else
+                trow.FTEs[per - 1].Value = 0;
 
-		return val;
+            trow.Hours[per - 1].Value = val;
+        }
+        else {
+            trow.Hours[per - 1].Value = fval * val;
+            trow.FTEs[per - 1].Value = val;
+        }
 
 
-	}
+        return val;
 
-	ResPlanAnalyzer.prototype.GridsOnAfterValueChanged = function (Grid, Row, Col, value) {
 
-		if (Grid.id == "g_1" && Col == "Select") {
-			var sb = new StringBuilder();
-			sb.append("<Rows ");
-			sb.append(" value='" + value + "'>");
+    }
 
-			HandleClick(Grid, Row, Col, value, sb);
+    ResPlanAnalyzer.prototype.GridsOnAfterValueChanged = function (Grid, Row, Col, value) {
 
-			sb.append("</Rows>");
+        if (Grid.id == "g_1" && Col == "Select") {
+            var sb = new StringBuilder();
+            sb.append("<Rows ");
+            sb.append(" value='" + value + "'>");
 
-	 //       alert(sb.toString());
+            HandleClick(Grid, Row, Col, value, sb);
 
-			WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADetailsSelectedFlag", sb.toString());
-			this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
-			RefreshBottomGrid();
-			return;
-		}
-	}
+            sb.append("</Rows>");
 
-	ResPlanAnalyzer.prototype.GridsOnClickCell = function (grid, row, col) {
+            //       alert(sb.toString());
 
-		if (grid.id == "g_1") {
+            WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADetailsSelectedFlag", sb.toString());
+            this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+            RefreshBottomGrid();
+            return;
+        }
+    }
 
-			var bg = Grids["bottomg_1"];
+    ResPlanAnalyzer.prototype.GridsOnClickCell = function (grid, row, col) {
 
-			bg.SelectAllRows(0);
-			return;
+        if (grid.id == "g_1") {
 
-		}
+            var bg = Grids["bottomg_1"];
 
-		if (grid.id == "bottomg_1") {
+            bg.SelectAllRows(0);
+            return;
 
-			var tg = Grids["g_1"];
+        }
 
-			tg.SelectAllRows(0);
-			return;
+        if (grid.id == "bottomg_1") {
 
-		}
+            var tg = Grids["g_1"];
 
+            tg.SelectAllRows(0);
+            return;
 
-		if (grid.id == "et_1")
-			this.csrow = row;
-	}
+        }
 
-	ResPlanAnalyzer.prototype.GetGridRow = function (Grid, row) {
-		try {
-			return Grid.Rows[row];
 
-		}
-		catch (e) {
-			return null;
-		}
+        if (grid.id == "et_1")
+            this.csrow = row;
+    }
+
+    ResPlanAnalyzer.prototype.GetGridRow = function (Grid, row) {
+        try {
+            return Grid.Rows[row];
+
+        }
+        catch (e) {
+            return null;
+        }
 
     }
 
@@ -2657,4061 +2684,4062 @@
 
     ResPlanAnalyzer.prototype.GridsOnFilterFinish = function (Grid) {
 
-	    if (Grid.id == "g_1") {
-
-	        this.FilteredTop = new Array();
-	        var fcnt = 0;
-
-	        if (this.GetGridRow(Grid, 1) == null)
-	            return;
-
-	        var children;
-
-	        var sb = new StringBuilder();
-	        sb.append("<FilteredRows>");
-
-	        var i = 1;
-
-	        while (i != 0) {
-	            var arow = this.GetGridRow(Grid, i);
-	            ++i;
-
-	            if (arow == null) {
-	                i = 0;
-	                break;
-	            }
-	            else {
-
-	                children = arow.firstChild;
-
-	                if (children == null) {
-	                    var rowid = Grid.GetString(arow, "rowid");
-
-	                    if (rowid != "" && arow.Visible == false) {
-	                        this.FilteredTop[fcnt] = rowid;
-	                        ++fcnt;
-	                        sb.append("<Row rowid='" + rowid + "'/>");
-	                    }
-	                }
-	            }
-	        }
-
-	        sb.append("</FilteredRows>");
-
-	        if (this.LastFilterString != sb.toString())
-	            WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADetailsFilteredFlag", sb.toString(), HandleRefreshDelegate);
-
-	        this.LastFilterString = sb.toString();
-
-	        return;
-	    }
-	}
-
-
-	ResPlanAnalyzer.prototype.GetSelectedView = function () {
-		try {
-			var selectView = document.getElementById("idAnalyzerTab_SelView");
-			if (selectView.selectedIndex >= 0) {
-				var selectedItem = selectView.options[selectView.selectedIndex];
-				if (selectedItem.value != null) {
-					if (this.Views != null) {
-						for (var i = 0; i < this.Views.length; i++) {
-							var view = this.Views[i];
-							if (view != null) {
-								if (view.ViewGUID == selectedItem.value) {
-									this.doTopApply = true;
-									this.doBottomApply = true;
-									this.flashRibbonSelect("idAnalyzerTab_SelView");
-									return view;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		catch (e) {
-			this.HandleException("GetSelectedView", e);
-		}
-		return null;
-	}
-
-
-
-	ResPlanAnalyzer.prototype.AnalyzerViewDlg_OnClose = function () {
-		this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
-		this.AnalyzerViewDlg = null;
-	}
+        if (Grid.id == "g_1") {
+
+            this.FilteredTop = new Array();
+            var fcnt = 0;
+
+            if (this.GetGridRow(Grid, 1) == null)
+                return;
+
+            var children;
+
+            var sb = new StringBuilder();
+            sb.append("<FilteredRows>");
+
+            var i = 1;
+
+            while (i != 0) {
+                var arow = this.GetGridRow(Grid, i);
+                ++i;
+
+                if (arow == null) {
+                    i = 0;
+                    break;
+                }
+                else {
+
+                    children = arow.firstChild;
+
+                    if (children == null) {
+                        var rowid = Grid.GetString(arow, "rowid");
+
+                        if (rowid != "" && arow.Visible == false) {
+                            this.FilteredTop[fcnt] = rowid;
+                            ++fcnt;
+                            sb.append("<Row rowid='" + rowid + "'/>");
+                        }
+                    }
+                }
+            }
+
+            sb.append("</FilteredRows>");
+
+            if (this.LastFilterString != sb.toString())
+                WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADetailsFilteredFlag", sb.toString(), HandleRefreshDelegate);
+
+            this.LastFilterString = sb.toString();
+
+            return;
+        }
+    }
+
+
+    ResPlanAnalyzer.prototype.GetSelectedView = function () {
+        try {
+            var selectView = document.getElementById("idAnalyzerTab_SelView");
+            if (selectView.selectedIndex >= 0) {
+                var selectedItem = selectView.options[selectView.selectedIndex];
+                if (selectedItem.value != null) {
+                    if (this.Views != null) {
+                        for (var i = 0; i < this.Views.length; i++) {
+                            var view = this.Views[i];
+                            if (view != null) {
+                                if (view.ViewGUID == selectedItem.value) {
+                                    this.doTopApply = true;
+                                    this.doBottomApply = true;
+                                    this.flashRibbonSelect("idAnalyzerTab_SelView");
+                                    return view;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (e) {
+            this.HandleException("GetSelectedView", e);
+        }
+        return null;
+    }
+
+
+
+    ResPlanAnalyzer.prototype.AnalyzerViewDlg_OnClose = function () {
+        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
+        this.AnalyzerViewDlg = null;
+    }
 
 
-	ResPlanAnalyzer.prototype.AnalyzerDeleteViewDlg_OnClose = function () {
-		this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").detachObject()
-		this.AnalyzerDeleteViewDlg = null;
-	}
+    ResPlanAnalyzer.prototype.AnalyzerDeleteViewDlg_OnClose = function () {
+        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").detachObject()
+        this.AnalyzerDeleteViewDlg = null;
+    }
 
-	ResPlanAnalyzer.prototype.DeleteResourceAnalyzerViewComplete = function (jsonString) {
-		try {
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				var viewGUID = jsonObject.Result.View.ViewGUID;
+    ResPlanAnalyzer.prototype.DeleteResourceAnalyzerViewComplete = function (jsonString) {
+        try {
+            var jsonObject = JSON_ConvertString(jsonString);
+            if (JSON_ValidateServerResult(jsonObject)) {
+                var viewGUID = jsonObject.Result.View.ViewGUID;
 
-				var bFound = false;
-				var select = document.getElementById("idAnalyzerTab_SelView");
-				for (var i = 0; i < select.options.length; i++) {
-					if (select.options[i].value == viewGUID) {
-						bFound = true;
-						select.options[i] = null;
+                var bFound = false;
+                var select = document.getElementById("idAnalyzerTab_SelView");
+                for (var i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value == viewGUID) {
+                        bFound = true;
+                        select.options[i] = null;
 
-						// for (var f in this.views)
-						for (var i = 0; i < this.Views.length; i++) {
+                        // for (var f in this.views)
+                        for (var i = 0; i < this.Views.length; i++) {
 
-							var view = this.Views[i];
+                            var view = this.Views[i];
 
-							if (view != undefined) {
+                            if (view != undefined) {
 
-								if (view.ViewGUID != undefined) {
+                                if (view.ViewGUID != undefined) {
 
-									if (view.ViewGUID == viewGUID) {
-										delete this.Views[i];
-										break;
-									}
-								}
-							}
-						}
-						break;
-					}
-				}
+                                    if (view.ViewGUID == viewGUID) {
+                                        delete this.Views[i];
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
 
-				if (select.options.length == 0)
-					select.disabled = true;
-				else
-					select.disabled = false;
-  
-				this.externalEvent('DeleteView_Cancel');
-				this.SetViewChanged(null);
+                if (select.options.length == 0)
+                    select.disabled = true;
+                else
+                    select.disabled = false;
 
+                this.externalEvent('DeleteView_Cancel');
+                this.SetViewChanged(null);
 
-			}
-		}
-		catch (e) {
-			this.HandleException("DeleteResourcePlanViewComplete", e);
-		}
-	}
 
+            }
+        }
+        catch (e) {
+            this.HandleException("DeleteResourcePlanViewComplete", e);
+        }
+    }
 
 
-	ResPlanAnalyzer.prototype.GridsOnReady = function (grid, start) {
-	    try {
 
-	        if (grid.id == "g_1")
-	            this.topgridready = true;
+    ResPlanAnalyzer.prototype.GridsOnReady = function (grid, start) {
+        try {
 
-	        if (grid.id == "bottomg_1") {
-	            if (this.bottomgridfirstready == false) {
-	                this.HideWorkingPopup("divLoading");
-	                bottomgridfirstready = true;
-	            }
+            if (grid.id == "g_1")
+                this.topgridready = true;
 
+            if (grid.id == "bottomg_1") {
+                if (this.bottomgridfirstready == false) {
+                    this.HideWorkingPopup("divLoading");
+                    bottomgridfirstready = true;
+                }
 
-	            this.bottomgridready = true;
-	        }
+                this.topgridready = true;
+                this.bottomgridready = true;
+            }
 
-	        if (this.doTopApply == false && this.doBottomApply == false && this.stashgridsettings != null && (grid.id == "g_1" || grid.id == "bottomg_1")) {
+            if (this.doTopApply == false && this.doBottomApply == false && this.stashgridsettings != null && (grid.id == "g_1" || grid.id == "bottomg_1")) {
 
-	            this.ApplyGridView(grid.id, this.stashgridsettings.View, false);
-	        }
-	        else if (this.bottomgriddragstash != null && grid.id == "bottomg_1") {
-	            this.ApplyGridView(grid.id, this.bottomgriddragstash.View, false);
-	            this.bottomgriddragstash = null;
-	            return;
-	        }
-	        else if (this.topgridstash != null && grid.id == "g_1") {
-	            this.ApplyGridView(grid.id, this.topgridstash.View, false);
-	            this.topgridstash = null;
-	            return;
-	        }
+                this.ApplyGridView(grid.id, this.stashgridsettings.View, false);
+            }
+            else if (this.bottomgriddragstash != null && grid.id == "bottomg_1") {
+                this.ApplyGridView(grid.id, this.bottomgriddragstash.View, false);
+                this.bottomgriddragstash = null;
+                return;
+            }
+            else if (this.topgridstash != null && grid.id == "g_1") {
+                this.ApplyGridView(grid.id, this.topgridstash.View, false);
+                this.topgridstash = null;
+                return;
+            }
 
 
-	    }
-	    catch (e) { };
+        }
+        catch (e) { };
 
 
 
-	    try {
+        try {
 
 
 
-	        if (grid.id == "g_1") {
-	            if (this.TotGrid == null) {
+            if (grid.id == "g_1") {
+                if (this.TotGrid == null) {
 
-	                if (this.AnalyzerFilterschecked == true) {
-	                    this.showFilters(grid);
-	                } else {
-	                    this.hideFilters(grid);
-	                }
+                    if (this.AnalyzerFilterschecked == true) {
+                        this.showFilters(grid);
+                    } else {
+                        this.hideFilters(grid);
+                    }
 
-	                if (this.AnalyzeGroupingchecked == true) {
-	                    this.showGrouping(grid);
-	                } else {
-	                    this.hideGrouping(grid);
-	                }
+                    if (this.AnalyzeGroupingchecked == true) {
+                        this.showGrouping(grid);
+                    } else {
+                        this.hideGrouping(grid);
+                    }
 
-	                var sbDataxml = new StringBuilder();
+                    var sbDataxml = new StringBuilder();
 
-	                sbDataxml = new StringBuilder();
-	                sbDataxml.append('<![CDATA[');
-	                sbDataxml.append('<Execute Function="GetResourceAnalyzerTotals">');
-	                sbDataxml.append('</Execute>');
-	                sbDataxml.append(']]>');
+                    sbDataxml = new StringBuilder();
+                    sbDataxml.append('<![CDATA[');
+                    sbDataxml.append('<Execute Function="GetResourceAnalyzerTotals">');
+                    sbDataxml.append('</Execute>');
+                    sbDataxml.append(']]>');
 
-	                sb = new StringBuilder();
-	                sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
-	                sb.append(" Export_Url='rpaExportExcel.aspx'");
-	                sb.append(" data_url='" + this.Webservice + "'");
-	                sb.append(" data_method='Soap'");
-	                sb.append(" data_function='Execute'")
-	                sb.append(" data_namespace='WorkEnginePPM'");
-	                sb.append(" data_param_Function='GetResourceAnalyzerTotals'");
-	                sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
-	                sb.append(" >");
-	                sb.append("</treegrid>");
+                    sb = new StringBuilder();
+                    sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
+                    sb.append(" Export_Url='rpaExportExcel.aspx'");
+                    sb.append(" data_url='" + this.Webservice + "'");
+                    sb.append(" data_method='Soap'");
+                    sb.append(" data_function='Execute'")
+                    sb.append(" data_namespace='WorkEnginePPM'");
+                    sb.append(" data_param_Function='GetResourceAnalyzerTotals'");
+                    sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+                    sb.append(" >");
+                    sb.append("</treegrid>");
 
 
-	                this.TotGrid = TreeGrid(sb.toString(), "gridDiv_Totals", "bottomg_1");
+                    this.TotGrid = TreeGrid(sb.toString(), "gridDiv_Totals", "bottomg_1");
 
-	                this.initialized = true;
-	                this.OnResize();
+                    this.initialized = true;
+                    this.OnResize();
 
 
-	            }
+                }
 
-	            if (this.selectedView != null && this.doTopApply == true)
-	                this.ApplyGridView(grid.id, this.selectedView, true);
+                if (this.selectedView != null && this.doTopApply == true)
+                    this.ApplyGridView(grid.id, this.selectedView, true);
 
 
 
-	            if (this.deferredhidedetails == true) {
-	                this.deferredhidedetails = false;
-	                this.AnalyzerHideDetailschecked = !this.AnalyzerHideDetailschecked;    // this gets flipped back or even set to false whilst in the next proc
-	                this.FlashTopGridHideDetails();
+                if (this.deferredhidedetails == true) {
+                    this.deferredhidedetails = false;
+                    this.AnalyzerHideDetailschecked = !this.AnalyzerHideDetailschecked;    // this gets flipped back or even set to false whilst in the next proc
+                    this.FlashTopGridHideDetails();
 
-	                if (this.AnalyzerHideDetailschecked == true) {
-	                    this.viewTab.setButtonStateOn("idAnalyzerHideDetails");
-	                } else {
-	                    this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
-	                }
+                    if (this.AnalyzerHideDetailschecked == true) {
+                        this.viewTab.setButtonStateOn("idAnalyzerHideDetails");
+                    } else {
+                        this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
+                    }
 
 
-	            }
-	            this.doTopApply = false;
+                }
+                this.doTopApply = false;
 
-	        }
+            }
 
-	        if (grid.id == "bottomg_1") {
+            if (grid.id == "bottomg_1") {
 
-	            if (this.selectedView != null && this.doBottomApply == true)
-	                this.ApplyGridView(grid.id, this.selectedView, false);
+                if (this.selectedView != null && this.doBottomApply == true)
+                    this.ApplyGridView(grid.id, this.selectedView, false);
 
-	            this.doBottomApply = false;
+                this.doBottomApply = false;
 
-	            if (this.TotalFilterschecked == true) {
-	                this.showFilters(grid);
-	            } else {
-	                this.hideFilters(grid);
-	            }
+                if (this.TotalFilterschecked == true) {
+                    this.showFilters(grid);
+                } else {
+                    this.hideFilters(grid);
+                }
 
-	            if (this.TotalGroupingchecked == true) {
-	                this.showGrouping(grid);
-	            } else {
-	                this.hideGrouping(grid);
-	            }
+                if (this.TotalGroupingchecked == true) {
+                    this.showGrouping(grid);
+                } else {
+                    this.hideGrouping(grid);
+                }
 
 
-	            if (this.loadedDataCount == "0") {
-	                alert("The Items or Resources you selected to Analyze do not have any associated plans with them - hence the grids are displaying no data");
+                if (this.loadedDataCount == "0") {
+                    alert("The Items or Resources you selected to Analyze do not have any associated plans with them - hence the grids are displaying no data");
 
 
-	            }
+                }
 
-	        }
+            }
 
-	    }
-	    catch (e) {
-	        this.HandleException("GridsOnReady", e);
-	    }
-	}
+        }
+        catch (e) {
+            this.HandleException("GridsOnReady", e);
+        }
+    }
 
-	var AllLeavesChecked = function (Grid, Row) {
-		var children;
-		children = Row.firstChild;
+    var AllLeavesChecked = function (Grid, Row) {
+        var children;
+        children = Row.firstChild;
 
-		if (children == null) {
-			var rowck = Grid.GetString(Row, "Select");
-			if (rowck == "0")
-				return false;
+        if (children == null) {
+            var rowck = Grid.GetString(Row, "Select");
+            if (rowck == "0")
+                return false;
 
-		}
+        }
 
-		while (children != null) {
-			if (AllLeavesChecked(Grid, children) == false)
-				return false;
+        while (children != null) {
+            if (AllLeavesChecked(Grid, children) == false)
+                return false;
 
-			children = children.nextSibling;
-		}
+            children = children.nextSibling;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	ResPlanAnalyzer.prototype.HandleRerenderChecks = function () {
+    ResPlanAnalyzer.prototype.HandleRerenderChecks = function () {
 
-		if (this.refreshChecksInDetGrid != null) {
-			for (var i = 0; i < this.refreshChecksInDetGrid.length; i++) {
-				this.DetGrid.RefreshCell(this.refreshChecksInDetGrid[i], "Select");
-			}
-			this.refreshChecksInDetGrid = null;
-		}
+        if (this.refreshChecksInDetGrid != null) {
+            for (var i = 0; i < this.refreshChecksInDetGrid.length; i++) {
+                this.DetGrid.RefreshCell(this.refreshChecksInDetGrid[i], "Select");
+            }
+            this.refreshChecksInDetGrid = null;
+        }
 
 
 
-	}
+    }
 
 
-	ResPlanAnalyzer.prototype.HandleRerenderRollups = function () {
-		this.tg_rollup_render = true;
-		
-		if (this.tg_rollup != null) {
-			for (var i = 0; i < this.tg_rollup.length; i++) {
+    ResPlanAnalyzer.prototype.HandleRerenderRollups = function () {
+        this.tg_rollup_render = true;
 
-				var o = this.tg_rollup[i];
-				this.DetGrid.RefreshCell(o.Row, o.Col);
-			}
+        if (this.tg_rollup != null) {
+            for (var i = 0; i < this.tg_rollup.length; i++) {
 
-		}
+                var o = this.tg_rollup[i];
+                this.DetGrid.RefreshCell(o.Row, o.Col);
+            }
 
-		this.tg_rollup = null;
-		this.tg_rollup_render = false;
+        }
 
-	}
+        this.tg_rollup = null;
+        this.tg_rollup_render = false;
 
-	ResPlanAnalyzer.prototype.CheckLeafValuesareSame = function (grid, row, col) {
+    }
 
-		var children;
-		children = row.firstChild;
+    ResPlanAnalyzer.prototype.CheckLeafValuesareSame = function (grid, row, col) {
 
-		if (children == null) {
-			var rowv = grid.GetString(row, col);
+        var children;
+        children = row.firstChild;
 
-			if (this.GrpColValSet == false) {
-				this.GrpColValSet = true;
-				this.GrpColVal = rowv;
-			}
-			else if (this.GrpColVal != rowv)
-				 return false;
+        if (children == null) {
+            var rowv = grid.GetString(row, col);
 
-		}
+            if (this.GrpColValSet == false) {
+                this.GrpColValSet = true;
+                this.GrpColVal = rowv;
+            }
+            else if (this.GrpColVal != rowv)
+                return false;
 
-		while (children != null) {
-			if (this.CheckLeafValuesareSame(grid, children, col) == false)
-				return false;
+        }
 
-			children = children.nextSibling;
-		}
+        while (children != null) {
+            if (this.CheckLeafValuesareSame(grid, children, col) == false)
+                return false;
 
-		return true;
-	}
+            children = children.nextSibling;
+        }
 
-	ResPlanAnalyzer.prototype.GridsOnGetDefaultColor = function (grid, row, col, r, g, b) {
-	    if (grid.id == "et_1") {
+        return true;
+    }
 
-	        if (this.EditGrid.GetAttribute(row, col, "CanEdit") == "0")
-	            return 0xDADCDD;
+    ResPlanAnalyzer.prototype.GridsOnGetDefaultColor = function (grid, row, col, r, g, b) {
+        if (grid.id == "et_1") {
 
-	        return null;
+            if (this.EditGrid.GetAttribute(row, col, "CanEdit") == "0")
+                return 0xDADCDD;
 
-	    }
+            return null;
 
-	    if (grid.id == "g_1") {
+        }
 
-	        if (row.id == "Filter")
-	            return null;
+        if (grid.id == "g_1") {
 
-	        if (row.Kind == "Data") {
+            if (row.id == "Filter")
+                return null;
 
-	            if (col == "Select") {
-	                var xfp = grid.GetValue(row, "xinterenalPeriodMin");
-	                var xlp = grid.GetValue(row, "xinterenalPeriodMax");
-	                var xtp = this.UsingPeriods.Period.length;   //  grid.GetValue(row, "xinterenalPeriodTotal");
-	                var xas = "";
+            if (row.Kind == "Data") {
 
-	                var cv = grid.GetValue(row, "P1C1HtmlPrefix");
+                if (col == "Select") {
+                    var xfp = grid.GetValue(row, "xinterenalPeriodMin");
+                    var xlp = grid.GetValue(row, "xinterenalPeriodMax");
+                    var xtp = this.UsingPeriods.Period.length;   //  grid.GetValue(row, "xinterenalPeriodTotal");
+                    var xas = "";
 
-	                if (this.AnalyzerShowBarschecked == false) {
-	                    if (cv != "") {
+                    var cv = grid.GetValue(row, "P1C1HtmlPrefix");
 
-	                        for (var xi = 1; xi <= xtp; ++xi) {
-	                            xas = "P" + xi.toString() + "C1";
-	                            grid.SetString(row, xas + "HtmlPrefix", "", 1);
-	                            grid.SetString(row, xas + "HtmlPostfix", "", 1);
-	                            grid.SetString(row, xas + "ClassInner", "", 1);
-	                        }
-	                    }
-	                }
-	                else {
-	                    if (cv == "") {
-	                        if (xfp != 0) {
+                    if (this.AnalyzerShowBarschecked == false) {
+                        if (cv != "") {
 
-	                            for (var xi = 1; xi < xfp; ++xi) {
-	                                xas = "P" + xi.toString() + "C1";
-	                                grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
-	                                grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
-	                                //	                            grid.SetString(row, xas + "ClassInner", "", 1);
-	                            }
+                            for (var xi = 1; xi <= xtp; ++xi) {
+                                xas = "P" + xi.toString() + "C1";
+                                grid.SetString(row, xas + "HtmlPrefix", "", 1);
+                                grid.SetString(row, xas + "HtmlPostfix", "", 1);
+                                grid.SetString(row, xas + "ClassInner", "", 1);
+                            }
+                        }
+                    }
+                    else {
+                        if (cv == "") {
+                            if (xfp != 0) {
 
+                                for (var xi = 1; xi < xfp; ++xi) {
+                                    xas = "P" + xi.toString() + "C1";
+                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+                                    //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                                }
 
-	                            for (var xi = xfp; xi <= xlp; ++xi) {
 
-	                                xas = "P" + xi.toString() + "C1";
+                                for (var xi = xfp; xi <= xlp; ++xi) {
 
+                                    xas = "P" + xi.toString() + "C1";
 
-	                                //	                                                        if (xfp == xlp)
-	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngSingleCell", 1);
-	                                //	                                                        else if (xi == xfp)
-	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngLeftCell", 1);
-	                                //	                                                        else if (xi == xlp)
-	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngRightCell", 1);
-	                                //	                                                        else
-	                                //	                                                            grid.SetString(row, xas + "ClassInner", "GMngMiddleCell", 1);
 
+                                    //	                                                        if (xfp == xlp)
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngSingleCell", 1);
+                                    //	                                                        else if (xi == xfp)
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngLeftCell", 1);
+                                    //	                                                        else if (xi == xlp)
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngRightCell", 1);
+                                    //	                                                        else
+                                    //	                                                            grid.SetString(row, xas + "ClassInner", "GMngMiddleCell", 1);
 
-	                                grid.SetString(row, xas + "HtmlPrefix", "<font color='white'>", 1);
-	                                grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
 
+                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='white'>", 1);
+                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
 
-	                            }
 
-	                            for (var xi = xlp + 1; xi <= xtp; ++xi) {
-	                                xas = "P" + xi.toString() + "C1";
-	                                grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
-	                                grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
-	                                //	                            grid.SetString(row, xas + "ClassInner", "", 1);
-	                            }
+                                }
 
-	                        }
-	                    }
-	                }
-	            }
+                                for (var xi = xlp + 1; xi <= xtp; ++xi) {
+                                    xas = "P" + xi.toString() + "C1";
+                                    grid.SetString(row, xas + "HtmlPrefix", "<font color='black'>", 1);
+                                    grid.SetString(row, xas + "HtmlPostfix", "</font>", 1);
+                                    //	                            grid.SetString(row, xas + "ClassInner", "", 1);
+                                }
 
+                            }
+                        }
+                    }
+                }
 
-	            if (grid.Cols[col].Sec == 2 && col.substr(0, 1) == "P" && this.AnalyzerShowBarschecked == true) {
-	                var fp = grid.GetValue(row, "xinterenalPeriodMin");
-	                var lp = grid.GetValue(row, "xinterenalPeriodMax");
 
-	                var stg = col.substr(1);
-	                var itg = stg.indexOf("C");
+                if (grid.Cols[col].Sec == 2 && col.substr(0, 1) == "P" && this.AnalyzerShowBarschecked == true) {
+                    var fp = grid.GetValue(row, "xinterenalPeriodMin");
+                    var lp = grid.GetValue(row, "xinterenalPeriodMax");
 
-	                var peridtg = parseInt(stg.substr(0, itg));
+                    var stg = col.substr(1);
+                    var itg = stg.indexOf("C");
 
-	                if (peridtg >= fp && peridtg <= lp) {
+                    var peridtg = parseInt(stg.substr(0, itg));
 
-	                    //var cls = grid.GetAttribute(row, col, "ClassInner");
-	                    //        grid.SetAttribute(row, col, "ClassInner", "GMngBodyRight", 1);
+                    if (peridtg >= fp && peridtg <= lp) {
 
+                        //var cls = grid.GetAttribute(row, col, "ClassInner");
+                        //        grid.SetAttribute(row, col, "ClassInner", "GMngBodyRight", 1);
 
 
-	                    return 0x0072C6;
-	                }
 
-	                if (row.firstChild == null)
-	                    return null;
+                        return 0x0072C6;
+                    }
 
-	                return this.groupColour;
-	            }
-	        }
+                    if (row.firstChild == null)
+                        return null;
 
+                    return this.groupColour;
+                }
+            }
 
 
-	        if (row.firstChild == null || row.id == "Filter")
-	            return null;
 
-	        if (col == "Select") {
+            if (row.firstChild == null || row.id == "Filter")
+                return null;
 
-	            var bAll = AllLeavesChecked(grid, row);
+            if (col == "Select") {
 
-	            var rowck = grid.GetString(row, "Select");
-	            var newck = (bAll == true ? "1" : "0");
+                var bAll = AllLeavesChecked(grid, row);
 
-	            if (rowck != newck) {
-	                grid.SetAttribute(row, col, null, newck, 1);
+                var rowck = grid.GetString(row, "Select");
+                var newck = (bAll == true ? "1" : "0");
 
+                if (rowck != newck) {
+                    grid.SetAttribute(row, col, null, newck, 1);
 
-	                if (this.refreshChecksInDetGrid == null) {
-	                    this.refreshChecksInDetGrid = new Array();
-	                    window.setTimeout(HandleRerenderChecksDelegate, 400);
-	                }
 
-	                this.refreshChecksInDetGrid[this.refreshChecksInDetGrid.length] = row;
-	                //grid.RefreshCell(row, "Select");
-	            }
-	        }
+                    if (this.refreshChecksInDetGrid == null) {
+                        this.refreshChecksInDetGrid = new Array();
+                        window.setTimeout(HandleRerenderChecksDelegate, 400);
+                    }
 
-	        if (col == "RowSel")
-	            return null;
+                    this.refreshChecksInDetGrid[this.refreshChecksInDetGrid.length] = row;
+                    //grid.RefreshCell(row, "Select");
+                }
+            }
 
+            if (col == "RowSel")
+                return null;
 
 
-	        // this is where we need to check the children to see if they all have the same value and if so set this rows col to that value....
 
-	        if (grid.Cols[col].Sec == 1 && this.tg_rollup_render == false) {
-	            var rowv = grid.GetString(row, col);
+            // this is where we need to check the children to see if they all have the same value and if so set this rows col to that value....
 
-	            if (rowv == "") {
-	                this.GrpColVal = "";
-	                this.GrpColValSet = false;
+            if (grid.Cols[col].Sec == 1 && this.tg_rollup_render == false) {
+                var rowv = grid.GetString(row, col);
 
+                if (rowv == "") {
+                    this.GrpColVal = "";
+                    this.GrpColValSet = false;
 
-	                if (this.CheckLeafValuesareSame(grid, row, col) == true) {
-	                    if (this.tg_rollup == null) {
-	                        this.tg_rollup = new Array();
-	                        window.setTimeout(HandleRerenderRollupsDelegate, 400);
-	                    }
 
-	                    var o = new Object();
+                    if (this.CheckLeafValuesareSame(grid, row, col) == true) {
+                        if (this.tg_rollup == null) {
+                            this.tg_rollup = new Array();
+                            window.setTimeout(HandleRerenderRollupsDelegate, 400);
+                        }
 
-	                    o.Row = row;
-	                    o.Col = col;
+                        var o = new Object();
 
-	                    grid.SetAttribute(row, col, null, this.GrpColVal, 1);
-	                    //  o.val = this.GrpColVal;
+                        o.Row = row;
+                        o.Col = col;
 
-	                    //          if (this.tg_rollup_render == false)
-	                    this.tg_rollup.push(o);
-	                }
+                        grid.SetAttribute(row, col, null, this.GrpColVal, 1);
+                        //  o.val = this.GrpColVal;
 
-	            }
+                        //          if (this.tg_rollup_render == false)
+                        this.tg_rollup.push(o);
+                    }
 
+                }
 
-	        }
 
+            }
 
-	        return this.groupColour;
-	    }
 
-	    if (row.firstChild == null)
-	        return null;
+            return this.groupColour;
+        }
 
-	    if (grid.id != "bottomg_1")
-	        return null;
+        if (row.firstChild == null)
+            return null;
 
-	    if (row.firstChild == null || row.id == "Filter")
-	        return null;
+        if (grid.id != "bottomg_1")
+            return null;
 
-	    if (col == "RowSel")
-	        return null;
+        if (row.firstChild == null || row.id == "Filter")
+            return null;
 
+        if (col == "RowSel")
+            return null;
 
-	    if (col.charAt(0) === "P") {
 
-	        var s = col.substr(1);
-	        var i = s.indexOf("C");
+        if (col.charAt(0) === "P") {
 
-	        if (i === -1)
-	            return 0xDADCDD;
+            var s = col.substr(1);
+            var i = s.indexOf("C");
 
-	        // because we can now swap the target bounds around we need to look at thchildrenminvalinstead if the comparison is swapped
+            if (i === -1)
+                return 0xDADCDD;
 
-	        var perid = s.substr(0, i);
-	        var subper = s.substr(i + 1);
-	        var childrenMaxhmVal = grid.GetValue(row, "X" + s);
-	        var childrenMinhmVal = grid.GetValue(row, "Y" + s);
-	        var myhmVal;
+            // because we can now swap the target bounds around we need to look at thchildrenminvalinstead if the comparison is swapped
 
-	        var hmcol = "P" + perid + "H";
+            var perid = s.substr(0, i);
+            var subper = s.substr(i + 1);
+            var childrenMaxhmVal = grid.GetValue(row, "X" + s);
+            var childrenMinhmVal = grid.GetValue(row, "Y" + s);
+            var myhmVal;
 
-	        var hmv = grid.GetValue(row, hmcol);
-	        var cv = grid.GetValue(row, col);
+            var hmcol = "P" + perid + "H";
 
-	        if (subper == this.TotalsGridTotalsCol) {
-	            var retval = this.TargetBackground(cv, hmv);
-	            var bdoit = false;
+            var hmv = grid.GetValue(row, hmcol);
+            var cv = grid.GetValue(row, col);
 
-	            if (this.selectedHeatMapColour == 1)
-	                bdoit = (this.tarlev < childrenMaxhmVal && childrenMaxhmVal != "")
-	            else
-	                bdoit = (this.tarlev > childrenMinhmVal && childrenMinhmVal != "")
+            if (subper == this.TotalsGridTotalsCol) {
+                var retval = this.TargetBackground(cv, hmv);
+                var bdoit = false;
 
+                if (this.selectedHeatMapColour == 1)
+                    bdoit = (this.tarlev < childrenMaxhmVal && childrenMaxhmVal != "")
+                else
+                    bdoit = (this.tarlev > childrenMinhmVal && childrenMinhmVal != "")
 
-	            if (bdoit == true) {
-	                var rowicon = grid.GetString(row, "IconFlag");
 
-	                if (rowicon != '/_layouts/ppm/images/Yellow.gif') {
+                if (bdoit == true) {
+                    var rowicon = grid.GetString(row, "IconFlag");
 
-	                    grid.SetAttribute(row, "IconFlag", null, '/_layouts/ppm/images/Yellow.gif', 1);
+                    if (rowicon != '/_layouts/ppm/images/Yellow.gif') {
 
-	                    if (this.refreshIconsInTotGrid == null) {
-	                        this.refreshIconsInTotGrid = new Array();
-	                        window.setTimeout(HandleRerenderDelegate, 600);
+                        grid.SetAttribute(row, "IconFlag", null, '/_layouts/ppm/images/Yellow.gif', 1);
 
-	                    }
+                        if (this.refreshIconsInTotGrid == null) {
+                            this.refreshIconsInTotGrid = new Array();
+                            window.setTimeout(HandleRerenderDelegate, 600);
 
+                        }
 
-	                    this.refreshIconsInTotGrid[this.refreshIconsInTotGrid.length] = row;
 
+                        this.refreshIconsInTotGrid[this.refreshIconsInTotGrid.length] = row;
 
-	                }
-	            }
 
+                    }
+                }
 
-	            //	            if (this.tarlev < childrenMaxhmVal) 
-	            //	                grid.SetString(row, col + "Icon", '/_layouts/ppm/images/Yellow.gif', 1);
-	            //	            else
-	            //	                grid.SetString(row, col + "Icon", '/_layouts/ppm/images/Green.gif', 1);
 
-	            return retval;
-	        }
-	        else
-	            return 0xFFFFFF;
+                //	            if (this.tarlev < childrenMaxhmVal) 
+                //	                grid.SetString(row, col + "Icon", '/_layouts/ppm/images/Yellow.gif', 1);
+                //	            else
+                //	                grid.SetString(row, col + "Icon", '/_layouts/ppm/images/Green.gif', 1);
 
-	    }
+                return retval;
+            }
+            else
+                return 0xFFFFFF;
 
-	    return this.groupColour;
+        }
 
-	}
+        return this.groupColour;
 
-	ResPlanAnalyzer.prototype.TargetBackground = function (Tdbl, Pdbl) {
+    }
 
-		var sRet = 0xFFFFFF;
-		var i;
-		this.tarlev = -4;
+    ResPlanAnalyzer.prototype.TargetBackground = function (Tdbl, Pdbl) {
 
-		try {
+        var sRet = 0xFFFFFF;
+        var i;
+        this.tarlev = -4;
 
-			var crgb = -1;
+        try {
 
-			if (this.TargetData == null)
-				return sRet;
+            var crgb = -1;
 
-			if (this.TargetData.Target.length == 0)
-				return sRet;
+            if (this.TargetData == null)
+                return sRet;
 
-			var targets = this.TargetData.Target
+            if (this.TargetData.Target.length == 0)
+                return sRet;
 
-			if (Tdbl == 0 && Pdbl == 0) {
-				this.tarlev = -3;
-				for (i = 0; i < targets.length; is++) {
-					if (targets[i].ID == -3) {
-						crgb = targets[i].RGB;
-						break;
-					}
-				}
-			}
-			else if (Tdbl == 0) {
-				this.tarlev = -2;
-				for (i = 0; i < targets.length; i++) {
-					if (targets[i].ID == -2) {
-						crgb = targets[i].RGB;
-						break;
-					}
-				}
-			}
-			else if (Pdbl == 0) {
-				this.tarlev = -1;
+            var targets = this.TargetData.Target
 
-				for (i = 0; i < targets.length; i++) {
-					if (targets[i].ID == -1) {
-						crgb = targets[i].RGB;
-						break;
-					}
-				}
-			}
-			else {
+            if (Tdbl == 0 && Pdbl == 0) {
+                this.tarlev = -3;
+                for (i = 0; i < targets.length; is++) {
+                    if (targets[i].ID == -3) {
+                        crgb = targets[i].RGB;
+                        break;
+                    }
+                }
+            }
+            else if (Tdbl == 0) {
+                this.tarlev = -2;
+                for (i = 0; i < targets.length; i++) {
+                    if (targets[i].ID == -2) {
+                        crgb = targets[i].RGB;
+                        break;
+                    }
+                }
+            }
+            else if (Pdbl == 0) {
+                this.tarlev = -1;
 
-				var percnt;
+                for (i = 0; i < targets.length; i++) {
+                    if (targets[i].ID == -1) {
+                        crgb = targets[i].RGB;
+                        break;
+                    }
+                }
+            }
+            else {
 
+                var percnt;
 
 
-				if (this.selectedHeatMapColour == 1)
-					percnt = (Tdbl / Pdbl) * 100;
-				else {
-					percnt = (Pdbl / Tdbl) * 100;
-				  
-				}
 
-  
-				
+                if (this.selectedHeatMapColour == 1)
+                    percnt = (Tdbl / Pdbl) * 100;
+                else {
+                    percnt = (Pdbl / Tdbl) * 100;
 
-				for (i = 0; i < targets.length; i++) {
-					if (targets[i].ID > 0) {
+                }
 
-						if ((percnt >= targets[i].Lowval && percnt <= targets[i].Hival) || (targets[i].Hival == 0)) {
-							crgb = targets[i].RGB;
-							this.tarlev = targets[i].ID;
-							break;
-						}
-					}
-				}
-			}
 
-			if (crgb == -1)
-				return sRet;
 
-			return "rgb(" + (crgb & 0xFF) + "," + ((crgb & 0xFF00) >> 8) + "," + ((crgb & 0xFF0000) >> 16) + ")";
-		}
-		catch (e) {
-			return sRet;
-		}
 
-	}
+                for (i = 0; i < targets.length; i++) {
+                    if (targets[i].ID > 0) {
 
+                        if ((percnt >= targets[i].Lowval && percnt <= targets[i].Hival) || (targets[i].Hival == 0)) {
+                            crgb = targets[i].RGB;
+                            this.tarlev = targets[i].ID;
+                            break;
+                        }
+                    }
+                }
+            }
 
-	ResPlanAnalyzer.prototype.GridsOnStartDragCell = function (grid, row, col, shtml) {
+            if (crgb == -1)
+                return sRet;
 
-		this.DoingCellDrag = false;
-		this.currDrag = null;
-		this.singleRowUndraggable = false;
+            return "rgb(" + (crgb & 0xFF) + "," + ((crgb & 0xFF00) >> 8) + "," + ((crgb & 0xFF0000) >> 16) + ")";
+        }
+        catch (e) {
+            return sRet;
+        }
 
-		if (this.PMOAdmin != "1")
-			return;
+    }
 
 
-		if (grid.id != "g_1")
-			return false;
-		
+    ResPlanAnalyzer.prototype.GridsOnStartDragCell = function (grid, row, col, shtml) {
 
-		this.includesNotDraggable = false;
-		this.includesDraggable = false;
-		this.draggingGroupRow = false;
+        this.DoingCellDrag = false;
+        this.currDrag = null;
+        this.singleRowUndraggable = false;
 
-		if (this.SelectedMode == 4)
-			return false;
+        if (this.PMOAdmin != "1")
+            return;
 
 
-		var children = row.firstChild;
+        if (grid.id != "g_1")
+            return false;
 
 
-		if (children == null) {
-			var rowdraggable = grid.GetString(row, "RowDraggable");
-			if (rowdraggable == "0") {
-				this.singleRowUndraggable = true;
-				return false;
-			}
+        this.includesNotDraggable = false;
+        this.includesDraggable = false;
+        this.draggingGroupRow = false;
 
-		} else {
-			this.draggingGroupRow = true;
-		}
+        if (this.SelectedMode == 4)
+            return false;
 
 
-		if (grid.Cols[col].Sec == 2) {
-			this.DoingCellDrag = true;
-			this.LastMovedCol = null;
-			this.HadMove = false;
-			this.currDrag = new Array();
-			this.startCol = col;
+        var children = row.firstChild;
 
-			this.CaptureDragRow(grid, row);
-			return false;
-		}
 
+        if (children == null) {
+            var rowdraggable = grid.GetString(row, "RowDraggable");
+            if (rowdraggable == "0") {
+                this.singleRowUndraggable = true;
+                return false;
+            }
 
+        } else {
+            this.draggingGroupRow = true;
+        }
 
-		return true;
 
-	}
+        if (grid.Cols[col].Sec == 2) {
+            this.DoingCellDrag = true;
+            this.LastMovedCol = null;
+            this.HadMove = false;
+            this.currDrag = new Array();
+            this.startCol = col;
 
-	ResPlanAnalyzer.prototype.GridsOnMoveDragCell = function (grid, row, pcol, togrid, torow, tocol, x, y) {
+            this.CaptureDragRow(grid, row);
+            return false;
+        }
 
-		if (grid.id != "g_1" || this.DoingCellDrag == false)
-			return;
 
-		if (this.PMOAdmin != "1")
-			return;
 
-		if (grid.id != togrid.id || row == null || pcol == null || torow == null || tocol == null)
-			return;
+        return true;
 
+    }
 
-		if (row != torow) {
-			//alert("You may only drag within the same row");
-			return;
-		}
+    ResPlanAnalyzer.prototype.GridsOnMoveDragCell = function (grid, row, pcol, togrid, torow, tocol, x, y) {
 
-		if (grid.Cols[tocol].Sec != 2) {
+        if (grid.id != "g_1" || this.DoingCellDrag == false)
+            return;
 
-			//   alert("You may only drag withing the rows right hand pane");
-			return;
-		}
+        if (this.PMOAdmin != "1")
+            return;
 
-		if (pcol == tocol)
-			return;
+        if (grid.id != togrid.id || row == null || pcol == null || torow == null || tocol == null)
+            return;
 
-		var start_period = 0;
-		var to_period = 0;
-		var s;
-		var i;
 
-		if (this.LastMovedCol == null)
-			col = pcol;
-		else
-			col = this.LastMovedCol;
+        if (row != torow) {
+            //alert("You may only drag within the same row");
+            return;
+        }
 
+        if (grid.Cols[tocol].Sec != 2) {
 
-		this.LastMovedCol = tocol;
+            //   alert("You may only drag withing the rows right hand pane");
+            return;
+        }
 
-		if (col.charAt(0) === "P") {
+        if (pcol == tocol)
+            return;
 
-			s = col.substr(1);
-			i = s.indexOf("C");
+        var start_period = 0;
+        var to_period = 0;
+        var s;
+        var i;
 
-			start_period = parseInt(s.substr(0, i));
+        if (this.LastMovedCol == null)
+            col = pcol;
+        else
+            col = this.LastMovedCol;
 
-		}
-		if (tocol.charAt(0) === "P") {
 
-			s = tocol.substr(1);
-			i = s.indexOf("C");
+        this.LastMovedCol = tocol;
 
-			to_period = parseInt(s.substr(0, i));
+        if (col.charAt(0) === "P") {
 
-		}
+            s = col.substr(1);
+            i = s.indexOf("C");
 
-		var sb = new StringBuilder();
+            start_period = parseInt(s.substr(0, i));
 
-		if (start_period != to_period)
-			this.HandleDragRow(grid, row, start_period, to_period, sb);
+        }
+        if (tocol.charAt(0) === "P") {
 
+            s = tocol.substr(1);
+            i = s.indexOf("C");
 
-	}
-	ResPlanAnalyzer.prototype.GridsOnEndDragCell = function (grid, row, col, togrid, torow, tocol, x, y) {
+            to_period = parseInt(s.substr(0, i));
 
-	    var sb = new StringBuilder();
+        }
 
+        var sb = new StringBuilder();
 
-	    if (this.PMOAdmin != "1") {
-	        alert("You do not have the application permission to be able to change the data by dragging rows");
-	        return;
-	    }
+        if (start_period != to_period)
+            this.HandleDragRow(grid, row, start_period, to_period, sb);
 
-	    if (grid == null || togrid == null)
-	        return;
 
+    }
+    ResPlanAnalyzer.prototype.GridsOnEndDragCell = function (grid, row, col, togrid, torow, tocol, x, y) {
 
-	    if (grid.id != togrid.id || row == null || col == null || torow == null || tocol == null)
-	        return;
+        var sb = new StringBuilder();
 
 
+        if (this.PMOAdmin != "1") {
+            alert("You do not have the application permission to be able to change the data by dragging rows");
+            return;
+        }
 
-	    if (this.DoingCellDrag == false) {
-	        if (this.singleRowUndraggable == true)
-	            alert("The selected row cannot be dragged - so no values have been changed");
-	        return;
+        if (grid == null || togrid == null)
+            return;
 
-	    }
 
-	    if (row != torow) {
-	        alert("You may only drag within the same row");
-	        this.ResetDragRow(grid, this.currDrag);
-	        return;
-	    }
+        if (grid.id != togrid.id || row == null || col == null || torow == null || tocol == null)
+            return;
 
-	    if (grid.Cols[tocol].Sec != 2) {
 
-	        alert("You may only drag withing the rows right hand pane");
-	        this.ResetDragRow(grid, this.currDrag);
-	        return;
-	    }
 
-	    if (col == tocol) {
-	        if (this.HadMove == false)
-	            return;
+        if (this.DoingCellDrag == false) {
+            if (this.singleRowUndraggable == true)
+                alert("The selected row cannot be dragged - so no values have been changed");
+            return;
 
-	        this.HandleDragRow(grid, row, 1, 1, null);
-	        return;
-	    }
+        }
 
-	    var start_period = 0;
-	    var to_period = 0;
-	    var s;
-	    var i;
+        if (row != torow) {
+            alert("You may only drag within the same row");
+            this.ResetDragRow(grid, this.currDrag);
+            return;
+        }
 
-	    if (this.startCol.charAt(0) === "P") {
+        if (grid.Cols[tocol].Sec != 2) {
 
-	        s = this.startCol.substr(1);
-	        i = s.indexOf("C");
+            alert("You may only drag withing the rows right hand pane");
+            this.ResetDragRow(grid, this.currDrag);
+            return;
+        }
 
-	        start_period = parseInt(s.substr(0, i));
+        if (col == tocol) {
+            if (this.HadMove == false)
+                return;
 
-	    }
-	    if (tocol.charAt(0) === "P") {
+            this.HandleDragRow(grid, row, 1, 1, null);
+            return;
+        }
 
-	        s = tocol.substr(1);
-	        i = s.indexOf("C");
+        var start_period = 0;
+        var to_period = 0;
+        var s;
+        var i;
 
-	        to_period = parseInt(s.substr(0, i));
+        if (this.startCol.charAt(0) === "P") {
 
-	    }
+            s = this.startCol.substr(1);
+            i = s.indexOf("C");
 
-	    sb = new StringBuilder();
-	    sb.append("<Rows ");
-	    sb.append(" fromCol='" + start_period + "'");
-	    sb.append(" toCol='" + to_period + "'>");
+            start_period = parseInt(s.substr(0, i));
 
+        }
+        if (tocol.charAt(0) === "P") {
 
+            s = tocol.substr(1);
+            i = s.indexOf("C");
 
-	    this.HandleDragRow(grid, row, null, null, sb);
+            to_period = parseInt(s.substr(0, i));
 
-	    sb.append("</Rows>");
+        }
 
+        sb = new StringBuilder();
+        sb.append("<Rows ");
+        sb.append(" fromCol='" + start_period + "'");
+        sb.append(" toCol='" + to_period + "'>");
 
-	    if (this.draggingGroupRow == true) {
-	        if (this.includesNotDraggable == true) {
-	            if (this.includesDraggable == true)
-	                alert("One of more of the children rows of the selected Group row are not draggable!  Values on those rows will not have changed");
-	            else {
-	                alert("None of the children rows of the selected Group row are draggable!  No values have changed");
-	                return;
-	            }
 
 
-	        }
-	    }
+        this.HandleDragRow(grid, row, null, null, sb);
 
+        sb.append("</Rows>");
 
-	    this.HaveDragChanges = true;
 
+        if (this.draggingGroupRow == true) {
+            if (this.includesNotDraggable == true) {
+                if (this.includesDraggable == true)
+                    alert("One of more of the children rows of the selected Group row are not draggable!  Values on those rows will not have changed");
+                else {
+                    alert("None of the children rows of the selected Group row are draggable!  No values have changed");
+                    return;
+                }
 
-	    if (this.NegMode == true) {
-	        if (this.NegWarn == false) {
-	            this.NegWarn = true;
-	            alert("Due to Negotiation Mode being enabled it will not be possible to publish any of the changes you make");
-	        }
 
-	    } else {
-	        this.SaveBtn = true;
+            }
+        }
 
 
-	        this.analyzerTab.enableItem("SaveBtn");
-	        this.viewTab.enableItem("SaveBtn2");
-	    }
+        this.HaveDragChanges = true;
 
-	    this.UnDoBtn = true;
-	    this.analyzerTab.enableItem("UndoBtn");
-	    this.viewTab.enableItem("UndoBtn2");
 
+        if (this.NegMode == true) {
+            if (this.NegWarn == false) {
+                this.NegWarn = true;
+                alert("Due to Negotiation Mode being enabled it will not be possible to publish any of the changes you make");
+            }
 
+        } else {
+            this.SaveBtn = true;
 
-	    this.dragStack.push(this.currDrag);
 
-	    this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+            this.analyzerTab.enableItem("SaveBtn");
+            this.viewTab.enableItem("SaveBtn2");
+        }
 
-	    this.TopGridDragged = true;
-	    WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADragRows", sb.toString(), HandleRefreshDelegate);
+        this.UnDoBtn = true;
+        this.analyzerTab.enableItem("UndoBtn");
+        this.viewTab.enableItem("UndoBtn2");
 
-	}
 
 
-	var HandleClick = function (Grid, Row, Col, value, sb) {
-		var children;
+        this.dragStack.push(this.currDrag);
 
-		Row.Changed = 1;
-		Grid.SetString(Row, Col, value, 1);
-		children = Row.firstChild;
+        this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
 
-		if (children == null) {
-			var rowid = Grid.GetString(Row, "rowid");
-			sb.append("<Row rowid='" + rowid + "'/>");
+        this.TopGridDragged = true;
+        WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADragRows", sb.toString(), HandleRefreshDelegate);
 
-		}
+    }
 
-		while (children != null) {
-			HandleClick(Grid, children, Col, value, sb);
-			children = children.nextSibling;
-		}
-	}
 
-	ResPlanAnalyzer.prototype.CaptureDragRow = function (Grid, Row) {
-		var children;
-		children = Row.firstChild;
+    var HandleClick = function (Grid, Row, Col, value, sb) {
+        var children;
 
-		if (children == null) {
-			var rowdraggable = Grid.GetString(Row, "RowDraggable");
-			if (rowdraggable == "0")
-				return;
+        Row.Changed = 1;
+        Grid.SetString(Row, Col, value, 1);
+        children = Row.firstChild;
 
-			var rowid = Grid.GetString(Row, "rowid");
-			var rCols = Grid.ColNames[2];
-			var trow = new Object;
-			trow.rowID = rowid;
-			trow.rowobj = Row.id;
-			trow.rowData = new Array();
-			trow.bcStart = Grid.GetValue(Row, "xinterenalPeriodMin");
-			trow.bcFinish = Grid.GetValue(Row, "xinterenalPeriodMax");
-			var tCol;
-			var cval;
+        if (children == null) {
+            var rowid = Grid.GetString(Row, "rowid");
+            sb.append("<Row rowid='" + rowid + "'/>");
 
+        }
 
-			for (var i = 0; i < rCols.length; i++) {
-				tCol = rCols[i];
-				cval = Grid.GetString(Row, tCol);
-				if (cval != "")
-					cval = parseFloat(cval.replace(/,/g, ''));
-				else
-					cval = 0;
+        while (children != null) {
+            HandleClick(Grid, children, Col, value, sb);
+            children = children.nextSibling;
+        }
+    }
 
-				trow.rowData[i] = cval;
+    ResPlanAnalyzer.prototype.CaptureDragRow = function (Grid, Row) {
+        var children;
+        children = Row.firstChild;
 
-			}
+        if (children == null) {
+            var rowdraggable = Grid.GetString(Row, "RowDraggable");
+            if (rowdraggable == "0")
+                return;
 
-			this.currDrag.push(trow);
+            var rowid = Grid.GetString(Row, "rowid");
+            var rCols = Grid.ColNames[2];
+            var trow = new Object;
+            trow.rowID = rowid;
+            trow.rowobj = Row.id;
+            trow.rowData = new Array();
+            trow.bcStart = Grid.GetValue(Row, "xinterenalPeriodMin");
+            trow.bcFinish = Grid.GetValue(Row, "xinterenalPeriodMax");
+            var tCol;
+            var cval;
 
 
-		}
+            for (var i = 0; i < rCols.length; i++) {
+                tCol = rCols[i];
+                cval = Grid.GetString(Row, tCol);
+                if (cval != "")
+                    cval = parseFloat(cval.replace(/,/g, ''));
+                else
+                    cval = 0;
 
-		while (children != null) {
-			this.CaptureDragRow(Grid, children);
-			children = children.nextSibling;
-		}
-	}
+                trow.rowData[i] = cval;
 
-	ResPlanAnalyzer.prototype.ResetDragRow = function (Grid, rows) {
+            }
 
-		if (rows == undefined)
-			return;
+            this.currDrag.push(trow);
 
-		if (rows == null)
-			return;
 
-		var rCols = Grid.ColNames[2];
+        }
 
-		var arows = Grid.Rows;
+        while (children != null) {
+            this.CaptureDragRow(Grid, children);
+            children = children.nextSibling;
+        }
+    }
 
-		for (var j = 0; j < rows.length; j++) {
-			var trow = null;
+    ResPlanAnalyzer.prototype.ResetDragRow = function (Grid, rows) {
 
-			trow = arows[rows[j].rowobj]
+        if (rows == undefined)
+            return;
 
-			var dcnt = Grid.GetString(trow, "RowChanged");
-			--dcnt;
-			Grid.SetString(trow, "RowChanged", dcnt, 1);
+        if (rows == null)
+            return;
 
-			if (dcnt == 0)
-				Grid.SetString(trow, "ChangedIcon", '/_layouts/ppm/images/Nogif.gif', 1);
-			else
-				Grid.SetString(trow, "ChangedIcon", '/_layouts/ppm/images/Approve.gif', 1)
+        var rCols = Grid.ColNames[2];
 
+        var arows = Grid.Rows;
 
+        for (var j = 0; j < rows.length; j++) {
+            var trow = null;
 
+            trow = arows[rows[j].rowobj]
 
-			Grid.SetString(trow, "xinterenalPeriodMin", trow.bcStart, 1);
-			Grid.SetString(trow, "xinterenalPeriodMax", trow.bcFinish, 1);
+            var dcnt = Grid.GetString(trow, "RowChanged");
+            --dcnt;
+            Grid.SetString(trow, "RowChanged", dcnt, 1);
 
-			for (var i = 0; i < rCols.length; i++) {
-				var cval = rows[j].rowData[i];
-				var tCol = rCols[i];
+            if (dcnt == 0)
+                Grid.SetString(trow, "ChangedIcon", '/_layouts/ppm/images/Nogif.gif', 1);
+            else
+                Grid.SetString(trow, "ChangedIcon", '/_layouts/ppm/images/Approve.gif', 1)
 
-				Grid.SetString(trow, tCol, cval, 1);
-				tCol = "X" + tCol.substr(1);
-//				cval = rows[j].bcData[i];
-//				Grid.SetString(trow, tCol, cval, 1);
-			}
-		}
-	}
 
 
-	ResPlanAnalyzer.prototype.HandleDragRow = function (Grid, Row, fromCol, toCol, sb) {
-		var children;
 
+            Grid.SetString(trow, "xinterenalPeriodMin", trow.bcStart, 1);
+            Grid.SetString(trow, "xinterenalPeriodMax", trow.bcFinish, 1);
 
+            for (var i = 0; i < rCols.length; i++) {
+                var cval = rows[j].rowData[i];
+                var tCol = rCols[i];
 
+                Grid.SetString(trow, tCol, cval, 1);
+                tCol = "X" + tCol.substr(1);
+                //				cval = rows[j].bcData[i];
+                //				Grid.SetString(trow, tCol, cval, 1);
+            }
+        }
+    }
 
-		Row.Changed = 1;
-		children = Row.firstChild;
 
+    ResPlanAnalyzer.prototype.HandleDragRow = function (Grid, Row, fromCol, toCol, sb) {
+        var children;
 
 
 
-		if (children == null) {
-			var rowdraggable = Grid.GetString(Row, "RowDraggable");
-			if (rowdraggable == "0") {
-				this.includesNotDraggable = true;
-				return;
-			}
 
-			var rowid = Grid.GetString(Row, "rowid");
-			if (sb != undefined)
-				sb.append("<Row rowid='" + rowid + "'/>");
+        Row.Changed = 1;
+        children = Row.firstChild;
 
-			this.includesDraggable = true;
 
-			if (fromCol != null) {
 
-				var sCol;
-				var tCol;
-				var cval;
-				var i;
 
-				var rCols = Grid.ColNames[2];
+        if (children == null) {
+            var rowdraggable = Grid.GetString(Row, "RowDraggable");
+            if (rowdraggable == "0") {
+                this.includesNotDraggable = true;
+                return;
+            }
 
-				if (fromCol == toCol) {
+            var rowid = Grid.GetString(Row, "rowid");
+            if (sb != undefined)
+                sb.append("<Row rowid='" + rowid + "'/>");
 
-					if (this.HadMove == false)
-						return;
+            this.includesDraggable = true;
 
-					this.HadMove = false;
+            if (fromCol != null) {
 
-					for (var j = 0; j <= this.currDrag.length; j++) {
-						var trow = this.currDrag[j];
+                var sCol;
+                var tCol;
+                var cval;
+                var i;
 
-						if (trow.rowID == rowid) {
+                var rCols = Grid.ColNames[2];
 
-							Grid.SetString(Row, "xinterenalPeriodMin", trow.bcStart, 1);
-							Grid.SetString(Row, "xinterenalPeriodMax", trow.bcFinish, 1);
+                if (fromCol == toCol) {
 
-							for (i = 0; i < rCols.length; i++) {
-								cval = trow.rowData[i];
-								tCol = rCols[i];
+                    if (this.HadMove == false)
+                        return;
 
-								Grid.SetString(Row, tCol, cval, 1);
-							}
-							return;
-						}
-					}
-					return;
-				}
-				else if (fromCol < toCol) {
-					var diffr = toCol - fromCol;
+                    this.HadMove = false;
 
-					for (var xi = 1; xi <= diffr; xi++) {
-						sCol = rCols[rCols.length - 1];
+                    for (var j = 0; j <= this.currDrag.length; j++) {
+                        var trow = this.currDrag[j];
 
-						cval = Grid.GetString(Row, sCol);
-						cval = parseFloat(cval.replace(/,/g, ''));
+                        if (trow.rowID == rowid) {
 
-						if (cval != 0)     // dont drag data of the end of the grid
-							return;
+                            Grid.SetString(Row, "xinterenalPeriodMin", trow.bcStart, 1);
+                            Grid.SetString(Row, "xinterenalPeriodMax", trow.bcFinish, 1);
 
-						var iRfp =   Grid.GetString(Row, "xinterenalPeriodMin");
-						var iRlp = Grid.GetString(Row, "xinterenalPeriodMax");
+                            for (i = 0; i < rCols.length; i++) {
+                                cval = trow.rowData[i];
+                                tCol = rCols[i];
 
+                                Grid.SetString(Row, tCol, cval, 1);
+                            }
+                            return;
+                        }
+                    }
+                    return;
+                }
+                else if (fromCol < toCol) {
+                    var diffr = toCol - fromCol;
 
+                    for (var xi = 1; xi <= diffr; xi++) {
+                        sCol = rCols[rCols.length - 1];
 
-						Grid.SetString(Row, "xinterenalPeriodMin", ++iRfp, 1);
-						Grid.SetString(Row, "xinterenalPeriodMax", ++iRlp, 1);
+                        cval = Grid.GetString(Row, sCol);
+                        cval = parseFloat(cval.replace(/,/g, ''));
 
-						this.HadMove = true;
-						for (i = rCols.length; i >= 2; i--) {
-							tCol = rCols[i - 1];
-							sCol = rCols[i - 2];
+                        if (cval != 0)     // dont drag data of the end of the grid
+                            return;
 
-							cval = Grid.GetString(Row, sCol);
-							cval = parseFloat(cval.replace(/,/g, ''));
-							Grid.SetString(Row, tCol, cval, 1);
+                        var iRfp = Grid.GetString(Row, "xinterenalPeriodMin");
+                        var iRlp = Grid.GetString(Row, "xinterenalPeriodMax");
 
-						 }
 
-						Grid.SetString(Row, rCols[0], 0, 1);
-					}
 
-				}
-				else {
+                        Grid.SetString(Row, "xinterenalPeriodMin", ++iRfp, 1);
+                        Grid.SetString(Row, "xinterenalPeriodMax", ++iRlp, 1);
 
-					var diffr = fromCol - toCol;
+                        this.HadMove = true;
+                        for (i = rCols.length; i >= 2; i--) {
+                            tCol = rCols[i - 1];
+                            sCol = rCols[i - 2];
 
-					for (var xi = 1; xi <= diffr; xi++) {
-						sCol = rCols[0];
+                            cval = Grid.GetString(Row, sCol);
+                            cval = parseFloat(cval.replace(/,/g, ''));
+                            Grid.SetString(Row, tCol, cval, 1);
 
-						cval = Grid.GetString(Row, sCol);
-						cval = parseFloat(cval.replace(/,/g, ''));
+                        }
 
-						if (cval != 0)     // dont drag data of the start of the grid
-							return;
+                        Grid.SetString(Row, rCols[0], 0, 1);
+                    }
 
-						var iLfp = Grid.GetString(Row, "xinterenalPeriodMin");
-						var iLlp = Grid.GetString(Row, "xinterenalPeriodMax");
+                }
+                else {
 
+                    var diffr = fromCol - toCol;
 
+                    for (var xi = 1; xi <= diffr; xi++) {
+                        sCol = rCols[0];
 
-						Grid.SetString(Row, "xinterenalPeriodMin", --iLfp, 1);
-						Grid.SetString(Row, "xinterenalPeriodMax", --iLlp, 1);
+                        cval = Grid.GetString(Row, sCol);
+                        cval = parseFloat(cval.replace(/,/g, ''));
 
+                        if (cval != 0)     // dont drag data of the start of the grid
+                            return;
 
-						this.HadMove = true;
-						for (i = 1; i <= rCols.length - 1; i++) {
-							tCol = rCols[i - 1];
-							sCol = rCols[i];
+                        var iLfp = Grid.GetString(Row, "xinterenalPeriodMin");
+                        var iLlp = Grid.GetString(Row, "xinterenalPeriodMax");
 
-							cval = Grid.GetString(Row, sCol);
-							cval = parseFloat(cval.replace(/,/g, ''));
-							Grid.SetString(Row, tCol, cval, 1);
-						}
 
-						Grid.SetString(Row, rCols[rCols.length - 1], 0, 1);
-					  }
-				}
-			}
-			else {
 
-				var dcnt = Grid.GetString(Row, "RowChanged");
-				++dcnt;
-				Grid.SetString(Row, "RowChanged", dcnt, 1);
-				Grid.SetString(Row, "ChangedIcon", '/_layouts/ppm/images/Approve.gif', 1);
+                        Grid.SetString(Row, "xinterenalPeriodMin", --iLfp, 1);
+                        Grid.SetString(Row, "xinterenalPeriodMax", --iLlp, 1);
 
-			}
 
+                        this.HadMove = true;
+                        for (i = 1; i <= rCols.length - 1; i++) {
+                            tCol = rCols[i - 1];
+                            sCol = rCols[i];
 
-		}
+                            cval = Grid.GetString(Row, sCol);
+                            cval = parseFloat(cval.replace(/,/g, ''));
+                            Grid.SetString(Row, tCol, cval, 1);
+                        }
 
-		while (children != null) {
-			this.HandleDragRow(Grid, children, fromCol, toCol, sb);
-			children = children.nextSibling;
-		}
-	}
+                        Grid.SetString(Row, rCols[rCols.length - 1], 0, 1);
+                    }
+                }
+            }
+            else {
 
-	var RefreshBottomGrid = function () {
+                var dcnt = Grid.GetString(Row, "RowChanged");
+                ++dcnt;
+                Grid.SetString(Row, "RowChanged", dcnt, 1);
+                Grid.SetString(Row, "ChangedIcon", '/_layouts/ppm/images/Approve.gif', 1);
 
-		try {
+            }
 
 
-			window.setTimeout(HandleRefreshDelegate, 700);
-		}
+        }
 
-		catch (e) {
-		}
-	}
+        while (children != null) {
+            this.HandleDragRow(Grid, children, fromCol, toCol, sb);
+            children = children.nextSibling;
+        }
+    }
 
-	ResPlanAnalyzer.prototype.HandleRefresh = function () {
+    var RefreshBottomGrid = function () {
 
-	    try {
+        try {
 
-	        if (this.TopGridDragged == true) {
-	            this.TopGridDragged = false;
 
-	            if (this.DetGrid != null)
-	                this.DetGrid.Render();
-	        }
+            window.setTimeout(HandleRefreshDelegate, 700);
+        }
 
-	        if (this.TotGrid != null) {
+        catch (e) {
+        }
+    }
 
-	            this.TotGrid.Reload(null);
-	        }
+    ResPlanAnalyzer.prototype.HandleRefresh = function () {
 
-	    }
-	    catch (e) {
+        try {
 
-	    }
+            if (this.TopGridDragged == true) {
+                this.TopGridDragged = false;
 
-	}
+                if (this.DetGrid != null)
+                    this.DetGrid.Render();
+            }
 
+            if (this.TotGrid != null) {
 
-	var RefreshTopGrid = function () {
+                this.TotGrid.Reload(null);
+            }
 
-		try {
+        }
+        catch (e) {
 
+        }
 
-			window.setTimeout(HandleRefreshTopDelegate, 700);
-		}
+    }
 
-		catch (e) {
-		}
-	}
 
-	ResPlanAnalyzer.prototype.HandleTopRefresh = function () {
+    var RefreshTopGrid = function () {
 
-		try {
-			if (this.DetGrid != null) {
+        try {
 
-				this.DetGrid.Reload(null);
-			}
 
-		}
-		catch (e) {
+            window.setTimeout(HandleRefreshTopDelegate, 700);
+        }
 
-		}
+        catch (e) {
+        }
+    }
 
-	}
-	ResPlanAnalyzer.prototype.GetCapacityScenarioListComplete = function (jsonString) {
+    ResPlanAnalyzer.prototype.HandleTopRefresh = function () {
 
-		try {
+        try {
+            if (this.DetGrid != null) {
 
-			if (jsonString != "") {
-				var jsonObject = JSON_ConvertString(jsonString);
-				if (JSON_ValidateServerResult(jsonObject)) {
-					this.CapacityScenarios = jsonObject.Result.CapacityScenarios;
-				}
-			}
+                this.DetGrid.Reload(null);
+            }
 
+        }
+        catch (e) {
 
+        }
 
-			if (this.CapScenDlg == null) {
-				this.CapScenDlg = new dhtmlXWindows();
-				this.CapScenDlg.setSkin("dhx_web");
-				this.CapScenDlg.enableAutoViewport(false);
-				this.CapScenDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-				this.CapScenDlg.setImagePath("/_layouts/ppm/images/");
-				this.CapScenDlg.createWindow("winCapScenDlg", 20, 30, 330, 247);
-				this.CapScenDlg.window("winCapScenDlg").setIcon("logo.ico", "logo.ico");
-				this.CapScenDlg.window("winCapScenDlg").denyResize();
-				this.CapScenDlg.window("winCapScenDlg").button("park").hide();
-				this.CapScenDlg.window("winCapScenDlg").setModal(true);
-				this.CapScenDlg.window("winCapScenDlg").center();
-				this.CapScenDlg.window("winCapScenDlg").setText("Capacity Scenarios");
-				this.CapScenDlg.window("winCapScenDlg").attachEvent("onClose", function (win) { CapScenDlg_OnCloseDelegate(); return true; });
-				this.CapScenDlg.window("winCapScenDlg").attachObject("idCapScenDlg");
+    }
+    ResPlanAnalyzer.prototype.GetCapacityScenarioListComplete = function (jsonString) {
 
+        try {
 
+            if (jsonString != "") {
+                var jsonObject = JSON_ConvertString(jsonString);
+                if (JSON_ValidateServerResult(jsonObject)) {
+                    this.CapacityScenarios = jsonObject.Result.CapacityScenarios;
+                }
+            }
 
-				var select = document.getElementById("idSelectCapScen");
-				select.options.length = 0;
 
 
-				if (this.CapacityScenarios == undefined || this.CapacityScenarios == null)
-					return;
+            if (this.CapScenDlg == null) {
+                this.CapScenDlg = new dhtmlXWindows();
+                this.CapScenDlg.setSkin("dhx_web");
+                this.CapScenDlg.enableAutoViewport(false);
+                this.CapScenDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+                this.CapScenDlg.setImagePath("/_layouts/ppm/images/");
+                this.CapScenDlg.createWindow("winCapScenDlg", 20, 30, 330, 247);
+                this.CapScenDlg.window("winCapScenDlg").setIcon("logo.ico", "logo.ico");
+                this.CapScenDlg.window("winCapScenDlg").denyResize();
+                this.CapScenDlg.window("winCapScenDlg").button("park").hide();
+                this.CapScenDlg.window("winCapScenDlg").setModal(true);
+                this.CapScenDlg.window("winCapScenDlg").center();
+                this.CapScenDlg.window("winCapScenDlg").setText("Capacity Scenarios");
+                this.CapScenDlg.window("winCapScenDlg").attachEvent("onClose", function (win) { CapScenDlg_OnCloseDelegate(); return true; });
+                this.CapScenDlg.window("winCapScenDlg").attachObject("idCapScenDlg");
 
-				this.csCalID = parseInt(this.CapacityScenarios.CB_ID);
 
-				this.CapScens = JSON_GetArray(this.CapacityScenarios, "CapacityScenario");
 
+                var select = document.getElementById("idSelectCapScen");
+                select.options.length = 0;
 
-				if (this.CapScens == undefined || this.CapScens == null)
-					return;
 
-				var bNotfound = true;
+                if (this.CapacityScenarios == undefined || this.CapacityScenarios == null)
+                    return;
 
+                this.csCalID = parseInt(this.CapacityScenarios.CB_ID);
 
-				for (var i = 0; i < this.CapScens.length; i++) {
-					select.options[i] = new Option(this.CapScens[i].Name, this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID);
+                this.CapScens = JSON_GetArray(this.CapacityScenarios, "CapacityScenario");
 
-					if (this.SelectedCapScen == this.CapScens[i].ID)
-						bNotfound = false;
-				}
 
+                if (this.CapScens == undefined || this.CapScens == null)
+                    return;
 
-				this.idCapScenEdit_disabled = bNotfound;
-				this.idCapScenCopy_disabled = bNotfound;
-				this.idCapScenDel_disabled = bNotfound;
+                var bNotfound = true;
 
-				this.setNewButtonDisable('idCapScenCopy', this.idCapScenCopy_disabled);
-				this.setNewButtonDisable('idCapScenEdit', this.idCapScenEdit_disabled);
-				this.setNewButtonDisable('idCapScenDel', this.idCapScenDel_disabled);
 
+                for (var i = 0; i < this.CapScens.length; i++) {
+                    select.options[i] = new Option(this.CapScens[i].Name, this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID);
 
-			}
-			else {
-				this.CapScenDlg.window("winCapScenDlg").show();
-			}
+                    if (this.SelectedCapScen == this.CapScens[i].ID)
+                        bNotfound = false;
+                }
 
-		}
-		catch (e) {
-			this.HandleException("GetCapacityScenarioList", e);
-		}
-	}
 
-	ResPlanAnalyzer.prototype.SaveCapacityScenarioListComplete = function (jsonString) {
+                this.idCapScenEdit_disabled = bNotfound;
+                this.idCapScenCopy_disabled = bNotfound;
+                this.idCapScenDel_disabled = bNotfound;
 
-	    try {
+                this.setNewButtonDisable('idCapScenCopy', this.idCapScenCopy_disabled);
+                this.setNewButtonDisable('idCapScenEdit', this.idCapScenEdit_disabled);
+                this.setNewButtonDisable('idCapScenDel', this.idCapScenDel_disabled);
 
-	        if (jsonString != "") {
-	            var jsonObject = JSON_ConvertString(jsonString);
-	            if (JSON_ValidateServerResult(jsonObject)) {
-	                this.CapacityScenarios = jsonObject.Result.CapacityScenarios;
-	            }
-	        }
 
+            }
+            else {
+                this.CapScenDlg.window("winCapScenDlg").show();
+            }
 
+        }
+        catch (e) {
+            this.HandleException("GetCapacityScenarioList", e);
+        }
+    }
 
-	        if (this.SaveScenDlg == null) {
-	            this.SaveScenDlg = new dhtmlXWindows();
-	            this.SaveScenDlg.setSkin("dhx_web");
-	            this.SaveScenDlg.enableAutoViewport(false);
-	            this.SaveScenDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-	            this.SaveScenDlg.setImagePath("/_layouts/ppm/images/");
-	            this.SaveScenDlg.createWindow("winSaveScenDlg", 20, 30, 300, 290);
-	            this.SaveScenDlg.window("winSaveScenDlg").setIcon("logo.ico", "logo.ico");
-	            this.SaveScenDlg.window("winSaveScenDlg").denyResize();
-	            this.SaveScenDlg.window("winSaveScenDlg").button("park").hide();
-	            this.SaveScenDlg.window("winSaveScenDlg").setModal(true);
-	            this.SaveScenDlg.window("winSaveScenDlg").center();
-	            this.SaveScenDlg.window("winSaveScenDlg").setText("Save Scenario");
-	            this.SaveScenDlg.window("winSaveScenDlg").attachEvent("onClose", function (win) { CapScenDlg_OnCloseDelegate(); return true; });
-	            this.SaveScenDlg.window("winSaveScenDlg").attachObject("idSaveScenDlg");
+    ResPlanAnalyzer.prototype.SaveCapacityScenarioListComplete = function (jsonString) {
 
+        try {
 
+            if (jsonString != "") {
+                var jsonObject = JSON_ConvertString(jsonString);
+                if (JSON_ValidateServerResult(jsonObject)) {
+                    this.CapacityScenarios = jsonObject.Result.CapacityScenarios;
+                }
+            }
 
-	            var select = document.getElementById("idSaveScenSel");
-	            select.options.length = 0;
 
 
-	            document.getElementById("idSaveScenText").value = "";
+            if (this.SaveScenDlg == null) {
+                this.SaveScenDlg = new dhtmlXWindows();
+                this.SaveScenDlg.setSkin("dhx_web");
+                this.SaveScenDlg.enableAutoViewport(false);
+                this.SaveScenDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+                this.SaveScenDlg.setImagePath("/_layouts/ppm/images/");
+                this.SaveScenDlg.createWindow("winSaveScenDlg", 20, 30, 300, 290);
+                this.SaveScenDlg.window("winSaveScenDlg").setIcon("logo.ico", "logo.ico");
+                this.SaveScenDlg.window("winSaveScenDlg").denyResize();
+                this.SaveScenDlg.window("winSaveScenDlg").button("park").hide();
+                this.SaveScenDlg.window("winSaveScenDlg").setModal(true);
+                this.SaveScenDlg.window("winSaveScenDlg").center();
+                this.SaveScenDlg.window("winSaveScenDlg").setText("Save Scenario");
+                this.SaveScenDlg.window("winSaveScenDlg").attachEvent("onClose", function (win) { CapScenDlg_OnCloseDelegate(); return true; });
+                this.SaveScenDlg.window("winSaveScenDlg").attachObject("idSaveScenDlg");
 
-	            if (this.CapacityScenarios == undefined || this.CapacityScenarios == null)
-	                return;
 
-	            this.csCalID = parseInt(this.CapacityScenarios.CB_ID);
 
-	            this.CapScens = JSON_GetArray(this.CapacityScenarios, "CapacityScenario");
+                var select = document.getElementById("idSaveScenSel");
+                select.options.length = 0;
 
 
-	            if (this.CapScens == undefined || this.CapScens == null)
-	                return;
+                document.getElementById("idSaveScenText").value = "";
 
-	            var bNotfound = true;
+                if (this.CapacityScenarios == undefined || this.CapacityScenarios == null)
+                    return;
 
+                this.csCalID = parseInt(this.CapacityScenarios.CB_ID);
 
-	            for (var i = 0; i < this.CapScens.length; i++) {
-	                select.options[i] = new Option(this.CapScens[i].Name, this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID);
+                this.CapScens = JSON_GetArray(this.CapacityScenarios, "CapacityScenario");
 
-	                if (this.SelectedCapScen == this.CapScens[i].ID)
-	                    bNotfound = false;
-	            }
 
+                if (this.CapScens == undefined || this.CapScens == null)
+                    return;
 
-	        }
-	        else {
-	            this.SaveScenDlg.window("winSaveScenDlg").show();
-	        }
+                var bNotfound = true;
 
-	    }
-	    catch (e) {
-	        this.HandleException("SaveCapacityScenarioList", e);
-	    }
-	}
 
-	ResPlanAnalyzer.prototype.CapScenDlg_OnClose = function () {
+                for (var i = 0; i < this.CapScens.length; i++) {
+                    select.options[i] = new Option(this.CapScens[i].Name, this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID, this.SelectedCapScen == this.CapScens[i].ID);
 
-		if (this.SaveScenDlg != null) {
-			this.SaveScenDlg.window("winSaveScenDlg").detachObject();
-			this.SaveScenDlg = null;
-		}
+                    if (this.SelectedCapScen == this.CapScens[i].ID)
+                        bNotfound = false;
+                }
 
 
-		if (this.CapScenDlg != null) {
-			this.CapScenDlg.window("winCapScenDlg").detachObject();
-			this.CapScenDlg = null;
-		}
-	}
+            }
+            else {
+                this.SaveScenDlg.window("winSaveScenDlg").show();
+            }
 
+        }
+        catch (e) {
+            this.HandleException("SaveCapacityScenarioList", e);
+        }
+    }
 
-	ResPlanAnalyzer.prototype.GoDoEdit = function () {
+    ResPlanAnalyzer.prototype.CapScenDlg_OnClose = function () {
 
-		try {
+        if (this.SaveScenDlg != null) {
+            this.SaveScenDlg.window("winSaveScenDlg").detachObject();
+            this.SaveScenDlg = null;
+        }
 
-			var csname = this.SelectedCapScenText;
-			var csid = this.SelectedCapScen;
 
-			if (this.dlgEditTarget == null) {
-				this.dlgEditTarget = new dhtmlXWindows();
-				this.dlgEditTarget.setSkin("dhx_web");
-				this.dlgEditTarget.enableAutoViewport(false);
-				this.dlgEditTarget.attachViewportTo(this.clientID + "mainDiv");
-				this.dlgEditTarget.setImagePath(this.imagePath);
+        if (this.CapScenDlg != null) {
+            this.CapScenDlg.window("winCapScenDlg").detachObject();
+            this.CapScenDlg = null;
+        }
+    }
 
-				this.dlgEditTarget.createWindow("winEditTargetDlg", 0, 0, this.Width, this.Height );
-				
-				//this.dlgEditTarget.createWindow("winEditTargetDlg", 20, 30, 655, 555);
 
-				this.dlgEditTarget.window("winEditTargetDlg").setIcon("logo.ico", "logo.ico");
-				this.dlgEditTarget.window("winEditTargetDlg").allowMove();
-				this.dlgEditTarget.window("winEditTargetDlg").allowResize();
-				this.dlgEditTarget.window("winEditTargetDlg").setModal(true);
+    ResPlanAnalyzer.prototype.GoDoEdit = function () {
 
-				this.dlgEditTarget.window("winEditTargetDlg").showHeader();
-				this.dlgEditTarget.window("winEditTargetDlg").progressOn();
-				this.dlgEditTarget.window("winEditTargetDlg").center();
+        try {
 
+            var csname = this.SelectedCapScenText;
+            var csid = this.SelectedCapScen;
 
-				this.dlgEditTarget.window("winEditTargetDlg").setText("Edit Capacity Scenario : " + csname);
-				this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditCapScenDlg");
-				this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
-				this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
+            if (this.dlgEditTarget == null) {
+                this.dlgEditTarget = new dhtmlXWindows();
+                this.dlgEditTarget.setSkin("dhx_web");
+                this.dlgEditTarget.enableAutoViewport(false);
+                this.dlgEditTarget.attachViewportTo(this.clientID + "mainDiv");
+                this.dlgEditTarget.setImagePath(this.imagePath);
 
-				this.EditCSid = this.EditCapScen;
-				this.EditName = csname;
+                this.dlgEditTarget.createWindow("winEditTargetDlg", 0, 0, this.Width, this.Height);
 
-				WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioData", csid, GetEditCSDataCompleteDelegate);
+                //this.dlgEditTarget.createWindow("winEditTargetDlg", 20, 30, 655, 555);
 
-			}
-			else
-				this.dlgEditTarget.window("winEditTargetDlg").show();
-		}
+                this.dlgEditTarget.window("winEditTargetDlg").setIcon("logo.ico", "logo.ico");
+                this.dlgEditTarget.window("winEditTargetDlg").allowMove();
+                this.dlgEditTarget.window("winEditTargetDlg").allowResize();
+                this.dlgEditTarget.window("winEditTargetDlg").setModal(true);
 
-		catch (e) {
-			alert("GoDoEdit");
-		}
+                this.dlgEditTarget.window("winEditTargetDlg").showHeader();
+                this.dlgEditTarget.window("winEditTargetDlg").progressOn();
+                this.dlgEditTarget.window("winEditTargetDlg").center();
 
-	}
 
+                this.dlgEditTarget.window("winEditTargetDlg").setText("Edit Capacity Scenario : " + csname);
+                this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditCapScenDlg");
+                this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
+                this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
 
-	ResPlanAnalyzer.prototype.GetEditCSDataComplete = function (jsonString) {
+                this.EditCSid = this.EditCapScen;
+                this.EditName = csname;
 
-		//	    try {
+                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioData", csid, GetEditCSDataCompleteDelegate);
 
-		this.CSRoleData = null;
-		
-		var jsonObject = JSON_ConvertString(jsonString);
-		if (JSON_ValidateServerResult(jsonObject)) {
+            }
+            else
+                this.dlgEditTarget.window("winEditTargetDlg").show();
+        }
 
-			this.CostCats = jsonObject.Result.CS_Data.CostCategories;
-			this.CostCatFTEData = JSON_GetArray(this.CostCats, "CostCategory");
-			this.CapScen = jsonObject.Result.CS_Data.CapScenRows;
-			this.CapScenData = JSON_GetArray(this.CapScen, "CapScenRow");
-			this.CapScenPeriodCount = jsonObject.Result.CS_Data.PeriodCount;
-			this.CapScenPeriods = JSON_GetArray(jsonObject.Result.CS_Data.Periods, "Period");
-			
-			if (jsonObject.Result.CS_Data.CapScenRoleDatas != undefined)
-				this.CSRoleData = JSON_GetArray(jsonObject.Result.CS_Data.CapScenRoleDatas, "CapScenRoleData");
-		}
+        catch (e) {
+            alert("GoDoEdit");
+        }
 
+    }
 
 
+    ResPlanAnalyzer.prototype.GetEditCSDataComplete = function (jsonString) {
 
-		var CSRibonData = {
-			parent: "ribbonbarEditCapScenDiv",
-			style: "display:none;",
-			imagePath: this.imagePath,
-			showstate: "false",
-			sections: [
-					 { name: "General",
-						 columns: [
+        //	    try {
+
+        this.CSRoleData = null;
+
+        var jsonObject = JSON_ConvertString(jsonString);
+        if (JSON_ValidateServerResult(jsonObject)) {
+
+            this.CostCats = jsonObject.Result.CS_Data.CostCategories;
+            this.CostCatFTEData = JSON_GetArray(this.CostCats, "CostCategory");
+            this.CapScen = jsonObject.Result.CS_Data.CapScenRows;
+            this.CapScenData = JSON_GetArray(this.CapScen, "CapScenRow");
+            this.CapScenPeriodCount = jsonObject.Result.CS_Data.PeriodCount;
+            this.CapScenPeriods = JSON_GetArray(jsonObject.Result.CS_Data.Periods, "Period");
+
+            if (jsonObject.Result.CS_Data.CapScenRoleDatas != undefined)
+                this.CSRoleData = JSON_GetArray(jsonObject.Result.CS_Data.CapScenRoleDatas, "CapScenRoleData");
+        }
+
+
+
+
+        var CSRibonData = {
+            parent: "ribbonbarEditCapScenDiv",
+            style: "display:none;",
+            imagePath: this.imagePath,
+            showstate: "false",
+            sections: [
+					 {
+					     name: "General",
+					     columns: [
 							{
-								items: [
+							    items: [
 									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('CSEdit_Close');" }
-								]
+							    ]
 							},
 							{
-								items: [
+							    items: [
 									{ type: "bigbutton", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('CSEdit_Save');" }
-								]
+							    ]
 							}
-						]
+					     ]
 					 },
-					 { name: "Mode",
-						 columns: [
+					 {
+					     name: "Mode",
+					     columns: [
 							{
-								items: [
+							    items: [
 									{ type: "text", name: "Display Mode" },
 									{ type: "select", id: "idCSEdit_SelMode", onchange: "dialogEvent('CSEdit_SelMode_Changed')", options: "<option value='1'>Hours</option><option value='2'>FTEs</option>", width: "90px" }
-								]
+							    ]
 							}
-						]
+					     ]
 					 },
-					{ name: "Tools",
-						columns: [
+					{
+					    name: "Tools",
+					    columns: [
 							{
-								items: [
+							    items: [
 									{ type: "smallbutton", id: "SpreadBtn", name: "Allocate Values", img: "spread.gif", tooltip: "Allocate Values", onclick: "dialogEvent('CSEdit_Spread');" },
 									{ type: "smallbutton", id: "LoadUpBtn", name: "Populate from Totals", img: "spread.gif", tooltip: "Populate from Totals", onclick: "dialogEvent('CSEdit_LoadUp');" }
-								]
+							    ]
 							}
-						]
+					    ]
 					}
 
-				 ]
-		};
+            ]
+        };
 
 
 
-		this.CSEditTab = new Ribbon(CSRibonData);
-		this.CSEditTab.Render();
+        this.CSEditTab = new Ribbon(CSRibonData);
+        this.CSEditTab.Render();
 
 
-		//        var select = document.getElementById("idCSEdit_SelMode");
-		//        select.options.length = 0;
-		//        select.options[0] = new Option("Hours", 1, true, true);
-		//        select.options[1] = new Option("FTE", 2, false, false);
-		this.CSHourMode = true;
+        //        var select = document.getElementById("idCSEdit_SelMode");
+        //        select.options.length = 0;
+        //        select.options[0] = new Option("Hours", 1, true, true);
+        //        select.options[1] = new Option("FTE", 2, false, false);
+        this.CSHourMode = true;
 
 
 
-		if (this.analyzerCalID != this.csCalID)
-			this.CSEditTab.disableItem("LoadUpBtn");
-		else if (this.CSRoleData == null)
-			this.CSEditTab.disableItem("LoadUpBtn");
-		else if (this.CSRoleData.length == 0)
-			this.CSEditTab.disableItem("LoadUpBtn");
+        if (this.analyzerCalID != this.csCalID)
+            this.CSEditTab.disableItem("LoadUpBtn");
+        else if (this.CSRoleData == null)
+            this.CSEditTab.disableItem("LoadUpBtn");
+        else if (this.CSRoleData.length == 0)
+            this.CSEditTab.disableItem("LoadUpBtn");
 
-		var sbDataxml = new StringBuilder();
+        var sbDataxml = new StringBuilder();
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append('<![CDATA[');
-		sbDataxml.append('<Execute Function="GetCapacityScenarioEdit">');
-		sbDataxml.append('</Execute>');
-		sbDataxml.append(']]>');
+        sbDataxml = new StringBuilder();
+        sbDataxml.append('<![CDATA[');
+        sbDataxml.append('<Execute Function="GetCapacityScenarioEdit">');
+        sbDataxml.append('</Execute>');
+        sbDataxml.append(']]>');
 
-		sb = new StringBuilder();
-		sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
-		sb.append(" data_url='" + this.Webservice + "'");
-		sb.append(" data_method='Soap'");
-		sb.append(" data_function='Execute'")
-		sb.append(" data_namespace='WorkEnginePPM'");
-		sb.append(" data_param_Function='GetCapacityScenarioEdit'");
-		sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
-		sb.append(" >");
-		sb.append("</treegrid>");
+        sb = new StringBuilder();
+        sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
+        sb.append(" data_url='" + this.Webservice + "'");
+        sb.append(" data_method='Soap'");
+        sb.append(" data_function='Execute'")
+        sb.append(" data_namespace='WorkEnginePPM'");
+        sb.append(" data_param_Function='GetCapacityScenarioEdit'");
+        sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+        sb.append(" >");
+        sb.append("</treegrid>");
 
 
-		this.EditGrid = TreeGrid(sb.toString(), "idEditGridDiv", "et_1");
-		this.csrow = null;
+        this.EditGrid = TreeGrid(sb.toString(), "idEditGridDiv", "et_1");
+        this.csrow = null;
 
 
-	}
+    }
 
-	ResPlanAnalyzer.prototype.NewCapScenDlg_OnClose = function () {
+    ResPlanAnalyzer.prototype.NewCapScenDlg_OnClose = function () {
 
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
-			this.AnalyzerViewDlg = null;
-			WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
+        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
+        this.AnalyzerViewDlg = null;
+        WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
 
-	}
+    }
 
-	ResPlanAnalyzer.prototype.RedrawCSGrid = function () {
+    ResPlanAnalyzer.prototype.RedrawCSGrid = function () {
 
-		this.EditGrid = Grids["et_1"];
+        this.EditGrid = Grids["et_1"];
 
-		var trow, grow, frow;
-		var arows = this.EditGrid.Rows;
-		var oc;
-		var xi;
+        var trow, grow, frow;
+        var arows = this.EditGrid.Rows;
+        var oc;
+        var xi;
 
-		for (var i = 0; i < this.CapScenData.length; i++) {
-			trow = this.CapScenData[i];
-			frow = this.CostCatFTEData[i];
-			grow = arows[i + 1];
+        for (var i = 0; i < this.CapScenData.length; i++) {
+            trow = this.CapScenData[i];
+            frow = this.CostCatFTEData[i];
+            grow = arows[i + 1];
 
-			for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-				var x = "P" + per.toString() + "V";
+            for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+                var x = "P" + per.toString() + "V";
 
-				var gval, fval;
+                var gval, fval;
 
-				if (this.CSHourMode == true) {
-					this.EditGrid.SetAttribute(grow, x, "CanEdit", 1, 1);
-					gval = trow.Hours[per - 1].Value;
-				}
-				else {
-					fval = frow.FTEs[per - 1].Value
-					this.EditGrid.SetAttribute(grow, x, "CanEdit", (fval == 0 ? 0 : 1), 1);
-					gval = trow.FTEs[per - 1].Value;
-					
-				}
+                if (this.CSHourMode == true) {
+                    this.EditGrid.SetAttribute(grow, x, "CanEdit", 1, 1);
+                    gval = trow.Hours[per - 1].Value;
+                }
+                else {
+                    fval = frow.FTEs[per - 1].Value
+                    this.EditGrid.SetAttribute(grow, x, "CanEdit", (fval == 0 ? 0 : 1), 1);
+                    gval = trow.FTEs[per - 1].Value;
 
-				this.EditGrid.SetString(grow, x, gval, 1);
+                }
 
-			}
-		}
-	}
+                this.EditGrid.SetString(grow, x, gval, 1);
 
-	ResPlanAnalyzer.prototype.GoDoSpread = function () {
+            }
+        }
+    }
 
-		if (this.csrow == null) {
-			alert("No Capacity Scenario row has been selected");
-			return;
-		}
+    ResPlanAnalyzer.prototype.GoDoSpread = function () {
 
-		if (this.dlgSpreadDlg == null) {
-			this.dlgSpreadDlg = new dhtmlXWindows();
-		   this.dlgSpreadDlg.setSkin("dhx_web");
-			this.dlgSpreadDlg.enableAutoViewport(false);
-			this.dlgSpreadDlg.attachViewportTo(this.clientID + "mainDiv");
-			this.dlgSpreadDlg.setImagePath(this.imagePath);
-
-			this.dlgSpreadDlg.createWindow("winSpreadDlg", 20, 30, 275, 245);
-
-			this.dlgSpreadDlg.window("winSpreadDlg").setIcon("logo.ico", "logo.ico");
-			this.dlgSpreadDlg.window("winSpreadDlg").allowMove();
-			this.dlgSpreadDlg.window("winSpreadDlg").allowResize();
-			this.dlgSpreadDlg.window("winSpreadDlg").setModal(true);
-
-			this.dlgSpreadDlg.window("winSpreadDlg").showHeader();
-			this.dlgSpreadDlg.window("winSpreadDlg").progressOn();
-			this.dlgSpreadDlg.window("winSpreadDlg").center();
-
-
-			this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate Hours");
-			this.dlgSpreadDlg.window("winSpreadDlg").attachObject("idSpreadDlgObj");
-			this.dlgSpreadDlg.window("winSpreadDlg").button("close").disable();
-			this.dlgSpreadDlg.window("winSpreadDlg").button("park").hide();
-
-		}
-		else
-			this.dlgSpreadDlg.window("winSpreadDlg").show();
+        if (this.csrow == null) {
+            alert("No Capacity Scenario row has been selected");
+            return;
+        }
 
-		var itemName = this.EditGrid.GetString(this.csrow, "CostCategory");
-		
-
-		this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate " + (this.CSHourMode ? "Hours" : "FTEs") + " to " + itemName);
-//                dlg.setText("Allocate " + sUnits + " to " + itemName);
-//  
-
-
-
-		var sUnits = "";
-		var sValue = "";
-		
-
-		if (this.CSHourMode) {
-			sUnits = "Hours";
-			sValue = "100";
-		}
-		else {
-			sUnits = "FTE";
-			sValue = "1";
-		}
-
-		var units = document.getElementById('idSpreadUnits');
-		units.innerHTML = sUnits;
-
-		document.getElementById("idSpreadAmount").value = sValue;
- 
-		 var from = document.getElementById('idSpreadStartPeriod');
-		 var to = document.getElementById('idSpreadFinishPeriod');
-
-		 if (from.options.length == 0) {
-			 from.options.length = 0;
-			 to.options.length = 0;
- 
-			for (var c = 0; c < this.CapScenPeriods.length; c++) {
-				var per = this.CapScenPeriods[c];
-				from.options[c] = new Option(per.Name, per.ID);
-				to.options[c] = new Option(per.Name, per.ID);
-			}
-			from.options.selectedIndex = 0;
-			to.options.selectedIndex = to.options.length - 1;
-		}
-	}
+        if (this.dlgSpreadDlg == null) {
+            this.dlgSpreadDlg = new dhtmlXWindows();
+            this.dlgSpreadDlg.setSkin("dhx_web");
+            this.dlgSpreadDlg.enableAutoViewport(false);
+            this.dlgSpreadDlg.attachViewportTo(this.clientID + "mainDiv");
+            this.dlgSpreadDlg.setImagePath(this.imagePath);
 
-	ResPlanAnalyzer.prototype.spreadDlg_Apply = function () {
-		var amount = document.getElementById("idSpreadAmount").value;
-		if (isNaN(amount)) {
-			alert("Amount : '" + amount + "' is not a number");
-			return;
-		}
-		var copy = document.getElementById("idSpreadCopy").checked;
-		//var spread = document.getElementById("idSpreadPeriods").checked;
-		var select = document.getElementById("idSpreadStartPeriod");
-		startPeriod = parseInt(select.options[select.selectedIndex].value);
-		select = document.getElementById("idSpreadFinishPeriod");
-		finishPeriod = parseInt(select.options[select.selectedIndex].value);
-		var clearPeriods = document.getElementById("idSpreadClearPeriods").checked;
+            this.dlgSpreadDlg.createWindow("winSpreadDlg", 20, 30, 275, 245);
 
+            this.dlgSpreadDlg.window("winSpreadDlg").setIcon("logo.ico", "logo.ico");
+            this.dlgSpreadDlg.window("winSpreadDlg").allowMove();
+            this.dlgSpreadDlg.window("winSpreadDlg").allowResize();
+            this.dlgSpreadDlg.window("winSpreadDlg").setModal(true);
 
-		var grid = this.EditGrid;
-		var row = this.csrow;
+            this.dlgSpreadDlg.window("winSpreadDlg").showHeader();
+            this.dlgSpreadDlg.window("winSpreadDlg").progressOn();
+            this.dlgSpreadDlg.window("winSpreadDlg").center();
 
-		var jval = ValidateStringAsNumber(amount, 10, 2, false, "");
-		var val = jval.value;
-		if (copy == 0)
-			val = val / (finishPeriod - startPeriod + 1);
 
+            this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate Hours");
+            this.dlgSpreadDlg.window("winSpreadDlg").attachObject("idSpreadDlgObj");
+            this.dlgSpreadDlg.window("winSpreadDlg").button("close").disable();
+            this.dlgSpreadDlg.window("winSpreadDlg").button("park").hide();
 
-		if (row != null) {
+        }
+        else
+            this.dlgSpreadDlg.window("winSpreadDlg").show();
 
-			var i = row.id - 1;
-			var trow = this.CapScenData[i];
-			var frow = this.CostCatFTEData[i];
-			var gval;
+        var itemName = this.EditGrid.GetString(this.csrow, "CostCategory");
 
 
-			for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-				fval = frow.FTEs[per - 1].Value;
-				
+        this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate " + (this.CSHourMode ? "Hours" : "FTEs") + " to " + itemName);
+        //                dlg.setText("Allocate " + sUnits + " to " + itemName);
+        //  
 
-				var x = "P" + per.toString() + "V";
 
-				if (per < startPeriod && clearPeriods != 0) {
-					trow.FTEs[per - 1].Value = 0;
-					trow.Hours[per - 1].Value = 0;
-					this.EditGrid.SetString(row, x, 0, 1)
-				}
 
-				if (per > finishPeriod && clearPeriods != 0) {
-					trow.FTEs[per - 1].Value = 0;
-					trow.Hours[per - 1].Value = 0;
-					this.EditGrid.SetString(row, x, 0, 1)
-				}
+        var sUnits = "";
+        var sValue = "";
 
 
+        if (this.CSHourMode) {
+            sUnits = "Hours";
+            sValue = "100";
+        }
+        else {
+            sUnits = "FTE";
+            sValue = "1";
+        }
 
-				if (per >= startPeriod && per <= finishPeriod) {
-					gval = val;
+        var units = document.getElementById('idSpreadUnits');
+        units.innerHTML = sUnits;
 
-					if (this.CSHourMode == true) {
-						if (fval != 0)
-							trow.FTEs[per - 1].Value = val / fval;
-						else
-							trow.FTEs[per - 1].Value = 0;
+        document.getElementById("idSpreadAmount").value = sValue;
 
-						trow.Hours[per - 1].Value = val;
-					}
-					else {
-						trow.Hours[per - 1].Value = val * fval;
-						if (fval != 0)
-							trow.FTEs[per - 1].Value = val;
-						else {
-							gval = 0;
-							trow.FTEs[per - 1].Value = 0;
-						}
-					}
-					this.EditGrid.SetString(row, x, gval, 1)
-				}
+        var from = document.getElementById('idSpreadStartPeriod');
+        var to = document.getElementById('idSpreadFinishPeriod');
 
-				
+        if (from.options.length == 0) {
+            from.options.length = 0;
+            to.options.length = 0;
 
+            for (var c = 0; c < this.CapScenPeriods.length; c++) {
+                var per = this.CapScenPeriods[c];
+                from.options[c] = new Option(per.Name, per.ID);
+                to.options[c] = new Option(per.Name, per.ID);
+            }
+            from.options.selectedIndex = 0;
+            to.options.selectedIndex = to.options.length - 1;
+        }
+    }
 
-			}
-		}
-	}
+    ResPlanAnalyzer.prototype.spreadDlg_Apply = function () {
+        var amount = document.getElementById("idSpreadAmount").value;
+        if (isNaN(amount)) {
+            alert("Amount : '" + amount + "' is not a number");
+            return;
+        }
+        var copy = document.getElementById("idSpreadCopy").checked;
+        //var spread = document.getElementById("idSpreadPeriods").checked;
+        var select = document.getElementById("idSpreadStartPeriod");
+        startPeriod = parseInt(select.options[select.selectedIndex].value);
+        select = document.getElementById("idSpreadFinishPeriod");
+        finishPeriod = parseInt(select.options[select.selectedIndex].value);
+        var clearPeriods = document.getElementById("idSpreadClearPeriods").checked;
 
 
+        var grid = this.EditGrid;
+        var row = this.csrow;
 
-	ResPlanAnalyzer.prototype.GoDoLoadUp = function () {
+        var jval = ValidateStringAsNumber(amount, 10, 2, false, "");
+        var val = jval.value;
+        if (copy == 0)
+            val = val / (finishPeriod - startPeriod + 1);
 
-		var grid = this.EditGrid;
 
-		var arows = grid.Rows;
+        if (row != null) {
 
-		for (var r in arows) {
-			var row = arows[r];
+            var i = row.id - 1;
+            var trow = this.CapScenData[i];
+            var frow = this.CostCatFTEData[i];
+            var gval;
 
 
-			if (row != null) {
-				if (row.Kind == "Data") {
+            for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+                fval = frow.FTEs[per - 1].Value;
 
-					var i = row.id - 1;
-					var trow = this.CapScenData[i];
-					var frow = this.CostCatFTEData[i];
-					var gval;
 
+                var x = "P" + per.toString() + "V";
 
-					for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-						var x = "P" + per.toString() + "V";
-						trow.FTEs[per - 1].Value = 0;
-						trow.Hours[per - 1].Value = 0;
-						this.EditGrid.SetString(row, x, 0, 1)
-					}
-				}
-			}
-		}
+                if (per < startPeriod && clearPeriods != 0) {
+                    trow.FTEs[per - 1].Value = 0;
+                    trow.Hours[per - 1].Value = 0;
+                    this.EditGrid.SetString(row, x, 0, 1)
+                }
 
-		for (var r in arows) {
-			var row = arows[r];
+                if (per > finishPeriod && clearPeriods != 0) {
+                    trow.FTEs[per - 1].Value = 0;
+                    trow.Hours[per - 1].Value = 0;
+                    this.EditGrid.SetString(row, x, 0, 1)
+                }
 
 
-			if (row != null) {
-				if (row.Kind == "Data") {
 
-					var i = row.id - 1;
-					var trow = this.CapScenData[i];
+                if (per >= startPeriod && per <= finishPeriod) {
+                    gval = val;
 
-					for (var xi = 0; xi < this.CSRoleData.length; xi++) {
-						var ord = this.CSRoleData[xi];
+                    if (this.CSHourMode == true) {
+                        if (fval != 0)
+                            trow.FTEs[per - 1].Value = val / fval;
+                        else
+                            trow.FTEs[per - 1].Value = 0;
 
-						if (ord.RoleID == trow.ID) {
-							try {
-								for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-									trow.FTEs[per - 1].Value = ord.FTE[per - 1].Value / 100;
-									trow.Hours[per - 1].Value = ord.Hours[per - 1].Value;
-								}
-							}
-							catch (e) { }
-							break;
-						}
+                        trow.Hours[per - 1].Value = val;
+                    }
+                    else {
+                        trow.Hours[per - 1].Value = val * fval;
+                        if (fval != 0)
+                            trow.FTEs[per - 1].Value = val;
+                        else {
+                            gval = 0;
+                            trow.FTEs[per - 1].Value = 0;
+                        }
+                    }
+                    this.EditGrid.SetString(row, x, gval, 1)
+                }
 
-					}
 
-				}
-			}
-		}
 
-		this.RedrawCSGrid();
 
-	}
+            }
+        }
+    }
 
-	ResPlanAnalyzer.prototype.SaveCapScenData = function () {
 
 
-		var trow, grow, frow;
-		var xi;
+    ResPlanAnalyzer.prototype.GoDoLoadUp = function () {
 
-		var sbDataxml = new StringBuilder();
-		var sb = new StringBuilder();
+        var grid = this.EditGrid;
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append('<CapacityScenarioData');
-		sbDataxml.append(' Name="' + this.EditName + '"');
-		sbDataxml.append(' ID="' + this.EditCSid + '" >');
-		sbDataxml.append('<CS_Values>');
+        var arows = grid.Rows;
 
+        for (var r in arows) {
+            var row = arows[r];
 
-		for (var i = 0; i < this.CapScenData.length; i++) {
-			trow = this.CapScenData[i];
 
-			for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-				var val, fval;
-				val = parseFloat(trow.Hours[per - 1].Value);
-				fval = parseFloat(trow.FTEs[per - 1].Value);
+            if (row != null) {
+                if (row.Kind == "Data") {
 
-				if (val !== 0 && fval !== 0) {
+                    var i = row.id - 1;
+                    var trow = this.CapScenData[i];
+                    var frow = this.CostCatFTEData[i];
+                    var gval;
 
-					sb = new StringBuilder();
-					sb.append('<CS_Value');
-					sb.append(' Role_ID="' + trow.ID + '"');
-					sb.append(' Per_ID="' + per + '"');
-					sb.append(' Hours="' + val + '"');
-					sb.append(' FTEs="' + fval * 10000 + '" />');
-					sbDataxml.append(sb.toString());
-				}
-			}
-		}
 
+                    for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+                        var x = "P" + per.toString() + "V";
+                        trow.FTEs[per - 1].Value = 0;
+                        trow.Hours[per - 1].Value = 0;
+                        this.EditGrid.SetString(row, x, 0, 1)
+                    }
+                }
+            }
+        }
 
-		sbDataxml.append('</CS_Values>');
-		sbDataxml.append('</CapacityScenarioData>');
+        for (var r in arows) {
+            var row = arows[r];
 
-		var s = sbDataxml.toString();
 
-		WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveCapacityScenarioData", s , this.SaveCapacityScenarioDataCompleteDelegate);
+            if (row != null) {
+                if (row.Kind == "Data") {
 
+                    var i = row.id - 1;
+                    var trow = this.CapScenData[i];
 
-	}
+                    for (var xi = 0; xi < this.CSRoleData.length; xi++) {
+                        var ord = this.CSRoleData[xi];
 
-	ResPlanAnalyzer.prototype.SaveCapacityScenarioDataComplete = function (jsonString) {
+                        if (ord.RoleID == trow.ID) {
+                            try {
+                                for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+                                    trow.FTEs[per - 1].Value = ord.FTE[per - 1].Value / 100;
+                                    trow.Hours[per - 1].Value = ord.Hours[per - 1].Value;
+                                }
+                            }
+                            catch (e) { }
+                            break;
+                        }
 
-		var jsonObject = JSON_ConvertString(jsonString);
-		if (JSON_ValidateServerResult(jsonObject)) {
+                    }
 
-			var CSDet = jsonObject.Result.CSID;
+                }
+            }
+        }
 
-			this.EditCSid = CSDet.Value;
-			this.SelectedCapScen = CSDet.Value;
-			this.EditCapScen = CSDet.Value;
-			
-		}
-	}
+        this.RedrawCSGrid();
 
+    }
 
-	ResPlanAnalyzer.prototype.SetViewChanged = function (selindex) {
+    ResPlanAnalyzer.prototype.SaveCapScenData = function () {
 
-		var selectView = document.getElementById("idAnalyzerTab_SelView");
 
-		if (selindex != null) {
+        var trow, grow, frow;
+        var xi;
 
-			selectView.selectedIndex = selindex - 1;
-		}
+        var sbDataxml = new StringBuilder();
+        var sb = new StringBuilder();
 
+        sbDataxml = new StringBuilder();
+        sbDataxml.append('<CapacityScenarioData');
+        sbDataxml.append(' Name="' + this.EditName + '"');
+        sbDataxml.append(' ID="' + this.EditCSid + '" >');
+        sbDataxml.append('<CS_Values>');
 
-		var selectedItem = null;
 
-		if (selectView.selectedIndex != -1)
-			selectView.options[selectView.selectedIndex];
+        for (var i = 0; i < this.CapScenData.length; i++) {
+            trow = this.CapScenData[i];
 
-		var oldguid = "";
-		var newguid = "";
+            for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+                var val, fval;
+                val = parseFloat(trow.Hours[per - 1].Value);
+                fval = parseFloat(trow.FTEs[per - 1].Value);
 
-		if (this.selectedView != null) {
-			oldguid = this.selectedView.ViewGUID;
-		}
+                if (val !== 0 && fval !== 0) {
 
+                    sb = new StringBuilder();
+                    sb.append('<CS_Value');
+                    sb.append(' Role_ID="' + trow.ID + '"');
+                    sb.append(' Per_ID="' + per + '"');
+                    sb.append(' Hours="' + val + '"');
+                    sb.append(' FTEs="' + fval * 10000 + '" />');
+                    sbDataxml.append(sb.toString());
+                }
+            }
+        }
 
-		this.selectedView = this.GetSelectedView();
 
-		if (this.selectedView != null) {
-			newguid = this.selectedView.ViewGUID;
-		}
+        sbDataxml.append('</CS_Values>');
+        sbDataxml.append('</CapacityScenarioData>');
 
-		this.flashRibbonSelect("idAnalyzerTab_SelView");
+        var s = sbDataxml.toString();
 
-		if (this.selectedView != null) {
+        WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveCapacityScenarioData", s, this.SaveCapacityScenarioDataCompleteDelegate);
 
 
-			this.AnalyzerShowBarschecked = false;
-			this.AnalyzerHideDetailschecked = false;
+    }
 
-			try {
-				this.AnalyzerShowBarschecked = (this.selectedView.ViewSettings.ShowBars == "1");
-			} catch (e) {
-			}
+    ResPlanAnalyzer.prototype.SaveCapacityScenarioDataComplete = function (jsonString) {
 
-			try {
-				this.AnalyzerHideDetailschecked = (this.selectedView.ViewSettings.HideDetails == "1");
-			} catch (e) {
-			}
+        var jsonObject = JSON_ConvertString(jsonString);
+        if (JSON_ValidateServerResult(jsonObject)) {
 
-			if (this.AnalyzerShowBarschecked == true) {
-				this.viewTab.setButtonStateOn("idAnalyzerShowBars");
-			} else {
-				this.viewTab.setButtonStateOff("idAnalyzerShowBars");
-			}
+            var CSDet = jsonObject.Result.CSID;
 
+            this.EditCSid = CSDet.Value;
+            this.SelectedCapScen = CSDet.Value;
+            this.EditCapScen = CSDet.Value;
 
-			if (this.AnalyzerHideDetailschecked == true) {
-				this.viewTab.setButtonStateOn("idAnalyzerHideDetails");
-			} else {
-				this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
-			}
+        }
+    }
 
-			this.deferredhidedetails = true;
 
-		}
+    ResPlanAnalyzer.prototype.SetViewChanged = function (selindex) {
 
-		if (oldguid == newguid && selindex == null)
-			return;
+        var selectView = document.getElementById("idAnalyzerTab_SelView");
 
-		if (this.selectedView != null) {
-			this.FilterDifferent = false;
+        if (selindex != null) {
 
+            selectView.selectedIndex = selindex - 1;
+        }
 
-			this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
-			var gridView = this.stashgridsettings.View.g_1;
-			var curfilter = gridView['Filters'];
-			gridView = this.selectedView["g_1"];
-			var newfilter = gridView['Filters'];
 
-			if (newfilter != curfilter) {
-				this.FilterDifferent = true;
-			}
+        var selectedItem = null;
 
-			WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("ApplyResourceAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, SetChangeViewCompleteDelegate);
-		}
-	}
+        if (selectView.selectedIndex != -1)
+            selectView.options[selectView.selectedIndex];
 
+        var oldguid = "";
+        var newguid = "";
 
+        if (this.selectedView != null) {
+            oldguid = this.selectedView.ViewGUID;
+        }
 
-	ResPlanAnalyzer.prototype.deferExternalEvent = function (event) {
-		this.deferevent = event;
 
-		window.setTimeout(this.deferedExternalEventDelegate, 200);
-	}
+        this.selectedView = this.GetSelectedView();
 
-	ResPlanAnalyzer.prototype.deferedExternalEvent = function () {
-		this.externalEvent(this.deferevent);
-		this.deferevent = "";
-	}
+        if (this.selectedView != null) {
+            newguid = this.selectedView.ViewGUID;
+        }
 
-	ResPlanAnalyzer.prototype.findAbsolutePosition = function (obj) {
-		var curleft = curtop = 0;
-		if (obj.offsetParent) {
-			do {
-				curleft += obj.offsetLeft;
-				curtop += obj.offsetTop;
-			} while (obj = obj.offsetParent);
-		}
-		return [curleft, curtop];
-		//returns an array
-	}
+        this.flashRibbonSelect("idAnalyzerTab_SelView");
 
-	ResPlanAnalyzer.prototype.deferedsetFocus = function () {
+        if (this.selectedView != null) {
 
-		if (this.doSetFocus == "")
-			return;
-		try {
-			document.getElementById(this.doSetFocus).focus();
-		}
-		catch (e) { }
-		
 
-		this.doSetFocus = "";
+            this.AnalyzerShowBarschecked = false;
+            this.AnalyzerHideDetailschecked = false;
 
-	}
+            try {
+                this.AnalyzerShowBarschecked = (this.selectedView.ViewSettings.ShowBars == "1");
+            } catch (e) {
+            }
 
-	ResPlanAnalyzer.prototype.setNewButtonDisable = function (idButton, bstate) {
+            try {
+                this.AnalyzerHideDetailschecked = (this.selectedView.ViewSettings.HideDetails == "1");
+            } catch (e) {
+            }
 
-		var btn = document.getElementById(idButton);
+            if (this.AnalyzerShowBarschecked == true) {
+                this.viewTab.setButtonStateOn("idAnalyzerShowBars");
+            } else {
+                this.viewTab.setButtonStateOff("idAnalyzerShowBars");
+            }
 
-		if (btn == null)
-			return;
-		
-		if (bstate == true)
-			btn.className = "button-new disabledSilver";
-		else 
-		   btn.className = "button-new silver";
-			 
-	}
 
-	ResPlanAnalyzer.prototype.externalEvent = function (event) {
+            if (this.AnalyzerHideDetailschecked == true) {
+                this.viewTab.setButtonStateOn("idAnalyzerHideDetails");
+            } else {
+                this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
+            }
 
-	    try {
+            this.deferredhidedetails = true;
 
-	        var grid = null;
-	        var i;
-	        var viewid = 1;
+        }
 
+        if (oldguid == newguid && selindex == null)
+            return;
 
-	        if (event == "")
-	            return;
+        if (this.selectedView != null) {
+            this.FilterDifferent = false;
 
 
-	        if (event.length > 11) {
-	            var firstchars = event.substr(0, 11);
+            this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
+            var gridView = this.stashgridsettings.View.g_1;
+            var curfilter = gridView['Filters'];
+            gridView = this.selectedView["g_1"];
+            var newfilter = gridView['Filters'];
 
-	            if (firstchars == "ViewChanged") {
-	                viewid = event.substr(11);
-	                event = "ViewChanged";
+            if (newfilter != curfilter) {
+                this.FilterDifferent = true;
+            }
 
-	            }
-	        }
+            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("ApplyResourceAnalyzerViewServerSideSettings", this.selectedView.ViewGUID, SetChangeViewCompleteDelegate);
+        }
+    }
 
 
-	        switch (event) {
 
-	            case "AnalyzerTab_SaveScen":
+    ResPlanAnalyzer.prototype.deferExternalEvent = function (event) {
+        this.deferevent = event;
 
-	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", SaveCapacityScenarioListCompleteDelegate);
-	                break;
+        window.setTimeout(this.deferedExternalEventDelegate, 200);
+    }
 
-	            case "AnalyzerTab_FromPeriod_Changed":
-	                var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
-	                var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
+    ResPlanAnalyzer.prototype.deferedExternalEvent = function () {
+        this.externalEvent(this.deferevent);
+        this.deferevent = "";
+    }
 
-	                if (tp < fp) {
-	                    alert("The From period cannot be after the To Period");
-	                    this.ribbonSetSelectValue("idAnalyzerTab_FromPeriod", this.PerStart);
-	                    return;
-	                }
+    ResPlanAnalyzer.prototype.findAbsolutePosition = function (obj) {
+        var curleft = curtop = 0;
+        if (obj.offsetParent) {
+            do {
+                curleft += obj.offsetLeft;
+                curtop += obj.offsetTop;
+            } while (obj = obj.offsetParent);
+        }
+        return [curleft, curtop];
+        //returns an array
+    }
 
-	                this.PerStart = fp;
+    ResPlanAnalyzer.prototype.deferedsetFocus = function () {
 
-	                this.flashGridView("g_1", true);
-	                this.flashGridView("bottomg_1", true);
-	                break;
+        if (this.doSetFocus == "")
+            return;
+        try {
+            document.getElementById(this.doSetFocus).focus();
+        }
+        catch (e) { }
 
 
+        this.doSetFocus = "";
 
-	            case "AnalyzerTab_chkCommit_Click":
+    }
 
-	                if (this.topgridready == false || this.bottomgridready == false)
-	                    return;
+    ResPlanAnalyzer.prototype.setNewButtonDisable = function (idButton, bstate) {
 
-	                this.topgridready = false;
-	                this.bottomgridready = false;
+        var btn = document.getElementById(idButton);
 
-	                var bchk = this.analyzerTab.getButtonState("chkCommit");
+        if (btn == null)
+            return;
 
-	                if (bchk == true)
-	                    this.analyzerTab.setButtonStateOff("chkCommit");
-	                else
-	                    this.analyzerTab.setButtonStateOn("chkCommit");
+        if (bstate == true)
+            btn.className = "button-new disabledSilver";
+        else
+            btn.className = "button-new silver";
 
-	                this.SelectDetails_OKOnClick();
+    }
 
-	                break;
+    ResPlanAnalyzer.prototype.externalEvent = function (event) {
 
-	            case "AnalyzerTab_chkMSP_Click":
+        try {
 
-	                if (this.topgridready == false || this.bottomgridready == false)
-	                    return;
+            var grid = null;
+            var i;
+            var viewid = 1;
 
-	                this.topgridready = false;
-	                this.bottomgridready = false;
 
-	                var bchk = this.analyzerTab.getButtonState("chkMSP");
+            if (event == "")
+                return;
 
-	                if (bchk == true)
-	                    this.analyzerTab.setButtonStateOff("chkMSP");
-	                else
-	                    this.analyzerTab.setButtonStateOn("chkMSP");
 
-	                this.SelectDetails_OKOnClick();
+            if (event.length > 11) {
+                var firstchars = event.substr(0, 11);
 
-	                break;
+                if (firstchars == "ViewChanged") {
+                    viewid = event.substr(11);
+                    event = "ViewChanged";
 
-	            case "AnalyzerTab_chkActual_Click":
+                }
+            }
 
-	                if (this.topgridready == false || this.bottomgridready == false)
-	                    return;
 
-	                this.topgridready = false;
-	                this.bottomgridready = false;
+            switch (event) {
 
-	                var bchk = this.analyzerTab.getButtonState("chkActual");
+                case "AnalyzerTab_SaveScen":
 
-	                if (bchk == true)
-	                    this.analyzerTab.setButtonStateOff("chkActual");
-	                else
-	                    this.analyzerTab.setButtonStateOn("chkActual");
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", SaveCapacityScenarioListCompleteDelegate);
+                    break;
 
-	                this.SelectDetails_OKOnClick();
+                case "AnalyzerTab_FromPeriod_Changed":
+                    var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
+                    var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
 
-	                break;
+                    if (tp < fp) {
+                        alert("The From period cannot be after the To Period");
+                        this.ribbonSetSelectValue("idAnalyzerTab_FromPeriod", this.PerStart);
+                        return;
+                    }
 
+                    this.PerStart = fp;
 
-	            case "AnalyzerTab_chkRequests_Click":
+                    this.flashGridView("g_1", true);
+                    this.flashGridView("bottomg_1", true);
+                    break;
 
-	                if (this.topgridready == false || this.bottomgridready == false)
-	                    return;
 
-	                this.topgridready = false;
-	                this.bottomgridready = false;
 
-	                var bchk = this.analyzerTab.getButtonState("chkRequests");
+                case "AnalyzerTab_chkCommit_Click":
 
-	                if (bchk == true)
-	                    this.analyzerTab.setButtonStateOff("chkRequests");
-	                else
-	                    this.analyzerTab.setButtonStateOn("chkRequests");
+                    if (this.topgridready == false || this.bottomgridready == false)
+                        return;
 
-	                this.SelectDetails_OKOnClick();
+                    this.topgridready = false;
+                    this.bottomgridready = false;
 
-	                break;
+                    var bchk = this.analyzerTab.getButtonState("chkCommit");
 
-	            case "AnalyzerTab_chkOpenRequests_Click":
+                    if (bchk == true)
+                        this.analyzerTab.setButtonStateOff("chkCommit");
+                    else
+                        this.analyzerTab.setButtonStateOn("chkCommit");
 
-	                if (this.topgridready == false || this.bottomgridready == false)
-	                    return;
+                    this.SelectDetails_OKOnClick();
 
-	                this.topgridready = false;
-	                this.bottomgridready = false;
+                    break;
 
-	                var bchk = this.analyzerTab.getButtonState("chkOpenRequests");
+                case "AnalyzerTab_chkMSP_Click":
 
-	                if (bchk == true)
-	                    this.analyzerTab.setButtonStateOff("chkOpenRequests");
-	                else
-	                    this.analyzerTab.setButtonStateOn("chkOpenRequests");
+                    if (this.topgridready == false || this.bottomgridready == false)
+                        return;
 
-	                this.SelectDetails_OKOnClick();
+                    this.topgridready = false;
+                    this.bottomgridready = false;
 
-	                break;
+                    var bchk = this.analyzerTab.getButtonState("chkMSP");
 
-	            case "AnalyzerTab_chkNonWork_Click":
+                    if (bchk == true)
+                        this.analyzerTab.setButtonStateOff("chkMSP");
+                    else
+                        this.analyzerTab.setButtonStateOn("chkMSP");
 
-	                if (this.topgridready == false || this.bottomgridready == false)
-	                    return;
+                    this.SelectDetails_OKOnClick();
 
-	                this.topgridready = false;
-	                this.bottomgridready = false;
+                    break;
 
-	                var bchk = this.analyzerTab.getButtonState("chkNonWork");
+                case "AnalyzerTab_chkActual_Click":
 
-	                if (bchk == true)
-	                    this.analyzerTab.setButtonStateOff("chkNonWork");
-	                else
-	                    this.analyzerTab.setButtonStateOn("chkNonWork");
+                    if (this.topgridready == false || this.bottomgridready == false)
+                        return;
 
-	                this.SelectDetails_OKOnClick();
+                    this.topgridready = false;
+                    this.bottomgridready = false;
 
-	                break;
+                    var bchk = this.analyzerTab.getButtonState("chkActual");
 
-	            case "AnalyzerTab_ToPeriod_Changed":
+                    if (bchk == true)
+                        this.analyzerTab.setButtonStateOff("chkActual");
+                    else
+                        this.analyzerTab.setButtonStateOn("chkActual");
 
+                    this.SelectDetails_OKOnClick();
 
-	                var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
-	                var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
+                    break;
 
-	                if (tp < fp) {
-	                    alert("The To period cannot be before the From Period");
-	                    this.ribbonSetSelectValue("idAnalyzerTab_ToPeriod", this.PerEnd);
-	                    return;
-	                }
 
-	                this.PerEnd = tp;
+                case "AnalyzerTab_chkRequests_Click":
 
-	                this.flashGridView("g_1", true);
-	                this.flashGridView("bottomg_1", true);
-	                break;
+                    if (this.topgridready == false || this.bottomgridready == false)
+                        return;
 
+                    this.topgridready = false;
+                    this.bottomgridready = false;
 
+                    var bchk = this.analyzerTab.getButtonState("chkRequests");
 
-	            case "ViewChanged":
-	                this.SetViewChanged(viewid);
+                    if (bchk == true)
+                        this.analyzerTab.setButtonStateOff("chkRequests");
+                    else
+                        this.analyzerTab.setButtonStateOn("chkRequests");
 
-	                break;
+                    this.SelectDetails_OKOnClick();
 
-	            case "ModeChanged0":
+                    break;
 
-	                if (this.SetSelectedMode(1) == true)
-	                    RefreshBothGrids();
-	                break;
+                case "AnalyzerTab_chkOpenRequests_Click":
 
-	            case "ModeChanged1":
+                    if (this.topgridready == false || this.bottomgridready == false)
+                        return;
 
-	                if (this.SetSelectedMode(2) == true)
-	                    RefreshBothGrids();
-	                break;
+                    this.topgridready = false;
+                    this.bottomgridready = false;
 
-	            case "ModeChanged2":
-	                if (this.SetSelectedMode(3) == true)
-	                    RefreshBothGrids();
-	                break;
+                    var bchk = this.analyzerTab.getButtonState("chkOpenRequests");
 
-	            case "ModeChanged3":
-	                if (this.SetSelectedMode(4) == true)
-	                    RefreshBothGrids();
-	                break;
+                    if (bchk == true)
+                        this.analyzerTab.setButtonStateOff("chkOpenRequests");
+                    else
+                        this.analyzerTab.setButtonStateOn("chkOpenRequests");
 
+                    this.SelectDetails_OKOnClick();
 
-	            case "TotalsTab_Maximize":
-	                this.TotMaxed = !this.TotMaxed;
+                    break;
 
-	                if (this.TotMaxed == true) {
-	                    this.preMaxHeight = this.layout.cells(this.mainArea).getHeight();
+                case "AnalyzerTab_chkNonWork_Click":
 
-	                    this.layout.cells(this.mainArea).detachObject();
-	                    this.layout._minHeight = 1;
-	                    this.layout.cells(this.mainArea).setHeight(2);
-	                    this.layout.cells(this.mainArea).fixSize(false, true);
+                    if (this.topgridready == false || this.bottomgridready == false)
+                        return;
 
-	                    //   this.MediumButtonState("TotGridMax", true);
+                    this.topgridready = false;
+                    this.bottomgridready = false;
 
+                    var bchk = this.analyzerTab.getButtonState("chkNonWork");
 
-	                } else {
+                    if (bchk == true)
+                        this.analyzerTab.setButtonStateOff("chkNonWork");
+                    else
+                        this.analyzerTab.setButtonStateOn("chkNonWork");
 
-	                    this.layout.cells(this.mainArea).fixSize(false, false);
-	                    this.layout.cells(this.mainArea).setHeight(this.preMaxHeight);
+                    this.SelectDetails_OKOnClick();
 
-	                    this.layout._minHeight = 18;
+                    break;
 
-	                    document.getElementById("gridDiv_1").style.display = "block";
-	                    this.layout.cells(this.mainArea).attachObject("gridDiv_1");
-	                    //           this.MediumButtonState("TotGridMax", false);
-	                }
+                case "AnalyzerTab_ToPeriod_Changed":
 
-	                break;
 
-	            case "TopRibbon_Toggle":
+                    var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
+                    var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
 
-	                if (this.analyzerTab.isCollapsed() == true) {
-	                    this.layout.cells(this.mainRibbonArea).fixSize(false, false);
-	                    this.layout.cells(this.mainRibbonArea).setHeight(120);
-	                    this.layout.cells(this.mainRibbonArea).fixSize(false, true);
-	                    this.analyzerTab.expand();
-	                    this.viewTab.expand();
+                    if (tp < fp) {
+                        alert("The To period cannot be before the From Period");
+                        this.ribbonSetSelectValue("idAnalyzerTab_ToPeriod", this.PerEnd);
+                        return;
+                    }
 
-	                } else {
-	                    this.layout.cells(this.mainRibbonArea).fixSize(false, false);
-	                    this.layout.cells(this.mainRibbonArea).setHeight(50);
-	                    this.layout.cells(this.mainRibbonArea).fixSize(false, true);
-	                    this.analyzerTab.collapse();
-	                    this.viewTab.collapse();
-	                }
-	                break;
+                    this.PerEnd = tp;
 
+                    this.flashGridView("g_1", true);
+                    this.flashGridView("bottomg_1", true);
+                    break;
 
-	            case "TotalRibbon_Toggle":
 
-	                if (this.totTab.isCollapsed() == true) {
-	                    this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, false);
-	                    this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
-	                    this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
 
-	                    this.totTab.expand();
+                case "ViewChanged":
+                    this.SetViewChanged(viewid);
 
-	                } else {
-	                    this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, false);
-	                    this.layout_totals.cells(this.totalsRibbonArea).setHeight(22);
-	                    this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
+                    break;
 
-	                    this.totTab.collapse();
-	                }
-	                break;
+                case "ModeChanged0":
 
+                    if (this.SetSelectedMode(1) == true)
+                        RefreshBothGrids();
+                    break;
 
+                case "ModeChanged1":
 
-	            case "AnalyzerTab_ShowFilters_Click":
-	                try {
-	                    this.AnalyzerFilterschecked = !this.AnalyzerFilterschecked;
-	                    grid = Grids["g_1"];
-	                    if (this.AnalyzerFilterschecked == true) {
-	                        this.showFilters(grid);
-	                    } else {
-	                        this.hideFilters(grid);
-	                    }
-	                }
-	                catch (e) {
+                    if (this.SetSelectedMode(2) == true)
+                        RefreshBothGrids();
+                    break;
 
-	                }
-	                break;
+                case "ModeChanged2":
+                    if (this.SetSelectedMode(3) == true)
+                        RefreshBothGrids();
+                    break;
 
+                case "ModeChanged3":
+                    if (this.SetSelectedMode(4) == true)
+                        RefreshBothGrids();
+                    break;
 
-	            case "AnalyzerTab_SaveDrag":
 
-	                if (this.SaveBtn == false || this.NewMode == true)
-	                    return;
+                case "TotalsTab_Maximize":
+                    this.TotMaxed = !this.TotMaxed;
 
+                    if (this.TotMaxed == true) {
+                        this.preMaxHeight = this.layout.cells(this.mainArea).getHeight();
 
+                        this.layout.cells(this.mainArea).detachObject();
+                        this.layout._minHeight = 1;
+                        this.layout.cells(this.mainArea).setHeight(2);
+                        this.layout.cells(this.mainArea).fixSize(false, true);
 
-	                var result = confirm("You are about to Publish the your changes to the modified resource plans.  Are you sure you want to continue?");
+                        //   this.MediumButtonState("TotGridMax", true);
 
-	                if (result == false)
-	                    return;
 
-	                this.HaveDragChanges = false;
-	                this.SaveBtn = false;
+                    } else {
 
-	                this.analyzerTab.disableItem("SaveBtn");
-	                this.viewTab.disableItem("SaveBtn2");
+                        this.layout.cells(this.mainArea).fixSize(false, false);
+                        this.layout.cells(this.mainArea).setHeight(this.preMaxHeight);
 
-	                WorkEnginePPM.ResPlanAnalyzer.Execute("RPASaveDraggedData", "");
-	                break;
+                        this.layout._minHeight = 18;
 
-	            case "AnalyzerTab_UnDoDrag":
+                        document.getElementById("gridDiv_1").style.display = "block";
+                        this.layout.cells(this.mainArea).attachObject("gridDiv_1");
+                        //           this.MediumButtonState("TotGridMax", false);
+                    }
 
-	                if (this.UnDoBtn == false)
-	                    return;
+                    break;
 
-	                if (this.dragStack.length == 0) {
-	                    this.UnDoBtn = false;
+                case "TopRibbon_Toggle":
 
-	                    this.analyzerTab.disableItem("UndoBtn");
-	                    this.viewTab.disableItem("UndoBtn2");
+                    if (this.analyzerTab.isCollapsed() == true) {
+                        this.layout.cells(this.mainRibbonArea).fixSize(false, false);
+                        this.layout.cells(this.mainRibbonArea).setHeight(120);
+                        this.layout.cells(this.mainRibbonArea).fixSize(false, true);
+                        this.analyzerTab.expand();
+                        this.viewTab.expand();
 
-	                    break;
-	                }
+                    } else {
+                        this.layout.cells(this.mainRibbonArea).fixSize(false, false);
+                        this.layout.cells(this.mainRibbonArea).setHeight(50);
+                        this.layout.cells(this.mainRibbonArea).fixSize(false, true);
+                        this.analyzerTab.collapse();
+                        this.viewTab.collapse();
+                    }
+                    break;
 
-	                if (this.NegMode == false) {
 
-	                    this.SaveBtn = true;
-	                    this.analyzerTab.enableItem("SaveBtn");
-	                    this.viewTab.enableItem("SaveBtn2");
-	                }
+                case "TotalRibbon_Toggle":
 
-	                grid = Grids["g_1"];
+                    if (this.totTab.isCollapsed() == true) {
+                        this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, false);
+                        this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
+                        this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
 
-	                var dragarr = this.dragStack.pop();
+                        this.totTab.expand();
 
-	                if (this.dragStack.length == 0) {
+                    } else {
+                        this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, false);
+                        this.layout_totals.cells(this.totalsRibbonArea).setHeight(22);
+                        this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
 
-	                    this.UnDoBtn = false;
-	                    this.analyzerTab.disableItem("UndoBtn");
-	                    this.viewTab.disableItem("UndoBtn2");
+                        this.totTab.collapse();
+                    }
+                    break;
 
-	                }
 
-	                this.ResetDragRow(grid, dragarr);
-	                WorkEnginePPM.ResPlanAnalyzer.Execute("UndoRADragRows", "", HandleRefreshDelegate);
-	                break;
 
-	            case "AnalyzerTab_ShowGrouping_Click":
-	                this.AnalyzeGroupingchecked = !this.AnalyzeGroupingchecked;
-	                grid = Grids["g_1"];
-	                if (this.AnalyzeGroupingchecked == true) {
-	                    this.showGrouping(grid);
-	                } else {
-	                    this.hideGrouping(grid);
-	                }
-	                grid.Render();
-	                break;
+                case "AnalyzerTab_ShowFilters_Click":
+                    try {
+                        this.AnalyzerFilterschecked = !this.AnalyzerFilterschecked;
+                        grid = Grids["g_1"];
+                        if (this.AnalyzerFilterschecked == true) {
+                            this.showFilters(grid);
+                        } else {
+                            this.hideFilters(grid);
+                        }
+                    }
+                    catch (e) {
 
+                    }
+                    break;
 
-	            case "AnalyzerTab_SelView_Changed":
-	                this.SetViewChanged(null);
 
-	                break;
+                case "AnalyzerTab_SaveDrag":
 
+                    if (this.SaveBtn == false || this.NewMode == true)
+                        return;
 
-	            case "AnalyzerTab_RenameView":
-	                var selectView = document.getElementById("idAnalyzerTab_SelView");
-	                if (selectView != null && selectView.selectedIndex >= 0) {
-	                    var view = this.GetSelectedView();
-	                    this.selectedView = view;
-	                    var selectedItem = selectView.options[selectView.selectedIndex];
-	                    document.getElementById("id_RenameView_Name").value = selectedItem.text;
-	                }
-	                else {
-	                    alert("No views have been saved to be renamed!");
-	                    break;
-	                }
 
-	                if (this.AnalyzerViewDlg == null) {
-	                    this.AnalyzerViewDlg = new dhtmlXWindows();
-	                    this.AnalyzerViewDlg.setSkin("dhx_web");
-	                    this.AnalyzerViewDlg.enableAutoViewport(false);
-	                    this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-	                    this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-	                    this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 280, 142);
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
-	                    //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
-	                    //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Rename View");
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { AnalyzerViewDlg_OnCloseDelegate(); return true; });
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idRenameAnalyzerDlg");
-	                }
-	                else {
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
-	                }
-	                break;
 
-	            case "AnalyzerTab_SaveView":
-	                document.getElementById("id_SaveView_Name").value = "New View";
-	                document.getElementById("id_SaveView_Default").checked = false;
-	                document.getElementById("id_SaveView_Personal").checked = true;
-	                var selectView = document.getElementById("idAnalyzerTab_SelView");
-	                if (selectView != null && selectView.selectedIndex >= 0) {
-	                    var view = this.GetSelectedView();
-	                    this.selectedView = view;
-	                    var selectedItem = selectView.options[selectView.selectedIndex];
-	                    document.getElementById("id_SaveView_Name").value = selectedItem.text;
-	                    var bDefault = false;
-	                    //    Joe wants the default for default to be off EVEN for the defaiult view 
-	                    //                       if (view.Default != 0)
-	                    //                           bDefault = true;
-	                    document.getElementById("id_SaveView_Default").checked = bDefault;
-	                    var bPersonal = false;
-	                    if (view.Personal != 0)
-	                        bPersonal = true;
-	                    document.getElementById("id_SaveView_Personal").checked = bPersonal;
-	                }
+                    var result = confirm("You are about to Publish the your changes to the modified resource plans.  Are you sure you want to continue?");
 
-	                if (this.AnalyzerViewDlg == null) {
-	                    this.AnalyzerViewDlg = new dhtmlXWindows();
-	                    this.AnalyzerViewDlg.setSkin("dhx_web");
-	                    this.AnalyzerViewDlg.enableAutoViewport(false);
-	                    this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-	                    this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-	                    this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 280, 192);
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
-	                    //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
-	                    //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Save View");
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { AnalyzerViewDlg_OnCloseDelegate(); return true; });
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idSaveAnalyzerDlg");
-	                }
-	                else {
-	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
-	                }
-	                break;
+                    if (result == false)
+                        return;
 
-	            case "AnalyzerTab_DeleteView":
-	                document.getElementById("id_DeleteView_Name").value = "";
-	                var selectView = document.getElementById("idAnalyzerTab_SelView");
-	                if (selectView != null && selectView.selectedIndex >= 0) {
-	                    var view = this.GetSelectedView();
-	                    this.selectedView = view;
-	                    var selectedItem = selectView.options[selectView.selectedIndex];
-	                    document.getElementById("id_DeleteView_Name").value = selectedItem.text;
-	                }
+                    this.HaveDragChanges = false;
+                    this.SaveBtn = false;
 
-	                if (this.AnalyzerDeleteViewDlg == null) {
-	                    this.AnalyzerDeleteViewDlg = new dhtmlXWindows();
-	                    this.AnalyzerDeleteViewDlg.setSkin("dhx_web");
-	                    this.AnalyzerDeleteViewDlg.enableAutoViewport(false);
-	                    this.AnalyzerDeleteViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-	                    this.AnalyzerDeleteViewDlg.setImagePath("/_layouts/ppm/images/");
-	                    this.AnalyzerDeleteViewDlg.createWindow("winAnalyzerDeleteViewDlg", 20, 30, 280, 157);
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setIcon("logo.ico", "logo.ico");
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").denyResize();
-	                    //this.ViewDlg.window("winViewDlg").button("close").disable();
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").button("park").hide();
-	                    //this.ViewDlg.setSkin(this.params.DHTMLXSkin);
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setModal(true);
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").center();
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setText("Delete View");
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").attachEvent("onClose", function (win) { AnalyzerDeleteViewDlg_OnCloseDelegate(); return true; });
-	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").attachObject("idDeleteAnalyzerDlg");
-	                }
-	                else {
-	                    this.ViewDlg.window("winViewDlg").show();
-	                }
-	                break;
+                    this.analyzerTab.disableItem("SaveBtn");
+                    this.viewTab.disableItem("SaveBtn2");
 
-	            case "SaveView_OK":
-	                var saveViewName = document.getElementById("id_SaveView_Name").value;
-	                var selectView = document.getElementById("idAnalyzerTab_SelView");
-	                //var saveViewGuid = "";
-	                var guid = new Guid();
-	                if (selectView.selectedIndex >= 0) {
-	                    var selectedItem = selectView.options[selectView.selectedIndex];
-	                    guid.value = selectedItem.value;
-	                    if (selectedItem.text != saveViewName || guid.isGuid() != true) {
-	                        guid.newGuid();
-	                    }
-	                }
-	                else
-	                    guid.newGuid();
+                    WorkEnginePPM.ResPlanAnalyzer.Execute("RPASaveDraggedData", "");
+                    break;
 
-	                var bDefault = document.getElementById("id_SaveView_Default").checked;
-	                var bPersonal = document.getElementById("id_SaveView_Personal").checked;
+                case "AnalyzerTab_UnDoDrag":
 
-	                var s = this.BuildViewInf(guid.value, saveViewName, bDefault, bPersonal, false);
-	                var sbd = new StringBuilder();
-	                sbd.append('<Execute Function="SaveResourcePlanAnalyzerView">');
-	                sbd.append(s);
-	                sbd.append('</Execute>');
+                    if (this.UnDoBtn == false)
+                        return;
 
-	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveResourceAnalyzerView", sbd.toString(), SaveResourceAnalyzerViewCompleteDelegate);
-	                break;
+                    if (this.dragStack.length == 0) {
+                        this.UnDoBtn = false;
 
-	            case "RenameView_OK":
-	                var renameViewName = document.getElementById("id_RenameView_Name").value;
-	                var selectView = document.getElementById("idAnalyzerTab_SelView");
-	                var viewGUID;
-	                if (selectView.selectedIndex >= 0) {
-	                    var selectedItem = selectView.options[selectView.selectedIndex];
-	                    viewGUID = selectedItem.value;
-	                }
+                        this.analyzerTab.disableItem("UndoBtn");
+                        this.viewTab.disableItem("UndoBtn2");
 
-	                var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(renameViewName) + '" />';
-	                var sbd = new StringBuilder();
-	                sbd.append('<Execute Function="RenameResourcePlanAnalyzerView">');
-	                sbd.append(dataXml);
-	                sbd.append('</Execute>');
+                        break;
+                    }
 
-	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("RenameResourceAnalyzerView", sbd.toString(), RenameResourceAnalyzerViewCompleteDelegate);
-	                break;
+                    if (this.NegMode == false) {
 
-	            case "SaveView_Cancel":
-	            case "RenameView_Cancel":
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(false);
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").hide();
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
-	                this.AnalyzerViewDlg = null;
-	                break;
+                        this.SaveBtn = true;
+                        this.analyzerTab.enableItem("SaveBtn");
+                        this.viewTab.enableItem("SaveBtn2");
+                    }
 
-	            case "DeleteView_Cancel":
-	                this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setModal(false);
-	                this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").hide();
-	                this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").detachObject()
-	                this.AnalyzerDeleteViewDlg = null;
-	                break;
+                    grid = Grids["g_1"];
 
+                    var dragarr = this.dragStack.pop();
 
-	            case "AnalyzerTab_Close":
-	                if (parent.SP.UI.DialogResult)
-	                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-	                else
-	                    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
-	                return;
+                    if (this.dragStack.length == 0) {
 
-	            case "EditResPlan":
+                        this.UnDoBtn = false;
+                        this.analyzerTab.disableItem("UndoBtn");
+                        this.viewTab.disableItem("UndoBtn2");
 
-	                if (this.params.RPEMode == 1)
-	                    break;
-	                
-	                this.EditResPlan();
-	                break;
+                    }
 
+                    this.ResetDragRow(grid, dragarr);
+                    WorkEnginePPM.ResPlanAnalyzer.Execute("UndoRADragRows", "", HandleRefreshDelegate);
+                    break;
 
-	            case "AnalyzerTab_SelectColumns":
-	                grid = Grids["g_1"];
-	                grid.ActionShowColumns('Selectable');
-	                break;
+                case "AnalyzerTab_ShowGrouping_Click":
+                    this.AnalyzeGroupingchecked = !this.AnalyzeGroupingchecked;
+                    grid = Grids["g_1"];
+                    if (this.AnalyzeGroupingchecked == true) {
+                        this.showGrouping(grid);
+                    } else {
+                        this.hideGrouping(grid);
+                    }
+                    grid.Render();
+                    break;
 
-	            case "AnalyzerTab_ExpandAll":
-	                grid = Grids["g_1"];
-	                var bExall = grid.ExpandAll(null, 0, 3);
-	                break;
 
-	            case "AnalyzerTab_CollapseAll":
-	                grid = Grids["g_1"];
-	                grid.CollapseAll();
-	                break;
+                case "AnalyzerTab_SelView_Changed":
+                    this.SetViewChanged(null);
 
-	            case "AnalyzerTab_Details_Changed":
-	                this.SelectDetails_OKOnClick();
+                    break;
 
-	            case "AnalyzerTab_DetailsCanceled":
-	                this.SetDetails.window("winDetDlg").detachObject()
-	                this.SetDetails.window("winDetDlg").close();
-	                this.SetDetails = null;
-	                break;
 
-	            case "AnalyzerTab_SelMode_Changed":
-	                this.SetSelectedMode(null);
-	                RefreshBothGrids();
-	                break;
+                case "AnalyzerTab_RenameView":
+                    var selectView = document.getElementById("idAnalyzerTab_SelView");
+                    if (selectView != null && selectView.selectedIndex >= 0) {
+                        var view = this.GetSelectedView();
+                        this.selectedView = view;
+                        var selectedItem = selectView.options[selectView.selectedIndex];
+                        document.getElementById("id_RenameView_Name").value = selectedItem.text;
+                    }
+                    else {
+                        alert("No views have been saved to be renamed!");
+                        break;
+                    }
 
-	            case "AnalyzerTab_ExporttoExcel":
-	                grid = Grids["g_1"];
-	                grid.Source.Export.Type = "xls";
-	                grid.ActionExport();
-	                break;
+                    if (this.AnalyzerViewDlg == null) {
+                        this.AnalyzerViewDlg = new dhtmlXWindows();
+                        this.AnalyzerViewDlg.setSkin("dhx_web");
+                        this.AnalyzerViewDlg.enableAutoViewport(false);
+                        this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+                        this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
+                        this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 280, 142);
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
+                        //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+                        //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Rename View");
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { AnalyzerViewDlg_OnCloseDelegate(); return true; });
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idRenameAnalyzerDlg");
+                    }
+                    else {
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
+                    }
+                    break;
 
-	            case "AnalyzerTab_Print":
-	                grid = Grids["g_1"];
-	                grid.ActionPrint();
-	                break;
+                case "AnalyzerTab_SaveView":
+                    document.getElementById("id_SaveView_Name").value = "New View";
+                    document.getElementById("id_SaveView_Default").checked = false;
+                    document.getElementById("id_SaveView_Personal").checked = true;
+                    var selectView = document.getElementById("idAnalyzerTab_SelView");
+                    if (selectView != null && selectView.selectedIndex >= 0) {
+                        var view = this.GetSelectedView();
+                        this.selectedView = view;
+                        var selectedItem = selectView.options[selectView.selectedIndex];
+                        document.getElementById("id_SaveView_Name").value = selectedItem.text;
+                        var bDefault = false;
+                        //    Joe wants the default for default to be off EVEN for the defaiult view 
+                        //                       if (view.Default != 0)
+                        //                           bDefault = true;
+                        document.getElementById("id_SaveView_Default").checked = bDefault;
+                        var bPersonal = false;
+                        if (view.Personal != 0)
+                            bPersonal = true;
+                        document.getElementById("id_SaveView_Personal").checked = bPersonal;
+                    }
 
-	            case "TotalTab_Print":
-	                grid = Grids["bottomg_1"];
-	                grid.ActionPrint();
-	                break;
+                    if (this.AnalyzerViewDlg == null) {
+                        this.AnalyzerViewDlg = new dhtmlXWindows();
+                        this.AnalyzerViewDlg.setSkin("dhx_web");
+                        this.AnalyzerViewDlg.enableAutoViewport(false);
+                        this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+                        this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
+                        this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 280, 192);
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
+                        //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+                        //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Save View");
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { AnalyzerViewDlg_OnCloseDelegate(); return true; });
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idSaveAnalyzerDlg");
+                    }
+                    else {
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
+                    }
+                    break;
 
+                case "AnalyzerTab_DeleteView":
+                    document.getElementById("id_DeleteView_Name").value = "";
+                    var selectView = document.getElementById("idAnalyzerTab_SelView");
+                    if (selectView != null && selectView.selectedIndex >= 0) {
+                        var view = this.GetSelectedView();
+                        this.selectedView = view;
+                        var selectedItem = selectView.options[selectView.selectedIndex];
+                        document.getElementById("id_DeleteView_Name").value = selectedItem.text;
+                    }
 
+                    if (this.AnalyzerDeleteViewDlg == null) {
+                        this.AnalyzerDeleteViewDlg = new dhtmlXWindows();
+                        this.AnalyzerDeleteViewDlg.setSkin("dhx_web");
+                        this.AnalyzerDeleteViewDlg.enableAutoViewport(false);
+                        this.AnalyzerDeleteViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+                        this.AnalyzerDeleteViewDlg.setImagePath("/_layouts/ppm/images/");
+                        this.AnalyzerDeleteViewDlg.createWindow("winAnalyzerDeleteViewDlg", 20, 30, 280, 157);
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setIcon("logo.ico", "logo.ico");
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").denyResize();
+                        //this.ViewDlg.window("winViewDlg").button("close").disable();
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").button("park").hide();
+                        //this.ViewDlg.setSkin(this.params.DHTMLXSkin);
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setModal(true);
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").center();
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setText("Delete View");
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").attachEvent("onClose", function (win) { AnalyzerDeleteViewDlg_OnCloseDelegate(); return true; });
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").attachObject("idDeleteAnalyzerDlg");
+                    }
+                    else {
+                        this.ViewDlg.window("winViewDlg").show();
+                    }
+                    break;
 
-	            case "AnalyzerTab_RemoveSorting_Click":
-	                grid = Grids["g_1"];
+                case "SaveView_OK":
+                    var saveViewName = document.getElementById("id_SaveView_Name").value;
+                    var selectView = document.getElementById("idAnalyzerTab_SelView");
+                    //var saveViewGuid = "";
+                    var guid = new Guid();
+                    if (selectView.selectedIndex >= 0) {
+                        var selectedItem = selectView.options[selectView.selectedIndex];
+                        guid.value = selectedItem.value;
+                        if (selectedItem.text != saveViewName || guid.isGuid() != true) {
+                            guid.newGuid();
+                        }
+                    }
+                    else
+                        guid.newGuid();
 
+                    var bDefault = document.getElementById("id_SaveView_Default").checked;
+                    var bPersonal = document.getElementById("id_SaveView_Personal").checked;
 
-	                grid.ChangeSort("rowid");
-	                grid.SortRows();
-	                grid.Render();
+                    var s = this.BuildViewInf(guid.value, saveViewName, bDefault, bPersonal, false);
+                    var sbd = new StringBuilder();
+                    sbd.append('<Execute Function="SaveResourcePlanAnalyzerView">');
+                    sbd.append(s);
+                    sbd.append('</Execute>');
 
-	                grid.ChangeSort("");
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveResourceAnalyzerView", sbd.toString(), SaveResourceAnalyzerViewCompleteDelegate);
+                    break;
 
-	                break;
+                case "RenameView_OK":
+                    var renameViewName = document.getElementById("id_RenameView_Name").value;
+                    var selectView = document.getElementById("idAnalyzerTab_SelView");
+                    var viewGUID;
+                    if (selectView.selectedIndex >= 0) {
+                        var selectedItem = selectView.options[selectView.selectedIndex];
+                        viewGUID = selectedItem.value;
+                    }
 
-	            case "AnalyzerTab_ShowBars_Click":
-	                this.AnalyzerShowBarschecked = !this.AnalyzerShowBarschecked;
-	                grid = Grids["g_1"];
-	                if (this.AnalyzerShowBarschecked == true) {
-	                    this.viewTab.setButtonStateOn("idAnalyzerShowBars");
-	                } else {
-	                    this.viewTab.setButtonStateOff("idAnalyzerShowBars");
-	                }
+                    var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(renameViewName) + '" />';
+                    var sbd = new StringBuilder();
+                    sbd.append('<Execute Function="RenameResourcePlanAnalyzerView">');
+                    sbd.append(dataXml);
+                    sbd.append('</Execute>');
 
-	                grid.Render();
-	                //this.topgridstash = this.BuildViewInf("guid", "name", false, false, true);
-	                //RefreshTopGrid();
-	                break;
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("RenameResourceAnalyzerView", sbd.toString(), RenameResourceAnalyzerViewCompleteDelegate);
+                    break;
 
+                case "SaveView_Cancel":
+                case "RenameView_Cancel":
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(false);
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").hide();
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
+                    this.AnalyzerViewDlg = null;
+                    break;
 
-	            case "AnalyzerTab_HideDetails_Click":
+                case "DeleteView_Cancel":
+                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setModal(false);
+                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").hide();
+                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").detachObject()
+                    this.AnalyzerDeleteViewDlg = null;
+                    break;
 
 
-	                this.FlashTopGridHideDetails();
+                case "AnalyzerTab_Close":
+                    if (parent.SP.UI.DialogResult)
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                    else
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                    return;
 
-	                if (this.AnalyzerHideDetailschecked == true) {
-	                    this.viewTab.setButtonStateOn("idAnalyzerHideDetails");
-	                } else {
-	                    this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
-	                }
+                case "EditResPlan":
 
-	                break;
+                    if (this.params.RPEMode == 1)
+                        break;
 
+                    this.EditResPlan();
+                    break;
 
-	            case "AnalyzerTab_CapScen":
 
-	                this.SelectedCapScen = 0;
-	                this.CSChanged = false;
+                case "AnalyzerTab_SelectColumns":
+                    grid = Grids["g_1"];
+                    grid.ActionShowColumns('Selectable');
+                    break;
 
-	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
+                case "AnalyzerTab_ExpandAll":
+                    grid = Grids["g_1"];
+                    var bExall = grid.ExpandAll(null, 0, 3);
+                    break;
 
-	                break;
+                case "AnalyzerTab_CollapseAll":
+                    grid = Grids["g_1"];
+                    grid.CollapseAll();
+                    break;
 
-	            case "TotalsTab_GridHelpBtn":
-	                this.DisplayGridExplaination();
-	                break;
+                case "AnalyzerTab_Details_Changed":
+                    this.SelectDetails_OKOnClick();
 
-	            case "TotalsTab_ExporttoExcel":
-	                grid = Grids["bottomg_1"];
-	                grid.Source.Export.Type = "xls";
-	                grid.ActionExport();
-	                break;
+                case "AnalyzerTab_DetailsCanceled":
+                    this.SetDetails.window("winDetDlg").detachObject()
+                    this.SetDetails.window("winDetDlg").close();
+                    this.SetDetails = null;
+                    break;
 
-	            case "TotalsTab_TarLegBtn":
-	                this.ShowLegend();
-	                break;
+                case "AnalyzerTab_SelMode_Changed":
+                    this.SetSelectedMode(null);
+                    RefreshBothGrids();
+                    break;
 
-	            case "TargetLegend_OKOnClick":
-	                this.dlgShowLegend.window("winShowLegDlg").detachObject()
-	                this.dlgShowLegend.window("winShowLegDlg").close();
-	                this.dlgShowLegend = null;
+                case "AnalyzerTab_ExporttoExcel":
+                    grid = Grids["g_1"];
+                    grid.Source.Export.Type = "xls";
+                    grid.ActionExport();
+                    break;
 
-	                this.LegendGrid.Dispose();
-	                this.LegendGrid = null;
-	                break;
+                case "AnalyzerTab_Print":
+                    grid = Grids["g_1"];
+                    grid.ActionPrint();
+                    break;
 
-	            case "SelectCalendar_Change":
-	                this.SelectCalendar_Change();
-	                break;
+                case "TotalTab_Print":
+                    grid = Grids["bottomg_1"];
+                    grid.ActionPrint();
+                    break;
 
-	            case "Display_RPA":
-	                this.SelectFiscalDlg_OKOnClick(0);
-	                break;
 
 
-	            case "Cancel_RPA":
-	                this.SelectFiscalDlg_OKOnClick(1);
-	                break;
+                case "AnalyzerTab_RemoveSorting_Click":
+                    grid = Grids["g_1"];
 
-	            case "TotalsTab_SelectTotalColumns":
-	                this.TotGrid.SelectAllRows(0);
 
-	                this.GetTotals();
-	                break;
+                    grid.ChangeSort("rowid");
+                    grid.SortRows();
+                    grid.Render();
 
-	            case "TotalColOK_Click":
-	                this.TotGrid.SelectAllRows(0);
-	                this.SelectTotals_OKOnClick(1);
-	                break;
+                    grid.ChangeSort("");
 
+                    break;
 
-	            case "TotalColCancel_Click":
-	                this.SelectTotals_OKOnClick(0);
-	                break;
+                case "AnalyzerTab_ShowBars_Click":
+                    this.AnalyzerShowBarschecked = !this.AnalyzerShowBarschecked;
+                    grid = Grids["g_1"];
+                    if (this.AnalyzerShowBarschecked == true) {
+                        this.viewTab.setButtonStateOn("idAnalyzerShowBars");
+                    } else {
+                        this.viewTab.setButtonStateOff("idAnalyzerShowBars");
+                    }
 
-	            case "TotalByRes_Click":
-	                if (this.TotalsLoading == true)
-	                    return;
+                    grid.Render();
+                    //this.topgridstash = this.BuildViewInf("guid", "name", false, false, true);
+                    //RefreshTopGrid();
+                    break;
 
-	                var rbtotByRole = document.getElementById('idTotalsByRole');
-	                var rbtotByRes = document.getElementById('idTotalsByRes');
 
-	                rbtotByRole.checked = false;
-	                rbtotByRes.checked = true;
+                case "AnalyzerTab_HideDetails_Click":
 
-	                var answer = confirm("All Capacity Scenario Total Columns will be removed from the view because Capacity Scenarios require the grid to be grouped by Role");
-	                if (!answer) {
-	                    rbtotByRole.checked = true;
-	                    rbtotByRes.checked = false;
-	                    return;
-	                }
 
-	                window.setTimeout(this.FinishTotalsDelegate, 10);
+                    this.FlashTopGridHideDetails();
 
-	                break;
+                    if (this.AnalyzerHideDetailschecked == true) {
+                        this.viewTab.setButtonStateOn("idAnalyzerHideDetails");
+                    } else {
+                        this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
+                    }
 
-	            case "TotalByRole_Click":
-	                if (this.TotalsLoading == true)
-	                    return;
+                    break;
 
-	                var rbtotByRole = document.getElementById('idTotalsByRole');
-	                var rbtotByRes = document.getElementById('idTotalsByRes');
-	                rbtotByRole.checked = true;
-	                rbtotByRes.checked = false;
 
-	                window.setTimeout(this.FinishTotalsDelegate, 10);
+                case "AnalyzerTab_CapScen":
 
-	                break;
+                    this.SelectedCapScen = 0;
+                    this.CSChanged = false;
 
-	            case "TotalHeatMap_Click":
-	                if (this.TotalsLoading == true)
-	                    return;
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
 
+                    break;
 
-	                var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
-	                var selHeatMap = document.getElementById('idSelHeatmap');
-	                var selHeatMapColour = document.getElementById('idSelHeatmapColour');
-	                selHeatMap.disabled = !chkEnableHeatMap.checked;
-	                selHeatMapColour.disabled = !chkEnableHeatMap.checked;
+                case "TotalsTab_GridHelpBtn":
+                    this.DisplayGridExplaination();
+                    break;
 
-	                break;
+                case "TotalsTab_ExporttoExcel":
+                    grid = Grids["bottomg_1"];
+                    grid.Source.Export.Type = "xls";
+                    grid.ActionExport();
+                    break;
 
-	            case "TotalAddCol_Click":
-	                if (this.addbtndisabled != true)
-	                    this.TotalsCols_ButtonClick(0);
+                case "TotalsTab_TarLegBtn":
+                    this.ShowLegend();
+                    break;
 
-	                break;
+                case "TargetLegend_OKOnClick":
+                    this.dlgShowLegend.window("winShowLegDlg").detachObject()
+                    this.dlgShowLegend.window("winShowLegDlg").close();
+                    this.dlgShowLegend = null;
 
-	            case "TotalRemoveCol_Click":
+                    this.LegendGrid.Dispose();
+                    this.LegendGrid = null;
+                    break;
 
-	                if (this.rembtndisabled != true)
-	                    this.TotalsCols_ButtonClick(1);
+                case "SelectCalendar_Change":
+                    this.SelectCalendar_Change();
+                    break;
 
-	                break;
+                case "Display_RPA":
+                    this.SelectFiscalDlg_OKOnClick(0);
+                    break;
 
-	            case "TotalEnableAdd":
-	                var selAvail = document.getElementById('idSelTotAvailCols');
 
+                case "Cancel_RPA":
+                    this.SelectFiscalDlg_OKOnClick(1);
+                    break;
 
-	                this.addbtndisabled = false;
-	                this.setNewButtonDisable('idTotButtonAdd', false);
+                case "TotalsTab_SelectTotalColumns":
+                    this.TotGrid.SelectAllRows(0);
 
+                    this.GetTotals();
+                    break;
 
-	                for (i = 0; i <= selAvail.options.length - 1; i++) {
+                case "TotalColOK_Click":
+                    this.TotGrid.SelectAllRows(0);
+                    this.SelectTotals_OKOnClick(1);
+                    break;
 
-	                    if (selAvail.options[i].selected == true) {
-	                        this.TotAddSel = selAvail.options[i].value;
-	                        break;
-	                    }
-	                }
 
-	                break;
+                case "TotalColCancel_Click":
+                    this.SelectTotals_OKOnClick(0);
+                    break;
 
-	            case "TotalEnableRemove":
-	                var selSelected = document.getElementById('idSelSelectedCols');
-	                var selival = 0;
+                case "TotalByRes_Click":
+                    if (this.TotalsLoading == true)
+                        return;
 
-	                for (i = 0; i <= selSelected.options.length; i++) {
+                    var rbtotByRole = document.getElementById('idTotalsByRole');
+                    var rbtotByRes = document.getElementById('idTotalsByRes');
 
-	                    if (selSelected.options[i].selected == true) {
-	                        selival = i;
-	                        this.TotRemSel = selSelected.options[i].value;
+                    rbtotByRole.checked = false;
+                    rbtotByRes.checked = true;
 
-	                        this.rembtndisabled = (selSelected.options[i].value == 0);
-	                        this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
-	                        break;
-	                    }
-	                }
+                    var answer = confirm("All Capacity Scenario Total Columns will be removed from the view because Capacity Scenarios require the grid to be grouped by Role");
+                    if (!answer) {
+                        rbtotByRole.checked = true;
+                        rbtotByRes.checked = false;
+                        return;
+                    }
 
-	                var moveupbtn = document.getElementById('idSelectedColsMoveUp');
-	                var movedownbtn = document.getElementById('idSelectedColsMoveDown');
+                    window.setTimeout(this.FinishTotalsDelegate, 10);
 
-	                if (selSelected.options.length <= 1) {
-	                    moveupbtn.disabled = true;
-	                    movedownbtn.disabled = true;
-	                }
-	                else {
-	                    moveupbtn.disabled = false;
-	                    movedownbtn.disabled = false;
-	                }
+                    break;
 
-	                if (selival == 0)
-	                    moveupbtn.disabled = true;
-	                else if (selival = (selSelected.options.length - 1))
-	                    movedownbtn.disabled = true;
+                case "TotalByRole_Click":
+                    if (this.TotalsLoading == true)
+                        return;
 
-	                break;
+                    var rbtotByRole = document.getElementById('idTotalsByRole');
+                    var rbtotByRes = document.getElementById('idTotalsByRes');
+                    rbtotByRole.checked = true;
+                    rbtotByRes.checked = false;
 
-	            case "TotalSelectMoveUp":
+                    window.setTimeout(this.FinishTotalsDelegate, 10);
 
-	                this.TotalsSelColsMove_ButtonClick(1);
-	                break;
+                    break;
 
-	            case "TotalSelectMoveDown":
+                case "TotalHeatMap_Click":
+                    if (this.TotalsLoading == true)
+                        return;
 
-	                this.TotalsSelColsMove_ButtonClick(0);
-	                break;
 
-	            case "TotalsTab_SelectColumns":
-	                grid = Grids["bottomg_1"];
-	                grid.ActionShowColumns('Selectable');
-	                break;
-	                break;
+                    var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+                    var selHeatMap = document.getElementById('idSelHeatmap');
+                    var selHeatMapColour = document.getElementById('idSelHeatmapColour');
+                    selHeatMap.disabled = !chkEnableHeatMap.checked;
+                    selHeatMapColour.disabled = !chkEnableHeatMap.checked;
 
-	            case "TotalsTab_ShowFilters_Click":
-	                try {
+                    break;
 
+                case "TotalAddCol_Click":
+                    if (this.addbtndisabled != true)
+                        this.TotalsCols_ButtonClick(0);
 
-	                    this.TotalFilterschecked = !this.TotalFilterschecked;
-	                    grid = Grids["bottomg_1"];
-	                    if (this.TotalFilterschecked == true) {
-	                        this.showFilters(grid);
-	                    } else {
-	                        this.hideFilters(grid);
-	                    }
-	                }
-	                catch (e) {
-	                }
+                    break;
 
-	                break;
+                case "TotalRemoveCol_Click":
 
-	            case "TotalsTab_ShowGrouping_Click":
-	                this.TotalGroupingchecked = !this.TotalGroupingchecked;
-	                grid = Grids["bottomg_1"];
-	                if (this.TotalGroupingchecked == true) {
-	                    this.showGrouping(grid);
-	                } else {
-	                    this.hideGrouping(grid);
-	                }
-	                grid.Render();
-	                break;
+                    if (this.rembtndisabled != true)
+                        this.TotalsCols_ButtonClick(1);
 
+                    break;
 
-	            case "TotalsTab_ExpandAll":
-	                grid = Grids["bottomg_1"];
-	                var bExall = grid.ExpandAll(null, 0, 3);
-	                break;
+                case "TotalEnableAdd":
+                    var selAvail = document.getElementById('idSelTotAvailCols');
 
-	            case "TotalsTab_CollapseAll":
-	                grid = Grids["bottomg_1"];
-	                grid.CollapseAll();
-	                break;
 
-	            case "TotalsTab_RemoveSorting_Click":
-	                grid = Grids["bottomg_1"];
+                    this.addbtndisabled = false;
+                    this.setNewButtonDisable('idTotButtonAdd', false);
 
 
-	                grid.ChangeSort("rowid");
-	                grid.SortRows();
-	                grid.Render();
+                    for (i = 0; i <= selAvail.options.length - 1; i++) {
 
-	                grid.ChangeSort("");
+                        if (selAvail.options[i].selected == true) {
+                            this.TotAddSel = selAvail.options[i].value;
+                            break;
+                        }
+                    }
 
-	                break;
+                    break;
 
-	            case "DeleteView_OK":
+                case "TotalEnableRemove":
+                    var selSelected = document.getElementById('idSelSelectedCols');
+                    var selival = 0;
 
+                    for (i = 0; i <= selSelected.options.length; i++) {
 
-	                var selectView = document.getElementById("idAnalyzerTab_SelView");
-	                if (selectView.selectedIndex >= 0) {
-	                    var selectedItem = selectView.options[selectView.selectedIndex];
-	                    var deleteViewGuid = selectedItem.value;
-	                    var sbd = new StringBuilder();
-	                    sbd.append('<Execute Function="DeleteResourceAnalyzerView">');
-	                    sbd.append('<View ViewGUID="' + XMLValue(deleteViewGuid) + '" />');
-	                    sbd.append('</Execute>');
+                        if (selSelected.options[i].selected == true) {
+                            selival = i;
+                            this.TotRemSel = selSelected.options[i].value;
 
-	                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("DeleteResourceAnalyzerView", sbd.toString(), DeleteResourceAnalyzerViewCompleteDelegate);
-	                }
-	                break;
+                            this.rembtndisabled = (selSelected.options[i].value == 0);
+                            this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
+                            break;
+                        }
+                    }
 
+                    var moveupbtn = document.getElementById('idSelectedColsMoveUp');
+                    var movedownbtn = document.getElementById('idSelectedColsMoveDown');
 
-	            case "SaveScenOK_Click":
-	                var sscen = document.getElementById("idSaveScenText").value;
+                    if (selSelected.options.length <= 1) {
+                        moveupbtn.disabled = true;
+                        movedownbtn.disabled = true;
+                    }
+                    else {
+                        moveupbtn.disabled = false;
+                        movedownbtn.disabled = false;
+                    }
 
+                    if (selival == 0)
+                        moveupbtn.disabled = true;
+                    else if (selival = (selSelected.options.length - 1))
+                        movedownbtn.disabled = true;
 
-	                sscen = sscen.replace(/^\s+|\s+$/g, "");
+                    break;
 
+                case "TotalSelectMoveUp":
 
-	                if (sscen == "") {
-	                    alert("You need to ender a Scenario name to save the data to");
-	                    return;
+                    this.TotalsSelColsMove_ButtonClick(1);
+                    break;
 
-	                }
+                case "TotalSelectMoveDown":
 
-	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveCurrentToScenario", sscen, RefreshBottomGrid);
+                    this.TotalsSelColsMove_ButtonClick(0);
+                    break;
 
+                case "TotalsTab_SelectColumns":
+                    grid = Grids["bottomg_1"];
+                    grid.ActionShowColumns('Selectable');
+                    break;
+                    break;
 
-	            case "SaveScenCan_Click":
+                case "TotalsTab_ShowFilters_Click":
+                    try {
 
-	                this.SaveScenDlg.window("winSaveScenDlg").detachObject();
-	                this.SaveScenDlg.window("winSaveScenDlg").close();
-	                this.SaveScenDlg = null;
 
-	                //                    if (event == "SaveScenOK_Click")
-	                //                        RefreshBottomGrid();
+                        this.TotalFilterschecked = !this.TotalFilterschecked;
+                        grid = Grids["bottomg_1"];
+                        if (this.TotalFilterschecked == true) {
+                            this.showFilters(grid);
+                        } else {
+                            this.hideFilters(grid);
+                        }
+                    }
+                    catch (e) {
+                    }
 
-	                break;
+                    break;
 
-	            case "CapScenDone_Click":
+                case "TotalsTab_ShowGrouping_Click":
+                    this.TotalGroupingchecked = !this.TotalGroupingchecked;
+                    grid = Grids["bottomg_1"];
+                    if (this.TotalGroupingchecked == true) {
+                        this.showGrouping(grid);
+                    } else {
+                        this.hideGrouping(grid);
+                    }
+                    grid.Render();
+                    break;
 
-	                this.CapScenDlg.window("winCapScenDlg").detachObject();
-	                this.CapScenDlg.window("winCapScenDlg").close();
-	                this.CapScenDlg = null;
 
-	                if (this.CSChanged == true)
-	                    RefreshBottomGrid();
+                case "TotalsTab_ExpandAll":
+                    grid = Grids["bottomg_1"];
+                    var bExall = grid.ExpandAll(null, 0, 3);
+                    break;
 
-	                break;
+                case "TotalsTab_CollapseAll":
+                    grid = Grids["bottomg_1"];
+                    grid.CollapseAll();
+                    break;
 
-	            case "CapScenSel":
-	                this.idCapScenEdit_disabled = false;
-	                this.idCapScenDel_disabled = false;
-	                this.idCapScenCopy_disabled = false;
+                case "TotalsTab_RemoveSorting_Click":
+                    grid = Grids["bottomg_1"];
 
-	                this.setNewButtonDisable('idCapScenCopy', this.idCapScenCopy_disabled);
-	                this.setNewButtonDisable('idCapScenEdit', this.idCapScenEdit_disabled);
-	                this.setNewButtonDisable('idCapScenDel', this.idCapScenDel_disabled);
-	                break;
 
+                    grid.ChangeSort("rowid");
+                    grid.SortRows();
+                    grid.Render();
 
+                    grid.ChangeSort("");
 
-	            case "SaveScenSel":
-	                var select = document.getElementById("idSaveScenSel");
+                    break;
 
-	                var selectedItem = select.options[select.selectedIndex];
+                case "DeleteView_OK":
 
-	                document.getElementById("idSaveScenText").value = selectedItem.text;
 
-	                break;
+                    var selectView = document.getElementById("idAnalyzerTab_SelView");
+                    if (selectView.selectedIndex >= 0) {
+                        var selectedItem = selectView.options[selectView.selectedIndex];
+                        var deleteViewGuid = selectedItem.value;
+                        var sbd = new StringBuilder();
+                        sbd.append('<Execute Function="DeleteResourceAnalyzerView">');
+                        sbd.append('<View ViewGUID="' + XMLValue(deleteViewGuid) + '" />');
+                        sbd.append('</Execute>');
 
-	            case "CapScenNew_Click":
-	                this.SelectedCapScen = -1;
-	                this.EditCapScen = -1;
-	                this.CapScenDlg.window("winCapScenDlg").detachObject();
-	                this.CapScenDlg.window("winCapScenDlg").close();
-	                this.CapScenDlg = null;
+                        WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("DeleteResourceAnalyzerView", sbd.toString(), DeleteResourceAnalyzerViewCompleteDelegate);
+                    }
+                    break;
 
-	                document.getElementById("idTxtCapScenName").value = "New Capacity Scenario";
 
-	                window.setTimeout(this.CapScenCreateNewDelegate, 100);
+                case "SaveScenOK_Click":
+                    var sscen = document.getElementById("idSaveScenText").value;
 
-	                break;
 
+                    sscen = sscen.replace(/^\s+|\s+$/g, "");
 
-	            case "CapScenCopy_Click":
 
-	                if (this.idCapScenCopy_disabled == true)
-	                    return;
+                    if (sscen == "") {
+                        alert("You need to ender a Scenario name to save the data to");
+                        return;
 
-	                var select = document.getElementById("idSelectCapScen");
-	                this.SelectedCapScen = select.value;
-	                this.EditCapScen = -1;
+                    }
 
-	                var selectedItem = select.options[select.selectedIndex];
-	                this.CapScenDlg.window("winCapScenDlg").detachObject();
-	                this.CapScenDlg.window("winCapScenDlg").close();
-	                this.CapScenDlg = null;
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveCurrentToScenario", sscen, RefreshBottomGrid);
 
 
+                case "SaveScenCan_Click":
 
+                    this.SaveScenDlg.window("winSaveScenDlg").detachObject();
+                    this.SaveScenDlg.window("winSaveScenDlg").close();
+                    this.SaveScenDlg = null;
 
-	                document.getElementById("idTxtCapScenName").value = "Copy of " + selectedItem.text;
-	                window.setTimeout(this.CapScenCreateCopyDelegate, 100);
-	                break;
+                    //                    if (event == "SaveScenOK_Click")
+                    //                        RefreshBottomGrid();
 
-	            case "CapScenEdit_Click":
+                    break;
 
-	                if (this.idCapScenEdit_disabled == true)
-	                    return;
+                case "CapScenDone_Click":
 
-	                var select = document.getElementById("idSelectCapScen");
-	                this.SelectedCapScen = select.value;
-	                this.EditCapScen = select.value;
+                    this.CapScenDlg.window("winCapScenDlg").detachObject();
+                    this.CapScenDlg.window("winCapScenDlg").close();
+                    this.CapScenDlg = null;
 
-	                var selectedItem = select.options[select.selectedIndex];
+                    if (this.CSChanged == true)
+                        RefreshBottomGrid();
 
+                    break;
 
-	                this.CapScenDlg.window("winCapScenDlg").detachObject();
-	                this.CapScenDlg.window("winCapScenDlg").close();
-	                this.CapScenDlg = null;
+                case "CapScenSel":
+                    this.idCapScenEdit_disabled = false;
+                    this.idCapScenDel_disabled = false;
+                    this.idCapScenCopy_disabled = false;
 
+                    this.setNewButtonDisable('idCapScenCopy', this.idCapScenCopy_disabled);
+                    this.setNewButtonDisable('idCapScenEdit', this.idCapScenEdit_disabled);
+                    this.setNewButtonDisable('idCapScenDel', this.idCapScenDel_disabled);
+                    break;
 
-	                this.SelectedCapScenText = selectedItem.text;
 
-	                window.setTimeout(this.GoDoEditDelegate, 100);
 
-	                //this.GoDoEdit(this.SelectedCapScen, selectedItem.text);
+                case "SaveScenSel":
+                    var select = document.getElementById("idSaveScenSel");
 
+                    var selectedItem = select.options[select.selectedIndex];
 
-	                break;
+                    document.getElementById("idSaveScenText").value = selectedItem.text;
 
-	            case "SaveCS_OK":
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(false);
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").hide();
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
-	                this.AnalyzerViewDlg = null;
+                    break;
 
-	                this.SelectedCapScenText = document.getElementById("idTxtCapScenName").value;
+                case "CapScenNew_Click":
+                    this.SelectedCapScen = -1;
+                    this.EditCapScen = -1;
+                    this.CapScenDlg.window("winCapScenDlg").detachObject();
+                    this.CapScenDlg.window("winCapScenDlg").close();
+                    this.CapScenDlg = null;
 
-	                window.setTimeout(this.GoDoEditDelegate, 100);
-	                //      this.GoDoEdit(this.SelectedCapScen, document.getElementById("idTxtCapScenName").value);
-	                break;
+                    document.getElementById("idTxtCapScenName").value = "New Capacity Scenario";
 
-	            //  call webservice to edit                                                                     
+                    window.setTimeout(this.CapScenCreateNewDelegate, 100);
 
+                    break;
 
 
-	            case "CapScenRemove_Click":
-	                if (this.idCapScenDel_disabled == true)
-	                    return;
+                case "CapScenCopy_Click":
 
-	                this.CSChanged = true;
+                    if (this.idCapScenCopy_disabled == true)
+                        return;
 
-	                var select = document.getElementById("idSelectCapScen");
+                    var select = document.getElementById("idSelectCapScen");
+                    this.SelectedCapScen = select.value;
+                    this.EditCapScen = -1;
 
-	                for (i = 0; i <= select.options.length - 1; i++) {
+                    var selectedItem = select.options[select.selectedIndex];
+                    this.CapScenDlg.window("winCapScenDlg").detachObject();
+                    this.CapScenDlg.window("winCapScenDlg").close();
+                    this.CapScenDlg = null;
 
-	                    if (select.options[i].selected == true) {
-	                        var iDelCapScen = select.options[i].value;
 
-	                        if (select.options.length == 1) {
-	                            this.idCapScenEdit_disabled = true;
-	                            this.idCapScenDel_disabled = true;
-	                            this.idCapScenCopy_disabled = true;
 
-	                            this.setNewButtonDisable('idCapScenCopy', this.idCapScenCopy_disabled);
-	                            this.setNewButtonDisable('idCapScenEdit', this.idCapScenEdit_disabled);
-	                            this.setNewButtonDisable('idCapScenDel', this.idCapScenDel_disabled);
 
-	                        }
-	                        else if (i == select.options.length - 1)
-	                            select.options[i - 1].selected = true;
-	                        else
-	                            select.options[i + 1].selected = true;
+                    document.getElementById("idTxtCapScenName").value = "Copy of " + selectedItem.text;
+                    window.setTimeout(this.CapScenCreateCopyDelegate, 100);
+                    break;
 
+                case "CapScenEdit_Click":
 
-	                        WorkEnginePPM.ResPlanAnalyzer.Execute("DeleteCapacityScenario", iDelCapScen);
-	                        // call webserveice to delete Cap Scen
-	                        select.remove(i);
-	                        break;
-	                    }
-	                }
+                    if (this.idCapScenEdit_disabled == true)
+                        return;
 
+                    var select = document.getElementById("idSelectCapScen");
+                    this.SelectedCapScen = select.value;
+                    this.EditCapScen = select.value;
 
-	                break;
+                    var selectedItem = select.options[select.selectedIndex];
 
-	            case "SaveCS_Cancel":
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(false);
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").hide();
-	                this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
-	                this.AnalyzerViewDlg = null;
 
-	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
+                    this.CapScenDlg.window("winCapScenDlg").detachObject();
+                    this.CapScenDlg.window("winCapScenDlg").close();
+                    this.CapScenDlg = null;
 
-	                break;
 
-	            case "CSEdit_Save":
-	                this.CSChanged = true;
-	                this.SaveCapScenData();
+                    this.SelectedCapScenText = selectedItem.text;
 
-	                break;
+                    window.setTimeout(this.GoDoEditDelegate, 100);
 
-	            case "CSEdit_Close":
+                    //this.GoDoEdit(this.SelectedCapScen, selectedItem.text);
 
 
-	                this.dlgEditTarget.window("winEditTargetDlg").setModal(false);
-	                this.dlgEditTarget.window("winEditTargetDlg").hide();
-	                this.dlgEditTarget.window("winEditTargetDlg").detachObject();
-	                this.dlgEditTarget = null;
+                    break;
 
+                case "SaveCS_OK":
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(false);
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").hide();
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
+                    this.AnalyzerViewDlg = null;
 
-	                this.EditGrid.Dispose();
-	                this.EditGrid = null;
+                    this.SelectedCapScenText = document.getElementById("idTxtCapScenName").value;
 
-	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
+                    window.setTimeout(this.GoDoEditDelegate, 100);
+                    //      this.GoDoEdit(this.SelectedCapScen, document.getElementById("idTxtCapScenName").value);
+                    break;
 
-	                break;
+                    //  call webservice to edit                                                                     
 
-	            case "CSEdit_SelMode_Changed":
 
-	                if (this.dlgSpreadDlg != null) {
-	                    this.dlgSpreadDlg.window("winSpreadDlg").setModal(false);
-	                    this.dlgSpreadDlg.window("winSpreadDlg").hide();
-	                    this.dlgSpreadDlg.window("winSpreadDlg").detachObject();
-	                    this.dlgSpreadDlg = null;
-	                }
-	                this.CSHourMode = (this.CSHourMode == false);
 
-	                this.RedrawCSGrid();
+                case "CapScenRemove_Click":
+                    if (this.idCapScenDel_disabled == true)
+                        return;
 
+                    this.CSChanged = true;
 
+                    var select = document.getElementById("idSelectCapScen");
 
-	                break;
+                    for (i = 0; i <= select.options.length - 1; i++) {
 
-	            case "CSEdit_Spread":
-	                this.GoDoSpread();
-	                break;
+                        if (select.options[i].selected == true) {
+                            var iDelCapScen = select.options[i].value;
 
-	            case "CSEdit_LoadUp":
-	                this.GoDoLoadUp();
-	                break;
+                            if (select.options.length == 1) {
+                                this.idCapScenEdit_disabled = true;
+                                this.idCapScenDel_disabled = true;
+                                this.idCapScenCopy_disabled = true;
 
+                                this.setNewButtonDisable('idCapScenCopy', this.idCapScenCopy_disabled);
+                                this.setNewButtonDisable('idCapScenEdit', this.idCapScenEdit_disabled);
+                                this.setNewButtonDisable('idCapScenDel', this.idCapScenDel_disabled);
 
-	            case "spreadDlg_Close":
+                            }
+                            else if (i == select.options.length - 1)
+                                select.options[i - 1].selected = true;
+                            else
+                                select.options[i + 1].selected = true;
 
 
-	                this.dlgSpreadDlg.window("winSpreadDlg").setModal(false);
-	                this.dlgSpreadDlg.window("winSpreadDlg").hide();
-	                this.dlgSpreadDlg.window("winSpreadDlg").detachObject();
-	                this.dlgSpreadDlg = null;
+                            WorkEnginePPM.ResPlanAnalyzer.Execute("DeleteCapacityScenario", iDelCapScen);
+                            // call webserveice to delete Cap Scen
+                            select.remove(i);
+                            break;
+                        }
+                    }
 
-	                break;
 
-	            case "spreadDlg_Apply":
-	                this.spreadDlg_Apply();
-	                break;
+                    break;
 
-	            case "GridExplain_OKOnClick":
-	                this.dlgShowGridEx.window("winGridExDlg").setModal(false);
-	                this.dlgShowGridEx.window("winGridExDlg").hide();
-	                this.dlgShowGridEx.window("winGridExDlg").detachObject();
-	                this.dlgShowGridEx = null;
-	                break;
+                case "SaveCS_Cancel":
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(false);
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").hide();
+                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").detachObject()
+                    this.AnalyzerViewDlg = null;
 
-	            default:
-	                alert("unhandled external event - " + event);
-	                break;
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
 
+                    break;
 
-	        }
-	    }
+                case "CSEdit_Save":
+                    this.CSChanged = true;
+                    this.SaveCapScenData();
 
-	    catch (e) {
-	        this.HandleException("externalEvent", e);
-	    }
+                    break;
 
-	}
+                case "CSEdit_Close":
 
-//  <<<< Filters>>>>
 
-	ResPlanAnalyzer.prototype.showFilters = function (grid) {
-	    try {
-	        grid.ShowRow(grid.GetRowById("Filter"));
+                    this.dlgEditTarget.window("winEditTargetDlg").setModal(false);
+                    this.dlgEditTarget.window("winEditTargetDlg").hide();
+                    this.dlgEditTarget.window("winEditTargetDlg").detachObject();
+                    this.dlgEditTarget = null;
 
-	        switch (grid.id) {
-	        case "g_1":
-	            this.AnalyzerFilterschecked = true;
-	            this.viewTab.setButtonStateOn("idAnalyzerShowFilters");
 
-	            break;
-	        case "bottomg_1":
-	            this.TotalFilterschecked = true;
-	            this.totTab.setButtonStateOn("idTotTab_ShowFilters");
+                    this.EditGrid.Dispose();
+                    this.EditGrid = null;
 
-	            break;
-	        }
-	        var htt;
-	        var htb;
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", GetCapacityScenarioListCompleteDelegate);
 
-	        htt = this.layout.cells(this.mainArea).getHeight();
-	        htb = this.layout_totals.cells(this.totalsGridArea).getHeight();
+                    break;
 
-	        this.layout_totals.cells(this.totalsGridArea).setHeight(100);
-	        this.layout.cells(this.mainArea).setHeight(htt / 2);
+                case "CSEdit_SelMode_Changed":
 
+                    if (this.dlgSpreadDlg != null) {
+                        this.dlgSpreadDlg.window("winSpreadDlg").setModal(false);
+                        this.dlgSpreadDlg.window("winSpreadDlg").hide();
+                        this.dlgSpreadDlg.window("winSpreadDlg").detachObject();
+                        this.dlgSpreadDlg = null;
+                    }
+                    this.CSHourMode = (this.CSHourMode == false);
 
-	        this.layout_totals.cells(this.totalsGridArea).setHeight(htb);
-	        this.layout.cells(this.mainArea).setHeight(htt);
-	    }
-	    catch (e)
-	    {
-	        
-	    }
+                    this.RedrawCSGrid();
 
-	}
 
 
-	ResPlanAnalyzer.prototype.FlashTopGridHideDetails = function () {
-	    var grid = Grids["g_1"];
+                    break;
 
+                case "CSEdit_Spread":
+                    this.GoDoSpread();
+                    break;
 
-	    var arows = grid.Rows;
-	    var row = null;
+                case "CSEdit_LoadUp":
+                    this.GoDoLoadUp();
+                    break;
 
-	    for (var r in arows) {
-	        var xrow = arows[r];
 
-	        if (xrow.Kind == "Data") {
-	            if (xrow.firstChild != null) {
-	                row = xrow;
-	                break;
-	            }
+                case "spreadDlg_Close":
 
-	        }
-	    }
 
-	    if (row == null) {
+                    this.dlgSpreadDlg.window("winSpreadDlg").setModal(false);
+                    this.dlgSpreadDlg.window("winSpreadDlg").hide();
+                    this.dlgSpreadDlg.window("winSpreadDlg").detachObject();
+                    this.dlgSpreadDlg = null;
 
-	        grid.DoFilter(null, null);
-	        this.AnalyzerHideDetailschecked = false;
-	        for (var r in arows) {
-	            var yrow = arows[r];
+                    break;
 
-	            if (yrow.Kind == "Data") {
+                case "spreadDlg_Apply":
+                    this.spreadDlg_Apply();
+                    break;
 
-	                if (this.CheckIfRowFiltered(grid, yrow))
-	                    grid.ShowRow(yrow);
-	            }
-	        }
-	        return;
-	    }
+                case "GridExplain_OKOnClick":
+                    this.dlgShowGridEx.window("winGridExDlg").setModal(false);
+                    this.dlgShowGridEx.window("winGridExDlg").hide();
+                    this.dlgShowGridEx.window("winGridExDlg").detachObject();
+                    this.dlgShowGridEx = null;
+                    break;
 
-	    if (row.firstChild == null) {
+                default:
+                    alert("unhandled external event - " + event);
+                    break;
 
-	        grid.DoFilter(null, null);
-	        this.AnalyzerHideDetailschecked = false;
-	        for (var r in arows) {
-	            var zrow = arows[r];
 
-	            if (zrow.Kind == "Data") {
-	                if (this.CheckIfRowFiltered(grid, zrow))
-	                    grid.ShowRow(zrow);
-	            }
+            }
+        }
 
+        catch (e) {
+            this.HandleException("externalEvent", e);
+        }
 
-	        }
-	        return;
-	    }
+    }
 
-	    this.AnalyzerHideDetailschecked = !this.AnalyzerHideDetailschecked;
+    //  <<<< Filters>>>>
 
+    ResPlanAnalyzer.prototype.showFilters = function (grid) {
+        try {
+            grid.ShowRow(grid.GetRowById("Filter"));
 
-	    var fc = null;
+            switch (grid.id) {
+                case "g_1":
+                    this.AnalyzerFilterschecked = true;
+                    this.viewTab.setButtonStateOn("idAnalyzerShowFilters");
 
-	    if (this.AnalyzerHideDetailschecked == true) {
-	        for (var r in arows) {
-	            row = arows[r];
+                    break;
+                case "bottomg_1":
+                    this.TotalFilterschecked = true;
+                    this.totTab.setButtonStateOn("idTotTab_ShowFilters");
 
-	            if (row.Kind == "Data") {
-	                fc = row.firstChild;
+                    break;
+            }
+            var htt;
+            var htb;
 
-	                if (fc == null)
-	                    grid.HideRow(row);
-	            }
-	        }
-	    } else {
+            htt = this.layout.cells(this.mainArea).getHeight();
+            htb = this.layout_totals.cells(this.totalsGridArea).getHeight();
 
-	        grid.DoFilter(null, null);
-	        for (var r in arows) {
-	            row = arows[r];
+            this.layout_totals.cells(this.totalsGridArea).setHeight(100);
+            this.layout.cells(this.mainArea).setHeight(htt / 2);
 
-	            if (row.Kind == "Data") {
-	                fc = row.firstChild;
 
-	                if (fc == null) {
-	                    if (this.CheckIfRowFiltered(grid, row))
-	                        grid.ShowRow(row);
-	                }
-	                   
-	            }
-	        }
+            this.layout_totals.cells(this.totalsGridArea).setHeight(htb);
+            this.layout.cells(this.mainArea).setHeight(htt);
+        }
+        catch (e) {
 
-	    }
+        }
 
+    }
 
-	    grid.Render();
-	    this.OnResize();
-	}
 
-	 ResPlanAnalyzer.prototype.hideFilters = function (grid) {
+    ResPlanAnalyzer.prototype.FlashTopGridHideDetails = function () {
+        var grid = Grids["g_1"];
 
-	     try {
-	         grid.HideRow(grid.GetRowById("Filter"));
 
+        var arows = grid.Rows;
+        var row = null;
 
-	         switch (grid.id) {
-	             case "g_1":
-	                 this.AnalyzerFilterschecked = false;
-	                 this.viewTab.setButtonStateOff("idAnalyzerShowFilters");
+        for (var r in arows) {
+            var xrow = arows[r];
 
+            if (xrow.Kind == "Data") {
+                if (xrow.firstChild != null) {
+                    row = xrow;
+                    break;
+                }
 
-	                 break;
-	             case "bottomg_1":
-	                 this.TotalFilterschecked = false;
-	                 this.totTab.setButtonStateOff("idTotTab_ShowFilters");
+            }
+        }
 
+        if (row == null) {
 
-	                 break;
-	         }
+            grid.DoFilter(null, null);
+            this.AnalyzerHideDetailschecked = false;
+            for (var r in arows) {
+                var yrow = arows[r];
 
-	         grid.Render();
+                if (yrow.Kind == "Data") {
 
-	         //             var htt;
-	         //             var htb;
+                    if (this.CheckIfRowFiltered(grid, yrow))
+                        grid.ShowRow(yrow);
+                }
+            }
+            return;
+        }
 
-	         //             htt = this.layout.cells(this.mainArea).getHeight();
-	         //             htb = this.layout_totals.cells(this.totalsGridArea).getHeight();
+        if (row.firstChild == null) {
 
-	         //             this.layout_totals.cells(this.totalsGridArea).setHeight(100);
-	         //             this.layout.cells(this.mainArea).setHeight(htt / 2);
-	         //             this.layout_totals.cells(this.totalsGridArea).setHeight(htb);
-	         //             this.layout.cells(this.mainArea).setHeight((htt * 3) / 2);
+            grid.DoFilter(null, null);
+            this.AnalyzerHideDetailschecked = false;
+            for (var r in arows) {
+                var zrow = arows[r];
 
-	         //             this.layout.cells(this.mainArea).setHeight(htt);
+                if (zrow.Kind == "Data") {
+                    if (this.CheckIfRowFiltered(grid, zrow))
+                        grid.ShowRow(zrow);
+                }
 
 
-	     }
-	     catch (e) { }
-	 }
+            }
+            return;
+        }
 
-	ResPlanAnalyzer.prototype.showGrouping = function (grid) {
-		var groupRow = this.getGroupRow(grid);
-		if (groupRow != null) {
-			groupRow.Visible = 1;
-		}
-		switch (grid.id) {
-			case "g_1":
-				this.AnalyzeGroupingchecked = true;
-				this.viewTab.setButtonStateOn("idAnalyzerShowGrouping");
+        this.AnalyzerHideDetailschecked = !this.AnalyzerHideDetailschecked;
 
-				break;
-			case "bottomg_1":
-				this.TotalGroupingchecked = true;
-				this.totTab.setButtonStateOn("idTotTab_ShowGrouping");
-				break;
-		}
-	}
 
-	ResPlanAnalyzer.prototype.getGroupRow = function (grid) {
-		var solid = grid.Solid;
-		var childrow = solid.firstChild;
-		while (childrow != null) {
-			if (childrow.Kind === 'Group') {
-				return childrow;
-			}
-			childrow = childrow.nextSibling;
-		}
-		return null;
-	}
+        var fc = null;
 
-	ResPlanAnalyzer.prototype.hideGrouping = function (grid) {
-		var groupRow = this.getGroupRow(grid);
-		if (groupRow != null) {
-			groupRow.Visible = 0;
-		}
-		switch (grid.id) {
-			case "g_1":
-				this.AnalyzeGroupingchecked = false;
-				this.viewTab.setButtonStateOff("idAnalyzerShowGrouping");
-				break;
-			case "bottomg_1":
-				this.TotalGroupingchecked = false;
-				this.totTab.setButtonStateOff("idTotTab_ShowGrouping");
-				break;
-		}
-	}
+        if (this.AnalyzerHideDetailschecked == true) {
+            for (var r in arows) {
+                row = arows[r];
 
-	ResPlanAnalyzer.prototype.GridsOnUpdated = function (grid) {
+                if (row.Kind == "Data") {
+                    fc = row.firstChild;
 
-//        var arow = grid.Rows["Filter"];
+                    if (fc == null)
+                        grid.HideRow(row);
+                }
+            }
+        } else {
 
-//        if (arow == undefined)
-//            return;
+            grid.DoFilter(null, null);
+            for (var r in arows) {
+                row = arows[r];
 
-//        if (arow == null)
-//            return;
+                if (row.Kind == "Data") {
+                    fc = row.firstChild;
 
-//        if (grid.id == "g_1")
-//           grid.ChangeDef(arow, "FilterRow", 1, 0);
+                    if (fc == null) {
+                        if (this.CheckIfRowFiltered(grid, row))
+                            grid.ShowRow(row);
+                    }
 
+                }
+            }
 
-	}
+        }
 
-	ResPlanAnalyzer.prototype.CapScenCreateNew = function () {
-		if (this.AnalyzerViewDlg == null) {
-			this.AnalyzerViewDlg = new dhtmlXWindows();
-			this.AnalyzerViewDlg.setSkin("dhx_web");
-			this.AnalyzerViewDlg.enableAutoViewport(false);
-			this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-			this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 245, 130);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
-			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
-			//this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create New Capacity Scenario");
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
-		}
-		else {
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
-		}
-	}
 
-	ResPlanAnalyzer.prototype.CapScenCreateCopy = function () {
-		if (this.AnalyzerViewDlg == null) {
-			this.AnalyzerViewDlg = new dhtmlXWindows();
-			this.AnalyzerViewDlg.setSkin("dhx_web");
-			this.AnalyzerViewDlg.enableAutoViewport(false);
-			this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-			this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 245, 130);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
-			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
-			//this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create Copy of Capacity Scenario");
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
-		}
-		else {
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
-		}
-	}
-					
-	ResPlanAnalyzer.prototype.GridsOnAfterColResize = function (grid, col) {
-		if (this.bInColResize == false) {
-			this.bInColResize = true;
+        grid.Render();
+        this.OnResize();
+    }
 
-			if (grid.Cols[col].Sec == 2) {
-				var lWidth = grid.GetAttribute(null, col, "Width");
-				if (lWidth > 0) {
+    ResPlanAnalyzer.prototype.hideFilters = function (grid) {
 
-					for (var c = 0; c < grid.ColNames[2].length; c++) {
-						var cCol = grid.ColNames[2][c];
-						var cWidth = grid.GetAttribute(null, cCol, "Width");
-						var cVis = grid.GetAttribute(null, cCol, "Visible");
-						if (cWidth > 0 && cVis > 0) {
-							var dx = lWidth - cWidth;
-							if (dx != 0)
-								grid.SetWidth(cCol, dx);
-						}
-					}
-				}
-			}
+        try {
+            grid.HideRow(grid.GetRowById("Filter"));
 
 
-			this.bInColResize = false;
-		}
-	}
+            switch (grid.id) {
+                case "g_1":
+                    this.AnalyzerFilterschecked = false;
+                    this.viewTab.setButtonStateOff("idAnalyzerShowFilters");
 
 
-	ResPlanAnalyzer.prototype.HandleException = function (sWhere, e) {
-		alert("Error " + sWhere + " : " + e.toString());
-	}
+                    break;
+                case "bottomg_1":
+                    this.TotalFilterschecked = false;
+                    this.totTab.setButtonStateOff("idTotTab_ShowFilters");
 
 
-	  ResPlanAnalyzer.prototype.ShowLegend = function () {
-		if (this.dlgShowLegend == null)
-		{
+                    break;
+            }
 
-			this.dlgShowLegend = new dhtmlXWindows();
-			this.dlgShowLegend.setSkin("dhx_web");
-			this.dlgShowLegend.enableAutoViewport(false);
-			this.dlgShowLegend.attachViewportTo(this.clientID + "mainDiv");
-			this.dlgShowLegend.setImagePath(this.imagePath);
-			this.dlgShowLegend.createWindow("winShowLegDlg", 20, 30, 405, 315);
-			this.dlgShowLegend.window("winShowLegDlg").setIcon("logo.ico", "logo.ico");
-			this.dlgShowLegend.window("winShowLegDlg").allowMove();
-			this.dlgShowLegend.window("winShowLegDlg").denyResize();
-			this.dlgShowLegend.window("winShowLegDlg").setModal(true);
-			this.dlgShowLegend.window("winShowLegDlg").center();
+            grid.Render();
 
- 
-			this.dlgShowLegend.window("winShowLegDlg").setText("Legend Key");
- 
-			this.dlgShowLegend.window("winShowLegDlg").attachObject("idTargetLegendDlgObj");
-			this.dlgShowLegend.window("winShowLegDlg").button("close").disable();
-			this.dlgShowLegend.window("winShowLegDlg").button("park").hide();
-			
-			var sbDataxml = new StringBuilder();
+            //             var htt;
+            //             var htb;
 
-			sbDataxml = new StringBuilder();
-			sbDataxml.append('<![CDATA[');
-			sbDataxml.append('<Execute Function="GetLegendKey">');
-			sbDataxml.append('</Execute>');
-			sbDataxml.append(']]>');
+            //             htt = this.layout.cells(this.mainArea).getHeight();
+            //             htb = this.layout_totals.cells(this.totalsGridArea).getHeight();
 
-			sb = new StringBuilder();
-			sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
-			sb.append(" data_url='" + this.Webservice + "'");
-			sb.append(" data_method='Soap'");
-			sb.append(" data_function='Execute'")
-			sb.append(" data_namespace='WorkEnginePPM'");
-			sb.append(" data_param_Function='GetLegendKey'");
-			sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
-			sb.append(" >");
-			sb.append("</treegrid>");
+            //             this.layout_totals.cells(this.totalsGridArea).setHeight(100);
+            //             this.layout.cells(this.mainArea).setHeight(htt / 2);
+            //             this.layout_totals.cells(this.totalsGridArea).setHeight(htb);
+            //             this.layout.cells(this.mainArea).setHeight((htt * 3) / 2);
 
-			this.LegendGrid = TreeGrid(sb.toString(), "idTarLegDiv", "leg_1");
+            //             this.layout.cells(this.mainArea).setHeight(htt);
 
-			   
-		}
-		else
-		   this.dlgShowLegend.window("winShowLegDlg").show();
 
-   }
+        }
+        catch (e) { }
+    }
 
-	ResPlanAnalyzer.prototype.tabbarOnSelect = function (id, data) {
-		if (this.analyzerTab.isCollapsed() == true) {
-			this.layout.cells(this.mainRibbonArea).fixSize(false, false);
-			this.layout.cells(this.mainRibbonArea).setHeight(120);
-			this.layout.cells(this.mainRibbonArea).fixSize(false, true);
-			this.analyzerTab.expand();
-			this.viewTab.expand();
-		}
-	}
+    ResPlanAnalyzer.prototype.showGrouping = function (grid) {
+        var groupRow = this.getGroupRow(grid);
+        if (groupRow != null) {
+            groupRow.Visible = 1;
+        }
+        switch (grid.id) {
+            case "g_1":
+                this.AnalyzeGroupingchecked = true;
+                this.viewTab.setButtonStateOn("idAnalyzerShowGrouping");
 
-	ResPlanAnalyzer.prototype.flashRibbonSelect = function (idsel) {
-		var select = document.getElementById(idsel);
-		var sttx = "";
+                break;
+            case "bottomg_1":
+                this.TotalGroupingchecked = true;
+                this.totTab.setButtonStateOn("idTotTab_ShowGrouping");
+                break;
+        }
+    }
 
-		if (select != null) {
+    ResPlanAnalyzer.prototype.getGroupRow = function (grid) {
+        var solid = grid.Solid;
+        var childrow = solid.firstChild;
+        while (childrow != null) {
+            if (childrow.Kind === 'Group') {
+                return childrow;
+            }
+            childrow = childrow.nextSibling;
+        }
+        return null;
+    }
 
-			if (select.selectedIndex != -1) {
+    ResPlanAnalyzer.prototype.hideGrouping = function (grid) {
+        var groupRow = this.getGroupRow(grid);
+        if (groupRow != null) {
+            groupRow.Visible = 0;
+        }
+        switch (grid.id) {
+            case "g_1":
+                this.AnalyzeGroupingchecked = false;
+                this.viewTab.setButtonStateOff("idAnalyzerShowGrouping");
+                break;
+            case "bottomg_1":
+                this.TotalGroupingchecked = false;
+                this.totTab.setButtonStateOff("idTotTab_ShowGrouping");
+                break;
+        }
+    }
 
-				var selectedopt = select.options[select.selectedIndex];
-				if (selectedopt.value != null) {
+    ResPlanAnalyzer.prototype.GridsOnUpdated = function (grid) {
 
-					sttx = selectedopt.text;
-				}
-			}
-		}
+        //        var arow = grid.Rows["Filter"];
 
-		var selectText = document.getElementById(idsel + "_textbox");
+        //        if (arow == undefined)
+        //            return;
 
-		if (selectText != null) {
-			if (document.all) selectText.innerText = sttx;
-			else selectText.textContent = sttx;
-		}
+        //        if (arow == null)
+        //            return;
 
-	}
+        //        if (grid.id == "g_1")
+        //           grid.ChangeDef(arow, "FilterRow", 1, 0);
 
 
-	ResPlanAnalyzer.prototype.ribbonGetSelectValue = function (idsel) {
-		var select = document.getElementById(idsel);
+    }
 
+    ResPlanAnalyzer.prototype.CapScenCreateNew = function () {
+        if (this.AnalyzerViewDlg == null) {
+            this.AnalyzerViewDlg = new dhtmlXWindows();
+            this.AnalyzerViewDlg.setSkin("dhx_web");
+            this.AnalyzerViewDlg.enableAutoViewport(false);
+            this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+            this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
+            this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 245, 130);
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
+            //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+            //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create New Capacity Scenario");
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
+        }
+        else {
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
+        }
+    }
 
-		if (select != null) {
+    ResPlanAnalyzer.prototype.CapScenCreateCopy = function () {
+        if (this.AnalyzerViewDlg == null) {
+            this.AnalyzerViewDlg = new dhtmlXWindows();
+            this.AnalyzerViewDlg.setSkin("dhx_web");
+            this.AnalyzerViewDlg.enableAutoViewport(false);
+            this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+            this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
+            this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 245, 130);
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
+            //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+            //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create Copy of Capacity Scenario");
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
+        }
+        else {
+            this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
+        }
+    }
 
-			if (select.selectedIndex == -1)
-				return 0;
+    ResPlanAnalyzer.prototype.GridsOnAfterColResize = function (grid, col) {
+        if (this.bInColResize == false) {
+            this.bInColResize = true;
 
-			var selectedopt = select.options[select.selectedIndex];
-			if (selectedopt.value != null) {
+            if (grid.Cols[col].Sec == 2) {
+                var lWidth = grid.GetAttribute(null, col, "Width");
+                if (lWidth > 0) {
 
-				return parseInt(selectedopt.value);
-			}
-		}
+                    for (var c = 0; c < grid.ColNames[2].length; c++) {
+                        var cCol = grid.ColNames[2][c];
+                        var cWidth = grid.GetAttribute(null, cCol, "Width");
+                        var cVis = grid.GetAttribute(null, cCol, "Visible");
+                        if (cWidth > 0 && cVis > 0) {
+                            var dx = lWidth - cWidth;
+                            if (dx != 0)
+                                grid.SetWidth(cCol, dx);
+                        }
+                    }
+                }
+            }
 
-		return 0;
-	}     
-	
-	 ResPlanAnalyzer.prototype.ribbonSetSelectValue = function (idsel, indval) {
-		var select = document.getElementById(idsel);
 
+            this.bInColResize = false;
+        }
+    }
 
-		if (select != null) {
 
+    ResPlanAnalyzer.prototype.HandleException = function (sWhere, e) {
+        alert("Error " + sWhere + " : " + e.toString());
+    }
 
-			for (var i = 0; i < select.options.length; i++) {
-				if (select.options[i].value == indval) {
-					select.selectedIndex = i;
-					break;
-				}
-			}
 
-			this.flashRibbonSelect(idsel);
-		}
-	}
+    ResPlanAnalyzer.prototype.ShowLegend = function () {
+        if (this.dlgShowLegend == null) {
 
+            this.dlgShowLegend = new dhtmlXWindows();
+            this.dlgShowLegend.setSkin("dhx_web");
+            this.dlgShowLegend.enableAutoViewport(false);
+            this.dlgShowLegend.attachViewportTo(this.clientID + "mainDiv");
+            this.dlgShowLegend.setImagePath(this.imagePath);
+            this.dlgShowLegend.createWindow("winShowLegDlg", 20, 30, 405, 315);
+            this.dlgShowLegend.window("winShowLegDlg").setIcon("logo.ico", "logo.ico");
+            this.dlgShowLegend.window("winShowLegDlg").allowMove();
+            this.dlgShowLegend.window("winShowLegDlg").denyResize();
+            this.dlgShowLegend.window("winShowLegDlg").setModal(true);
+            this.dlgShowLegend.window("winShowLegDlg").center();
 
-	function mycallback(dialogResult, returnValue) {
-		WorkEnginePPM.ResPlanAnalyzer.Execute("ReloadPlanData", "", ReloadPlanDataCompleteDelegate);
-		
- 
-		this.analyzerTab.disableItem("UndoBtn");
-		this.viewTab.disableItem("UndoBtn2");
-		 this.analyzerTab.disableItem("SaveBtn");
-		this.viewTab.disableItem("SaveBtn2");  
-		
-		
-		this.dragStack = new Array();
-		this.dragLevel = 0;
-	}
 
+            this.dlgShowLegend.window("winShowLegDlg").setText("Legend Key");
 
-	ResPlanAnalyzer.prototype.ReloadPlanDataComplete = function () {
-		this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true); 
-		RefreshBothGrids();
-	}
+            this.dlgShowLegend.window("winShowLegDlg").attachObject("idTargetLegendDlgObj");
+            this.dlgShowLegend.window("winShowLegDlg").button("close").disable();
+            this.dlgShowLegend.window("winShowLegDlg").button("park").hide();
 
-	ResPlanAnalyzer.prototype.EditResPlan = function () {
+            var sbDataxml = new StringBuilder();
 
+            sbDataxml = new StringBuilder();
+            sbDataxml.append('<![CDATA[');
+            sbDataxml.append('<Execute Function="GetLegendKey">');
+            sbDataxml.append('</Execute>');
+            sbDataxml.append(']]>');
 
-		//       alert(document.URL);
-		var weburl = document.URL;
-		weburl = weburl.replace("rpanalyzer", "rpeditor");
-		//    weburl = "/_layouts/ppm/rpeditor.aspx?dataid=" + this.params.TicketVal + "&IsResource=" + this.fromresource       
+            sb = new StringBuilder();
+            sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
+            sb.append(" data_url='" + this.Webservice + "'");
+            sb.append(" data_method='Soap'");
+            sb.append(" data_function='Execute'")
+            sb.append(" data_namespace='WorkEnginePPM'");
+            sb.append(" data_param_Function='GetLegendKey'");
+            sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+            sb.append(" >");
+            sb.append("</treegrid>");
 
-		var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: mycallback };
+            this.LegendGrid = TreeGrid(sb.toString(), "idTarLegDiv", "leg_1");
 
-		parent.SP.UI.ModalDialog.showModalDialog(options);
 
-	}
+        }
+        else
+            this.dlgShowLegend.window("winShowLegDlg").show();
 
-	ResPlanAnalyzer.prototype.DisplayGridExplaination = function () {
+    }
 
-		try {
-			if (this.dlgShowGridEx == null) {
+    ResPlanAnalyzer.prototype.tabbarOnSelect = function (id, data) {
+        if (this.analyzerTab.isCollapsed() == true) {
+            this.layout.cells(this.mainRibbonArea).fixSize(false, false);
+            this.layout.cells(this.mainRibbonArea).setHeight(120);
+            this.layout.cells(this.mainRibbonArea).fixSize(false, true);
+            this.analyzerTab.expand();
+            this.viewTab.expand();
+        }
+    }
 
-				this.dlgShowGridEx = new dhtmlXWindows();
-				this.dlgShowGridEx.setSkin("dhx_web");
-				this.dlgShowGridEx.enableAutoViewport(false);
-				this.dlgShowGridEx.attachViewportTo(this.clientID + "mainDiv");
-				this.dlgShowGridEx.setImagePath(this.imagePath);
-				this.dlgShowGridEx.createWindow("winGridExDlg", 20, 30, 720, 500);
-				this.dlgShowGridEx.window("winGridExDlg").setIcon("logo.ico", "logo.ico");
-				this.dlgShowGridEx.window("winGridExDlg").allowMove();
-				this.dlgShowGridEx.window("winGridExDlg").denyResize();
-				this.dlgShowGridEx.window("winGridExDlg").setModal(true);
-				this.dlgShowGridEx.window("winGridExDlg").center();
+    ResPlanAnalyzer.prototype.flashRibbonSelect = function (idsel) {
+        var select = document.getElementById(idsel);
+        var sttx = "";
 
+        if (select != null) {
 
-				this.dlgShowGridEx.window("winGridExDlg").setText("Grid Explanation");
+            if (select.selectedIndex != -1) {
 
-				this.dlgShowGridEx.window("winGridExDlg").attachObject("idGridExplainDlgObj");
-				this.dlgShowGridEx.window("winGridExDlg").button("close").disable();
-				this.dlgShowGridEx.window("winGridExDlg").button("park").hide();
+                var selectedopt = select.options[select.selectedIndex];
+                if (selectedopt.value != null) {
 
-			} else
-				this.dlgShowGridEx.window("winGridExDlg").show();
+                    sttx = selectedopt.text;
+                }
+            }
+        }
 
-			var wrktxt = document.getElementById("iddivgewrk");
+        var selectText = document.getElementById(idsel + "_textbox");
 
+        if (selectText != null) {
+            if (document.all) selectText.innerText = sttx;
+            else selectText.textContent = sttx;
+        }
 
-			var sb = new StringBuilder();
-			sb.append("<ul style='list-style-type:disc'>");
+    }
 
-			if (this.DetailsData.CommittedWork.Value == "1")
-				sb.append("<li>Committed Work – Committed Work values come from committed items within Resource Plans</li>");
 
-			if (this.DetailsData.ScheduledWork.Value == "1")
-				sb.append("<li>Scheduled Work – Scheduled Work values come from items in SharePoint such as Tasks and Issues that have been configured as Scheduled Work items</li>");
+    ResPlanAnalyzer.prototype.ribbonGetSelectValue = function (idsel) {
+        var select = document.getElementById(idsel);
 
-			if (this.DetailsData.ActualWork.Value == "1")
-				sb.append("<li>Timesheet Actuals - Timesheet Actuals values come from the actual values entered via the Timesheet</li>");
 
+        if (select != null) {
 
-			var negmode = this.DetailsData.NegMode.Value;
-			var showpersonal = this.DetailsData.ShowPersonal.Value;
-			var showopen = this.DetailsData.ShowOpenReq.Value;
+            if (select.selectedIndex == -1)
+                return 0;
 
-			if (this.DetailsData.ProposedWork.Value == "1" && negmode == "1")
-				sb.append("<li>Proposed Work - Proposed Work values </li>");
+            var selectedopt = select.options[select.selectedIndex];
+            if (selectedopt.value != null) {
 
+                return parseInt(selectedopt.value);
+            }
+        }
 
+        return 0;
+    }
 
-			if (this.DetailsData.OpenRequestWork.Value == "1" && showopen == "1")
-				sb.append("<li>Open Requirements - Open Requirements values </li>");
+    ResPlanAnalyzer.prototype.ribbonSetSelectValue = function (idsel, indval) {
+        var select = document.getElementById(idsel);
 
 
-			if (this.DetailsData.PersonalWork.Value == "1" && showpersonal == "1")
-				sb.append("<li>Personal Time Off - Personal Time Off </li>");
+        if (select != null) {
 
-			sb.append("</ul");
 
+            for (var i = 0; i < select.options.length; i++) {
+                if (select.options[i].value == indval) {
+                    select.selectedIndex = i;
+                    break;
+                }
+            }
 
-			wrktxt.innerHTML = sb.toString();
+            this.flashRibbonSelect(idsel);
+        }
+    }
 
-			var colsSect = document.getElementById("iddivgeExtraColsSection");
-			var colstxt = document.getElementById("iddivgecols");
 
-			var sb = new StringBuilder();
-			var colcnt = 0;
+    function mycallback(dialogResult, returnValue) {
+        WorkEnginePPM.ResPlanAnalyzer.Execute("ReloadPlanData", "", ReloadPlanDataCompleteDelegate);
 
-			sb.append("<ul style='list-style-type:disc'>");
 
+        this.analyzerTab.disableItem("UndoBtn");
+        this.viewTab.disableItem("UndoBtn2");
+        this.analyzerTab.disableItem("SaveBtn");
+        this.viewTab.disableItem("SaveBtn2");
 
-			if (this.TotalsData != null) {
 
-				var xiii = 0;
+        this.dragStack = new Array();
+        this.dragLevel = 0;
+    }
 
-			}
 
-			sb.append("</ul");
+    ResPlanAnalyzer.prototype.ReloadPlanDataComplete = function () {
+        this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
+        RefreshBothGrids();
+    }
 
+    ResPlanAnalyzer.prototype.EditResPlan = function () {
 
-			colstxt.innerHTML = sb.toString();
 
-			if (colcnt == 0)
-				iddivgeExtraColsSection.style.display = "none";
-			else
-				iddivgeExtraColsSection.style.display = "block";
+        //       alert(document.URL);
+        var weburl = document.URL;
+        weburl = weburl.replace("rpanalyzer", "rpeditor");
+        //    weburl = "/_layouts/ppm/rpeditor.aspx?dataid=" + this.params.TicketVal + "&IsResource=" + this.fromresource       
 
+        var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: mycallback };
 
-		}
-		catch (e) {
-		}
+        parent.SP.UI.ModalDialog.showModalDialog(options);
 
-	}
+    }
 
+    ResPlanAnalyzer.prototype.DisplayGridExplaination = function () {
 
+        try {
+            if (this.dlgShowGridEx == null) {
 
-	try {
-		this.fromresource = "";
-		// Initialised fields
-		this.dlgShowGridEx = null;
+                this.dlgShowGridEx = new dhtmlXWindows();
+                this.dlgShowGridEx.setSkin("dhx_web");
+                this.dlgShowGridEx.enableAutoViewport(false);
+                this.dlgShowGridEx.attachViewportTo(this.clientID + "mainDiv");
+                this.dlgShowGridEx.setImagePath(this.imagePath);
+                this.dlgShowGridEx.createWindow("winGridExDlg", 20, 30, 720, 500);
+                this.dlgShowGridEx.window("winGridExDlg").setIcon("logo.ico", "logo.ico");
+                this.dlgShowGridEx.window("winGridExDlg").allowMove();
+                this.dlgShowGridEx.window("winGridExDlg").denyResize();
+                this.dlgShowGridEx.window("winGridExDlg").setModal(true);
+                this.dlgShowGridEx.window("winGridExDlg").center();
 
-		this.NegMode = false;
-	    this.NegWarn = false;
-		
-		this.TotMaxed = false;
-		this.groupColour = 0xF8F8F8;
 
-		this.bapplyDefView = false;
+                this.dlgShowGridEx.window("winGridExDlg").setText("Grid Explanation");
 
-		this.analyzerCalID = 0;
-		this.CmtCal = 0;
-		this.csCalID = 0;
+                this.dlgShowGridEx.window("winGridExDlg").attachObject("idGridExplainDlgObj");
+                this.dlgShowGridEx.window("winGridExDlg").button("close").disable();
+                this.dlgShowGridEx.window("winGridExDlg").button("park").hide();
 
-		this.tg_rollup = null;
-		this.tg_rollup_render = false;
+            } else
+                this.dlgShowGridEx.window("winGridExDlg").show();
 
-		this.topgridready = false;
-		this.bottomgridready = false;
-	    this.bottomgridfirstready = false;
+            var wrktxt = document.getElementById("iddivgewrk");
 
 
-		this.FilteredTop = new Array();
+            var sb = new StringBuilder();
+            sb.append("<ul style='list-style-type:disc'>");
 
-		this.AnalyzeGroupingchecked = false;
-		this.AnalyzerFilterschecked = false;
+            if (this.DetailsData.CommittedWork.Value == "1")
+                sb.append("<li>Committed Work – Committed Work values come from committed items within Resource Plans</li>");
 
-		this.AnalyzerShowBarschecked = false;
-		this.AnalyzerHideDetailschecked = false;
-		
-		this.TotalGroupingchecked = false;
-		this.TotalFilterschecked = false;
+            if (this.DetailsData.ScheduledWork.Value == "1")
+                sb.append("<li>Scheduled Work – Scheduled Work values come from items in SharePoint such as Tasks and Issues that have been configured as Scheduled Work items</li>");
 
-		this.AnalyzerTabisCollapsed = false;
-		this.TotalTabisCollapsed = false;
+            if (this.DetailsData.ActualWork.Value == "1")
+                sb.append("<li>Timesheet Actuals - Timesheet Actuals values come from the actual values entered via the Timesheet</li>");
 
-		this.bInColResize = false;
-		this.EditCapScen = -1;
-		this.SelectedMode = 0;
-		this.HaveDragChanges = false;
 
-		this.SaveBtn = false;
-		this.UnDoBtn = false;
+            var negmode = this.DetailsData.NegMode.Value;
+            var showpersonal = this.DetailsData.ShowPersonal.Value;
+            var showopen = this.DetailsData.ShowOpenReq.Value;
 
+            if (this.DetailsData.ProposedWork.Value == "1" && negmode == "1")
+                sb.append("<li>Proposed Work - Proposed Work values </li>");
 
-		this.CapScenDlg = null;
-	    this.TopGridDragged = false;
 
-		this.params = params;
-		this.TotSelectedOrder = null;
 
-		this.clientID = this.params.ClientID;
-		this.Webservice = params.Webservice;
+            if (this.DetailsData.OpenRequestWork.Value == "1" && showopen == "1")
+                sb.append("<li>Open Requirements - Open Requirements values </li>");
 
-		this.mainRibbonArea = "a";
-		this.mainArea = "b";
-		this.totalsArea = "c";
-		this.totalsRibbonArea = "a";
-		this.totalsGridArea = "b";
 
-		this.analyzerTab = null;
-		this.viewTab = null;
-		
-		this.TotAddSel = null;
-		this.TotRemSel = null;
-		this.CSHourMode = null;
+            if (this.DetailsData.PersonalWork.Value == "1" && showpersonal == "1")
+                sb.append("<li>Personal Time Off - Personal Time Off </li>");
 
-		this.dlgShowLegend = null;
-		this.LegendGrid = null;
-		
-		this.Dirty = false;
-		this.initialized = false;
-		this.ExitConfirmed = false;
-		this.Height = 0;
-		this.Width = 0;
-   
-		this.layout = null;
-		this.layout_totals = null;
+            sb.append("</ul");
 
-		this.TotGrid = null;
-		this.DetGrid = null;
-		this.TotalsGridSettingsData = null;
 
-		this.FilterDifferent = false;
-		this.CSChanged = false;
+            wrktxt.innerHTML = sb.toString();
 
+            var colsSect = document.getElementById("iddivgeExtraColsSection");
+            var colstxt = document.getElementById("iddivgecols");
 
-		this.selectCalendarAndPeriods = null;
-		this.imagePath = "/_layouts/ppm/images/";
+            var sb = new StringBuilder();
+            var colcnt = 0;
 
-		// dialog handles
+            sb.append("<ul style='list-style-type:disc'>");
 
-		this.fiscalInfo = null;
-		this.Views = null;
-		this.selectedView = null;
 
-		this.SetTotals = null
-		this.TotalsLoading = false
-		this.TotalsData = null;
-		this.tarlev = 0;
+            if (this.TotalsData != null) {
 
-		this.SetDetails = null;
-		this.DetailsLoading = false
-		this.DetailsData = null;
-		this.DetailsSettings = "";
-		this.DisplayMode = "";
+                var xiii = 0;
 
-		this.TargetData = null;
-		this.TotalsColumnSettings = "";
-		this.TotalsGridSupressHeatmap = 0;
-		this.TotalsGridTotalsCol = 0;
+            }
 
-		this.stashgridsettings = null;
+            sb.append("</ul");
 
-		this.AnalyzerViewDlg = null;
-		this.AnalyzerDeleteViewDlg = null;
 
-		this.doTopApply = true;
-		this.doBottomApply = true;
-		this.CapScens = null;
-		this.SelectedCapScen = 0;
+            colstxt.innerHTML = sb.toString();
 
-		this.dlgEditTarget = null;
-		this.EditGrid = null;
-		this.dlgSpreadDlg = null;
-		this.csrow = null;
-		this.doSetFocus = "";
+            if (colcnt == 0)
+                iddivgeExtraColsSection.style.display = "none";
+            else
+                iddivgeExtraColsSection.style.display = "block";
 
-		this.bottomgriddragstash = null;
-		this.topgridstash = null;
-		this.CSRoleData = null;
 
-		this.initDataStart = 0;
-		this.initDataFinish = 0;
+        }
+        catch (e) {
+        }
 
-		this.heatmapText = "";
-		this.bottomgridbyrole = false;
-		this.totTab = null;
+    }
 
-		this.selectedHeatMapColour = "1";
 
-		this.deferredhidedetails = false;
-	   
 
-		var loadDelegate = MakeDelegate(this, this.OnLoad);
-//        var unloadDelegate = MakeDelegate(this, this.OnUnload);
-		var HandlePingSessionData = MakeDelegate(this, this.HandlePingSession);
-		var HandlePopulateUI = MakeDelegate(this, this.PopulateUI);
+    try {
+        this.fromresource = "";
+        // Initialised fields
+        this.dlgShowGridEx = null;
 
-		this.deferevent = "";
-		this.deferedExternalEventDelegate = MakeDelegate(this, this.deferedExternalEvent);
-		this.deferedsetFocusDelegate = MakeDelegate(this, this.deferedsetFocus);
-		
-		
-		var GetCalendarInfoCompleteDelegate = MakeDelegate(this, this.GetCalendarInfoComplete);
-		var LoadResPlanDataCompleteDelegate = MakeDelegate(this, this.LoadResPlanDataComplete);
+        this.NegMode = false;
+        this.NegWarn = false;
 
-		this.SaveCapacityScenarioDataCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioDataComplete);
+        this.TotMaxed = false;
+        this.groupColour = 0xF8F8F8;
 
-		this.GetTotalsDataCompleteDelegate = MakeDelegate(this, this.GetTotalsDataComplete);
-		this.SetTotalsDataCompleteDelegate = MakeDelegate(this, this.SetTotalsDataComplete);
-		this.CreateTopGridDelegate = MakeDelegate(this, this.CreateTopGrid);
+        this.bapplyDefView = false;
 
-		var GetCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.GetCapacityScenarioListComplete);
-		var SaveCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioListComplete);
+        this.analyzerCalID = 0;
+        this.CmtCal = 0;
+        this.csCalID = 0;
 
-		
-		var GetEditCSDataCompleteDelegate = MakeDelegate(this, this.GetEditCSDataComplete);
+        this.tg_rollup = null;
+        this.tg_rollup_render = false;
 
-		var ReloadPlanDataCompleteDelegate = MakeDelegate(this, this.ReloadPlanDataComplete);
-		var SaveResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.SaveResourceAnalyzerViewComplete);
-		var RenameResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.RenameResourceAnalyzerViewComplete);
-		
-		this.LastFilterString = "";
+        this.topgridready = false;
+        this.bottomgridready = false;
+        this.bottomgridfirstready = false;
 
-		this.FinishTotalsDelegate = MakeDelegate(this, this.FinishTotals);
-		this.GoDoEditDelegate = MakeDelegate(this, this.GoDoEdit);
-		this.CapScenCreateCopyDelegate = MakeDelegate(this, this.CapScenCreateCopy);
-		this.CapScenCreateNewDelegate = MakeDelegate(this, this.CapScenCreateNew);
 
-		var GridsOnGetDefaultColorDelegate = MakeDelegate(this, this.GridsOnGetDefaultColor);
-		var GridsOnStartDragCellDelegate = MakeDelegate(this, this.GridsOnStartDragCell);
-		var GridsOnMoveDragCellDelegate = MakeDelegate(this, this.GridsOnMoveDragCell);
-		var GridsOnEndDragCellDelegate = MakeDelegate(this, this.GridsOnEndDragCell);
-		var HandleRefreshBothDelegate = MakeDelegate(this, this.HandleBothRefresh);
-		var HandleRefreshTopDelegate = MakeDelegate(this, this.HandleTopRefresh);
-		var HandleRefreshDelegate = MakeDelegate(this, this.HandleRefresh);
-		var GridsOnAfterValueChangedDelegate = MakeDelegate(this, this.GridsOnAfterValueChanged);
-		var GridsOnUpdatedDelegate = MakeDelegate(this, this.GridsOnUpdated);
-		var SetChangeViewCompleteDelegate = MakeDelegate(this, this.SetChangeViewComplete);
-		var DeleteResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.DeleteResourceAnalyzerViewComplete);
-		var GridsOnAfterColResizeDelegate = MakeDelegate(this, this.GridsOnAfterColResize);
-		var GridsOnClickCellDelegate = MakeDelegate(this, this.GridsOnClickCell);
-		var GridsOnMouseOverDelegate = MakeDelegate(this, this.GridsOnMouseOver);
-		var GridsOnMouseDownDelegate = MakeDelegate(this, this.GridsOnMouseDown);
+        this.FilteredTop = new Array();
 
+        this.AnalyzeGroupingchecked = false;
+        this.AnalyzerFilterschecked = false;
 
-		var NewCapScenDlg_OnCloseDelegate = MakeDelegate(this, this.NewCapScenDlg_OnClose);
+        this.AnalyzerShowBarschecked = false;
+        this.AnalyzerHideDetailschecked = false;
 
+        this.TotalGroupingchecked = false;
+        this.TotalFilterschecked = false;
 
-		GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
-		var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
-		
+        this.AnalyzerTabisCollapsed = false;
+        this.TotalTabisCollapsed = false;
 
+        this.bInColResize = false;
+        this.EditCapScen = -1;
+        this.SelectedMode = 0;
+        this.HaveDragChanges = false;
 
-		var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
-		var AnalyzerViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerViewDlg_OnClose);
-		var AnalyzerDeleteViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerDeleteViewDlg_OnClose);
+        this.SaveBtn = false;
+        this.UnDoBtn = false;
 
-		var CapScenDlg_OnCloseDelegate = MakeDelegate(this, this.CapScenDlg_OnClose);
 
-		this.CapacityScenarios = null;
+        this.CapScenDlg = null;
+        this.TopGridDragged = false;
 
-		var GridsOnRenderStartDelegate = MakeDelegate(this, this.GridsOnRenderStart);
-		var GridsOnRenderFinishDelegate = MakeDelegate(this, this.GridsOnRenderFinish);
-		this.refreshIconsInTotGrid = null; 
-		this.refreshChecksInDetGrid = null;
-		var HandleRerenderDelegate = MakeDelegate(this, this.HandleRerender);
-		var HandleRerenderChecksDelegate = MakeDelegate(this, this.HandleRerenderChecks);
-		var HandleRerenderRollupsDelegate = MakeDelegate(this, this.HandleRerenderRollups);
-		
-		this.dragStack = new Array();
-		this.dragLevel = 0;
+        this.params = params;
+        this.TotSelectedOrder = null;
 
-		var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);	
+        this.clientID = this.params.ClientID;
+        this.Webservice = params.Webservice;
 
-		if (document.addEventListener != null) { // e.g. Firefox
-			window.addEventListener("load", loadDelegate, true);
-//            window.addEventListener("beforeunload", unloadDelegate, true);
-		}
-		else { // e.g. IE
-			window.attachEvent("onload", loadDelegate);
-//            window.attachEvent("onbeforeunload", unloadDelegate);
-		}
-	}
-	catch (e) {
-		alert("Resource Plan Analyzer Initialization error");
-	}
-	
+        this.mainRibbonArea = "a";
+        this.mainArea = "b";
+        this.totalsArea = "c";
+        this.totalsRibbonArea = "a";
+        this.totalsGridArea = "b";
+
+        this.analyzerTab = null;
+        this.viewTab = null;
+
+        this.TotAddSel = null;
+        this.TotRemSel = null;
+        this.CSHourMode = null;
+
+        this.dlgShowLegend = null;
+        this.LegendGrid = null;
+
+        this.Dirty = false;
+        this.initialized = false;
+        this.ExitConfirmed = false;
+        this.Height = 0;
+        this.Width = 0;
+
+        this.layout = null;
+        this.layout_totals = null;
+
+        this.TotGrid = null;
+        this.DetGrid = null;
+        this.TotalsGridSettingsData = null;
+
+        this.FilterDifferent = false;
+        this.CSChanged = false;
+
+
+        this.selectCalendarAndPeriods = null;
+        this.imagePath = "/_layouts/ppm/images/";
+
+        // dialog handles
+
+        this.fiscalInfo = null;
+        this.Views = null;
+        this.selectedView = null;
+
+        this.SetTotals = null
+        this.TotalsLoading = false
+        this.TotalsData = null;
+        this.tarlev = 0;
+
+        this.SetDetails = null;
+        this.DetailsLoading = false
+        this.DetailsData = null;
+        this.DetailsSettings = "";
+        this.DisplayMode = "";
+
+        this.TargetData = null;
+        this.TotalsColumnSettings = "";
+        this.TotalsGridSupressHeatmap = 0;
+        this.TotalsGridTotalsCol = 0;
+
+        this.stashgridsettings = null;
+
+        this.AnalyzerViewDlg = null;
+        this.AnalyzerDeleteViewDlg = null;
+
+        this.doTopApply = true;
+        this.doBottomApply = true;
+        this.CapScens = null;
+        this.SelectedCapScen = 0;
+
+        this.dlgEditTarget = null;
+        this.EditGrid = null;
+        this.dlgSpreadDlg = null;
+        this.csrow = null;
+        this.doSetFocus = "";
+
+        this.bottomgriddragstash = null;
+        this.topgridstash = null;
+        this.CSRoleData = null;
+
+        this.initDataStart = 0;
+        this.initDataFinish = 0;
+
+        this.heatmapText = "";
+        this.bottomgridbyrole = false;
+        this.totTab = null;
+
+        this.selectedHeatMapColour = "1";
+
+        this.deferredhidedetails = false;
+
+
+        var loadDelegate = MakeDelegate(this, this.OnLoad);
+        //        var unloadDelegate = MakeDelegate(this, this.OnUnload);
+        var HandlePingSessionData = MakeDelegate(this, this.HandlePingSession);
+        var HandlePopulateUI = MakeDelegate(this, this.PopulateUI);
+
+        this.deferevent = "";
+        this.deferedExternalEventDelegate = MakeDelegate(this, this.deferedExternalEvent);
+        this.deferedsetFocusDelegate = MakeDelegate(this, this.deferedsetFocus);
+
+
+        var GetCalendarInfoCompleteDelegate = MakeDelegate(this, this.GetCalendarInfoComplete);
+        var LoadResPlanDataCompleteDelegate = MakeDelegate(this, this.LoadResPlanDataComplete);
+
+        this.SaveCapacityScenarioDataCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioDataComplete);
+
+        this.GetTotalsDataCompleteDelegate = MakeDelegate(this, this.GetTotalsDataComplete);
+        this.SetTotalsDataCompleteDelegate = MakeDelegate(this, this.SetTotalsDataComplete);
+        this.CreateTopGridDelegate = MakeDelegate(this, this.CreateTopGrid);
+
+        var GetCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.GetCapacityScenarioListComplete);
+        var SaveCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioListComplete);
+
+
+        var GetEditCSDataCompleteDelegate = MakeDelegate(this, this.GetEditCSDataComplete);
+
+        var ReloadPlanDataCompleteDelegate = MakeDelegate(this, this.ReloadPlanDataComplete);
+        var SaveResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.SaveResourceAnalyzerViewComplete);
+        var RenameResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.RenameResourceAnalyzerViewComplete);
+
+        this.LastFilterString = "";
+
+        this.FinishTotalsDelegate = MakeDelegate(this, this.FinishTotals);
+        this.GoDoEditDelegate = MakeDelegate(this, this.GoDoEdit);
+        this.CapScenCreateCopyDelegate = MakeDelegate(this, this.CapScenCreateCopy);
+        this.CapScenCreateNewDelegate = MakeDelegate(this, this.CapScenCreateNew);
+
+        var GridsOnGetDefaultColorDelegate = MakeDelegate(this, this.GridsOnGetDefaultColor);
+        var GridsOnStartDragCellDelegate = MakeDelegate(this, this.GridsOnStartDragCell);
+        var GridsOnMoveDragCellDelegate = MakeDelegate(this, this.GridsOnMoveDragCell);
+        var GridsOnEndDragCellDelegate = MakeDelegate(this, this.GridsOnEndDragCell);
+        var HandleRefreshBothDelegate = MakeDelegate(this, this.HandleBothRefresh);
+        var HandleRefreshTopDelegate = MakeDelegate(this, this.HandleTopRefresh);
+        var HandleRefreshDelegate = MakeDelegate(this, this.HandleRefresh);
+        var GridsOnAfterValueChangedDelegate = MakeDelegate(this, this.GridsOnAfterValueChanged);
+        var GridsOnUpdatedDelegate = MakeDelegate(this, this.GridsOnUpdated);
+        var SetChangeViewCompleteDelegate = MakeDelegate(this, this.SetChangeViewComplete);
+        var DeleteResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.DeleteResourceAnalyzerViewComplete);
+        var GridsOnAfterColResizeDelegate = MakeDelegate(this, this.GridsOnAfterColResize);
+        var GridsOnClickCellDelegate = MakeDelegate(this, this.GridsOnClickCell);
+        var GridsOnMouseOverDelegate = MakeDelegate(this, this.GridsOnMouseOver);
+        var GridsOnMouseDownDelegate = MakeDelegate(this, this.GridsOnMouseDown);
+
+
+        var NewCapScenDlg_OnCloseDelegate = MakeDelegate(this, this.NewCapScenDlg_OnClose);
+
+
+        GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
+        var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
+
+
+
+        var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
+        var AnalyzerViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerViewDlg_OnClose);
+        var AnalyzerDeleteViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerDeleteViewDlg_OnClose);
+
+        var CapScenDlg_OnCloseDelegate = MakeDelegate(this, this.CapScenDlg_OnClose);
+
+        this.CapacityScenarios = null;
+
+        var GridsOnRenderStartDelegate = MakeDelegate(this, this.GridsOnRenderStart);
+        var GridsOnRenderFinishDelegate = MakeDelegate(this, this.GridsOnRenderFinish);
+        this.refreshIconsInTotGrid = null;
+        this.refreshChecksInDetGrid = null;
+        var HandleRerenderDelegate = MakeDelegate(this, this.HandleRerender);
+        var HandleRerenderChecksDelegate = MakeDelegate(this, this.HandleRerenderChecks);
+        var HandleRerenderRollupsDelegate = MakeDelegate(this, this.HandleRerenderRollups);
+
+        this.dragStack = new Array();
+        this.dragLevel = 0;
+
+        var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);
+
+        if (document.addEventListener != null) { // e.g. Firefox
+            window.addEventListener("load", loadDelegate, true);
+            //            window.addEventListener("beforeunload", unloadDelegate, true);
+        }
+        else { // e.g. IE
+            window.attachEvent("onload", loadDelegate);
+            //            window.attachEvent("onbeforeunload", unloadDelegate);
+        }
+    }
+    catch (e) {
+        alert("Resource Plan Analyzer Initialization error");
+    }
+
 
 }
