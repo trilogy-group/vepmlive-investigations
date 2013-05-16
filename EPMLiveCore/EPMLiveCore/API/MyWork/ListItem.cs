@@ -121,9 +121,6 @@ namespace EPMLiveCore.API
                                         {
                                         }
                                     }
-
-                                    if (field.Type != SPFieldType.Currency && ((SPFieldNumber) field).ShowAsPercentage)
-                                        value = (double.Parse(value)*100).ToString(CultureInfo.InvariantCulture);
                                 }
                                 else if (field.Type == SPFieldType.DateTime)
                                 {
@@ -325,14 +322,7 @@ namespace EPMLiveCore.API
                                     }
 
                                     SPField spField = spListItem.Fields.GetFieldByInternalName(theField);
-                                    if (spField.Type == SPFieldType.Number)
-                                    {
-                                        if (((SPFieldNumber) spField).ShowAsPercentage)
-                                            theValue =
-                                                (double.Parse(theValue, new CultureInfo("en-US"))/100).ToString(
-                                                    CultureInfo.InvariantCulture);
-                                    }
-                                    else if (spField.Type == SPFieldType.DateTime)
+                                    if (spField.Type == SPFieldType.DateTime)
                                     {
                                         try
                                         {

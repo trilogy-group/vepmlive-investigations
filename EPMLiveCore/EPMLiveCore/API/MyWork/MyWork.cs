@@ -496,11 +496,6 @@ namespace EPMLiveCore.API
 
             GetTypeAndFormat(fieldTypes, field, out type, out format);
 
-            if (format.Equals("Percentage") && !string.IsNullOrEmpty(value))
-            {
-                value = (double.Parse(value, new CultureInfo("en-US"))*100).ToString(CultureInfo.InvariantCulture);
-            }
-
             if (field.Equals("Complete"))
             {
                 value = value.Equals("True") ? "1" : "0";
@@ -674,12 +669,6 @@ namespace EPMLiveCore.API
                                 string format;
 
                                 GetTypeAndFormat(fieldTypes, selectedField, out type, out format);
-
-                                if (format.Equals("Percentage"))
-                                    if (!string.IsNullOrEmpty(value))
-                                        value =
-                                            (double.Parse(value, new CultureInfo("en-US"))*100).
-                                                ToString(CultureInfo.InvariantCulture);
 
                                 var fieldElement = new XElement("Field", new XCData(value));
                                 fieldElement.Add(new XAttribute("Name", selectedField));
@@ -1943,12 +1932,6 @@ namespace EPMLiveCore.API
 
                         GetTypeAndFormat(fieldTypes, selectedField, out type, out format);
 
-                        if (format.Equals("Percentage"))
-                            if (!string.IsNullOrEmpty(value))
-                                value =
-                                    (double.Parse(value, new CultureInfo("en-US"))*100).ToString(
-                                        CultureInfo.InvariantCulture);
-
                         if (selectedField.Equals("Complete"))
                         {
                             value = value.Equals("True") ? "1" : "0";
@@ -2836,7 +2819,7 @@ namespace EPMLiveCore.API
                         string relatedGridFormat = GetRelatedGridFormat(type, format, fieldTypes[internalName], spWeb);
                         c.Add(new XAttribute("Format", relatedGridFormat));
 
-                        if (type.Equals("Date"))
+                        if (type.Equals("Date") || (type.Equals("Float") && relatedGridFormat.Contains("%")))
                         {
                             c.Add(new XAttribute("EditFormat", relatedGridFormat));
                         }
@@ -3118,7 +3101,7 @@ namespace EPMLiveCore.API
 
                         if (((SPFieldNumber) spField).ShowAsPercentage)
                         {
-                            percentageSign = @"\%";
+                            percentageSign = @"%";
                         }
 
                         switch (((SPFieldNumber) spField).DisplayFormat)
