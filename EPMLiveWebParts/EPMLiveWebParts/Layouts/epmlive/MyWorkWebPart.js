@@ -782,16 +782,11 @@ function editRowHelper(grid, row) {
 
                                 grid.ColTypes[listWebSiteId][colName] = colType;
 
-                                if (colType == 'Lines') {
-                                    colType = 'Html';
-
-                                    grid.SetAttribute(row, colName, 'Button', iconUrl + 'edit.png', true, false);
-                                    grid.SetAttribute(row, colName, 'OnClickSideButton', 'showRichTextBox("' + grid.id + '", "' + row.id + '", "' + colName + '")', true, false);
-                                    grid.CalcWidth(colName, 0);
-                                }
-
                                 grid.SetAttribute(row, colName, 'Type', colType, true, false);
-                                grid.SetAttribute(row, colName, 'CanEdit', 1, true, false);
+                                
+                                if (colType !== 'Lines') {
+                                    grid.SetAttribute(row, colName, 'CanEdit', 1, true, false);
+                                }
                             }
 
                             editRowFinalizer(grid, row, cols, listWebSiteId);
@@ -803,15 +798,11 @@ function editRowHelper(grid, row) {
             for (var col in grid.ColTypes[listWebSiteId]) {
                 var colType = grid.ColTypes[listWebSiteId][col];
 
-                if (colType == 'Lines') {
-                    colType = 'Html';
-
-                    grid.SetAttribute(row, col, 'Button', iconUrl + 'edit-html.png', true, false);
-                    grid.SetAttribute(row, col, 'OnClickSideButton', 'showRichTextBox("' + grid.id + '", "' + row.id + '", "' + col + '")', true, false);
-                }
-
                 grid.SetAttribute(row, col, 'Type', colType, true, false);
-                grid.SetAttribute(row, col, 'CanEdit', 1, true, false);
+                
+                if (colType !== 'Lines') {
+                    grid.SetAttribute(row, col, 'CanEdit', 1, true, false);
+                }
             }
             editRowFinalizer(grid, row, cols, listWebSiteId);
         }
@@ -925,7 +916,9 @@ function newItemAdded(result, value, params) {
 }
 
 function onshowRichTextBoxClosed(result, value, params) {
-    if (result == 1) setCellValue(unescape(value), params.gridId, params.rowId, params.col);
+    if (result == 1) {
+        setCellValue(unescape(value), params.gridId, params.rowId, params.col);
+    }
 }
 
 function parseJson(response) {
@@ -1072,7 +1065,7 @@ function showRichTextBox(gridId, rowId, col) {
         gridId: gridId,
         rowId: rowId,
         col: col
-    });
+    }, 600, 400);
 
     return;
 }
