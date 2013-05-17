@@ -151,6 +151,7 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
 
         if (row.Def.Name === 'Group' && col === 'Title') {
             if (row.Expanded === 1) {
+                grid.FRow = null;
                 grid.Collapse(row);
             } else {
                 grid.Expand(row);
