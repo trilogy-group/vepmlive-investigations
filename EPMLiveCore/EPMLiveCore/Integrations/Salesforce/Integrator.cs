@@ -93,7 +93,7 @@ namespace EPMLiveCore.Integrations.Salesforce
 
                 var ignoredFields = new[]
                     {
-                        "IsDeleted", "CreatedDate", "CreatedById", "LastModifiedDate",
+                        "IsDeleted", "CreatedDate", "LastModifiedDate",
                         "LastModifiedById", "SystemModstamp", "LastActivityDate",
                         sfService.AppNamespace + "__Additional_Assigned_To__c",
                         sfService.AppNamespace + "__FK__c"
