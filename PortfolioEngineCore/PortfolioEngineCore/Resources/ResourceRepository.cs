@@ -332,21 +332,28 @@ namespace PortfolioEngineCore
                 }
             }
 
-            if (resource.PermissionsDictionary.Count == existingResource.PermissionsDictionary.Count)
-            {
-                if (
-                    resource.PermissionsDictionary.Any(
-                        keyValuePair => !existingResource.PermissionsDictionary.ContainsKey(keyValuePair.Key)))
-                {
-                    changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
-                                               existingResource.Permissions);
-                }
-            }
-            else
-            {
-                changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
-                                           existingResource.Permissions);
-            }
+			if (resource.PermissionsDictionary.Count == existingResource.PermissionsDictionary.Count)
+			{
+				if (
+					resource.PermissionsDictionary.Any(kvp => !existingResource.PermissionsDictionary.ContainsKey(kvp.Key)))
+				{
+					changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
+											   existingResource.Permissions);
+				}
+				else
+				{
+					if (resource.PermissionsDictionary.Any(kvp => kvp.Value.Contains("|DEL")))
+					{
+						changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
+											   existingResource.Permissions);
+					}
+				}
+			}
+			else
+			{
+				changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
+										   existingResource.Permissions);
+			}
 
             List<IField> existingCustomFields = existingResource.CustomFields.ToList();
             List<IField> customFields = resource.CustomFields.ToList();
