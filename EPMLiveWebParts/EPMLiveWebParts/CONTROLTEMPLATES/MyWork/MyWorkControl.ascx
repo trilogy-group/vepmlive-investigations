@@ -178,7 +178,7 @@
     </div>
 
     <div id="MWG_SaveView" style="display:none;">
-      <div style="width:200px;padding:10px;"> Name:&nbsp;
+      <div style="width:225px;padding:10px;"> Name:&nbsp;
         <input id="MWG_ViewName" type="text" />
         <br />
         <input id="MWG_DefaultView" type="checkbox" />
