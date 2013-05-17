@@ -53,7 +53,7 @@ namespace EPMLiveCore.API
             {
                 SPList resourcePool = _spWeb.Lists["Resources"];
 
-                ValidateAccess(resourcePool);
+                ValidateAccess();
 
                 Dictionary<string, object[]> fieldDictionary = BuildFieldDictionary(resourcePool);
                 DataTable dataTable = GetResources(resourcePool);
@@ -399,6 +399,11 @@ namespace EPMLiveCore.API
                     column.Style = 5U;
                 }
 
+                if (pair.Key.Equals("SharePointAccount") && new Act(_spWeb).IsOnline)
+                {
+                    column.Hidden = true;
+                }
+
                 columns.AppendChild(column);
 
                 colIndex++;
@@ -524,20 +529,6 @@ namespace EPMLiveCore.API
                 sheetData.AppendChild(row);
             }
 
-            var sheetProtection = new SheetProtection
-                                      {
-                                          Password = "9FCF",
-                                          Sheet = true,
-                                          FormatCells = false,
-                                          FormatColumns = false,
-                                          FormatRows = false,
-                                          InsertRows = false,
-                                          DeleteRows = false,
-                                          Sort = false,
-                                          AutoFilter = false,
-                                          PivotTables = false
-                                      };
-
             var worksheetExtensionList = new WorksheetExtensionList();
 
             var worksheetExtension = new WorksheetExtension {Uri = "{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}"};
@@ -599,7 +590,7 @@ namespace EPMLiveCore.API
             worksheetExtension.AppendChild(dataValidations);
             worksheetExtensionList.AppendChild(worksheetExtension);
 
-            worksheet.Append(columns, sheetData, sheetProtection, worksheetExtensionList);
+            worksheet.Append(columns, sheetData, worksheetExtensionList);
             worksheetPart.Worksheet = worksheet;
         }
 
@@ -997,7 +988,7 @@ namespace EPMLiveCore.API
 
             SPSecurity.RunWithElevatedPrivileges(() =>
                                                  {
-                                                     _permissions = GetPermissions(resourcePool.ParentWeb);
+                                                     _permissions = GetPermissions(resourcePool.ParentWeb).ToList();
 
                                                      dataTable = resourcePool.GetItems(new SPQuery()).GetDataTable();
 
@@ -1020,7 +1011,10 @@ namespace EPMLiveCore.API
                                                      }
                                                  });
 
-            dataTable.Columns.Add("EXTID", typeof (int));
+            if (!dataTable.Columns.Contains("EXTID"))
+            {
+                dataTable.Columns.Add("EXTID", typeof(int));
+            }
 
             foreach (DataRow dataRow in dataTable.Rows)
             {
@@ -1034,7 +1028,11 @@ namespace EPMLiveCore.API
 
                     if (spUser != null)
                     {
-                        dataRow["Permissions"] = string.Join(", ", (from SPGroup g in spUser.Groups where _permissions.Contains(g.Name) select g.Name).ToArray());
+                        var permissions = (from SPGroup g in spUser.Groups where _permissions.Contains(g.Name) select g.Name).ToList();
+                        
+                        dataRow["Permissions"] = permissions.Any()
+                                                     ? string.Join(", ", permissions.ToArray())
+                                                     : string.Empty;
                     }
                 }
                 else
@@ -1042,13 +1040,17 @@ namespace EPMLiveCore.API
                     dataRow["SharePointAccount"] = string.Empty;
                 }
 
-                dataRow["EXTID"] = spListItem["EXTID"];
+                try
+                {
+                    dataRow["EXTID"] = spListItem["EXTID"];
+                }
+                catch { }
             }
 
             return dataTable;
         }
 
-        private void ValidateAccess(SPList resourcePool)
+        private void ValidateAccess()
         {
             if (!_spWeb.CurrentUser.IsSiteAdmin)
             {
