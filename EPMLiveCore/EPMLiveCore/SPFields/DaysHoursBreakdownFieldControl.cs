@@ -214,7 +214,7 @@ namespace EPMLiveCore.SPFields
                         }
                         else
                         {
-                            hours = _workHoursDictionary[dateTime.ToString("dddd")];
+                            hours = _workHoursDictionary[dateTime.ToString("dddd", new CultureInfo("en-US"))];
 
                             if (_holidayDictionary.ContainsKey(columnName)) hours = 0;
 
@@ -241,7 +241,7 @@ namespace EPMLiveCore.SPFields
             {
                 string columnName = dataColumn.ColumnName;
                 DateTime dateTime = DateTime.ParseExact(columnName, "yyyyMMdd", CultureInfo.InvariantCulture);
-                string day = dateTime.ToString("dddd");
+                string day = dateTime.ToString("dddd", new CultureInfo("en-US"));
                 string title = day;
                 decimal hours = 8;
 
