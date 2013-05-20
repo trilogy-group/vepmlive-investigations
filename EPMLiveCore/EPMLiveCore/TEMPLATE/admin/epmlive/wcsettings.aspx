@@ -19,7 +19,7 @@
 </asp:Content>
 <asp:Content ID="Content5" ContentPlaceHolderId="PlaceHolderAdditionalPageHead" runat="server">
 
-    <script src="/_layouts/epmlive/DHTML/xajax/dhtmlxcommon.js" type="text/javascript"></script>
+    <script src="/_layouts/epmlive/DHTML/xgrid/dhtmlxcommon.js" type="text/javascript"></script>
 
     <script language="javascript">
         var divInstall;
