@@ -755,7 +755,9 @@ as
 SELECT     weburl
 FROM         publishercheck
 WHERE     (projectguid = @projid)')
- 
+
+
+
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spSecGetQueue')
 begin
     Print 'Creating Stored Procedure spSecGetQueue'
@@ -780,8 +782,8 @@ set @sql = '';WITH CTE AS
 ( 
 SELECT TOP '' + @maxthreads + '' * 
 FROM ITEMSEC 
-WHERE QUEUE is null
-order by dtadded
+WHERE QUEUE is null and STATUS = 0
+order by case when USER_ID=1073741823 then 1 else 0 end, priority, dtadded
 ) 
 UPDATE CTE SET QUEUE='''''' + @servername + ''''''''
 
@@ -789,7 +791,7 @@ UPDATE CTE SET QUEUE='''''' + @servername + ''''''''
 exec(@sql)
 
 
-SELECT * FROM ITEMSEC WHERE QUEUE = @servername
+SELECT * FROM ITEMSEC WHERE QUEUE = @servername and status = 0
 
 END
 ')
@@ -1021,6 +1023,8 @@ end
 exec(@sql)
 ')
  
+
+
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetApprovedTimesheets')
 begin
     Print 'Creating Stored Procedure spTSGetApprovedTimesheets'
@@ -1043,8 +1047,8 @@ SELECT     USERNAME, PROJECT_ID, WEB_UID, TS_ITEM_DATE,
                       SUM(TS_ITEM_HOURS) as TotalHours, PERIOD_START, PERIOD_END, PROJECT_LIST_UID, 
                       TYPEID, TSTYPE_NAME, LIST, LIST_UID
 FROM (
-SELECT     dbo.TSTIMESHEET.USERNAME, case when LIST=''Project Center'' and PROJECT_ID = 0 then ITEM_ID else dbo.TSITEM.PROJECT_ID end as PROJECT_ID, dbo.TSITEM.WEB_UID, dbo.TSITEMHOURS.TS_ITEM_DATE, 
-                      dbo.TSITEMHOURS.TS_ITEM_HOURS, dbo.TSPERIOD.PERIOD_START, dbo.TSPERIOD.PERIOD_END, case when LIST=''Project Center'' and PROJECT_LIST_UID IS NULL then LIST_UID else dbo.TSITEM.PROJECT_LIST_UID end as PROJECT_LIST_UID, 
+SELECT     dbo.TSTIMESHEET.USERNAME, case when PROJECT_ID = 0 then ITEM_ID else dbo.TSITEM.PROJECT_ID end as PROJECT_ID, dbo.TSITEM.WEB_UID, dbo.TSITEMHOURS.TS_ITEM_DATE, 
+                      dbo.TSITEMHOURS.TS_ITEM_HOURS, dbo.TSPERIOD.PERIOD_START, dbo.TSPERIOD.PERIOD_END, case when PROJECT_LIST_UID IS NULL then LIST_UID else dbo.TSITEM.PROJECT_LIST_UID end as PROJECT_LIST_UID, 
                       COALESCE (dbo.TSTYPE.TYPEID, 1) AS TYPEID, dbo.TSTYPE.TSTYPE_NAME, LIST, LIST_UID
 FROM         dbo.TSTIMESHEET INNER JOIN
                       dbo.TSITEM ON dbo.TSTIMESHEET.TS_UID = dbo.TSITEM.TS_UID INNER JOIN
@@ -1060,7 +1064,7 @@ ORDER BY USERNAME, PERIOD_START
 
 END
 ')
- 
+
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetPeriodsForSite')
 begin
     Print 'Creating Stored Procedure spTSGetPeriodsForSite'

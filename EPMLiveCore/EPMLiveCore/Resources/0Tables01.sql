@@ -649,14 +649,28 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[ITEM_ID] [int] NULL,
 			[USER_ID] [int] NULL,
 			[dtadded] [datetime] NULL DEFAULT (getdate()),
-			[QUEUE] [varchar](255) NULL
+			[PRIORITY] [int] NULL DEFAULT ((1)),
+			[QUEUE] [varchar](255) NULL,
+			[STATUS] [int] NULL DEFAULT ((0))
 		) ON [PRIMARY]
+
 end
 else
 begin
 
 	print 'Updating Table ITEMSEC'
 
+	if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'ITEMSEC' and column_name = 'PRIORITY')
+	begin
+		alter table ITEMSEC
+		ADD [PRIORITY] [int] NULL DEFAULT ((1))
+	end
+
+	if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'ITEMSEC' and column_name = 'STATUS')
+	begin
+		alter table ITEMSEC
+		ADD [STATUS] [int] NULL DEFAULT ((0))
+	end
 
 end
 

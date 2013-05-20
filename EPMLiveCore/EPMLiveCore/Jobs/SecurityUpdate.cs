@@ -20,7 +20,7 @@ namespace EPMLiveCore.Jobs
 
             GridGanttSettings settings = new GridGanttSettings(list);
 
-            
+
             List<string> cNewGrps = new List<string>();
             bool isSecure = false;
             try
@@ -31,7 +31,7 @@ namespace EPMLiveCore.Jobs
 
             SPUser orignalUser = web.AllUsers.GetByID(userid);
 
-            if(isSecure)
+            if (isSecure)
             {
                 string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
 
@@ -97,7 +97,7 @@ namespace EPMLiveCore.Jobs
 
                     li.BreakRoleInheritance(false);
 
-                    foreach(KeyValuePair<string, SPRoleType> group in pNewGrps)
+                    foreach (KeyValuePair<string, SPRoleType> group in pNewGrps)
                     {
                         SPGroup g = web.SiteGroups[group.Key];
 
@@ -108,7 +108,7 @@ namespace EPMLiveCore.Jobs
 
                 }
                 catch { }
-                   
+
             }
 
 
@@ -120,7 +120,7 @@ namespace EPMLiveCore.Jobs
             //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
             valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
 
-            if(valueHelper == null)
+            if (valueHelper == null)
             {
                 return;
             }
@@ -129,7 +129,7 @@ namespace EPMLiveCore.Jobs
 
             bool bHasLookup = false;
 
-            foreach(string fld in fields)
+            foreach (string fld in fields)
             {
                 SPFieldLookup lookup = null;
                 try
@@ -138,7 +138,7 @@ namespace EPMLiveCore.Jobs
                 }
                 catch { }
 
-                if(lookup == null)
+                if (lookup == null)
                 {
                     continue;
                 }
@@ -151,25 +151,25 @@ namespace EPMLiveCore.Jobs
                     sVal = li[fld].ToString();
                 }
                 catch { }
-                if(!string.IsNullOrEmpty(sVal))
+                if (!string.IsNullOrEmpty(sVal))
                 {
                     bHasLookup = true;
                     break;
                 }
             }
 
-            if(bHasLookup)
+            if (bHasLookup)
             {
                 // has security fields
-                if(fields.Count > 0)
+                if (fields.Count > 0)
                 {
                     // if the list is not a security list itself
-                    if(!isSecure)
+                    if (!isSecure)
                     {
                         li.BreakRoleInheritance(false);
                     }
 
-                    foreach(string fld in fields)
+                    foreach (string fld in fields)
                     {
                         SPFieldLookup lookup = null;
                         try
@@ -178,7 +178,7 @@ namespace EPMLiveCore.Jobs
                         }
                         catch { }
 
-                        if(lookup == null)
+                        if (lookup == null)
                         {
                             continue;
                         }
@@ -190,20 +190,20 @@ namespace EPMLiveCore.Jobs
                         string sVal = string.Empty;
                         try { sVal = li[fld].ToString(); }
                         catch { }
-                        if(string.IsNullOrEmpty(sVal)) { continue; }
+                        if (string.IsNullOrEmpty(sVal)) { continue; }
 
                         SPFieldLookupValue lookupVal = new SPFieldLookupValue(sVal.ToString());
                         SPListItem targetItem = lookupPrntList.GetItemById(lookupVal.LookupId);
-                        if(!targetItem.HasUniqueRoleAssignments)
+                        if (!targetItem.HasUniqueRoleAssignments)
                         {
                             continue;
                         }
                         SPRoleAssignmentCollection raCol = targetItem.RoleAssignments;
                         string itemMemberGrp = "Member";
-                        foreach(SPRoleAssignment ra in raCol)
+                        foreach (SPRoleAssignment ra in raCol)
                         {
                             // add their groups to this item but change permission lvl
-                            if(ra.Member.Name.Contains(itemMemberGrp))
+                            if (ra.Member.Name.Contains(itemMemberGrp))
                             {
                                 SPRoleAssignment newRa = new SPRoleAssignment(ra.Member);
                                 SPRoleDefinition newDef = web.RoleDefinitions.GetByType(SPRoleType.Contributor);
@@ -248,14 +248,14 @@ namespace EPMLiveCore.Jobs
                 cmd.Parameters.AddWithValue("@itemid", li.ID);
                 cmd.ExecuteNonQuery();
 
-                foreach(SPRoleAssignment ra in li.RoleAssignments)
+                foreach (SPRoleAssignment ra in li.RoleAssignments)
                 {
                     int type = 0;
-                    if(ra.Member.GetType() == typeof(SPGroup))
+                    if (ra.Member.GetType() == typeof(SPGroup))
                     {
                         type = 1;
                     }
-                    if((ra.RoleDefinitionBindings[0].BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems)
+                    if ((ra.RoleDefinitionBindings[0].BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems)
                     {
                         cmd = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn);
                         cmd.Parameters.AddWithValue("@siteid", site.ID);
@@ -288,7 +288,7 @@ namespace EPMLiveCore.Jobs
             SPGroup ownerGrp = null;
             //SPListItem eI = ew.Lists[base.ListUid].GetItemById(base.ItemID);
 
-            foreach(string grp in grps)
+            foreach (string grp in grps)
             {
                 string finalName = string.Empty;
                 SPGroup testGrp = null;
@@ -297,7 +297,7 @@ namespace EPMLiveCore.Jobs
                     testGrp = ew.SiteGroups[safeTitle + " " + grp];
                 }
                 catch { }
-                if(testGrp != null)
+                if (testGrp != null)
                 {
                     finalName = testGrp.Name;
                 }
@@ -314,7 +314,7 @@ namespace EPMLiveCore.Jobs
 
                 SPGroup finalGrp = ew.SiteGroups[finalName];
                 SPRoleType rType;
-                switch(grp)
+                switch (grp)
                 {
                     case "Owner":
                         ownerGrp = finalGrp;
@@ -341,18 +341,18 @@ namespace EPMLiveCore.Jobs
         public void AddBuildTeamSecurityGroups(SPWeb ew, GridGanttSettings settings, SPListItem eI)
         {
             string teamPerm = string.Empty;
-            
+
             try
             {
                 teamPerm = settings.BuildTeamPermissions;
             }
             catch { }
-            if(!string.IsNullOrEmpty(teamPerm))
+            if (!string.IsNullOrEmpty(teamPerm))
             {
                 string[] strOuter = settings.BuildTeamPermissions.Split(new string[] { "|~|" }, StringSplitOptions.None);
                 //SPListItem eI = ew.Lists[base.ListUid].GetItemById(base.ItemID);
 
-                foreach(string strInner in strOuter)
+                foreach (string strInner in strOuter)
                 {
                     string[] strInnerMost = strInner.Split('~');
                     SPGroup g = null;
@@ -364,7 +364,7 @@ namespace EPMLiveCore.Jobs
                         r = ew.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1]));
                     }
                     catch { }
-                    if(g != null && r != null)
+                    if (g != null && r != null)
                     {
                         SPRoleAssignment assign = new SPRoleAssignment(g);
                         assign.RoleDefinitionBindings.Add(r);
@@ -393,7 +393,7 @@ namespace EPMLiveCore.Jobs
         private string GetSafeGroupTitle(string grpName)
         {
             string result = string.Empty;
-            if(!string.IsNullOrEmpty(grpName))
+            if (!string.IsNullOrEmpty(grpName))
             {
                 result = grpName;
                 result = result.Replace("\"", "")

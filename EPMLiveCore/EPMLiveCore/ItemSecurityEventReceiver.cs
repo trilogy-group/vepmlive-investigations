@@ -33,21 +33,11 @@ namespace EPMLiveCore
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(properties.Web.Site.WebApplication.Id));
-                cn.Open();
-
-                SqlCommand cmd = new SqlCommand("INSERT INTO ITEMSEC (SITE_ID, WEB_ID, LIST_ID, ITEM_ID, USER_ID) VALUES (@siteid, @webid, @listid, @itemid, @userid)", cn);
-                cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
-                cmd.Parameters.AddWithValue("@webid", properties.Web.ID);
-                cmd.Parameters.AddWithValue("@listid", properties.ListId);
-                cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
-                cmd.Parameters.AddWithValue("@userid", properties.CurrentUserId);
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
 
                 base.EventFiringEnabled = false;
                 GridGanttSettings settings = new GridGanttSettings(properties.List);
+
+
 
                 bool isSecure = false;
                 try
@@ -55,6 +45,27 @@ namespace EPMLiveCore
                     isSecure = settings.BuildTeamSecurity;
                 }
                 catch { }
+
+
+                int priority = 1;
+                if (isSecure)
+                    priority = 0;
+
+                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(properties.Web.Site.WebApplication.Id));
+                cn.Open();
+
+                SqlCommand cmd = new SqlCommand("INSERT INTO ITEMSEC (SITE_ID, WEB_ID, LIST_ID, ITEM_ID, USER_ID, priority) VALUES (@siteid, @webid, @listid, @itemid, @userid, @priority)", cn);
+                cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
+                cmd.Parameters.AddWithValue("@webid", properties.Web.ID);
+                cmd.Parameters.AddWithValue("@listid", properties.ListId);
+                cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
+                cmd.Parameters.AddWithValue("@userid", properties.CurrentUserId);
+                cmd.Parameters.AddWithValue("@priority", priority);
+                cmd.ExecuteNonQuery();
+
+                cn.Close();
+
+
 
                 SPUser orignalUser = properties.Web.AllUsers.GetByID(properties.CurrentUserId);
 
@@ -85,9 +96,24 @@ namespace EPMLiveCore
                         sAssignedTo = assignedToFv.ToString();
                     }
 
-                    if (string.IsNullOrEmpty(sAssignedTo))
+                    SPFieldUserValueCollection uCol = new SPFieldUserValueCollection();
+
+                    if (!string.IsNullOrEmpty(sAssignedTo))
                     {
-                        li["AssignedTo"] = new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName);
+                        uCol = new SPFieldUserValueCollection(properties.Web, sAssignedTo);
+                    }
+
+                    if (assignedTo != null)
+                    {
+                        if (assignedTo.AllowMultipleValues)
+                        {
+                            uCol.Add(new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName));
+                            li["AssignedTo"] = uCol;
+                        }
+                        else
+                        {
+                            li["AssignedTo"] = new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName);
+                        }
 
                         try
                         {

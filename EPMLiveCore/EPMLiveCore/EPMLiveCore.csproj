@@ -13,18 +13,16 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Munjal%27s Deploy Config</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
-
-iisreset
-net stop "WorkEngine Timer"
-net start "WorkEngine Timer"</PostDeploymentCommand>
-    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore</PreDeploymentCommand>
+    <PostDeploymentCommand>
+    </PostDeploymentCommand>
+    <PreDeploymentCommand>
+    </PreDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -765,9 +763,12 @@ net start "WorkEngine Timer"</PostDeploymentCommand>
       <DependentUpon>notificationsadmin.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\PerformUpgrade.aspx.cs">
+      <DependentUpon>PerformUpgrade.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Layouts\epmlive\PerformUpgrade.aspx.designer.cs" />
+    <Compile Include="Layouts\epmlive\PerformUpgrade.aspx.designer.cs">
+      <DependentUpon>PerformUpgrade.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\permissions.aspx.cs">
       <DependentUpon>permissions.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -895,13 +896,19 @@ net start "WorkEngine Timer"</PostDeploymentCommand>
       <DependentUpon>unsealfields.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\Upgrade.aspx.cs">
+      <DependentUpon>Upgrade.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Layouts\epmlive\Upgrade.aspx.designer.cs" />
+    <Compile Include="Layouts\epmlive\Upgrade.aspx.designer.cs">
+      <DependentUpon>Upgrade.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\UpgradeResult.aspx.cs">
+      <DependentUpon>UpgradeResult.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs" />
+    <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs">
+      <DependentUpon>UpgradeResult.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
       <DependentUpon>proxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2957,6 +2964,7 @@ net start "WorkEngine Timer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\deleteteam.png" />
     <Content Include="Layouts\epmlive\images\down.gif" />
     <Content Include="Layouts\epmlive\images\dropdown2.gif" />
+    <Content Include="Layouts\epmlive\images\dropdown2.png" />
     <Content Include="Layouts\epmlive\images\epmlive-header.png" />
     <Content Include="Layouts\epmlive\images\epmlive-logo.png" />
     <Content Include="Layouts\epmlive\images\error.png" />
@@ -3607,11 +3615,7 @@ net start "WorkEngine Timer"</PostDeploymentCommand>
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
+del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
   </PropertyGroup>
 </Project>
