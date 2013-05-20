@@ -16,11 +16,13 @@ namespace TimerService
     class SecurityClass
     {
         private Object thisLock = new Object();
+        private static Object qLock = new Object();
 
         public struct RunnerData
         {
             public string cn;
             public DataRow dr;
+            public int index;
         }
 
         private class WorkerThreads
@@ -34,40 +36,54 @@ namespace TimerService
                 _arrWorkers = new BackgroundWorker[maxThreads];
             }
 
-            public bool add(BackgroundWorker newBw)
+            public int add(BackgroundWorker newBw)
             {
-                for(int i = 0; i < _maxThreads; i++)
+                lock (qLock)
                 {
-                    if(_arrWorkers[i] == null)
+                    for (int i = 0; i < _maxThreads; i++)
                     {
-                        _arrWorkers[i] = newBw;
-                        return true;
+                        if (_arrWorkers[i] == null)
+                        {
+                            _arrWorkers[i] = newBw;
+                            return i;
+                        }
                     }
                 }
-                return false;
+                return -1;
             }
 
             public int remainingThreads()
             {
                 int counter = 0;
-                foreach(BackgroundWorker bw in _arrWorkers)
+                lock (qLock)
                 {
-                    if(bw == null)
-                        counter++;
+                    foreach (BackgroundWorker bw in _arrWorkers)
+                    {
+                        if (bw == null)
+                            counter++;
+                    }
                 }
                 return counter;
             }
 
+            public void remove(int i)
+            {
+                lock (qLock)
+                {
+                    _arrWorkers[i] = null;
+                }
+            }
+
             public void cleanup()
             {
-                for(int i = 0; i < _maxThreads; i++)
-                    if(_arrWorkers[i] != null)
-                        if(!((BackgroundWorker)_arrWorkers[i]).IsBusy)
+                for (int i = 0; i < _maxThreads; i++)
+                    if (_arrWorkers[i] != null)
+                        if (!((BackgroundWorker)_arrWorkers[i]).IsBusy)
                             _arrWorkers[i] = null;
             }
         }
 
-        private WorkerThreads workingThreads;
+        private static WorkerThreads workingThreads;
 
         public bool startTimer()
         {
@@ -95,7 +111,7 @@ namespace TimerService
 
         private void logMessage(string type, string module, string message)
         {
-            lock(thisLock)
+            lock (thisLock)
             {
                 DateTime dt = DateTime.Now;
 
@@ -113,17 +129,16 @@ namespace TimerService
             {
                 workingThreads.cleanup();
                 int maxThreads = workingThreads.remainingThreads();
-                if(maxThreads > 0)
+                if (maxThreads > 0)
                 {
-
-                    foreach(SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
-                        if(sConn != "")
+                        if (sConn != "")
                         {
                             SqlConnection cn = new SqlConnection(sConn);
                             cn.Open();
-                            
+
                             SqlCommand cmd = new SqlCommand("spSecGetQueue", cn);
                             cmd.CommandType = CommandType.StoredProcedure;
                             cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
@@ -133,44 +148,94 @@ namespace TimerService
                             SqlDataAdapter da = new SqlDataAdapter(cmd);
                             da.Fill(ds);
 
-                            foreach(DataRow dr in ds.Tables[0].Rows)
+                            foreach (DataRow dr in ds.Tables[0].Rows)
                             {
-                                try
-                                {
-                                    EPMLiveCore.Jobs.SecurityUpdate sec = new EPMLiveCore.Jobs.SecurityUpdate();
-                                    Guid ListUid = new Guid(dr["LIST_ID"].ToString());
-                                    int ItemID = int.Parse(dr["ITEM_ID"].ToString());
-                                    int userid = int.Parse(dr["USER_ID"].ToString());
-
-                                    using(SPSite site = new SPSite(new Guid(dr["SITE_ID"].ToString())))
-                                    {
-                                        using(SPWeb web = site.OpenWeb(new Guid(dr["WEB_ID"].ToString())))
-                                        {
-                                            sec.execute(site, web, ListUid, ItemID, userid, "");
-                                        }
-                                    }
-
-                                }
-                                catch { }
-
-                                cmd = new SqlCommand("delete from ITEMSEC where ITEM_SEC_ID=@id", cn);
-                                cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
-                                cmd.ExecuteNonQuery();
+                                startProcess(dr, cn);
                             }
 
                             cn.Close();
                         }
-
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logMessage("ERR", "RUN", ex.Message);
             }
         }
 
-        
+        public bool startProcess(DataRow dr, SqlConnection cn)
+        {
+            try
+            {
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.WorkerReportsProgress = true;
+                bw.WorkerSupportsCancellation = true;
+
+                bw.DoWork += bw_DoWork;
+                //bw.ProgressChanged += bw_ProgressChanged;
+                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+
+                RunnerData d = new RunnerData();
+                d.cn = cn.ConnectionString;
+                d.dr = dr;
+                d.index = workingThreads.add(bw);
+
+                if (d.index > -1)
+                {
+                    SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 1 where ITEM_SEC_ID=@id", cn);
+                    cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                    cmd.ExecuteNonQuery();
+
+                    bw.RunWorkerAsync(d);
+
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logMessage("ERR", "STPR", ex.Message);
+                return false;
+            }
+        }
+
+        private void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Thread.Sleep(500);
+            RunnerData rd = (RunnerData)e.Argument;
+            DataRow dr = rd.dr;
+            try
+            {
+                try
+                {
+                    EPMLiveCore.Jobs.SecurityUpdate sec = new EPMLiveCore.Jobs.SecurityUpdate();
+                    Guid ListUid = new Guid(dr["LIST_ID"].ToString());
+                    int ItemID = int.Parse(dr["ITEM_ID"].ToString());
+                    int userid = int.Parse(dr["USER_ID"].ToString());
+
+                    using (SPSite site = new SPSite(new Guid(dr["SITE_ID"].ToString())))
+                    {
+                        using (SPWeb web = site.OpenWeb(new Guid(dr["WEB_ID"].ToString())))
+                        {
+                            sec.execute(site, web, ListUid, ItemID, userid, "");
+                        }
+                    }
+
+                }
+                catch { }
+
+                SqlConnection cn = new SqlConnection(rd.cn);
+                cn.Open();
+                SqlCommand cmd = new SqlCommand("delete from ITEMSEC where ITEM_SEC_ID=@id", cn);
+                cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                cmd.ExecuteNonQuery();
+                cn.Close();
+            }
+            catch { }
+
+            workingThreads.remove(rd.index);
+        }
 
 
         static void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

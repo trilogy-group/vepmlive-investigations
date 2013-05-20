@@ -129,7 +129,7 @@ namespace TimerService
                     int poll = 5;
                     try
                     {
-                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("IntPollingInterval"));
+                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
                     Thread.Sleep(poll * 1000);
@@ -207,7 +207,7 @@ namespace TimerService
                     int poll = 30;
                     try
                     {
-                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("HighPollingInterval"));
+                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
                     Thread.Sleep(poll * 1000);
@@ -237,7 +237,7 @@ namespace TimerService
                     int poll = 5;
                     try
                     {
-                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("TSPollingInterval"));
+                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
                     Thread.Sleep(poll * 1000);
@@ -267,7 +267,7 @@ namespace TimerService
                     int poll = 2;
                     try
                     {
-                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("SecPollingInterval"));
+                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
                     Thread.Sleep(poll * 1000);
