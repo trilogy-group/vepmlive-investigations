@@ -938,8 +938,7 @@ namespace EPMLiveCore.API
                                                                  .Replace("##itemId##", sItemId.ToString())
                                                                  .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                  .Replace("##createdDate##", dCreated.ToFriendlyDateAndTime())
-                                                                 .Replace("##comment##", GetXMLSafeVersion((string)(originalComment["Comment"] ?? string.Empty))));
-
+                                                                 .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(originalComment["Comment"].ToString() ?? string.Empty)))));
                         // get user object 
                         SPFieldUser author = (SPFieldUser)originalComment.Fields[SPBuiltInFieldId.Author];
                         SPFieldUserValue user = (SPFieldUserValue)author.GetFieldValue(originalComment[SPBuiltInFieldId.Author].ToString());
@@ -1041,7 +1040,7 @@ namespace EPMLiveCore.API
                                                                          .Replace("##itemId##", sItemId2.ToString())
                                                                          .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                          .Replace("##createdDate##", dCreated2.ToFriendlyDateAndTime())
-                                                                         .Replace("##comment##", GetXMLSafeVersion((string)(comment["Comment"] ?? string.Empty))));
+                                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(comment["Comment"].ToString() ?? string.Empty)))));
 
                                 sbResult.Append(XML_USER_INFO_SECTION.Replace("##username##", userObject.Name)
                                                                      .Replace("##useremail##", userObject.Email)
