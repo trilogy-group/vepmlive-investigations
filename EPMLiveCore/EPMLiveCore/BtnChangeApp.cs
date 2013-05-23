@@ -33,7 +33,7 @@ namespace EPMLiveCore
                         if (!string.IsNullOrEmpty(urlWelcome))
                         {
                             url = es.MakeFullUrl(urlWelcome);
-                            url = SPHttpUtility.UrlKeyValueDecode(url);
+                            url = SPHttpUtility.UrlKeyValueDecode(url); 
                         }
                     }
                 }
