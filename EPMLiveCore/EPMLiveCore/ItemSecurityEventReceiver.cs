@@ -96,24 +96,9 @@ namespace EPMLiveCore
                         sAssignedTo = assignedToFv.ToString();
                     }
 
-                    SPFieldUserValueCollection uCol = new SPFieldUserValueCollection();
-
-                    if (!string.IsNullOrEmpty(sAssignedTo))
+                    if (string.IsNullOrEmpty(sAssignedTo))
                     {
-                        uCol = new SPFieldUserValueCollection(properties.Web, sAssignedTo);
-                    }
-
-                    if (assignedTo != null)
-                    {
-                        if (assignedTo.AllowMultipleValues)
-                        {
-                            uCol.Add(new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName));
-                            li["AssignedTo"] = uCol;
-                        }
-                        else
-                        {
-                            li["AssignedTo"] = new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName);
-                        }
+                        li["AssignedTo"] = new SPFieldUserValue(properties.Web, orignalUser.ID, orignalUser.LoginName);
 
                         try
                         {
