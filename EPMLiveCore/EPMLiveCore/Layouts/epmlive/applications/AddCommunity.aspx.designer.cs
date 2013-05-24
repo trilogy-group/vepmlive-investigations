@@ -40,6 +40,15 @@ namespace EPMLiveCore.Layouts.epmlive.applications {
         protected global::System.Web.UI.WebControls.TextBox txtName;
         
         /// <summary>
+        /// reqValCommName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.InputFormRequiredFieldValidator reqValCommName;
+        
+        /// <summary>
         /// btnAdd control.
         /// </summary>
         /// <remarks>

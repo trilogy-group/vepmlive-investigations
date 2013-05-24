@@ -23,7 +23,6 @@ namespace EPMLiveCore.Layouts.epmlive.applications
         {
             try
             {
-
                 CommId = API.Applications.CreateCommunity(txtName.Text, Web).ToString();
 
                 pnlDone.Visible = true;
@@ -36,5 +35,6 @@ namespace EPMLiveCore.Layouts.epmlive.applications
                 lblError.Visible = true;
             }
         }
+
     }
 }

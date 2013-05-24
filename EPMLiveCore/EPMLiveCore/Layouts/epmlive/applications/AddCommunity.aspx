@@ -57,7 +57,9 @@
     To create a new community for your site, enter the title of the new community.
     </p>
     <asp:Label ID="lblError" runat="server" Visible="false" ForeColor="Red"></asp:Label>
-    <span class="wizText">Enter Community Name:</span> <asp:TextBox ID="txtName" runat="server"></asp:TextBox><br />
+    <span class="wizText">Enter Community Name:</span> <asp:TextBox ID="txtName" runat="server"></asp:TextBox> 
+        <SharePoint:InputFormRequiredFieldValidator ID="reqValCommName" runat="server" ControlToValidate="txtName" ErrorMessage="Please enter a community name."></SharePoint:InputFormRequiredFieldValidator>
+        <br />
     <hr style="margin-top:15px;">
     <div style="width:100%;text-align:right;">
     <asp:Button ID="btnAdd" Text="Add" runat="server" OnClick="btnAdd_Click" class="btn" style="height:28px;width:65px;" />
