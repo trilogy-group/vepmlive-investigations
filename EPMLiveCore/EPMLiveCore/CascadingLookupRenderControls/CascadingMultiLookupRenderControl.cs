@@ -24,11 +24,11 @@ namespace EPMLiveCore
         {
             //ScriptLink.Register(Page, "/_layouts/epmlive/jQueryLibrary/jquery-1.6.2.min.js", false);
 
-            Page.ClientScript.RegisterClientScriptBlock(GetType(), "_LookupFieldsPropsArray_",
-                "if (!_LookupFieldsPropsArray) { var _LookupFieldsPropsArray = new Array(); }", true);
+            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_LookupFieldsPropsArray_",
+                "<script>if (!_LookupFieldsPropsArray) { var _LookupFieldsPropsArray = new Array(); }</script>", false);
 
-            this.Page.ClientScript.RegisterClientScriptBlock(GetType(), "_LookupFieldsPropsArray_Edit_" + this.ClientID,
-                
+            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_LookupFieldsPropsArray_Edit_" + this.ClientID,
+                "<script>" +
                 "if (_LookupFieldsPropsArray) { " +
                 "   var lookupFieldProp_" + LookupData.Field + " = { FieldName : '" + LookupData.Field + "', " +
                 "                                                    ControlType: '" + LookupData.Type + "', " +
@@ -54,11 +54,12 @@ namespace EPMLiveCore
                 "                                                    CachedValue: ''};" +
                 "  var arrLength = _LookupFieldsPropsArray.length; " +
                 "  _LookupFieldsPropsArray[arrLength] = lookupFieldProp_" + LookupData.Field + "; " +
-                "} "
-                , true);
+                "} " +
+                "</script>"
+                , false);
 
-
-            ScriptLink.Register(Page, "epmlive/ModifiedDropDown.js", false);
+            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_ModifiedDropDownJS_", "<script src='/_layouts/epmlive/ModifiedDropDown.js'></script>", false);
+        
 
             object fv = null;
             string sfv = string.Empty;
