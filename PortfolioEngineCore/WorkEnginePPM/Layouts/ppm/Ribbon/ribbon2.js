@@ -2838,8 +2838,14 @@ function Ribbon(ribbonData) {
                     sb.append("<a" + aid + "></a>");
                     sb.append("</span>");
                     sb.append("<a class='ms-cui-dd-arrow-button' onclick='Ribbon_showPopup(\"" + item.id + "_popup\",\"" + item.id + "\",\"" + this.ribbonData.parent + "\");'>");
-                    sb.append("<span class='ms-cui-img-5by3 ms-cui-img-cont-float'>");
-                    sb.append("<img alt='' src='./images/formatmap16x16.png' style='top: -24px; left: -48px;position:relative;z-index:5;' />");
+
+                    // Firefox has an issue trying to extract the downarrow - so let us create our own image to get round the issue
+
+                    //sb.append("<span class='ms-cui-img-5by3 ms-cui-img-cont-float'>");
+                    //sb.append("<img alt='' src='./images/formatmap16x16.png' style='top: -24px; left: -48px;position:relative;z-index:5;' />");
+
+                    sb.append("<span class='ms-cui-img-cont-float'>");
+                     sb.append("<img alt='' src='./images/ribbondnarrow.png' style='position:relative;z-index:5;' />");
                     sb.append("</span>");
                     sb.append("</a>");
                     sb.append("</span>");
