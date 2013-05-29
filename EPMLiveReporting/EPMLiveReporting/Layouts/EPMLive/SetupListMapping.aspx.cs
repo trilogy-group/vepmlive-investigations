@@ -85,6 +85,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             PopulateFieldList();
         }
 
+        protected void Cancel_Click(object sender, EventArgs e)
+        {
+            SPUtility.Redirect(SPContext.Current.Web.Url + "/_layouts/epmlive/listmappings.aspx?Source=" + SPContext.Current.Web.Url + "/_layouts/epmlive/settings.aspx", SPRedirectFlags.Static, HttpContext.Current);
+        }
+
         protected void Submit_Click(object sender, EventArgs e)
         {
             var fields = new ListItemCollection();            

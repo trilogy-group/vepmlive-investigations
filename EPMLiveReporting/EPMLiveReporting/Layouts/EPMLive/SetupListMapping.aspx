@@ -111,10 +111,11 @@
             </template_inputformcontrols>
         </wssuc:InputFormSection>
         
-        <wssuc:ButtonSection ID="ButtonSection1" runat="server">
+        <wssuc:ButtonSection ID="ButtonSection1" runat="server" ShowStandardCancelButton="false">
             <template_buttons>
                 <asp:PlaceHolder ID="PlaceHolder1" runat="server">
                     <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Submit_Click" Text="Save Settings" id="Button1" accesskey="" Width="150"/>
+                    <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Cancel_Click" Text="Cancel" id="btnCancel" accesskey="" Width="150"/>
                 </asp:PlaceHolder>
             </template_buttons>
         </wssuc:ButtonSection>
