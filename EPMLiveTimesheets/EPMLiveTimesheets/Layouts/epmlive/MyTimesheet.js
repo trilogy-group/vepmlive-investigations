@@ -68,10 +68,14 @@ Grids.OnScroll = function (grid) {
 
 
 Grids.OnKeyDown = function (grid, key, event, name, prefix) {
+    curGrid = grid;
+    setTimeout('esGrid()', 10);
+}
 
+function esGrid() {
     if (curPop) {
-        grid.EndEdit(false);
-        grid.StartEdit();
+        curGrid.EndEdit(false);
+        curGrid.StartEdit();
     }
 }
 

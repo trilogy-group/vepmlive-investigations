@@ -53,8 +53,7 @@
     <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_clist.js"></script>
 	<script src="DHTML/xgrid/excells/dhtmlxgrid_excell_acheck.js"></script>
 	<script src="DHTML/xgrid/excells/dhtmlxgrid_excell_calendar.js"></script>	
-    <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js"></script>
-    <script src="DHTML/dhtmlxajax.js"></script>
+    <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js"></script
 
     <script src="DHTML/calendar/dhtmlxcalendar.js"></script>
 

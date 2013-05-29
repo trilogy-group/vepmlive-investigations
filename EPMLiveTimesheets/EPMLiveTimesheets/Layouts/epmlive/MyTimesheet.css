@@ -41,13 +41,13 @@ border-color:#92C0E0;
 
 .tsOK
 {
-    min-width: 4em;
-    padding: 7px 0px;
+    min-width: 4em !important;
+    padding: 7px 0px !important;
     border: 1px solid #ABABAB;
     background-color: #FDFDFD;
     background-color: #FDFDFD;
     font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-    font-size: 11px;
+    font-size: 11px !important;
     color: #444;
 }
 
