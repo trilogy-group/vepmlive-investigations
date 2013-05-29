@@ -183,7 +183,7 @@ namespace EPMLiveReportsAdmin
 
             if (string.IsNullOrEmpty(sql)) return;
 
-            if (!_myWorkReportData.InsertListItem(sql))
+            foreach (var stmt in sql.Split(new[] {"!-x-x-x-x-x-!"}, StringSplitOptions.None).Where(stmt => !_myWorkReportData.InsertListItem(stmt)))
             {
                 _myWorkReportData.LogStatus(_myWorkReportData.GetListId(_listName), _listName.Replace("'", string.Empty),
                                             "Url:" + _properties.RelativeWebUrl.Replace("'", string.Empty) +

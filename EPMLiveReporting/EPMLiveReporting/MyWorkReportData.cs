@@ -121,6 +121,7 @@ namespace EPMLiveReportsAdmin
         public string InsertSQL(string tableName, string listName, DataTable columns, SPListItem spListItem,
                                 ArrayList defaultColumns)
         {
+            string sql = string.Empty;
             _cmdWithParams = null;
 
             SPFieldCollection spFieldCollection = spListItem.ParentList.Fields;
@@ -172,9 +173,11 @@ namespace EPMLiveReportsAdmin
                     object hours = null;
                     try
                     {
-                        hours = double.Parse(originalWork.ToString()) / totalAssignedToUsers;
+                        hours = double.Parse(originalWork.ToString())/totalAssignedToUsers;
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
                     foreach (SPFieldUserValue spFieldUserValue in spFieldUserValueCollection)
                     {
@@ -195,13 +198,42 @@ namespace EPMLiveReportsAdmin
                     spListItem["Work"] = originalWork;
                     spListItem["AssignedTo"] = spFieldUserValueCollection;
 
-                    return stringBuilder.ToString();
+                    sql = stringBuilder.ToString();
+                }
+                else
+                {
+                    sql= stringBuilder.ToString();
+                }
+            }
+
+            if (_params.Count > 2000)
+            {
+                var stringBuilder = new StringBuilder();
+
+                var stmts = sql.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
+                var totalParams = 0;
+
+                foreach (var stmt in stmts)
+                {
+                    var paramCount = stmt.TakeWhile(c => c == '@').Count();
+
+                    if (totalParams + paramCount > 2000)
+                    {
+                        stringBuilder.AppendLine("!-x-x-x-x-x-!");
+                        stringBuilder.AppendLine(stmt);
+                        totalParams = paramCount;
+                    }
+                    else
+                    {
+                        stringBuilder.AppendLine(stmt);
+                        totalParams += paramCount;
+                    }
                 }
 
                 return stringBuilder.ToString();
             }
 
-            return string.Empty;
+            return sql;
         }
 
         // Protected Methods (4) 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Linq;
 using EPMLiveCore;
 using EPMLiveReportsAdmin.Properties;
 using Microsoft.SharePoint;
@@ -632,11 +633,37 @@ namespace EPMLiveReportsAdmin
 
         public bool ExecuteNonQuery(SqlCommand command, SqlParameterCollection paramCollection, SqlConnection con)
         {
+            var sql = command.CommandText;
+            var sqlCommand = new SqlCommand(command.CommandText);
+
             try
             {
+                if (command.Parameters.Count > 2000)
+                {
+                    var parameters = new List<SqlParameter>();
+                    foreach (var parameter in command.Parameters)
+                    {
+                        parameters.Add((SqlParameter) parameter);
+                    }
+
+                    foreach (SqlParameter sqlParameter in parameters)
+                    {
+                        if (sql.Contains(sqlParameter.ParameterName))
+                        {
+                            sqlCommand.Parameters.Add(new SqlParameter(sqlParameter.ParameterName, sqlParameter.Value));
+                        }
+                    }
+
+                    sqlCommand.CommandTimeout = 3600; // 1hour
+                    sqlCommand.Connection = con;
+                    sqlCommand.ExecuteNonQuery();
+                }
+                else
+                {
                 command.CommandTimeout = 3600; // 1hour
                 command.Connection = con;
                 command.ExecuteNonQuery();
+            }
             }
             catch (SqlException ex)
             {
@@ -648,7 +675,7 @@ namespace EPMLiveReportsAdmin
 
                     EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
                     myLog.MaximumKilobytes = 32768;
-                    string cmdDetails = "Command: " + command.CommandText;
+                    string cmdDetails = "Command: " + sql;
                     string cmdParams = " Params: ";
 
                     foreach (SqlParameter param in paramCollection)
@@ -672,7 +699,9 @@ namespace EPMLiveReportsAdmin
             finally
             {
                 command.Dispose();
+                sqlCommand.Dispose();
             }
+
             return true;
         }
 
