@@ -76,7 +76,7 @@ namespace CADataCache
                 m_targets[i] = new clsDetailRowData(persize); 
         }
     }
-
+    [Serializable()]
     public class CostAnalyzerDataCache
     {
         clsCostData m_clsda = null;

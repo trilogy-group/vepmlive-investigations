@@ -427,8 +427,9 @@ border-radius: 0px;
 	params.ClientID = '<%=ClientID%>';
 	params.URL = '<%=URL%>';
 	params.TicketVal = '<%=TicketVal%>';
+	params.ListIdVal = '<%=ListIdVal%>';
+	params.ViewID = '<%=ViewIDVal%>';
 	params.Webservice = '<%=Webservice%>';
-	params.RPEMode = '<%=RPEMode%>';
 	optimizerco = new Optimizer('optimizerwp', params);
 
 </script>

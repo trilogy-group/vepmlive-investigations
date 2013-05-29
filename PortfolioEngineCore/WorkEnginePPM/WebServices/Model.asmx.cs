@@ -89,8 +89,8 @@ namespace WorkEnginePPM
         public string Execute(string Ticket, string Function, string Dataxml)
         {
             string sStage;
-            ModelCache ModelData = (ModelCache)this.Context.Session[Ticket];
- 
+
+            ModelCache ModelData = (ModelCache) GetCachedData(this.Context, Ticket);
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
             {
                 try
@@ -106,6 +106,8 @@ namespace WorkEnginePPM
                 {
                     return HandleError("Execute", 99999, string.Format("Error executing function: {0}", ex.Message));
                 }
+
+                SaveCachedData(this.Context, Ticket, ModelData);
             }
             else
                 return HandleError("Execute", 99999, string.Format("PfE User Authentication Failed. Stage: {0}", sStage));
@@ -181,8 +183,7 @@ namespace WorkEnginePPM
                 {
 
                     string sDBConnect = WebAdmin.GetConnectionString(this.Context);
-                    //int lw = (int)Context.Session["WResID"];
-                    //int lw = vb.val(WebAdmin.GetSPSessionString(Context,"WResID"));
+
 
                     int lw;
 
@@ -198,22 +199,19 @@ namespace WorkEnginePPM
                         if (CheckUserGlobalPermission(conn, lw, perm) == true)
                              bpermallow = true;
 
-                        ModelData = (ModelCache)this.Context.Session[sTicket];
 
                         if (ModelData == null)
                         {
  
                             ModelData = new ModelCache();
                             ModelData.InitalLoadData(conn, sTicket, sModel, sVersions, lw.ToString(), sViewID);
-                            SaveSessionData(sTicket, ModelData);
-                            this.Context.Session[sTicket] = ModelData;
 
                         }
                         else
                             ModelData.InitalLoadData(conn, sTicket, sModel, sVersions, lw.ToString(), sViewID);
 
 
-
+                        SaveCachedData(Context, sTicket, ModelData);
 
                 }
 
@@ -238,14 +236,10 @@ namespace WorkEnginePPM
         public void DoTopGridCheck(string Ticket, string Row)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetSelectedForRow(Row);
-
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
         }
 
@@ -263,16 +257,12 @@ namespace WorkEnginePPM
         public ModelBarsChanged DoBarMoved(string Ticket, string Row, string sStart, string sFinish)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelBarsChanged retData = new ModelBarsChanged();
 
             ModelData.DoBarMove(Row, sStart, sFinish, ref retData);
-
+            SaveCachedData(this.Context, Ticket, ModelData);
             return retData;
 
          }
@@ -290,17 +280,9 @@ namespace WorkEnginePPM
         public void DoCopyVersion(string Ticket, string sFrom, string sTo, string sPIs)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-  //              sFrom = "0";
-  //              sTo = "1";
-  //              sPIs = "";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
-
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
             ModelData.DoCopyVersion(sFrom, sTo, sPIs);
-
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
 
         }
@@ -314,14 +296,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public void DoLoadVersion(string Ticket, string sLoad)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-                sLoad = "2";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
-
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
@@ -337,7 +312,7 @@ namespace WorkEnginePPM
             }
 
 
-
+            SaveCachedData(this.Context, Ticket, ModelData);
 
             return;
 
@@ -353,16 +328,8 @@ namespace WorkEnginePPM
         public void DoLoadTarget(string Ticket, string sTarget)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-                //             sTarget = "1";
-            }
-            if (sTarget == "")
-            {
-                sTarget = "1";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
 
             string sStage;
@@ -379,7 +346,7 @@ namespace WorkEnginePPM
             }
 
 
-
+            SaveCachedData(this.Context, Ticket, ModelData);
 
             return;
 
@@ -395,11 +362,7 @@ namespace WorkEnginePPM
         public string GetTopGridLayout(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetTopGridLayout();
         }
@@ -414,11 +377,7 @@ namespace WorkEnginePPM
         public string GetTopGridData(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetTopGridData();
         }
@@ -431,12 +390,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public string GetBottomGridLayout(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetBottomGridLayout();
         }
@@ -450,11 +404,7 @@ namespace WorkEnginePPM
         public string GetBottomGridData(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetBottomGridData();
  
@@ -469,14 +419,11 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public void DoShowFTEs(string Ticket, int FTEMode)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetFTEMode(FTEMode);
+
+            SaveCachedData(this.Context, Ticket, ModelData);
 
             return;   // ModelData.GetBottomGridData();
 
@@ -490,12 +437,6 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public void DoPingSession(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
 
   
             return;   // ModelData.GetBottomGridData();
@@ -512,14 +453,11 @@ namespace WorkEnginePPM
         public int DoShowGantt(string Ticket, int GanttMode)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
+            int gm =  ModelData.SetGanttMode(GanttMode);
+            SaveCachedData(this.Context, Ticket, ModelData);
 
-            return ModelData.SetGanttMode(GanttMode);
-
+            return gm;
 
         }
 
@@ -533,14 +471,11 @@ namespace WorkEnginePPM
         public void DoSetGroupingFlag(string Ticket, int GroupMode)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.DoSetGroupingFlag(GroupMode);
-
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
 
 
@@ -634,32 +569,9 @@ namespace WorkEnginePPM
                 SqlConnection conn = ObtainSqlConnection(out lw);
                 ModelCache ModelData = new ModelCache();
 
-                //int lw = (int)Context.Session["WResID"];
-                //int lw = vb.val(WebAdmin.GetSPSessionString(Context, "WResID"));
-
                 ModelData.ReadModelNames(modelID.ToString(), lw.ToString(), conn, ref vers);
 
-                //string cmdText = "SELECT * FROM EPGP_MODEL_VERSIONS WHERE model_uid = " + modelID.ToString() + "  ORDER BY MODEL_VERSION_NAME";
-                //dba.SelectData(cmdText, (StatusEnum)99828, out dt);
 
-                //ItemDefn mdl = null;
-
-                //mdl = new ItemDefn();
-                //mdl.Id = 0;
-                //mdl.Name = "Current";
-                //mdl.Deflt = 1;
-                //vers.Add(mdl);
-
-
-                //foreach (DataRow row in dt.Rows)
-                //{
-                //    mdl = new ItemDefn();
-                //    mdl.Id = DBAccess.ReadIntValue(row["MODEL_VERSION_UID"]);
-                //    mdl.Deflt = DBAccess.ReadIntValue(row["MODEL_DEFAULT"]);
-
-                //    mdl.Name = DBAccess.ReadStringValue(row["MODEL_VERSION_NAME"]);
-                //    vers.Add(mdl);
-                //}
             }
             return vers;
 
@@ -696,11 +608,7 @@ namespace WorkEnginePPM
         public string GetFilterGridLayout(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetFilterGridLayout();
         }
@@ -714,12 +622,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public string GetFilterGridData(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetFilterGridData();
         }
@@ -734,11 +637,7 @@ namespace WorkEnginePPM
         public void SetFilterData(string Ticket, string sfilterData)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sVer = ModelData.SetFilterData(sfilterData);
 
@@ -760,6 +659,7 @@ namespace WorkEnginePPM
             }
 
             ModelData.ProcessAndCreateDistplayLists();
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
         }
 
@@ -772,11 +672,7 @@ namespace WorkEnginePPM
         public string GetTotalGridLayout(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetTotalGridLayout();
         }
@@ -791,11 +687,7 @@ namespace WorkEnginePPM
         public string GetTotalGridData(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetTotalGridData();
         }
@@ -809,11 +701,7 @@ namespace WorkEnginePPM
         public string GetCostTypeCompareGridData(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetCTCmpGridData();
         }
@@ -827,17 +715,13 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public void SetCostTypeCompareData(string Ticket, string sCTCmpData)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetCTCmpData(sCTCmpData);
 
 
             ModelData.ProcessAndCreateDistplayLists();
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
         }
 
@@ -849,12 +733,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public string GetColumnGridData(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetColumnGridData();
         }
@@ -869,16 +748,13 @@ namespace WorkEnginePPM
         public void SetTotalData(string Ticket, string sTotalData)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetTotalData(sTotalData);
 
 
             ModelData.ProcessAndCreateDistplayLists();
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
         }
 
@@ -890,16 +766,12 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public SortGroupDefn GetSortAndGroup(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             SortGroupDefn sng = new SortGroupDefn();
 
             ModelData.GetSortAndGroup(ref sng);
+            SaveCachedData(this.Context, Ticket, ModelData);
 
             return sng;
         }
@@ -913,15 +785,10 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public void SetSortAndGroup(string Ticket, SortGroupDefn SnG)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetSortAndGroup(SnG);
-
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
         }
 
@@ -934,11 +801,7 @@ namespace WorkEnginePPM
         public SortGroupDefn GetColumnOrderData(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             SortGroupDefn sng = new SortGroupDefn();
 
@@ -958,14 +821,10 @@ namespace WorkEnginePPM
         public void SetColumnOrder(string Ticket, SortGroupDefn SnG)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetColumnOrderData(SnG);
-
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
         }
 
@@ -981,11 +840,7 @@ namespace WorkEnginePPM
         public SortGroupDefn LoadCopyVersionPILists(string Ticket, int fromVer, int toVer)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             SortGroupDefn sng = new SortGroupDefn();
 
@@ -1002,11 +857,7 @@ namespace WorkEnginePPM
         public List<ItemDefn> GetSaveVersions(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             List<ItemDefn> versions = new List<ItemDefn>();
 
@@ -1022,12 +873,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public List<ItemDefn> GetTargetList(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             List<ItemDefn> targets = new List<ItemDefn>();
 
@@ -1049,11 +895,7 @@ namespace WorkEnginePPM
         public void DoSaveVersion(string Ticket, string sVersion)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
 
             string sStage;
@@ -1067,7 +909,7 @@ namespace WorkEnginePPM
                 ModelData.SaveVersion(conn, sVersion);
   
             }
-
+            SaveCachedData(this.Context, Ticket, ModelData);
             return;
 
         }
@@ -1082,12 +924,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public PeriodsAndOptions GetPeriodsandDisplay(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             PeriodsAndOptions pao = new PeriodsAndOptions();
 
@@ -1108,14 +945,11 @@ namespace WorkEnginePPM
         public void SetPeriodsandDisplay(string Ticket, PeriodsAndOptions poa)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetPeriodsandVersions(poa);
             ModelData.ProcessAndCreateDistplayLists();
+            SaveCachedData(this.Context, Ticket, ModelData);
 
         }
 
@@ -1129,13 +963,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public void DoDeleteTarget(string Ticket, string sTarget)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
-
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
@@ -1148,6 +976,8 @@ namespace WorkEnginePPM
                 ModelData.DeleteTarget(conn, sTarget);
  
             }
+
+            SaveCachedData(this.Context, Ticket, ModelData);
    
         }
 
@@ -1166,12 +996,7 @@ namespace WorkEnginePPM
             ItemDefn ret = new ItemDefn();
             ret.Id = 0;
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
-
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
@@ -1185,6 +1010,7 @@ namespace WorkEnginePPM
                 ret.Name = sTargetName;
                }
 
+            SaveCachedData(this.Context, Ticket, ModelData);
             return ret;
    
         }
@@ -1198,12 +1024,7 @@ namespace WorkEnginePPM
         public CSRatesAndCategory GetClientSideCalcData(string Ticket)
         {
             CSRatesAndCategory ret = new CSRatesAndCategory();
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.RatesAndCategory(ref ret);
 
@@ -1220,11 +1041,7 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public CSTargetData PrepareTargetData(string Ticket, int targetID)
         {
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             CSTargetData targetData = new CSTargetData();
 
@@ -1239,6 +1056,7 @@ namespace WorkEnginePPM
  
                 ModelData.PrepareTargetData(conn, targetID, ref targetData);
             }
+            SaveCachedData(this.Context, Ticket, ModelData);
             return  targetData;
 
         }
@@ -1253,11 +1071,7 @@ namespace WorkEnginePPM
         public string GetTargetGridLayout(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetTargetGridLayout();
         }
@@ -1272,11 +1086,7 @@ namespace WorkEnginePPM
         public string GetTargetGridData(string Ticket)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetTargetGridData();
         }
@@ -1291,11 +1101,7 @@ namespace WorkEnginePPM
         public CSTargetData ReturnVersionAsTarget(string Ticket, int VersID)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             CSTargetData targetData = new CSTargetData();
 
@@ -1311,6 +1117,8 @@ namespace WorkEnginePPM
                 ModelData.LoadVersionTargetData(conn, VersID, ref targetData);
  
             }
+
+            SaveCachedData(this.Context, Ticket, ModelData);
             return targetData;
 
         }
@@ -1325,11 +1133,7 @@ namespace WorkEnginePPM
         public void SaveTargetData(string Ticket, int TargetID, CSTargetData targetData)
         {
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
@@ -1343,6 +1147,8 @@ namespace WorkEnginePPM
 
  
             }
+
+            SaveCachedData(this.Context, Ticket, ModelData);
  
         }
 
@@ -1392,14 +1198,11 @@ Status_Error:
         public void DoShowRemTotal(string Ticket, int showRemFlag)
         {
 
-  
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             ModelData.SetShowRemainingFlag(showRemFlag != 0);
+            SaveCachedData(this.Context, Ticket, ModelData);
         }
 
 
@@ -1410,11 +1213,7 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public string GetLegendGridLayout(string Ticket)
         {
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetLegendGridLayout();
 
@@ -1427,11 +1226,7 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public string GetLegendGridData(string Ticket)
         {
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetLegendGridData();
 
@@ -1445,14 +1240,10 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public List<ItemDefn> LoadUserViewData(string Ticket)
         {
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
-
-            return ModelData.LoadUserViewData();
-
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
+            List<ItemDefn> rv = ModelData.LoadUserViewData();
+            SaveCachedData(this.Context, Ticket, ModelData);
+            return rv;
         }
 
         /// <summary>
@@ -1462,11 +1253,7 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public List<ItemDefn> DeleteUserViewData(string Ticket, string sviewName, int localflag)
         {
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache)this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
 
@@ -1480,7 +1267,10 @@ Status_Error:
                 ModelData.DeleteUserViewData(conn, sviewName, localflag);
             }
 
-            return ModelData.LoadUserViewData();
+
+            List<ItemDefn> rv = ModelData.LoadUserViewData();
+            SaveCachedData(this.Context, Ticket, ModelData);
+            return rv;
 
         }
 
@@ -1491,11 +1281,7 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public List<ItemDefn> RenameUserViewData(string Ticket, string snewName, string sviewName, int localflag)
         {
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache)this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
 
@@ -1510,8 +1296,9 @@ Status_Error:
 
              }
 
-            return ModelData.LoadUserViewData();
-
+            List<ItemDefn> rv = ModelData.LoadUserViewData();
+            SaveCachedData(this.Context, Ticket, ModelData);
+            return rv;
         }
 
         /// <summary>
@@ -1521,11 +1308,7 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public List<ItemDefn> SaveUserViewData(string Ticket, string sviewName, int localflag, string sZoomTo)
         {
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
 
@@ -1539,7 +1322,9 @@ Status_Error:
                 ModelData.SaveUserViewData(conn, sviewName, localflag, sZoomTo);
 
             }
-            return ModelData.LoadUserViewData();
+            List<ItemDefn> rv = ModelData.LoadUserViewData();
+            SaveCachedData(this.Context, Ticket, ModelData);
+            return rv;
 
         }
 
@@ -1552,11 +1337,7 @@ Status_Error:
         {
             SortGroupDefn sng = new SortGroupDefn();
 
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache) this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             string sStage;
 
@@ -1570,7 +1351,7 @@ Status_Error:
                 sng.ViewZoomTo = ModelData.SelectUserViewData(conn, viewIndex);
                 ModelData.ProcessAndCreateDistplayLists();
                 ModelData.GetSortAndGroup(ref sng);
- 
+                SaveCachedData(this.Context, Ticket, ModelData);
                 return sng;
             }
             return null;
@@ -1584,74 +1365,12 @@ Status_Error:
         [WebMethod(EnableSession = true)]
         public string GetCompareStringValue(string Ticket)
         {
-
-            if (Ticket == "")
-            {
-                Ticket = "ebe45859-43b7-4e4c-a5df-4615b14904ed";
-            }
-            ModelCache ModelData = (ModelCache)this.Context.Session[Ticket];
+            ModelCache ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
 
             return ModelData.GetCmpString();
         }
 
 
-        private void SaveSessionData(string Ticket, ModelCache ModelData)
-        {
-
-            return;
-
-            //string sDBConnect = WebAdmin.GetConnectionString(this.Context);
-            //DBAccess dba = new DBAccess(sDBConnect);
-            //if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
-            //int lRows = 0;
- 
-            //string cmdText = "DELETE FROM EPG_SESSION_CACHE WHERE (SC_GUID = " + dba.PrepareText(Ticket) + ") OR (SC_TIMESTAMP <= GETDATE() - 2)";
-            //dba.DeleteData(cmdText, (StatusEnum)99999, out lRows);
-
-            //cmdText = "INSERT INTO EPG_SESSION_CACHE (SC_GUID, SC_TIMESTAMP, SC_MODE, SC_DATA) " +
-            //          " VALUES (" + dba.PrepareText(Ticket) + ", GetDate(), 1, ?)";
-
-
-            //try
-            //{
-            //    SqlCommand oCommand = new SqlCommand(cmdText, dba.Connection);
-
-            //    Byte[] s = ToByteArray(ModelData);
-            //    oCommand.Parameters.Add("SC_DATA", SqlType.Binary, s.Length).Value = s;
-            //    oCommand.ExecuteNonQuery();
-
-            //}
-
-            //catch (Exception ex)
-            //{
-            //    string exm = ex.Message;
-
-            //}
-
-            
-            
-            
-            //Status_Error:
-            //dba.Close();
-        }
-
-        private  string SerializeToXml(object value) 
-        {
-
-            System.IO.StringWriter writer = new System.IO.StringWriter(CultureInfo.InvariantCulture);
-            XmlSerializer serializer = new XmlSerializer(value.GetType()); 
-            serializer.Serialize(writer, value); 
-            return writer.ToString(); 
-        }
-
-        private byte[] ToByteArray(object source) 
-        { 
-            var formatter = new BinaryFormatter(); 
-            using (var stream = new MemoryStream()) 
-            { 
-                formatter.Serialize(stream, source); return stream.ToArray();
-            }
-        }
 
         private static bool CheckUserGlobalPermission(SqlConnection oDataAccess, int lWResID, GlobalPermissionsEnum ePermUID)
         {
@@ -1731,6 +1450,22 @@ Status_Error:
 
             return cn;
          }
+
+        private static void SaveCachedData(HttpContext Context, string sKey, object value)
+        {
+            Context.Session[sKey] = null;
+            Context.Session[sKey] = value;
+            //DataCacheAPI.SaveCachedData(Context, sKey, value);
+        }
+
+
+        private static object GetCachedData(HttpContext Context, string sKey)
+        {
+            return Context.Session[sKey];
+            //return DataCacheAPI.GetCachedData(Context, sKey);
+        }
+        
+
     }
 }
 

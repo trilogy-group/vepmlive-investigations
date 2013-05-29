@@ -2402,6 +2402,12 @@ namespace CADataCache
 
             xI.CreateIntAttr("NoColorState", 1);
 
+            string suom = "";
+
+            if (oDet.sUoM != null)
+            {
+                suom = oDet.sUoM.Trim();
+            }
 
             for (int i = 0; i <= maxp; i++)
             {
@@ -2419,8 +2425,10 @@ namespace CADataCache
                 if (oDet.zCost[i] != double.MinValue)
                     xI.CreateDoubleAttr("P" + i.ToString() + "C", oDet.zCost[i]);
 
+  
 
-                if (oDet.sUoM == "")
+
+                if (suom == "")
                 {
                     xI.CreateIntAttr("P" + i.ToString() + "VCanEdit", 0);
                     xI.CreateIntAttr("P" + i.ToString() + "CCanEdit", 1);

@@ -38,6 +38,7 @@ namespace OptmizerDataCache
     {
 
         private string m_ticket = "";
+        private string m_ListID = "";
         private string m_Pids = "";
         private string m_viewsxml = "";
         private string m_Stratagiesxml = "";
@@ -55,13 +56,14 @@ namespace OptmizerDataCache
             
         }
 
-        public void CaptureOptData(string sxml, string sticket, string spids)
+        public void CaptureOptData(string sxml, string sticket, string spids, string sListID)
         {
             m_ticket = sticket;
             m_Pids = spids;
             m_fielddef = new List<clsOptFieldDelf>();
             m_PIList = new List<clsOptPIData>();
             m_commitflagname = "";
+            m_ListID = sListID;
 
             CStruct xRoot = new CStruct();
             CStruct xFields;
@@ -229,6 +231,11 @@ namespace OptmizerDataCache
         public void StashStratagies(string sStratagies)
         {
             m_Stratagiesxml = sStratagies;
+        }
+
+        public string GetListID()
+        {
+            return m_ListID;
         }
 
         private int StripNum(ref string sin)

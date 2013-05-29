@@ -378,8 +378,22 @@ namespace RPADataCache
 
                         if (col.m_type == 2)
                         {
-                            //                       xC.CreateStringAttr("Type", "Date");
-                            //                       xC.CreateStringAttr("Format", "MM/dd/yyyy");
+
+                            if (col.m_id == RPConstants.TGRID_SDATE)
+                            {
+                                xC.CreateStringAttr("Type", "Date");
+
+                                string sminFunc = "(Row.id == 'Filter' ? '' : min())";
+                                m_xDefTree.CreateStringAttr(sn + "Formula", sminFunc);
+                            }
+                            else if (col.m_id == RPConstants.TGRID_FDATE) {
+                                xC.CreateStringAttr("Type", "Date");
+
+                                string smaxFunc = "(Row.id == 'Filter' ? '' : max())";
+                                m_xDefTree.CreateStringAttr(sn + "Formula", smaxFunc);
+                            }
+                         //   xC.CreateStringAttr("Type", "Date");
+                         //                          xC.CreateStringAttr("Format", "MM/dd/yyyy");
                         }
                         else if (col.m_type == 3)
                         {
@@ -626,6 +640,7 @@ namespace RPADataCache
             xI.CreateStringAttr("rowid", "r" + oDet.rowid);
             xI.CreateBooleanAttr("rowidCanEdit", false);
 
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
             foreach (clsRXDisp col in Cols)
             {
@@ -712,7 +727,7 @@ namespace RPADataCache
                             if (oPIData != null)
                             {
                                 if (oPIData.start != DateTime.MinValue)
-                                    xI.CreateStringAttr(sn, oPIData.start.ToShortDateString());
+                                  xI.CreateStringAttr(sn, oPIData.start.ToShortDateString());
                             }
                             break;
                         case RPConstants.TGRID_FDATE:

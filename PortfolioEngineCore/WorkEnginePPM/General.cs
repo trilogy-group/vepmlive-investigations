@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using System.Runtime.Serialization.Formatters.Binary;
+using PortfolioEngineCore;
 
 namespace WorkEnginePPM
 {
@@ -40,5 +42,68 @@ namespace WorkEnginePPM
             else
                 return s;
         }
+    }
+
+    public class DataCacheAPI
+    {
+
+        private static string SerializeToBinary(object value)
+        {
+            string str;
+            BinaryFormatter bf = new BinaryFormatter();
+            System.IO.MemoryStream mem = new System.IO.MemoryStream();
+            bf.Serialize(mem, value);
+            str = Convert.ToBase64String(mem.ToArray());
+
+            return str;
+        }
+        private static object BinaryToClass(string str)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            System.IO.MemoryStream mem = new System.IO.MemoryStream(Convert.FromBase64String(str));
+            object mine = bf.Deserialize(mem);
+            return mine;
+        }
+
+
+        public static void SaveCachedData(HttpContext Context, string sKey, object value)
+        {
+            string basePath;
+            string ppmId;
+            string ppmCompany;
+            string ppmDbConn;
+            string username;
+            SecurityLevels securityLevel;
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioEngineCore.AnalyzerDataCache rpa = new AnalyzerDataCache(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+            string sdata = SerializeToBinary(value);
+
+            rpa.SaveStashEntry(sKey, sdata);
+        }
+
+
+        public static object GetCachedData(HttpContext Context, string sKey)
+        {
+
+            string basePath;
+            string ppmId;
+            string ppmCompany;
+            string ppmDbConn;
+            string username;
+            SecurityLevels securityLevel; 
+            
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioEngineCore.AnalyzerDataCache rpa = new AnalyzerDataCache(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+
+            string sdata = rpa.GetStashEntry(sKey);
+
+            if (sdata == "")
+                return null;
+
+            return BinaryToClass(sdata);
+        }
+        
+
     }
 }

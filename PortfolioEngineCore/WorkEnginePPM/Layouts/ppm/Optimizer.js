@@ -851,7 +851,6 @@
 
         sflds.append("<Performance  Title='" + this.ConfNameValue + "' Value='" + this.targetValue + "' TFID='" + tfld + "' />");
 
-
         sflds.append("<Fields>")
 
         for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
@@ -898,7 +897,7 @@
 
 
 
-        var dataXml = '<Stratagy StratagyGUID="' + XMLValue(StratagyGUID) + '" Name="' + XMLValue(StratagyName) + '" Default="'
+        var dataXml = '<Stratagy StratagyGUID="' + XMLValue(StratagyGUID) + '" Name="' + XMLValue(StratagyName) + '" ListID="' + this.params.ListIdVal + '" Default="'
 				+ isStratagyDefault + '" Personal="' + isStratagyPersonal + '">'
 				+ sflds.toString()
 				+ '</Stratagy>';
@@ -2103,7 +2102,7 @@
             
         sInject.append('<div class="modalText" style="margin-top:10px;padding-right:10px;">');
         sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:20x;padding-left:12px!important;">');
-        sInject.append('	1) Which field will be totalled and used to compare to the manually entered value?<br>');
+        sInject.append('	1) Which field will be totaled and used to compare to the manually entered value?<br>');
         sInject.append('<br>');
         sInject.append('  </div>');
         sInject.append('  <div style="padding-left:12px!important;">');

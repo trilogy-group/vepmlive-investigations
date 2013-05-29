@@ -51,12 +51,26 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             set { m_sTicket = value; }
         }
 
-        private int m_rpemode = 0;
-        public int RPEMode
+        private string m_sListID = "";
+
+        public string ListIdVal
         {
-            get { return m_rpemode; }
-            set { m_rpemode = value; }
+            get { return m_sListID; }
+            set { m_sListID = value; }
         }
+
+        private string m_sViewID = "";
+        public string ViewIDVal
+        {
+            get { return m_sViewID; }
+            set { m_sViewID = value; }
+        }
+        public string ViewNameVal
+        {
+            get { return m_sViewID; }
+            set { m_sViewID = value; }
+        }
+
         public string Webservice
         {
             get

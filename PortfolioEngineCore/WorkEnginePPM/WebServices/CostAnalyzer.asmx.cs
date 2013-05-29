@@ -70,15 +70,16 @@ namespace WorkEnginePPM
             string sStage;
             string cakey = GetCASessionKey();
 
-            CostAnalyzerDataCache datacache = (CostAnalyzerDataCache)this.Context.Session[cakey];
+            CostAnalyzerDataCache datacache = null; // (CostAnalyzerDataCache)this.Context.Session[cakey];
             bool bNew = false;
 
-
-            if (Function == "CALoadData" && datacache != null)
+            if (Function == "CALoadData") // && datacache != null)
             {
-                this.Context.Session[cakey] = null;
+                //this.Context.Session[cakey] = null;
                 datacache = null;
             }
+            else
+                datacache = (CostAnalyzerDataCache) GetCachedData(this.Context, cakey);
 
             if (datacache == null)
             {
@@ -86,6 +87,9 @@ namespace WorkEnginePPM
                 datacache = new CostAnalyzerDataCache();
             }
 
+
+
+  
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
             {
                 try
@@ -95,10 +99,11 @@ namespace WorkEnginePPM
                     MethodInfo m = thisClass.GetMethod(Function);
                     object result = m.Invoke(null, new object[] { this.Context, Dataxml, datacache});
 
-                    if (Function == "CALoadData" && bNew == true)
-                        this.Context.Session[cakey] = datacache;
-                    
-                      return result.ToString();
+                    //if (Function == "CALoadData" && bNew == true)
+                    //    this.Context.Session[cakey] = datacache;
+
+                    SaveCachedData(this.Context, cakey, datacache);
+                    return result.ToString();
                 }
                 catch (Exception ex)
                 {
@@ -749,6 +754,21 @@ namespace WorkEnginePPM
             return HandleError(sContext, nStatus, "Exception in CostAnalyzer.asmx (" + sStage + "): '" + ex.Message.ToString() + "'");
 
         }
+
+        private static void SaveCachedData(HttpContext Context, string sKey, object value)
+        {
+            Context.Session[sKey] = null;
+            Context.Session[sKey] = value;
+            //DataCacheAPI.SaveCachedData(Context, sKey, value);
+        }
+
+
+        private static object GetCachedData(HttpContext Context, string sKey)
+        {
+            return Context.Session[sKey];
+            //return DataCacheAPI.GetCachedData(Context, sKey);
+        }
+        
     }
 
 }

@@ -65,7 +65,7 @@ namespace WorkEnginePPM
             string sStage;
             string cakey = GetOptimizerSessionKey();
 
-            clsOptmizerDataCache datacache = (clsOptmizerDataCache)this.Context.Session[cakey];
+            clsOptmizerDataCache datacache = null;
 
 
             bool bNew = false;
@@ -73,9 +73,11 @@ namespace WorkEnginePPM
 
             if (Function == "GetOptimizerData" && datacache != null)
             {
-                this.Context.Session[cakey] = null;
+               // this.Context.Session[cakey] = null;
                 datacache = null;
             }
+            else
+                datacache = (clsOptmizerDataCache)GetCachedData(this.Context, cakey);
 
             if (datacache == null)
             {
@@ -92,9 +94,11 @@ namespace WorkEnginePPM
                     MethodInfo m = thisClass.GetMethod(Function);
                     object result = m.Invoke(null, new object[] { this.Context, Dataxml, datacache });
 
-                    if (Function == "GetOptimizerData" && bNew == true)
-                        this.Context.Session[cakey] = datacache;
-                    
+                    //if (Function == "GetOptimizerData" && bNew == true)
+                    //    this.Context.Session[cakey] = datacache;
+
+                    SaveCachedData(Context, cakey, datacache);
+ 
                       return result.ToString();
                 }
                 catch (Exception ex)
@@ -152,9 +156,13 @@ namespace WorkEnginePPM
 
             string sErrStage = "O010";
 
+            CStruct xRoot = new CStruct(); 
+            xRoot.LoadXML(sXML);
 
-            string sTicket = sXML;
+           // string sTicket = sXML;
 
+            string sTicket = xRoot.GetStringAttr("Ticket");
+            string ListID = xRoot.GetStringAttr("ListID");
 
 
             string sEchoReplyMessage = "";
@@ -175,13 +183,13 @@ namespace WorkEnginePPM
             Extradata = xResult.CreateSubStruct("OptData");
             string sOpt = opt.OptimizerLoadData(sPids);
 
-            datacache.CaptureOptData(sOpt, sTicket,sPids);
+            datacache.CaptureOptData(sOpt, sTicket, sPids, ListID);
             string sViews = "";
             if (opt.GetOptimizerViewsXML(out sViews) == false)
                 sViews = "";
 
             string sStrat = "";
-            if (opt.GetOptimizerStratagiesXML(out sStrat) == false)
+            if (opt.GetOptimizerStratagiesXML(ListID, out sStrat) == false)
                 sStrat = "";
 
             datacache.StashViews(sViews);
@@ -387,7 +395,7 @@ namespace WorkEnginePPM
                     sReply = xResult.XML();
 
                     string sStratagy = "";
-                    if (opt.GetOptimizerStratagiesXML(out sStratagy) == false)
+                    if (opt.GetOptimizerStratagiesXML(datacache.GetListID(), out sStratagy) == false)
                         sStratagy = "";
                     datacache.StashStratagies(sStratagy);
 
@@ -432,7 +440,7 @@ namespace WorkEnginePPM
                     sReply = xResult.XML();
 
                     string sStratagy = "";
-                    if (opt.GetOptimizerStratagiesXML(out sStratagy) == false)
+                    if (opt.GetOptimizerStratagiesXML(datacache.GetListID(), out sStratagy) == false)
                         sStratagy = "";
                     datacache.StashStratagies(sStratagy);
                 }
@@ -475,7 +483,7 @@ namespace WorkEnginePPM
                     sReply = xResult.XML();
 
                     string sStratagy = "";
-                    if (opt.GetOptimizerStratagiesXML(out sStratagy) == false)
+                    if (opt.GetOptimizerStratagiesXML(datacache.GetListID(), out sStratagy) == false)
                         sStratagy = "";
                     datacache.StashStratagies(sStratagy);
                 }
@@ -579,6 +587,22 @@ namespace WorkEnginePPM
             return HandleError(sContext, nStatus, "Exception in CostAnalyzer.asmx (" + sStage + "): '" + ex.Message.ToString() + "'");
 
         }
+
+        private static void SaveCachedData(HttpContext Context, string sKey, object value)
+        {
+            Context.Session[sKey] = null;
+            Context.Session[sKey] = value;
+            //DataCacheAPI.SaveCachedData(Context, sKey, value);
+        }
+
+
+        private static object GetCachedData(HttpContext Context, string sKey)
+        {
+            return Context.Session[sKey];
+            //return DataCacheAPI.GetCachedData(Context, sKey);
+        }       
+
+
     }
 
 }

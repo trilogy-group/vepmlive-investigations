@@ -10,27 +10,35 @@
 		}
 	}
 
-	//  General page settings
+//  General page settings
+
+    Optimizer.prototype.BuildLoadInf = function (sTicket, ListID, ViewID) {
+
+        var dataXml = '<Load Ticket="' + sTicket + '" ListID="' + ListID + '" ViewID="' + ViewID + '">' + '</Load>';
+        return dataXml;
+    }
 
 
-	Optimizer.prototype.OnLoad = function (event) {
-		try {
-
-			Grids.OnValueChanged = GridsOnValueChangedDelegate;
-			Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
-			Grids.OnReady = GridsOnReadyDelegate;
-
-  
-
-			WorkEnginePPM.Optimizer.set_path(this.params.Webservice);
 
 
-			WorkEnginePPM.Optimizer.ExecuteJSON("GetOptimizerData", this.params.TicketVal, LoadOptimizerDataCompleteDelegate);
-		}
-		catch (e) {
-			alert("Optimizer OnLoad Exception");
-		}
-	}
+    Optimizer.prototype.OnLoad = function (event) {
+        try {
+
+            Grids.OnValueChanged = GridsOnValueChangedDelegate;
+            Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
+            Grids.OnReady = GridsOnReadyDelegate;
+
+            var s = this.BuildLoadInf(this.params.TicketVal, this.params.ListIdVal, this.params.ViewID);
+
+            WorkEnginePPM.Optimizer.set_path(this.params.Webservice);
+
+
+            WorkEnginePPM.Optimizer.ExecuteJSON("GetOptimizerData", s, LoadOptimizerDataCompleteDelegate);
+        }
+        catch (e) {
+            alert("Optimizer OnLoad Exception");
+        }
+    }
 
 	Optimizer.prototype.OnUnload = function (event) {
 		if (this.Dirty && this.ExitConfirmed == false)

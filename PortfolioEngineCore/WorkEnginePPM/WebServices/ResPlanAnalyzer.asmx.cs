@@ -66,15 +66,17 @@ namespace WorkEnginePPM
         {
             string sStage;
             string rpkey = GetRPSessionKey();
-            RPAData RAData = (RPAData)this.Context.Session[rpkey];
+            RPAData RAData = null; // (RPAData)this.Context.Session[rpkey];
             bool bNew = false;
 
 
             if (Function == "RALoadData" && RAData != null)
             {
-                this.Context.Session[rpkey] = null;
+                //     this.Context.Session[rpkey] = null;
                 RAData = null;
             }
+            else
+                RAData = (RPAData) GetCachedData(this.Context, rpkey);
 
             if (RAData == null)
             {
@@ -97,8 +99,11 @@ namespace WorkEnginePPM
                         MethodInfo m = thisClass.GetMethod(Function);
                         object result = m.Invoke(null, new object[] {this.Context, Dataxml, RAData});
 
-                        if (Function == "RALoadData" && bNew == true)
-                            this.Context.Session[rpkey] = RAData;
+                    //    if (Function == "RALoadData" && bNew == true)
+                    //        this.Context.Session[rpkey] = RAData;
+
+
+                        SaveCachedData(Context, rpkey, RAData);
 
                         return result.ToString();
                     }
@@ -1025,10 +1030,14 @@ namespace WorkEnginePPM
 
 
                     string rpkey = GetRPSessionKey();
-                    this.Context.Session[rpkey] = null;
-                    RAData = null;
 
-                    this.Context.Session[rpkey] = newRPA;
+                    SaveCachedData(Context, rpkey, newRPA);
+
+
+//                    this.Context.Session[rpkey] = null;
+                    RAData = newRPA;
+
+//                    this.Context.Session[rpkey] = newRPA;
                    
                 }
 
@@ -1112,6 +1121,23 @@ namespace WorkEnginePPM
             return HandleError(sContext, nStatus, "Exception in ResPlanAnalyzer.asmx (" + sStage + "): '" + ex.Message.ToString() + "'");
 
         }
+
+        private static void SaveCachedData(HttpContext Context, string sKey, object value)
+        {
+            Context.Session[sKey] = null;
+            Context.Session[sKey] = value;
+            //DataCacheAPI.SaveCachedData(Context, sKey, value);
+        }
+
+
+        private static object GetCachedData(HttpContext Context, string sKey)
+        {
+            return Context.Session[sKey];
+            //return DataCacheAPI.GetCachedData(Context, sKey);
+        }       
+
+
+
     }
 
 }

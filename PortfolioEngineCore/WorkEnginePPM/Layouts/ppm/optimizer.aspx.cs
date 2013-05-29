@@ -28,7 +28,9 @@ namespace WorkEnginePPM
                 WorkEnginePPM.ControlTemplates.WorkEnginePPM.OptimizerControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.OptimizerControl)LoadControl("/_layouts/ppm/Optimizer.ascx");
 
                 ctl.TicketVal = Request["dataid"];
-
+                ctl.ListIdVal = Request["listid"];
+                ctl.ViewIDVal = Request["view"];
+ 
                 PlaceHolder1.Controls.Add(ctl);
             }
 
