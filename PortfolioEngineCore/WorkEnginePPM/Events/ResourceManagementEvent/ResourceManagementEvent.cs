@@ -167,10 +167,10 @@ namespace WorkEnginePPM.Events
                 SPWeb spWeb = properties.Web;
 
                 decimal rate;
-                Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId,
-                                            out rate);
+                var extId = Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId, out rate);
 
                 if (rate != 0) properties.AfterProperties["StandardRate"] = rate;
+                properties.AfterProperties["EXTID"] = extId;
             }
             catch (Exception exception)
             {

@@ -44,11 +44,34 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
                     if (rawValue.Equals("0"))
                     {
-                        long externalId = DateTime.Now.Ticks;
-                        resourceElement.Add(new XAttribute("ExtId", externalId));
+                        bool proceed = false;
+
+                        var idRows = fieldsTable.Select("Id = 3013");
+                        if (idRows.Length == 0)
+                        {
+                            proceed = true;
+                        }
+                        else
+                        {
+                            var id = idRows[0]["Value"];
+                            if (id == DBNull.Value || id == null)
+                            {
+                                proceed = true;
+                            }
+                            else
+                            {
+                                resourceElement.Add(new XAttribute("ExtId", id));
+                            }
+                        }
+
+                        if (proceed)
+                        {
+                            long externalId = DateTime.Now.Ticks;
+                            resourceElement.Add(new XAttribute("ExtId", externalId));
 
                         resourceElement.Add(new XElement("Field", externalId,
                                                          new XAttribute("Id", (int) PFEResourceField.ID)));
+                    }
                     }
                     else
                     {
@@ -107,6 +130,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
             rate = 0;
 
             XAttribute rateAttribute = resourceElements[0].Attribute("Rate");
+            XAttribute extIdAttribute = resourceElements[0].Attribute("Id");
 
             if (!String.IsNullOrEmpty(rateAttribute.Value))
             {
@@ -282,7 +306,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                         }
 
                         if (!AreEqualObjects(newValue, currentValue, spField, properties.Web) ||
-                            internalName.Equals("Title"))
+                            internalName.Equals("Title") || internalName.Equals("SharePointAccount"))
                         {
                             dataRow["Id"] = resourceField;
                             dataRow["Value"] = newValue;

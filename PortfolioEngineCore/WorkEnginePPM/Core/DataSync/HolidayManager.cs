@@ -74,11 +74,10 @@ namespace WorkEnginePPM.Core.DataSync
                 string hsId = hsElement.Attribute("Id").Value;
                 string hsTitle = hsElement.Attribute("Title").Value;
 
-                HolidaySchedule holidaySchedule = (from hs in existingHolidaySchedules
-                                                   where hs.Title.Equals(hsTitle) || hs.Title.Equals(title)
-                                                   select hs).FirstOrDefault();
+                HolidaySchedule holidaySchedule =
+                    (from hs in existingHolidaySchedules where hs.Title.Equals(hsTitle) select hs).FirstOrDefault();
 
-                if (holidaySchedule == null)
+                if (holidaySchedule == null || !holidaySchedule.Title.ToLower().Equals(title.ToLower()))
                 {
                     var schedule = new HolidaySchedule
                                        {

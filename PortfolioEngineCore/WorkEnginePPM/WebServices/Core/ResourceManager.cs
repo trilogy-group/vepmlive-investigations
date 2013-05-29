@@ -76,7 +76,19 @@ namespace WorkEnginePPM.WebServices.Core
                         dataRow[columnName] = keyValuePair.Value;
                     }
 
-                    break;
+                    var username = dataRow["Username"];
+                    if (username == DBNull.Value || username == null)
+                    {
+                        var spAccount = dataRow["3014"];
+                        if (spAccount != DBNull.Value)
+                        {
+                            var account = spAccount.ToString();
+                            if (!string.IsNullOrEmpty(account))
+                            {
+                                dataRow["Username"] = account;
+                            }
+                        }
+                    }
                 }
             }
 
