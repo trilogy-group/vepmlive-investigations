@@ -2594,15 +2594,19 @@ namespace EPMLiveWebParts
             output.WriteLine("Grids.OnRenderFinish = function(grid){grid.ActionZoomFit();};");
             output.WriteLine("Grids.OnReady = function(grid, start)  { document.getElementById('loadinggrid" + this.ID + "').style.display = 'none'; }");
             output.WriteLine("Grids.OnRenderFinish = function(grid)  { clickTab(); }");
-            output.WriteLine(@"Grids.OnFocus = function(grid, row, col, orow, ocol, pagepos) 
+            output.WriteLine(@"Grids.OnClick = function(grid, row, col, x, y, event) 
                                 {
-                                    var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + @"');
-                                    fireEvent(wp, 'mouseup');
-
-                                    var wp2 = document.getElementById('Ribbon.ListItem-title');
-		                            if(wp2)
-			                            fireEvent(wp2.firstChild, 'click'); 
-                                };");  
+                                    //var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + @"');
+                                    //fireEvent(wp, 'mouseup');
+                                    setTimeout('showribbon()', 100);
+                                    
+                                };
+                                function showribbon()
+                                {
+                                var wp2 = document.getElementById('Ribbon.ListItem-title');
+		                                                            if(wp2)
+			                                                            fireEvent(wp2.firstChild, 'click'); 
+                                }");  
             
 
             output.WriteLine("ArrGantts.push('GanttGrid" + sFullGridId + "');");
