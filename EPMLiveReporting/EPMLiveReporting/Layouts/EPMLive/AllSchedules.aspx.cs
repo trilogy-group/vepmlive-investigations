@@ -127,6 +127,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             Response.Expires = -1;
             MaintainScrollPositionOnPostBack = true;
             btnSave.ServerClick += new EventHandler(btnSave_ServerClick);
+            btnCancel.ServerClick += btnCancel_ServerClick;
+        }
+
+        void btnCancel_ServerClick(object sender, EventArgs e)
+        {
+            SPUtility.Redirect(SPContext.Current.Web.Url + "/_layouts/epmlive/listmappings.aspx?Source=" + SPContext.Current.Web.Url + "/_layouts/epmlive/settings.aspx", SPRedirectFlags.Static, HttpContext.Current);
         }
 
         void btnSave_ServerClick(object sender, EventArgs e)

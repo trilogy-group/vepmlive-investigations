@@ -107,9 +107,11 @@
             </Template_InputFormControls>
         </wssuc:InputFormSection>
         <br />
-        <wssuc:ButtonSection ID="ButtonSection1" runat="server">
+        <wssuc:ButtonSection ID="ButtonSection1" runat="server" ShowStandardCancelButton="false">
             <Template_Buttons>
                 <input class="ms-ButtonHeightWidth" id="btnSave" accesskey="O" type="submit" value="Save"
+                    runat="server" />
+                <input class="ms-ButtonHeightWidth" id="btnCancel" accesskey="1" type="submit" value="Cancel"
                     runat="server" />
             </Template_Buttons>
         </wssuc:ButtonSection>

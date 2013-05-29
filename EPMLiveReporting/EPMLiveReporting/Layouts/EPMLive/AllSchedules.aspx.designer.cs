@@ -130,6 +130,15 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive {
         protected global::System.Web.UI.HtmlControls.HtmlInputSubmit btnSave;
         
         /// <summary>
+        /// btnCancel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputSubmit btnCancel;
+        
+        /// <summary>
         /// grdVwSchedules control.
         /// </summary>
         /// <remarks>
