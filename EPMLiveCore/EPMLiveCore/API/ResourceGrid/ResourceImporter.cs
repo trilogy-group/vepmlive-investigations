@@ -544,8 +544,8 @@ namespace EPMLiveCore.API
         private void UpdateItem(DataRow row, ICollection<string> lockedColumns, SPList spList, SPListItem spListItem,
                                 bool isGeneric)
         {
-            var spWeb = spList.ParentWeb;
-            var spRegionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
+            SPWeb spWeb = spList.ParentWeb;
+            SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
 
             foreach (
                 string columnName in
@@ -555,21 +555,25 @@ namespace EPMLiveCore.API
             {
                 object value = row[columnName];
 
+                string col = columnName.Replace(" ", "_x0020_");
+
                 if (value != null && value != DBNull.Value)
                 {
                     string sValue = value.ToString();
                     if (!string.IsNullOrEmpty(sValue))
                     {
-                        if (columnName.Equals("Title"))
+                        if (col.Equals("Title"))
                         {
                             value = sValue.Trim();
                         }
                         else
                         {
-                            SPField spField = spList.Fields.GetFieldByInternalName(columnName);
+                            SPField spField = spList.Fields.GetFieldByInternalName(col);
                             if (spField.Type == SPFieldType.DateTime)
                             {
-                                value = SPUtility.CreateISO8601DateTimeFromSystemDateTime(((DateTime)value).ToUniversalTime());
+                                value =
+                                    SPUtility.CreateISO8601DateTimeFromSystemDateTime(
+                                        ((DateTime) value).ToUniversalTime());
                             }
                         }
                     }
@@ -583,7 +587,7 @@ namespace EPMLiveCore.API
                     value = null;
                 }
 
-                spListItem[columnName] = value;
+                spListItem[col] = value;
                 AddMasterLog(string.Format("{0}: {1}", columnName, value), 4);
             }
 
@@ -731,11 +735,11 @@ namespace EPMLiveCore.API
                 {
                     SPListItemCollection items =
                         resourcePool.GetItems(new SPQuery
-                                                  {
-                                                      Query =
-                                                          string.Format(VALIDATE_ACCOUNT_QUERY,
-                                                                        spFieldUserValue.User.ID)
-                                                  });
+                            {
+                                Query =
+                                    string.Format(VALIDATE_ACCOUNT_QUERY,
+                                                  spFieldUserValue.User.ID)
+                            });
 
                     if (items.Count > 0)
                     {

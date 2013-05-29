@@ -118,6 +118,8 @@ namespace EPMLiveCore.API.ResourceManagement
                     int resourceExtId = 0;
                     int resourcePoolId = 0;
 
+                    var categoriesProcessed = new List<int>();
+
                     try
                     {
                         foreach (var category in from t in timeOffData
@@ -131,15 +133,19 @@ namespace EPMLiveCore.API.ResourceManagement
                                                      Title = t.Category
                                                  })
                         {
+                            int categoryId = category.CategoryId;
+
+                            if (categoriesProcessed.Contains(categoryId)) continue;
+
                             resourcePoolId = category.ResourcePoolId;
                             resourceExtId = category.ResourceExtId;
-
-                            int categoryId = category.CategoryId;
 
                             var categoryElement = new XElement("Category");
 
                             try
                             {
+                                var timeOffsProcessed = new List<int>();
+
                                 foreach (var timeOff in from t in timeOffData
                                                         where (t.ResourceId == resourceId && t.CategoryId == categoryId)
                                                         select new
@@ -155,6 +161,8 @@ namespace EPMLiveCore.API.ResourceManagement
                                                             t.ResourceExtId
                                                         })
                                 {
+                                    if (timeOffsProcessed.Contains((int) timeOff.Id)) continue;
+
                                     var timeOffElement = new XElement("TimeOff");
 
                                     decimal totalHours = 0;
@@ -200,6 +208,8 @@ namespace EPMLiveCore.API.ResourceManagement
                                                            new XAttribute("FinishDate", timeOff.FinishDate),
                                                            new XAttribute("Hours", totalHours));
 
+                                        timeOffsProcessed.Add((int) timeOff.Id);
+
                                         categoryElement.Add(timeOffElement);
                                     }
                                 }
@@ -214,9 +224,9 @@ namespace EPMLiveCore.API.ResourceManagement
                                 categoryElement.Add(new XAttribute("Id", categoryId),
                                                     new XAttribute("Title", category.Title),
                                                     new XAttribute("ExtId", category.CategoryExtId));
+                                categoriesProcessed.Add(categoryId);
 
                                 resourceElement.Add(categoryElement);
-
                                 resourceProcessed[resourceId] = true;
                             }
                         }

@@ -14,6 +14,8 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
         {
             jobtype = Jobs.Upgrades.Steps.Utilities.GetJobType(Request["V"]);
 
+            if (jobtype == 0) jobtype = 201;
+
             if(jobtype != 0)
             {
                 switch(Request["Action"])
@@ -40,8 +42,6 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
             data = "Status: \"" + status + "\", Message: \"" + message + "\", Percent: \"" + percent + "\"";
         }
 
-        
-
         private void CheckStatus()
         {
             XmlNode ndRes = API.Timer.GetTimerJobStatus(Web.Site.ID, Web.ID, jobtype, false);
@@ -53,7 +53,6 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
         {
             try
             {
-
                 XmlNode ndRes = API.Timer.GetTimerJobStatus(Web.Site.ID, Web.ID, jobtype, false);
 
                 string status = ndRes.Attributes["Status"].Value;
@@ -73,9 +72,7 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
             }
             catch(Exception ex)
             {
-
                 outputData("Error", ex.Message, "0");
-                
             }
         }
     }

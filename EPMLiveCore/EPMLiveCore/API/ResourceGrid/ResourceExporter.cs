@@ -110,17 +110,17 @@ namespace EPMLiveCore.API
             fieldDictionary.Add(field.InternalName, GetFieldInfo(field));
 
             Dictionary<string, object[]> dictionary = new[]
-                                                          {
-                                                              "ID", "Generic", "Title", "FirstName", "LastName",
-                                                              "SharePointAccount", "Email",
-                                                              "Permissions", "ResourceLevel", "TimesheetManager",
-                                                              "TimesheetDelegates",
-                                                              "TimesheetAdministrator", "StandardRate", "Disabled",
-                                                              "AvailableFrom",
-                                                              "AvailableTo", "HolidaySchedule", "WorkHours", "Role",
-                                                              "Department"
-                                                          }.Where(fieldDictionary.ContainsKey)
-                                                           .ToDictionary(col => col, col => fieldDictionary[col]);
+                {
+                    "ID", "Generic", "Title", "FirstName", "LastName",
+                    "SharePointAccount", "Email",
+                    "Permissions", "ResourceLevel", "TimesheetManager",
+                    "TimesheetDelegates",
+                    "TimesheetAdministrator", "StandardRate", "Disabled",
+                    "AvailableFrom",
+                    "AvailableTo", "HolidaySchedule", "WorkHours", "Role",
+                    "Department"
+                }.Where(fieldDictionary.ContainsKey)
+                 .ToDictionary(col => col, col => fieldDictionary[col]);
 
             foreach (var p in fieldDictionary.Where(p => !dictionary.ContainsKey(p.Key)))
             {
@@ -155,15 +155,15 @@ namespace EPMLiveCore.API
                 List<string> s = sharedString;
 
                 SPSecurity.RunWithElevatedPrivileges(() =>
-                                                     {
-                                                         using (var site = new SPSite(_spWeb.Site.ID))
-                                                         {
-                                                             using (SPWeb web = site.OpenWeb(_spWeb.ID))
-                                                             {
-                                                                 s.AddRange(_permissions);
-                                                             }
-                                                         }
-                                                     });
+                    {
+                        using (var site = new SPSite(_spWeb.Site.ID))
+                        {
+                            using (SPWeb web = site.OpenWeb(_spWeb.ID))
+                            {
+                                s.AddRange(_permissions);
+                            }
+                        }
+                    });
             }
 
             sharedString.Add(true.ToString());
@@ -214,19 +214,19 @@ namespace EPMLiveCore.API
             string rId = "rId" + lookupCounter;
 
             workbookPart.Workbook.Sheets.AppendChild(new Sheet
-                                                         {
-                                                             Name = "DNValues",
-                                                             SheetId = (UInt32Value) (lookupCounter + (0U)),
-                                                             Id = rId,
-                                                             State = SheetStateValues.Hidden
-                                                         });
+                {
+                    Name = "DNValues",
+                    SheetId = (UInt32Value) (lookupCounter + (0U)),
+                    Id = rId,
+                    State = SheetStateValues.Hidden
+                });
 
             var dnWorksheetPart = workbookPart.AddNewPart<WorksheetPart>(rId);
 
             var dnWorksheet = new Worksheet
-                                  {
-                                      MCAttributes = new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
-                                  };
+                {
+                    MCAttributes = new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
+                };
 
             dnWorksheet.AddNamespaceDeclaration("r", R_SCHEMA);
             dnWorksheet.AddNamespaceDeclaration("mc", MC_SCHEMA);
@@ -248,25 +248,28 @@ namespace EPMLiveCore.API
             {
                 string key = pair.Key;
 
-                if ((SPFieldType)pair.Value[1] != SPFieldType.Lookup && (SPFieldType)pair.Value[1] != SPFieldType.Choice && !key.Equals("ResourceLevel")) continue;
+                if ((SPFieldType) pair.Value[1] != SPFieldType.Lookup &&
+                    (SPFieldType) pair.Value[1] != SPFieldType.Choice && !key.Equals("ResourceLevel")) continue;
+
+                key = key.Replace("_x0020_", "__");
 
                 string id = "rId" + lookupCounter;
 
                 workbookPart.Workbook.Sheets.AppendChild(new Sheet
-                                                             {
-                                                                 Name = key + "Values",
-                                                                 SheetId = (UInt32Value) (lookupCounter + (0U)),
-                                                                 Id = id,
-                                                                 State = SheetStateValues.Hidden
-                                                             });
+                    {
+                        Name = key + "Values",
+                        SheetId = (UInt32Value) (lookupCounter + (0U)),
+                        Id = id,
+                        State = SheetStateValues.Hidden
+                    });
 
                 var worksheetPart = workbookPart.AddNewPart<WorksheetPart>(id);
 
                 var worksheet = new Worksheet
-                                    {
-                                        MCAttributes =
-                                            new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
-                                    };
+                    {
+                        MCAttributes =
+                            new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
+                    };
                 worksheet.AddNamespaceDeclaration("r", R_SCHEMA);
                 worksheet.AddNamespaceDeclaration("mc", MC_SCHEMA);
                 worksheet.AddNamespaceDeclaration("x14ac", X14_AC_SCHEMA);
@@ -288,10 +291,10 @@ namespace EPMLiveCore.API
                                                       new CellValue(
                                                           sharedStringIndices[lookupValue]
                                                               .ToString(CultureInfo.InvariantCulture)))
-                                                      {
-                                                          CellReference = "A" + counter,
-                                                          DataType = CellValues.SharedString
-                                                      }) {RowIndex = (UInt32Value) (counter + (0U))});
+                        {
+                            CellReference = "A" + counter,
+                            DataType = CellValues.SharedString
+                        }) {RowIndex = (UInt32Value) (counter + (0U))});
                 }
 
                 worksheet.Append(sheetProperties, sheetDimension, sheetData);
@@ -328,10 +331,10 @@ namespace EPMLiveCore.API
                                                   new CellValue(
                                                       sharedStringIndices[permission]
                                                           .ToString(CultureInfo.InvariantCulture)))
-                                                  {
-                                                      CellReference = "A" + counter,
-                                                      DataType = CellValues.SharedString
-                                                  }) {RowIndex = (UInt32Value) (counter + (0U))});
+                    {
+                        CellReference = "A" + counter,
+                        DataType = CellValues.SharedString
+                    }) {RowIndex = (UInt32Value) (counter + (0U))});
             }
 
             worksheet.Append(sheetProperties, sheetDimension, sheetData);
@@ -371,9 +374,9 @@ namespace EPMLiveCore.API
                                                              TopLeftCell = "A2",
                                                              WorkbookViewId = (UInt32Value) 0U
                                                          }))
-                                {
-                                    MCAttributes = new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
-                                };
+                {
+                    MCAttributes = new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
+                };
 
             worksheet.AddNamespaceDeclaration("r", R_SCHEMA);
             worksheet.AddNamespaceDeclaration("mc", MC_SCHEMA);
@@ -385,14 +388,14 @@ namespace EPMLiveCore.API
             foreach (var pair in fieldDictionary)
             {
                 var column = new Column
-                                 {
-                                     Min = colIndex,
-                                     Max = colIndex,
-                                     Width = 9.140625D,
-                                     Style = 1U,
-                                     BestFit = true,
-                                     CustomWidth = true
-                                 };
+                    {
+                        Min = colIndex,
+                        Max = colIndex,
+                        Width = 9.140625D,
+                        Style = 1U,
+                        BestFit = true,
+                        CustomWidth = true
+                    };
 
                 if (pair.Key.Equals("ID") || pair.Key.Equals("EXTID") || pair.Key.Equals("Title"))
                 {
@@ -553,12 +556,12 @@ namespace EPMLiveCore.API
                 dataValidations.Count++;
 
                 var dataValidation = new X14.DataValidation
-                                         {
-                                             Type = DataValidationValues.List,
-                                             AllowBlank = true,
-                                             ShowInputMessage = true,
-                                             ShowErrorMessage = true
-                                         };
+                    {
+                        Type = DataValidationValues.List,
+                        AllowBlank = true,
+                        ShowInputMessage = true,
+                        ShowErrorMessage = true
+                    };
 
                 string formulaValue = string.Empty;
 
@@ -570,7 +573,8 @@ namespace EPMLiveCore.API
                     case SPFieldType.Lookup:
                     case SPFieldType.Choice:
                         int count = ((List<string>) pair.Value[2]).Count();
-                        formulaValue = pair.Key + "Values!$A$1" + (count > 1 ? ":$A$" + count : string.Empty);
+                        formulaValue = pair.Key.Replace("_x0020_", "__") + "Values!$A$1" +
+                                       (count > 1 ? ":$A$" + count : string.Empty);
                         break;
                     case SPFieldType.User:
                         formulaValue = "DNValues!$D:$D";
@@ -600,19 +604,19 @@ namespace EPMLiveCore.API
             string rId = "rId" + lookupCounter;
 
             workbookPart.Workbook.Sheets.AppendChild(new Sheet
-                                                         {
-                                                             Name = "Settings",
-                                                             SheetId = (UInt32Value) (lookupCounter + (0U)),
-                                                             Id = rId,
-                                                             State = SheetStateValues.Hidden
-                                                         });
+                {
+                    Name = "Settings",
+                    SheetId = (UInt32Value) (lookupCounter + (0U)),
+                    Id = rId,
+                    State = SheetStateValues.Hidden
+                });
 
             var worksheetPart = workbookPart.AddNewPart<WorksheetPart>(rId);
 
             var worksheet = new Worksheet
-                                {
-                                    MCAttributes = new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
-                                };
+                {
+                    MCAttributes = new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
+                };
 
             worksheet.AddNamespaceDeclaration("r", R_SCHEMA);
             worksheet.AddNamespaceDeclaration("mc", MC_SCHEMA);
@@ -626,11 +630,11 @@ namespace EPMLiveCore.API
 
             var cell = new Cell {CellReference = "A1", DataType = CellValues.SharedString};
             var cellValue = new CellValue
-                                {
-                                    Text =
-                                        sharedStringIndices[new Act(_spWeb).IsOnline.ToString()].ToString(
-                                            CultureInfo.InvariantCulture)
-                                };
+                {
+                    Text =
+                        sharedStringIndices[new Act(_spWeb).IsOnline.ToString()].ToString(
+                            CultureInfo.InvariantCulture)
+                };
 
             cell.AppendChild(cellValue);
             row.AppendChild(cell);
@@ -647,12 +651,12 @@ namespace EPMLiveCore.API
             var sharedStringTablePart = workbookPart.AddNewPart<SharedStringTablePart>("rId100");
 
             var sharedStringTable = new SharedStringTable
-                                        {
-                                            Count =
-                                                (UInt32Value)
-                                                (fieldDictionary.Count*(2 + dataTable.Rows.Count) + 0U),
-                                            UniqueCount = (UInt32Value) (sharedStringIndices.Count + 0U)
-                                        };
+                {
+                    Count =
+                        (UInt32Value)
+                        (fieldDictionary.Count*(2 + dataTable.Rows.Count) + 0U),
+                    UniqueCount = (UInt32Value) (sharedStringIndices.Count + 0U)
+                };
 
             foreach (var pair in sharedStringIndices)
             {
@@ -696,10 +700,10 @@ namespace EPMLiveCore.API
             stylesheet.AddNamespaceDeclaration("x14ac", X14_AC_SCHEMA);
 
             var numberingFormats = new NumberingFormats(new NumberingFormat
-                                                            {
-                                                                NumberFormatId = 44U,
-                                                                FormatCode = FORMAT_CODE
-                                                            }) {Count = 1U};
+                {
+                    NumberFormatId = 44U,
+                    FormatCode = FORMAT_CODE
+                }) {Count = 1U};
 
             var fonts = new Fonts {Count = 3U, KnownFonts = true};
 
@@ -733,90 +737,90 @@ namespace EPMLiveCore.API
             var cellStyleFormats = new CellStyleFormats {Count = 2U};
             var cellFormat1 = new CellFormat {NumberFormatId = 0U, FontId = 0U, FillId = 0U, BorderId = 0U};
             var cellFormat2 = new CellFormat
-                                  {
-                                      NumberFormatId = 44U,
-                                      FontId = 1U,
-                                      FillId = 0U,
-                                      BorderId = 0U,
-                                      ApplyFont = false,
-                                      ApplyFill = false,
-                                      ApplyBorder = false,
-                                      ApplyAlignment = false,
-                                      ApplyProtection = false
-                                  };
+                {
+                    NumberFormatId = 44U,
+                    FontId = 1U,
+                    FillId = 0U,
+                    BorderId = 0U,
+                    ApplyFont = false,
+                    ApplyFill = false,
+                    ApplyBorder = false,
+                    ApplyAlignment = false,
+                    ApplyProtection = false
+                };
 
             cellStyleFormats.Append(cellFormat1, cellFormat2);
 
             var cellFormats = new CellFormats {Count = 6U};
             var cellFormat3 = new CellFormat
-                                  {
-                                      NumberFormatId = 0U,
-                                      FontId = 0U,
-                                      FillId = 0U,
-                                      BorderId = 0U,
-                                      FormatId = 0U
-                                  };
+                {
+                    NumberFormatId = 0U,
+                    FontId = 0U,
+                    FillId = 0U,
+                    BorderId = 0U,
+                    FormatId = 0U
+                };
 
             var cellFormat4 = new CellFormat
-                                  {
-                                      NumberFormatId = 0U,
-                                      FontId = 0U,
-                                      FillId = 0U,
-                                      BorderId = 0U,
-                                      FormatId = 0U,
-                                      ApplyProtection = true
-                                  };
+                {
+                    NumberFormatId = 0U,
+                    FontId = 0U,
+                    FillId = 0U,
+                    BorderId = 0U,
+                    FormatId = 0U,
+                    ApplyProtection = true
+                };
             var protection1 = new Protection {Locked = false};
 
             cellFormat4.AppendChild(protection1);
 
             var cellFormat5 = new CellFormat
-                                  {
-                                      NumberFormatId = 44U,
-                                      FontId = 0U,
-                                      FillId = 0U,
-                                      BorderId = 0U,
-                                      FormatId = 1U,
-                                      ApplyFont = true,
-                                      ApplyProtection = true
-                                  };
+                {
+                    NumberFormatId = 44U,
+                    FontId = 0U,
+                    FillId = 0U,
+                    BorderId = 0U,
+                    FormatId = 1U,
+                    ApplyFont = true,
+                    ApplyProtection = true
+                };
             var protection2 = new Protection {Locked = false};
 
             cellFormat5.AppendChild(protection2);
 
             var cellFormat6 = new CellFormat
-                                  {
-                                      NumberFormatId = 14U,
-                                      FontId = 0U,
-                                      FillId = 0U,
-                                      BorderId = 0U,
-                                      FormatId = 0U,
-                                      ApplyNumberFormat = true,
-                                      ApplyProtection = true
-                                  };
+                {
+                    NumberFormatId = 14U,
+                    FontId = 0U,
+                    FillId = 0U,
+                    BorderId = 0U,
+                    FormatId = 0U,
+                    ApplyNumberFormat = true,
+                    ApplyProtection = true
+                };
             var protection3 = new Protection {Locked = false};
 
             cellFormat6.AppendChild(protection3);
             var cellFormat7 = new CellFormat
-                                  {
-                                      NumberFormatId = 0U,
-                                      FontId = 2U,
-                                      FillId = 2U,
-                                      BorderId = 0U,
-                                      FormatId = 0U,
-                                      ApplyFont = true,
-                                      ApplyFill = true,
-                                      ApplyProtection = true
-                                  };
+                {
+                    NumberFormatId = 0U,
+                    FontId = 2U,
+                    FillId = 2U,
+                    BorderId = 0U,
+                    FormatId = 0U,
+                    ApplyFont = true,
+                    ApplyFill = true,
+                    ApplyProtection = true
+                };
             var cellFormat8 = new CellFormat
-                                  {
-                                      NumberFormatId = 0U,
-                                      FontId = 0U,
-                                      FillId = 0U,
-                                      BorderId = 0U,
-                                      FormatId = 0U,
-                                      ApplyProtection = true
-                                  };
+                {
+                    NumberFormatId = 0U,
+                    FontId = 0U,
+                    FillId = 0U,
+                    BorderId = 0U,
+                    FormatId = 0U,
+                    ApplyProtection = true
+                };
 
             cellFormats.Append(cellFormat3, cellFormat4, cellFormat5, cellFormat6, cellFormat7, cellFormat8);
 
@@ -829,11 +833,11 @@ namespace EPMLiveCore.API
             var differentialFormats = new DifferentialFormats {Count = 0U};
 
             var tableStyles = new TableStyles
-                                  {
-                                      Count = 0U,
-                                      DefaultTableStyle = "TableStyleMedium2",
-                                      DefaultPivotStyle = "PivotStyleLight16"
-                                  };
+                {
+                    Count = 0U,
+                    DefaultTableStyle = "TableStyleMedium2",
+                    DefaultPivotStyle = "PivotStyleLight16"
+                };
 
             var stylesheetExtensionList = new StylesheetExtensionList();
 
@@ -874,17 +878,16 @@ namespace EPMLiveCore.API
 
         private string GetColId(int index)
         {
-            const string alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
+            int dividend = index + 1;
             string colId = string.Empty;
-            double value = Convert.ToDouble(index);
+            int modulo;
 
-            do
+            while (dividend > 0)
             {
-                double remainder = value - (26*Math.Truncate(value/26));
-                colId = colId + alphabets.Substring((int) remainder, 1);
-                value = Math.Truncate(value/26);
-            } while (value > 0);
+                modulo = (dividend - 1)%26;
+                colId = Convert.ToChar(65 + modulo).ToString() + colId;
+                dividend = ((dividend - modulo)/26);
+            }
 
             return colId;
         }
@@ -899,16 +902,16 @@ namespace EPMLiveCore.API
             {
                 case SPFieldType.Choice:
                     choices = new List<string>();
-                    foreach (var choice in ((SPFieldChoice) spField).Choices)
+                    foreach (string choice in ((SPFieldChoice) spField).Choices)
                     {
                         ((List<string>) choices).Add("|" + choice);
                     }
                     break;
                 case SPFieldType.MultiChoice:
                     choices = new List<string>();
-                    foreach (var choice in ((SPFieldMultiChoice) spField).Choices)
+                    foreach (string choice in ((SPFieldMultiChoice) spField).Choices)
                     {
-                        ((List<string>)choices).Add("|" + choice);
+                        ((List<string>) choices).Add("|" + choice);
                     }
                     break;
                 case SPFieldType.Lookup:
@@ -987,33 +990,33 @@ namespace EPMLiveCore.API
             var dataTable = new DataTable();
 
             SPSecurity.RunWithElevatedPrivileges(() =>
-                                                 {
-                                                     _permissions = GetPermissions(resourcePool.ParentWeb).ToList();
+                {
+                    _permissions = GetPermissions(resourcePool.ParentWeb).ToList();
 
-                                                     dataTable = resourcePool.GetItems(new SPQuery()).GetDataTable();
+                    dataTable = resourcePool.GetItems(new SPQuery()).GetDataTable();
 
-                                                     if (dataTable != null) return;
+                    if (dataTable != null) return;
 
-                                                     using (new DisabledItemEventScope())
-                                                     {
-                                                         _spWeb.AllowUnsafeUpdates = true;
+                    using (new DisabledItemEventScope())
+                    {
+                        _spWeb.AllowUnsafeUpdates = true;
 
-                                                         SPListItem spListItem = resourcePool.Items.Add();
-                                                         spListItem["Title"] = "EPMLiveResourceExporter";
-                                                         spListItem.SystemUpdate();
+                        SPListItem spListItem = resourcePool.Items.Add();
+                        spListItem["Title"] = "EPMLiveResourceExporter";
+                        spListItem.SystemUpdate();
 
-                                                         dataTable = resourcePool.GetItems(new SPQuery()).GetDataTable();
-                                                         dataTable.Rows[0].Delete();
+                        dataTable = resourcePool.GetItems(new SPQuery()).GetDataTable();
+                        dataTable.Rows[0].Delete();
 
-                                                         spListItem.Delete();
+                        spListItem.Delete();
 
-                                                         _spWeb.AllowUnsafeUpdates = false;
-                                                     }
-                                                 });
+                        _spWeb.AllowUnsafeUpdates = false;
+                    }
+                });
 
             if (!dataTable.Columns.Contains("EXTID"))
             {
-                dataTable.Columns.Add("EXTID", typeof(int));
+                dataTable.Columns.Add("EXTID", typeof (int));
             }
 
             foreach (DataRow dataRow in dataTable.Rows)
@@ -1028,8 +1031,9 @@ namespace EPMLiveCore.API
 
                     if (spUser != null)
                     {
-                        var permissions = (from SPGroup g in spUser.Groups where _permissions.Contains(g.Name) select g.Name).ToList();
-                        
+                        List<string> permissions =
+                            (from SPGroup g in spUser.Groups where _permissions.Contains(g.Name) select g.Name).ToList();
+
                         dataRow["Permissions"] = permissions.Any()
                                                      ? string.Join(", ", permissions.ToArray())
                                                      : string.Empty;
@@ -1044,7 +1048,9 @@ namespace EPMLiveCore.API
                 {
                     dataRow["EXTID"] = spListItem["EXTID"];
                 }
-                catch { }
+                catch
+                {
+                }
             }
 
             return dataTable;

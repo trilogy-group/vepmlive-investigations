@@ -81,7 +81,7 @@ namespace EPMLiveCore.API
 				var resourceExporter = new ResourceExporter(spWeb);
 				bool exported = resourceExporter.Export(out file,out message);
 
-			    return string.Format(@"<ResourceExporter Success=""{0}"" Message=""{1}"" File=""{2}"" />", exported, message, file);
+				return string.Format(@"<ResourceExporter Success=""{0}"" Message=""{1}"" File=""{2}"" />", exported, message, file);
 			}
 			catch (APIException)
 			{
@@ -94,7 +94,7 @@ namespace EPMLiveCore.API
 		}
 		// Private Methods (7) 
 
-/// <summary>
+		/// <summary>
 		///     Builds the department hierarchy.
 		/// </summary>
 		/// <param name="dataRows">The data rows.</param>

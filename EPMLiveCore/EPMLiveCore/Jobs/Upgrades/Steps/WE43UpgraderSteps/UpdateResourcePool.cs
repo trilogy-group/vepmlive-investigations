@@ -1,26 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Microsoft.SharePoint;
-using System.Data;
+using Microsoft.Win32;
 
 namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 {
     [JobStep("WE43Upgrader", 40)]
-
     public class UpdateResourcePool : Step
     {
+        #region Constructors (1) 
+
         public UpdateResourcePool(SPWeb spWeb, string data, int stepNumber, bool bispfe)
             : base(spWeb, data, stepNumber, bispfe)
         {
         }
 
+        #endregion Constructors 
+
+        #region Properties (1) 
+
         public override string Description
         {
             get { return "Updating Resource Pool"; }
         }
+
+        #endregion Properties 
+
+        #region Methods (5) 
+
+        // Public Methods (1) 
 
         public override bool Perform()
         {
@@ -29,6 +41,8 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             SPList oResourcePool = SPWeb.Lists.TryGetList("Resources");
             SPList oRoles = SPWeb.Lists.TryGetList("Roles");
             SPList oDepartments = SPWeb.Lists.TryGetList("Departments");
+            SPList oHolidaySchedule = SPWeb.Lists.TryGetList("HolidaySchedules");
+            SPList oWorkHours = SPWeb.Lists.TryGetList("WorkHours");
 
             if (oResourcePool == null)
             {
@@ -42,12 +56,22 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             {
                 LogMessage("", "Departments list missing", 3);
             }
+            else if (oHolidaySchedule == null)
+            {
+                LogMessage("", "HolidaySchedules list missing", 3);
+            }
+            else if (oWorkHours == null)
+            {
+                LogMessage("", "WorkHours list missing", 3);
+            }
             else
             {
                 try
                 {
                     DataTable dtRoles = oRoles.Items.GetDataTable();
                     DataTable dtDepartments = oDepartments.Items.GetDataTable();
+
+                    #region Add Temp fields
 
                     try
                     {
@@ -64,7 +88,10 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                             oField.Update();
                         }
                     }
-                    catch (Exception ex) { LogMessage("\t", "Adding TempRole field: " + ex.Message, 3); }
+                    catch (Exception ex)
+                    {
+                        LogMessage("\t", "Adding TempRole field: " + ex.Message, 3);
+                    }
 
                     try
                     {
@@ -81,9 +108,16 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                             oField.Update();
                         }
                     }
-                    catch (Exception ex) { LogMessage("\t", "Adding TempDept field: " + ex.Message, 3); }
+                    catch (Exception ex)
+                    {
+                        LogMessage("\t", "Adding TempDept field: " + ex.Message, 3);
+                    }
 
                     oResourcePool.Update();
+
+                    #endregion
+
+                    #region Process Role and Departments
 
                     bool bProcessRole = false;
                     bool bProcessDept = false;
@@ -93,13 +127,17 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                         if (oResourcePool.Fields.GetFieldByInternalName("Role").Type == SPFieldType.Choice)
                             bProcessRole = true;
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                     try
                     {
                         if (oResourcePool.Fields.GetFieldByInternalName("Department").Type == SPFieldType.Choice)
                             bProcessDept = true;
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
                     SPField oFieldRole;
                     SPField oFieldDept;
@@ -123,7 +161,8 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     }
                     catch
                     {
-                        SPField newField = oResourcePool.Fields.CreateNewField(SPFieldType.Choice.ToString(), "Department");
+                        SPField newField = oResourcePool.Fields.CreateNewField(SPFieldType.Choice.ToString(),
+                                                                               "Department");
                         oResourcePool.Fields.Add(newField);
                         oResourcePool.Update();
 
@@ -132,7 +171,6 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                     if (bProcessRole || bProcessDept)
                     {
-
                         LogMessage("\tCopying Temporary Data");
 
                         foreach (SPListItem li in oResourcePool.Items)
@@ -156,42 +194,161 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                                 LogMessage("\t", "Error (" + li.Title + "): " + ex.Message, 3);
                             }
                         }
-
                     }
 
                     Thread.Sleep(5000);
+
+                    #endregion
 
                     ProcessFields(ref oResourcePool);
 
                     oFieldRole = oResourcePool.Fields.GetFieldByInternalName("Role");
                     oFieldDept = oResourcePool.Fields.GetFieldByInternalName("Department");
 
-                    LogMessage("\tUpdating Role and Department");
+                    LogMessage("\tUpdating Role, Department, Holiday Schedule and Work Hours");
+
+                    EnumerableRowCollection<DataRow> resourceHSWS = null;
+                    EnumerableRowCollection<DataRow> holidaySchedules = null;
+                    EnumerableRowCollection<DataRow> workHours = null;
+
+                    try
+                    {
+                        var dtResourceHSWS = new DataTable();
+
+                        using (var sqlConnection = new SqlConnection(GetConnectionString()))
+                        {
+                            using (var sqlCommand = new SqlCommand(SQL, sqlConnection))
+                            {
+                                sqlConnection.Open();
+                                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+                                {
+                                    dtResourceHSWS.Load(sqlDataReader);
+                                }
+                            }
+                        }
+
+                        resourceHSWS = dtDepartments.AsEnumerable();
+
+                        if (resourceHSWS.Any())
+                        {
+                            holidaySchedules = oHolidaySchedule.Items.GetDataTable().AsEnumerable();
+                            workHours = oWorkHours.Items.GetDataTable().AsEnumerable();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogMessage("\t", "(Get PFE DB ConnectionString): " + ex.Message, 3);
+                    }
 
                     foreach (SPListItem li in oResourcePool.Items)
                     {
                         try
                         {
-                            if (li["TempDept"] != null && !li["TempDept"].ToString().Contains(";#") && oFieldDept.Type == SPFieldType.Lookup)
+                            #region Copy Department and Roles
+
+                            if (li["TempDept"] != null && !li["TempDept"].ToString().Contains(";#") &&
+                                oFieldDept.Type == SPFieldType.Lookup)
                             {
-                                DataRow[] dr = dtDepartments.Select("Title='" + li["TempDept"].ToString() + "'");
+                                DataRow[] dr = dtDepartments.Select("DisplayName='" + li["TempDept"] + "'");
                                 if (dr.Length > 0)
                                 {
-
-                                    SPFieldLookupValue lv = new SPFieldLookupValue(int.Parse(dr[0]["ID"].ToString()), li["TempDept"].ToString());
+                                    var lv = new SPFieldLookupValue(int.Parse(dr[0]["ID"].ToString()),
+                                                                    li["TempDept"].ToString());
                                     li[oFieldDept.Id] = lv;
                                 }
                             }
 
-                            if (li["TempRole"] != null && !li["TempRole"].ToString().Contains(";#") && oFieldRole.Type == SPFieldType.Lookup)
+                            if (li["TempRole"] != null && !li["TempRole"].ToString().Contains(";#") &&
+                                oFieldRole.Type == SPFieldType.Lookup)
                             {
-                                DataRow[] dr = dtRoles.Select("Title='" + li["TempRole"].ToString() + "'");
+                                DataRow[] dr = dtRoles.Select("Title='" + li["TempRole"] + "'");
                                 if (dr.Length > 0)
                                 {
-
-                                    SPFieldLookupValue lv = new SPFieldLookupValue(int.Parse(dr[0]["ID"].ToString()), li["TempRole"].ToString());
+                                    var lv = new SPFieldLookupValue(int.Parse(dr[0]["ID"].ToString()),
+                                                                    li["TempRole"].ToString());
                                     li[oFieldRole.Id] = lv;
                                 }
+                            }
+
+                            #endregion
+
+                            if (resourceHSWS != null && resourceHSWS.Any())
+                            {
+                                try
+                                {
+                                    SPListItem resource = li;
+                                    foreach (object schedule in from hs in resourceHSWS
+                                                                let extId = hs["ExtId"]
+                                                                where extId != null && extId != DBNull.Value
+                                                                where
+                                                                    extId.ToString()
+                                                                         .Equals(
+                                                                             resource.ID.ToString(
+                                                                                 CultureInfo.InvariantCulture))
+                                                                select hs["HolidaySchedule"]
+                                                                into schedule
+                                                                where schedule != null && schedule != DBNull.Value
+                                                                select schedule)
+                                    {
+                                        foreach (DataRow s in holidaySchedules)
+                                        {
+                                            object sch = s["Title"];
+                                            if (sch == null || sch == DBNull.Value) continue;
+
+                                            string hsch = sch.ToString();
+                                            if (!hsch.ToLower().Equals(schedule.ToString().ToLower())) continue;
+
+                                            li["HolidaySchedule"] =
+                                                new SPFieldLookupValue(Convert.ToInt32(s["ID"].ToString()), hsch);
+                                            break;
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogMessage("\t", "(" + li.Title + "): Not setting Holiday Schedule. " + ex.Message,
+                                               3);
+                                }
+
+                                try
+                                {
+                                    SPListItem resource = li;
+                                    foreach (object hours in from wh in resourceHSWS
+                                                             let extId = wh["ExtId"]
+                                                             where extId != null && extId != DBNull.Value
+                                                             where
+                                                                 extId.ToString()
+                                                                      .Equals(
+                                                                          resource.ID.ToString(
+                                                                              CultureInfo.InvariantCulture))
+                                                             select wh["WorkHours"]
+                                                             into hours
+                                                             where hours != null && hours != DBNull.Value select hours)
+                                    {
+                                        foreach (DataRow h in workHours)
+                                        {
+                                            object hr = h["Title"];
+                                            if (hr == null || hr == DBNull.Value) continue;
+
+                                            string whr = hr.ToString();
+                                            if (!whr.ToLower().Equals(hours.ToString().ToLower())) continue;
+
+                                            li["WorkHours"] = new SPFieldLookupValue(
+                                                Convert.ToInt32(h["ID"].ToString()), whr);
+                                            break;
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogMessage("\t", "(" + li.Title + "): Not setting Work Hours. " + ex.Message, 3);
+                                }
+                            }
+                            else
+                            {
+                                LogMessage("\t",
+                                           "(" + li.Title +
+                                           "): Not setting Holiday Schedule and Work Hours. Cannot load from PFE.", 3);
                             }
 
                             li.Update();
@@ -210,7 +367,9 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                         {
                             LogMessage("Installing PfE Resource Events");
 
-                            WorkEngineAPI.AddRemoveFeatureEvents(@"<AddRemoveFeatureEvents><Data><Feature Name=""pferesourcemanagement"" Operation=""ADD""/></Data></AddRemoveFeatureEvents>", SPWeb);
+                            WorkEngineAPI.AddRemoveFeatureEvents(
+                                @"<AddRemoveFeatureEvents><Data><Feature Name=""pferesourcemanagement"" Operation=""ADD""/></Data></AddRemoveFeatureEvents>",
+                                SPWeb);
                         }
                     }
 
@@ -227,7 +386,6 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                         }
                     }
 
-
                     LogMessage("Processing Editable Fields");
                     UpdateField("Generic", true, false, true, ref oResourcePool);
                     UpdateField("FirstName", true, true, true, ref oResourcePool);
@@ -243,69 +401,74 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     UpdateField("AvailableFrom", true, true, true, ref oResourcePool);
                     UpdateField("AvailableTo", true, true, true, ref oResourcePool);
                     UpdateField("Disabled", false, true, true, ref oResourcePool);
-
                 }
                 catch (Exception ex)
                 {
                     LogMessage("", "General: " + ex.Message, 3);
                 }
-
             }
-
 
             return true;
         }
 
-        private void UpdateField(string sFieldName, bool bCanShowInNewForm, bool bCanShowInEditForm, bool bCanShowInDisplayForm, ref SPList ResourcePool)
+        // Private Methods (4) 
+
+        private string GetConnectionString()
         {
-            using (var spSite = new SPSite(ResourcePool.ParentWeb.Site.ID))
+            string basePath = CoreFunctions.getConfigSetting(SPWeb, "epkbasepath");
+
+            if (string.IsNullOrEmpty(basePath))
+        {
+                throw new Exception("EPK Base Path is empty.");
+            }
+
+            string database = CoreFunctions.getConfigSetting(SPWeb, "ppmdbconn");
+
+            if (string.IsNullOrEmpty(database))
             {
-                using (SPWeb spWeb = spSite.OpenWeb(ResourcePool.ParentWeb.ID))
+                database = GetDatabaseFromRegistry(basePath);
+            }
+
+            string[] list = database.Split(';').Where(s => !s.ToLower().Contains("provider")).ToArray();
+
+            return string.Join(";", list);
+        }
+
+        private static string GetDatabaseFromRegistry(string basePath)
+        {
+            string database = string.Empty;
+
+            RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("Software", false);
+
+            try
+            {
+                RegistryKey key = registryKey.OpenSubKey("EPMLive", false)
+                                             .OpenSubKey("PortfolioEngine", false)
+                                             .OpenSubKey(basePath);
+
+                database = key.GetValue("ConnectionString").ToString();
+            }
+            catch
+            {
+                try
+                            {
+                    RegistryKey key = registryKey.OpenSubKey("Wow6432Node", false)
+                                                 .OpenSubKey("EPMLive", false)
+                                                 .OpenSubKey("PortfolioEngine", false)
+                                                 .OpenSubKey(basePath);
+
+                    database = key.GetValue("ConnectionString").ToString();
+                        }
+                catch
                 {
-                    SPList oResourcePool = spWeb.Lists[ResourcePool.ID];
-
-                    if (oResourcePool.Fields.ContainsFieldWithInternalName(sFieldName))
-                    {
-                        try
-                        {
-                            SPField oField = oResourcePool.Fields.GetFieldByInternalName(sFieldName);
-
-                            bool bSealed = oField.Sealed;
-                            if (bSealed)
-                            {
-                                oField.Sealed = false;
-                                oField.Update();
-                            }
-
-                            oField.ShowInDisplayForm = bCanShowInDisplayForm;
-                            oField.ShowInEditForm = bCanShowInEditForm;
-                            oField.ShowInNewForm = bCanShowInNewForm;
-                            oField.Update();
-
-                            if (bSealed)
-                            {
-                                oField.Sealed = true;
-                                oField.Update();
-                            }
-                            LogMessage("\t" + sFieldName);
-                        }
-                        catch (Exception ex)
-                        {
-                            LogMessage("", "(" + sFieldName + "): " + ex.Message, 3);
-                        }
                     }
                 }
-            }
+
+            return database;
         }
 
         private void ProcessFields(ref SPList oResourcePool)
         {
-            //using (var spSite = new SPSite(resourcePool.ParentWeb.Site.ID))
-            //{
-            //    using (SPWeb spWeb = spSite.OpenWeb(resourcePool.ParentWeb.ID))
-            //    {
-            //        SPList oResourcePool = spWeb.Lists[resourcePool.ID];
-
             try
             {
                 if (oResourcePool.Fields.ContainsFieldWithInternalName("CanLogin"))
@@ -320,20 +483,12 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     oField.AllowDeletion = true;
                     oField.Update();
                     oField.Delete();
-
                 }
             }
-            catch (Exception ex) { LogMessage("\t", "Removing CanLogin field: " + ex.Message, 3); }
-
-            //oResourcePool.Update();
-            //    }
-            //}
-
-            //using (var spSite = new SPSite(resourcePool.ParentWeb.Site.ID))
-            //{
-            //    using (SPWeb spWeb = spSite.OpenWeb(resourcePool.ParentWeb.ID))
-            //    {
-            //        SPList oResourcePool = spWeb.Lists[resourcePool.ID];
+            catch (Exception ex)
+            {
+                LogMessage("\t", "Removing CanLogin field: " + ex.Message, 3);
+            }
 
             try
             {
@@ -352,17 +507,10 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     oField.Delete();
                 }
             }
-            catch (Exception ex) { LogMessage("\t", "Removing DepartmentManager field: " + ex.Message, 3); }
-
-            //        oResourcePool.Update();
-            //    }
-            //}
-
-            //using (var spSite = new SPSite(resourcePool.ParentWeb.Site.ID))
-            //{
-            //    using (SPWeb spWeb = spSite.OpenWeb(resourcePool.ParentWeb.ID))
-            //    {
-            //        SPList oResourcePool = spWeb.Lists[resourcePool.ID];
+            catch (Exception ex)
+            {
+                LogMessage("\t", "Removing DepartmentManager field: " + ex.Message, 3);
+            }
 
             try
             {
@@ -370,24 +518,19 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 {
                     LogMessage("\tAdding License Type field");
 
-                    string sField = oResourcePool.Fields.AddFieldAsXml(@"<Field Type=""ResourceLevels"" DisplayName=""ResourceLevel"" Required=""FALSE"" EnforceUniqueValues=""FALSE"" StaticName=""ResourceLevel"" Name=""ResourceLevel"" AllowDeletion=""FALSE"" Description=""Choose the license type that this resource will require within EPM Live.  The licence type selected will determine the features available to this resource.""/>");
+                    string sField =
+                        oResourcePool.Fields.AddFieldAsXml(
+                            @"<Field Type=""ResourceLevels"" DisplayName=""ResourceLevel"" Required=""FALSE"" EnforceUniqueValues=""FALSE"" StaticName=""ResourceLevel"" Name=""ResourceLevel"" AllowDeletion=""FALSE"" Description=""Choose the license type that this resource will require within EPM Live.  The licence type selected will determine the features available to this resource.""/>");
                     SPField oField = oResourcePool.Fields.GetFieldByInternalName("ResourceLevel");
                     oField.Title = "License Type";
                     oField.Sealed = true;
                     oField.Update();
                 }
             }
-            catch (Exception ex) { LogMessage("\t", "Adding License Type field: " + ex.Message, 3); }
-
-            //oResourcePool.Update();
-            //    }
-            //}
-
-            //using (var spSite = new SPSite(resourcePool.ParentWeb.Site.ID))
-            //{
-            //    using (SPWeb spWeb = spSite.OpenWeb(resourcePool.ParentWeb.ID))
-            //    {
-            //        SPList oResourcePool = spWeb.Lists[resourcePool.ID];
+            catch (Exception ex)
+            {
+                LogMessage("\t", "Adding License Type field: " + ex.Message, 3);
+            }
 
             try
             {
@@ -399,7 +542,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     if (oHolidaySchedules != null)
                     {
                         oResourcePool.Fields.AddLookup("HolidaySchedule", oHolidaySchedules.ID, true);
-                        SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName("HolidaySchedule");
+                        var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName("HolidaySchedule");
                         oField.LookupField = "Title";
                         oField.Title = "Holiday Schedule";
                         oField.Update();
@@ -410,17 +553,10 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     }
                 }
             }
-            catch (Exception ex) { LogMessage("\t", "Adding Holiday Schedule field: " + ex.Message, 3); }
-
-            //oResourcePool.Update();
-            //    }
-            //}
-
-            //using (var spSite = new SPSite(resourcePool.ParentWeb.Site.ID))
-            //{
-            //    using (SPWeb spWeb = spSite.OpenWeb(resourcePool.ParentWeb.ID))
-            //    {
-            //        SPList oResourcePool = spWeb.Lists[resourcePool.ID];
+            catch (Exception ex)
+            {
+                LogMessage("\t", "Adding Holiday Schedule field: " + ex.Message, 3);
+            }
 
             try
             {
@@ -432,7 +568,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     if (oWorkHours != null)
                     {
                         oResourcePool.Fields.AddLookup("WorkHours", oWorkHours.ID, true);
-                        SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName("WorkHours");
+                        var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName("WorkHours");
                         oField.LookupField = "Title";
                         oField.Title = "Work Hours";
                         oField.Update();
@@ -443,17 +579,10 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     }
                 }
             }
-            catch (Exception ex) { LogMessage("\t", "Adding Work Hours field: " + ex.Message, 3); }
-
-            //        oResourcePool.Update();
-            //    }
-            //}
-
-            //using (var spSite = new SPSite(resourcePool.ParentWeb.Site.ID))
-            //{
-            //    using (SPWeb spWeb = spSite.OpenWeb(resourcePool.ParentWeb.ID))
-            //    {
-            //        SPList oResourcePool = spWeb.Lists[resourcePool.ID];
+            catch (Exception ex)
+            {
+                LogMessage("\t", "Adding Work Hours field: " + ex.Message, 3);
+            }
 
             try
             {
@@ -468,13 +597,13 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                         if (bIsPfe)
                         {
-                            SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName("Role");
+                            var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName("Role");
                             oField.LookupField = "CCRName";
                             oField.Update();
                         }
                         else
                         {
-                            SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName("Role");
+                            var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName("Role");
                             oField.LookupField = "Title";
                             oField.Update();
                         }
@@ -507,13 +636,13 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                             if (bIsPfe)
                             {
-                                SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName(sField);
+                                var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName(sField);
                                 oField.LookupField = "CCRName";
                                 oField.Update();
                             }
                             else
                             {
-                                SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName(sField);
+                                var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName(sField);
                                 oField.LookupField = "Title";
                                 oField.Update();
                             }
@@ -525,17 +654,10 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     }
                 }
             }
-            catch (Exception ex) { LogMessage("\t", "Adding Role field: " + ex.Message, 3); }
-
-            //        oResourcePool.Update();
-            //    }
-            //}
-
-            //using (var spSite = new SPSite(resourcePool.ParentWeb.Site.ID))
-            //{
-            //    using (SPWeb spWeb = spSite.OpenWeb(resourcePool.ParentWeb.ID))
-            //    {
-            //        SPList oResourcePool = spWeb.Lists[resourcePool.ID];
+            catch (Exception ex)
+            {
+                LogMessage("\t", "Adding Role field: " + ex.Message, 3);
+            }
 
             try
             {
@@ -548,7 +670,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     {
                         oResourcePool.Fields.AddLookup("Department", oDepts.ID, true);
 
-                        SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName("Department");
+                        var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName("Department");
                         oField.LookupField = "DisplayName";
                         oField.Update();
                     }
@@ -617,7 +739,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                             LogMessage("\t\tConfiguring the Department lookup");
 
-                            SPFieldLookup oField = (SPFieldLookup)oResourcePool.Fields.GetFieldByInternalName("Department");
+                            var oField = (SPFieldLookup) oResourcePool.Fields.GetFieldByInternalName("Department");
                             oField.LookupField = "DisplayName";
 
                             try
@@ -639,11 +761,66 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     }
                 }
             }
-            catch (Exception ex) { LogMessage("\t", "Adding Department field: " + ex.Message, 3); }
+            catch (Exception ex)
+            {
+                LogMessage("\t", "Adding Department field: " + ex.Message, 3);
+            }
 
             oResourcePool.Update();
-            //    }
-            //}
         }
+
+        private void UpdateField(string sFieldName, bool bCanShowInNewForm, bool bCanShowInEditForm,
+                                 bool bCanShowInDisplayForm, ref SPList ResourcePool)
+        {
+            using (var spSite = new SPSite(ResourcePool.ParentWeb.Site.ID))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(ResourcePool.ParentWeb.ID))
+                {
+                    SPList oResourcePool = spWeb.Lists[ResourcePool.ID];
+
+                    if (!oResourcePool.Fields.ContainsFieldWithInternalName(sFieldName)) return;
+
+                    try
+                    {
+                        SPField oField = oResourcePool.Fields.GetFieldByInternalName(sFieldName);
+
+                        bool bSealed = oField.Sealed;
+                        if (bSealed)
+                        {
+                            oField.Sealed = false;
+                            oField.Update();
+                        }
+
+                        oField.ShowInDisplayForm = bCanShowInDisplayForm;
+                        oField.ShowInEditForm = bCanShowInEditForm;
+                        oField.ShowInNewForm = bCanShowInNewForm;
+                        oField.Update();
+
+                        if (bSealed)
+                        {
+                            oField.Sealed = true;
+                            oField.Update();
+                        }
+                        LogMessage("\t" + sFieldName);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogMessage("", "(" + sFieldName + "): " + ex.Message, 3);
+                    }
+        }
+    }
+}
+
+        #endregion Methods 
+
+        private const string SQL = @"
+            SELECT    dbo.EPG_VW_RPT_Resources.WRES_EXT_UID AS ExtId, dbo.EPG_GROUPS.GROUP_NAME AS HolidaySchedule, EPG_GROUPS_1.GROUP_NAME AS WorkHours
+            FROM      dbo.EPG_GROUP_MEMBERS AS EPG_GROUP_MEMBERS_1 INNER JOIN
+                      dbo.EPG_GROUPS AS EPG_GROUPS_1 ON EPG_GROUP_MEMBERS_1.GROUP_ID = EPG_GROUPS_1.GROUP_ID RIGHT OUTER JOIN
+                      dbo.EPG_VW_RPT_Resources ON EPG_GROUP_MEMBERS_1.MEMBER_UID = dbo.EPG_VW_RPT_Resources.ResourceID LEFT OUTER JOIN
+                      dbo.EPG_GROUP_MEMBERS INNER JOIN
+                      dbo.EPG_GROUPS ON dbo.EPG_GROUP_MEMBERS.GROUP_ID = dbo.EPG_GROUPS.GROUP_ID ON
+                      dbo.EPG_VW_RPT_Resources.ResourceID = dbo.EPG_GROUP_MEMBERS.MEMBER_UID
+            WHERE     (dbo.EPG_GROUPS.GROUP_ENTITY = 11) AND (EPG_GROUPS_1.GROUP_ENTITY = 10)";
     }
 }
