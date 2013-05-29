@@ -190,3 +190,55 @@ else
 begin
     UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.Integration', [Title]='Integration Job', Priority=20 where jobtype_id=70
 end
+if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 201)
+begin
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (201,'EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Jobs.EPMLiveUpgrade.Upgrader','EPM Live Upgrader',11)
+end
+else
+begin
+    UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.EPMLiveUpgrade.Upgrader', [Title]='EPM Live Upgrader', Priority=11 where jobtype_id=201
+end
+if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc499')
+begin
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc499','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.SQL','SQL','This provides access to data located in Microsoft SQL Server','sql.png','<Properties>
+	<Connection>
+		<Input Type="Text" Property="Server" Title="Server Name">Enter the full name of the sql server</Input>
+		<Input Type="Text" Property="Database" Title="Database Name"/>
+	</Connection>
+	<General>
+		<Input Type="Select" Property="Table" Title="Select Table or View"/>
+		<Input Type="Text" Property="Where" Title="Enter Where Clause"/>
+		<Input Type="Select" Property="UserMapType" Title="Select User Mapping Type"/>
+	</General>
+</Properties>','False')
+end
+else
+begin
+    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.API.Integration.SQL', [Title]='SQL', Description='This provides access to data located in Microsoft SQL Server', Icon='sql.png', CustomProps='<Properties>
+	<Connection>
+		<Input Type="Text" Property="Server" Title="Server Name">Enter the full name of the sql server</Input>
+		<Input Type="Text" Property="Database" Title="Database Name"/>
+	</Connection>
+	<General>
+		<Input Type="Select" Property="Table" Title="Select Table or View"/>
+		<Input Type="Text" Property="Where" Title="Enter Where Clause"/>
+		<Input Type="Select" Property="UserMapType" Title="Select User Mapping Type"/>
+	</General>
+</Properties>',AvailableOnline='False' where module_id='a0950b9b-3525-40b8-a456-6403156dc499'
+end
+if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc49a')
+begin
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49a','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Integrations.Salesforce.Integrator','SalesForce','This connector allows data synchronization to and from salesforce','salesforce.png','<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>','True')
+end
+else
+begin
+    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Integrations.Salesforce.Integrator', [Title]='SalesForce', Description='This connector allows data synchronization to and from salesforce', Icon='salesforce.png', CustomProps='<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>',AvailableOnline='True' where module_id='a0950b9b-3525-40b8-a456-6403156dc49a'
+end
+if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc49b')
+begin
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49b','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','API.Integration.Office365','Office 365','','office365.png','','True')
+end
+else
+begin
+    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='API.Integration.Office365', [Title]='Office 365', Description='', Icon='office365.png', CustomProps='',AvailableOnline='True' where module_id='a0950b9b-3525-40b8-a456-6403156dc49b'
+end
