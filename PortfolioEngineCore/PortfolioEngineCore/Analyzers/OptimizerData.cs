@@ -443,7 +443,7 @@ namespace PortfolioEngineCore
             return true; // (_dba.Status == StatusEnum.rsSuccess);
         }
 
-        public bool GetOptimizerStratagiesXML(out string sReply)
+        public bool GetOptimizerStratagiesXML(string ListID, out string sReply)
         {
             sReply = "";
             if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
@@ -486,7 +486,9 @@ namespace PortfolioEngineCore
                 if (sXML != string.Empty)
                 {
                     xStratagy.LoadXML(sXML);
-                    xStratagies.AppendSubStruct(xStratagy);
+
+                    if (xStratagy.GetStringAttr("ListID") == ListID)
+                        xStratagies.AppendSubStruct(xStratagy);
                 }
             }
             reader.Close();
