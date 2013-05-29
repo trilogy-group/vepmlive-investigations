@@ -120,6 +120,9 @@ namespace TimeSheets
             ribbonExtensions.LoadXml(Properties.Resources.txtTimesheetPMApprovalsTab.Replace("#language#", language));
             ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListContextualGroup._children");
 
+            ribbonExtensions.LoadXml(Properties.Resources.flexible2);
+            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.Templates._children");
+
             ribbonExtensions = new XmlDocument();
             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Print\" Sequence=\"10\" Command=\"PrintGrid\" Image16by16=\"/_layouts/epmlive/images/print.gif\" Image32by32=\"/_layouts/epmlive/images/printmenu.gif\" LabelText=\"Print\" ToolTipTitle=\"Print\" ToolTipDescription=\"\" TemplateAlias=\"o1\"/>");
             ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Share.Controls._children");

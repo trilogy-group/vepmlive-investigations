@@ -14,6 +14,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace TimeSheets
 {
@@ -64,6 +65,20 @@ namespace TimeSheets
 
             if(activation != 0)
                 return;
+
+            if (SPContext.Current.ViewContext.View != null)
+            {
+                try
+                {
+                    typeof(ListTitleViewSelectorMenu).GetField("m_wpSingleInit", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(Page.FindControl("ctl00$PlaceHolderPageTitleInTitleArea$ctl01$ctl00").Controls[1], true);
+                }
+                catch { }
+                try
+                {
+                    typeof(ListTitleViewSelectorMenu).GetField("m_wpSingle", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(Page.FindControl("ctl00$PlaceHolderPageTitleInTitleArea$ctl01$ctl00").Controls[1], true);
+                }
+                catch { }
+            }
 
             try
             {
