@@ -2593,7 +2593,16 @@ namespace EPMLiveWebParts
             output.WriteLine("<script language=\"javascript\">");
             output.WriteLine("Grids.OnRenderFinish = function(grid){grid.ActionZoomFit();};");
             output.WriteLine("Grids.OnReady = function(grid, start)  { document.getElementById('loadinggrid" + this.ID + "').style.display = 'none'; }");
-            output.WriteLine("Grids.OnRenderFinish = function(grid)  { clickTab(); }");  
+            output.WriteLine("Grids.OnRenderFinish = function(grid)  { clickTab(); }");
+            output.WriteLine(@"Grids.OnFocus = function(grid, row, col, orow, ocol, pagepos) 
+                                {
+                                    var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + @"');
+                                    fireEvent(wp, 'mouseup');
+
+                                    var wp2 = document.getElementById('Ribbon.ListItem-title');
+		                            if(wp2)
+			                            fireEvent(wp2.firstChild, 'click'); 
+                                };");  
             
 
             output.WriteLine("ArrGantts.push('GanttGrid" + sFullGridId + "');");
@@ -2745,6 +2754,20 @@ namespace EPMLiveWebParts
             output.WriteLine("fireEvent(wp2, 'click');");
             output.WriteLine("}catch(e){}");
             output.WriteLine("}");
+
+            output.WriteLine(@"function fireEvent(element,event){
+                                if (document.createEventObject){
+                                    // dispatch for IE
+                                    var evt = document.createEventObject();
+                                    return element.fireEvent('on'+event,evt)
+                                }
+                                else{
+                                    // dispatch for firefox + others
+                                    var evt = document.createEvent(""HTMLEvents"");
+                                    evt.initEvent(event, true, true ); // event type,bubbling,cancelable
+                                    return !element.dispatchEvent(evt);
+                                }
+                            }");
                 
         //output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"GridViewContextualTabPageComponent.js\");");
 
