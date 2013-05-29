@@ -318,7 +318,7 @@
         <wssuc:ButtonSection runat="server">
             <template_buttons>
                 <asp:PlaceHolder ID="PlaceHolder1" runat="server">
-                    <asp:Button ID="btnRunManually" runat="server" Text="Run Now" OnClick="btnRunManually_Click" CssClass="ms-ButtonHeightWidth" style="width:150px;/>&nbsp;<asp:Button UseSubmitBehavior="false" runat="server" OnClick="Submit_Click" OnClientClick="SaveSelections()" class="ms-ButtonHeightWidth" Text="Save Settings" id="Button1" accesskey="" Width="150"/>
+                    <asp:Button ID="btnRunManually" runat="server" Text="Run Now" OnClick="btnRunManually_Click" CssClass="ms-ButtonHeightWidth" style="width:150px;"/>&nbsp;<asp:Button UseSubmitBehavior="false" runat="server" OnClick="Submit_Click" OnClientClick="SaveSelections()" class="ms-ButtonHeightWidth" Text="Save Settings" id="Button1" accesskey="" Width="150"/>
                                        
                 </asp:PlaceHolder>
             </template_buttons>
