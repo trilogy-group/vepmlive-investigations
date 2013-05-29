@@ -93,7 +93,6 @@ function registerEpmLiveResourceGridScript() {
             },
 
             load: function() {
-
                 function register(folders) {
                     if (!folders.length) {
                         folders = [folders];
@@ -125,9 +124,7 @@ function registerEpmLiveResourceGridScript() {
                             break;
                         }
                     }
-                }
-
-                ;
+                };
 
                 $.ajax({
                     type: 'POST',
@@ -242,6 +239,12 @@ function registerEpmLiveResourceGridScript() {
                     this.showFilters();
                 }
 
+                window.setTimeout(function () {
+                    var g = $$.grid.grids[$$.id()];
+                    g.Update();
+                    g.Render();
+                }, 10);
+
                 return this.filteringOn;
             },
 
@@ -252,11 +255,23 @@ function registerEpmLiveResourceGridScript() {
                     this.showGrouping();
                 }
 
+                window.setTimeout(function () {
+                    var g = $$.grid.grids[$$.id()];
+                    g.Update();
+                    g.Render();
+                }, 10);
+
                 return this.groupingOn;
             },
 
             removeSorting: function() {
                 this.g().ChangeSort('Title');
+
+                window.setTimeout(function () {
+                    var g = $$.grid.grids[$$.id()];
+                    g.Update();
+                    g.Render();
+                }, 10);
             },
 
             resetNoDataRow: function() {
@@ -328,6 +343,12 @@ function registerEpmLiveResourceGridScript() {
                             try {
                                 grid.AddDataFromServer(responseJson.ResourcePoolDataGridChanges.Data['#cdata']);
                                 grid.RenderBody();
+
+                                window.setTimeout(function () {
+                                    var g = $$.grid.grids[$$.id()];
+                                    g.Update();
+                                    g.Render();
+                                }, 10);
 
                                 if (changeType === 'Added') {
                                     $('#s4-workspace').animate({ scrollTop: $('#' + grid.id).height() }, 'slow');
@@ -1414,8 +1435,7 @@ function registerEpmLiveResourceGridScript() {
                                     break;
                                 }
                             }
-                        } catch(e) {
-                        }
+                        } catch (e) { }
                     }
 
                     if (hide) {
@@ -1496,6 +1516,12 @@ function registerEpmLiveResourceGridScript() {
                     grid.ChangeFilter('IsMyResource', '1', 1, 0, 1, null);
                     $$.actions.myResourcesOn = true;
                 }
+
+                window.setTimeout(function () {
+                    var g = $$.grid.grids[$$.id()];
+                    g.Update();
+                    g.Render();
+                }, 500);
             },
 
             hideEasyScroll: function(refresh) {
@@ -1675,13 +1701,25 @@ function registerEpmLiveResourceGridScript() {
 
                     return true;
                 }
+
+                window.setTimeout(function () {
+                    var g = $$.grid.grids[$$.id()];
+                    g.Update();
+                    g.Render();
+                }, 10);
             } else if (row.Kind === 'Header' && col === 'Panel') {
                 window.setTimeout(function() {
                     window.RefreshCommandUI();
                 }, 100);
             }
-            
-            window.RefreshCommandUI();
+        };
+
+        window.Grids.OnGroup = function (grid, group) {
+            window.setTimeout(function () {
+                var g = $$.grid.grids[$$.id()];
+                g.Update();
+                g.Render();
+            }, 500);
         };
 
         window.Grids.OnColumnsChanged = function(grid, cols, count) {

@@ -144,6 +144,10 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
 
             if (MyWorkGrid.lastClickedCell === cell) {
                 editSaveRow(grid.id, row.id);
+
+                if (grid.Cols[col].Type === 'Lines') {
+                    showRichTextBox(grid.id, row.id, col);
+                }
             }
 
             MyWorkGrid.lastClickedCell = cell;
@@ -156,6 +160,12 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
             } else {
                 grid.Expand(row);
             }
+
+            window.setTimeout(function () {
+                var g = Grids[MyWorkGrid.gridId];
+                g.Update();
+                g.Render();
+            }, 100);
 
             return true;
         }
@@ -357,6 +367,16 @@ window.Grids.OnGetColor = function(grid, row, col, r, g, b, edit) {
         }
 
         return null;
+    }
+};
+
+window.Grids.OnGroup = function (grid, group) {
+    if (grid.id === window.allWorkGridId) {
+        window.setTimeout(function () {
+            var g = Grids[MyWorkGrid.gridId];
+            g.Update();
+            g.Render();
+        }, 500);
     }
 };
 
@@ -1466,6 +1486,9 @@ var MyWorkGrid = {
                 var g = Grids[MyWorkGrid.gridId];
                 g.Update();
                 g.Render();
+
+                $('#EPMMyWorkGrid').css('overflow', 'visible');
+                $('.s4-wpTopTable').css('border', 'none');
             }, 10);
         } catch (e) {
         }
@@ -1778,6 +1801,12 @@ var MyWorkGrid = {
             MyWorkGrid.hideFilters();
         }
 
+        window.setTimeout(function () {
+            var g = Grids[MyWorkGrid.gridId];
+            g.Update();
+            g.Render();
+        }, 10);
+
         return MyWorkGrid.filtersOn;
     },
 
@@ -1801,6 +1830,12 @@ var MyWorkGrid = {
         } else {
             MyWorkGrid.hideGrouping();
         }
+
+        window.setTimeout(function () {
+            var g = Grids[MyWorkGrid.gridId];
+            g.Update();
+            g.Render();
+        }, 10);
 
         return MyWorkGrid.groupingOn;
     },
@@ -2348,6 +2383,12 @@ var MyWorkGrid = {
                 searchBox.val('');
             }
         }
+
+        window.setTimeout(function () {
+            var g = Grids[MyWorkGrid.gridId];
+            g.Update();
+            g.Render();
+        }, 1000);
     },
 
     configureRibbon: function () {
@@ -2695,6 +2736,12 @@ var MyWorkGrid = {
         MyWorkGrid.showMeFilterApplied = true;
 
         MyWorkGrid.hidePivotMenu();
+
+        window.setTimeout(function () {
+            var g = Grids[MyWorkGrid.gridId];
+            g.Update();
+            g.Render();
+        }, 10);
     },
 
     clearFilter: function () {
@@ -2708,6 +2755,12 @@ var MyWorkGrid = {
         MyWorkGrid.showMeFilterApplied = false;
 
         MyWorkGrid.hidePivotMenu();
+
+        window.setTimeout(function () {
+            var g = Grids[MyWorkGrid.gridId];
+            g.Update();
+            g.Render();
+        }, 10);
     },
 
     changeToolbarSelection: function (selection) {

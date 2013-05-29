@@ -678,6 +678,14 @@
                 });
 
                 $('#EPMSplashContainer').hide();
+
+                if ($.browser.msie) {
+                    window.setTimeout(function () {
+                        var g = $$.grid.g;
+                        g.Update();
+                        g.Render();
+                    }, 10);
+                }
             },
 
             load: function () {
@@ -1554,6 +1562,14 @@
                         changeChildRowSelection(row, selection);
                         element.attr('data-selected', selection);
                     }
+                }
+
+                if ($.browser.msie) {
+                    window.setTimeout(function () {
+                        var g = $$.grid.g;
+                        g.Update();
+                        g.Render();
+                    }, 10);
                 }
             }
         };
