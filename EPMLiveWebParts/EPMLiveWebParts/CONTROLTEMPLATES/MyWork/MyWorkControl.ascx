@@ -71,7 +71,7 @@
     <script type="text/javascript">
         function initializeEPMLoader() {
             $(function() {
-                if (document.location.href.toLowerCase().indexOf('mywork.aspx') !== -1) {
+                if (document.location.href.toLowerCase().indexOf('my%20work.aspx') !== -1) {
                     function showLoading() {
                         window.myWorkLoader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
                     }
