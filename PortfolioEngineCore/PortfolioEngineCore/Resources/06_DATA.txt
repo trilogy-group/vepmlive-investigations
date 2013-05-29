@@ -1,0 +1,72 @@
+SET IDENTITY_INSERT [EPGC_FIELD_ATTRIBS] ON
+
+if NOT EXISTS (SELECT * FROM EPGC_FIELD_ATTRIBS where FA_NAME='OptimizerFlag') 
+begin
+
+	INSERT INTO [EPGC_FIELD_ATTRIBS]
+           ([FA_FIELD_ID]
+           ,[FA_NAME]
+           ,[FA_DESC]
+           ,[FA_LOOKUPONLY]
+           ,[FA_LOOKUP_UID]
+           ,[FA_LEAFONLY]
+           ,[FA_USEFULLNAME]
+           ,[FA_TABLE_ID]
+           ,[FA_FIELD_IN_TABLE]
+           ,[FA_FORMAT])
+     VALUES
+           ('21000'
+           ,'OptimizerFlag'
+           ,null
+           ,0
+           ,0
+           ,0
+           ,0
+           ,201
+           ,50
+           ,13)
+           
+		   Update EPGP_PROJECT_INT_VALUES Set PI_050=0 
+end     
+
+
+
+if NOT EXISTS (SELECT * FROM EPGC_FIELD_ATTRIBS where FA_NAME='Resource Plan Hours') 
+begin
+
+	INSERT INTO [EPGC_FIELD_ATTRIBS]
+           ([FA_FIELD_ID]
+           ,[FA_NAME]
+           ,[FA_DESC]
+           ,[FA_LOOKUPONLY]
+           ,[FA_LOOKUP_UID]
+           ,[FA_LEAFONLY]
+           ,[FA_USEFULLNAME]
+           ,[FA_TABLE_ID]
+           ,[FA_FIELD_IN_TABLE]
+           ,[FA_FORMAT])
+           VALUES
+           ('21001'
+           ,'Resource Plan Hours'
+           ,null
+           ,0
+           ,0
+           ,0
+           ,0
+           ,203
+           ,50
+           ,3)
+
+           Update EPGP_PROJECT_DEC_VALUES Set PC_050=0.000000
+
+		   UPDATE [EPG_ADMIN]
+			SET [ADM_PROJ_RES_HOURS_CFID] = 21001
+           
+end
+
+SET IDENTITY_INSERT [EPGC_FIELD_ATTRIBS] OFF
+
+
+
+
+

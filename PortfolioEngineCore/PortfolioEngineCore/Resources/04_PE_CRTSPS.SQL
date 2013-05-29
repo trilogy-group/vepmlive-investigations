@@ -7646,6 +7646,12 @@ Select Distinct Top 3 ''10.Task Assignment'' as Type,PROJECT_NAME as Name From E
       UNION
 Select Distinct Top 3 ''11.Program Manager'' as Type,LV_VALUE as Name From EPGP_PROG_INFOS p 
  Join EPGP_LOOKUP_VALUES v On p.PROG_UID=v.LV_UID Where PROG_MANAGER = @WresID
+      UNION
+Select Distinct Top 3 ''12.Scheduled Work'' as Type,PROJECT_NAME as Name From EPGP_PI_WORK1 w 
+ join EPGP_PROJECTS p On w.PROJECT_ID=p.PROJECT_ID Where WRES_ID = @WresID
+      UNION
+Select Distinct Top 3 ''13.List Work'' as Type,PROJECT_NAME as Name From EPGP_PI_WORK1 w
+ join EPGP_PROJECTS p On w.PROJECT_ID=p.PROJECT_ID Where WRES_ID = @WresID
 
    Order By Type, Name 
 ')
