@@ -27,8 +27,8 @@
         mCal.setDate(parent.curTempDate);
     </script>
     <br />
-    <input type="button" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, mCal.getDate()); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /> &nbsp;
-    <input type="button" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />  
+    <input type="button" value="OK" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, mCal.getDate()); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /> &nbsp;
+    <input type="button" value="Cancel" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />  
 
     
 

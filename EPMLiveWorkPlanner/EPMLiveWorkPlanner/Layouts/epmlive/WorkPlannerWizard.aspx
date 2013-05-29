@@ -154,7 +154,7 @@
     <asp:Panel ID="pnlUpload" runat="server" Visible="false">
         <asp:Label ID="lblUploadError" runat="server" ForeColor="Red" Visible="false"></asp:Label>
         Upload Project File: <br/>
-        <asp:FileUpload ID="FileUpload" runat="server" /> <asp:Button ID="btnUpload" runat="server" OnClick="btnUpload_Click" Text="Upload" />
+        <asp:FileUpload ID="FileUpload" runat="server" /><br /> <asp:Button ID="btnUpload" runat="server" OnClick="btnUpload_Click" Text="Upload" /> <asp:Button ID="Button1" runat="server" OnClick="btnCancel_Click" Text="Cancel" />
     </asp:Panel>
 
     <asp:Panel ID="pnlUploadDone" runat="server" Visible="false">

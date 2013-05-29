@@ -157,6 +157,20 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         }
 
+        protected void btnCancel_Click(object sender, EventArgs e)
+        {
+            string qs = "";
+            foreach (string key in Request.QueryString.AllKeys)
+            {
+                if (key != "Upload")
+                    qs += key + "=" + Request.QueryString[key] + "&";
+            }
+            qs = qs.Trim('&');
+
+            Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/workplannerwizard.aspx?" + qs, Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+
+        }
+
         protected void btnUpload_Click(object sender, EventArgs e)
         {
             if(FileUpload.FileName.EndsWith(".mpp"))
