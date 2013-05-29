@@ -45,7 +45,7 @@ namespace EPMLiveCore.API
             xElement.Add(new XAttribute("WebId", epmNotification.WebId));
             xElement.Add(new XAttribute("ListId", epmNotification.ListId));
             xElement.Add(new XAttribute("ItemId", epmNotification.ItemId));
-            xElement.Add(new XAttribute("NotificationRead", epmNotification.NotificationRead));
+            xElement.Add(new XAttribute("NotificationRead", epmNotification.NotificationRead)); 
             xElement.Add(new XAttribute("UserEmailed", epmNotification.UserEmailed));
             xElement.Add(new XAttribute("Emailed", epmNotification.Emailed));
             xElement.Add(new XAttribute("PersonalizationId", epmNotification.PersonalizationId));

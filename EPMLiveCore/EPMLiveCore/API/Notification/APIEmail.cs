@@ -189,7 +189,7 @@ namespace EPMLiveCore.API
                 webid = doc.FirstChild.Attributes["WebID"].Value;
             }catch{}
 
-            try
+            try 
             {
                 hideFromUser = bool.Parse(doc.FirstChild.Attributes["HideFromUser"].Value);
             }catch{}
