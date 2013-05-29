@@ -29,7 +29,7 @@
 			scnHei = document.documentElement.clientHeight;
 		else if (document.body) // other Explorers
 			scnHei = document.body.clientHeight;
-		scnHei = (scnHei - findAbsoluteTop(document.getElementById("EPKDisplay")) - 7);
+		scnHei = (scnHei - findAbsoluteTop(document.getElementById("EPKDisplay")) - 60);
 		if (scnHei <= 20) return 20;
 		return scnHei;
 	}
@@ -37,7 +37,7 @@
 	function Body_OnResize()
 	{
 		try {
-			if(***RESIZE***) { var id = document.getElementById('EPKDisplay'); if (id != null) id.style.height = getHeight(); }
+			if(***RESIZE***) { var id = document.getElementById('EPKDisplay'); if (id != null) id.style.height = getHeight() + 'px'; }
 		}
 		catch (e) {
 			alert("OnResize exception : Exception. \nType=" + e.name + "; \nMessage=" + e.Message + ";\n\nPlease report this to your System Administrator");
@@ -251,7 +251,7 @@
 			SP.UI.ModalDialog.commonModalDialogClose(0, '');
     }
 
-	CreateControl("EPKDisplayDiv", "<object classid='CLSID:7393552F-C4E6-49F0-8B01-52819BB9A0BC' id='EPKDisplay' type='application/x-oleobject' style='width: 100%; height:100px' viewastext codebase='***EPKURL***/CAB/WE_Client.CAB#version=***CABVERSION***'><div style='color:Red; vertical-align:top; height:100%;'><p>Please install the PfE client controls.</p></div></object>");
+	CreateControl("EPKDisplayDiv", "<object classid='CLSID:7393552F-C4E6-49F0-8B01-52819BB9A0BC' id='EPKDisplay' type='application/x-oleobject' style='width: 100%; height:300px' viewastext codebase='***EPKURL***/CAB/WE_Client.CAB#version=***CABVERSION***'><div style='color:Red; vertical-align:top; height:100%;'><p>Please install the PfE client controls.</p></div></object>");
 	
 	function this_Onload() {
 		if (typeof(document.all("EPKDisplay").HandleData) == "undefined")
@@ -278,9 +278,21 @@
 	{
 	}
 
-    document.body.onload = this_Onload;
-    document.body.onbeforeunload = Body_OnBeforeUnload;
-    document.body.onunload = Body_OnUnload;
-    document.body.onresize = Body_OnResize;
+    //document.body.onload = this_Onload;
+    //document.body.onbeforeunload = Body_OnBeforeUnload;
+    //document.body.onunload = Body_OnUnload;
+    //document.body.onresize = Body_OnResize;
+    if (document.addEventListener != null) { // e.g. Firefox
+        window.addEventListener("load", this_Onload, true);
+        window.addEventListener("beforeunload", Body_OnBeforeUnload, true);
+        window.addEventListener("unload", Body_OnUnload, true);
+        window.addEventListener("resize", Body_OnResize, true);
+    }
+    else { // e.g. IE
+        window.attachEvent("onload", this_Onload);
+        window.attachEvent("onbeforeunload", Body_OnBeforeUnload);
+        window.attachEvent("onunload", Body_OnUnload);
+        window.attachEvent("onresize", Body_OnResize);
+    }
 
 </script>
