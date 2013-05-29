@@ -931,6 +931,13 @@ namespace EPMLiveCore.API
                         string sItemId = (string)(originalComment["ItemId"] ?? string.Empty);
                         DateTime dCreated = (DateTime)originalComment["Created"];
 
+                        string soriginComment = string.Empty;
+                        try
+                        {
+                            soriginComment = originalComment["Comment"].ToString();
+                        }
+                        catch { }
+
                         sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", new Guid(sListId).ToString())
                                                                  .Replace("##listName##", realItem.ParentList.Title)
                                                                  .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
@@ -938,7 +945,7 @@ namespace EPMLiveCore.API
                                                                  .Replace("##itemId##", sItemId.ToString())
                                                                  .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                  .Replace("##createdDate##", dCreated.ToFriendlyDateAndTime())
-                                                                 .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(originalComment["Comment"].ToString() ?? string.Empty)))));
+                                                                 .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(soriginComment ?? string.Empty)))));
                         // get user object 
                         SPFieldUser author = (SPFieldUser)originalComment.Fields[SPBuiltInFieldId.Author];
                         SPFieldUserValue user = (SPFieldUserValue)author.GetFieldValue(originalComment[SPBuiltInFieldId.Author].ToString());
@@ -1033,6 +1040,14 @@ namespace EPMLiveCore.API
                                 // 1. display first item ordered by asending date
                                 // 2. display rest ordered by desending date
                                 // 3. do not repeat items 
+
+                                string soriginComment2 = string.Empty;
+                                try
+                                {
+                                    soriginComment2 = comment["Comment"].ToString();
+                                }
+                                catch { }
+
                                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", new Guid(sListId2).ToString())
                                                                          .Replace("##listName##", realItem.ParentList.Title)
                                                                          .Replace("##listDispUrl##", realItem.ParentList.DefaultDisplayFormUrl)
@@ -1040,7 +1055,7 @@ namespace EPMLiveCore.API
                                                                          .Replace("##itemId##", sItemId2.ToString())
                                                                          .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
                                                                          .Replace("##createdDate##", dCreated2.ToFriendlyDateAndTime())
-                                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(comment["Comment"].ToString() ?? string.Empty)))));
+                                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(soriginComment2 ?? string.Empty)))));
 
                                 sbResult.Append(XML_USER_INFO_SECTION.Replace("##username##", userObject.Name)
                                                                      .Replace("##useremail##", userObject.Email)
