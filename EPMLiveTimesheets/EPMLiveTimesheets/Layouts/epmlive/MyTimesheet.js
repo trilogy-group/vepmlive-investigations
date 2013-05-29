@@ -22,7 +22,7 @@ var bTSApproving = false;
 var iApproveInterval;
 var curServerDate;
 var spnMsg = null;
-
+var bSaveAndSubmit = false;
 
 Grids.OnRenderStart = function (grid) {
     if (grid.id.substr(0, 2) == "TS") {
@@ -143,6 +143,18 @@ function CheckSaveStatus(gridid) {
                     bTSSaving = false;
                     RefreshCommandUI();
                 }
+
+                if (bSaveAndSubmit) {
+                    bSaveAndSubmit = false;
+                    StartCheckApproveStatus(gridid);
+
+                    var newgridid = grid.id.substr(2);
+                    var newobj = eval("TSObject" + newgridid);
+
+                    newobj.Status = "Submitted";
+                    RefreshCommandUI();
+                }
+
             }
             else {
                 if (!bTSSaving) {
@@ -200,35 +212,49 @@ function UnSubmitTimesheet(gridid) {
 function SubmitTimesheet(gridid) {
 
     if (!StopWatchRow) {
-        ShowMessage(gridid, "Submitting...", 140, 30);
+
 
         var grid = Grids[gridid];
 
-        EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_SubmitTimesheet", "<Timesheet ID=\"" + grid.TimesheetUID + "\" />", function (response) {
-            var oResponse = eval("(" + response + ")");
-
+        if (grid.HasChanges()) {
+            ShowMessage(gridid, "Saving and Submitting...", 180, 30);
+            grid.SaveAndSubmit = 'true';
+            bSaveAndSubmit = true;
+            DisableAllRows(grid);
+            grid.Save();
             HideMessage(grid.id);
+            AfterSubmit(grid);
+            RefreshCommandUI();
+        }
+        else {
+            ShowMessage(gridid, "Submitting...", 140, 30);
 
-            if (oResponse.SubmitTimesheet.Status == "0") {
+            EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_SubmitTimesheet", "<Timesheet ID=\"" + grid.TimesheetUID + "\" />", function (response) {
+                var oResponse = eval("(" + response + ")");
 
-                var newgridid = grid.id.substr(2);
-                var newobj = eval("TSObject" + newgridid);
+                HideMessage(grid.id);
 
-                newobj.Status = "Submitted";
+                if (oResponse.SubmitTimesheet.Status == "0") {
 
-                DisableAllRows(grid);
+                    var newgridid = grid.id.substr(2);
+                    var newobj = eval("TSObject" + newgridid);
 
-                AfterSubmit(grid);
+                    newobj.Status = "Submitted";
 
-                RefreshCommandUI();
+                    DisableAllRows(grid);
 
-            }
-            else {
-                alert(oResponse.SubmitTimesheet.Text);
-            }
+                    AfterSubmit(grid);
 
-            StartCheckApproveStatus(gridid);
-        });
+                    RefreshCommandUI();
+
+                }
+                else {
+                    alert(oResponse.SubmitTimesheet.Text);
+                }
+
+                StartCheckApproveStatus(gridid);
+            });
+        }
     }
     else {
         alert('You have a stopwatch currently running, please stop the stopwatch before you submit');
@@ -606,7 +632,7 @@ function CheckApproveStatus(gridid) {
 
 Grids.OnFocus = function (grid, row, col, x, y, event) {
 
-    if(!curRow)
+    if (!curRow)
         curRow = row;
 
     DoPopUp(grid, row, col);
@@ -616,7 +642,7 @@ Grids.OnFocus = function (grid, row, col, x, y, event) {
 
 Grids.OnClick = function (grid, row, col, x, y, event) {
 
-    if(!curPop)
+    if (!curPop)
         DoPopUp(grid, row, col);
 
 }
@@ -761,9 +787,9 @@ function DoPopUp(grid, row, col) {
                 }
 
                 strTypeDiv += "<tr><td colspan=\"2\" align=\"right\">";
-                if(!bLocked)
+                if (!bLocked)
                     strTypeDiv += "<input type=\"button\" value=\"OK\" class=\"tsOK\" onClick=\"SaveTypes(event);\">&nbsp;";
-                    
+
                 strTypeDiv += "<input type=\"button\" value=\"Cancel\" class=\"tsOK\" onClick=\"CloseTypes(event);\"></td></tr></table></div><div style='position: absolute; margin-top: -10px; margin-left: -9px '><img src='/_layouts/epmlive/images/tsoutline.png'></div>";
 
                 grid.SetAttribute(row, col, "HtmlPrefix", strTypeDiv, true, false);
@@ -777,7 +803,7 @@ function DoPopUp(grid, row, col) {
 }
 
 function CheckForUpdate(grid) {
-    
+
     curGrid = grid;
 
     ShowMessage(grid.id, "Refreshing Timesheet", 180, 50);
@@ -791,7 +817,7 @@ function CheckForUpdate(grid) {
         }
     }
 
-    if(rows.length > 0)
+    if (rows.length > 0)
         rows = rows.substr(1);
 
     var dataxml = "&lt;Param";
@@ -1050,8 +1076,7 @@ function StartStopWatch(grid, row) {
     if (IsLocked(grid)) {
         alert("You cannot start a stop watch on a submitted timesheet");
     }
-    else
-    {
+    else {
         if (newobj.IsCurPeriod) {
 
             EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_StartStopWatch", "<StopWatch ID=\"" + row.UID + "\" UserId=\"" + newobj.UserId + "\"/>", function (response) {
@@ -1190,7 +1215,7 @@ function GetDecimalFromTime(time) {
 }
 
 function CloseTypes(event) {
-    
+
     curGrid.EndEdit(false);
 
     curGrid.SetAttribute(curRow, curCol, "HtmlPrefix", "", true, false);
@@ -1340,8 +1365,7 @@ function BeforeSubmit(grid) {
         return true;
 }
 
-function IsLocked(grid)
-{
+function IsLocked(grid) {
     var newgridid = grid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
 
@@ -1349,7 +1373,7 @@ function IsLocked(grid)
         return true;
     if (newobj.Status != 'Unsubmitted')
         return true;
-        
+
     return false;
 }
 
@@ -1411,18 +1435,16 @@ function fireEvent(element, event) {
     }
 }
 
-function leavePage()
-{
-    if (curGrid.HasChanges())
-    {
+function leavePage() {
+    if (curGrid.HasChanges()) {
         if (!e) e = window.event;
 
-	    e.returnValue = 'You have unsaved changes.';
+        e.returnValue = 'You have unsaved changes.';
 
-	    if (e.stopPropagation) {
-		    e.stopPropagation();
-		    e.preventDefault();
-	    }
+        if (e.stopPropagation) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
     }
 }
 

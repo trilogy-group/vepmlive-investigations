@@ -462,6 +462,13 @@ namespace TimeSheets
                 }
                 catch { }
 
+                bool SaveAndSubmit = false;
+                try
+                {
+                    SaveAndSubmit = bool.Parse(docTimesheet.FirstChild.Attributes["SaveAndSubmit"].Value);
+                }
+                catch { }
+
                 bool liveHours = false;
 
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
@@ -552,6 +559,8 @@ namespace TimeSheets
                 }
                 cn.Close();
 
+                if (SaveAndSubmit)
+                    TimesheetAPI.SubmitTimesheet("<Timesheet ID=\"" + base.TSUID + "\" />", site.RootWeb);
             }
             catch (Exception ex)
             {

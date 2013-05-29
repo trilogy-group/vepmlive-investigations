@@ -121,7 +121,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'Ribbon.MyTimesheet.ClearSort':
                 return true;
             case 'Ribbon.MyTimesheet.RemoveWork':
-                if (this.tsObject.Locked || bTSApproving)
+                if (this.tsObject.Locked || bTSApproving || (bTSSaving && bSaveAndSubmit))
                     return false;
                 if (this.tsObject.Status != 'Unsubmitted')
                     return false;
@@ -131,7 +131,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'Ribbon.MyTimesheet.AddWork':
             case 'Ribbon.MyTimesheet.AddNonWork':
             case 'Ribbon.MyTimesheet.AutoWork':
-                if (this.tsObject.Locked || bTSApproving)
+                if (this.tsObject.Locked || bTSApproving || (bTSSaving && bSaveAndSubmit))
                     return false;
                 if (this.tsObject.Status != 'Unsubmitted')
                     return false;

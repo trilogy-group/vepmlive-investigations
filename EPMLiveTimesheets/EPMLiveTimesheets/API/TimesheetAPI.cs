@@ -37,11 +37,11 @@ namespace TimeSheets
                 {
                     SPList lstMyWork = oWeb.Site.RootWeb.Lists.TryGetList("My Work");
 
-                    if(lstMyWork != null)
+                    if (lstMyWork != null)
                     {
-                        foreach(SPField field in lstMyWork.Fields)
+                        foreach (SPField field in lstMyWork.Fields)
                         {
-                            if(field.Type == SPFieldType.Lookup)
+                            if (field.Type == SPFieldType.Lookup)
                             {
 
                                 arrLookups.Add(field.InternalName + "Text");
@@ -66,14 +66,14 @@ namespace TimeSheets
                 string sUser = "";
                 string sPeriod = "";
 
-                if(drTS.Read())
+                if (drTS.Read())
                 {
                     sUser = drTS.GetInt32(0).ToString();
                     sPeriod = drTS.GetInt32(1).ToString();
                 }
                 drTS.Close();
 
-                if(sUser == "")
+                if (sUser == "")
                 {
                     return "<Grid><IO Result=\"-1\" Message=\"Could not determine user\"/></Grid>";
                 }
@@ -81,14 +81,14 @@ namespace TimeSheets
                 {
                     SPUser user = GetUser(oWeb, sUser);
 
-                    if(user.ID.ToString() == sUser)
+                    if (user.ID.ToString() == sUser)
                     {
 
                         DataSet dsTS = iGetTSData(cn, oWeb, user, sPeriod);
 
                         bool bCanEdit = true;
 
-                        if(dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
+                        if (dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
                         {
                             bCanEdit = false;
                         }
@@ -101,9 +101,9 @@ namespace TimeSheets
                         }
                         catch { }
 
-                        foreach(DataRow dr in dsTS.Tables[2].Rows)
+                        foreach (DataRow dr in dsTS.Tables[2].Rows)
                         {
-                            if(!rows.Contains(dr["TS_ITEM_UID"].ToString()))
+                            if (!rows.Contains(dr["TS_ITEM_UID"].ToString()))
                             {
                                 XmlNode nd = CreateTSRow(ref docRet, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit);
 
@@ -123,7 +123,7 @@ namespace TimeSheets
 
                 return docRet.OuterXml;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<Grid><IO Result=\"-1\" Message=\"" + ex.Message + "\"/></Grid>";
             }
@@ -146,11 +146,11 @@ namespace TimeSheets
 
                 return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
-            
+
         }
 
         public static string DeleteView(string data, SPWeb oWeb)
@@ -170,7 +170,7 @@ namespace TimeSheets
 
                 return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
@@ -194,7 +194,7 @@ namespace TimeSheets
 
                 return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
@@ -208,7 +208,7 @@ namespace TimeSheets
                 XmlDocument docTimesheet = new XmlDocument();
                 docTimesheet.LoadXml(data);
 
-                if(docTimesheet.FirstChild.Attributes["NonWork"].Value == "true")
+                if (docTimesheet.FirstChild.Attributes["NonWork"].Value == "true")
                 {
                     EPMLiveCore.API.ViewManager Views = GetNonWorkViews(oWeb);
 
@@ -234,7 +234,7 @@ namespace TimeSheets
                     return "<Views Status=\"0\">" + Views.ToJSON() + "</Views>";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<Views Status=\"1\">" + ex.Message + "</Views>";
             }
@@ -245,7 +245,7 @@ namespace TimeSheets
         {
             EPMLiveCore.API.ViewManager vws = new EPMLiveCore.API.ViewManager(oWeb, "EPMLiveTSNonWorkViews");
 
-            if(vws.Views.Count > 0)
+            if (vws.Views.Count > 0)
             {
 
             }
@@ -269,7 +269,7 @@ namespace TimeSheets
         {
             EPMLiveCore.API.ViewManager vws = new EPMLiveCore.API.ViewManager(oWeb, "EPMLiveTSWorkViews");
 
-            if(vws.Views.Count > 0)
+            if (vws.Views.Count > 0)
             {
 
             }
@@ -294,13 +294,13 @@ namespace TimeSheets
         {
             EPMLiveCore.API.ViewManager vws = new EPMLiveCore.API.ViewManager(oWeb, "EPMLiveTSViews");
 
-            if(vws.Views.Count > 0)
+            if (vws.Views.Count > 0)
             {
 
             }
             else
             {
-                Dictionary <string, string> sVals = new Dictionary<string,string>();
+                Dictionary<string, string> sVals = new Dictionary<string, string>();
                 sVals.Add("Default", "True");
                 sVals.Add("Filters", "");
                 sVals.Add("Group", "Project");
@@ -338,7 +338,7 @@ namespace TimeSheets
 
                 int userid = 0;
 
-                if(dr.Read())
+                if (dr.Read())
                 {
                     userid = dr.GetInt32(0);
                 }
@@ -346,13 +346,13 @@ namespace TimeSheets
 
                 string message = "";
 
-                if(userid != 0)
+                if (userid != 0)
                 {
-                    
+
 
                     SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
 
-                    if(user.ID != userid)
+                    if (user.ID != userid)
                     {
                         message = "<UnSubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
                     }
@@ -365,18 +365,18 @@ namespace TimeSheets
                         bool bLocked = false;
                         int approval = 0;
                         dr = cmd.ExecuteReader();
-                        if(dr.Read())
+                        if (dr.Read())
                         {
                             bLocked = dr.GetBoolean(0);
                             approval = dr.GetInt32(1);
                         }
                         dr.Close();
 
-                        if(bLocked)
+                        if (bLocked)
                         {
                             message = "<UnSubmitTimesheet Status=\"4\">That timesheet is locked.</UnSubmitTimesheet>";
                         }
-                        else if(approval == 1 && !settings.DisableApprovals)
+                        else if (approval == 1 && !settings.DisableApprovals)
                         {
                             message = "<UnSubmitTimesheet Status=\"3\">That timesheet has already been approved.</UnSubmitTimesheet>";
                         }
@@ -400,7 +400,7 @@ namespace TimeSheets
 
                 return message;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<UnSubmitTimesheet Status=\"1\">Error: " + ex.Message + "</UnSubmitTimesheet>";
             }
@@ -429,7 +429,7 @@ namespace TimeSheets
 
                 int userid = 0;
 
-                if(dr.Read())
+                if (dr.Read())
                 {
                     userid = dr.GetInt32(0);
                 }
@@ -437,11 +437,11 @@ namespace TimeSheets
 
                 string message = "";
 
-                if(userid != 0)
+                if (userid != 0)
                 {
                     SPUser user = TimesheetAPI.GetUser(oWeb, userid.ToString());
 
-                    if(user.ID != userid)
+                    if (user.ID != userid)
                     {
                         message = "<SubmitTimesheet Status=\"3\">You do not have access to edit that timesheet.</SubmitTimesheet>";
                     }
@@ -456,7 +456,7 @@ namespace TimeSheets
 
                         TimesheetSettings settings = new TimesheetSettings(oWeb);
 
-                        if(settings.DisableApprovals)
+                        if (settings.DisableApprovals)
                         {
                             ApproveTimesheets("<Approve><TSIDS>" + tsuid + "</TSIDS></Approve>", oWeb);
                         }
@@ -471,7 +471,7 @@ namespace TimeSheets
 
                 return message;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<SubmitTimesheet Status=\"1\">Error: " + ex.Message + "</SubmitTimesheet>";
             }
@@ -498,13 +498,13 @@ namespace TimeSheets
                 SqlCommand cmd = new SqlCommand("SELECT submitted FROM TSTIMESHEET where TS_UID=@tsuid ", cn);
                 cmd.Parameters.AddWithValue("@tsuid", tsuid);
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.Read())
+                if (dr.Read())
                 {
                     submitted = dr.GetBoolean(0);
                 }
                 dr.Close();
 
-                if(!submitted)
+                if (!submitted)
                 {
                     int status = 2;
 
@@ -512,13 +512,13 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@tsuid", tsuid);
 
                     dr = cmd.ExecuteReader();
-                    if(dr.Read())
+                    if (dr.Read())
                     {
                         status = dr.GetInt32(0);
                     }
                     dr.Close();
 
-                    if(status == 2)
+                    if (status == 2)
                     {
                         cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
@@ -547,11 +547,11 @@ namespace TimeSheets
 
                     return "<SaveTimesheet Status=\"3\">Timesheet is submitted and cannot save.</SaveTimesheet>";
                 }
-                
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return "<SaveTimesheet Status=\"1\">Error: " + ex.Message  + "</SaveTimesheet>";
+                return "<SaveTimesheet Status=\"1\">Error: " + ex.Message + "</SaveTimesheet>";
             }
         }
 
@@ -587,14 +587,14 @@ namespace TimeSheets
                 string sMessage = "";
 
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.Read())
+                if (dr.Read())
                 {
                     bError = true;
                     sMessage = "Timer already started on another item.";
                 }
                 dr.Close();
 
-                if(!bError)
+                if (!bError)
                 {
 
                     DateTime dt = DateTime.Now;
@@ -604,13 +604,15 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@userid", user.ID);
                     cmd.ExecuteNonQuery();
 
-                    sMessage = dt.ToString("F");
+                    System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
+                    IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
+                    sMessage = dt.ToString("F", culture);
 
                 }
 
                 cn.Close();
 
-                if(bError)
+                if (bError)
                 {
                     return "<StopWatch Status=\"1\">Error: " + sMessage + "</StopWatch>";
                 }
@@ -620,7 +622,7 @@ namespace TimeSheets
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<StopWatch Status=\"1\">Error: " + ex.Message + "</StopWatch>";
             }
@@ -652,14 +654,14 @@ namespace TimeSheets
                 string resulttext = "";
 
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.Read())
+                if (dr.Read())
                 {
                     status = dr.GetInt32(0);
-                    if(!dr.IsDBNull(1))
+                    if (!dr.IsDBNull(1))
                         pct = dr.GetInt32(1);
-                    if(!dr.IsDBNull(2))
+                    if (!dr.IsDBNull(2))
                         result = dr.GetString(2);
-                    if(!dr.IsDBNull(3))
+                    if (!dr.IsDBNull(3))
                         resulttext = dr.GetString(3);
                 }
                 dr.Close();
@@ -669,9 +671,9 @@ namespace TimeSheets
 
                 return "<SaveStatus Result=\"0\" Status=\"" + status + "\" PercentComplete=\"" + pct + "\" ErrorResult=\"" + result + "\" ResultText=\"" + resulttext + "\"></SaveStatus>";
 
-                
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<SaveStatus Result=\"1\">Error: " + ex.Message + "</SaveStatus>";
             }
@@ -703,14 +705,14 @@ namespace TimeSheets
                 string resulttext = "";
 
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.Read())
+                if (dr.Read())
                 {
                     status = dr.GetInt32(0);
-                    if(!dr.IsDBNull(1))
+                    if (!dr.IsDBNull(1))
                         pct = dr.GetInt32(1);
-                    if(!dr.IsDBNull(2))
+                    if (!dr.IsDBNull(2))
                         result = dr.GetString(2);
-                    if(!dr.IsDBNull(3))
+                    if (!dr.IsDBNull(3))
                         resulttext = dr.GetString(3);
                 }
                 dr.Close();
@@ -721,7 +723,7 @@ namespace TimeSheets
 
                 int approvalstatus = 0;
 
-                if(dr.Read())
+                if (dr.Read())
                 {
                     approvalstatus = dr.GetInt32(0);
                 }
@@ -734,7 +736,7 @@ namespace TimeSheets
 
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<ApproveStatus Result=\"1\">Error: " + ex.Message + "</ApproveStatus>";
             }
@@ -771,7 +773,7 @@ namespace TimeSheets
                 cmd.Parameters.AddWithValue("@id", tsuid);
                 cmd.Parameters.AddWithValue("@userid", user.ID);
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.Read())
+                if (dr.Read())
                 {
                     dtStart = dr.GetDateTime(0);
                 }
@@ -784,7 +786,7 @@ namespace TimeSheets
 
                 cn.Close();
 
-                if(dtStart != DateTime.MinValue)
+                if (dtStart != DateTime.MinValue)
                 {
                     TimesheetSettings settings = new TimesheetSettings(oWeb);
                     string[] dayDefs = settings.DayDef.Split('|');
@@ -798,18 +800,18 @@ namespace TimeSheets
 
                     string output = "";
 
-                    while(dtCounter <= dtNowRounded)
+                    while (dtCounter <= dtNowRounded)
                     {
-                        if(dayDefs[(int)dtCounter.DayOfWeek * 3].ToLower() == "true")
+                        if (dayDefs[(int)dtCounter.DayOfWeek * 3].ToLower() == "true")
                         {
                             double minutes = 0;
                             double maxMinutes = double.Parse(dayDefs[(int)dtCounter.DayOfWeek * 3 + 2]) * 60;
-                            if(dtStartRounded == dtNowRounded)
+                            if (dtStartRounded == dtNowRounded)
                             {
                                 TimeSpan ts = dtNow - dtStart;
                                 minutes = ts.TotalMinutes;
                             }
-                            else if(dtCounter == dtNowRounded)
+                            else if (dtCounter == dtNowRounded)
                             {
                                 TimeSpan ts = dtNow - dtCounter;
                                 minutes = ts.TotalMinutes;
@@ -819,10 +821,13 @@ namespace TimeSheets
                                 minutes = 24 * 60;
                             }
 
-                            if(minutes > maxMinutes)
+                            if (minutes > maxMinutes)
                                 minutes = maxMinutes;
+                            
+                            System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
+                            IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
 
-                            output += "<StopWatchValue Date=\"" + dtCounter.ToString("F") + "\" DateTicks=\"" + dtCounter.Ticks + "\" Minutes=\"" + Math.Floor(minutes) + "\"/>";
+                            output += "<StopWatchValue Date=\"" + dtCounter.ToString("F", culture) + "\" DateTicks=\"" + dtCounter.Ticks + "\" Minutes=\"" + Math.Floor(minutes) + "\"/>";
 
 
                         }
@@ -836,7 +841,7 @@ namespace TimeSheets
                     return "<StopWatch Status=\"1\">Could not find stopwatch entry.</StopWatch>";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<StopWatch Status=\"1\">Error: " + ex.Message + "</StopWatch>";
             }
@@ -856,7 +861,7 @@ namespace TimeSheets
 
                 //XmlNode ndPeriod = doc.FirstChild.SelectSingleNode("//Period");
                 XmlNode ndTS = doc.FirstChild.SelectSingleNode("//TSIDS");
-                
+
                 string outData = "";
                 bool errors = false;
 
@@ -865,7 +870,7 @@ namespace TimeSheets
                 //    throw new EPMLiveCore.API.APIException(900001, "No Period Provided");
                 //}
                 //else 
-                if(ndTS == null)
+                if (ndTS == null)
                 {
                     throw new EPMLiveCore.API.APIException(900002, "No Timesheets Provided");
                 }
@@ -892,16 +897,16 @@ namespace TimeSheets
 
                     outData = "<Approve>";
 
-                    if(cn != null && cn.State == System.Data.ConnectionState.Open)
+                    if (cn != null && cn.State == System.Data.ConnectionState.Open)
                     {
 
-                        string []tsUids = ndTS.InnerText.Split(',');
+                        string[] tsUids = ndTS.InnerText.Split(',');
 
                         int status = 2;
 
-                        foreach(string tsUid in tsUids)
+                        foreach (string tsUid in tsUids)
                         {
-                            if(tsUid != "")
+                            if (tsUid != "")
                             {
                                 try
                                 {
@@ -909,15 +914,15 @@ namespace TimeSheets
                                     cmd.Parameters.AddWithValue("@tsuid", tsUid);
 
                                     SqlDataReader dr = cmd.ExecuteReader();
-                                    if(dr.Read())
+                                    if (dr.Read())
                                     {
                                         status = dr.GetInt32(0);
                                     }
                                     dr.Close();
-                                    
+
                                     string[] tsData = tsUid.Split('|');
 
-                                    if(status == 2)
+                                    if (status == 2)
                                     {
                                         cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
                                         cmd.Parameters.AddWithValue("@tsuid", tsUid);
@@ -926,7 +931,7 @@ namespace TimeSheets
                                         cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
                                         cmd.Parameters.AddWithValue("@tsuid", tsData[0]);
                                         cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                        if(tsData.Length > 1)
+                                        if (tsData.Length > 1)
                                             cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
                                         else
                                             cmd.Parameters.AddWithValue("@JOBDATA", "");
@@ -939,7 +944,7 @@ namespace TimeSheets
                                         outData += "<TS ID='" + tsData[0] + "' Status=\"1\">Item is already being processed</TS>";
                                     }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     errors = true;
                                     outData += "<TS ID='" + tsUid + "' Status=\"2\">" + ex.Message + "</TS>";
@@ -953,12 +958,12 @@ namespace TimeSheets
                     outData += "</Approve>";
                 }
 
-                if(errors)
+                if (errors)
                     return EPMLiveCore.API.Response.Failure(90010, outData);
                 else
                     return EPMLiveCore.API.Response.Success(outData);
             }
-            catch(EPMLiveCore.API.APIException ex)
+            catch (EPMLiveCore.API.APIException ex)
             {
                 return EPMLiveCore.API.Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
@@ -966,7 +971,7 @@ namespace TimeSheets
 
         private static void queuetimesheet()
         {
-                
+
         }
 
         public static string GetTimesheetGridLayout(string data, SPWeb web)
@@ -1002,6 +1007,11 @@ namespace TimeSheets
                 attr.Value = sPeriod;
                 ndCfg.Attributes.Append(attr);
 
+                attr = docLayout.CreateAttribute("SaveAndSubmit");
+                attr.Value = "false";
+                ndCfg.Attributes.Append(attr);
+
+
                 XmlNode ndRightCols = docLayout.FirstChild.SelectSingleNode("//RightCols");
                 XmlNode ndFooter = docLayout.FirstChild.SelectSingleNode("//Foot/I[@id='-1']");
                 XmlNode ndHeader = docLayout.FirstChild.SelectSingleNode("//Head/Header[@id='Header']");
@@ -1016,7 +1026,7 @@ namespace TimeSheets
 
                 XmlNode ndSW = docLayout.FirstChild.SelectSingleNode("//RightCols/C[@Name='StopWatch']");
 
-                if(settings.AllowStopWatch)
+                if (settings.AllowStopWatch)
                 {
                     RightWidth += int.Parse(ndSW.Attributes["Width"].Value);
                 }
@@ -1031,11 +1041,11 @@ namespace TimeSheets
 
                 EPMLiveCore.API.ViewManager views = GetViews(web);
 
-                foreach(KeyValuePair<string, Dictionary<string, string>> key in views.Views)
+                foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
                 {
                     try
                     {
-                        if(key.Value["Default"].ToLower() == "true")
+                        if (key.Value["Default"].ToLower() == "true")
                         {
                             attr = docLayout.CreateAttribute("Group");
                             attr.Value = key.Value["Group"];
@@ -1050,7 +1060,7 @@ namespace TimeSheets
                     }
                     catch { }
                 }
-                
+
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
@@ -1065,7 +1075,7 @@ namespace TimeSheets
 
                     ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
 
-                    foreach(DateTime dtStart in arrPeriods)
+                    foreach (DateTime dtStart in arrPeriods)
                     {
                         //Col
                         XmlNode ndCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
@@ -1114,13 +1124,13 @@ namespace TimeSheets
                         attr1.Value = ",0.00";
                         ndCol.Attributes.Append(attr1);
 
-                        if(dsTypes.Tables[0].Rows.Count > 0 || settings.AllowNotes)
+                        if (dsTypes.Tables[0].Rows.Count > 0 || settings.AllowNotes)
                         {
                             XmlNode ndCol2 = ndCol.CloneNode(true);
                             ndCol2.Attributes["Name"].Value = "TS" + ndCol2.Attributes["Name"].Value;
                             ndCol2.Attributes["Type"].Value = "Text";
                             ndCol2.Attributes["Visible"].Value = "0";
-                            
+
                             ndRightCols.AppendChild(ndCol2);
                         }
 
@@ -1150,14 +1160,14 @@ namespace TimeSheets
                     cn.Close();
 
 
-                    using(SPSite rsite = new SPSite(web.Site.ID))
+                    using (SPSite rsite = new SPSite(web.Site.ID))
                     {
-                        using(SPWeb rweb = rsite.OpenWeb(web.ID))
+                        using (SPWeb rweb = rsite.OpenWeb(web.ID))
                         {
                             Guid lWebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
-                            if(lWebGuid != rweb.ID)
+                            if (lWebGuid != rweb.ID)
                             {
-                                using(SPWeb lweb = rsite.OpenWeb(lWebGuid))
+                                using (SPWeb lweb = rsite.OpenWeb(lWebGuid))
                                 {
                                     PopulateTimesheetGridLayout(lweb, ref docLayout, settings, ref MidWidth, viewInfo, false, "My Work");
                                 }
@@ -1262,17 +1272,17 @@ namespace TimeSheets
                 attr2.Value = TotalColumnCalc.Trim('+');
                 ndGroupDef.Attributes.Append(attr2);
 
-                
-                
 
-                if(RightWidth > (TSCellWidth * 5) + 300)
+
+
+                if (RightWidth > (TSCellWidth * 5) + 300)
                     RightWidth = (TSCellWidth * 5) + 300;
 
                 attr2 = docLayout.CreateAttribute("MinRightWidth");
                 attr2.Value = RightWidth.ToString();
                 ndCfg.Attributes.Append(attr2);
 
-                if(MidWidth > 300)
+                if (MidWidth > 300)
                     MidWidth = 300;
 
                 attr2 = docLayout.CreateAttribute("MinMidWidth");
@@ -1284,7 +1294,7 @@ namespace TimeSheets
 
 
                 XmlNode ndCols = docLayout.FirstChild.SelectSingleNode("//Cols");
-                if(ndCols.ChildNodes.Count > 0)
+                if (ndCols.ChildNodes.Count > 0)
                 {
                     ndFooter.Attributes["MidHtml"].Value = "<div align=\"right\"><b>Total:&nbsp;</b></div>";
                 }
@@ -1293,11 +1303,11 @@ namespace TimeSheets
                     ndFooter.Attributes["LeftHtml"].Value = "<div align=\"right\"><b>Total:&nbsp;</b></div>";
                 }
 
-                
+
 
                 return docLayout.OuterXml;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
 
@@ -1308,7 +1318,7 @@ namespace TimeSheets
 
                 return docLayout.OuterXml;
             }
-            
+
         }
 
         private static void PopulateTimesheetGridLayout(SPWeb web, ref XmlDocument docLayout, TimesheetSettings settings, ref int MidWidth, Dictionary<string, string> viewInfo, bool isWork, string InputList)
@@ -1318,7 +1328,7 @@ namespace TimeSheets
             try
             {
                 string[] sCols = viewInfo["Cols"].Split(',');
-                foreach(string sCol in sCols)
+                foreach (string sCol in sCols)
                 {
                     string[] sColInfo = sCol.Split('|');
                     string width = "";
@@ -1327,31 +1337,31 @@ namespace TimeSheets
                         width = sColInfo[1];
                     }
                     catch { }
-                    if(sColInfo[0] != "")
+                    if (sColInfo[0] != "")
                         arrCols.Add(sColInfo[0], width);
                 }
             }
             catch { }
-            if(!arrCols.Contains("Title"))
+            if (!arrCols.Contains("Title"))
                 arrCols.Add("Title", "");
 
             SPList oLstMyWork = web.Lists.TryGetList(InputList);
-            if(oLstMyWork != null)
+            if (oLstMyWork != null)
             {
 
                 XmlNode ndCols = docLayout.FirstChild.SelectSingleNode("//Cols");
                 XmlNode ndLeftCols = docLayout.FirstChild.SelectSingleNode("//LeftCols");
                 XmlNode ndHeader = docLayout.FirstChild.SelectSingleNode("//Head/Header[@id='Header']");
 
-                foreach(SPField field in oLstMyWork.Fields)
+                foreach (SPField field in oLstMyWork.Fields)
                 {
 
-                    if(field.Reorderable && isGoodField(field.InternalName))
+                    if (field.Reorderable && isGoodField(field.InternalName))
                     {
                         int iFieldWidth = iGetFieldWidth(field);
                         string sFieldType = iGetFieldType(field);
                         string GoodFieldname = field.InternalName;
-                        if(GoodFieldname.EndsWith("Type"))
+                        if (GoodFieldname.EndsWith("Type"))
                             GoodFieldname += "Field";
 
                         XmlNode ndCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
@@ -1360,7 +1370,7 @@ namespace TimeSheets
                         ndCol.Attributes.Append(attr1);
 
                         attr1 = docLayout.CreateAttribute("Visible");
-                        if(arrCols.Contains(GoodFieldname) || settings.TimesheetFields.Contains(field.InternalName))
+                        if (arrCols.Contains(GoodFieldname) || settings.TimesheetFields.Contains(field.InternalName))
                             attr1.Value = "1";
                         else
                             attr1.Value = "0";
@@ -1377,7 +1387,7 @@ namespace TimeSheets
 
 
                         attr1 = docLayout.CreateAttribute("Width");
-                        if(arrCols.Contains(GoodFieldname) && arrCols[GoodFieldname].ToString() != "")
+                        if (arrCols.Contains(GoodFieldname) && arrCols[GoodFieldname].ToString() != "")
                             attr1.Value = arrCols[GoodFieldname].ToString();
                         else
                             attr1.Value = iFieldWidth.ToString();
@@ -1391,7 +1401,7 @@ namespace TimeSheets
                         attr1.Value = iGetFieldAlign(field);
                         ndCol.Attributes.Append(attr1);
 
-                        if(sFieldType == "Enum")
+                        if (sFieldType == "Enum")
                         {
                             attr1 = docLayout.CreateAttribute("IconAlign");
                             attr1.Value = "Right";
@@ -1402,9 +1412,9 @@ namespace TimeSheets
                         }
 
 
-                        if(isWork)
+                        if (isWork)
                         {
-                            if(!settings.TimesheetFields.Contains(field.InternalName))
+                            if (!settings.TimesheetFields.Contains(field.InternalName))
                             {
                                 attr1 = docLayout.CreateAttribute("CanHide");
                                 attr1.Value = "1";
@@ -1417,7 +1427,7 @@ namespace TimeSheets
                                 ndLeftCols.AppendChild(ndCol);
                             }
                         }
-                        else if(settings.TimesheetFields.Contains(field.InternalName))
+                        else if (settings.TimesheetFields.Contains(field.InternalName))
                         {
                             MidWidth += iFieldWidth;
 
@@ -1463,42 +1473,43 @@ namespace TimeSheets
 
             try
             {
-                if(field.Type == SPFieldType.Choice)
+                if (field.Type == SPFieldType.Choice)
                 {
                     SPFieldChoice ocField = (SPFieldChoice)field;
-                    foreach(string choice in ocField.Choices)
+                    foreach (string choice in ocField.Choices)
                     {
                         enums += "|" + choice;
                     }
                 }
-                else if(field.Type == SPFieldType.MultiChoice)
+                else if (field.Type == SPFieldType.MultiChoice)
                 {
                     SPFieldMultiChoice ocField = (SPFieldMultiChoice)field;
-                    foreach(string choice in ocField.Choices)
+                    foreach (string choice in ocField.Choices)
                     {
                         enums += "|" + choice;
                     }
                 }
-                else if(field.Type == SPFieldType.Lookup)
+                else if (field.Type == SPFieldType.Lookup)
                 {
                     SPFieldLookup olField = (SPFieldLookup)field;
 
                     SPList oList = web.Lists[new Guid(olField.LookupList)];
 
-                    foreach(SPListItem li in oList.Items)
+                    foreach (SPListItem li in oList.Items)
                     {
                         enums += "|" + li[olField.LookupField].ToString();
                         enumkeys += "|" + li.ID;
                     }
                 }
-            }catch{}
-            if(enums != "")
+            }
+            catch { }
+            if (enums != "")
             {
                 XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("Enum");
                 attr1.Value = enums;
                 ndCol.Attributes.Append(attr1);
             }
-            if(enumkeys != "")
+            if (enumkeys != "")
             {
                 XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("EnumKeys");
                 attr1.Value = enumkeys;
@@ -1508,7 +1519,7 @@ namespace TimeSheets
 
         private static int iGetFieldWidth(SPField field)
         {
-            switch(field.Type)
+            switch (field.Type)
             {
                 case SPFieldType.Boolean:
                     return 30;
@@ -1522,7 +1533,7 @@ namespace TimeSheets
 
         private static string iGetFieldType(SPField field)
         {
-            switch(field.Type)
+            switch (field.Type)
             {
                 case SPFieldType.Choice:
                 case SPFieldType.MultiChoice:
@@ -1541,7 +1552,7 @@ namespace TimeSheets
 
         private static string iGetFieldAlign(SPField field)
         {
-            switch(field.Type)
+            switch (field.Type)
             {
                 case SPFieldType.Number:
                 case SPFieldType.Currency:
@@ -1553,7 +1564,7 @@ namespace TimeSheets
 
         private static bool isGoodField(string field)
         {
-            switch(field)
+            switch (field)
             {
                 case "Title":
                     return false;
@@ -1591,11 +1602,11 @@ namespace TimeSheets
 
             ArrayList arrLookups = new ArrayList();
 
-            if(lstMyWork != null)
+            if (lstMyWork != null)
             {
-                foreach(SPField field in lstMyWork.Fields)
+                foreach (SPField field in lstMyWork.Fields)
                 {
-                    if(field.Type == SPFieldType.Lookup)
+                    if (field.Type == SPFieldType.Lookup)
                     {
 
                         arrLookups.Add(field.InternalName + "Text");
@@ -1627,20 +1638,20 @@ namespace TimeSheets
 
                 bool bCanEdit = true;
 
-                if(dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
+                if (dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True" || dsTS.Tables[1].Rows[0]["SUBMITTED"].ToString() == "True")
                 {
                     bCanEdit = false;
                 }
 
 
-                foreach(DataRow dr in dsTS.Tables[2].Rows)
+                foreach (DataRow dr in dsTS.Tables[2].Rows)
                 {
                     ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit));
                 }
 
                 docData.SelectSingleNode("//Cfg").Attributes["TimesheetUID"].Value = dsTS.Tables[0].Rows[0]["tsuid"].ToString();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 docData.LoadXml("<Grid><Body><B></B></Body></Grid>");
 
@@ -1654,7 +1665,7 @@ namespace TimeSheets
                 ndBod.AppendChild(ndCol);
             }
 
-            
+
 
             return docData.OuterXml;
         }
@@ -1696,7 +1707,7 @@ namespace TimeSheets
 
             //============My Work Fields==============
 
-            if(result == null && dr["ITEM_TYPE"].ToString() == "1")//Regular Work
+            if (result == null && dr["ITEM_TYPE"].ToString() == "1")//Regular Work
             {
                 attr1 = docData.CreateAttribute("CanEdit");
                 attr1.Value = "0";
@@ -1707,7 +1718,7 @@ namespace TimeSheets
                 ndCol.Attributes.Append(attr1);
 
             }
-            else if(dr["ITEM_TYPE"].ToString() == "2")//Non Work
+            else if (dr["ITEM_TYPE"].ToString() == "2")//Non Work
             {
                 attr1 = docData.CreateAttribute("CanEdit");
                 attr1.Value = "1";
@@ -1725,30 +1736,30 @@ namespace TimeSheets
             {
 
 
-                foreach(DataColumn dc in dsTS.Tables[myworktableid].Columns)
+                foreach (DataColumn dc in dsTS.Tables[myworktableid].Columns)
                 {
                     string GoodFieldname = dc.ColumnName;
-                    if(GoodFieldname.EndsWith("Type"))
+                    if (GoodFieldname.EndsWith("Type"))
                         GoodFieldname += "Field";
 
-                    if(arrLookups.Contains(GoodFieldname))
+                    if (arrLookups.Contains(GoodFieldname))
                     {
                         GoodFieldname = GoodFieldname.Substring(0, GoodFieldname.Length - 4);
                     }
 
-                    if(isValidMyWorkColumn(GoodFieldname))
+                    if (isValidMyWorkColumn(GoodFieldname))
                     {
                         attr1 = docData.CreateAttribute(GoodFieldname);
                         attr1.Value = result[dc.ColumnName].ToString();
                         ndCol.Attributes.Append(attr1);
 
-                        if(GoodFieldname == "Timesheet")
+                        if (GoodFieldname == "Timesheet")
                         {
                             string en = "0";
 
-                            if(result[dc.ColumnName].ToString().ToLower() == "true")
+                            if (result[dc.ColumnName].ToString().ToLower() == "true")
                                 en = "1";
-                            
+
                             attr1 = docData.CreateAttribute("CanEdit");
                             attr1.Value = en;
                             ndCol.Attributes.Append(attr1);
@@ -1762,17 +1773,17 @@ namespace TimeSheets
             }
 
             //============Timesheet Specific Fields==============
-            foreach(string tsField in settings.TimesheetFields)
+            foreach (string tsField in settings.TimesheetFields)
             {
                 string GoodFieldname = tsField;
-                if(GoodFieldname.EndsWith("Type"))
+                if (GoodFieldname.EndsWith("Type"))
                     GoodFieldname += "Field";
 
-                if(isValidMyWorkColumn(GoodFieldname))
+                if (isValidMyWorkColumn(GoodFieldname))
                 {
                     DataRow[] drTS = dsTS.Tables[5].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"].ToString() + "' AND ListName='MYTS' AND ColumnName='" + tsField + "'");
 
-                    if(drTS.Length > 0)
+                    if (drTS.Length > 0)
                     {
                         attr1 = docData.CreateAttribute(GoodFieldname);
                         attr1.Value = drTS[0]["ColumnValue"].ToString();
@@ -1787,7 +1798,7 @@ namespace TimeSheets
             System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
             IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
 
-            if(drTSOther.Length > 0)
+            if (drTSOther.Length > 0)
             {
                 attr1 = docData.CreateAttribute("TSOtherHours");
                 attr1.Value = float.Parse(drTSOther[0]["OtherHours"].ToString()).ToString(culture);
@@ -1799,10 +1810,11 @@ namespace TimeSheets
             //============StopWatch==========
             DataRow[] drSW = dsTS.Tables[9].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"].ToString() + "'");
 
-            if(drSW.Length > 0)
+            if (drSW.Length > 0)
             {
+
                 attr1 = docData.CreateAttribute("StopWatch");
-                attr1.Value = ((DateTime)drSW[0]["Started"]).ToString("F");
+                attr1.Value = ((DateTime)drSW[0]["Started"]).ToString("F", culture);
                 ndCol.Attributes.Append(attr1);
 
                 attr1 = docData.CreateAttribute("StopWatchIcon");
@@ -1816,7 +1828,7 @@ namespace TimeSheets
                 ndCol.Attributes.Append(attr1);
             }
 
-            if(!bCanEdit)
+            if (!bCanEdit)
             {
                 ndCol.Attributes["CanEdit"].Value = "0";
             }
@@ -1833,17 +1845,17 @@ namespace TimeSheets
             cmd.Parameters.AddWithValue("@periodid", sPeriod);
 
             SqlDataReader dr = cmd.ExecuteReader();
-            
+
             string[] dayDefs = settings.DayDef.Split('|');
 
-            if(dr.Read())
+            if (dr.Read())
             {
                 DateTime dtStart = dr.GetDateTime(0);
                 DateTime dtEnd = dr.GetDateTime(1);
-                        
-                while(dtStart <= dtEnd)
+
+                while (dtStart <= dtEnd)
                 {
-                    if(dayDefs[(int)dtStart.DayOfWeek * 3].ToLower() == "true")
+                    if (dayDefs[(int)dtStart.DayOfWeek * 3].ToLower() == "true")
                     {
                         arrPeriods.Add(dtStart);
                     }
@@ -1861,18 +1873,18 @@ namespace TimeSheets
         {
             bool bHasTypes = (dsTS.Tables[7].Rows.Count > 0);
 
-            foreach(DateTime dtStart in arrPeriods)
+            foreach (DateTime dtStart in arrPeriods)
             {
                 DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + tsitemuid + "' AND TS_ITEM_DATE='" + dtStart.ToString() + "'");
                 DataRow[] drNotes = dsTS.Tables[4].Select("TS_ITEM_UID='" + tsitemuid + "' AND TS_ITEM_DATE='" + dtStart.ToString() + "'");
 
-                if(bHasTypes)
+                if (bHasTypes)
                 {
                     float totalHours = 0;
                     string hoursString = "";
-                    if(bHasTypes)
+                    if (bHasTypes)
                     {
-                        foreach(DataRow drHour in drHours)
+                        foreach (DataRow drHour in drHours)
                         {
                             hoursString += "T" + drHour["TS_ITEM_TYPE_ID"].ToString() + ": " + float.Parse(drHour["TS_ITEM_HOURS"].ToString()).ToString(culture) + ",";
 
@@ -1881,13 +1893,13 @@ namespace TimeSheets
                     }
                     else
                     {
-                        if(drHours.Length > 0)
+                        if (drHours.Length > 0)
                         {
                             totalHours = float.Parse(drHours[0]["TS_ITEM_HOURS"].ToString());
                         }
                     }
 
-                    if(drNotes.Length > 0)
+                    if (drNotes.Length > 0)
                     {
                         hoursString += "Notes: \"" + System.Web.HttpUtility.UrlEncode(drNotes[0]["TS_ITEM_NOTES"].ToString()) + "\",";
                     }
@@ -1902,17 +1914,17 @@ namespace TimeSheets
                     attr1.Value = hoursString;
                     ndCol.Attributes.Append(attr1);
                 }
-                else if(settings.AllowNotes)
+                else if (settings.AllowNotes)
                 {
 
-                    if(drHours.Length > 0)
+                    if (drHours.Length > 0)
                     {
                         XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("P" + dtStart.Ticks);
                         attr1.Value = float.Parse(drHours[0]["TS_ITEM_HOURS"].ToString()).ToString(culture);
                         ndCol.Attributes.Append(attr1);
                     }
 
-                    if(drNotes.Length > 0)
+                    if (drNotes.Length > 0)
                     {
                         XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("TSP" + dtStart.Ticks);
                         attr1.Value = drNotes[0]["TS_ITEM_NOTES"].ToString();
@@ -1921,7 +1933,7 @@ namespace TimeSheets
                 }
                 else
                 {
-                    if(drHours.Length > 0)
+                    if (drHours.Length > 0)
                     {
                         XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("P" + dtStart.Ticks);
                         attr1.Value = float.Parse(drHours[0]["TS_ITEM_HOURS"].ToString()).ToString(culture);
@@ -1932,7 +1944,7 @@ namespace TimeSheets
             }
 
 
-            
+
         }
 
         public static string AutoAddWork(string data, SPWeb oWeb)
@@ -1956,7 +1968,7 @@ namespace TimeSheets
             SqlCommand cmd = new SqlCommand("SELECT submitted, period_id FROM TSTIMESHEET where TS_UID=@tsuid ", cn);
             cmd.Parameters.AddWithValue("@tsuid", tsuid);
             SqlDataReader dr = cmd.ExecuteReader();
-            if(dr.Read())
+            if (dr.Read())
             {
                 submitted = dr.GetBoolean(0);
                 period = dr.GetInt32(1);
@@ -1971,26 +1983,26 @@ namespace TimeSheets
             DateTime fn = DateTime.MinValue;
             DateTime st = DateTime.MaxValue;
 
-            if(dr.Read())
+            if (dr.Read())
             {
                 st = dr.GetDateTime(0);
                 fn = dr.GetDateTime(1);
             }
             dr.Close();
 
-            if(!submitted)
+            if (!submitted)
             {
                 EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(oWeb.Site.ID);
 
                 ArrayList arrRows = new ArrayList();
                 try
                 {
-                    if(docTimesheet.FirstChild.Attributes["Rows"] != null)
+                    if (docTimesheet.FirstChild.Attributes["Rows"] != null)
                     {
                         string[] sTempRows = docTimesheet.FirstChild.Attributes["Rows"].Value.ToLower().Split(',');
-                        foreach(string sTempRow in sTempRows)
+                        foreach (string sTempRow in sTempRows)
                         {
-                            if(sTempRow != "" && !arrRows.Contains(sTempRow))
+                            if (sTempRow != "" && !arrRows.Contains(sTempRow))
                                 arrRows.Add(sTempRow);
                         }
                     }
@@ -2000,23 +2012,23 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@tsuid", tsuid);
                     dr = cmd.ExecuteReader();
 
-                    while(dr.Read())
+                    while (dr.Read())
                     {
                         string s = dr.GetGuid(0).ToString() + "." + dr.GetInt32(1);
-                        if(!arrRows.Contains(s))
+                        if (!arrRows.Contains(s))
                             arrRows.Add(s);
                     }
                     dr.Close();
-                    
+
                 }
                 catch { }
 
 
                 DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + oWeb.CurrentUser.ID + "'");
 
-                foreach(DataRow drWork in dtWork.Rows)
+                foreach (DataRow drWork in dtWork.Rows)
                 {
-                    if(!arrRows.Contains(drWork["ListId"].ToString().ToLower() + "." + drWork["ItemId"].ToString().ToLower()))
+                    if (!arrRows.Contains(drWork["ListId"].ToString().ToLower() + "." + drWork["ItemId"].ToString().ToLower()))
                         AddWorkItem(drWork, oWeb.Site, tsuid, Guid.NewGuid(), cn);
                 }
 
@@ -2031,13 +2043,13 @@ namespace TimeSheets
                 return "<AutoAddWork Status=\"3\">Timesheet is submitted and cannot add work.</AutoAddWork>";
             }
 
-            
-            
+
+
         }
 
         private static bool isValidMyWorkColumn(string colName)
         {
-            switch(colName)
+            switch (colName)
             {
                 case "Title":
                 case "ID":
@@ -2048,7 +2060,7 @@ namespace TimeSheets
 
         internal static SPUser GetUser(SPWeb web, string sUserId)
         {
-            if(sUserId == "")
+            if (sUserId == "")
                 return web.CurrentUser;
             else
             {
@@ -2056,7 +2068,7 @@ namespace TimeSheets
                 {
                     SPUser u = web.SiteUsers.GetByID(int.Parse(sUserId));
 
-                    if(iVerifyDelegate(web, u))
+                    if (iVerifyDelegate(web, u))
                     {
                         return u;
                     }
@@ -2065,7 +2077,7 @@ namespace TimeSheets
                         return web.CurrentUser;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     return web.CurrentUser;
                 }
@@ -2111,7 +2123,7 @@ namespace TimeSheets
         {
 
             EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(web.Site.ID);
-            
+
             SqlCommand cmd = new SqlCommand("select TOP 1 TS_UID from TSTIMESHEET where SITE_UID = @siteid and PERIOD_ID = @period and USERNAME = @username", cn);
             cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
             cmd.Parameters.AddWithValue("@period", sPeriod);
@@ -2120,13 +2132,13 @@ namespace TimeSheets
             Guid tsuid = Guid.Empty;
 
             SqlDataReader dr = cmd.ExecuteReader();
-            if(dr.Read())
+            if (dr.Read())
             {
                 tsuid = dr.GetGuid(0);
             }
             dr.Close();
 
-            if(tsuid == Guid.Empty)
+            if (tsuid == Guid.Empty)
             {
                 tsuid = iGenerateTSFromPast(cn, web, user, sPeriod, rptData);
             }
@@ -2144,7 +2156,7 @@ namespace TimeSheets
             Guid userid = Guid.Empty;
 
             dr = cmd.ExecuteReader();
-            if(dr.Read())
+            if (dr.Read())
             {
                 userid = dr.GetGuid(0);
             }
@@ -2172,15 +2184,15 @@ namespace TimeSheets
             ArrayList drAdded = new ArrayList();
 
 
-            foreach(DataRow drItem in ds.Tables[2].Rows)
+            foreach (DataRow drItem in ds.Tables[2].Rows)
             {
-                if(!drAdded.Contains(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString()))
+                if (!drAdded.Contains(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString()))
                 {
                     sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                     myWorkDataTable = rptData.ExecuteSql(sql);
 
 
-                    if(myWorkDataTable.Rows.Count > 0)
+                    if (myWorkDataTable.Rows.Count > 0)
                         ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
 
                     drAdded.Add(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString());
@@ -2189,9 +2201,9 @@ namespace TimeSheets
 
             TimesheetSettings settings = new TimesheetSettings(web);
 
-            foreach(string sField in settings.TimesheetFields)
+            foreach (string sField in settings.TimesheetFields)
             {
-                if(sField != "")
+                if (sField != "")
                 {
                     try
                     {
@@ -2203,7 +2215,7 @@ namespace TimeSheets
 
             ds.Tables[myworktableid].PrimaryKey = new[] { ds.Tables[myworktableid].Columns["ListId"], ds.Tables[myworktableid].Columns["ItemId"] };
 
-            
+
 
             return ds;
         }
@@ -2221,7 +2233,7 @@ namespace TimeSheets
 
             SqlDataReader dr = cmd.ExecuteReader();
 
-            if(dr.Read())
+            if (dr.Read())
             {
                 copyfromtsuid = dr.GetGuid(0);
             }
@@ -2236,10 +2248,10 @@ namespace TimeSheets
             cmd.Parameters.AddWithValue("@resourcename", user.Name);
             cmd.ExecuteNonQuery();
 
-            if(copyfromtsuid != Guid.Empty)
+            if (copyfromtsuid != Guid.Empty)
             {
 
-                
+
 
                 cmd = new SqlCommand("SELECT * FROM TSITEM where TS_UID = @tsuid and item_type = 1", cn);
                 cmd.Parameters.AddWithValue("@tsuid", copyfromtsuid);
@@ -2248,17 +2260,17 @@ namespace TimeSheets
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dsItems);
 
-                foreach(DataRow drItem in dsItems.Tables[0].Rows)
+                foreach (DataRow drItem in dsItems.Tables[0].Rows)
                 {
                     try
                     {
                         string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                         DataTable myWorkDataTable = rptData.ExecuteSql(sql);
 
-                        if(myWorkDataTable.Rows.Count > 0)
+                        if (myWorkDataTable.Rows.Count > 0)
                         {
 
-                            if(myWorkDataTable.Rows[0]["Timesheet"].ToString() == "True")
+                            if (myWorkDataTable.Rows[0]["Timesheet"].ToString() == "True")
                             {
                                 cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID, WEB_UID, LIST_UID, ITEM_ID, ITEM_TYPE, TITLE, PROJECT, PROJECT_ID, LIST, PROJECT_LIST_UID) VALUES (@tsuid, @webuid, @listuid, @itemid, 1, @title, @project, @projectid, @list, @projectlistuid)", cn);
                                 cmd.Parameters.AddWithValue("@tsuid", tsuid);
@@ -2278,10 +2290,10 @@ namespace TimeSheets
                     }
                     catch { }
                 }
-                
-                
+
+
             }
-            
+
             return tsuid;
         }
 
@@ -2334,7 +2346,7 @@ namespace TimeSheets
                 }
                 catch { }
 
-                
+
 
                 XmlNode ndCfg = docOut.FirstChild.SelectSingleNode("//Cfg");
 
@@ -2346,16 +2358,16 @@ namespace TimeSheets
 
                 EPMLiveCore.API.ViewManager views = null;
 
-                if(bNonWork)
+                if (bNonWork)
                     views = GetNonWorkViews(oWeb);
                 else
                     views = GetWorkViews(oWeb);
 
-                foreach(KeyValuePair<string, Dictionary<string, string>> key in views.Views)
+                foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
                 {
                     try
                     {
-                        if(key.Value["Default"].ToLower() == "true")
+                        if (key.Value["Default"].ToLower() == "true")
                         {
                             XmlAttribute attr = docOut.CreateAttribute("Group");
                             attr.Value = key.Value["Group"];
@@ -2391,7 +2403,7 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@uid", TSID);
                     SqlDataReader drTS = cmd.ExecuteReader();
 
-                    if(drTS.Read())
+                    if (drTS.Read())
                     {
                         sUser = drTS.GetInt32(0).ToString();
 
@@ -2406,7 +2418,7 @@ namespace TimeSheets
 
                     cn.Close();
 
-                    if(sUser == "")
+                    if (sUser == "")
                     {
                         sUser = "";
                         docOut.LoadXml("<Grid><IO Result=\"-1\" Message=\"Could not determine user\"/></Grid>");
@@ -2415,7 +2427,7 @@ namespace TimeSheets
                     {
                         SPUser user = GetUser(oWeb, sUser);
 
-                        if(user.ID.ToString() != sUser)
+                        if (user.ID.ToString() != sUser)
                         {
                             sUser = "";
                             docOut.LoadXml("<Grid><IO Result=\"-1\" Message=\"User mismatch or access denied\"/></Grid>");
@@ -2423,20 +2435,20 @@ namespace TimeSheets
                     }
 
 
-                    if(sUser != "")
+                    if (sUser != "")
                     {
                         string InputList = "My Work";
-                        if(bNonWork)
+                        if (bNonWork)
                             InputList = settings.NonWorkList;
 
-                        using(SPSite rsite = new SPSite(oWeb.Site.ID))
+                        using (SPSite rsite = new SPSite(oWeb.Site.ID))
                         {
-                            using(SPWeb rweb = rsite.OpenWeb(oWeb.ID))
+                            using (SPWeb rweb = rsite.OpenWeb(oWeb.ID))
                             {
                                 Guid lWebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
-                                if(lWebGuid != rweb.ID)
+                                if (lWebGuid != rweb.ID)
                                 {
-                                    using(SPWeb lweb = rsite.OpenWeb(lWebGuid))
+                                    using (SPWeb lweb = rsite.OpenWeb(lWebGuid))
                                     {
                                         PopulateTimesheetGridLayout(lweb, ref docOut, settings, ref temp, viewInfo, true, InputList);
                                     }
@@ -2451,13 +2463,13 @@ namespace TimeSheets
                             {
                                 SPList lstMyWork = rsite.RootWeb.Lists.TryGetList("My Work");
 
-                                if(lstMyWork != null)
+                                if (lstMyWork != null)
                                 {
-                                    foreach(SPField field in lstMyWork.Fields)
+                                    foreach (SPField field in lstMyWork.Fields)
                                     {
-                                        if(field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User)
+                                        if (field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User)
                                         {
-                                            if(field.InternalName == SearchField)
+                                            if (field.InternalName == SearchField)
                                                 SearchField += "Text";
 
                                             arrLookups.Add(field.InternalName + "Text");
@@ -2471,7 +2483,7 @@ namespace TimeSheets
                     }
                 });
 
-                if(sUser != "")
+                if (sUser != "")
                 {
 
 
@@ -2479,14 +2491,14 @@ namespace TimeSheets
 
                     DataTable work = GetWorkDT(oWeb, bOtherWork, bNonWork, sUser, settings, SearchField, SearchText);
 
-                    foreach(DataRow dr in work.Rows)
+                    foreach (DataRow dr in work.Rows)
                     {
 
                         XmlNode ndRow = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
 
                         XmlAttribute attr = docOut.CreateAttribute("WorkTypeField");
 
-                        if(!bNonWork)
+                        if (!bNonWork)
                             attr.Value = dr["WorkType"].ToString();
                         else
                             attr.Value = settings.NonWorkList;
@@ -2520,40 +2532,40 @@ namespace TimeSheets
                         attr.Value = dr["ItemID"].ToString();
                         ndRow.Attributes.Append(attr);
 
-                        
+
 
                         attr = docOut.CreateAttribute("TSEnabled");
                         attr.Value = "1";
                         ndRow.Attributes.Append(attr);
 
                         attr = docOut.CreateAttribute("ItemTypeID");
-                        if(bNonWork)
+                        if (bNonWork)
                             attr.Value = "2";
                         else
                             attr.Value = "1";
                         ndRow.Attributes.Append(attr);
 
                         DataRow[] drCurrent = dsCur.Tables[0].Select("LIST_UID='" + dr["listid"].ToString() + "' and ITEM_ID='" + dr["itemid"].ToString() + "'");
-                        if(drCurrent.Length > 0)
+                        if (drCurrent.Length > 0)
                         {
                             attr = docOut.CreateAttribute("Current");
                             attr.Value = "1";
                             ndRow.Attributes.Append(attr);
                         }
 
-                        foreach(DataColumn dc in work.Columns)
+                        foreach (DataColumn dc in work.Columns)
                         {
                             string GoodFieldname = dc.ColumnName;
 
-                            if(GoodFieldname.EndsWith("Type"))
+                            if (GoodFieldname.EndsWith("Type"))
                                 GoodFieldname += GoodFieldname;
 
-                            if(arrLookups.Contains(GoodFieldname))
+                            if (arrLookups.Contains(GoodFieldname))
                             {
                                 GoodFieldname = GoodFieldname.Substring(0, GoodFieldname.Length - 4);
                             }
 
-                            if(isValidMyWorkColumn(GoodFieldname))
+                            if (isValidMyWorkColumn(GoodFieldname))
                             {
                                 attr = docOut.CreateAttribute(GoodFieldname);
                                 attr.Value = dr[dc].ToString();
@@ -2565,7 +2577,7 @@ namespace TimeSheets
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 docOut.LoadXml(Properties.Resources.txtMyTimesheetWork_GridLayout);
 
@@ -2588,25 +2600,25 @@ namespace TimeSheets
 
             string sql = "";
 
-            if(!string.IsNullOrEmpty(SearchField) && !string.IsNullOrEmpty(SearchText))
+            if (!string.IsNullOrEmpty(SearchField) && !string.IsNullOrEmpty(SearchText))
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'","''"));
+                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND Timesheet=1 AND {1} LIKE '%{2}%'", oWeb.Site.ID, SearchField, SearchText.Replace("'", "''"));
             }
-            else if(bOtherWork)
+            else if (bOtherWork)
             {
                 sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{1}' AND Timesheet=1", userid, oWeb.Site.ID);
             }
-            else if(bNonWork)
+            else if (bNonWork)
             {
                 SPList list = oWeb.Lists.TryGetList(settings.NonWorkList);
-                
-                if(list != null)
+
+                if (list != null)
                 {
                     SPSiteDataQuery q = new SPSiteDataQuery();
                     q.Lists = "<Lists><List ID=\"" + list.ID.ToString() + "\"/></Lists>";
-                    foreach(SPField field in list.Fields)
+                    foreach (SPField field in list.Fields)
                     {
-                        if(field.Reorderable)
+                        if (field.Reorderable)
                         {
                             q.ViewFields += "<FieldRef Name='" + field.InternalName + "' />";
                         }
@@ -2625,7 +2637,7 @@ namespace TimeSheets
                 sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND Timesheet=1", userid, oWeb.Site.ID);
             }
 
-            
+
 
             return rptData.ExecuteSql(sql);
 
@@ -2637,16 +2649,16 @@ namespace TimeSheets
             string listid = row["ListID"].ToString();
             string itemid = row["ItemID"].ToString();
 
-            if(webid != "")
+            if (webid != "")
             {
-                if(listid != "")
+                if (listid != "")
                 {
-                    if(itemid != "")
+                    if (itemid != "")
                     {
                         try
                         {
 
-                            using(SPWeb web = site.OpenWeb(new Guid(webid)))
+                            using (SPWeb web = site.OpenWeb(new Guid(webid)))
                             {
                                 SPListItem li = null;
 
@@ -2660,7 +2672,7 @@ namespace TimeSheets
                                     }
                                     catch { }
 
-                                    if(li != null)
+                                    if (li != null)
                                     {
                                         int projectid = 0;
                                         string project = "";
@@ -2683,12 +2695,12 @@ namespace TimeSheets
                                         cmd.Parameters.AddWithValue("@itemid", li.ID);
                                         cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
                                         cmd.Parameters.AddWithValue("@list", list.Title);
-                                        if(projectlist == "")
+                                        if (projectlist == "")
                                             cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
                                         else
                                             cmd.Parameters.AddWithValue("@projectlistid", projectlist);
 
-                                        if(projectid == 0)
+                                        if (projectid == 0)
                                         {
                                             cmd.Parameters.AddWithValue("@project", DBNull.Value);
                                             cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
@@ -2734,7 +2746,7 @@ namespace TimeSheets
                 string[] sItems = docTimesheet.FirstChild.InnerText.Split(',');
 
 
-                foreach(string sItem in sItems)
+                foreach (string sItem in sItems)
                 {
                     string[] ItemInfo = sItem.Split('.');
 
@@ -2742,7 +2754,7 @@ namespace TimeSheets
 
                     DataTable dtWork = rptData.ExecuteSql(sql);
 
-                    if(dtWork.Rows.Count > 0)
+                    if (dtWork.Rows.Count > 0)
                     {
                         AddWorkItem(dtWork.Rows[0], oWeb.Site, tsuid, id, cn);
                     }
@@ -2752,7 +2764,7 @@ namespace TimeSheets
                 return "<AddWork Status=\"0\"></AddWork>";
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "<AddWork Status=\"1\">Error: " + ex.Message + "</AddWork>";
             }

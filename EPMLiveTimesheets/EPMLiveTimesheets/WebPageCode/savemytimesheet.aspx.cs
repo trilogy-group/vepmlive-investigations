@@ -8,7 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint; 
+using Microsoft.SharePoint;
 using System.Text.RegularExpressions;
 using System.Data.SqlClient;
 using System.Web.Script.Serialization;
@@ -28,18 +28,26 @@ namespace TimeSheets
 
             string sPeriodId = doc.FirstChild.SelectSingleNode("//Cfg").Attributes["PeriodId"].Value;
             string tsuid = doc.FirstChild.SelectSingleNode("//Cfg").Attributes["TimesheetUID"].Value;
+            bool submit = false;
+
+            try
+            {
+                submit = bool.Parse(doc.FirstChild.SelectSingleNode("//Cfg").Attributes["SaveAndSubmit"].Value);
+            }
+            catch { }
 
             TimesheetSettings settings = new TimesheetSettings(SPContext.Current.Web);
 
             XmlNodeList ndListItems = doc.FirstChild.SelectNodes("//B/I");
 
             XmlDocument docTimesheet = new XmlDocument();
-            docTimesheet.LoadXml("<Timesheet TSUID=\"" + tsuid + "\" Editable=\"0\"/>");
+            docTimesheet.LoadXml("<Timesheet TSUID=\"" + tsuid + "\" Editable=\"0\" SaveAndSubmit=\"" + submit.ToString() + "\"/>");
 
             try
             {
                 docTimesheet.FirstChild.Attributes["Editable"].Value = doc.FirstChild.SelectSingleNode("//Cfg").Attributes["GridEditable"].Value;
-            }catch{}
+            }
+            catch { }
 
             SqlConnection cn = null;
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -48,7 +56,7 @@ namespace TimeSheets
                 cn.Open();
             });
 
-            
+
 
             SqlCommand cmd = new SqlCommand("SELECT * FROM TSTYPE where SITE_UID=@siteid", cn);
             cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
@@ -61,33 +69,33 @@ namespace TimeSheets
 
             bool bTypes = false;
 
-            if(dtTypes.Rows.Count > 0)
+            if (dtTypes.Rows.Count > 0)
                 bTypes = true;
 
             ArrayList arrPeriodDates = TimesheetAPI.GetPeriodDaysArray(cn, settings, SPContext.Current.Web, sPeriodId);
             Hashtable arrPeriodDateCols = new Hashtable();
-            foreach(DateTime dt in arrPeriodDates)
+            foreach (DateTime dt in arrPeriodDates)
             {
                 arrPeriodDateCols.Add("P" + dt.Ticks, dt.ToString("s"));
-                if(bTypes)
+                if (bTypes)
                     arrPeriodDateCols.Add("TSP" + dt.Ticks, dt.ToString("s"));
             }
 
             cn.Close();
 
-            foreach(XmlNode nd in ndListItems)
+            foreach (XmlNode nd in ndListItems)
             {
                 XmlNode ndRow = docTimesheet.CreateNode(XmlNodeType.Element, "Item", docTimesheet.NamespaceURI);
                 XmlNode ndRowHours = docTimesheet.CreateNode(XmlNodeType.Element, "Hours", docTimesheet.NamespaceURI);
                 ndRow.AppendChild(ndRowHours);
 
-                foreach(XmlAttribute attr in nd.Attributes)
+                foreach (XmlAttribute attr in nd.Attributes)
                 {
-                    if(arrPeriodDateCols.Contains(attr.Name))
+                    if (arrPeriodDateCols.Contains(attr.Name))
                     {
-                        if(bTypes)
+                        if (bTypes)
                         {
-                            if(attr.Name.StartsWith("TS"))
+                            if (attr.Name.StartsWith("TS"))
                             {
                                 JavaScriptSerializer a = new JavaScriptSerializer();
                                 object o = a.DeserializeObject(attr.Value);
@@ -100,7 +108,7 @@ namespace TimeSheets
                                 attr1.Value = arrPeriodDateCols[attr.Name].ToString();
                                 ndDate.Attributes.Append(attr1);
 
-                                foreach(DataRow dr in dtTypes.Rows)
+                                foreach (DataRow dr in dtTypes.Rows)
                                 {
                                     try
                                     {
@@ -119,7 +127,7 @@ namespace TimeSheets
                                     catch { }
                                 }
 
-                                if(settings.AllowNotes)
+                                if (settings.AllowNotes)
                                 {
                                     string notes = "";
                                     try
@@ -127,7 +135,7 @@ namespace TimeSheets
                                         notes = oo["Notes"].ToString();
                                     }
                                     catch { }
-                                    if(notes != "")
+                                    if (notes != "")
                                     {
                                         XmlNode ndNotes = docTimesheet.CreateNode(XmlNodeType.Element, "Notes", docTimesheet.NamespaceURI);
                                         ndNotes.InnerText = notes;
@@ -155,10 +163,10 @@ namespace TimeSheets
                             attr1.Value = attr.Value;
                             ndTime.Attributes.Append(attr1);
 
-                            if(settings.AllowNotes)
+                            if (settings.AllowNotes)
                             {
                                 string notes = nd.Attributes["TS" + attr.Name].Value;
-                                if(notes != "")
+                                if (notes != "")
                                 {
                                     XmlNode ndNotes = docTimesheet.CreateNode(XmlNodeType.Element, "Notes", docTimesheet.NamespaceURI);
                                     ndNotes.InnerText = notes;
@@ -186,7 +194,8 @@ namespace TimeSheets
             docRes.LoadXml(TimesheetAPI.SaveTimesheet(docTimesheet.OuterXml, SPContext.Current.Web));
 
 
-            if(docRes.FirstChild.Attributes["Status"].Value == "0")
+
+            if (docRes.FirstChild.Attributes["Status"].Value == "0")
                 data = "<Grid><IO Result='" + docRes.FirstChild.Attributes["Status"].Value + "'/></Grid>";
             else
                 data = "<Grid><IO Result='" + docRes.FirstChild.Attributes["Status"].Value + "' Message='" + docRes.FirstChild.InnerText + "'/></Grid>";

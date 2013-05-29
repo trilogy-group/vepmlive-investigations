@@ -375,7 +375,8 @@ namespace TimeSheets
 
 
             curUrl = curUrl.Trim('&').Trim('?');
-
+            System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
+                    IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
             output.WriteLine(@"<script language=""javascript"">
                                     var TSObject" + sFullGridId + @" = new Object();
                                     TSObject" + sFullGridId + @".canSave = true;
@@ -408,7 +409,8 @@ namespace TimeSheets
                                     TSCols = " + TSCols + @";
                                     TSDCols = " + TSDCols + @";
                                     siteUrl = '" + url + @"';
-                                    curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss") + @"')).getTime();
+
+                                    curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss", culture) + @"')).getTime();
                             </script>
                             ");
             
