@@ -122,7 +122,7 @@
 					<div class="fileinputs">
 						<asp:FileUpload ID="FileUpload" CssClass="fileinput" runat="server" />
 						<div class="fakefile">
-							<input type="text" />
+							<input type="text" class="epmliveinput" />
 							<input type="button" value="Upload" />
 						</div>
 					</div>
