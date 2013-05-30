@@ -51,10 +51,10 @@
 
                             var postBackMarkerTextBox = $('input[title=DaysHoursBreakdownPostBackMarker]').first();
 
-                            var startDateField = $('input[id$=DateTimeField_DateTimeFieldDate][title=' + info[0] + ']').first();
-                            var finishDateField = $('input[id$=DateTimeField_DateTimeFieldDate][title=' + info[1] + ']').first();
+                            var startDateField = $('input[id$=DateTimeFieldDate][title=' + info[0] + ']').first();
+                            var finishDateField = $('input[id$=DateTimeFieldDate][title=' + info[1] + ']').first();
 
-                            $('input[id$=TextField][title=' + info[2] + ']').first().attr('disabled', 'disabled');
+                            $('input[id$=NumberField][title=' + info[2] + ']').first().attr('disabled', 'disabled');
 
                             startDateField.change(function () {
                                 startDateTextBox.val($(this).val());
@@ -90,7 +90,7 @@
 //                        var infoTextBox = $('input[title=DaysHoursBreakdownInfo]').first();
 //                        var info = infoTextBox.val().split('|');
 //
-//                        var totalHoursField = $('input[id$=TextField][title=' + info[2] + ']').first();
+//                        var totalHoursField = $('input[id$=NumberField][title=' + info[2] + ']').first();
 //                        var gridHourFields = $('input[dhbcontrol=true]');
 //
 //                        $('input[title=DaysHoursBreakdownPostBackMarker]').first().val('false');
