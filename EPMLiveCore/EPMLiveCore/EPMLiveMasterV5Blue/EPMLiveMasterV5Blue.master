@@ -42,6 +42,7 @@
             <asp:ContentPlaceHolder id="PlaceHolderBodyAreaClass" runat="server" />
         </SharePoint:AjaxDelta>
         <SharePoint:CssRegistration ID="CssRegistration1" Name="Themable/corev15.css" runat="server" />
+        <link href="/_layouts/15/epmlive/stylesheets/master.css" rel="stylesheet" type="text/css" />
         <style type="text/css">
             .ms-breadcrumb-top { display: none; }
             #searchInputBox {  margin-bottom: 3px !important;  }

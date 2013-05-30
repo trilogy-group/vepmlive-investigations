@@ -3033,6 +3033,7 @@
     <Content Include="Layouts\epmlive\images\settings\Timesheet.png" />
     <Content Include="Layouts\epmlive\images\settings\UserMgmt.png" />
     <Content Include="Layouts\epmlive\images\settings\Users.png" />
+    <Content Include="Layouts\epmlive\images\progress_ring.gif" />
     <Content Include="Layouts\epmlive\images\unlink.GIF" />
     <Content Include="Layouts\epmlive\images\up.gif" />
     <Content Include="Layouts\epmlive\images\warning.png" />
@@ -3143,6 +3144,7 @@
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_888888_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.css" />
+    <Content Include="Layouts\epmlive\stylesheets\master.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
