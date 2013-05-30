@@ -231,7 +231,7 @@
     <div id="EPMResourceGrid" class="rg-clear-fix" style="width:100%;height:800px;">
          <script type="text/javascript">
              function initializeResourceGridWP() {
-                 if (document.location.href.toLowerCase().indexOf('resources.aspx') !== -1) {
+                 if (document.location.href.toLowerCase().indexOf('resource.aspx') !== -1) {
                      function showLoading() {
                          epmLiveResourceGrid.loader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
                      }

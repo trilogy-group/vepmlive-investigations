@@ -1305,7 +1305,7 @@ function registerEpmLiveResourceGridScript() {
                 }
 
                 if (selectedRowIds.length > 0) {
-                    var url = '{0}/_layouts/epmlive/AssignmentPlanner.aspx?resources={1}'.format($$$.currentWebUrl, selectedRowIds.join(','));
+                    var url = '{0}/_layouts/epmlive/AssignmentPlanner.aspx?resources={1}&IsDlg=1'.format($$$.currentWebUrl, selectedRowIds.join(','));
                     $$.actions.displayPopUp(url, 'Assignment Planner', true, true, null, null, 1000, 700);
                 }
             },
