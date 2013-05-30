@@ -1623,7 +1623,7 @@ namespace EPMLiveCore.API
             if(oViewFile.Exists)
             {
                 
-                string sUrl = "Applications/" + appDef.Title + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
+                string sUrl = appDef.url + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
 
                 bool bHasViewFile = false;
                 try
@@ -2704,7 +2704,7 @@ namespace EPMLiveCore.API
 
             if(oParentFolder.Exists)
             {
-                string sUrl = "Applications/" + appDef.Title + "/Files/" + sFullFile;
+                string sUrl = appDef.url + "/Files/" + sFullFile;
 
                 byte[] fileBytes = copy.GetFile(sUrl);
 
@@ -2725,7 +2725,7 @@ namespace EPMLiveCore.API
             {
                 string sRemoteName = getAttribute(ndChild, "RemoteFile");
                 string sType = getAttribute(ndChild, "Type");
-                string sFullFile = sRemoteName.Replace("Applications/" + appDef.Title + "/Files/", "");
+                string sFullFile = sRemoteName.Replace(appDef.url + "/Files/", "");
                 string sFileName = getAttribute(ndChild, "Name");
                 string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
@@ -2946,7 +2946,7 @@ namespace EPMLiveCore.API
                                     catch { sTitle = lvFileLeafRef.LookupValue; }
 
                                     string sRemoteFile = lvFileRef.LookupValue;
-                                    string sFullFile = sRemoteFile.Replace("Applications/" + appDef.Title + "/Files/", "");
+                                    string sFullFile = sRemoteFile.Replace(appDef.url + "/Files/", "");
                                     string sFileName = System.IO.Path.GetFileName(sFullFile);
                                     string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
@@ -2958,7 +2958,7 @@ namespace EPMLiveCore.API
                                             sFileName = sTitle;
                                     }
 
-                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace("Applications/" + appDef.Title + "/Files/", "")) + "/" + sFileName;
+                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace(appDef.url + "/Files/", "")) + "/" + sFileName;
                                     sFullFile = sFullFile.Replace("\\", "/");
                                     sFullFile = sFullFile.Trim('/');
 
