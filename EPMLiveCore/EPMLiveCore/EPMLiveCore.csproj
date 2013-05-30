@@ -13,16 +13,21 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>Munjal%27s Deploy Config</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>
-    </PostDeploymentCommand>
-    <PreDeploymentCommand>
-    </PreDeploymentCommand>
+    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
+"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
+iisreset
+net stop "WorkEngine Timer"
+net start "WorkEngine Timer"
+</PostDeploymentCommand>
+    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
+"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f
+</PreDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -3008,6 +3013,7 @@
     <Content Include="Layouts\epmlive\images\Plus14.png" />
     <Content Include="Layouts\epmlive\images\print.gif" />
     <Content Include="Layouts\epmlive\images\printmenu.gif" />
+    <Content Include="Layouts\epmlive\images\progress_ring.gif" />
     <Content Include="Layouts\epmlive\images\PurchaseAccounts.png" />
     <Content Include="Layouts\epmlive\images\Question.png" />
     <Content Include="Layouts\epmlive\images\refresh.png" />
@@ -3033,7 +3039,6 @@
     <Content Include="Layouts\epmlive\images\settings\Timesheet.png" />
     <Content Include="Layouts\epmlive\images\settings\UserMgmt.png" />
     <Content Include="Layouts\epmlive\images\settings\Users.png" />
-    <Content Include="Layouts\epmlive\images\progress_ring.gif" />
     <Content Include="Layouts\epmlive\images\unlink.GIF" />
     <Content Include="Layouts\epmlive\images\up.gif" />
     <Content Include="Layouts\epmlive\images\warning.png" />
