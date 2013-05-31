@@ -135,8 +135,15 @@ function AddResourcePool() {
 
 function onAddResourcePool(dialogResult, returnValue) {
 
-    Grids.ResourceGrid.Reload();
+    ShowTDialog("Refreshing...");
+    
+    setTimeout("reloadres()", 2000);
 
+}
+
+function reloadres() {
+    HideTDialog();
+    Grids.ResourceGrid.Reload();
 }
 
 function AddResColumns() {
