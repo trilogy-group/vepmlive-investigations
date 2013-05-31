@@ -29,6 +29,9 @@ function ToggleCommonActionsMenu() {
         var allElements = document.getElementsByTagName("*");
 
         for (var i = 0; (element = allElements[i]) != null; i++) {
+            if (typeof element.className !== 'string') {
+                continue;
+            }
             var elementClass = element.className;
             if (elementClass && (elementClass.indexOf("ms-MenuUIPopupBody") != -1)) {
                 if (element.style.display != "none" || element.style.display != "None") {

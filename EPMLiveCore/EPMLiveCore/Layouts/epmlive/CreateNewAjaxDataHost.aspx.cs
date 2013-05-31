@@ -10,31 +10,21 @@ namespace EPMLiveCore
     {
         private string _requestUrl = string.Empty;
         private const string LIST_ITEM_HTML =
-            "<li id=\"{0}\"class=\"ms-MenuUIULItem\" type=\"option\" menugroupid=\"100\" description=\"{1}\"" +
-                        "text=\"{2}\"" +
-                        "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-            //"onmenuclick_original=\"javascript:GoToPage('\u002fsites\u002fdevsite\u002f_layouts\u002fuserdisp.aspx?Force=True\u0026ID=' + _spUserId);return false;\"" +
-                        "text_original=\"{2}\" description_original=\"{1}\">" +
-                        "<div class=\"ms-MenuUIULItem\" menugroupid=\"100\" description=\"{1}\"" +
-                            "text=\"{2}\"" +
-                            "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-            //"onmenuclick_original=\"javascript:GoToPage('\u002fsites\u002fdevsite\u002f_layouts\u002fuserdisp.aspx?Force=True\u0026ID=' + _spUserId);return false;\"" +
-                            "text_original=\"{2}\" description_original=\"{1}\"" +
-                            "onmouseover=\"javascript:this.className='ms-MenuUIULItemHover';\" onmouseout=\"javascript:this.className='ms-MenuUIULItem';\">" +
-                            "<a class=\"ms-MenuUIULLink\" href=\"{4}\" onclick=\"{5}\" >" +
-                                "<span style=\"white-space: nowrap\" class=\"ms-MenuUIIcon\" align=\"center\">" +
-                                    "<img class=\"ms-MenuUIULImg\" title=\"\" alt=\"\" src=\"{3}\" width=\"16\" height=\"16\">" +
-                                "</span>" +
-                                "<span style=\"WHITE-SPACE: nowrap\" class=\"ms-MenuUILabel\">" +
-                                    "<span style=\"white-space: nowrap\">{2}</span><br>" +
-            //"<span style=\"white-space: normal\" class=\"ms-menuitemdescription\">{1}</span>" +
-                                    "<span></span>" +
-                                "</span>" +
-                                "<span style=\"width: auto; display: none; white-space: nowrap; cssfloat: left\" class=\"ms-MenuUIAccessKey\"></span>" +
-                                "<span style=\"display: none; white-space: nowrap\" class=\"ms-MenuUISubmenuArrow\"></span>" +
-                            "</a>" +
-                        "</div>" +
-                    "</li>";
+             "<li id=\"{0}\" class=\"ms-core-menu-item\" type=\"option\" menugroupid=\"100\" description=\"{1}\" text=\"{2}\"" +
+                         "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
+                         "text_original=\"{2}\" description_original=\"{1}\">" +
+                         "<a class=\"ms-core-menu-link\" href=\"{4}\" onclick=\"{5}\" >" +
+                             "<div class=\"ms-hide\">" +
+                                 "<img id=\"mp1_0_0_ICON\" title=\"\" alt=\"\" src=\"/_layouts/15/images/menuprofile.gif?rev=23\" width=\"32\" height=\"32\">" +
+                             "</div>" +
+                             "<div id=\"zz2_ID_PersonalInformation\" class=\"ms-core-menu-label\">" +
+                                 "<span class=\"ms-core-menu-title\">{2}</span>" +
+                                 "<span></span>" +
+                             "</div>" +
+                             "<span class=\"ms-accessible\"></span>" +
+                             "<div></div>" +
+                         "</a>" +
+                     "</li>";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -56,7 +46,7 @@ namespace EPMLiveCore
             StringBuilder itemsHtml = new StringBuilder();
             SPSite cSite = SPContext.Current.Site;
             SPWeb cWeb = SPContext.Current.Web;
-            itemsHtml.Append("<ul class=\"ms-MenuUIUL\">");
+            itemsHtml.Append("<ul class=\"ms-core-menu-list\">");
             itemsHtml.Append("<li class=\"ms-MenuUIULItem\"><div style=\"background-color: #F0F2F5 !important;border-bottom: 1px solid #E2E4E7;color: #4C535C;font-weight: bold !important;padding: 4px 2px !important;\"><span style=\"margin-left:5px\">Lists</span></div></li>");
             itemsHtml.Append(BuildListSection());
             itemsHtml.Append("<li class=\"ms-MenuUIULItem\"><div style=\"background-color: #F0F2F5 !important;border-bottom: 1px solid #E2E4E7;border-top: 1px solid #E2E4E7;color: #4C535C;font-weight: bold !important;padding: 4px 2px !important;\"><span style=\"margin-left:5px\">Document Libraries</span></div></li>");

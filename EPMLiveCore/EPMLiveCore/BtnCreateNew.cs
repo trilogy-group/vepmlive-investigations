@@ -86,9 +86,8 @@ namespace EPMLiveCore
 
                 // html for actual menu
                 // ===================================================
-                writer.Write("<div id=\"divCreateNewMenu\" style=\"z-index: 103; position: absolute; display:none; max-height:450px; overflow-x:hidden;overflow-y:auto;\" dir=\"ltr\" class=\"ms-MenuUIPopupBody ms-MenuUIPopupScreen\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid6\" flipped=\"false\" leftforbackiframe=\"834\" topforbackiframe=\"29\">");
-                writer.Write("<div style=\"overflow: visible\" class=\"ms-MenuUIPopupInner\" isinner=\"true\">");
-                writer.Write("<div id=\"divCreateNewMenuAsync\" class=\"ms-MenuUI\" style=\"width:254px\">");
+                writer.Write("<div id=\"divCreateNewMenu\" style=\"z-index: 103; position: absolute; width: 159px; display:none; top: 30px; left: 13px\" dir=\"ltr\" class=\"ms-core-menu-box ms-core-defaultFont ms-shadow\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid4\" flipped=\"false\" LeftForBackIframe=\"13\" TopForBackIframe=\"30\">");
+                writer.Write("<div id=\"divCreateNewMenuAsync\" >");
                 // loading div
                 // ========================================
                 writer.Write("<div id=\"divCreateNewLoading\" style=\"width: 100%; text-align: center;padding-top:5px;padding-bottom:5px;\">");
@@ -96,7 +95,6 @@ namespace EPMLiveCore
                 writer.Write("Loading...");
                 writer.Write("</div>");
                 // =========================================
-                writer.Write("</div>");
                 writer.Write("</div>");
                 writer.Write("</div>");
             }

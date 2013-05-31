@@ -5,11 +5,12 @@ using System.Text;
 using System.Web.UI.WebControls;
 using System.Web.UI;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore
 {
     [ToolboxData("<{0}:SiteNavigationRibbonButton runat=server></{0}:SiteNavigationRibbonButton>")]
-    public class SiteNavigationRibbonButton : WebControl, INamingContainer
+    public class SiteNavigationRibbonButton : ThemedClusteredHoverImage, INamingContainer
     {
         public SiteNavigationRibbonButton()
         {
@@ -50,7 +51,7 @@ namespace EPMLiveCore
 
             writer.Write("<script type=\"text/javascript\" src=\"" + currentFullPageUrl + "/_layouts/epmlive/SiteHierarchyMenu.js\"></script>");
             writer.Write("<script type=\"text/javascript\"> var currentWebUrl = \"" + currentWebUrl + "\"; </script>");
-            writer.Write("<a href=\"#\" rel=\"tooltipbottom\" title=\"My Workspaces\" onclick=\"javascript:PopupWorkspaceListWP();return false;\"><img src=\"/_layouts/epmlive/images/workspaces.png\" style=\"padding-top:3px;padding-right:5px;\" border=\"0\"></a>");
+            //writer.Write("<a href=\"#\" rel=\"tooltipbottom\" title=\"My Workspaces\" onclick=\"javascript:PopupWorkspaceListWP();return false;\"><img src=\"/_layouts/epmlive/images/workspaces.png\" style=\"padding-top:3px;padding-right:5px;\" border=\"0\"></a>");
 
             //writer.Write("<span id=\"spnPopupNav\" onclick=\"javascript:PopupWorkspaceListWP();return false;\" oncontextmenu=\"javascript:PopupWorkspaceListWP();return false;\" class=\"ms-SPLink ms-SpLinkButtonInActive ms-welcomeMenu\" style=\"white-space: nowrap;\" onmouseover=\"MMU_EcbTableMouseOverOut(this, true)\" hoverinactive=\"ms-SPLink ms-SpLinkButtonInActive ms-welcomeMenu\" hoveractive=\"ms-SPLink ms-SpLinkButtonActive ms-welcomeMenu\">");
             //writer.Write("<a class=\"ms-menu-a\" id=\"lnkPopupNav\" style=\"color:white;white-space:nowrap;cursor:pointer;\" onfocus=\"MMU_EcbLinkOnFocusBlur(byid('zz11_ID_PersonalActionMenu'), this, true);\" href=\"#\" >");

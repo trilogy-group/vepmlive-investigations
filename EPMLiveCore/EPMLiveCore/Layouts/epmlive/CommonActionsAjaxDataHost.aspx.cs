@@ -26,30 +26,20 @@ namespace EPMLiveCore
         // {5} - target property of the link
 
         private const string LIST_ITEM_HTML =
-            "<li id=\"{0}\"class=\"ms-MenuUIULItem\" type=\"option\" menugroupid=\"100\" description=\"{1}\"" +
-                        "text=\"{2}\"" +
+            "<li id=\"{0}\" class=\"ms-core-menu-item\" type=\"option\" menugroupid=\"100\" description=\"{1}\" text=\"{2}\"" +
                         "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-            //"onmenuclick_original=\"javascript:GoToPage('\u002fsites\u002fdevsite\u002f_layouts\u002fuserdisp.aspx?Force=True\u0026ID=' + _spUserId);return false;\"" +
                         "text_original=\"{2}\" description_original=\"{1}\">" +
-                        "<div class=\"ms-MenuUIULItem\" menugroupid=\"100\" description=\"{1}\"" +
-                            "text=\"{2}\"" +
-                            "iconsrc=\"{3}\" type=\"option\" enabled=\"true\" checked=\"false\"" +
-            //"onmenuclick_original=\"javascript:GoToPage('\u002fsites\u002fdevsite\u002f_layouts\u002fuserdisp.aspx?Force=True\u0026ID=' + _spUserId);return false;\"" +
-                            "text_original=\"{2}\" description_original=\"{1}\"" +
-                            "onmouseover=\"javascript:this.className='ms-MenuUIULItemHover';\" onmouseout=\"javascript:this.className='ms-MenuUIULItem';\">" +
-                            "<a id=\"mp1_0_0_Anchor\" class=\"ms-MenuUIULLink\" href=\"{4}\" target=\"{5}\" onclick=\"{6}\">" +
-                                "<span style=\"white-space: nowrap\" class=\"ms-MenuUIIconLarge\" align=\"center\">" +
-                                    "<img id=\"mp1_0_0_ICON\" class=\"ms-MenuUIULImg\" title=\"\" alt=\"\" src=\"{3}\" width=\"32\" height=\"32\">" +
-                                "</span>" +
-                                "<span id=\"zz12_ID_PersonalInformation\" class=\"ms-MenuUILabel\">" +
-                                    "<span style=\"white-space: normal\">{2}</span><br>" +
-                                    "<span style=\"white-space: normal\" class=\"ms-menuitemdescription\">{1}</span>" +
-                                    "<span></span>" +
-                                "</span>" +
-                                "<span style=\"width: auto; display: none; white-space: nowrap; cssfloat: left\" class=\"ms-MenuUIAccessKey\"></span>" +
-                                "<span style=\"display: none; white-space: nowrap\" class=\"ms-MenuUISubmenuArrow\"></span>" +
-                            "</a>" +
-                        "</div>" +
+                        "<a class=\"ms-core-menu-link\" href=\"{4}\" onclick=\"{5}\" >" +
+                            "<div class=\"ms-hide\">" +
+                                "<img id=\"mp1_0_0_ICON\" title=\"\" alt=\"\" src=\"/_layouts/15/images/menuprofile.gif?rev=23\" width=\"32\" height=\"32\">" +
+                            "</div>" +
+                            "<div id=\"zz2_ID_PersonalInformation\" class=\"ms-core-menu-label\">" +
+                                "<span class=\"ms-core-menu-title\">{2}</span>" +
+                                "<span></span>" +
+                            "</div>" +
+                            "<span class=\"ms-accessible\"></span>" +
+                            "<div></div>" +
+                        "</a>" +
                     "</li>";
 
         protected void Page_Load(object sender, EventArgs e)
@@ -70,7 +60,7 @@ namespace EPMLiveCore
         private string BuildListItemHTML()
         {
             StringBuilder itemsHtml = new StringBuilder();
-            itemsHtml.Append("<ul class=\"ms-MenuUIUL\">");
+            itemsHtml.Append("<ul class=\"ms-core-menu-list\">");
             SPSite site = SPContext.Current.Site;
             SPWeb web = SPContext.Current.Web;
             SPList commonActionsList = web.Lists.TryGetList(COMMON_ACTIONS_LIST_NAME);

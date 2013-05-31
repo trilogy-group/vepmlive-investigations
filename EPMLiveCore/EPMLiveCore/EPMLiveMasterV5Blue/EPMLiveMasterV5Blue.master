@@ -267,6 +267,33 @@
                                     AccessKey=""
                                     ToolTip="Provide Feedback" />
                             </span>
+                            <span id="ms-myworkspace">
+                                <SharePoint:ThemedClusteredHoverImage
+                                    runat="server"
+                                    ID="ThemedClusteredHoverImage1"
+                                    ThemeKey="spintl"
+                                    TouchMode="true"
+                                    TouchModeWidth="30"
+                                    TouchModeHeight="30"
+                                    TouchModePaddingTop="7"
+                                    TouchModePaddingRight="7"
+                                    TouchModePaddingBottom="7"
+                                    TouchModePaddingLeft="7"
+                                    ImageUrl="/_layouts/epmlive/images/epmlive-header.png"
+                                    Width="16"
+                                    Height="16"
+                                    OffsetX="16"
+                                    OffsetY="20"
+                                    HoverOffsetX="67"
+                                    HoverOffsetY="20"
+                                    NavigateUrl="#"
+                                    rel="tooltipbottom"
+                                    onclick="PopupWorkspaceListWP();return false"
+                                    AlternateText=""
+                                    AccessKey=""
+                                    ToolTip="My Workspaces" />
+
+                            </span>
                             
                             <span class="ms-siteactions-root" id="siteactiontd">
                                 <SharePoint:SiteActions runat="server" accesskey="<%$Resources:wss,tb_SiteActions_AK%>" id="SiteActionsMenuMain"
@@ -586,6 +613,14 @@
   </SharePoint:AjaxDelta>
 </h1>
 			</div>
+            <div style="height:70px;width:250px;float:right">
+                <div style="width:35px;height:70px;float:right;margin-right:15px;">
+                    <epm:BtnCommonActions runat="server"></epm:BtnCommonActions>
+                </div>
+                <div style="width:35px;height:70px;float:right;margin-right:15px;">
+                    <epm:BtnCreateNew runat="server"></epm:BtnCreateNew>
+                </div>
+            </div>
 			
 		</div>
 		<div
