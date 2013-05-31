@@ -1117,19 +1117,12 @@ function registerEpmLiveResourceGridScript() {
                                     if (tabs.hasOwnProperty(tab)) {
                                         var t = tabs[tab];
 
-                                        var rule = 'height: 33px !important; margin-top: -4px !important';
-                                        var style = rule;
-                                        
-                                        if (t.attr('aria-selected') === 'true') {
-                                            style += ' border-top: 1px solid #E1E1E1 !important;';
-                                        }
-                                        
-                                        t.attr('style', style);
+                                        t.attr('style', 'border-top: 1px solid #E1E1E1 !important; height: 33px !important; margin-top: -4px !important');
                                         t.find('a').attr('style', 'padding-top: 4px !important;');
-
-                                        t.hover(function() {
-                                            $(this).attr('style', rule + ' border: 1px solid #E1E1E1 !important; border-bottom: none !important;');
-                                        });
+                                        
+                                        if (t.attr('aria-selected') === 'false') {
+                                            t.attr('style', 'height: 33px !important; margin-top: -4px !important');
+                                        }
                                     }
                                 }
                             } catch (ex) {
