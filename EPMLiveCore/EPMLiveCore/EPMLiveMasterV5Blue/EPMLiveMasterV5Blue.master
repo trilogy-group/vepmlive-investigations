@@ -693,10 +693,10 @@
 				</div>
 		</div>
 		<div style="height:70px;width:250px;float:right;position:relative;margin-top:-72px;">
-                <div style="width:35px;height:70px;float:right;margin-right:20px;">
+                <div style="width:35px;height:70px;float:right;margin-right:20px;" title="Common Actions">
                     <epm:BtnCommonActions runat="server"></epm:BtnCommonActions>
                 </div>
-                <div style="width:35px;height:70px;float:right;margin-right:20px;">
+                <div style="width:35px;height:70px;float:right;margin-right:20px;" title="Create New">
                     <epm:BtnCreateNew runat="server"></epm:BtnCreateNew>
                 </div>
             </div>
