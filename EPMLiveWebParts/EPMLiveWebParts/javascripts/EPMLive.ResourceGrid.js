@@ -1126,7 +1126,7 @@ function registerEpmLiveResourceGridScript() {
                                 }
                             } catch(ex) {
                             }
-                        }, 100);
+                        }, 2000);
                     };
 
                     var pm = SP.Ribbon.PageManager.get_instance();
