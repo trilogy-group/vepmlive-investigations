@@ -16,39 +16,40 @@ namespace EPMLiveReportsAdmin.API
 {
     public class ReportManager : BaseManager, IDisposable
     {
-        #region Fields (1) 
+        #region Fields (1)
 
         private ReportingService2006 _reportingService2006;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Constructors (2) 
+        #region Constructors (2)
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReportManager"/> class.
+        ///     Initializes a new instance of the <see cref="ReportManager" /> class.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
-        public ReportManager(SPWeb spWeb) : base(spWeb)
+        public ReportManager(SPWeb spWeb)
+            : base(spWeb)
         {
         }
 
         /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="ReportManager"/> is reclaimed by garbage collection.
+        ///     Releases unmanaged resources and performs other cleanup operations before the
+        ///     <see cref="ReportManager" /> is reclaimed by garbage collection.
         /// </summary>
         ~ReportManager()
         {
             Dispose(false);
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Methods (5) 
+        #region Methods (5)
 
         // Public Methods (1) 
 
         /// <summary>
-        /// Gets all reports.
+        ///     Gets all reports.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -91,7 +92,7 @@ namespace EPMLiveReportsAdmin.API
         // Private Methods (4) 
 
         /// <summary>
-        /// Builds the report query string.
+        ///     Builds the report query string.
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <returns></returns>
@@ -101,7 +102,8 @@ namespace EPMLiveReportsAdmin.API
 
             bool hasResourcesParam = false;
 
-            foreach (ReportParameter reportParameter in _reportingService2006.GetReportParameters(url, null, null, null))
+            foreach (ReportParameter reportParameter in _reportingService2006.GetReportParameters(url, null, null, null)
+                )
             {
                 string name = reportParameter.Name;
                 if (string.IsNullOrEmpty(reportParameter.Prompt))
@@ -135,7 +137,7 @@ namespace EPMLiveReportsAdmin.API
         }
 
         /// <summary>
-        /// Builds the report tree.
+        ///     Builds the report tree.
         /// </summary>
         /// <param name="parentFolder">The parent folder.</param>
         /// <param name="spFolders">The sp folders.</param>
@@ -157,20 +159,39 @@ namespace EPMLiveReportsAdmin.API
                 string name = spFile.Name;
 
                 string safeServerRelativeUrl = Web.SafeServerRelativeUrl();
-                string reportUrl = BuildReportQueryString(SPUrlUtility.CombineUrl(Web.Url, spListItem.Url));
+                string url = string.Empty;
+                string hasResourcesParam = string.Empty;
+                string error = string.Empty;
 
-                var reportUrlParts = reportUrl.Split('|');
+                try
+                {
+                    string reportUrl = BuildReportQueryString(SPUrlUtility.CombineUrl(Web.Url, spListItem.Url));
+                    string[] reportUrlParts = reportUrl.Split('|');
 
-                string url =
-                    string.Format(
-                        @"{0}/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl={1}{2}&rv:HeaderArea=none",
-                        safeServerRelativeUrl,
-                        HttpUtility.UrlEncode(string.Format(@"{0}/{1}", safeServerRelativeUrl, spListItem.Url)),
-                        reportUrlParts[0]);
+                    url =
+                        string.Format(
+                            @"{0}/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl={1}{2}&rv:HeaderArea=none",
+                            safeServerRelativeUrl,
+                            HttpUtility.UrlEncode(string.Format(@"{0}/{1}", safeServerRelativeUrl, spListItem.Url)),
+                            reportUrlParts[0]);
 
-                xElement.Add(new XElement("Report", new XAttribute("Name", name.Substring(0, name.Length - 4)),
-                                          new XAttribute("Url", url),
-                                          new XAttribute("HasResourcesParam", reportUrlParts[1])));
+                    hasResourcesParam = reportUrlParts[1];
+                }
+                catch (Exception ex)
+                {
+                    error = ex.Message;
+                }
+
+                var element = new XElement("Report", new XAttribute("Name", name.Substring(0, name.Length - 4)),
+                                           new XAttribute("Url", url),
+                                           new XAttribute("HasResourcesParam", hasResourcesParam));
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    element.Add(new XElement("Error", new XCData(error)));
+                }
+
+                xElement.Add(element);
             }
 
             foreach (
@@ -185,7 +206,7 @@ namespace EPMLiveReportsAdmin.API
         }
 
         /// <summary>
-        /// Configures the reporting service.
+        ///     Configures the reporting service.
         /// </summary>
         private void ConfigureReportingService()
         {
@@ -219,10 +240,10 @@ namespace EPMLiveReportsAdmin.API
             try
             {
                 _reportingService2006 = new ReportingService2006
-                {
-                    UseDefaultCredentials = true,
-                    Url = string.Format("{0}/ReportService2006.asmx", reportingServiceUrl)
-                };
+                    {
+                        UseDefaultCredentials = true,
+                        Url = string.Format("{0}/ReportService2006.asmx", reportingServiceUrl)
+                    };
             }
             catch (Exception)
             {
@@ -249,9 +270,11 @@ namespace EPMLiveReportsAdmin.API
         }
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources
+        ///     Releases unmanaged and - optionally - managed resources
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        /// <param name="disposing">
+        ///     <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.
+        /// </param>
         private void Dispose(bool disposing)
         {
             if (!disposing) return;
@@ -262,12 +285,12 @@ namespace EPMLiveReportsAdmin.API
             _reportingService2006 = null;
         }
 
-        #endregion Methods 
+        #endregion Methods
 
         #region Implementation of IDisposable
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
