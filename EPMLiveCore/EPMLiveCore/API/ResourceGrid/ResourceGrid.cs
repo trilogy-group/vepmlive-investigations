@@ -796,7 +796,7 @@ namespace EPMLiveCore.API
 					iElement.Add(new XAttribute("ResourceID", resourceId));
 					iElement.Add(new XAttribute("ProfilePic",
 												string.Format(
-													@"<div style=""width:100%;height:50px;text-align:center;padding-top:2.5px;padding-bottom:2.5px;"">
+                                                    @"<div style=""width:100%;height:50px;text-align:center;padding-top:2.5px;padding-bottom:2.5px;"" class=""EPMLiveResourceGridPicture"">
 															  <img src=""{0}"" height=""50""/>
 														  </div>",
 													profilePic)));
