@@ -297,7 +297,11 @@ function registerEpmLiveResourceGridScript() {
             },
 
             rowsSelected: function() {
-                return $$.grid.grids[$$.id()].GetSelRows().length;
+                try {
+                    return $$.grid.grids[$$.id()].GetSelRows().length;
+                } catch(e) {
+                    return 0;
+                }
             },
 
             resourceUpdated: function(result, target, params) {
