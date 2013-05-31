@@ -13,14 +13,16 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>EPM Live Deployment</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
-    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"</PostDeploymentCommand>
+    <PreDeploymentCommand>
+    </PreDeploymentCommand>
+    <PostDeploymentCommand>
+    </PostDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -1153,6 +1156,21 @@
     <Content Include="Layouts\epmlive\images\BubbleChart\YAxisIcon.png" />
     <Content Include="Layouts\epmlive\images\BubbleChart\ZAxisColorIcon.png" />
     <Content Include="Layouts\epmlive\images\BubbleChart\ZAxisIcon.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\Area.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\AreaClustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\Bar.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\Bar100.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\BarClustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\BarStacked.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\bubble.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\column.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\column100.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\columnclustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\columnstacked.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\donut.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\line.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\lineclustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\pie.png" />
     <Content Include="Layouts\epmlive\images\costanalyzer.png" />
     <Content Include="Layouts\epmlive\images\costanalyzer16.png" />
     <Content Include="Layouts\epmlive\images\DisplayProfilePicture\DefaultProfilePic.png" />

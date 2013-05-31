@@ -30,6 +30,7 @@ using System.Data.SqlClient;
 
 namespace EPMLiveWebParts
 {
+    [MdsCompliant(true)]
     [ToolboxData("<{0}:GridViewWebpart runat=server></{0}:GridViewWebpart>")]
     [Guid("f816bcc6-82de-4bb6-98aa-408dd07bf62c")]
     [XmlRoot(Namespace = "GridListView")]
@@ -37,6 +38,8 @@ namespace EPMLiveWebParts
     {
         private IReportID _myProvider;
 
+        private DateTime StartDate;
+        private DateTime FinishDate;
 
         private bool inEditMode = false;
         private bool titlefound = false;
@@ -1810,17 +1813,18 @@ namespace EPMLiveWebParts
 
             //ScriptManager.RegisterClientScriptInclude(Page, this.GetType(), "dhtmlxcommon.js", "");
             //ScriptManager.RegisterClientScriptInclude(Page, this.GetType(), "dhtmlxgrid.js", "/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js");
-            
+            FinishDate = DateTime.Now;
         }
 
         protected override void OnLoad(EventArgs e)
         {
+            StartDate = DateTime.Now;
             sFullGridId = this.ZoneIndex + this.ZoneID;
         }
 
         protected override void CreateChildControls()
         {
-
+            
             
             if(SPContext.Current.ViewContext.View != null)
             {
@@ -1949,7 +1953,7 @@ namespace EPMLiveWebParts
             peSingle.MultiSelect = false;
             peSingle.ID = "userpickersingle";
             this.Controls.Add(peSingle);
-
+            
         }
 
 
@@ -2213,8 +2217,8 @@ namespace EPMLiveWebParts
 
                     //buildParams();
                     //string switchto = "";
-                    
-                    
+
+
 
                     if (view != null)
                     {
@@ -2301,7 +2305,7 @@ namespace EPMLiveWebParts
                     output.WriteLine(".ms-splitbuttonhover .ms-splitbuttondropdown { border: none !important; padding-right: 2px !important;}");
                     output.WriteLine(".ms-splitbuttonhover .ms-splitbuttontext { border: none !important; border-bottom: #FFFFFF 1px solid !important; padding-left: 0px !important; padding-right: 7px !important; }");
                     output.WriteLine(".ms-list-addnew-imgSpan20 { width: 23px !important; height: 24px !important}");
-                    
+
                     output.WriteLine("</style>");
 
                     if (list != null && view != null)
@@ -2341,13 +2345,13 @@ namespace EPMLiveWebParts
                                     toolbar.Controls[0].Controls[1].Controls[0].Controls.AddAt(toolbar.Controls[0].Controls[1].Controls[0].Controls.Count - 1, pnl);
                                 }
                                 //<asp:Panel runat="server" id="pnlFilter"><table border="0" cellpadding="0" cellspacing="0"><tr><td class="ms-toolbar" nowrap="true"><div class="ms-buttoninactivehover" onmouseover="this.className='ms-buttonactivehover'" onmouseout="this.className='ms-buttoninactivehover'"><asp:Label id="lblFilter" runat="server"/><img align='absmiddle' alt="" src="/_layouts/images/filter.gif" style='border-width:0px;'>&nbsp;<asp:Label id="lblFilterText" runat="server" Text="Show Filters"/></a></div></td></tr></table></asp:Panel>
-                                
+
                                 toolbar.RenderControl(output);
                             }
                             catch { }
                         }
 
-                        if(hasList)
+                        if (hasList)
                         {
                             output.WriteLine("<script language=\"javascript\">");
                             output.WriteLine("function newAppPopup(list, itemid){");
@@ -2402,9 +2406,9 @@ namespace EPMLiveWebParts
                         //    renderGantt(output, web);
                     }
 
-                    
 
-                    
+
+
                 }
             }
             catch (Exception ex)
@@ -2412,7 +2416,18 @@ namespace EPMLiveWebParts
                 output.Write("Error (Render WebPart): " + ex.Message);
             }
 
+            //writetime(output);
         }
+
+        private void writetime(HtmlTextWriter output)
+        {
+            {
+                TimeSpan ts = FinishDate - StartDate;
+
+                output.WriteLine(ts.TotalMilliseconds);
+            }
+        }
+
         private void HideListView()
         {
             if(SPContext.Current.ViewContext.View != null)

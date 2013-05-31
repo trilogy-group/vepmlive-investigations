@@ -5,6 +5,8 @@ using System.Data.SqlClient;
 using System.Security.Permissions;
 using System.Security.Principal;
 using System.Runtime.InteropServices;
+using System.Web;
+using System.Net;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
@@ -30,6 +32,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //if (!SPContext.Current.Web.CurrentUser.IsSiteAdmin)
             //    Response.Redirect("../accessdenied.aspx");
 
+            
             if (!IsPostBack)
             {
                 step = 1;
@@ -620,6 +623,33 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         SSRS.Credentials = new System.Net.NetworkCredential(username, password);
                     }
                 }
+
+
+                /*System.Web.HttpCookie tCookie = System.Web.HttpContext.Current.Response.Cookies["WSS_KeepSessionAuthenticated"];
+
+                System.Net.Cookie oC = new System.Net.Cookie();
+
+                // Convert between the System.Net.Cookie to a System.Web.HttpCookie...
+                oC.Domain = System.Web.HttpContext.Current.Request.Url.Host;
+                oC.Expires = tCookie.Expires;
+                oC.Name = tCookie.Name;
+                oC.Path = tCookie.Path;
+                oC.Secure = tCookie.Secure;
+                oC.Value = tCookie.Value;
+                 
+                SSRS.CookieContainer = new System.Net.CookieContainer();
+
+                SSRS.CookieContainer.Add(oC);
+                */
+
+
+                var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
+
+                var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
+                SSRS.CookieContainer =
+
+                new CookieContainer();
+                SSRS.CookieContainer.Add(fedAuth);
 
                 SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
 
