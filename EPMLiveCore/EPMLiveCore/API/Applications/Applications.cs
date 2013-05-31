@@ -1198,10 +1198,10 @@ namespace EPMLiveCore.API
                     SPFile fDefault = web.RootFolder.Files["Default.aspx"];
                     if(fDefault.Exists)
                     {
-                        fDefault.CopyTo(cleanTitle + ".aspx", true);
+                        fDefault.CopyTo("SitePages/" + cleanTitle + ".aspx", true);
                     }
 
-                    li["HomePage"] = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/" + cleanTitle + ".aspx";
+                    li["HomePage"] = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/SitePages/" + cleanTitle + ".aspx";
                     li.Update();
 
 
@@ -1245,7 +1245,7 @@ namespace EPMLiveCore.API
                         {
                             ArrayList arrNav = new ArrayList();
 
-                            SPNavigationNode newnav = new SPNavigationNode("Home", cleanTitle + ".aspx");
+                            SPNavigationNode newnav = new SPNavigationNode("Home", "SitePages/" +cleanTitle + ".aspx");
                             web.Navigation.QuickLaunch.AddAsFirst(newnav);
 
                             arrNav.Add(newnav.Id.ToString());

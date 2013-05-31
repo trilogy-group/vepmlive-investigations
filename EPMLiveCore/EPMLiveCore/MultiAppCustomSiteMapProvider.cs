@@ -33,7 +33,7 @@ namespace EPMLiveCore
                 List<int> appGlobalNodeIds = null;
                 SiteMapNodeCollection result = new SiteMapNodeCollection();
                 SiteMapNodeCollection childNodes = base.GetChildNodes(node);
-
+                
                 //if (HttpContext.Current.Request.Cookies["CurrentAppId_" + _webId.ToString("N")] != null)
                 //{
                 //    HttpCookie cookieAppId = HttpContext.Current.Request.Cookies["CurrentAppId_" + _webId.ToString("N")];
@@ -157,7 +157,7 @@ namespace EPMLiveCore
 
         //    return quickLaunchNode != null;
         //}
-
+        
         private List<string> GetUserGroups(SPUser user)
         {
             List<string> result = new List<string>();

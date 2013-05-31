@@ -23,7 +23,7 @@ namespace EPMLiveCore.API
             bool add = false;
             bool upd = false;
             
-            SPEventReceiverDefinitionCollection eventColl = list.EventReceivers;
+            SPEventReceiverDefinitionCollection eventColl = list.EventReceivers; 
 
             foreach(SPEventReceiverDefinition eventDef in eventColl)
             {

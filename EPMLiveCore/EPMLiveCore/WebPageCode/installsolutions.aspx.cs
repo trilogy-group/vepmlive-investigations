@@ -48,6 +48,7 @@ namespace EPMLiveCore
         {
             SPSolution sol = farm.Solutions[Solution];
             SPContext.Current.Web.AllowUnsafeUpdates = true;
+            
             SPContext.Current.Site.AllowUnsafeUpdates = true;
             sol.Deploy(DateTime.Now, true, apps, true);
             

@@ -1190,12 +1190,13 @@ namespace EPMLiveCore
 
                 // Add EPMLive custom entity picker control to 
                 // lookup fields
-
-                foreach (SPField f in Fields)
+                if (Fields != null)
                 {
-                    AddTypeAheadFieldControls(f);
+                    foreach (SPField f in Fields)
+                    {
+                        AddTypeAheadFieldControls(f);
+                    }
                 }
-
                 //AddEntityPickersToLookups();
             }
             else
