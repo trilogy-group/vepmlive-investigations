@@ -801,7 +801,7 @@ function GetData() {
 
             if (comment !== undefined) {
                 var orginalComment = comment;
-                comment = escape(comment);
+                
                 var dataXml = '<Data><Param key="ListId">' + listId + '</Param><Param key="ItemId">' + itemId + '</Param><Param key="Comment"><![CDATA[' + comment + ']]></Param></Data>';
 
                 $.ajax({
