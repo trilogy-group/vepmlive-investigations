@@ -41,8 +41,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
             if (ClientScript.IsStartupScriptRegistered("CloseDialog")) return;
             
             var javascript = @"
-                                //ExecuteOrDelayUntilScriptLoaded(closeModal, ""sp.js"");                                
-                                
                                 SP.SOD.executeFunc('sp.js', 'SP.ClientContext', closeModal);
                                 
                                 function closeModal(){                                
@@ -64,8 +62,16 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             var indexForGettingEverythingAfterPipe = loginName.IndexOf("|") + 1;
             var loginNameWithDomain = loginName.Mid(indexForGettingEverythingAfterPipe);
+
             var indexForGettingEverythingAfterDomain = loginNameWithDomain.IndexOf("\\") + 1;
             var loginNameWithoutDomain = loginNameWithDomain.Mid(indexForGettingEverythingAfterDomain);
+
+            if (loginNameWithoutDomain.Contains("|"))
+            {
+                var indexForAdditionalPipe = loginNameWithoutDomain.IndexOf("|") + 1;
+                var loginNameWithOutExtraPipe = loginNameWithoutDomain.Mid(indexForAdditionalPipe);
+                loginNameWithoutDomain = loginNameWithOutExtraPipe;
+            }
 
             return loginNameWithoutDomain;
         }
@@ -178,9 +184,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             return string.Format("{0}/{1}/{2}", SPContext.Current.Site.RootWeb.Url, ProfilePictureLibraryName, fileName);
         }
 
-        private static void DeleteExistingPicturesForUser(SPFolder pictureDocumentLibrary)
+        private void DeleteExistingPicturesForUser(SPFolder pictureDocumentLibrary)
         {
-            var userName = EPMLiveCore.CoreFunctions.GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName, SPContext.Current.Site);
+            var userName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
             var picturesToDelete = new List<SPFile>();
             
             foreach (SPFile file in pictureDocumentLibrary.Files)
