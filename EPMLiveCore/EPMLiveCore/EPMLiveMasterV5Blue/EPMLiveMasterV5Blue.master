@@ -433,7 +433,7 @@
                         <div id="welcomeMenuBox"> 	
                         	<wssuc:Welcome id="IdWelcome" runat="server" EnableViewState="false" />
                         </div>
-                        <div id="Div1"> 					
+                        <div id="changeApp" style="display:inline-block;font-size:1em;height:30px;vertical-align: top;">                                                                              				
                                 <epm:BtnChangeApp ID="BtnChangeApp1" runat="server"></epm:BtnChangeApp>				
                         </div>
                     </SharePoint:AjaxDelta>
