@@ -355,7 +355,6 @@ function registerEpmLiveResourceGridScript() {
                                 }, 10);
 
                                 if (changeType === 'Added') {
-                                    $('#s4-workspace').animate({ scrollTop: $('#' + grid.id).height() }, 'slow');
                                     $$.actions.reIndexResources();
                                 }
                             } catch(e) {
