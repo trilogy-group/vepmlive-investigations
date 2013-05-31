@@ -2135,3 +2135,17 @@ SliderRangeTextDiv{
     z-index: 0!important; 
 }
 
+.ms-cui-ctl-large {
+    text-decoration:none !important;
+}
+.ms-cui-ctl-lowerlarge {
+    text-decoration:none !important;
+}
+
+a.ms-cui-ctl-large:hover * {
+    text-decoration: none !important;
+}
+
+a.ms-cui-ctl-lowerlarge:hover * {
+    text-decoration: none !important;
+}
