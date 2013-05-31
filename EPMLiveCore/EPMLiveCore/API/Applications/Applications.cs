@@ -1504,7 +1504,7 @@ namespace EPMLiveCore.API
                                 versionInfo = "/VERSION_" + versionInfo;
                             }
 
-                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
+                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
                             string sXml = "";
                             appDef.url = rootFilePath;
                             appDef.Title = getAttribute(ndChild, "ows_Title");
