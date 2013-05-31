@@ -205,7 +205,7 @@ namespace EPMLiveCore.API
 				else if (type.Equals("Boolean"))
 				{
 					value =
-						(bool.Parse(dataElement.Value) ? 1 : 0).ToString(CultureInfo.InvariantCulture);
+                        (dataElement.Value.ToBool() ? 1 : 0).ToString(CultureInfo.InvariantCulture);
 				}
 			}
 
@@ -666,7 +666,7 @@ namespace EPMLiveCore.API
 														profilePic)));
 
 						iElement.Add(new XAttribute("IsMyResource",
-													bool.Parse(resourceElement.Attribute("IsMyResource").Value) ? 1 : 0));
+                                                    resourceElement.Attribute("IsMyResource").Value.ToBool() ? 1 : 0));
 
 						bElement.Add(iElement);
 					}
@@ -1038,13 +1038,13 @@ namespace EPMLiveCore.API
 						XElement includeHiddenElement = rootElement.Element("IncludeHidden");
 						if (includeHiddenElement != null)
 						{
-							includeHidden = bool.Parse(includeHiddenElement.Value);
+                            includeHidden = includeHiddenElement.Value.ToBool();
 						}
 
 						XElement includeReadOnlyElement = rootElement.Element("IncludeReadOnly");
 						if (includeReadOnlyElement != null)
 						{
-							includeReadOnly = bool.Parse(includeReadOnlyElement.Value);
+                            includeReadOnly = includeReadOnlyElement.Value.ToBool();
 						}
 					}
 
