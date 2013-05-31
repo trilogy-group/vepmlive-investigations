@@ -1117,15 +1117,19 @@ function registerEpmLiveResourceGridScript() {
                                     if (tabs.hasOwnProperty(tab)) {
                                         var t = tabs[tab];
 
-                                        var style = 'height: 33px !important; margin-top: -4px !important';
+                                        var rule = 'height: 33px !important; margin-top: -4px !important';
+                                        var style = rule;
                                         
                                         if (t.attr('aria-selected') === 'true') {
                                             style += ' border-top: 1px solid #E1E1E1 !important;';
                                         }
                                         
                                         t.attr('style', style);
-
                                         t.find('a').attr('style', 'padding-top: 4px !important;');
+
+                                        t.hover(function() {
+                                            $(this).attr('style', rule + ' border: 1px solid #E1E1E1 !important; border-bottom: none !important;');
+                                        });
                                     }
                                 }
                             } catch (ex) {
