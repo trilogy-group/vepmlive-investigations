@@ -45,7 +45,6 @@
                         $('#divLoading').css('display', 'none');
                         $('.GSText').css('cursor', 'pointer');
                         $('.GSNC').css('cursor', 'default');
-                        $('#contentBox').css('margin-left', '0px !important');
                     }
 
                     Grids.OnClick = function (grid, row, col, x, y, evt) {
