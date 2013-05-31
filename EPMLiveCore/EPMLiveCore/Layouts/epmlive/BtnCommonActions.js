@@ -44,34 +44,34 @@ function ToggleCommonActionsMenu() {
             document.getElementById('divCommonActionsMenu').style.display = "none";
         }
         else {
-            document.getElementById('divCommonActionsMenu').style.display = "inline";
+            document.getElementById('divCommonActionsMenu').style.display = "";
         }
     }
 
-    document.getElementById('divCommonActionsMenu').style.display = "inline";
+    document.getElementById('divCommonActionsMenu').style.display = "";
 
-    if ((GetFullLeft(document.getElementById('lnkCommonActions')) + document.getElementById('divCommonActionsMenu').offsetWidth) > pageWidth()) {
-        var differenceInWidth = document.getElementById('divCommonActionsMenu').offsetWidth - document.getElementById('lnkCommonActions').offsetWidth;
-        document.getElementById('divCommonActionsMenu').style.left = (GetFullLeft(document.getElementById('lnkCommonActions')) - differenceInWidth) + "px";
-    }
-    else {
-        document.getElementById('divCommonActionsMenu').style.left = GetFullLeft(document.getElementById('lnkCommonActions')) + "px";
-    }
+    //if ((GetFullLeft(document.getElementById('lnkCommonActions')) + document.getElementById('divCommonActionsMenu').offsetWidth) > pageWidth()) {
+    //    var differenceInWidth = document.getElementById('divCommonActionsMenu').offsetWidth - document.getElementById('lnkCommonActions').offsetWidth;
+    //    document.getElementById('divCommonActionsMenu').style.left = (GetFullLeft(document.getElementById('lnkCommonActions')) - differenceInWidth) + "px";
+    //}
+    //else {
+    //    document.getElementById('divCommonActionsMenu').style.left = GetFullLeft(document.getElementById('lnkCommonActions')) + "px";
+    //}
 
-    //document.getElementById('divCommonActionsMenu').style.top = (GetFullTop(document.getElementById('lnkCommonActions')) + document.getElementById('lnkCommonActions').offsetHeight) + "px";
-    document.getElementById('divCommonActionsMenu').style.top = (GetFullTop(document.getElementById('lnkCommonActions')) - document.getElementById('lnkCommonActions').offsetHeight) + 6 + "px";
-    //var tempTop = document.getElementById('divCommonActionsMenu').style.top.replace('px', '');
-    var tempTop = tempTop = document.getElementById('lnkCommonActions').offsetTop + document.getElementById('lnkCommonActions').offsetHeight;
+    ////document.getElementById('divCommonActionsMenu').style.top = (GetFullTop(document.getElementById('lnkCommonActions')) + document.getElementById('lnkCommonActions').offsetHeight) + "px";
+    //document.getElementById('divCommonActionsMenu').style.top = (GetFullTop(document.getElementById('lnkCommonActions')) - document.getElementById('lnkCommonActions').offsetHeight) + 11 + "px";
+    ////var tempTop = document.getElementById('divCommonActionsMenu').style.top.replace('px', '');
+    //var tempTop = tempTop = document.getElementById('lnkCommonActions').offsetTop + document.getElementById('lnkCommonActions').offsetHeight;
 
-    if ((parseInt(tempTop) + document.getElementById('divCommonActionsMenu').offsetHeight) > pageHeight()) {
-        var newHeight = pageHeight() - (GetFullTop(document.getElementById('lnkCommonActions')) + document.getElementById('lnkCommonActions').offsetHeight);
-        document.getElementById('divCommonActionsMenu').style.height = newHeight + "px";
-    }
-    else {
-        document.getElementById('divCommonActionsMenu').style.height = "auto";
-    }
+    //if ((parseInt(tempTop) + document.getElementById('divCommonActionsMenu').offsetHeight) > pageHeight()) {
+    //    var newHeight = pageHeight() - (GetFullTop(document.getElementById('lnkCommonActions')) + document.getElementById('lnkCommonActions').offsetHeight);
+    //    document.getElementById('divCommonActionsMenu').style.height = newHeight + "px";
+    //}
+    //else {
+    //    document.getElementById('divCommonActionsMenu').style.height = "auto";
+    //}
 
-    document.getElementById('divCommonActionsMenu').style.top = tempTop + "px";
+    //document.getElementById('divCommonActionsMenu').style.top = tempTop + "px";
 }
 
 function clickedOutsideElement(elemId, event) {

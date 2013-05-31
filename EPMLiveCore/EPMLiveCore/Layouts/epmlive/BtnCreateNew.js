@@ -44,31 +44,31 @@ function ToggleCreateNewMenu() {
             document.getElementById('divCreateNewMenu').style.display = "none";
         }
         else {
-            document.getElementById('divCreateNewMenu').style.display = "inline";
+            document.getElementById('divCreateNewMenu').style.display = "";
         }
     }
-    document.getElementById('divCreateNewMenu').style.display = "inline";
-    if ((GetFullLeft(document.getElementById('lnkCreateNew')) + document.getElementById('divCreateNewMenu').offsetWidth) > pageWidth()) {
-        var differenceInWidth = document.getElementById('divCreateNewMenu').offsetWidth - document.getElementById('lnkCreateNew').offsetWidth;
-        document.getElementById('divCreateNewMenu').style.left = (GetFullLeft(document.getElementById('lnkCreateNew')) - differenceInWidth) + "px";
-    }
-    else {
-        document.getElementById('divCreateNewMenu').style.left = GetFullLeft(document.getElementById('lnkCreateNew')) + "px";
-    }
-    //document.getElementById('divCreateNewMenu').style.top = (GetFullTop(document.getElementById('spnCreateNew')) + document.getElementById('spnCreateNew').offsetHeight) + "px";
-    document.getElementById('divCreateNewMenu').style.top = (GetFullTop(document.getElementById('lnkCreateNew')) - document.getElementById('lnkCreateNew').offsetHeight) + 6 + "px";
+    //document.getElementById('divCreateNewMenu').style.display = "inline";
+    //if ((GetFullLeft(document.getElementById('lnkCreateNew')) + document.getElementById('divCreateNewMenu').offsetWidth) > pageWidth()) {
+    //    var differenceInWidth = document.getElementById('divCreateNewMenu').offsetWidth - document.getElementById('lnkCreateNew').offsetWidth;
+    //    document.getElementById('divCreateNewMenu').style.left = (GetFullLeft(document.getElementById('lnkCreateNew')) - differenceInWidth) + "px";
+    //}
+    //else {
+    //    document.getElementById('divCreateNewMenu').style.left = GetFullLeft(document.getElementById('lnkCreateNew')) + "px";
+    //}
+    ////document.getElementById('divCreateNewMenu').style.top = (GetFullTop(document.getElementById('spnCreateNew')) + document.getElementById('spnCreateNew').offsetHeight) + "px";
+    //document.getElementById('divCreateNewMenu').style.top = (GetFullTop(document.getElementById('lnkCreateNew')) - document.getElementById('lnkCreateNew').offsetHeight) + 11 + "px";
     
-    //var tempTop = document.getElementById('divCreateNewMenu').style.top.replace('px', '');
-    var tempTop = tempTop = document.getElementById('lnkCreateNew').offsetTop + document.getElementById('lnkCreateNew').offsetHeight;
+    ////var tempTop = document.getElementById('divCreateNewMenu').style.top.replace('px', '');
+    //var tempTop = tempTop = document.getElementById('lnkCreateNew').offsetTop + document.getElementById('lnkCreateNew').offsetHeight;
 
-    if ((parseInt(tempTop) + document.getElementById('divCreateNewMenu').offsetHeight) > pageHeight()) {
-        var newHeight = pageHeight() - (GetFullTop(document.getElementById('lnkCreateNew')) + document.getElementById('lnkCreateNew').offsetHeight);
-        document.getElementById('divCreateNewMenu').style.height = newHeight + "px";
-    }
-    else {
-        document.getElementById('divCreateNewMenu').style.height = "auto";
-    }
-    document.getElementById('divCreateNewMenu').style.top = tempTop + "px";
+    //if ((parseInt(tempTop) + document.getElementById('divCreateNewMenu').offsetHeight) > pageHeight()) {
+    //    var newHeight = pageHeight() - (GetFullTop(document.getElementById('lnkCreateNew')) + document.getElementById('lnkCreateNew').offsetHeight);
+    //    document.getElementById('divCreateNewMenu').style.height = newHeight + "px";
+    //}
+    //else {
+    //    document.getElementById('divCreateNewMenu').style.height = "auto";
+    //}
+    //document.getElementById('divCreateNewMenu').style.top = tempTop + "px";
 }
 
 function clickedOutsideElement(elemId, event) {
