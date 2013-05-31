@@ -262,13 +262,13 @@
                                     HoverOffsetY="20"
                                     NavigateUrl="#"
                                     rel="tooltipbottom"
-                                    onclick="UserVoice.showPopupWidget();return false"
+                                    onclick="UserVoice.showPopupWidget();return false;"
                                     AlternateText=""
                                     AccessKey=""
                                     ToolTip="Provide Feedback" />
                             </span>
                             <span id="ms-myworkspace">
-                                <SharePoint:ThemedClusteredHoverImage
+                                <epm:SiteNavigationRibbonButton
                                     runat="server"
                                     ID="ThemedClusteredHoverImage1"
                                     ThemeKey="spintl"
@@ -282,13 +282,13 @@
                                     ImageUrl="/_layouts/epmlive/images/epmlive-header.png"
                                     Width="16"
                                     Height="16"
-                                    OffsetX="16"
-                                    OffsetY="20"
-                                    HoverOffsetX="67"
-                                    HoverOffsetY="20"
+                                    OffsetX="366"
+                                    OffsetY="24"
+                                    HoverOffsetX="313"
+                                    HoverOffsetY="24"
                                     NavigateUrl="#"
                                     rel="tooltipbottom"
-                                    onclick="PopupWorkspaceListWP();return false"
+                                    onclick="PopupWorkspaceListWP();return false;"
                                     AlternateText=""
                                     AccessKey=""
                                     ToolTip="My Workspaces" />
