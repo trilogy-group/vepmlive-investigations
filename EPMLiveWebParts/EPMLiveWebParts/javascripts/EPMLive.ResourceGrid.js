@@ -1108,6 +1108,25 @@ function registerEpmLiveResourceGridScript() {
                 SP.SOD.executeOrDelayUntilScriptLoaded(function() {
                     var selectTab = function(tabId) {
                         window._ribbonStartInit(tabId, false, null);
+
+                        window.setTimeout(function() {
+                            try {
+                                var tabs = [$(document.getElementById('Ribbon.ResourceGridTab-title')), $(document.getElementById('Ribbon.ResourceGridViewTab-title'))];
+
+                                for (var tab in tabs) {
+                                    if (tabs.hasOwnProperty(tab)) {
+                                        var t = tabs[tab];
+
+                                        t.css('border-top', '1px solid #E1E1E1 !important');
+                                        t.css('height', '33px !important');
+                                        t.css('margin-top', '-4px !important');
+
+                                        t.find('a').css('padding-top', '4px !important');
+                                    }
+                                }
+                            } catch(ex) {
+                            }
+                        }, 100);
                     };
 
                     var pm = SP.Ribbon.PageManager.get_instance();
