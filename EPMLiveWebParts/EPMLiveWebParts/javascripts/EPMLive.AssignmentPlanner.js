@@ -1398,7 +1398,7 @@
 
                     var options = {
                         url: '{0}/_layouts/epmlive/SelectDate.aspx'.format($$$.currentWebUrl),
-                        width: 250,
+                        width: 280,
                         height: 280,
                         title: 'Select {0} Date:'.format(type),
                         dialogReturnValueCallback: Function.createDelegate(null, $$.actions.updateDateRangeClosed)
