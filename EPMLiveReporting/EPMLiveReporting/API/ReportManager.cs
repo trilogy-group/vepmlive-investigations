@@ -244,6 +244,14 @@ namespace EPMLiveReportsAdmin.API
                         UseDefaultCredentials = true,
                         Url = string.Format("{0}/ReportService2006.asmx", reportingServiceUrl)
                     };
+                try
+                {
+                    var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
+                    var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
+                    _reportingService2006.CookieContainer = new CookieContainer();
+                    _reportingService2006.CookieContainer.Add(fedAuth);
+                }
+                catch { }
             }
             catch (Exception)
             {
