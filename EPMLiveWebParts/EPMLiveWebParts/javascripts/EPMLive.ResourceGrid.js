@@ -1111,20 +1111,30 @@ function registerEpmLiveResourceGridScript() {
 
                         window.setTimeout(function () {
                             try {
-                                var tabs = [$(document.getElementById('Ribbon.ResourceGridTab-title')), $(document.getElementById('Ribbon.ResourceGridViewTab-title'))];
+                                var setTabStyle = function() {
+                                    var tabs = [$(document.getElementById('Ribbon.ResourceGridTab-title')), $(document.getElementById('Ribbon.ResourceGridViewTab-title'))];
 
-                                for (var tab in tabs) {
-                                    if (tabs.hasOwnProperty(tab)) {
-                                        var t = tabs[tab];
+                                    for (var tab in tabs) {
+                                        if (tabs.hasOwnProperty(tab)) {
+                                            var t = tabs[tab];
 
-                                        t.attr('style', 'border-top: 1px solid #E1E1E1 !important; height: 33px !important; margin-top: -4px !important');
-                                        t.find('a').attr('style', 'padding-top: 4px !important;');
-                                        
-                                        if (t.attr('aria-selected') === 'false') {
-                                            t.attr('style', 'height: 33px !important; margin-top: -4px !important');
+                                            t.attr('style', 'border-top: 1px solid #E1E1E1 !important; height: 33px !important; margin-top: -4px !important');
+                                            t.find('a').attr('style', 'padding-top: 4px !important;');
+
+                                            if (t.attr('aria-selected') === 'false') {
+                                                t.attr('style', 'height: 33px !important; margin-top: -3px !important');
+                                            }
+
+                                            t.click(function() {
+                                                window.setTimeout(function() {
+                                                    setTabStyle();
+                                                }, 100);
+                                            });
                                         }
                                     }
-                                }
+                                };
+
+                                setTabStyle();
                             } catch (ex) {
                             }
                         }, 2000);
