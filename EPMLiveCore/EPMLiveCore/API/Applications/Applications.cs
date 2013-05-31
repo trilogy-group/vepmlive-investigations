@@ -1370,29 +1370,36 @@ namespace EPMLiveCore.API
                 string[] sCheckVersion = checkVersion.Split('.');
                 string[] sAssVersion = assVersion.Split('.');
 
-                if(int.Parse(sCheckVersion[0]) > int.Parse(sAssVersion[0]))
+                if(int.Parse(sCheckVersion[0]) < int.Parse(sAssVersion[0]))
                 {
-                    return false;
+                    return true;
                 }
-                else
+                else if(int.Parse(sCheckVersion[0]) == int.Parse(sAssVersion[0]))
                 {
-                    if(int.Parse(sCheckVersion[1]) > int.Parse(sAssVersion[1]))
+                    if (int.Parse(sCheckVersion[1]) < int.Parse(sAssVersion[1]))
                     {
-                        return false;
+                        return true;
                     }
-                    else
+                    else if (int.Parse(sCheckVersion[1]) == int.Parse(sAssVersion[1]))
                     {
-                        if(int.Parse(sCheckVersion[2]) > int.Parse(sAssVersion[2]))
+                        if (int.Parse(sCheckVersion[2]) <= int.Parse(sAssVersion[2]))
                         {
-                            return false;
+                            return true;
                         }
                         else
                         {
 
-                            return true;
-
+                            return false;
                         }
                     }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
             catch { }
