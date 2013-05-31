@@ -31,7 +31,7 @@
                      var loadListsAndViewsGrid = function () {
                          $(function () {
                              var grid = window.TreeGrid('<treegrid Data_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Data_Timeout="0" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Function="GetListsAndViewsGridData" Data_Param_Dataxml="<%= DataXml %>" Layout_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Layout_Timeout="0" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Function="GetListAndViewsGridLayout" Layout_Param_Dataxml="<%= LayoutXml %>" SuppressMessage="3" Debug="" ></treegrid>', 'ListsAndViewsGrid');
-                        });
+                         });
                     };
                     ExecuteOrDelayUntilScriptLoaded(loadListsAndViewsGrid, 'EPMLive.js');
 
@@ -43,6 +43,9 @@
                         $('#ListsAndViewsGrid').css('display', '');
                         $('#divButtons').css('display', '');
                         $('#divLoading').css('display', 'none');
+                        $('.GSText').css('cursor', 'pointer');
+                        $('.GSNC').css('cursor', 'default');
+                        $('#contentBox').css('margin-left', '0px !important');
                     }
 
                     Grids.OnClick = function (grid, row, col, x, y, evt) {
@@ -68,6 +71,7 @@
                         parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
                     }
 
+                    
 
                 </script>
             </div>
