@@ -285,6 +285,19 @@ namespace EPMLiveCore
             return result;
         }
 
+        /// <summary>
+        /// Object to bool converter.
+        /// </summary>
+        /// <returns>Returns false if value is null, false, no or 0. Returns true for everything else.</returns>
+        public static bool ToBool(this object value)
+        {
+            if (value == null) return false;
+
+            string val = value.ToString().Trim().ToLower();
+
+            return val != "false" && val != "no" && val != "0";
+        }
+
         #endregion
 
         #region SPFile Extensions
