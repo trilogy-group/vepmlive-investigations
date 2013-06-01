@@ -109,6 +109,7 @@
     <Compile Include="ChartControl\vfChartSeries.cs" />
     <Compile Include="Comments\Comments.cs" />
     <Compile Include="Comments\CommentsToolPart.cs" />
+    <Compile Include="ContentView\ContentView.cs" />
     <Compile Include="ContextualHelpSlideOut\ContextualHelpSlideOut.cs" />
     <Compile Include="CONTROLTEMPLATES\AssignmentPlannerUserControl.ascx.cs">
       <DependentUpon>AssignmentPlannerUserControl.ascx</DependentUpon>
@@ -413,6 +414,10 @@
     <None Include="Comments\Comments.dwp" />
     <None Include="Comments\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{12f1c5c3-9eb1-43af-ab44-e3e7bfe7a5b9}</SharePointProjectItemId>
+    </None>
+    <None Include="ContentView\ContentView.dwp" />
+    <None Include="ContentView\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{0df1f62d-fcc9-4ea3-a76f-d94b4213f8e2}</SharePointProjectItemId>
     </None>
     <None Include="ContextualHelpSlideOut\ContextualSlideOut.dwp" />
     <None Include="ContextualHelpSlideOut\SharePointProjectItem.spdata">
@@ -728,6 +733,7 @@
     <Content Include="BuyNow\Elements.xml" />
     <Content Include="ChartControl\Elements.xml" />
     <Content Include="Comments\Elements.xml" />
+    <Content Include="ContentView\Elements.xml" />
     <Content Include="ContextualHelpSlideOut\Elements.xml" />
     <Content Include="CONTROLTEMPLATES\AssignmentPlannerUserControl.ascx" />
     <Content Include="CONTROLTEMPLATES\ContextualHelpSlideOutControl.ascx" />
