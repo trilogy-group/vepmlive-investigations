@@ -52,7 +52,7 @@ namespace EPMLiveCore
                 writer.Write("<script type=\"text/javascript\"> var commonActionsAsyncUrl = \"" + _commonActionsDataHostPageUrl + "\"; </script>");
                 writer.Write("<script type=\"text/javascript\" src=\"" + site.MakeFullUrl(web.ServerRelativeUrl) + "/_layouts/epmlive/BtnCommonActions.js\"></script>");
 
-                writer.Write("<A id=lnkCommonActions class=ms-socialNotif onclick=\"ToggleCommonActionsMenu();return false;\" href=\"javascript:;\"  style=\"width:55px\"><SPAN onlick=\"document.getElementById('lnkCommonActions').click()\"><SPAN onlick=\"document.getElementById('lnkCommonActions').click()\" style=\"POSITION: relative; WIDTH: 32px; DISPLAY: inline-block; HEIGHT: 32px; OVERFLOW: hidden\" ><IMG style=\"BORDER-BOTTOM: 0px; POSITION: absolute; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px; LEFT: -409px !important; TOP:-11px;\" src=\"/_layouts/epmlive/images/epmlive-header.png\"></SPAN></SPAN></A>");
+                writer.Write("<A id=\"lnkCommonActions\" title=\"Common Actions\" rel=\"tooltipbottom\" class=\"ms-socialNotif\" onclick=\"ToggleCommonActionsMenu();return false;\" href=\"javascript:;\"  style=\"width:55px\"><SPAN onlick=\"document.getElementById('lnkCommonActions').click()\"><SPAN onlick=\"document.getElementById('lnkCommonActions').click()\" style=\"POSITION: relative; WIDTH: 32px; DISPLAY: inline-block; HEIGHT: 32px; OVERFLOW: hidden\" ><IMG style=\"BORDER-BOTTOM: 0px; POSITION: absolute; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px; LEFT: -409px !important; TOP:-11px;\" src=\"/_layouts/epmlive/images/epmlive-header.png\"></SPAN></SPAN></A>");
 
                 // render the button
                 // =====================================================

@@ -50,7 +50,7 @@ namespace EPMLiveCore
 
 
 
-                writer.Write("<A id=lnkCreateNew class=ms-socialNotif onclick=\"ToggleCreateNewMenu();return false;\" href=\"javascript:;\"><SPAN onlick=\"document.getElementById('lnkCreateNew').click()\"><SPAN onlick=\"document.getElementById('lnkCreateNew').click()\" style=\"POSITION: relative; WIDTH: 32px; DISPLAY: inline-block; HEIGHT: 32px; OVERFLOW: hidden\" ><IMG style=\"BORDER-BOTTOM: 0px; POSITION: absolute; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px; LEFT: -461px !important; TOP: -11px;\" src=\"/_layouts/epmlive/images/epmlive-header.png\"></SPAN></SPAN></A>");
+                writer.Write("<A id=lnkCreateNew rel=\"tooltipbottom\" title=\"Create New\" class=\"ms-socialNotif\" onclick=\"ToggleCreateNewMenu();return false;\" href=\"javascript:;\"><SPAN onlick=\"document.getElementById('lnkCreateNew').click()\"><SPAN onlick=\"document.getElementById('lnkCreateNew').click()\" style=\"POSITION: relative; WIDTH: 32px; DISPLAY: inline-block; HEIGHT: 32px; OVERFLOW: hidden\" ><IMG style=\"BORDER-BOTTOM: 0px; POSITION: absolute; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px; LEFT: -461px !important; TOP: -11px;\" src=\"/_layouts/epmlive/images/epmlive-header.png\"></SPAN></SPAN></A>");
 
                 // render button
                 // =====================================================
