@@ -4,3 +4,11 @@
     height: 50px;
     width: 100%;
 }
+
+#contentBox {
+                margin-left:20px;
+}
+
+.ms-dialog #contentBox {
+                margin-left:0px;
+}
