@@ -142,13 +142,15 @@ namespace EPMLiveCore
                 // render button
                 // =====================================================
                 writer.Write("<div>");
-                writer.Write("<span title='Open Menu' class='ms-menu-althov ms-welcome-root' style='white-space: nowrap;' hoverinactive='ms-menu-althov ms-welcome-root' hoveractive='ms-menu-althov-active ms-welcome-root ms-welcome-hover'>");
+                writer.Write("<span title='Open Menu' class='ms-menu-althov ms-welcome-root' style='white-space: nowrap;' hoverinactive='ms-menu-althov ms-welcome-root' hoveractive='ms-menu-althov-active ms-welcome-root ms-welcome-hover' onmouseover='MMU_PopMenuIfShowing(this);MMU_EcbTableMouseOverOut(this, true)'>");
                 writer.Write("<a id=\"lnkChangeApp\" class=\"ms-core-menu-root\" href=\"#\" onclick=\"ToggleChangeAppMenu();return false;\">");
              
                 writer.Write("<span onlick=\"document.getElementById('lnkChangeApp').click()\">");
                 writer.Write(string.Format("<span onlick=\"document.getElementById('lnkChangeApp').click()\" id=\"spnChangeAppText\" >{0}</span>", appTitle));
                 writer.Write("</span>");
- 
+
+                writer.Write("</a>");
+
                 writer.Write("<span style=\"POSITION: relative; WIDTH: 7px; DISPLAY: inline-block; HEIGHT: 4px; OVERFLOW: hidden\" class=\"s4-clust ms-viewselector-arrow ms-menu-stdarw ms-core-menu-arrow\">" +
                              "<img style=\"POSITION: absolute; TOP: -259px !important; LEFT: -95px !important\" alt=\"Open Menu\" src=\"/_layouts/15/images/spcommon.png?rev=23\">" +
                              "</span>");
@@ -157,15 +159,10 @@ namespace EPMLiveCore
                 writer.Write("<span style=\"POSITION: relative; WIDTH: 7px; DISPLAY: inline-block; HEIGHT: 4px; OVERFLOW: hidden\" class=\"s4-clust ms-core-menu-arrow ms-viewselector-arrow ms-menu-hovarw\">" +
                              "<img style=\"POSITION: absolute; TOP: -259px !important; LEFT: -86px !important\" alt=\"Open Menu\" src=\"/_layouts/15/images/spcommon.png?rev=23\">" +
                              "</span>");
-                
-                
-                writer.Write("</a>");
-                writer.Write("</span>");
-                writer.Write("</div>");
 
                 // html for actual menu
                 // ===================================================
-                writer.Write("<div id=\"divChangeAppMenu\" style=\"z-index: 103; position: absolute; width: 159px; display:none; top: 30px; left: 13px\" dir=\"ltr\" class=\"ms-core-menu-box ms-core-defaultFont ms-shadow\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid4\" flipped=\"false\" LeftForBackIframe=\"13\" TopForBackIframe=\"30\">");
+                writer.Write("<div id=\"divChangeAppMenu\" style=\"z-index: 103; position: absolute; width: 159px; display:none; top: 28px; left: -86px\" dir=\"ltr\" class=\"ms-core-menu-box ms-core-defaultFont ms-shadow\" title=\"\" ismenu=\"true\" level=\"0\" _backgroundframeid=\"msomenuid4\" flipped=\"false\" LeftForBackIframe=\"13\" TopForBackIframe=\"30\">");
                 writer.Write("<div id=\"divChangeAppMenuAsync\">");
                 // loading div
                 // ========================================
@@ -176,6 +173,11 @@ namespace EPMLiveCore
                 // =========================================
                 writer.Write("</div>");
                 writer.Write("</div>");
+                
+                writer.Write("</span>");
+                writer.Write("</div>");
+
+                
             }
         }
 

@@ -1588,7 +1588,7 @@
   </SharePoint:AjaxDelta>
 </div>
 <div id="contentBox"
- aria-live="polite" aria-relevant="all" style="margin-left:20px !important">
+ aria-live="polite" aria-relevant="all" >
   <div id="notificationArea" class="ms-notif-box"></div>
 	<SharePoint:AjaxDelta id="DeltaPageStatusBar" BlockElement="true" runat="server">
 	     <!-- Statusbar -->
