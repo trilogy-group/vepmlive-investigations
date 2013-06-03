@@ -469,7 +469,7 @@ u.GMT,u.GMTL,u.GMC,u.GMCL,u.GME,u.GMEL,u.GMD0,u.GMD1,u.GMD2,u.GMD3,u.GMD0L,u.GMD
 
 /* ------------- Tree Img without lines ------------- */
 
-.GMND0,.GMND1,.GMND2,.GMND3,.GMNC,.GMNE,.GMNCR,.GMNER { font-size:10px; background-image:url(TreeNTS.gif); background-repeat:no-repeat; vertical-align:top; }
+.GMND0,.GMND1,.GMND2,.GMND3,.GMNC,.GMNE,.GMNCR,.GMNER { font-size:10px; background-image:url(TreeN.gif); background-repeat:no-repeat; vertical-align:top; }
 u.GMND0,u.GMND1,u.GMND2,u.GMND3,u.GMNC,u.GMNE,u.GMNCR,u.GMNER { padding-left:26px; }
 .GMND0 { background-position: 0px 0px; }
 .GMND1 { background-position: -50px 0px; }

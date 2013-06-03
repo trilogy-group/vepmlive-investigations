@@ -3013,7 +3013,6 @@ net start "WorkEngine Timer"
     <Content Include="Layouts\epmlive\images\Plus14.png" />
     <Content Include="Layouts\epmlive\images\print.gif" />
     <Content Include="Layouts\epmlive\images\printmenu.gif" />
-    <Content Include="Layouts\epmlive\images\progress_ring.gif" />
     <Content Include="Layouts\epmlive\images\PurchaseAccounts.png" />
     <Content Include="Layouts\epmlive\images\Question.png" />
     <Content Include="Layouts\epmlive\images\refresh.png" />
@@ -3149,7 +3148,6 @@ net start "WorkEngine Timer"
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_888888_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.css" />
-    <Content Include="Layouts\epmlive\stylesheets\master.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
@@ -3248,6 +3246,7 @@ net start "WorkEngine Timer"
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\BackgroundsOLD.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\ButtonSpace.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\critgantt.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\critganttpct.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\FastPanel1.gif" />

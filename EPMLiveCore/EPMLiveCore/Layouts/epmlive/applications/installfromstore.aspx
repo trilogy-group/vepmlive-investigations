@@ -1,4 +1,4 @@
-﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
+﻿<%@ Assembly Name="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
@@ -21,22 +21,20 @@
 
     <script type="text/ecmascript">
 
-	    function ShowInstall()
-            {
-		    var surl = "choosecommunity.aspx?appid=<%=Request["appid"] %>";
+        function ShowInstall() {
+            var surl = "choosecommunity.aspx?appid=<%=Request["appid"] %>";
 
-                var options = { url: surl, width: 700, title: "Install Application", dialogReturnValueCallback: InstallAppClose };
+	        var options = { url: surl, width: 700, title: "Install Application", dialogReturnValueCallback: InstallAppClose };
 
-                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
-            }
-
-        
-	    function InstallAppClose()
-	    {
-		
+	        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 	    }
 
-         _spBodyOnLoadFunctionNames.push("ShowInstall");
+
+	    function InstallAppClose() {
+
+	    }
+
+	    _spBodyOnLoadFunctionNames.push("ShowInstall");
 
     </script>
 
