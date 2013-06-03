@@ -836,6 +836,8 @@ namespace EPMLiveCore
 
                                 if(f.Type == SPFieldType.User)
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$ClientPeoplePicker";
+                                else if (f.TypeAsString == "ResourcePermissions" || f.TypeAsString == "ResourceLevels")
+                                    fname = tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
 
                                 dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, fname);
 
