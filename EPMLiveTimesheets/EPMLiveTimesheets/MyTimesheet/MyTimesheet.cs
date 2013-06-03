@@ -426,6 +426,8 @@ namespace TimeSheets
                                     siteUrl = '" + url + @"';
 
                                     curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss", culture) + @"')).getTime();
+
+                                    
                             </script>
                             ");
             

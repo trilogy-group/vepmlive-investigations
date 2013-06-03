@@ -79,6 +79,17 @@ function esGrid() {
     }
 }
 
+Grids.OnRenderFinish = function (grid) { showribbon(); };
+
+Grids.OnClick = function (grid, row, col, x, y, event) {
+    setTimeout('showribbon()', 100);
+}
+function showribbon() {
+    var wp2 = document.getElementById('Ribbon.MyTimesheetTab-title');
+    if (wp2)
+        fireEvent(wp2.firstChild, 'click');
+}
+
 Grids.OnEnterEdit = function (grid, row, col) {
     if (curPop) {
         setTimeout("curGrid.StartEdit()", 100);
