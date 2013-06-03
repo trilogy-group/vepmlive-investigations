@@ -693,13 +693,9 @@
 				</div>
 		</div>
 		<div style="height:70px;width:250px;float:right;position:relative;margin-top:-72px;">
-                <div style="width:35px;height:70px;float:right;margin-right:20px;" >
-                    <epm:BtnCommonActions runat="server"></epm:BtnCommonActions>
-                </div>
-                <div style="width:35px;height:70px;float:right;margin-right:20px;" >
-                    <epm:BtnCreateNew runat="server"></epm:BtnCreateNew>
-                </div>
-            </div>
+            <epm:BtnCommonActions runat="server"></epm:BtnCommonActions>
+            <epm:BtnCreateNew runat="server"></epm:BtnCreateNew>
+        </div>
 		</div>
 		<div id="contentRow">
 <div id="sideNavBox"
