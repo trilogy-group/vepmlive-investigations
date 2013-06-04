@@ -605,7 +605,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
         weburl = "";
 
     if (action == "epkcommand")
-        weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&subaction=" + subaction + "&view=" + this._viewname + "&Source=" + document.location.href;
+        weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&subaction=" + subaction + "&view=" + this._viewname + "&Source=" + escape(document.location.href);
     else
         weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=" + action + "&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&subaction=" + subaction + "&Source=" + escape(document.location.href);
 
