@@ -53,7 +53,7 @@
     <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_clist.js"></script>
 	<script src="DHTML/xgrid/excells/dhtmlxgrid_excell_acheck.js"></script>
 	<script src="DHTML/xgrid/excells/dhtmlxgrid_excell_calendar.js"></script>	
-    <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js"></script
+    <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js"></script>
 
     <script src="DHTML/calendar/dhtmlxcalendar.js"></script>
 
@@ -508,7 +508,7 @@
 	        </td></tr>
 	        <tr>
 	            <td colspan="2">
-	                <div id="tsgrid" style="width:100%" style="display:none;"></div>
+	                <div id="tsgrid" style="width:100%;height:100%" style="display:none;"></div>
 	                 <div  width="100%" id="loadingtsgrid" align="center">
                      <img src="/_layouts/images/gears_anv4.gif" style="vertical-align: middle;"/> Loading Periods...
                      </div>
