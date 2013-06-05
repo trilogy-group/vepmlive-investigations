@@ -1313,7 +1313,7 @@ namespace EPMLiveCore
                 }
             }
 
-            List<FormField> formFields = this.GetFormFieldByType(typeof(SPFieldLookup));
+            //List<FormField> formFields = this.GetFormFieldByType(typeof(SPFieldLookup));
             List<FormField> modCandidates = new List<FormField>() { currentFld };
 
             for (int index = 0; index < modCandidates.Count; index++)
@@ -1459,7 +1459,10 @@ namespace EPMLiveCore
 
                         ctrl.CustomProperty = customValue;
                         FormField ff = this.GetFormFieldByField(fld);
-                        ff.Parent.Controls.AddAfter(ff, ctrl);
+                        if (ff != null)
+                        {
+                            ff.Parent.Controls.AddAfter(ff, ctrl);
+                        }
                     }
                 }
                 else if (isParent && isEnhanced)
@@ -1524,7 +1527,10 @@ namespace EPMLiveCore
                         picker.CustomProperty = customValue;
                         
                         FormField ff = this.GetFormFieldByField(fld);
-                        ff.Parent.Controls.AddAfter(ff, picker);
+                        if (ff != null)
+                        {
+                            ff.Parent.Controls.AddAfter(ff, picker);
+                        }
 
                         #endregion
                     }
@@ -1557,7 +1563,10 @@ namespace EPMLiveCore
                             cclrCtrl.CustomProperty = customValue;
                             
                             FormField ff = this.GetFormFieldByField(fld);
-                            ff.Parent.Controls.AddAfter(ff, cclrCtrl);
+                            if (ff != null)
+                            {
+                                ff.Parent.Controls.AddAfter(ff, cclrCtrl);
+                            }
                         }
 
                         #endregion
@@ -1625,7 +1634,10 @@ namespace EPMLiveCore
                         picker.CustomProperty = customValue;
                         
                         FormField ff = this.GetFormFieldByField(fld);
-                        ff.Parent.Controls.AddAfter(ff, picker);
+                        if (ff != null)
+                        {
+                            ff.Parent.Controls.AddAfter(ff, picker);
+                        }
                         
 
                         #endregion
@@ -1659,7 +1671,10 @@ namespace EPMLiveCore
                             cclrCtrl.CustomProperty = customValue;
                             
                             FormField ff = this.GetFormFieldByField(fld);
-                            ff.Parent.Controls.AddAfter(ff, cclrCtrl);
+                            if (ff != null)
+                            {
+                                ff.Parent.Controls.AddAfter(ff, cclrCtrl);
+                            }
                         }
                         else
                         {
@@ -1685,7 +1700,10 @@ namespace EPMLiveCore
                             cclrCtrl.CustomProperty = customValue;
 
                             FormField ff = this.GetFormFieldByField(fld);
-                            ff.Parent.Controls.AddAfter(ff, cclrCtrl);                        
+                            if (ff != null)
+                            {
+                                ff.Parent.Controls.AddAfter(ff, cclrCtrl);
+                            }
                         }
 
                         #endregion
@@ -2395,11 +2413,6 @@ namespace EPMLiveCore
                                       where form.Field.GetType().Equals(fieldType)
                                       select form).ToList<FormField>();
 
-            if (fields == null)
-            {
-                throw new Exception("Could not find form field type: " + fieldType.ToString());
-            }
-
             return fields;
         }
 
@@ -2408,11 +2421,6 @@ namespace EPMLiveCore
             FormField ff = (from form in formFields
                             where form.Field.Equals(field)
                             select form).FirstOrDefault();
-
-            if (ff == null)
-            {
-                throw new Exception("Could not find form field for field: " + field.ToString());
-            }
 
             return ff;
         }
