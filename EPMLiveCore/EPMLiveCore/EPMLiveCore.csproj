@@ -12,8 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Munjal%27s Deploy Config</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -28,6 +28,11 @@ net start "WorkEngine Timer"
     <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
 "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f
 </PreDeploymentCommand>
+    <ProjectMode>SharePointCustomization</ProjectMode>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UpgradeBackupLocation />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,6 +82,7 @@ net start "WorkEngine Timer"
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -3013,6 +3019,7 @@ net start "WorkEngine Timer"
     <Content Include="Layouts\epmlive\images\Plus14.png" />
     <Content Include="Layouts\epmlive\images\print.gif" />
     <Content Include="Layouts\epmlive\images\printmenu.gif" />
+    <Content Include="Layouts\epmlive\images\progress_ring.gif" />
     <Content Include="Layouts\epmlive\images\PurchaseAccounts.png" />
     <Content Include="Layouts\epmlive\images\Question.png" />
     <Content Include="Layouts\epmlive\images\refresh.png" />
@@ -3148,6 +3155,7 @@ net start "WorkEngine Timer"
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_888888_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.css" />
+    <Content Include="Layouts\epmlive\stylesheets\master.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
@@ -3246,7 +3254,6 @@ net start "WorkEngine Timer"
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\BackgroundsOLD.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.png" />
-    <Content Include="Layouts\epmlive\TreeGrid\MYTS\ButtonSpace.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\critgantt.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\critganttpct.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\FastPanel1.gif" />
@@ -3605,7 +3612,7 @@ net start "WorkEngine Timer"
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
-      <FlavorProperties GUID="{BB1F664B-9266-4fd6-B973-E1E44974B511}">
+      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
         <DeploymentConfigurations>
           <DeploymentConfiguration Name="New Deployment Configuration">
             <DeploymentSteps>Microsoft.VisualStudio.SharePoint.RetractSolution;Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.AddSolution;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand;Microsoft.VisualStudio.SharePoint.ActivateFeatures;Microsoft.VisualStudio.SharePoint.RecycleApplicationPool</DeploymentSteps>

@@ -472,8 +472,23 @@ namespace EPMLiveCore.SPFields
 
                             if (spUser.ID != web.CurrentUser.ID) continue;
 
-                            GetWorkHours(workHoursList, resourceListItem, web);
-                            GetHolidays(holidaysList, resourceListItem);
+                            try
+                            {
+                                GetWorkHours(workHoursList, resourceListItem, web);
+                            }
+                            catch
+                            {
+                                throw new Exception("Your user account does not have a Work Hours schedule specified in the Resource Pool.  Please contact your Administrator to correctly associate your account with a Work Hours schedule.");
+                            }
+
+                            try
+                            {
+                                GetHolidays(holidaysList, resourceListItem);
+                            }
+                            catch
+                            {
+                                throw new Exception("Your user account is not associated with a Holiday Schedule in the Resource Pool.  Please contact your Administrator to correctly associate your account with a Holiday Schedule.");
+                            }
 
                             resourceFoundInPool = true;
 

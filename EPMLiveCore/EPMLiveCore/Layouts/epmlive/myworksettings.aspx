@@ -1,7 +1,7 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
-<%@ Register Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" Namespace="Microsoft.SharePoint.WebControls" Tagprefix="SharePoint" %>
+<%@ Register Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" Namespace="Microsoft.SharePoint.WebControls" Tagprefix="SharePoint" %>
 <%@ Register Src="~/_controltemplates/InputFormControl.ascx" TagName="InputFormControl" TagPrefix="wssuc" %>
 <%@ Register src="~/_controltemplates/InputFormSection.ascx" TagName="InputFormSection" TagPrefix="wssuc" %>
 <%@ Register src="~/_controltemplates/ButtonSection.ascx" TagName="ButtonSection" TagPrefix="wssuc" %>
