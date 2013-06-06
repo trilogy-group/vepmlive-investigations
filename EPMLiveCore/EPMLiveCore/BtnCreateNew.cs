@@ -49,7 +49,7 @@ namespace EPMLiveCore
                 writer.Write("<script type=\"text/javascript\" src=\"" + site.MakeFullUrl(web.ServerRelativeUrl) + "/_layouts/epmlive/BtnCreateNew.js\"></script>");
 
                 // render container div
-                writer.Write("<div style=\"max-width:35px;height:70px;float:right;margin-right:20px;\" >");
+                writer.Write("<div style=\"max-width:35px;height:32px;float:right;margin-right:20px;\" >");
 
                 // render button
                 writer.Write("<A id=lnkCreateNew rel=\"tooltipbottom\" title=\"Create New\" class=\"ms-socialNotif\" onclick=\"ToggleCreateNewMenu();return false;\" href=\"javascript:;\"><SPAN onlick=\"document.getElementById('lnkCreateNew').click()\"><SPAN onlick=\"document.getElementById('lnkCreateNew').click()\" style=\"POSITION: relative; WIDTH: 32px; DISPLAY: inline-block; HEIGHT: 32px; OVERFLOW: hidden\" ><IMG style=\"BORDER-BOTTOM: 0px; POSITION: absolute; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px; LEFT: -461px !important; TOP: -11px;\" src=\"/_layouts/epmlive/images/epmlive-header.png\"></SPAN></SPAN></A>");

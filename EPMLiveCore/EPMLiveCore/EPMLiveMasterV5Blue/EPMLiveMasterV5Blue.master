@@ -692,7 +692,7 @@
 </SharePoint:AjaxDelta>
 				</div>
 		</div>
-		<div style="height:70px;width:250px;float:right;position:relative;margin-top:-72px;z-index:-10000;">
+		<div style="height:32px;float:right;position:relative;margin-top:-72px;">
             <epm:BtnCommonActions runat="server"></epm:BtnCommonActions>
             <epm:BtnCreateNew runat="server"></epm:BtnCreateNew>
         </div>
