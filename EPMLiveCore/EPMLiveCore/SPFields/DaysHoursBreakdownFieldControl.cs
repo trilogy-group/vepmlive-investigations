@@ -459,42 +459,38 @@ namespace EPMLiveCore.SPFields
 
                     foreach (SPListItem resourceListItem in resourcesList.Items)
                     {
+                        object spAccount = resourceListItem["SharePointAccount"];
+
+                        if (spAccount == null) continue;
+
+                        var spFieldUserValue = new SPFieldUserValue(web, (string)spAccount);
+                        SPUser spUser = spFieldUserValue.User;
+
+                        if (spUser == null) continue;
+
+                        if (spUser.ID != web.CurrentUser.ID) continue;
+
                         try
                         {
-                            object spAccount = resourceListItem["SharePointAccount"];
-
-                            if (spAccount == null) continue;
-
-                            var spFieldUserValue = new SPFieldUserValue(web, (string)spAccount);
-                            SPUser spUser = spFieldUserValue.User;
-
-                            if (spUser == null) continue;
-
-                            if (spUser.ID != web.CurrentUser.ID) continue;
-
-                            try
-                            {
-                                GetWorkHours(workHoursList, resourceListItem, web);
-                            }
-                            catch
-                            {
-                                throw new Exception("Your user account does not have a Work Hours schedule specified in the Resource Pool.  Please contact your Administrator to correctly associate your account with a Work Hours schedule.");
-                            }
-
-                            try
-                            {
-                                GetHolidays(holidaysList, resourceListItem);
-                            }
-                            catch
-                            {
-                                throw new Exception("Your user account is not associated with a Holiday Schedule in the Resource Pool.  Please contact your Administrator to correctly associate your account with a Holiday Schedule.");
-                            }
-
-                            resourceFoundInPool = true;
-
-                            break;
+                            GetWorkHours(workHoursList, resourceListItem, web);
                         }
-                        catch { }
+                        catch
+                        {
+                            throw new Exception("Your user account does not have a Work Hours schedule specified in the Resource Pool.  Please contact your Administrator to correctly associate your account with a Work Hours schedule.");
+                        }
+
+                        try
+                        {
+                            GetHolidays(holidaysList, resourceListItem);
+                        }
+                        catch
+                        {
+                            throw new Exception("Your user account is not associated with a Holiday Schedule in the Resource Pool.  Please contact your Administrator to correctly associate your account with a Holiday Schedule.");
+                        }
+
+                        resourceFoundInPool = true;
+
+                        break;
                     }
 
                     if (!resourceFoundInPool)
