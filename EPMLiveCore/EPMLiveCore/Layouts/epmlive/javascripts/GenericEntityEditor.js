@@ -494,7 +494,7 @@ function GEInit() {
                         // don't return options that has been selected already
                         for (var i in items) {
                             if (items[i].indexOf(',') != -1) {
-                                var itemPair = items[i].split(',');
+                                var itemPair = items[i].split('^^');
                                 var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
                                 $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
                                 $('#' + controlProps.ControlInfo.DropDownClientId).val(itemPair[0]);
@@ -509,7 +509,7 @@ function GEInit() {
                             // get the values that begins with the search text
                             // don't return options that has been selected already
                             for (var i in items) {
-                                var itemPair = items[i].split(',');
+                                var itemPair = items[i].split('^^');
                                 if (itemPair[1] != undefined) {
                                     hasMatch = true;
                                     var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
@@ -578,7 +578,7 @@ function GEInit() {
                     // get the values that begins with the search text
                     // don't return options that has been selected already
                     for (var i in items) {
-                        var itemPair = items[i].split(',');
+                        var itemPair = items[i].split('^^');
                         if (itemPair[1] != undefined &&
                 itemPair[1].toLowerCase().trim().indexOf(cleanTxt) == 0 &&
                 !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
@@ -591,7 +591,7 @@ function GEInit() {
                     // get the values that contains the search text
                     // don't return options that has been selected already
                     for (var i in items) {
-                        var itemPair = items[i].split(',');
+                        var itemPair = items[i].split('^^');
                         if (itemPair[1] != undefined &&
                 itemPair[1].toLowerCase().trim().indexOf(cleanTxt) != 0 &&
                 itemPair[1].toLowerCase().trim().indexOf(cleanTxt) != -1 &&
@@ -679,7 +679,7 @@ function GEInit() {
                         // don't return options that has been selected already
                         for (var i in items) {
                             if (items[i].indexOf(',') != -1) {
-                                var itemPair = items[i].split(',');
+                                var itemPair = items[i].split('^^');
                                 var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
                                 $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
                                 $('#' + controlProps.ControlInfo.DropDownClientId).val(itemPair[0]);
@@ -694,7 +694,7 @@ function GEInit() {
                             // get the values that begins with the search text
                             // don't return options that has been selected already
                             for (var i in items) {
-                                var itemPair = items[i].split(',');
+                                var itemPair = items[i].split('^^');
                                 if (itemPair[1] != undefined) {
                                     hasMatch = true;
                                     var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
@@ -757,7 +757,7 @@ function GEInit() {
                     // get the values that contains the search text
                     // don't return options that has been selected already
                     for (var i in items) {
-                        var itemPair = items[i].split(',');
+                        var itemPair = items[i].split('^^');
                         if (itemPair[1] != undefined &&
                 !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
                             hasMatch = true;

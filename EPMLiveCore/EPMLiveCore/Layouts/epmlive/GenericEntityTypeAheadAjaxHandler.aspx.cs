@@ -99,7 +99,7 @@ namespace EPMLiveCore
 
                     foreach (DataRow r in dt.Rows)
                     {
-                        _sbResult.Append(r["ID"].ToString() + "," + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
+                        _sbResult.Append(r["ID"].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
                     }
                 }
             }
@@ -119,7 +119,7 @@ namespace EPMLiveCore
                     DataRow[] results = dt.Select("", _field + " ASC");
                     foreach (DataRow r in results)
                     {
-                        _sbResult.Append(r["ID"].ToString() + "," + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
+                        _sbResult.Append(r["ID"].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
                     }
                 }
 
