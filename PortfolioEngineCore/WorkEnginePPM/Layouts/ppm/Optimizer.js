@@ -90,7 +90,7 @@
                         this.EditRangeDlg.setImagePath("/_layouts/ppm/images/");
 
                         this.EditRangeDlg.createWindow("winEditRangeDlgDlg", 20, 30, 300, 115);
-  //                      this.EditRangeDlg.window("winEditRangeDlgDlg").setIcon("logo.ico", "logo.ico");
+                        //                      this.EditRangeDlg.window("winEditRangeDlgDlg").setIcon("logo.ico", "logo.ico");
                         this.EditRangeDlg.window("winEditRangeDlgDlg").denyResize();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").button("park").hide();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setModal(true);
@@ -406,7 +406,7 @@
                         this.DeleteStratDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.DeleteStratDlg.setImagePath("/_layouts/ppm/images/");
                         this.DeleteStratDlg.createWindow("winDeleteStratDlg", 20, 30, 280, 157);
-  //                      this.DeleteStratDlg.window("winDeleteStratDlg").setIcon("logo.ico", "logo.ico");
+                        //                      this.DeleteStratDlg.window("winDeleteStratDlg").setIcon("logo.ico", "logo.ico");
                         this.DeleteStratDlg.window("winDeleteStratDlg").denyResize();
                         this.DeleteStratDlg.window("winDeleteStratDlg").button("park").hide();
                         this.DeleteStratDlg.window("winDeleteStratDlg").setModal(true);
@@ -499,7 +499,7 @@
                         this.SaveStratDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.SaveStratDlg.setImagePath("/_layouts/ppm/images/");
                         this.SaveStratDlg.createWindow("winSaveStratDlg", 20, 30, 280, 192);
- //                       this.SaveStratDlg.window("winSaveStratDlg").setIcon("logo.ico", "logo.ico");
+                        //                       this.SaveStratDlg.window("winSaveStratDlg").setIcon("logo.ico", "logo.ico");
                         this.SaveStratDlg.window("winSaveStratDlg").denyResize();
                         this.SaveStratDlg.window("winSaveStratDlg").button("park").hide();
                         this.SaveStratDlg.window("winSaveStratDlg").setModal(true);
@@ -582,7 +582,7 @@
                         this.RenameStratDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                         this.RenameStratDlg.setImagePath("/_layouts/ppm/images/");
                         this.RenameStratDlg.createWindow("winRenameStratDlg", 20, 30, 280, 142);
- //                       this.RenameStratDlg.window("winRenameStratDlg").setIcon("logo.ico", "logo.ico");
+                        //                       this.RenameStratDlg.window("winRenameStratDlg").setIcon("logo.ico", "logo.ico");
                         this.RenameStratDlg.window("winRenameStratDlg").denyResize();
                         this.RenameStratDlg.window("winRenameStratDlg").button("park").hide();
                         this.RenameStratDlg.window("winRenameStratDlg").setModal(true);
@@ -667,7 +667,7 @@
                     break;
 
 
-  
+
                 default:
                     alert("unhandled Optimizer event - " + event);
                     break;
@@ -881,7 +881,7 @@
                     }
                 }
                 sflds.append(" isNum='0' FSELCNT='" + fcount + "' >")
-                
+
                 for (var xi = 0; xi < fld.bSelVals.length; xi++) {
                     if (fld.bSelVals[xi] == true) {
                         sflds.append("<Selected>" + fld.textVals[xi] + "</Selected>")
@@ -974,7 +974,7 @@
                         else {
                             fsel = new Array();
                             if (xfie[c].FSELCNT == 1)
-                                fsel[0] = xfie[c].selected;
+                                fsel[0] = xfie[c].Selected;
                         }
 
                         for (var yi = 0; yi < fsel.length; yi++) {
@@ -1061,273 +1061,271 @@
 
     OptimizerRibbon.prototype.GetMinVal = function (sID) {
 
-       var container = $("#" + sID).parent();
-       var val = container.find('.epm-slider-minval');
-       return val.html();
+        var container = $("#" + sID).parent();
+        var val = container.find('.epm-slider-minval');
+        return val.html();
 
     }
     OptimizerRibbon.prototype.GetMaxVal = function (sID) {
-       var container = $("#" + sID).parent();
-       var val = container.find('.epm-slider-maxval');
-       return val.html();
-   }
+        var container = $("#" + sID).parent();
+        var val = container.find('.epm-slider-maxval');
+        return val.html();
+    }
 
-   OptimizerRibbon.prototype.GetPosMinVal = function (sID) {
+    OptimizerRibbon.prototype.GetPosMinVal = function (sID) {
 
-       var container = $("#" + sID).parent();
-       var val = container.find('.epm-slider-buttonmin');
+        var container = $("#" + sID).parent();
+        var val = container.find('.epm-slider-buttonmin');
 
-       var xvl = val.css('left');
+        var xvl = val.css('left');
 
-       if (xvl == -1)
-           xvl = 0;
+        if (xvl == -1)
+            xvl = 0;
 
-       return xvl;
+        return xvl;
 
-   }
+    }
     OptimizerRibbon.prototype.GetPosMaxVal = function (sID) {
-       var container = $("#" + sID).parent();
-       var val = container.find('.epm-slider-buttonmax');
-       return val.css('left');
-   }
-   OptimizerRibbon.prototype.CaptureFilters = function () {
-       var fld;
+        var container = $("#" + sID).parent();
+        var val = container.find('.epm-slider-buttonmax');
+        return val.css('left');
+    }
+    OptimizerRibbon.prototype.CaptureFilters = function () {
+        var fld;
 
-       for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
-           fld = this.usingselectedFilters[n1];
+        for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
+            fld = this.usingselectedFilters[n1];
 
-           if (fld.isNumeric) {
+            if (fld.isNumeric) {
 
-               popupInput(fld.ribbonName, 0);
+                popupInput(fld.ribbonName, 0);
 
-               fld.rangeMinValue = this.GetMinVal(fld.ribbonName);
-               fld.rangeMaxValue = this.GetMaxVal(fld.ribbonName);
+                fld.rangeMinValue = this.GetMinVal(fld.ribbonName);
+                fld.rangeMaxValue = this.GetMaxVal(fld.ribbonName);
 
-               this.SetSliderVals(fld.ribbonName, fld.rangeMinValue, fld.rangeMaxValue, fld.FTYPE)
+                this.SetSliderVals(fld.ribbonName, fld.rangeMinValue, fld.rangeMaxValue, fld.FTYPE)
 
-               fld.posMinValue = this.GetPosMinVal(fld.ribbonName);
-               fld.posMaxValue = this.GetPosMaxVal(fld.ribbonName);
+                fld.posMinValue = this.GetPosMinVal(fld.ribbonName);
+                fld.posMaxValue = this.GetPosMaxVal(fld.ribbonName);
 
-   
 
-           } else {
-               var selvals = this.optTab.GetCheckedSelection(fld.ribbonName);
 
-               for (var xi = 0; xi < fld.bSelVals.length; xi++)
-                   fld.bSelVals[xi] = false;
+            } else {
+                var selvals = this.optTab.GetCheckedSelection(fld.ribbonName);
 
-               for (var xi = 0; xi < selvals.length; xi++) {
-                   var accind = selvals[xi].value;
-                   fld.bSelVals[accind] = true;
-               }
+                for (var xi = 0; xi < fld.bSelVals.length; xi++)
+                    fld.bSelVals[xi] = false;
 
+                for (var xi = 0; xi < selvals.length; xi++) {
+                    var accind = selvals[xi].value;
+                    fld.bSelVals[accind] = true;
+                }
 
-           }
-       }
-   }
-   OptimizerRibbon.prototype.applyFilters = function () {
-       var item;
-       var fld;
-       var shakeitallabout;
-       var fValue;
 
-       this.piIn = new Array();
-       this.piOut = new Array();
-       this.runningPITotal = 0;
+            }
+        }
+    }
+    OptimizerRibbon.prototype.applyFilters = function () {
+        var item;
+        var fld;
+        var shakeitallabout;
+        var fValue;
 
-       this.CaptureFilters();
+        this.piIn = new Array();
+        this.piOut = new Array();
+        this.runningPITotal = 0;
 
+        this.CaptureFilters();
 
-       for (var i = 0; i < this.Items.length; i++) {
-           item = this.Items[i];
 
-           item.stashsel = item.isSel;
-           shakeitallabout = true;
+        for (var i = 0; i < this.Items.length; i++) {
+            item = this.Items[i];
 
+            item.stashsel = item.isSel;
+            shakeitallabout = true;
 
 
 
 
-           for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
-               fld = this.usingselectedFilters[n1];
 
-               if (fld.isNumeric) 
-               {
-                   fValue = item.Fields[fld.accind].Value;
+            for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
+                fld = this.usingselectedFilters[n1];
 
-                   if (fValue < fld.rangeMinValue || fValue > fld.rangeMaxValue) {
-                       shakeitallabout = false;
-                       break;
-                   }
+                if (fld.isNumeric) {
+                    fValue = item.Fields[fld.accind].Value;
 
+                    if (fValue < fld.rangeMinValue || fValue > fld.rangeMaxValue) {
+                        shakeitallabout = false;
+                        break;
+                    }
 
-               } else 
-               {
-                   fValue = item.Fields[fld.accind].Value;
 
+                } else {
+                    fValue = item.Fields[fld.accind].Value;
 
-                   for (var xi = 0; xi < fld.bSelVals.length; xi++) {
-                       if (fValue == fld.textVals[xi]) {
-                           if (fld.bSelVals[xi] == false) {
-                               shakeitallabout = false;
-                               break;
-                           }
-                       }
 
-                   }
+                    for (var xi = 0; xi < fld.bSelVals.length; xi++) {
+                        if (fValue == fld.textVals[xi]) {
+                            if (fld.bSelVals[xi] == false) {
+                                shakeitallabout = false;
+                                break;
+                            }
+                        }
 
-               }
-           }
+                    }
 
+                }
+            }
 
-           item.isFilterSel = shakeitallabout;
 
-           if (item.statusMode == 1)
-               shakeitallabout = true;
-           else if (item.statusMode == 2)
-               shakeitallabout = false;
+            item.isFilterSel = shakeitallabout;
 
+            if (item.statusMode == 1)
+                shakeitallabout = true;
+            else if (item.statusMode == 2)
+                shakeitallabout = false;
 
-           if (shakeitallabout == true) {
-               if (this.totalField != null) {
-                   this.runningPITotal += item.Fields[this.totalField.accind].Value;
-               }
 
-               item.isSel = true;
-               this.piIn[this.piIn.length] = item;
-           } else {
-               this.piOut[this.piOut.length] = item;
-               item.isSel = false;
-           }
+            if (shakeitallabout == true) {
+                if (this.totalField != null) {
+                    this.runningPITotal += item.Fields[this.totalField.accind].Value;
+                }
 
-       }
+                item.isSel = true;
+                this.piIn[this.piIn.length] = item;
+            } else {
+                this.piOut[this.piOut.length] = item;
+                item.isSel = false;
+            }
 
-   };
+        }
 
-   OptimizerRibbon.prototype.PreRangeInput = function () {
-       for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
-           fld = this.usingselectedFilters[n1];
+    };
 
-           if (fld.isNumeric == true) {
+    OptimizerRibbon.prototype.PreRangeInput = function () {
+        for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
+            fld = this.usingselectedFilters[n1];
 
-               popupInput(fld.ribbonName, 0);
- 
-           }
-       }
+            if (fld.isNumeric == true) {
 
+                popupInput(fld.ribbonName, 0);
 
-   }
-   OptimizerRibbon.prototype.RangeInput = function () {
-       for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
-           fld = this.usingselectedFilters[n1];
+            }
+        }
 
-           if (fld.isNumeric == true) {
 
-               popupInput(fld.ribbonName, 0);
+    }
+    OptimizerRibbon.prototype.RangeInput = function () {
+        for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
+            fld = this.usingselectedFilters[n1];
 
-               var ldcontainer = document.getElementById(fld.ribbonName + 'inputl');
-               var rdcontainer = document.getElementById(fld.ribbonName + 'inputr');
+            if (fld.isNumeric == true) {
 
-               var ldscontainer = document.getElementById(fld.ribbonName + 'displ');
-               var rdscontainer = document.getElementById(fld.ribbonName + 'dispr');
+                popupInput(fld.ribbonName, 0);
 
+                var ldcontainer = document.getElementById(fld.ribbonName + 'inputl');
+                var rdcontainer = document.getElementById(fld.ribbonName + 'inputr');
 
-               var lv = parseFloat(ldcontainer.value);
-               var rv = parseFloat(rdcontainer.value);
-               var lvc = true;
-               var rvc = true;
+                var ldscontainer = document.getElementById(fld.ribbonName + 'displ');
+                var rdscontainer = document.getElementById(fld.ribbonName + 'dispr');
 
-               if (lv < fld.minValue)
-                   lv = fld.minValue;
-               else if (lv > fld.maxValue)
-                   lv = fld.maxValue;
-               else if (lv > rv)
-                   lv = rv;
-               else
-                   lvc = false;
 
-               if (rv < fld.minValue)
-                   rv = fld.minValue;
-               else if (rv > fld.maxValue)
-                   rv = fld.maxValue;
-               else if (lv > rv)
-                   rv = lv;
-               else
-                   rvc = false;
+                var lv = parseFloat(ldcontainer.value);
+                var rv = parseFloat(rdcontainer.value);
+                var lvc = true;
+                var rvc = true;
 
+                if (lv < fld.minValue)
+                    lv = fld.minValue;
+                else if (lv > fld.maxValue)
+                    lv = fld.maxValue;
+                else if (lv > rv)
+                    lv = rv;
+                else
+                    lvc = false;
 
-               ldcontainer.value = lv;
-               rdcontainer.value = rv;
+                if (rv < fld.minValue)
+                    rv = fld.minValue;
+                else if (rv > fld.maxValue)
+                    rv = fld.maxValue;
+                else if (lv > rv)
+                    rv = lv;
+                else
+                    rvc = false;
 
-               if (fld.FTYPE == 8) {
-                   ldscontainer.innerHTML = toPrettyString(lv, this.currprefix, this.currpostfix);
-                   rdscontainer.innerHTML = toPrettyString(rv, this.currprefix, this.currpostfix);
-               }
-               else {
-                   ldscontainer.innerHTML = toPrettyString(lv, "", "");
-                   rdscontainer.innerHTML = toPrettyString(rv, "", "");
-               }
 
-               var totrng = fld.maxValue - fld.minValue;
-               var lp = parseInt(((lv - fld.minValue) * 100) / totrng);
-               var hp = parseInt(((rv - fld.minValue) * 100) / totrng);
+                ldcontainer.value = lv;
+                rdcontainer.value = rv;
 
-               fld.rangeMinValue = this.GetMinVal(fld.ribbonName);
-               fld.rangeMaxValue = this.GetMaxVal(fld.ribbonName);
+                if (fld.FTYPE == 8) {
+                    ldscontainer.innerHTML = toPrettyString(lv, this.currprefix, this.currpostfix);
+                    rdscontainer.innerHTML = toPrettyString(rv, this.currprefix, this.currpostfix);
+                }
+                else {
+                    ldscontainer.innerHTML = toPrettyString(lv, "", "");
+                    rdscontainer.innerHTML = toPrettyString(rv, "", "");
+                }
 
+                var totrng = fld.maxValue - fld.minValue;
+                var lp = parseInt(((lv - fld.minValue) * 100) / totrng);
+                var hp = parseInt(((rv - fld.minValue) * 100) / totrng);
 
-               var container = $("#" + fld.ribbonName).parent();
-               var val = container.find('.epm-slider-minval');
-               val.html(lv);
+                fld.rangeMinValue = this.GetMinVal(fld.ribbonName);
+                fld.rangeMaxValue = this.GetMaxVal(fld.ribbonName);
 
-               val = container.find('.epm-slider-maxval');
-               val.html(rv);
 
+                var container = $("#" + fld.ribbonName).parent();
+                var val = container.find('.epm-slider-minval');
+                val.html(lv);
 
-               val = container.find('.epm-slider-buttonmin');
-               val.css('left', lp);
+                val = container.find('.epm-slider-maxval');
+                val.html(rv);
 
-               val = container.find('.epm-slider-buttonmax');
-               val.css('left', hp - lp);
 
+                val = container.find('.epm-slider-buttonmin');
+                val.css('left', lp);
 
+                val = container.find('.epm-slider-buttonmax');
+                val.css('left', hp - lp);
 
-               val = container.find('.epm-slider-scalemiddle')
-               val.css('left', lp);
-               val.width(hp - lp);
 
 
+                val = container.find('.epm-slider-scalemiddle')
+                val.css('left', lp);
+                val.width(hp - lp);
 
-           }
-       }
 
 
-   }
-   
-   OptimizerRibbon.prototype.clearFilters = function () {
+            }
+        }
 
 
+    }
 
+    OptimizerRibbon.prototype.clearFilters = function () {
 
-       // reset the non-numeric fields
-       for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
-           fld = this.usingselectedFilters[n1];
 
-           if (fld.isNumeric == false) {
-               for (var xi = 0; xi < fld.bSelVals.length; xi++) {
-                   fld.bSelVals[xi] = true;
-               }
 
-           }
-           else {
-               fld.rangeMaxValue = fld.maxValue;
-               fld.rangeMinValue = fld.minValue;
-               fld.posMaxValue = 94;
-               fld.posMinValue = 0;
-           }
-       }
 
-   };
+        // reset the non-numeric fields
+        for (var n1 = 0; n1 < this.usingselectedFilters.length; n1++) {
+            fld = this.usingselectedFilters[n1];
+
+            if (fld.isNumeric == false) {
+                for (var xi = 0; xi < fld.bSelVals.length; xi++) {
+                    fld.bSelVals[xi] = true;
+                }
+
+            }
+            else {
+                fld.rangeMaxValue = fld.maxValue;
+                fld.rangeMinValue = fld.minValue;
+                fld.posMaxValue = 94;
+                fld.posMinValue = 0;
+            }
+        }
+
+    };
     OptimizerRibbon.prototype.updateRibbonDueToUserChange = function () {
 
         var item;
@@ -1373,7 +1371,7 @@
         this.targetValue = tv;
 
         this.targetRemaining = tv - this.runningPITotal;
-        
+
         if (bApplyDelay)
             window.setTimeout(this.flashRemainingValueDelegate, 10);
         else
@@ -1401,27 +1399,27 @@
 
     OptimizerRibbon.prototype.flashTabRibbon = function () {
         try {
- //           this.Tabbar.removeTab("tab_Opt", false);
+            //           this.Tabbar.removeTab("tab_Opt", false);
 
             this.Tabbar.clearAll();
             this.Tabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
             this.Tabbar.enableAutoReSize();
 
 
-  //          this.Tabbar.addTab("tab_Opt", "Optimizer", 70, 0);
+            //          this.Tabbar.addTab("tab_Opt", "Optimizer", 70, 0);
 
             var rdiv = this.optTab.getRibbonDiv();
             this.Tabbar.setContent("tab_Opt", rdiv);
 
- //           this.Tabbar.setTabActive("tab_Opt");
+            //           this.Tabbar.setTabActive("tab_Opt");
             this.Tabbar.enableScroll(false);
         }
         catch (e) {
             var x = e;
         }
 
-    }  
-    
+    }
+
     OptimizerRibbon.prototype.DeferInitialTabRibbon = function () {
         try {
 
@@ -1472,13 +1470,13 @@
     OptimizerRibbon.prototype.getOptimizerDlgInjectHtml = function () {
         return DlgHtmlInject();
     };
-    OptimizerRibbon.prototype.getOptimizerRibbon = function (sRibbonDiv, sonstatechange, simagePath, tabbar,  viewTab) {
+    OptimizerRibbon.prototype.getOptimizerRibbon = function (sRibbonDiv, sonstatechange, simagePath, tabbar, viewTab) {
 
         this.sRibbonDiv = sRibbonDiv;
         this.sonstatechange = sonstatechange;
         this.simagePath = simagePath;
         this.Tabbar = tabbar;
- //       this.tabopt = tabopt;
+        //       this.tabopt = tabopt;
         this.viewTab = viewTab
 
         var sJSON = this.getOptimizerRibbonJSON();
@@ -1498,7 +1496,7 @@
         this.Tabbar.setContent("tab_Opt", this.optTab.getRibbonDiv());
         this.Tabbar.addTab("tab_View", "View", 70);
         this.Tabbar.setContent("tab_View", this.viewTab.getRibbonDiv());
- //       window.setTimeout(this.DeferInitialTabRibbonDelegate, 1000);
+        //       window.setTimeout(this.DeferInitialTabRibbonDelegate, 1000);
 
 
         return this.optTab;
@@ -1534,23 +1532,23 @@
 							{
 							    items: [
 									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "OptimizerEvent('OptClose');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "bigbutton", name: "Configure", img: "configure.png", tooltip: "Configure", onclick: "OptimizerEvent('OptEditScen');" }
-								]
+							    ]
 							},
 							{
 							    items: [
 									{ type: "smallbutton", id: "idptSaveScen", img: "createview.gif", name: "Save Strategy", tooltip: "Save Strategy", onclick: "OptimizerEvent('OptSaveScen');" },
 								    { type: "smallbutton", id: "idrenamestrat", name: "Rename Strategy", img: "editview.gif", tooltip: "Rename Strategy", onclick: "OptimizerEvent('OptRenScen');" },
 									{ type: "smallbutton", id: "idptDelScen", img: "deleteview.gif", name: "Delete Strategy", tooltip: "Delete Strategy", onclick: "OptimizerEvent('OptDelScen');" }
-								]
+							    ]
 							},
 					        {
 					            items: [
-									{ type: "smallbutton", id: "idptCmtScen", img: "createview.gif", name: "Commit Strategy", tooltip: "Commit Strategy", disabled: this.notgotOptimzerFlag, onclick: "OptimizerEvent('OptCmtScen');"}]
+									{ type: "smallbutton", id: "idptCmtScen", img: "createview.gif", name: "Commit Strategy", tooltip: "Commit Strategy", disabled: this.notgotOptimzerFlag, onclick: "OptimizerEvent('OptCmtScen');" }]
 					        },
                             {
                                 items: [
@@ -1561,9 +1559,9 @@
 							    items: [
 
 									{ type: "select", id: "idOptTab_SelView", onchange: "OptimizerEvent('OptSelStrat_Changed');", width: "100px" }
-							   ]
+							    ]
 							}
-						]
+					    ]
 					},
 	                {
 	                    name: "Comparison",
@@ -1571,11 +1569,11 @@
 							{
 							    items: [
 							        { type: "optirp", id: "opttar", onchange: 'OptimizerEvent("OptUpdateProgress");', title: this.ConfNameValue, targetValue: this.targetValue, targetRemaining: this.targetRemaining, targetPrefix: tarpre, targetPostfix: tarpost }
-								]
+							    ]
 							}
 	                    ]
 	                }
-				]
+            ]
         };
 
 
@@ -1677,10 +1675,10 @@
                         addme.step = 1;
                     else if (idif <= 1000)
                         addme.step = 10;
-                    //                    else if (idif <= 10000)
-                    //                        addme.step = 1000;
-                    //                    else if (idif <= 100000)
-                    //                        addme.step = 10000;
+                        //                    else if (idif <= 10000)
+                        //                        addme.step = 1000;
+                        //                    else if (idif <= 100000)
+                        //                        addme.step = 10000;
                     else
                         addme.step = idif / 100;
 
@@ -1765,7 +1763,7 @@
                 this.OptDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                 this.OptDlg.setImagePath(this.imagePath);
                 this.OptDlg.createWindow("winOptDlg", 20, 30, 594, 453);
- //               this.OptDlg.window("winOptDlg").setIcon("logo.ico", "logo.ico");
+                //               this.OptDlg.window("winOptDlg").setIcon("logo.ico", "logo.ico");
                 this.OptDlg.window("winOptDlg").allowMove();
                 this.OptDlg.window("winOptDlg").denyResize();
                 this.OptDlg.window("winOptDlg").setModal(true);
@@ -2080,26 +2078,24 @@
         window.setTimeout(this.FinishOptConfDelegate, 10);
 
     }
-    function ThisTypeNumeric(fldtype)
-        {
+    function ThisTypeNumeric(fldtype) {
 
-            switch (fldtype)
-            {
+        switch (fldtype) {
 
 
-                case "20":
-                case "23":  
-                case "2":
-                case "3":
-                case "8":
-                case "11":
-                    return true;
-            }
-            return false;
+            case "20":
+            case "23":
+            case "2":
+            case "3":
+            case "8":
+            case "11":
+                return true;
         }
-    function DlgHtmlInject  () {        
+        return false;
+    }
+    function DlgHtmlInject() {
         var sInject = new StringBuilder();
-            
+
         sInject.append('<div class="modalText" style="margin-top:10px;padding-right:10px;">');
         sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:20x;padding-left:12px!important;">');
         sInject.append('	1) Which field will be totaled and used to compare to the manually entered value?<br>');
@@ -2107,7 +2103,7 @@
         sInject.append('  </div>');
         sInject.append('  <div style="padding-left:12px!important;">');
         sInject.append('    <select id="idOptConfTotalField" name="idOptTotalField" style="vertical-align:middle;padding:0px;margin:0px;" ></select>');
-        sInject.append('  </div>'); 
+        sInject.append('  </div>');
         sInject.append('  <br />');
         sInject.append('  <div style="display:relative;vertical-align:middle;padding-bottom:20px;padding-left:12px!important;">');
         sInject.append('	2) Enter a title for the comparison field.');
@@ -2119,7 +2115,7 @@
         sInject.append('  <div style="padding-left:12px!important;">');
         sInject.append('    <div style="display:relative;vertical-align:middle;padding-bottom:20px;">');
         sInject.append('	  3) Which fields will be used as filters?');
-        sInject.append('    </div>');        
+        sInject.append('    </div>');
         sInject.append('    <table cellspacing="0" cellpadding="0" style="width:100%; display: block;">');
         sInject.append('        <tr>');
         sInject.append('            <td style="padding-bottom:3px;">Available Fields</td>');
@@ -2180,7 +2176,7 @@
         sInject.append('    </div>');
         sInject.append('</div>');
 
-        
+
         return sInject.toString();
 
     }
@@ -2225,7 +2221,7 @@
         this.flashRemainingValueDelegate = MakeDelegate(this, this.flashRemainingValue);
         this.flashTabRibbonDelegate = MakeDelegate(this, this.flashTabRibbon);
         this.DeferInitialTabRibbonDelegate = MakeDelegate(this, this.DeferInitialTabRibbon);
-   
+
         this.TotAddSel = null;
         this.TotRemSel = null;
 
@@ -2245,7 +2241,7 @@
         this.curr_sym = "$";
         this.currprefix = "$";
         this.currpostfix = "";
-        
+
         try {
             this.curr_pos = this.OptData.Currency.Pos;
             this.curr_sym = this.OptData.Currency.Sym;
@@ -2255,18 +2251,18 @@
                 this.currprefix = this.curr_sym;
             else if (this.curr_pos == 2)
                 this.currprefix = this.curr_sym + " ";
-            else 
+            else
                 this.currprefix = "";
 
             if (this.curr_pos == 1)
                 this.currpostfix = this.curr_sym;
             else if (this.curr_pos == 3)
-                this.currpostfix = " " +  this.curr_sym;
-            else 
-                this.currpostfix = "";    
-      
+                this.currpostfix = " " + this.curr_sym;
+            else
+                this.currpostfix = "";
+
         }
-        catch(e) {
+        catch (e) {
 
         }
 
@@ -2289,7 +2285,7 @@
             var fld = this.Fields[fi];
 
             if (fld.FOPTFLAG == 1)
-                this.notgotOptimzerFlag = false;               
+                this.notgotOptimzerFlag = false;
 
             fld.FID = parseInt(fld.FID);
             fld.accind = fi;
@@ -2320,7 +2316,7 @@
                         fld.maxValue = Math.max(iVal, fld.maxValue);
                     }
                 }
-                
+
 
 
                 fld.rangeMaxValue = fld.maxValue;
@@ -2378,7 +2374,7 @@
             }
 
         }
-        
+
         // by now we have the data ranges for the numeric stuff and the list of unique text values for all the items brought in!
 
         item = 0;
