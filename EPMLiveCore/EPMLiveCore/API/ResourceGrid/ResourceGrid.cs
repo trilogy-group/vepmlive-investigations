@@ -649,6 +649,9 @@ namespace EPMLiveCore.API
 						foreach (XElement dataElement in resourceElement.Elements())
 						{
 							string field = dataElement.Attribute("Field").Value;
+
+						    if (field.Equals("LinkTitle") || field.Equals("LinkTitleNoMenu")) continue;
+
 							string value = dataElement.Attribute("HtmlValue").Value;
 							string type = dataElement.Attribute("Type").Value;
 
@@ -908,6 +911,8 @@ namespace EPMLiveCore.API
 						if (spField.Hidden && !spField.InternalName.Equals("EXTID")) continue;
 
 						string internalName = spField.InternalName;
+
+                        if (internalName.Equals("LinkTitle") || internalName.Equals("LinkTitleNoMenu")) continue;
 
 						if (existingCols.Contains(internalName)) continue;
 
