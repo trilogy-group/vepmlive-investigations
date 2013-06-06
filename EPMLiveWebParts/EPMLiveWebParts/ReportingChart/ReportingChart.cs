@@ -659,6 +659,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
+            int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sArea = new AreaSeries();
@@ -699,6 +700,16 @@ namespace EPMLiveWebParts.ReportingChart
                     sArea.TooltipsAppearance.DataFormatString = "{0:p}";
                 }
                 _radChart.PlotArea.Series.Add(sArea);
+
+                int ndct = (from SeriesItem si in sArea.Items
+                            where si.YValue > 0
+                            select si).Count();
+                intNoDataCt += ndct;
+            }
+
+            if (intNoDataCt == 0)
+            {
+                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
             }
         }
 
@@ -710,6 +721,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
+            int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sBar = new BarSeries();
@@ -747,6 +759,15 @@ namespace EPMLiveWebParts.ReportingChart
 
 
                 _radChart.PlotArea.Series.Add(sBar);
+                int ndct = (from SeriesItem si in sBar.Items
+                            where si.YValue > 0
+                            select si).Count();
+                intNoDataCt += ndct;
+            }
+
+            if (intNoDataCt == 0)
+            {
+                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
             }
         }
 
@@ -758,6 +779,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
+            int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sCol = new ColumnSeries();
@@ -796,6 +818,16 @@ namespace EPMLiveWebParts.ReportingChart
                 }
 
                 _radChart.PlotArea.Series.Add(sCol);
+
+                int ndct = (from SeriesItem si in sCol.Items
+                            where si.YValue > 0
+                            select si).Count();
+                intNoDataCt += ndct;
+            }
+
+            if (intNoDataCt == 0)
+            {
+                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
             }
         }
 
@@ -807,6 +839,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
+            int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sLine = new LineSeries();
@@ -839,6 +872,15 @@ namespace EPMLiveWebParts.ReportingChart
 
 
                 _radChart.PlotArea.Series.Add(sLine);
+                int ndct = (from SeriesItem si in sLine.Items
+                            where si.YValue > 0
+                            select si).Count();
+                intNoDataCt += ndct;
+            }
+
+            if (intNoDataCt == 0)
+            {
+                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
             }
         }
 
@@ -846,6 +888,7 @@ namespace EPMLiveWebParts.ReportingChart
         {
             PieSeries sPie;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
+            int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sPie = new PieSeries();
@@ -864,7 +907,22 @@ namespace EPMLiveWebParts.ReportingChart
                 }
 
                 _radChart.PlotArea.Series.Add(sPie);
+                
+                int ndct = (from SeriesItem si in sPie.Items
+                            where si.YValue > 0
+                            select si).Count();
+                intNoDataCt += ndct;
             }
+
+            if (intNoDataCt == 0)
+            {
+                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            }
+
+            _radChart.PlotArea.XAxis.MajorGridLines.Visible = false;
+            _radChart.PlotArea.XAxis.MinorGridLines.Visible = false;
+            _radChart.PlotArea.YAxis.MajorGridLines.Visible = false;
+            _radChart.PlotArea.YAxis.MinorGridLines.Visible = false;
         }
 
         private void BuildScatterSeries()
@@ -907,6 +965,7 @@ namespace EPMLiveWebParts.ReportingChart
         {
             BubbleSeries sBubble;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
+            int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sBubble = new BubbleSeries();
@@ -929,6 +988,16 @@ namespace EPMLiveWebParts.ReportingChart
                 }
 
                 _radChart.PlotArea.Series.Add(sBubble);
+
+                int ndct = (from SeriesItem si in sBubble.Items
+                            where si.YValue > 0 && si.XValue > 0 && si.SizeValue > 0
+                            select si).Count();
+                intNoDataCt += ndct;
+            }
+
+            if (intNoDataCt == 0)
+            {
+                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
             }
         }
 
@@ -936,6 +1005,7 @@ namespace EPMLiveWebParts.ReportingChart
         {
             DonutSeries sDonut;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
+            int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sDonut = new DonutSeries();
@@ -959,7 +1029,21 @@ namespace EPMLiveWebParts.ReportingChart
                     }
                 }
                 _radChart.PlotArea.Series.Add(sDonut);
+                int ndct = (from SeriesItem si in sDonut.Items
+                            where si.YValue > 0
+                            select si).Count();
+                intNoDataCt += ndct;
             }
+
+            if (intNoDataCt == 0)
+            {
+                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            }
+
+            _radChart.PlotArea.XAxis.MajorGridLines.Visible = false;
+            _radChart.PlotArea.XAxis.MinorGridLines.Visible = false;
+            _radChart.PlotArea.YAxis.MajorGridLines.Visible = false;
+            _radChart.PlotArea.YAxis.MinorGridLines.Visible = false;
         }
 
         private Dictionary<string, List<SeriesItem>> GetSeriesItems()
