@@ -227,7 +227,7 @@ namespace EPMLiveCore.API
                             li["Icon"] = appDef.Icon;
                             li["Status"] = "Not Installed";
                             li["InstallXML"] = appDef.ApplicationXml.OuterXml;
-                            li["AppUrl"] = appDef.url;
+                            li["AppUrl"] = appDef.fullurl;
 
                             li.Update();
                         }
@@ -262,7 +262,8 @@ namespace EPMLiveCore.API
                                 appDef.Version = li["AppVersion"].ToString();
                                 try
                                 {
-                                    appDef.url = oListItem["AppUrl"].ToString();
+                                    appDef.fullurl = oListItem["AppUrl"].ToString();
+                                    appDef.appurl = appDef.fullurl.Replace(EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore"), "");
                                 }
                                 catch { }
                             }
@@ -1623,7 +1624,7 @@ namespace EPMLiveCore.API
             if(oViewFile.Exists)
             {
                 
-                string sUrl = appDef.url + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
+                string sUrl = appDef.fullurl + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
 
                 bool bHasViewFile = false;
                 try
@@ -2572,7 +2573,7 @@ namespace EPMLiveCore.API
 
                         webClient.Credentials = CoreFunctions.GetStoreCreds();
                         byte[] fileBytes = null;
-                        fileBytes = webClient.DownloadData(appDef.url + "/Solutions/" + FileName);
+                        fileBytes = webClient.DownloadData(appDef.fullurl + "/Solutions/" + FileName);
                         newFile = solutions.RootFolder.Files.Add(FileName, fileBytes);
                     }
 
@@ -2664,7 +2665,7 @@ namespace EPMLiveCore.API
 
                             webClient.Credentials = CoreFunctions.GetStoreCreds();
                             byte[] fileBytes = null;
-                            fileBytes = webClient.DownloadData(appDef.url + "/Lists/" + FileName);
+                            fileBytes = webClient.DownloadData(appDef.fullurl + "/Lists/" + FileName);
                             solutions.RootFolder.Files.Add(FileName, fileBytes);
                         }
 
@@ -2704,7 +2705,7 @@ namespace EPMLiveCore.API
 
             if(oParentFolder.Exists)
             {
-                string sUrl = appDef.url + "/Files/" + sFullFile;
+                string sUrl = appDef.fullurl + "/Files/" + sFullFile;
 
                 byte[] fileBytes = copy.GetFile(sUrl);
 
@@ -2725,7 +2726,7 @@ namespace EPMLiveCore.API
             {
                 string sRemoteName = getAttribute(ndChild, "RemoteFile");
                 string sType = getAttribute(ndChild, "Type");
-                string sFullFile = sRemoteName.Replace(appDef.url + "/Files/", "");
+                string sFullFile = sRemoteName.Replace(appDef.appurl + "/Files/", "");
                 string sFileName = getAttribute(ndChild, "Name");
                 string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
@@ -2946,7 +2947,7 @@ namespace EPMLiveCore.API
                                     catch { sTitle = lvFileLeafRef.LookupValue; }
 
                                     string sRemoteFile = lvFileRef.LookupValue;
-                                    string sFullFile = sRemoteFile.Replace(appDef.url + "/Files/", "");
+                                    string sFullFile = sRemoteFile.Replace(appDef.appurl + "/Files/", "");
                                     string sFileName = System.IO.Path.GetFileName(sFullFile);
                                     string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
@@ -2958,7 +2959,7 @@ namespace EPMLiveCore.API
                                             sFileName = sTitle;
                                     }
 
-                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace(appDef.url + "/Files/", "")) + "/" + sFileName;
+                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace(appDef.appurl + "/Files/", "")) + "/" + sFileName;
                                     sFullFile = sFullFile.Replace("\\", "/");
                                     sFullFile = sFullFile.Trim('/');
 
@@ -3040,7 +3041,7 @@ namespace EPMLiveCore.API
             }
             oListItem["InstallPercent"] = 0;
             oListItem["AppVersion"] = appDef.Version;
-            oListItem["AppUrl"] = appDef.url;
+            oListItem["AppUrl"] = appDef.fullurl;
             oListItem.Update();
 
             if(!bVerifyOnly)

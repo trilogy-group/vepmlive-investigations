@@ -21,7 +21,8 @@ namespace EPMLiveCore.API
         public int Id;
         public SortedList PreReqs;
         public XmlDocument ApplicationXml;
-        public string url;
+        public string fullurl;
+        public string appurl;
         public bool bIsConfigOnly = false;
         public string Icon;
         public string Version;
@@ -1506,7 +1507,8 @@ namespace EPMLiveCore.API
 
                             string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
                             string sXml = "";
-                            appDef.url = rootFilePath;
+                            appDef.fullurl = rootFilePath;
+                            appDef.appurl = "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
                             appDef.Title = getAttribute(ndChild, "ows_Title");
                             appDef.Icon = getAttribute(ndChild, "ows_Icon");
                             if(appDef.AppAssemblyVersion != "")
