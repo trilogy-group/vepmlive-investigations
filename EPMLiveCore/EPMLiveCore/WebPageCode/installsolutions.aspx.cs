@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using System.Threading;
+using System.Globalization;
 
 namespace EPMLiveCore
 {
@@ -50,7 +51,9 @@ namespace EPMLiveCore
             SPContext.Current.Web.AllowUnsafeUpdates = true;
             
             SPContext.Current.Site.AllowUnsafeUpdates = true;
-            sol.Deploy(DateTime.Now, true, apps, true);
+
+            EnsureLanguagePack(sol, 0U).DeployLocal(true, apps, true, SPCompatibilityRange.AllVersions);
+            //sol.Deploy(DateTime.Now, true, apps, true);
             
             DateTime dtStart = DateTime.Now;
 
@@ -64,6 +67,25 @@ namespace EPMLiveCore
             }
 
             return true;
+        }
+
+        private static SPSolutionLanguagePack EnsureLanguagePack(SPSolution spSolution, uint lcid)
+        {
+            SPSolutionLanguagePack languagePack = spSolution.GetLanguagePack(lcid);
+            if (!(languagePack == null))
+            {
+                return languagePack;
+            }
+
+            if ((int)lcid == 0)
+            {
+                throw new SPException(SPResource.GetString("SolutionLangNeutralNotFound", new object[0]));
+            }
+
+            throw new SPException(SPResource.GetString("SolutionLangPackNotFound", new object[]
+                {
+                    lcid.ToString(NumberFormatInfo.InvariantInfo)
+                }));
         }
     }
 }
