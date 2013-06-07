@@ -14,14 +14,14 @@ namespace PortfolioEngineCore
 {
     internal sealed class ResourceRepository : IRepository<Resource>
     {
-		#region Fields (2) 
+        #region Fields (2) 
 
         private readonly FieldFactory _fieldFactory = new FieldFactory();
         private readonly SqlConnection _sqlConnection;
 
-		#endregion Fields 
+        #endregion Fields 
 
-		#region Enums (1) 
+        #region Enums (1) 
 
         private enum CustomFieldTable
         {
@@ -48,12 +48,12 @@ namespace PortfolioEngineCore
             TaskWIDEC = 803
         }
 
-		#endregion Enums 
+        #endregion Enums 
 
-		#region Constructors (1) 
+        #region Constructors (1) 
 
-/// <summary>
-        /// Initializes a new instance of the <see cref="ResourceRepository"/> class.
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ResourceRepository" /> class.
         /// </summary>
         /// <param name="sqlConnection">The SQL connection.</param>
         internal ResourceRepository(SqlConnection sqlConnection)
@@ -61,14 +61,14 @@ namespace PortfolioEngineCore
             _sqlConnection = sqlConnection;
         }
 
-		#endregion Constructors 
+        #endregion Constructors 
 
-		#region Methods (27) 
+        #region Methods (27) 
 
-		// Public Methods (1) 
+        // Public Methods (1) 
 
         /// <summary>
-        /// Deletes the specified resource.
+        ///     Deletes the specified resource.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="currentUserId">The current user id.</param>
@@ -93,16 +93,18 @@ namespace PortfolioEngineCore
                 _sqlConnection.Close();
             }
         }
-		// Private Methods (23) 
+
+        // Private Methods (23) 
 
         /// <summary>
-        /// Adds the permission.
+        ///     Adds the permission.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="permissionGroup">The permission group.</param>
         private void AddPermission(Resource resource, KeyValuePair<int, string> permissionGroup)
         {
-            const string query = @"INSERT INTO dbo.EPG_GROUP_MEMBERS (MEMBER_UID, GROUP_ID) VALUES(@ResourceId, @GroupId)";
+            const string query =
+                @"INSERT INTO dbo.EPG_GROUP_MEMBERS (MEMBER_UID, GROUP_ID) VALUES(@ResourceId, @GroupId)";
 
             using (var sqlCommand = new SqlCommand(query, _sqlConnection))
             {
@@ -116,7 +118,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Calculates the name of the table field.
+        ///     Calculates the name of the table field.
         /// </summary>
         /// <param name="fieldId">The field id.</param>
         /// <param name="tableId">The table id.</param>
@@ -221,13 +223,14 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Deletes the permission.
+        ///     Deletes the permission.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="permissionGroup">The permission group.</param>
         private void DeletePermission(Resource resource, KeyValuePair<int, string> permissionGroup)
         {
-            const string query = @"DELETE FROM dbo.EPG_GROUP_MEMBERS WHERE MEMBER_UID = @ResourceId AND GROUP_ID = @GroupId";
+            const string query =
+                @"DELETE FROM dbo.EPG_GROUP_MEMBERS WHERE MEMBER_UID = @ResourceId AND GROUP_ID = @GroupId";
 
             using (var sqlCommand = new SqlCommand(query, _sqlConnection))
             {
@@ -241,7 +244,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Generates the new resource id.
+        ///     Generates the new resource id.
         /// </summary>
         /// <returns></returns>
         private int GenerateNewResourceId()
@@ -268,7 +271,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the available custom fields.
+        ///     Gets the available custom fields.
         /// </summary>
         /// <returns></returns>
         private DataTable GetAvailableCustomFields()
@@ -293,7 +296,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the changed properties.
+        ///     Gets the changed properties.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <returns></returns>
@@ -332,28 +335,29 @@ namespace PortfolioEngineCore
                 }
             }
 
-			if (resource.PermissionsDictionary.Count == existingResource.PermissionsDictionary.Count)
-			{
-				if (
-					resource.PermissionsDictionary.Any(kvp => !existingResource.PermissionsDictionary.ContainsKey(kvp.Key)))
-				{
-					changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
-											   existingResource.Permissions);
-				}
-				else
-				{
-					if (resource.PermissionsDictionary.Any(kvp => kvp.Value.Contains("|DEL")))
-					{
-						changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
-											   existingResource.Permissions);
-					}
-				}
-			}
-			else
-			{
-				changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
-										   existingResource.Permissions);
-			}
+            if (resource.PermissionsDictionary.Count == existingResource.PermissionsDictionary.Count)
+            {
+                if (
+                    resource.PermissionsDictionary.Any(
+                        kvp => !existingResource.PermissionsDictionary.ContainsKey(kvp.Key)))
+                {
+                    changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
+                                               existingResource.Permissions);
+                }
+                else
+                {
+                    if (resource.PermissionsDictionary.Any(kvp => kvp.Value.Contains("|DEL")))
+                    {
+                        changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
+                                                   existingResource.Permissions);
+                    }
+                }
+            }
+            else
+            {
+                changedProperties.Rows.Add(3200, null, "Permissions", resource.Permissions,
+                                           existingResource.Permissions);
+            }
 
             List<IField> existingCustomFields = existingResource.CustomFields.ToList();
             List<IField> customFields = resource.CustomFields.ToList();
@@ -400,7 +404,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the custom field.
+        ///     Gets the custom field.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="name">The name.</param>
@@ -409,7 +413,7 @@ namespace PortfolioEngineCore
         private IField GetCustomField(int id, string name, object value)
         {
             foreach (DataRow dataRow in GetAvailableCustomFields().Rows.Cast<DataRow>()
-                .Where(dataRow => (int) dataRow["FA_FIELD_ID"] == id))
+                                                                  .Where(dataRow => (int) dataRow["FA_FIELD_ID"] == id))
             {
                 var fieldType = (int) dataRow["FA_FORMAT"];
 
@@ -424,7 +428,21 @@ namespace PortfolioEngineCore
                     case (int) PFEFieldType.CodeField:
                         if (valueNotNull)
                         {
-                            int code = Convert.ToInt32(value);
+                            int code;
+
+                            try
+                            {
+                                code = Convert.ToInt32(value);
+                            }
+                            catch
+                            {
+                                DataRow lookupValue =
+                                    lookupValueCollection.Cast<DataRow>()
+                                                         .First(
+                                                             row =>
+                                                             row["LV_FULLVALUE"].ToString().Equals(value.ToString()));
+                                code = (int) lookupValue["LV_UID"];
+                            }
 
                             try
                             {
@@ -450,8 +468,8 @@ namespace PortfolioEngineCore
                             var dictionary = new Dictionary<int, string>();
 
                             foreach (int code in ((string) value).Split(',')
-                                .Select(val => Convert.ToInt32(val))
-                                .Where(code => !dictionary.ContainsKey(code)))
+                                                                 .Select(val => Convert.ToInt32(val))
+                                                                 .Where(code => !dictionary.ContainsKey(code)))
                             {
                                 try
                                 {
@@ -486,7 +504,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the custom fields.
+        ///     Gets the custom fields.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="resource">The resource.</param>
@@ -511,7 +529,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the custom field values.
+        ///     Gets the custom field values.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="queryFields">The query fields.</param>
@@ -523,7 +541,7 @@ namespace PortfolioEngineCore
             {
                 sqlCommand.CommandType = CommandType.StoredProcedure;
                 sqlCommand.Parameters.Add(new SqlParameter("@Fields", SqlDbType.NVarChar)
-                                              {Value = string.Join(",", queryFields.ToArray())});
+                    {Value = string.Join(",", queryFields.ToArray())});
                 sqlCommand.Parameters.Add(new SqlParameter("@ResourceId", SqlDbType.Int) {Value = id});
 
                 DataTable lookupValues = GetLookupValues();
@@ -561,10 +579,13 @@ namespace PortfolioEngineCore
                                 var code = (int) value;
 
                                 DataRow lookupValue =
-                                    lookupValues.Rows.Cast<DataRow>().First(row => (int) row["LV_UID"] == code);
+                                    lookupValues.Rows.Cast<DataRow>().FirstOrDefault(row => (int) row["LV_UID"] == code);
 
-                                ((CodeField) field).SetCode(code);
-                                field.SetValue(lookupValue["LV_FULLVALUE"]);
+                                if (lookupValue != null)
+                                {
+                                    ((CodeField) field).SetCode(code);
+                                    field.SetValue(lookupValue["LV_FULLVALUE"]);
+                                }
                             }
                         }
                         else
@@ -586,7 +607,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the general information.
+        ///     Gets the general information.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="resource">The resource.</param>
@@ -644,7 +665,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the groups.
+        ///     Gets the groups.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="resource">The resource.</param>
@@ -720,7 +741,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the lookup values.
+        ///     Gets the lookup values.
         /// </summary>
         /// <returns></returns>
         private DataTable GetLookupValues()
@@ -748,14 +769,15 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the multi value custom field values.
+        ///     Gets the multi value custom field values.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="dataTable">The data table.</param>
         /// <param name="resource">The resource.</param>
         private void GetMultiValueCustomFieldValues(int id, DataTable dataTable, ref Resource resource)
         {
-            const string query = @"SELECT dbo.EPGC_RESOURCE_MV_VALUES.MVR_FIELD_ID, dbo.EPGC_RESOURCE_MV_VALUES.MVR_UID, dbo.EPGP_LOOKUP_VALUES.LV_VALUE 
+            const string query =
+                @"SELECT dbo.EPGC_RESOURCE_MV_VALUES.MVR_FIELD_ID, dbo.EPGC_RESOURCE_MV_VALUES.MVR_UID, dbo.EPGP_LOOKUP_VALUES.LV_VALUE 
                                    FROM   dbo.EPGP_LOOKUP_VALUES INNER JOIN dbo.EPGC_RESOURCE_MV_VALUES ON dbo.EPGP_LOOKUP_VALUES.LV_UID = dbo.EPGC_RESOURCE_MV_VALUES.MVR_UID
                                    WHERE  (dbo.EPGC_RESOURCE_MV_VALUES.WRES_ID = @ResourceId)";
 
@@ -812,7 +834,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the query fields.
+        ///     Gets the query fields.
         /// </summary>
         /// <param name="singleValueQueryFields">The single value query fields.</param>
         /// <param name="multiValueQueryFields">The multi value query fields.</param>
@@ -848,7 +870,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the resource custom field values.
+        ///     Gets the resource custom field values.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="dictionary">The dictionary.</param>
@@ -889,7 +911,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the unboxed value.
+        ///     Gets the unboxed value.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="type">The type.</param>
@@ -917,7 +939,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Inserts the basic resource information.
+        ///     Inserts the basic resource information.
         /// </summary>
         /// <param name="resource">The resource.</param>
         private void InsertBasicResourceInformation(Resource resource)
@@ -948,13 +970,13 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Determines whether [is resource in use] [the specified resource].
+        ///     Determines whether [is resource in use] [the specified resource].
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="stringBuilder">The string builder.</param>
         /// <param name="checkLevel">The check level.</param>
         /// <returns>
-        ///   <c>true</c> if [is resource in use] [the specified resource]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [is resource in use] [the specified resource]; otherwise, <c>false</c>.
         /// </returns>
         private bool IsResourceInUse(Resource resource, StringBuilder stringBuilder, int checkLevel)
         {
@@ -1018,7 +1040,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Updates the cost category.
+        ///     Updates the cost category.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="costCategoryId">The cost category id.</param>
@@ -1044,7 +1066,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Updates the custom fields.
+        ///     Updates the custom fields.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="changedCustomFields">The changed custom fields.</param>
@@ -1063,14 +1085,14 @@ namespace PortfolioEngineCore
                              let fieldTableId = (int) availableFields["FA_TABLE_ID"]
                              where fieldTableId == tableId
                              select new
-                                        {
-                                            FieldId = changedFieldId,
-                                            FieldValue = changedFields["NewValue"],
-                                            FieldFormat = Enum.Parse(typeof (PFEFieldType),
-                                                                     availableFields["FA_FORMAT"].ToString()),
-                                            TableId = fieldTableId,
-                                            TableFieldId = (int) availableFields["FA_FIELD_IN_TABLE"],
-                                        };
+                                 {
+                                     FieldId = changedFieldId,
+                                     FieldValue = changedFields["NewValue"],
+                                     FieldFormat = Enum.Parse(typeof (PFEFieldType),
+                                                              availableFields["FA_FORMAT"].ToString()),
+                                     TableId = fieldTableId,
+                                     TableFieldId = (int) availableFields["FA_FIELD_IN_TABLE"],
+                                 };
 
                 string tableName = null;
 
@@ -1211,7 +1233,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Updates the general information.
+        ///     Updates the general information.
         /// </summary>
         /// <param name="resourceId">The resource id.</param>
         /// <param name="changedProperties">The changed properties.</param>
@@ -1253,7 +1275,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Updates the groups.
+        ///     Updates the groups.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="dataRow">The data row.</param>
@@ -1290,7 +1312,8 @@ namespace PortfolioEngineCore
 
             if (!propertyName.Equals("Permissions"))
             {
-                query = @"DELETE FROM dbo.EPG_GROUP_MEMBERS WHERE MEMBER_UID = @ResourceId AND GROUP_ID In (SELECT GROUP_ID FROM dbo.EPG_GROUPS WHERE GROUP_ENTITY = @GroupEntityId)";
+                query =
+                    @"DELETE FROM dbo.EPG_GROUP_MEMBERS WHERE MEMBER_UID = @ResourceId AND GROUP_ID In (SELECT GROUP_ID FROM dbo.EPG_GROUPS WHERE GROUP_ENTITY = @GroupEntityId)";
 
                 using (var sqlCommand = new SqlCommand(query, _sqlConnection))
                 {
@@ -1341,7 +1364,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Validates the resource.
+        ///     Validates the resource.
         /// </summary>
         /// <param name="resource">The resource.</param>
         private void ValidateResource(Resource resource)
@@ -1369,10 +1392,11 @@ namespace PortfolioEngineCore
                                        string.Format("Validation Errors: {0}", string.Join(" ", errorMessages.ToArray())));
             }
         }
-		// Internal Methods (3) 
+
+        // Internal Methods (3) 
 
         /// <summary>
-        /// Builds the resource.
+        ///     Builds the resource.
         /// </summary>
         /// <param name="dataRow">The data row.</param>
         /// <param name="permissionGroups">The permission groups.</param>
@@ -1380,7 +1404,8 @@ namespace PortfolioEngineCore
         /// <param name="extId">The ext id.</param>
         /// <param name="id">The id.</param>
         /// <returns></returns>
-        internal Resource BuildResource(DataRow dataRow, IEnumerable<Group> permissionGroups, string username, string extId, int? id)
+        internal Resource BuildResource(DataRow dataRow, IEnumerable<Group> permissionGroups, string username,
+                                        string extId, int? id)
         {
             Resource resource;
 
@@ -1404,9 +1429,10 @@ namespace PortfolioEngineCore
                 foreach (
                     FieldInfoAttribute fieldInfoAttribute in
                         propertyInfo.GetCustomAttributes(typeof (FieldInfoAttribute), false)
-                            .Cast<FieldInfoAttribute>()
-                            .Where(
-                                fieldInfo => dcCollection.Contains(fieldInfo.Id.ToString(CultureInfo.InvariantCulture)))
+                                    .Cast<FieldInfoAttribute>()
+                                    .Where(
+                                        fieldInfo =>
+                                        dcCollection.Contains(fieldInfo.Id.ToString(CultureInfo.InvariantCulture)))
                     )
                 {
                     int fieldId = fieldInfoAttribute.Id;
@@ -1451,7 +1477,10 @@ namespace PortfolioEngineCore
                         {
                             resource.PermissionsDictionary.Clear();
 
-                            var dictionary = ((string) value).Split(',').Select(perm => perm.Split(':')).ToDictionary(p => p[0], p => bool.Parse(p[1]));
+                            Dictionary<string, bool> dictionary =
+                                ((string) value).Split(',')
+                                                .Select(perm => perm.Split(':'))
+                                                .ToDictionary(p => p[0], p => bool.Parse(p[1]));
 
                             foreach (Group perm in permissionGroups)
                             {
@@ -1514,7 +1543,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Determines whether this instance can delete the specified resource.
+        ///     Determines whether this instance can delete the specified resource.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <param name="message">The message.</param>
@@ -1622,7 +1651,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Gets the resource id.
+        ///     Gets the resource id.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="externalUId">The external U id.</param>
@@ -1655,12 +1684,12 @@ namespace PortfolioEngineCore
             throw new PFEException((int) PFEError.GetResourceId, "Cannot find the requested resource in PFE.");
         }
 
-		#endregion Methods 
+        #endregion Methods 
 
         #region Implementation of IRepository<Resource>
 
         /// <summary>
-        /// Adds the specified resource.
+        ///     Adds the specified resource.
         /// </summary>
         /// <param name="resource">The resource.</param>
         /// <returns></returns>
@@ -1679,7 +1708,7 @@ namespace PortfolioEngineCore
 
 
         /// <summary>
-        /// Updates the specified resource.
+        ///     Updates the specified resource.
         /// </summary>
         /// <param name="resource">The resource.</param>
         public void Update(Resource resource)
@@ -1739,7 +1768,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Finds the id by.
+        ///     Finds the id by.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
@@ -1776,7 +1805,7 @@ namespace PortfolioEngineCore
         }
 
         /// <summary>
-        /// Finds the resource by id.
+        ///     Finds the resource by id.
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns></returns>
