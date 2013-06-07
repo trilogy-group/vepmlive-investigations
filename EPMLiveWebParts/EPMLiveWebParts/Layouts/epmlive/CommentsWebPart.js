@@ -238,14 +238,14 @@ function GetData() {
                 dataType: 'json',
 
                 success: function (response) {
+                    $('#divLoader_CommentsWebPart').css('display', 'none');
+
                     if (response.d) {
                         var responseJson = window.epmLive.parseJson(response.d);
 
                         if (window.epmLive.responseIsSuccess(responseJson.Result)) {
                             // remember what items has been loaded
                             loadedItemIds += ',' + responseJson.Result.Comments.LoadedIds;
-
-                            $('#divLoader_CommentsWebPart').css('display', 'none');
 
                             if (responseJson.Result.Comments && responseJson.Result.Comments.CommentItem) {
                                 var comments;
@@ -513,14 +513,13 @@ function GetData() {
                 dataType: 'json',
 
                 success: function (response) {
+                    $('#divLoader_CommentsWebPart').css('display', 'none');
                     if (response.d) {
                         var responseJson = window.epmLive.parseJson(response.d);
 
                         if (window.epmLive.responseIsSuccess(responseJson.Result)) {
                             // remember what items has been loaded
                             loadedItemIds = responseJson.Result.Comments.LoadedIds;
-
-                            $('#divLoader_CommentsWebPart').css('display', 'none');
 
                             if (responseJson.Result.Comments && responseJson.Result.Comments.CommentItem) {
                                 var comments;
@@ -766,7 +765,7 @@ function GetData() {
                     }
                     else {
                         $.getScript('/_layouts/epmlive/slimScroll.js', function () {
-                            $('#commentsWebPartMainContainer').slimScroll({ height: '300px', size: '10px', wheelStep: 5 });
+                            //$('#commentsWebPartMainContainer').slimScroll({ height: '300px', size: '10px', wheelStep: 5 });
                         }, true);
 
                         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
