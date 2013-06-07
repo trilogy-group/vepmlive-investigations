@@ -20,16 +20,15 @@ namespace EPMLiveWebParts.Comments
     {
         #region constant strings
 
-        const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" style=\"width: 100%; text-align: center;\">" +
-                                        "<img src=\"/_layouts/15/images/gears_anv4.gif\" style=\"vertical-align: middle\" />" +
-                                        "<span id=\"spanMainLoading\">Loading comments...</span>" +
+        const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" style=\"background:url('/_layouts/15/epmlive/images/progress_ring.gif') no-repeat scroll center center transparent;height:50px;width:100%\">" +
                                     "</div>";
 
-        const string _loadingHtml2 = "<div id=\"divLoader_CommentsWebPart\" style=\"display:none;width:100%; vertical-align: middle; white-space: nowrap; background-color: rgb(255, 255, 255); padding-top:10px; padding-bottom:10px;\">" +
-                                    "<IMG style=\"VERTICAL-ALIGN: middle; margin-left:45%;\" title=\"Loading...\" alt=\"Loading...\" src=\"/_layouts/images/progress-circle-24.gif\">&nbsp;" +
-                                    "<SPAN style=\"TEXT-ALIGN: center; WHITE-SPACE: nowrap; COLOR: black; VERTICAL-ALIGN: middle; OVERFLOW: hidden;font-family:Verdana;font-size:12px;color:#686868;\">Loading...</SPAN>"+
-                                    "</div>";
+        //const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" style=\"display:none;width:100%; vertical-align: middle; white-space: nowrap; background-color: rgb(255, 255, 255); padding-top:10px; padding-bottom:10px;\" >" +
+        //                            "<IMG style=\"VERTICAL-ALIGN: middle; margin-left:45%;\" title=\"Loading...\" alt=\"Loading...\" src=\"/_layouts/images/progress-circle-24.gif\">&nbsp;" +
+        //                            "<SPAN style=\"TEXT-ALIGN: center; WHITE-SPACE: nowrap; COLOR: black; VERTICAL-ALIGN: middle; OVERFLOW: hidden;font-family:Verdana;font-size:12px;color:#686868;\">Loading...</SPAN>"+
+        //                            "</div>";
 
+        
 
         const string _noCommentHtml = "<div id=\"divNoCommentIndicator\" style=\"width: 100%; text-align: center;display:none\">" +
                                         "<span id=\"spanMainLoading\">You have no comments.</span>" +
@@ -148,7 +147,7 @@ namespace EPMLiveWebParts.Comments
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsWebPartStyle.css\"/>");
 
             output.Write("<div id=\"commentsWebPartMainContainer\" class=\"commentsWPMainContainer\">");
-            output.Write(_loadingHtml2);
+            output.Write(_loadingHtml);
             output.Write("<div style=\"clear:both;height:5px\"></div>");
             output.Write(_noCommentHtml);
             output.Write("</div>");
