@@ -265,13 +265,13 @@
 					LabelText="Resource Information"
 					TemplateAlias="oM"/>
 				
-				<Button
+				<!--<Button
 					Id="Ribbon.WorkPlanner.ResourcesGroup.CheckResource"
 					Sequence="40"
 					Image16by16="/_layouts/images/epmlive_rt_check.gif"
 					Command="Ribbon.WorkPlanner.CheckResource"
 					LabelText="Check Resource"
-					TemplateAlias="oM"/>
+					TemplateAlias="oM"/>-->
 
 				
 
