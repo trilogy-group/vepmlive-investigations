@@ -371,7 +371,7 @@ namespace EPMLiveCore.Integrations.Salesforce
             {
                 upsertResults.AddRange(
                     _sforceService.update(objectsToUpdate.ToArray())
-                                  .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.INSERT, r}}));
+                                  .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.UPDATE, r}}));
             }
 
             return upsertResults;

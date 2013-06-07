@@ -293,11 +293,23 @@ namespace EPMLiveCore.Integrations.Salesforce
 
                                 for (int i = 0; i < errors.Count(); i++)
                                 {
+                                    var error = errors[i];
+
+                                    string fields = string.Empty;
+
+                                    if (error.fields != null)
+                                    {
+                                        try
+                                        {
+                                            fields = "Fields: " + string.Join(",", error.fields) + ".";
+                                        }
+                                        catch { }
+                                    }
+
                                     log.LogMessage(
                                         string.Format(
-                                            "Could not insert / update record with Salesforce ID: {0}, SharePoint ID: {1}. Status code: {2}. Message: {3}. Fields: {4}",
-                                            sfId, spid, errors[i].statusCode, errors[i].message,
-                                            string.Join(",", errors[i].fields)), IntegrationLogType.Warning);
+                                            "Could not insert / update record with Salesforce ID: {0}, SharePoint ID: {1}. Status code: {2}. Message: {3} {4}",
+                                            sfId, spid, error.statusCode, error.message, fields), IntegrationLogType.Warning);
                                 }
                             }
                         }
