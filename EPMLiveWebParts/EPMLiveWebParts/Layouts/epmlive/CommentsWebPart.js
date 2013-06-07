@@ -17,11 +17,13 @@ function GetData() {
                                 '<img alt="User Photo" style="width:45px;height:45px" src="##userPicUrl##">' +
                             '</td>' +
                             '<td class="socialcomment-IMPawn" rowSpan="2" align="left">' +
-                                '<div id="DataFrameManager_ctl02_socomIM_0" class="socialcomment-IMPawn">' +
-                                    '<span>' +
-                                        '<img border="0" id="commentAvailBubble##itemId##" alt="Status indicator" src="/_layouts/images/imnhdr.gif" width="12" onload="IMNRC(\'##userEmail##\');" height="12" ShowOfflinePawn="1">' +
-                                    '</span>' +
-                                '</div>' +
+                                '<span class="ms-imnSpan">' +
+	                                '<a class="ms-imnlink ms-spimn-presenceLink" onclick="IMNImageOnClick(event); return false;" href="#">' +
+		                                '<span class="ms-spimn-presenceWrapper ms-imnImg ms-spimn-imgSize-10x10"><img id="imn0,type=sip" sip="##userEmail##" src="/_layouts/15/images/spimn.png" showofflinepawn="1" class="ms-spimn-img ms-spimn-presence-disconnected-10x10x32" name="imnmark" alt="No presence information" title="">' +
+		                                '</span>' +
+	                                '</a>' +
+                                '</span>' +
+
                             '</td>' +
                             '<td class="socialcomment-top" vAlign="left">' +
                                 '<div>' +
@@ -53,11 +55,12 @@ function GetData() {
                                 '<img alt="User Photo" style="width:32px;height:32px" src="##userPicUrl##">' +
                             '</td>' +
                             '<td class="socialcomment-IMPawn" rowSpan="2" align="left">' +
-                                '<div id="DataFrameManager_ctl02_socomIM_0" class="socialcomment-IMPawn">' +
-                                    '<span>' +
-                                        '<img border="0" id="commentAvailBubble##itemId##" alt="Status indicator" src="/_layouts/images/imnhdr.gif" width="12" onload="IMNRC(\'##userEmail##\');" height="12" ShowOfflinePawn="1">' +
-                                    '</span>' +
-                                '</div>' +
+                                '<span class="ms-imnSpan">' +
+	                                '<a class="ms-imnlink ms-spimn-presenceLink" onclick="IMNImageOnClick(event); return false;" href="#">' +
+		                                '<span class="ms-spimn-presenceWrapper ms-imnImg ms-spimn-imgSize-10x10"><img id="imn0,type=sip" sip="##userEmail##" src="/_layouts/15/images/spimn.png" showofflinepawn="1" class="ms-spimn-img ms-spimn-presence-disconnected-10x10x32" name="imnmark" alt="No presence information" title="">' +
+		                                '</span>' +
+	                                '</a>' +
+                                '</span>' +
                             '</td>' +
                             '<td class="socialcomment-top" vAlign="left">' +
                                 '<div>' +
@@ -85,11 +88,17 @@ function GetData() {
                                 '<img alt="User Photo" style="width:32px;height:32px" src="##userPicUrl##">' +
                             '</td>' +
                             '<td class="socialcomment-IMPawn" rowSpan="2" align="left">' +
-                                '<div id="DataFrameManager_ctl02_socomIM_0" class="socialcomment-IMPawn">' +
-                                    '<span>' +
-                                        '<img border="0" id="commentAvailBubble##itemId##" alt="Status indicator" src="/_layouts/images/imnhdr.gif" width="12" onload="IMNRC(\'##userEmail##\');" height="12" ShowOfflinePawn="1">' +
-                                    '</span>' +
-                                '</div>' +
+                                //'<div id="DataFrameManager_ctl02_socomIM_0" class="socialcomment-IMPawn">' +
+                                //    '<span>' +
+                                //        '<img border="0" id="commentAvailBubble##itemId##" alt="Status indicator" src="/_layouts/images/imnhdr.gif" width="12" onload="IMNRC(\'##userEmail##\');" height="12" ShowOfflinePawn="1">' +
+                                //    '</span>' +
+                                //'</div>' +
+                                '<span class="ms-imnSpan">' +
+	                                '<a class="ms-imnlink ms-spimn-presenceLink" onclick="IMNImageOnClick(event); return false;" href="#">' +
+		                                '<span class="ms-spimn-presenceWrapper ms-imnImg ms-spimn-imgSize-10x10"><img id="imn0,type=sip" sip="##userEmail##" src="/_layouts/15/images/spimn.png" showofflinepawn="1" class="ms-spimn-img ms-spimn-presence-disconnected-10x10x32" name="imnmark" alt="No presence information" title="">' +
+		                                '</span>' +
+	                                '</a>' +
+                                '</span>' +
                             '</td>' +
                             '<td class="socialcomment-top" vAlign="left">' +
                                 '<div>' +
