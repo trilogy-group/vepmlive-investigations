@@ -310,15 +310,6 @@
                                                                         Location="Microsoft.SharePoint.StandardMenu"
                                                                         GroupId="SiteActions"
                                                                         UseShortId="true">
-                                            <SharePoint:MenuItemTemplate runat="server"
-                                                                         id="MenuItem_ShareThisSite"
-                                                                         Text="<%$Resources:wss,siteactions_sharethissite%>"
-                                                                         Description="<%$Resources:wss,siteactions_sharethissitedescription%>"
-                                                                         MenuGroupId="100"
-                                                                         Sequence="110"
-                                                                         UseShortId="true"
-                                                                         PermissionsString="ViewPages"
-                                                                         PermissionMode="Any" />
                                             <SharePoint:MenuItemTemplate runat="server" id="MenuItem_EditPage"
                                                                          Text="<%$Resources:wss,siteactions_editpage15%>"
                                                                          Description="<%$Resources:wss,siteactions_editpagedescriptionv4%>"
@@ -1681,6 +1672,11 @@
 	        if ($("#ctl00_PlaceHolderSearchArea_SmallSearchInputBox1_csr_sbox").length == 0) {
 	            $("#ms-helpSearch").hide();
 	        }
+            
+	        //hide getting started and Change the look links from Site Settings menu
+	        $('#ctl00_SiteActionsMenuMain_ctl00_ctl00').remove();
+	        $('#zz5_MenuItem_ChangeTheLook').remove();
+
 	    }
 
 	    ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
