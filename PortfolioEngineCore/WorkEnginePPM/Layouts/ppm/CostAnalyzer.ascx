@@ -527,7 +527,7 @@ border-radius: 0px;
     <table id="TotalsGridTable" width="100%"  cellspacing="0">
           <tr >
             <td>
-                <br/>1. Select which fields you want to aggregate the totals too :<br/>
+                <br/>1) Select the fields to be aggregated and displayed in the bottom grid<br/>
             </td>
         </tr>
         <tr >
