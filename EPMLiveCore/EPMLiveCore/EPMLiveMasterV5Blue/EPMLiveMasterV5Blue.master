@@ -1673,10 +1673,8 @@
 	            $("#ms-helpSearch").hide();
 	        }
             
-	        //hide getting started and Change the look links from Site Settings menu
-	        $('#ctl00_SiteActionsMenuMain_ctl00_ctl00').remove();
+	        //hide Change the look link from Site Settings menu
 	        $('#zz5_MenuItem_ChangeTheLook').remove();
-
 	    }
 
 	    ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
