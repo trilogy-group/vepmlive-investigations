@@ -43,8 +43,10 @@ namespace EPMLiveCore
                     Image dropImg = new Image();
                     dropImg.ImageUrl = "/_layouts/epmlive/images/dropdown2.png";
                     dropImg.Attributes["id"] = propBag.Field + "_ddlShowAll";
-                    dropImg.Attributes["style"] = "margin-left: -5px;;margin-top:-1px;";
+                    dropImg.Attributes["style"] = "margin-left: -5px;";
                     browseControl.Parent.Controls.AddAt(0, dropImg);
+
+                    (browseControl.Parent as TableCell).Attributes["Style"] = "padding-left: 5px;";
                 }
 
                 //if (propBag.Required)
