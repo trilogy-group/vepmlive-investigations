@@ -196,6 +196,7 @@ namespace ResourceValues
         public int RoleFieldID;
         public int MajorCategoryFieldID;
 
+        public List<int> UserDepartments;                       //  Departments the user has access to - used in creating Capacity Scenarios - Jun 2013               
         public Dictionary<int, clsCatItem> CostCategories;      //    collection of clsCatItem objects
         public Dictionary<int, clsCatItem> Rates;               //    collection of clsCatItem objects
         public Dictionary<int, CPeriod> Periods;                //    collection of CPeriod objects
@@ -658,7 +659,17 @@ namespace ResourceValues
                     xFTEConv.CreateIntAttr("CAT_ID", ofte.Cat_UID);
                     xFTEConv.CreateIntAttr("Period_ID", ofte.PeriodID);
                     xFTEConv.CreateIntAttr("FTE", ofte.FTEConv);
-                    
+
+                }
+            }
+
+            if (UserDepartments != null)
+            {
+                CStruct xUserDepts = xResourceValues.CreateSubStruct("UserDepts");
+                foreach (int nDept in UserDepartments)
+                {
+                    CStruct xUserDept = xUserDepts.CreateSubStruct("Dept");
+                    xUserDept.CreateIntAttr("DEPT_UID", nDept);
                 }
             }
 
@@ -1275,6 +1286,22 @@ namespace ResourceValues
                         oFTEConc.PeriodID = xListEntry.GetIntAttr("Period_ID");
                         oFTEConc.FTEConv = xListEntry.GetIntAttr("FTE");
                         FTEConvData.Add(oFTEConc);
+                    }
+                }
+            }
+
+            UserDepartments = new List<int>();
+
+            xList = xXMLDatas.GetSubStruct("UserDepts");
+            if (xList != null)
+            {
+                listentries = xList.GetList("Dept");
+                if (listentries != null)
+                {
+                    foreach (CStruct xListEntry in listentries)
+                    {
+                        int nDept = xListEntry.GetIntAttr("DEPT_UID");
+                        UserDepartments.Add(nDept);
                     }
                 }
             }

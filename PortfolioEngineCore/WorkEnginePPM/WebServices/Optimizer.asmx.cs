@@ -42,7 +42,8 @@ namespace WorkEnginePPM
 
         private string GetSPSessionBasePath()
         {
-            using (SPWeb web = SPContext.Current.Web)
+            //using (SPWeb web = SPContext.Current.Web)
+            SPWeb web = SPContext.Current.Web;
             {
                 return ConfigFunctions.getConfigSetting(web, "EPKBasepath");
             }

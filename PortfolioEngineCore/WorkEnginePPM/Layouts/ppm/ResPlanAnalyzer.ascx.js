@@ -729,117 +729,123 @@
 
 	ResPlanAnalyzer.prototype.GetCalendarInfoComplete = function (jsonString) {
 
-		try {
-			var jsonObject = JSON_ConvertString(jsonString);
-			if (JSON_ValidateServerResult(jsonObject)) {
-				this.ficalInfo = jsonObject.Result.ResourceAnalyzerCalendars;
+	    try {
 
-				if (this.ficalInfo.Security.Value != "1") {
+	        if (jsonString != null) {
 
-					alert("You do not have the Global Permission set to access this functionality!");
+	            var jsonObject = JSON_ConvertString(jsonString);
+	            if (JSON_ValidateServerResult(jsonObject)) {
+	                this.ficalInfo = jsonObject.Result.ResourceAnalyzerCalendars;
 
-					if (parent.SP.UI.DialogResult)
-						parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-					else
-						parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	                if (this.ficalInfo.Security.Value != "1") {
 
+	                    alert("You do not have the Global Permission set to access this functionality!");
 
-					return;
-				}
-
-
-				var CalList = document.getElementById('idCalList');
-				var FromList = document.getElementById('idPerFromList');
-				var ToList = document.getElementById('idPerToList');
-				var LastCal = null;
-
-				this.CmtCal = this.ficalInfo.Calendars.CmtCal.Value;
-				CalList.options.length = 0;
-				FromList.options.length = 0;
-				ToList.options.length = 0;
-
-				var cal_arr = JSON_GetArray(this.ficalInfo.Calendars, "Calendar");
-
-				if (cal_arr.length == 0) {
-					alert("No Fiscal Calendars have been defined - please contact your administrator");
-
-					if (parent.SP.UI.DialogResult)
-						parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-					else
-						parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	                    if (parent.SP.UI.DialogResult)
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	                    else
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
-					return;
-				}
+	                    return;
+	                }
+	            }
+	        }
+
+	        {
+
+	            var CalList = document.getElementById('idCalList');
+	            var FromList = document.getElementById('idPerFromList');
+	            var ToList = document.getElementById('idPerToList');
+	            var LastCal = null;
+
+	            this.CmtCal = this.ficalInfo.Calendars.CmtCal.Value;
+	            CalList.options.length = 0;
+	            FromList.options.length = 0;
+	            ToList.options.length = 0;
+
+	            var cal_arr = JSON_GetArray(this.ficalInfo.Calendars, "Calendar");
+
+	            if (cal_arr.length == 0) {
+	                alert("No Fiscal Calendars have been defined - please contact your administrator");
+
+	                if (parent.SP.UI.DialogResult)
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	                else
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
-				if (this.selectCalendarAndPeriods == null) {
-					this.selectCalendarAndPeriods = new dhtmlXWindows();
-					this.selectCalendarAndPeriods.setSkin("dhx_web");
-					this.selectCalendarAndPeriods.enableAutoViewport(false);
-					this.selectCalendarAndPeriods.attachViewportTo(this.params.ClientID + "mainDiv");   // ("layoutDiv");
-					this.selectCalendarAndPeriods.setImagePath("/_layouts/ppm/images/");
-					//                   this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 175);
-					this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 120);
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").setIcon("logo.ico", "logo.ico");
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").allowMove();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").denyResize();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").setModal(true);
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").center();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").setText("Select Analyzer Periods");
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").attachObject("idFCandPerDlgObj");
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").button("close").disable();
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").button("park").hide();
-					//      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
-
-				}
-				else
-					this.selectCalendarAndPeriods.window("winFCandPerDlg").show();
+	                return;
+	            }
 
 
-				for (var n = 0; n < cal_arr.length; n++) {
-					var cal = cal_arr[n];
-					var Id = cal.calID;
-					var Name = cal.calName;
-					CalList.options[n] = new Option(Name, Id, Id == this.ficalInfo.LastUserData.lastCalID, Id == this.ficalInfo.LastUserData.lastCalID);
-					if (Id == this.ficalInfo.LastUserData.lastCalID)
-						LastCal = cal;
-				}
+	            if (this.selectCalendarAndPeriods == null) {
+	                this.selectCalendarAndPeriods = new dhtmlXWindows();
+	                this.selectCalendarAndPeriods.setSkin("dhx_web");
+	                this.selectCalendarAndPeriods.enableAutoViewport(false);
+	                this.selectCalendarAndPeriods.attachViewportTo(this.params.ClientID + "mainDiv");   // ("layoutDiv");
+	                this.selectCalendarAndPeriods.setImagePath("/_layouts/ppm/images/");
+	                //                   this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 175);
+	                this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 120);
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").setIcon("logo.ico", "logo.ico");
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").allowMove();
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").denyResize();
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").setModal(true);
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").center();
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").setText("Select Analyzer Periods");
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").attachObject("idFCandPerDlgObj");
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").button("close").disable();
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").button("park").hide();
+	                //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
 
-				if (LastCal == null) {
-					LastCal = cal_arr[0];
-					this.ficalInfo.LastUserData.lastCalID = LastCal.calID;
-				}
+	            }
+	            else
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").show();
 
-				if (LastCal == null)
-					return;
 
-				this.UsingPeriods = LastCal.Periods;
+	            for (var n = 0; n < cal_arr.length; n++) {
+	                var cal = cal_arr[n];
+	                var Id = cal.calID;
+	                var Name = cal.calName;
+	                CalList.options[n] = new Option(Name, Id, Id == this.ficalInfo.LastUserData.lastCalID, Id == this.ficalInfo.LastUserData.lastCalID);
+	                if (Id == this.ficalInfo.LastUserData.lastCalID)
+	                    LastCal = cal;
+	            }
 
-				if (LastCal.Periods != null) {
+	            if (LastCal == null) {
+	                LastCal = cal_arr[0];
+	                this.ficalInfo.LastUserData.lastCalID = LastCal.calID;
+	            }
 
-					for (var n1 = 0; n1 < LastCal.Periods.Period.length; n1++) {
-						var per = LastCal.Periods.Period[n1];
-						var perId = per.perID;
-						var perName = per.perName;
+	            if (LastCal == null)
+	                return;
 
-						FromList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastStartPerID, perId == this.ficalInfo.LastUserData.lastStartPerID);
-						ToList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastFinishPerID, perId == this.ficalInfo.LastUserData.lastFinishPerID);
-					}
-				}
-			}
-		}
+	            this.UsingPeriods = LastCal.Periods;
 
-		catch (e) {
-			alert("Resource Analyzer  GetCalendarInfoComplete error " + e.toString());
+	            if (LastCal.Periods != null) {
 
-			if (parent.SP.UI.DialogResult)
-				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-			else
-				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
-		}
+	                for (var n1 = 0; n1 < LastCal.Periods.Period.length; n1++) {
+	                    var per = LastCal.Periods.Period[n1];
+	                    var perId = per.perID;
+	                    var perName = per.perName;
 
-		return;
+	                    FromList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastStartPerID, perId == this.ficalInfo.LastUserData.lastStartPerID);
+	                    ToList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastFinishPerID, perId == this.ficalInfo.LastUserData.lastFinishPerID);
+	                }
+	            }
+	        }
+	    }
+
+	    catch (e) {
+	        alert("Resource Analyzer  GetCalendarInfoComplete error " + e.toString());
+
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	        else
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	    }
+
+	    return;
 	}
 
 	ResPlanAnalyzer.prototype.SelectCalendar_Change = function () {
@@ -884,64 +890,85 @@
 
 
 	ResPlanAnalyzer.prototype.SelectFiscalDlg_OKOnClick = function (iCancel) {
+	    this.selectCalendarAndPeriods.window("winFCandPerDlg").detachObject()
+	    this.selectCalendarAndPeriods.window("winFCandPerDlg").close();
+	    this.selectCalendarAndPeriods = null;
 
 
-		if (iCancel == 1) {
-
-			if (parent.SP.UI.DialogResult)
-				parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-			else
-				parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
 
 
-			return;
-		}
-
-		var CalList = document.getElementById('idCalList');
-		var FromList = document.getElementById('idPerFromList');
-		var ToList = document.getElementById('idPerToList');
+	    if (iCancel == 1) {
 
 
-		if (this.ficalInfo.LastUserData.lastCalID == -1) {
-			alert("No fiscal calendar has been selected!");
-			return;
-		}
+	        if (this.FromChangePeriods == false) {
+	            if (parent.SP.UI.DialogResult)
+	                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	            else
+	                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	        }
 
-		if (FromList.length == 0) {
+	        this.FromChangePeriods = false;
 
-			alert("The fiscal calendar selected does not have any periods defined!");
-			return;
+	        return;
+	    }
 
-		}
-
-		//        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
-		//        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
-		var per = this.UsingPeriods.Period[0];
-		StartID = per.perID;
-		var per = this.UsingPeriods.Period[this.UsingPeriods.Period.length - 1];
-		FinishID = per.perID;
-
-		//        if (StartID >= FinishID) {
-
-		//            alert("The From period must be before the To period");
-		//            return;
-		//        }
+	    if (this.FromChangePeriods == true) {
 
 
-		this.ficalInfo.LastUserData.lastStartPerID = StartID;
-		this.ficalInfo.LastUserData.lastFinishPerID = FinishID;
+	            this.Detrid = Grids["g_1"];
+	            this.Detrid.Dispose();
+	            this.Detrid = null;
 
-		this.selectCalendarAndPeriods.window("winFCandPerDlg").detachObject()
-		this.selectCalendarAndPeriods.window("winFCandPerDlg").close();
-		this.selectCalendarAndPeriods = null;
+	            this.TotGrid = Grids["bottomg_1"];
+	            this.TotGrid.Dispose();
+	            this.TotGrid = null;
+
+	            this.InitVars();
+        }
 
 
-		this.analyzerCalID = parseInt(this.ficalInfo.LastUserData.lastCalID);
+	    var CalList = document.getElementById('idCalList');
+	    var FromList = document.getElementById('idPerFromList');
+	    var ToList = document.getElementById('idPerToList');
 
-		var s = this.BuildLoadInf(this.params.TicketVal, this.ficalInfo.LastUserData.lastCalID, StartID, FinishID);
+
+	    if (this.ficalInfo.LastUserData.lastCalID == -1) {
+	        alert("No fiscal calendar has been selected!");
+	        return;
+	    }
+
+	    if (FromList.length == 0) {
+
+	        alert("The fiscal calendar selected does not have any periods defined!");
+	        return;
+
+	    }
+
+	    //        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+	    //        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+	    var per = this.UsingPeriods.Period[0];
+	    StartID = per.perID;
+	    var per = this.UsingPeriods.Period[this.UsingPeriods.Period.length - 1];
+	    FinishID = per.perID;
+
+	    //        if (StartID >= FinishID) {
+
+	    //            alert("The From period must be before the To period");
+	    //            return;
+	    //        }
 
 
-		WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("RALoadData", s, LoadResPlanDataCompleteDelegate);
+	    this.ficalInfo.LastUserData.lastStartPerID = StartID;
+	    this.ficalInfo.LastUserData.lastFinishPerID = FinishID;
+
+
+
+	    this.analyzerCalID = parseInt(this.ficalInfo.LastUserData.lastCalID);
+
+	    var s = this.BuildLoadInf(this.params.TicketVal, this.ficalInfo.LastUserData.lastCalID, StartID, FinishID);
+
+
+	    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("RALoadData", s, LoadResPlanDataCompleteDelegate);
 
 	}
 
@@ -1898,11 +1925,11 @@
 					{
 					    name: "Actions",
 					    columns: [
-							{
-							    items: [
+                             {
+                                items: [
 									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
 								]
-							},
+                            },
 							{
 							    items: [
 									{ type: "bigbutton", id: "idSaveScenario1", name: "Save<br/>Scenario", img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
@@ -2098,73 +2125,75 @@
 
 	        //,{ type: "smallbutton", id: "GridExplain", name: "Grid Explaination", img: "help.gif", tooltip: "Grid Explaination", onclick: "dialogEvent('TotalsTab_GridHelpBtn');" }
 
+	        if (this.layout == null) {
+	            this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "3E", "dhx_skyblue");
+	            this.layout.cells(this.mainRibbonArea).setText("Analyzer");
+	            this.layout.cells(this.mainArea).setText("Main Area");
+	            this.layout.cells(this.totalsArea).setText("Total Area");
 
-	        this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "3E", "dhx_skyblue");
-	        this.layout.cells(this.mainRibbonArea).setText("Analyzer");
-	        this.layout.cells(this.mainArea).setText("Main Area");
-	        this.layout.cells(this.totalsArea).setText("Total Area");
-
-	        this.layout.cells(this.mainRibbonArea).hideHeader();
-	        this.layout.cells(this.mainArea).hideHeader();
-	        this.layout.cells(this.totalsArea).hideHeader();
-	        this.layout_totals = this.layout.cells(this.totalsArea).attachLayout("2E", "dhx_skyblue");
-	        this.layout_totals.cells(this.totalsRibbonArea).setText("Totals");
-	        this.layout_totals.cells(this.totalsGridArea).setText("Total Grid Area");
-	        this.layout_totals.cells(this.totalsRibbonArea).hideHeader();
-	        this.layout_totals.cells(this.totalsGridArea).hideHeader();
-	        this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
-	        this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
-
-
-	        //	        this.tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
+	            this.layout.cells(this.mainRibbonArea).hideHeader();
+	            this.layout.cells(this.mainArea).hideHeader();
+	            this.layout.cells(this.totalsArea).hideHeader();
+	            this.layout_totals = this.layout.cells(this.totalsArea).attachLayout("2E", "dhx_skyblue");
+	            this.layout_totals.cells(this.totalsRibbonArea).setText("Totals");
+	            this.layout_totals.cells(this.totalsGridArea).setText("Total Grid Area");
+	            this.layout_totals.cells(this.totalsRibbonArea).hideHeader();
+	            this.layout_totals.cells(this.totalsGridArea).hideHeader();
+	            this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
+	            this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
 
 
-
-	        this.layout.cells(this.mainArea).attachObject("gridDiv_1");
-
-
-	        this.Tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
-	        this.Tabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
-
-	        this.analyzerTab = new Ribbon(analyzerTabData);
-
-
-	        this.analyzerTab.Render();
+	            //	        this.tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
 
 
 
+	            this.layout.cells(this.mainArea).attachObject("gridDiv_1");
 
-	        this.viewTab = new Ribbon(viewTabData);
-	        this.viewTab.Render();
 
-	        this.totTab = new Ribbon(BottomTabData);
-	        this.totTab.Render();
+	            this.Tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
+	            this.Tabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
 
-	        //this.planTabbar.setSkin("dark_blue");
-	        this.Tabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
-	        this.Tabbar.enableAutoReSize();
-	        this.Tabbar.addTab("tab_Display", "Analyzer", 70);
-	        this.Tabbar.setContent("tab_Display", this.analyzerTab.getRibbonDiv());
-	        this.Tabbar.addTab("tab_View", "View", 70);
-	        this.Tabbar.setContent("tab_View", this.viewTab.getRibbonDiv());
+	            this.analyzerTab = new Ribbon(analyzerTabData);
 
-	        this.layout_totals.cells(this.totalsRibbonArea).attachObject(document.getElementById(this.totTab.getRibbonDiv()));
 
-	        this.layout_totals.cells(this.totalsGridArea).attachObject("gridDiv_Totals");
-
-	        this.layout.cells(this.mainArea).setHeight(200);
+	            this.analyzerTab.Render();
 
 
 
-	        this.layout.cells(this.mainRibbonArea).setHeight(120);
+
+	            this.viewTab = new Ribbon(viewTabData);
+	            this.viewTab.Render();
+
+	            this.totTab = new Ribbon(BottomTabData);
+	            this.totTab.Render();
+
+	            //this.planTabbar.setSkin("dark_blue");
+	            this.Tabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
+	            this.Tabbar.enableAutoReSize();
+	            this.Tabbar.addTab("tab_Display", "Analyzer", 70);
+	            this.Tabbar.setContent("tab_Display", this.analyzerTab.getRibbonDiv());
+	            this.Tabbar.addTab("tab_View", "View", 70);
+	            this.Tabbar.setContent("tab_View", this.viewTab.getRibbonDiv());
+
+	            this.layout_totals.cells(this.totalsRibbonArea).attachObject(document.getElementById(this.totTab.getRibbonDiv()));
+
+	            this.layout_totals.cells(this.totalsGridArea).attachObject("gridDiv_Totals");
+
+	            this.layout.cells(this.mainArea).setHeight(200);
 
 
-	        this.layout.cells(this.mainRibbonArea).setHeight(120);
-	        this.layout.cells(this.mainRibbonArea).fixSize(false, true);
-	        this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
 
-	        this.layout_totals._minHeight = 18;
-	        this.layout._minHeight = 18;
+	            this.layout.cells(this.mainRibbonArea).setHeight(120);
+
+
+	            this.layout.cells(this.mainRibbonArea).setHeight(120);
+	            this.layout.cells(this.mainRibbonArea).fixSize(false, true);
+	            this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
+
+	            this.layout_totals._minHeight = 18;
+	            this.layout._minHeight = 18;
+
+	        }
 
 	        var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
 	        var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
@@ -2659,10 +2688,10 @@
 	    if (grid.id == "et_1") {
 	        this.csrow = row;
 
-	        if (this.dlgSpreadDlg != null) {
+            if (this.dlgSpreadDlg != null) {
 	            var itemName = this.EditGrid.GetString(this.csrow, "CostCategory");
 	            this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate " + (this.CSHourMode ? "Hours" : "FTEs") + " to " + itemName);
-	        }
+            }
 	    }
 	}
 
@@ -3969,15 +3998,31 @@
 
 		}
 
-	}
-	ResPlanAnalyzer.prototype.GetCapacityScenarioListComplete = function (jsonString) {
+     }
+
+      ResPlanAnalyzer.prototype.PopulateCSDeptList = function (defdept)
+      {
+          var DeptList = document.getElementById("idNewCSDept");
+          DeptList.options.length = 0;
+          for (var n = 0; n < this.CSDepts.length; n++) 
+          {
+	                var dp = this.CSDepts[n];
+	                var Id = dp.DEPTUID;
+	                var Name = dp.DEPTNAME;
+	                DeptList.options[n] = new Option(Name, Id, Id == defdept, Id == defdept);
+	      }
+      }
+
+	  ResPlanAnalyzer.prototype.GetCapacityScenarioListComplete = function (jsonString) {
 
 		try {
 
 			if (jsonString != "") {
 				var jsonObject = JSON_ConvertString(jsonString);
 				if (JSON_ValidateServerResult(jsonObject)) {
-					this.CapacityScenarios = jsonObject.Result.CapacityScenarios;
+				    this.CapacityScenarios = jsonObject.Result.CapacityScenarios;
+
+				    this.CSDepts = JSON_GetArray(jsonObject.Result.CSDepts, "CSDept");
 				}
 			}
 
@@ -4184,51 +4229,51 @@
 
 	ResPlanAnalyzer.prototype.GetEditCSDataComplete = function (jsonString) {
 
-		//	    try {
+	    //	    try {
 
-		this.CSRoleData = null;
-		
-		var jsonObject = JSON_ConvertString(jsonString);
-		if (JSON_ValidateServerResult(jsonObject)) {
+	    this.CSRoleData = null;
 
-			this.CostCats = jsonObject.Result.CS_Data.CostCategories;
-			this.CostCatFTEData = JSON_GetArray(this.CostCats, "CostCategory");
-			this.CapScen = jsonObject.Result.CS_Data.CapScenRows;
-			this.CapScenData = JSON_GetArray(this.CapScen, "CapScenRow");
-			this.CapScenPeriodCount = jsonObject.Result.CS_Data.PeriodCount;
-			this.CapScenPeriods = JSON_GetArray(jsonObject.Result.CS_Data.Periods, "Period");
-			
-			if (jsonObject.Result.CS_Data.CapScenRoleDatas != undefined)
-				this.CSRoleData = JSON_GetArray(jsonObject.Result.CS_Data.CapScenRoleDatas, "CapScenRoleData");
-		}
+	    var jsonObject = JSON_ConvertString(jsonString);
+	    if (JSON_ValidateServerResult(jsonObject)) {
 
+	        this.CostCats = jsonObject.Result.CS_Data.CostCategories;
+	        this.CostCatFTEData = JSON_GetArray(this.CostCats, "CostCategory");
+	        this.CapScen = jsonObject.Result.CS_Data.CapScenRows;
+	        this.CapScenData = JSON_GetArray(this.CapScen, "CapScenRow");
+	        this.CapScenPeriodCount = jsonObject.Result.CS_Data.PeriodCount;
+	        this.CapScenPeriods = JSON_GetArray(jsonObject.Result.CS_Data.Periods, "Period");
 
+	        if (jsonObject.Result.CS_Data.CapScenRoleDatas != undefined)
+	            this.CSRoleData = JSON_GetArray(jsonObject.Result.CS_Data.CapScenRoleDatas, "CapScenRoleData");
+	    }
 
 
-		var CSRibonData = {
-			parent: "ribbonbarEditCapScenDiv",
-			style: "display:none;",
-			imagePath: this.imagePath,
-			showstate: "false",
-			sections: [
+
+
+	    var CSRibonData = {
+	        parent: "ribbonbarEditCapScenDiv",
+	        style: "display:none;",
+	        imagePath: this.imagePath,
+	        showstate: "false",
+	        sections: [
 					 { name: "General",
-						 columns: [
+					     columns: [
 							{
-								items: [
+							    items: [
 									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('CSEdit_Close');" }
 								]
 							},
 							{
-								items: [
+							    items: [
 									{ type: "bigbutton", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('CSEdit_Save');" }
 								]
 							}
 						]
 					 },
 					 { name: "Mode",
-						 columns: [
+					     columns: [
 							{
-								items: [
+							    items: [
 									{ type: "text", name: "Display Mode" },
 									{ type: "select", id: "idCSEdit_SelMode", onchange: "dialogEvent('CSEdit_SelMode_Changed')", options: "<option value='1'>Hours</option><option value='2'>FTEs</option>", width: "90px" }
 								]
@@ -4236,9 +4281,9 @@
 						]
 					 },
 					{ name: "Tools",
-						columns: [
+					    columns: [
 							{
-								items: [
+							    items: [
 									{ type: "smallbutton", id: "SpreadBtn", name: "Allocate Values", img: "spread.gif", tooltip: "Allocate Values", onclick: "dialogEvent('CSEdit_Spread');" },
 									{ type: "smallbutton", id: "LoadUpBtn", name: "Populate from Totals", img: "spread.gif", tooltip: "Populate from Totals", onclick: "dialogEvent('CSEdit_LoadUp');" }
 								]
@@ -4247,51 +4292,65 @@
 					}
 
 				 ]
-		};
+	    };
+
+	    if (this.layout_CS == null) {
+	        this.layout_CS = new dhtmlXLayoutObject("idEditCS", "2E", "dhx_skyblue");
+	        this.layout_CS.cells(this.totalsRibbonArea).setText("Ribbon");
+	        this.layout_CS.cells(this.totalsGridArea).setText("Grid Area");
+	        this.layout_CS.cells(this.totalsRibbonArea).hideHeader();
+	        this.layout_CS.cells(this.totalsGridArea).hideHeader();
+	        this.layout_CS.cells(this.totalsRibbonArea).setHeight(92);
+	        this.layout_CS.cells(this.totalsRibbonArea).fixSize(false, true);
+
+	        this.CSEditTab = new Ribbon(CSRibonData);
+	        this.CSEditTab.Render();
+
+
+	        //        var select = document.getElementById("idCSEdit_SelMode");
+	        //        select.options.length = 0;
+	        //        select.options[0] = new Option("Hours", 1, true, true);
+	        //        select.options[1] = new Option("FTE", 2, false, false);
+
+
+	        this.layout_CS.cells(this.totalsRibbonArea).attachObject(document.getElementById(this.CSEditTab.getRibbonDiv()));
+
+	        this.layout_CS.cells(this.totalsGridArea).attachObject("idEditGridDiv");
+
+	    }
+	    this.CSHourMode = true;
 
 
 
-		this.CSEditTab = new Ribbon(CSRibonData);
-		this.CSEditTab.Render();
+	    if (this.analyzerCalID != this.csCalID)
+	        this.CSEditTab.disableItem("LoadUpBtn");
+	    else if (this.CSRoleData == null)
+	        this.CSEditTab.disableItem("LoadUpBtn");
+	    else if (this.CSRoleData.length == 0)
+	        this.CSEditTab.disableItem("LoadUpBtn");
+
+	    var sbDataxml = new StringBuilder();
+
+	    sbDataxml = new StringBuilder();
+	    sbDataxml.append('<![CDATA[');
+	    sbDataxml.append('<Execute Function="GetCapacityScenarioEdit">');
+	    sbDataxml.append('</Execute>');
+	    sbDataxml.append(']]>');
+
+	    sb = new StringBuilder();
+	    sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
+	    sb.append(" data_url='" + this.Webservice + "'");
+	    sb.append(" data_method='Soap'");
+	    sb.append(" data_function='Execute'")
+	    sb.append(" data_namespace='WorkEnginePPM'");
+	    sb.append(" data_param_Function='GetCapacityScenarioEdit'");
+	    sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
+	    sb.append(" >");
+	    sb.append("</treegrid>");
 
 
-		//        var select = document.getElementById("idCSEdit_SelMode");
-		//        select.options.length = 0;
-		//        select.options[0] = new Option("Hours", 1, true, true);
-		//        select.options[1] = new Option("FTE", 2, false, false);
-		this.CSHourMode = true;
-
-
-
-		if (this.analyzerCalID != this.csCalID)
-			this.CSEditTab.disableItem("LoadUpBtn");
-		else if (this.CSRoleData == null)
-			this.CSEditTab.disableItem("LoadUpBtn");
-		else if (this.CSRoleData.length == 0)
-			this.CSEditTab.disableItem("LoadUpBtn");
-
-		var sbDataxml = new StringBuilder();
-
-		sbDataxml = new StringBuilder();
-		sbDataxml.append('<![CDATA[');
-		sbDataxml.append('<Execute Function="GetCapacityScenarioEdit">');
-		sbDataxml.append('</Execute>');
-		sbDataxml.append(']]>');
-
-		sb = new StringBuilder();
-		sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
-		sb.append(" data_url='" + this.Webservice + "'");
-		sb.append(" data_method='Soap'");
-		sb.append(" data_function='Execute'")
-		sb.append(" data_namespace='WorkEnginePPM'");
-		sb.append(" data_param_Function='GetCapacityScenarioEdit'");
-		sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
-		sb.append(" >");
-		sb.append("</treegrid>");
-
-
-		this.EditGrid = TreeGrid(sb.toString(), "idEditGridDiv", "et_1");
-		this.csrow = null;
+	    this.EditGrid = TreeGrid(sb.toString(), "idEditGridDiv", "et_1");
+	    this.csrow = null;
 
 
 	}
@@ -4569,47 +4628,51 @@
 	ResPlanAnalyzer.prototype.SaveCapScenData = function () {
 
 
-		var trow, grow, frow;
-		var xi;
+	    var trow, grow, frow;
+	    var xi;
 
-		var sbDataxml = new StringBuilder();
-		var sb = new StringBuilder();
+	    var sbDataxml = new StringBuilder();
+	    var sb = new StringBuilder();
 
-		sbDataxml = new StringBuilder();
-		sbDataxml.append('<CapacityScenarioData');
-		sbDataxml.append(' Name="' + this.EditName + '"');
-		sbDataxml.append(' ID="' + this.EditCSid + '" >');
-		sbDataxml.append('<CS_Values>');
+	    sbDataxml = new StringBuilder();
+	    sbDataxml.append('<CapacityScenarioData');
+	    sbDataxml.append(' Name="' + this.EditName + '"');
+	    sbDataxml.append(' ID="' + this.EditCSid + '"');
+	    sbDataxml.append(' DEPT="' + this.SelectedCapScenDept + '"');
+	    sbDataxml.append(' WRES="' + (this.SelectedCapScenPrivate == true ? '1' : '0') + '" >');
+	    sbDataxml.append('<CS_Values>');
+
+	    this.SelectedCapScenPrivate = false;
+        this.SelectedCapScenDept = 0;
+
+	    for (var i = 0; i < this.CapScenData.length; i++) {
+	        trow = this.CapScenData[i];
+
+	        for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+	            var val, fval;
+	            val = parseFloat(trow.Hours[per - 1].Value);
+	            fval = parseFloat(trow.FTEs[per - 1].Value);
+
+	            if (val !== 0 && fval !== 0) {
+
+	                sb = new StringBuilder();
+	                sb.append('<CS_Value');
+	                sb.append(' Role_ID="' + trow.ID + '"');
+	                sb.append(' Per_ID="' + per + '"');
+	                sb.append(' Hours="' + val + '"');
+	                sb.append(' FTEs="' + fval * 10000 + '" />');
+	                sbDataxml.append(sb.toString());
+	            }
+	        }
+	    }
 
 
-		for (var i = 0; i < this.CapScenData.length; i++) {
-			trow = this.CapScenData[i];
+	    sbDataxml.append('</CS_Values>');
+	    sbDataxml.append('</CapacityScenarioData>');
 
-			for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-				var val, fval;
-				val = parseFloat(trow.Hours[per - 1].Value);
-				fval = parseFloat(trow.FTEs[per - 1].Value);
+	    var s = sbDataxml.toString();
 
-				if (val !== 0 && fval !== 0) {
-
-					sb = new StringBuilder();
-					sb.append('<CS_Value');
-					sb.append(' Role_ID="' + trow.ID + '"');
-					sb.append(' Per_ID="' + per + '"');
-					sb.append(' Hours="' + val + '"');
-					sb.append(' FTEs="' + fval * 10000 + '" />');
-					sbDataxml.append(sb.toString());
-				}
-			}
-		}
-
-
-		sbDataxml.append('</CS_Values>');
-		sbDataxml.append('</CapacityScenarioData>');
-
-		var s = sbDataxml.toString();
-
-		WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveCapacityScenarioData", s , this.SaveCapacityScenarioDataCompleteDelegate);
+	    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("SaveCapacityScenarioData", s, this.SaveCapacityScenarioDataCompleteDelegate);
 
 
 	}
@@ -5311,6 +5374,11 @@
 	                this.AnalyzerDeleteViewDlg = null;
 	                break;
 
+	            //	            case "TEST":  
+	            //	                this.FromChangePeriods = true;  
+	            //	                this.GetCalendarInfoComplete(null);  
+	            //	                return;  
+
 
 	            case "AnalyzerTab_Close":
 	                if (parent.SP.UI.DialogResult)
@@ -5323,7 +5391,7 @@
 
 	                if (this.params.RPEMode == 1)
 	                    break;
-	                
+
 	                this.EditResPlan();
 	                break;
 
@@ -5453,6 +5521,7 @@
 	                break;
 
 	            case "Display_RPA":
+	                this.ShowWorkingPopup();
 	                this.SelectFiscalDlg_OKOnClick(0);
 	                break;
 
@@ -5742,6 +5811,8 @@
 
 	                document.getElementById("idTxtCapScenName").value = "New Capacity Scenario";
 
+
+	                this.PopulateCSDeptList(0);
 	                window.setTimeout(this.CapScenCreateNewDelegate, 100);
 
 	                break;
@@ -5765,6 +5836,14 @@
 
 
 	                document.getElementById("idTxtCapScenName").value = "Copy of " + selectedItem.text;
+
+	                var csc = this.CapScens[select.selectedIndex];
+
+	                document.getElementById("idNewCSPrivate").checked = (csc.WRES != 0);
+
+	                this.PopulateCSDeptList(csc.DEPT);
+
+
 	                window.setTimeout(this.CapScenCreateCopyDelegate, 100);
 	                break;
 
@@ -5802,11 +5881,19 @@
 
 	                this.SelectedCapScenText = document.getElementById("idTxtCapScenName").value;
 
+	                this.SelectedCapScenPrivate = document.getElementById("idNewCSPrivate").checked;
+
+	                
+	                var deptsel = document.getElementById("idNewCSDept");
+
+	                this.SelectedCapScenDept = deptsel.options[deptsel.selectedIndex].value;
+
+
 	                window.setTimeout(this.GoDoEditDelegate, 100);
 	                //      this.GoDoEdit(this.SelectedCapScen, document.getElementById("idTxtCapScenName").value);
 	                break;
 
-	            //  call webservice to edit                                                                     
+	            //  call webservice to edit                                                                       
 
 
 
@@ -6179,7 +6266,7 @@
 			this.AnalyzerViewDlg.enableAutoViewport(false);
 			this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 			this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 245, 130);
+			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
@@ -6190,6 +6277,10 @@
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create New Capacity Scenario");
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
+
+			document.getElementById("idNewCSPrivate").checked = false;
+
+			
 		}
 		else {
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
@@ -6203,7 +6294,7 @@
 			this.AnalyzerViewDlg.enableAutoViewport(false);
 			this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 			this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 245, 130);
+			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
@@ -6214,7 +6305,11 @@
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create Copy of Capacity Scenario");
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
-		}
+
+
+
+
+}
 		else {
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
 		}
@@ -6507,236 +6602,253 @@
 
 	}
 
+	ResPlanAnalyzer.prototype.InitVars = function () {
+	    this.fromresource = "";
+	    // Initialised fields
+	    this.dlgShowGridEx = null;
+
+	    this.SelectedCapScenPrivate = false;
 
 
-	try {
-		this.fromresource = "";
-		// Initialised fields
-		this.dlgShowGridEx = null;
-
-		this.NegMode = false;
+	    this.NegMode = false;
 	    this.NegWarn = false;
-		
-		this.TotMaxed = false;
-		this.groupColour = 0xF8F8F8;
 
-		this.bapplyDefView = false;
+	    this.TotMaxed = false;
+	    this.groupColour = 0xF8F8F8;
 
-		this.analyzerCalID = 0;
-		this.CmtCal = 0;
-		this.csCalID = 0;
+	    this.bapplyDefView = false;
 
-		this.tg_rollup = null;
-		this.tg_rollup_render = false;
+	    this.analyzerCalID = 0;
+	    this.CmtCal = 0;
+	    this.csCalID = 0;
 
-		this.topgridready = false;
-		this.bottomgridready = false;
+	    this.tg_rollup = null;
+	    this.tg_rollup_render = false;
+
+	    this.topgridready = false;
+	    this.bottomgridready = false;
 	    this.bottomgridfirstready = false;
 
 
-		this.FilteredTop = new Array();
+	    this.FilteredTop = new Array();
 
-		this.AnalyzeGroupingchecked = false;
-		this.AnalyzerFilterschecked = false;
+	    this.AnalyzeGroupingchecked = false;
+	    this.AnalyzerFilterschecked = false;
 
-		this.AnalyzerShowBarschecked = false;
-		this.AnalyzerHideDetailschecked = false;
-		
-		this.TotalGroupingchecked = false;
-		this.TotalFilterschecked = false;
+	    this.AnalyzerShowBarschecked = false;
+	    this.AnalyzerHideDetailschecked = false;
 
-		this.AnalyzerTabisCollapsed = false;
-		this.TotalTabisCollapsed = false;
+	    this.TotalGroupingchecked = false;
+	    this.TotalFilterschecked = false;
 
-		this.bInColResize = false;
-		this.EditCapScen = -1;
-		this.SelectedMode = 0;
-		this.HaveDragChanges = false;
+	    this.AnalyzerTabisCollapsed = false;
+	    this.TotalTabisCollapsed = false;
 
-		this.SaveBtn = false;
-		this.UnDoBtn = false;
+	    this.bInColResize = false;
+	    this.EditCapScen = -1;
+	    this.SelectedMode = 0;
+	    this.HaveDragChanges = false;
+
+	    this.SaveBtn = false;
+	    this.UnDoBtn = false;
 
 
-		this.CapScenDlg = null;
+	    this.CapScenDlg = null;
 	    this.TopGridDragged = false;
 
-		this.params = params;
-		this.TotSelectedOrder = null;
+	    this.params = params;
+	    this.TotSelectedOrder = null;
 
-		this.clientID = this.params.ClientID;
-		this.Webservice = params.Webservice;
+	    this.clientID = this.params.ClientID;
+	    this.Webservice = params.Webservice;
 
-		this.mainRibbonArea = "a";
-		this.mainArea = "b";
-		this.totalsArea = "c";
-		this.totalsRibbonArea = "a";
-		this.totalsGridArea = "b";
-
-		this.analyzerTab = null;
-		this.viewTab = null;
-		
-		this.TotAddSel = null;
-		this.TotRemSel = null;
-		this.CSHourMode = null;
-
-		this.dlgShowLegend = null;
-		this.LegendGrid = null;
-		
-		this.Dirty = false;
-		this.initialized = false;
-		this.ExitConfirmed = false;
-		this.Height = 0;
-		this.Width = 0;
-   
-		this.layout = null;
-		this.layout_totals = null;
-
-		this.TotGrid = null;
-		this.DetGrid = null;
-		this.TotalsGridSettingsData = null;
-
-		this.FilterDifferent = false;
-		this.CSChanged = false;
+	    this.mainRibbonArea = "a";
+	    this.mainArea = "b";
+	    this.totalsArea = "c";
+	    this.totalsRibbonArea = "a";
+	    this.totalsGridArea = "b";
 
 
-		this.selectCalendarAndPeriods = null;
-		this.imagePath = "/_layouts/ppm/images/";
+	    this.TotAddSel = null;
+	    this.TotRemSel = null;
+	    this.CSHourMode = null;
 
-		// dialog handles
+	    this.dlgShowLegend = null;
+	    this.LegendGrid = null;
 
-		this.fiscalInfo = null;
-		this.Views = null;
-		this.selectedView = null;
-
-		this.SetTotals = null
-		this.TotalsLoading = false
-		this.TotalsData = null;
-		this.tarlev = 0;
-
-		this.SetDetails = null;
-		this.DetailsLoading = false
-		this.DetailsData = null;
-		this.DetailsSettings = "";
-		this.DisplayMode = "";
-
-		this.TargetData = null;
-		this.TotalsColumnSettings = "";
-		this.TotalsGridSupressHeatmap = 0;
-		this.TotalsGridTotalsCol = 0;
-
-		this.stashgridsettings = null;
-
-		this.AnalyzerViewDlg = null;
-		this.AnalyzerDeleteViewDlg = null;
-
-		this.doTopApply = true;
-		this.doBottomApply = true;
-		this.CapScens = null;
-		this.SelectedCapScen = 0;
-
-		this.dlgEditTarget = null;
-		this.EditGrid = null;
-		this.dlgSpreadDlg = null;
-		this.csrow = null;
-		this.doSetFocus = "";
-
-		this.bottomgriddragstash = null;
-		this.topgridstash = null;
-		this.CSRoleData = null;
-
-		this.initDataStart = 0;
-		this.initDataFinish = 0;
-
-		this.heatmapText = "";
-		this.bottomgridbyrole = false;
-		this.totTab = null;
-
-		this.selectedHeatMapColour = "1";
-
-		this.deferredhidedetails = false;
-	   
-
-		var loadDelegate = MakeDelegate(this, this.OnLoad);
-//        var unloadDelegate = MakeDelegate(this, this.OnUnload);
-		var HandlePingSessionData = MakeDelegate(this, this.HandlePingSession);
-		var HandlePopulateUI = MakeDelegate(this, this.PopulateUI);
-
-		this.deferevent = "";
-		this.deferedExternalEventDelegate = MakeDelegate(this, this.deferedExternalEvent);
-		this.deferedsetFocusDelegate = MakeDelegate(this, this.deferedsetFocus);
-		
-		
-		var GetCalendarInfoCompleteDelegate = MakeDelegate(this, this.GetCalendarInfoComplete);
-		var LoadResPlanDataCompleteDelegate = MakeDelegate(this, this.LoadResPlanDataComplete);
-
-		this.SaveCapacityScenarioDataCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioDataComplete);
-
-		this.GetTotalsDataCompleteDelegate = MakeDelegate(this, this.GetTotalsDataComplete);
-		this.SetTotalsDataCompleteDelegate = MakeDelegate(this, this.SetTotalsDataComplete);
-		this.CreateTopGridDelegate = MakeDelegate(this, this.CreateTopGrid);
-
-		var GetCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.GetCapacityScenarioListComplete);
-		var SaveCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioListComplete);
-
-		
-		var GetEditCSDataCompleteDelegate = MakeDelegate(this, this.GetEditCSDataComplete);
-
-		var ReloadPlanDataCompleteDelegate = MakeDelegate(this, this.ReloadPlanDataComplete);
-		var SaveResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.SaveResourceAnalyzerViewComplete);
-		var RenameResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.RenameResourceAnalyzerViewComplete);
-		
-		this.LastFilterString = "";
-
-		this.FinishTotalsDelegate = MakeDelegate(this, this.FinishTotals);
-		this.GoDoEditDelegate = MakeDelegate(this, this.GoDoEdit);
-		this.CapScenCreateCopyDelegate = MakeDelegate(this, this.CapScenCreateCopy);
-		this.CapScenCreateNewDelegate = MakeDelegate(this, this.CapScenCreateNew);
-
-		var GridsOnGetDefaultColorDelegate = MakeDelegate(this, this.GridsOnGetDefaultColor);
-		var GridsOnStartDragCellDelegate = MakeDelegate(this, this.GridsOnStartDragCell);
-		var GridsOnMoveDragCellDelegate = MakeDelegate(this, this.GridsOnMoveDragCell);
-		var GridsOnEndDragCellDelegate = MakeDelegate(this, this.GridsOnEndDragCell);
-		var HandleRefreshBothDelegate = MakeDelegate(this, this.HandleBothRefresh);
-		var HandleRefreshTopDelegate = MakeDelegate(this, this.HandleTopRefresh);
-		var HandleRefreshDelegate = MakeDelegate(this, this.HandleRefresh);
-		var GridsOnAfterValueChangedDelegate = MakeDelegate(this, this.GridsOnAfterValueChanged);
-		var GridsOnUpdatedDelegate = MakeDelegate(this, this.GridsOnUpdated);
-		var SetChangeViewCompleteDelegate = MakeDelegate(this, this.SetChangeViewComplete);
-		var DeleteResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.DeleteResourceAnalyzerViewComplete);
-		var GridsOnAfterColResizeDelegate = MakeDelegate(this, this.GridsOnAfterColResize);
-		var GridsOnClickCellDelegate = MakeDelegate(this, this.GridsOnClickCell);
-		var GridsOnMouseOverDelegate = MakeDelegate(this, this.GridsOnMouseOver);
-		var GridsOnMouseDownDelegate = MakeDelegate(this, this.GridsOnMouseDown);
+	    this.Dirty = false;
+	    this.initialized = false;
+	    this.ExitConfirmed = false;
+	    this.Height = 0;
+	    this.Width = 0;
 
 
-		var NewCapScenDlg_OnCloseDelegate = MakeDelegate(this, this.NewCapScenDlg_OnClose);
+
+	    this.TotGrid = null;
+	    this.DetGrid = null;
+	    this.TotalsGridSettingsData = null;
+
+	    this.FilterDifferent = false;
+	    this.CSChanged = false;
 
 
-		GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
-		var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
-		
+	    this.selectCalendarAndPeriods = null;
+	    this.imagePath = "/_layouts/ppm/images/";
+
+	    // dialog handles
+
+	    this.fiscalInfo = null;
+	    this.Views = null;
+	    this.selectedView = null;
+
+	    this.SetTotals = null
+	    this.TotalsLoading = false
+	    this.TotalsData = null;
+	    this.tarlev = 0;
+
+	    this.SetDetails = null;
+	    this.DetailsLoading = false
+	    this.DetailsData = null;
+	    this.DetailsSettings = "";
+	    this.DisplayMode = "";
+
+	    this.TargetData = null;
+	    this.TotalsColumnSettings = "";
+	    this.TotalsGridSupressHeatmap = 0;
+	    this.TotalsGridTotalsCol = 0;
+
+	    this.stashgridsettings = null;
+
+	    this.AnalyzerViewDlg = null;
+	    this.AnalyzerDeleteViewDlg = null;
+
+	    this.doTopApply = true;
+	    this.doBottomApply = true;
+	    this.CapScens = null;
+	    this.SelectedCapScen = 0;
+
+	    this.dlgEditTarget = null;
+	    this.EditGrid = null;
+	    this.dlgSpreadDlg = null;
+	    this.csrow = null;
+	    this.doSetFocus = "";
+
+	    this.bottomgriddragstash = null;
+	    this.topgridstash = null;
+	    this.CSRoleData = null;
+
+	    this.initDataStart = 0;
+	    this.initDataFinish = 0;
+
+	    this.heatmapText = "";
+	    this.bottomgridbyrole = false;
 
 
-		var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
-		var AnalyzerViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerViewDlg_OnClose);
-		var AnalyzerDeleteViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerDeleteViewDlg_OnClose);
+	    this.selectedHeatMapColour = "1";
 
-		var CapScenDlg_OnCloseDelegate = MakeDelegate(this, this.CapScenDlg_OnClose);
+	    this.deferredhidedetails = false;
 
-		this.CapacityScenarios = null;
 
-		var GridsOnRenderStartDelegate = MakeDelegate(this, this.GridsOnRenderStart);
-		var GridsOnRenderFinishDelegate = MakeDelegate(this, this.GridsOnRenderFinish);
-		this.refreshIconsInTotGrid = null; 
-		this.refreshChecksInDetGrid = null;
-		var HandleRerenderDelegate = MakeDelegate(this, this.HandleRerender);
-		var HandleRerenderChecksDelegate = MakeDelegate(this, this.HandleRerenderChecks);
-		var HandleRerenderRollupsDelegate = MakeDelegate(this, this.HandleRerenderRollups);
-		
-		this.dragStack = new Array();
-		this.dragLevel = 0;
 
-		var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);	
+	    this.LastFilterString = "";
+
+	    this.CapacityScenarios = null;
+	    this.refreshIconsInTotGrid = null;
+	    this.refreshChecksInDetGrid = null;
+
+
+	    this.dragStack = new Array();
+	    this.dragLevel = 0;
+	    this.FromChangePeriods = false;
+
+	    this.CSDepts = null;
+        this.SelectedCapScenDept = 0;
+	}
+
+	try {
+
+
+	    this.InitVars();
+
+	    this.layout = null;
+	    this.layout_totals = null;
+	    this.analyzerTab = null;
+	    this.viewTab = null;
+	    this.totTab = null;
+	    this.layout_CS = null;
+
+	    var loadDelegate = MakeDelegate(this, this.OnLoad);
+	    //        var unloadDelegate = MakeDelegate(this, this.OnUnload);
+	    var HandlePingSessionData = MakeDelegate(this, this.HandlePingSession);
+	    var HandlePopulateUI = MakeDelegate(this, this.PopulateUI);
+
+	    this.deferevent = "";
+	    this.deferedExternalEventDelegate = MakeDelegate(this, this.deferedExternalEvent);
+	    this.deferedsetFocusDelegate = MakeDelegate(this, this.deferedsetFocus);
+
+
+	    var GetCalendarInfoCompleteDelegate = MakeDelegate(this, this.GetCalendarInfoComplete);
+	    var LoadResPlanDataCompleteDelegate = MakeDelegate(this, this.LoadResPlanDataComplete);
+
+	    this.SaveCapacityScenarioDataCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioDataComplete);
+
+	    this.GetTotalsDataCompleteDelegate = MakeDelegate(this, this.GetTotalsDataComplete);
+	    this.SetTotalsDataCompleteDelegate = MakeDelegate(this, this.SetTotalsDataComplete);
+	    this.CreateTopGridDelegate = MakeDelegate(this, this.CreateTopGrid);
+
+	    var GetCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.GetCapacityScenarioListComplete);
+	    var SaveCapacityScenarioListCompleteDelegate = MakeDelegate(this, this.SaveCapacityScenarioListComplete);
+
+
+	    var GetEditCSDataCompleteDelegate = MakeDelegate(this, this.GetEditCSDataComplete);
+
+	    var ReloadPlanDataCompleteDelegate = MakeDelegate(this, this.ReloadPlanDataComplete);
+	    var SaveResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.SaveResourceAnalyzerViewComplete);
+	    var RenameResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.RenameResourceAnalyzerViewComplete);
+
+
+	    this.FinishTotalsDelegate = MakeDelegate(this, this.FinishTotals);
+	    this.GoDoEditDelegate = MakeDelegate(this, this.GoDoEdit);
+	    this.CapScenCreateCopyDelegate = MakeDelegate(this, this.CapScenCreateCopy);
+	    this.CapScenCreateNewDelegate = MakeDelegate(this, this.CapScenCreateNew);
+
+	    var GridsOnGetDefaultColorDelegate = MakeDelegate(this, this.GridsOnGetDefaultColor);
+	    var GridsOnStartDragCellDelegate = MakeDelegate(this, this.GridsOnStartDragCell);
+	    var GridsOnMoveDragCellDelegate = MakeDelegate(this, this.GridsOnMoveDragCell);
+	    var GridsOnEndDragCellDelegate = MakeDelegate(this, this.GridsOnEndDragCell);
+	    var HandleRefreshBothDelegate = MakeDelegate(this, this.HandleBothRefresh);
+	    var HandleRefreshTopDelegate = MakeDelegate(this, this.HandleTopRefresh);
+	    var HandleRefreshDelegate = MakeDelegate(this, this.HandleRefresh);
+	    var GridsOnAfterValueChangedDelegate = MakeDelegate(this, this.GridsOnAfterValueChanged);
+	    var GridsOnUpdatedDelegate = MakeDelegate(this, this.GridsOnUpdated);
+	    var SetChangeViewCompleteDelegate = MakeDelegate(this, this.SetChangeViewComplete);
+	    var DeleteResourceAnalyzerViewCompleteDelegate = MakeDelegate(this, this.DeleteResourceAnalyzerViewComplete);
+	    var GridsOnAfterColResizeDelegate = MakeDelegate(this, this.GridsOnAfterColResize);
+	    var GridsOnClickCellDelegate = MakeDelegate(this, this.GridsOnClickCell);
+	    var GridsOnMouseOverDelegate = MakeDelegate(this, this.GridsOnMouseOver);
+	    var GridsOnMouseDownDelegate = MakeDelegate(this, this.GridsOnMouseDown);
+
+
+	    var NewCapScenDlg_OnCloseDelegate = MakeDelegate(this, this.NewCapScenDlg_OnClose);
+
+
+	    GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
+	    var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
+
+
+
+	    var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
+	    var AnalyzerViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerViewDlg_OnClose);
+	    var AnalyzerDeleteViewDlg_OnCloseDelegate = MakeDelegate(this, this.AnalyzerDeleteViewDlg_OnClose);
+
+	    var CapScenDlg_OnCloseDelegate = MakeDelegate(this, this.CapScenDlg_OnClose);
+
+	    var GridsOnRenderStartDelegate = MakeDelegate(this, this.GridsOnRenderStart);
+	    var GridsOnRenderFinishDelegate = MakeDelegate(this, this.GridsOnRenderFinish);
+	    var HandleRerenderDelegate = MakeDelegate(this, this.HandleRerender);
+	    var HandleRerenderChecksDelegate = MakeDelegate(this, this.HandleRerenderChecks);
+	    var HandleRerenderRollupsDelegate = MakeDelegate(this, this.HandleRerenderRollups);
+	    var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);	
 
 		if (document.addEventListener != null) { // e.g. Firefox
 			window.addEventListener("load", loadDelegate, true);

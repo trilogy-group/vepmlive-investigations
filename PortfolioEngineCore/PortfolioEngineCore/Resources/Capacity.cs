@@ -1640,8 +1640,27 @@ namespace PortfolioEngineCore
 
                 // Make a list of the departments we've hit (unless list passed in) and get their names
                 sErrorInfo = "k001";
+                RVClass.UserDepartments=new List<int>();
                 if (lRequestNo != ResourceValues.ResCenterRequest.ResourceValuesForDepts)
                 {
+                    // June 2013 - new List of Departments I have access to when called from Resource Grid
+                    //      won't work for list of Depts passed in but that can't happen in WE
+                    //      need to add to the departments I've hit list before I get the data for that
+                    if (lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForResources)
+                    {
+                        string sDeptXML;
+                        SelectMyDepts(out sDeptXML);
+                        CStruct xSelDepts = new CStruct();
+                        xSelDepts.LoadXML(sDeptXML);
+                        List<CStruct> listDepts = xSelDepts.GetList("Dept");
+                        foreach (CStruct xSelDept in listDepts)
+                        {
+                            int lDeptID = xSelDept.GetIntAttr("ID");
+                            RVClass.UserDepartments.Add(lDeptID);
+                            if (!RVLists_Depts.Contains(lDeptID)) { RVLists_Depts.Add(lDeptID); }
+                        }
+                    }
+
                     sDeptList = MakeListFromCollection(RVLists_Depts);
                 }
 
@@ -1671,8 +1690,12 @@ namespace PortfolioEngineCore
                 {
                     RVClass.CapacityTargets = new Dictionary<int, ResourceValues.clsEPKItem>();
 
+                    // now we can't call for Depts and this bit is executed for resources we want the Capacity Scenarios for the Departments I manage not the ones we've hit
+                    // wouldn't expect it would be different but not sure
+                    string sManagedDeptList = MakeListFromCollection(RVClass.UserDepartments);
+
                     string sDeptListPlus0;
-                    if (sDeptList.Length > 0) { sDeptListPlus0 = sDeptList + ",0"; }
+                    if (sManagedDeptList.Length > 0) { sDeptListPlus0 = sManagedDeptList + ",0"; }
                     else { sDeptListPlus0 = "0"; }
 
                     oCommand = new SqlCommand("EPG_SP_ReadCapacityTargets", _dba.Connection);

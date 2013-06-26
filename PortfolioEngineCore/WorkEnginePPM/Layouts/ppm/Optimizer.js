@@ -1744,6 +1744,18 @@
 
     };
     OptimizerRibbon.prototype.showOptDialog = function (idDiv) {
+
+        if (this.Items.length == 1) {
+            alert("You cannot Optimize only one Item!");
+            return;
+        }
+
+
+
+
+
+
+
         if (this.CostnNumbers.length == 0) {
             alert("No Cost or Number fields have been defined - so it is not possible to display the Optimizer Configuration Dialog");
             return;
@@ -1764,8 +1776,8 @@
                 this.OptDlg.enableAutoViewport(false);
                 this.OptDlg.attachViewportTo(this.params.ClientID + "mainDiv");
                 this.OptDlg.setImagePath(this.imagePath);
-                this.OptDlg.createWindow("winOptDlg", 20, 30, 594, 493);
- //               this.OptDlg.window("winOptDlg").setIcon("logo.ico", "logo.ico");
+                this.OptDlg.createWindow("winOptDlg", 20, 30, 594, 508);
+                //               this.OptDlg.window("winOptDlg").setIcon("logo.ico", "logo.ico");
                 this.OptDlg.window("winOptDlg").allowMove();
                 this.OptDlg.window("winOptDlg").denyResize();
                 this.OptDlg.window("winOptDlg").setModal(true);

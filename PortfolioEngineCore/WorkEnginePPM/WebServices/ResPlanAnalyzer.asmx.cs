@@ -44,7 +44,8 @@ namespace WorkEnginePPM
 
         private string GetSPSessionBasePath()
         {
-            using (SPWeb web = SPContext.Current.Web)
+           // using (SPWeb web = SPContext.Current.Web)
+            SPWeb web = SPContext.Current.Web;
             {
                 return ConfigFunctions.getConfigSetting(web, "EPKBasepath");
             }
@@ -70,7 +71,7 @@ namespace WorkEnginePPM
             bool bNew = false;
 
 
-            if (Function == "RALoadData" && RAData != null)
+            if (Function == "RALoadData")   // && RAData != null)
             {
                 //     this.Context.Session[rpkey] = null;
                 RAData = null;
@@ -213,6 +214,12 @@ namespace WorkEnginePPM
 
             WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
             PortfolioEngineCore.ResourceAnalyzer rpa = new ResourceAnalyzer(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+
+
+            PortfolioEngineCore.CapacityScenarios rpcs = new CapacityScenarios(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+
+            bool RoleBasedCSAllowed = rpcs.RoleBasedCSAllowed();
+
             string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
             //PortfolioEngineCore.ResourceAnalyzer rpa = new PortfolioEngineCore.ResourceAnalyzer(sBaseInfo);
             try
@@ -389,6 +396,8 @@ namespace WorkEnginePPM
                             sErrStage = "O025";
                             if ((StatusEnum)capacity.GetRVInfo(sParmXML, out sReplyXML, out sReplyMessage) == StatusEnum.rsSuccess)
                             {
+
+
                                 sErrStage = "O026";
                                 if (sReplyMessage != "")
                                     sEchoReplyMessage += "\n" + sReplyMessage;
@@ -404,6 +413,18 @@ namespace WorkEnginePPM
 
                                     sErrStage = "O027";
                                     RAData.GrabRAData(resValues, "", resValues.ResExamView, StartID, CalID, sParmXML, out sErrStage);
+
+                                    string sModeXML = "";
+
+                                    string sDepts = RAData.GetCSDeptUIDs();
+
+                                    rpcs.GetCapacityScenariosXML(out sModeXML, RoleBasedCSAllowed, sDepts);
+                                    CStruct xCSMode = new CStruct();
+                                    xCSMode.LoadXML(sModeXML);
+
+
+                                    RAData.StashCSRoleMode(RoleBasedCSAllowed);
+                                    RAData.UpdateCSDataMode(xCSMode);
 
                                     sErrStage = "O028";
                                     sReply = RAData.GetTargetRGBData();
@@ -479,6 +500,9 @@ namespace WorkEnginePPM
 
             Extradata = xResult.CreateSubStruct("FromResGrid");
             Extradata.CreateStringAttr("Value", sFromResGrid);
+
+            Extradata = xResult.CreateSubStruct("AllowCSResMode");
+            Extradata.CreateIntAttr("Value", (RoleBasedCSAllowed ? 1 : 0));
 
             Extradata = xResult.CreateSubStruct("DisplayMode");
             Extradata.CreateStringAttr("Value", sDispMode);
@@ -849,10 +873,15 @@ namespace WorkEnginePPM
             //PortfolioEngineCore.CapacityScenarios rpcs = new PortfolioEngineCore.CapacityScenarios(sBaseInfo);     
             string sRetXML = "";
 
-            rpcs.GetCapacityScenariosXML(out sRetXML);
+            string sDepts = RAData.GetCSDeptUIDs();
+            rpcs.GetCapacityScenariosXML(out sRetXML, RAData.IsCSRoleAllowed(), sDepts);
 
             CStruct xResult = BuildResultXML("GetCapacityScenarioList", 0);
             xResult.AppendXML(sRetXML);
+            xResult.AppendXML(RAData.GetCSDeptList());
+
+
+            
             return xResult.XML();
 
         }
@@ -905,7 +934,7 @@ namespace WorkEnginePPM
 
             }
 
-    
+            
 
             xResult = BuildResultXML("GetCapacityScenarioData", 0);
             xResult.AppendXML(RAData.PrepareCSGrid(sRetXML));
@@ -986,7 +1015,21 @@ namespace WorkEnginePPM
 
 
                 if (bDoIt)
+                {
                     RAData.ReplaceCSData(resValues);
+
+                    string sModeXML = "";
+
+                    bool RoleBasedCSAllowed = RAData.IsCSRoleAllowed();
+
+                    string sDepts = RAData.GetCSDeptUIDs();
+
+                    rpcs.GetCapacityScenariosXML(out sModeXML, RoleBasedCSAllowed, sDepts);
+                    CStruct xCSMode = new CStruct();
+                    xCSMode.LoadXML(sModeXML);
+                    RAData.UpdateCSDataMode(xCSMode);
+
+                }
             }
 
             xResult = BuildResultXML("SaveCapacityScenarioData", 0);
@@ -1088,7 +1131,19 @@ namespace WorkEnginePPM
 
 
                 if (bDoIt)
+                {
                     RAData.ReplaceCSData(resValues);
+
+                    string sModeXML = "";
+                    bool RoleBasedCSAllowed = RAData.IsCSRoleAllowed();
+
+                    string sDepts = RAData.GetCSDeptUIDs();
+                    rpcs.GetCapacityScenariosXML(out sModeXML, RoleBasedCSAllowed, sDepts);
+                    CStruct xCSMode = new CStruct();
+                    xCSMode.LoadXML(sModeXML);
+                    RAData.UpdateCSDataMode(xCSMode);
+
+                }
             }
 
 

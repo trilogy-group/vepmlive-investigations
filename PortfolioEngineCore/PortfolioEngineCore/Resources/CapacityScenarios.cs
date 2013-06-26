@@ -34,8 +34,40 @@ namespace PortfolioEngineCore
             _sqlConnection = _PFECN;
         }
 
-       public bool GetCapacityScenariosXML(out string sReply)
-       {
+        public bool RoleBasedCSAllowed()
+        {
+            bool bReply = false;
+            try
+            {
+
+                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                _sqlConnection.Open();
+
+
+                string cmdText = "SELECT CS_ROLE_BASED FROM  EPGP_CAPACITY_SETS ORDER BY CS_NAME";
+
+                SqlCommand oCommand = new SqlCommand(cmdText, _sqlConnection);
+                SqlDataReader reader = oCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    bReply = true;
+                }
+                reader.Close();
+
+            }
+
+            catch (Exception ex)
+            {
+
+            }
+            return bReply;
+
+
+        }
+
+        public bool GetCapacityScenariosXML(out string sReply, bool CSRoleAllowed, string DeptUIDs)
+        {
            sReply = "";
            try
            {
@@ -65,7 +97,29 @@ namespace PortfolioEngineCore
 
                xCSA.CreateIntAttr("CB_ID", CalID);
 
-               cmdText = "SELECT * FROM  EPGP_CAPACITY_SETS ORDER BY CS_NAME";
+               bool bPrivate = PrivateAllowed();
+
+               cmdText = "SELECT CS_ID, CS_NAME, DEPT_UID";
+
+
+               if (CSRoleAllowed)
+                   cmdText += ", CS_ROLE_BASED ";
+               else
+                   cmdText += ", 0 AS CS_ROLE_BASED ";
+
+               if (bPrivate)
+                   cmdText += ", WRES_ID ";
+               else
+                   cmdText += ", 0 AS WRES_ID ";
+
+               cmdText += " FROM  EPGP_CAPACITY_SETS  WHERE (DEPT_UID IS NULL OR DEPT_UID IN (" + DeptUIDs + ") )";
+
+               if (bPrivate)
+               {
+                   cmdText += " AND (WRES_ID = 0 OR WRES_ID IS NULL OR WRES_ID = " + _userWResID.ToString() + ")";
+               }
+               
+               cmdText += " ORDER BY CS_NAME";
 
                oCommand = new SqlCommand(cmdText, _sqlConnection);
                reader = oCommand.ExecuteReader();
@@ -76,10 +130,16 @@ namespace PortfolioEngineCore
 
                    int cs_id = DBAccess.ReadIntValue(reader["CS_ID"]);
                    string cs_name = DBAccess.ReadStringValue(reader["CS_NAME"]);
-
+                   int role_mode = DBAccess.ReadIntValue(reader["CS_ROLE_BASED"]);
                    xNode.CreateIntAttr("ID", cs_id);
                    xNode.CreateStringAttr("Name", cs_name);
+                   xNode.CreateIntAttr("RMODE", role_mode);
+                   xNode.CreateIntAttr("DEPT", DBAccess.ReadIntValue(reader["DEPT_UID"]));
 
+                   if (bPrivate)
+                       xNode.CreateIntAttr("WRES", DBAccess.ReadIntValue(reader["WRES_ID"]));
+                   else
+                       xNode.CreateIntAttr("WRES", 0);
                }
                reader.Close();
 
@@ -124,7 +184,7 @@ namespace PortfolioEngineCore
 
       }
 
-      public int AddCapacityScenarioXML(string sScenarioName)
+      public int AddCapacityScenarioXML(string sScenarioName, bool bPriv, int deptID)
       {
 
           if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
@@ -144,7 +204,12 @@ namespace PortfolioEngineCore
 
          ++maxid;
 
-           cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME) VALUES(" + maxid.ToString() + ", 0," + DBAccess.PrepareText(sScenarioName) + ")";
+         bool bPrivate = PrivateAllowed();
+
+          if (bPrivate)
+              cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME, WRES_ID) VALUES(" + maxid.ToString() + ", " + deptID.ToString() + " ," + DBAccess.PrepareText(sScenarioName) + "," + (bPriv ? _userWResID.ToString() : "0") + ")";
+          else 
+                cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME) VALUES(" + maxid.ToString() + ", " + deptID.ToString() + " ," + DBAccess.PrepareText(sScenarioName) + ")";
            oCommand = new SqlCommand(cmdText, _sqlConnection);
            reader = oCommand.ExecuteReader();
 
@@ -403,12 +468,14 @@ namespace PortfolioEngineCore
 
           string sCapName = xSaveData.GetStringAttr("Name");
           int iCapacityID = xSaveData.GetIntAttr("ID");
+          int wRes = xSaveData.GetIntAttr("WRES"); 
+          int DeptID = xSaveData.GetIntAttr("DEPT");
 
 
           if (iCapacityID == -1)
           {
 
-              iCapacityID = AddCapacityScenarioXML(sCapName);
+              iCapacityID = AddCapacityScenarioXML(sCapName, wRes != 0, DeptID);
           }
 
           CStruct CSValues = xSaveData.GetSubStruct("CS_Values");
@@ -450,6 +517,13 @@ namespace PortfolioEngineCore
           SqlCommand oCommand = new SqlCommand(cmdText, _sqlConnection);
           SqlDataReader reader = oCommand.ExecuteReader();
 
+          CStruct xSaveData = new CStruct();
+
+          xSaveData.LoadXML(sCSDataXML);
+
+          int wRes = xSaveData.GetIntAttr("WRES");
+          int DeptID = xSaveData.GetIntAttr("DEPT");
+
           while (reader.Read())
           {
                curid = DBAccess.ReadIntValue(reader["CS_ID"]);
@@ -458,13 +532,41 @@ namespace PortfolioEngineCore
 
           if (curid == 0)
           {
-              curid = AddCapacityScenarioXML(sSaveToName);
+              curid = AddCapacityScenarioXML(sSaveToName, wRes != 0, DeptID);
           }
 
           SaveCapacityScenario(curid, sCSDataXML);
 
 
           return true;
+
+      }
+
+
+      private bool PrivateAllowed()
+      {
+          bool bReply = false;
+          try
+          {
+              string cmdText = "SELECT WRES_ID FROM  EPGP_CAPACITY_SETS";
+
+              SqlCommand oCommand = new SqlCommand(cmdText, _sqlConnection);
+              SqlDataReader reader = oCommand.ExecuteReader();
+
+              while (reader.Read())
+              {
+                  bReply = true;
+              }
+              reader.Close();
+
+          }
+
+          catch (Exception ex)
+          {
+
+          }
+          return bReply;
+
 
       }
 

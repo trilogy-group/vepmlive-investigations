@@ -421,10 +421,25 @@ border-radius: 0px;
 </div>
 <div id="idCreateNewCapScen" class="modalContent" style="display:none;">
 	<div class="modalText" style="margin-top:5px;padding-right:10px;">
-			<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
+        <div style="display:relative;vertical-align:middle;padding-bottom:3px;">
 			Capacity Scenario Name:
 		</div>
-		<div><input id="idTxtCapScenName" type="text" value=" " style="width:210px;text-align:left;padding:0px;margin:0px;height:20px;" /></div>
+        <div><input id="idTxtCapScenName" type="text" value=" " style="width:210px;text-align:left;padding:0px;margin:0px;height:20px;" /></div>
+        <br />
+        <div style="display:relative;vertical-align:middle;padding-bottom:3px;">
+			Department:
+		</div>  
+        <div>   
+		    <select id="idNewCSDept" name="idNewCSDept" style="vertical-align:middle;padding:0px;margin:0px 4px 0px 4px;">
+		    </select>
+       </div>
+       <br />
+       <div style="display:none;">
+       <div>
+			<input id="idNewCSPrivate" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Personal Scenario</font>
+		</div>
+        <br />
+        </div>
 		<div style="width:200px;margin-left:10px;margin-top:3px;">
 			<div style="padding-top:10px;">
 					<a href="javascript:dialogEvent('SaveCS_OK');" class="button-new green" style="width:75px;">OK</a>
@@ -587,6 +602,7 @@ border-radius: 0px;
 	</div>
 </div>
 <div id="idEditCapScenDlg" style="display:none;">
+   <div id="idEditCS" style="position: relative; width: 100%; height: 650px; top: 0px; left: 0px;"></div>    
    <div id="ribbonbarEditCapScenDiv"></div>
    <div id="idEditGridDiv" ></div>
 </div>

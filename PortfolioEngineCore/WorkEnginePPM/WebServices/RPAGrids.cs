@@ -1887,8 +1887,8 @@ namespace RPADataCache
             }
             else if (fid == -2)
             {
-                vval = oDet.tot_proposed.getvarr(i);
-                fval = oDet.tot_proposed.getftarr(i);
+                vval = oDet.tot_proposal.getvarr(i);
+                fval = oDet.tot_proposal.getftarr(i);
             }
             else if (fid == -3)
             {
@@ -1940,8 +1940,8 @@ namespace RPADataCache
                     }
                     else if (iHeatmapID == -2)
                     {
-                        vval = oDet.tot_proposed.getvarr(i);
-                        fval = oDet.tot_proposed.getftarr(i);
+                        vval = oDet.tot_proposal.getvarr(i);
+                        fval = oDet.tot_proposal.getftarr(i);
                     }
                     else if (iHeatmapID == -3)
                     {
@@ -2033,20 +2033,30 @@ namespace RPADataCache
             CStruct xPanel = xGrid.CreateSubStruct("Panel");
             xPanel.CreateIntAttr("Visible", 1);
             xPanel.CreateIntAttr("Delete", 0);
+            xPanel.CreateIntAttr("Select", 0);
+            xPanel.CreateIntAttr("Delete", 0);
+            xPanel.CreateIntAttr("CanHide", 0);
+            xPanel.CreateIntAttr("CanSelect", 0);
 
             CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-   
+
+            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            xCfg.CreateIntAttr("SuppressCfg", 3);
+            xCfg.CreateIntAttr("SuppressMessage", 3);
+  
             xCfg.CreateIntAttr("ShowDeleted", 0);
             xCfg.CreateIntAttr("Deleting", 0);
             xCfg.CreateIntAttr("Selecting", 0);
             xCfg.CreateIntAttr("ColResizing", 1);
-            xCfg.CreateIntAttr("SuppressMessage", 3);
+
             xCfg.CreateIntAttr("PrintCols", 0);
 
             xCfg.CreateBooleanAttr("DateStrings", true);
             xCfg.CreateBooleanAttr("NoTreeLines", true);
 
+            xCfg.CreateIntAttr("MaxHeight", 0);
             xCfg.CreateIntAttr("MaxWidth", 1);
+
             xCfg.CreateIntAttr("AppendId", 0);
             xCfg.CreateIntAttr("FullId", 0);
             xCfg.CreateStringAttr("IdChars", "0123456789");
@@ -2055,21 +2065,22 @@ namespace RPADataCache
             xCfg.CreateIntAttr("Dragging", 0);
             xCfg.CreateIntAttr("DragEdit", 0);
             xCfg.CreateIntAttr("ExportFormat", 1);
+            xCfg.CreateIntAttr("WideHScroll", 0);
+            xCfg.CreateIntAttr("ShowVScroll", 1);
 
             xCfg.CreateStringAttr("IdPrefix", "R");
             xCfg.CreateStringAttr("IdPostfix", "x");
             xCfg.CreateIntAttr("CaseSensitiveId", 0);
             xCfg.CreateIntAttr("FilterEmpty", 1);
 
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+
             xCfg.CreateStringAttr("Style", "GM");
             xCfg.CreateStringAttr("CSS", "ResPlanAnalyzer");
 
-            xCfg.CreateIntAttr("LeftWidth", 400);
+            xCfg.CreateIntAttr("LeftWidth", 150);
+            xCfg.CreateIntAttr("Width", 250);
 
 
-
-            xCfg.CreateIntAttr("SuppressCfg", 1);
 
              xCfg.CreateIntAttr("Sorting", 0);
 
