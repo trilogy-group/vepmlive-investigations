@@ -795,6 +795,22 @@
                                 ]
                             }
                         ]
+	                },
+                    {
+                        name: "Share",
+                        tooltip: "Share",
+                        columns: [
+                           {
+                               items: [
+                                    { type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "formatmap32x32.png", style: "top: -352px; left: 0px;position:relative;", tooltip: "Export Details to Excel", onclick: "dialogEvent('EditorTab_Export');" }
+                                ]
+                           },
+                           {
+                               items: [
+                                    { type: "bigbutton", id: "idPrintTop", name: "Print", img: "ps32x32.png", style: "top: -287px; left: -128px;position:relative;", tooltip: "Print", onclick: "dialogEvent('PrintTopBtn');" }
+                                ]
+                           }
+                        ]
                     }
                 ]
             };
@@ -979,7 +995,7 @@
                 this.editorTab.hideItem('RowHistoryBtn');
             }
             // comment this out to show heatmap button in ribbon
-            this.resourcesTab.hideItem('idResourcesTab_ShowHeatmap');
+            //this.resourcesTab.hideItem('idResourcesTab_ShowHeatmap');
 
             this.planTabbar = this.layout_plan.cells(const_PlanRibbonCell).attachTabbar();
             this.planTabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
@@ -1027,6 +1043,7 @@
 
                 var sb = new StringBuilder();
                 sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
+                sb.append(" Export_Url='ModelExportExcel.aspx'");
                 sb.append(" data_url='" + this.params.Webservice + "'");
                 sb.append(" data_method='Soap'");
                 sb.append(" data_function='Execute'");
@@ -2560,6 +2577,15 @@
                         this.Cancel(this.plangrid, this.planrow);
                     }
                     break;
+                case "EditorTab_Export":
+                    var plangrid = Grids["g_RPE"];
+                    plangrid.Source.Export.Type = "xls";
+                    plangrid.ActionExport();
+                    break;
+                case "PrintTopBtn":
+                    var plangrid = Grids["g_RPE"];
+                    plangrid.ActionPrint();
+                    break;
                 case "ViewTab_SelView_Changed":
                     var selectedView = this.GetSelectedView();
                     if (selectedView != null) {
@@ -3474,7 +3500,7 @@
             var reqrow = this.GetParentRequirement(row);
             if (reqrow != null) {
                 this.UpdatePlanRowCalculatedValues(reqrow, 0);
-                this.RefreshPlanRowPeriods(plangrid, reqrow, true);
+                this.RefreshPlanRowPeriods(grid, reqrow, true);
             }
             this.UpdateButtonsAsync();
         }
@@ -3659,15 +3685,12 @@
                 var resuid = plangrid.GetAttribute(planrow, null, "Res_UID");
                 var pendingresuid = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
                 if ((resuid == null || resuid == 0) && (pendingresuid == null || pendingresuid == 0)) {
-                    window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(planrow, "ItemName"); }, 10);
-                    alert("Plan cannot be saved.\n\nPlan row must have a valid resource");
+                    window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(planrow, "ItemName"); alert("Plan cannot be saved.\n\nPlan row must have a valid resource"); }, 10);
                     return false;
                 }
-
                 var plandeptUid = plangrid.GetAttribute(planrow, null, "Dept_UID");
                 if (plandeptUid == null || plandeptUid == 0) {
-                    window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(planrow, "ItemName"); }, 10);
-                    alert("Plan cannot be saved.\n\nPlan row must have a valid department");
+                    window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(planrow, "ItemName"); alert("Plan cannot be saved.\n\nPlan row must have a valid department"); }, 10);
                     return false;
                 }
             }
@@ -4039,21 +4062,21 @@
                 if (this.showHeatmap != true) {
                     sValue = "0.##;<span style='color:red;'>-0.##</span>;0";
                 } else {
-                    sValue = "0.##;<div style='background-color:red;height:inherit;vertical-align:middle;padding:0 !important;'>-0.##</div>;0";
+                    sValue = "0.##;<div style='background-color:red;height:inherit;vertical-align:middle;padding:1px !important;'>-0.##</div>;0";
                 }
                 break;
             case 1: /* FTE */
                 if (this.showHeatmap != true) {
                     sValue = "0.####;<span style='color:red;'>-0.####</span>;0";
                 } else {
-                    sValue = "0.####;<div style='background-color:red;height:100%;vertical-align:middle;padding:0 !important;'>-0.####</div>;0";
+                    sValue = "0.####;<div style='background-color:red;height:inherit;vertical-align:middle;padding::1px !important;'>-0.####</div>;0";
                 }
                 break;
             case 2: /* FTE% */
                 if (this.showHeatmap != true) {
                     sValue = "0\\%;<span style='color:red;'>-0\\%</span>;0";
                 } else {
-                    sValue = "0\\%;<div style='background-color:red;height:100%;vertical-align:middle;padding:0 !important;'>-0\\%</div>;no value";
+                    sValue = "0\\%;<div style='background-color:red;height:inherit;vertical-align:middle;padding::1px !important;'>-0\\%</div>;no value";
                 }
                 break;
             case 3: /* FTE Conv */
