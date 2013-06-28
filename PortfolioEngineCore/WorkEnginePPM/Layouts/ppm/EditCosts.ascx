@@ -50,6 +50,7 @@
     IFRAME.dhtmlx_wins_ie6_cover_fix { height: 0px !important; }
 
     .GMColorDefault { background-color:#E7EAF0 !important;}
+    .GMClassAdded { font-weight:normal !important; }
 
     .dhx_tabbar_row { background-color:#eeeeee !important;}
 </style>

@@ -938,6 +938,8 @@
             var sNewId = sParentId + "S" + ncount.toString();
             var newrow = grid.CopyRow(parentrow, parentrow, null, false, false);
             grid.SetAttribute(newrow, null, "id", sNewId, 0, 0);
+            grid.SetAttribute(newrow, null, "HtmlPrefix", "", 0, 0);
+            grid.SetAttribute(newrow, null, "HtmlPostfix", "", 0, 0);
             for (var c = 0; c < grid.ColNames[0].length; c++) {
                 var col = grid.ColNames[0][c];
                 var sType = col.substring(0, 1);
@@ -994,7 +996,7 @@
     };
     EditCosts.prototype.HideQtyCol = function (grid, col) {
         var canHide = true;
-        if (grid.RowCount > 0) {
+//        if (grid.RowCount > 0) {
             var row = grid.GetFirst(null, 0);
             while (row != null) {
                 var uom = row["uom"];
@@ -1010,7 +1012,7 @@
                 }
                 row = grid.GetNext(row);
             }
-        }
+//        }
         return canHide;
     };
     EditCosts.prototype.toolsDlg_LoadData = function () {
