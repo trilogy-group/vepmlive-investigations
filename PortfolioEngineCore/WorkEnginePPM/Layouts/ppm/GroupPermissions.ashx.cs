@@ -100,10 +100,17 @@ namespace WorkEnginePPM
                                 dbaUsers.SelectGroupPermissions(dba, nGroupId, out dt);
                                 dba.Close();
 
-                                string sTreegridData = BuildGridLayout(dt).XML();
-                                xGroupPermissions.CreateStringAttr("treegridData", sTreegridData);
+                                if (dba.Status != StatusEnum.rsSuccess)
+                                {
+                                    sReply = WebAdmin.FormatError("exception", "GroupPermissions.SelectGroupPermissions", dba.StatusText);
+                                }
+                                else
+                                {
+                                    string sTreegridData = BuildGridLayout(dt).XML();
+                                    xGroupPermissions.CreateStringAttr("treegridData", sTreegridData);
 
-                                sReply = xGroupPermissions.XML();
+                                    sReply = xGroupPermissions.XML();
+                                }
                             }
                         }
                         break;

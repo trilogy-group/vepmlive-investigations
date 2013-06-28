@@ -43,6 +43,25 @@ html, body {
 		</div>
 	</div>
 </div>
+<div class="modalContent" id="idFTEsDlg" style="display:none;">
+	<div style="padding-bottom:3px;">
+        <table width="100%" cellspacing="0">
+            <tr id="trCalendar">
+                <td>Calendar : </td>
+                <td class="controlcell">
+                    <select id="idCalendar"  onchange="FTEsDlg_event('calendarOnChange');"></select>
+                </td>
+            </tr>
+        </table>
+	</div>
+    <div id="idToolbarFTEsDiv"></div>
+    <div style="display:block;"><tg1:TGridUserControl id="tgridFTEs" runat="server" /></div>
+	<div style="float:right;">
+		<div class="button-container" >
+			<input type="button" class="epmliveButton" value="Close" onclick="FTEsDlg_event('cancel');"/>
+		</div>
+	</div>
+</div>
 <div class="modalContent" id="idRolesDlg" style="display:none;">
     <input id="idRolesDlgMode" type="hidden" value="" />
 	<div style="margin-top:10px;padding-right:10px;">
@@ -122,12 +141,12 @@ html, body {
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", name: "Save", img: "addresource.gif", tooltip: "Save", width: "80px", onclick: "toolbar_event('btnSave');" },
-            { type: "button", name: "Add", img: "addresource.gif", tooltip: "Add", width: "80px", onclick: "toolbar_event('btnAdd');" },
-            { type: "button", id: "btnAddRole", name: "Add Role", img: "addresource.gif", tooltip: "Add role", width: "80px", onclick: "toolbar_event('btnAddRole');" },
-            { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return toolbar_event('btnDelete');", disabled: true },
-            { type: "button", id: "btnFTEs", name: "FTEs", img: "delete.png", tooltip: "FTEs", width: "80px", onclick: "return toolbar_event('btnFTEs');", disabled: true },
-            { type: "button", id: "btnRates", name: "Rates", img: "delete.png", tooltip: "Rates", width: "80px", onclick: "return toolbar_event('btnRates');", disabled: true }
+            { type: "button", id: "btnSave", name: "SAVE", img: "formatmap16x16_2.png", style: "top: -127px; left: -91px;", tooltip: "Save",  onclick: "toolbar_event('btnSave');" },
+            { type: "button", id: "btnAdd", name: "ADD", img: "formatmap16x16_2.png", style: "top: -90px; left: -216px;", tooltip: "Add", onclick: "toolbar_event('btnAdd');" },
+            { type: "button", id: "btnAddRole", name: "ADD ROLE", img: "addresource.gif", tooltip: "Add role", width: "80px", onclick: "toolbar_event('btnAddRole');" },
+            { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
+            { type: "button", id: "btnFTEs", name: "FTEs", img: "delete.png", tooltip: "FTEs", width: "80px", onclick: "return toolbar_event('btnFTEs');", disabled: false },
+            { type: "button", id: "btnRates", name: "RATES", img: "delete.png", tooltip: "Rates", width: "80px", onclick: "return toolbar_event('btnRates');", disabled: true }
         ]
     };
     var toolbarRatesData = {
@@ -140,12 +159,22 @@ html, body {
             { type: "button", id: "btnDelete2", name: "Delete", img: "delete.png", tooltip: "Delete", width: "80px", onclick: "return ratesDlg_event('btnDelete2');", disabled: true }
         ]
     };
+    var toolbarFTEsData = {
+        parent: "idToolbarFTEsDiv",
+        style: "display:none;",
+        imagePath: "images/",
+        items: [
+             { type: "button", id: "btnSaveFTEs", name: "SAVE", img: "formatmap16x16_2.png", style: "top: -127px; left: -91px;", tooltip: "Save",  onclick: "FTEsDlg_event('btnSaveFTEs');", disabled: true  }
+       ]
+    };
 
     var toolbar = new Toolbar(toobarData);
     toolbar.Render();
     var toolbarRates = new Toolbar(toolbarRatesData);
+    var toolbarFTEs = new Toolbar(toolbarFTEsData);
     var tgrid1_selectedRow = 0;
     var tgridRates_selectedRow = 0;
+    var tgridFTEs_selectedRow = 0;
     var tgrid1 = window.<%=tgrid1.UID%>;
  
     var OnLoad = function (event) {
@@ -165,6 +194,19 @@ html, body {
         toolbarRates.enableItem("btnInsert2");
         toolbarRates.enableItem("btnDelete2");
     };
+    function tgridFTEs_OnFocus(grid, row, col, orow, ocol, pagepos) {
+        tgridFTEs_selectedRow = row;
+        toolbarFTEs.enableItem("btnInsert2");
+        toolbarFTEs.enableItem("btnDelete2");
+    };
+    function tgridFTEs_OnAfterValueChanged(grid, row, col, va) {
+        var hasChanges = grid.HasChanges();
+        if ((hasChanges & (1 << 0)) != 0)
+            toolbarFTEs.enableItem("btnSaveFTEs");
+        else
+            toolbarFTEs.disableItem("btnSaveFTEs");
+    };
+
     var OnResize = function (event) {
         var tgrid1 = window.<%=tgrid1.UID%>;
         var top = tgrid1.GetTop();
@@ -248,7 +290,8 @@ html, body {
     function toolbar_event(event) {
         var tgrid1 = window.<%=tgrid1.UID%>;
         var sRowId = "";
-        //document.getElementById('idCustomfieldDlgMode').value = event;
+        if (toolbar.isItemDisabled(event) == true)
+            return;
         switch (event) {
             case "btnAdd":
                 var row = tgrid1.AddRow();
@@ -369,6 +412,41 @@ html, body {
                     DisplayDialog(400, 300, s, "winRatesDlg", "idRatesDlg", true, false);
                 }
                 break;
+            case "btnFTEs":
+                var hasChanges = tgrid1.grid.HasChanges();
+                if ((hasChanges & (1 << 0)) != 0) {
+                     window.alert("You have unsaved changes to cost categories.\n\nYou must save or abandon these changes before editing FTEs");
+                     return;
+                }
+                var sRequest = '<request function="CostCategoriesRequest" context="ReadCalendarFTEsInfo"><data><![CDATA[' + -1 + ']]></data></request>';
+                var jsonString = SendRequest(sRequest);
+                var json = JSON_ConvertString(jsonString);
+                if (json.reply != null) {
+                    if (jsf_alertError(json.reply.error) == true)
+                        return false;
+                }
+                var nCalendar = json.reply.FTEs.CB_ID;
+                var idCalendar = document.getElementById('idCalendar');
+                idCalendar.options.length = 0;
+                var item = json.reply.FTEs.calendars.item;
+                for (var i = 0; i < item.length; i++) {
+                    idCalendar.options[idCalendar.options.length] = new Option(item[i].name, item[i].id);
+                    if (item[i].id == nCalendar)
+                        idCalendar.selectedIndex = idCalendar.options.length - 1;
+                }
+                var tgridFTEs = window['<%=tgridFTEs.UID%>'];
+                tgridFTEs.Initialize(json.reply.FTEs.tgridFTEs);
+                tgridFTEs.SetWidth(570);
+                tgridFTEs.SetHeight(250);
+                toolbarFTEs.Render();
+                tgridFTEs.addEventListener("OnFocus", tgridFTEs_OnFocus);
+                tgridFTEs.addEventListener("OnAfterValueChanged", tgridFTEs_OnAfterValueChanged);
+
+                var s = "Cost Category FTE Values";
+                tgridFTEs_selectedRow = 0;
+                DisplayDialog(600, 430, s, "winFTEsDlg", "idFTEsDlg", true, false);
+
+                break;
         }
         return false;
     };
@@ -415,6 +493,62 @@ html, body {
           case "btnDelete2":
                tgridRates.grid.DeleteRow(tgridRates_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
                break;
+        }
+        return false;
+    };
+    function FTEsDlg_event(event) {
+        var tgridFTEs = window['<%=tgridFTEs.UID%>'];
+        tgridFTEs.grid.EndEdit(true);
+        var hasChanges = tgridFTEs.grid.HasChanges();
+        switch (event) {
+            case "btnSaveFTEs":
+                if ((hasChanges & (1 << 0)) == 0) {
+                    alert("There are no changes to save");
+                    return;
+                }
+                var sb = new StringBuilder();
+                var calendarId=document.getElementById('idCalendar').value;
+                sb.append('<request function="CostCategoriesRequest" context="SaveCalendarFTEsInfo">');
+                sb.append('<data');
+                sb.append(' CB_ID="' + calendarId + '"');
+                sb.append('>');
+                sb.append('<![CDATA[' + tgridFTEs.GetXmlData() + ']]>');
+                sb.append('</data>');
+                sb.append('</request>'); 
+                var sRequest = sb.toString();
+                var jsonString = SendRequest(sRequest);
+                var json = JSON_ConvertString(jsonString);
+                if (json.reply != null) {
+                    if (jsf_alertError(json.reply.error) == true)
+                        return false;
+                }
+                break;
+            case "ok":
+                CloseDialog('winFTEsDlg');
+                break;
+            case "cancel":
+                CloseDialog('winFTEsDlg');
+                break;
+            case "calendarOnChange":
+                if ((hasChanges & (1 << 0)) != 0) {
+                    var b = true;
+                    b = window.confirm("You have unsaved changes.\n\nAre you sure you want to continue without saving?");
+
+                }
+                var calendarId=document.getElementById('idCalendar').value;
+                var sRequest = '<request function="CostCategoriesRequest" context="ReadCalendarFTEsInfo"><data><![CDATA[' + calendarId + ']]></data></request>';
+                var jsonString = SendRequest(sRequest);
+                var json = JSON_ConvertString(jsonString);
+                if (json.reply != null) {
+                    if (jsf_alertError(json.reply.error) == true)
+                        return false;
+                }
+                tgridFTEs.Initialize(json.reply.FTEs.tgridFTEs);
+                tgridFTEs.SetWidth(570);
+                tgridFTEs.SetHeight(250);
+                tgridFTEs.addEventListener("OnFocus", tgridFTEs_OnFocus);
+                tgridFTEs.addEventListener("OnAfterValueChanged", tgridFTEs_OnAfterValueChanged);
+                break;
         }
         return false;
     };

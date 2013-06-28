@@ -61,10 +61,10 @@ namespace PortfolioEngineCore
         public StatusEnum GetAdminInfo(DBAccess dba)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
+            SqlDataReader reader = null;
+            SqlCommand oCommand = null;
             try
             {
-                SqlCommand oCommand = null;
-                SqlDataReader reader = null;
                 oCommand = new SqlCommand("EPG_SP_ReadAdmin", dba.Connection);
                 oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                 reader = oCommand.ExecuteReader();
@@ -143,14 +143,17 @@ namespace PortfolioEngineCore
                     DefaultFTEHOL = DBAccess.ReadIntValue(reader["ADM_DEF_FTE_HOL"]);
                     WEReportingDBConnect = DBAccess.ReadStringValue(reader["ADM_WE_REPORTING_DB_CONNECT"]);
                     ProjectResourceHoursCFID = DBAccess.ReadIntValue(reader["ADM_PROJ_RES_HOURS_CFID"]);
-
-                    reader.Close();
-                    reader = null;
                 }
             }
             catch (Exception ex)
             {
                 eStatus = dba.HandleException("GetAdminInfo", (StatusEnum)99999, ex);
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+                reader = null;
             }
             return eStatus;
         }

@@ -463,8 +463,6 @@ namespace WorkEnginePPM
             {
                 try
                 {
-                    //  don't know if calcs and avail ccs will be same grid or separate - assuming same one with different columns right now - probably won't be a grid
-
                     CStruct xAvailCCs = new CStruct();
                     xAvailCCs.Initialize("AvailCCs");
                     CStruct xCalcs = new CStruct();

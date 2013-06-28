@@ -39,6 +39,13 @@ namespace PortfolioEngineCore
             return dba.SelectDataById(cmdText, nCalendarId, (StatusEnum)99996, out dt);
         }
 
+        public static StatusEnum SelectCalendarPeriodCount(DBAccess dba, int nCalendarId, out DataTable dt)
+        {
+            // for now assuming periods start at 1 - which will likely remian true
+            string cmdText = "SELECT MAX(PRD_ID) as PeriodCount FROM EPG_PERIODS WHERE CB_ID = @p1";
+            return dba.SelectDataById(cmdText, nCalendarId, (StatusEnum)99996, out dt);
+        }
+
         public static StatusEnum UpdateCalendar(DBAccess dba, ref int nCalendarId, string sCalendarName, string sCalendarDescription, out string sReply)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
@@ -343,6 +350,12 @@ namespace PortfolioEngineCore
                 eStatus = StatusEnum.rsRequestCannotBeCompleted;
             }
             return eStatus;
+        }
+
+        public static StatusEnum ReadCalendarFTEs(DBAccess dba, int nCalendarId, out DataTable dt)
+        {
+            const string cmdText = "EPG_SP_ReadCalendarFTEs @p1";
+            return dba.SelectDataById(cmdText, nCalendarId, (StatusEnum)99997, out dt);
         }
     }
 }

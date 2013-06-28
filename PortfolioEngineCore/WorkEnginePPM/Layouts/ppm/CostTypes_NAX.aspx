@@ -143,7 +143,7 @@ html, body {
 				</tr>
             </table>
         </div>
-        <div id="idDeleteWarning" style="width:300px; color:red; display:none;"><a>Are you sure, all data will be cleared?</a></div>
+        <div id="idDeleteWarning" style="width:300px; color:red; font-size:15px !important; display:none;"><a>Are you sure, all data will be cleared?</a></div>
 		<div style="float:right;">
 			<div class="button-container" >
 			    <input id="idOKButton" type="button" class="epmliveButton" value="OK" onclick="costtypeDlg_event('ok');"/>
@@ -310,9 +310,9 @@ html, body {
                 document.getElementById('txtId').value = costtype.CT_ID;
                 var tgridSecurity = window['<%=tgridSecurity.UID%>'];
                 tgridSecurity.Initialize(costtype.tgridSecurity);
-                tgridSecurity.SetWidth(260);
+                tgridSecurity.SetWidth(310);
                 tgridSecurity.SetHeight(180);
-                DisplayDialog(300, 270, "Security for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winSecurityDlg", "idSecurityDlg", true, false);
+                DisplayDialog(350, 270, "Security for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winSecurityDlg", "idSecurityDlg", true, false);
                 break;
             case "btnModify":
                 if (toolbar.isItemDisabled("btnModify") == true) {
@@ -418,7 +418,7 @@ html, body {
                 var sFormula = jsf_getStringFromValue(json.reply.costtype.formula);
                 document.getElementById('idFormula').value = sFormula;
                 var ht = SetCTDlgState();
-                DisplayDialog(625, ht + 15, "Delete Cost Type - " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME") + "  Are you sure?", "winCosttypeDlg", "idCostTypeDlg", true, false);
+                DisplayDialog(625, ht + 15, "Delete Cost Type - " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME") + "?", "winCosttypeDlg", "idCostTypeDlg", true, false);
                 break;
         }
         return false;

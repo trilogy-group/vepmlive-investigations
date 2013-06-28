@@ -122,6 +122,15 @@ namespace PortfolioEngineCore.WEIntegration
             //  alternative would be to build up status for each Timesheet entry and return the whole thing
             //  or just return entries in error ...
 
+            // June 12, 2013 - jason tells me to just ignore records where NOT FOUND in PfE as error is annoying and "it really doesn't affect anything"
+            // Following result from test after changes and with an invalid resource and an invalid date:
+            //    <PostTimesheetData>
+            //       <Result Status="0">
+            //       </Result>
+            //       <Result Status="0" Timesheets="3" WithError="2" />
+            //       </PostTimesheetData>
+            //  don't know why Result tag there twice but thought safer to leave it alone
+
             CStruct xTimesheets=null;
             CStruct xDataInputElement = xData.GetSubStruct("Data");
             if (xDataInputElement == null) xTimesheets = xData.GetSubStruct("Timesheets");
@@ -184,9 +193,13 @@ namespace PortfolioEngineCore.WEIntegration
                 if (oResource == null)
                 {
                     if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1;}
+
+                    // old drastic reaction to error
                     //throw new PFEException((int)PFEError.PostTimesheetData, "Resource Not Found: " + resource);
-                    CStruct xError = xResult.CreateSubStruct("Error");
-                    xError.CreateCDataSection("Resource Not Found: " + resource);
+
+                    // errors not even reported now - per Jason June 2013: Users don't want to see these errors, they don't mean anything
+                    //CStruct xError = xResult.CreateSubStruct("Error");
+                    //xError.CreateCDataSection("Resource Not Found: " + resource);
                 }
                 else
                 {
@@ -230,10 +243,14 @@ namespace PortfolioEngineCore.WEIntegration
                             if (lProjID <= 0)
                             {
                                 if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1; }
+
+                                // old drastic reaction to error
                                 //if (transaction != null) transaction.Rollback();
                                 //throw new PFEException((int)PFEError.PostTimesheetData,"Project Not Found: " + resource + ", " + PIExtId);
-                                CStruct xError = xResult.CreateSubStruct("Error");
-                                xError.CreateCDataSection("Project Not Found: " + resource + ", " + PIExtId);
+
+                                // errors not even reported now - June 2013
+                                //CStruct xError = xResult.CreateSubStruct("Error");
+                                //xError.CreateCDataSection("Project Not Found: " + resource + ", " + PIExtId);
                             }
                             else
                             {
@@ -253,11 +270,15 @@ namespace PortfolioEngineCore.WEIntegration
                                 // we have a charge fully defined
                                 if (dWorkdate < periodstart || dWorkdate > periodend)
                                 {
-                                    if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1; }
+                                    if (bUpdateOK) { bUpdateOK = false; linvalidtimesheets += 1; }                                
+                                    
+                                    // old drastic reaction to error
                                     //if (transaction != null) transaction.Rollback();
                                     //throw new PFEException((int) PFEError.PostTimesheetData,"Timesheet Information outside specified range: " + resource +", " + PIExtId);
-                                    CStruct xError = xResult.CreateSubStruct("Error");
-                                    xError.CreateCDataSection("Timesheet Information outside specified range: " + resource + ", " + PIExtId);
+                                    
+                                    // errors not even reported now - June 2013
+                                    //CStruct xError = xResult.CreateSubStruct("Error");
+                                    //xError.CreateCDataSection("Timesheet Information outside specified range: " + resource + ", " + PIExtId);
                                 }
                                 else
                                 {
@@ -272,8 +293,10 @@ namespace PortfolioEngineCore.WEIntegration
                 lprocessedtimesheets += 1;
             }
 
-            if (linvalidtimesheets > 0) { xResult.CreateIntAttr("Status", 1); }
-            else { xResult.CreateIntAttr("Status", 0); }
+            //if (linvalidtimesheets > 0) { xResult.CreateIntAttr("Status", 1); }
+            //else { xResult.CreateIntAttr("Status", 0); }
+            xResult.CreateIntAttr("Status", 0);
+
             xResult.CreateIntAttr("Timesheets", lprocessedtimesheets);
             xResult.CreateIntAttr("WithError", linvalidtimesheets);
 

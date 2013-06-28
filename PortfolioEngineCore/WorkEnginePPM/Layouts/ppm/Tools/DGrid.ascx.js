@@ -36,7 +36,13 @@
         if (this.grid != null)
             this.grid.attachEvent(eventName, eventFumction);
     };
-
+    DGrid.prototype.autoSizeColumns = function () {
+        var gridcols = this.columns;
+        var cols = gridcols.head.column;
+        for (var c = 0; c < cols.length; c++) {
+            this.grid.adjustColumnSize(c);
+        }
+    };
     DGrid.prototype.OnRowSelect = function (id, ind) {
         //this.RowEvent("", "onclick", id);
     };
@@ -49,13 +55,15 @@
 
     DGrid.prototype.SetHeight = function (h) {
         var div = document.getElementById(params.grid_div);
-        div.style.height = h + "px";
+        if (h > 0)
+            div.style.height = h + "px";
         this.grid.setSizes();
     };
 
     DGrid.prototype.SetWidth = function (w) {
         var div = document.getElementById(params.grid_div);
-        div.style.width = w + "px";
+        if (w > 0)
+            div.style.width = w + "px";
         this.grid.setSizes();
     };
 

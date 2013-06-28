@@ -68,6 +68,12 @@ namespace WorkEnginePPM
                         }
                         dba.Close();
                     }
+
+                    if (dba.Status != StatusEnum.rsSuccess)
+                    {
+                        lblGeneralError.Text = "Exception from CostCategories.Page_Load - " + dba.StatusText;
+                        lblGeneralError.Visible = true;
+                    }
                 }
             }
             catch (PFEException pex)

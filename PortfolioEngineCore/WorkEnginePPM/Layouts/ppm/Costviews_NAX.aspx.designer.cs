@@ -10,16 +10,7 @@
 namespace WorkEnginePPM {
     
     
-    public partial class SPResourceFieldMapping {
-        
-        /// <summary>
-        /// btnSave control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSave;
+    public partial class Costviews_NAX {
         
         /// <summary>
         /// lblGeneralError control.
@@ -31,21 +22,12 @@ namespace WorkEnginePPM {
         protected global::System.Web.UI.WebControls.Label lblGeneralError;
         
         /// <summary>
-        /// pnlMain control.
+        /// dgrid1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlMain;
-        
-        /// <summary>
-        /// GridView1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView GridView1;
+        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.DGrid dgrid1;
     }
 }

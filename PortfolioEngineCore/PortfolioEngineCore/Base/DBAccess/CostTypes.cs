@@ -718,7 +718,7 @@ namespace PortfolioEngineCore
                 if (CanDeleteCostType(dba, nCTId, out sdeletemessage) != StatusEnum.rsSuccess) return dba.Status;
                 if (sdeletemessage.Length > 0)
                 {
-                    sReply = DBAccess.FormatAdminError("error", "Customfields.DeleteCustomField", "This Cost Type cannot be deleted, it is currently used as follows:" + "\n" + "\n" + sdeletemessage);
+                    sReply = DBAccess.FormatAdminError("error", "CostTypes.DeleteCostType", "This Cost Type cannot be deleted, it is currently used as follows:" + "\n" + "\n" + sdeletemessage);
                     return StatusEnum.rsRequestCannotBeCompleted;
                 }
 

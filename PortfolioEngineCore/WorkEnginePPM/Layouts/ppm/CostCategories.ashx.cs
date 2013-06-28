@@ -100,8 +100,17 @@ namespace WorkEnginePPM
                     case "ReadCostCategoryRatesInfo":
                         sReply = ReadCostCategoryRatesInfo(Context, xData);
                         break;
+                    case "ReadCalendarFTEsInfo":
+                        sReply = ReadCalendarFTEsInfo(Context, xData);
+                        break;
                     case "SaveCostCategoryRatesInfo":
                         sReply = SaveCostCategoryRatesInfo(Context, xData);
+                        break;
+                    case "SaveCalendarFTEsInfo":
+                        sReply = SaveCalendarFTEsInfo(Context, xData);
+                        break;
+                    default:
+                        sReply = WebAdmin.FormatError("error", "CostCategoriesRequest", "Unknown Request : " + sRequestContext);
                         break;
                 }
             }
@@ -112,13 +121,13 @@ namespace WorkEnginePPM
 
             return sReply;
         }
-        private static void InitializeColumns(_TGrid tg)
-        {
-            tg.AddColumn(title: "ID", width: 50, name: "RT_UID", isId: true, hidden: true);
-            tg.AddColumn(title: "Name", width: 180, name: "LV_VALUE", editable: true);
-            tg.AddColumn(title: "Effective Date", width: 180, name: "LV_VALUE", editable: true);
-            tg.AddColumn(title: "Rate", width: 180, name: "LV_LEVEL", editable: true);
-        }
+        //private static void InitializeColumns(_TGrid tg)
+        //{
+        //    tg.AddColumn(title: "ID", width: 50, name: "RT_UID", isId: true, hidden: true);
+        //    tg.AddColumn(title: "Name", width: 180, name: "LV_VALUE", editable: true);
+        //    tg.AddColumn(title: "Effective Date", width: 180, name: "LV_VALUE", editable: true);
+        //    tg.AddColumn(title: "Rate", width: 180, name: "LV_LEVEL", editable: true);
+        //}
         private static string ReadCostCategoryRatesInfo(HttpContext Context, CStruct xData)
         {
             string sReply = "";
@@ -257,6 +266,104 @@ namespace WorkEnginePPM
                 catch (Exception ex)
                 {
                     sReply = WebAdmin.FormatError("exception", "CostCategories.DeleteCostCategoryInfo", ex.Message);
+                }
+                dba.Close();
+            }
+            return sReply;
+        }
+        private static void InitializeFTEColumns(DBAccess dba, int nCalendarId, _TGrid tg)
+        {
+            DataTable dt;
+            DataTable dtPeriods;
+            dbaCalendars.SelectCalendarPeriods(dba, nCalendarId, out dtPeriods);
+
+            // looks like following stmnt might not be used?
+            dbaCalendars.ReadCalendarFTEs(dba, nCalendarId, out dt);
+
+            tg.AddColumn(title: "ID", width: 50, name: "BC_UID", isId: true, hidden: true);
+            tg.AddColumn(title: "Category", width: 180, name: "BC_NAME", maincol: true);
+            //tg.AddColumn(title: "UoM", width: 180, name: "BC_UOM", editable: true);
+            tg.AddColumn(title: "Level", width: 180, name: "BC_LEVEL", mainlevelcol: true, hidden: true);
+            tg.AddColumn(title: "Role", width: 180, name: "BC_ROLE", hidden: true);
+            foreach (DataRow row in dtPeriods.Rows)
+            {
+                int periodid = DBAccess.ReadIntValue(row["PRD_ID"]);
+                string periodname = DBAccess.ReadStringValue(row["PRD_NAME"]);
+                tg.AddColumn(title: periodname, width: 70, name: "P" + periodid.ToString(), editable: true, align: _TGrid.Align.center);
+            }
+        }
+        private static string ReadCalendarFTEsInfo(HttpContext Context, CStruct xData)
+        {
+            string sReply = "";
+            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            DataAccess da = new DataAccess(sBaseInfo);
+            DBAccess dba = da.dba;
+            if (dba.Open() == StatusEnum.rsSuccess)
+            {
+                try
+                {
+                    int nCalendarId = -1;
+                    int i;
+                    if (Int32.TryParse(xData.InnerText, out i) == true)
+                        nCalendarId = i;
+                    CStruct xCostCategory = new CStruct();
+                    xCostCategory.Initialize("FTEs");
+                    xCostCategory.CreateIntAttr("CB_ID", nCalendarId);
+                    DataTable dt;
+                    dbaCalendars.SelectCalendars(dba, out dt);
+                    CStruct xCalendars = xCostCategory.CreateSubStruct("calendars");
+                    CStruct xItem = xCalendars.CreateSubStruct("item");
+                    xItem.CreateIntAttr("id", -1);
+                    xItem.CreateStringAttr("name", "--Select a Calendar--");
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        xItem = xCalendars.CreateSubStruct("item");
+                        int nCalendar = DBAccess.ReadIntValue(row["CB_ID"]);
+                        xItem.CreateIntAttr("id", nCalendar);
+                        xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["CB_NAME"]));
+                    }
+                    
+                    _TGrid tg = new _TGrid();
+                    InitializeFTEColumns(dba, nCalendarId, tg);
+                    dbaCalendars.ReadCalendarFTEs(dba, nCalendarId, out dt);
+                    tg.SetDataTable(dt);
+                    string tgridFTEs = "";
+                    tg.Build(out tgridFTEs);
+                    xCostCategory.CreateString("tgridFTEs", tgridFTEs);
+                    sReply = xCostCategory.XML();
+                }
+                catch (Exception ex)
+                {
+                    sReply = WebAdmin.FormatError("exception", "CostCategories.ReadCalendarFTEsInfo", ex.Message);
+                }
+                dba.Close();
+            }
+            return sReply;
+        }
+        private static string SaveCalendarFTEsInfo(HttpContext Context, CStruct xData)
+        {
+            string sReply = "";
+            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            DataAccess da = new DataAccess(sBaseInfo);
+            DBAccess dba = da.dba;
+            if (dba.Open() == StatusEnum.rsSuccess)
+            {
+                try
+                {
+                    int nCalendarId = xData.GetIntAttr("CB_ID");
+                    _TGrid tg = new _TGrid();
+                    InitializeFTEColumns(dba, nCalendarId, tg);
+
+                    string stgridFTEs = xData.InnerText;
+                    DataTable dt = tg.SetXmlData(stgridFTEs);
+                    if (dbaCostCategories.UpdateCostCategoryFTEs(dba, nCalendarId, dt, out sReply) != StatusEnum.rsSuccess)
+                    {
+                        if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "CostCategories.SaveCalendarFTEsInfo", dba.StatusText);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    sReply = WebAdmin.FormatError("exception", "CostCategories.SaveCalendarFTEsInfo", ex.Message);
                 }
                 dba.Close();
             }

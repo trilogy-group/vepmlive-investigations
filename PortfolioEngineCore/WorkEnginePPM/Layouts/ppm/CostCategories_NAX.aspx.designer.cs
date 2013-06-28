@@ -22,6 +22,15 @@ namespace WorkEnginePPM {
         protected global::WorkEnginePPM.TGrid tgridRates;
         
         /// <summary>
+        /// tgridFTEs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::WorkEnginePPM.TGrid tgridFTEs;
+        
+        /// <summary>
         /// ddlResourceRoles control.
         /// </summary>
         /// <remarks>

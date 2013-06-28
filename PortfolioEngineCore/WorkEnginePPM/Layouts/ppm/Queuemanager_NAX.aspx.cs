@@ -11,6 +11,15 @@ namespace WorkEnginePPM
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+                idPage.Text = "1";
+                idRowsPerPageCount.Text = "20";
+                Page_Reload(sender, e);
+            }
+        }
+        protected void Page_Reload(object sender, EventArgs e)
+        {
             DBAccess dba = null;
             try
             {
@@ -21,7 +30,9 @@ namespace WorkEnginePPM
 
                 if (dba.Open() == StatusEnum.rsSuccess)
                 {
+                    
                     dg.AddColumn(title: "ID", width: 50, name: "JOB_GUID", isId: true, hidden: true);
+                    dg.AddColumn(title: "Row", width: 50, name: "RowNumber");
                     _DGrid.DCol col = dg.AddColumn(title: "Context", width: 120, name: "JOB_CONTEXT");
                     col.AddKeyValuePair(0, "Custom");
                     col.AddKeyValuePair(1, "Import Project");
@@ -40,20 +51,37 @@ namespace WorkEnginePPM
                     dg.AddColumn(title: "Submitted", width: 160, name: "JOB_SUBMITTED");
                     dg.AddColumn(title: "Started", width: 160, name: "JOB_STARTED");
                     dg.AddColumn(title: "Completed", width: 160, name: "JOB_COMPLETED");
-                    col = dg.AddColumn(title: "Status", width: 140, name: "JOB_STATUS");
+                    col = dg.AddColumn(title: "Status", width: 130, name: "JOB_STATUS");
                     col.AddKeyValuePair(-2, "Completed with Errors");
                     col.AddKeyValuePair(-1, "Completed");
                     col.AddKeyValuePair(0, "Not Started");
                     col.AddKeyValuePair(1, "Started");
-                    dg.AddColumn(title: "Error", width: 40, name: "JOB_ERRORCODE");
+                    dg.AddColumn(title: "Error", width: 50, name: "JOB_ERRORCODE");
                     dg.AddColumn(title: "Status Message", width: 200, name: "JMG_MESSAGE");
                     dg.AddColumn(title: "User Name", width: 180, name: "RES_NAME");
+                    int nPageSize;
+                    if (Int32.TryParse(idRowsPerPageCount.Text, out nPageSize) == false)
+                    {
+                        nPageSize = 20;
+                        idRowsPerPageCount.Text = nPageSize.ToString("0");
+                    }
+                    int nPage;
+                    if (Int32.TryParse(idPage.Text, out nPage) == false)
+                    {
+                        nPage = 1;
+                        idPage.Text = nPage.ToString("0");
+                    }
+                    if (nPage < 1)
+                    {
+                        nPage = 1;
+                        idPage.Text = nPage.ToString("0");
+                    }
+                    int nStartRow = (nPage - 1) * nPageSize + 1;
+                    int nFinishRow = nStartRow + nPageSize - 1;
 
+                    int nRowsPerPage = nPageSize;
                     DataTable dt;
-                    DateTime dtTo = DateTime.Now;
-                    DateTime dtFrom = dtTo.AddDays(-30);
-                    string sStatusList = "-2,-1,0,1";
-                    dbaQueueManager.SelectQueue(dba, dtFrom, dtTo, sStatusList, out dt);
+                    dbaQueueManager.SelectQueue2(dba, nPage, nRowsPerPage, out dt);
                     dba.Close();
                     dg.SetDataTable(dt);
                     dg.Render();
@@ -76,6 +104,27 @@ namespace WorkEnginePPM
                 if (dba != null)
                     dba.Close();
             }
+        }
+        protected void btnRefresh_Click(object sender, EventArgs e)
+        {
+            idPage.Text = "1";
+            Page_Reload(sender, e);
+        }
+        protected void btnPrevious_Click(object sender, EventArgs e)
+        {
+            int nPage = 0;
+            Int32.TryParse(idPage.Text, out nPage);
+            if (nPage > 1)
+                idPage.Text = (nPage - 1).ToString("0");
+            else
+                idPage.Text = "1";
+            Page_Reload(sender, e);
+        }
+        protected void btnNext_Click(object sender, EventArgs e)
+        {
+            int nPage = Int32.Parse(idPage.Text);
+            idPage.Text = (nPage + 1).ToString("0");
+            Page_Reload(sender, e);
         }
     }
 }

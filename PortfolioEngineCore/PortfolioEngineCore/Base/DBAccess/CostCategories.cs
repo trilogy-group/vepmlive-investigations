@@ -239,6 +239,9 @@ namespace PortfolioEngineCore
                         oCommand.Parameters.AddWithValue("@pCA_UID", nCA_UID);
                         SqlParameter pDate = oCommand.Parameters.Add("@pDate", SqlDbType.DateTime);
                         SqlParameter pRate = oCommand.Parameters.Add("@pRate", SqlDbType.Decimal);
+                        pRate.Precision = 25;
+                        pRate.Scale = 6;
+
                         //  need sizing data here?
 
                         bool bFirstDate = true;
@@ -260,7 +263,152 @@ namespace PortfolioEngineCore
             }
             catch (Exception ex)
             {
-                sReply = DBAccess.FormatAdminError("exception", "CostTypes.UpdateCostTypeSecurityInfo", ex.Message);
+                sReply = DBAccess.FormatAdminError("exception", "CostCategories.UpdateCostCategoryRates", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
+        public static StatusEnum UpdateCostCategoryFTEs(DBAccess dba, int nCalendar, DataTable dt, out string sReply)
+        {
+            string cmdText;
+            SqlCommand oCommand;
+            sReply = "";
+            try
+            {
+                if (nCalendar >= 0 && dt != null)
+                {
+                    
+                    //  neede to know number of periods in calendar as that used to create cols in grid
+                    DataTable dtPeriods;
+                    dbaCalendars.SelectCalendarPeriodCount(dba, nCalendar, out dtPeriods);
+                    int periodcount = 0;
+                    foreach (DataRow row in dtPeriods.Rows)
+                    {
+                        periodcount = DBAccess.ReadIntValue(row["PeriodCount"]);
+                    }
+                    if (periodcount < 1)
+                    {
+                        sReply = DBAccess.FormatAdminError("error", "CostCategories.UpdateCostCategoryFTEs", "No Periods in calendar!");
+                        return StatusEnum.rsRequestCannotBeCompleted;
+                    }
+
+                    Dictionary<int, PfEItem> ftes = new Dictionary<int,PfEItem>();
+                    bool bIsNull;
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        int nBC_UID = DBAccess.ReadIntValue(row["BC_UID"], out bIsNull);
+                        for (int i = 1; i <= periodcount; i++)
+                        {
+                            int nFTE = DBAccess.ReadIntValue(row["P" + i.ToString()]);
+                            PfEItem fteitem = new PfEItem();
+                            fteitem.UID = nBC_UID;
+                            fteitem.lValue1 = i;  // period
+                            fteitem.lValue2 = nFTE * 100;
+                            ftes.Add((fteitem.UID * 100000) + fteitem.lValue1, fteitem);  // key = (BC_UID*10000) + periodid
+                        }
+                    }
+
+                    // we've got all the info we want to write so go to it - a real pain, we shouldn't have used same record for FTE and Rate that was BAD!
+                    bool bupdateOK = true;
+                    dba.BeginTransaction();
+                    cmdText = "Select CB_ID,BA_BC_UID,BA_PRD_ID,BA_FTE_CONV From EPGP_COST_BREAKDOWN_ATTRIBS Where CB_ID=@CB_ID And BA_RATETYPE_UID=0 And BA_CODE_UID=0";
+                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                    oCommand.Parameters.AddWithValue("@CB_ID", nCalendar);
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(oCommand.ExecuteReader());
+
+                    if (dataTable != null)
+                    {
+                        //  update the dt with any new FTE values
+                        foreach (DataRow attribrow in dataTable.Rows)
+                        {
+                            int bcuid = DBAccess.ReadIntValue(attribrow["BA_BC_UID"]);
+                            int prdid = DBAccess.ReadIntValue(attribrow["BA_PRD_ID"]);
+                            int oldfte = DBAccess.ReadIntValue(attribrow["BA_FTE_CONV"]);
+
+                            if (ftes.ContainsKey((bcuid*100000)+prdid))
+                            {
+                                PfEItem catfte = ftes[(bcuid*100000)+prdid];
+                                catfte.bflag = true;
+                                int newfte = catfte.lValue2;
+                                if (newfte != oldfte)
+                                {
+                                    attribrow["BA_FTE_CONV"] = newfte;
+                                }
+                            }
+                        }
+                        //  apply updates to dbs
+                        if (bupdateOK)
+                        {
+                            cmdText = @"Update EPGP_COST_BREAKDOWN_ATTRIBS SET BA_FTE_CONV=@fte" +
+                                " Where CB_ID=@cal And BA_BC_UID=@cc And BA_PRD_ID=@period And BA_RATETYPE_UID=0 And BA_CODE_UID=0";
+                            oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                            oCommand.CommandType = CommandType.Text;
+
+                            SqlParameter pfte = oCommand.Parameters.Add("@fte", SqlDbType.Int);
+                            SqlParameter pcal = oCommand.Parameters.Add("@cal", SqlDbType.Int);
+                            SqlParameter pcc = oCommand.Parameters.Add("@cc", SqlDbType.Int);
+                            SqlParameter pperiod = oCommand.Parameters.Add("@period", SqlDbType.Int);
+
+                            foreach (DataRow attribrow in dataTable.Rows)
+                            {
+                                if (attribrow.RowState == DataRowState.Modified)
+                                {
+                                    pfte.Value = attribrow["BA_FTE_CONV"];
+                                    pcal.Value = nCalendar;
+                                    pcc.Value = attribrow["BA_BC_UID"];
+                                    pperiod.Value = attribrow["BA_PRD_ID"];
+                                    oCommand.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                    }
+                    dataTable.Dispose();
+
+                    //  check for inserts
+                    if (bupdateOK)
+                    {
+                        cmdText = @"Insert Into EPGP_COST_BREAKDOWN_ATTRIBS (CB_ID,BA_RATETYPE_UID,BA_CODE_UID,BA_BC_UID,BA_PRD_ID,BA_FTE_CONV,BA_RATE)" +
+                            " Values (@cal,0,0,@cc,@period,@fte,0)";
+                        oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                        oCommand.CommandType = CommandType.Text;
+
+                        SqlParameter pcal = oCommand.Parameters.Add("@cal", SqlDbType.Int);
+                        SqlParameter pcc = oCommand.Parameters.Add("@cc", SqlDbType.Int);
+                        SqlParameter pperiod = oCommand.Parameters.Add("@period", SqlDbType.Int);
+                        SqlParameter pfte = oCommand.Parameters.Add("@fte", SqlDbType.Int);
+
+                        foreach (KeyValuePair<int, PfEItem> catfte in ftes)
+                        {
+                            if (catfte.Value.bflag == false)
+                            {
+                                if (catfte.Value.lValue2 > 0)  // don't write out rows with nothing in there
+                                {
+                                    pcal.Value = nCalendar;
+                                    pcc.Value = catfte.Value.UID;
+                                    pperiod.Value = catfte.Value.lValue1;
+                                    pfte.Value = catfte.Value.lValue2;
+                                    oCommand.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                    }
+
+                    //  execute a delete to clear out possible left overs where a rate was deleted and there is no FTE either
+                    if (bupdateOK)
+                    {
+                        cmdText = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
+                            " Where (BA_FTE_CONV = 0 Or BA_FTE_CONV is NULL) And (BA_RATE = 0 Or BA_RATE is NULL)";
+                        oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                        oCommand.CommandType = CommandType.Text;
+                        oCommand.ExecuteNonQuery();
+                    }
+                    if (bupdateOK) dba.CommitTransaction();
+                }
+                return StatusEnum.rsSuccess;
+            }
+            catch (Exception ex)
+            {
+                sReply = DBAccess.FormatAdminError("exception", "CostCategories.UpdateCostCategoryFTEs", ex.Message);
                 return StatusEnum.rsRequestCannotBeCompleted;
             }
         }
@@ -456,6 +604,16 @@ namespace PortfolioEngineCore
             public int mc_Uid;
             public string ExtId;
             public string UOM;
+        }
+
+        private class PfEItem
+        {
+            public int UID;
+            public string name;
+            public double dValue1;
+            public int lValue1;
+            public int lValue2;
+            public bool bflag;
         }
 
     }

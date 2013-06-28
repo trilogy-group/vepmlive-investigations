@@ -10,35 +10,21 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 	<link id="pageStyles" href="styles/page.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="tools/toolbar.css" />
+    <script src="tools/jsfunctions.js" type="text/javascript"></script>
+    <script src="general.js" type="text/javascript"></script>
+    <script src="tools/toolbar.js" type="text/javascript"></script>
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+    <div style="display:none;"><asp:Button ID="btnSave" runat="server" Text="Button" OnClick="btnSave_Click" /></div>
     <table width="100%">
         <tr id="idWorkspaceArea">
 	        <td style="width:100%; vertical-align:top;">
             <div>
                 <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
+                <div id="idToolbarDiv"></div>
                 <asp:Panel runat="server" ID="pnlMain">
                     <table width="100%" cellspacing="0">
-                        <!--<tr>
-                            <td width="450" class="controlcell">
-                                <b>Connected URL</b><br />
-                            </td>
-                            <td class="controlcell">
-                        
-                                <asp:Label ID="lblUrl" runat="server"></asp:Label>
-                        
-                            </td>
-                        </tr>-->
-                        <tr>
-                            <td width="450" class="controlcell">
-                                <b>Resource Pool URL</b><br />
-                            </td>
-                            <td class="controlcell">
-                        
-                                <asp:Label ID="lblResPoolUrl" runat="server"></asp:Label>
-                        
-                            </td>
-                        </tr>
                         <tr valign="top">
                             <td width="450" class="controlcell">
                                 <b>SharePoint Field Mapping</b><br />
@@ -71,22 +57,33 @@
                         
                             </td>
                         </tr>
-                        <tr>
-                        <td></td>
-                        <td>
-                            <asp:Button ID="btnSave" runat="server" Text="Save" CssClass="button" 
-                                onclick="btnSave_Click"/>&nbsp;
-                        </td>
-                    </tr>
                     </table>
                 </asp:Panel>
-                <!--<asp:Panel runat="server" ID="pnlNoUrl">
-                    The Integration URL has not been set. <a href="SPIntegration.aspx">Click here</a> to set.
-                </asp:Panel>-->
             </div>
             </td>
         </tr>
     </table>
+<script type="text/javascript">
+    var toolbarData = {
+        parent: "idToolbarDiv",
+        style: "display:none;",
+        imagePath: "images/",
+        items: [
+            { type: "button", id: "btnSave", name: "SAVE", img: "formatmap16x16_2.png", style: "top: -127px; left: -91px;", tooltip: "Save",  onclick: "toolbar_event('btnSave');" }
+        ]
+    };
+    var toolbar = new Toolbar(toolbarData);
+    toolbar.Render();
+    function toolbar_event(event) {
+        if (toolbar.isItemDisabled(event) == true)
+            return;
+        switch (event) {
+            case "btnSave":
+                <%= Page.ClientScript.GetPostBackEventReference(btnSave, String.Empty) %>;
+                break;
+        }
+    };
+</script>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

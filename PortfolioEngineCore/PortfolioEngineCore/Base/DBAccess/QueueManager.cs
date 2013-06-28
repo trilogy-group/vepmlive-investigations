@@ -30,6 +30,29 @@ namespace PortfolioEngineCore
             return eStatus;
 
         }
+        public static StatusEnum SelectQueue2(DBAccess dba, int nPage, int nRowsPerPage, out DataTable dt)
+        {
+            StatusEnum eStatus = StatusEnum.rsSuccess;
+            dt = null;
+            try
+            {
+                SqlCommand oCommand = new SqlCommand("EPG_SP_ReadJobQueue2", dba.Connection);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.Parameters.AddWithValue("@intStartRow", ((nPage - 1) * nRowsPerPage) + 1);
+                oCommand.Parameters.AddWithValue("@intEndRow", (nPage) * nRowsPerPage);
+                SqlDataReader reader = oCommand.ExecuteReader();
+                dt = new DataTable();
+                dt.Load(reader);
+                reader.Close();
+                reader.Dispose();
+            }
+            catch (Exception ex)
+            {
+                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "SelectQueue2", (StatusEnum)99999, ex.Message.ToString());
+            }
+            return eStatus;
+
+        }
         public static StatusEnum PostCostValues(DBAccess dba, string sComment, string sData, out int lRowsAffected)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;

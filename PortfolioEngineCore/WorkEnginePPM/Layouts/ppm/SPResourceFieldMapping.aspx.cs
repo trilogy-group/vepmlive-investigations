@@ -85,7 +85,6 @@ ExecuteProcess_Error:
         {
             xNode = null;
             return ExecuteProcessEx("", sContext, sXMLRequest, out xNode);
-            return false;
         }
 
         private static bool ExecuteProcessEx(string sURL, string sContext, string sXMLRequest, out XmlNode xNode)
@@ -107,7 +106,7 @@ ExecuteProcess_Error:
             if (ExecuteProcess("getresourcepoolurl", "", out ndResPoolUrl) == false) goto ExecuteProcess_Error;
             if (ndResPoolUrl.InnerText != "")
             {
-                lblResPoolUrl.Text = ndResPoolUrl.InnerText;
+                //lblResPoolUrl.Text = ndResPoolUrl.InnerText;
 
                 string sUrl = ndResPoolUrl.InnerText; // +"/_vti_bin/Integration.asmx";
                 XmlNode ndSettings = null;
@@ -148,6 +147,10 @@ ExecuteProcess_Error:
         {
             StringBuilder sb = new StringBuilder();
             DataTable dt = new DataTable();
+            dt.Columns.Add("EPKID");
+            dt.Columns.Add("WEID");
+            dt.Columns.Add("WEName");
+
             foreach (GridViewRow gvr in GridView1.Rows)
             {
                 if (gvr.RowType == DataControlRowType.DataRow)
@@ -162,7 +165,9 @@ ExecuteProcess_Error:
                         sb.Append(",");
                         sb.Append(1);
 
-                        DataRow dr = dt.NewRow();
+                        // writing mappings to PfE table using this dt - don't think it is used now but no harm (as of Jun 2013 code was half here and half missing and it failed! - KT)
+                        //DataRow dr = dt.NewRow();
+                        DataRow dr = dt.Rows.Add();
                         int nID;
                         Int32.TryParse(gvr.Cells[2].Text, out nID);
                         dr["EPKID"] = nID;

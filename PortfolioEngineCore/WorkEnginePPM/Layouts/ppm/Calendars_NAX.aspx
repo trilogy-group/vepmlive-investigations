@@ -122,14 +122,26 @@ html, body {
 
     function dgrid1_OnRowSelect(rowid, cellindex) {
         dgrid1_selectedRow = rowid;
-        toolbar.enableItem("btnModify");
-        toolbar.enableItem("btnDelete");
+        if (rowid != null && rowid >= 0) {
+            toolbar.enableItem("btnModify");
+            toolbar.enableItem("btnDelete");
+        }
+        else {
+            toolbar.disableItem("btnModify");
+            toolbar.disableItem("btnDelete");
+        }
     };
 
     function tgrid1_OnClickCell(grid, row, col) {
         tgrid1_selectedRow = row;
-        toolbar2.enableItem("btnInsert2");
-        toolbar2.enableItem("btnDelete2");
+        if (row != null && row != "") {
+            toolbar2.enableItem("btnInsert2");
+            toolbar2.enableItem("btnDelete2");
+        }
+        else {
+            toolbar2.disableItem("btnInsert2");
+            toolbar2.disableItem("btnDelete2");
+        }
     };
 
     function OnResize(event) {
@@ -157,6 +169,10 @@ html, body {
         var dlgTitle = "";
         switch (event) {
            case "btnInsert2":
+                if (toolbar2.isItemDisabled("btnInsert2") == true) {
+                    alert("Select a row to enable the Insert button");
+                    return false;
+                }
            case "btnAdd2":
                 var newrow;
                 if (event == "btnInsert2") {
@@ -169,12 +185,12 @@ html, body {
                 var start = null;
                 var finish = null;
                 var id = 0;
-                if (prevrow != null) {
+                var const_day = 86400000;
+                if (prevrow != null && tgrid1.grid.GetAttribute(prevrow, null, "Deleted") != 1) {
                     start = tgrid1.GetCellValue(prevrow, "PRD_START_DATE");
                     finish = tgrid1.GetCellValue(prevrow, "PRD_FINISH_DATE");
                     id = parseInt(tgrid1.GetCellValue(prevrow, "PRD_ID"));
                     if (start != null && finish != null) {
-                        var const_day = 86400000;
                         tgrid1.SetCellValue(newrow, "PRD_START_DATE", finish + const_day);
                         tgrid1.SetCellValue(newrow, "PRD_FINISH_DATE", finish + (finish - start) + const_day);
                     }
@@ -183,25 +199,37 @@ html, body {
                 }
                 else {
                     var nextrow = newrow.nextSibling;
-                    if (nextrow != null) {
+                    if (nextrow != null && tgrid1.grid.GetAttribute(nextrow, null, "Deleted") != 1) {
                         start = tgrid1.GetCellValue(nextrow, "PRD_START_DATE");
                         finish = tgrid1.GetCellValue(nextrow, "PRD_FINISH_DATE");
                         id = parseInt(tgrid1.GetCellValue(nextrow, "PRD_ID"));
                         if (start != null && finish != null) {
-                            var const_day = 86400000;
                             tgrid1.SetCellValue(newrow, "PRD_FINISH_DATE", start - const_day);
                             tgrid1.SetCellValue(newrow, "PRD_START_DATE", start - (finish - start) - const_day);
                         }
+                        tgrid1.SetCellValue(newrow, "PRD_ID", (id-1));
+                        tgrid1.SetCellValue(newrow, "PRD_NAME", "Period" + (id-1).toString());
                     }
-                    tgrid1.SetCellValue(newrow, "PRD_ID", (id-1));
-                    tgrid1.SetCellValue(newrow, "PRD_NAME", "Period" + (id-1).toString());
+                    else {
+                        tgrid1.SetCellValue(newrow, "PRD_ID", 1);
+                        tgrid1.SetCellValue(newrow, "PRD_NAME", "Period1");
+                        var today = new Date().getTime();
+                        today = parseInt(today / const_day) * const_day;
+                        tgrid1.SetCellValue(newrow, "PRD_START_DATE", today);
+                        tgrid1.SetCellValue(newrow, "PRD_FINISH_DATE", today + const_day);
+                    }
                 }
                 tgrid1_selectedRow = newrow;
                 tgrid1.Focus(newrow, 'PRD_NAME');
                 break;
           case "btnDelete2":
-               tgrid1.grid.DeleteRow(tgrid1_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
-               break;
+                if (toolbar2.isItemDisabled("btnDelete2") == true) {
+                    alert("Select a row to enable the Delete button");
+                    return false;
+                }
+                tgrid1.grid.DeleteRow(tgrid1_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
+                tgrid1_OnClickCell(tgrid1.grid, null, null)
+                break;
         }
         return false;
     };
@@ -231,7 +259,7 @@ html, body {
                 }
                 sRowId = dgrid1_selectedRow;
                 GetCalendarInfo(event, "Delete Calendar, are you sure?", sRowId);
-               break;
+                break;
         }
         return false;
     };
@@ -319,6 +347,7 @@ html, body {
                         // if deleted  then remove row from grid
                         var sRowId = dgrid1_selectedRow;
                         dgrid1.deleteRow(sRowId);
+                        dgrid1_OnRowSelect(null);
                       break;
                 }
                 CloseDialog('winCalendarDlg');

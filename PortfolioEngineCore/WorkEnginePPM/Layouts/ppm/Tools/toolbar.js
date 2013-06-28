@@ -95,6 +95,11 @@
             var itemname = "";
             if (item.name != null)
                 itemname = item.name.replace(/ /g, "&nbsp;");
+            var itemtooltip = "";
+            if (item.tooltip != null)
+                itemtooltip = item.tooltip.replace(/ /g, "&nbsp;");
+            else
+                itemtooltip = itemname;
             var classdisabled = "";
             if (item.disabled == true)
                 classdisabled = " toolbar-button-disabled";
@@ -118,7 +123,7 @@
                     classname = item.className + classdisabled;
                     sb.append("<td class='toolbar-item-td' >");
                     sb.append("<a class='toolbar-button-link' >");
-                    sb.append("<button" + id + " type='button' title='" + itemname + "' class='" + classname + "' " + onclick + ">");
+                    sb.append("<button" + id + " type='button' title='" + itemtooltip + "' class='" + classname + "' " + onclick + ">");
                     //sb.append("<span>");
                     sb.append("<span class='toolbar-button-image-span'>");
                     sb.append("<img alt='' src='" + this.toolbarData.imagePath + item.img + "' " + itemstyle + "/>");

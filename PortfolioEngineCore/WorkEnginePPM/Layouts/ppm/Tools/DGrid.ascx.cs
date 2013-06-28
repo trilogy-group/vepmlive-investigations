@@ -157,6 +157,13 @@ namespace WorkEnginePPM
             tableData = "";
             if (this.m_dt != null)
             {
+                if (m_cols.Count == 0)
+                {
+                    foreach (DataColumn col in m_dt.Columns)
+                    {
+                        AddColumn(title: col.ColumnName, width: 100, name: col.ColumnName, editable: true);
+                    }
+                }
                 CStruct rows = new CStruct();
                 rows.Initialize("rows");
                 CStruct head = rows.CreateSubStruct("head");
