@@ -11,7 +11,7 @@
 	<Cfg Paging="2" NoPager="1" ChildParts="2" InEditMode ="2" ShowDeleted="0"/>
 	<Def>
 		<D GroupEmpty="0" Name="R" Calculated="1" Wrap="0" HoverCell="0" HoverRow="Class" FocusCell="Border" FocusRow="0" ShowHint="0" NoColorState="1" CanEdit="0" CalcOrder="TSTotals,Progress,ProgressHtmlPrefix" />
-		<D TitleGroupEmpty="0" GroupEmpty="0" Name="Group" Calculated="1" CanFilter="2" Class="MWG_Bold" CalcOrder="TSTotals" Expanded="1" />
+		<D TitleGroupEmpty="0" GroupEmpty="0" Name="Group" Calculated="1" CanFilter="2" Class="TSBold" CalcOrder="TSTotals" Expanded="1" />
 	</Def>
 	<Toolbar Visible="0" CanHide="0" />
 	<Panel Visible="0" CanHide="0" />
@@ -20,7 +20,7 @@
 		<Filter CanHide="0" CanEdit="1" Visible="0"/>
 	</Head>
 	<Solid>
-		<Group CanHide="0" Visible="0" id="Group"/>
+		<Group CanHide="0" Visible="0" id="Group" />
 	</Solid>
 	<LeftCols>
 		<C Name="ItemTypeID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
