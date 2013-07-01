@@ -1276,6 +1276,10 @@ BEGIN
 	declare @sql varchar(MAX)
 
 	set @list = REPLACE(@list, '' '', '''')
+	if @list == ''lstResources'' then
+	begin
+		set @list = ''lstResourcePool''
+	end
 
 	if @rollup = 1
 		begin
