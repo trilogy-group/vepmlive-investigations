@@ -604,9 +604,7 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@userid", user.ID);
                     cmd.ExecuteNonQuery();
 
-                    System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
-                    IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
-                    sMessage = dt.ToString("F", culture);
+                    sMessage = dt.ToString("F");
 
                 }
 
@@ -823,11 +821,8 @@ namespace TimeSheets
 
                             if (minutes > maxMinutes)
                                 minutes = maxMinutes;
-                            
-                            System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
-                            IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
 
-                            output += "<StopWatchValue Date=\"" + dtCounter.ToString("F", culture) + "\" DateTicks=\"" + dtCounter.Ticks + "\" Minutes=\"" + Math.Floor(minutes) + "\"/>";
+                            output += "<StopWatchValue Date=\"" + dtCounter.ToString("F") + "\" DateTicks=\"" + dtCounter.Ticks + "\" Minutes=\"" + Math.Floor(minutes) + "\"/>";
 
 
                         }
@@ -1142,7 +1137,7 @@ namespace TimeSheets
 
                         //Header
                         attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks);
-                        attr1.Value = dtStart.ToString("MMM dd<br>ddd");
+                        attr1.Value = dtStart.ToString("ddd<br>MMM dd");
                         ndHeader.Attributes.Append(attr1);
 
                         attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks + "Formula");
@@ -1812,9 +1807,8 @@ namespace TimeSheets
 
             if (drSW.Length > 0)
             {
-
                 attr1 = docData.CreateAttribute("StopWatch");
-                attr1.Value = ((DateTime)drSW[0]["Started"]).ToString("F", culture);
+                attr1.Value = ((DateTime)drSW[0]["Started"]).ToString("F");
                 ndCol.Attributes.Append(attr1);
 
                 attr1 = docData.CreateAttribute("StopWatchIcon");
