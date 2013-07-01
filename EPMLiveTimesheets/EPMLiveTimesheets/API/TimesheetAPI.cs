@@ -1142,7 +1142,7 @@ namespace TimeSheets
 
                         //Header
                         attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks);
-                        attr1.Value = dtStart.ToString("MMM dd");
+                        attr1.Value = dtStart.ToString("MMM dd<br>ddd");
                         ndHeader.Attributes.Append(attr1);
 
                         attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks + "Formula");
