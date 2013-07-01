@@ -237,7 +237,7 @@ namespace TimeSheets
             }
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, bool liveHours)
+        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
 
@@ -353,23 +353,26 @@ namespace TimeSheets
 
                                                 ProcessTimesheetHours(id, ndRow, cn, settings, web, period);
 
-                                                if (WorkList != null)
-                                                    ProcessTimesheetFields(id, ndRow, cn, settings);
-
-                                                if (Editable)
+                                                if (!bSkipSP)
                                                 {
-                                                    //PROCESS LI
+                                                    if (WorkList != null)
+                                                        ProcessTimesheetFields(id, ndRow, cn, settings);
+
+                                                    if (Editable)
+                                                    {
+                                                        //PROCESS LI
+                                                    }
+
+                                                    ProcessListFields(id, ndRow, cn, settings, li, true, list);
+
+                                                    if (liveHours)
+                                                        processLiveHours(li, list.ID);
+
+                                                    if (Editable)
+                                                        li.Update();
+                                                    else
+                                                        li.SystemUpdate();
                                                 }
-
-                                                ProcessListFields(id, ndRow, cn, settings, li, true, list);
-
-                                                if (liveHours)
-                                                    processLiveHours(li, list.ID);
-
-                                                if (Editable)
-                                                    li.Update();
-                                                else
-                                                    li.SystemUpdate();
                                             }
                                         }
                                         catch (Exception ex)
@@ -521,10 +524,15 @@ namespace TimeSheets
 
                         foreach (XmlNode ndItem in ndItems)
                         {
+                            string worktype = "";
 
-                            ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours);
+                            try
+                            {
+                                worktype = ndItem.Attributes["WorkTypeField"].Value;
+                            }
+                            catch { }
 
-
+                            ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList);
 
                             count++;
                             float pct = count / total * 100;
@@ -718,45 +726,47 @@ namespace TimeSheets
                 {
                     try
                     {
-                        Guid wGuid = new Guid(drProject["WEB_UID"].ToString());
-                        Guid lGuid = new Guid(drProject["PROJECT_LIST_UID"].ToString());
+                        if (drProject["PROJECT_LIST_UID"].ToString() != "")
+                        {
+                            Guid wGuid = new Guid(drProject["WEB_UID"].ToString());
+                            Guid lGuid = new Guid(drProject["PROJECT_LIST_UID"].ToString());
 
-                        if (webGuid != wGuid)
-                        {
-                            try
-                            {
-                                if (iWeb != null)
-                                {
-                                    iWeb.Close();
-                                    iWeb = site.OpenWeb(wGuid);
-                                }
-                                else
-                                    iWeb = site.OpenWeb(wGuid);
-                                webGuid = iWeb.ID;
-                            }
-                            catch { }
-                        }
-                        if (iWeb != null)
-                        {
-                            if (listGuid != lGuid)
-                            {
-                                iList = iWeb.Lists[lGuid];
-                                listGuid = iList.ID;
-                            }
-                            iWeb.AllowUnsafeUpdates = true;
-                            string project = drProject["Project_id"].ToString();
-                            if (project != "0")
+                            if (webGuid != wGuid)
                             {
                                 try
                                 {
-                                    SPListItem liProject = iList.GetItemById(int.Parse(project));
-                                    liProject["TimesheetHours"] = drProject["Hours"].ToString();
-                                    liProject.SystemUpdate();
+                                    if (iWeb != null)
+                                    {
+                                        iWeb.Close();
+                                        iWeb = site.OpenWeb(wGuid);
+                                    }
+                                    else
+                                        iWeb = site.OpenWeb(wGuid);
+                                    webGuid = iWeb.ID;
                                 }
                                 catch { }
                             }
+                            if (iWeb != null)
+                            {
+                                if (listGuid != lGuid)
+                                {
+                                    iList = iWeb.Lists[lGuid];
+                                    listGuid = iList.ID;
+                                }
+                                iWeb.AllowUnsafeUpdates = true;
+                                string project = drProject["Project_id"].ToString();
+                                if (project != "0")
+                                {
+                                    try
+                                    {
+                                        SPListItem liProject = iList.GetItemById(int.Parse(project));
+                                        liProject["TimesheetHours"] = drProject["Hours"].ToString();
+                                        liProject.SystemUpdate();
+                                    }
+                                    catch { }
+                                }
+                            }
                         }
-
                     }
                     catch (Exception exception)
                     {
