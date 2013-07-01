@@ -146,7 +146,9 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                     pGrid.ChangeDef(nRow, "R", 1, 0);
                                     pGrid.SetValue(nRow, "TSTotals", 0, 0);
                                     pGrid.Recalculate(nRow, "TSTotals", 1);
-
+                                    for (var p in parent.TSCols) {
+                                        pGrid.SetValue(nRow, p, 0, 0);
+                                    }
                                     pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
                                 }
                             }
@@ -185,6 +187,9 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                     pGrid.SetValue(nRow, "TSTotals", 0, 0);
                                     pGrid.Recalculate(nRow, "TSTotals", 1);
                                     pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
+                                    for (var p in parent.TSCols) {
+                                        pGrid.SetValue(nRow, p, 0, 0);
+                                    }
                                 }
                                 else
                                 {
@@ -198,6 +203,9 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                 pGrid.SetValue(nRow, "TSTotals", 0, 0);
                                 pGrid.Recalculate(nRow, "TSTotals", 1);
                                 pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
+                                for (var p in parent.TSCols) {
+                                    pGrid.SetValue(nRow, p, 0, 0);
+                                }
                             }
                         }
                     }
