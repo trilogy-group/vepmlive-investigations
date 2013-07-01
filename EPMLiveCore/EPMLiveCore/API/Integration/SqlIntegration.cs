@@ -225,6 +225,11 @@ namespace EPMLiveCore.API.Integration
                 case "UserMapType":
                     props.Add("EmailAddress", "Email Address");
                     break;
+                case "AvailableSynchOptions":
+                    props.Add("LI", "LI");
+                    props.Add("TI", "TI");
+                    props.Add("TO", "TO");
+                    break;
             }
             
             cn.Close();

@@ -58,6 +58,24 @@ namespace EPMLiveCore.Layouts.epmlive.Integration {
         protected global::System.Web.UI.WebControls.Label lblID;
         
         /// <summary>
+        /// InputFormControl222 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl InputFormControl222;
+        
+        /// <summary>
+        /// lblURL control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblURL;
+        
+        /// <summary>
         /// InputFormSection3 control.
         /// </summary>
         /// <remarks>
@@ -103,40 +121,85 @@ namespace EPMLiveCore.Layouts.epmlive.Integration {
         protected global::System.Web.UI.WebControls.CheckBox chkLin;
         
         /// <summary>
-        /// InputFormControl5 control.
+        /// InputFormSection33 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormControl5;
+        protected global::System.Web.UI.UserControl InputFormSection33;
         
         /// <summary>
-        /// chkTout control.
+        /// InputFormControl331 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkTout;
+        protected global::System.Web.UI.UserControl InputFormControl331;
         
         /// <summary>
-        /// InputFormControl6 control.
+        /// ddlTimed control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormControl6;
+        protected global::System.Web.UI.WebControls.DropDownList ddlTimed;
         
         /// <summary>
-        /// chkTin control.
+        /// InputFormControl332 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkTin;
+        protected global::System.Web.UI.UserControl InputFormControl332;
+        
+        /// <summary>
+        /// ddlScheduleType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlScheduleType;
+        
+        /// <summary>
+        /// InputFormControl333 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl InputFormControl333;
+        
+        /// <summary>
+        /// ddlDayOfMonth control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlDayOfMonth;
+        
+        /// <summary>
+        /// ddlHour control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlHour;
+        
+        /// <summary>
+        /// chkDayOfWeek control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList chkDayOfWeek;
         
         /// <summary>
         /// InputFormSectionDelete control.

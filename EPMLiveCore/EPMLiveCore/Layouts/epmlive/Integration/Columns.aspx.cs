@@ -91,6 +91,8 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     }
                 }
 
+                sl.Add("Created By", "Author");
+
                 Hashtable hshParams = new Hashtable();
                 hshParams.Add("intlistid", intlistid);
 
@@ -126,6 +128,20 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                                 li2.Selected = true;
 
                         ddl.Items.Add(li2);
+                    }
+
+                    bool selectedFound = false;
+
+                    foreach (ListItem listItem in ddl.Items)
+                    {
+                        if (!selectedFound)
+                        {
+                            selectedFound = listItem.Selected;
+                        }
+                        else
+                        {
+                            listItem.Selected = false;
+                        }
                     }
 
                     ArrControls.Add(ddl);

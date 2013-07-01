@@ -124,6 +124,7 @@ net start "WorkEngine Timer"
     <Compile Include="API\Comments\CommentManager.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
     <Compile Include="API\ExecutionStatus.asmx.cs" />
+    <Compile Include="API\Integration\Generic.cs" />
     <Compile Include="API\Integration\IntegrationAdmin.cs" />
     <Compile Include="API\Integration\IntegrationControls.cs" />
     <Compile Include="API\Integration\IntegrationControlTemplate.cs" />

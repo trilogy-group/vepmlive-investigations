@@ -41,6 +41,9 @@
                 <TR>
                     <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><SPAN style="POSITION: relative; WIDTH: 10px; DISPLAY: inline-block; HEIGHT: 10px; OVERFLOW: hidden" class=s4-clust><IMG style="POSITION: absolute; TOP: -128px !important; LEFT: 0px !important" alt="" src="/_layouts/images/fgimg.png"></SPAN>&nbsp; <A id=idHomePageNewItem class=ms-addnew href="add.aspx?List=<%=Request["List"] %>">Add New Integration</A> </TD>
                 </TR>
+                <TR>
+                    <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><A id=A1 class=ms-addnew href="../../listedit.aspx?List=<%=Request["List"] %>">Back to List Settings</A> </TD>
+                </TR>
             </TBODY>
         </TABLE>
      </asp:Panel>

@@ -10,6 +10,7 @@ using System.Reflection;
 using EPMLiveIntegration;
 using System.Xml;
 using Microsoft.SharePoint.Administration;
+using System.Text.RegularExpressions;
 
 namespace EPMLiveCore.API.Integration
 {
@@ -629,6 +630,58 @@ namespace EPMLiveCore.API.Integration
                             }
                             catch { }
 
+                            if(drIntegration["MODULE_ID"].ToString() == "a0950b9b-3525-40b8-a456-6403156dc49c")
+                            {
+                                DataRow drNew = dtItem.NewRow();
+
+                                try
+                                {
+                                    drNew["ID"] = dr["INTITEM_ID"].ToString();
+                                    bool bOpened = false;
+                                    if(cn.State != ConnectionState.Open)
+                                    {
+                                        bOpened = true;
+                                        cn.Open();
+                                    }
+                                    SqlCommand cmd = new SqlCommand("SELECT DATA FROM INT_EVENTS WHERE INT_EVENT_ID=@inteventid", cn);
+                                    cmd.Parameters.AddWithValue("@inteventid", dr["INT_EVENT_ID"].ToString());
+                                    string xml = "";
+
+                                    SqlDataReader dataRead = cmd.ExecuteReader();
+                                    try
+                                    {
+                                        if(dataRead.Read())
+                                            xml = dataRead.GetString(0);
+                                    }
+                                    catch { }
+                                    dataRead.Close();
+
+                                    if(bOpened)
+                                        cn.Close();
+
+                                    if(xml != "")
+                                    {
+                                        XmlDocument doc = new XmlDocument();
+                                        doc.LoadXml(xml);
+
+                                        XmlNode ndFields = doc.FirstChild.SelectSingleNode("Fields");
+                                        foreach(XmlNode ndField in ndFields.SelectNodes("Field"))
+                                        {
+                                            try
+                                            {
+                                                string fName = ndField.Attributes["Name"].Value;
+                                                string fVal = ndField.InnerText;
+                                                drNew[fName] = fVal;
+                                            }
+                                            catch { }
+                                        }
+                                        dtItem.Rows.Add(drNew);
+                                    }
+                                }
+                                catch { }
+
+                                
+                            }
 
                             dtItem = GetExternalItem(dtItem, new Guid(drIntegration["INT_LIST_ID"].ToString()), list.ID, dr["INTITEM_ID"].ToString());
                             
@@ -945,7 +998,7 @@ namespace EPMLiveCore.API.Integration
                             arrColsDel.Add(dc);
                         }
 
-                        if(drColUser.Length > 0)
+                        if(drColUser.Length > 0 && drColMap.Length > 0)
                         {
                             if(drColUser[0]["Type"].ToString() == "1")
                             {
@@ -1128,6 +1181,92 @@ namespace EPMLiveCore.API.Integration
 
             props.Properties = Props;
 
+            props.EnabledFeatures = new ArrayList();
+
+            OpenConnection();
+
+            SqlCommand cmd = new SqlCommand("SELECT     LIST_ID from INT_LISTS where INT_LIST_ID=@intlistid", cn);
+            cmd.Parameters.AddWithValue("@intlistid", intlistid);
+            SqlDataReader dr = cmd.ExecuteReader();
+            Guid listid = Guid.Empty;
+            if(dr.Read())
+            {
+                listid = dr.GetGuid(0);
+            }
+            dr.Close();
+            CloseConnection(false);
+
+            if(listid != Guid.Empty)
+            {
+                SPList list = _web.Lists[listid];
+
+                GridGanttSettings gSettings = new GridGanttSettings(list);
+
+                props.EnabledFeatures.Add("comments");
+                if(gSettings.BuildTeam)
+                    props.EnabledFeatures.Add("team");
+
+                SPWeb rweb = _site.RootWeb;
+
+                try
+                {
+                    if(_web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
+                    {
+
+                        ArrayList arr = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKLists").ToLower().Split(','));
+                        if(arr.Contains(list.Title.ToLower()))
+                        {
+                            string menus = "";
+                            menus = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPK" + list.Title.Replace(" ", "") + "_menus");
+                            if(menus == "")
+                                menus = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKMenus");
+
+                            ArrayList arrButtons = new ArrayList(menus.Split('|'));
+
+                            if(arrButtons.Contains("costs"))
+                                props.EnabledFeatures.Add("costplan");
+                            if(arrButtons.Contains("resplan"))
+                                props.EnabledFeatures.Add("resplan");
+                        }
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if(_web.Site.Features[new Guid("e6df7606-1541-4bf1-a810-e8e9b11819e3")] != null)
+                    {
+                        string planners = CoreFunctions.getLockConfigSetting(_web, "EPMLivePlannerPlanners", false);
+
+                        foreach(string planner in planners.Split(','))
+                        {
+                            if(!String.IsNullOrEmpty(planner))
+                            {
+                                string[] sPlanner = planner.Split('|');
+                                string pc = CoreFunctions.getLockConfigSetting(_web, "EPMLivePlanner" + sPlanner[0] + "ProjectCenter", false);
+
+                                if(pc == list.Title)
+                                {
+                                    props.EnabledFeatures.Add("workplan");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    ArrayList lists = new ArrayList(CoreFunctions.getConfigSetting(rweb, "EPMLiveTSLists").Replace("\r\n", "\n").Split('\n')); ;
+
+                    if(lists.Contains(list.Title))
+                    {
+                        props.EnabledFeatures.Add("worklog");
+                    }
+                }
+                catch { }
+            }
             return props;
         }
 
@@ -1390,6 +1529,62 @@ namespace EPMLiveCore.API.Integration
             }
         }
 
+        private void AddField(SPField field, DataTable dtU, DataRow drIntegrationModule, ref DataTable dt)
+        {
+            if(!dt.Columns.Contains(field.InternalName))
+            {
+                Type t;
+                switch(field.Type)
+                {
+                    case SPFieldType.Number:
+                    case SPFieldType.Currency:
+                        t = typeof(string);
+                        break;
+                    case SPFieldType.DateTime:
+                        t = typeof(string);
+                        break;
+                    case SPFieldType.Boolean:
+                        t = typeof(string);
+                        break;
+                    case SPFieldType.User:
+                        t = typeof(string);
+                        if(dtU.Select("Fieldname='" + field.InternalName + "'").Length <= 0)
+                            dtU.Rows.Add(new string[] { field.InternalName, "1", "", "" });
+                        break;
+                    case SPFieldType.Lookup:
+                        t = typeof(string);
+
+                        try
+                        {
+                            SPFieldLookup l = (SPFieldLookup)field;
+
+                            Hashtable parms = new Hashtable();
+                            parms.Add("listid", l.LookupList);
+                            parms.Add("moduleid", drIntegrationModule["MODULE_ID"].ToString());
+
+                            DataSet dsOther = GetDataSet("SELECT * FROM INT_LISTS WHERE LIST_ID=@listid and MODULE_ID=@moduleid", parms);
+
+
+                            if(dtU.Select("Fieldname='" + field.InternalName + "'").Length <= 0)
+                            {
+                                if(dsOther.Tables[0].Rows.Count > 0)
+                                    dtU.Rows.Add(new string[] { field.InternalName, "2", dsOther.Tables[0].Rows[0]["INT_COLID"].ToString(), l.LookupList });
+                                else
+                                    dtU.Rows.Add(new string[] { field.InternalName, "2", "", "" });
+                            }
+                        }
+                        catch { }
+
+                        break;
+                    default:
+                        t = typeof(string);
+                        break;
+                }
+
+                dt.Columns.Add(field.InternalName, t);
+            }
+        }
+
         internal DataSet GetDataSet(SPList list, string eventfromid, Guid intlistid)
         {
             DataSet dsIntegration = new DataSet();
@@ -1460,79 +1655,96 @@ namespace EPMLiveCore.API.Integration
                     daCols.Fill(dsCols);
                     //SqlDataReader dr = cmd.ExecuteReader();
 
-                    foreach(DataRow dr in dsCols.Tables[0].Rows)
+                    /*if(drIntegrationModule["MODULE_ID"].ToString() == "a0950b9b-3525-40b8-a456-6403156dc49c")//Generic Integration
                     {
+                        cmd = new SqlCommand("SELECT VALUE FROM INT_PROPS where INT_LIST_ID=@intlistid and PROPERTY='WSDLMap'", cn);
+                        cmd.Parameters.AddWithValue("@intlistid", drIntegrationModule["INT_LIST_ID"].ToString());
+                        SqlDataReader drProp = cmd.ExecuteReader();
+                        string wsdlmap = "";
                         try
                         {
-                            SPField field = list.Fields.GetFieldByInternalName(dr["SharePointColumn"].ToString());
-                            if(field != null)
+                            if(drProp.Read())
+                                wsdlmap = drProp.GetString(0);
+                        }
+                        catch { }
+                        drProp.Close();
+                        if(wsdlmap != "")
+                        {
+                            string[] sWSDLProps = wsdlmap.Replace("\r\n", "\n").Split('\n');
+                            foreach(string sWSDLProp in sWSDLProps)
                             {
-                                dtCols.Rows.Add(new string[] { dr["SharePointColumn"].ToString(), dr["IntegrationColumn"].ToString(), dr["Setting"].ToString() });
+                                string wprop = sWSDLProp.Substring(0, sWSDLProp.IndexOf("="));
+                                string wval = sWSDLProp.Substring(sWSDLProp.IndexOf("=") + 1);
 
-                                if(!dt.Columns.Contains(dr["SharePointColumn"].ToString()))
+                                if(wval.StartsWith("*"))//Array of Fields
                                 {
-                                    Type t;
-                                    switch(field.Type)
+                                    wval = wval.Substring(1);
+                                    string[] sFieldList = wval.Split(',');
+                                    foreach(string sField in sFieldList)
                                     {
-                                        case SPFieldType.Number:
-                                        case SPFieldType.Currency:
-                                            t = typeof(string);
-                                            break;
-                                        case SPFieldType.DateTime:
-                                            t = typeof(string);
-                                            break;
-                                        case SPFieldType.Boolean:
-                                            t = typeof(string);
-                                            break;
-                                        case SPFieldType.User:
-                                            t = typeof(string);
-                                            if(dtU.Select("Fieldname='" + field.InternalName + "'").Length <= 0)
-                                                dtU.Rows.Add(new string[] { field.InternalName, "1", "", "" });
-                                            break;
-                                        case SPFieldType.Lookup:
-                                            t = typeof(string);
-
+                                        if(sField != "ID")
+                                        {
                                             try
                                             {
-                                                SPFieldLookup l = (SPFieldLookup)field;
-
-                                                Hashtable parms = new Hashtable();
-                                                parms.Add("listid", l.LookupList);
-                                                parms.Add("moduleid", drIntegrationModule["MODULE_ID"].ToString());
-
-                                                DataSet dsOther = GetDataSet("SELECT * FROM INT_LISTS WHERE LIST_ID=@listid and MODULE_ID=@moduleid", parms);
-
-
-                                                if(dtU.Select("Fieldname='" + field.InternalName + "'").Length <= 0)
-                                                {
-                                                    if(dsOther.Tables[0].Rows.Count > 0)
-                                                        dtU.Rows.Add(new string[] { field.InternalName, "2", dsOther.Tables[0].Rows[0]["INT_COLID"].ToString(), l.LookupList });
-                                                    else
-                                                        dtU.Rows.Add(new string[] { field.InternalName, "2", "", "" });
-                                                }
+                                                SPField f = list.Fields.GetFieldByInternalName(sField);
+                                                AddField(f, dtU, drIntegrationModule, ref dt);
+                                                dtCols.Rows.Add(new string[] { sField, sField, "G" });
                                             }
                                             catch { }
+                                        }
+                                    }
+                                }
+                                else//Field
+                                {
+                                    foreach(Match match in Regex.Matches(wval, @"\[\w*\]"))
+                                    {
+                                        string sf = match.Value.Trim(']').Trim('[');
+                                        if(sf != "ID")
+                                        {
+                                            try
+                                            {
+                                                SPField f = list.Fields.GetFieldByInternalName(sf);
+                                                AddField(f, dtU, drIntegrationModule, ref dt);
+                                                dtCols.Rows.Add(new string[] { sf, sf, "G" });
+                                            }
+                                            catch { }
+                                        }
 
-                                            break;
-                                        default:
-                                            t = typeof(string);
-                                            break;
                                     }
 
-                                    dt.Columns.Add(field.InternalName, t);
+                                    
                                 }
                             }
                         }
-                        catch { }
                     }
+                    else
+                    {*/
+                        foreach(DataRow dr in dsCols.Tables[0].Rows)
+                        {
+                            try
+                            {
+                                SPField field = list.Fields.GetFieldByInternalName(dr["SharePointColumn"].ToString());
+                                if(field != null)
+                                {
+                                    dtCols.Rows.Add(new string[] { dr["SharePointColumn"].ToString(), dr["IntegrationColumn"].ToString(), dr["Setting"].ToString() });
 
+                                    if(!dt.Columns.Contains(dr["SharePointColumn"].ToString()))
+                                    {
+                                        AddField(field, dtU, drIntegrationModule, ref dt);
+                                    }
+                                }
+                            }
+                            catch { }
+                        }
+                    //}
+                    
                 }
             }
 
             return dsIntegration;
         }
 
-        private string GetAPIUrl(Guid webappid)
+        internal string GetAPIUrl(Guid webappid)
         {
             string apiurl = "";
             SPSecurity.RunWithElevatedPrivileges(delegate()
