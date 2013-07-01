@@ -3617,6 +3617,9 @@ namespace EPMLiveWebParts
                 {
                     XmlNode ndWhere = null;
                     ndWhere = xmlQuery.FirstChild.SelectSingleNode("Where");
+
+                    
+
                     if(ndWhere == null)
                     {
                         ndWhere = xmlQuery.CreateElement("Where");
@@ -3667,18 +3670,28 @@ namespace EPMLiveWebParts
 
                 if(!String.IsNullOrEmpty(sSearchField))
                 {
+
+
                     XmlNode ndWhere = null;
                     ndWhere = xmlQuery.FirstChild.SelectSingleNode("Where");
-                    if(ndWhere == null)
+
+                    string query = "<" + searchtypedisplay + "><FieldRef Name=\"" + sSearchField + "\"/><Value Type=\"Text\">" + HttpUtility.HtmlEncode(sSearchValue) + "</Value></" + searchtypedisplay + ">";
+
+                    if (searchtypedisplay == "Eq" && sSearchValue == "")
+                    {
+                        query = "<Or>" + query + "<IsNull><FieldRef Name=\"" + sSearchField + "\"/></IsNull></Or>";
+                    }
+
+                    if (ndWhere == null)
                     {
                         ndWhere = xmlQuery.CreateElement("Where");
                         xmlQuery.FirstChild.PrependChild(ndWhere);
 
-                        ndWhere.InnerXml = "<" + searchtypedisplay + "><FieldRef Name=\"" + sSearchField + "\"/><Value Type=\"Text\">" + HttpUtility.HtmlEncode(sSearchValue) + "</Value></" + searchtypedisplay +">";
+                        ndWhere.InnerXml = query;
                     }
                     else
                     {
-                        ndWhere.InnerXml = "<And><" + searchtypedisplay + "><FieldRef Name=\"" + sSearchField + "\"/><Value Type=\"Text\">" + HttpUtility.HtmlEncode(sSearchValue) + "</Value></" + searchtypedisplay + ">" + ndWhere.InnerXml + "</And>";
+                        ndWhere.InnerXml = "<And>" + query + ndWhere.InnerXml + "</And>";
                     }
                 }
             }
