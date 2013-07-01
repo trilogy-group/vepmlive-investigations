@@ -68,6 +68,9 @@ Grids.OnScroll = function (grid) {
 
 
 Grids.OnKeyDown = function (grid, key, event, name, prefix) {
+    if (key == 46) {
+        return true;
+    }
     curGrid = grid;
     setTimeout('esGrid()', 10);
 }
