@@ -43,7 +43,7 @@ function MDInit() {
                 for (var k in window._LookupFieldsPropsArray) {
                     var prop = window._LookupFieldsPropsArray[k];
                     if (prop.Parent == currentProp.FieldName) {
-                        FetchChildData(currentProp, prop);
+                        FetchChildData(currentProp, prop, k);
                     }
                 }
             }
@@ -74,7 +74,7 @@ function MDInit() {
             return result;
         }
 
-        function FetchChildData(currentProp, childControlProp) {
+        function FetchChildData(currentProp, childControlProp, k) {
             var parentVal = $('#' + currentProp.ControlInfo.DropDownClientId).val();
 
             var postData = {
@@ -88,8 +88,50 @@ function MDInit() {
             };
 
             $.post(currentProp.ControlInfo.CurWebURL + "/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx", postData, function (data) {
-                SetCache(data, childControlProp);
+                if (childControlProp.ControlType == '2') {
+                    $('#' + childControlProp.ControlInfo.GenericEntityDivId).removeAttr('disabled');
+                    $('#' + childControlProp.ControlInfo.GenericEntityDivId).removeClass('disabledTb');
+                    var index = childControlProp.ControlInfo.GenericEntityDivId.lastIndexOf('_');
+                    var browseId = childControlProp.ControlInfo.GenericEntityDivId.substring(0, index) + '_browse';
+                    var addItemId = childControlProp.ControlInfo.GenericEntityDivId.substring(0, index) + '_addItem';
+                    $('#' + browseId).attr('onclick', childControlProp.BrowseLinkOnClick);
+                    $('#' + browseId).css('cursor', 'pointer');
+                    $('#' + browseId).find('IMG').removeClass('disabledImg')
+                    $('#' + addItemId).attr('onclick', childControlProp.AddItemLinkOnClick);
+                    $('#' + addItemId).css('cursor', 'pointer');
+                    $('#' + addItemId).find('IMG').removeClass('disabledImg')
 
+                    if ($('#' + childControlProp.FieldName + '_ddlShowAll').length > 0) {
+                        $('#' + childControlProp.FieldName + '_ddlShowAll').click(function () {
+
+                            if (childControlProp.Parent != '') {
+                                var index = CheckIfDataExists(childControlProp);
+                                var cachedata = GetCachedData(index);
+                                BuildAllItemsDropDown(cachedata, childControlProp);
+                            }
+                        });
+
+                        $('#' + childControlProp.FieldName + '_ddlShowAll').attr('CtrlPropArrPos', k);
+                        $('#' + childControlProp.FieldName + '_ddlShowAll').removeClass('disabledImg');
+                    }
+
+                }
+                else {
+                    if ($('#' + childControlProp.ControlInfo.DropDownClientId).length > 0) {
+                        $('#' + childControlProp.ControlInfo.DropDownClientId).removeAttr('disabled');
+                        if (childControlProp.Parent != '') {
+                            var index = CheckIfDataExists(childControlProp);
+                            var cachedata = GetCachedData(index);
+                            BuildAllItemsDropDown(cachedata, childControlProp);
+                        }
+                    }
+                }
+
+                $('#' + childControlProp.ControlInfo.GenericEntityDivId).html('');
+                $('#' + childControlProp.ControlInfo.GenericEntityDivId).html('<span style="color:gray">Type here to search...</span>');
+
+                SetCache(data, childControlProp);
+                BuildDropDownWithCache(data, childControlProp);
             });
         }
 
@@ -112,7 +154,7 @@ function MDInit() {
             controlProps.CachedValue = data;
 
             // build the drop down on first time
-            BuildDropDownWithCache(data, controlProps);
+            //BuildDropDownWithCache(data, controlProps);
         }
 
         function BuildDropDownWithCache(cachedata, controlProps) {
@@ -128,20 +170,22 @@ function MDInit() {
                 if (cachedata) {
                     if (controlProps.ControlInfo.IsMultiSelect != true) {
                         $('#' + controlProps.ControlInfo.DropDownClientId).empty();
+                        var none = "<option value='0'>(none)</option>";
+                        $('#' + controlProps.ControlInfo.DropDownClientId).append(none);
                         var items = cachedata.split(';#');
                         var itemIndex = 0;
                         // get the values that begins with the search text
                         // don't return options that has been selected already
                         for (var i in items) {
-                            if (items[i].indexOf(',') != -1) {
-                                var itemPair = items[i].split(',');
+                            if (items[i].indexOf('^') != -1) {
+                                var itemPair = items[i].split('^^');
                                 var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
                                 $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
                                 $('#' + controlProps.ControlInfo.DropDownClientId).val(itemPair[0]);
                             }
                         }
                     }
-                    // if control is a multi-select control
+                        // if control is a multi-select control
                     else {
                         if (cachedata && cachedata.indexOf(';#') != -1) {
                             $('#' + controlProps.ControlInfo.SelectCandidateId).empty();
@@ -149,7 +193,7 @@ function MDInit() {
                             // get the values that begins with the search text
                             // don't return options that has been selected already
                             for (var i in items) {
-                                var itemPair = items[i].split(',');
+                                var itemPair = items[i].split('^^');
                                 if (itemPair[1] != undefined) {
                                     hasMatch = true;
                                     var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
@@ -184,7 +228,7 @@ function MDInit() {
                     containerDiv.css('left', GetFullLeft($('#' + controlProps.ControlInfo.GenericEntityDivId)));
 
                     $('#' + controlProps.ControlInfo.GenericEntityDivId).after(containerDiv);
-                    RegisterClickOutsideEvent(controlProps.ControlInfo.AutoCompleteDivId);
+                    RegisterClickOutsideEvent(controlProps);
 
                     $('#' + controlProps.ControlInfo.GenericEntityDivId).blur(function () {
                         $(this).css('display', '');
@@ -218,7 +262,7 @@ function MDInit() {
                     // get the values that begins with the search text
                     // don't return options that has been selected already
                     for (var i in items) {
-                        var itemPair = items[i].split(',');
+                        var itemPair = items[i].split('^^');
                         if (itemPair[1] != undefined &&
                 itemPair[1].toLowerCase().trim().indexOf(cleanTxt) == 0 &&
                 !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
@@ -231,7 +275,7 @@ function MDInit() {
                     // get the values that contains the search text
                     // don't return options that has been selected already
                     for (var i in items) {
-                        var itemPair = items[i].split(',');
+                        var itemPair = items[i].split('^^');
                         if (itemPair[1] != undefined &&
                 itemPair[1].toLowerCase().trim().indexOf(cleanTxt) != 0 &&
                 itemPair[1].toLowerCase().trim().indexOf(cleanTxt) != -1 &&
@@ -261,10 +305,180 @@ function MDInit() {
                 if (!hasMatch) {
                     RemoveTypeAheadChoiceCandidate(controlProps);
                 }
-
-
-
             }
+        }
+
+        function BuildAllItemsDropDown(cachedata, controlProps) {
+
+            if (controlProps.ControlType == '1') {
+                $('#' + controlProps.ControlInfo.DropDownClientId).prop('disabled', false);
+            }
+            else if (controlProps.ControlType == '2') {
+                $('#' + controlProps.ControlInfo.GenericEntityDivId).prop('disabled', false);
+            }
+
+            if (controlProps.ControlType == '1') {
+                if (cachedata) {
+                    if (controlProps.ControlInfo.IsMultiSelect != true) {
+                        $('#' + controlProps.ControlInfo.DropDownClientId).empty();
+                        var items = cachedata.split(';#');
+                        var itemIndex = 0;
+                        // get the values that begins with the search text
+                        // don't return options that has been selected already
+                        for (var i in items) {
+                            if (items[i].indexOf('^') != -1) {
+                                var itemPair = items[i].split('^^');
+                                var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
+                                $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
+                                $('#' + controlProps.ControlInfo.DropDownClientId).val(itemPair[0]);
+                            }
+                        }
+                    }
+                        // if control is a multi-select control
+                    else {
+                        if (cachedata && cachedata.indexOf(';#') != -1) {
+                            $('#' + controlProps.ControlInfo.SelectCandidateId).empty();
+                            var items = cachedata.split(';#');
+                            // get the values that begins with the search text
+                            // don't return options that has been selected already
+                            for (var i in items) {
+                                var itemPair = items[i].split('^^');
+                                if (itemPair[1] != undefined) {
+                                    hasMatch = true;
+                                    var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
+                                    $('#' + controlProps.ControlInfo.SelectCandidateId).append(opt);
+                                    itemIndex++;
+                                }
+                            }
+
+                            $('#' + controlProps.ControlInfo.SelectCandidateId).prop('disabled', false);
+                            $('#' + controlProps.ControlInfo.AddButtonId).prop('disabled', false);
+                            $('#' + controlProps.ControlInfo.RemoveButtonId).prop('disabled', false);
+                            $('#' + controlProps.ControlInfo.SelectResultId).prop('disabled', false);
+                        }
+                    }
+                }
+            }
+            else if (controlProps.ControlType == '2') {
+                controlProps.ControlInfo.CandidateIndex = -1;
+                var pickerSelections = new Array();
+                var hasMatch = false;
+                if (cachedata) {
+
+                    RemoveTypeAheadChoiceCandidate(controlProps);
+
+                    var containerDiv = $(document.createElement('div'))
+                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).width())
+                           .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
+                           .addClass('autocomplete')
+                           .css('background-color', 'white');
+
+                    containerDiv.css('top', GetFullTop($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+                    containerDiv.css('left', GetFullLeft($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).after(containerDiv);
+                    RegisterClickOutsideEvent(controlProps);
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).blur(function () {
+                        $(this).css('display', '');
+                    });
+
+                    // get the list of options
+                    var htmlHolder = $('#' + controlProps.ControlInfo.GenericEntityDivId).html();
+                    htmlHolder = htmlHolder.split('&nbsp').join('').split(';').join('');
+                    var parent = null;
+                    try {
+                        parent = $('<div>' + htmlHolder + '</div>');
+                    }
+                    catch (e) {
+                    }
+
+                    if (parent != null && htmlHolder.length > 0) {
+                        parent.find('SPAN').each(function () {
+                            pickerSelections.push($(this).text().trim());
+                        });
+                    }
+
+                    var items = cachedata.split(';#');
+                    var itemIndex = 0;
+
+                    // get the values that contains the search text
+                    // don't return options that has been selected already
+                    for (var i in items) {
+                        var itemPair = items[i].split('^^');
+                        if (itemPair[1] != undefined &&
+                !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
+                            hasMatch = true;
+                            $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_" + itemIndex + "' value='" + itemPair[0] + "'>" + itemPair[1] + "</div>");
+                            itemIndex++;
+                        }
+                    }
+
+                    RegisterHoverStyle();
+
+                    $('.autoText').click(function () {
+                        if ($(this).attr('id') === 'autoText_noValue') {
+                            return;
+                        }
+
+                        if ($('#' + controlProps.FieldName + '_errorText').length > 0) {
+                            $('#' + controlProps.FieldName + '_errorText').remove();
+                        }
+                        if (!controlProps.ControlInfo.IsMultiSelect) {
+                            var newText = $(this).html();
+                            controlProps.ControlInfo.SingleSelectDisplayVal = newText;
+                            controlProps.ControlInfo.SingleSelectLookupVal = $(this).attr('value');
+                            //UpdateSingleSelectPickerValue(controlProps);
+                            var index = $(this).attr('value');
+                            UpdateSingleSelectPickerValueWOValidation(controlProps, index);
+                        }
+                        else {
+                            var newText = $(this).html();
+                            var index = $(this).attr('value');
+                            //UpdateMultiSelectPickerValue(controlProps, newText);
+                            UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
+                        }
+                    });
+
+
+                }
+                    // without cache
+                else {
+                    RemoveTypeAheadChoiceCandidate(controlProps);
+
+                    var containerDiv = $(document.createElement('div'))
+                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).width())
+                           .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
+                           .addClass('autocomplete')
+                           .css('background-color', 'white');
+
+                    containerDiv.css('top', GetFullTop($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+                    containerDiv.css('left', GetFullLeft($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).after(containerDiv);
+                    RegisterClickOutsideEvent(controlProps);
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).blur(function () {
+                        $(this).css('display', '');
+                    });
+
+                    //$('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_noValue'>No Values To Select</div>");
+                    hasMatch = false;
+                }
+
+                if (!hasMatch) {
+                    $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_noValue'>No Values To Select</div>");
+                    //RemoveTypeAheadChoiceCandidate(controlProps);
+                }
+            }
+        }
+
+        function GetCachedData(cacheObjID) {
+            var data = '';
+            if (window._LookupFieldsPropsArray) {
+                data = window._LookupFieldsPropsArray[cacheObjID].CachedValue;
+            }
+            return data;
         }
 
         function RemoveTypeAheadChoiceCandidate(controlProps) {
@@ -498,9 +712,9 @@ function MDInit() {
                                 var hiddenCtrlID = '#' + hiddenControlID;
                                 $(hiddenCtrlID).val(newHiddenCtrlValue);
                             }
-                            // chrome does not have this control
-                            // so we're going to set the new
-                            // dropdown value
+                                // chrome does not have this control
+                                // so we're going to set the new
+                                // dropdown value
                             else {
                                 var lookupDdlId = controlProps.ControlInfo.SourceControlId.substr(0, controlProps.ControlInfo.SourceControlId.lastIndexOf('_')) + '_Lookup';
                                 $('#' + lookupDdlId).val(controlProps.ControlInfo.SingleSelectLookupVal);
@@ -532,24 +746,41 @@ function MDInit() {
         }
 
 
-        function RegisterClickOutsideEvent(autoCompleteDivID) {
+        function RegisterClickOutsideEvent(controlProps) {
             document.onclick = function (event) {
-                if (clickedOutsideElement(autoCompleteDivID, event)) {
-                    $('#' + autoCompleteDivID).css('display', 'none');
+                if (clickedOutsideElement(controlProps.ControlInfo.AutoCompleteDivId, event)) {
+                    if (clickedOutsideElement(controlProps.FieldName + '_ddlShowAll', event)) {
+                        $('#' + controlProps.ControlInfo.AutoCompleteDivId).css('display', 'none');
+                    }
                 }
                 else {
-                    $('#' + autoCompleteDivID).css('display', '');
+                    $('#' + controlProps.ControlInfo.AutoCompleteDivId).css('display', '');
                 }
             }
         }
 
         // fires before form save
-        window.PreSaveAction = function () {
-            PostDataBackToMultiSelectLookup();
+        //        window.PreSaveAction = function () {
+        //            PostDataBackToMultiSelectLookup();
 
-            UpdateAllSingleSelectValsBeforeSafe();
-            PostDataBackToSingleSelectLookup();
-            return true;
+        //            UpdateAllSingleSelectValsBeforeSafe();
+        //            PostDataBackToSingleSelectLookup();
+        //            return true;
+        //        }
+
+        // fires before form save
+        window.PreSaveAction = function () {
+            var multiOk = PostDataBackToMultiSelectLookup();
+            var updateOk = UpdateAllSingleSelectValsBeforeSafe();
+            var singleOk = PostDataBackToSingleSelectLookup();
+
+            //CleanPeopleEditorVals();
+
+            if (multiOk && updateOk && singleOk) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         function ValidateEntity(genericEntityCheckNameID) {
@@ -560,6 +791,6 @@ function MDInit() {
             }, 0);
         }
 
-    } (window.ModifiedDropDown = window.ModifiedDropDown || {}, jQuery));
+    }(window.ModifiedDropDown = window.ModifiedDropDown || {}, jQuery));
 }
 ExecuteOrDelayUntilScriptLoaded(MDInit, "EPMLive.js");

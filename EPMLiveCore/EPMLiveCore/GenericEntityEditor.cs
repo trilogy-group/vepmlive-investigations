@@ -8,6 +8,9 @@ using System.Web.UI;
 using System.Xml.Linq;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using System.Diagnostics;
+using System.Reflection;
+using System.Globalization;
 
 namespace EPMLiveCore
 {
@@ -225,7 +228,14 @@ namespace EPMLiveCore
                 "  _LookupFieldsPropsArray[arrLength] = lookupFieldProp_" + propBag.Field + "; " +
                 "  }</script>", false);
 
-            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityEditorJS_", "<script src='/_layouts/epmlive/javascripts/GenericEntityEditor.js'></script>", false);
+            string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+            if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
+            {
+                fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+            }
+
+            ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/GenericEntityEditor.js?v=" + fileVersion, false);
+            //this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityEditorJS_", "<script src='/_layouts/epmlive/javascripts/GenericEntityEditor.js'></script>", false);
             this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityPickerStyle_", "<link href=\"/_layouts/epmlive/GenericEntityPickerStyle.css\" rel=\"stylesheet\" type=\"text/css\" />", false);
 
             base.OnPreRender(e);

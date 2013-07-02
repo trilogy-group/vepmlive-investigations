@@ -10,6 +10,8 @@ using System.Web.UI.WebControls;
 using Microsoft.SharePoint.Utilities;
 using System.Globalization;
 using System.Web.UI;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace EPMLiveCore
 {
@@ -152,31 +154,31 @@ namespace EPMLiveCore
                     //}
                     //else
                     //{
-                        //if (LookupData.IsParent && LookupData.Parent == "none")
-                        //{
-                        foreach (SPListItem item in items)
+                    //if (LookupData.IsParent && LookupData.Parent == "none")
+                    //{
+                    foreach (SPListItem item in items)
+                    {
+                        object fv = null;
+                        string sfv = string.Empty;
+
+                        try
                         {
-                            object fv = null;
-                            string sfv = string.Empty;
-
-                            try
-                            {
-                                fv = item[LookupField.LookupField];
-                            }
-                            catch { }
-
-                            try
-                            {
-                                sfv = fv.ToString();
-                            }
-                            catch { }
-
-                            DataRow r = table.NewRow();
-                            r["ValueField"] = item.ID;
-                            r["TextField"] = item[LookupField.LookupField];
-                            table.Rows.Add(r);
+                            fv = item[LookupField.LookupField];
                         }
-                        //}
+                        catch { }
+
+                        try
+                        {
+                            sfv = fv.ToString();
+                        }
+                        catch { }
+
+                        DataRow r = table.NewRow();
+                        r["ValueField"] = item.ID;
+                        r["TextField"] = item[LookupField.LookupField];
+                        table.Rows.Add(r);
+                    }
+                    //}
 
                     //}
 
@@ -225,7 +227,7 @@ namespace EPMLiveCore
             //ScriptLink.Register(Page, "/_layouts/epmlive/jQueryLibrary/jquery-1.6.2.min.js", false);
 
             this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_LookupFieldsPropsArray_",
-                "<script>if (!_LookupFieldsPropsArray) { var _LookupFieldsPropsArray = new Array(); }</script>", false);
+                "<script> if (!_LookupFieldsPropsArray) { var _LookupFieldsPropsArray = new Array(); } </script>", false);
 
             string fieldName = (LookupData.Field != "none" ? LookupData.Field : LookupField.InternalName);
             string type = LookupData.Type;
@@ -253,33 +255,37 @@ namespace EPMLiveCore
                 "                                             ParentListField: '" + parentListField + "', " +
                 "                                             CachedValue: ''};" +
                 "  var arrLength = _LookupFieldsPropsArray.length; " +
-                "  _LookupFieldsPropsArray[arrLength] = lookupFieldProp_" + fieldName + "}; " +
-                "</script>"
+                "  _LookupFieldsPropsArray[arrLength] = lookupFieldProp_" + fieldName + "}; " + 
+                "</script>" 
                 , false);
 
-            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_ModifiedDropDownJS_", "<script src='/_layouts/epmlive/ModifiedDropDown.js'></script>", false);
+            string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+            if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
+            {
+                fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+            }
+
+            ScriptLink.Register(Page, "epmlive/ModifiedDropDown.js?v=" + fileVersion, false);
 
             base.OnPreRender(e);
 
+            if (!string.IsNullOrEmpty(parent))
+            {
+                this.Page.ClientScript.RegisterStartupScript(GetType(), "_HideChildCascadeField_" + this.ClientID,
+
+                    "function HideControl_" + this.ClientID + "(){ " +
+                    "   if ($('#" + this.ClientID + "').length > 0){ " +
+                    "       $('#" + this.ClientID + "').prop('disabled', true); " +
+                    "   } else { " +
+                    "       setTimeout(HideControl_" + this.ClientID + ", 500); " +
+                    "   } " +
+                    "} " +
+
+                    "$(document).ready(function () { " +
+                        "HideControl_" + this.ClientID + "();" +
+                    "});", true);
+            }
         }
-
-        //protected override void OnLoad(EventArgs e)
-        //{
-        //    base.OnLoad(e);
-
-        //    if (!string.IsNullOrEmpty(parent))
-        //    {
-        //        this.Page.ClientScript.RegisterStartupScript(GetType(), "_HideChildCascadeField_" + this.ClientID,
-
-        //            "$(document).ready(function (){" +
-        //                "$('#" + this.ClientID + "').prop('disabled', true);" +
-        //                "$('#" + this.ClientID + "').change(function(){" +
-        //                    "alert('value changed');" +
-        //                "});" +
-        //            "});"
-        //            , true);
-        //    }
-        //}
 
         protected override void CreateChildControls()
         {
@@ -415,7 +421,7 @@ namespace EPMLiveCore
                             {
                                 this.SetFieldControlValue(fv2);
                             }
-                            
+
                         }
                     }
                 }
@@ -432,7 +438,7 @@ namespace EPMLiveCore
 
         private void SetFieldControlValue(object value)
         {
-            if (!(this.m_value.Equals(value)) || !this.m_hasValueSet)
+            if (!this.m_hasValueSet || !(this.m_value.Equals(value)))
             {
                 this.Clear();
                 this.m_value = value;

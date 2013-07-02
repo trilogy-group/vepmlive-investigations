@@ -6,6 +6,7 @@ using System.Xml;
 using Microsoft.SharePoint;
 using System.Data;
 using System.Data.SqlClient;
+using System.Collections;
 
 namespace EPMLiveCore
 {
@@ -69,12 +70,12 @@ namespace EPMLiveCore
 
             foreach(XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
             {
-
                 string orderField = nd.Attributes["Name"].Value;
                 if (orderField == "ID")
                     orderField = "ItemID";
 
                 orderby += "," + orderField;
+
                 try
                 {
                     if(nd.Attributes["Ascending"].Value.ToLower() == "false")
@@ -138,12 +139,19 @@ namespace EPMLiveCore
                             field += "Text";
                         }
 
-                        foreach(XmlNode ndVal in ndVals.SelectNodes("Value"))
+                        if (ndVals.SelectNodes("Value").Count > 0)
                         {
-                            vals += field + " = '" + ndVal.InnerText + "' OR";
+                            foreach (XmlNode ndVal in ndVals.SelectNodes("Value"))
+                            {
+                                vals += field + " = '" + ndVal.InnerText + "' OR ";
+                            }
+                        }
+                        else
+                        {
+                            vals += field + " = ''";
                         }
 
-                        return vals.Trim('R').Trim('O') + ")";
+                        return vals.Trim(' ').Trim('R').Trim('O') + ")";
                     }
                     else
                     {
@@ -214,6 +222,95 @@ namespace EPMLiveCore
                 default:
                     return "=";
             }
+        }
+        // TEST //
+        public static string ProcessReportFilter(SPList list, SPWeb web, string filterWpId)
+        {
+            string ret = "";
+            ArrayList reportFilterIDs = new ArrayList();
+            Guid listid = Guid.Empty;
+            string reportFilterField = "";
+            int MAX_LOOKUPFILTER = 300;
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                try
+                {
+                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                    cn.Open();
+
+                    SqlCommand cmd = new SqlCommand("SELECT VALUE,listid FROM PERSONALIZATIONS where userid=@userid and [key]=@key and FK=@FK", cn);
+                    cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
+                    cmd.Parameters.AddWithValue("@key", "ReportFilterWebPartSelections");
+                    cmd.Parameters.AddWithValue("@FK", filterWpId);
+                    cmd.ExecuteNonQuery();
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        reportFilterIDs = new ArrayList(dr.GetString(0).Split('|')[0].Split(','));
+                        listid = dr.GetGuid(1);
+                    }
+                    dr.Close();
+                    cn.Close();
+                }
+                catch { }
+            });
+
+            if (listid == list.ID)
+            {
+                reportFilterField = "Title";
+
+                if (reportFilterIDs.Count < MAX_LOOKUPFILTER)
+                {
+
+                    ret = "<In><FieldRef Name=\"Title\"/><Values>" + GetReportFilters(reportFilterIDs) + "</Values></In>";
+
+                }
+            }
+            else if (listid != Guid.Empty)
+            {
+
+
+
+                foreach (SPField oField in list.Fields)
+                {
+                    if (oField.Type == SPFieldType.Lookup)
+                    {
+                        try
+                        {
+                            SPFieldLookup oLookup = (SPFieldLookup)oField;
+                            if (new Guid(oLookup.LookupList) == listid)
+                            {
+                                reportFilterField = oLookup.InternalName;
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
+                }
+
+
+                if (reportFilterIDs.Count < MAX_LOOKUPFILTER && reportFilterField != "")
+                {
+                    ret = "<In><FieldRef Name=\"" + reportFilterField + "\"/><Values>" + GetReportFilters(reportFilterIDs) + "</Values></In>";
+                }
+            }
+
+
+            return ret;
+        }
+
+        private static string GetReportFilters(ArrayList reportFilterIDs)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in reportFilterIDs)
+            {
+                sb.Append("<Value Type=\"Text\">");
+                sb.Append(System.Web.HttpUtility.HtmlEncode(s));
+                sb.Append("</Value>");
+            }
+
+            return sb.ToString();
         }
     }
 }

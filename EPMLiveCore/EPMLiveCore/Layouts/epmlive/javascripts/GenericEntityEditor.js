@@ -7,42 +7,43 @@ function GEInit() {
 
             if (window._LookupFieldsPropsArray) {
                 for (var k in window._LookupFieldsPropsArray) {
-                    var controlProps = window._LookupFieldsPropsArray[k];
+                    if (window._LookupFieldsPropsArray.hasOwnProperty(k)) {
+                        var controlProps = window._LookupFieldsPropsArray[k];
 
-                    HideSPControls(controlProps);
+                        HideSPControls(controlProps);
 
-                    if (controlProps.ControlType !== '2') {
-                        continue;
-                    }
+                        if (controlProps.ControlType !== '2') {
+                            continue;
+                        }
 
-                    SetProperOuterTableCssClass(controlProps.ControlInfo.GenericEntityDivIdRoot);
+                        SetProperOuterTableCssClass(controlProps.ControlInfo.GenericEntityDivIdRoot);
 
-                    if (!SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId) && controlProps.Parent == '') {
-                        var h = $('#' + controlProps.ControlInfo.GenericEntityDivId).height();
-                        $('#' + controlProps.ControlInfo.GenericEntityDivId).append("<img src=\"/_layouts/epmlive/images/LoadingBar.gif\" style=\"vertical-align: middle;float:left;margin-left:5px;margin-top: 2px;\" /><div style=\"float:left;margin-left:5px;color:gray;\">Loading...</div> ");
-                        $('#' + controlProps.ControlInfo.GenericEntityDivId).height(h);
-                    }
+                        if (!SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId) && controlProps.Parent == '') {
+                            var h = $('#' + controlProps.ControlInfo.GenericEntityDivId).height();
+                            $('#' + controlProps.ControlInfo.GenericEntityDivId).append("<img src=\"/_layouts/epmlive/images/LoadingBar.gif\" style=\"vertical-align: middle;float:left;margin-left:5px;margin-top: 2px;\" /><div style=\"float:left;margin-left:5px;color:gray;\">Loading...</div> ");
+                            $('#' + controlProps.ControlInfo.GenericEntityDivId).height(h);
+                        }
 
-                    if (controlProps.ControlType == '2' && controlProps.Parent !== '') {
-                        $('#' + controlProps.ControlInfo.GenericEntityDivId).attr('disabled', true);
-                        $('#' + controlProps.ControlInfo.GenericEntityDivId).addClass('disabledTb');
-                        var index = controlProps.ControlInfo.GenericEntityDivId.lastIndexOf('_');
-                        var browseId = controlProps.ControlInfo.GenericEntityDivId.substring(0, index) + '_browse';
-                        var addItemId = controlProps.ControlInfo.GenericEntityDivId.substring(0, index) + '_addItem';
-                        controlProps.BrowseLinkOnClick = $('#' + browseId).attr('onclick');
-                        controlProps.AddItemLinkOnClick = $('#' + addItemId).attr('onclick');
-                        $('#' + browseId).removeAttr('onclick');
-                        $('#' + browseId).css('cursor', 'default');
-                        $('#' + browseId).find('IMG').addClass('disabledImg')
-                        $('#' + addItemId).removeAttr('onclick');
-                        $('#' + addItemId).css('cursor', 'default');
-                        $('#' + addItemId).find('IMG').addClass('disabledImg')
+                        if (controlProps.ControlType == '2' && controlProps.Parent !== '') {
+                            $('#' + controlProps.ControlInfo.GenericEntityDivId).attr('disabled', true);
+                            $('#' + controlProps.ControlInfo.GenericEntityDivId).addClass('disabledTb');
+                            var index = controlProps.ControlInfo.GenericEntityDivId.lastIndexOf('_');
+                            var browseId = controlProps.ControlInfo.GenericEntityDivId.substring(0, index) + '_browse';
+                            var addItemId = controlProps.ControlInfo.GenericEntityDivId.substring(0, index) + '_addItem';
+                            controlProps.BrowseLinkOnClick = $('#' + browseId).attr('onclick');
+                            controlProps.AddItemLinkOnClick = $('#' + addItemId).attr('onclick');
+                            $('#' + browseId).removeAttr('onclick');
+                            $('#' + browseId).css('cursor', 'default');
+                            $('#' + browseId).find('IMG').addClass('disabledImg')
+                            $('#' + addItemId).removeAttr('onclick');
+                            $('#' + addItemId).css('cursor', 'default');
+                            $('#' + addItemId).find('IMG').addClass('disabledImg')
 
-                        if (controlProps.ControlType == '2' && $('#' + controlProps.FieldName + '_ddlShowAll').length > 0) {
-                            $('#' + controlProps.FieldName + '_ddlShowAll').addClass('disabledImg');
+                            if (controlProps.ControlType == '2' && $('#' + controlProps.FieldName + '_ddlShowAll').length > 0) {
+                                $('#' + controlProps.FieldName + '_ddlShowAll').addClass('disabledImg');
+                            }
                         }
                     }
-
                 }
             }
 
@@ -177,7 +178,7 @@ function GEInit() {
                             if (controlProps.ControlInfo.SearchText.length > 0) {
                                 // is multi select
                                 if (controlProps.ControlInfo.IsMultiSelect ||
-                                // or is single select and does not contain a value already
+                                    // or is single select and does not contain a value already
                                     (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
 
                                     if (controlProps.Parent != '') {
@@ -219,7 +220,7 @@ function GEInit() {
                             if (controlProps.ControlInfo.SearchText.length > 0) {
                                 // is multi select
                                 if (controlProps.ControlInfo.IsMultiSelect ||
-                                // or is single select and does not contain a value already
+                                    // or is single select and does not contain a value already
                                     (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
 
                                     if (controlProps.Parent != '') {
@@ -352,7 +353,7 @@ function GEInit() {
                             if (controlProps.ControlInfo.SearchText.length > 0) {
                                 // is multi select
                                 if (controlProps.ControlInfo.IsMultiSelect ||
-                                // or is single select and does not contain a value already
+                                    // or is single select and does not contain a value already
                                     (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
 
                                     if (controlProps.Parent != '') {
@@ -488,12 +489,14 @@ function GEInit() {
                 if (cachedata) {
                     if (controlProps.ControlInfo.IsMultiSelect != true) {
                         $('#' + controlProps.ControlInfo.DropDownClientId).empty();
+                        var none = "<option value='0'>(none)</option>";
+                        $('#' + controlProps.ControlInfo.DropDownClientId).append(none);
                         var items = cachedata.split(';#');
                         var itemIndex = 0;
                         // get the values that begins with the search text
                         // don't return options that has been selected already
                         for (var i in items) {
-                            if (items[i].indexOf(',') != -1) {
+                            if (items[i].indexOf('^') != -1) {
                                 var itemPair = items[i].split('^^');
                                 var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
                                 $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
@@ -501,7 +504,7 @@ function GEInit() {
                             }
                         }
                     }
-                    // if control is a multi-select control
+                        // if control is a multi-select control
                     else {
                         if (cachedata && cachedata.indexOf(';#') != -1) {
                             $('#' + controlProps.ControlInfo.SelectCandidateId).empty();
@@ -629,7 +632,7 @@ function GEInit() {
                     });
 
                 }
-                // without cache
+                    // without cache
                 else {
                     RemoveTypeAheadChoiceCandidate(controlProps);
 
@@ -678,7 +681,7 @@ function GEInit() {
                         // get the values that begins with the search text
                         // don't return options that has been selected already
                         for (var i in items) {
-                            if (items[i].indexOf(',') != -1) {
+                            if (items[i].indexOf('^') != -1) {
                                 var itemPair = items[i].split('^^');
                                 var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
                                 $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
@@ -686,7 +689,7 @@ function GEInit() {
                             }
                         }
                     }
-                    // if control is a multi-select control
+                        // if control is a multi-select control
                     else {
                         if (cachedata && cachedata.indexOf(';#') != -1) {
                             $('#' + controlProps.ControlInfo.SelectCandidateId).empty();
@@ -794,7 +797,7 @@ function GEInit() {
 
 
                 }
-                // without cache
+                    // without cache
                 else {
                     RemoveTypeAheadChoiceCandidate(controlProps);
 
@@ -990,12 +993,18 @@ function GEInit() {
                 else {
                     if ($('#' + childControlProp.ControlInfo.DropDownClientId).length > 0) {
                         $('#' + childControlProp.ControlInfo.DropDownClientId).removeAttr('disabled');
+                        if (childControlProp.Parent != '') {
+                            var index = CheckIfDataExists(childControlProp);
+                            var cachedata = GetCachedData(index);
+                            BuildAllItemsDropDown(cachedata, childControlProp);
+                        }
                     }
                 }
 
                 $('#' + childControlProp.ControlInfo.GenericEntityDivId).html('');
                 $('#' + childControlProp.ControlInfo.GenericEntityDivId).html('<span style="color:gray">Type here to search...</span>');
                 SetCache(data, childControlProp);
+                BuildDropDownWithCache(data, childControlProp);
             });
         }
 
@@ -1085,11 +1094,11 @@ function GEInit() {
                                 var hiddenCtrlID = '#' + hiddenControlID;
                                 $(hiddenCtrlID).val(newHiddenCtrlValue);
                             }
-                            // chrome does not have this control
-                            // so we're going to set the new
-                            // dropdown value
+                                // chrome does not have this control
+                                // so we're going to set the new
+                                // dropdown value
                             else {
-                                
+                                var lookupDdlId = controlProps.ControlInfo.SourceControlId;
                                 if ((controlProps.Required == 'True'
                                 && $('#' + controlProps.ControlInfo.GenericEntityDivId).html().indexOf('SPAN') == -1
                                 && $('#' + controlProps.ControlInfo.GenericEntityDivId).html().indexOf('span') == -1) ||
@@ -1105,36 +1114,36 @@ function GEInit() {
                                 else {
                                     if ($('#' + controlProps.ControlInfo.GenericEntityDivId).find('#divEntityData').length > 0) {
                                         var entityKey = $('#' + controlProps.ControlInfo.GenericEntityDivId).find('#divEntityData').first().attr('key');
-                                        if (entityKey != $('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').val()) {
-                                            if (!($('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').find('option[value=' + entityKey + ']').length > 0)) {
-                                                //var index = CheckIfDataExists(controlProps);
-                                                //var cachedata = GetCachedData(index);
-                                                //var keyValPairs = cachedata.split(';#');
-                                                //var newOpt = '';
-                                                //if (!keyValPairs.length) {
-                                                //    keyValPairs = [keyValPairs];
-                                                //}
+                                        if (entityKey != $('#' + lookupDdlId).val()) {
+                                            if (!($('[id="' + lookupDdlId + '"]').find('option[value="' + entityKey + '"]').length > 0)) {
+                                                var index = CheckIfDataExists(controlProps);
+                                                var cachedata = GetCachedData(index);
+                                                var keyValPairs = cachedata.split(';#');
+                                                var newOpt = '';
+                                                if (!keyValPairs.length) {
+                                                    keyValPairs = [keyValPairs];
+                                                }
 
-                                                //if (keyValPairs.length > 0) {
-                                                //    for (k in keyValPairs) {
-                                                //        var pair = keyValPairs[k];
-                                                //        if (pair.split(',')[0] == controlProps.ControlInfo.SingleSelectLookupVal) {
-                                                //            newOpt = pair;
-                                                //        }
-                                                //    }
-                                                //}
+                                                if (keyValPairs.length > 0) {
+                                                    for (k in keyValPairs) {
+                                                        var pair = keyValPairs[k];
+                                                        if (pair.split('^^')[0] == controlProps.ControlInfo.SingleSelectLookupVal) {
+                                                            newOpt = pair;
+                                                        }
+                                                    }
+                                                }
 
-                                                //var opt = "<option value='" + newOpt.split(',')[0] + "'>" + newOpt.split(',')[1] + "</option>";
-                                                //$('#' + controlProps.ControlInfo.SourceDropDownID).append(opt);
+                                                var opt = "<option value='" + newOpt.split('^^')[0] + "'>" + newOpt.split('^^')[1] + "</option>";
+                                                $('[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').append(opt);
                                                 //$('#' + lookupDdlId).val(controlProps.ControlInfo.SingleSelectLookupVal);
                                             }
                                             else {
-                                                $('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').val(entityKey)
+                                                $('[id="' + lookupDdlId + '"]').val(entityKey)
                                             }
                                         }
                                     }
                                     else {
-                                        $('SELECT[id="' + controlProps.ControlInfo.SourceDropDownID + '"]').val(0)
+                                        $('[id="' + lookupDdlId + '"]').val(0)
                                     }
 
                                     //                                if (controlProps.ControlInfo.SingleSelectLookupVal != '' &&
@@ -1365,6 +1374,10 @@ function GEInit() {
                 $('#' + controlProps.ControlInfo.AutoCompleteDivId).remove();
             }
 
+            if ($('.autocomplete').length > 0) {
+                $('.autocomplete').remove();
+            }
+
             controlProps.ControlInfo.CandidateIndex = -1;
         }
 
@@ -1402,7 +1415,7 @@ function GEInit() {
                 theElem = (window.event) ? getEventTarget(window.event) : event.target;
             }
             catch (e)
-        { }
+            { }
             while (theElem != null) {
                 if (theElem.id == elemId) {
                     return false;
@@ -1517,11 +1530,11 @@ function GEInit() {
                 width: 650,
                 height: 500,
                 dialogReturnValueCallback: function (dialogResult) {
-                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult);
+                    SP.UI.ModalDialog.RefreshPage(dialogResult);
                 }
             };
 
-            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+            SP.UI.ModalDialog.showModalDialog(options);
         }
 
         function UnescapeHTML(escapedHTML) {
@@ -1538,7 +1551,7 @@ function GEInit() {
             $('#' + id).animate({ scrollTop: newTop }, 'fast');
         }
 
-    } (window.epmLiveGenericEntityEditor = window.epmLiveGenericEntityEditor || {}, jQuery));
+    }(window.epmLiveGenericEntityEditor = window.epmLiveGenericEntityEditor || {}, jQuery));
 
 }
 ExecuteOrDelayUntilScriptLoaded(GEInit, "EPMLive.js");
