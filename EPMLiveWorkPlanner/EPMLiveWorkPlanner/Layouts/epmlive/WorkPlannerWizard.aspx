@@ -188,12 +188,13 @@
     <asp:Panel ID="pnlPlanner" runat="server" Visible="false">
 
         <h4>Select Planner</h4><br />
+        <div style="width:380px;height:22px;overflow:auto;padding-left:5px;">
+            <input type="checkbox" value="setdefault" id="chkDefault" name="chkDefault" /> Use as default planner
+        </div><br />
         <div style="width:390px;max-height:400px;overflow:auto" class="wizardBoxes">
             <%=sOutputHtml %>
         </div>
-        <div style="width:380px;height:22px;overflow:auto;padding-left:5px;">
-            <input type="checkbox" value="setdefault" id="chkDefault" name="chkDefault" /> Use as default planner
-        </div>
+        
     </asp:Panel>
 
     <asp:Panel ID="pnlItem" runat="server" Visible="false">
