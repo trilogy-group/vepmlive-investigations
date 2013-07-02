@@ -294,10 +294,7 @@ namespace EPMLiveReportsAdmin
                                                       ? (spListItem[field.InternalName] != null
                                                              ? (object) spListItem[field.InternalName].ToString()
                                                              : DBNull.Value)
-                                                      : (spListItem[field.InternalName] == null
-                                                             ? (object) DBNull.Value
-                                                             : ((DateTime) spListItem[field.InternalName]).
-                                                                   ToUniversalTime());
+                                                      : (spListItem[field.InternalName] ?? DBNull.Value);
                                 }
                                 else
                                 {
