@@ -879,7 +879,7 @@ namespace EPMLiveCore.API
             while (dividend > 0)
             {
                 modulo = (dividend - 1)%26;
-                colId = Convert.ToChar(65 + modulo) + colId;
+                colId = Convert.ToChar(65 + modulo).ToString() + colId;
                 dividend = ((dividend - modulo)/26);
             }
 
