@@ -4064,8 +4064,18 @@ function DoSetBaseline() {
     try {
         Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById(sPlannerID + "BD"), "V", dt.valueOf(), 1, 0);
     } catch (e) { }
+    
+    setTimeout("DoSetBaselinePJ()", 100);
+
+}
+
+function DoSetBaselinePJ() {
+    for (var col in oBaselineFields) {
+        RollupSummaryField(oBaselineFields[col]);
+    }
     HideTDialog();
 }
+
 
 function DoSetBaselineClose(loader) {
     HideTDialog();
