@@ -292,12 +292,12 @@ namespace PortfolioEngineCore
                 }
                 reader.Close();
 
-                //string[] spGuids = sticketData.Split(',');
                 bool bisValidResourceTicket = true;
                 foreach (string sList in sticketData.Split(','))
                 {
                     int nWresID;
-                    if (int.TryParse(sList, out nWresID) == false) { bisValidResourceTicket = false; break; }
+                    if (sList.Length > 0)
+                    { if (int.TryParse(sList, out nWresID) == false) { bisValidResourceTicket = false; break; } }
                 }
 
                 if (bisValidResourceTicket)

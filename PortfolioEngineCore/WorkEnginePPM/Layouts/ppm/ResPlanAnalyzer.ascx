@@ -279,6 +279,8 @@ border-radius: 0px;
 <div id="idAnalyzerTabDiv"></div>    
 <div id="idViewTabDiv"></div>
 <div id="idBottomTabDiv"></div>
+<div id="ribbonbarEditCapScenDiv"></div>
+<div id="idEditGridDiv" ></div>
 <div id="divLoading" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
 	<img style="margin: 30px 10px; vertical-align: middle" title="Loading..." alt="Loading..." src="../images/PROGRESS-CIRCLE-24.GIF"/>
 	<span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Loading...</span>
@@ -433,15 +435,13 @@ border-radius: 0px;
 		    <select id="idNewCSDept" name="idNewCSDept" style="vertical-align:middle;padding:0px;margin:0px 4px 0px 4px;">
 		    </select>
        </div>
-       <br />
        <div style="display:none;">
        <div>
 			<input id="idNewCSPrivate" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Personal Scenario</font>
 		</div>
-        <br />
         </div>
-		<div style="width:200px;margin-left:10px;margin-top:3px;">
-			<div style="padding-top:10px;">
+        <div style="width:200px;float:right">
+	        <div class="button-container">
 					<a href="javascript:dialogEvent('SaveCS_OK');" class="button-new green" style="width:75px;">OK</a>
 					<a href="javascript:dialogEvent('SaveCS_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
 			</div>
@@ -602,9 +602,7 @@ border-radius: 0px;
 	</div>
 </div>
 <div id="idEditCapScenDlg" style="display:none;">
-   <div id="idEditCS" style="position: relative; width: 100%; height: 650px; top: 0px; left: 0px;"></div>    
-   <div id="ribbonbarEditCapScenDiv"></div>
-   <div id="idEditGridDiv" ></div>
+   <div id="idEditCS" style="position: relative; width: 100%; height: 350px; top: 0px; left: 0px;"></div>    
 </div>
 <div id="idGridExplainDlgObj" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">

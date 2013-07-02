@@ -2054,7 +2054,7 @@ namespace RPADataCache
             xCfg.CreateBooleanAttr("DateStrings", true);
             xCfg.CreateBooleanAttr("NoTreeLines", true);
 
-            xCfg.CreateIntAttr("MaxHeight", 0);
+         //   xCfg.CreateIntAttr("MaxHeight", 300);
             xCfg.CreateIntAttr("MaxWidth", 1);
 
             xCfg.CreateIntAttr("AppendId", 0);
@@ -2203,6 +2203,7 @@ namespace RPADataCache
 
             xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
             xCfg.CreateIntAttr("FilterEmpty", 1);
+            xCfg.CreateIntAttr("SuppressCfg", 3);
             xCfg.CreateIntAttr("SuppressMessage", 3);
             xCfg.CreateIntAttr("PrintCols", 0);
             xCfg.CreateBooleanAttr("NoTreeLines", true);

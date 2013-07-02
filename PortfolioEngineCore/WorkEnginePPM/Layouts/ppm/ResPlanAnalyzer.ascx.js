@@ -56,39 +56,46 @@
 
 
 	ResPlanAnalyzer.prototype.OnResize = function (event) {
-		if (this.initialized == true) {
-			//var toolbarDataObjectDiv = document.getElementById("toolbarDataObjectDiv");
-			var lHeight = this.Height;
-			var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
-			if (lHeight > 400) {
-				divLayout.style.height = (lHeight /*- toolbarDataObjectDiv.offsetHeight*/ - 12) + "px";
-
-				var lsplit = Math.floor((lHeight - 200) / 2);
-
-				if (this.TotMaxed == false) {
-			
-					this.layout.cells(this.mainArea).setHeight(lsplit - 12);
-
-					this.layout_totals.cells(this.totalsGridArea).setHeight(lsplit - 12);
-				}
-
-		}
-			var lWidth = this.Width;
-			if (lWidth > 300) {
-				divLayout.style.width = lWidth + "px";
-			}
-
-			this.layout.cont.obj._offsetTop = 0;
-			this.layout.cont.obj._offsetHeight = 0;
-			this.layout.cont.obj._offsetLeft = 0;
-			this.layout.cont.obj._offsetWidth = 0;
+	    if (this.initialized == true) {
+	        //var toolbarDataObjectDiv = document.getElementById("toolbarDataObjectDiv");
 
 
-			this.layout.setSizes();
-			
-			if (this.dlgEditTarget != null) 
-				this.dlgEditTarget.window("winEditTargetDlg").setDimension(this.Width, this.Height);
-		}
+	        if (this.Height == 0) {
+
+	            this.Width = document.documentElement.clientWidth;
+	            this.Height = document.documentElement.clientHeight;
+	        }
+	        var lHeight = this.Height;
+	        var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
+	        if (lHeight > 400) {
+	            divLayout.style.height = (lHeight /*- toolbarDataObjectDiv.offsetHeight*/ - 12) + "px";
+
+	            var lsplit = Math.floor((lHeight - 200) / 2);
+
+	            if (this.TotMaxed == false) {
+
+	                this.layout.cells(this.mainArea).setHeight(lsplit - 12);
+
+	                this.layout_totals.cells(this.totalsGridArea).setHeight(lsplit - 12);
+	            }
+
+	        }
+	        var lWidth = this.Width;
+	        if (lWidth > 300) {
+	            divLayout.style.width = lWidth + "px";
+	        }
+
+	        this.layout.cont.obj._offsetTop = 0;
+	        this.layout.cont.obj._offsetHeight = 0;
+	        this.layout.cont.obj._offsetLeft = 0;
+	        this.layout.cont.obj._offsetWidth = 0;
+
+
+	        this.layout.setSizes();
+
+	        if (this.dlgEditTarget != null)
+	            this.dlgEditTarget.window("winEditTargetDlg").setDimension(this.Width, this.Height);
+	    }
 	}
 
 
@@ -1932,7 +1939,7 @@
                             },
 							{
 							    items: [
-									{ type: "bigbutton", id: "idSaveScenario1", name: "Save<br/>Scenario", img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
+									{ type: "bigbutton", id: "idSaveScenario1", name: "Save<br/>Scenario", disabled: (this.fromresource == "1" ? false : true), img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
 								]
 							},
 							{
@@ -2058,7 +2065,7 @@
 							},
 							{
 							    items: [
-									{ type: "mediumbutton", id: "idTotCol", name: "Capacity<br/> Scenarios", img: "capscenariosl20x20.png", tooltip: "Capacity Scenarios", onclick: "dialogEvent('AnalyzerTab_CapScen');" }
+									{ type: "mediumbutton", id: "idTotCol", name: "Capacity<br/> Scenarios", disabled: (this.fromresource == "1" ? false : true), img: "capscenariosl20x20.png", tooltip: "Capacity Scenarios", onclick: "dialogEvent('AnalyzerTab_CapScen');" }
 								]
 							}
 						 ]
@@ -2234,7 +2241,7 @@
 	        this.Tabbar.setTabActive("tab_Display");
 
 
-	        if (this.analyzerCalID != this.CmtCal) {
+	        if (this.analyzerCalID != this.CmtCal || this.fromresource == "0") {
 
 	            this.analyzerTab.disableItem("idSaveScenario");
 	            this.viewTab.disableItem("idSaveScenario1");
@@ -4111,7 +4118,7 @@
 	            this.SaveScenDlg.enableAutoViewport(false);
 	            this.SaveScenDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 	            this.SaveScenDlg.setImagePath("/_layouts/ppm/images/");
-	            this.SaveScenDlg.createWindow("winSaveScenDlg", 20, 30, 300, 290);
+	            this.SaveScenDlg.createWindow("winSaveScenDlg", 20, 30, 300, 300);
 	            this.SaveScenDlg.window("winSaveScenDlg").setIcon("logo.ico", "logo.ico");
 	            this.SaveScenDlg.window("winSaveScenDlg").denyResize();
 	            this.SaveScenDlg.window("winSaveScenDlg").button("park").hide();
@@ -4179,50 +4186,55 @@
 
 	ResPlanAnalyzer.prototype.GoDoEdit = function () {
 
-		try {
+	    try {
 
-			var csname = this.SelectedCapScenText;
-			var csid = this.SelectedCapScen;
+	        var csname = this.SelectedCapScenText;
+	        var csid = this.SelectedCapScen;
 
-			if (this.dlgEditTarget == null) {
-				this.dlgEditTarget = new dhtmlXWindows();
-				this.dlgEditTarget.setSkin("dhx_web");
-				this.dlgEditTarget.enableAutoViewport(false);
-				this.dlgEditTarget.attachViewportTo(this.clientID + "mainDiv");
-				this.dlgEditTarget.setImagePath(this.imagePath);
+	        if (this.dlgEditTarget == null) {
+	            this.dlgEditTarget = new dhtmlXWindows();
+	            this.dlgEditTarget.setSkin("dhx_web");
+	            this.dlgEditTarget.enableAutoViewport(false);
+	            this.dlgEditTarget.attachViewportTo(this.clientID + "mainDiv");
+	            this.dlgEditTarget.setImagePath(this.imagePath);
 
-				this.dlgEditTarget.createWindow("winEditTargetDlg", 0, 0, this.Width, this.Height );
-				
-				//this.dlgEditTarget.createWindow("winEditTargetDlg", 20, 30, 655, 555);
+	            if (this.Width == 0) {
+	                this.Width = this.layout.cells(this.mainRibbonArea).getWidth();
+	                this.Height = this.layout.cells(this.mainRibbonArea).getHeight() + this.layout.cells(this.mainArea).getHeight() + this.layout.cells(this.totalsArea).getHeight();
+	            }
 
-				this.dlgEditTarget.window("winEditTargetDlg").setIcon("logo.ico", "logo.ico");
-				this.dlgEditTarget.window("winEditTargetDlg").allowMove();
-				this.dlgEditTarget.window("winEditTargetDlg").allowResize();
-				this.dlgEditTarget.window("winEditTargetDlg").setModal(true);
+	            this.dlgEditTarget.createWindow("winEditTargetDlg", 0, 0, this.Width, this.Height - 10);
 
-				this.dlgEditTarget.window("winEditTargetDlg").showHeader();
-				this.dlgEditTarget.window("winEditTargetDlg").progressOn();
-				this.dlgEditTarget.window("winEditTargetDlg").center();
+	            //	this.dlgEditTarget.createWindow("winEditTargetDlg", 20, 30, 655, 555);
+
+	            this.dlgEditTarget.window("winEditTargetDlg").setIcon("logo.ico", "logo.ico");
+	            this.dlgEditTarget.window("winEditTargetDlg").allowMove();
+	            this.dlgEditTarget.window("winEditTargetDlg").allowResize();
+	            this.dlgEditTarget.window("winEditTargetDlg").setModal(true);
+
+	            this.dlgEditTarget.window("winEditTargetDlg").showHeader();
+	            this.dlgEditTarget.window("winEditTargetDlg").progressOn();
+	            this.dlgEditTarget.window("winEditTargetDlg").center();
 
 
-				this.dlgEditTarget.window("winEditTargetDlg").setText("Edit Capacity Scenario : " + csname);
-				this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditCapScenDlg");
-				this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
-				this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
+	            this.dlgEditTarget.window("winEditTargetDlg").setText("Edit Capacity Scenario : " + csname);
+	            this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditCapScenDlg");
+	            this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
+	            this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
 
-				this.EditCSid = this.EditCapScen;
-				this.EditName = csname;
+	            this.EditCSid = this.EditCapScen;
+	            this.EditName = csname;
 
-				WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioData", csid, GetEditCSDataCompleteDelegate);
+	            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioData", csid, GetEditCSDataCompleteDelegate);
 
-			}
-			else
-				this.dlgEditTarget.window("winEditTargetDlg").show();
-		}
+	        }
+	        else
+	            this.dlgEditTarget.window("winEditTargetDlg").show();
+	    }
 
-		catch (e) {
-			alert("GoDoEdit");
-		}
+	    catch (e) {
+	        alert("GoDoEdit");
+	    }
 
 	}
 
@@ -4296,12 +4308,21 @@
 
 	    if (this.layout_CS == null) {
 	        this.layout_CS = new dhtmlXLayoutObject("idEditCS", "2E", "dhx_skyblue");
+
 	        this.layout_CS.cells(this.totalsRibbonArea).setText("Ribbon");
 	        this.layout_CS.cells(this.totalsGridArea).setText("Grid Area");
 	        this.layout_CS.cells(this.totalsRibbonArea).hideHeader();
 	        this.layout_CS.cells(this.totalsGridArea).hideHeader();
+	        //this.layout_CS.cells(this.totalsGridArea).setHeight(this.Height - 110);
 	        this.layout_CS.cells(this.totalsRibbonArea).setHeight(92);
 	        this.layout_CS.cells(this.totalsRibbonArea).fixSize(false, true);
+
+
+
+	        var parentObj = document.getElementById("idEditCS");
+	        parentObj.style.height = (this.Height - 53) + "px";
+	        this.layout_CS.setSizes();
+
 
 	        this.CSEditTab = new Ribbon(CSRibonData);
 	        this.CSEditTab.Render();
@@ -4317,6 +4338,15 @@
 
 	        this.layout_CS.cells(this.totalsGridArea).attachObject("idEditGridDiv");
 
+
+
+	    }
+	    else {
+
+	        var parentObj = document.getElementById("idEditCS");
+	        parentObj.style.height = (this.Height - 53) + "px";
+	        parentObj.style.width = (this.Width - 10) + "px";
+	        this.layout_CS.setSizes();
 	    }
 	    this.CSHourMode = true;
 
@@ -4328,6 +4358,9 @@
 	        this.CSEditTab.disableItem("LoadUpBtn");
 	    else if (this.CSRoleData.length == 0)
 	        this.CSEditTab.disableItem("LoadUpBtn");
+
+
+        this.CSEditTab.selectByValue("idCSEdit_SelMode", 1) 
 
 	    var sbDataxml = new StringBuilder();
 
@@ -4347,6 +4380,8 @@
 	    sb.append(" data_param_Dataxml='" + sbDataxml.toString() + "'");
 	    sb.append(" >");
 	    sb.append("</treegrid>");
+
+	    //	    this.layout_CS.setSizes();
 
 
 	    this.EditGrid = TreeGrid(sb.toString(), "idEditGridDiv", "et_1");
@@ -4679,16 +4714,19 @@
 
 	ResPlanAnalyzer.prototype.SaveCapacityScenarioDataComplete = function (jsonString) {
 
-		var jsonObject = JSON_ConvertString(jsonString);
-		if (JSON_ValidateServerResult(jsonObject)) {
+	    var jsonObject = JSON_ConvertString(jsonString);
+	    if (JSON_ValidateServerResult(jsonObject)) {
 
-			var CSDet = jsonObject.Result.CSID;
+	        var CSDet = jsonObject.Result.CSID;
 
-			this.EditCSid = CSDet.Value;
-			this.SelectedCapScen = CSDet.Value;
-			this.EditCapScen = CSDet.Value;
-			
-		}
+	        this.EditCSid = CSDet.Value;
+	        this.SelectedCapScen = CSDet.Value;
+	        this.EditCapScen = CSDet.Value;
+
+	    }
+
+
+	    alert("The Capacity Scenario has been saved.");
 	}
 
 
@@ -4857,6 +4895,9 @@
 	        switch (event) {
 
 	            case "AnalyzerTab_SaveScen":
+
+	                if (this.fromresource == "0")
+	                    break;
 
 	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", SaveCapacityScenarioListCompleteDelegate);
 	                break;
@@ -5374,10 +5415,10 @@
 	                this.AnalyzerDeleteViewDlg = null;
 	                break;
 
-	            //	            case "TEST":  
-	            //	                this.FromChangePeriods = true;  
-	            //	                this.GetCalendarInfoComplete(null);  
-	            //	                return;  
+	            //	            case "TEST":    
+	            //	                this.FromChangePeriods = true;    
+	            //	                this.GetCalendarInfoComplete(null);    
+	            //	                return;    
 
 
 	            case "AnalyzerTab_Close":
@@ -5485,6 +5526,8 @@
 
 
 	            case "AnalyzerTab_CapScen":
+	                if (this.fromresource == "0")
+	                    break;
 
 	                this.SelectedCapScen = 0;
 	                this.CSChanged = false;
@@ -5883,7 +5926,7 @@
 
 	                this.SelectedCapScenPrivate = document.getElementById("idNewCSPrivate").checked;
 
-	                
+
 	                var deptsel = document.getElementById("idNewCSDept");
 
 	                this.SelectedCapScenDept = deptsel.options[deptsel.selectedIndex].value;
@@ -5893,7 +5936,7 @@
 	                //      this.GoDoEdit(this.SelectedCapScen, document.getElementById("idTxtCapScenName").value);
 	                break;
 
-	            //  call webservice to edit                                                                       
+	            //  call webservice to edit                                                                         
 
 
 
@@ -5970,13 +6013,25 @@
 
 	            case "CSEdit_SelMode_Changed":
 
+                    var vl =  this.ribbonGetSelectValue("idCSEdit_SelMode");
+
 	                if (this.dlgSpreadDlg != null) {
 	                    this.dlgSpreadDlg.window("winSpreadDlg").setModal(false);
 	                    this.dlgSpreadDlg.window("winSpreadDlg").hide();
 	                    this.dlgSpreadDlg.window("winSpreadDlg").detachObject();
 	                    this.dlgSpreadDlg = null;
 	                }
-	                this.CSHourMode = (this.CSHourMode == false);
+
+
+                    if (vl == 1 && this.CSHourMode == true)
+                        break;
+
+                    if (vl == 2 && this.CSHourMode == false)
+                        break;
+
+
+
+ 	                this.CSHourMode = (this.CSHourMode == false);
 
 	                this.RedrawCSGrid();
 
@@ -6495,14 +6550,22 @@
 	ResPlanAnalyzer.prototype.EditResPlan = function () {
 
 
-		//       alert(document.URL);
-		var weburl = document.URL;
-		weburl = weburl.replace("rpanalyzer", "rpeditor");
-		//    weburl = "/_layouts/ppm/rpeditor.aspx?dataid=" + this.params.TicketVal + "&IsResource=" + this.fromresource       
+	    //       alert(document.URL);
+	    var weburl = document.URL;
+	    weburl = weburl.replace("rpanalyzer", "rpeditor");
 
-		var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: mycallback };
+	    if (this.fromresource == 1) {   
+	        if (weburl.indexOf("isresource=") == -1) {
+	            weburl += "&isresource=1";
+	        }
 
-		parent.SP.UI.ModalDialog.showModalDialog(options);
+	    }
+
+	    //    weburl = "/_layouts/ppm/rpeditor.aspx?dataid=" + this.params.TicketVal + "&IsResource=" + this.fromresource       
+
+	    var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: mycallback };
+
+	    parent.SP.UI.ModalDialog.showModalDialog(options);
 
 	}
 
