@@ -111,8 +111,8 @@ namespace EPMLiveCore.API
             finally
             {
                 ImportCompleted(this,
-                                new ImportCompletedEventHandlerArgs(exception, false, null, _masterLog.ToString(),
-                                                                    _processedResources));
+                    new ImportCompletedEventHandlerArgs(exception, false, null, _masterLog.ToString(),
+                        _processedResources));
             }
         }
 
@@ -211,10 +211,10 @@ namespace EPMLiveCore.API
                                     {
                                         IEnumerable<string> permissions =
                                             val.Split(',')
-                                               .Select(
-                                                   p =>
-                                                   lookupFieldDict["Permissions"][p.Trim()].ToString(
-                                                       CultureInfo.InvariantCulture));
+                                                .Select(
+                                                    p =>
+                                                        lookupFieldDict["Permissions"][p.Trim()].ToString(
+                                                            CultureInfo.InvariantCulture));
                                         value = string.Join(",", permissions.ToArray());
                                     }
 
@@ -264,7 +264,7 @@ namespace EPMLiveCore.API
                             catch (Exception e)
                             {
                                 string message = string.Format("Resource: {0} (ID: {1}). Field: {2} Error: {3}",
-                                                               row["Title"], row["ID"], col, e.Message);
+                                    row["Title"], row["ID"], col, e.Message);
                                 AddMasterLog(message, 2);
                             }
                         }
@@ -370,7 +370,7 @@ namespace EPMLiveCore.API
                     foreach (SPListItem spListItem in spListItemCollection)
                     {
                         lookupFieldDict[columnName].Add(spListItem[spFieldLookup.LookupField].ToString(),
-                                                        (int) spListItem["ID"]);
+                            (int) spListItem["ID"]);
                     }
                 }
                 catch
@@ -417,7 +417,7 @@ namespace EPMLiveCore.API
                     resource.Name = (string) row["Title"];
 
                     message = string.Format("Importing resource {1} of {2}: {0} . . .", resource.Name,
-                                            _processedResources.Count + 1, _totalResources);
+                        _processedResources.Count + 1, _totalResources);
 
                     AddMasterLog(message, false);
 
@@ -518,14 +518,20 @@ namespace EPMLiveCore.API
 
                     for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
                     {
-                        Cell cell = row.Descendants<Cell>().ElementAt(i);
+                        try
+                        {
+                            Cell cell = row.Descendants<Cell>().ElementAt(i);
 
-                        string columnName = fieldCellDict[GetCellReference(cell)];
-                        string value = GetCellValue(document, cell);
+                            string columnName = fieldCellDict[GetCellReference(cell)];
+                            string value = GetCellValue(document, cell);
 
-                        dataRow[columnName] = value;
+                            dataRow[columnName] = value;
 
-                        if (!string.IsNullOrEmpty(value)) isEmpty = false;
+                            if (!string.IsNullOrEmpty(value)) isEmpty = false;
+                        }
+                        catch
+                        {
+                        }
                     }
 
                     if (!isEmpty) _dtResources.Rows.Add(dataRow);
@@ -536,59 +542,62 @@ namespace EPMLiveCore.API
         private void ReportProgress()
         {
             ImportProgressChanged(this, new ImportProgressChangedEventHandlerArgs(
-                                            ProgressPercentage, new ResourceImporterState(
-                                                                    _step, _currentProcess, _masterLog.ToString(),
-                                                                    _processedResources)));
+                ProgressPercentage, new ResourceImporterState(
+                    _step, _currentProcess, _masterLog.ToString(),
+                    _processedResources)));
         }
 
         private void UpdateItem(DataRow row, ICollection<string> lockedColumns, SPList spList, SPListItem spListItem,
-                                bool isGeneric)
+            bool isGeneric)
         {
-            SPWeb spWeb = spList.ParentWeb;
-            SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
-
             foreach (
                 string columnName in
                     _dtResources.Columns.Cast<DataColumn>()
-                                .Select(c => c.ColumnName)
-                                .Where(c => !lockedColumns.Contains(c)))
+                        .Select(c => c.ColumnName)
+                        .Where(c => !lockedColumns.Contains(c)))
             {
-                object value = row[columnName];
-
-                string col = columnName.Replace(" ", "_x0020_");
-
-                if (value != null && value != DBNull.Value)
+                try
                 {
-                    string sValue = value.ToString();
-                    if (!string.IsNullOrEmpty(sValue))
+                    object value = row[columnName];
+
+                    string col = columnName.Replace(" ", "_x0020_");
+
+                    if (value != null && value != DBNull.Value)
                     {
-                        if (col.Equals("Title"))
+                        string sValue = value.ToString();
+                        if (!string.IsNullOrEmpty(sValue))
                         {
-                            value = sValue.Trim();
+                            if (col.Equals("Title"))
+                            {
+                                value = sValue.Trim();
+                            }
+                            else
+                            {
+                                SPField spField = spList.Fields.GetFieldByInternalName(col);
+                                if (spField.Type == SPFieldType.DateTime)
+                                {
+                                    value =
+                                        SPUtility.CreateISO8601DateTimeFromSystemDateTime(
+                                            ((DateTime) value).ToUniversalTime());
+                                }
+                            }
                         }
                         else
                         {
-                            SPField spField = spList.Fields.GetFieldByInternalName(col);
-                            if (spField.Type == SPFieldType.DateTime)
-                            {
-                                value =
-                                    SPUtility.CreateISO8601DateTimeFromSystemDateTime(
-                                        ((DateTime) value).ToUniversalTime());
-                            }
+                            value = null;
                         }
                     }
                     else
                     {
                         value = null;
                     }
-                }
-                else
-                {
-                    value = null;
-                }
 
-                spListItem[col] = value;
-                AddMasterLog(string.Format("{0}: {1}", columnName, value), 4);
+                    spListItem[col] = value;
+                    AddMasterLog(string.Format("{0}: {1}", columnName, value), 4);
+                }
+                catch
+                {
+                }
             }
 
             if (isGeneric) spListItem["Title"] = spListItem["Title"];
@@ -695,7 +704,7 @@ namespace EPMLiveCore.API
                     if (spListItem.ID != id)
                     {
                         string message = string.Format("{0} (ID: {1}) has the same email address.", spListItem.Title,
-                                                       spListItem.ID);
+                            spListItem.ID);
                         throw new Exception(message);
                     }
                 }
@@ -735,11 +744,11 @@ namespace EPMLiveCore.API
                 {
                     SPListItemCollection items =
                         resourcePool.GetItems(new SPQuery
-                            {
-                                Query =
-                                    string.Format(VALIDATE_ACCOUNT_QUERY,
-                                                  spFieldUserValue.User.ID)
-                            });
+                        {
+                            Query =
+                                string.Format(VALIDATE_ACCOUNT_QUERY,
+                                    spFieldUserValue.User.ID)
+                        });
 
                     if (items.Count > 0)
                     {
@@ -747,7 +756,7 @@ namespace EPMLiveCore.API
                         if (spListItem.ID != id)
                         {
                             string message = string.Format(@"{0} (ID: {1}) has the same SharePoint account.",
-                                                           spListItem.Title, spListItem.ID);
+                                spListItem.Title, spListItem.ID);
                             throw new Exception(message);
                         }
                     }
@@ -781,7 +790,7 @@ namespace EPMLiveCore.API
         public bool IsNew
         {
             get { return string.IsNullOrEmpty(Id); }
-            set { return; }
+            set { }
         }
 
         [DataMember]
@@ -842,7 +851,7 @@ namespace EPMLiveCore.API
         /// <param name="result">The result.</param>
         /// <param name="resources">The resources.</param>
         public ImportCompletedEventHandlerArgs(Exception error, bool cancelled, object userState,
-                                               string result, IList<ProcessedResource> resources)
+            string result, IList<ProcessedResource> resources)
             : base(error, cancelled, userState)
         {
             _result = result;
