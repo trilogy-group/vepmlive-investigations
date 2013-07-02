@@ -2669,6 +2669,13 @@ function onDoUpdates(dialogResult, returnValue)
 {
     if (dialogResult == SP.UI.DialogResult.OK) {
         sUpdates = returnValue;
+
+        var grid = Grids.WorkPlannerGrid;
+
+        if (grid.Cols["G"].GanttCorrectDependencies == 1) {
+            grid.ActionCorrectAllDependencies();
+        }
+
         CheckUpdatesBox();
     }
 }
