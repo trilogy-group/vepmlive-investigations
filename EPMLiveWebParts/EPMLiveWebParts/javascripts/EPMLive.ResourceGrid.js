@@ -18,6 +18,7 @@ function registerEpmLiveResourceGridScript() {
         $$.importInProgress = false;
         $$.webpartHeight = false;
         $$.userIsSiteAdmin = false;
+        $$.allSelected = false;
 
         $$.reports = {
             wcReportId: null,
@@ -110,11 +111,19 @@ function registerEpmLiveResourceGridScript() {
                                 var fldr = folder.Folder[j];
 
                                 if (fldr['@Name'] === '(2) Resource' || fldr['@Name'] === 'Resources') {
-                                    for (var l = 0; l < fldr.Report.length; l++) {
-                                        var report = fldr.Report[l];
-                                        var name = report['@Name'];
+                                    if (!fldr.Folder || !fldr.Folder.length) {
+                                        fldr.Folder = [fldr];
+                                    }
 
-                                        $$.reports.collection[$$$.md5(name)] = { name: name, url: report['@Url'], hasResourcesParam: report['@HasResourcesParam'] === 'True' };
+                                    for (var l = 0; l < fldr.Folder.length; l++) {
+                                        var fld = fldr.Folder[l];
+
+                                        for (var m = 0; m < fld.Report.length; m++) {
+                                            var report = fld.Report[m];
+                                            var name = report['@Name'];
+
+                                            $$.reports.collection[$$$.md5(name)] = { name: name, url: report['@Url'], hasResourcesParam: report['@HasResourcesParam'] === 'True' };
+                                        }
                                     }
 
                                     break;
@@ -1162,6 +1171,18 @@ function registerEpmLiveResourceGridScript() {
                 var grid = $$.grid.g();
 
                 var selectedRows = grid.GetSelRows();
+
+                if ($$.allSelected) {
+                    selectedRows = [];
+                    var rows = grid.Rows;
+
+                    for (var r in rows) {
+                        if (rows.hasOwnProperty(r)) {
+                            selectedRows.push(rows[r]);
+                        }
+                    }
+                }
+
                 var selectedRowIds = [];
 
                 for (var i = 0; i < selectedRows.length; i++) {
@@ -1741,6 +1762,8 @@ function registerEpmLiveResourceGridScript() {
                     g.Render();
                 }, 10);
             } else if (row.Kind === 'Header' && col === 'Panel') {
+                $$.allSelected = !$$.allSelected;
+
                 window.setTimeout(function () {
                     window.RefreshCommandUI();
                 }, 100);
