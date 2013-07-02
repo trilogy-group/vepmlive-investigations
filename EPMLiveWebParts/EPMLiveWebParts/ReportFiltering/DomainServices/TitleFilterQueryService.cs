@@ -110,7 +110,8 @@ namespace ReportFiltering.DomainServices
 
             if (userSettings.TitleSelections.Count < MaxLookupfilter && reportFilterField != string.Empty)
             {
-                titleFilterQuery = string.Format("<In><FieldRef Name=\"{0}\"/><Values>{1}</Values></In>", HttpUtility.HtmlEncode(reportFilterField), HttpUtility.HtmlEncode(filterValues.ToString()));
+                //titleFilterQuery = string.Format("<In><FieldRef Name=\"{0}\"/><Values>{1}</Values></In>", HttpUtility.HtmlEncode(reportFilterField), HttpUtility.HtmlEncode(filterValues.ToString()));
+                titleFilterQuery = string.Format("<In><FieldRef Name=\"{0}\"/><Values>{1}</Values></In>", HttpUtility.HtmlEncode(reportFilterField), filterValues.ToString());
             }
             return titleFilterQuery;
         }

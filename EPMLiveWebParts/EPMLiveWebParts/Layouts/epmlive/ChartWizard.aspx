@@ -48,7 +48,7 @@
                                 <asp:TextBox ID="tbSelectedListAndView" runat="server" style="height:24px;width:100%;padding-top:5px;padding-left:5px;padding-right:5px;" Enabled="false"></asp:TextBox>
                             </div>
                             <div style="float:right;width:12%">
-                                <input id="Button1" type="button" class="epmliveButton" style="height:35px;min-width:0px !important;width:100%;margin-left: 0px !important;"
+                                <input id="Button1" type="button" class="epmliveButton" style="height:35px;min-width:0px !important;width:100%;"
                                     onclick="OpenDataSourceGrid(); return false;" value="..." />
                             </div>
                         </div>

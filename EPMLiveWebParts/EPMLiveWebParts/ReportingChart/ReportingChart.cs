@@ -18,6 +18,8 @@ using Microsoft.SharePoint.WebPartPages;
 using Telerik.Web.UI;
 using EPMLiveCore.ReportingProxy;
 using System.Globalization;
+using System.Xml;
+using ReportFiltering.DomainServices;
 
 namespace EPMLiveWebParts.ReportingChart
 {
@@ -56,6 +58,7 @@ namespace EPMLiveWebParts.ReportingChart
 
         private List<string> XAxisLabels;
         private string YAxisLabel = string.Empty;
+        private IReportID _myProvider;
         #endregion
 
         #region Properties
@@ -71,6 +74,27 @@ namespace EPMLiveWebParts.ReportingChart
                 }
                 return result;
             }
+        }
+
+        private Guid _filterWebPartId
+        {
+            get
+            {
+                if (_myProvider != null)
+                {
+                    return new Guid(_myProvider.ReportID.Replace("g_", "").Replace("_", "-"));
+                }
+                else
+                {
+                    return Guid.Empty;
+                }
+            }
+        }
+
+        [ConnectionConsumer("Report ID Consumer", "ReportIDConsumer")]
+        public void ReportIDConsumer(IReportID Provider)
+        {
+            _myProvider = Provider;
         }
 
         [Category("Chart Control Properties")]
@@ -317,16 +341,20 @@ namespace EPMLiveWebParts.ReportingChart
         protected override void CreateChildControls()
         {
             AddControls();
-            ConfigureDisplayFormat();
-            BuildSeries();
-            BuildXAxisItemLabels();
-            BuildYAxisItemLabels();
+            //ConfigureDisplayFormat();
+            //BuildSeries();
+            //BuildXAxisItemLabels();
+            //BuildYAxisItemLabels();
         }
 
 
 
         public override void RenderControl(HtmlTextWriter writer)
         {
+            ConfigureDisplayFormat();
+            BuildSeries();
+            BuildXAxisItemLabels();
+            BuildYAxisItemLabels();
             base.RenderControl(writer);
 
             if (!string.IsNullOrEmpty(Width) && !string.IsNullOrEmpty(Height))
@@ -659,7 +687,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-            int intNoDataCt = 0;
+            //int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sArea = new AreaSeries();
@@ -704,13 +732,13 @@ namespace EPMLiveWebParts.ReportingChart
                 int ndct = (from SeriesItem si in sArea.Items
                             where si.YValue > 0
                             select si).Count();
-                intNoDataCt += ndct;
+                //intNoDataCt += ndct;
             }
 
-            if (intNoDataCt == 0)
-            {
-                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
-            }
+            //if (intNoDataCt == 0)
+            //{
+            //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            //}
         }
 
         private void BuildBarSeries()
@@ -721,7 +749,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-            int intNoDataCt = 0;
+            //int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sBar = new BarSeries();
@@ -762,13 +790,13 @@ namespace EPMLiveWebParts.ReportingChart
                 int ndct = (from SeriesItem si in sBar.Items
                             where si.YValue > 0
                             select si).Count();
-                intNoDataCt += ndct;
+                //intNoDataCt += ndct;
             }
 
-            if (intNoDataCt == 0)
-            {
-                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
-            }
+            //if (intNoDataCt == 0)
+            //{
+            //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            //}
         }
 
         private void BuildColumnSeries()
@@ -779,7 +807,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-            int intNoDataCt = 0;
+            //int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sCol = new ColumnSeries();
@@ -822,13 +850,13 @@ namespace EPMLiveWebParts.ReportingChart
                 int ndct = (from SeriesItem si in sCol.Items
                             where si.YValue > 0
                             select si).Count();
-                intNoDataCt += ndct;
+                //intNoDataCt += ndct;
             }
 
-            if (intNoDataCt == 0)
-            {
-                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
-            }
+            //if (intNoDataCt == 0)
+            //{  
+            //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            //}
         }
 
         private void BuildLineSeries()
@@ -839,7 +867,7 @@ namespace EPMLiveWebParts.ReportingChart
             KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
             int colorIndex = 0;
             Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
-            int intNoDataCt = 0;
+            //int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sLine = new LineSeries();
@@ -875,20 +903,20 @@ namespace EPMLiveWebParts.ReportingChart
                 int ndct = (from SeriesItem si in sLine.Items
                             where si.YValue > 0
                             select si).Count();
-                intNoDataCt += ndct;
+                //intNoDataCt += ndct;
             }
 
-            if (intNoDataCt == 0)
-            {
-                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
-            }
+            //if (intNoDataCt == 0)
+            //{
+            //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            //}
         }
 
         private void BuildPieSeries()
         {
             PieSeries sPie;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
-            int intNoDataCt = 0;
+            //int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sPie = new PieSeries();
@@ -907,17 +935,17 @@ namespace EPMLiveWebParts.ReportingChart
                 }
 
                 _radChart.PlotArea.Series.Add(sPie);
-                
+
                 int ndct = (from SeriesItem si in sPie.Items
                             where si.YValue > 0
                             select si).Count();
-                intNoDataCt += ndct;
+                //intNoDataCt += ndct;
             }
 
-            if (intNoDataCt == 0)
-            {
-                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
-            }
+            //if (intNoDataCt == 0)
+            //{
+            //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            //}
 
             _radChart.PlotArea.XAxis.MajorGridLines.Visible = false;
             _radChart.PlotArea.XAxis.MinorGridLines.Visible = false;
@@ -965,7 +993,7 @@ namespace EPMLiveWebParts.ReportingChart
         {
             BubbleSeries sBubble;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
-            int intNoDataCt = 0;
+            //int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sBubble = new BubbleSeries();
@@ -992,20 +1020,20 @@ namespace EPMLiveWebParts.ReportingChart
                 int ndct = (from SeriesItem si in sBubble.Items
                             where si.YValue > 0 && si.XValue > 0 && si.SizeValue > 0
                             select si).Count();
-                intNoDataCt += ndct;
+                //intNoDataCt += ndct;
             }
 
-            if (intNoDataCt == 0)
-            {
-                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
-            }
+            //if (intNoDataCt == 0)
+            //{
+            //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            //}
         }
 
         private void BuildDonutSeries()
         {
             DonutSeries sDonut;
             Dictionary<string, List<SeriesItem>> lListSeriesItems = GetSeriesItems();
-            int intNoDataCt = 0;
+            //int intNoDataCt = 0;
             foreach (KeyValuePair<string, List<SeriesItem>> list in lListSeriesItems)
             {
                 sDonut = new DonutSeries();
@@ -1032,13 +1060,13 @@ namespace EPMLiveWebParts.ReportingChart
                 int ndct = (from SeriesItem si in sDonut.Items
                             where si.YValue > 0
                             select si).Count();
-                intNoDataCt += ndct;
+                //intNoDataCt += ndct;
             }
 
-            if (intNoDataCt == 0)
-            {
-                _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
-            }
+            //if (intNoDataCt == 0)
+            //{
+            //    _radChart.ChartTitle.Text = (PropChartTitle + " (No data found)");
+            //}
 
             _radChart.PlotArea.XAxis.MajorGridLines.Visible = false;
             _radChart.PlotArea.XAxis.MinorGridLines.Visible = false;
@@ -1058,13 +1086,39 @@ namespace EPMLiveWebParts.ReportingChart
             string sQuery, sOrderBy = string.Empty;
             SPWeb w = SPContext.Current.Web;
             SPList l = w.Lists.TryGetList(PropChartSelectedListTitle);
-            sQuery = ReportingData.GetReportQuery(w, l, l.Views[PropChartSelectedViewTitle].Query, out sOrderBy);
-            // check if list actually exists in reporting db
-            if (!string.IsNullOrEmpty(sOrderBy) && !ColExistsInListReportingDB(sOrderBy, l.Title))
+            SPView v = null;
+            try
             {
-                sOrderBy = string.Empty;
+                v = l.Views[PropChartSelectedViewTitle];
             }
-            tbListData = ReportingData.GetReportingData(w, l.Title, false, sQuery, sOrderBy);
+            catch { }
+
+            if (ThisChartIsTiedToAReportFilter() && v != null)
+            {
+                string camlQuery = string.Empty;
+                string dbQuery = string.Empty;
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml("<Query>" + v.Query + "</Query>");
+                camlQuery = GetFilterQuery(l, doc);
+                camlQuery = camlQuery.Replace("<Query>", string.Empty).Replace("</Query>", string.Empty);
+                dbQuery = ReportingData.GetReportQuery(w, l, camlQuery, out sOrderBy);
+                // check if list actually exists in reporting db
+                if (!string.IsNullOrEmpty(sOrderBy) && !ColExistsInListReportingDB(sOrderBy, l.Title))
+                {
+                    sOrderBy = string.Empty;
+                }
+                tbListData = ReportingData.GetReportingData(w, l.Title, false, dbQuery, sOrderBy);
+            }
+            else if (v != null)
+            {
+                sQuery = ReportingData.GetReportQuery(w, l, v.Query, out sOrderBy);
+                // check if list actually exists in reporting db
+                if (!string.IsNullOrEmpty(sOrderBy) && !ColExistsInListReportingDB(sOrderBy, l.Title))
+                {
+                    sOrderBy = string.Empty;
+                }
+                tbListData = ReportingData.GetReportingData(w, l.Title, false, sQuery, sOrderBy);
+            }
 
             string sChartTypeVal = Enum.GetName(typeof(ChartType), PropChartType);
             string sAggType = PropChartAggregationType;
@@ -1162,6 +1216,29 @@ namespace EPMLiveWebParts.ReportingChart
 
 
         #region HELPER METHODS (GETTING SERIES ITEMS)
+
+        private string GetFilterQuery(SPList list, XmlDocument originalQuery)
+        {
+            if (ThisChartIsTiedToAReportFilter())
+            {
+                UpdateTheOriginalQueryToAlsoFilterTitles(list, ref originalQuery);
+            }
+
+            return originalQuery.InnerXml;
+        }
+
+        private bool ThisChartIsTiedToAReportFilter()
+        {
+            return _myProvider != null;
+        }
+
+        private string UpdateTheOriginalQueryToAlsoFilterTitles(SPList list, ref XmlDocument originalQuery)
+        {
+            var titleFilterQueryService = new TitleFilterQueryService();
+            titleFilterQueryService.MergeExistingQueryWithTitleQuery(list, _filterWebPartId, ref originalQuery);
+
+            return originalQuery.InnerXml;
+        }
 
         /// <summary>
         /// Get data for bubble graph.
