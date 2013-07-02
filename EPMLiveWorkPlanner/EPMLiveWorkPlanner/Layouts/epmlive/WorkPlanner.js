@@ -2575,7 +2575,7 @@ function Unlink() {
 
             for (var sD in sDs) {
                 var rId = sDs[sD];
-                var iRow = grid.GetRowById(rId);
+                var iRow = grid.GetRowById(parseFloat(rId));
                 if(iRow)
                     grid.SetValue(iRow, "Predecessors", RemovePred(grid, iRow, rows[i].id), 1);
             }

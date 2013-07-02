@@ -516,6 +516,21 @@
 	                            </Template_InputFormControls>
                             </wssuc:InputFormSection>
 
+                        <wssuc:InputFormSection Title="Enforce Start as Soon as Possible"
+	                            Description=""
+	                            runat="server">
+	                            <Template_Description>
+                                    With this enabled, all tasks will start as soon as possible and will lock all tasks to the start date of the project or to their successors.
+	                            </Template_Description>
+	                            <Template_InputFormControls>
+		                            <wssuc:InputFormControl LabelText="" runat="server">
+			                             <Template_Control>
+			                               <asp:CheckBox runat="server" ID="chkStartSoon" /> Enable Start as Soon as Possible
+			                             </Template_Control>
+		                            </wssuc:InputFormControl>
+	                            </Template_InputFormControls>
+                            </wssuc:InputFormSection>
+
                         <wssuc:InputFormSection Title="Select Statusing Method"
 	                        Description=""
 	                        runat="server">

@@ -79,7 +79,7 @@ namespace EPMLiveWorkPlanner
 
                         filltasklist(web);
                         //fillbackloglist(web);
-
+                        statusfields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "StatusFields");
                         try
                         {
                             bool c = false;
@@ -200,6 +200,11 @@ namespace EPMLiveWorkPlanner
                         try
                         {
                             chkLinking.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableLink"));
+                        }
+                        catch { }
+                        try
+                        {
+                            chkStartSoon.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "StartSoon"));
                         }
                         catch { }
                     }
@@ -435,6 +440,7 @@ namespace EPMLiveWorkPlanner
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "LunchEnd", ddlLunchEnd.SelectedValue);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "DisablePC", chkDisableParentChild.Checked.ToString());
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "EnableLink", chkLinking.Checked.ToString());
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "StartSoon", chkStartSoon.Checked.ToString());
 
                     if(chkAgilePlanner.Checked)
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "AgileIterationField", ddlAgileContentType.SelectedValue);
