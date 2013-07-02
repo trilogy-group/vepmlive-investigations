@@ -60,41 +60,53 @@ namespace EPMLiveCore
                         NameValueCollection nv = HttpUtility.ParseQueryString(Page.Request.UrlReferrer.Query);
                         StringBuilder sbUrl = new StringBuilder();
 
-                        foreach(string key in nv.AllKeys)
+
+                        bool bPersonal = false;
+                        try
                         {
-                            if(isValidQS(key))
-                            {
-                                sbUrl.Append("&");
-                                sbUrl.Append(key);
-                                sbUrl.Append("=");
-                                sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
-                            }
+                            if(nv["PageView"] == "Personal")
+                                bPersonal = true;
                         }
+                        catch { }
 
-                        foreach(Control item in base.MenuTemplateControl.Controls)
+                        if (!bPersonal)
                         {
-                            try
+                            foreach (string key in nv.AllKeys)
                             {
-                                if((item is MenuItemTemplate) && (View.ParentList.Views[((MenuItemTemplate)item).Text]) != null)
-
-                                    if(featureEnabled)
-                                    {
-                                        item.Visible = UserCanSeeView(View.ParentList.Views[((MenuItemTemplate)item).Text].Url, roleProperties);
-                                    }
-
-                                Microsoft.SharePoint.WebControls.MenuItemTemplate mn = (Microsoft.SharePoint.WebControls.MenuItemTemplate)item;
-                                string sDoc = System.IO.Path.GetFileName(mn.ClientOnClickNavigateUrl);
-
-                                if(!sDoc.Contains("ViewEdit.aspx?") && !sDoc.Contains("ViewType.aspx?"))
+                                if (isValidQS(key))
                                 {
-                                    if(sbUrl.ToString() != "")
-                                    {
-                                        //mn.ClientOnClickScript = mn.ClientOnClickScript.Insert(mn.ClientOnClickScript.Length - 3, "?" + sbUrl.ToString().TrimStart('&'));
-                                        mn.ClientOnClickNavigateUrl += "?" + sbUrl.ToString().TrimStart('&');
-                                    }
+                                    sbUrl.Append("&");
+                                    sbUrl.Append(key);
+                                    sbUrl.Append("=");
+                                    sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
                                 }
                             }
-                            catch { }
+
+                            foreach (Control item in base.MenuTemplateControl.Controls)
+                            {
+                                try
+                                {
+                                    if ((item is MenuItemTemplate) && (View.ParentList.Views[((MenuItemTemplate)item).Text]) != null)
+
+                                        if (featureEnabled)
+                                        {
+                                            item.Visible = UserCanSeeView(View.ParentList.Views[((MenuItemTemplate)item).Text].Url, roleProperties);
+                                        }
+
+                                    Microsoft.SharePoint.WebControls.MenuItemTemplate mn = (Microsoft.SharePoint.WebControls.MenuItemTemplate)item;
+                                    string sDoc = System.IO.Path.GetFileName(mn.ClientOnClickNavigateUrl);
+
+                                    if (!sDoc.Contains("ViewEdit.aspx?") && !sDoc.Contains("ViewType.aspx?"))
+                                    {
+                                        if (sbUrl.ToString() != "")
+                                        {
+                                            //mn.ClientOnClickScript = mn.ClientOnClickScript.Insert(mn.ClientOnClickScript.Length - 3, "?" + sbUrl.ToString().TrimStart('&'));
+                                            mn.ClientOnClickNavigateUrl += "?" + sbUrl.ToString().TrimStart('&');
+                                        }
+                                    }
+                                }
+                                catch { }
+                            }
                         }
                     }
                     catch { }
