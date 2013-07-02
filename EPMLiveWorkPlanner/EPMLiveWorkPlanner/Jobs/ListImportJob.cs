@@ -68,14 +68,14 @@ namespace EPMLiveWorkPlanner
                 try
                 {
                     XmlNode ndColumns = docNew.FirstChild.SelectSingleNode("Columns");
-                    foreach(XmlNode ndField in ndColumns.SelectNodes("Column"))
+                    foreach (XmlNode ndField in ndColumns.SelectNodes("Column"))
                     {
                         string ListField = getAttribute(ndField, "ListField");
                         string PlannerField = getAttribute(ndField, "PlannerField");
 
-                        if(ListField != "" && PlannerField != "")
+                        if (ListField != "" && PlannerField != "")
                         {
-                            if(!hshMapping.ContainsKey(ListField) && !hshMapping.ContainsValue(PlannerField))
+                            if (!hshMapping.ContainsKey(ListField) && !hshMapping.ContainsValue(PlannerField))
                             {
                                 hshMapping.Add(ListField, PlannerField);
                             }
@@ -84,17 +84,17 @@ namespace EPMLiveWorkPlanner
                 }
                 catch { }
 
-                if(sPlanner == "")
+                if (sPlanner == "")
                 {
                     bErrors = true;
                     sErrors = "No Planner Specified";
                 }
-                else if(sID == "")
+                else if (sID == "")
                 {
                     bErrors = true;
                     sErrors = "No ID Specified";
                 }
-                else if(sList == "")
+                else if (sList == "")
                 {
                     bErrors = true;
                     sErrors = "No List Specified";
@@ -104,7 +104,7 @@ namespace EPMLiveWorkPlanner
 
                     SPList oList = oweb.Lists.TryGetList(sList);
 
-                    if(oList != null)
+                    if (oList != null)
                     {
                         WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(oweb, sPlanner);
 
@@ -114,7 +114,7 @@ namespace EPMLiveWorkPlanner
 
                         bool bMatchingTaskCenter = false;
 
-                        if(oList.Title.ToLower() == props.sListTaskCenter.ToLower())
+                        if (oList.Title.ToLower() == props.sListTaskCenter.ToLower())
                             bMatchingTaskCenter = true;
 
                         XmlDocument docPlanInfo = new XmlDocument();
@@ -123,10 +123,13 @@ namespace EPMLiveWorkPlanner
                         XmlDocument docPlan = new XmlDocument();
                         docPlan.LoadXml(WorkPlannerAPI.GetTasks(docPlanInfo, oweb));
 
-                        if(bAttachedItemsOnly)
+                        if (bAttachedItemsOnly)
                         {
                             SPQuery query = new SPQuery();
                             query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + sID + "</Value></Eq></Where>";
+
+                            if (oList.Fields.ContainsField("taskorder"))
+                                query.Query += "<OrderBy><FieldRef Name='taskorder'/></OrderBy>";
 
                             ImportTasksFromListTasks(oList.GetItems(query), docNew, hshMapping, dsResources, bMatchingTaskCenter, docPlan);
                         }
@@ -138,7 +141,7 @@ namespace EPMLiveWorkPlanner
                         XmlDocument docRet = new XmlDocument();
                         docRet.LoadXml(WorkPlannerAPI.ImportTasks(docNew, oweb));
 
-                        if(docRet.FirstChild.Attributes["Status"].Value == "1")
+                        if (docRet.FirstChild.Attributes["Status"].Value == "1")
                         {
                             bErrors = true;
                         }
@@ -152,7 +155,7 @@ namespace EPMLiveWorkPlanner
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 bErrors = true;
                 sErrors = "Error importing list: " + ex.Message + "";
@@ -164,7 +167,7 @@ namespace EPMLiveWorkPlanner
         {
             base.totalCount = lic.Count;
             float cnt = 0;
-            foreach(SPListItem li in lic)
+            foreach (SPListItem li in lic)
             {
 
                 //if(bMatchingTaskCenter)
@@ -202,11 +205,11 @@ namespace EPMLiveWorkPlanner
 
             ArrayList arrAssn = new ArrayList();
 
-            foreach(SPField field in li.ParentList.Fields)
+            foreach (SPField field in li.ParentList.Fields)
             {
-                if(field.Reorderable)
+                if (field.Reorderable)
                 {
-                    if(hshMapping.ContainsKey(field.InternalName))
+                    if (hshMapping.ContainsKey(field.InternalName))
                     {
                         attr = docNew.CreateAttribute(hshMapping[field.InternalName].ToString());
                         attr.Value = getFieldValue(li, field, dsResources);
@@ -229,7 +232,7 @@ namespace EPMLiveWorkPlanner
             string val = "";
             try
             {
-                switch(oField.Type)
+                switch (oField.Type)
                 {
                     case SPFieldType.DateTime:
                         try
@@ -240,10 +243,10 @@ namespace EPMLiveWorkPlanner
                         break;
                     case SPFieldType.User:
                         SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, li[oField.Id].ToString());
-                        foreach(SPFieldUserValue uv in uvc)
+                        foreach (SPFieldUserValue uv in uvc)
                         {
                             DataRow[] dr = dsResources.Tables[2].Select("SPAccountInfo = '" + uv.ToString() + "'");
-                            if(dr.Length > 0)
+                            if (dr.Length > 0)
                             {
                                 val += ";" + dr[0]["ID"].ToString();
                             }
@@ -259,7 +262,7 @@ namespace EPMLiveWorkPlanner
                         break;
                     case SPFieldType.Calculated:
                         SPFieldCalculated c = (SPFieldCalculated)oField;
-                        switch(c.OutputType)
+                        switch (c.OutputType)
                         {
                             case SPFieldType.Number:
                             case SPFieldType.Currency:
@@ -273,12 +276,13 @@ namespace EPMLiveWorkPlanner
                         break;
                     case SPFieldType.Number:
                         SPFieldNumber num = (SPFieldNumber)oField;
-                        if(num.ShowAsPercentage)
+                        if (num.ShowAsPercentage)
                         {
                             try
                             {
                                 val = (float.Parse(li[oField.Id].ToString()) * 100).ToString();
-                            }catch{val = li[oField.Id].ToString();}
+                            }
+                            catch { val = li[oField.Id].ToString(); }
 
                         }
                         else
@@ -293,7 +297,7 @@ namespace EPMLiveWorkPlanner
                         try
                         {
                             SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(li[oField.Id].ToString());
-                            foreach(SPFieldLookupValue uv in lvc)
+                            foreach (SPFieldLookupValue uv in lvc)
                             {
                                 val += ";" + uv.LookupId;
                             }
@@ -304,7 +308,7 @@ namespace EPMLiveWorkPlanner
                     case SPFieldType.Boolean:
                         try
                         {
-                            if(li[oField.Id].ToString().ToLower() == "true")
+                            if (li[oField.Id].ToString().ToLower() == "true")
                                 val = "1";
                             else
                                 val = "0";
@@ -317,7 +321,7 @@ namespace EPMLiveWorkPlanner
 
                 };
 
-                if(oField.Description == "Indicator")
+                if (oField.Description == "Indicator")
                 {
                     string url = li.ParentList.ParentWeb.ServerRelativeUrl;
                     val = "<img src=\"" + ((url == "/") ? "" : url) + "/_layouts/images/" + val + "\">";
