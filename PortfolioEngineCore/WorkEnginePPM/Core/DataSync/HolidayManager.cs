@@ -15,7 +15,7 @@ namespace WorkEnginePPM.Core.DataSync
         #region Constructors (1) 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HolidayManager"/> class.
+        ///     Initializes a new instance of the <see cref="HolidayManager" /> class.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
         public HolidayManager(SPWeb spWeb)
@@ -30,7 +30,7 @@ namespace WorkEnginePPM.Core.DataSync
         // Public Methods (4) 
 
         /// <summary>
-        /// Adds the PFE holidays.
+        ///     Adds the PFE holidays.
         /// </summary>
         /// <param name="properties">The properties.</param>
         public void AddPFEHolidays(SPItemEventProperties properties)
@@ -42,9 +42,14 @@ namespace WorkEnginePPM.Core.DataSync
             {
                 try
                 {
-                    holidayDate = ((string) ((properties.AfterProperties["Date"] ?? properties.ListItem["Date"]))).Split('T')[0];
+                    holidayDate =
+                        ((string)
+                            ((properties.AfterProperties["Date"] ??
+                              ((DateTime) properties.ListItem["Date"]).ToString("s")))).Split('T')[0];
                 }
-                catch { }
+                catch
+                {
+                }
             }
 
             SPList holidaySchedulesList = Web.Lists["Holiday Schedules"];
@@ -52,7 +57,8 @@ namespace WorkEnginePPM.Core.DataSync
 
             List<HolidaySchedule> existingHolidaySchedules = GetExistingHolidaySchedules(holidaySchedulesList.Items);
             List<Holiday> existingHolidays =
-                existingHolidaySchedules.SelectMany(existingHolidaySchedule => existingHolidaySchedule.Holidays).ToList();
+                existingHolidaySchedules.SelectMany(existingHolidaySchedule => existingHolidaySchedule.Holidays)
+                    .ToList();
 
             XDocument responseXml;
 
@@ -60,14 +66,6 @@ namespace WorkEnginePPM.Core.DataSync
             {
                 responseXml = XDocument.Parse(portfolioEngineAPI.Execute("GetHolidaySchedules", string.Empty));
             }
-
-            var title = string.Empty;
-
-            try
-            {
-                title = properties.ListItem.Title;
-            }
-            catch { }
 
             foreach (XElement hsElement in responseXml.Descendants("HolidaySchedule"))
             {
@@ -77,14 +75,14 @@ namespace WorkEnginePPM.Core.DataSync
                 HolidaySchedule holidaySchedule =
                     (from hs in existingHolidaySchedules where hs.Title.Equals(hsTitle) select hs).FirstOrDefault();
 
-                if (holidaySchedule == null || !holidaySchedule.Title.ToLower().Equals(title.ToLower()))
+                if (holidaySchedule == null)
                 {
                     var schedule = new HolidaySchedule
-                                       {
-                                           Title = hsTitle,
-                                           ExtId = hsId,
-                                           Holidays = new List<Holiday>()
-                                       };
+                    {
+                        Title = hsTitle,
+                        ExtId = hsId,
+                        Holidays = new List<Holiday>()
+                    };
 
                     using (new DisabledItemEventScope())
                     {
@@ -100,17 +98,19 @@ namespace WorkEnginePPM.Core.DataSync
                         foreach (XElement hElement in hsElement.Descendants("Holiday"))
                         {
                             var holiday = new Holiday
-                                              {
-                                                  Title = hElement.Attribute("Title").Value,
-                                                  Date = hElement.Attribute("Date").Value,
-                                                  Hours = Convert.ToDouble(hElement.Attribute("Hours").Value)
-                                              };
+                            {
+                                Title = hElement.Attribute("Title").Value,
+                                Date = hElement.Attribute("Date").Value,
+                                Hours = Convert.ToDouble(hElement.Attribute("Hours").Value)
+                            };
 
                             try
                             {
                                 if (holiday.Hours == 24) holiday.Hours = 8;
                             }
-                            catch { }
+                            catch
+                            {
+                            }
 
                             SPListItem listItem = holidaysList.AddItem();
 
@@ -133,13 +133,13 @@ namespace WorkEnginePPM.Core.DataSync
                 }
 
                 foreach (XElement hElement in from hElement in hsElement.Descendants("Holiday")
-                                              let hldy = (from h in existingHolidays
-                                                          let d1 = DateTime.Parse(h.Date)
-                                                          let d2 = DateTime.Parse(hElement.Attribute("Date").Value)
-                                                          where d1.Date == d2.Date
-                                                          select h).FirstOrDefault()
-                                              where hldy == null
-                                              select hElement)
+                    let hldy = (from h in existingHolidays
+                        let d1 = DateTime.Parse(h.Date)
+                        let d2 = DateTime.Parse(hElement.Attribute("Date").Value)
+                        where d1.Date == d2.Date
+                        select h).FirstOrDefault()
+                    where hldy == null
+                    select hElement)
                 {
                     string date = hElement.Attribute("Date").Value;
 
@@ -148,17 +148,19 @@ namespace WorkEnginePPM.Core.DataSync
                     using (new DisabledItemEventScope())
                     {
                         var holiday = new Holiday
-                                          {
-                                              Title = hElement.Attribute("Title").Value,
-                                              Date = date,
-                                              Hours = Convert.ToDouble(hElement.Attribute("Hours").Value)
-                                          };
+                        {
+                            Title = hElement.Attribute("Title").Value,
+                            Date = date,
+                            Hours = Convert.ToDouble(hElement.Attribute("Hours").Value)
+                        };
 
                         try
                         {
                             if (holiday.Hours == 24) holiday.Hours = 8;
                         }
-                        catch { }
+                        catch
+                        {
+                        }
 
                         SPListItem listItem = holidaysList.AddItem();
 
@@ -166,7 +168,7 @@ namespace WorkEnginePPM.Core.DataSync
                         listItem["Date"] = holiday.Date;
                         listItem["Hours"] = holiday.Hours;
                         listItem["HolidaySchedule"] = new SPFieldLookupValue((int) holidaySchedule.Id,
-                                                                             holidaySchedule.Title);
+                            holidaySchedule.Title);
 
                         listItem.SystemUpdate();
 
@@ -180,20 +182,20 @@ namespace WorkEnginePPM.Core.DataSync
         }
 
         /// <summary>
-        /// Deletes the schedule.
+        ///     Deletes the schedule.
         /// </summary>
         /// <param name="holidaySchedule">The holiday schedule.</param>
         /// <returns></returns>
         public bool DeleteSchedule(HolidaySchedule holidaySchedule)
         {
             var request = new XElement("DeleteHolidaySchedules", new XElement("Params"),
-                                       new XElement("Data",
-                                                    new XElement("HolidaySchedule",
-                                                                 new XAttribute("Id", holidaySchedule.ExtId),
-                                                                 new XAttribute("ExtId",
-                                                                                (object) holidaySchedule.Id ??
-                                                                                string.Empty),
-                                                                 new XAttribute("DataId", holidaySchedule.UniqueId))));
+                new XElement("Data",
+                    new XElement("HolidaySchedule",
+                        new XAttribute("Id", holidaySchedule.ExtId),
+                        new XAttribute("ExtId",
+                            (object) holidaySchedule.Id ??
+                            string.Empty),
+                        new XAttribute("DataId", holidaySchedule.UniqueId))));
 
             using (var portfolioEngineAPI = new PortfolioEngineAPI(Web))
             {
@@ -209,7 +211,7 @@ namespace WorkEnginePPM.Core.DataSync
         }
 
         /// <summary>
-        /// Gets the existing holiday schedules.
+        ///     Gets the existing holiday schedules.
         /// </summary>
         /// <param name="spListItemCollection">The sp list item collection.</param>
         /// <returns></returns>
@@ -238,9 +240,9 @@ namespace WorkEnginePPM.Core.DataSync
             foreach (SPListItem spListItem in listItemCollection)
             {
                 dataTable.Rows.Add(spListItem.ID, spListItem["Title"],
-                                   ((DateTime) spListItem["Date"]).ToString("yyyy-MM-dd"),
-                                   spListItem["Hours"], spListItem.UniqueId,
-                                   new SPFieldLookupValue((string) spListItem["HolidaySchedule"]).LookupId);
+                    ((DateTime) spListItem["Date"]).ToString("yyyy-MM-dd"),
+                    spListItem["Hours"], spListItem.UniqueId,
+                    new SPFieldLookupValue((string) spListItem["HolidaySchedule"]).LookupId);
             }
 
             foreach (SPListItem spListItem in spListItemCollection)
@@ -257,23 +259,23 @@ namespace WorkEnginePPM.Core.DataSync
                 {
                     List<Holiday> holidays = dataTable.Select(string.Format("ScheduleId = {0}", id))
                         .Select(dataRow => new Holiday
-                                               {
-                                                   Id = (int) dataRow["Id"],
-                                                   Title = (string) dataRow["Title"],
-                                                   Date = (string) dataRow["Date"],
-                                                   Hours = (double) dataRow["Hours"],
-                                                   UniqueId = (Guid) dataRow["UniqueId"]
-                                               }).ToList();
+                        {
+                            Id = (int) dataRow["Id"],
+                            Title = (string) dataRow["Title"],
+                            Date = (string) dataRow["Date"],
+                            Hours = (double) dataRow["Hours"],
+                            UniqueId = (Guid) dataRow["UniqueId"]
+                        }).ToList();
 
                     holidaySchedules.Add(new HolidaySchedule
-                                             {
-                                                 Id = id,
-                                                 Title = (string) title,
-                                                 IsDefault = bool.Parse((spListItem["IsDefault"] ?? false).ToString()),
-                                                 ExtId = (string) spListItem["EXTID"],
-                                                 UniqueId = spListItem.UniqueId,
-                                                 Holidays = holidays
-                                             });
+                    {
+                        Id = id,
+                        Title = (string) title,
+                        IsDefault = bool.Parse((spListItem["IsDefault"] ?? false).ToString()),
+                        ExtId = (string) spListItem["EXTID"],
+                        UniqueId = spListItem.UniqueId,
+                        Holidays = holidays
+                    });
                 }
             }
 
@@ -283,7 +285,7 @@ namespace WorkEnginePPM.Core.DataSync
         }
 
         /// <summary>
-        /// Synchronizes the specified holiday schedules.
+        ///     Synchronizes the specified holiday schedules.
         /// </summary>
         /// <param name="holidaySchedules">The holiday schedules.</param>
         /// <returns></returns>
@@ -294,19 +296,19 @@ namespace WorkEnginePPM.Core.DataSync
             foreach (HolidaySchedule holidaySchedule in holidaySchedules)
             {
                 var holidayScheduleElement = new XElement("HolidaySchedule",
-                                                          new XAttribute("Id", holidaySchedule.ExtId ?? string.Empty),
-                                                          new XAttribute("Title", holidaySchedule.Title),
-                                                          new XAttribute("Default",
-                                                                         holidaySchedule.IsDefault ? "1" : "0"),
-                                                          new XAttribute("ExtId",
-                                                                         (object) (holidaySchedule.Id) ?? string.Empty),
-                                                          new XAttribute("DataId", holidaySchedule.UniqueId));
+                    new XAttribute("Id", holidaySchedule.ExtId ?? string.Empty),
+                    new XAttribute("Title", holidaySchedule.Title),
+                    new XAttribute("Default",
+                        holidaySchedule.IsDefault ? "1" : "0"),
+                    new XAttribute("ExtId",
+                        (object) (holidaySchedule.Id) ?? string.Empty),
+                    new XAttribute("DataId", holidaySchedule.UniqueId));
 
                 foreach (Holiday holiday in holidaySchedule.Holidays)
                 {
                     holidayScheduleElement.Add(new XElement("Holiday", new XAttribute("Date", holiday.Date),
-                                                            new XAttribute("Title", holiday.Title),
-                                                            new XAttribute("Hours", holiday.Hours)));
+                        new XAttribute("Title", holiday.Title),
+                        new XAttribute("Hours", holiday.Hours)));
                 }
 
                 dataElement.Add(holidayScheduleElement);

@@ -10,7 +10,7 @@ using WorkEnginePPM.Core.Entities;
 namespace WorkEnginePPM.Events.DataSync
 {
     /// <summary>
-    /// List Item Events
+    ///     List Item Events
     /// </summary>
     public class HolidaySyncEvent : SPItemEventReceiver
     {
@@ -19,7 +19,7 @@ namespace WorkEnginePPM.Events.DataSync
         // Public Methods (3) 
 
         /// <summary>
-        /// An item is being added.
+        ///     An item is being added.
         /// </summary>
         public override void ItemAdding(SPItemEventProperties properties)
         {
@@ -39,12 +39,12 @@ namespace WorkEnginePPM.Events.DataSync
                 Guid uniqueId = Guid.NewGuid();
 
                 var newHoliday = new Holiday
-                                     {
-                                         Title = (string) title,
-                                         Date = (string) date,
-                                         Hours = (double) hours,
-                                         UniqueId = uniqueId
-                                     };
+                {
+                    Title = (string) title,
+                    Date = (string) date,
+                    Hours = (double) hours,
+                    UniqueId = uniqueId
+                };
 
                 int newHolidayScheduleId = new SPFieldLookupValue((string) schedule).LookupId;
 
@@ -78,7 +78,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being deleted.
+        ///     An item is being deleted.
         /// </summary>
         public override void ItemDeleting(SPItemEventProperties properties)
         {
@@ -137,7 +137,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being updated.
+        ///     An item is being updated.
         /// </summary>
         public override void ItemUpdating(SPItemEventProperties properties)
         {
@@ -223,7 +223,7 @@ namespace WorkEnginePPM.Events.DataSync
         // Private Methods (2) 
 
         /// <summary>
-        /// Gets the field values.
+        ///     Gets the field values.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="schedule">The schedule.</param>
@@ -231,7 +231,7 @@ namespace WorkEnginePPM.Events.DataSync
         /// <param name="title">The title.</param>
         /// <param name="date">The date.</param>
         private void GetFieldValues(SPItemEventProperties properties, out object schedule, out object hours,
-                                    out object title, out object date)
+            out object title, out object date)
         {
             title = properties.AfterProperties["Title"] ?? properties.ListItem["Title"];
             date = properties.AfterProperties["Date"] ?? properties.ListItem["Date"];
@@ -244,12 +244,11 @@ namespace WorkEnginePPM.Events.DataSync
             if (schedule == null) throw new Exception("Please select a holiday schedule.");
 
             hours = double.Parse(hours.ToString());
-
-            date = ((string) date).Split('T')[0];
+            date = (date is string ? (string) date : ((DateTime) date).ToString("s")).Split('T')[0];
         }
 
         /// <summary>
-        /// Validates the request.
+        ///     Validates the request.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <returns></returns>

@@ -4,7 +4,6 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 using EPMLiveCore;
 using Microsoft.SharePoint;
@@ -20,7 +19,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         // Public Methods (6) 
 
         /// <summary>
-        /// Adds the update resource.
+        ///     Adds the update resource.
         /// </summary>
         /// <param name="fieldsTable">The fields table.</param>
         /// <param name="spWeb">The sp web.</param>
@@ -46,14 +45,14 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     {
                         bool proceed = false;
 
-                        var idRows = fieldsTable.Select("Id = 3013");
+                        DataRow[] idRows = fieldsTable.Select("Id = 3013");
                         if (idRows.Length == 0)
                         {
                             proceed = true;
                         }
                         else
                         {
-                            var id = idRows[0]["Value"];
+                            object id = idRows[0]["Value"];
                             if (id == DBNull.Value || id == null)
                             {
                                 proceed = true;
@@ -69,9 +68,9 @@ namespace WorkEnginePPM.Core.ResourceManagement
                             long externalId = DateTime.Now.Ticks;
                             resourceElement.Add(new XAttribute("ExtId", externalId));
 
-                        resourceElement.Add(new XElement("Field", externalId,
-                                                         new XAttribute("Id", (int) PFEResourceField.ID)));
-                    }
+                            resourceElement.Add(new XElement("Field", externalId,
+                                new XAttribute("Id", (int) PFEResourceField.ID)));
+                        }
                     }
                     else
                     {
@@ -81,7 +80,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 else
                 {
                     resourceElement.Add(new XElement("Field", GetCleanFieldValue(spWeb, dataRow, rawValue),
-                                                     new XAttribute("Id", fieldId)));
+                        new XAttribute("Id", fieldId)));
                 }
             }
 
@@ -106,8 +105,8 @@ namespace WorkEnginePPM.Core.ResourceManagement
             {
                 XElement resultElement = responseRoot.Element("Result");
                 XAttribute statusAttribute = resultElement != null
-                                                 ? resultElement.Attribute("Status")
-                                                 : responseRoot.Attribute("Status");
+                    ? resultElement.Attribute("Status")
+                    : responseRoot.Attribute("Status");
 
                 if (statusAttribute != null && statusAttribute.Value.Equals("1") && statusAttribute.Parent != null)
                 {
@@ -144,12 +143,11 @@ namespace WorkEnginePPM.Core.ResourceManagement
         }
 
         /// <summary>
-        /// Builds the fields table.
+        ///     Builds the fields table.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="isNewResource">if set to <c>true</c> [is new resource].</param>
         /// <returns></returns>
-        /// 
         public static DataTable BuildFieldsTable(SPItemEventProperties properties, bool isNewResource)
         {
             bool isOnline = false;
@@ -174,6 +172,18 @@ namespace WorkEnginePPM.Core.ResourceManagement
             var defaultFields = new List<int>();
 
             SPFieldCollection spFieldCollection = properties.List.Fields;
+
+            SPFieldUserValue resourceUser = null;
+
+            try
+            {
+                resourceUser = new SPFieldUserValue(properties.Web,
+                    (string)
+                        (properties.AfterProperties["SharePointAccount"] ?? properties.ListItem["SharePointAccount"]));
+            }
+            catch
+            {
+            }
 
             foreach (SPField spField in spFieldCollection)
             {
@@ -220,7 +230,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                         {
                             value =
                                 (properties.AfterProperties[internalName] ?? properties.ListItem[internalName]) as
-                                string;
+                                    string;
                         }
 
                         value = value ?? string.Empty;
@@ -232,7 +242,9 @@ namespace WorkEnginePPM.Core.ResourceManagement
                         {
                             try
                             {
-                                bool canUse = spGroup.Roles.Cast<SPRole>().Any(spRole => spRole.PermissionMask != (SPRights) 134287360);
+                                bool canUse =
+                                    spGroup.Roles.Cast<SPRole>()
+                                        .Any(spRole => spRole.PermissionMask != (SPRights) 134287360);
 
                                 if (!spGroup.CanCurrentUserEditMembership || !canUse) continue;
 
@@ -248,11 +260,27 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                     }
                                     else
                                     {
-                                        list.Add(spGroup.Name + ":" + false);
+                                        try
+                                        {
+                                            if (spGroup.Users.GetByID(resourceUser.LookupId) != null)
+                                            {
+                                                list.Add(spGroup.Name + ":" + true);
+                                            }
+                                            else
+                                            {
+                                                list.Add(spGroup.Name + ":" + false);
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            list.Add(spGroup.Name + ":" + false);
+                                        }
                                     }
                                 }
                             }
-                            catch { }
+                            catch
+                            {
+                            }
                         }
 
                         currentValue = string.Join(",", list.ToArray());
@@ -323,7 +351,13 @@ namespace WorkEnginePPM.Core.ResourceManagement
             string resourceFields = string.Empty;
 
             SPSecurity.RunWithElevatedPrivileges(
-                () => { resourceFields = CoreFunctions.getConfigSetting(properties.OpenWeb(), "epkresourcefields"); });
+                () =>
+                {
+                    using (SPWeb spWeb = properties.OpenWeb())
+                    {
+                        resourceFields = CoreFunctions.getConfigSetting(spWeb, "epkresourcefields");
+                    }
+                });
 
             if (!string.IsNullOrEmpty(resourceFields))
             {
@@ -422,7 +456,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         }
 
         /// <summary>
-        /// Deletes the resource.
+        ///     Deletes the resource.
         /// </summary>
         /// <param name="extId">The ext id.</param>
         /// <param name="dataId">The data id.</param>
@@ -450,8 +484,8 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
             XElement resultElement = rootElement.Element("Result");
             XAttribute statusAttribute = resultElement != null
-                                             ? resultElement.Attribute("Status")
-                                             : rootElement.Attribute("Status");
+                ? resultElement.Attribute("Status")
+                : rootElement.Attribute("Status");
 
             if (statusAttribute != null && statusAttribute.Value.Equals("1") && statusAttribute.Parent != null)
             {
@@ -462,7 +496,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         }
 
         /// <summary>
-        /// Gets the clean field value.
+        ///     Gets the clean field value.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
         /// <param name="rawValue">The raw value.</param>
@@ -502,89 +536,89 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     }
                     break;
                 case SPFieldType.User:
+                {
+                    var spFieldUser = (SPFieldUser) spField;
+
+                    if (spFieldUser.AllowMultipleValues)
                     {
-                        var spFieldUser = (SPFieldUser) spField;
+                        var users = new List<string>();
 
-                        if (spFieldUser.AllowMultipleValues)
+                        SPFieldUserValueCollection spFieldUserValueCollection = null;
+
+                        if (rawValue is string)
                         {
-                            var users = new List<string>();
-
-                            SPFieldUserValueCollection spFieldUserValueCollection = null;
-
-                            if (rawValue is string)
-                            {
-                                spFieldUserValueCollection = new SPFieldUserValueCollection(spWeb, (string) rawValue);
-                            }
-                            else if (rawValue is SPFieldUserValueCollection)
-                            {
-                                spFieldUserValueCollection = (SPFieldUserValueCollection) rawValue;
-                            }
-
-                            if (spFieldUserValueCollection != null)
-                            {
-                                users.AddRange(
-                                    spFieldUserValueCollection.Select(
-                                        spFieldUserValue => GetUserName(spWeb, spFieldUserValue)));
-
-                                value = string.Join(",", users.ToArray());
-                            }
+                            spFieldUserValueCollection = new SPFieldUserValueCollection(spWeb, (string) rawValue);
                         }
-                        else
+                        else if (rawValue is SPFieldUserValueCollection)
                         {
-                            var spFieldUserValue = new SPFieldUserValue(spWeb, (string) rawValue);
+                            spFieldUserValueCollection = (SPFieldUserValueCollection) rawValue;
+                        }
 
-                            value = GetUserName(spWeb, spFieldUserValue);
+                        if (spFieldUserValueCollection != null)
+                        {
+                            users.AddRange(
+                                spFieldUserValueCollection.Select(
+                                    spFieldUserValue => GetUserName(spWeb, spFieldUserValue)));
+
+                            value = string.Join(",", users.ToArray());
                         }
                     }
+                    else
+                    {
+                        var spFieldUserValue = new SPFieldUserValue(spWeb, (string) rawValue);
+
+                        value = GetUserName(spWeb, spFieldUserValue);
+                    }
+                }
                     break;
                 case SPFieldType.Lookup:
+                {
+                    var spFieldLookup = (SPFieldLookup) spField;
+
+                    SPList spList = spWeb.Lists[new Guid(spFieldLookup.LookupList)];
+
+                    if (spFieldLookup.AllowMultipleValues)
                     {
-                        var spFieldLookup = (SPFieldLookup) spField;
+                        var fieldValue = (SPFieldLookupValueCollection) spField.GetFieldValue(rawValue.ToString());
 
-                        SPList spList = spWeb.Lists[new Guid(spFieldLookup.LookupList)];
-
-                        if (spFieldLookup.AllowMultipleValues)
+                        if (fieldValue != null)
                         {
-                            var fieldValue = (SPFieldLookupValueCollection) spField.GetFieldValue(rawValue.ToString());
+                            IEnumerable<int> lookupIds =
+                                fieldValue.Select(spFieldLookupValue => spFieldLookupValue.LookupId);
 
-                            if (fieldValue != null)
+                            SPListItemCollection spListItemCollection = spList.Items;
+
+                            IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
+                                .Where(spListItem => lookupIds.Contains((int) spListItem["ID"]))
+                                .Select(spListItem => spListItem["EXTID"].ToString());
+
+                            value = string.Join(",", values.ToArray());
+                        }
+                        else
+                        {
+                            value = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        var fieldValue = (SPFieldLookupValue) spField.GetFieldValue(rawValue.ToString());
+
+                        if (fieldValue != null)
+                        {
+                            SPListItemCollection spListItemCollection = spList.Items;
+
+                            foreach (SPListItem spListItem in spListItemCollection.Cast<SPListItem>()
+                                .Where(spListItem => (int) spListItem["ID"] == fieldValue.LookupId))
                             {
-                                IEnumerable<int> lookupIds =
-                                    fieldValue.Select(spFieldLookupValue => spFieldLookupValue.LookupId);
-
-                                SPListItemCollection spListItemCollection = spList.Items;
-
-                                IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
-                                    .Where(spListItem => lookupIds.Contains((int) spListItem["ID"]))
-                                    .Select(spListItem => spListItem["EXTID"].ToString());
-
-                                value = string.Join(",", values.ToArray());
-                            }
-                            else
-                            {
-                                value = string.Empty;
+                                value = spListItem["EXTID"].ToString();
                             }
                         }
                         else
                         {
-                            var fieldValue = (SPFieldLookupValue) spField.GetFieldValue(rawValue.ToString());
-
-                            if (fieldValue != null)
-                            {
-                                SPListItemCollection spListItemCollection = spList.Items;
-
-                                foreach (SPListItem spListItem in spListItemCollection.Cast<SPListItem>()
-                                    .Where(spListItem => (int) spListItem["ID"] == fieldValue.LookupId))
-                                {
-                                    value = spListItem["EXTID"].ToString();
-                                }
-                            }
-                            else
-                            {
-                                value = string.Empty;
-                            }
+                            value = string.Empty;
                         }
                     }
+                }
                     break;
             }
 
@@ -592,7 +626,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         }
 
         /// <summary>
-        /// Performs the delete resource check.
+        ///     Performs the delete resource check.
         /// </summary>
         /// <param name="extId">The ext id.</param>
         /// <param name="dataId">The data id.</param>
@@ -601,8 +635,8 @@ namespace WorkEnginePPM.Core.ResourceManagement
         /// <param name="deleteResourceCheckMessage">The delete resource check message.</param>
         /// <returns></returns>
         public static bool PerformDeleteResourceCheck(int extId, Guid dataId, SPWeb spWeb,
-                                                      out string deleteResourceCheckStatus,
-                                                      out string deleteResourceCheckMessage)
+            out string deleteResourceCheckStatus,
+            out string deleteResourceCheckMessage)
         {
             deleteResourceCheckStatus = string.Empty;
             deleteResourceCheckMessage = string.Empty;
@@ -636,14 +670,14 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 if (dataElement != null)
                 {
                     foreach (var deleteCheckResponse in from e in dataElement.Elements("Resource")
-                                                        let dataIdAttribute = e.Attribute("DataId")
-                                                        where
-                                                            dataIdAttribute != null &&
-                                                            dataIdAttribute.Value.Equals(dataId.ToString())
-                                                        let canDeleteAttribute = e.Attribute("CanDelete")
-                                                        where canDeleteAttribute != null
-                                                        select
-                                                            new {Status = canDeleteAttribute.Value, Message = e.Value})
+                        let dataIdAttribute = e.Attribute("DataId")
+                        where
+                            dataIdAttribute != null &&
+                            dataIdAttribute.Value.Equals(dataId.ToString())
+                        let canDeleteAttribute = e.Attribute("CanDelete")
+                        where canDeleteAttribute != null
+                        select
+                            new {Status = canDeleteAttribute.Value, Message = e.Value})
                     {
                         deleteResourceCheckStatus = deleteCheckResponse.Status;
                         deleteResourceCheckMessage = deleteCheckResponse.Message;
@@ -657,7 +691,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         }
 
         /// <summary>
-        /// Writes the data table to file.
+        ///     Writes the data table to file.
         /// </summary>
         /// <param name="dt">The dt.</param>
         /// <param name="outputFilePath">The output file path.</param>
@@ -709,8 +743,8 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     for (int i = 0; i < dt.Columns.Count; i++)
                     {
                         sw.Write(!row.IsNull(i)
-                                     ? row[i].ToString().PadRight(maxLengths[i] + 2)
-                                     : new string(' ', maxLengths[i] + 2));
+                            ? row[i].ToString().PadRight(maxLengths[i] + 2)
+                            : new string(' ', maxLengths[i] + 2));
                         sw.Write("|");
                     }
 
@@ -726,7 +760,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         // Private Methods (5) 
 
         /// <summary>
-        /// Ares the equal objects.
+        ///     Ares the equal objects.
         /// </summary>
         /// <param name="newValue">The new value.</param>
         /// <param name="currentValue">The current value.</param>
@@ -736,14 +770,14 @@ namespace WorkEnginePPM.Core.ResourceManagement
         private static bool AreEqualObjects(object newValue, object currentValue, SPField spField, SPWeb spWeb)
         {
             return newValue == null
-                       ? currentValue == null
-                       : currentValue != null &&
-                         GetCleanFieldValue(spWeb, newValue, spField)
-                             .Equals(GetCleanFieldValue(spWeb, currentValue, spField));
+                ? currentValue == null
+                : currentValue != null &&
+                  GetCleanFieldValue(spWeb, newValue, spField)
+                      .Equals(GetCleanFieldValue(spWeb, currentValue, spField));
         }
 
         /// <summary>
-        /// Gets the clean field value.
+        ///     Gets the clean field value.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
         /// <param name="dataRow">The data row.</param>
@@ -755,7 +789,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         }
 
         /// <summary>
-        /// Gets the name of the user.
+        ///     Gets the name of the user.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
         /// <param name="spFieldUserValue">The sp field user value.</param>
@@ -765,17 +799,17 @@ namespace WorkEnginePPM.Core.ResourceManagement
             SPUser spUser = spFieldUserValue.User;
 
             return spUser != null
-                       ? CoreFunctions.GetUserNameWithDomain(
-                           CoreFunctions.GetRealUserName(spUser.LoginName, spWeb.Site))
-                       : (spFieldUserValue.LookupId == -1
-                              ? (!string.IsNullOrEmpty(spFieldUserValue.LookupValue)
-                                     ? CoreFunctions.GetUserNameWithDomain(spFieldUserValue.LookupValue)
-                                     : string.Empty)
-                              : string.Empty);
+                ? CoreFunctions.GetUserNameWithDomain(
+                    CoreFunctions.GetRealUserName(spUser.LoginName, spWeb.Site))
+                : (spFieldUserValue.LookupId == -1
+                    ? (!string.IsNullOrEmpty(spFieldUserValue.LookupValue)
+                        ? CoreFunctions.GetUserNameWithDomain(spFieldUserValue.LookupValue)
+                        : string.Empty)
+                    : string.Empty);
         }
 
         /// <summary>
-        /// Gets the value.
+        ///     Gets the value.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="internalName">Name of the internal.</param>
@@ -791,7 +825,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         }
 
         /// <summary>
-        /// Tries the get PFE field id.
+        ///     Tries the get PFE field id.
         /// </summary>
         /// <param name="internalName">Name of the internal.</param>
         /// <param name="pfeResourceField">The pfe resource field.</param>

@@ -9,7 +9,7 @@ using WorkEnginePPM.Core.Entities;
 namespace WorkEnginePPM.Events.DataSync
 {
     /// <summary>
-    /// List Item Events
+    ///     List Item Events
     /// </summary>
     public class WorkScheduleSyncEvent : SPItemEventReceiver
     {
@@ -18,7 +18,7 @@ namespace WorkEnginePPM.Events.DataSync
         // Public Methods (4) 
 
         /// <summary>
-        /// An item was added.
+        ///     An item was added.
         /// </summary>
         public override void ItemAdded(SPItemEventProperties properties)
         {
@@ -31,23 +31,23 @@ namespace WorkEnginePPM.Events.DataSync
                     SPListItem spListItem = properties.ListItem;
 
                     workScheduleManager.Synchronize(new List<WorkSchedule>
-                                                        {
-                                                            new WorkSchedule
-                                                                {
-                                                                    Id = spListItem.ID,
-                                                                    Title = (string) spListItem["Title"],
-                                                                    Sunday = (decimal) spListItem["Sunday"],
-                                                                    Monday = (decimal) spListItem["Monday"],
-                                                                    Tuesday = (decimal) spListItem["Tuesday"],
-                                                                    Wednesday = (decimal) spListItem["Wednesday"],
-                                                                    Thursday = (decimal) spListItem["Thursday"],
-                                                                    Friday = (decimal) spListItem["Friday"],
-                                                                    Saturday = (decimal) spListItem["Saturday"],
-                                                                    IsDefault = (bool) spListItem["IsDefault"],
-                                                                    ExtId = (string) spListItem["EXTID"],
-                                                                    UniqueId = spListItem.UniqueId
-                                                                }
-                                                        });
+                    {
+                        new WorkSchedule
+                        {
+                            Id = spListItem.ID,
+                            Title = (string) spListItem["Title"],
+                            Sunday = (decimal) spListItem["Sunday"],
+                            Monday = (decimal) spListItem["Monday"],
+                            Tuesday = (decimal) spListItem["Tuesday"],
+                            Wednesday = (decimal) spListItem["Wednesday"],
+                            Thursday = (decimal) spListItem["Thursday"],
+                            Friday = (decimal) spListItem["Friday"],
+                            Saturday = (decimal) spListItem["Saturday"],
+                            IsDefault = (bool) spListItem["IsDefault"],
+                            ExtId = (string) spListItem["EXTID"],
+                            UniqueId = spListItem.UniqueId
+                        }
+                    });
                 }
             }
             catch (Exception exception)
@@ -59,7 +59,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being added.
+        ///     An item is being added.
         /// </summary>
         public override void ItemAdding(SPItemEventProperties properties)
         {
@@ -80,7 +80,7 @@ namespace WorkEnginePPM.Events.DataSync
                 object isDefault;
 
                 GetFieldValues(properties, out title, out sunday, out monday, out tuesday, out wednesday, out thursday,
-                               out friday, out saturday, out isDefault);
+                    out friday, out saturday, out isDefault);
 
                 bool Default = bool.Parse(isDefault.ToString());
 
@@ -95,18 +95,18 @@ namespace WorkEnginePPM.Events.DataSync
                     workSchedules = workScheduleManager.GetExistingWorkSchedules(properties.List.Items);
 
                     workSchedule = new WorkSchedule
-                                       {
-                                           Title = (string) title,
-                                           Sunday = (decimal) sunday,
-                                           Monday = (decimal) monday,
-                                           Tuesday = (decimal) tuesday,
-                                           Wednesday = (decimal) wednesday,
-                                           Thursday = (decimal) thursday,
-                                           Friday = (decimal) friday,
-                                           Saturday = (decimal) saturday,
-                                           IsDefault = Default,
-                                           UniqueId = uniqueId
-                                       };
+                    {
+                        Title = (string) title,
+                        Sunday = (decimal) sunday,
+                        Monday = (decimal) monday,
+                        Tuesday = (decimal) tuesday,
+                        Wednesday = (decimal) wednesday,
+                        Thursday = (decimal) thursday,
+                        Friday = (decimal) friday,
+                        Saturday = (decimal) saturday,
+                        IsDefault = Default,
+                        UniqueId = uniqueId
+                    };
 
                     workSchedules.Add(workSchedule);
 
@@ -130,7 +130,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being deleted.
+        ///     An item is being deleted.
         /// </summary>
         public override void ItemDeleting(SPItemEventProperties properties)
         {
@@ -143,11 +143,11 @@ namespace WorkEnginePPM.Events.DataSync
                     SPListItem spListItem = properties.ListItem;
 
                     workScheduleManager.Delete(new WorkSchedule
-                                                   {
-                                                       Id = spListItem.ID,
-                                                       ExtId = (string) spListItem["EXTID"],
-                                                       UniqueId = spListItem.UniqueId
-                                                   });
+                    {
+                        Id = spListItem.ID,
+                        ExtId = (string) spListItem["EXTID"],
+                        UniqueId = spListItem.UniqueId
+                    });
                 }
             }
             catch (Exception exception)
@@ -159,7 +159,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being updated.
+        ///     An item is being updated.
         /// </summary>
         public override void ItemUpdating(SPItemEventProperties properties)
         {
@@ -181,7 +181,7 @@ namespace WorkEnginePPM.Events.DataSync
                 object isDefault;
 
                 GetFieldValues(properties, out title, out sunday, out monday, out tuesday, out wednesday, out thursday,
-                               out friday, out saturday, out isDefault);
+                    out friday, out saturday, out isDefault);
 
                 bool Default = bool.Parse(isDefault.ToString());
 
@@ -238,7 +238,7 @@ namespace WorkEnginePPM.Events.DataSync
         // Private Methods (4) 
 
         /// <summary>
-        /// Gets the field values.
+        ///     Gets the field values.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="title">The title.</param>
@@ -251,38 +251,38 @@ namespace WorkEnginePPM.Events.DataSync
         /// <param name="saturday">The saturday.</param>
         /// <param name="isDefault">The is default.</param>
         private static void GetFieldValues(SPItemEventProperties properties, out object title, out object sunday,
-                                           out object monday, out object tuesday, out object wednesday,
-                                           out object thursday, out object friday, out object saturday,
-                                           out object isDefault)
+            out object monday, out object tuesday, out object wednesday,
+            out object thursday, out object friday, out object saturday,
+            out object isDefault)
         {
             title = properties.AfterProperties["Title"] ?? properties.ListItem["Title"];
             if (title == null) throw new Exception("Title cannot be empty.");
 
-            sunday = properties.AfterProperties["Sunday"] ?? properties.ListItem["Sunday"];
+            sunday = properties.AfterProperties["Sunday"] ?? properties.ListItem["Sunday"].ToString();
             if (sunday == null) throw new Exception("Please provide work hours for Sunday.");
             sunday = decimal.Parse((string) sunday);
 
-            monday = properties.AfterProperties["Monday"] ?? properties.ListItem["Monday"];
+            monday = properties.AfterProperties["Monday"] ?? properties.ListItem["Monday"].ToString();
             if (monday == null) throw new Exception("Please provide work hours for Monday.");
             monday = decimal.Parse((string) monday);
 
-            tuesday = properties.AfterProperties["Tuesday"] ?? properties.ListItem["Tuesday"];
+            tuesday = properties.AfterProperties["Tuesday"] ?? properties.ListItem["Tuesday"].ToString();
             if (tuesday == null) throw new Exception("Please provide work hours for Tuesday.");
             tuesday = decimal.Parse((string) tuesday);
 
-            wednesday = properties.AfterProperties["Wednesday"] ?? properties.ListItem["Wednesday"];
+            wednesday = properties.AfterProperties["Wednesday"] ?? properties.ListItem["Wednesday"].ToString();
             if (wednesday == null) throw new Exception("Please provide work hours for Wednesday.");
             wednesday = decimal.Parse((string) wednesday);
 
-            thursday = properties.AfterProperties["Thursday"] ?? properties.ListItem["Thursday"];
+            thursday = properties.AfterProperties["Thursday"] ?? properties.ListItem["Thursday"].ToString();
             if (thursday == null) throw new Exception("Please provide work hours for Thursday.");
             thursday = decimal.Parse((string) thursday);
 
-            friday = properties.AfterProperties["Friday"] ?? properties.ListItem["Friday"];
+            friday = properties.AfterProperties["Friday"] ?? properties.ListItem["Friday"].ToString();
             if (friday == null) throw new Exception("Please provide work hours for Friday.");
             friday = decimal.Parse((string) friday);
 
-            saturday = properties.AfterProperties["Saturday"] ?? properties.ListItem["Saturday"];
+            saturday = properties.AfterProperties["Saturday"] ?? properties.ListItem["Saturday"].ToString();
             if (saturday == null) throw new Exception("Please provide work hours for Saturday.");
             saturday = decimal.Parse((string) saturday);
 
@@ -290,7 +290,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// Sets the ext id.
+        ///     Sets the ext id.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="uniqueId">The unique id.</param>
@@ -318,7 +318,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// Updates the default.
+        ///     Updates the default.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="uniqueId">The unique id.</param>
@@ -332,8 +332,8 @@ namespace WorkEnginePPM.Events.DataSync
             SPListItemCollection spListItemCollection = properties.List.Items;
 
             foreach (SPListItem listItem in from SPListItem spListItem in spListItemCollection
-                                            where spListItem.UniqueId != uniqueId
-                                            select spListItem.ParentList.GetItemByUniqueId(spListItem.UniqueId))
+                where spListItem.UniqueId != uniqueId
+                select spListItem.ParentList.GetItemByUniqueId(spListItem.UniqueId))
             {
                 listItem["IsDefault"] = false;
                 listItem.SystemUpdate();
@@ -343,7 +343,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// Validates the request.
+        ///     Validates the request.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <returns></returns>

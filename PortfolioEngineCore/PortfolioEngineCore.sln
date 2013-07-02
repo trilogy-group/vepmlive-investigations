@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.20617.1 PREVIEW
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioEngineCore", "PortfolioEngineCore\PortfolioEngineCore.csproj", "{BB86B09C-CB35-4888-8639-C047A40A9C0C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkEnginePPM", "WorkEnginePPM\WorkEnginePPM.csproj", "{51CAF42A-31AF-4B74-853F-24B672C185C2}"

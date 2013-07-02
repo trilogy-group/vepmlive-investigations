@@ -10,7 +10,7 @@ using WorkEnginePPM.Core.Entities;
 namespace WorkEnginePPM.Events.DataSync
 {
     /// <summary>
-    /// List Item Events
+    ///     List Item Events
     /// </summary>
     public class HolidayScheduleSyncEvent : SPItemEventReceiver
     {
@@ -19,7 +19,7 @@ namespace WorkEnginePPM.Events.DataSync
         // Public Methods (4) 
 
         /// <summary>
-        /// An item was added.
+        ///     An item was added.
         /// </summary>
         public override void ItemAdded(SPItemEventProperties properties)
         {
@@ -42,7 +42,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being added.
+        ///     An item is being added.
         /// </summary>
         public override void ItemAdding(SPItemEventProperties properties)
         {
@@ -67,12 +67,12 @@ namespace WorkEnginePPM.Events.DataSync
                     holidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
 
                     holidaySchedules.Add(new HolidaySchedule
-                                             {
-                                                 Title = (string) title,
-                                                 IsDefault = isDefault,
-                                                 UniqueId = uniqueId,
-                                                 Holidays = new List<Holiday>()
-                                             });
+                    {
+                        Title = (string) title,
+                        IsDefault = isDefault,
+                        UniqueId = uniqueId,
+                        Holidays = new List<Holiday>()
+                    });
 
                     holidaySchedules = holidayManager.Synchronize(holidaySchedules);
                 }
@@ -89,7 +89,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being deleted.
+        ///     An item is being deleted.
         /// </summary>
         public override void ItemDeleting(SPItemEventProperties properties)
         {
@@ -108,11 +108,11 @@ namespace WorkEnginePPM.Events.DataSync
                 using (var holidayManager = new HolidayManager(properties.Web))
                 {
                     var holidaySchedule = new HolidaySchedule
-                                              {
-                                                  Id = (int?) spListItem["ID"],
-                                                  ExtId = extId,
-                                                  UniqueId = spListItem.UniqueId
-                                              };
+                    {
+                        Id = (int?) spListItem["ID"],
+                        ExtId = extId,
+                        UniqueId = spListItem.UniqueId
+                    };
 
                     if (!holidayManager.DeleteSchedule(holidaySchedule)) return;
 
@@ -125,11 +125,11 @@ namespace WorkEnginePPM.Events.DataSync
                     SPListItemCollection spListItemCollection = spList.Items;
 
                     IEnumerable<int> holidaysToDelete = from SPListItem listItem in spListItemCollection
-                                                        let spFieldLookupValue =
-                                                            new SPFieldLookupValue(
-                                                            (string) listItem["HolidaySchedule"])
-                                                        where spFieldLookupValue.LookupId == spListItem.ID
-                                                        select listItem.ID;
+                        let spFieldLookupValue =
+                            new SPFieldLookupValue(
+                                (string) listItem["HolidaySchedule"])
+                        where spFieldLookupValue.LookupId == spListItem.ID
+                        select listItem.ID;
 
                     foreach (int holidayId in holidaysToDelete)
                     {
@@ -148,7 +148,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being updated.
+        ///     An item is being updated.
         /// </summary>
         public override void ItemUpdating(SPItemEventProperties properties)
         {
@@ -171,7 +171,10 @@ namespace WorkEnginePPM.Events.DataSync
                     if (title == null) throw new Exception("Title cannot be empty.");
                     if (extId == null) throw new Exception("External ID cannot be empty.");
 
-                    bool isDefault = bool.Parse((properties.AfterProperties["IsDefault"] ?? false).ToString());
+                    bool isDefault =
+                        bool.Parse(
+                            (properties.AfterProperties["IsDefault"] ?? (properties.ListItem["IsDefault"] ?? false))
+                                .ToString());
 
                     Guid uniqueId = properties.ListItem.UniqueId;
 
@@ -204,13 +207,13 @@ namespace WorkEnginePPM.Events.DataSync
         // Private Methods (3) 
 
         /// <summary>
-        /// Sets the ext id.
+        ///     Sets the ext id.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="uniqueId">The unique id.</param>
         /// <param name="holidaySchedules">The holiday schedules.</param>
         private void SetExtId(SPItemEventProperties properties, Guid uniqueId,
-                              IEnumerable<HolidaySchedule> holidaySchedules)
+            IEnumerable<HolidaySchedule> holidaySchedules)
         {
             EventFiringEnabled = false;
 
@@ -233,7 +236,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// Updates the default.
+        ///     Updates the default.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <param name="uniqueId">The unique id.</param>
@@ -247,8 +250,8 @@ namespace WorkEnginePPM.Events.DataSync
             SPListItemCollection spListItemCollection = properties.List.Items;
 
             foreach (SPListItem listItem in from SPListItem spListItem in spListItemCollection
-                                            where spListItem.UniqueId != uniqueId
-                                            select spListItem.ParentList.GetItemByUniqueId(spListItem.UniqueId))
+                where spListItem.UniqueId != uniqueId
+                select spListItem.ParentList.GetItemByUniqueId(spListItem.UniqueId))
             {
                 listItem["IsDefault"] = false;
                 listItem.SystemUpdate();
@@ -258,7 +261,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// Validates the request.
+        ///     Validates the request.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <returns></returns>

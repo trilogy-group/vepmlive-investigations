@@ -9,7 +9,7 @@ namespace WorkEnginePPM.Core
         #region Constructors (2) 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseManager"/> class.
+        ///     Initializes a new instance of the <see cref="BaseManager" /> class.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
         protected BaseManager(SPWeb spWeb)
@@ -20,8 +20,8 @@ namespace WorkEnginePPM.Core
         }
 
         /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="BaseManager"/> is reclaimed by garbage collection.
+        ///     Releases unmanaged resources and performs other cleanup operations before the
+        ///     <see cref="BaseManager" /> is reclaimed by garbage collection.
         /// </summary>
         ~BaseManager()
         {
@@ -33,14 +33,22 @@ namespace WorkEnginePPM.Core
         #region Properties (2) 
 
         /// <summary>
-        /// Gets the username.
+        ///     Gets the username.
         /// </summary>
-        protected string Username { get; private set; }
+        protected string Username
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
-        /// Gets the SP web.
+        ///     Gets the SP web.
         /// </summary>
-        protected SPWeb Web { get; private set; }
+        protected SPWeb Web
+        {
+            get;
+            private set;
+        }
 
         #endregion Properties 
 
@@ -49,7 +57,7 @@ namespace WorkEnginePPM.Core
         // Public Methods (1) 
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
@@ -60,9 +68,12 @@ namespace WorkEnginePPM.Core
         // Protected Methods (2) 
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources
+        ///     Releases unmanaged and - optionally - managed resources
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        /// <param name="disposing">
+        ///     <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
+        ///     unmanaged resources.
+        /// </param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
@@ -74,23 +85,40 @@ namespace WorkEnginePPM.Core
         }
 
         /// <summary>
-        /// Validates the response.
+        ///     Validates the response.
         /// </summary>
         /// <param name="element">The element.</param>
         protected virtual void ValidateResponse(XElement element)
         {
             if (element == null) return;
 
-            XElement resultElement = element.Element("Result");
-            XAttribute statusAttribute = resultElement != null
-                                             ? resultElement.Attribute("Status")
-                                             : element.Attribute("Status");
+            if (element.Name.LocalName.Equals("Result"))
+            {
+                XAttribute statusAttribute = element.Attribute("Status");
 
-            if (statusAttribute == null || !statusAttribute.Value.Equals("1") || statusAttribute.Parent == null) return;
+                if (statusAttribute == null || !statusAttribute.Value.Equals("1") || statusAttribute.Parent == null)
+                    return;
 
-            XElement errorElement = statusAttribute.Parent.Element("Error");
+                XElement errorElement = statusAttribute.Parent.Element("Error");
 
-            if (errorElement != null) throw new Exception(errorElement.Value);
+                if (errorElement != null) throw new Exception(errorElement.Value);
+            }
+            else
+            {
+                foreach (XElement resultElement in element.Descendants("Result"))
+                {
+                    XAttribute statusAttribute = resultElement != null
+                        ? resultElement.Attribute("Status")
+                        : element.Attribute("Status");
+
+                    if (statusAttribute == null || !statusAttribute.Value.Equals("1") || statusAttribute.Parent == null)
+                        continue;
+
+                    XElement errorElement = statusAttribute.Parent.Element("Error");
+
+                    if (errorElement != null) throw new Exception(errorElement.Value);
+                }
+            }
         }
 
         #endregion Methods 
