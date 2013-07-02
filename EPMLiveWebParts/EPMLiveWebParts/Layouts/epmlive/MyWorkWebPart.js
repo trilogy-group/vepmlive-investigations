@@ -1302,7 +1302,7 @@ var MyWorkGrid = {
 
                         if (masterView === '') {
                             var defaultPersonalView = '';
-                            var defaultGlobalView = '';
+                            var defaultGlobalView = 'dv';
 
                             for (var v in MyWorkGrid.views) {
                                 var view = MyWorkGrid.views[v];
@@ -1718,8 +1718,8 @@ var MyWorkGrid = {
                     MyWorkGrid.views[viewId] = {
                         id: viewId,
                         name: viewName,
-                        isDefault: isViewDefault,
-                        isPersonal: isViewPersonal,
+                        isDefault: isViewDefault === 'true' ? true : false,
+                        isPersonal: isViewPersonal === 'true' ? true : false,
                         leftCols: leftCols,
                         cols: cols,
                         rightCols: rightCols,
