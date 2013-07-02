@@ -1431,7 +1431,7 @@
 
             //CopySummaryField(col);
 
-            grid.DoFilter();
+            //grid.DoFilter();
 
             RefreshCommandUI();
         }
