@@ -69,11 +69,15 @@ namespace EPMLiveReportsAdmin
             _siteID = siteID;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SPSite spSite = new SPSite(siteID);
-                OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
-                SPWeb rootweb = spSite.OpenWeb();
-                _siteUrl = rootweb.ServerRelativeUrl;
-                _siteName = rootweb.Name;
+                using (var spSite = new SPSite(siteID))
+                {
+                    OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+                    using (SPWeb rootweb = spSite.OpenWeb())
+                    {
+                        _siteUrl = rootweb.ServerRelativeUrl;
+                        _siteName = rootweb.Name;
+                    }
+                }
             });
 
 
@@ -89,13 +93,15 @@ namespace EPMLiveReportsAdmin
         {
             _siteID = siteID;
             _webAppId = webAppId;
-            SPSite spSite = new SPSite(siteID);
+            using (var spSite = new SPSite(siteID))
             {
-                OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(webAppId);
-                SPWeb rootweb = spSite.OpenWeb();
+                OpenEPMLiveConnection = CoreFunctions.getConnectionString(webAppId);
+                using (var rootweb = spSite.OpenWeb())
                 {
-                    _siteUrl = rootweb.ServerRelativeUrl;
-                    _siteName = rootweb.Name;
+                    {
+                        _siteUrl = rootweb.ServerRelativeUrl;
+                        _siteName = rootweb.Name;
+                    }
                 }
             }
 
@@ -402,7 +408,7 @@ namespace EPMLiveReportsAdmin
             }
             catch (Exception ex)
             {
-                LogStatus(string.Empty, sListNames, "Refresh not completed due errors." + ex.Message, ex.StackTrace, 2, 3, string.Empty);
+                LogStatus(string.Empty, sListNames, "List data cleanup not completed due errors." + ex.Message, ex.StackTrace, 2, 3, string.Empty);
                 return false;
             }
         }
@@ -418,8 +424,10 @@ namespace EPMLiveReportsAdmin
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SPSite spSite = new SPSite(siteID);
-                OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+                using (var spSite = new SPSite(siteID))
+                {
+                    OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+                }
             });
 
 
@@ -1045,7 +1053,7 @@ namespace EPMLiveReportsAdmin
             }
         }
 
-        public void GetRefreshQueueStatus(out int status, out string listguid, out int pctComplete, out bool queued)
+        public void GetCleanupQueueStatus(out int status, out string listguid, out int pctComplete, out bool queued)
         {
             DataTable dt;
             //Command = "SELECT dbo.QUEUE.status, dbo.QUEUE.percentComplete, dbo.TIMERJOBS.listguid, dbo.TIMERJOBS.jobtype, dbo.TIMERJOBS.lastqueuecheck FROM dbo.QUEUE RIGHT OUTER JOIN dbo.TIMERJOBS ON dbo.QUEUE.timerjobuid = dbo.TIMERJOBS.timerjobuid WHERE (dbo.TIMERJOBS.jobtype = 5) AND (dbo.TIMERJOBS.lastqueuecheck IS NULL) AND dbo.TIMERJOBS.siteguid =@siteId";
@@ -2336,8 +2344,10 @@ namespace EPMLiveReportsAdmin
             string un = string.Empty;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                SPSite site = new SPSite(_siteID);
-                un = site.WebApplication.ApplicationPool.Username;
+                using (var site = new SPSite(_siteID))
+                {
+                    un = site.WebApplication.ApplicationPool.Username;
+                }
             });
 
             string sql;

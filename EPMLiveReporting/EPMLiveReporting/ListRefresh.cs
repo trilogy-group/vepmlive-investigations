@@ -442,7 +442,7 @@ namespace EPMLiveReportsAdmin
                                     "ProcessSecurity processed successfully on refresh all for web: " + _web.Title,
                                     0,
                                     1,
-                                    timerjobguid.ToString()); 
+                                    timerjobguid.ToString());
                             }
                             catch (Exception ex)
                             {
@@ -453,7 +453,7 @@ namespace EPMLiveReportsAdmin
                                     ex.Message,
                                     2,
                                     3,
-                                    timerjobguid.ToString()); 
+                                    timerjobguid.ToString());
                             }
 
                             #endregion

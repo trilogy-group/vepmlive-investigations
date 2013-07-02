@@ -249,11 +249,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 string url = SPContext.Current.Web.ServerRelativeUrl;
                 if (url.EndsWith("/"))
                 {
-                    Response.Redirect(url + "_layouts/epmlive/Allschedules.aspx");
+                    Response.Redirect(url + "/_layouts/epmlive/AllSnapShots.aspx");
                 }
                 else
                 {
-                    Response.Redirect(url + "/_layouts/epmlive/Allschedules.aspx");
+                    Response.Redirect(url + "/_layouts/epmlive/AllSnapShots.aspx");
                 }
             }
             catch (Exception ex)

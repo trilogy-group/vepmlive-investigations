@@ -13,24 +13,6 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive {
     public partial class AllSchedules {
         
         /// <summary>
-        /// mtEventMenu control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.MenuTemplate mtEventMenu;
-        
-        /// <summary>
-        /// MenuItemTemplate3 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.MenuItemTemplate MenuItemTemplate3;
-        
-        /// <summary>
         /// InputFormSection1 control.
         /// </summary>
         /// <remarks>
@@ -121,39 +103,21 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive {
         protected global::System.Web.UI.UserControl ButtonSection1;
         
         /// <summary>
+        /// btnRunNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRunNow;
+        
+        /// <summary>
         /// btnSave control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputSubmit btnSave;
-        
-        /// <summary>
-        /// btnCancel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputSubmit btnCancel;
-        
-        /// <summary>
-        /// grdVwSchedules control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.SPGridView grdVwSchedules;
-        
-        /// <summary>
-        /// lnk_createSchedule control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor lnk_createSchedule;
+        protected global::System.Web.UI.WebControls.Button btnSave;
     }
 }

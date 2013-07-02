@@ -749,6 +749,12 @@ namespace EPMLiveReportsAdmin
                                 WHERE 
                                        RPTListId = @RPTListId
                             ", Resources.ListTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            if (web != null)
+            {
+                web.Close();
+                web.Dispose();
+            }
+
             return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
 
         }

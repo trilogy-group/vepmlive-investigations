@@ -16,54 +16,33 @@ using System.ComponentModel;
 using EPMLiveReportsAdmin.Properties;
 using System.Data.SqlClient;
 using Microsoft.SharePoint.Utilities;
+using EPMLiveCore;
 
-namespace EPMLiveReportsAdmin.Layouts.EPMLive  
+namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
-    public partial class AllSchedules : LayoutsPageBase, IPostBackEventHandler
+    public partial class AllSchedules : LayoutsPageBase
     {
         EPMData _DAO;
-        //protected SPGridView grdVwSchedules;
-        //protected DropDownList DropDownListTimes;
-        //protected HtmlInputButton btnSave;
         protected MenuItemTemplate MenuItemTemplateDelete;
         protected MenuItemTemplate MenuItemTemplate1;
-
-        //protected Label lblMessages;
-        //protected Label lblLastRun;
-        //protected HtmlAnchor lnk_createSchedule;
 
         protected void Page_Init(object sender, EventArgs e)
         {
             _DAO = new EPMData(SPContext.Current.Web.Site.ID);
-            LoadSchedules(true);
             LoadScheduleStatus();
         }
 
         protected void LoadScheduleStatus()
         {
-
-            if (SPContext.Current.Web.ServerRelativeUrl.EndsWith("/"))
-            {
-                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl + "_layouts/epmlive/ReportSchedule.aspx";
-            }
-            else
-            {
-                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl + "/_layouts/epmlive/ReportSchedule.aspx";
-            }
-
             if (!IsPostBack)
             {
                 try
                 {
-                    //using (SPSite site = SPContext.Current.Site)
-                    //{
-                        //using (SPWeb web = SPContext.Current.Web)
-                        //{
-                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                            SPSecurity.RunWithElevatedPrivileges(delegate()
-                            {
-                                cn.Open();
-                            });
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
+                        {
+                            cn.Open();
 
                             SqlCommand cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn);
                             cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID);
@@ -100,9 +79,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     lblLastRun.Text = dr.GetDateTime(4).ToString();
                             }
                             dr.Close();
-                       
-                        //}
-                    //}
+                            cn.Close();
+                        }
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -116,9 +95,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
                     });
                 }
-
-            }  
-            
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -126,33 +103,21 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Expires = -1;
             MaintainScrollPositionOnPostBack = true;
-            btnSave.ServerClick += new EventHandler(btnSave_ServerClick);
-            btnCancel.ServerClick += btnCancel_ServerClick;
+            if (!IsPostBack)
+            {
+                loadData(SPContext.Current.Web);
+            }
         }
 
-        void btnCancel_ServerClick(object sender, EventArgs e)
-        {
-            SPUtility.Redirect(SPContext.Current.Web.Url + "/_layouts/epmlive/listmappings.aspx?Source=" + SPContext.Current.Web.Url + "/_layouts/epmlive/settings.aspx", SPRedirectFlags.Static, HttpContext.Current);
-        }
-
-        void btnSave_ServerClick(object sender, EventArgs e)
-        {
-            SaveSchedule();
-        }
-
-        protected void SaveSchedule()
+        protected void SaveSchedule(object sender, EventArgs e)
         {
             try
             {
-                //using (SPSite site = SPContext.Current.Site)
-                //{
-                    //using (SPWeb web = SPContext.Current.Web)
-                    //{
-                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id));
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
-                        {
-                            cn.Open();
-                        });
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
+                    {
+                        cn.Open();
 
                         SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn);
                         cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
@@ -172,13 +137,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                             cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                             cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
                             cmd.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
-
                             cmd.ExecuteNonQuery();
                         }
 
                         cn.Close();
-                    //}
-                //}
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -186,48 +150,187 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
         }
 
-        protected void LoadSchedules(bool blnLoadColums)
+        protected void RunRefreshNow(object sender, EventArgs e)
         {
-            DataTable dt;
-            SPBoundField gridColumn;
-
-            _DAO.Command = "SELECT jobname as [Schedule Name], jobdata as [Lists], siteguid, timerjobuid  FROM TIMERJOBS WHERE siteguid ='" + SPContext.Current.Web.Site.ID + "' AND jobtype=7 AND ScheduleType <> 0";
-            dt = _DAO.GetTable(_DAO.GetEPMLiveConnection);
-
-            if (!IsPostBack || blnLoadColums)
+            try
             {
-                foreach (DataColumn column in dt.Columns)
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    gridColumn = new SPBoundField();
-                    gridColumn.HeaderText = column.ColumnName;
-                    gridColumn.DataField = column.ColumnName;
-
-                    if (column.ColumnName.EndsWith("uid"))
+                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                     {
-                        gridColumn.Visible = false;
+                        cn.Open();
+
+                        Guid timerjobuid = Guid.Empty;
+                        SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=5", cn);
+                        cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                        object obj = cmd.ExecuteScalar();
+                        if (obj != null)
+                        {
+                            timerjobuid = new Guid(obj.ToString());
+                        }
+                        else
+                        {
+                            timerjobuid = Guid.NewGuid();
+                            cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 5, 'Reporting Refresh', 0, @webguid)", cn);
+                            cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                            cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        if (timerjobuid != Guid.Empty)
+                        {
+                            EPMLiveCore.CoreFunctions.enqueue(timerjobuid, 0);
+                        }
+
+                        cn.Close();
                     }
-                    grdVwSchedules.Columns.Add(gridColumn);
+
+                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/AllSchedules.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                });
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        protected void loadData(SPWeb web)
+        {
+            SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                cn.Open();
+            });
+
+            SqlCommand cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=5", cn);
+            cmd.Parameters.AddWithValue("@siteguid", web.Site.ID);
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            bool processing = false;
+
+            if (dr.Read())
+            {
+                if (!dr.IsDBNull(3))
+                {
+                    if (dr.GetInt32(3) == 0)
+                    {
+                        processing = true;
+                        //lblLastRun.Text = "Queued";
+                        lblMessages.Text = "Queued";
+                        btnRunNow.Enabled = false;
+                    }
+                    else if (dr.GetInt32(3) == 1)
+                    {
+                        processing = true;
+                        //lblLastRun.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
+                        lblMessages.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
+                        btnRunNow.Enabled = false;
+                    }
+                    else if (!dr.IsDBNull(5))
+                    {
+                        lblMessages.Text = dr.GetString(5);
+                    }
+                    else
+                    {
+                        lblMessages.Text = "No Results";
+                    }
+                }
+
+                if (!dr.IsDBNull(4))
+                    lblLastRun.Text = dr.GetDateTime(4).ToString();
+
+                dr.Close();
+
+                cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=1", cn);
+                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID);
+                dr = cmd.ExecuteReader();
+
+                if (!processing)
+                {
+                    if (dr.Read())
+                    {
+                        if (!dr.IsDBNull(3))
+                        {
+                            if (dr.GetInt32(3) == 0)
+                            {
+                                processing = true;
+                                //lblLastRun.Text = "Queued";
+                                lblMessages.Text = "Queued";
+                                btnRunNow.Enabled = false;
+                            }
+                            else if (dr.GetInt32(3) == 1)
+                            {
+                                processing = true;
+                                //lblLastRun.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
+                                lblMessages.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
+                                btnRunNow.Enabled = false;
+                            }
+                            else if (!dr.IsDBNull(5))
+                            {
+                                lblMessages.Text = dr.GetString(5);
+                            }
+                            else
+                            {
+                                lblMessages.Text = "No Results";
+                            }
+                        }
+
+                        if (!dr.IsDBNull(4))
+                            lblMessages.Text = dr.GetDateTime(4).ToString();
+                    }
+                    dr.Close();
                 }
             }
 
-            grdVwSchedules.DataSource = dt;
-            grdVwSchedules.DataBind();
+            cn.Close();
         }
 
-        public void RaisePostBackEvent(string timerjobuid)
-        {
-            if (timerjobuid.EndsWith("_"))
-            {
-                timerjobuid = timerjobuid.Replace("_", "");
-                SPUtility.Redirect("/epmlive/ReportSchedule.aspx?uid=" + timerjobuid, SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-            }
-            else
-            {
-                _DAO.Command = "DELETE TIMERJOBS where timerjobuid='" + timerjobuid + "'";
-                _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
-                SPUtility.Redirect("epmlive/AllSchedules.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-            }
-        }
+        //protected void LoadSchedules(bool blnLoadColums)
+        //{
+        //    DataTable dt;
+        //    SPBoundField gridColumn;
+
+        //    _DAO.Command = "SELECT jobname as [Schedule Name], jobdata as [Lists], siteguid, timerjobuid  FROM TIMERJOBS WHERE siteguid ='" + SPContext.Current.Web.Site.ID + "' AND jobtype=7 AND ScheduleType <> 0";
+        //    dt = _DAO.GetTable(_DAO.GetEPMLiveConnection);
+
+        //    if (!IsPostBack || blnLoadColums)
+        //    {
+        //        foreach (DataColumn column in dt.Columns)
+        //        {
+        //            gridColumn = new SPBoundField();
+        //            gridColumn.HeaderText = column.ColumnName;
+        //            gridColumn.DataField = column.ColumnName;
+
+        //            if (column.ColumnName.EndsWith("uid"))
+        //            {
+        //                gridColumn.Visible = false;
+        //            }
+        //            grdVwSchedules.Columns.Add(gridColumn);
+        //        }
+        //    }
+
+        //    grdVwSchedules.DataSource = dt;
+        //    grdVwSchedules.DataBind();
+        //}
+
+        //public void RaisePostBackEvent(string timerjobuid)
+        //{
+        //    if (timerjobuid.EndsWith("_"))
+        //    {
+        //        timerjobuid = timerjobuid.Replace("_", "");
+        //        SPUtility.Redirect("/epmlive/ReportSchedule.aspx?uid=" + timerjobuid, SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        //    }
+        //    else
+        //    {
+        //        _DAO.Command = "DELETE TIMERJOBS where timerjobuid='" + timerjobuid + "'";
+        //        _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
+        //        SPUtility.Redirect("epmlive/AllSchedules.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        //    }
+        //}
 
         protected void Page_LoadComplete(object sender, EventArgs e)
         {

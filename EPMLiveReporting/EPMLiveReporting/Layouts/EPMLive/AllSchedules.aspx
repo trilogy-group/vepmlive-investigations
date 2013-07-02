@@ -34,25 +34,11 @@
             }
         }
     </script>
-    <SharePoint:MenuTemplate ID="mtEventMenu" runat="server">
-        <SharePoint:MenuItemTemplate ID="MenuItemTemplate1" runat="server" Text="Edit" ImageUrl="/_layouts/images/CDX16.GIF"
-            ClientOnClickUsingPostBackEvent="__page,%uid%_" Title="Edit">
-        </SharePoint:MenuItemTemplate>
-        <SharePoint:MenuItemTemplate ID="MenuItemTemplateDelete" runat="server" Text="Delete"
-            ImageUrl="/_layouts/images/CDX16.GIF" ClientOnClickUsingPostBackEvent="__page,%uid%"
-            Title="Delete">
-        </SharePoint:MenuItemTemplate>
-        <SharePoint:MenuItemTemplate ID="MenuItemTemplate3" runat="server" Text="View log"
-            ImageUrl="/_layouts/images/CDX16.GIF" 
-            Title="View log"
-            ClientOnClickScript="resize('/_layouts/epmlive/ViewLogDetail.aspx?uid=%uid%')">
-        </SharePoint:MenuItemTemplate>
-    </SharePoint:MenuTemplate>
     <table width="100%">
-        <wssuc:InputFormSection ID="InputFormSection1" Title="Reporting Cleanup:" Description=""
+        <wssuc:InputFormSection ID="InputFormSection1" Title="Reporting Refresh:" Description=""
             runat="server">
             <Template_Description>
-                Choose a time when the Reporting Cleanup will take place. This time should be set
+                Choose a time when the Reporting Refresh will take place. This time should be set
                 to a time when your system will be idle or close to idle.
             </Template_Description>
             <Template_InputFormControls>
@@ -107,16 +93,14 @@
             </Template_InputFormControls>
         </wssuc:InputFormSection>
         <br />
-        <wssuc:ButtonSection ID="ButtonSection1" runat="server" ShowStandardCancelButton="false">
+       <wssuc:ButtonSection ID="ButtonSection1" runat="server">
             <Template_Buttons>
-                <input class="ms-ButtonHeightWidth" id="btnSave" accesskey="O" type="submit" value="Save"
-                    runat="server" />
-                <input class="ms-ButtonHeightWidth" id="btnCancel" accesskey="1" type="submit" value="Cancel"
-                    runat="server" />
+                <asp:Button UseSubmitBehavior="false" class="ms-ButtonHeightWidth" runat="server" ID="btnRunNow" Text="Run Now" OnClick="RunRefreshNow" />
+                <asp:Button UseSubmitBehavior="false" class="ms-ButtonHeightWidth" runat="server" ID="btnSave" Text="Save" OnClick="SaveSchedule" />
             </Template_Buttons>
         </wssuc:ButtonSection>
     </table>
-    <table class="ms-toolbar" width="100%" cellpadding="3">
+    <%--<table class="ms-toolbar" width="100%" cellpadding="3">
         <tr>
             <td class="ms-viewlsts" colspan="2">
                 <h3 class="ms-standardheader">
@@ -139,5 +123,5 @@
                 <a runat="server" id="lnk_createSchedule">Create New Schedule</a>
             </td>
         </tr>
-    </table>
+    </table>--%>
 </asp:Content>

@@ -53,8 +53,8 @@
     
     <sharepoint:menutemplate id="mtEventMenu" runat="server">
        <Sharepoint:MenuItemTemplate ID="MenuItemTemplate1" runat="server"
-           Text="Refresh" ImageUrl="images/EPMRefresh.gif"         
-           ClientOnClickUsingPostBackEvent = "__page,%NAME%_refresh"
+           Text="Cleanup" ImageUrl="images/EPMRefresh.gif"         
+           ClientOnClickUsingPostBackEvent = "__page,%NAME%_cleanup"
            >
       </Sharepoint:MenuItemTemplate>
       <Sharepoint:MenuItemTemplate ID="MenuItemTemplate2" runat="server"
@@ -107,7 +107,7 @@
             <asp:TemplateField HeaderText="Snapshot">
             <ItemTemplate><%# GetIconLink(2) %></ItemTemplate>
             </asp:TemplateField>
-            <asp:TemplateField HeaderText="Refresh">
+            <asp:TemplateField HeaderText="Cleanup">
             <ItemTemplate><%# GetIconLink(3) %></ItemTemplate>
             </asp:TemplateField>
         </Columns>
@@ -154,6 +154,25 @@
         hm('dlgWaiting');
     }
 
+    function VerifyThenSubmit() {
+        var options = {
+            title: 'Cleanup Confirmation',
+            url: 'cleanupwarning.aspx',
+            width: 500,
+            allowMaximize: false,
+            showClose: false,
+            autoSize: false,
+            dialogReturnValueCallback: verifySubmit
+        };
+
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+    }
+
+    function verifySubmit(dialogResult, returnVal) {
+        if (dialogResult == 1) {
+            submit('CleanupAll');
+        }
+    }
 </script>
 
 

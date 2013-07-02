@@ -31,6 +31,33 @@
            Title="Edit">
       </Sharepoint:MenuItemTemplate>     
     </sharepoint:menutemplate>
+    
+     <table class="ms-toolbar" width="100%" cellpadding="3">
+        <tr>
+            <td class="ms-viewlsts" colspan="2">
+                <h3 class="ms-standardheader">
+                    Schedules</h3>
+            </td>
+        </tr>
+    </table>
+    <SharePoint:SPGridView ID="grdVwSchedules" runat="server" AutoGenerateColumns="false"
+        HeaderStyle-CssClass="ms-alternatingstrong" Width="70%">
+        <Columns>
+            <SharePoint:SPMenuField HeaderText="Schedule Name" TextFields="Schedule Name" HeaderStyle-Font-Size="Smaller"
+                MenuTemplateId="mtEventMenu" ToolTipFields="Schedule Name" TokenNameAndValueFields="uid=timerjobuid" />
+        </Columns>
+    </SharePoint:SPGridView>
+    <table>
+        <tr>
+            <td class="ms-propertysheet">
+                <img alt="" src="/_layouts/images/rect.gif" />
+                <img width="8" height="1" alt="" src="/_layouts/images/blank.gif" />
+                <a runat="server" id="lnk_createSchedule">Create New Schedule</a>
+            </td>
+        </tr>
+    </table>
+
+
     <table class="ms-toolbar" width="100%" cellpadding="3">
         <tr>
             <td class="ms-viewlsts" colspan="2">

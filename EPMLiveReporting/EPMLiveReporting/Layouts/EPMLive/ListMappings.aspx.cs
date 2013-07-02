@@ -99,7 +99,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void InitQueueStatus()
         {
-            _DAO.GetRefreshQueueStatus(out _RFstatus, out _RFlistguid, out _RFpctComplete, out _RFqueued);
+            _DAO.GetCleanupQueueStatus(out _RFstatus, out _RFlistguid, out _RFpctComplete, out _RFqueued);
             _DAO.GetSnapshotQueueStatus(out _SSstatus, out _SSlistguid, out _SSpctComplete, out _SSqueued);
         }
 
@@ -172,8 +172,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             sAction = sAction.Substring(sAction.LastIndexOf("_") + 1);
             switch (sAction)
             {
-                case "refresh":
-                    RefreshLists(param);
+                case "cleanup":
+                    CleanupLists(param);
                     break;
 
                 case "snapshot":
@@ -253,7 +253,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             //END
         }
 
-        protected void RefreshLists(string sLists)
+        protected void CleanupLists(string sLists)
         {
             //Prod -- Start
             using (SPSite site = SPContext.Current.Site)
@@ -267,7 +267,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     _DAO.DeleteWork(listID, -1);
                     //END
 
-                    _DAO.Command = "select timerjobuid from timerjobs where siteguid=@siteguid and listguid = @listguid and jobtype=5";
+                    _DAO.Command = "select timerjobuid from timerjobs where siteguid=@siteguid and listguid = @listguid and jobtype=6";
                     _DAO.AddParam("@siteguid", site.ID.ToString());
                     _DAO.AddParam("@listguid", listID.ToString());
                     object oResult = _DAO.ExecuteScalar(_DAO.GetEPMLiveConnection);
@@ -281,7 +281,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     else
                     {
                         timerjobuid = Guid.NewGuid();
-                        _DAO.Command = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, listguid, jobdata) VALUES (@timerjobuid, @siteguid, 5, 'Reporting Refresh', 0, @webguid, @listguid, @jobdata)";
+                        _DAO.Command = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, listguid, jobdata) VALUES (@timerjobuid, @siteguid, 6, 'List Data Cleanup', 0, @webguid, @listguid, @jobdata)";
                         _DAO.AddParam("@siteguid", site.ID.ToString());
                         _DAO.AddParam("@webguid", web.ID.ToString());
                         _DAO.AddParam("@listguid", listID.ToString());
@@ -310,27 +310,35 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             if (!_RFqueued)
             {
 
-                actionsMenu.Items.Add(new EPMMenuItem("epm03_RefreshAll", "images/EPMRefresh.gif", "submit('RefreshAll'); return false", "Refresh All", "100", enabled));
+                //actionsMenu.Items.Add(new EPMMenuItem("epm03_CleanupAll", "images/EPMRefresh.gif", "submit('CleanupAll'); return false", "Cleanup All", "100", enabled));
+                actionsMenu.Items.Add(
+                    new EPMMenuItem(
+                        "epm03_CleanupAll",
+                        "images/EPMRefresh.gif",
+                        "VerifyThenSubmit(); return false;",
+                        "Cleanup All",
+                        "100",
+                        enabled));
             }
             actionsMenu.Render(pnlActionsMenu);
 
             var settingsMenu = new EPMMenu("Settings");
-            settingsMenu.Items.Add(new EPMMenuItem("epm11_Snapshots", "images/EPMSnapshot.gif", "javascript:location.href='allsnapshots.aspx'; return false", "Snapshots", "200", enabled));
-            settingsMenu.Items.Add(new EPMMenuItem("epm12_Schedule", "/_layouts/images/calendar.gif", "javascript:location.href='allschedules.aspx'; return false", "Schedule", "200", enabled));
+            settingsMenu.Items.Add(new EPMMenuItem("epm11_Snapshots", "images/EPMSnapshot.gif", "javascript:location.href='allsnapshots.aspx'; return false", "Snapshot Management", "200", enabled));
+            settingsMenu.Items.Add(new EPMMenuItem("epm12_Schedule", "/_layouts/images/calendar.gif", "javascript:location.href='allschedules.aspx'; return false", "Refresh Schedule", "200", enabled));
             settingsMenu.Render(pnlSettingsMenu);
         }
 
-        protected string ShowRefresh(string listId)
-        {
-            if (_RFlistguid == listId.ToString())
-            {
-                return "false";
-            }
-            else
-            {
-                return "true";
-            }
-        }
+        //protected string ShowRefresh(string listId)
+        //{
+        //    if (_RFlistguid == listId.ToString())
+        //    {
+        //        return "false";
+        //    }
+        //    else
+        //    {
+        //        return "true";
+        //    }
+        //}
 
         protected string ShowSnapshot(string listId)
         {

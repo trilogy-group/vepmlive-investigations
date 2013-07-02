@@ -29,5 +29,23 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Microsoft.SharePoint.WebControls.MenuItemTemplate MenuItemTemplate1;
+        
+        /// <summary>
+        /// grdVwSchedules control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.SPGridView grdVwSchedules;
+        
+        /// <summary>
+        /// lnk_createSchedule control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor lnk_createSchedule;
     }
 }

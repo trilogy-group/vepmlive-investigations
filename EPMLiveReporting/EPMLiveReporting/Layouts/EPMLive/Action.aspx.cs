@@ -12,18 +12,18 @@ using Microsoft.SharePoint.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace EPMLiveReportsAdmin.Layouts.EPMLive  
-{ 
+namespace EPMLiveReportsAdmin.Layouts.EPMLive
+{
     public partial class Action : LayoutsPageBase
     {
-      EPMData _DAO;
+        EPMData _DAO;
         protected void Page_Load(object sender, EventArgs e)
         {
             _DAO = new EPMData(SPContext.Current.Site.ID);
             var action = Request["Action"];
             Guid timerjobguid = Guid.NewGuid();
             //DataTable dtResults;
-           
+
             if (action != null && action == "SnapshotAll")
             {
                 try
@@ -39,13 +39,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     {
                         using (SPWeb web = SPContext.Current.Web)
                         {
-                           
-                                _DAO.Command = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, jobdata) VALUES (@timerjobuid,@siteguid, 7, 'Reporting Snapshot All', 0, @webguid, @jobdata)";
-                                _DAO.AddParam("@timerjobuid", timerjobguid);
-                                _DAO.AddParam("@siteguid", site.ID.ToString());
-                                _DAO.AddParam("@webguid", web.ID.ToString());
-                                _DAO.AddParam("@jobdata", sLists);
-                                _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);                            
+
+                            _DAO.Command = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, jobdata) VALUES (@timerjobuid,@siteguid, 7, 'Reporting Snapshot All', 0, @webguid, @jobdata)";
+                            _DAO.AddParam("@timerjobuid", timerjobguid);
+                            _DAO.AddParam("@siteguid", site.ID.ToString());
+                            _DAO.AddParam("@webguid", web.ID.ToString());
+                            _DAO.AddParam("@jobdata", sLists);
+                            _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
                         }
                         EPMLiveCore.CoreFunctions.enqueue(timerjobguid, 0);
                     }
@@ -54,13 +54,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 }
                 catch (Exception ex)
                 {
-                    _DAO.LogStatus(string.Empty, string.Empty, "Process: SnapshotAll - " + ex.Message, ex.StackTrace, 2, 9,string.Empty);
+                    _DAO.LogStatus(string.Empty, string.Empty, "Process: SnapshotAll - " + ex.Message, ex.StackTrace, 2, 9, string.Empty);
                     Response.Write("Error: " + ex.Message);
                     return;
                 }
                 SPUtility.Redirect("epmlive/ListMappings.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
             }
-            else if (action != null && action == "RefreshAll")
+            else if (action != null && action == "CleanupAll")
             {
                 //Local Testing -- Start
                 //string sListNames = _DAO.GetListNames();
@@ -88,10 +88,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     using (SPWeb web = SPContext.Current.Web)
                     {
                         //DELETE WORK
-                        _DAO.DeleteWork(Guid.Empty,-1);
+                        _DAO.DeleteWork(Guid.Empty, -1);
                         //END
 
-                        _DAO.Command = "select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5";
+                        _DAO.Command = "select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=6";
                         _DAO.AddParam("@siteguid", site.ID.ToString());
                         object oResult = _DAO.ExecuteScalar(_DAO.GetEPMLiveConnection);
                         Guid timerjobuid = Guid.Empty;
@@ -103,7 +103,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         else
                         {
                             timerjobuid = Guid.NewGuid();
-                            _DAO.Command = "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, timerjobuid) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @timerjobuid)";
+                            _DAO.Command = "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, timerjobuid) VALUES (@siteguid, 6, 'List Data Cleanup', 2, @webguid, @timerjobuid)";
                             _DAO.AddParam("@siteguid", site.ID.ToString());
                             _DAO.AddParam("@webguid", web.ID.ToString());
                             _DAO.AddParam("@timerjobuid", timerjobuid);
@@ -119,5 +119,5 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
 
         }
-    }    
+    }
 }

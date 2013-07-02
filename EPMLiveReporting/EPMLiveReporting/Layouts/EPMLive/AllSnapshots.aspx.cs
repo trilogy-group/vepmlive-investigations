@@ -26,7 +26,17 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected void Page_Init(object sender, EventArgs e)
         {
             _DAO = new EPMData(SPContext.Current.Web.Site.ID);
+            LoadSchedules(true);
             LoadSnapshots();
+
+            if (SPContext.Current.Web.ServerRelativeUrl.EndsWith("/"))
+            {
+                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl + "_layouts/epmlive/ReportSchedule.aspx";
+            }
+            else
+            {
+                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl + "/_layouts/epmlive/ReportSchedule.aspx";
+            }
         }
 
         protected void LoadSnapshots()
@@ -52,6 +62,34 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 grdVwSnapshots.DataSource = dt;
                 grdVwSnapshots.DataBind();
             }
+        }
+
+        protected void LoadSchedules(bool blnLoadColums)
+        {
+            DataTable dt;
+            SPBoundField gridColumn;
+
+            _DAO.Command = "SELECT jobname as [Schedule Name], jobdata as [Lists], siteguid, timerjobuid  FROM TIMERJOBS WHERE siteguid ='" + SPContext.Current.Web.Site.ID + "' AND jobtype=7 AND ScheduleType <> 0";
+            dt = _DAO.GetTable(_DAO.GetEPMLiveConnection);
+
+            if (!IsPostBack || blnLoadColums)
+            {
+                foreach (DataColumn column in dt.Columns)
+                {
+                    gridColumn = new SPBoundField();
+                    gridColumn.HeaderText = column.ColumnName;
+                    gridColumn.DataField = column.ColumnName;
+
+                    if (column.ColumnName.EndsWith("uid"))
+                    {
+                        gridColumn.Visible = false;
+                    }
+                    grdVwSchedules.Columns.Add(gridColumn);
+                }
+            }
+
+            grdVwSchedules.DataSource = dt;
+            grdVwSchedules.DataBind();
         }
 
         public void RaisePostBackEvent(string snapshotuid)
