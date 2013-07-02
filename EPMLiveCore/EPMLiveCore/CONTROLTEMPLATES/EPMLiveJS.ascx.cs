@@ -53,20 +53,24 @@ namespace EPMLiveCore.ControlTemplates
         private void ManageWalkMeIntegration()
         {
             string sWalkMeId = string.Empty;
-            try{
+            try
+            {
                 sWalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
             }
-            catch{}
+            catch
+            {
+            }
 
 
-            if(!string.IsNullOrEmpty(sWalkMeId)){
+            if (!string.IsNullOrEmpty(sWalkMeId))
+            {
                 try
                 {
-                    Page.ClientScript.RegisterClientScriptBlock(
+                    Page.ClientScript.RegisterStartupScript(
                         //Type type//
-                        Page.GetType(), 
+                        Page.GetType(),
                         //string key//
-                        "WalkMeScript_" + sWalkMeId, 
+                        "WalkMeScript_" + sWalkMeId,
                         //string script//
                         @"(function () {
                             var walkme = document.createElement('script');
@@ -78,12 +82,14 @@ namespace EPMLiveCore.ControlTemplates
                         })();".Replace("##SCHEME##", Request.Url.Scheme).Replace("##WALKMEID##", sWalkMeId),
                         //bool addScriptTags//
                         true
-                    );
+                        );
                 }
-                catch { }
+                catch
+                {
+                }
             }
-            
         }
+
         #endregion Methods 
     }
 }

@@ -210,14 +210,16 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
 
         private static void UpdateMyWorkWebPart(SPWeb spWeb)
         {
-            SPLimitedWebPartManager webPartManager = spWeb.GetLimitedWebPartManager("MyWork.aspx",
-                                                                                    PersonalizationScope.Shared);
-
-            foreach (object webPart in webPartManager.WebParts.Cast<object>().Where(webPart => webPart is MyWorkWebPart)
-                )
+            using (
+                SPLimitedWebPartManager webPartManager = spWeb.GetLimitedWebPartManager("MyWork.aspx",
+                    PersonalizationScope.Shared))
             {
-                ((MyWorkWebPart) webPart).Height = string.Empty;
-                webPartManager.SaveChanges((WebPart) webPart);
+                foreach (
+                    object webPart in webPartManager.WebParts.Cast<object>().Where(webPart => webPart is MyWorkWebPart))
+                {
+                    ((MyWorkWebPart) webPart).Height = string.Empty;
+                    webPartManager.SaveChanges((WebPart) webPart);
+                }
             }
         }
 
@@ -227,18 +229,22 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
 
             using (var spSite = new SPSite(SPContext.Current.Site.ID))
             {
-                foreach (SPWeb web in spSite.AllWebs)
+                SPWebCollection spWebCollection = spSite.AllWebs;
+                for (int i = 0; i < spWebCollection.Count; i++)
                 {
-                    using (SPWeb spWeb = spSite.OpenWeb(web.ID))
+                    using (SPWeb web = spWebCollection[i])
                     {
-                        LogMessage("-- Web: " + spWeb.ServerRelativeUrl);
+                        using (SPWeb spWeb = spSite.OpenWeb(web.ID))
+                        {
+                            LogMessage("-- Web: " + spWeb.ServerRelativeUrl);
 
-                        spWeb.AllowUnsafeUpdates = true;
+                            spWeb.AllowUnsafeUpdates = true;
 
-                        UpdateMyWorkWebPart(spWeb);
-                        ConfigureMyWorkViews();
+                            UpdateMyWorkWebPart(spWeb);
+                            ConfigureMyWorkViews();
 
-                        spWeb.AllowUnsafeUpdates = false;
+                            spWeb.AllowUnsafeUpdates = false;
+                        }
                     }
                 }
             }

@@ -856,7 +856,14 @@ namespace EPMLiveCore
                 {
                     if (spWeb.Webs.Count == 0) return;
 
-                    foreach (SPWeb web in spWeb.Webs) GetWebTree(web.ID, siteUrl, ref tree);
+                    var spWebCollection = spWeb.Webs;
+                    for (int i = 0; i < spWebCollection.Count; i++)
+                    {
+                        using (var web = spWebCollection[i])
+                        {
+                            GetWebTree(web.ID, siteUrl, ref tree);
+                        }
+                    }
                 }
             }
         }

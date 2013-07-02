@@ -33,44 +33,49 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             {
                 using (var spSite = new SPSite(Web.Site.ID))
                 {
-                    foreach (SPWeb spWeb in spSite.AllWebs)
+                    SPWebCollection spWebCollection = spSite.AllWebs;
+                    for (int i = 0; i < spWebCollection.Count; i++)
                     {
-                        try
+                        using (SPWeb spWeb = spWebCollection[i])
                         {
-                            using (SPWeb web = spSite.OpenWeb(spWeb.ID))
+                            try
                             {
-                                LogTitle(GetWebInfo(web), 1);
-
-                                var configSetting = CoreFunctions.getConfigSetting(web, EPK_LIST_PROPERTY);
-                                if (string.IsNullOrEmpty(configSetting))
+                                using (SPWeb web = spSite.OpenWeb(spWeb.ID))
                                 {
-                                    LogMessage("No PFE list was found.", MessageKind.SKIPPED, 2);
-                                    continue;
-                                }
+                                    LogTitle(GetWebInfo(web), 1);
 
-                                foreach (string listName in configSetting.Split(',').Distinct())
-                                {
-                                    var list = listName.Trim();
-
-                                    SPList spList = spWeb.Lists.TryGetList(list);
-                                    if (spList == null)
+                                    string configSetting = CoreFunctions.getConfigSetting(web, EPK_LIST_PROPERTY);
+                                    if (string.IsNullOrEmpty(configSetting))
                                     {
-                                        LogMessage(@"List " + list + " does not exist.", MessageKind.SKIPPED, 2);
+                                        LogMessage("No PFE list was found.", MessageKind.SKIPPED, 2);
                                         continue;
                                     }
 
-                                    LogTitle(GetListInfo(spList), 2);
+                                    foreach (string listName in configSetting.Split(',').Distinct())
+                                    {
+                                        string list = listName.Trim();
 
-                                    MapField(spList, web, "Selected", "Selected", SPFieldType.Boolean,
-                                             "21000,Selected,1");
-                                    MapField(spList, web, "ResourcePlanHours", "Resource Plan Hours", SPFieldType.Number,
-                                             "21001,ResourcePlanHours,1");
+                                        SPList spList = spWeb.Lists.TryGetList(list);
+                                        if (spList == null)
+                                        {
+                                            LogMessage(@"List " + list + " does not exist.", MessageKind.SKIPPED, 2);
+                                            continue;
+                                        }
+
+                                        LogTitle(GetListInfo(spList), 2);
+
+                                        MapField(spList, web, "Selected", "Selected", SPFieldType.Boolean,
+                                            "21000,Selected,1");
+                                        MapField(spList, web, "ResourcePlanHours", "Resource Plan Hours",
+                                            SPFieldType.Number,
+                                            "21001,ResourcePlanHours,1");
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception e)
-                        {
-                            LogMessage(e.Message, MessageKind.FAILURE, 2);
+                            catch (Exception e)
+                            {
+                                LogMessage(e.Message, MessageKind.FAILURE, 2);
+                            }
                         }
                     }
                 }
@@ -86,7 +91,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         // Private Methods (1) 
 
         private void MapField(SPList spList, SPWeb web, string internalName, string displayName, SPFieldType spFieldType,
-                              string propertyValue)
+            string propertyValue)
         {
             string message;
             MessageKind messageKind;
@@ -94,7 +99,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             LogMessage("Adding field: " + displayName, 3);
 
             SPField spField = UpgradeUtilities.TryAddField(internalName, displayName, spFieldType, spList, out message,
-                                                           out messageKind);
+                out messageKind);
 
             if (spField != null)
             {
@@ -120,7 +125,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
             LogMessage(message, messageKind, 4);
 
-            var listName = spList.Title.Replace(" ", string.Empty).ToLower();
+            string listName = spList.Title.Replace(" ", string.Empty).ToLower();
 
             SetProperty(web, propertyValue, "epk" + listName + "_fields");
         }
@@ -179,10 +184,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     LogTitle(GetWebInfo(spSite.RootWeb), 1);
 
                     foreach (var feature in new Dictionary<Guid, string>
-                        {
-                            {new Guid(WEBPARTS_FEATURE_ID), "Work Engine Web Parts"},
-                            {new Guid(TIMESHEETS_FEATURE_ID), "WorkEngine Timesheets"}
-                        })
+                    {
+                        {new Guid(WEBPARTS_FEATURE_ID), "Work Engine Web Parts"},
+                        {new Guid(TIMESHEETS_FEATURE_ID), "WorkEngine Timesheets"}
+                    })
                     {
                         ResetFeature(feature, spSite);
                     }

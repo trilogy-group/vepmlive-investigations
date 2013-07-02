@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.SharePoint;
@@ -41,8 +40,8 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             SPList oResourcePool = SPWeb.Lists.TryGetList("Resources");
             SPList oRoles = SPWeb.Lists.TryGetList("Roles");
             SPList oDepartments = SPWeb.Lists.TryGetList("Departments");
-            SPList oHolidaySchedule = SPWeb.Lists.TryGetList("HolidaySchedules");
-            SPList oWorkHours = SPWeb.Lists.TryGetList("WorkHours");
+            SPList oHolidaySchedule = SPWeb.Lists.TryGetList("Holiday Schedules");
+            SPList oWorkHours = SPWeb.Lists.TryGetList("Work Hours");
 
             if (oResourcePool == null)
             {
@@ -162,7 +161,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     catch
                     {
                         SPField newField = oResourcePool.Fields.CreateNewField(SPFieldType.Choice.ToString(),
-                                                                               "Department");
+                            "Department");
                         oResourcePool.Fields.Add(newField);
                         oResourcePool.Update();
 
@@ -215,7 +214,14 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     {
                         var dtResourceHSWS = new DataTable();
 
-                        using (var sqlConnection = new SqlConnection(GetConnectionString()))
+                        string connectionString = GetConnectionString();
+
+                        if (string.IsNullOrEmpty(connectionString))
+                        {
+                            throw new Exception("PFE DB connection string is empty.");
+                        }
+
+                        using (var sqlConnection = new SqlConnection(connectionString))
                         {
                             using (var sqlCommand = new SqlCommand(SQL, sqlConnection))
                             {
@@ -227,7 +233,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                             }
                         }
 
-                        resourceHSWS = dtDepartments.AsEnumerable();
+                        resourceHSWS = dtResourceHSWS.AsEnumerable();
 
                         if (resourceHSWS.Any())
                         {
@@ -253,7 +259,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                                 if (dr.Length > 0)
                                 {
                                     var lv = new SPFieldLookupValue(int.Parse(dr[0]["ID"].ToString()),
-                                                                    li["TempDept"].ToString());
+                                        li["TempDept"].ToString());
                                     li[oFieldDept.Id] = lv;
                                 }
                             }
@@ -265,30 +271,61 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                                 if (dr.Length > 0)
                                 {
                                     var lv = new SPFieldLookupValue(int.Parse(dr[0]["ID"].ToString()),
-                                                                    li["TempRole"].ToString());
+                                        li["TempRole"].ToString());
                                     li[oFieldRole.Id] = lv;
                                 }
                             }
 
                             #endregion
 
-                            if (resourceHSWS != null && resourceHSWS.Any())
+                            string spAccount = string.Empty;
+                            var resAcct = li["SharePointAccount"] as string;
+                            if (!string.IsNullOrEmpty(resAcct))
+                            {
+                                var uv = new SPFieldUserValue(SPWeb, resAcct);
+                                if (uv.User != null)
+                                {
+                                    spAccount = uv.User.LoginName.ToLower();
+                                }
+                            }
+
+                            string extId = (li["EXTID"] ?? string.Empty).ToString();
+
+                            if (resourceHSWS != null && resourceHSWS.Any() && !string.IsNullOrEmpty(spAccount))
                             {
                                 try
                                 {
-                                    SPListItem resource = li;
+                                    if (string.IsNullOrEmpty(extId))
+                                    {
+                                        foreach (DataRow row in resourceHSWS)
+                                        {
+                                            object acct = row["Account"];
+                                            if (acct != null && acct != DBNull.Value)
+                                            {
+                                                if (acct.ToString().ToLower().Equals(spAccount))
+                                                {
+                                                    li["EXTID"] = (row["ResourceId"] ?? string.Empty).ToString();
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogMessage("\t", "(" + li.Title + "): Not setting EXTID. " + ex.Message, 3);
+                                }
+
+                                try
+                                {
                                     foreach (object schedule in from hs in resourceHSWS
-                                                                let extId = hs["ExtId"]
-                                                                where extId != null && extId != DBNull.Value
-                                                                where
-                                                                    extId.ToString()
-                                                                         .Equals(
-                                                                             resource.ID.ToString(
-                                                                                 CultureInfo.InvariantCulture))
-                                                                select hs["HolidaySchedule"]
-                                                                into schedule
-                                                                where schedule != null && schedule != DBNull.Value
-                                                                select schedule)
+                                        let account = hs["Account"]
+                                        where account != null && account != DBNull.Value
+                                        where account.ToString().ToLower().Equals(spAccount)
+                                        select hs["HolidaySchedule"]
+                                        into schedule
+                                        where schedule != null && schedule != DBNull.Value
+                                        select schedule)
                                     {
                                         foreach (DataRow s in holidaySchedules)
                                         {
@@ -307,23 +344,19 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                                 catch (Exception ex)
                                 {
                                     LogMessage("\t", "(" + li.Title + "): Not setting Holiday Schedule. " + ex.Message,
-                                               3);
+                                        3);
                                 }
 
                                 try
                                 {
-                                    SPListItem resource = li;
                                     foreach (object hours in from wh in resourceHSWS
-                                                             let extId = wh["ExtId"]
-                                                             where extId != null && extId != DBNull.Value
-                                                             where
-                                                                 extId.ToString()
-                                                                      .Equals(
-                                                                          resource.ID.ToString(
-                                                                              CultureInfo.InvariantCulture))
-                                                             select wh["WorkHours"]
-                                                             into hours
-                                                             where hours != null && hours != DBNull.Value select hours)
+                                        let account = wh["Account"]
+                                        where account != null && account != DBNull.Value
+                                        where account.ToString().ToLower().Equals(spAccount)
+                                        select wh["WorkHours"]
+                                        into hours
+                                        where hours != null && hours != DBNull.Value
+                                        select hours)
                                     {
                                         foreach (DataRow h in workHours)
                                         {
@@ -347,8 +380,8 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                             else
                             {
                                 LogMessage("\t",
-                                           "(" + li.Title +
-                                           "): Not setting Holiday Schedule and Work Hours. Cannot load from PFE.", 3);
+                                    "(" + li.Title +
+                                    "): Not setting Holiday Schedule and Work Hours. Cannot load from PFE.", 3);
                             }
 
                             li.Update();
@@ -381,7 +414,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                         {
                             SPList resourcePool = spWeb.Lists.GetList(oResourcePool.ID, false);
 
-                            var gSettings = new GridGanttSettings(resourcePool) { HideNewButton = false };
+                            var gSettings = new GridGanttSettings(resourcePool) {HideNewButton = false};
                             gSettings.SaveSettings();
                         }
                     }
@@ -418,7 +451,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             string basePath = CoreFunctions.getConfigSetting(SPWeb, "epkbasepath");
 
             if (string.IsNullOrEmpty(basePath))
-        {
+            {
                 throw new Exception("EPK Base Path is empty.");
             }
 
@@ -427,6 +460,11 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             if (string.IsNullOrEmpty(database))
             {
                 database = GetDatabaseFromRegistry(basePath);
+            }
+
+            if (string.IsNullOrEmpty(database))
+            {
+                throw new Exception("Cannot read PFE DB information from the registry.");
             }
 
             string[] list = database.Split(';').Where(s => !s.ToLower().Contains("provider")).ToArray();
@@ -443,26 +481,26 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             try
             {
                 RegistryKey key = registryKey.OpenSubKey("EPMLive", false)
-                                             .OpenSubKey("PortfolioEngine", false)
-                                             .OpenSubKey(basePath);
+                    .OpenSubKey("PortfolioEngine", false)
+                    .OpenSubKey(basePath);
 
                 database = key.GetValue("ConnectionString").ToString();
             }
             catch
             {
                 try
-                            {
+                {
                     RegistryKey key = registryKey.OpenSubKey("Wow6432Node", false)
-                                                 .OpenSubKey("EPMLive", false)
-                                                 .OpenSubKey("PortfolioEngine", false)
-                                                 .OpenSubKey(basePath);
+                        .OpenSubKey("EPMLive", false)
+                        .OpenSubKey("PortfolioEngine", false)
+                        .OpenSubKey(basePath);
 
                     database = key.GetValue("ConnectionString").ToString();
-                        }
+                }
                 catch
                 {
-                    }
                 }
+            }
 
             return database;
         }
@@ -770,7 +808,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
         }
 
         private void UpdateField(string sFieldName, bool bCanShowInNewForm, bool bCanShowInEditForm,
-                                 bool bCanShowInDisplayForm, ref SPList ResourcePool)
+            bool bCanShowInDisplayForm, ref SPList ResourcePool)
         {
             using (var spSite = new SPSite(ResourcePool.ParentWeb.Site.ID))
             {
@@ -807,14 +845,14 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                     {
                         LogMessage("", "(" + sFieldName + "): " + ex.Message, 3);
                     }
+                }
+            }
         }
-    }
-}
 
         #endregion Methods 
 
         private const string SQL = @"
-            SELECT    dbo.EPG_VW_RPT_Resources.WRES_EXT_UID AS ExtId, dbo.EPG_GROUPS.GROUP_NAME AS HolidaySchedule, EPG_GROUPS_1.GROUP_NAME AS WorkHours
+            SELECT    dbo.EPG_VW_RPT_Resources.ResourceID AS ResourceId, dbo.EPG_VW_RPT_Resources.[User Name] AS Account, dbo.EPG_GROUPS.GROUP_NAME AS HolidaySchedule, EPG_GROUPS_1.GROUP_NAME AS WorkHours
             FROM      dbo.EPG_GROUP_MEMBERS AS EPG_GROUP_MEMBERS_1 INNER JOIN
                       dbo.EPG_GROUPS AS EPG_GROUPS_1 ON EPG_GROUP_MEMBERS_1.GROUP_ID = EPG_GROUPS_1.GROUP_ID RIGHT OUTER JOIN
                       dbo.EPG_VW_RPT_Resources ON EPG_GROUP_MEMBERS_1.MEMBER_UID = dbo.EPG_VW_RPT_Resources.ResourceID LEFT OUTER JOIN

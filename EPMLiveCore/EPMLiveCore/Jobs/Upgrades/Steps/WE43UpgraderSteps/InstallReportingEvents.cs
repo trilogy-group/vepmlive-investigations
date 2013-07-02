@@ -6,7 +6,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 {
-    [JobStep("WE43Upgrader", 4)]
+    [JobStep("WE43Upgrader", 15)]
     public class InstallReportingEvents : Step
     {
         #region Constructors (1) 
@@ -21,7 +21,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
         #region Overrides of Step
 
         /// <summary>
-        /// Gets the description.
+        ///     Gets the description.
         /// </summary>
         public override string Description
         {
@@ -29,9 +29,9 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
         }
 
         /// <summary>
-        /// Performs this instance.
+        ///     Performs this instance.
         /// </summary>
-        /// <returns/>
+        /// <returns />
         public override bool Perform()
         {
             try
@@ -69,10 +69,10 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             const string className = "EPMLiveReportsAdmin.LstEvents";
 
             int count = (from SPEventReceiverDefinition erd in spList.EventReceivers
-                         where erd.Assembly.Equals(assemblyName)
-                         where erd.Class.Equals(className)
-                         where erd.Type == SPEventReceiverType.FieldAdded
-                         select erd.Name).Count();
+                where erd.Assembly.Equals(assemblyName)
+                where erd.Class.Equals(className)
+                where erd.Type == SPEventReceiverType.FieldAdded
+                select erd.Name).Count();
 
             if (count == 0)
             {

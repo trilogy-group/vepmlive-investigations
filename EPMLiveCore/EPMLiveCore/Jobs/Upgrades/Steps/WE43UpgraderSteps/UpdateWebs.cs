@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.SharePoint;
 using System.Data;
+using System.IO;
+using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 {
@@ -22,48 +20,50 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
         public override bool Perform()
         {
-            foreach(SPWeb web in SPSite.AllWebs)
+            SPWebCollection spWebCollection = SPSite.AllWebs;
+            for (int i = 0; i < spWebCollection.Count; i++)
             {
-                LogMessage("Web: " + web.ServerRelativeUrl);
+                using (SPWeb web = spWebCollection[i])
+                {
+                    LogMessage("Web: " + web.ServerRelativeUrl);
 
-                try
-                {
-                    UpdateMaster(web);
-                }
-                catch (Exception ex)
-                {
-                    LogMessage("", ex.Message, 3);
-                }
+                    try
+                    {
+                        UpdateMaster(web);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogMessage("", ex.Message, 3);
+                    }
 
-                try
-                {
-                    ActivateAppsList(web);
-                }
-                catch (Exception ex)
-                {
-                    LogMessage("", ex.Message, 3);
-                }
+                    try
+                    {
+                        ActivateAppsList(web);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogMessage("", ex.Message, 3);
+                    }
 
-                try
-                {
-                    UpdateSettings(web);
-                }
-                catch (Exception ex)
-                {
-                    LogMessage("", ex.Message, 3);
-                }
+                    try
+                    {
+                        UpdateSettings(web);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogMessage("", ex.Message, 3);
+                    }
 
-                try
-                {
-                    AddCommunity(web);
+                    try
+                    {
+                        AddCommunity(web);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogMessage("", ex.Message, 3);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    LogMessage("", ex.Message, 3);
-                }
-
             }
-
 
             return true;
         }
@@ -74,7 +74,9 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             {
                 return category.Substring(category.IndexOf(")") + 2);
             }
-            catch { }
+            catch
+            {
+            }
             return category;
         }
 
@@ -84,32 +86,33 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             {
                 return category.Substring(0, category.IndexOf(")"));
             }
-            catch { }
+            catch
+            {
+            }
             return category;
         }
 
         private void UpdateSettings(SPWeb web)
         {
-
-            if(!web.IsRootWeb)
+            if (!web.IsRootWeb)
             {
                 LogMessage("\tUpdating Settings List");
 
 
                 SPList list = web.Lists.TryGetList("EPM Live Settings");
 
-                if(list != null)
+                if (list != null)
                 {
-                    SPFieldChoice oField = (SPFieldChoice)list.Fields.GetFieldByInternalName("Category");
+                    var oField = (SPFieldChoice) list.Fields.GetFieldByInternalName("Category");
 
                     bool bCatFound = false;
 
                     string lastNum = "1";
                     string CategoryName = "";
 
-                    foreach(string s in oField.Choices)
+                    foreach (string s in oField.Choices)
                     {
-                        if(getCategoryName(s) == "Configuration")
+                        if (getCategoryName(s) == "Configuration")
                         {
                             CategoryName = s;
                             bCatFound = true;
@@ -118,7 +121,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                         lastNum = getCategoryNumber(s);
                     }
 
-                    if(!bCatFound)
+                    if (!bCatFound)
                     {
                         LogMessage("\t\tAdding Category");
 
@@ -135,7 +138,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                     DataRow[] dr = dt.Select("Title='Manage Communities'");
 
-                    if(dr.Length == 0)
+                    if (dr.Length == 0)
                     {
                         LogMessage("\t\tAdding Setting: Manage Communities");
 
@@ -148,7 +151,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                     dr = dt.Select("Title='Manage Applications'");
 
-                    if(dr.Length == 0)
+                    if (dr.Length == 0)
                     {
                         LogMessage("\t\tAdding Setting: Manage Applications");
 
@@ -170,12 +173,13 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
         {
             LogMessage("Adding Communities");
 
-            SPList list = EPMLiveCore.API.Applications.GetApplicationList(web);
+            SPList list = API.Applications.GetApplicationList(web);
 
-            SPQuery query = new SPQuery();
-            query.Query = "<Where><IsNull><FieldRef Name='EXTID'/></IsNull></Where><OrderBy><FieldRef Name='Title'/></OrderBy>";
+            var query = new SPQuery();
+            query.Query =
+                "<Where><IsNull><FieldRef Name='EXTID'/></IsNull></Where><OrderBy><FieldRef Name='Title'/></OrderBy>";
 
-            if(list.GetItems(query).Count == 0)
+            if (list.GetItems(query).Count == 0)
             {
                 try
                 {
@@ -183,16 +187,17 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                     LogMessage("\tAdding Community: Projects");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     LogMessage("", "Adding Community: Projects: " + ex.Message, 3);
                 }
             }
 
             query = new SPQuery();
-            query.Query = "<Where><IsNotNull><FieldRef Name='EXTID'/></IsNotNull></Where><OrderBy><FieldRef Name='Title'/></OrderBy>";
+            query.Query =
+                "<Where><IsNotNull><FieldRef Name='EXTID'/></IsNotNull></Where><OrderBy><FieldRef Name='Title'/></OrderBy>";
 
-            if(list.GetItems(query).Count == 0)
+            if (list.GetItems(query).Count == 0)
             {
                 try
                 {
@@ -207,7 +212,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                     LogMessage("\tAdding App: PMO");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     LogMessage("", "Adding App: PMO: " + ex.Message, 3);
                 }
@@ -227,19 +232,19 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
             string masterUrl = web.MasterUrl;
 
-            if(System.IO.Path.GetFileName(masterUrl).ToLower().Equals("wetoplevel.master"))
+            if (Path.GetFileName(masterUrl).ToLower().Equals("wetoplevel.master"))
             {
                 ActivateFeature(true, web);
                 ChangeMasterPage("MasterV43LightBlueTop", web);
             }
-            else if(System.IO.Path.GetFileName(masterUrl).ToLower().Equals("weworkspacetopnav.master"))
+            else if (Path.GetFileName(masterUrl).ToLower().Equals("weworkspacetopnav.master"))
             {
                 ActivateFeature(false, web);
                 ChangeMasterPage("MasterV43LightBlueWS", web);
             }
             else
             {
-                if(web.IsRootWeb)
+                if (web.IsRootWeb)
                 {
                     ActivateFeature(true, web);
                     //ChangeMasterPage("MasterV43LightBlueTop", SPWeb);
@@ -265,12 +270,11 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
         private void ActivateFeature(bool bTopLevel, SPWeb web)
         {
-            LogMessage("\t\tActivating Master Page Feature Top: " + bTopLevel.ToString());
+            LogMessage("\t\tActivating Master Page Feature Top: " + bTopLevel);
 
             web.Features.Add(bTopLevel
-                                   ? new Guid("12c595be-1b08-4eda-b45a-b4703650234f")
-                                   : new Guid("7d08f889-c324-460b-95e2-c26ee42657ad"), true);
+                ? new Guid("12c595be-1b08-4eda-b45a-b4703650234f")
+                : new Guid("7d08f889-c324-460b-95e2-c26ee42657ad"), true);
         }
-
     }
 }
