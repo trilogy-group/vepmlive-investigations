@@ -25,10 +25,10 @@
 	<Toolbar Visible="0" />
 	<Panel Delete="0" Visible="1" CanHide="0" HoverCell="Color" HoverRow="Color" />
 	<Head>
-		<Filter CanEdit="1" HoverRow="" HoverCell="" FocusRow="" FocusCell="" />
+		<Filter CanEdit="1" HoverRow="" HoverCell="" FocusRow="" FocusCell="" Visible="0" />
 	</Head>
 	<Solid>
-		<Group />
+		<Group Visible="0" />
 		<I id="NoData" Html="No resource found." />
 	</Solid>
 	<Lang>
