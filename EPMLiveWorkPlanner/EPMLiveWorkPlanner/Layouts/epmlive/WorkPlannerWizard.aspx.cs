@@ -177,20 +177,35 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             {
                 SPList oList = Web.Lists[new Guid(sProjectListId)];
 
-                sProjectName = oList.GetItemById(int.Parse(sItemID)).Title;
+                try
+                {    
 
+                    sProjectName = oList.GetItemById(int.Parse(sItemID)).Title;
 
+                    byte[] fBytes = FileUpload.FileBytes;
 
-                byte[] fBytes = FileUpload.FileBytes;
+                    SPFolder folder = Web.GetFolder("Project Schedules/" + sPlannerID);
+                    if (!folder.Exists)
+                        folder = Web.Folders["Project Schedules"].SubFolders.Add(sPlannerID);
 
-                SPFolder folder = Web.GetFolder("Project Schedules/" + sPlannerID);
-                if(!folder.Exists)
-                    folder = Web.Folders["Project Schedules"].SubFolders.Add(sPlannerID);
+                    folder.Files.Add(sProjectName + ".mpp", fBytes);
 
-                folder.Files.Add(sProjectName + ".mpp", fBytes);
-
-                pnlUpload.Visible = false;
-                pnlUploadDone.Visible = true;
+                    pnlUpload.Visible = false;
+                    pnlUploadDone.Visible = true;
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.Contains("contains invalid characters"))
+                    {
+                        lblUploadError.Text = "You may not use the following characters in the name of your " + oList.Title + " item: \"# % & * : < > ? /  { | } \". Please rename your item and import the file again.";
+                        lblUploadError.Visible = true;
+                    }
+                    else
+                    {
+                        lblUploadError.Text = "Error: " + ex.Message;
+                        lblUploadError.Visible = true;
+                    }
+                }
             }
             else
             {
