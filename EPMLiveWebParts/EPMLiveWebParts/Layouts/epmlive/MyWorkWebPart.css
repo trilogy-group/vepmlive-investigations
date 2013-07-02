@@ -39,10 +39,7 @@ div.MWG_CommentHovered {
     cursor: pointer;
 }
 
-div.MWG_CommentRead 
-{
-    background-image:url('images/mywork/comment.png');
-}
+div.MWG_CommentRead, div.MWG_CommentRead_Completed { background-image: url('images/mywork/comment.png'); }
 
 div.MWG_CommentDisabled
 {
