@@ -1944,7 +1944,7 @@ namespace PortfolioEngineCore
                     oCommand = new SqlCommand("EPG_SP_ReadResourcePlansHours", _dba.Connection);
                     oCommand.CommandType = CommandType.StoredProcedure;
                     oCommand.Parameters.Add("StartPeriodID", SqlDbType.Int).Value = lStartPeriodID;
-                    oCommand.Parameters.Add("sList", SqlDbType.VarChar, 255).Value = sCMTUIDs;
+                    oCommand.Parameters.Add("sList", SqlDbType.VarChar, sCMTUIDs.Length).Value = sCMTUIDs;
                     reader = oCommand.ExecuteReader();
 
                     string sPeriods = "";
