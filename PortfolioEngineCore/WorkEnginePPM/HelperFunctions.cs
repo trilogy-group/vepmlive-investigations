@@ -118,10 +118,12 @@ namespace WorkEnginePPM
                     string []sProjectUidArray = id.Split('.');
                     using (SPSite site = SPContext.Current.Site)
                     {
-                        SPWeb web = site.OpenWeb(new Guid(sProjectUidArray[0]));
-                        SPList list = web.Lists[new Guid(sProjectUidArray[1])];
-                        SPListItem li = list.GetItemById(int.Parse(sProjectUidArray[2]));
-                        sProjectName = li.Title;
+                        using (SPWeb web = site.OpenWeb(new Guid(sProjectUidArray[0])))
+                        {
+                            SPList list = web.Lists[new Guid(sProjectUidArray[1])];
+                            SPListItem li = list.GetItemById(int.Parse(sProjectUidArray[2]));
+                            sProjectName = li.Title;
+                        }
                     }
                 }
                 catch { }
@@ -131,6 +133,7 @@ namespace WorkEnginePPM
 
         private static void prepareItemList(SPList list)
         {
+            list.ParentWeb.AllowUnsafeUpdates = true;
             if (!list.Fields.ContainsField("ExternalID"))
             {
                 list.Fields.Add("ExternalID", SPFieldType.Text, false);

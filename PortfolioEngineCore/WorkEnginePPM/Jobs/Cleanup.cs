@@ -28,24 +28,28 @@ namespace WorkEnginePPM.Jobs
                 string ppmCompany = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
                 string ppmDbConn = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
 
-                PortfolioEngineCore.WEIntegration.WEIntegration we = new PortfolioEngineCore.WEIntegration.WEIntegration(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
-                PortfolioEngineCore.PortfolioItems.PortfolioItems pe = new PortfolioEngineCore.PortfolioItems.PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
+                PortfolioEngineCore.WEIntegration.WEIntegration we =
+                    new PortfolioEngineCore.WEIntegration.WEIntegration(basePath, username, ppmId, ppmCompany, ppmDbConn,
+                                                                        false);
+                PortfolioEngineCore.PortfolioItems.PortfolioItems pe =
+                    new PortfolioEngineCore.PortfolioItems.PortfolioItems(basePath, username, ppmId, ppmCompany,
+                                                                          ppmDbConn, false);
 
-                string resUrl = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", false);
-                SPWeb resWeb = null;
-                SPSite resSite = null;
-                SPList resList = null;
+                //string resUrl = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", false);
+                //SPWeb resWeb = null;
+                //SPSite resSite = null;
+                //SPList resList = null;
 
-                if(resUrl.ToLower() != web.Url.ToLower())
-                {
-                    resSite = new SPSite(resUrl);
-                    resWeb = resSite.OpenWeb();
-                }
-                else
-                {
-                    resSite = web.Site;
-                    resWeb = web;
-                }
+                //if (resUrl.ToLower() != web.Url.ToLower())
+                //{
+                //    resSite = new SPSite(resUrl);
+                //    resWeb = resSite.OpenWeb();
+                //}
+                //else
+                //{
+                //    resSite = web.Site;
+                //    resWeb = web;
+                //}
 
 
                 //string PortfolioXml = epkInt.ExecuteProcess("GetPortfolioItems", "");
@@ -92,13 +96,15 @@ namespace WorkEnginePPM.Jobs
                 sErrors = "Processing Timesheets: <br>";
                 try
                 {
-                    if(cn != null)
+                    if (cn != null)
                         processTimesheets(site, web, cn, we);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">General Error Processing Timesheets: " + ex.Message + "</font><br>";
+                    sErrors +=
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">General Error Processing Timesheets: " +
+                        ex.Message + "</font><br>";
                 }
 
                 //    sErrors += "<br>Processing Resources: <br>";
@@ -126,7 +132,7 @@ namespace WorkEnginePPM.Jobs
                 //    }
                 //}
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 bErrors = true;
                 sErrors += "<font color=\"red\">General Error: " + ex.Message + "</font><br>";

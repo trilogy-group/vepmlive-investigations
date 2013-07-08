@@ -2029,43 +2029,47 @@ namespace WorkEnginePPM
                         {
                             string[] arrLists = slists.Split(',');
 
-                            foreach (SPWeb web in site.AllWebs)
+                            var spWebCollection = site.AllWebs;
+                            for (int i = 0; i < spWebCollection.Count; i++)
                             {
-                                string badLists = "";
-
-                                foreach (string sList in arrLists)
+                                using (var web = spWebCollection[i])
                                 {
-                                    int eventCount = 0;
+                                    string badLists = "";
 
-                                    try
+                                    foreach (string sList in arrLists)
                                     {
-                                        
-                                        SPList list = web.Lists[sList];
+                                        int eventCount = 0;
 
-                                        foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
+                                        try
                                         {
-                                            if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                eventCount++;
 
-                                            if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                eventCount++;
+                                            SPList list = web.Lists[sList];
 
-                                            if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                eventCount++;
+                                            foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
+                                            {
+                                                if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                    eventCount++;
+
+                                                if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                    eventCount++;
+
+                                                if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                    eventCount++;
+                                            }
+
+                                            if (eventCount != 3)
+                                            {
+                                                badLists += "," + sList;
+                                            }
                                         }
-
-                                        if (eventCount != 3)
-                                        {
-                                            badLists += "," + sList;
-                                        }
+                                        catch { }
                                     }
-                                    catch { }
-                                }
-                                if (badLists != "")
-                                {
-                                    badLists = badLists.Trim(',');
+                                    if (badLists != "")
+                                    {
+                                        badLists = badLists.Trim(',');
 
-                                    message += "<Web><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
+                                        message += "<Web><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
+                                    }
                                 }
                             }
                         }
@@ -2267,57 +2271,61 @@ namespace WorkEnginePPM
                         {
                             string[] arrLists = slists.Split(',');
 
-                            foreach (SPWeb web in site.AllWebs)
+                            var spWebCollection = site.AllWebs;
+                            for (int i = 0; i < spWebCollection.Count; i++)
                             {
-                                string badLists = "";
-                                string lerrors = "";
-
-                                foreach (string sList in arrLists)
+                                using (var web = spWebCollection[i])
                                 {
-                                    try
+                                    string badLists = "";
+                                    string lerrors = "";
+
+                                    foreach (string sList in arrLists)
                                     {
-                                        SPList list = web.Lists[sList];
-
-                                        ArrayList arrEvents = new ArrayList();
-                                        foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
-                                        {
-                                            if (spEventDef.Type == SPEventReceiverType.ItemAdding && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                arrEvents.Add(spEventDef.Id);
-                                            
-                                            if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                arrEvents.Add(spEventDef.Id);
-
-                                            if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                arrEvents.Add(spEventDef.Id);
-
-                                            if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                                arrEvents.Add(spEventDef.Id);
-                                        }
-
                                         try
                                         {
-                                            foreach (Guid id in arrEvents)
-                                            {
-                                                list.EventReceivers[id].Delete();
-                                            }
-                                            list.Update();
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            lerrors += ex.Message + "  ";
-                                        }
-                                        if (arrEvents.Count > 0)
-                                            badLists += "," + sList;
-                                    }
-                                    catch { }
-                                }
-                                if (badLists != "")
-                                {
-                                    badLists = badLists.Trim(',');
-                                    if (lerrors != "")
-                                        errors = true;
+                                            SPList list = web.Lists[sList];
 
-                                    message += "<Web Status=\"" + ((lerrors != "") ? "1" : "0") + "\"><Error>" + lerrors + "</Error><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
+                                            ArrayList arrEvents = new ArrayList();
+                                            foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
+                                            {
+                                                if (spEventDef.Type == SPEventReceiverType.ItemAdding && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                    arrEvents.Add(spEventDef.Id);
+
+                                                if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                    arrEvents.Add(spEventDef.Id);
+
+                                                if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                    arrEvents.Add(spEventDef.Id);
+
+                                                if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                    arrEvents.Add(spEventDef.Id);
+                                            }
+
+                                            try
+                                            {
+                                                foreach (Guid id in arrEvents)
+                                                {
+                                                    list.EventReceivers[id].Delete();
+                                                }
+                                                list.Update();
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                lerrors += ex.Message + "  ";
+                                            }
+                                            if (arrEvents.Count > 0)
+                                                badLists += "," + sList;
+                                        }
+                                        catch { }
+                                    }
+                                    if (badLists != "")
+                                    {
+                                        badLists = badLists.Trim(',');
+                                        if (lerrors != "")
+                                            errors = true;
+
+                                        message += "<Web Status=\"" + ((lerrors != "") ? "1" : "0") + "\"><Error>" + lerrors + "</Error><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
+                                    }
                                 }
                             }
                         }
@@ -2373,56 +2381,60 @@ namespace WorkEnginePPM
                 {
                     using (SPSite site = SPContext.Current.Site)
                     {
-                        foreach (SPWeb web in site.AllWebs)
+                        var spWebCollection = site.AllWebs;
+                        for (int i = 0; i < spWebCollection.Count; i++)
                         {
-                            string badLists = "";
-                            string lerrors = "";
-
-                            for(int i = 0;i<web.Lists.Count ;i++)
+                            using (var web = spWebCollection[i])
                             {
-                                SPList list = web.Lists[i];
-                                try
+                                string badLists = "";
+                                string lerrors = "";
+
+                                for (int j = 0; j < web.Lists.Count; j++)
                                 {
-                                    ArrayList arrEvents = new ArrayList();
-                                    foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
-                                    {
-                                        if (spEventDef.Type == SPEventReceiverType.ItemAdding && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                            arrEvents.Add(spEventDef.Id);
-
-                                        if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                            arrEvents.Add(spEventDef.Id);
-
-                                        if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                            arrEvents.Add(spEventDef.Id);
-
-                                        if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
-                                            arrEvents.Add(spEventDef.Id);
-                                    }
-
+                                    SPList list = web.Lists[j];
                                     try
                                     {
-                                        foreach (Guid id in arrEvents)
+                                        ArrayList arrEvents = new ArrayList();
+                                        foreach (SPEventReceiverDefinition spEventDef in list.EventReceivers)
                                         {
-                                            list.EventReceivers[id].Delete();
-                                        }
-                                        list.Update();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        lerrors += ex.Message + "  ";
-                                    }
-                                    if (arrEvents.Count > 0)
-                                        badLists += "," + list.Title;
-                                }
-                                catch { }
-                            }
-                            if (badLists != "")
-                            {
-                                badLists = badLists.Trim(',');
-                                if (lerrors != "")
-                                    errors = true;
+                                            if (spEventDef.Type == SPEventReceiverType.ItemAdding && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                arrEvents.Add(spEventDef.Id);
 
-                                message += "<Web Status=\"" + ((lerrors != "") ? "1" : "0") + "\"><Error>" + lerrors + "</Error><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
+                                            if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                arrEvents.Add(spEventDef.Id);
+
+                                            if (spEventDef.Type == SPEventReceiverType.ItemUpdating && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                arrEvents.Add(spEventDef.Id);
+
+                                            if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == eventclass.ToLower())
+                                                arrEvents.Add(spEventDef.Id);
+                                        }
+
+                                        try
+                                        {
+                                            foreach (Guid id in arrEvents)
+                                            {
+                                                list.EventReceivers[id].Delete();
+                                            }
+                                            list.Update();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            lerrors += ex.Message + "  ";
+                                        }
+                                        if (arrEvents.Count > 0)
+                                            badLists += "," + list.Title;
+                                    }
+                                    catch { }
+                                }
+                                if (badLists != "")
+                                {
+                                    badLists = badLists.Trim(',');
+                                    if (lerrors != "")
+                                        errors = true;
+
+                                    message += "<Web Status=\"" + ((lerrors != "") ? "1" : "0") + "\"><Error>" + lerrors + "</Error><URL><![CDATA[" + web.ServerRelativeUrl + "]]></URL><Title><![CDATA[" + web.Title + "]]></Title><Lists><![CDATA[" + badLists + "]]></Lists></Web>";
+                                }
                             }
                         }
                     }

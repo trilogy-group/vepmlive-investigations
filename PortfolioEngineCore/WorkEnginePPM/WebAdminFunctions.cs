@@ -14,13 +14,16 @@ namespace WorkEnginePPM
             secLevel = SecurityLevels.Base;
             using (var site = new SPSite(SPContext.Current.Web.Site.ID))
             {
+                //using (SPWeb rootWeb = site.RootWeb)
                 SPWeb rootWeb = site.RootWeb;
+                {
 
-                basepath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
-                ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
-                ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
-                ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
-                username = ConfigFunctions.GetCleanUsername(rootWeb);
+                    basepath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
+                    ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
+                    ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
+                    ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
+                    username = ConfigFunctions.GetCleanUsername(rootWeb);
+                }
             }
         }
 
@@ -173,6 +176,13 @@ namespace WorkEnginePPM
             xReply.CreateString("location", location);
             xReply.CreateString("message", message);
             xReply.CreateString("trace", trace);
+            return xReply.XML();
+        }
+        public static string FormatWarning(string message)
+        {
+            CStruct xReply = new CStruct();
+            xReply.Initialize("warning");
+            xReply.CreateString("message", message);
             return xReply.XML();
         }
     }
