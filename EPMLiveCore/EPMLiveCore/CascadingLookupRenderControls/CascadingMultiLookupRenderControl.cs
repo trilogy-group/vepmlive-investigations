@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint;
+using System.Diagnostics;
+using System.Reflection;
+using System.Globalization;
 
 namespace EPMLiveCore
 {
@@ -58,7 +61,12 @@ namespace EPMLiveCore
                 "</script>"
                 , false);
 
-            this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_ModifiedDropDownJS_", "<script src='/_layouts/epmlive/ModifiedDropDown.js'></script>", false);
+            string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+            if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
+            {
+                fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+            }
+            ScriptLink.Register(Page, "/_layouts/epmlive/ModifiedDropDown.js?v=" + fileVersion, false);
         
 
             object fv = null;
