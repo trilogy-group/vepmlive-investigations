@@ -93,7 +93,7 @@ namespace EPMLiveCore.API
             CheckInstalledRoot();
 
             oAppList = oWeb.Lists.TryGetList("Installed Applications");
-            if(oAppList == null)
+            if (oAppList == null)
             {
                 addMessage(ErrorLevels.Error, "Application List", "You do not have the application list installed", 0);
                 return;
@@ -105,7 +105,7 @@ namespace EPMLiveCore.API
                 query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + appDef.Id + "</Value></Eq></Where>";
                 SPListItemCollection lic = oAppList.GetItems(query);
 
-                if(lic.Count > 0)
+                if (lic.Count > 0)
                 {
                     oListItem = lic[0];
                 }
@@ -115,19 +115,19 @@ namespace EPMLiveCore.API
                     return;
                 }
 
-                if(appDef.loadErrorMessage == "")
+                if (appDef.loadErrorMessage == "")
                 {
-                    if(CheckPermissions())
+                    if (CheckPermissions())
                     {
-                        if(CheckForApplicationList())
+                        if (CheckForApplicationList())
                         {
-                            if(CheckForPreReqs())
+                            if (CheckForPreReqs())
                             {
-                                if(CheckForKeys())
+                                if (CheckForKeys())
                                 {
                                     iInstallAndConfigureApp();
 
-                                    if(!bVerifyOnly)
+                                    if (!bVerifyOnly)
                                     {
                                         ReportToAppReporting(web);
                                     }
@@ -140,7 +140,7 @@ namespace EPMLiveCore.API
                 {
                     addMessage(ErrorLevels.Error, "Check Applications", appDef.loadErrorMessage, 0);
                 }
-                if(oListItem != null)
+                if (oListItem != null)
                 {
                     reportResults();
                 }
@@ -158,7 +158,7 @@ namespace EPMLiveCore.API
                 string sourceurl = "";
 
 
-                if(act.IsOnline)
+                if (act.IsOnline)
                 {
                     source = 2;
                     sourceurl = web.Url;
@@ -175,9 +175,9 @@ namespace EPMLiveCore.API
 
         private void reportResults()
         {
-            if(bVerifyOnly)
+            if (bVerifyOnly)
             {
-                if(_maxErrorLevel > 1)
+                if (_maxErrorLevel > 1)
                 {
                     oListItem["Status"] = "PreCheck Failed";
                 }
@@ -188,7 +188,7 @@ namespace EPMLiveCore.API
             }
             else
             {
-                if(_maxErrorLevel > 5)
+                if (_maxErrorLevel > 5)
                 {
                     oListItem["Status"] = "Install Failed";
                 }
@@ -197,7 +197,7 @@ namespace EPMLiveCore.API
                     oListItem["Status"] = "Installed";
                     oListItem["Visible"] = false;
                 }
-                
+
             }
 
 
@@ -210,14 +210,14 @@ namespace EPMLiveCore.API
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using(SPSite site = new SPSite(oWeb.Site.ID))
+                using (SPSite site = new SPSite(oWeb.Site.ID))
                 {
-                    using(SPWeb web = site.RootWeb)
+                    using (SPWeb web = site.RootWeb)
                     {
                         SPList list = Applications.GetApplicationList(web);
 
-                            
-                        if(list != null)
+
+                        if (list != null)
                         {
 
                             SPListItem li = list.Items.Add();
@@ -227,7 +227,7 @@ namespace EPMLiveCore.API
                             li["Icon"] = appDef.Icon;
                             li["Status"] = "Not Installed";
                             li["InstallXML"] = appDef.ApplicationXml.OuterXml;
-                            li["AppUrl"] = appDef.fullurl;
+                            li["AppUrl"] = appDef.url;
 
                             li.Update();
                         }
@@ -240,9 +240,9 @@ namespace EPMLiveCore.API
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using(SPSite site = new SPSite(oWeb.Site.ID))
+                using (SPSite site = new SPSite(oWeb.Site.ID))
                 {
-                    using(SPWeb root = site.OpenWeb())
+                    using (SPWeb root = site.OpenWeb())
                     {
                         SPList list = root.Lists.TryGetList("Installed Applications");
 
@@ -251,7 +251,7 @@ namespace EPMLiveCore.API
 
                         SPListItemCollection lic = list.GetItems(query);
 
-                        if(lic.Count > 0)
+                        if (lic.Count > 0)
                         {
                             int pId = addMessage(ErrorLevels.Upgrade, "Application Install", "Application is already installed in site collection and will configure.", 0);
 
@@ -262,12 +262,11 @@ namespace EPMLiveCore.API
                                 appDef.Version = li["AppVersion"].ToString();
                                 try
                                 {
-                                    appDef.fullurl = oListItem["AppUrl"].ToString();
-                                    appDef.appurl = appDef.fullurl.Replace(EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore"), "");
+                                    appDef.url = oListItem["AppUrl"].ToString();
                                 }
                                 catch { }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 addMessage(ErrorLevels.Error, "Copying Feature XML", "Error: " + ex.Message, pId);
                             }
@@ -308,17 +307,17 @@ namespace EPMLiveCore.API
 
         private void iInstallFeature(Guid gFeatureId, SPFeatureDefinition def, SPFeatureDefinitionScope scope, int ParentMessageId)
         {
-            switch(def.Scope)
+            switch (def.Scope)
             {
                 case SPFeatureScope.Site:
-                    if(!bVerifyOnly)
+                    if (!bVerifyOnly)
                         oWeb.Site.Features.Add(gFeatureId, true, scope);
 
                     addMessage(ErrorLevels.NoError, def.DisplayName, "", ParentMessageId);
 
                     break;
                 case SPFeatureScope.Web:
-                    if(!bVerifyOnly)
+                    if (!bVerifyOnly)
                     {
                         oWeb.Features.Add(gFeatureId, true, scope);
                         //TODO: Install on All Webs
@@ -355,10 +354,8 @@ namespace EPMLiveCore.API
                 float max = ListNdFeatures.Count;
                 float counter = 0;
 
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures = new Dictionary<Guid, SPFeatureDefinition>();
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -366,18 +363,12 @@ namespace EPMLiveCore.API
                     {
                         foreach (SPFeatureDefinition def in site.WebApplication.Farm.FeatureDefinitions)
                         {
-                            if (def.CompatibilityLevel == 14)
-                                ArrInstalledFarmFeatures14.Add(def.Id, def);
-                            else
-                                ArrInstalledFarmFeatures15.Add(def.Id, def);
+                            ArrInstalledFarmFeatures.Add(def.Id, def);
                         }
 
                         foreach (SPFeatureDefinition def in site.FeatureDefinitions)
                         {
-                            if (def.CompatibilityLevel == 14)
-                                ArrInstalledSiteFeatures14.Add(def.Id, def);
-                            else
-                                ArrInstalledSiteFeatures15.Add(def.Id, def);
+                            ArrInstalledSiteFeatures.Add(def.Id, def);
                         }
                     }
                 });
@@ -395,29 +386,16 @@ namespace EPMLiveCore.API
                             bool.TryParse(getAttribute(ndFeature, "IncludedInSolutions"), out bIncluded);
 
                             Guid gFeatureId = new Guid(FeatureId);
-                            if (ArrInstalledFarmFeatures15.ContainsKey(gFeatureId))
+                            if (ArrInstalledFarmFeatures.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures15[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
 
                             }
-                            else if (ArrInstalledFarmFeatures14.ContainsKey(gFeatureId))
+                            else if (ArrInstalledSiteFeatures.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures14[gFeatureId];
-
-                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
-
-                            }
-                            else if (ArrInstalledSiteFeatures15.ContainsKey(gFeatureId))
-                            {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures15[gFeatureId];
-
-                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
-                            }
-                            else if (ArrInstalledSiteFeatures14.ContainsKey(gFeatureId))
-                            {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures14[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
                             }
@@ -450,18 +428,18 @@ namespace EPMLiveCore.API
 
         private int updateParentStatus(int parent, ErrorLevels level)
         {
-            if(parent > 0)
+            if (parent > 0)
             {
                 DataRow[] drParent = _dtMessages.Select("ID='" + parent + "'");
-                if(drParent.Length > 0)
+                if (drParent.Length > 0)
                 {
-                    if((ErrorLevels)drParent[0][2] < level)
+                    if ((ErrorLevels)drParent[0][2] < level)
                     {
                         drParent[0][2] = (int)level;
                     }
 
                     int tabLength = updateParentStatus((int)drParent[0]["ParentID"], level);
-                    return tabLength+1;
+                    return tabLength + 1;
                 }
             }
             return 0;
@@ -469,7 +447,7 @@ namespace EPMLiveCore.API
 
         private int addMessage(ErrorLevels level, string message, string details, int parent)
         {
-            if(_maxErrorLevel < (int)level)
+            if (_maxErrorLevel < (int)level)
                 _maxErrorLevel = (int)level;
 
             _MessageId++;
@@ -492,7 +470,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                if(list != "" && appDef.ApplicationXml.FirstChild.SelectSingleNode("Lists").SelectNodes("List[@Name='" + list + "']").Count > 0)
+                if (list != "" && appDef.ApplicationXml.FirstChild.SelectSingleNode("Lists").SelectNodes("List[@Name='" + list + "']").Count > 0)
                     return true;
             }
             catch { }
@@ -501,23 +479,23 @@ namespace EPMLiveCore.API
 
         private bool DoesLocationExist(string url, string rawUrl, string list, XmlNode ndFiles)
         {
-            if(oWeb.GetFile(url).Exists || oWeb.GetFolder(url).Exists)
+            if (oWeb.GetFile(url).Exists || oWeb.GetFolder(url).Exists)
             {
                 return true;
             }
             else
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
                     try
                     {
-                        if(ndFiles.SelectNodes("//File[@FullFile='" + rawUrl.Replace("{SiteUrl}/", "") + "']").Count > 0)
+                        if (ndFiles.SelectNodes("//File[@FullFile='" + rawUrl.Replace("{SiteUrl}/", "") + "']").Count > 0)
                             return true;
                     }
                     catch { }
                     try
                     {
-                        if(list != "" && appDef.ApplicationXml.FirstChild.SelectSingleNode("Lists").SelectNodes("List[@Name='" + list + "']").Count > 0)
+                        if (list != "" && appDef.ApplicationXml.FirstChild.SelectSingleNode("Lists").SelectNodes("List[@Name='" + list + "']").Count > 0)
                             return true;
                     }
                     catch { }
@@ -535,13 +513,13 @@ namespace EPMLiveCore.API
             oListItem.ParentList.ParentWeb.AllowUnsafeUpdates = true;
             percent = percent * _currentPercentSpan + _currentBasePercent;
 
-            if(oListItem != null)
+            if (oListItem != null)
             {
                 oListItem["InstallMessages"] = Message;
                 oListItem["InstallPercent"] = Math.Round(percent / 100, 2);
                 oListItem.Update();
 
-                if(percent != _lastPercent)
+                if (percent != _lastPercent)
                 {
                     _lastPercent = percent;
                     _configJob.SetPercent(_lastPercent);
@@ -555,15 +533,15 @@ namespace EPMLiveCore.API
         {
             try
             {
-                string []navs = oLiParent[oLiParent.ParentList.Fields.GetFieldByInternalName(navField).Id].ToString().Split(',');
+                string[] navs = oLiParent[oLiParent.ParentList.Fields.GetFieldByInternalName(navField).Id].ToString().Split(',');
 
-                foreach(SPNavigationNode ndNav in navNode)
+                foreach (SPNavigationNode ndNav in navNode)
                 {
-                    if(string.Equals(ndNav.Title, nodename, StringComparison.InvariantCultureIgnoreCase))
+                    if (string.Equals(ndNav.Title, nodename, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        foreach(string nav in navs)
+                        foreach (string nav in navs)
                         {
-                            if(ndNav.Id == int.Parse(nav))
+                            if (ndNav.Id == int.Parse(nav))
                                 return ndNav;
                         }
                     }
@@ -579,7 +557,7 @@ namespace EPMLiveCore.API
 
             ArrayList iArrNodes = new ArrayList();
 
-            foreach(XmlNode nd in ndParentItems)
+            foreach (XmlNode nd in ndParentItems)
             {
 
                 string sParentName = getAttribute(nd, "Name");
@@ -591,7 +569,7 @@ namespace EPMLiveCore.API
                 bool bAppend = false;
                 bool.TryParse(getAttribute(nd, "Append"), out bAppend);
 
-                if(bParentExternal || DoesLocationExist(sParentUrl, getAttribute(nd, "Url"), getAttribute(nd, "List"), docFiles))
+                if (bParentExternal || DoesLocationExist(sParentUrl, getAttribute(nd, "Url"), getAttribute(nd, "List"), docFiles))
                 {
                     XmlNodeList ndChildItems = nd.SelectNodes("Item");
 
@@ -599,10 +577,10 @@ namespace EPMLiveCore.API
                     {
                         SPNavigationNode oNewNav = null;
 
-                        if(!bVerifyOnly)
+                        if (!bVerifyOnly)
                             oNewNav = iGetNavNode(navNode, navField, sParentName, oParentListItem);
 
-                        if(!bVerifyOnly && oNewNav == null)
+                        if (!bVerifyOnly && oNewNav == null)
                         {
                             oNewNav = new SPNavigationNode(sParentName, sParentUrl, bParentExternal);
                             navNode.AddAsLast(oNewNav);
@@ -613,7 +591,7 @@ namespace EPMLiveCore.API
 
                         int ParentNavMessageId = addMessage(ErrorLevels.NoError, sParentName, "", ParentMessageId);
 
-                        foreach(XmlNode ndChild in nd.SelectNodes("Item"))
+                        foreach (XmlNode ndChild in nd.SelectNodes("Item"))
                         {
                             string sChildName = getAttribute(ndChild, "Name");
 
@@ -623,9 +601,9 @@ namespace EPMLiveCore.API
                                 bool bChildExternal = false;
                                 bool.TryParse(getAttribute(ndChild, "External"), out bChildExternal);
 
-                                if(bChildExternal || DoesLocationExist(sChildUrl, getAttribute(ndChild, "Url"), getAttribute(ndChild, "List"), docFiles))
+                                if (bChildExternal || DoesLocationExist(sChildUrl, getAttribute(ndChild, "Url"), getAttribute(ndChild, "List"), docFiles))
                                 {
-                                    if(oNewNav != null)
+                                    if (oNewNav != null)
                                     {
                                         SPNavigationNode oNewChildNav = new SPNavigationNode(sChildName, GetCleanUrl(sChildUrl), bChildExternal);
                                         oNewNav.Children.AddAsLast(oNewChildNav);
@@ -641,16 +619,16 @@ namespace EPMLiveCore.API
                                     addMessage(ErrorLevels.Warning, sChildName, "Url Doesn't Exist (" + sChildUrl + ")", ParentNavMessageId);
                                 }
                             }
-                            catch(Exception ex2)
+                            catch (Exception ex2)
                             {
                                 addMessage(ErrorLevels.Warning, sChildName, "Error: " + ex2.Message, ParentNavMessageId);
                             }
                         }
 
-                        if(oNewNav != null)
+                        if (oNewNav != null)
                             oNewNav.Update();
                     }
-                    catch(Exception ex1)
+                    catch (Exception ex1)
                     {
                         addMessage(ErrorLevels.Warning, sParentName, "Error: " + ex1.Message, ParentMessageId);
                     }
@@ -665,16 +643,17 @@ namespace EPMLiveCore.API
                 updateLIPercent(percent);
             }
 
-            if(!bVerifyOnly && oParentListItem != null)
+            if (!bVerifyOnly && oParentListItem != null)
             {
                 try
                 {
-                    if(oParentListItem[navField].ToString() != "")
+                    if (oParentListItem[navField].ToString() != "")
                     {
                         string[] Navs = oParentListItem[navField].ToString().Split(',');
                         iArrNodes.AddRange(Navs);
                     }
-                }catch{}
+                }
+                catch { }
                 oParentListItem[navField] = String.Join(",", (string[])iArrNodes.ToArray(typeof(string)));
                 oParentListItem.Update();
             }
@@ -688,7 +667,7 @@ namespace EPMLiveCore.API
             query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + ParentApplicationId + "</Value></Eq></Where>";
             SPListItemCollection lic = oAppList.GetItems(query);
 
-            if(lic.Count > 0)
+            if (lic.Count > 0)
             {
                 return lic[0];
             }
@@ -700,18 +679,18 @@ namespace EPMLiveCore.API
         {
 
             XmlNode appNod = appDef.ApplicationXml.FirstChild.SelectSingleNode("Application");
-            
-            if(appNod != null)
+
+            if (appNod != null)
             {
 
                 XmlNode ndQuickLaunch = appNod.SelectSingleNode("QuickLaunch");
                 XmlNode ndTopNav = appNod.SelectSingleNode("TopNav");
 
-                if(ndQuickLaunch != null || ndTopNav != null)
+                if (ndQuickLaunch != null || ndTopNav != null)
                 {
                     int NavParentMessageId = 0;
 
-                    if(bVerifyOnly)
+                    if (bVerifyOnly)
                     {
                         NavParentMessageId = addMessage(0, "Checking Navigation", "", 0);
                     }
@@ -735,7 +714,7 @@ namespace EPMLiveCore.API
                         max += ndTopNavItems.Count;
                     }
                     catch { }
-                    
+
                     float counter = 0;
 
                     ArrayList arrTopNavNavNodes = new ArrayList();
@@ -772,24 +751,24 @@ namespace EPMLiveCore.API
                     //}
                     //else
                     //{
-                        if(ndQuickLaunch != null)
-                        {
-                            int ParentMessageId = addMessage(0, "QuickLaunch", "", NavParentMessageId);
+                    if (ndQuickLaunch != null)
+                    {
+                        int ParentMessageId = addMessage(0, "QuickLaunch", "", NavParentMessageId);
 
-                            counter = iInstallNavigationItem(oWeb.Navigation.QuickLaunch, ndQuickLaunchItems, ParentMessageId, docFiles, counter, max, "QuickLaunch", null, ref arrQuickLaunchNavNodes);
-                        }
+                        counter = iInstallNavigationItem(oWeb.Navigation.QuickLaunch, ndQuickLaunchItems, ParentMessageId, docFiles, counter, max, "QuickLaunch", null, ref arrQuickLaunchNavNodes);
+                    }
 
-                        if(ndTopNav != null)
-                        {
-                            int ParentMessageId = addMessage(0, "TopNav", "", NavParentMessageId);
+                    if (ndTopNav != null)
+                    {
+                        int ParentMessageId = addMessage(0, "TopNav", "", NavParentMessageId);
 
-                            counter = iInstallNavigationItem(oWeb.Navigation.TopNavigationBar, ndTopNavItems, ParentMessageId, docFiles, counter, max, "TopNav", null, ref arrTopNavNavNodes);
-                        }
+                        counter = iInstallNavigationItem(oWeb.Navigation.TopNavigationBar, ndTopNavItems, ParentMessageId, docFiles, counter, max, "TopNav", null, ref arrTopNavNavNodes);
+                    }
                     //}
 
-                    if(!bVerifyOnly)
+                    if (!bVerifyOnly)
                     {
-                        if(iCommunity != 0)
+                        if (iCommunity != 0)
                         {
                             SPListItem oLiCommunity = oAppList.GetItemById(iCommunity);
 
@@ -809,7 +788,7 @@ namespace EPMLiveCore.API
                             arrCurQuickLaunch.AddRange(arrQuickLaunchNavNodes);
                             arrCurTopNav.AddRange(arrTopNavNavNodes);
 
-                            
+
                             oLiCommunity["QuickLaunch"] = String.Join(",", (string[])arrCurQuickLaunch.ToArray(typeof(string)));
                             oLiCommunity["TopNav"] = String.Join(",", (string[])arrCurTopNav.ToArray(typeof(string)));
                             oLiCommunity.Update();
@@ -836,7 +815,7 @@ namespace EPMLiveCore.API
 
         private string iInstallPropertiesGet(string sPropertyName, bool bLockWeb)
         {
-            if(bLockWeb)
+            if (bLockWeb)
             {
                 return CoreFunctions.getLockConfigSetting(oWeb, sPropertyName, false);
             }
@@ -848,10 +827,10 @@ namespace EPMLiveCore.API
 
         private void iInstallPropertiesSet(string sPropertyName, string sPropertyValue, bool bLockWeb)
         {
-            if(bLockWeb)
+            if (bLockWeb)
             {
                 Guid lWeb = CoreFunctions.getLockedWeb(oWeb);
-                using(SPWeb tWeb = oWeb.Site.OpenWeb(lWeb))
+                using (SPWeb tWeb = oWeb.Site.OpenWeb(lWeb))
                 {
                     CoreFunctions.setConfigSetting(tWeb, sPropertyName, sPropertyValue);
                 }
@@ -865,14 +844,14 @@ namespace EPMLiveCore.API
         private void iInstallProperties()
         {
             XmlNode ndWeb = appDef.ApplicationXml.FirstChild.SelectSingleNode("Web");
-            if(ndWeb != null)
+            if (ndWeb != null)
             {
                 XmlNode ndProperties = ndWeb.SelectSingleNode("Properties");
-                if(ndProperties != null)
+                if (ndProperties != null)
                 {
                     int ParentMessageId = 0;
 
-                    if(bVerifyOnly)
+                    if (bVerifyOnly)
                     {
                         ParentMessageId = addMessage(0, "Checking Properties", "", 0);
                     }
@@ -887,7 +866,7 @@ namespace EPMLiveCore.API
                     float max = ListNdProperties.Count;
                     float counter = 0;
 
-                    foreach(XmlNode ndProperty in ListNdProperties)
+                    foreach (XmlNode ndProperty in ListNdProperties)
                     {
 
                         try
@@ -901,72 +880,72 @@ namespace EPMLiveCore.API
                             bool.TryParse(getAttribute(ndProperty, "Overwrite"), out bOverwrite);
                             bool.TryParse(getAttribute(ndProperty, "LockWebProperty"), out bIsLockWeb);
 
-                            if(bAppend)
+                            if (bAppend)
                             {
-                                if(oWeb.Properties.ContainsKey(sPropertyName))
+                                if (oWeb.Properties.ContainsKey(sPropertyName))
                                 {
 
                                     char sSeperator = getAttribute(ndProperty, "Seperator")[0];
-                                    if(getAttribute(ndProperty, "Seperator") == "\\n")
+                                    if (getAttribute(ndProperty, "Seperator") == "\\n")
                                         sSeperator = '\n';
 
-                                    if(getAttribute(ndProperty, "Seperator") == "\\r")
+                                    if (getAttribute(ndProperty, "Seperator") == "\\r")
                                         sSeperator = '\r';
 
-                                    if(sSeperator == '\0')
-                                        sSeperator=',';
+                                    if (sSeperator == '\0')
+                                        sSeperator = ',';
 
                                     string DuplicateRegEx = getAttribute(ndProperty, "DuplicateRegEx");
 
                                     string curProp = iInstallPropertiesGet(sPropertyName, bIsLockWeb);
-                                    
-                                    if(sSeperator == '\r')
+
+                                    if (sSeperator == '\r')
                                         curProp = curProp.Replace("\r\n", "\r");
 
                                     string[] sCurVals = curProp.Split(sSeperator);
 
-                                    if(DuplicateRegEx == "")
+                                    if (DuplicateRegEx == "")
                                         DuplicateRegEx = sPropertyValue;
 
                                     bool found = false;
 
-                                    foreach(string sCurVal in sCurVals)
+                                    foreach (string sCurVal in sCurVals)
                                     {
                                         Match m = Regex.Match(sCurVal, DuplicateRegEx);
-                                        if(m.Length > 0)
+                                        if (m.Length > 0)
                                         {
                                             found = true;
                                         }
                                     }
-                                    
-                                    if(found)
+
+                                    if (found)
                                     {
-                                        if(bOverwrite)
+                                        if (bOverwrite)
                                         {
-                                            if(!bVerifyOnly)
+                                            if (!bVerifyOnly)
                                             {
                                                 string newVal = "";
 
-                                                foreach(string sCurVal in sCurVals)
+                                                foreach (string sCurVal in sCurVals)
                                                 {
                                                     Match m = Regex.Match(sCurVal, DuplicateRegEx);
-                                                    if(m.Length > 0)
+                                                    if (m.Length > 0)
                                                     {
-                                                        if(sSeperator == '\r')
+                                                        if (sSeperator == '\r')
                                                             newVal += "\r\n" + sPropertyValue;
                                                         else
                                                             newVal += sSeperator + sPropertyValue;
                                                     }
                                                     else
                                                     {
-                                                        if(sSeperator == '\r')
+                                                        if (sSeperator == '\r')
                                                             newVal += "\r\n" + sCurVal;
                                                         else
                                                             newVal += sSeperator + sCurVal;
                                                     }
                                                 }
 
-                                                if(sSeperator == '\r')
+                                                if (sSeperator == '\r')
                                                     newVal = newVal.Trim('\n').Trim('\r');
                                                 else
                                                     newVal = newVal.Trim(sSeperator);
@@ -983,16 +962,16 @@ namespace EPMLiveCore.API
                                     }
                                     else
                                     {
-                                        if(!bVerifyOnly)
+                                        if (!bVerifyOnly)
                                         {
                                             string newVal = iInstallPropertiesGet(sPropertyName, bIsLockWeb);
 
-                                            if(sSeperator == '\r')
+                                            if (sSeperator == '\r')
                                                 newVal += "\r\n" + sPropertyValue;
                                             else
                                                 newVal += sSeperator + sPropertyValue;
 
-                                            if(sSeperator == '\r')
+                                            if (sSeperator == '\r')
                                                 newVal = newVal.Trim('\n').Trim('\r');
                                             else
                                                 newVal = newVal.Trim(sSeperator);
@@ -1005,7 +984,7 @@ namespace EPMLiveCore.API
                                 }
                                 else
                                 {
-                                    if(!bVerifyOnly)
+                                    if (!bVerifyOnly)
                                     {
                                         iInstallPropertiesSet(sPropertyName, sPropertyValue, bIsLockWeb);
                                     }
@@ -1015,11 +994,11 @@ namespace EPMLiveCore.API
                             }
                             else
                             {
-                                if(bOverwrite)
+                                if (bOverwrite)
                                 {
-                                    if(bVerifyOnly)
+                                    if (bVerifyOnly)
                                     {
-                                        if(oWeb.Properties.ContainsKey(sPropertyName) && iInstallPropertiesGet(sPropertyName, bIsLockWeb) != sPropertyValue)
+                                        if (oWeb.Properties.ContainsKey(sPropertyName) && iInstallPropertiesGet(sPropertyName, bIsLockWeb) != sPropertyValue)
                                         {
                                             addMessage(ErrorLevels.Upgrade, sPropertyName, "Property already exists and will overwrite", ParentMessageId);
                                         }
@@ -1034,15 +1013,16 @@ namespace EPMLiveCore.API
 
                                         addMessage(ErrorLevels.NoError, sPropertyName, "", ParentMessageId);
                                     }
-                                }                               else
+                                }
+                                else
                                 {
-                                    if(oWeb.Properties.ContainsKey(sPropertyName) && iInstallPropertiesGet(sPropertyName, bIsLockWeb) != sPropertyValue)
+                                    if (oWeb.Properties.ContainsKey(sPropertyName) && iInstallPropertiesGet(sPropertyName, bIsLockWeb) != sPropertyValue)
                                     {
                                         addMessage(ErrorLevels.Warning, sPropertyName, "Property already exists and cannot overwrite", ParentMessageId);
                                     }
                                     else
                                     {
-                                        if(!bVerifyOnly)
+                                        if (!bVerifyOnly)
                                         {
                                             iInstallPropertiesSet(sPropertyName, sPropertyValue, bIsLockWeb);
                                         }
@@ -1052,7 +1032,7 @@ namespace EPMLiveCore.API
                                 }
                             }
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             addMessage(ErrorLevels.Error, ndProperty.Attributes["Name"].Value, ex.Message, ParentMessageId);
                         }
@@ -1060,10 +1040,10 @@ namespace EPMLiveCore.API
                         counter++;
                         percent = counter / max;
                         updateLIPercent(percent);
-                        
+
                     }
 
-                    
+
                 }
             }
         }
@@ -1104,11 +1084,11 @@ namespace EPMLiveCore.API
                 string sDescription = getAttribute(ndList, "Description");
                 SPDocumentLibrary lists = (SPDocumentLibrary)oWeb.Site.GetCatalog(SPListTemplateType.ListTemplateCatalog);
 
-                if(sFileName != "")
+                if (sFileName != "")
                 {
-                    foreach(SPListTemplate template in oWeb.Site.GetCustomListTemplates(oWeb))
+                    foreach (SPListTemplate template in oWeb.Site.GetCustomListTemplates(oWeb))
                     {
-                        if(template.InternalName == sFileName)
+                        if (template.InternalName == sFileName)
                         {
                             Guid gList = oWeb.Lists.Add(sListName, sDescription, template);
                             list = oWeb.Lists[gList];
@@ -1116,7 +1096,7 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-                else if(sTemplate != "")
+                else if (sTemplate != "")
                 {
                     Guid gList = oWeb.Lists.Add(sListName, sDescription, GetTemplateType(sTemplate));
                     list = oWeb.Lists[gList];
@@ -1126,7 +1106,7 @@ namespace EPMLiveCore.API
                     error = "List FileName or Template property not found";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 error = "Error: " + ex.Message;
             }
@@ -1136,7 +1116,7 @@ namespace EPMLiveCore.API
 
         private SPFieldType iGetFieldTypeByString(string sType)
         {
-            switch(sType)
+            switch (sType)
             {
                 case "Boolean":
                     return SPFieldType.Boolean;
@@ -1167,7 +1147,7 @@ namespace EPMLiveCore.API
 
         private bool isValidSchemaAttribute(string attribute)
         {
-            switch(attribute)
+            switch (attribute)
             {
                 case "ID":
                 case "SourceID":
@@ -1183,7 +1163,7 @@ namespace EPMLiveCore.API
 
         private bool isValidNewSchemaAttribute(string attribute)
         {
-            switch(attribute)
+            switch (attribute)
             {
                 case "ID":
                 case "SourceID":
@@ -1197,10 +1177,10 @@ namespace EPMLiveCore.API
         private SPField iInstallListFieldsAddField(SPList list, string sInternalName, string sType, XmlNode ndNewField)
         {
             SPFieldType oType = iGetFieldTypeByString(sType);
-            if(oType != SPFieldType.Invalid)
+            if (oType != SPFieldType.Invalid)
             {
                 list.Fields.Add(sInternalName, oType, false);
-                
+
                 SPField field = list.Fields.GetFieldByInternalName(sInternalName);
 
                 return field;
@@ -1211,21 +1191,21 @@ namespace EPMLiveCore.API
                 {
                     ArrayList arrAttr = new ArrayList();
 
-                    foreach(XmlAttribute attr in ndNewField.Attributes)
+                    foreach (XmlAttribute attr in ndNewField.Attributes)
                     {
-                        if(!isValidNewSchemaAttribute(attr.Name))
+                        if (!isValidNewSchemaAttribute(attr.Name))
                             arrAttr.Add(attr);
                     }
 
-                    foreach(XmlAttribute attr in arrAttr)
+                    foreach (XmlAttribute attr in arrAttr)
                     {
                         ndNewField.Attributes.Remove(attr);
                     }
-                    
+
                     string sDisplay = ndNewField.Attributes["DisplayName"].Value;
 
-                    ndNewField.Attributes["DisplayName"].Value  = sInternalName;
-                   
+                    ndNewField.Attributes["DisplayName"].Value = sInternalName;
+
 
                     list.Fields.AddFieldAsXml(ndNewField.OuterXml);
                     SPField field = list.Fields.GetFieldByInternalName(sInternalName);
@@ -1233,7 +1213,7 @@ namespace EPMLiveCore.API
                     ndNewField.Attributes["DisplayName"].Value = sDisplay;
                     return field;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 { throw new Exception("Error: " + ex.Message); }
 
             }
@@ -1243,7 +1223,7 @@ namespace EPMLiveCore.API
         {
 
             bool bIsSealed = field.Sealed;
-            if(bIsSealed)
+            if (bIsSealed)
             {
                 field.Sealed = false;
                 field.Update();
@@ -1251,7 +1231,7 @@ namespace EPMLiveCore.API
 
             iiInstallListFieldSwapXml(list, field.InternalName, ndNewField);
 
-            if(bIsSealed)
+            if (bIsSealed)
             {
                 field.Sealed = bIsSealed;
                 field.Update(true);
@@ -1262,20 +1242,20 @@ namespace EPMLiveCore.API
         {
             SPField field = list.Fields.GetFieldByInternalName(sField);
 
-            if(field.Type == SPFieldType.Calculated)
+            if (field.Type == SPFieldType.Calculated)
             {
                 SPFieldCalculated calc = (SPFieldCalculated)field;
                 calc.Formula = ndNewField.SelectSingleNode("FormulaDisplayNames").InnerText;
                 field.Update();
             }
 
-            if(field.Type == SPFieldType.Choice || field.Type == SPFieldType.MultiChoice)
+            if (field.Type == SPFieldType.Choice || field.Type == SPFieldType.MultiChoice)
             {
                 SPFieldChoice choice = (SPFieldChoice)field;
                 choice.Choices.Clear();
 
                 XmlNode ndChoices = ndNewField.SelectSingleNode("CHOICES");
-                foreach(XmlNode ndChoice in ndChoices.SelectNodes("CHOICE"))
+                foreach (XmlNode ndChoice in ndChoices.SelectNodes("CHOICE"))
                 {
                     choice.Choices.Add(ndChoice.InnerText);
                 }
@@ -1310,11 +1290,11 @@ namespace EPMLiveCore.API
 
                 XmlNode ndOldField = docOldField.FirstChild;
 
-                foreach(XmlAttribute attrNew in ndNewField.Attributes)
+                foreach (XmlAttribute attrNew in ndNewField.Attributes)
                 {
-                    if(isValidSchemaAttribute(attrNew.Name))
+                    if (isValidSchemaAttribute(attrNew.Name))
                     {
-                        if(ndOldField.Attributes[attrNew.Name] == null)
+                        if (ndOldField.Attributes[attrNew.Name] == null)
                         {
                             XmlAttribute attr = docOldField.CreateAttribute(attrNew.Name);
                             attr.Value = ndNewField.Attributes[attrNew.Name].Value;
@@ -1331,23 +1311,23 @@ namespace EPMLiveCore.API
                 field.SchemaXml = ndOldField.OuterXml;
                 field.Update();
             }
-            
+
         }
 
-        
+
 
         private void iInstallListsItems(SPList list, XmlNode ndList, int ParentMessageId, bool added)
         {
             XmlNode ndItems = ndList.SelectSingleNode("Items");
 
-            if(ndItems != null)
+            if (ndItems != null)
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                     ParentMessageId = addMessage(0, "Checking Items", "", ParentMessageId);
                 else
                     ParentMessageId = addMessage(0, "Installing Items", "", ParentMessageId);
 
-                foreach(XmlNode ndItem in ndItems.SelectNodes("Item"))
+                foreach (XmlNode ndItem in ndItems.SelectNodes("Item"))
                 {
 
                     oWeb.AllowUnsafeUpdates = true;
@@ -1358,7 +1338,7 @@ namespace EPMLiveCore.API
                         sTitle = ndItem.SelectSingleNode("Field[@Name='Title']").InnerText;
                     }
                     catch { }
-                    if(sTitle == "")
+                    if (sTitle == "")
                     {
                         try
                         {
@@ -1367,10 +1347,10 @@ namespace EPMLiveCore.API
                         catch { }
                     }
 
-                    if(sTitle != "")
+                    if (sTitle != "")
                     {
 
-                        if(bVerifyOnly)
+                        if (bVerifyOnly)
                         {
                             addMessage(0, sTitle, "", ParentMessageId);
                         }
@@ -1380,7 +1360,7 @@ namespace EPMLiveCore.API
                             {
                                 SPListItem li = list.Items.Add();
 
-                                foreach(XmlNode ndField in ndItem.SelectNodes("Field"))
+                                foreach (XmlNode ndField in ndItem.SelectNodes("Field"))
                                 {
                                     li[ndField.Attributes["Name"].Value] = ndField.InnerText;
                                 }
@@ -1389,7 +1369,7 @@ namespace EPMLiveCore.API
 
                                 addMessage(0, sTitle, "", ParentMessageId);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 addMessage(ErrorLevels.Error, sTitle, "Error: " + ex.Message, ParentMessageId);
                             }
@@ -1405,16 +1385,16 @@ namespace EPMLiveCore.API
         {
             XmlNode ndEventHandlers = ndList.SelectSingleNode("EventHandlers");
 
-            if(ndEventHandlers != null)
+            if (ndEventHandlers != null)
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                     ParentMessageId = addMessage(0, "Checking Event Handlers", "", ParentMessageId);
                 else
                     ParentMessageId = addMessage(0, "Installing Event Handlers", "", ParentMessageId);
 
                 XmlNode ndParent = ndList.ParentNode;
 
-                foreach(XmlNode ndEventHandler in ndEventHandlers.SelectNodes("EventHandler"))
+                foreach (XmlNode ndEventHandler in ndEventHandlers.SelectNodes("EventHandler"))
                 {
 
                     string sType = getAttribute(ndEventHandler, "Type");
@@ -1422,18 +1402,18 @@ namespace EPMLiveCore.API
                     string sClass = getAttribute(ndEventHandler, "Class");
                     SPEventReceiverType oType = CoreFunctions.iGetListEventType(sType);
 
-                    if(oType != SPEventReceiverType.InvalidReceiver)
+                    if (oType != SPEventReceiverType.InvalidReceiver)
                     {
-                        if(bVerifyOnly)
+                        if (bVerifyOnly)
                         {
                             addMessage(0, sType + "(" + sClass + ")", "", ParentMessageId);
                         }
                         else
                         {
                             bool found = false;
-                            foreach(SPEventReceiverDefinition oRecDef in list.EventReceivers)
+                            foreach (SPEventReceiverDefinition oRecDef in list.EventReceivers)
                             {
-                                if(oRecDef.Type == oType && oRecDef.Assembly.ToLower() == sAssembly.ToLower() && oRecDef.Class.ToLower() == oRecDef.Class.ToLower())
+                                if (oRecDef.Type == oType && oRecDef.Assembly.ToLower() == sAssembly.ToLower() && oRecDef.Class.ToLower() == oRecDef.Class.ToLower())
                                 {
                                     found = true;
                                     addMessage(ErrorLevels.Upgrade, sType + "(" + sClass + ")", "Event found, skipped", ParentMessageId);
@@ -1441,7 +1421,7 @@ namespace EPMLiveCore.API
                                 }
                             }
 
-                            if(!found)
+                            if (!found)
                             {
                                 list.EventReceivers.Add(oType, sAssembly, sClass);
 
@@ -1471,15 +1451,15 @@ namespace EPMLiveCore.API
             bool.TryParse(getAttribute(ndWorkflow, "StartOnChange"), out bStartOnChange);
 
 
-            foreach(SPWorkflowTemplate template in oWeb.WorkflowTemplates)
+            foreach (SPWorkflowTemplate template in oWeb.WorkflowTemplates)
             {
-                if(template.Name == sName)
+                if (template.Name == sName)
                 {
                     assocation = SPWorkflowAssociation.CreateListAssociation(template, sDisplayName, oTaskList, oHistoryList);
                     break;
                 }
             }
-            if(assocation != null)
+            if (assocation != null)
             {
                 assocation.AllowManual = bAllowManual;
                 assocation.AutoStartChange = bStartOnChange;
@@ -1493,34 +1473,34 @@ namespace EPMLiveCore.API
         {
             XmlNode ndWorkflows = ndList.SelectSingleNode("Workflows");
 
-            if(ndWorkflows != null)
+            if (ndWorkflows != null)
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                     ParentMessageId = addMessage(0, "Checking Workflows", "", ParentMessageId);
                 else
                     ParentMessageId = addMessage(0, "Updating Workflows", "", ParentMessageId);
 
                 XmlNode ndParent = ndList.ParentNode;
 
-                foreach(XmlNode ndWorkflow in ndWorkflows.SelectNodes("Workflow"))
+                foreach (XmlNode ndWorkflow in ndWorkflows.SelectNodes("Workflow"))
                 {
 
                     string sName = getAttribute(ndWorkflow, "Name");
-                    
+
                     string sDisplayName = getAttribute(ndWorkflow, "DisplayName");
-                    if(sDisplayName == "")
+                    if (sDisplayName == "")
                         sDisplayName = sName;
 
-                    if(sName != "")
+                    if (sName != "")
                     {
                         try
                         {
                             string sTaskList = getAttribute(ndWorkflow, "TaskList");
-                            if(sTaskList == "")
+                            if (sTaskList == "")
                                 sTaskList = "Workflow Tasks";
 
                             string sHistoryList = getAttribute(ndWorkflow, "HistoryList");
-                            if(sHistoryList == "")
+                            if (sHistoryList == "")
                                 sHistoryList = "Workflow History";
 
                             bool bOverwrite = false;
@@ -1529,29 +1509,29 @@ namespace EPMLiveCore.API
                             SPList oTaskList = oWeb.Lists.TryGetList(sTaskList);
                             SPList oHistoryList = oWeb.Lists.TryGetList(sHistoryList);
 
-                            if(oTaskList != null || (IsListInstalledWithApplication(sTaskList) && bVerifyOnly))
+                            if (oTaskList != null || (IsListInstalledWithApplication(sTaskList) && bVerifyOnly))
                             {
-                                if(oHistoryList != null || (IsListInstalledWithApplication(sHistoryList) && bVerifyOnly))
+                                if (oHistoryList != null || (IsListInstalledWithApplication(sHistoryList) && bVerifyOnly))
                                 {
-                                    if(bVerifyOnly)
+                                    if (bVerifyOnly)
                                     {
                                         bool found = false;
-                                        if(list != null)
+                                        if (list != null)
                                         {
-                                            foreach(SPWorkflowAssociation association in list.WorkflowAssociations)
+                                            foreach (SPWorkflowAssociation association in list.WorkflowAssociations)
                                             {
-                                                if(association.BaseTemplate.Name == sName)
+                                                if (association.BaseTemplate.Name == sName)
                                                 {
                                                     found = true;
                                                     break;
                                                 }
                                             }
                                         }
-                                        if(found && ! bOverwrite)
+                                        if (found && !bOverwrite)
                                         {
                                             addMessage(ErrorLevels.Error, sName, "Workflow found and cannot overwrite", ParentMessageId);
                                         }
-                                        else if(found)
+                                        else if (found)
                                         {
                                             addMessage(ErrorLevels.Upgrade, sName, "Workflow found and will upgrade", ParentMessageId);
                                         }
@@ -1566,9 +1546,9 @@ namespace EPMLiveCore.API
 
                                         bool found = false;
 
-                                        foreach(SPWorkflowAssociation oassociation in list.WorkflowAssociations)
+                                        foreach (SPWorkflowAssociation oassociation in list.WorkflowAssociations)
                                         {
-                                            if(oassociation.BaseTemplate.Name == sName)
+                                            if (oassociation.BaseTemplate.Name == sName)
                                             {
                                                 association = oassociation;
                                                 found = true;
@@ -1576,7 +1556,7 @@ namespace EPMLiveCore.API
                                             }
                                         }
 
-                                        if(found && bOverwrite)
+                                        if (found && bOverwrite)
                                         {
                                             found = false;
                                             list.WorkflowAssociations.Remove(association);
@@ -1585,7 +1565,7 @@ namespace EPMLiveCore.API
 
                                             addMessage(ErrorLevels.Upgrade, sName, "Workflow found and was upgraded", ParentMessageId);
                                         }
-                                        else if(found)
+                                        else if (found)
                                         {
                                             addMessage(ErrorLevels.Error, sName, "Workflow found and could not overwrite", ParentMessageId);
                                         }
@@ -1596,7 +1576,7 @@ namespace EPMLiveCore.API
                                             addMessage(ErrorLevels.NoError, sName, "", ParentMessageId);
                                         }
                                     }
-                                    
+
                                 }
                                 else
                                 {
@@ -1605,12 +1585,12 @@ namespace EPMLiveCore.API
                             }
                             else
                             {
-                                addMessage(ErrorLevels.Error, sName, "Workflow task list (" + sTaskList  + ") does not exist", ParentMessageId);
+                                addMessage(ErrorLevels.Error, sName, "Workflow task list (" + sTaskList + ") does not exist", ParentMessageId);
                             }
 
 
                         }
-                        catch(Exception ex) { addMessage(ErrorLevels.Error, sName, "Error: " + ex.Message, ParentMessageId); }
+                        catch (Exception ex) { addMessage(ErrorLevels.Error, sName, "Error: " + ex.Message, ParentMessageId); }
 
                     }
                 }
@@ -1621,23 +1601,23 @@ namespace EPMLiveCore.API
         {
             SPFile oViewFile = oWeb.GetFile(oView.Url);
 
-            if(oViewFile.Exists)
+            if (oViewFile.Exists)
             {
-                
-                string sUrl = appDef.fullurl + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
+
+                string sUrl = "Applications/" + appDef.Title + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
 
                 bool bHasViewFile = false;
                 try
                 {
                     byte[] fileBytes = copy.GetFile(sUrl);
-                    if(fileBytes != null)
+                    if (fileBytes != null)
                     {
                         SPFolder folder = oWeb.GetFolder("TempViewStorage");
 
-                        if(!folder.Exists)
+                        if (!folder.Exists)
                             folder = oWeb.Folders.Add("TempViewStorage");
 
-                        if(!bVerifyOnly)
+                        if (!bVerifyOnly)
                             folder.Files.Add(oView.Title + ".aspx", fileBytes);
 
                         bHasViewFile = true;
@@ -1645,9 +1625,9 @@ namespace EPMLiveCore.API
                 }
                 catch { }
 
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
-                    if(bHasViewFile || bInstallGrid)
+                    if (bHasViewFile || bInstallGrid)
                     {
                         addMessage(0, oView.Title, "", ParentMessageId);
                     }
@@ -1656,12 +1636,12 @@ namespace EPMLiveCore.API
                 {
                     SPLimitedWebPartManager oViewWebManager = oViewFile.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
 
-                    if(bHasViewFile)
+                    if (bHasViewFile)
                     {
                         SPFile oTempFile = null;
                         try
                         {
-                            
+
                             oTempFile = oWeb.GetFile("TempViewStorage/" + oView.Title + ".aspx");
                             var tempFileContents = oTempFile.GetContents();
                             oViewFile.UpdateContentsAndSave(tempFileContents);
@@ -1670,7 +1650,7 @@ namespace EPMLiveCore.API
 
                             ArrayList arrWebParts = new ArrayList();
 
-                            foreach(WebPart wp in oViewWebManager.WebParts)
+                            foreach (WebPart wp in oViewWebManager.WebParts)
                             {
                                 if (wp is XsltListViewWebPart)
                                 {
@@ -1678,32 +1658,32 @@ namespace EPMLiveCore.API
                                     oViewWebManager.SaveChanges(wp);
                                 }
 
-                                if(wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
+                                if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
                                 {
                                     arrWebParts.Add(wp);
                                 }
                             }
 
-                            foreach(WebPart wp in arrWebParts)
+                            foreach (WebPart wp in arrWebParts)
                             {
                                 oViewWebManager.DeleteWebPart(wp);
                             }
 
-                            foreach(WebPart wp in oTempFileWebManager.WebParts)
+                            foreach (WebPart wp in oTempFileWebManager.WebParts)
                             {
                                 if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
                                 {
                                     oViewWebManager.AddWebPart(wp, wp.ZoneID, wp.ZoneIndex);
                                 }
                             }
-                            
+
 
                             ConnectWebPartConsumersToReportFilter(oViewWebManager);
 
 
                             addMessage(0, oView.Title, "", ParentMessageId);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
                         }
@@ -1719,18 +1699,18 @@ namespace EPMLiveCore.API
 
                         try
                         {
-                            if(bInstallGrid)
+                            if (bInstallGrid)
                             {
-                                foreach(WebPart wp in oViewWebManager.WebParts)
+                                foreach (WebPart wp in oViewWebManager.WebParts)
                                 {
-                                    if(wp.GetType().ToString() == "EPMLiveWebParts.GridListView")
+                                    if (wp.GetType().ToString() == "EPMLiveWebParts.GridListView")
                                     {
                                         bHasGrid = true;
                                         break;
                                     }
                                 }
 
-                                if(!bHasGrid)
+                                if (!bHasGrid)
                                 {
                                     EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
                                     oViewWebManager.AddWebPart(gv, "Main", 0);
@@ -1738,7 +1718,7 @@ namespace EPMLiveCore.API
                             }
                             addMessage(0, oView.Title, "", ParentMessageId);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
                         }
@@ -1755,7 +1735,7 @@ namespace EPMLiveCore.API
             if (providerWebPart == null) return;
 
             ProviderConnectionPoint providerConnection = null;
-            
+
             foreach (ProviderConnectionPoint point in webPartManager.GetProviderConnectionPoints(providerWebPart))
             {
                 if (point.InterfaceType == typeof(IReportID))
@@ -1788,7 +1768,7 @@ namespace EPMLiveCore.API
             //TODO: Install WebParts
             XmlNode ndViews = ndList.SelectSingleNode("Views");
 
-            if(ndViews != null)
+            if (ndViews != null)
             {
                 string storeurl = CoreFunctions.getFarmSetting("workenginestore");
 
@@ -1800,13 +1780,13 @@ namespace EPMLiveCore.API
                     SslPolicyErrors sslPolicyErrors)
                 {
                     return true;
-                };  
+                };
 
                 ApplicationStore.AppStore copy = new ApplicationStore.AppStore();
                 copy.Credentials = CoreFunctions.GetStoreCreds();
                 copy.Url = storeurl + "_vti_bin/appstore.asmx";
 
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                     ParentMessageId = addMessage(0, "Checking WebParts", "", ParentMessageId);
                 else
                     ParentMessageId = addMessage(0, "Updating WebParts", "", ParentMessageId);
@@ -1814,14 +1794,14 @@ namespace EPMLiveCore.API
                 bool bInstallAll = false;
                 bool.TryParse(getAttribute(ndViews, "InstallGridOnAllViews"), out bInstallAll);
 
-                if(bInstallAll)
+                if (bInstallAll)
                     addMessage(0, "Grid on All Views", "", ParentMessageId);
 
-                if(oList != null)
+                if (oList != null)
                 {
-                    foreach(SPView oView in oList.Views)
+                    foreach (SPView oView in oList.Views)
                     {
-                        if(!oView.PersonalView)
+                        if (!oView.PersonalView)
                         {
                             XmlNode ndView = ndViews.SelectSingleNode("View[@Name='" + oView.Title + "']");
 
@@ -1837,14 +1817,14 @@ namespace EPMLiveCore.API
         {
             XmlNode ndViews = ndList.SelectSingleNode("Views");
 
-            if(ndViews != null)
+            if (ndViews != null)
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                     ParentMessageId = addMessage(0, "Checking Views", "", ParentMessageId);
                 else
                     ParentMessageId = addMessage(0, "Updating Views", "", ParentMessageId);
 
-                foreach(XmlNode ndView in ndViews.SelectNodes("View"))
+                foreach (XmlNode ndView in ndViews.SelectNodes("View"))
                 {
                     string sName = getAttribute(ndView, "Name");
                     //XmlNode ndInternalViewXml = ndView.SelectSingleNode("Field");
@@ -1860,15 +1840,15 @@ namespace EPMLiveCore.API
 
                     int ViewParentMessageId = 0;
 
-                    if(bVerifyOnly)
+                    if (bVerifyOnly)
                     {
-                        if(view == null)
+                        if (view == null)
                         {
                             ViewParentMessageId = addMessage(0, sName, "", ParentMessageId);
                         }
                         else
                         {
-                            if(bOverwrite)
+                            if (bOverwrite)
                             {
                                 ViewParentMessageId = addMessage(ErrorLevels.Upgrade, sName, "View exists and will overwrite", ParentMessageId);
                             }
@@ -1880,13 +1860,13 @@ namespace EPMLiveCore.API
                     }
                     else
                     {
-                        if(list != null)
+                        if (list != null)
                         {
-                            if(view == null)
+                            if (view == null)
                             {
                                 try
                                 {
-                                    System.Collections.Specialized.StringCollection sFields= new System.Collections.Specialized.StringCollection();
+                                    System.Collections.Specialized.StringCollection sFields = new System.Collections.Specialized.StringCollection();
                                     sFields.AddRange(ndView.SelectSingleNode("Fields").InnerText.Split(','));
                                     string sQuery = getChildNodeText(ndView, "Query");
                                     string sProjectedFields = getChildNodeText(ndView, "ProjectedFields");
@@ -1899,24 +1879,24 @@ namespace EPMLiveCore.API
                                     bool.TryParse(getAttribute(ndView, "MakeDefault"), out bDefault);
 
                                     view = list.Views.Add(sName, sFields, sQuery, sJoins, sProjectedFields, iRowLimit, false, bDefault, SPViewCollection.SPViewType.Html, false);
-                                    
+
                                     ViewParentMessageId = addMessage(0, sName, "", ParentMessageId);
-                                    
+
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     ViewParentMessageId = addMessage(ErrorLevels.Error, sName, "Error adding view: " + ex.Message, ParentMessageId);
                                 }
                             }
                             else
                             {
-                                if(bOverwrite)
+                                if (bOverwrite)
                                 {
 
                                     try
                                     {
 
-                                        string []sFields = ndView.SelectSingleNode("Fields").InnerText.Split(',');
+                                        string[] sFields = ndView.SelectSingleNode("Fields").InnerText.Split(',');
                                         string sQuery = getChildNodeText(ndView, "Query");
                                         string sProjectedFields = getChildNodeText(ndView, "ProjectedFields");
                                         string sJoins = getChildNodeText(ndView, "Joins");
@@ -1929,7 +1909,7 @@ namespace EPMLiveCore.API
 
                                         view.ViewFields.DeleteAll();
 
-                                        foreach(string sField in sFields)
+                                        foreach (string sField in sFields)
                                         {
                                             SPField oField = null;
                                             try
@@ -1937,7 +1917,7 @@ namespace EPMLiveCore.API
                                                 oField = list.Fields.GetFieldByInternalName(sField);
                                             }
                                             catch { }
-                                            if(oField != null)
+                                            if (oField != null)
                                                 view.ViewFields.Add(oField);
                                         }
 
@@ -1951,7 +1931,7 @@ namespace EPMLiveCore.API
                                         ViewParentMessageId = addMessage(ErrorLevels.Upgrade, sName, "View exists and will overwrite", ParentMessageId);
 
                                     }
-                                    catch(Exception ex)
+                                    catch (Exception ex)
                                     {
                                         ViewParentMessageId = addMessage(ErrorLevels.Error, sName, "Error updating view: " + ex.Message, ParentMessageId);
                                     }
@@ -1971,14 +1951,14 @@ namespace EPMLiveCore.API
         {
             XmlNode ndFields = ndList.SelectSingleNode("Fields");
 
-            if(ndFields != null)
+            if (ndFields != null)
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                     ParentMessageId = addMessage(0, "Checking Fields", "", ParentMessageId);
                 else
                     ParentMessageId = addMessage(0, "Updating Fields", "", ParentMessageId);
 
-                foreach(XmlNode ndField in ndFields.SelectNodes("Field"))
+                foreach (XmlNode ndField in ndFields.SelectNodes("Field"))
                 {
 
                     string sInternalName = getAttribute(ndField, "InternalName");
@@ -1996,12 +1976,12 @@ namespace EPMLiveCore.API
                     }
                     catch { }
 
-                    if(oField == null)//field new let's add
+                    if (oField == null)//field new let's add
                     {
-                        if(bVerifyOnly)
+                        if (bVerifyOnly)
                         {
                             SPFieldType oType = iGetFieldTypeByString(sType);
-                            
+
                             addMessage(ErrorLevels.NoError, sInternalName, "", ParentMessageId);
 
                         }
@@ -2012,31 +1992,31 @@ namespace EPMLiveCore.API
                                 oField = iInstallListFieldsAddField(list, sInternalName, sType, ndInternalFieldXml);
                                 try
                                 {
-                                    if(oField != null)
+                                    if (oField != null)
                                         iInstallListFieldSwapXml(list, oField, ndInternalFieldXml);
 
                                     addMessage(ErrorLevels.NoError, sInternalName, "", ParentMessageId);
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     addMessage(ErrorLevels.Error, sInternalName, "Error updating field schema: " + ex.Message, ParentMessageId);
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 addMessage(ErrorLevels.Error, sInternalName, "Error adding field: " + ex.Message, ParentMessageId);
                             }
 
-                            
+
                         }
                     }
                     else//field exists so we can upgrade
                     {
-                        if(oField.TypeAsString.ToLower() == sType.ToLower())
+                        if (oField.TypeAsString.ToLower() == sType.ToLower())
                         {
-                            if(bOverwrite)
+                            if (bOverwrite)
                             {
-                                if(bVerifyOnly)
+                                if (bVerifyOnly)
                                 {
                                     addMessage(ErrorLevels.Upgrade, sInternalName, "Field exists and will overwrite", ParentMessageId);
                                 }
@@ -2044,12 +2024,12 @@ namespace EPMLiveCore.API
                                 {
                                     try
                                     {
-                                        if(oField != null)
+                                        if (oField != null)
                                             iInstallListFieldSwapXml(list, oField, ndInternalFieldXml);
 
                                         addMessage(ErrorLevels.NoError, sInternalName, "Field updated", ParentMessageId);
                                     }
-                                    catch(Exception ex)
+                                    catch (Exception ex)
                                     {
                                         addMessage(ErrorLevels.Error, sInternalName, "Error updating field schema: " + ex.Message, ParentMessageId);
                                     }
@@ -2066,7 +2046,7 @@ namespace EPMLiveCore.API
                         }
                     }
 
-                    if(!string.IsNullOrEmpty(sTotal))
+                    if (!string.IsNullOrEmpty(sTotal))
                     {
                         GridGanttSettings gSettings = new GridGanttSettings(list);
 
@@ -2074,12 +2054,12 @@ namespace EPMLiveCore.API
 
                         string[] fieldList = gSettings.TotalSettings.Split('\n');
 
-                        foreach(string field in fieldList)
+                        foreach (string field in fieldList)
                         {
-                            if(field != "")
+                            if (field != "")
                             {
                                 string[] fieldData = field.Split('|');
-                                if(fieldData[0] != sInternalName)
+                                if (fieldData[0] != sInternalName)
                                 {
                                     output += "\n" + field;
                                 }
@@ -2101,14 +2081,14 @@ namespace EPMLiveCore.API
 
             XmlNode ndLookups = ndList.SelectSingleNode("Lookups");
 
-            if(ndLookups != null)
+            if (ndLookups != null)
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                     ParentMessageId = addMessage(0, "Checking Lookups", "", ParentMessageId);
                 else
                     ParentMessageId = addMessage(0, "Fixing Lookups", "", ParentMessageId);
 
-                foreach(XmlNode ndLookup in ndLookups.SelectNodes("Lookup"))
+                foreach (XmlNode ndLookup in ndLookups.SelectNodes("Lookup"))
                 {
                     string sInternalName = getAttribute(ndLookup, "InternalName");
 
@@ -2119,10 +2099,10 @@ namespace EPMLiveCore.API
                         string sField = getAttribute(ndLookup, "Field");
                         string sDisplayName = getAttribute(ndLookup, "DisplayName");
                         string sAdvancedLookup = getAttribute(ndLookup, "AdvancedLookup");
-                        
+
                         bool bOverwrite = false;
                         bool.TryParse(getAttribute(ndLookup, "Overwrite"), out bOverwrite);
-                        
+
                         bool bRequired = false;
                         bool.TryParse(getAttribute(ndLookup, "Required"), out bRequired);
 
@@ -2137,26 +2117,26 @@ namespace EPMLiveCore.API
                         }
                         catch { }
 
-                        if(tList != null)//If the parent list is found then lets use it
+                        if (tList != null)//If the parent list is found then lets use it
                         {
                             int tParentFieldMessage = ParentMessageId;
 
-                            if(tField == null)//Field does not exist, lets add
+                            if (tField == null)//Field does not exist, lets add
                             {
-                                if(!bVerifyOnly)
+                                if (!bVerifyOnly)
                                 {
                                     try
                                     {
                                         list.Fields.AddLookup(sInternalName, tList.ID, bRequired);
                                         SPFieldLookup ttField = (SPFieldLookup)list.Fields.GetFieldByInternalName(sInternalName);
-                                        if(sDisplayName != "")
+                                        if (sDisplayName != "")
                                             ttField.Title = sDisplayName;
                                         ttField.LookupField = sField;
 
                                         ttField.Update();
                                         tParentFieldMessage = addMessage(0, sInternalName, "Field added", ParentMessageId);
                                     }
-                                    catch(Exception ex)
+                                    catch (Exception ex)
                                     {
                                         tParentFieldMessage = addMessage(ErrorLevels.Error, sInternalName, "Error adding field: " + ex.Message, ParentMessageId);
                                     }
@@ -2168,11 +2148,11 @@ namespace EPMLiveCore.API
                             }
                             else//If the field exists
                             {
-                                if(tField.Type == SPFieldType.Lookup)
+                                if (tField.Type == SPFieldType.Lookup)
                                 {
-                                    if(bVerifyOnly)
+                                    if (bVerifyOnly)
                                     {
-                                        if(bOverwrite)
+                                        if (bOverwrite)
                                         {
                                             tParentFieldMessage = addMessage(ErrorLevels.Upgrade, sInternalName, "Field exists and will overwrite", ParentMessageId);
                                         }
@@ -2183,7 +2163,7 @@ namespace EPMLiveCore.API
                                     }
                                     else
                                     {
-                                        if(bOverwrite)
+                                        if (bOverwrite)
                                         {
                                             try
                                             {
@@ -2192,14 +2172,14 @@ namespace EPMLiveCore.API
 
                                                 doc.FirstChild.Attributes["List"].Value = tList.ID.ToString("B");
                                                 doc.FirstChild.Attributes["ShowField"].Value = sField;
-                                                
+
 
                                                 tField.SchemaXml = doc.FirstChild.OuterXml;
                                                 tField.Update(true);
 
                                                 tParentFieldMessage = addMessage(0, sInternalName, "Field updated", ParentMessageId);
                                             }
-                                            catch(Exception ex)
+                                            catch (Exception ex)
                                             {
                                                 tParentFieldMessage = addMessage(ErrorLevels.Error, sInternalName, "Error updating field: " + ex.Message, ParentMessageId);
                                             }
@@ -2217,7 +2197,7 @@ namespace EPMLiveCore.API
                             }
 
 
-                            if(!string.IsNullOrEmpty(sAdvancedLookup))
+                            if (!string.IsNullOrEmpty(sAdvancedLookup))
                             {
                                 GridGanttSettings gSettings = new GridGanttSettings(list);
 
@@ -2225,13 +2205,13 @@ namespace EPMLiveCore.API
 
                                 string output = "";
 
-                                foreach(string sLookup in LookupArray)
+                                foreach (string sLookup in LookupArray)
                                 {
-                                    if(sLookup != "")
+                                    if (sLookup != "")
                                     {
                                         string[] sLookupInfo = sLookup.Split('^');
 
-                                        if(sLookupInfo[0] != sInternalName)
+                                        if (sLookupInfo[0] != sInternalName)
                                         {
                                             output += "|" + sLookup;
                                         }
@@ -2244,20 +2224,20 @@ namespace EPMLiveCore.API
                                 gSettings.SaveSettings();
 
                                 addMessage(ErrorLevels.NoError, "Enabled Advanced Lookup", "", tParentFieldMessage);
-                                
+
                             }
                         }
                         else //If parent list is not found
                         {
-                            if(bVerifyOnly)
+                            if (bVerifyOnly)
                             {
-                                if(ndParent.SelectSingleNode("List[@Name='" + sList + "']") != null)
+                                if (ndParent.SelectSingleNode("List[@Name='" + sList + "']") != null)
                                 {
                                     addMessage(0, sInternalName, "", ParentMessageId);
                                 }
                                 else
                                 {
-                                    if(bDeleteIfNoList)
+                                    if (bDeleteIfNoList)
                                     {
                                         addMessage(ErrorLevels.Upgrade, sInternalName, "Lookup List missing (" + sList + ") field will be deleted", ParentMessageId);
                                     }
@@ -2269,7 +2249,7 @@ namespace EPMLiveCore.API
                             }
                             else
                             {
-                                if(bDeleteIfNoList && tField != null)
+                                if (bDeleteIfNoList && tField != null)
                                 {
                                     try
                                     {
@@ -2278,7 +2258,7 @@ namespace EPMLiveCore.API
 
                                         addMessage(ErrorLevels.Upgrade, sInternalName, "Lookup List missing (" + sList + ") field deleted", ParentMessageId);
                                     }
-                                    catch(Exception ex)
+                                    catch (Exception ex)
                                     {
                                         addMessage(ErrorLevels.Error, sInternalName, "Lookup List missing (" + sList + ") field failed to delete: " + ex.Message, ParentMessageId);
                                     }
@@ -2290,7 +2270,7 @@ namespace EPMLiveCore.API
                             }
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         addMessage(ErrorLevels.Error, sInternalName, "Error processing: " + ex.Message, ParentMessageId);
                     }
@@ -2301,13 +2281,13 @@ namespace EPMLiveCore.API
 
         private void iInstallLists()
         {
-           
+
             XmlNode ndLists = appDef.ApplicationXml.FirstChild.SelectSingleNode("Lists");
-            if(ndLists != null)
+            if (ndLists != null)
             {
                 int ParentMessageId = 0;
 
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
                     ParentMessageId = addMessage(0, "Checking Lists", "", 0);
                 }
@@ -2322,7 +2302,7 @@ namespace EPMLiveCore.API
                 float max = ListNdLists.Count;
                 float counter = 0;
 
-                foreach(XmlNode ndList in ListNdLists)
+                foreach (XmlNode ndList in ListNdLists)
                 {
                     try
                     {
@@ -2336,10 +2316,10 @@ namespace EPMLiveCore.API
 
                         bool bDoesListExist = DoesListExist(sListName);
 
-                        if(bDoesListExist)
+                        if (bDoesListExist)
                         {
-                            XmlAttribute attrNoDelete= ndList.Attributes["NoDelete"];
-                            if(attrNoDelete == null)
+                            XmlAttribute attrNoDelete = ndList.Attributes["NoDelete"];
+                            if (attrNoDelete == null)
                             {
                                 attrNoDelete = ndList.OwnerDocument.CreateAttribute("NoDelete");
                                 attrNoDelete.Value = "True";
@@ -2352,12 +2332,12 @@ namespace EPMLiveCore.API
                         }
 
 
-                        if(bDoesListExist && bCanUpgrade || !bDoesListExist)
+                        if (bDoesListExist && bCanUpgrade || !bDoesListExist)
                         {
                             SPList oList = null;
                             int ListParentMessageId = 0;
                             bool bListAdded = false;
-                            if(bDoesListExist && bCanUpgrade)
+                            if (bDoesListExist && bCanUpgrade)
                             {
                                 ListParentMessageId = addMessage(ErrorLevels.NoError, sListName, "List exists and will upgrade", ParentMessageId);
                             }
@@ -2366,12 +2346,12 @@ namespace EPMLiveCore.API
                                 try
                                 {
                                     string error = "";
-                                    if(!bVerifyOnly)
+                                    if (!bVerifyOnly)
                                     {
                                         oList = iInstallListsAddList(ndList, out error);
                                         bListAdded = true;
                                     }
-                                    if(error == "")
+                                    if (error == "")
                                     {
                                         ListParentMessageId = addMessage(ErrorLevels.NoError, sListName, "", ParentMessageId);
                                     }
@@ -2380,13 +2360,14 @@ namespace EPMLiveCore.API
                                         ListParentMessageId = addMessage(ErrorLevels.Error, sListName, error, ParentMessageId);
                                     }
 
-                                }catch{}
-                                
+                                }
+                                catch { }
+
                             }
 
                             oList = oWeb.Lists.TryGetList(sListName);
 
-                            if(oList != null)
+                            if (oList != null)
                                 iInstallListsFields(oList, ndList, ListParentMessageId, bListAdded);
 
                             iInstallListsLookups(oList, ndList, ListParentMessageId);
@@ -2396,9 +2377,9 @@ namespace EPMLiveCore.API
                             iInstallListsEvents(oList, ndList, ListParentMessageId, bListAdded);
                             iInstallListsItems(oList, ndList, ListParentMessageId, bListAdded);
 
-                            if(bAddReporting)
+                            if (bAddReporting)
                             {
-                                if(bVerifyOnly)
+                                if (bVerifyOnly)
                                     addMessage(ErrorLevels.NoError, "Add to Reporting Database", "", ListParentMessageId);
                                 else
                                 {
@@ -2407,7 +2388,7 @@ namespace EPMLiveCore.API
                                         var rb = new EPMLiveReportsAdmin.ReportBiz(oList.ParentWeb.Site.ID);
                                         EPMLiveReportsAdmin.ListBiz lb = rb.GetListBiz(oList.ID);
 
-                                        if(string.IsNullOrEmpty(lb.ListName))
+                                        if (string.IsNullOrEmpty(lb.ListName))
                                         {
                                             System.Web.UI.WebControls.ListItemCollection oFields = new System.Web.UI.WebControls.ListItemCollection();
 
@@ -2423,7 +2404,7 @@ namespace EPMLiveCore.API
                                             addMessage(ErrorLevels.NoError, "Add to Reporting Database", "", ListParentMessageId);
                                         }
                                     }
-                                    catch(Exception ex)
+                                    catch (Exception ex)
                                     {
                                         addMessage(ErrorLevels.Error, "Add to Reporting Database", ex.Message, ListParentMessageId);
                                     }
@@ -2456,9 +2437,9 @@ namespace EPMLiveCore.API
             XmlNode ndSolutions = appDef.ApplicationXml.FirstChild.SelectSingleNode("Solutions");
             int ParentMessageId = 0;
 
-            if(ndSolutions != null)
+            if (ndSolutions != null)
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
                     ParentMessageId = addMessage(0, "Checking Solutions and Lists", "", 0);
                 }
@@ -2473,9 +2454,9 @@ namespace EPMLiveCore.API
                 float max = ListNdSolutions.Count;
                 float counter = 0;
 
-                foreach(XmlNode ndSolution in ListNdSolutions)
+                foreach (XmlNode ndSolution in ListNdSolutions)
                 {
-                    switch(ndSolution.Name)
+                    switch (ndSolution.Name)
                     {
                         case "Solution":
                             iInstallSolution(ndSolution, ParentMessageId);
@@ -2502,21 +2483,21 @@ namespace EPMLiveCore.API
                 bool bOverwrite = false;
                 bool.TryParse(getAttribute(ndSolution, "Overwrite"), out bOverwrite);
 
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
                     bool found = false;
 
-                    foreach(SPFile f in solutions.RootFolder.Files)
+                    foreach (SPFile f in solutions.RootFolder.Files)
                     {
-                        if(f.Name == FileName)
+                        if (f.Name == FileName)
                         {
                             found = true;
                         }
                     }
 
-                    if(found)
+                    if (found)
                     {
-                        if(bOverwrite)
+                        if (bOverwrite)
                         {
                             addMessage(ErrorLevels.Upgrade, FileName, "Solution exists but will upgrade", ParentMessageId);
                         }
@@ -2533,20 +2514,20 @@ namespace EPMLiveCore.API
 
                     bool found = false;
                     SPFile foundFile = null;
-                    foreach(SPFile f in solutions.RootFolder.Files)
+                    foreach (SPFile f in solutions.RootFolder.Files)
                     {
-                        if(f.Name == FileName)
+                        if (f.Name == FileName)
                         {
                             foundFile = f;
                             found = true;
                         }
                     }
 
-                    if(found)
+                    if (found)
                     {
-                        foreach(SPUserSolution us in oWeb.Site.Solutions)
+                        foreach (SPUserSolution us in oWeb.Site.Solutions)
                         {
-                            if(us.Name == FileName)
+                            if (us.Name == FileName)
                             {
                                 oWeb.Site.Solutions.Remove(us);
                                 break;
@@ -2559,7 +2540,7 @@ namespace EPMLiveCore.API
 
                     SPFile newFile = null;
 
-                    using(WebClient webClient = new WebClient())
+                    using (WebClient webClient = new WebClient())
                     {
                         ServicePointManager.ServerCertificateValidationCallback +=
                         delegate(
@@ -2569,15 +2550,15 @@ namespace EPMLiveCore.API
                             SslPolicyErrors sslPolicyErrors)
                         {
                             return true;
-                        };  
+                        };
 
                         webClient.Credentials = CoreFunctions.GetStoreCreds();
                         byte[] fileBytes = null;
-                        fileBytes = webClient.DownloadData(appDef.fullurl + "/Solutions/" + FileName);
+                        fileBytes = webClient.DownloadData(appDef.url + "/Solutions/" + FileName);
                         newFile = solutions.RootFolder.Files.Add(FileName, fileBytes);
                     }
 
-                    if(newFile != null)
+                    if (newFile != null)
                     {
                         SPUserSolution solution = oWeb.Site.Solutions.Add(newFile.Item.ID);
                     }
@@ -2585,12 +2566,12 @@ namespace EPMLiveCore.API
                     addMessage(ErrorLevels.NoError, FileName, "", ParentMessageId);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 addMessage(ErrorLevels.Error, ndSolution.Attributes["FileName"].Value, "Error: " + ex.Message, ParentMessageId);
             }
 
-            
+
         }
 
         private void iInstallListTemplate(XmlNode ndSolution, int ParentMessageId)
@@ -2603,21 +2584,21 @@ namespace EPMLiveCore.API
                 bool bOverwrite = false;
                 bool.TryParse(getAttribute(ndSolution, "Overwrite"), out bOverwrite);
 
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
                     bool found = false;
 
-                    foreach(SPFile f in solutions.RootFolder.Files)
+                    foreach (SPFile f in solutions.RootFolder.Files)
                     {
-                        if(f.Name == FileName)
+                        if (f.Name == FileName)
                         {
                             found = true;
                         }
                     }
 
-                    if(found)
+                    if (found)
                     {
-                        if(bOverwrite)
+                        if (bOverwrite)
                         {
                             addMessage(ErrorLevels.Upgrade, FileName, "List template exists but will upgrade", ParentMessageId);
                         }
@@ -2634,23 +2615,23 @@ namespace EPMLiveCore.API
 
                     bool found = false;
                     SPFile foundFile = null;
-                    foreach(SPFile f in solutions.RootFolder.Files)
+                    foreach (SPFile f in solutions.RootFolder.Files)
                     {
-                        if(f.Name == FileName)
+                        if (f.Name == FileName)
                         {
                             foundFile = f;
                             found = true;
                         }
                     }
 
-                    if(found && bOverwrite)
+                    if (found && bOverwrite)
                     {
                         foundFile.Delete();
                     }
 
-                    if(!found || bOverwrite)
+                    if (!found || bOverwrite)
                     {
-                        using(WebClient webClient = new WebClient())
+                        using (WebClient webClient = new WebClient())
                         {
                             ServicePointManager.ServerCertificateValidationCallback +=
                             delegate(
@@ -2661,15 +2642,15 @@ namespace EPMLiveCore.API
                             {
                                 return true;
 
-                            };  
+                            };
 
                             webClient.Credentials = CoreFunctions.GetStoreCreds();
                             byte[] fileBytes = null;
-                            fileBytes = webClient.DownloadData(appDef.fullurl + "/Lists/" + FileName);
+                            fileBytes = webClient.DownloadData(appDef.url + "/Lists/" + FileName);
                             solutions.RootFolder.Files.Add(FileName, fileBytes);
                         }
 
-                        if(found)
+                        if (found)
                             addMessage(ErrorLevels.NoError, FileName, "List template upgraded", ParentMessageId);
                         else
                             addMessage(ErrorLevels.NoError, FileName, "", ParentMessageId);
@@ -2680,7 +2661,7 @@ namespace EPMLiveCore.API
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 addMessage(ErrorLevels.Error, ndSolution.Attributes["FileName"].Value, "Error: " + ex.Message, ParentMessageId);
             }
@@ -2693,7 +2674,7 @@ namespace EPMLiveCore.API
         #region Install Files
         private int GetParentFolderId(Hashtable hshParents, string sParentFolder, int mainId)
         {
-            if(hshParents.ContainsKey(sParentFolder))
+            if (hshParents.ContainsKey(sParentFolder))
                 return (int)hshParents[sParentFolder];
 
             return mainId;
@@ -2703,14 +2684,14 @@ namespace EPMLiveCore.API
         {
             SPFolder oParentFolder = oWeb.GetFolder(sParentFolder);
 
-            if(oParentFolder.Exists)
+            if (oParentFolder.Exists)
             {
-                string sUrl = appDef.fullurl + "/Files/" + sFullFile;
+                string sUrl = "Applications/" + appDef.Title + "/Files/" + sFullFile;
 
                 byte[] fileBytes = copy.GetFile(sUrl);
 
                 oParentFolder.Files.Add(sFileName, fileBytes, true);
-                
+
             }
             else
             {
@@ -2722,29 +2703,29 @@ namespace EPMLiveCore.API
         {
             XmlNode ndLists = appDef.ApplicationXml.FirstChild.SelectSingleNode("Lists");
 
-            foreach(XmlNode ndChild in ndFolder.ChildNodes)
+            foreach (XmlNode ndChild in ndFolder.ChildNodes)
             {
                 string sRemoteName = getAttribute(ndChild, "RemoteFile");
                 string sType = getAttribute(ndChild, "Type");
-                string sFullFile = sRemoteName.Replace(appDef.appurl + "/Files/", "");
+                string sFullFile = sRemoteName.Replace("Applications/" + appDef.Title + "/Files/", "");
                 string sFileName = getAttribute(ndChild, "Name");
                 string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
                 try
                 {
 
-                    if(sType == "1")
+                    if (sType == "1")
                     {
                         SPFolder oFolder = oWeb.GetFolder(sFullFile);
 
                         int iId = ParentMessageId;
                         bool bProcessFolder = false;
-                        
-                        if(!oFolder.Exists)
+
+                        if (!oFolder.Exists)
                         {
-                            if(sFullFile.Contains("/"))
+                            if (sFullFile.Contains("/"))
                             {
-                                if(!bVerifyOnly)
+                                if (!bVerifyOnly)
                                 {
                                     oWeb.Folders.Add(sFullFile);
                                     oFolder = oWeb.GetFolder(sFullFile);
@@ -2761,7 +2742,7 @@ namespace EPMLiveCore.API
                                 }
                                 catch { }
 
-                                if(ndList == null)
+                                if (ndList == null)
                                 {
                                     iId = addMessage(ErrorLevels.Error, "Folder: " + sFileName, "Document Library or Folder does not exist.", ParentMessageId);
                                 }
@@ -2776,7 +2757,7 @@ namespace EPMLiveCore.API
                         else
                         {
                             XmlAttribute attrNoDelete = ndChild.Attributes["NoDelete"];
-                            if(attrNoDelete == null)
+                            if (attrNoDelete == null)
                             {
                                 attrNoDelete = ndChild.OwnerDocument.CreateAttribute("NoDelete");
                                 attrNoDelete.Value = "True";
@@ -2798,7 +2779,7 @@ namespace EPMLiveCore.API
                         }
                         catch { }
 
-                        if(bProcessFolder)
+                        if (bProcessFolder)
                             iInstallFilesProcessFolder(iId, counter, ndChild, max, copy, bOverwriteFolder);
                     }
                     else
@@ -2811,18 +2792,18 @@ namespace EPMLiveCore.API
                         catch { }
 
                         SPFile oFile = oWeb.GetFile(getAttribute(ndChild, "FullFile"));
-                        if(oFile.Exists)
+                        if (oFile.Exists)
                         {
-                            if(bOverwrite || bOverwriteFile)
+                            if (bOverwrite || bOverwriteFile)
                             {
                                 try
                                 {
-                                    if(!bVerifyOnly)
+                                    if (!bVerifyOnly)
                                         iInstallFile(sFileName, sParentFolder, sFullFile, copy);
 
                                     addMessage(ErrorLevels.NoError, "File: " + sFileName, "", ParentMessageId);
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     addMessage(ErrorLevels.Error, "File: " + sFileName, "Error: " + ex.Message, ParentMessageId);
                                 }
@@ -2836,19 +2817,19 @@ namespace EPMLiveCore.API
                         {
                             try
                             {
-                                if(!bVerifyOnly)
+                                if (!bVerifyOnly)
                                     iInstallFile(sFileName, sParentFolder, sFullFile, copy);
 
                                 addMessage(ErrorLevels.NoError, "File: " + sFileName, "", ParentMessageId);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 addMessage(ErrorLevels.Error, "File: " + sFileName, "Error: " + ex.Message, ParentMessageId);
                             }
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     addMessage(ErrorLevels.Error, sFileName, "Error: " + ex.Message, ParentMessageId);
                 }
@@ -2858,14 +2839,14 @@ namespace EPMLiveCore.API
                 updateLIPercent(percent);
             }
 
-            
+
         }
 
         private XmlNode iInstallFiles()
         {
             int ParentMessageId = 0;
 
-            if(bVerifyOnly)
+            if (bVerifyOnly)
             {
                 ParentMessageId = addMessage(0, "Checking Files", "", 0);
             }
@@ -2873,7 +2854,7 @@ namespace EPMLiveCore.API
             {
                 ParentMessageId = addMessage(0, "Installing Files", "", 0);
             }
-            
+
             XmlDocument docFiles = new XmlDocument();
             docFiles.LoadXml("<Files/>");
 
@@ -2891,7 +2872,7 @@ namespace EPMLiveCore.API
                     SslPolicyErrors sslPolicyErrors)
                 {
                     return true;
-                };  
+                };
 
                 WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists();
                 listSvc.Url = storeurl + "_vti_bin/lists.asmx";
@@ -2916,23 +2897,23 @@ namespace EPMLiveCore.API
 
                 float max = 0;
 
-                foreach(XmlNode nd in ndItems.ChildNodes)
+                foreach (XmlNode nd in ndItems.ChildNodes)
                 {
-                    if(nd.Name == "rs:data")
+                    if (nd.Name == "rs:data")
                     {
 
 
                         float.TryParse(nd.Attributes["ItemCount"].Value, out max);
-                        if(max > 0)
+                        if (max > 0)
                         {
-                            if(!bVerifyOnly)
+                            if (!bVerifyOnly)
                             {
-                                
+
                             }
 
-                            foreach(XmlNode ndChild in nd.ChildNodes)
+                            foreach (XmlNode ndChild in nd.ChildNodes)
                             {
-                                if(ndChild.Name == "z:row")
+                                if (ndChild.Name == "z:row")
                                 {
                                     SPFieldLookupValue lvFSObjType = new SPFieldLookupValue(ndChild.Attributes["ows_FSObjType"].Value);
                                     SPFieldLookupValue lvFileRef = new SPFieldLookupValue(ndChild.Attributes["ows_FileRef"].Value);
@@ -2947,19 +2928,19 @@ namespace EPMLiveCore.API
                                     catch { sTitle = lvFileLeafRef.LookupValue; }
 
                                     string sRemoteFile = lvFileRef.LookupValue;
-                                    string sFullFile = sRemoteFile.Replace(appDef.appurl + "/Files/", "");
+                                    string sFullFile = sRemoteFile.Replace("Applications/" + appDef.Title + "/Files/", "");
                                     string sFileName = System.IO.Path.GetFileName(sFullFile);
                                     string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
                                     bool bOverwrite = false;
 
-                                    if(System.IO.Path.GetExtension(sFileName) == ".txt")
+                                    if (System.IO.Path.GetExtension(sFileName) == ".txt")
                                     {
-                                        if(sTitle.Contains("."))
+                                        if (sTitle.Contains("."))
                                             sFileName = sTitle;
                                     }
 
-                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace(appDef.appurl + "/Files/", "")) + "/" + sFileName;
+                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace("Applications/" + appDef.Title + "/Files/", "")) + "/" + sFileName;
                                     sFullFile = sFullFile.Replace("\\", "/");
                                     sFullFile = sFullFile.Trim('/');
 
@@ -3001,7 +2982,7 @@ namespace EPMLiveCore.API
 
                                     XmlNode ndParent = docFiles.FirstChild.SelectSingleNode("//File[@FullFile='" + sParentFolder + "']");
 
-                                    if(ndParent == null)
+                                    if (ndParent == null)
                                         docFiles.FirstChild.AppendChild(ndNew);
                                     else
                                         ndParent.AppendChild(ndNew);
@@ -3014,7 +2995,7 @@ namespace EPMLiveCore.API
 
                 iInstallFilesProcessFolder(ParentMessageId, 0, docFiles.FirstChild, max, copy, false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 addMessage(ErrorLevels.Error, "Installing Files", "Error: " + ex.Message, ParentMessageId);
             }
@@ -3031,7 +3012,7 @@ namespace EPMLiveCore.API
                 oListItem["Description"] = ndApp.SelectSingleNode("Description").InnerText;
             }
             catch { }
-            if(bVerifyOnly)
+            if (bVerifyOnly)
             {
                 oListItem["Status"] = "PreCheck Started";
             }
@@ -3041,14 +3022,14 @@ namespace EPMLiveCore.API
             }
             oListItem["InstallPercent"] = 0;
             oListItem["AppVersion"] = appDef.Version;
-            oListItem["AppUrl"] = appDef.fullurl;
+            oListItem["AppUrl"] = appDef.url;
             oListItem.Update();
 
-            if(!bVerifyOnly)
+            if (!bVerifyOnly)
             {
-                if(appDef.Icon != null && appDef.Icon != "")
+                if (appDef.Icon != null && appDef.Icon != "")
                 {
-                    using(WebClient webClient = new WebClient())
+                    using (WebClient webClient = new WebClient())
                     {
                         ServicePointManager.ServerCertificateValidationCallback +=
                         delegate(
@@ -3058,7 +3039,7 @@ namespace EPMLiveCore.API
                             SslPolicyErrors sslPolicyErrors)
                         {
                             return true;
-                        };  
+                        };
 
                         webClient.Credentials = CoreFunctions.GetStoreCreds();
                         byte[] fileBytes = null;
@@ -3079,21 +3060,21 @@ namespace EPMLiveCore.API
 
             try
             {
-                if(oAppList != null)
+                if (oAppList != null)
                 {
-                    
+
                     XmlNode ndApp = appDef.ApplicationXml.FirstChild.SelectSingleNode("Application");
 
                     iProcessLI(ndApp);
 
                     addMessage(ErrorLevels.NoError, "Install Version", appDef.Version, 0);
 
-                    if(!oWeb.IsRootWeb && !bIsInstalledElsewhere && !bVerifyOnly)
+                    if (!oWeb.IsRootWeb && !bIsInstalledElsewhere && !bVerifyOnly)
                     {
                         InstallOnRootWeb();
                     }
 
-                    if(!bIsInstalledElsewhere)
+                    if (!bIsInstalledElsewhere)
                     {
                         _currentPercentSpan = 10;
                         _currentBasePercent = 0;
@@ -3114,10 +3095,10 @@ namespace EPMLiveCore.API
 
                     _currentPercentSpan = 10;
                     _currentBasePercent = 70;
-                    docFiles.LoadXml( iInstallFiles().OuterXml );
+                    docFiles.LoadXml(iInstallFiles().OuterXml);
                     //TODO: Fix Reports in Report Library (Data Connections)
 
-                    if(appDef.Community != "" && !bVerifyOnly)
+                    if (appDef.Community != "" && !bVerifyOnly)
                     {
                         try
                         {
@@ -3127,7 +3108,8 @@ namespace EPMLiveCore.API
 
                             addMessage(ErrorLevels.NoError, "Creating Community", appDef.Community, 0);
                         }
-                        catch(Exception ex) {
+                        catch (Exception ex)
+                        {
                             addMessage(ErrorLevels.Error, "Creating Community", "Error: " + ex.Message, 0);
                         }
                     }
@@ -3157,9 +3139,9 @@ namespace EPMLiveCore.API
                     _currentPercentSpan = 10;
                     _currentBasePercent = 90;
 
-                    if(bProcessReports)
+                    if (bProcessReports)
                     {
-                        if(bVerifyOnly)
+                        if (bVerifyOnly)
                             addMessage(ErrorLevels.NoError, "Processing Reports", "", 0);
                         else
                         {
@@ -3169,16 +3151,16 @@ namespace EPMLiveCore.API
 
                                 addMessage(ErrorLevels.NoError, "Processing Reports", "", 0);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 addMessage(ErrorLevels.Error, "Processing Reports", "Error: " + ex.Message, 0);
                             }
                         }
                     }
 
-                    if(!bVerifyOnly)
+                    if (!bVerifyOnly)
                     {
-                        
+
                         try
                         {
                             oListItem["InstallXML"] = appDef.ApplicationXml.OuterXml;
@@ -3204,7 +3186,7 @@ namespace EPMLiveCore.API
                         //    try
                         //    {
                         //        oListItem["Visible"] = visible;
-                                
+
                         //    }
                         //    catch { }
                         //}
@@ -3214,33 +3196,33 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    if(!bVerifyOnly)
+                    if (!bVerifyOnly)
                     {
                         addMessage(ErrorLevels.Error, "Installing Application", "Unable to find Installed Applications List", 0);
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                addMessage(ErrorLevels.Error, "Installing Application", "Exception: " + ex.Message , 0);
+                addMessage(ErrorLevels.Error, "Installing Application", "Exception: " + ex.Message, 0);
             }
 
-            if(oListItem != null)
+            if (oListItem != null)
             {
                 oListItem["InstalledFiles"] = docFiles.InnerXml;
             }
         }
 
-        
+
         private bool CheckForKeys()
         {
             XmlNode ndApplication = appDef.ApplicationXml.FirstChild.SelectSingleNode("Application");
-            if(ndApplication != null)
+            if (ndApplication != null)
             {
-                if(ndApplication.Attributes["RequiredFeatureKeys"] != null)
+                if (ndApplication.Attributes["RequiredFeatureKeys"] != null)
                 {
                     string reqKeys = ndApplication.Attributes["RequiredFeatureKeys"].Value;
-                    if(reqKeys != "")
+                    if (reqKeys != "")
                     {
                         int ParentMessageId = addMessage(ErrorLevels.NoError, "Activation Key Check", "", 0);
 
@@ -3251,11 +3233,11 @@ namespace EPMLiveCore.API
 
                         Act act = new Act(oWeb);
 
-                        foreach(string featureId in featureIds)
+                        foreach (string featureId in featureIds)
                         {
                             try
                             {
-                                if(act.CheckFeatureLicense((ActFeature)int.Parse(featureId)) == 0)
+                                if (act.CheckFeatureLicense((ActFeature)int.Parse(featureId)) == 0)
                                 {
                                     addMessage(ErrorLevels.NoError, CoreFunctions.getFeatureName(featureId), "", ParentMessageId);
                                 }
@@ -3278,19 +3260,19 @@ namespace EPMLiveCore.API
 
         private bool CheckForPreReqs()
         {
-            if(oAppList != null)
+            if (oAppList != null)
             {
                 int ParentMessageId = addMessage(ErrorLevels.NoError, "Pre Requisite Check", "", 0);
 
                 bool failed = false;
 
-                foreach(DictionaryEntry de in appDef.PreReqs)
+                foreach (DictionaryEntry de in appDef.PreReqs)
                 {
                     SPQuery query = new SPQuery();
                     query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + de.Key + "</Value></Eq></Where>";
                     SPListItemCollection lic = oAppList.GetItems(query);
 
-                    if(lic.Count > 0)
+                    if (lic.Count > 0)
                     {
                         addMessage(ErrorLevels.NoError, de.Value.ToString(), "", ParentMessageId);
                     }
@@ -3315,25 +3297,25 @@ namespace EPMLiveCore.API
         {
             bool bHasPerms = false;
 
-            if(bIsInstalledElsewhere)
+            if (bIsInstalledElsewhere)
             {
                 SPUser oUser = oWeb.AllUsers.GetByID(_configJob.userid);
 
                 try
                 {
-                    using(SPSite tempSite = new SPSite(oWeb.Site.ID, oUser.UserToken))
+                    using (SPSite tempSite = new SPSite(oWeb.Site.ID, oUser.UserToken))
                     {
                         tempSite.CatchAccessDeniedException = false;
-                        using(SPWeb tempWeb = tempSite.OpenWeb(oWeb.ID))
+                        using (SPWeb tempWeb = tempSite.OpenWeb(oWeb.ID))
                         {
-                            if(tempWeb.DoesUserHavePermissions(SPBasePermissions.ManageWeb))
+                            if (tempWeb.DoesUserHavePermissions(SPBasePermissions.ManageWeb))
                                 bHasPerms = true;
                         }
                     }
                 }
-                catch {  }
+                catch { }
 
-                if(bHasPerms)
+                if (bHasPerms)
                 {
                     addMessage(ErrorLevels.NoError, "Permissions Check", "", 0);
                 }
@@ -3350,16 +3332,16 @@ namespace EPMLiveCore.API
                 try
                 {
                     XmlNode ndSolutions = appDef.ApplicationXml.FirstChild.SelectSingleNode("Solutions");
-                    if(ndSolutions.ChildNodes.Count > 0)
+                    if (ndSolutions.ChildNodes.Count > 0)
                         bHasSolutions = true;
                 }
                 catch { }
 
-                if(bHasSolutions)
+                if (bHasSolutions)
                 {
                     SPUser oUser = oWeb.AllUsers.GetByID(_configJob.userid);
 
-                    if(oUser.IsSiteAdmin)
+                    if (oUser.IsSiteAdmin)
                     {
                         addMessage(ErrorLevels.NoError, "Permissions Check", "", 0);
                         bHasPerms = true;
@@ -3376,19 +3358,19 @@ namespace EPMLiveCore.API
 
                     try
                     {
-                        using(SPSite tempSite = new SPSite(oWeb.Site.ID, oUser.UserToken))
+                        using (SPSite tempSite = new SPSite(oWeb.Site.ID, oUser.UserToken))
                         {
                             tempSite.CatchAccessDeniedException = false;
-                            using(SPWeb tempWeb = tempSite.OpenWeb(oWeb.ID))
+                            using (SPWeb tempWeb = tempSite.OpenWeb(oWeb.ID))
                             {
-                                if(tempWeb.DoesUserHavePermissions(SPBasePermissions.ManageWeb))
+                                if (tempWeb.DoesUserHavePermissions(SPBasePermissions.ManageWeb))
                                     bHasPerms = true;
                             }
                         }
                     }
                     catch { }
 
-                    if(bHasPerms)
+                    if (bHasPerms)
                     {
                         addMessage(ErrorLevels.NoError, "Permissions Check", "", 0);
                     }
@@ -3406,9 +3388,9 @@ namespace EPMLiveCore.API
         {
             try
             {
-                if(bVerifyOnly)
+                if (bVerifyOnly)
                 {
-                    switch(li["Status"].ToString())
+                    switch (li["Status"].ToString())
                     {
                         case "PreCheck Queued":
                             return true;
@@ -3418,7 +3400,7 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    switch(li["Status"].ToString())
+                    switch (li["Status"].ToString())
                     {
                         case "Install Queued":
                             return true;
@@ -3433,42 +3415,42 @@ namespace EPMLiveCore.API
 
         private bool CheckForApplicationList()
         {
-            
-            
-                SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + appDef.Id + "</Value></Eq></Where>";
-                SPListItemCollection lic = oAppList.GetItems(query);
 
-                if(lic.Count > 0)
+
+            SPQuery query = new SPQuery();
+            query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + appDef.Id + "</Value></Eq></Where>";
+            SPListItemCollection lic = oAppList.GetItems(query);
+
+            if (lic.Count > 0)
+            {
+                if (CheckStatus(lic[0]))
                 {
-                    if(CheckStatus(lic[0]))
-                    {
-                        addMessage(ErrorLevels.NoError, "Application List", "", 0);
-                        return true;
-                    }
-                    else
-                    {
-                        addMessage(ErrorLevels.Error, "Application List", "Application has not been queued.", 0);
-                        return false;
-                    }
+                    addMessage(ErrorLevels.NoError, "Application List", "", 0);
+                    return true;
                 }
                 else
                 {
-                    query = new SPQuery();
-                    query.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + appDef.Title + "</Value></Eq></Where>";
-                    lic = oAppList.GetItems(query);
-                    if(lic.Count > 0)
-                    {
-                        addMessage(ErrorLevels.Error, "Application List", "You already have an application with the same name installed", 0);
-                        return false;
-                    }
-                    else
-                    {
-                        addMessage(ErrorLevels.NoError, "Application List", "", 0);
-                        return true;
-                    }
+                    addMessage(ErrorLevels.Error, "Application List", "Application has not been queued.", 0);
+                    return false;
                 }
-            
+            }
+            else
+            {
+                query = new SPQuery();
+                query.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + appDef.Title + "</Value></Eq></Where>";
+                lic = oAppList.GetItems(query);
+                if (lic.Count > 0)
+                {
+                    addMessage(ErrorLevels.Error, "Application List", "You already have an application with the same name installed", 0);
+                    return false;
+                }
+                else
+                {
+                    addMessage(ErrorLevels.NoError, "Application List", "", 0);
+                    return true;
+                }
+            }
+
         }
 
         #region Accessors
@@ -3489,7 +3471,7 @@ namespace EPMLiveCore.API
                 docMessages.LoadXml("<Messages/>");
                 XmlNode ndParent = docMessages.FirstChild;
 
-                foreach(DataRow dr in _dtMessages.Rows)
+                foreach (DataRow dr in _dtMessages.Rows)
                 {
                     XmlNode ndMessageRow = docMessages.CreateNode(XmlNodeType.Element, "MessageRow", docMessages.NamespaceURI);
 
@@ -3513,7 +3495,7 @@ namespace EPMLiveCore.API
 
                     XmlNode ndParentMessageRow = ndParent.SelectSingleNode("//MessageRow[@ID='" + dr["ParentID"].ToString() + "']");
 
-                    if(ndParentMessageRow != null)
+                    if (ndParentMessageRow != null)
                         ndParentMessageRow.AppendChild(ndMessageRow);
                     else
                         ndParent.AppendChild(ndMessageRow);
@@ -3524,18 +3506,18 @@ namespace EPMLiveCore.API
                 return docMessages;
             }
         }
-     
+
 
         public DataTable DtMessagesHTML
         {
             get
             {
                 DataTable dt = DtMessages.Clone();
-                foreach(DataRow dr in DtMessages.Rows)
+                foreach (DataRow dr in DtMessages.Rows)
                 {
                     DataRow drNew = dt.Rows.Add(new object[] { dr[0], dr[1], dr[2], dr[3], dr[4], dr[5] });
 
-                    for(int i = 0; i < int.Parse(drNew["Tabbing"].ToString()); i++)
+                    for (int i = 0; i < int.Parse(drNew["Tabbing"].ToString()); i++)
                     {
                         drNew["Message"] = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + drNew["Message"].ToString();
                     }
@@ -3550,12 +3532,12 @@ namespace EPMLiveCore.API
             {
                 StringBuilder sbMessage = new StringBuilder();
                 DataTable dt = DtMessagesHTML;
-                foreach(DataRow dr in dt.Rows)
+                foreach (DataRow dr in dt.Rows)
                 {
                     sbMessage.Append(dr[3].ToString());
                     sbMessage.Append("...");
 
-                    switch((ErrorLevels)int.Parse(dr[2].ToString()))
+                    switch ((ErrorLevels)int.Parse(dr[2].ToString()))
                     {
                         case ErrorLevels.NoError:
                         case ErrorLevels.Upgrade:
@@ -3569,7 +3551,7 @@ namespace EPMLiveCore.API
                             break;
                     }
 
-                    if(dr[4].ToString().Length > 0)
+                    if (dr[4].ToString().Length > 0)
                     {
                         sbMessage.Append(" (");
                         sbMessage.Append(dr[4].ToString());
@@ -3578,7 +3560,7 @@ namespace EPMLiveCore.API
                     sbMessage.Append("<br>");
                 }
 
-                return sbMessage.ToString(); 
+                return sbMessage.ToString();
             }
         }
 
