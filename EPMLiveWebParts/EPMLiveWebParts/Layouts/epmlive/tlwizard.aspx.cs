@@ -252,6 +252,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                         ProcessNotifications(web);
                         ProcessTimerJob(web);
+                        ProcessReportingRefreshJob(web);
                         ProcessBackEndLists(web);
                         ProcessGroups(web, w.CurrentUser);
 
@@ -282,6 +283,42 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     }
                 }
             });
+        }
+
+        private void ProcessReportingRefreshJob(SPWeb web)
+        {
+            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                cn.Open();
+            });
+            Guid timerjobguid;
+            SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=5", cn);
+            cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                timerjobguid = dr.GetGuid(0);
+                dr.Close();
+                cmd = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=5", cn);
+                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+                cmd.Parameters.AddWithValue("@runtime", ddlReportingRefresh.SelectedValue);
+                cmd.ExecuteNonQuery();
+            }
+            else
+            {
+                timerjobguid = Guid.NewGuid();
+                dr.Close();
+                cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 5, 'Reporting Refresh', @runtime, 2, @webguid)", cn);
+                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+                cmd.Parameters.AddWithValue("@timerjobuid", timerjobguid);
+                cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
+                cmd.Parameters.AddWithValue("@runtime", ddlReportingRefresh.SelectedValue);
+                cmd.ExecuteNonQuery();
+            }
+
+            cn.Close();
         }
 
         private void ProcessGroups(SPWeb web, SPUser user)

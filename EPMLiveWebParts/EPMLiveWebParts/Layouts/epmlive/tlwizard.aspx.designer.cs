@@ -202,6 +202,15 @@ namespace EPMLiveWebParts.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.DropDownList ddlTimerRunTime;
         
         /// <summary>
+        /// ddlReportingRefresh control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlReportingRefresh;
+        
+        /// <summary>
         /// Button1 control.
         /// </summary>
         /// <remarks>
