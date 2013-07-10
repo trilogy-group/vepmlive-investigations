@@ -265,7 +265,7 @@ namespace EPMLiveCore
                 fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
             }
 
-            ScriptLink.Register(Page, "epmlive/ModifiedDropDown.js?v=" + fileVersion, false);
+            ScriptLink.Register(Page, "/_layouts/epmlive/ModifiedDropDown.js?v=" + fileVersion, false);
 
             base.OnPreRender(e);
 
