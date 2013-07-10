@@ -21,8 +21,7 @@ namespace EPMLiveCore.API
         public int Id;
         public SortedList PreReqs;
         public XmlDocument ApplicationXml;
-        public string fullurl;
-        public string appurl;
+        public string url;
         public bool bIsConfigOnly = false;
         public string Icon;
         public string Version;
@@ -50,7 +49,7 @@ namespace EPMLiveCore.API
             {
                 return nd.Attributes[attribute].Value;
             }
-            catch { return "";  }
+            catch { return ""; }
 
         }
 
@@ -58,7 +57,7 @@ namespace EPMLiveCore.API
         {
             web.AllowUnsafeUpdates = true;
             SPList oList = web.Lists.TryGetList("AppDocuments");
-            if(oList == null)
+            if (oList == null)
             {
                 Guid gList = web.Lists.Add("AppDocuments", "", SPListTemplateType.DocumentLibrary);
                 oList = web.Lists[gList];
@@ -69,7 +68,7 @@ namespace EPMLiveCore.API
             }
 
             oList = web.Lists.TryGetList("Installed Applications");
-            if(oList == null)
+            if (oList == null)
             {
                 web.Features.Add(new Guid("21c3b2a2-f0c6-4abf-8671-a07c9f50d00d"), true);
 
@@ -93,16 +92,16 @@ namespace EPMLiveCore.API
 
         private static SPList CheckApplicationList(SPList oList)
         {
-            if(oList != null)
+            if (oList != null)
             {
                 SPField oField = GetField(oList, "Description");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("Description", SPFieldType.Note, false);
                 }
 
                 oField = GetField(oList, "EXTID");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("EXTID", SPFieldType.Number, false);
                     oField = GetField(oList, "EXTID");
@@ -112,7 +111,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "QuickLaunch");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("QuickLaunch", SPFieldType.Text, false);
                     oField = GetField(oList, "QuickLaunch");
@@ -122,7 +121,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "TopNav");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("TopNav", SPFieldType.Text, false);
                     oField = GetField(oList, "TopNav");
@@ -132,7 +131,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "Visible");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("Visible", SPFieldType.Boolean, false);
                     SPFieldBoolean bField = (SPFieldBoolean)GetField(oList, "Visible");
@@ -141,7 +140,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "Default");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("Default", SPFieldType.Boolean, false);
                     SPFieldBoolean bField = (SPFieldBoolean)GetField(oList, "Default");
@@ -152,19 +151,19 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "HomePage");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("HomePage", SPFieldType.URL, false);
                 }
 
                 oField = GetField(oList, "Icon");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("Icon", SPFieldType.URL, false);
                 }
 
                 oField = GetField(oList, "AppVersion");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("AppVersion", SPFieldType.Text, false);
                     oField = GetField(oList, "AppVersion");
@@ -174,7 +173,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "AppUrl");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("AppUrl", SPFieldType.Text, false);
                     oField = GetField(oList, "AppUrl");
@@ -184,7 +183,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "Status");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("Status", SPFieldType.Text, false);
                     oField = GetField(oList, "Status");
@@ -194,7 +193,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "InstallPercent");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("InstallPercent", SPFieldType.Number, false);
                     SPFieldNumber bField = (SPFieldNumber)GetField(oList, "InstallPercent");
@@ -205,7 +204,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "InstallMessages");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("InstallMessages", SPFieldType.Note, false);
                     SPFieldMultiLineText bField = (SPFieldMultiLineText)GetField(oList, "InstallMessages");
@@ -217,7 +216,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "Configured");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("Configured", SPFieldType.Boolean, false);
                     oField = GetField(oList, "Configured");
@@ -227,7 +226,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "InstalledFiles");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("InstalledFiles", SPFieldType.Note, false);
                     oField = GetField(oList, "InstalledFiles");
@@ -237,7 +236,7 @@ namespace EPMLiveCore.API
 
 
                 oField = GetField(oList, "QuickLaunchXML");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("QuickLaunchXML", SPFieldType.Note, false);
                     oField = GetField(oList, "QuickLaunchXML");
@@ -247,7 +246,7 @@ namespace EPMLiveCore.API
 
 
                 oField = GetField(oList, "TopNavXML");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("TopNavXML", SPFieldType.Note, false);
                     oField = GetField(oList, "TopNavXML");
@@ -256,7 +255,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "InstallXML");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("InstallXML", SPFieldType.Note, false);
                     oField = GetField(oList, "InstallXML");
@@ -265,7 +264,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "LinkedApps");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("LinkedApps", SPFieldType.Note, false);
                     oField = GetField(oList, "LinkedApps");
@@ -274,7 +273,7 @@ namespace EPMLiveCore.API
                 }
 
                 oField = GetField(oList, "LinkedCommunity");
-                if(oField == null)
+                if (oField == null)
                 {
                     oList.Fields.Add("LinkedCommunity", SPFieldType.Number, false);
                     oField = GetField(oList, "LinkedCommunity");
@@ -304,7 +303,7 @@ namespace EPMLiveCore.API
 
         private static void AddEventReceiverElement(string operation, string className, string assembly, IEnumerable<SPEventReceiverType> spEventReceiverTypes, Guid listId, ref XElement dataElement, SPWeb web)
         {
-            foreach(SPEventReceiverType spEventReceiverType in spEventReceiverTypes)
+            foreach (SPEventReceiverType spEventReceiverType in spEventReceiverTypes)
             {
                 dataElement.Add(new XElement("EventReceiver", new XAttribute("SiteId", web.Site.ID),
                                              new XAttribute("WebId", web.ID), new XAttribute("ListId", listId),
@@ -327,16 +326,16 @@ namespace EPMLiveCore.API
 
             bool foundapp = false;
 
-            foreach(string sNav in arrNavs)
+            foreach (string sNav in arrNavs)
             {
                 string[] sNavInfo = sNav.Split(':');
-                if(sNavInfo.Length > 1 && sNavInfo[1] == appextid.ToString())
+                if (sNavInfo.Length > 1 && sNavInfo[1] == appextid.ToString())
                 {
                     foundapp = true;
                 }
             }
 
-            if(!foundapp)
+            if (!foundapp)
             {
                 ArrayList arrNewNavs = new ArrayList();
                 try
@@ -354,7 +353,7 @@ namespace EPMLiveCore.API
 
         private static void AddAppNavSub(SPListItem oLiCommunity, int appextid, XmlNode ndNav, SPNavigationNodeCollection nodeCollection, SPField NavField, ref ArrayList arrNewNavs)
         {
-            foreach(XmlNode nd in ndNav.SelectNodes("Item"))
+            foreach (XmlNode nd in ndNav.SelectNodes("Item"))
             {
                 try
                 {
@@ -393,7 +392,7 @@ namespace EPMLiveCore.API
                 SPField fQuickLaunch = oLiCommunity.ParentList.Fields.GetFieldByInternalName("QuickLaunch");
 
                 XmlNode nd = appDef.ApplicationXml.FirstChild.SelectSingleNode("//Application/QuickLaunch");
-                if(nd != null)
+                if (nd != null)
                 {
                     AddAppNav(oLiCommunity, appextid, nd, oLiCommunity.ParentList.ParentWeb.Navigation.QuickLaunch, fQuickLaunch);
 
@@ -403,7 +402,7 @@ namespace EPMLiveCore.API
                 SPField fTopNav = oLiCommunity.ParentList.Fields.GetFieldByInternalName("TopNav");
 
                 nd = appDef.ApplicationXml.FirstChild.SelectSingleNode("//Application/TopNav");
-                if(nd != null)
+                if (nd != null)
                 {
                     AddAppNav(oLiCommunity, appextid, nd, oLiCommunity.ParentList.ParentWeb.Navigation.TopNavigationBar, fTopNav);
 
@@ -442,12 +441,12 @@ namespace EPMLiveCore.API
             {
                 arrNavs = new ArrayList(oLiCommunity[NavField.Id].ToString().Split(','));
 
-                foreach(string sNav in arrNavs)
+                foreach (string sNav in arrNavs)
                 {
                     string[] sNavInfo = sNav.Split(':');
-                    if(sNavInfo.Length > 1)
+                    if (sNavInfo.Length > 1)
                     {
-                        if(sNavInfo[1] == appid.ToString())
+                        if (sNavInfo[1] == appid.ToString())
                         {
                             arrDelNavs.Add(sNavInfo[0]);
                         }
@@ -462,7 +461,7 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                foreach(string sDelNav in arrDelNavs)
+                foreach (string sDelNav in arrDelNavs)
                 {
                     try
                     {
@@ -489,7 +488,7 @@ namespace EPMLiveCore.API
             {
                 arrNavs = new ArrayList(oLiCommunity[NavField.Id].ToString().Split(','));
 
-                foreach(string sNav in arrNavs)
+                foreach (string sNav in arrNavs)
                 {
                     string[] sNavInfo = sNav.Split(':');
                     try
@@ -563,7 +562,7 @@ namespace EPMLiveCore.API
         //    }
 
         //    oLiCommunity[oNavField.Id] = string.Join(",", (string[])curCommunityNav.ToArray(typeof(string)));
-            
+
         //    oLiCommunity.Update();
         //}
 
@@ -607,16 +606,16 @@ namespace EPMLiveCore.API
             cWeb.Site.CatchAccessDeniedException = false;
             cWeb.AllowUnsafeUpdates = true;
             SPList appsList = cWeb.Lists.TryGetList(INSTALLED_APP_LIST_NAME);
-            if(appsList != null)
+            if (appsList != null)
             {
                 xml.Append("<" + field + ">");
                 SPListItem currentApp = appsList.GetItemById(AppId);
                 string sQlIds = (string)(currentApp[field] ?? string.Empty);
-                if(!string.IsNullOrEmpty(sQlIds))
+                if (!string.IsNullOrEmpty(sQlIds))
                 {
                     string[] ids = sQlIds.Split(',');
                     Hashtable hshNavs = new Hashtable();
-                    foreach(string s in ids)
+                    foreach (string s in ids)
                     {
 
                         string[] sIdInfo = s.Split(':');
@@ -624,14 +623,15 @@ namespace EPMLiveCore.API
                         try
                         {
                             appid = sIdInfo[1];
-                        }catch{}
+                        }
+                        catch { }
                         hshNavs.Add(sIdInfo[0], appid);
                     }
 
                     // go by the order of the web node collection, 
                     // rather than by the ids in "QuickLaunch" or "TopNav" column
-                    foreach(SPNavigationNode n in nodeCollection.Parent.Children)
-                    {   
+                    foreach (SPNavigationNode n in nodeCollection.Parent.Children)
+                    {
                         if (hshNavs.ContainsKey(n.Id.ToString()))
                         {
                             CreateChildXML(n, xml, cWeb, hshNavs);
@@ -668,19 +668,19 @@ namespace EPMLiveCore.API
         private static void CreateChildXML(SPNavigationNode n, StringBuilder xml, SPWeb web, Hashtable hshNavs)
         {
             string url = web.ServerRelativeUrl;
-            if(url == "/")
+            if (url == "/")
                 url = n.Url;
             else
                 url = n.Url.Replace(web.ServerRelativeUrl, "{SiteUrl}");
 
-            if(hshNavs.ContainsKey(n.Id.ToString()) && hshNavs[n.Id.ToString()] != "")
+            if (hshNavs.ContainsKey(n.Id.ToString()) && hshNavs[n.Id.ToString()] != "")
                 xml.Append("<Nav name=\"" + n.Title + "\" url=\"" + url + "\" isExternal=\"" + n.IsExternal + "\" AppId=\"" + hshNavs[n.Id.ToString()] + "\">");
             else
                 xml.Append("<Nav name=\"" + n.Title + "\" url=\"" + url + "\" isExternal=\"" + n.IsExternal + "\" >");
 
-            if(n.Children.Count > 0)
+            if (n.Children.Count > 0)
             {
-                foreach(SPNavigationNode child in n.Children)
+                foreach (SPNavigationNode child in n.Children)
                 {
                     CreateChildXML(child, xml, web, hshNavs);
                 }
@@ -695,32 +695,33 @@ namespace EPMLiveCore.API
 
             SPList list = web.Lists.TryGetList("Installed Applications");
 
-            if(list != null)
+            if (list != null)
             {
                 SPListItemCollection lic = list.Items;
 
                 Hashtable hshQuickLaunch = new Hashtable();
                 Hashtable hshTopNav = new Hashtable();
 
-                if(lic.Count > 0)
+                if (lic.Count > 0)
                 {
-                    foreach(SPListItem li in lic)
+                    foreach (SPListItem li in lic)
                     {
                         try
                         {
                             string xml = li["QuickLaunchXML"].ToString();
-                            if(xml != "")
+                            if (xml != "")
                             {
                                 xml = xml.Replace("&", "&amp;");
                                 hshQuickLaunch.Add(li.ID, xml);
                             }
 
-                        }catch{}
+                        }
+                        catch { }
 
                         try
                         {
                             string xml = li["TopNavXML"].ToString();
-                            if(xml != "")
+                            if (xml != "")
                             {
                                 xml = xml.Replace("&", "&amp;");
                                 hshTopNav.Add(li.ID, xml);
@@ -730,11 +731,11 @@ namespace EPMLiveCore.API
                         catch { }
                     }
 
-                    if(hshQuickLaunch.Count > 0)
+                    if (hshQuickLaunch.Count > 0)
                     {
                         ClearNav(web.Navigation.QuickLaunch);
 
-                        foreach(DictionaryEntry de in hshQuickLaunch)
+                        foreach (DictionaryEntry de in hshQuickLaunch)
                         {
                             string IDs = "";
                             SPListItem li = list.GetItemById(int.Parse(de.Key.ToString()));
@@ -750,11 +751,11 @@ namespace EPMLiveCore.API
 
                     }
 
-                    if(hshTopNav.Count > 0)
+                    if (hshTopNav.Count > 0)
                     {
                         ClearNav(web.Navigation.TopNavigationBar);
 
-                        foreach(DictionaryEntry de in hshQuickLaunch)
+                        foreach (DictionaryEntry de in hshQuickLaunch)
                         {
                             string IDs = "";
                             SPListItem li = list.GetItemById(int.Parse(de.Key.ToString()));
@@ -775,7 +776,7 @@ namespace EPMLiveCore.API
 
         private static void BuildNav(SPNavigationNodeCollection collection, XmlNode ndParent, ref string IDs, SPWeb web)
         {
-            foreach(XmlNode nd in ndParent.ChildNodes)
+            foreach (XmlNode nd in ndParent.ChildNodes)
             {
                 string name = getAttribute(nd, "name");
                 string url = getAttribute(nd, "url");
@@ -787,7 +788,7 @@ namespace EPMLiveCore.API
                 try
                 {
                     string wurl = web.ServerRelativeUrl;
-                    if(wurl == "/")
+                    if (wurl == "/")
                         wurl = "";
 
                     SPNavigationNode newNav = new SPNavigationNode(name, url.Replace("{SiteUrl}", wurl), external);
@@ -803,12 +804,12 @@ namespace EPMLiveCore.API
         private static void ClearNav(SPNavigationNodeCollection collection)
         {
             ArrayList arrNodes = new ArrayList();
-            foreach(SPNavigationNode nd in collection)
+            foreach (SPNavigationNode nd in collection)
             {
                 arrNodes.Add(nd);
             }
 
-            foreach(SPNavigationNode nd in arrNodes)
+            foreach (SPNavigationNode nd in arrNodes)
             {
                 collection.Delete(nd);
             }
@@ -823,13 +824,13 @@ namespace EPMLiveCore.API
         {
             ApplicationDef appDef = GetApplicationInfo(id);
 
-            if(!web.IsRootWeb)
+            if (!web.IsRootWeb)
             {
                 try
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        using(SPSite site = new SPSite(web.Site.ID))
+                        using (SPSite site = new SPSite(web.Site.ID))
                         {
                             GetApplicationList(site.RootWeb);
                         }
@@ -845,14 +846,14 @@ namespace EPMLiveCore.API
             SPQuery query = new SPQuery();
             query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + id + "</Value></Eq></Where>";
             SPListItemCollection lic = oList.GetItems(query);
-            if(lic.Count > 0)
+            if (lic.Count > 0)
             {
                 try
                 {
                     oListItem = lic[0];
-                    if(verifyOnly)
+                    if (verifyOnly)
                     {
-                        switch(oListItem["Status"].ToString())
+                        switch (oListItem["Status"].ToString())
                         {
                             case "PreCheck Queued":
                             case "PreCheck Started":
@@ -874,7 +875,7 @@ namespace EPMLiveCore.API
                     }
                     else
                     {
-                        switch(oListItem["Status"].ToString())
+                        switch (oListItem["Status"].ToString())
                         {
                             case "PreCheck Queued":
                             case "PreCheck Started":
@@ -893,14 +894,14 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new Exception(ex.Message);
                 }
             }
             else
             {
-                if(verifyOnly)
+                if (verifyOnly)
                 {
                     oListItem = oList.Items.Add();
                     oListItem["Title"] = appDef.Title;
@@ -915,7 +916,7 @@ namespace EPMLiveCore.API
 
             oListItem["InstallPercent"] = 0;
 
-            if(verifyOnly)
+            if (verifyOnly)
             {
                 oListItem["InstallMessages"] = "";
                 oListItem["Status"] = "PreCheck Queued";
@@ -983,7 +984,7 @@ namespace EPMLiveCore.API
             SPQuery query = new SPQuery();
             query.Query = "<Where><Eq><FieldRef Name='ID' /><Value Type='Number'>" + id + "</Value></Eq></Where>";
             SPListItemCollection lic = oList.GetItems(query);
-            if(lic.Count > 0)
+            if (lic.Count > 0)
             {
                 oListItem = lic[0];
                 Guid job = EPMLiveCore.API.Timer.AddTimerJob(web.Site.ID, web.ID, oList.ID, oListItem.ID, "App Uninstall Check", 52, verifyOnly.ToString(), "", -1, 9, "");
@@ -1013,7 +1014,7 @@ namespace EPMLiveCore.API
             SPQuery query = new SPQuery();
             query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + id + "</Value></Eq></Where>";
             SPListItemCollection lic = oList.GetItems(query);
-            if(lic.Count > 0)
+            if (lic.Count > 0)
             {
                 oListItem = lic[0];
 
@@ -1021,8 +1022,8 @@ namespace EPMLiveCore.API
                 {
                     ndStatus.SelectSingleNode("Status").InnerText = oListItem["Status"].ToString();
                 }
-                catch 
-                { 
+                catch
+                {
                     ndStatus.SelectSingleNode("Status").InnerText = "Could not read status";
                 }
 
@@ -1068,7 +1069,7 @@ namespace EPMLiveCore.API
             SPQuery query = new SPQuery();
             query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + id + "</Value></Eq></Where>";
             SPListItemCollection lic = oList.GetItems(query);
-            if(lic.Count > 0)
+            if (lic.Count > 0)
             {
                 oListItem = lic[0];
 
@@ -1081,7 +1082,7 @@ namespace EPMLiveCore.API
                     ndStatus.SelectSingleNode("Status").InnerText = "Could not read status";
                 }
 
-                XmlNode ndJob =  API.Timer.GetTimerJobStatus(web.Site.ID, web.ID, oList.ID, oListItem.ID, jobtype);
+                XmlNode ndJob = API.Timer.GetTimerJobStatus(web.Site.ID, web.ID, oList.ID, oListItem.ID, jobtype);
 
                 try
                 {
@@ -1102,14 +1103,14 @@ namespace EPMLiveCore.API
 
             SPList oList = web.Lists.TryGetList("Installed Applications");
 
-            if(oList != null)
+            if (oList != null)
             {
                 try
                 {
                     web.AllowUnsafeUpdates = true;
                     oList.GetItemById(id).Delete();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new Exception("Error deleting community: " + ex.Message);
                 }
@@ -1124,9 +1125,9 @@ namespace EPMLiveCore.API
         private static void CreateCommunityNav(SPListItem LiCommunity, SPNavigationNodeCollection ParentNav, XmlNode ndNavs, ref ArrayList arrNavs)
         {
 
-            foreach(XmlNode nd in ndNavs.ChildNodes)
+            foreach (XmlNode nd in ndNavs.ChildNodes)
             {
-                if(nd.Name == "Item")
+                if (nd.Name == "Item")
                 {
                     string wurl = LiCommunity.ParentList.ParentWeb.ServerRelativeUrl;
                     string title = getAttribute(nd, "Name");
@@ -1156,7 +1157,7 @@ namespace EPMLiveCore.API
             SPQuery query = new SPQuery();
             query.Query = "<Where><IsNull><FieldRef Name='EXTID'/></IsNull></Where><OrderBy><FieldRef Name='Title'/></OrderBy>";
 
-            if(list.GetItems(query).Count == 0)
+            if (list.GetItems(query).Count == 0)
                 return true;
 
             return false;
@@ -1164,7 +1165,7 @@ namespace EPMLiveCore.API
 
         private static void ReadNavs(SPNavigationNodeCollection ParentNav, ref ArrayList arrNavs)
         {
-            foreach(SPNavigationNode nd in ParentNav)
+            foreach (SPNavigationNode nd in ParentNav)
             {
                 arrNavs.Add(nd.Id.ToString());
 
@@ -1177,7 +1178,7 @@ namespace EPMLiveCore.API
 
             SPList oList = GetApplicationList(web);
 
-            if(oList != null)
+            if (oList != null)
             {
                 try
                 {
@@ -1187,32 +1188,32 @@ namespace EPMLiveCore.API
                     SPListItem li = oList.Items.Add();
                     li["Title"] = title;
                     li["Visible"] = true;
-                    
+
 
                     string cleanTitle = "";
                     MatchCollection col = Regex.Matches(title, "\\w");
-                    foreach(Match m in col)
+                    foreach (Match m in col)
                     {
                         cleanTitle += m.Value;
                     }
 
                     SPFile fDefault = web.RootFolder.Files["Default.aspx"];
-                    if(fDefault.Exists)
+                    if (fDefault.Exists)
                     {
-                        fDefault.CopyTo("SitePages/" + cleanTitle + ".aspx", true);
+                        fDefault.CopyTo(cleanTitle + ".aspx", true);
                     }
 
-                    li["HomePage"] = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/SitePages/" + cleanTitle + ".aspx";
+                    li["HomePage"] = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/" + cleanTitle + ".aspx";
                     li.Update();
 
 
-                    if(bFirst)
+                    if (bFirst)
                     {
                         ArrayList arrNav = new ArrayList();
 
                         ReadNavs(web.Navigation.QuickLaunch, ref arrNav);
 
-                        if(arrNav.Count > 0)
+                        if (arrNav.Count > 0)
                         {
                             li["QuickLaunch"] = String.Join(",", (string[])arrNav.ToArray(typeof(string)));
                             li.Update();
@@ -1224,7 +1225,7 @@ namespace EPMLiveCore.API
 
                         ReadNavs(web.Navigation.TopNavigationBar, ref arrNav);
 
-                        if(arrNav.Count > 0)
+                        if (arrNav.Count > 0)
                         {
                             li["TopNav"] = String.Join(",", (string[])arrNav.ToArray(typeof(string)));
                             li.Update();
@@ -1234,7 +1235,7 @@ namespace EPMLiveCore.API
                     else
                     {
                         string sNavs = CoreFunctions.getConfigSetting(web, "DefaultCommunityNavs");
-                        if(sNavs == "")
+                        if (sNavs == "")
                             sNavs = Properties.Resources.DefaultCommunityNavs;
 
                         XmlDocument doc = new XmlDocument();
@@ -1242,11 +1243,11 @@ namespace EPMLiveCore.API
 
                         XmlNode ndQL = doc.FirstChild.SelectSingleNode("//Navs/QuickLaunch");
 
-                        if(ndQL != null)
+                        if (ndQL != null)
                         {
                             ArrayList arrNav = new ArrayList();
 
-                            SPNavigationNode newnav = new SPNavigationNode("Home", "SitePages/" +cleanTitle + ".aspx");
+                            SPNavigationNode newnav = new SPNavigationNode("Home", cleanTitle + ".aspx");
                             web.Navigation.QuickLaunch.AddAsFirst(newnav);
 
                             arrNav.Add(newnav.Id.ToString());
@@ -1261,7 +1262,7 @@ namespace EPMLiveCore.API
 
                         XmlNode ndTN = doc.FirstChild.SelectSingleNode("//Navs/TopNav");
 
-                        if(ndTN != null)
+                        if (ndTN != null)
                         {
                             ArrayList arrNav = new ArrayList();
                             CreateCommunityNav(li, web.Navigation.TopNavigationBar, ndTN, ref arrNav);
@@ -1273,7 +1274,7 @@ namespace EPMLiveCore.API
                     }
                     return li.ID;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new Exception("Error adding community: " + ex.Message);
                 }
@@ -1297,13 +1298,13 @@ namespace EPMLiveCore.API
 
             SPListItemCollection lic = list.GetItems(query);
 
-            if(lic.Count > 0)
+            if (lic.Count > 0)
             {
                 SPListItem li = lic[0];
 
                 appDef.Id = int.Parse(id);
                 appDef.Title = li["Title"].ToString();
-                
+
                 appDef.ApplicationXml.LoadXml(li["InstallXML"].ToString());
 
                 try
@@ -1319,29 +1320,29 @@ namespace EPMLiveCore.API
         private static string GetValidVersion(string checkVersion, string assVersion, string highestVersion)
         {
 
-            if(isValidVersion(checkVersion, assVersion))
+            if (isValidVersion(checkVersion, assVersion))
             {
                 try
                 {
-                    if(highestVersion == "")
+                    if (highestVersion == "")
                         return checkVersion;
 
                     string[] sCheckVersion = checkVersion.Split('.');
                     string[] sHighVersion = highestVersion.Split('.');
 
-                    if(int.Parse(sCheckVersion[0]) > int.Parse(sHighVersion[0]))
+                    if (int.Parse(sCheckVersion[0]) > int.Parse(sHighVersion[0]))
                     {
                         return checkVersion;
                     }
                     else
                     {
-                        if(int.Parse(sCheckVersion[1]) > int.Parse(sHighVersion[1]))
+                        if (int.Parse(sCheckVersion[1]) > int.Parse(sHighVersion[1]))
                         {
                             return checkVersion;
                         }
                         else
                         {
-                            if(int.Parse(sCheckVersion[2]) > int.Parse(sHighVersion[2]))
+                            if (int.Parse(sCheckVersion[2]) > int.Parse(sHighVersion[2]))
                             {
                                 return checkVersion;
                             }
@@ -1371,36 +1372,29 @@ namespace EPMLiveCore.API
                 string[] sCheckVersion = checkVersion.Split('.');
                 string[] sAssVersion = assVersion.Split('.');
 
-                if(int.Parse(sCheckVersion[0]) < int.Parse(sAssVersion[0]))
+                if (int.Parse(sCheckVersion[0]) > int.Parse(sAssVersion[0]))
                 {
-                    return true;
+                    return false;
                 }
-                else if(int.Parse(sCheckVersion[0]) == int.Parse(sAssVersion[0]))
+                else
                 {
-                    if (int.Parse(sCheckVersion[1]) < int.Parse(sAssVersion[1]))
+                    if (int.Parse(sCheckVersion[1]) > int.Parse(sAssVersion[1]))
                     {
-                        return true;
+                        return false;
                     }
-                    else if (int.Parse(sCheckVersion[1]) == int.Parse(sAssVersion[1]))
+                    else
                     {
-                        if (int.Parse(sCheckVersion[2]) <= int.Parse(sAssVersion[2]))
+                        if (int.Parse(sCheckVersion[2]) > int.Parse(sAssVersion[2]))
                         {
-                            return true;
+                            return false;
                         }
                         else
                         {
 
-                            return false;
+                            return true;
+
                         }
                     }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
                 }
             }
             catch { }
@@ -1422,21 +1416,21 @@ namespace EPMLiveCore.API
             XmlNode node = listSvc.GetListItems("Applications", null, query, null, null, queryOptions, null);
 
             string version = "";
-            
+
             string assVersion = CoreFunctions.GetAssemblyVersion();
 
-            foreach(XmlNode nd in node.ChildNodes)
+            foreach (XmlNode nd in node.ChildNodes)
             {
-                if(nd.Name == "rs:data")
+                if (nd.Name == "rs:data")
                 {
-                    foreach(XmlNode ndChild in nd.ChildNodes)
+                    foreach (XmlNode ndChild in nd.ChildNodes)
                     {
-                        if(ndChild.Name == "z:row")
+                        if (ndChild.Name == "z:row")
                         {
 
                             string filename = getAttribute(ndChild, "ows_LinkFilename");
 
-                            if(filename.StartsWith("VERSION_"))
+                            if (filename.StartsWith("VERSION_"))
                             {
 
                                 filename = filename.Substring(8);
@@ -1466,8 +1460,8 @@ namespace EPMLiveCore.API
                 SslPolicyErrors sslPolicyErrors)
             {
                 return true;
-            };  
-            
+            };
+
             WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists();
             listSvc.Url = storeurl + "/_vti_bin/lists.asmx";
             listSvc.Credentials = CoreFunctions.GetStoreCreds();
@@ -1487,31 +1481,30 @@ namespace EPMLiveCore.API
 
             XmlNode ndItems = listSvc.GetListItems("Applications", null, ndQuery, ndViewFields, "10000", ndQueryOptions, null);
 
-            
 
-            foreach(XmlNode nd in ndItems.ChildNodes)
+
+            foreach (XmlNode nd in ndItems.ChildNodes)
             {
-                if(nd.Name == "rs:data")
+                if (nd.Name == "rs:data")
                 {
-                    foreach(XmlNode ndChild in nd.ChildNodes)
+                    foreach (XmlNode ndChild in nd.ChildNodes)
                     {
-                        if(ndChild.Name == "z:row")
+                        if (ndChild.Name == "z:row")
                         {
                             string versionInfo = GetVersionFolder(listSvc, getAttribute(ndChild, "ows_Title"));
 
-                            if(versionInfo != "")
+                            if (versionInfo != "")
                             {
                                 appDef.AppAssemblyVersion = versionInfo;
                                 versionInfo = "/VERSION_" + versionInfo;
                             }
 
-                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
+                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
                             string sXml = "";
-                            appDef.fullurl = rootFilePath;
-                            appDef.appurl = "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
+                            appDef.url = rootFilePath;
                             appDef.Title = getAttribute(ndChild, "ows_Title");
                             appDef.Icon = getAttribute(ndChild, "ows_Icon");
-                            if(appDef.AppAssemblyVersion != "")
+                            if (appDef.AppAssemblyVersion != "")
                             {
                                 appDef.Version = appDef.AppAssemblyVersion + "_" + getAttribute(ndChild, "ows_AppVersion");
                             }
@@ -1524,11 +1517,11 @@ namespace EPMLiveCore.API
                             }
                             catch { }
                             appDef.Id = int.Parse(id);
-                            
+
 
                             try
                             {
-                                using(WebClient webClient = new WebClient())
+                                using (WebClient webClient = new WebClient())
                                 {
                                     webClient.Credentials = CoreFunctions.GetStoreCreds();
                                     byte[] fileBytes = null;
@@ -1538,9 +1531,9 @@ namespace EPMLiveCore.API
                                     fileBytes = null;
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
-                                if(ex.Message.EndsWith("(404) Not Found."))
+                                if (ex.Message.EndsWith("(404) Not Found."))
                                 {
                                     appDef.loadErrorMessage = "No application for your version was found.";
                                     return appDef;
@@ -1550,7 +1543,7 @@ namespace EPMLiveCore.API
 
                             try
                             {
-                                if(appDef.ApplicationXml.FirstChild.SelectSingleNode("//Features/Feature[@ID='12345678-0000-0000-0000-000000000000']") != null)
+                                if (appDef.ApplicationXml.FirstChild.SelectSingleNode("//Features/Feature[@ID='12345678-0000-0000-0000-000000000000']") != null)
                                 {
                                     appDef.loadErrorMessage = "No application for your version was found.";
                                     return appDef;
@@ -1567,7 +1560,8 @@ namespace EPMLiveCore.API
                             try
                             {
                                 appDef.ParentApplications = appDef.ApplicationXml.FirstChild.SelectSingleNode("//Application").Attributes["ParentApplications"].Value.Split(',');
-                            }catch{}
+                            }
+                            catch { }
 
                             try
                             {
@@ -1576,12 +1570,12 @@ namespace EPMLiveCore.API
                             catch { }
 
                             string sLvc = getAttribute(ndChild, "ows_PreReqs");
-                            if(sLvc != "")
+                            if (sLvc != "")
                             {
                                 int counter = 0;
                                 SPFieldLookupValueCollection lvcuid = new SPFieldLookupValueCollection(getAttribute(ndChild, "ows_PreReqs_x003a_UID"));
                                 SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(sLvc);
-                                foreach(SPFieldLookupValue lv in lvc)
+                                foreach (SPFieldLookupValue lv in lvc)
                                 {
                                     appDef.PreReqs.Add(lvcuid[counter].LookupValue, lv.LookupValue);
                                     counter++;
@@ -1591,7 +1585,7 @@ namespace EPMLiveCore.API
                     }
                 }
             }
-            
+
             return appDef;
         }
 
@@ -1615,7 +1609,7 @@ namespace EPMLiveCore.API
                 SslPolicyErrors sslPolicyErrors)
             {
                 return true;
-            };  
+            };
 
             WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists();
             listSvc.Url = storeurl + "/_vti_bin/lists.asmx";
@@ -1634,13 +1628,13 @@ namespace EPMLiveCore.API
 
             XmlNode ndItems = listSvc.GetListItems("Applications", null, ndQuery, ndViewFields, "10000", ndQueryOptions, null);
 
-            foreach(XmlNode nd in ndItems.ChildNodes)
+            foreach (XmlNode nd in ndItems.ChildNodes)
             {
-                if(nd.Name == "rs:data")
+                if (nd.Name == "rs:data")
                 {
-                    foreach(XmlNode ndChild in nd.ChildNodes)
+                    foreach (XmlNode ndChild in nd.ChildNodes)
                     {
-                        if(ndChild.Name == "z:row")
+                        if (ndChild.Name == "z:row")
                         {
                             dt.Rows.Add(new string[] { getAttribute(ndChild, "ows_UID"), getAttribute(ndChild, "ows_Title"), getAttribute(ndChild, "ows_ShortDescription"), getAttribute(ndChild, "ows_MoreInfo"), getAttribute(ndChild, "ows_Company"), getAttribute(ndChild, "ows_PreReqs"), });
                         }
