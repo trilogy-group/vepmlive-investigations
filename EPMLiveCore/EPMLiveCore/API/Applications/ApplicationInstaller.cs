@@ -227,7 +227,7 @@ namespace EPMLiveCore.API
                             li["Icon"] = appDef.Icon;
                             li["Status"] = "Not Installed";
                             li["InstallXML"] = appDef.ApplicationXml.OuterXml;
-                            li["AppUrl"] = appDef.url;
+                            li["AppUrl"] = appDef.fullurl;
 
                             li.Update();
                         }
@@ -262,7 +262,8 @@ namespace EPMLiveCore.API
                                 appDef.Version = li["AppVersion"].ToString();
                                 try
                                 {
-                                    appDef.url = oListItem["AppUrl"].ToString();
+                                    appDef.fullurl = oListItem["AppUrl"].ToString();
+                                    appDef.appurl = appDef.fullurl.Replace(EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore"), "");
                                 }
                                 catch { }
                             }
@@ -354,8 +355,10 @@ namespace EPMLiveCore.API
                 float max = ListNdFeatures.Count;
                 float counter = 0;
 
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures = new Dictionary<Guid, SPFeatureDefinition>();
-                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures14 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
+                Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -363,12 +366,18 @@ namespace EPMLiveCore.API
                     {
                         foreach (SPFeatureDefinition def in site.WebApplication.Farm.FeatureDefinitions)
                         {
-                            ArrInstalledFarmFeatures.Add(def.Id, def);
+                            if (def.CompatibilityLevel == 14)
+                                ArrInstalledFarmFeatures14.Add(def.Id, def);
+                            else
+                                ArrInstalledFarmFeatures15.Add(def.Id, def);
                         }
 
                         foreach (SPFeatureDefinition def in site.FeatureDefinitions)
                         {
-                            ArrInstalledSiteFeatures.Add(def.Id, def);
+                            if (def.CompatibilityLevel == 14)
+                                ArrInstalledSiteFeatures14.Add(def.Id, def);
+                            else
+                                ArrInstalledSiteFeatures15.Add(def.Id, def);
                         }
                     }
                 });
@@ -386,16 +395,29 @@ namespace EPMLiveCore.API
                             bool.TryParse(getAttribute(ndFeature, "IncludedInSolutions"), out bIncluded);
 
                             Guid gFeatureId = new Guid(FeatureId);
-                            if (ArrInstalledFarmFeatures.ContainsKey(gFeatureId))
+                            if (ArrInstalledFarmFeatures15.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures15[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
 
                             }
-                            else if (ArrInstalledSiteFeatures.ContainsKey(gFeatureId))
+                            else if (ArrInstalledFarmFeatures14.ContainsKey(gFeatureId))
                             {
-                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures[gFeatureId];
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledFarmFeatures14[gFeatureId];
+
+                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Farm, ParentMessageId);
+
+                            }
+                            else if (ArrInstalledSiteFeatures15.ContainsKey(gFeatureId))
+                            {
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures15[gFeatureId];
+
+                                iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
+                            }
+                            else if (ArrInstalledSiteFeatures14.ContainsKey(gFeatureId))
+                            {
+                                SPFeatureDefinition def = (SPFeatureDefinition)ArrInstalledSiteFeatures14[gFeatureId];
 
                                 iInstallFeature(gFeatureId, def, SPFeatureDefinitionScope.Site, ParentMessageId);
                             }
@@ -1604,7 +1626,7 @@ namespace EPMLiveCore.API
             if (oViewFile.Exists)
             {
 
-                string sUrl = "Applications/" + appDef.Title + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
+                string sUrl = appDef.fullurl + "/Lists/" + oView.ParentList.Title + "/" + oView.Title + ".txt";
 
                 bool bHasViewFile = false;
                 try
@@ -2554,7 +2576,7 @@ namespace EPMLiveCore.API
 
                         webClient.Credentials = CoreFunctions.GetStoreCreds();
                         byte[] fileBytes = null;
-                        fileBytes = webClient.DownloadData(appDef.url + "/Solutions/" + FileName);
+                        fileBytes = webClient.DownloadData(appDef.fullurl + "/Solutions/" + FileName);
                         newFile = solutions.RootFolder.Files.Add(FileName, fileBytes);
                     }
 
@@ -2646,7 +2668,7 @@ namespace EPMLiveCore.API
 
                             webClient.Credentials = CoreFunctions.GetStoreCreds();
                             byte[] fileBytes = null;
-                            fileBytes = webClient.DownloadData(appDef.url + "/Lists/" + FileName);
+                            fileBytes = webClient.DownloadData(appDef.fullurl + "/Lists/" + FileName);
                             solutions.RootFolder.Files.Add(FileName, fileBytes);
                         }
 
@@ -2686,7 +2708,7 @@ namespace EPMLiveCore.API
 
             if (oParentFolder.Exists)
             {
-                string sUrl = "Applications/" + appDef.Title + "/Files/" + sFullFile;
+                string sUrl = appDef.fullurl + "/Files/" + sFullFile;
 
                 byte[] fileBytes = copy.GetFile(sUrl);
 
@@ -2707,7 +2729,7 @@ namespace EPMLiveCore.API
             {
                 string sRemoteName = getAttribute(ndChild, "RemoteFile");
                 string sType = getAttribute(ndChild, "Type");
-                string sFullFile = sRemoteName.Replace("Applications/" + appDef.Title + "/Files/", "");
+                string sFullFile = sRemoteName.Replace(appDef.appurl + "/Files/", "");
                 string sFileName = getAttribute(ndChild, "Name");
                 string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
@@ -2928,7 +2950,7 @@ namespace EPMLiveCore.API
                                     catch { sTitle = lvFileLeafRef.LookupValue; }
 
                                     string sRemoteFile = lvFileRef.LookupValue;
-                                    string sFullFile = sRemoteFile.Replace("Applications/" + appDef.Title + "/Files/", "");
+                                    string sFullFile = sRemoteFile.Replace(appDef.appurl + "/Files/", "");
                                     string sFileName = System.IO.Path.GetFileName(sFullFile);
                                     string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
@@ -2940,7 +2962,7 @@ namespace EPMLiveCore.API
                                             sFileName = sTitle;
                                     }
 
-                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace("Applications/" + appDef.Title + "/Files/", "")) + "/" + sFileName;
+                                    sFullFile = System.IO.Path.GetDirectoryName(sRemoteFile.Replace(appDef.appurl + "/Files/", "")) + "/" + sFileName;
                                     sFullFile = sFullFile.Replace("\\", "/");
                                     sFullFile = sFullFile.Trim('/');
 
@@ -3022,7 +3044,7 @@ namespace EPMLiveCore.API
             }
             oListItem["InstallPercent"] = 0;
             oListItem["AppVersion"] = appDef.Version;
-            oListItem["AppUrl"] = appDef.url;
+            oListItem["AppUrl"] = appDef.fullurl;
             oListItem.Update();
 
             if (!bVerifyOnly)

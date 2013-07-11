@@ -21,7 +21,8 @@ namespace EPMLiveCore.API
         public int Id;
         public SortedList PreReqs;
         public XmlDocument ApplicationXml;
-        public string url;
+        public string fullurl;
+        public string appurl;
         public bool bIsConfigOnly = false;
         public string Icon;
         public string Version;
@@ -1200,10 +1201,10 @@ namespace EPMLiveCore.API
                     SPFile fDefault = web.RootFolder.Files["Default.aspx"];
                     if (fDefault.Exists)
                     {
-                        fDefault.CopyTo(cleanTitle + ".aspx", true);
+                        fDefault.CopyTo("SitePages/" + cleanTitle + ".aspx", true);
                     }
 
-                    li["HomePage"] = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/" + cleanTitle + ".aspx";
+                    li["HomePage"] = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/SitePages/" + cleanTitle + ".aspx";
                     li.Update();
 
 
@@ -1247,7 +1248,7 @@ namespace EPMLiveCore.API
                         {
                             ArrayList arrNav = new ArrayList();
 
-                            SPNavigationNode newnav = new SPNavigationNode("Home", cleanTitle + ".aspx");
+                            SPNavigationNode newnav = new SPNavigationNode("Home", "SitePages/" + cleanTitle + ".aspx");
                             web.Navigation.QuickLaunch.AddAsFirst(newnav);
 
                             arrNav.Add(newnav.Id.ToString());
@@ -1372,29 +1373,36 @@ namespace EPMLiveCore.API
                 string[] sCheckVersion = checkVersion.Split('.');
                 string[] sAssVersion = assVersion.Split('.');
 
-                if (int.Parse(sCheckVersion[0]) > int.Parse(sAssVersion[0]))
+                if (int.Parse(sCheckVersion[0]) < int.Parse(sAssVersion[0]))
                 {
-                    return false;
+                    return true;
                 }
-                else
+                else if (int.Parse(sCheckVersion[0]) == int.Parse(sAssVersion[0]))
                 {
-                    if (int.Parse(sCheckVersion[1]) > int.Parse(sAssVersion[1]))
+                    if (int.Parse(sCheckVersion[1]) < int.Parse(sAssVersion[1]))
                     {
-                        return false;
+                        return true;
                     }
-                    else
+                    else if (int.Parse(sCheckVersion[1]) == int.Parse(sAssVersion[1]))
                     {
-                        if (int.Parse(sCheckVersion[2]) > int.Parse(sAssVersion[2]))
+                        if (int.Parse(sCheckVersion[2]) <= int.Parse(sAssVersion[2]))
                         {
-                            return false;
+                            return true;
                         }
                         else
                         {
 
-                            return true;
-
+                            return false;
                         }
                     }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
             catch { }
@@ -1499,9 +1507,10 @@ namespace EPMLiveCore.API
                                 versionInfo = "/VERSION_" + versionInfo;
                             }
 
-                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
+                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
                             string sXml = "";
-                            appDef.url = rootFilePath;
+                            appDef.fullurl = rootFilePath;
+                            appDef.appurl = "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
                             appDef.Title = getAttribute(ndChild, "ows_Title");
                             appDef.Icon = getAttribute(ndChild, "ows_Icon");
                             if (appDef.AppAssemblyVersion != "")
