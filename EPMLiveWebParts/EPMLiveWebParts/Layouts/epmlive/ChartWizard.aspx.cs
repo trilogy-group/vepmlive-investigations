@@ -227,6 +227,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             rcbZField.OnClientSelectedIndexChanged = "ManageUI";
             rcbYNonNumSingle.OnClientSelectedIndexChanged = "ManageUI";
             rcbYNonNumMulti.OnClientItemChecked = "ManageUI";
+            rcbYAxisFormat.OnClientSelectedIndexChanged = "ManageUI";
             rcbGroupBy.OnClientSelectedIndexChanged = "ManageUI";
         }
 
