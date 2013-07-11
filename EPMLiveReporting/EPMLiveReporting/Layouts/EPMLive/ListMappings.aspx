@@ -25,7 +25,7 @@
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-<script type="text/javascript" src="/_layouts/epmlive/DHTML/dhtmlxajax.js"></script>
+<script type="text/javascript" src="/_layouts/epmlive/DHTML/XGrid/dhtmlxcommon.js"></script>
 <link rel="stylesheet" href="/_layouts/epmlive/modal/modalmain.css" type="text/css" />
 <script type="text/javascript" src="/_layouts/epmlive/modal/modal.js"></script>
     
@@ -161,7 +161,6 @@
             width: 500,
             allowMaximize: false,
             showClose: false,
-            autoSize: false,
             dialogReturnValueCallback: verifySubmit
         };
 

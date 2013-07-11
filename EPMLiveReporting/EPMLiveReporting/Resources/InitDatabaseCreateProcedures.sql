@@ -1276,7 +1276,7 @@ BEGIN
 	declare @sql varchar(MAX)
 
 	set @list = REPLACE(@list, '' '', '''')
-	if @list == ''lstResources'' then
+	if @list = ''lstResources'' 
 	begin
 		set @list = ''lstResourcePool''
 	end

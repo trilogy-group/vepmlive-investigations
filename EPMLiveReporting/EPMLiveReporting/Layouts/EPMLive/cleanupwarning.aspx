@@ -25,8 +25,8 @@
         </tr>
         <wssuc:ButtonSection id="ButtonSection1" runat="server" ShowStandardCancelButton="false">
             <Template_buttons>
-                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cleanup" OnClientClick="SP.UI.ModalDialog.commonModalDialogClose(1, 'cleanup');return false;" />
-                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cancel" OnClientClick="SP.UI.ModalDialog.commonModalDialogClose(0, 'cancel');return false;" />
+                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cleanup" OnClientClick="parent.SP.UI.ModalDialog.commonModalDialogClose(1, 'cleanup'); return false;" />
+                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cancel" OnClientClick="parent.SP.UI.ModalDialog.commonModalDialogClose(0, 'cancel'); return false;" />
             </Template_buttons>
         </wssuc:ButtonSection>
     </table>
