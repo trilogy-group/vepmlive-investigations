@@ -91,10 +91,14 @@ namespace EPMLiveCore
                     DataTable table = new DataTable();
                     table.Columns.Add("ValueField", typeof(int));
                     table.Columns.Add("TextField", typeof(string));
-                    DataRow r_none = table.NewRow();
-                    r_none["ValueField"] = 0;
-                    r_none["TextField"] = "(None)";
-                    table.Rows.Add(r_none);
+
+                    if (!base.Field.Required)
+                    {
+                        DataRow r_none = table.NewRow();
+                        r_none["ValueField"] = 0;
+                        r_none["TextField"] = "(None)";
+                        table.Rows.Add(r_none);
+                    }
 
                     SPListItemCollection items = LookupList.Items;
 
@@ -359,7 +363,14 @@ namespace EPMLiveCore
                                 if (lookupVal != null)
                                 {
                                     this.m_value = lookupVal.ToString();
-                                    this.m_dropList.SelectedIndex = lookupVal.LookupId;
+                                    if (base.Field.Required)
+                                    {
+                                        this.m_dropList.SelectedIndex = ((lookupVal.LookupId - 1) >= 0) ? (lookupVal.LookupId - 1) : 0;
+                                    }
+                                    else
+                                    {
+                                        this.m_dropList.SelectedIndex = lookupVal.LookupId;
+                                    }
                                     this.m_hasValueSet = true;
                                 }
 
