@@ -1808,7 +1808,6 @@ function registerEpmLiveResourceGridScript() {
 
             $$.views.load();
             $$.reports.load();
-            $$.actions.loadRibbon();
         };
 
         window.Grids.OnUpdated = function (grid) {
@@ -1866,7 +1865,7 @@ function registerEpmLiveResourceGridScript() {
             grid.Update();
             grid.Render();
 
-            $$.actions.loadRibbon();
+            window.setTimeout(function() { $$.actions.loadRibbon(); }, 3000);
         };
 
         window.Grids.OnGetHtmlValue = function (grid, row, col, val) {
