@@ -597,6 +597,17 @@ function MDInit() {
                                 }
                             });
 
+                            if (controlProps.Required === 'True') {
+                                if (!pickerSelections.length) {
+                                    if (!($('#' + controlProps.FieldName + '_errorText').length > 0)) {
+                                        $('#' + controlProps.ControlInfo.GenericEntityDivId).after('<div style=\"clear:both\"></div>')
+                                                                                        .after('<div id=\"' + controlProps.FieldName + '_errorText\" class=\"ms-formvalidation\">You must specify a value for this required field.</div>');
+
+                                    }
+                                    return false;
+                                }
+                            }
+
                             // select new candidates
                             $('#' + controlProps.ControlInfo.SelectCandidateId).trigger('click');
                             // select them in selectCandidate listbox
@@ -616,6 +627,7 @@ function MDInit() {
                     }
                 }
             }
+            return true;
         }
 
         function UpdateSingleSelectPickerValue(controlProps) {
@@ -667,6 +679,7 @@ function MDInit() {
                     }
                 }
             }
+            return true;
         }
 
         function PostDataBackToSingleSelectLookup() {
@@ -679,16 +692,16 @@ function MDInit() {
 
                         if (controlProps.ControlType == "1") {
 
-                            //                        var lookupDdlId = controlProps.ControlInfo.SourceControlId.substr(0, controlProps.ControlInfo.SourceControlId.lastIndexOf('_')) + '_Lookup';
-                            //                        
-                            //                        $('#' + lookupDdlId).find('option').each(function () {
-                            //                            if ($(this).val() == controlProps.ControlInfo.SingleSelectLookupVal) {
-                            //                                $(this).prop('selected', 'selected');
-                            //                            }
-                            //                            else {
-                            //                                $(this).removeAttr('selected');
-                            //                            }
-                            //                        });
+                            var lookupDdlId = controlProps.ControlInfo.SourceControlId.substr(0, controlProps.ControlInfo.SourceControlId.lastIndexOf('_')) + '_Lookup';
+                                                    
+                            $('#' + lookupDdlId).find('option').each(function () {
+                                if ($(this).val() == controlProps.ControlInfo.SingleSelectLookupVal) {
+                                    $(this).prop('selected', 'selected');
+                                }
+                                else {
+                                    $(this).removeAttr('selected');
+                                }
+                            });
                         }
                         else if (controlProps.ControlType == "2") {
 
@@ -716,22 +729,61 @@ function MDInit() {
                                 // so we're going to set the new
                                 // dropdown value
                             else {
-                                var lookupDdlId = controlProps.ControlInfo.SourceControlId.substr(0, controlProps.ControlInfo.SourceControlId.lastIndexOf('_')) + '_Lookup';
-                                $('#' + lookupDdlId).val(controlProps.ControlInfo.SingleSelectLookupVal);
-                                //                            $('#' + lookupDdlId).find('option').each(function () {
-                                //                                if ($(this).text() == controlProps.ControlInfo.SingleSelectLookupVal) {
-                                //                                    $(this).attr('selected', true);
-                                //                                }
-                                //                                else {
-                                //                                    $(this).attr('selected', false);
-                                //                                }
-                                //                            });
+                                var lookupDdlId = controlProps.ControlInfo.SourceControlId;
+                                //$('#' + lookupDdlId).val(controlProps.ControlInfo.SingleSelectLookupVal);
+                                if ((controlProps.Required == 'True'
+                                && $('#' + controlProps.ControlInfo.GenericEntityDivId).html().indexOf('SPAN') == -1
+                                && $('#' + controlProps.ControlInfo.GenericEntityDivId).html().indexOf('span') == -1) ||
+                                (controlProps.Required == 'True'
+                                && $('#' + controlProps.ControlInfo.GenericEntityDivId).html().indexOf('Type here to search...') != -1)) {
+                                    if (!($('#' + controlProps.FieldName + '_errorText').length > 0)) {
+                                        $('#' + controlProps.ControlInfo.GenericEntityDivId).after('<div style=\"clear:both\"></div>')
+                                                                                        .after('<div id=\"' + controlProps.FieldName + '_errorText\" class=\"ms-formvalidation\">You must specify a value for this required field.</div>');
 
+                                    }
+                                    return false;
+                                }
+                                else {
+                                    if ($('#' + controlProps.ControlInfo.GenericEntityDivId).find('#divEntityData').length > 0) {
+                                        var entityKey = $('#' + controlProps.ControlInfo.GenericEntityDivId).find('#divEntityData').first().attr('key');
+                                        if (entityKey != $('#' + lookupDdlId).val()) {
+                                            if (!($('#' + lookupDdlId).find('option[value=' + entityKey + ']').length > 0)) {
+                                                var index = CheckIfDataExists(controlProps);
+                                                var cachedata = GetCachedData(index);
+                                                var keyValPairs = cachedata.split(';#');
+                                                var newOpt = '';
+                                                if (!keyValPairs.length) {
+                                                    keyValPairs = [keyValPairs];
+                                                }
+
+                                                if (keyValPairs.length > 0) {
+                                                    for (k in keyValPairs) {
+                                                        var pair = keyValPairs[k];
+                                                        if (pair.split('^^')[0] == controlProps.ControlInfo.SingleSelectLookupVal) {
+                                                            newOpt = pair;
+                                                        }
+                                                    }
+                                                }
+
+                                                var opt = "<option value='" + newOpt.split('^^')[0] + "'>" + newOpt.split('^^')[1] + "</option>";
+                                                $('#' + controlProps.ControlInfo.SourceDropDownID).append(opt);
+                                                //$('#' + lookupDdlId).val(controlProps.ControlInfo.SingleSelectLookupVal);
+                                            }
+                                            else {
+                                                $('#' + lookupDdlId).val(entityKey)
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        $('#' + lookupDdlId).val(0)
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+            return true;
         }
 
 
