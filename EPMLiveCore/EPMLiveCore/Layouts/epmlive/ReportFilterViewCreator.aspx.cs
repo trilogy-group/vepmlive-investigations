@@ -164,11 +164,11 @@ namespace EPMLiveCore.Layouts.epmlive
             htmlContentsStringBuilder.Append("<WebPartPages:WebPartZone runat=\"server\" Title=\"loc:Header\" ID=\"Header\" FrameType=\"TitleBarOnly\"><ZoneTemplate></ZoneTemplate></WebPartPages:WebPartZone> </td>");
             htmlContentsStringBuilder.Append("</tr>");
             htmlContentsStringBuilder.Append("<tr>");
-            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\"> ");
+            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\" width=\"33%\"> ");
             htmlContentsStringBuilder.Append("<WebPartPages:WebPartZone runat=\"server\" Title=\"loc:LeftColumn\" ID=\"LeftColumn\" FrameType=\"TitleBarOnly\"><ZoneTemplate></ZoneTemplate></WebPartPages:WebPartZone> </td>");
-            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\"> ");
+            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\" width=\"34%\"> ");
             htmlContentsStringBuilder.Append("<WebPartPages:WebPartZone runat=\"server\" Title=\"loc:MiddleColumn\" ID=\"MiddleColumn\" FrameType=\"TitleBarOnly\"><ZoneTemplate></ZoneTemplate></WebPartPages:WebPartZone> </td>");
-            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\"> ");
+            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\" width=\"33%\"> ");
             htmlContentsStringBuilder.Append("<WebPartPages:WebPartZone runat=\"server\" Title=\"loc:RightColumn\" ID=\"RightColumn\" FrameType=\"TitleBarOnly\"><ZoneTemplate></ZoneTemplate></WebPartPages:WebPartZone> </td>");
             htmlContentsStringBuilder.Append("</tr>");
             htmlContentsStringBuilder.Append("<tr>");
@@ -214,7 +214,7 @@ namespace EPMLiveCore.Layouts.epmlive
             htmlContentsStringBuilder.Append("<WebPartPages:WebPartZone runat=\"server\" Title=\"loc:Header\" ID=\"Header\" FrameType=\"TitleBarOnly\"><ZoneTemplate></ZoneTemplate></WebPartPages:WebPartZone> </td>");
             htmlContentsStringBuilder.Append("</tr>");
             htmlContentsStringBuilder.Append("<tr>");
-            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\">");
+            htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\" >");
             htmlContentsStringBuilder.Append("<WebPartPages:WebPartZone runat=\"server\" Title=\"loc:LeftColumn\" ID=\"LeftColumn\" FrameType=\"TitleBarOnly\"><ZoneTemplate></ZoneTemplate></WebPartPages:WebPartZone> </td>");
             htmlContentsStringBuilder.Append("<td id=\"_invisibleIfEmpty\" name=\"_invisibleIfEmpty\" valign=\"top\" height=\"100%\" width=\"100%\">");
             htmlContentsStringBuilder.Append("<WebPartPages:WebPartZone runat=\"server\" Title=\"loc:Body\" ID=\"Body\" FrameType=\"TitleBarOnly\"><ZoneTemplate></ZoneTemplate></WebPartPages:WebPartZone> </td>");
