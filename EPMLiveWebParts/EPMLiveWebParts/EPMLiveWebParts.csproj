@@ -51,6 +51,10 @@
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\Open XML SDK\V2.0\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="EPM Live Core">
       <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
@@ -90,6 +94,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Telerik.Web.UI.Skins.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsBase" />
     <Reference Include="WorkEnginePPM">
       <HintPath>..\..\PortfolioEngineCore\WorkEnginePPM\bin\Debug\WorkEnginePPM.dll</HintPath>
     </Reference>
@@ -162,6 +167,10 @@
     <Compile Include="CONTROLTEMPLATES\ResourceGridUserControl.ascx.designer.cs">
       <DependentUpon>ResourceGridUserControl.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="DomainModel\ExcelConnectionInfo.cs" />
+    <Compile Include="DomainServices\ExcelConnectionUpdatorService.cs" />
+    <Compile Include="DomainServices\ISharepointService.cs" />
+    <Compile Include="DomainServices\SharepointService.cs" />
     <Compile Include="EpmCharting\DomainModel\BubbleChartAxisToColumnMapping.cs" />
     <Compile Include="EpmCharting\DomainModel\EpmChartAggregateType.cs" />
     <Compile Include="EpmCharting\DomainModel\EpmChartDataPoint.cs" />
@@ -1162,21 +1171,6 @@
     <Content Include="Layouts\epmlive\images\BubbleChart\YAxisIcon.png" />
     <Content Include="Layouts\epmlive\images\BubbleChart\ZAxisColorIcon.png" />
     <Content Include="Layouts\epmlive\images\BubbleChart\ZAxisIcon.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\Area.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\AreaClustered.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\Bar.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\Bar100.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\BarClustered.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\BarStacked.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\bubble.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\column.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\column100.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\columnclustered.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\columnstacked.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\donut.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\line.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\lineclustered.png" />
-    <Content Include="Layouts\epmlive\images\ChartWizard\pie.png" />
     <Content Include="Layouts\epmlive\images\costanalyzer.png" />
     <Content Include="Layouts\epmlive\images\costanalyzer16.png" />
     <Content Include="Layouts\epmlive\images\DisplayProfilePicture\DefaultProfilePic.png" />

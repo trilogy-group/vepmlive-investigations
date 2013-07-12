@@ -255,7 +255,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         ProcessReportingRefreshJob(web);
                         ProcessBackEndLists(web);
                         ProcessGroups(web, w.CurrentUser);
-
+                        ProcessExcel(web);
+                        ProcessLists(web);
                         if(rdoYes.Checked)
                         {
                             if(url != "")
@@ -285,6 +286,72 @@ namespace EPMLiveWebParts.Layouts.epmlive
             });
         }
 
+        private void ProcessLists(SPWeb web)
+        {
+            string[] sLists = new string[] { "Holiday Schedules", "Holidays", "Work Hours", "Resources", "User Information List" };
+
+            foreach (String sList in sLists)
+            {
+                SPList l = web.Lists.TryGetList(sList);
+                if (l != null)
+                {
+                    SPQuery query = new SPQuery();
+                    query.Query = "";
+                    SPListItemCollection lic = l.GetItems(query);
+                    foreach (SPListItem li in lic)
+                    {
+                        try
+                        {
+                            li.SystemUpdate();
+                        }
+                        catch { }
+                    }
+                }
+            }
+
+        }
+
+        private void ProcessExcel(SPWeb web)
+        {
+
+            string pwd = "";
+            if (hdnReportPassword.Value == "")
+                pwd = hdnSaveReportPassword.Value;
+            else
+                pwd = hdnReportPassword.Value;
+
+
+            var connectionInfo = new ExcelConnectionInfo
+            {
+                SiteUrl = web.Url,                                         // The site URL that contains the files to be updated.
+                DataConnectionLibraryName = "Excel Datasources",      // The name of the document library containing the odc files.
+                ExcelFileLibraryName = "Excel Reports",                      // The name of the document library containing the excel files.
+                DataConnectionReportDbName = txtReportDatabase.Text,            // The name of the reporting database.
+                DataConnectionServerName = txtReportServer.Text,                      // The name of the server the reporting database is hosted on.
+                DataConnectionUserName = txtReportUsername.Text,                 // The username to connect to the reporting database.
+                DataConnectionUserPassword = pwd,
+                ReportDatabaseToken = "{REPORTDB}",                        // The token that needs to be put into the odc/excel files to be replaced with DataConnectionReportDbName property above.
+                ReportServerToken = "{DBSERVER}",                          // The token that needs to be put into the odc/excel files to be replaced with DataConnectionServerName property above.
+                UserNameToken = "{USERNAME}",                              // The token that needs to be put into the odc/excel files to be replaced with DataConnectionUserName property above.
+                PasswordToken = "{PASSWORD}",                              // The token that needs to be put into the odc/excel files to be replaced with DataConnectionUserPassword property above.
+                SiteUrlToken = "{SITEURL}",                                // The token that needs to be put into the odc/excel files to be replaced with SiteUrl property above.
+                DataConnectionLibraryToken = "{DATACONNECTIONLIBRARY}",    // The token that needs to be put into the odc/excel files to be replaced with DataConnectionLibraryName property above.
+                OdcFilePrefix = "EPMLIVE_"                                 // This is what the odc files need to be prefixed with so that only those ones are updated.
+            };
+
+            // This is the updater object which takes in the object above along with a "SharepointService".
+            // The SharepointService class simply encapsulates commands to interact with sharepoint like reading/writing files.
+            var updater = new ExcelConnectionUpdatorService(connectionInfo, new SharepointService());
+
+            // These are the only two methods that need to be called on the updater.
+            // One to update the ODC files and another to update the Excel files.
+            try
+            {
+                updater.ProcessOdcFiles();
+                updater.ProcessExcelFiles();
+            }
+            catch { }
+        }
         private void ProcessReportingRefreshJob(SPWeb web)
         {
             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));

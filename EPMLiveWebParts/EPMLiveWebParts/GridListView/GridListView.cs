@@ -3703,10 +3703,10 @@ namespace EPMLiveWebParts
                 if(bShowSearch)
                 {
                     if(bHasSearchResults)
-                        output.WriteLine("setTimeout(\"loadX" + sFullGridId + "('" + sSearchField + "','" + sSearchValue + "','" + sSearchType + "'\"), 100);");
+                        output.WriteLine("setTimeout(\"loadX" + sFullGridId + "('" + sSearchField + "','" + sSearchValue + "','" + sSearchType + "'\"), 1000);");
                 }
                 else
-                    output.WriteLine("setTimeout(\"loadX" + sFullGridId + "()\", 100);");
+                    output.WriteLine("setTimeout(\"loadX" + sFullGridId + "()\", 1000);");
 
                 output.WriteLine("}");
 
