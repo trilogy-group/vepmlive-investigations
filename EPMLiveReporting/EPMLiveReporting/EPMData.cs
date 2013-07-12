@@ -1057,7 +1057,7 @@ namespace EPMLiveReportsAdmin
         {
             DataTable dt;
             //Command = "SELECT dbo.QUEUE.status, dbo.QUEUE.percentComplete, dbo.TIMERJOBS.listguid, dbo.TIMERJOBS.jobtype, dbo.TIMERJOBS.lastqueuecheck FROM dbo.QUEUE RIGHT OUTER JOIN dbo.TIMERJOBS ON dbo.QUEUE.timerjobuid = dbo.TIMERJOBS.timerjobuid WHERE (dbo.TIMERJOBS.jobtype = 5) AND (dbo.TIMERJOBS.lastqueuecheck IS NULL) AND dbo.TIMERJOBS.siteguid =@siteId";
-            Command = " SELECT * FROM vwQueueTimerLog WHERE siteguid=@siteId and jobtype=5 and (NOT(status=2))";
+            Command = " SELECT * FROM vwQueueTimerLog WHERE siteguid=@siteId and jobtype=6 and (NOT(status=2))";
             AddParam("@siteId", _siteID);
 
             dt = GetTable(GetEPMLiveConnection);
