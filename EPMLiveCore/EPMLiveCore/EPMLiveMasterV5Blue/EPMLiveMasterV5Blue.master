@@ -1679,21 +1679,7 @@
 
 	    ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
 
-	    var uvOptions = {};
-
-	    function UVLoad() {
-	        (function () {
-	            var uv = document.createElement('script');
-	            uv.type = 'text/javascript';
-	            uv.async = true;
-	            uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/yEDMyjE4NNMKmmRoDiWQ.js';
-	            var s = document.getElementsByTagName('script')[0];
-	            s.parentNode.insertBefore(uv, s);
-	        })();
-	    }
-
-	    ExecuteOrDelayUntilScriptLoaded(UVLoad, "sp.ribbon.js");
-
+	    
 
 	    function walkme_ready() {
 
@@ -1720,6 +1706,15 @@
 	            $('#support-link').fadeOut("fast");
 	        }
 	    }
+
+	    (function () {
+	        var uv = document.createElement('script');
+	        uv.type = 'text/javascript';
+	        uv.async = true;
+	        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/yEDMyjE4NNMKmmRoDiWQ.js';
+	        var s = document.getElementsByTagName('script')[0];
+	        s.parentNode.insertBefore(uv, s);
+	    })();
 
         </script>
        
