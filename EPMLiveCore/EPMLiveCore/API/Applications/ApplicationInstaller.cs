@@ -2910,7 +2910,7 @@ namespace EPMLiveCore.API
                 ndQuery.InnerXml = "<OrderBy><FieldRef Name='FileRef'/></OrderBy>";
 
                 XmlNode ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
-                ndQueryOptions.InnerXml = "<Folder>Applications/" + appDef.Title + "/Files</Folder><ViewAttributes Scope=\"RecursiveAll\" />";
+                ndQueryOptions.InnerXml = "<Folder>" + appDef.appurl + "/Files</Folder><ViewAttributes Scope=\"RecursiveAll\" />";
 
                 XmlNode ndViewFields = xDoc.CreateNode(XmlNodeType.Element, "ViewFields", "");
                 ndViewFields.InnerXml = "<FieldRef Name='Title'/>";
