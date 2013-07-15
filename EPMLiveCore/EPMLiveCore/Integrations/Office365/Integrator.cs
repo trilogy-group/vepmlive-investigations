@@ -158,7 +158,8 @@ namespace EPMLiveCore.Integrations.Office365
                 O365Service o365Service = GetO365Service(webProps);
 
                 o365Service.InstallIntegration(webProps.IntegrationId, integrationKey, apiUrl, webProps.Title,
-                                               webProps.FullURL, (string) webProps.Properties["List"],
+                                               webProps.FullURL, webProps.EnabledFeatures,
+                                               (string) webProps.Properties["List"],
                                                bool.Parse((string) webProps.Properties["AllowAddInt"]),
                                                bool.Parse((string) webProps.Properties["AllowAddList"]),
                                                bool.Parse((string) webProps.Properties["AllowDeleteInt"]));

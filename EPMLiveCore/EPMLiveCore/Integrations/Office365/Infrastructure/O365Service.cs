@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Security;
 using System.Threading;
@@ -38,7 +40,7 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
 
         #endregion Constructors 
 
-        #region Methods (18) 
+        #region Methods (19) 
 
         // Public Methods (9) 
 
@@ -200,8 +202,8 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
         }
 
         public void InstallIntegration(Guid integrationId, string integrationKey, string apiUrl, string webTitle,
-                                       string webUrl, string listName, bool allowIncoming, bool allowOutgoing,
-                                       bool allowDeletion)
+                                       string webUrl, ArrayList enabledFeatures, string listName, bool allowIncoming,
+                                       bool allowOutgoing, bool allowDeletion)
         {
             using (ClientContext clientContext = GetClientContext())
             {
@@ -214,7 +216,7 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
                 listItem["AllowDeletion"] = allowDeletion;
                 listItem["Active"] = true;
                 listItem["IntID"] = integrationId.ToString();
-                listItem["ControlButtons"] = "WorkPlan";
+                listItem["ControlButtons"] = GetControlButtons(enabledFeatures);
                 listItem["APIEndpoint"] = apiUrl;
                 listItem["IntKey"] = integrationKey;
                 listItem["EPMWeb"] = webTitle;
@@ -314,7 +316,7 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
             return o365Results;
         }
 
-        // Private Methods (9) 
+        // Private Methods (10) 
 
         private void FillItemsTable(DataTable items, IEnumerable<ListItem> resultItems, IEnumerable<Field> listFields)
         {
@@ -416,6 +418,38 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
                     Thread.Sleep(5000);
                 }
             }
+        }
+
+        private static string GetControlButtons(ArrayList enabledFeatures)
+        {
+            var ribbonButtons = new List<string>();
+
+            foreach (string feature in enabledFeatures)
+            {
+                switch (feature.ToLower())
+                {
+                    case "workplan":
+                        ribbonButtons.Add("WorkPlan");
+                        break;
+                    case "comments":
+                        ribbonButtons.Add("Comments");
+                        break;
+                    case "associated":
+                        ribbonButtons.Add("Associated");
+                        break;
+                    case "costplan":
+                        ribbonButtons.Add("CostPlan");
+                        break;
+                    case "resplan":
+                        ribbonButtons.Add("ResPlan");
+                        break;
+                    case "team":
+                        ribbonButtons.Add("Team");
+                        break;
+                }
+            }
+
+            return string.Join(",", ribbonButtons.ToArray());
         }
 
         private object GetFieldValue(ListItem listItem, string columnName, List<string> userFields,
