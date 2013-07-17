@@ -1829,9 +1829,13 @@ namespace RPADataCache
                                 tarlev = 0;
 
                             xI.CreateIntAttr("Y" + oPer.PeriodID.ToString() + "C" + cnt.ToString(), tarlev);
-                         
-                             if (rgb != "" && iHeatMapID != ot.fid)
+
+                            if (rgb != "" && iHeatMapID != ot.fid)
+                            {
                                 xI.CreateStringAttr(sCName + "Color", rgb);
+                                xI.CreateStringAttr(sCName + "ExportStyle", "background-color: " + rgb);
+                            } 
+                            
                         }
                     }
                                     }

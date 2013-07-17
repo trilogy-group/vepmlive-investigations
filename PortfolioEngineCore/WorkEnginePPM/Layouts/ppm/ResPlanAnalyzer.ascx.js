@@ -3345,6 +3345,7 @@
 	            //	            else
 	            //	                grid.SetString(row, col + "Icon", '/_layouts/ppm/images/Green.gif', 1);
 
+	            grid.SetAttribute(row, col, "ExportStyle", 'background-color: ' + retval, false, false);
 	            return retval;
 	        }
 	        else
