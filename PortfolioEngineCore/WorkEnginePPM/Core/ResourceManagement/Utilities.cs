@@ -446,9 +446,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
             if (!isNewResource)
             {
-                var row = (from f in fieldsTable.AsEnumerable()
-                    where f["Field"].ToString().Equals("Email")
-                    select f).FirstOrDefault();
+                DataRow row = fieldsTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["Field"].ToString().Equals("Email"));
 
                 if (row == null)
                 {

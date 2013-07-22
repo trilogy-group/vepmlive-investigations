@@ -77,7 +77,6 @@
     <Compile Include="Base\DBAccess\CostCategories.cs" />
     <Compile Include="Base\DBAccess\Costs.cs" />
     <Compile Include="Base\DBAccess\CostTypes.cs" />
-    <Compile Include="Base\DBAccess\CostValues.cs" />
     <Compile Include="Base\DBAccess\DataAccess.cs" />
     <Compile Include="Base\DBAccess\General.cs" />
     <Compile Include="Base\DBAccess\Groups.cs" />
