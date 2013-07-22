@@ -7,16 +7,16 @@ using WorkEnginePPM.Core.DataSync;
 namespace WorkEnginePPM.Events.DataSync
 {
     /// <summary>
-    /// List Item Events
+    ///     List Item Events
     /// </summary>
     public class TimeOffSyncEvent : SPItemEventReceiver
     {
-        #region Methods (6) 
+        #region Methods (7) 
 
         // Public Methods (3) 
 
         /// <summary>
-        /// An item was added
+        ///     An item was added
         /// </summary>
         public override void ItemAdded(SPItemEventProperties properties)
         {
@@ -28,7 +28,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item is being deleted
+        ///     An item is being deleted
         /// </summary>
         public override void ItemDeleting(SPItemEventProperties properties)
         {
@@ -38,7 +38,7 @@ namespace WorkEnginePPM.Events.DataSync
             {
                 using (var timeOffManager = new TimeOffManager(properties.Web))
                 {
-                    timeOffManager.Delete(properties.ListItem.ID);
+                    timeOffManager.Delete(properties.ListItem.ID, GetUserId(properties));
                 }
             }
             catch (Exception exception)
@@ -50,7 +50,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// An item was updated
+        ///     An item was updated
         /// </summary>
         public override void ItemUpdated(SPItemEventProperties properties)
         {
@@ -61,10 +61,38 @@ namespace WorkEnginePPM.Events.DataSync
             SetHours(properties);
         }
 
-        // Private Methods (3) 
+        // Private Methods (4) 
+
+        private static int GetUserId(SPItemEventProperties properties)
+        {
+            int userId = properties.Web.CurrentUser.ID;
+
+            try
+            {
+                string user;
+
+                try
+                {
+                    user = properties.AfterProperties["AssignedTo"].ToString();
+                }
+                catch
+                {
+                    user = properties.ListItem["AssignedTo"].ToString();
+                }
+
+                if (!string.IsNullOrEmpty(user))
+                {
+                    var userValue = new SPFieldUserValue(properties.Web, user);
+                    userId = userValue.User.ID;
+                }
+            }
+            catch { }
+
+            return userId;
+        }
 
         /// <summary>
-        /// Sets the hours.
+        ///     Sets the hours.
         /// </summary>
         /// <param name="properties">The properties.</param>
         private static void SetHours(SPItemEventProperties properties)
@@ -80,13 +108,11 @@ namespace WorkEnginePPM.Events.DataSync
                     spListItem.SystemUpdate();
                 }
             }
-            catch
-            {
-            }
+            catch { }
         }
 
         /// <summary>
-        /// Synchronizes the specified properties.
+        ///     Synchronizes the specified properties.
         /// </summary>
         /// <param name="properties">The properties.</param>
         private static void Synchronize(SPItemEventProperties properties)
@@ -99,7 +125,7 @@ namespace WorkEnginePPM.Events.DataSync
             {
                 using (var timeOffManager = new TimeOffManager(properties.Web))
                 {
-                    timeOffManager.Synchronize();
+                    timeOffManager.Synchronize(GetUserId(properties));
                 }
             }
             catch (Exception exception)
@@ -111,7 +137,7 @@ namespace WorkEnginePPM.Events.DataSync
         }
 
         /// <summary>
-        /// Validates the request.
+        ///     Validates the request.
         /// </summary>
         /// <param name="properties">The properties.</param>
         /// <returns></returns>

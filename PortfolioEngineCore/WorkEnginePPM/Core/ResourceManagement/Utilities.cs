@@ -181,9 +181,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     (string)
                         (properties.AfterProperties["SharePointAccount"] ?? properties.ListItem["SharePointAccount"]));
             }
-            catch
-            {
-            }
+            catch { }
 
             foreach (SPField spField in spFieldCollection)
             {
@@ -278,9 +276,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                     }
                                 }
                             }
-                            catch
-                            {
-                            }
+                            catch { }
                         }
 
                         currentValue = string.Join(",", list.ToArray());
@@ -318,13 +314,11 @@ namespace WorkEnginePPM.Core.ResourceManagement
                         {
                             currentValue = properties.ListItem[internalName];
                         }
-                        catch
-                        {
-                        }
+                        catch { }
 
                         object newValue = GetValue(properties, internalName);
 
-                        if (internalName.Equals("Generic") || internalName.Equals("Email"))
+                        if (internalName.Equals("Generic"))
                         {
                             newValue = currentValue;
                         }
@@ -429,9 +423,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                         {
                             currentValue = properties.ListItem[internalName];
                         }
-                        catch
-                        {
-                        }
+                        catch { }
 
                         object newValue = afterProperty;
 
@@ -448,6 +440,41 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
                             fieldsTable.Rows.Add(dataRow);
                         }
+                    }
+                }
+            }
+
+            if (!isNewResource)
+            {
+                var row = (from f in fieldsTable.AsEnumerable()
+                    where f["Field"].ToString().Equals("Email")
+                    select f).FirstOrDefault();
+
+                if (row == null)
+                {
+                    string email = null;
+
+                    try
+                    {
+                        try
+                        {
+                            email = (string) properties.AfterProperties["Email"];
+                        }
+                        catch
+                        {
+                            email = (string) properties.ListItem["Email"];
+                        }
+                    }
+                    catch { }
+
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        DataRow dataRow = fieldsTable.NewRow();
+                        dataRow["Id"] = (int) PFEResourceField.Email;
+                        dataRow["Value"] = email;
+                        dataRow["Field"] = properties.List.Fields["Email"];
+
+                        fieldsTable.Rows.Add(dataRow);
                     }
                 }
             }
@@ -487,12 +514,11 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 ? resultElement.Attribute("Status")
                 : rootElement.Attribute("Status");
 
-            if (statusAttribute != null && statusAttribute.Value.Equals("1") && statusAttribute.Parent != null)
-            {
-                XElement errorElement = statusAttribute.Parent.Element("Error");
+            if (statusAttribute == null || !statusAttribute.Value.Equals("1") || statusAttribute.Parent == null) return;
 
-                if (errorElement != null) throw new Exception(errorElement.Value);
-            }
+            XElement errorElement = statusAttribute.Parent.Element("Error");
+
+            if (errorElement != null) throw new Exception(errorElement.Value);
         }
 
         /// <summary>
