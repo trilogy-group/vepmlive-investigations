@@ -92,7 +92,7 @@ namespace EPMLiveCore.API
 
         #endregion Delegates and Events 
 
-        #region Methods (16) 
+        #region Methods (17) 
 
         // Public Methods (1) 
 
@@ -116,7 +116,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        // Private Methods (15) 
+        // Private Methods (16) 
 
         private void AddMasterLog(string message, bool isHeader)
         {
@@ -232,32 +232,34 @@ namespace EPMLiveCore.API
                                         value = DateTime.FromOADate(Convert.ToDouble(val));
                                         break;
                                     case SPFieldType.User:
-                                        try
+                                        if (val.Contains(","))
                                         {
-                                            value = new SPFieldUserValue(_spWeb, (int) usersDict[val][0], val);
+                                            var collection = new SPFieldUserValueCollection();
+                                            collection.AddRange(
+                                                val.Split(',')
+                                                    .Select(u => u.Trim())
+                                                    .Select(uv => GetUserValue(usersDict, uv)));
+                                            value = collection;
                                         }
-                                        catch
+                                        else
                                         {
-                                            bool found = false;
-
-                                            foreach (var pair in usersDict.Where(p => p.Value[1].ToString().Equals(val))
-                                                )
-                                            {
-                                                found = true;
-                                                value = new SPFieldUserValue(_spWeb, (int) pair.Value[0], pair.Key);
-                                                break;
-                                            }
-
-                                            if (!found)
-                                            {
-                                                SPUser spUser = _spWeb.EnsureUser(val);
-                                                usersDict.Add(spUser.LoginName, new object[] {spUser.ID, spUser.Name});
-                                                value = new SPFieldUserValue(_spWeb, spUser.ID, spUser.Name);
-                                            }
+                                            value = GetUserValue(usersDict, val);
                                         }
                                         break;
                                     case SPFieldType.Lookup:
-                                        value = new SPFieldLookupValue(lookupFieldDict[col][val], val);
+                                        if (val.Contains(","))
+                                        {
+                                            var collection = new SPFieldLookupValueCollection();
+                                            collection.AddRange(
+                                                val.Split(',')
+                                                    .Select(v => v.Trim())
+                                                    .Select(lv => new SPFieldLookupValue(lookupFieldDict[col][lv], lv)));
+                                            value = collection;
+                                        }
+                                        else
+                                        {
+                                            value = new SPFieldLookupValue(lookupFieldDict[col][val], val);
+                                        }
                                         break;
                                 }
                             }
@@ -334,9 +336,7 @@ namespace EPMLiveCore.API
                                 lookupFieldDict[columnName].Add(actLevel.name, actLevel.id);
                             }
                         }
-                        catch
-                        {
-                        }
+                        catch { }
 
                         continue;
                     }
@@ -352,9 +352,7 @@ namespace EPMLiveCore.API
                                 lookupFieldDict[columnName].Add(spGroup.Name, spGroup.ID);
                             }
                         }
-                        catch
-                        {
-                        }
+                        catch { }
 
                         continue;
                     }
@@ -373,9 +371,7 @@ namespace EPMLiveCore.API
                             (int) spListItem["ID"]);
                     }
                 }
-                catch
-                {
-                }
+                catch { }
             }
 
             return fieldDict;
@@ -392,12 +388,40 @@ namespace EPMLiveCore.API
                 {
                     usersDict.Add(spListItem["Name"].ToString(), new[] {spListItem["ID"], spListItem["Title"]});
                 }
-                catch
-                {
-                }
+                catch { }
             }
 
             return usersDict;
+        }
+
+        private SPFieldUserValue GetUserValue(Dictionary<string, object[]> usersDict, string val)
+        {
+            SPFieldUserValue value = null;
+
+            try
+            {
+                value = new SPFieldUserValue(_spWeb, (int) usersDict[val][0], val);
+            }
+            catch
+            {
+                bool found = false;
+
+                foreach (var pair in usersDict.Where(p => p.Value[1].ToString().Equals(val)))
+                {
+                    found = true;
+                    value = new SPFieldUserValue(_spWeb, (int) pair.Value[0], pair.Key);
+                    break;
+                }
+
+                if (!found)
+                {
+                    SPUser spUser = _spWeb.EnsureUser(val);
+                    usersDict.Add(spUser.LoginName, new object[] {spUser.ID, spUser.Name});
+                    value = new SPFieldUserValue(_spWeb, spUser.ID, spUser.Name);
+                }
+            }
+
+            return value;
         }
 
         private void ImportResources()
@@ -529,9 +553,7 @@ namespace EPMLiveCore.API
 
                             if (!string.IsNullOrEmpty(value)) isEmpty = false;
                         }
-                        catch
-                        {
-                        }
+                        catch { }
                     }
 
                     if (!isEmpty) _dtResources.Rows.Add(dataRow);
@@ -595,9 +617,7 @@ namespace EPMLiveCore.API
                     spListItem[col] = value;
                     AddMasterLog(string.Format("{0}: {1}", columnName, value), 4);
                 }
-                catch
-                {
-                }
+                catch { }
             }
 
             if (isGeneric) spListItem["Title"] = spListItem["Title"];
@@ -627,9 +647,7 @@ namespace EPMLiveCore.API
                 {
                     spListItem = spList.GetItemById(Convert.ToInt32(row["ID"]));
                 }
-                catch
-                {
-                }
+                catch { }
 
                 if (spListItem == null)
                 {
@@ -736,9 +754,7 @@ namespace EPMLiveCore.API
                 {
                     spFieldUserValue = new SPFieldUserValue(_spWeb, account);
                 }
-                catch
-                {
-                }
+                catch { }
 
                 if (spFieldUserValue != null)
                 {
@@ -772,9 +788,7 @@ namespace EPMLiveCore.API
     {
         #region Constructors (1) 
 
-        internal ProcessedResource()
-        {
-        }
+        internal ProcessedResource() { }
 
         #endregion Constructors 
 
@@ -818,9 +832,7 @@ namespace EPMLiveCore.API
         ///     A unique user state.
         /// </param>
         public ImportProgressChangedEventHandlerArgs(int progressPercentage, object userState)
-            : base(progressPercentage, userState)
-        {
-        }
+            : base(progressPercentage, userState) { }
 
         #endregion Constructors 
     }

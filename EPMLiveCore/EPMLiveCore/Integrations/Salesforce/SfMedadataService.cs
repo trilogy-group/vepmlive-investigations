@@ -32,7 +32,8 @@ namespace EPMLiveCore.Integrations.Salesforce
 
         #region Constructors (2) 
 
-        internal SfMedadataService(string username, string password, string securityToken, string appNamespace, bool isSandbox)
+        internal SfMedadataService(string username, string password, string securityToken, string appNamespace,
+            bool isSandbox)
         {
             _appNamespace = appNamespace;
             _sforceService = new SforceService();
@@ -48,22 +49,22 @@ namespace EPMLiveCore.Integrations.Salesforce
             _sforceService.SessionHeaderValue = new SessionHeader {sessionId = _loginResult.sessionId};
 
             _metadataService = new MetadataService
+            {
+                Url = _loginResult.metadataServerUrl,
+                SessionHeaderValue = new SalesforceMetadataService.SessionHeader
                 {
-                    Url = _loginResult.metadataServerUrl,
-                    SessionHeaderValue = new SalesforceMetadataService.SessionHeader
-                        {
-                            sessionId = _loginResult.sessionId
-                        }
-                };
+                    sessionId = _loginResult.sessionId
+                }
+            };
 
             _apexService = new ApexService
+            {
+                Url = _loginResult.serverUrl.Replace("/u/", "/s/"),
+                SessionHeaderValue = new SalesforceApexService.SessionHeader
                 {
-                    Url = _loginResult.serverUrl.Replace("/u/", "/s/"),
-                    SessionHeaderValue = new SalesforceApexService.SessionHeader
-                        {
-                            sessionId = _loginResult.sessionId
-                        }
-                };
+                    sessionId = _loginResult.sessionId
+                }
+            };
         }
 
         ~SfMedadataService()
@@ -93,25 +94,19 @@ namespace EPMLiveCore.Integrations.Salesforce
             {
                 _metadataService.Dispose();
             }
-            catch
-            {
-            }
+            catch { }
 
             try
             {
                 _sforceService.Dispose();
             }
-            catch
-            {
-            }
+            catch { }
 
             try
             {
                 _apexService.Dispose();
             }
-            catch
-            {
-            }
+            catch { }
         }
 
         // Private Methods (3) 
@@ -129,14 +124,18 @@ namespace EPMLiveCore.Integrations.Salesforce
 
             var stringBuilder = new StringBuilder();
 
-            stringBuilder.AppendLine("Could not create " + triggerName);
-
-            foreach (CompileTriggerResult triggerResult in result.triggers)
+            foreach (CompileTriggerResult triggerResult in result.triggers.Where(r => !string.IsNullOrEmpty(r.problem)))
             {
+                stringBuilder.AppendLine("Could not create " + triggerName);
                 stringBuilder.AppendLine(triggerResult.problem);
             }
 
-            throw new Exception(stringBuilder.ToString());
+            string message = stringBuilder.ToString();
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                throw new Exception(message);
+            }
         }
 
         private IEnumerable<FileProperties> QueryMetadata(string metadataType)
@@ -157,16 +156,16 @@ namespace EPMLiveCore.Integrations.Salesforce
             if (QueryMetadata("RemoteSiteSetting").Any(fp => fp.fullName.Equals(remoteSiteSettingName))) return;
 
             AsyncResult asyncResult = _metadataService.create(new Metadata[]
+            {
+                new RemoteSiteSetting
                 {
-                    new RemoteSiteSetting
-                        {
-                            description = "Allow EPM Live app to call EPM Live Integration service.",
-                            disableProtocolSecurity = false,
-                            isActive = true,
-                            url = apiUrl,
-                            fullName = remoteSiteSettingName
-                        }
-                })[0];
+                    description = "Allow EPM Live app to call EPM Live Integration service.",
+                    disableProtocolSecurity = false,
+                    isActive = true,
+                    url = apiUrl,
+                    fullName = remoteSiteSettingName
+                }
+            })[0];
 
             while (!asyncResult.done)
             {
@@ -244,18 +243,18 @@ namespace EPMLiveCore.Integrations.Salesforce
             string triggerName = objectName.Replace("__c", "_custom") + "_" + TRIGGER_NAME;
             string triggerBody =
                 new Dictionary<string, string>
-                    {
-                        {"{TRIGGER_NAME}", triggerName},
-                        {"{TRIGGER_OBJECT}", objectName},
-                        {"{APP_NAMESPACE}", _appNamespace},
-                        {"{TIMESTAMP}", DateTime.Now.ToUniversalTime().ToString("r")}
-                    }.Aggregate(Resources.SFIntTrigger, (c, p) => c.Replace(p.Key, p.Value));
+                {
+                    {"{TRIGGER_NAME}", triggerName},
+                    {"{TRIGGER_OBJECT}", objectName},
+                    {"{APP_NAMESPACE}", _appNamespace},
+                    {"{TIMESTAMP}", DateTime.Now.ToUniversalTime().ToString("r")}
+                }.Aggregate(Resources.SFIntTrigger, (c, p) => c.Replace(p.Key, p.Value));
 
             CompileAndTestResult result = _apexService.compileAndTest(new CompileAndTestRequest
-                {
-                    triggers = new[] {triggerBody},
-                    checkOnly = true
-                });
+            {
+                triggers = new[] {triggerBody},
+                checkOnly = true
+            });
 
             ProcessTriggerInstallationResults(result, triggerName);
 
@@ -279,13 +278,11 @@ namespace EPMLiveCore.Integrations.Salesforce
 
                 DeleteItems(new[] {triggers.First().Id});
             }
-            catch
-            {
-            }
+            catch { }
         }
 
         internal List<Dictionary<UpsertKind, SaveResult>> UpsertItems(string objectName, DataTable items,
-                                                                      bool hasEpmLiveId)
+            bool hasEpmLiveId)
         {
             var objectsToInsert = new List<sObject>();
             var objectsToUpdate = new List<sObject>();
@@ -364,14 +361,14 @@ namespace EPMLiveCore.Integrations.Salesforce
             {
                 upsertResults.AddRange(
                     _sforceService.create(objectsToInsert.ToArray())
-                                  .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.INSERT, r}}));
+                        .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.INSERT, r}}));
             }
 
             if (objectsToUpdate.Count > 0)
             {
                 upsertResults.AddRange(
                     _sforceService.update(objectsToUpdate.ToArray())
-                                  .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.UPDATE, r}}));
+                        .Select(r => new Dictionary<UpsertKind, SaveResult> {{UpsertKind.UPDATE, r}}));
             }
 
             return upsertResults;

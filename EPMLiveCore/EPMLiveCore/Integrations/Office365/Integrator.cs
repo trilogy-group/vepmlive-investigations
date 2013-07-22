@@ -81,10 +81,10 @@ namespace EPMLiveCore.Integrations.Office365
                 O365Service o365Service = GetO365Service(webProps);
 
                 var ignoredFields = new[]
-                    {
-                        "AppAuthor", "AppEditor", "Attachments", "DocIcon",
-                        "ItemChildCount", "FolderChildCount", "_UIVersionString"
-                    };
+                {
+                    "AppAuthor", "AppEditor", "Attachments", "DocIcon",
+                    "ItemChildCount", "FolderChildCount", "_UIVersionString"
+                };
 
                 columnProperties.AddRange(
                     from field in o365Service.GetListFields(webProps.Properties["List"].ToString())
@@ -93,12 +93,12 @@ namespace EPMLiveCore.Integrations.Office365
                           !internalName.StartsWith("LinkTitle") && !internalName.EndsWith("NoMenu")
                     orderby field.Title
                     select new ColumnProperty
-                        {
-                            ColumnName = internalName,
-                            DiplayName = field.Title,
-                            type = TranslateFieldType(field.FieldTypeKind),
-                            DefaultListColumn = GetMatchingListColumn(internalName)
-                        });
+                    {
+                        ColumnName = internalName,
+                        DiplayName = field.Title,
+                        type = TranslateFieldType(field.FieldTypeKind),
+                        DefaultListColumn = GetMatchingListColumn(internalName)
+                    });
             }
             catch (Exception e)
             {
@@ -109,7 +109,7 @@ namespace EPMLiveCore.Integrations.Office365
         }
 
         public Dictionary<string, string> GetDropDownValues(WebProperties webProps, IntegrationLog log, string property,
-                                                            string parentPropertyValue)
+            string parentPropertyValue)
         {
             var dictionary = new Dictionary<string, string>();
 
@@ -140,16 +140,16 @@ namespace EPMLiveCore.Integrations.Office365
             catch (Exception e)
             {
                 log.LogMessage(e.Message, e.Message.StartsWith("No records found")
-                                              ? IntegrationLogType.Warning
-                                              : IntegrationLogType.Error);
+                    ? IntegrationLogType.Warning
+                    : IntegrationLogType.Error);
             }
 
             return items;
         }
 
         public bool InstallIntegration(WebProperties webProps, IntegrationLog log, out string message,
-                                       string integrationKey,
-                                       string apiUrl)
+            string integrationKey,
+            string apiUrl)
         {
             message = string.Empty;
 
@@ -158,11 +158,11 @@ namespace EPMLiveCore.Integrations.Office365
                 O365Service o365Service = GetO365Service(webProps);
 
                 o365Service.InstallIntegration(webProps.IntegrationId, integrationKey, apiUrl, webProps.Title,
-                                               webProps.FullURL, webProps.EnabledFeatures,
-                                               (string) webProps.Properties["List"],
-                                               bool.Parse((string) webProps.Properties["AllowAddInt"]),
-                                               bool.Parse((string) webProps.Properties["AllowAddList"]),
-                                               bool.Parse((string) webProps.Properties["AllowDeleteInt"]));
+                    webProps.FullURL, webProps.EnabledFeatures,
+                    (string) webProps.Properties["List"],
+                    bool.Parse((string) webProps.Properties["AllowAddInt"]),
+                    bool.Parse((string) webProps.Properties["AllowAddList"]),
+                    bool.Parse((string) webProps.Properties["AllowDeleteInt"]));
 
                 return true;
             }
@@ -184,15 +184,15 @@ namespace EPMLiveCore.Integrations.Office365
             catch (Exception e)
             {
                 log.LogMessage("Scheduled Pull. " + e.Message, e.Message.StartsWith("No records found")
-                                                                   ? IntegrationLogType.Warning
-                                                                   : IntegrationLogType.Error);
+                    ? IntegrationLogType.Warning
+                    : IntegrationLogType.Error);
             }
 
             return items;
         }
 
         public bool RemoveIntegration(WebProperties webProps, IntegrationLog log, out string message,
-                                      string integrationKey)
+            string integrationKey)
         {
             message = string.Empty;
 
@@ -317,7 +317,7 @@ namespace EPMLiveCore.Integrations.Office365
         }
 
         private static void GetAuthParameters(WebProperties webProps, out string username, out SecureString password,
-                                              out string siteUrl)
+            out string siteUrl)
         {
             username = webProps.Properties["Username"].ToString();
             if (string.IsNullOrEmpty(username)) throw new Exception("Please provide the username.");

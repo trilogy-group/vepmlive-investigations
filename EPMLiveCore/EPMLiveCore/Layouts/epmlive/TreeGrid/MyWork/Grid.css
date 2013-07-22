@@ -1368,3 +1368,99 @@ overflow:hidden; width:0px; height:0px; }
 
 /* Do not change, marks the style loaded */
 .GMLoaded { border:1px solid black!important; }
+
+/* -------------- Custom scrollbars ------------------ */
+
+.GMCustScroll1RightHidden { background:url(VScroll.gif) left -108px; height:18px; overflow:hidden; }
+.GMCustScroll1Right { padding-right:18px; background:url(VScroll.gif) right 0px; }
+.GMCustScroll1RightHover { padding-right:18px; background:url(VScroll.gif) right -18px; }
+.GMCustScroll1Left { padding-left:18px;  background:url(VScroll.gif) left 0px; }
+.GMCustScroll1LeftHover { padding-left:18px;  background:url(VScroll.gif) left -18px; }
+.GMCustScroll1SliderRight { padding-right:3px; background:url(VScroll.gif) right -36px; }
+.GMCustScroll1SliderLeft { padding-left:3px; background:url(VScroll.gif) left -36px; }
+.GMCustScroll1SliderHIn { height:18px; overflow:hidden; background:url(VScroll.gif) center -54px; }
+.GMCustScroll1SliderRightHover { padding-right:3px; background:url(VScroll.gif) right -72px; }
+.GMCustScroll1SliderLeftHover { padding-left:3px; background:url(VScroll.gif) left -72px; }
+.GMCustScroll1SliderHInHover { height:18px; overflow:hidden; background:url(VScroll.gif) center -90px; }
+.GMCustScroll1X { background:#F4F4F4; }
+
+.GMCustScroll2RightHidden { background:url(VScroll.gif) left -364px; height:36px; overflow:hidden; }
+.GMCustScroll2Right { padding-right:36px; background:url(VScroll.gif) right -148px; }
+.GMCustScroll2RightHover { padding-right:36px; background:url(VScroll.gif) right -184px; }
+.GMCustScroll2Left { padding-left:36px;  background:url(VScroll.gif) left -148px; }
+.GMCustScroll2LeftHover { padding-left:36px;  background:url(VScroll.gif) left -184px; }
+.GMCustScroll2SliderRight { padding-right:6px; background:url(VScroll.gif) right -220px; }
+.GMCustScroll2SliderLeft { padding-left:6px; background:url(VScroll.gif) left -220px; }
+.GMCustScroll2SliderHIn { height:36px; overflow:hidden; background:url(VScroll.gif) center -256px; }
+.GMCustScroll2SliderRightHover { padding-right:6px; background:url(VScroll.gif) right -292px; }
+.GMCustScroll2SliderLeftHover { padding-left:6px; background:url(VScroll.gif) left -292px; }
+.GMCustScroll2SliderHInHover { height:36px; overflow:hidden; background:url(VScroll.gif) center -328px; }
+.GMCustScroll2X { background:#F4F4F4; }
+
+.GMCustScroll3Right,.GMCustScroll3RightHidden { background:white; height:9px; overflow:hidden; }
+.GMCustScroll3SliderRight,.GMCustScroll3SliderRightHover { padding-right:3px; height:9px; background:url(VScroll.gif) right -126px; }
+.GMCustScroll3SliderLeft,.GMCustScroll3SliderLeftHover { height:9px; background:url(VScroll.gif) left -126px; }
+.GMCustScroll3SliderRightHover { background-position:right -135px; }
+.GMCustScroll3SliderLeftHover { background-position:left -135px; }
+.GMCustScroll3X { background:white; }
+
+.GMCustScroll4Right,.GMCustScroll4RightHidden,.GMCustScroll4SliderRight,.GMCustScroll4SliderRightHover { height:1px; overflow:hidden; }
+.GMCustScroll4X { }
+
+.GMCustScroll1DownHidden { background:url(HScroll.png) -108px top; width:18px; overflow:hidden; }
+.GMCustScroll1Down { padding-bottom:18px; background:url(HScroll.png) 0px bottom; cursor:default; width:18px; overflow:hidden; }
+.GMCustScroll1DownHover { padding-bottom:18px; background:url(HScroll.png) -18px bottom; width:18px; overflow:hidden; }
+.GMCustScroll1Up { padding-top:18px; background:url(HScroll.png) 0px top; width:18px; overflow:hidden; }
+.GMCustScroll1UpHover { padding-top:18px;  background:url(HScroll.png) -18px top; width:18px; overflow:hidden; }
+.GMCustScroll1SliderDown { padding-bottom:3px; background:url(HScroll.png) -36px bottom; width:18px; overflow:hidden; }
+.GMCustScroll1SliderUp { padding-top:3px; background:url(HScroll.png) -36px top; width:18px; overflow:hidden; }
+.GMCustScroll1SliderVIn { background:url(HScroll.png) -54px center; width:18px; overflow:hidden; }
+.GMCustScroll1SliderDownHover { padding-bottom:3px; background:url(HScroll.png) -72px bottom; width:18px; overflow:hidden; }
+.GMCustScroll1SliderUpHover { padding-top:3px; background:url(HScroll.png) -72px top; width:18px; overflow:hidden; }
+.GMCustScroll1SliderVInHover { background:url(HScroll.png) -90px center; width:18px; overflow:hidden; }
+
+.GMCustScroll2DownHidden { background:url(HScroll.png) -364px top; width:36px; overflow:hidden; }
+.GMCustScroll2Down { padding-bottom:36px; background:url(HScroll.png) -148px bottom; cursor:default; width:36px; overflow:hidden; }
+.GMCustScroll2DownHover { padding-bottom:36px; background:url(HScroll.png) -184px bottom; width:36px; overflow:hidden; }
+.GMCustScroll2Up { padding-top:36px; background:url(HScroll.png) -148px top; width:36px; overflow:hidden; }
+.GMCustScroll2UpHover { padding-top:36px;  background:url(HScroll.png) -184px top; width:36px; overflow:hidden; }
+.GMCustScroll2SliderDown { padding-bottom:6px; background:url(HScroll.png) -220px bottom; width:36px; overflow:hidden; }
+.GMCustScroll2SliderUp { padding-top:6px; background:url(HScroll.png) -220px top; width:36px; overflow:hidden; }
+.GMCustScroll2SliderVIn { background:url(HScroll.png) -256px center; width:36px; overflow:hidden; }
+.GMCustScroll2SliderDownHover { padding-bottom:6px; background:url(HScroll.png) -292px bottom; width:36px; overflow:hidden; }
+.GMCustScroll2SliderUpHover { padding-top:6px; background:url(HScroll.png) -292px top; width:36px; overflow:hidden; }
+.GMCustScroll2SliderVInHover { background:url(HScroll.png) -328px center; width:36px; overflow:hidden; }
+
+.GMCustScroll3Down,.GMCustScroll3DownHidden { background:white; width:9px; overflow:hidden; cursor:default; }
+.GMCustScroll3SliderDown,.GMCustScroll3SliderDownHover { padding-bottom:3px; width:9px; background:url(HScroll.png) -126px bottom; }
+.GMCustScroll3SliderUp,.GMCustScroll3SliderUpHover { width:9px; background:url(HScroll.png) -126px top; cursor:default; }
+.GMCustScroll3SliderDownHover { background-position:-135px bottom; }
+.GMCustScroll3SliderUpHover { background-position:-135px top; cursor:default; }
+
+.GMCustScroll4Down,.GMCustScroll4DownHidden,.GMCustScroll4SliderDown,.GMCustScroll4SliderDownHover { width:1px; overflow:hidden; }
+
+/* Mobile */
+
+.GMLeftSplitter,.GMRightSplitter,.GMLeftSplitterTouch,.GMRightSplitterTouch { width:5px; background:#E1F1FF; overflow:hidden; cursor:e-resize; font-size:1px; }
+.GMLeftSplitterTouch,.GMRightSplitterTouch { width:15px; }
+.GMLeftSplitter,.GMLeftSplitterTouch { border-right:1px solid #c0c0ff; }
+.GMRightSplitter,.GMRightSplitterTouch { border-left:1px solid #c0c0ff; }
+.GMHScrollLeft,.GMHScrollMid,.GMHScrollRight,.GMHScrollLeftResize,.GMHScrollRightResize,.GMHScrollLeftResizeTouch,.GMHScrollRightResizeTouch { 
+   padding-left:1px; padding-right:1px; cursor:default; 
+   }
+.GMHScrollLeftResizeTouch { border-right:2px solid black; padding-right:18px; background:#F4F4F4; }
+.GMHScrollRightResizeTouch { border-left:2px solid black; padding-left:18px; background:#F4F4F4; }
+.GMHScrollMidLeftResizeTouch { border-left:1px solid black; padding-left:19px; background:#F4F4F4; }
+.GMHScrollMidRightResizeTouch { border-right:1px solid black; padding-right:19px; background:#F4F4F4; }
+.GMRowHeightTouch { height:22px; }
+.GMSpaceMarginTouch { margin:5px; }
+.GMPagerItemTouch { padding-top:4px; padding-bottom:4px; }
+.GMMenuItemTouch { padding-top:5px; padding-bottom:5px; }
+.GMMenuFocusTouch { padding-top:4px; padding-bottom:4px; }
+.GMCfgMenuItemTouch,.GMColumnsMenuItemTouch { padding-top:6px; padding-bottom:6px; }
+.GMCfgMenuFocusTouch,.GMColumnsMenuFocusTouch { padding-top:5px; padding-bottom:5px; }
+.GMPickCellTouch { width:32px; }
+.GMPickTouch { font-size:14px; }
+.GMPick2CellMTouch { height:26px; width:75px; }
+.GMPick2CellYTouch { height:26px; width:45px; }
+.GMPick2SepTouch { height:26px; }

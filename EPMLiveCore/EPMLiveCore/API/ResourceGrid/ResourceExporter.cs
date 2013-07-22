@@ -145,20 +145,24 @@ namespace EPMLiveCore.API
                 from oLookup in (List<string>) pair.Value[2]
                 select oLookup.Split('|')[1]);
 
+            foreach (var pair in fieldDictionary)
+            {
+                var list = new List<string>();
+                if ((bool) pair.Value[3])
+                {
+                    object val = pair.Value[2];
+                    if (val != null)
+                    {
+                        list.AddRange(from v in (List<string>) val select v.Split('|')[1]);
+                    }
+                }
+
+                sharedString.Add(string.Join(", ", list.ToArray()));
+            }
+
             if (fieldDictionary.Any(pair => pair.Key.Equals("Permissions")))
             {
-                List<string> s = sharedString;
-
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                {
-                    using (var site = new SPSite(_spWeb.Site.ID))
-                    {
-                        using (SPWeb web = site.OpenWeb(_spWeb.ID))
-                        {
-                            s.AddRange(_permissions);
-                        }
-                    }
-                });
+                sharedString.AddRange(_permissions);
             }
 
             sharedString.Add(true.ToString());
@@ -242,9 +246,11 @@ namespace EPMLiveCore.API
             foreach (var pair in fieldDictionary)
             {
                 string key = pair.Key;
+                var spFieldType = (SPFieldType) pair.Value[1];
 
-                if ((SPFieldType) pair.Value[1] != SPFieldType.Lookup &&
-                    (SPFieldType) pair.Value[1] != SPFieldType.Choice && !key.Equals("ResourceLevel")) continue;
+                if (spFieldType != SPFieldType.Lookup &&
+                    spFieldType != SPFieldType.Choice &&
+                    spFieldType != SPFieldType.MultiChoice && !key.Equals("ResourceLevel")) continue;
 
                 key = key.Replace("_x0020_", "__");
 
@@ -262,8 +268,7 @@ namespace EPMLiveCore.API
 
                 var worksheet = new Worksheet
                 {
-                    MCAttributes =
-                        new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
+                    MCAttributes = new MarkupCompatibilityAttributes {Ignorable = "x14ac"}
                 };
                 worksheet.AddNamespaceDeclaration("r", R_SCHEMA);
                 worksheet.AddNamespaceDeclaration("mc", MC_SCHEMA);
@@ -300,7 +305,7 @@ namespace EPMLiveCore.API
             }
 
             CreateDisplayNameWorksheet(workbookPart, lookupCounter);
-            CreateSettingsWorksheet(workbookPart, lookupCounter + 1, sharedStringIndices);
+            CreateSettingsWorksheet(workbookPart, lookupCounter + 1, sharedStringIndices, fieldDictionary);
         }
 
         private void CreatePermissionsWorksheet(WorkbookPart workbookPart, Dictionary<string, int> sharedStringIndices)
@@ -546,6 +551,7 @@ namespace EPMLiveCore.API
                     spFieldType != SPFieldType.User && spFieldType != SPFieldType.Choice) continue;
 
                 if (pair.Key.Equals("SharePointAccount")) continue;
+                if ((bool) pair.Value[3]) continue;
 
                 dataValidations.Count++;
 
@@ -593,7 +599,8 @@ namespace EPMLiveCore.API
         }
 
         private void CreateSettingsWorksheet(WorkbookPart workbookPart, int lookupCounter,
-            Dictionary<string, int> sharedStringIndices)
+            Dictionary<string, int> sharedStringIndices,
+            Dictionary<string, object[]> fieldDictionary)
         {
             string rId = "rId" + lookupCounter;
 
@@ -634,6 +641,48 @@ namespace EPMLiveCore.API
             row.AppendChild(cell);
 
             sheetData.AppendChild(row);
+
+            int lRowIndex = 1;
+            int uRowIndex = 1;
+
+            foreach (var pair in fieldDictionary)
+            {
+                if (!((bool) pair.Value[3])) continue;
+
+                int index = 0;
+                string col = "A";
+
+                switch ((SPFieldType) pair.Value[1])
+                {
+                    case SPFieldType.User:
+                        index = uRowIndex++;
+                        col = "B";
+                        break;
+                    case SPFieldType.Lookup:
+                    case SPFieldType.MultiChoice:
+                        index = lRowIndex++;
+                        col = "C";
+                        break;
+                }
+
+                var r = new Row
+                {
+                    RowIndex = (UInt32Value) (index + 0U),
+                    Spans = new ListValue<StringValue> {InnerText = "1:1"},
+                    DyDescent = 0.25D
+                };
+
+                var c = new Cell {CellReference = col + index, DataType = CellValues.String};
+                var cv = new CellValue
+                {
+                    Text = pair.Key
+                };
+
+                c.AppendChild(cv);
+                r.AppendChild(c);
+
+                sheetData.AppendChild(r);
+            }
 
             worksheet.Append(sheetProperties, sheetDimension, sheetData);
             worksheetPart.Worksheet = worksheet;
@@ -764,6 +813,7 @@ namespace EPMLiveCore.API
                 FormatId = 0U,
                 ApplyProtection = true
             };
+
             var protection1 = new Protection {Locked = false};
 
             cellFormat4.AppendChild(protection1);
@@ -778,6 +828,7 @@ namespace EPMLiveCore.API
                 ApplyFont = true,
                 ApplyProtection = true
             };
+
             var protection2 = new Protection {Locked = false};
 
             cellFormat5.AppendChild(protection2);
@@ -792,6 +843,7 @@ namespace EPMLiveCore.API
                 ApplyNumberFormat = true,
                 ApplyProtection = true
             };
+
             var protection3 = new Protection {Locked = false};
 
             cellFormat6.AppendChild(protection3);
@@ -806,6 +858,7 @@ namespace EPMLiveCore.API
                 ApplyFill = true,
                 ApplyProtection = true
             };
+
             var cellFormat8 = new CellFormat
             {
                 NumberFormatId = 0U,
@@ -874,12 +927,11 @@ namespace EPMLiveCore.API
         {
             int dividend = index + 1;
             string colId = string.Empty;
-            int modulo;
 
             while (dividend > 0)
             {
-                modulo = (dividend - 1)%26;
-                colId = Convert.ToChar(65 + modulo).ToString() + colId;
+                int modulo = (dividend - 1)%26;
+                colId = Convert.ToChar(65 + modulo).ToString(CultureInfo.InvariantCulture) + colId;
                 dividend = ((dividend - modulo)/26);
             }
 
@@ -889,6 +941,7 @@ namespace EPMLiveCore.API
         private object[] GetFieldInfo(SPField spField)
         {
             object choices = null;
+            bool isMultiValue = false;
 
             SPFieldType spFieldType = spField.Type;
 
@@ -907,9 +960,14 @@ namespace EPMLiveCore.API
                     {
                         ((List<string>) choices).Add("|" + choice);
                     }
+                    isMultiValue = true;
                     break;
                 case SPFieldType.Lookup:
                     choices = GetLookupChoices(spField);
+                    isMultiValue = ((SPFieldLookup) spField).AllowMultipleValues;
+                    break;
+                case SPFieldType.User:
+                    isMultiValue = ((SPFieldUser) spField).AllowMultipleValues;
                     break;
             }
 
@@ -938,7 +996,7 @@ namespace EPMLiveCore.API
                 spFieldType = SPFieldType.Lookup;
             }
 
-            return new[] {spField.Title, spFieldType, choices};
+            return new[] {spField.Title, spFieldType, choices, isMultiValue};
         }
 
         private IList<string> GetLookupChoices(SPField spField)
@@ -1006,6 +1064,35 @@ namespace EPMLiveCore.API
                 }
             });
 
+            var muFields = new List<string>();
+            var mlFields = new List<string>();
+            var mcFields = new List<string>();
+
+            SPFieldCollection fieldCollection = resourcePool.Fields;
+            foreach (SPField field in fieldCollection)
+            {
+                string internalName = field.InternalName;
+
+                switch (field.Type)
+                {
+                    case SPFieldType.User:
+                        if (((SPFieldUser) field).AllowMultipleValues)
+                        {
+                            muFields.Add(internalName);
+                        }
+                        break;
+                    case SPFieldType.Lookup:
+                        if (((SPFieldLookup) field).AllowMultipleValues)
+                        {
+                            mlFields.Add(internalName);
+                        }
+                        break;
+                    case SPFieldType.MultiChoice:
+                        mcFields.Add(internalName);
+                        break;
+                }
+            }
+
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 SPListItem spListItem = resourcePool.GetItemById((int) dataRow["ID"]);
@@ -1029,6 +1116,57 @@ namespace EPMLiveCore.API
                 else
                 {
                     dataRow["SharePointAccount"] = string.Empty;
+                }
+
+                foreach (string field in muFields)
+                {
+                    try
+                    {
+                        var list = new List<string>();
+
+                        var collection = (SPFieldUserValueCollection) spListItem[field];
+                        foreach (SPFieldUserValue userValue in collection)
+                        {
+                            try
+                            {
+                                list.Add(userValue.User.LoginName);
+                            }
+                            catch { }
+                        }
+
+                        dataRow[field] = string.Join(", ", list.ToArray());
+                    }
+                    catch { }
+                }
+
+                foreach (string field in mlFields)
+                {
+                    try
+                    {
+                        var list = new List<string>();
+
+                        var collection = (SPFieldLookupValueCollection) spListItem[field];
+                        foreach (SPFieldLookupValue lookupValue in collection)
+                        {
+                            try
+                            {
+                                list.Add(lookupValue.LookupValue);
+                            }
+                            catch { }
+                        }
+
+                        dataRow[field] = string.Join(", ", list.ToArray());
+                    }
+                    catch { }
+                }
+
+                foreach (string field in mcFields)
+                {
+                    try
+                    {
+                        dataRow[field] = spListItem[field].ToString().Replace(";#", string.Empty);
+                    }
+                    catch { }
                 }
             }
 

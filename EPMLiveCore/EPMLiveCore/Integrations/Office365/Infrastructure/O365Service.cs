@@ -90,9 +90,14 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
 
                 return true;
             }
-            catch
+            catch (Exception e)
             {
-                return false;
+                if (e.Message.Contains(string.Format("List '{0}' does not exist", INT_LIST)))
+                {
+                    return false;
+                }
+
+                throw;
             }
         }
 
@@ -137,7 +142,7 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
         {
             string lastSynchDateTime =
                 DateTime.SpecifyKind(lastSynchDate.ToUniversalTime(), DateTimeKind.Utc)
-                        .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK");
+                    .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK");
 
             using (ClientContext clientContext = GetClientContext())
             {
@@ -150,8 +155,8 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
                     (from DataColumn c in items.Columns select @"<FieldRef Name='" + c.ColumnName + "' />");
 
                 var query = new CamlQuery
-                    {
-                        ViewXml = string.Format(@"
+                {
+                    ViewXml = string.Format(@"
                             <ViewFields>
                                 {0}
                             </ViewFields>
@@ -168,7 +173,7 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
                                 </Or>
                             </Where>
                         ", string.Join(Environment.NewLine, cols), lastSynchDateTime)
-                    };
+                };
 
                 ListItemCollection itemCollection = list.GetItems(query);
                 clientContext.ExecuteQuery();
@@ -202,8 +207,8 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
         }
 
         public void InstallIntegration(Guid integrationId, string integrationKey, string apiUrl, string webTitle,
-                                       string webUrl, ArrayList enabledFeatures, string listName, bool allowIncoming,
-                                       bool allowOutgoing, bool allowDeletion)
+            string webUrl, ArrayList enabledFeatures, string listName, bool allowIncoming,
+            bool allowOutgoing, bool allowDeletion)
         {
             using (ClientContext clientContext = GetClientContext())
             {
@@ -243,10 +248,10 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
                 string intId = _cryptographyService.Encrypt(integrationId.ToString());
 
                 foreach (ListItem listItem in listItemCollection.ToList()
-                                                                .Where(
-                                                                    i =>
-                                                                    ((string) i["IntKey"]).Equals(intKey) &&
-                                                                    ((string) i["IntID"]).Equals(intId)))
+                    .Where(
+                        i =>
+                            ((string) i["IntKey"]).Equals(intKey) &&
+                            ((string) i["IntID"]).Equals(intId)))
                 {
                     listItem.DeleteObject();
                     clientContext.ExecuteQuery();
@@ -345,18 +350,18 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
 
                         break;
                     case FieldType.Lookup:
-                        {
-                            var lookupField = (FieldLookup) field;
+                    {
+                        var lookupField = (FieldLookup) field;
 
-                            if (lookupField.AllowMultipleValues)
-                            {
-                                multLookupFields.Add(internalName);
-                            }
-                            else
-                            {
-                                lookupFields.Add(internalName);
-                            }
+                        if (lookupField.AllowMultipleValues)
+                        {
+                            multLookupFields.Add(internalName);
                         }
+                        else
+                        {
+                            lookupFields.Add(internalName);
+                        }
+                    }
 
                         break;
                 }
@@ -369,7 +374,7 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
                 foreach (string columnName in from DataColumn dataColumn in items.Columns select dataColumn.ColumnName)
                 {
                     dataRow[columnName] = GetFieldValue(listItem, columnName, userFields, multiUserFields, lookupFields,
-                                                        multLookupFields);
+                        multLookupFields);
                 }
 
                 items.Rows.Add(dataRow);
@@ -379,8 +384,8 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
         private void FillListFields(DataTable items, List<string> fields)
         {
             foreach (string col in items.Columns.Cast<DataColumn>()
-                                        .Select(c => c.ColumnName)
-                                        .Where(c => !c.ToLower().Equals("id") && !fields.Contains(c)))
+                .Select(c => c.ColumnName)
+                .Where(c => !c.ToLower().Equals("id") && !fields.Contains(c)))
             {
                 fields.Add(col);
             }
@@ -453,27 +458,40 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
         }
 
         private object GetFieldValue(ListItem listItem, string columnName, List<string> userFields,
-                                     List<string> multiUserFields,
-                                     List<string> lookupFields, List<string> multLookupFields)
+            List<string> multiUserFields, List<string> lookupFields,
+            List<string> multLookupFields)
         {
             object value = listItem.FieldValues[columnName];
 
-            if (userFields.Contains(columnName))
+            try
             {
-                value = GetUserValue((FieldUserValue) value);
+                if (value != null && !string.IsNullOrEmpty(value.ToString()))
+                {
+                    if (userFields.Contains(columnName))
+                    {
+                        value = GetUserValue((FieldUserValue) value);
+                    }
+                    else if (multiUserFields.Contains(columnName))
+                    {
+                        value = string.Join(",",
+                            (from v in (object[]) value select GetUserValue((FieldUserValue) v)).ToArray
+                                ());
+                    }
+                    else if (lookupFields.Contains(columnName))
+                    {
+                        value = ((FieldLookupValue) value).LookupId;
+                    }
+                    else if (multLookupFields.Contains(columnName))
+                    {
+                        value = string.Join(",",
+                            (from v in (object[]) value
+                                select
+                                    ((FieldLookupValue) v).LookupId.ToString(CultureInfo.InvariantCulture))
+                                .ToArray());
+                    }
+                }
             }
-            else if (multiUserFields.Contains(columnName))
-            {
-                value = string.Join(",", (from v in (object[]) value select GetUserValue((FieldUserValue) v)).ToArray());
-            }
-            else if (lookupFields.Contains(columnName))
-            {
-                value = ((FieldLookupValue) value).LookupId;
-            }
-            else if (multLookupFields.Contains(columnName))
-            {
-                value = string.Join(",", (from v in (object[]) value select ((FieldLookupValue) v).LookupId).ToArray());
-            }
+            catch { }
 
             return value;
         }
@@ -558,19 +576,19 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
                 if (list != null && list.ItemCount > 0)
                 {
                     var query = new CamlQuery
-                        {
-                            ViewXml =
-                                @"<View><Query><Where><Eq><FieldRef Name='ID' /><Value Type='Counter'>" + user.LookupId +
-                                "</Value></Eq></Where></Query><ViewFields><FieldRef Name='EMail' /></ViewFields></View>"
-                        };
+                    {
+                        ViewXml =
+                            @"<View><Query><Where><Eq><FieldRef Name='ID' /><Value Type='Counter'>" + user.LookupId +
+                            "</Value></Eq></Where></Query><ViewFields><FieldRef Name='EMail' /></ViewFields></View>"
+                    };
 
                     ListItemCollection listItems = list.GetItems(query);
                     clientContext.Load(listItems);
                     clientContext.ExecuteQuery();
 
-                    if (listItems.Any())
+                    if (listItems.Count > 0)
                     {
-                        email = (listItems.First()["EMail"] ?? string.Empty).ToString();
+                        email = (listItems[0]["EMail"] ?? string.Empty).ToString();
                         _userEmails.Add(user.LookupId, email);
                     }
                 }
@@ -582,10 +600,10 @@ namespace EPMLiveCore.Integrations.Office365.Infrastructure
         private ClientContext TryGetClientContext(string siteUrl)
         {
             return new ClientContext(siteUrl)
-                {
-                    Credentials = new SharePointOnlineCredentials(_username, _password),
-                    RequestTimeout = 300000
-                };
+            {
+                Credentials = new SharePointOnlineCredentials(_username, _password),
+                RequestTimeout = 300000
+            };
         }
 
         #endregion Methods 

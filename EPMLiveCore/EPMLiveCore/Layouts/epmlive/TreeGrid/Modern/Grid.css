@@ -106,7 +106,8 @@
 
 /* ------------- Inside cell ------------- */
 
-.GMHtml,.GMText,.GMLines,.GMPass,.GMInt,.GMFloat,.GMDate,.GMLink,.GMImg,.GMRadio,.GMRadioText,.GMList,.GMEnum,.GMDropCols,.GMAbs,.GMPagerEdit,.GMUser,.GMC
+.GMHtml,.GMText,.GMLines,.GMPass,.GMInt,.GMFloat,.GMDate,.GMLink,.GMImg,.GMRadio,.GMRadioText,.GMList,.GMEnum,.GMDropCols,.GMAbs,.GMPagerEdit,.GMUser,.GMC
+
 hart {
    font-size:11px; font-family:"Microsoft Sans Serif",Verdana,Arial; white-space:nowrap;
    padding-left:3px; padding-right:3px; padding-top:2px; padding-bottom:2px;
@@ -122,7 +123,8 @@ hart {
 .GMHidden { }
 .GMHiddenSpace { display:none; }
 .GMDropCols { padding-top:2px!important; }
-.GMHeaderText { font:13px "Trebuchet MS", Tahoma, Arial; line-height:17px; color:#FFFFFF; padding-left:3px; padding-right:3px; padding-bottom:2px!
+.GMHeaderText { font:13px "Trebuchet MS", Tahoma, Arial; line-height:17px; color:#FFFFFF; padding-left:3px; padding-right:3px; padding-bottom:2px!
+
 important; padding-top:3px!important; }
 .GMAbs { padding:0px; }
 .GMUser { padding:0px; }
@@ -172,7 +174,8 @@ important; padding-top:3px!important; }
 .GMGantt90Out { padding-right:0px; border-right:0px none; }
 .GMGantt0In,.GMGantt10In,.GMGantt90In,.GMGantt100In,.GMGanttNullIn, 
 .GMGantt0InErr,.GMGantt10InErr,.GMGantt90InErr,.GMGantt100InErr,.GMGanttNullInErr, 
-.GMGantt0InCrit,.GMGantt10InCrit,.GMGantt90InCrit,.GMGantt100InCrit,.GMGanttNullInCrit { height:9px; overflow:hidden; font-size:1px; background:url
+.GMGantt0InCrit,.GMGantt10InCrit,.GMGantt90InCrit,.GMGantt100InCrit,.GMGanttNullInCrit { height:9px; overflow:hidden; font-size:1px; background:url
+
 (Backgrounds.gif) }
 .GMGantt0In {  background-position: 0px -1709px; }
 .GMGantt0InErr {  background-position: 0px -1578px; }
@@ -224,7 +227,8 @@ important; padding-top:3px!important; }
 .GMGanttFlowInErr { background:#F55; }
 .GMGanttFlowInCrit { background:#FA0; }
 
-.GMGanttRunHover { margin:0px!important; border:2px solid red!important; padding:0px!important; padding-left:1px!important;padding-right:1px!important; 
+.GMGanttRunHover { margin:0px!important; border:2px solid red!important; padding:0px!important; padding-left:1px!important;padding-right:1px!important; 
+
 overflow:hidden; }  
 .GMGanttRunEmptyOut,.GMGanttRunBoxOut,.GMGanttRunSolidOut,.GMGanttRunLeftOut,.GMGanttRunRightOut,.GMGanttRunFixedOut,
 .GMGanttRunBoundOut,.GMGanttRunBoundStartOut,.GMGanttRunEndOut,.GMGanttRunEndStartOut,.GMGanttRunNbspOut {
@@ -242,9 +246,11 @@ overflow:hidden; }
 .GMGanttRunBoxIn { background:url(Backgrounds.gif) left -1500px; }
 .GMGanttRunSolidOut { }
 .GMGanttRunSolidIn { background:url(Backgrounds.gif) left -1539px; }
-.GMGanttRunFixedOut,.GMGanttRunLeftOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-left-style:solid!important; border-left-width:3px!important; 
+.GMGanttRunFixedOut,.GMGanttRunLeftOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-left-style:solid!important; border-left-width:3px!important; 
+
 margin-left:0px;}
-.GMGanttRunFixedOut,.GMGanttRunRightOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-right-style:solid!important; border-right-width:3px!
+.GMGanttRunFixedOut,.GMGanttRunRightOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-right-style:solid!important; border-right-width:3px!
+
 important; }
 .GMGanttRunFixedIn,.GMGanttRunLeftIn,.GMGanttRunRightIn { background:url(Backgrounds.gif) left -1526px; }
 .GMGanttRunBoundOut,.GMGanttRunBoundStartOut,.GMGanttRunEndOut,.GMGanttRunEndStartOut { }
@@ -394,7 +400,8 @@ important; }
 .GMGanttExclude,.GMGanttExcludeHidden { height:500px; overflow:hidden; background:#E8F8E8; margin-left:auto; margin-right:auto; }
 .GMGanttExcludeHidden { background:#D8F8D8; }
 
-.GMGanttBase,.GMGanttBaseAuto,.GMGanttFinish,.GMGanttFinishAuto { height:500px; overflow:hidden; border-left:2px solid #FF9E0C; width:2px; margin-
+.GMGanttBase,.GMGanttBaseAuto,.GMGanttFinish,.GMGanttFinishAuto { height:500px; overflow:hidden; border-left:2px solid #FF9E0C; width:2px; margin-
+
 left:auto; margin-right:auto; }
 .GMGanttFinishAuto,.GMGanttBaseAuto { border-left:1px solid #FF9E0C; }
 
@@ -472,7 +479,8 @@ u.GMT,u.GMTL,u.GMC,u.GMCL,u.GME,u.GMEL,u.GMD0,u.GMD1,u.GMD2,u.GMD3,u.GMD0L,u.GMD
 
 /* ------------- Tree Img without lines ------------- */
 
-.GMND0,.GMND1,.GMND2,.GMND3,.GMNC,.GMNE,.GMNCR,.GMNER { font-size:10px; background-image:url(TreeN.gif); background-repeat:no-repeat; vertical-align:top; 
+.GMND0,.GMND1,.GMND2,.GMND3,.GMNC,.GMNE,.GMNCR,.GMNER { font-size:10px; background-image:url(TreeN.gif); background-repeat:no-repeat; vertical-align:top; 
+
 }
 u.GMND0,u.GMND1,u.GMND2,u.GMND3,u.GMNC,u.GMNE,u.GMNCR,u.GMNER { padding-left:26px; }
 .GMND0 { background-position: 0px 0px; }
@@ -487,7 +495,8 @@ u.GMNL { padding-left:21px; }
 
 /* ------------- Panel img ------------- */
 
-.GMPanelImage,.GMPanelMove,.GMPanelMoveOff,.GMPanelSelect,.GMPanelSelectOn,.GMPanelSelectOff,.GMPanelDelete,.GMPanelDeleteOff,.GMPanelCopy,.GMPanelCopyOff
+.GMPanelImage,.GMPanelMove,.GMPanelMoveOff,.GMPanelSelect,.GMPanelSelectOn,.GMPanelSelectOff,.GMPanelDelete,.GMPanelDeleteOff,.GMPanelCopy,.GMPanelCopyOff
+
 ,.GMPanelEmpty {
    font-size:10px; padding-left:16px; background-image:url(Panel.gif); background-repeat:no-repeat;
    }
@@ -654,7 +663,8 @@ u.GMPSpace4 { padding-left:62px; }
 
 .GMResizeGrid,.GMResizeGridRtl,.GMToolSave,.GMToolReload,.GMToolRepaint,.GMToolAdd,.GMToolAddChild,.GMToolSort1,.GMToolSort,.GMToolCalc1,.GMToolCalc,
 .GMToolExpandAll,.GMToolCollapseAll,.GMToolColumns,.GMToolCfg,.GMToolHelp,.GMToolPrint,.GMToolExport,.GMToolExportPDF,.GMToolDebug, 
-.GMToolUndo,.GMToolUndo1,.GMToolRedo,.GMToolRedo1,.GMToolCorrect,.GMToolCorrect1,.GMToolZoomIn,.GMToolZoomIn1,.GMToolZoomOut,.GMToolZoomOut1,.GMToolZoomFi
+.GMToolUndo,.GMToolUndo1,.GMToolRedo,.GMToolRedo1,.GMToolCorrect,.GMToolCorrect1,.GMToolZoomIn,.GMToolZoomIn1,.GMToolZoomOut,.GMToolZoomOut1,.GMToolZoomFi
+
 t,
 .GMToolPagerFirst,.GMToolPagerFirst1,.GMToolPagerPrev,.GMToolPagerPrev1,.GMToolPagerNext,.GMToolPagerNext1,.GMToolPagerLast,.GMToolPagerLast1 {
    font-size:11px; background-image:url(Toolbar.png); -background-image:url(Toolbar.gif); background-repeat:no-repeat;
@@ -793,21 +803,26 @@ u.GMFilter0,u.GMFilter1 { padding-left:16px; }
 .GMPopupNone { padding-right:14px; }
 
 /* ------------- Filter images ------------- */
-.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMF
+.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMF
+
 ilter10Left,.GMFilter11Left,.GMFilter12Left,
-.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9
+.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9
+
 Right,.GMFilter10Right,.GMFilter11Right,.GMFilter12Right {
    font-size:11px; background-image:url(Filter.gif); background-repeat:no-repeat;
    }
-.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMF
+.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMF
+
 ilter10Left,.GMFilter11Left,.GMFilter12Left {
    padding-left:17px;
    }
-.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9
+.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9
+
 Right,.GMFilter10Right,.GMFilter11Right,.GMFilter12Right {
    padding-right:17px;
    }
-u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4Right,u.GMFilter5Right,u.GMFilter6Right,u.GMFilter7Right,u.GMFilter8Right,u
+u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4Right,u.GMFilter5Right,u.GMFilter6Right,u.GMFilter7Right,u.GMFilter8Right,u
+
 .GMFilter9Right,u.GMFilter10Right,u.GMFilter11Right,u.GMFilter12Right {  
    padding-right:0px; padding-left:17px;
    }
@@ -838,7 +853,8 @@ u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4R
 .GMFilter11Right { background-position:right -1650px; }
 .GMFilter12Right { background-position:right -1800px; }
 
-.GMFilter0Menu,.GMFilter1Menu,.GMFilter2Menu,.GMFilter3Menu,.GMFilter4Menu,.GMFilter5Menu,.GMFilter6Menu,.GMFilter7Menu,.GMFilter8Menu,.GMFilter9Menu,.GMF
+.GMFilter0Menu,.GMFilter1Menu,.GMFilter2Menu,.GMFilter3Menu,.GMFilter4Menu,.GMFilter5Menu,.GMFilter6Menu,.GMFilter7Menu,.GMFilter8Menu,.GMFilter9Menu,.GMF
+
 ilter10Menu,.GMFilter11Menu,.GMFilter12Menu {
    width:17px; height:17px; overflow:hidden; background-image:url(Filter.gif); background-repeat:no-repeat; margin-left:-1px;
    }
@@ -973,13 +989,17 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMEditCellInput { position:relative; border:1px solid #BBB; overflow:hidden; z-index:2; }
 
 .GMCursorBackground { position:relative; border:none; padding:0px; overflow:hidden; }
-.GMCursorBorderLeft { position:relative; padding-right:0px; padding-top:0px; padding-bottom:0px; border-right:none; border-top:none; border-bottom:none; 
+.GMCursorBorderLeft { position:relative; padding-right:0px; padding-top:0px; padding-bottom:0px; border-right:none; border-top:none; border-bottom:none; 
+
 overflow:hidden; width:0px; height:0px; }
-.GMCursorBorderRight { position:relative; padding-left:0px; padding-top:0px; padding-bottom:0px; border-left:none; border-top:none; border-bottom:none; 
+.GMCursorBorderRight { position:relative; padding-left:0px; padding-top:0px; padding-bottom:0px; border-left:none; border-top:none; border-bottom:none; 
+
 overflow:hidden; width:0px; height:0px; }
-.GMCursorBorderTop { position:relative; padding-bottom:0px; padding-left:0px; padding-right:0px; border-bottom:none; border-left:none; border-right:none; 
+.GMCursorBorderTop { position:relative; padding-bottom:0px; padding-left:0px; padding-right:0px; border-bottom:none; border-left:none; border-right:none; 
+
 overflow:hidden; width:0px; height:0px; }
-.GMCursorBorderBottom { position:relative; padding-top:0px; padding-left:0px; padding-right:0px; border-top:none; border-left:none; border-right:none; 
+.GMCursorBorderBottom { position:relative; padding-top:0px; padding-left:0px; padding-right:0px; border-top:none; border-left:none; border-right:none; 
+
 overflow:hidden; width:0px; height:0px; }
 
 /*--------------- Cell edges ----------------- */
@@ -1040,7 +1060,8 @@ overflow:hidden; width:0px; height:0px; }
    position:absolute!IE;
    left:expression((5+(_7i1=document.compatMode=="CSS1Compat"?document.documentElement.scrollLeft:document.body.scrollLeft))+"px")!IE;
    width:expression((-10+(_7i1=document.compatMode=="CSS1Compat"?document.documentElement.clientWidth-8:document.body.clientWidth))+"px")!IE;
-   top:expression((-205+(_7i2=document.compatMode=="CSS1Compat"?document.documentElement.scrollTop+document.documentElement.clientHeight-
+   top:expression((-205+(_7i2=document.compatMode=="CSS1Compat"?document.documentElement.scrollTop+document.documentElement.clientHeight-
+
 8:document.body.scrollTop+document.body.clientHeight))+"px")!IE;
    }
 .GridDebugTagMax,.GridDebugButtonsMax {
@@ -1220,7 +1241,8 @@ overflow:hidden; width:0px; height:0px; }
    background:transparent; color:#333333;
    width:16px; padding:1px; font:10px Arial; text-align:center; cursor:default;
    }
-.GMPickHover,.GMPickSelHover,.GMPickWD, .GMPickSa, .GMPickSu, .GMPickSel, .GMPickNow, .GMPickWDNE, .GMPickSaNE, .GMPickSuNE, .GMPickSelNE, .GMPickNowNE, 
+.GMPickHover,.GMPickSelHover,.GMPickWD, .GMPickSa, .GMPickSu, .GMPickSel, .GMPickNow, .GMPickWDNE, .GMPickSaNE, .GMPickSuNE, .GMPickSelNE, .GMPickNowNE, 
+
 .GMPickOM, .GMPickOMNE {
    text-align:center; width:16px; border:1px solid white;
    font:10px "Microsoft Sans Serif",Arial; cursor:pointer; _cursor:hand;
@@ -1386,3 +1408,99 @@ overflow:hidden; width:0px; height:0px; }
 
 /* Do not change, marks the style loaded */
 .GMLoaded { border:1px solid black!important; }
+
+/* -------------- Custom scrollbars ------------------ */
+
+.GMCustScroll1RightHidden { background:url(VScroll.gif) left -108px; height:18px; overflow:hidden; }
+.GMCustScroll1Right { padding-right:18px; background:url(VScroll.gif) right 0px; }
+.GMCustScroll1RightHover { padding-right:18px; background:url(VScroll.gif) right -18px; }
+.GMCustScroll1Left { padding-left:18px;  background:url(VScroll.gif) left 0px; }
+.GMCustScroll1LeftHover { padding-left:18px;  background:url(VScroll.gif) left -18px; }
+.GMCustScroll1SliderRight { padding-right:3px; background:url(VScroll.gif) right -36px; }
+.GMCustScroll1SliderLeft { padding-left:3px; background:url(VScroll.gif) left -36px; }
+.GMCustScroll1SliderHIn { height:18px; overflow:hidden; background:url(VScroll.gif) center -54px; }
+.GMCustScroll1SliderRightHover { padding-right:3px; background:url(VScroll.gif) right -72px; }
+.GMCustScroll1SliderLeftHover { padding-left:3px; background:url(VScroll.gif) left -72px; }
+.GMCustScroll1SliderHInHover { height:18px; overflow:hidden; background:url(VScroll.gif) center -90px; }
+.GMCustScroll1X { background:#F4F4F4; }
+
+.GMCustScroll2RightHidden { background:url(VScroll.gif) left -364px; height:36px; overflow:hidden; }
+.GMCustScroll2Right { padding-right:36px; background:url(VScroll.gif) right -148px; }
+.GMCustScroll2RightHover { padding-right:36px; background:url(VScroll.gif) right -184px; }
+.GMCustScroll2Left { padding-left:36px;  background:url(VScroll.gif) left -148px; }
+.GMCustScroll2LeftHover { padding-left:36px;  background:url(VScroll.gif) left -184px; }
+.GMCustScroll2SliderRight { padding-right:6px; background:url(VScroll.gif) right -220px; }
+.GMCustScroll2SliderLeft { padding-left:6px; background:url(VScroll.gif) left -220px; }
+.GMCustScroll2SliderHIn { height:36px; overflow:hidden; background:url(VScroll.gif) center -256px; }
+.GMCustScroll2SliderRightHover { padding-right:6px; background:url(VScroll.gif) right -292px; }
+.GMCustScroll2SliderLeftHover { padding-left:6px; background:url(VScroll.gif) left -292px; }
+.GMCustScroll2SliderHInHover { height:36px; overflow:hidden; background:url(VScroll.gif) center -328px; }
+.GMCustScroll2X { background:#F4F4F4; }
+
+.GMCustScroll3Right,.GMCustScroll3RightHidden { background:white; height:9px; overflow:hidden; }
+.GMCustScroll3SliderRight,.GMCustScroll3SliderRightHover { padding-right:3px; height:9px; background:url(VScroll.gif) right -126px; }
+.GMCustScroll3SliderLeft,.GMCustScroll3SliderLeftHover { height:9px; background:url(VScroll.gif) left -126px; }
+.GMCustScroll3SliderRightHover { background-position:right -135px; }
+.GMCustScroll3SliderLeftHover { background-position:left -135px; }
+.GMCustScroll3X { background:white; }
+
+.GMCustScroll4Right,.GMCustScroll4RightHidden,.GMCustScroll4SliderRight,.GMCustScroll4SliderRightHover { height:1px; overflow:hidden; }
+.GMCustScroll4X { }
+
+.GMCustScroll1DownHidden { background:url(HScroll.png) -108px top; width:18px; overflow:hidden; }
+.GMCustScroll1Down { padding-bottom:18px; background:url(HScroll.png) 0px bottom; cursor:default; width:18px; overflow:hidden; }
+.GMCustScroll1DownHover { padding-bottom:18px; background:url(HScroll.png) -18px bottom; width:18px; overflow:hidden; }
+.GMCustScroll1Up { padding-top:18px; background:url(HScroll.png) 0px top; width:18px; overflow:hidden; }
+.GMCustScroll1UpHover { padding-top:18px;  background:url(HScroll.png) -18px top; width:18px; overflow:hidden; }
+.GMCustScroll1SliderDown { padding-bottom:3px; background:url(HScroll.png) -36px bottom; width:18px; overflow:hidden; }
+.GMCustScroll1SliderUp { padding-top:3px; background:url(HScroll.png) -36px top; width:18px; overflow:hidden; }
+.GMCustScroll1SliderVIn { background:url(HScroll.png) -54px center; width:18px; overflow:hidden; }
+.GMCustScroll1SliderDownHover { padding-bottom:3px; background:url(HScroll.png) -72px bottom; width:18px; overflow:hidden; }
+.GMCustScroll1SliderUpHover { padding-top:3px; background:url(HScroll.png) -72px top; width:18px; overflow:hidden; }
+.GMCustScroll1SliderVInHover { background:url(HScroll.png) -90px center; width:18px; overflow:hidden; }
+
+.GMCustScroll2DownHidden { background:url(HScroll.png) -364px top; width:36px; overflow:hidden; }
+.GMCustScroll2Down { padding-bottom:36px; background:url(HScroll.png) -148px bottom; cursor:default; width:36px; overflow:hidden; }
+.GMCustScroll2DownHover { padding-bottom:36px; background:url(HScroll.png) -184px bottom; width:36px; overflow:hidden; }
+.GMCustScroll2Up { padding-top:36px; background:url(HScroll.png) -148px top; width:36px; overflow:hidden; }
+.GMCustScroll2UpHover { padding-top:36px;  background:url(HScroll.png) -184px top; width:36px; overflow:hidden; }
+.GMCustScroll2SliderDown { padding-bottom:6px; background:url(HScroll.png) -220px bottom; width:36px; overflow:hidden; }
+.GMCustScroll2SliderUp { padding-top:6px; background:url(HScroll.png) -220px top; width:36px; overflow:hidden; }
+.GMCustScroll2SliderVIn { background:url(HScroll.png) -256px center; width:36px; overflow:hidden; }
+.GMCustScroll2SliderDownHover { padding-bottom:6px; background:url(HScroll.png) -292px bottom; width:36px; overflow:hidden; }
+.GMCustScroll2SliderUpHover { padding-top:6px; background:url(HScroll.png) -292px top; width:36px; overflow:hidden; }
+.GMCustScroll2SliderVInHover { background:url(HScroll.png) -328px center; width:36px; overflow:hidden; }
+
+.GMCustScroll3Down,.GMCustScroll3DownHidden { background:white; width:9px; overflow:hidden; cursor:default; }
+.GMCustScroll3SliderDown,.GMCustScroll3SliderDownHover { padding-bottom:3px; width:9px; background:url(HScroll.png) -126px bottom; }
+.GMCustScroll3SliderUp,.GMCustScroll3SliderUpHover { width:9px; background:url(HScroll.png) -126px top; cursor:default; }
+.GMCustScroll3SliderDownHover { background-position:-135px bottom; }
+.GMCustScroll3SliderUpHover { background-position:-135px top; cursor:default; }
+
+.GMCustScroll4Down,.GMCustScroll4DownHidden,.GMCustScroll4SliderDown,.GMCustScroll4SliderDownHover { width:1px; overflow:hidden; }
+
+/* Mobile */
+
+.GMLeftSplitter,.GMRightSplitter,.GMLeftSplitterTouch,.GMRightSplitterTouch { width:5px; background:#E1F1FF; overflow:hidden; cursor:e-resize; font-size:1px; }
+.GMLeftSplitterTouch,.GMRightSplitterTouch { width:15px; }
+.GMLeftSplitter,.GMLeftSplitterTouch { border-right:1px solid #c0c0ff; }
+.GMRightSplitter,.GMRightSplitterTouch { border-left:1px solid #c0c0ff; }
+.GMHScrollLeft,.GMHScrollMid,.GMHScrollRight,.GMHScrollLeftResize,.GMHScrollRightResize,.GMHScrollLeftResizeTouch,.GMHScrollRightResizeTouch { 
+   padding-left:1px; padding-right:1px; cursor:default; 
+   }
+.GMHScrollLeftResizeTouch { border-right:2px solid black; padding-right:18px; background:#F4F4F4; }
+.GMHScrollRightResizeTouch { border-left:2px solid black; padding-left:18px; background:#F4F4F4; }
+.GMHScrollMidLeftResizeTouch { border-left:1px solid black; padding-left:19px; background:#F4F4F4; }
+.GMHScrollMidRightResizeTouch { border-right:1px solid black; padding-right:19px; background:#F4F4F4; }
+.GMRowHeightTouch { height:22px; }
+.GMSpaceMarginTouch { margin:5px; }
+.GMPagerItemTouch { padding-top:4px; padding-bottom:4px; }
+.GMMenuItemTouch { padding-top:5px; padding-bottom:5px; }
+.GMMenuFocusTouch { padding-top:4px; padding-bottom:4px; }
+.GMCfgMenuItemTouch,.GMColumnsMenuItemTouch { padding-top:6px; padding-bottom:6px; }
+.GMCfgMenuFocusTouch,.GMColumnsMenuFocusTouch { padding-top:5px; padding-bottom:5px; }
+.GMPickCellTouch { width:32px; }
+.GMPickTouch { font-size:14px; }
+.GMPick2CellMTouch { height:26px; width:75px; }
+.GMPick2CellYTouch { height:26px; width:45px; }
+.GMPick2SepTouch { height:26px; }
