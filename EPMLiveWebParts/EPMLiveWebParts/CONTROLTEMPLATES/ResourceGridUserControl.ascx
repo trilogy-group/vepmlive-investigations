@@ -12,6 +12,10 @@
 
 <asp:Panel ID="pnlGrid" runat="server">
     <style type="text/css">
+        input[type=text]::-ms-clear {
+            display: none !important;
+        }
+        
         .rg-clear-fix:after {
             content: ".";
             display: block;
@@ -187,6 +191,10 @@
             max-height: 400px; 
             overflow-y: auto; 
             overflow-x: hidden;
+        }
+        
+        .s4-wpTopTable {
+            border: none !important;
         }
     </style>
     

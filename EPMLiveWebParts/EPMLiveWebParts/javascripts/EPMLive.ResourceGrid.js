@@ -1755,12 +1755,6 @@ function registerEpmLiveResourceGridScript() {
 
                     return true;
                 }
-
-                window.setTimeout(function () {
-                    var g = $$.grid.grids[$$.id()];
-                    g.Update();
-                    g.Render();
-                }, 10);
             } else if (row.Kind === 'Header' && col === 'Panel') {
                 $$.allSelected = !$$.allSelected;
 
@@ -1770,12 +1764,25 @@ function registerEpmLiveResourceGridScript() {
             }
         };
 
-        window.Grids.OnGroup = function (grid, group) {
+        window.Grids.OnExpand = function (grid, row) {
+            if ($.browser.msie) {
             window.setTimeout(function () {
-                var g = $$.grid.grids[$$.id()];
-                g.Update();
-                g.Render();
-            }, 500);
+                    grid.Render();
+                    grid.Update();
+                    grid.Render();
+
+                    window.setTimeout(function () {
+                        grid.Render();
+                        grid.Update();
+                        grid.Render();
+                        grid.Render();
+
+                        grid.SetScrollTop(grid.GetScrollTop() + 2);
+                        grid.SetScrollTop(grid.GetScrollTop() - 2);
+                    }, 200);
+
+                }, 200);
+            }
         };
 
         window.Grids.OnColumnsChanged = function (grid, cols, count) {

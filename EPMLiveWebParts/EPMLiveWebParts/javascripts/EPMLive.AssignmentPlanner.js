@@ -211,11 +211,25 @@
             hideFilters: function () {
                 this.hideRow('AR1');
                 this.filteringOn = false;
+
+                if ($.browser.msie) {
+                    window.setTimeout(function () {
+                        var g = $$.grid.g;
+                        g.Render();
+                    }, 1);
+                }
             },
 
             showFilters: function () {
                 this.showRow('AR1');
                 this.filteringOn = true;
+
+                if ($.browser.msie) {
+                    window.setTimeout(function () {
+                        var g = $$.grid.g;
+                        g.Render();
+                    }, 1);
+                }
             },
 
             hideGrouping: function () {
@@ -238,6 +252,13 @@
                     this.hideRow(rowId);
                     this.groupingOn = false;
                 }
+
+                if ($.browser.msie) {
+                    window.setTimeout(function () {
+                        var g = $$.grid.g;
+                        g.Render();
+                    }, 1);
+                }
             },
 
             showGrouping: function () {
@@ -259,6 +280,13 @@
                 if (rowId) {
                     this.showRow(rowId);
                     this.groupingOn = true;
+                }
+
+                if ($.browser.msie) {
+                    window.setTimeout(function () {
+                        var g = $$.grid.g;
+                        g.Render();
+                    }, 1);
                 }
             },
 
@@ -295,6 +323,13 @@
                     var grid = $$.grid.g;
 
                     grid.ActionZoomIn();
+
+                    if ($.browser.msie) {
+                        window.setTimeout(function () {
+                            var g = $$.grid.g;
+                            g.Render();
+                        }, 1);
+                    }
                 }
             },
 
@@ -307,6 +342,13 @@
                     var grid = $$.grid.g;
 
                     grid.ActionZoomOut();
+
+                    if ($.browser.msie) {
+                        window.setTimeout(function () {
+                            var g = $$.grid.g;
+                            g.Render();
+                        }, 1);
+                    }
                 }
             },
 
@@ -1582,6 +1624,15 @@
                 $$.actions.close();
             } catch (e) {
                 $$$.log(e);
+            }
+        };
+
+        window.Grids.OnFilterFinish = function(grid, type) {
+            if ($.browser.msie) {
+                window.setTimeout(function () {
+                    grid.Update();
+                    grid.Render();
+                }, 100);
             }
         };
 
