@@ -25,6 +25,11 @@
             Grids.OnClickCell = GridsOnClickCellDelegate;
             Grids.OnDataSend = GridsOnDataSendDelegate;
             Grids.OnAfterColumnsChanged = GridsOnAfterColumnsChangedDelegate;
+            Grids.OnFilter = GridsOnFilterDelegate;
+            Grids.OnRowFilter = GridsOnRowFilterDelegate;
+            Grids.OnFilterFinish = GridsOnFilterFinishDelegate;
+            //Grids.OnGroup = GridsOnGroupDelegate;
+            //Grids.OnGroupFinish = GridsOnGroupFinishDelegate;
 
             var sbDataxml = new StringBuilder();
             sbDataxml.append('<Execute Function="GetMetaData">');
@@ -507,7 +512,7 @@
 
             var groupCols = grid.Group.split(',');
 
-            try { grid.DoGrouping(null); } catch (e) { };
+            //try { grid.DoGrouping(null); } catch (e) { };
 
             for (var i = 0; i < groupCols.length; i++) {
                 grid.HideCol(groupCols[i]);
@@ -576,10 +581,10 @@
                 try { grid.ChangeFilter(colvals, valvals, opvals, 0, 0, null); } catch (e) { };
             }
 
-            grid.ChangeSort(gridView['Sorting']);
+            //grid.ChangeSort(gridView['Sorting']);
 
             if (gridView['Grouping'] === '') {
-                try { grid.DoGrouping(null); } catch (e) { };
+                //try { grid.DoGrouping(null); } catch (e) { };
             } else {
                 var grouping = gridView['Grouping'].split('|');
 
@@ -588,8 +593,8 @@
                 } else {
                     this.hideGrouping(grid);
                 }
-
-                try { grid.DoGrouping(grouping[1]); } catch (e) { };
+                grid.Group = grouping[1];
+                //try { grid.DoGrouping(grouping[1]); } catch (e) { };
             }
             if (view.Settings != null) {
                 var displayMode = parseInt(view.Settings.displayMode);
@@ -1200,7 +1205,8 @@
             if (grid.id == "g_RPE") {
                 this.InitialisePlanGrid();
                 var selectedView = this.GetSelectedView();
-                if (selectedView != null) this.ApplyGridView(grid.id, selectedView, false);
+                if (selectedView != null) 
+                    this.ApplyGridView(grid.id, selectedView, false);
                 this.ShowHidePeriods(grid);
                 this.RefreshPlanPeriods(false);
                 if (this.initialized == false) {
@@ -1237,16 +1243,20 @@
                 }
             }
             else if (grid.id == "g_Res") {
+                grid.ActionFilterOff();
+                grid.ActionGroupOff();
+                //grid.ActionSortOff();
                 this.InitialiseResourceGrid();
                 var selectedView = this.GetSelectedView();
-                if (selectedView != null) this.ApplyGridView(grid.id, selectedView, false);
+                if (selectedView != null) 
+                    this.ApplyGridView(grid.id, selectedView, false);
                 this.ShowHidePeriods(grid);
                 this.ShowSelectedResourceGroup();
                 this.RefreshResourcePeriods();
                 window.setTimeout(thisID + ".HandleAction('OnStart')", 100);
                 window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(gridRPE.GetFirst(null, 0), "ItemName"); }, 10);
             }
-            grid.SortRows();
+            //grid.SortRows();
         }
         catch (e) {
             this.HandleException("GridsOnReady", e);
@@ -1264,6 +1274,9 @@
                 this.UpdateButtonsAsync();
                 this.CheckPlanAsync();
                 this.HideWorkingPopup("divLoading");
+                grid.ActionFilterOn();
+                grid.ActionGroupOn();
+                //grid.ActionSortOn();
             }
         }
     };
@@ -2693,9 +2706,9 @@
                     break;
                 case "ResourcesTab_Match":
                     var resgrid = Grids["g_Res"];
-                    resgrid.Rendering = true;
+                    //resgrid.Rendering = true;
                     this.HandleMatch();
-                    resgrid.Rendering = false;
+                    //resgrid.Rendering = false;
                     resgrid.RenderBody();
                     break;
                 case "ResourcesTab_Select_Changed":
@@ -2878,83 +2891,103 @@
     };
     RPEditor.prototype.ShowSelectedResourceGroup = function () {
         var resgrid = this.resgrid;
-        resgrid.Rendering = true;
+        var sort = resgrid.Sort;
+        if (this.ResourcesSelectMode == 4) {
+            resgrid.ShowCol("Match");
+            if (sort != "-Match")
+                resgrid.ChangeSort("-Match");
+        }
+        else {
+            resgrid.HideCol("Match");
+            if (sort == "Match" || sort == "-Match")
+                resgrid.ChangeSort("");
+        }
+        var row = resgrid.GetFirst(null, 0);
+        while (row != null) {
+            var show = this.FilterResourceRow(resgrid, row);
+            row.Visible = show;
+            row = resgrid.GetNext(row);
+        }
+        row = resgrid.GetFirst(null, 0);
+        if (this.initialized == true) {
+            //resgrid.DoFilter();
+            if (resgrid.Group!= "")
+                resgrid.DoGrouping(resgrid.Group);
+            else
+                resgrid.RenderBody();
+        }
+        this.HideUnusedGroupRowsAsync();
+    };
+    RPEditor.prototype.GridsOnRowFilter = function (grid, row, show) {
+        if (grid.id != "g_Res")
+            return show;
+        if (show == false)
+            return show;
+        return this.FilterResourceRow(grid, row);
+    }
+    RPEditor.prototype.FilterResourceRow = function (grid, row) {
+        var show = true;
+        var resgrid = grid;
         switch (this.ResourcesSelectMode) {
             case 0: // show all
-                resgrid.ChangeColsVisibility([], ["Match"], 0);
-                var row = resgrid.GetFirst(null, 0);
-                while (row != null) {
-                    resgrid.SetAttribute(row, "Match", null, 0, 0, 0);
-                    resgrid.ShowRow(row, true);
-                    row = resgrid.GetNext(row);
-                }
-                resgrid.SortRows();
-                row = resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(resgrid, row);
                 break;
             case 1: // show generic
-                var row = resgrid.GetFirst(null, 0);
-                while (row != null) {
-                    if (resgrid.GetAttribute(row, null, "IsGeneric") != 0) resgrid.ShowRow(row, true); else resgrid.HideRow(row, true);
-                    row = resgrid.GetNext(row);
-                }
-                resgrid.HideCol("Match");
-                row = resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(resgrid, row);
+                if (resgrid.GetAttribute(row, null, "IsGeneric") != 1)
+                    return false;
                 break;
             case 2: // show plan
                 var resarr = this.GetPlanResourceArray();
-                var row = resgrid.GetFirst(null, 0);
-                while (row != null) {
-                    var resuid = resgrid.GetAttribute(row, null, "Res_UID");
-                    if (resarr[resuid] != null) resgrid.ShowRow(row, true); else resgrid.HideRow(row, true);
-                    row = resgrid.GetNext(row);
-                }
-                resgrid.HideCol("Match");
-                row = resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(resgrid, row);
+                var resuid = resgrid.GetAttribute(row, null, "Res_UID");
+                if (resarr[resuid] == null)
+                    return false;
                 break;
             case 3: // show team
                 var resarr = this.GetPlanResourceArray();
-                var row = resgrid.GetFirst(null, 0);
-                while (row != null) {
-                    var resuid = resgrid.GetAttribute(row, null, "Res_UID");
-                    if (resgrid.GetAttribute(row, null, "InTeam") != null || resarr[resuid] != null) resgrid.ShowRow(row, true); else resgrid.HideRow(row, true);
-                    row = resgrid.GetNext(row);
-                }
-                resgrid.HideCol("Match");
-                row = resgrid.GetFirst(null, 0);
-                this.HideUnusedGroupRows(resgrid, row);
+                var resuid = resgrid.GetAttribute(row, null, "Res_UID");
+                if (resgrid.GetAttribute(row, null, "InTeam") == null && resarr[resuid] == null)
+                    return false;
                 break;
             case 4: // match
-                this.HandleMatch();
+                var match = resgrid.GetAttribute(row, null, "Match");
+                if (match == null || match <= 0)
+                    return false;
                 break;
+            case 5: // none
+                return false;
             default:
-                alert("unknown resource select mode - '" + this.ResourcesSelectMode + "'");
+                //alert("unknown resource select mode - '" + this.ResourcesSelectMode + "'");
                 break;
         }
-        resgrid.Rendering = false;
-        if (this.initialized == true)
-            resgrid.RenderBody();
+        return show;
     };
-    RPEditor.prototype.HideUnusedGroupRows = function (grid, row) {
-        var bUsed = false;
-        while (row != null) {
-            var stype = row.id.toString();
-            if (stype.substr(0, 2) === "GR") {
-                var childrow = row.firstChild;
-                if (this.HideUnusedGroupRows(grid, childrow) == false) {
-                    grid.HideRow(row, true);
-                } else {
-                    grid.ShowRow(row, true);
-                    bUsed = true;
-                }
-            } else if (row.Visible != 0) {
-                return true;
-            }
-            row = row.nextSibling;
+    //    RPEditor.prototype.GridsOnGroup = function (grid, Group) {
+    //        if (grid.id != "g_Res")
+    //            return;
+    //    };
+//    RPEditor.prototype.GridsOnGroupFinish = function (grid) {
+//        if (grid.id != "g_Res")
+//            return;
+//    };
+    RPEditor.prototype.GridsOnFilter = function (grid, type) {
+        if (grid.id != "g_Res")
+            return false;
+        if (type == 0 && grid.Group != "" && grid.Grouping == 1) {
+            grid.DoGrouping(grid.Group);
+            return true;
         }
-        return bUsed;
+        return false;
+    };
+    RPEditor.prototype.GridsOnFilterFinish = function (grid, type) {
+        if (grid.id != "g_Res")
+            return;
+        if (type == 2 && grid.Group != "" && grid.Grouping == 1)
+            this.HideUnusedGroupRowsAsync();
+    };
+    RPEditor.prototype.HideUnusedGroupRowsAsync = function () {
+        //window.setTimeout(function () { var grid = Grids["g_Res"]; var row = grid.GetFirst(null, 0); HideUnusedGroupRows(grid, row); }, 100);
+        var grid = Grids["g_Res"];
+        var row = grid.GetFirst(null, 0);
+        HideUnusedGroupRows(grid, row, 0);
     };
     RPEditor.prototype.DisplaySaveViewDialog = function (title, action) {
         document.getElementById("id_SaveView_Name").value = "New View";
@@ -4365,13 +4398,11 @@
     };
     RPEditor.prototype.RefreshResourcePeriods = function () {
         var resgrid = Grids["g_Res"];
-        resgrid.Rendering = true;
         var row = resgrid.GetFirst(null, 0);
         while (row != null) {
             this.RefreshResourceRowPeriods(resgrid, row, false);
             row = resgrid.GetNext(row);
         }
-        resgrid.Rendering = false;
         if (this.initialized == true)
             resgrid.RenderBody();
         resgrid.Calculate(1, 0);
@@ -4932,9 +4963,8 @@
         var planrowresuid = plangrid.GetAttribute(planrow, null, "Res_UID");
         var resrow = resgrid.GetFirst(null, 0);
         while (resrow != null) {
-            if (this.CanMatchResourceToPlanRow(planrow, resrow, false, false) == false) {
-                resgrid.HideRow(resrow, true);
-            } else {
+            resgrid.SetAttribute(resrow, "Match", null, null, 0, 0);
+            if (this.CanMatchResourceToPlanRow(planrow, resrow, false, false) != false) {
                 var match = 0;
                 var planroleUid = plangrid.GetAttribute(planrow, null, "Role_UID");
                 var resroleUid = resgrid.GetAttribute(resrow, null, "Role_UID");
@@ -5007,21 +5037,15 @@
                 }
                 if (match > 0) {
                     resgrid.SetAttribute(resrow, "Match", null, match, 1, 0);
-                    resgrid.ShowRow(resrow, true);
                 }
-                else
-                    resgrid.HideRow(resrow, true);
             }
-            //resgrid.SetAttribute(resrow, null, "Match", null, 1, 0);
             resrow = resgrid.GetNext(resrow);
         }
 
-        resgrid.ChangeSort("Match");
-        resgrid.ShowCol("Match");
-        resgrid.SortClick("Match", 1);
         var select = document.getElementById("idResourcesTab_Select");
         this.ResourcesSelectMode = 4;
         select.selectedIndex = this.ResourcesSelectMode; // = match view
+        this.ShowSelectedResourceGroup();
         this.resourcesTab.refreshSelect("idResourcesTab_Select");
     };
     RPEditor.prototype.CanMatchResourceToPlanRow = function (planrow, resrow, bAllowGeneric, balert) {
@@ -5256,6 +5280,11 @@
         var GridsOnTipDelegate = MakeDelegate(this, this.GridsOnTip);
         var GridsOnDataSendDelegate = MakeDelegate(this, this.GridsOnDataSend);
         var GridsOnAfterColumnsChangedDelegate = MakeDelegate(this, this.GridsOnAfterColumnsChanged);
+        //var GridsOnGroupFinishDelegate = MakeDelegate(this, this.GridsOnGroupFinish);
+        //var GridsOnGroupDelegate = MakeDelegate(this, this.GridsOnGroup);
+        var GridsOnFilterDelegate = MakeDelegate(this, this.GridsOnFilter);
+        var GridsOnRowFilterDelegate = MakeDelegate(this, this.GridsOnRowFilter);
+        var GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
 
         var dlg_OnCloseDelegate = MakeDelegate(this, this.dlg_OnClose);
 
@@ -5279,4 +5308,32 @@
     }
 }
 
+function HideUnusedGroupRows(grid, row, level) {
+    var childrenvisible = false;
+    while (row != null) {
+        //if (row.Visible == 1) {
+            var stype = row.id.toString();
+            if (stype.substr(0, 2) === "GR") {
+                var childrow = row.firstChild;
+                if (HideUnusedGroupRows(grid, childrow, level + 1) == false) {
+                    grid.HideRow(row);
+                    row.Visible = 0;
+                    //var itemName = grid.GetAttribute(row, null, "ItemName");
+                    //alert("hiding '" + itemName + "'");
+                }
+                else {
+                    childrenvisible = true;
+                    if (row.Visible == 0) {
+                        grid.ShowRow(row);
+                        row.Visible = 1;
+                    }
+                }
+            }
+            else if (row.Visible == 1)
+                childrenvisible = true;
+        //}
+        row = row.nextSibling;
+    }
+    return childrenvisible;
+};
 

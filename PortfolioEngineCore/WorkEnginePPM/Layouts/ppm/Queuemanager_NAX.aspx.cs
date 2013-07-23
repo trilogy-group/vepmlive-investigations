@@ -11,10 +11,15 @@ namespace WorkEnginePPM
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            lblGeneralError.Visible = false;
             if (!IsPostBack)
             {
                 idPage.Text = "1";
                 idRowsPerPageCount.Text = "20";
+                ddlDeleteOptions.Items.Clear();
+                ddlDeleteOptions.Items.Add(new ListItem("Selected Row", "1"));
+                ddlDeleteOptions.Items.Add(new ListItem("Completed Rows Older than 1 Week", "2"));
+                ddlDeleteOptions.Items.Add(new ListItem("All Rows Older than 1 Month", "3"));
                 Page_Reload(sender, e);
             }
         }
@@ -27,10 +32,8 @@ namespace WorkEnginePPM
                 string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
                 DataAccess da = new DataAccess(sBaseInfo, SecurityLevels.DBAUtil);
                 dba = da.dba;
-
                 if (dba.Open() == StatusEnum.rsSuccess)
                 {
-                    
                     dg.AddColumn(title: "ID", width: 50, name: "JOB_GUID", isId: true, hidden: true);
                     dg.AddColumn(title: "Row", width: 50, name: "RowNumber");
                     _DGrid.DCol col = dg.AddColumn(title: "Context", width: 120, name: "JOB_CONTEXT");
@@ -125,6 +128,79 @@ namespace WorkEnginePPM
             int nPage = Int32.Parse(idPage.Text);
             idPage.Text = (nPage + 1).ToString("0");
             Page_Reload(sender, e);
+        }
+        protected void btnDelete_Click(object sender, EventArgs e)
+        {
+            DBAccess dba = null;
+            try
+            {
+                string sGuid = idSelectedGuid.Text;
+                int mode = Int32.Parse(idSelectedValue.Text);
+                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                DataAccess da = new DataAccess(sBaseInfo, SecurityLevels.DBAUtil);
+                dba = da.dba;
+                if (dba.Open() == StatusEnum.rsSuccess)
+                {
+                    switch (mode)
+                    {
+                        case 1: // delete selected row
+                            if (sGuid == string.Empty)
+                            {
+                                lblGeneralError.Text = "Please select the row to be deleted";
+                                lblGeneralError.Visible = true;
+                            }
+                            else
+                            {
+                                if (dbaQueueManager.DeleteRowByGuid(dba, sGuid) != StatusEnum.rsSuccess)
+                                {
+                                    lblGeneralError.Text = dba.FormatErrorText();
+                                    lblGeneralError.Visible = true;
+                                }
+                            }
+                            break;
+                        case 2: // Delete Completed Rows Older than 1 Week
+                            if (dbaQueueManager.DeleteCompletedRowsOlderThan1Week(dba) != StatusEnum.rsSuccess)
+                            {
+                                lblGeneralError.Text = dba.FormatErrorText();
+                                lblGeneralError.Visible = true;
+                            } 
+                            else
+                                idPage.Text = "1";
+                            break;
+                        case 3: // Delete All Rows Older than 1 Month
+                            if (dbaQueueManager.DeleteAllRowsOlderThan1Month(dba) != StatusEnum.rsSuccess)
+                            {
+                                lblGeneralError.Text = dba.FormatErrorText();
+                                lblGeneralError.Visible = true;
+                            }
+                            else
+                                idPage.Text = "1";
+                            break;
+                        default:
+                            lblGeneralError.Text = "Invalid delete mode : " + mode.ToString();
+                            lblGeneralError.Visible = true;
+                            break;
+                    }
+                    Page_Reload(sender, e);
+                }
+            }
+            catch (PFEException pex)
+            {
+                if (pex.ExceptionNumber == 9999)
+                    Response.Redirect(this.Site.Url + "/_layouts/ppm/NoPerm.aspx?requesturl='" + Request.RawUrl + "'");
+                lblGeneralError.Text = "PFE Exception : " + pex.ExceptionNumber.ToString() + " - " + pex.Message;
+                lblGeneralError.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                lblGeneralError.Text = ex.Message;
+                lblGeneralError.Visible = true;
+            }
+            finally
+            {
+                if (dba != null)
+                    dba.Close();
+            }
         }
     }
 }

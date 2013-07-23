@@ -66,6 +66,9 @@ namespace PortfolioEngineCore
             xCfg.CreateIntAttr("NoFormatEscape", 1); // means html can be put in format
             //xCfg.CreateIntAttr("StaticCursor", 1); // If set to 1, grid does not delete cursor when it loses focus   after click outside grid.
             xCfg.CreateIntAttr("FocusWholeRow", 1);
+            xCfg.CreateIntAttr("Paging", 2);
+            xCfg.CreateIntAttr("NoPager", 1);
+            xCfg.CreateIntAttr("AllPages", 1);
 
             CStruct xDef = xGrid.CreateSubStruct("Def");
             CStruct xD = xDef.CreateSubStruct("D");
@@ -84,6 +87,7 @@ namespace PortfolioEngineCore
 
             CStruct xSolid = xGrid.CreateSubStruct("Solid");
             CStruct xGroup = xSolid.CreateSubStruct("Group");
+            xGroup.CreateStringAttr("id", "Group");
             xGroup.CreateIntAttr("Visible", 0);
             //xGroup.CreateStringAttr("Cells", "List,Custom");
             xGroup.CreateStringAttr("Panel", "1");
@@ -221,6 +225,9 @@ namespace PortfolioEngineCore
                     xC.CreateIntAttr("CanMove", 1);
                     xC.CreateIntAttr("CaseSensitive", 0);
                     xC.CreateIntAttr("ShowHint", 0);
+                    //xC.CreateIntAttr("GroupEmpty", 0);
+                    //xC.CreateIntAttr("GroupSingle", 0);
+                    //xC.CreateIntAttr("GroupSole", 0);
                     xC.CreateBooleanAttr("Visible", !xField.GetBooleanAttr("Hidden"));
                     xHeader1.CreateStringAttr(sColIDName, xField.GetStringAttr("Title").Replace("/n", "\n"));
                 }

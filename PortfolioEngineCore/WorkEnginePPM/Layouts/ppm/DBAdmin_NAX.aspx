@@ -53,9 +53,11 @@ html, body {
         tabbar.addTab("a1", "Tables", "100px");
         tabbar.addTab("a2", "PIs", "100px");
         tabbar.addTab("a3", "Resources", "100px");
+        tabbar.addTab("a4", "Log", "100px");
         tabbar.setContentHref("a1", "DBATables.aspx?IsDlg=1");
         tabbar.setContentHref("a2", "DBAPIs.aspx?IsDlg=1");
         tabbar.setContentHref("a3", "DBAResources.aspx?IsDlg=1");
+        tabbar.setContentHref("a4", "DBALog.aspx?IsDlg=1");
         tabbar.enableAutoReSize();
         tabbar.setStyle("winDflt");
         tabbar.setSkinColors("#EEEEEE", "#FFFFFF");

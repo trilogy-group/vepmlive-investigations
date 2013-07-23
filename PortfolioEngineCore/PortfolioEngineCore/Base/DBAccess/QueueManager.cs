@@ -105,6 +105,38 @@ namespace PortfolioEngineCore
             }
             return eStatus;
         }
+
+        public static StatusEnum DeleteRowByGuid(DBAccess dba, string sGuid)
+        {
+            StatusEnum eStatus;
+            int lRowsAffected;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_UPLOADS WHERE UPL_GUID = '" + sGuid + "'", (StatusEnum)98789, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_JOB_MSGS WHERE JOB_GUID = '" + sGuid + "'", (StatusEnum)98788, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_JOBS WHERE JOB_GUID = '" + sGuid + "'", (StatusEnum)98787, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            return StatusEnum.rsSuccess;
+        }
+
+        public static StatusEnum DeleteCompletedRowsOlderThan1Week(DBAccess dba)
+        {
+            const string cmdText = "SELECT JOB_GUID FROM EPG_JOBS WHERE JOB_STATUS = -1 AND JOB_COMPLETED < DATEADD(day, -7, GETDATE())";
+            StatusEnum eStatus;
+            int lRowsAffected;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_UPLOADS WHERE UPL_GUID IN (" + cmdText + ")", (StatusEnum)98789, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_JOB_MSGS WHERE JOB_GUID IN (" + cmdText + ")", (StatusEnum)98788, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_JOBS WHERE JOB_GUID IN (" + cmdText + ")", (StatusEnum)98787, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            return StatusEnum.rsSuccess;
+        }
+
+        public static StatusEnum DeleteAllRowsOlderThan1Month(DBAccess dba)
+        {
+            const string cmdText = "SELECT JOB_GUID FROM EPG_JOBS WHERE JOB_SUBMITTED < DATEADD(month, -1, GETDATE())";
+            StatusEnum eStatus;
+            int lRowsAffected;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_UPLOADS WHERE UPL_GUID IN (" + cmdText + ")", (StatusEnum)98789, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_JOB_MSGS WHERE JOB_GUID IN (" + cmdText + ")", (StatusEnum)98788, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            if ((eStatus = dba.DeleteData("DELETE FROM EPG_JOBS WHERE JOB_GUID IN (" + cmdText + ")", (StatusEnum)98787, out lRowsAffected)) != StatusEnum.rsSuccess) return eStatus;
+            return StatusEnum.rsSuccess;
+        }
     }
 }
 

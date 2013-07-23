@@ -1886,7 +1886,7 @@ Exit_Function:
                 sFrom += " INNER JOIN dbo.EPG_FN_ConvertListToTable(N'" + sWResIDs + "') LT on WR.WRES_ID=LT.TokenVal ";
 
         Exit_Function:
-            return sSelect + sFrom + sWhere;
+            return sSelect + sFrom + sWhere + " ORDER BY RES_NAME";
         }
 
         private static StatusEnum GetCustomFieldNameFromID(DBAccess dba, int lFieldID, out string sTableName, out string sFieldName)

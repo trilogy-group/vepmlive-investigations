@@ -9,175 +9,9 @@ namespace PortfolioEngineCore
 {
     public class DBAccess : SqlDb
     {
-        private int m_lActiveTraceChannels = 0;
-        private CStruct m_xTraceMessages = null;
-        private string m_sSessionInfo = "";
-        public int UserWResID = 0;
-        public string UserName = "";
 
         public DBAccess(string connectionString) : base(connectionString) { }
         public DBAccess(string connectionString, SqlConnection connection) : base(connectionString, connection) { }
-
-
-        public override StatusEnum HandleException(string sFunction, StatusEnum eStatus, Exception ex)
-        {
-            base.HandleException(sFunction, eStatus, ex);
-            DBTrace(eStatus, TraceChannelEnum.Exception, "HandleException", sFunction, ex.Message.ToString(), "Exception Stack : " + ex.StackTrace.ToString(), true);
-            return eStatus;
-        }
-
-        public override StatusEnum HandleStatusError(SeverityEnum eSeverity, string sFunction, StatusEnum eStatus, string sText)
-        {
-            base.HandleStatusError(eSeverity, sFunction, eStatus, sText);
-            DBTrace(eStatus, TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), true);
-            return eStatus;
-        }
-
-        public void DBTrace(StatusEnum eStatus, TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, bool bImmediate=false)
-        {
-
-            // let's see if the channel is one of the active DB trace channels
-            if (((int)eChannel & m_lActiveTraceChannels) == 0)
-                return;
-
-            if (m_xTraceMessages == null)
-            {
-                m_xTraceMessages = new CStruct();
-                m_xTraceMessages.Initialize("TraceMessages");
-            }
-
-            CStruct xTrace;
-            xTrace = m_xTraceMessages.CreateSubStruct("Trace");
-            xTrace.CreateIntAttr("Status", (int)eStatus);
-            xTrace.CreateIntAttr("Channel", (int)eChannel);
-            xTrace.CreateDateAttr("Timestamp", DateTime.Now);
-            xTrace.CreateStringAttr("Keyword", sKeyword);
-            xTrace.CreateStringAttr("Function", sFunction);
-            xTrace.CreateStringAttr("Text", sText);
-            xTrace.CreateStringAttr("Details", sDetails);
-
-            if (bImmediate)
-            {
-                WriteTrace();
-            }
-        }
-
-        private void WriteTrace()
-        {
-            if (m_xTraceMessages == null)
-                return;
-            if (Open() != StatusEnum.rsSuccess)
-                return;
-
-            SqlCommand oCommand;
-            string sCommand;
-
-            // delete lines > 5 days old but only once every 3 days - don't see real harm in leaving this here
-            sCommand = "If Exists(Select TOP 1 LOG_TIMESTAMP From EPG_LOG Where LOG_TIMESTAMP < (GETDATE() - 8))"
-                        + " Delete From EPG_LOG Where LOG_TIMESTAMP < (GETDATE() - 5)";
-            oCommand = new SqlCommand(sCommand, base.Connection);
-            oCommand.CommandType = CommandType.Text;
-            oCommand.ExecuteNonQuery();
-
-            sCommand =
-                "INSERT INTO EPG_LOG (LOG_WRES_ID,LOG_SESSION,LOG_STATUS,LOG_CHANNEL,LOG_TIMESTAMP,LOG_KEYWORD,LOG_FUNCTION,LOG_TEXT,LOG_DETAILS) "
-              + " VALUES(@LOG_WRES_ID,@LOG_SESSION,@LOG_STATUS,@LOG_CHANNEL,@LOG_TIMESTAMP,@LOG_KEYWORD,@LOG_FUNCTION,@LOG_TEXT,@LOG_DETAILS)";
-            try
-            {
-                oCommand = new SqlCommand(sCommand, base.Connection);
-
-                oCommand.Parameters.Add("@LOG_WRES_ID", SqlDbType.Int).Value = UserWResID;
-                oCommand.Parameters.Add("@LOG_SESSION", SqlDbType.VarChar, vb.Max(1, m_sSessionInfo.Length)).Value = m_sSessionInfo;
-
-                SqlParameter pStatus = oCommand.Parameters.Add("@LOG_STATUS", SqlDbType.Int);
-                SqlParameter pChannel = oCommand.Parameters.Add("@LOG_CHANNEL", SqlDbType.Int);
-                SqlParameter pTimestamp = oCommand.Parameters.Add("@LOG_TIMESTAMP", SqlDbType.Timestamp);
-                SqlParameter pKeyword = oCommand.Parameters.Add("@LOG_KEYWORD", SqlDbType.VarChar, 50);
-                SqlParameter pFunction = oCommand.Parameters.Add("@LOG_FUNCTION", SqlDbType.VarChar, 50);
-                SqlParameter pText = oCommand.Parameters.Add("@LOG_TEXT", SqlDbType.VarChar, 255);
-                SqlParameter pDetails = oCommand.Parameters.Add("@LOG_DETAILS", SqlDbType.VarChar, 2048);
-
-
-                Queue<CStruct> clnTraceMessages = m_xTraceMessages.GetCollection("Trace");
-                foreach (CStruct xTrace in clnTraceMessages)
-                {
-                    pStatus.Value = xTrace.GetIntAttr("Status");
-                    pChannel.Value = xTrace.GetIntAttr("Channel");
-                    pTimestamp.Value = xTrace.GetDateAttr("Timestamp");
-                    pKeyword.Value = vb.Left(xTrace.GetStringAttr("Keyword"), 48);
-                    pFunction.Value = vb.Left(xTrace.GetStringAttr("Function"), 48);
-                    pText.Value = vb.Left(xTrace.GetStringAttr("Text"), 253);
-                    pDetails.Value = vb.Left(xTrace.GetStringAttr("Details"), 2048);
-
-                    int lRowsAffected = oCommand.ExecuteNonQuery();
-                }
-                m_xTraceMessages = null;
-            }
-            catch (Exception ex)
-            {
-                Status = (StatusEnum)9899;
-                StatusText = "WriteTrace Exception : " + ex.Message.ToString();
-                // can't call HandleStatusError here
-                //HandleStatusError(SeverityEnum.Exception, "CDataAccess.WriteTrace", (StatusEnum)9265, ex.Message.ToString());
-            }
-            return;
-        }
-
-        public void WriteImmTrace(string sKeyword, string sFunction, string sText, string sDetails)
-        {
-            if (Open() != StatusEnum.rsSuccess)
-                return;
-
-            try
-            {
-                SqlCommand oCommand;
-                string sCommand;
-
-                // delete lines > 5 days old but only once every 3 days
-                sCommand = "If Exists(Select TOP 1 LOG_TIMESTAMP From EPG_LOG Where LOG_CHANNEL=9999 And LOG_TIMESTAMP < (GETDATE() - 8))"
-                            + " Delete From EPG_LOG Where LOG_CHANNEL=9999 And LOG_TIMESTAMP < (GETDATE() - 5)";
-                oCommand = new SqlCommand(sCommand, base.Connection);
-                oCommand.CommandType = CommandType.Text;
-                oCommand.ExecuteNonQuery();
-
-                sCommand =
-                    "INSERT INTO EPG_LOG (LOG_TIMESTAMP,LOG_WRES_ID,LOG_SESSION,LOG_STATUS,LOG_CHANNEL,LOG_KEYWORD,LOG_FUNCTION,LOG_TEXT,LOG_DETAILS) "
-                  + " VALUES(GetDate(),@LOG_WRES_ID,@LOG_SESSION,@LOG_STATUS,@LOG_CHANNEL,@LOG_KEYWORD,@LOG_FUNCTION,@LOG_TEXT,@LOG_DETAILS)";
-                oCommand = new SqlCommand(sCommand, base.Connection);
-
-                oCommand.Parameters.Add("@LOG_WRES_ID", SqlDbType.Int).Value = UserWResID;
-                oCommand.Parameters.Add("@LOG_SESSION", SqlDbType.VarChar, vb.Max(1, m_sSessionInfo.Length)).Value = m_sSessionInfo;
-
-                SqlParameter pStatus = oCommand.Parameters.Add("@LOG_STATUS", SqlDbType.Int);
-                SqlParameter pChannel = oCommand.Parameters.Add("@LOG_CHANNEL", SqlDbType.Int);
-                SqlParameter pKeyword = oCommand.Parameters.Add("@LOG_KEYWORD", SqlDbType.VarChar, 50);
-                SqlParameter pFunction = oCommand.Parameters.Add("@LOG_FUNCTION", SqlDbType.VarChar, 50);
-                SqlParameter pText = oCommand.Parameters.Add("@LOG_TEXT", SqlDbType.VarChar, 255);
-                SqlParameter pDetails = oCommand.Parameters.Add("@LOG_DETAILS", SqlDbType.VarChar, 2048);
-
-
-                pStatus.Value = 0;
-                pChannel.Value = 9999;
-                if (sKeyword.Length > 48) sKeyword = sKeyword.Substring(1, 48);
-                pKeyword.Value = sKeyword;
-                if (sFunction.Length > 48) sFunction = sFunction.Substring(1, 48);
-                pFunction.Value = sFunction;
-                if (sText.Length > 253) sText = sText.Substring(1, 253);
-                pText.Value = sText;
-                if (sDetails.Length > 2048) sDetails = sDetails.Substring(1, 2048);
-                pDetails.Value = sDetails;
-
-                int lRowsAffected = oCommand.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                Status = (StatusEnum)9899;
-                StatusText = "WriteTrace Exception : " + ex.Message.ToString();
-                // can't call HandleStatusError here
-                //HandleStatusError(SeverityEnum.Exception, "CDataAccess.WriteTrace", (StatusEnum)9265, ex.Message.ToString());
-            }
-            return;
-        }
 
     }
 
@@ -195,27 +29,32 @@ namespace PortfolioEngineCore
         private static string m_sStatusText = string.Empty;
         private static string m_sStackTrace = string.Empty;
 
+        private int m_lActiveTraceChannels = 0;
+        private CStruct m_xTraceMessages = null;
+        private string m_sSessionInfo = "";
+        public int UserWResID = 0;
+        public string UserName = "";
 
         public SqlDb(string connectionString)
         {
             m_sConnect = connectionString;
-            ResetStatus();
+            //ResetStatus();
         }
 
         public SqlDb(string connectionString, SqlConnection connection)
         {
             m_oConnection = connection;
             m_sConnect = connectionString;
-            ResetStatus();
+            //ResetStatus();
         }
 
         public StatusEnum Open()
         {
-            ResetStatus();
             try
             {
                 if (m_oConnection == null || m_oConnection.State != ConnectionState.Open)
                 {
+                    ResetStatus();
                     if (m_oConnection == null) m_oConnection = new SqlConnection();
                     var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = m_sConnect };
                     dbConnectionStringBuilder.Remove("Provider");
@@ -516,7 +355,10 @@ namespace PortfolioEngineCore
             m_eStatus = eStatus;
             m_sStatusText = ex.Message.ToString();
             m_sStackTrace = ex.StackTrace.ToString();
-            EventLog.WriteEntry("DBAccess Exception", FormatErrorText(), EventLogEntryType.Error);
+            // V4.4.3 - don't let exception writing to eventlog hide original error
+            try { EventLog.WriteEntry("DBAccess Exception", FormatErrorText(), EventLogEntryType.Error); }
+            catch { }
+            DBTrace(eStatus, TraceChannelEnum.Exception, "HandleException", sFunction, ex.Message.ToString(), "Exception Stack : " + ex.StackTrace.ToString(), true);
             return m_eStatus;
         }
 
@@ -526,8 +368,173 @@ namespace PortfolioEngineCore
             m_sStatusFunction = sFunction;
             m_eStatus = eStatus;
             m_sStatusText = sText;
-            EventLog.WriteEntry("DBAccess Error", FormatErrorText(), EventLogEntryType.Error);
+            // V4.4.3 - don't let exception writing to eventlog hide original error
+            try { EventLog.WriteEntry("DBAccess Error", FormatErrorText(), EventLogEntryType.Error); }
+            catch { }
+            DBTrace(eStatus, TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), true);
             return m_eStatus;
+        }
+
+        //public override StatusEnum HandleException(string sFunction, StatusEnum eStatus, Exception ex)
+        //{
+        //    base.HandleException(sFunction, eStatus, ex);
+        //    DBTrace(eStatus, TraceChannelEnum.Exception, "HandleException", sFunction, ex.Message.ToString(), "Exception Stack : " + ex.StackTrace.ToString(), true);
+        //    return eStatus;
+        //}
+
+        //public override StatusEnum HandleStatusError(SeverityEnum eSeverity, string sFunction, StatusEnum eStatus, string sText)
+        //{
+        //    base.HandleStatusError(eSeverity, sFunction, eStatus, sText);
+        //    DBTrace(eStatus, TraceChannelEnum.Exception, "HandleStatusError", sFunction, sText, "Severity : " + eSeverity.ToString(), true);
+        //    return eStatus;
+        //}
+
+        public void DBTrace(StatusEnum eStatus, TraceChannelEnum eChannel, string sKeyword, string sFunction, string sText, string sDetails, bool bImmediate = false)
+        {
+
+            // let's see if the channel is one of the active DB trace channels
+            // V4.4.3 - log all channels
+            //if (((int)eChannel & m_lActiveTraceChannels) == 0)
+            //    return;
+
+            if (m_xTraceMessages == null)
+            {
+                m_xTraceMessages = new CStruct();
+                m_xTraceMessages.Initialize("TraceMessages");
+            }
+
+            CStruct xTrace;
+            xTrace = m_xTraceMessages.CreateSubStruct("Trace");
+            xTrace.CreateIntAttr("Status", (int)eStatus);
+            xTrace.CreateIntAttr("Channel", (int)eChannel);
+            xTrace.CreateDateAttr("Timestamp", DateTime.Now);
+            xTrace.CreateStringAttr("Keyword", sKeyword);
+            xTrace.CreateStringAttr("Function", sFunction);
+            xTrace.CreateStringAttr("Text", sText);
+            xTrace.CreateStringAttr("Details", sDetails);
+
+            if (bImmediate)
+            {
+                WriteTrace();
+            }
+        }
+
+        private void WriteTrace()
+        {
+            if (m_xTraceMessages == null)
+                return;
+            if (Open() != StatusEnum.rsSuccess)
+                return;
+
+            SqlCommand oCommand;
+            string sCommand;
+
+            // delete lines > 5 days old but only once every 3 days - don't see real harm in leaving this here
+            sCommand = "If Exists(Select TOP 1 LOG_TIMESTAMP From EPG_LOG Where LOG_TIMESTAMP < (GETDATE() - 8))"
+                        + " Delete From EPG_LOG Where LOG_TIMESTAMP < (GETDATE() - 5)";
+            oCommand = new SqlCommand(sCommand, Connection);
+            oCommand.CommandType = CommandType.Text;
+            oCommand.ExecuteNonQuery();
+
+            sCommand =
+                "INSERT INTO EPG_LOG (LOG_WRES_ID,LOG_SESSION,LOG_STATUS,LOG_CHANNEL,LOG_TIMESTAMP,LOG_KEYWORD,LOG_FUNCTION,LOG_TEXT,LOG_DETAILS) "
+              + " VALUES(@LOG_WRES_ID,@LOG_SESSION,@LOG_STATUS,@LOG_CHANNEL,GetDate(),@LOG_KEYWORD,@LOG_FUNCTION,@LOG_TEXT,@LOG_DETAILS)";
+            try
+            {
+                oCommand = new SqlCommand(sCommand, Connection);
+
+                oCommand.Parameters.Add("@LOG_WRES_ID", SqlDbType.Int).Value = UserWResID;
+                oCommand.Parameters.Add("@LOG_SESSION", SqlDbType.VarChar, vb.Max(1, m_sSessionInfo.Length)).Value = m_sSessionInfo;
+
+                SqlParameter pStatus = oCommand.Parameters.Add("@LOG_STATUS", SqlDbType.Int);
+                SqlParameter pChannel = oCommand.Parameters.Add("@LOG_CHANNEL", SqlDbType.Int);
+                //SqlParameter pTimestamp = oCommand.Parameters.Add("@LOG_TIMESTAMP", SqlDbType.Timestamp);
+                SqlParameter pKeyword = oCommand.Parameters.Add("@LOG_KEYWORD", SqlDbType.VarChar, 50);
+                SqlParameter pFunction = oCommand.Parameters.Add("@LOG_FUNCTION", SqlDbType.VarChar, 50);
+                SqlParameter pText = oCommand.Parameters.Add("@LOG_TEXT", SqlDbType.VarChar, 255);
+                SqlParameter pDetails = oCommand.Parameters.Add("@LOG_DETAILS", SqlDbType.VarChar, 2048);
+
+
+                Queue<CStruct> clnTraceMessages = m_xTraceMessages.GetCollection("Trace");
+                foreach (CStruct xTrace in clnTraceMessages)
+                {
+                    pStatus.Value = xTrace.GetIntAttr("Status");
+                    pChannel.Value = xTrace.GetIntAttr("Channel");
+                    //pTimestamp.Value = xTrace.GetDateAttr("Timestamp");
+                    pKeyword.Value = vb.Left(xTrace.GetStringAttr("Keyword"), 48);
+                    pFunction.Value = vb.Left(xTrace.GetStringAttr("Function"), 48);
+                    pText.Value = vb.Left(xTrace.GetStringAttr("Text"), 253);
+                    pDetails.Value = vb.Left(xTrace.GetStringAttr("Details"), 2048);
+
+                    int lRowsAffected = oCommand.ExecuteNonQuery();
+                }
+                m_xTraceMessages = null;
+            }
+            catch (Exception ex)
+            {
+                // v4.4.3 - don't lose the original exception code
+                if (m_eStatus == StatusEnum.rsSuccess)
+                {
+                    Status = (StatusEnum)9899;
+                    StatusText = "WriteTrace Exception : " + ex.Message.ToString();
+                }
+            }
+            return;
+        }
+
+        public void WriteImmTrace(string sKeyword, string sFunction, string sText, string sDetails)
+        {
+            if (Open() != StatusEnum.rsSuccess)
+                return;
+
+            try
+            {
+                SqlCommand oCommand;
+                string sCommand;
+
+                // delete lines > 5 days old but only once every 3 days
+                sCommand = "If Exists(Select TOP 1 LOG_TIMESTAMP From EPG_LOG Where LOG_CHANNEL=9999 And LOG_TIMESTAMP < (GETDATE() - 8))"
+                            + " Delete From EPG_LOG Where LOG_CHANNEL=9999 And LOG_TIMESTAMP < (GETDATE() - 5)";
+                oCommand = new SqlCommand(sCommand, Connection);
+                oCommand.CommandType = CommandType.Text;
+                oCommand.ExecuteNonQuery();
+
+                sCommand =
+                    "INSERT INTO EPG_LOG (LOG_TIMESTAMP,LOG_WRES_ID,LOG_SESSION,LOG_STATUS,LOG_CHANNEL,LOG_KEYWORD,LOG_FUNCTION,LOG_TEXT,LOG_DETAILS) "
+                  + " VALUES(GetDate(),@LOG_WRES_ID,@LOG_SESSION,@LOG_STATUS,@LOG_CHANNEL,@LOG_KEYWORD,@LOG_FUNCTION,@LOG_TEXT,@LOG_DETAILS)";
+                oCommand = new SqlCommand(sCommand, Connection);
+
+                oCommand.Parameters.Add("@LOG_WRES_ID", SqlDbType.Int).Value = UserWResID;
+                oCommand.Parameters.Add("@LOG_SESSION", SqlDbType.VarChar, vb.Max(1, m_sSessionInfo.Length)).Value = m_sSessionInfo;
+
+                SqlParameter pStatus = oCommand.Parameters.Add("@LOG_STATUS", SqlDbType.Int);
+                SqlParameter pChannel = oCommand.Parameters.Add("@LOG_CHANNEL", SqlDbType.Int);
+                SqlParameter pKeyword = oCommand.Parameters.Add("@LOG_KEYWORD", SqlDbType.VarChar, 50);
+                SqlParameter pFunction = oCommand.Parameters.Add("@LOG_FUNCTION", SqlDbType.VarChar, 50);
+                SqlParameter pText = oCommand.Parameters.Add("@LOG_TEXT", SqlDbType.VarChar, 255);
+                SqlParameter pDetails = oCommand.Parameters.Add("@LOG_DETAILS", SqlDbType.VarChar, 2048);
+
+
+                pStatus.Value = 0;
+                pChannel.Value = 9999;
+                if (sKeyword.Length > 48) sKeyword = sKeyword.Substring(1, 48);
+                pKeyword.Value = sKeyword;
+                if (sFunction.Length > 48) sFunction = sFunction.Substring(1, 48);
+                pFunction.Value = sFunction;
+                if (sText.Length > 253) sText = sText.Substring(1, 253);
+                pText.Value = sText;
+                if (sDetails.Length > 2048) sDetails = sDetails.Substring(1, 2048);
+                pDetails.Value = sDetails;
+
+                int lRowsAffected = oCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                // v4.4.3 - don't lose the original exception code
+                //Status = (StatusEnum)9899;
+                //StatusText = "WriteTrace Exception : " + ex.Message.ToString();
+            }
+            return;
         }
 
         public void BeginTransaction()
@@ -693,7 +700,7 @@ namespace PortfolioEngineCore
 
         public bool GetLastIdentityValue(out int lAutoNumber)
         {
-            ResetStatus();
+            //ResetStatus();
             SqlCommand oCommand = new SqlCommand("EPG_SP_GetLastAutonumber", this.Connection);
             oCommand.Transaction = this.Transaction;
             oCommand.CommandType = System.Data.CommandType.StoredProcedure;
