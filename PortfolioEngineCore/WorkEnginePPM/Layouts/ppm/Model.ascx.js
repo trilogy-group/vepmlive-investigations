@@ -5240,6 +5240,11 @@
                if (this.ZoomTo != "") {
                    this.DetGrid.ChangeZoom(this.ZoomTo);
 
+                   this.deferredZoom = this.ZoomTo;
+
+
+                   window.setTimeout(this.DeferredZommDelegate, 100);
+
 
                    var selectZoom = document.getElementById("idGanttZoom");
 
@@ -5343,6 +5348,31 @@
 
        }
    }
+
+
+   Model.prototype.DeferredZomm = function () {
+
+
+       try {
+           if (this.deferredZoom == "")
+               return;
+
+
+           this.DetGrid.ChangeZoom(this.deferredZoom);
+
+           this.deferredZoom = "";
+
+
+
+           if (this.firstdate != null)
+               this.DetGrid.ScrollToDate(this.firstdate);
+
+       }
+
+       catch (e) { };
+
+   }
+
 
     Model.prototype.GetCompareStringValueComplete = function (result) {
         this.scompareStringtext = result;
@@ -5502,7 +5532,9 @@
 		this.dlgCreateTarget = null;
 		this.viaPopulateTarget = false;
 		this.CurrUserView = "";
-        this.dospecialcurrview = true;
+		this.dospecialcurrview = true;
+
+		this.deferredZoom = "";
 
 		this.SearchDet = true;
 		this.SeachCol = "";
@@ -5597,9 +5629,12 @@
 		var LoadUserViewDataCompleteDelegate = MakeDelegate(this, this.LoadUserViewDataComplete);
 		var SaveTargetDataCompleteDelegate = MakeDelegate(this, this.SaveTargetDataComplete);
 
-		var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);	
+		var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);
 
 		var GoDoEditTimerDelegate = MakeDelegate(this, this.GoDoEditTimer);
+
+		this.DeferredZommDelegate = MakeDelegate(this, this.DeferredZomm);
+
 		
 		this.GoDoEditID = 0;
 		this.GoDoEditName = "";

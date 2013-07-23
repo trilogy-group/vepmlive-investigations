@@ -1680,6 +1680,8 @@
 
 		this.DetailsSettings = sb.toString();
 		this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
+		this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+
 		WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDetails", sb.toString());
 
 		RefreshBothGrids();
@@ -1716,6 +1718,7 @@
 				this.DisplayMode = sb.toString();
 				this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
 				WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDisplayMode", sb.toString());
+				this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
 
 				return true;
 			}
