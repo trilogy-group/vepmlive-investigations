@@ -267,12 +267,19 @@
                         <img id="imgUserProfile" style="width: 32px; height: 32px" alt="User Photo" src="" />
                     </td>
                     <td class="socialcomment-IMPawn" rowspan="2" align="left">
-                        <div id="DataFrameManager_ctl02_socomIM_0" class="socialcomment-IMPawn">
+                       <%-- <div id="DataFrameManager_ctl02_socomIM_0" class="socialcomment-IMPawn">
                             <span>
                                 <img id="commentAvailBubble_Model" alt="Status indicator" src="/_layouts/images/imnhdr.gif"
                                     width="12" onload="QueuePopulateIMNRC('',this);" height="12" showofflinepawn="1" />
                             </span>
-                        </div>
+                        </div>--%>
+                        <span class="ms-imnSpan">   
+                            <a href="#" onclick="IMNImageOnClick(event);return false;" class="ms-imnlink ms-spimn-presenceLink" >    
+                                <span class="ms-spimn-presenceWrapper ms-imnImg ms-spimn-imgSize-10x10">
+                                    <img name="imnmark" title="" ShowOfflinePawn="1" class="ms-spimn-img ms-spimn-presence-disconnected-10x10x32" src="/_layouts/15/images/spimn.png?rev=23" alt="User Presence" sip="" />   
+                                </span>  
+                            </a>
+                        </span>
                     </td>
                     <td class="socialcomment-top" valign="left">
                         <span class="socialcomment-username"><a id="lnkUserProfile" href="#" target="_parent">
