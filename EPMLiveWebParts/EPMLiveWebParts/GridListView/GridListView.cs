@@ -38,16 +38,14 @@ namespace EPMLiveWebParts
     {
         private IReportID _myProvider;
 
-        private DateTime StartDate;
-        private DateTime FinishDate;
 
         private bool inEditMode = false;
         private bool titlefound = false;
-        
+
         private EPMLiveCore.Act act;
 
         private GridGantUserControl ganttControl;
-        
+
         //PROPS
         string strList;
         private string strView;
@@ -96,8 +94,8 @@ namespace EPMLiveWebParts
         private string useParent = "false";
 
         private bool disableNewButtonModification;
-        
-        
+
+
         private bool BOOLShowViewBar;
         //=======================================
 
@@ -170,7 +168,7 @@ namespace EPMLiveWebParts
         [Browsable(false)]
         public string PropGroup1
         {
-            
+
             get
             {
                 return strGroup1;
@@ -289,7 +287,7 @@ namespace EPMLiveWebParts
             get
             {
                 if (boolLockViewContext == null)
-                    if(SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.ViewContext.View != null)
+                    if (SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.ViewContext.View != null)
                         return true;
                     else
                         return false;
@@ -803,12 +801,12 @@ namespace EPMLiveWebParts
         public GridListView()
         {
             boolUseDefaults = true;
-            
+
         }
 
         public WebPartContextualInfo WebPartContextualInfo
         {
-            
+
             get
             {
                 if(SPContext.Current.ViewContext.View != null && (SPContext.Current.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url == PropList || PropList == ""))
@@ -820,32 +818,15 @@ namespace EPMLiveWebParts
                     WebPartRibbonTab ribbonItemTab = new WebPartRibbonTab();
                     WebPartRibbonTab ribbonListTab = new WebPartRibbonTab();
                     //Create the contextual group object and initialize its values.
+                    contextualGroup.Id = "Ribbon.ListContextualGroup";
+                    contextualGroup.Command = "ListContextualGroup";
+                    contextualGroup.VisibilityContext = "CustomContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
 
-                    //if (SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.List.BaseType == SPBaseType.DocumentLibrary)
-                    //{
-                    //    contextualGroup.Id = "Ribbon.LibraryContextualGroup";
-                    //    contextualGroup.Command = "LibraryContextualGroup";
-                    //    contextualGroup.VisibilityContext = "CustomContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
+                    ribbonItemTab.Id = "Ribbon.ListItem";
+                    ribbonItemTab.VisibilityContext = "GridViewListItemContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
 
-                    //    ribbonItemTab.Id = "Ribbon.Document";
-                    //    ribbonItemTab.VisibilityContext = "GridViewListItemContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
-
-                    //    ribbonListTab.Id = "Ribbon.Library";
-                    //    ribbonListTab.VisibilityContext = "GridViewListContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
-                    //}
-                    //else
-                    //{
-
-                        contextualGroup.Id = "Ribbon.ListContextualGroup";
-                        contextualGroup.Command = "ListContextualGroup";
-                        contextualGroup.VisibilityContext = "CustomContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
-
-                        ribbonItemTab.Id = "Ribbon.ListItem";
-                        ribbonItemTab.VisibilityContext = "GridViewListItemContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
-
-                        ribbonListTab.Id = "Ribbon.List";
-                        ribbonListTab.VisibilityContext = "GridViewListContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
-                    //}
+                    ribbonListTab.Id = "Ribbon.List";
+                    ribbonListTab.VisibilityContext = "GridViewListContextualTab" + webPartPageComponentId + ".CustomVisibilityContext";
 
                     info.ContextualGroups.Add(contextualGroup);
                     info.Tabs.Add(ribbonItemTab);
@@ -915,7 +896,7 @@ namespace EPMLiveWebParts
                 {
                     foreach (SPListItem li in list.Items)
                     {
-                        if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)    
+                        if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
                             planner += "<Button Id=\"Ribbon.ListItem.EPMLive.LEditInProject\" Sequence=\"20\" Command=\"LEditInProject\" CommandValueId=\"" + list.ID + "." + li.ID + "\" LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
                         else
                             planner += "<Button Id=\"Ribbon.ListItem.EPMLive.EditInPSProject\" Sequence=\"10\" Command=\"LEditInPSProject\"  LabelText=\"" + HttpUtility.HtmlEncode(li.Title) + "\" CommandValueId=\"" + list.ID + "." + li.ID + "\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/project2007logo.gif\"/>";
@@ -986,7 +967,7 @@ namespace EPMLiveWebParts
                 if (taskcenter.ToLower() == list.Title.ToLower() && enableWP)
                 {
                     SPList pList = web.Lists[projectcenter];
-                    
+
                     if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null)
                         preid = pList.ID + ".";
 
@@ -1005,7 +986,7 @@ namespace EPMLiveWebParts
             string planner = "";
             try
             {
-                
+
                 string taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPKTaskCenter");
 
                 if(taskcenter.ToLower() == list.Title.ToLower())
@@ -1244,7 +1225,7 @@ namespace EPMLiveWebParts
                 />");
                 hasAction = true;
             }
-            
+
 
             if (hasAction)
             {
@@ -1283,15 +1264,9 @@ namespace EPMLiveWebParts
                             //    initialTabId = "Ribbon.List";
                             //if (!ribbon.IsTabAvailable(initialTabId))
                             //    ribbon.MakeTabAvailable(initialTabId);
-                            if (SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.List.BaseType == SPBaseType.DocumentLibrary)
-                                ribbon.InitialTabId = "Ribbon.Document";    
-                            else
-                                ribbon.InitialTabId = "Ribbon.ListItem";
+                            ribbon.InitialTabId = "Ribbon.ListItem";
 
-                            if (SPContext.Current != null && SPContext.Current.List != null && SPContext.Current.List.BaseType == SPBaseType.DocumentLibrary)
-                                ribbon.MakeContextualGroupInitiallyVisible("Ribbon.LibraryContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
-                            else
-                                ribbon.MakeContextualGroupInitiallyVisible("Ribbon.ListContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
+                            ribbon.MakeContextualGroupInitiallyVisible("Ribbon.ListContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
                         }
 
 
@@ -1419,7 +1394,7 @@ namespace EPMLiveWebParts
 
                             //string editinproject = "";
                             //string workspace = "";
-                            
+
 
                             if(pubPC == list.Title)
                             {
@@ -1520,13 +1495,13 @@ namespace EPMLiveWebParts
                             string lwp = "";
                             string lagile = "";
 
-                            if(!disablePlan)
+                            if (!disablePlan)
                             {
                                 lagile = getPlannerList("Agile", web, "Agile Planner");
 
-                                if(web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
+                                if (web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
                                 {
-                                    if(web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
+                                    if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
                                         lwp = getPlannerList("WP", web, "Work Planner");
                                     else
                                         lwp = getPlannerList("PSWebApp", web, "Edit in Project Web App");
@@ -1534,28 +1509,28 @@ namespace EPMLiveWebParts
 
                             }
 
-                            if(!disableProject && (foundmpp && list.Title == pubTC) || web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null)
+                            if (!disableProject && (foundmpp && list.Title == pubTC) || web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null)
                             {
                                 pj = getPjList(web);
                             }
 
                             string lepk = "";
 
-                            if(!disablePlan && web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null && EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPKTaskCenter").ToLower() == list.Title.ToLower())
+                            if (!disablePlan && web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null && EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPKTaskCenter").ToLower() == list.Title.ToLower())
                             {
                                 lepk = getEPKPlannerList(web);
                             }
 
                             StringBuilder sb = new StringBuilder();
 
-                            if(lwp != "" || lagile != "" || pj != "" || lepk != "")
+                            if (lwp != "" || lagile != "" || pj != "" || lepk != "")
                             {
                                 sb.Append("<Group Id=\"Ribbon.List.EPMLive\" Sequence=\"41\" Command=\"ListEPMLiveGroup\" Description=\"\" Title=\"WorkEngine\" Template=\"Ribbon.Templates.Flexible2\">");
                                 sb.Append("<Controls Id=\"Ribbon.List.EPMLive.Controls\">");
 
-                                if(pj != "" && PlannerV2Menu == "")
+                                if (pj != "" && PlannerV2Menu == "")
                                 {
-                                    if(web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
+                                    if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
                                     {
                                         sb.Append("<FlyoutAnchor Id=\"Ribbon.List.EPMLive.EditInProject\" Sequence=\"10\" Command=\"ListEPMLiveEditInProject\" Image32by32=\"_layouts/images/project2007logo.gif\" LabelText=\"Edit In Project\" TemplateAlias=\"o1\">");
                                         sb.Append("<Menu Id=\"Ribbon.List.EPMLive.EditInProject.Menu\">");
@@ -1581,10 +1556,10 @@ namespace EPMLiveWebParts
                                     }
                                 }
 
-                                if(lwp != "" && PlannerV2Menu == "")
+                                if (lwp != "" && PlannerV2Menu == "")
                                 {
 
-                                    if(web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
+                                    if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
                                     {
                                         sb.Append("<FlyoutAnchor Id=\"Ribbon.List.EPMLive.EditInWorkplanner\" Sequence=\"11\" Command=\"ListEPMLiveEditWP\" Image32by32=\"_layouts/images/epmlivelogo.gif\" LabelText=\"Edit In Workplanner\" TemplateAlias=\"o1\">");
                                         sb.Append("<Menu Id=\"Ribbon.List.EPMLive.EditInWorkPlanner.Menu\">");
@@ -1609,7 +1584,7 @@ namespace EPMLiveWebParts
                                         sb.Append("</FlyoutAnchor>");
                                     }
                                 }
-                                if(lagile != "")
+                                if (lagile != "")
                                 {
                                     sb.Append("<FlyoutAnchor Id=\"Ribbon.List.EPMLive.EditInAgilePlanner\" Sequence=\"11\" Command=\"ListEPMLiveEditAgile\" Image32by32=\"_layouts/images/epmlivelogo.gif\" LabelText=\"Edit In Agile Planner\" TemplateAlias=\"o1\">");
                                     sb.Append("<Menu Id=\"Ribbon.List.EPMLive.EditInAgilePlanner.Menu\">");
@@ -1621,7 +1596,7 @@ namespace EPMLiveWebParts
                                     sb.Append("</Menu>");
                                     sb.Append("</FlyoutAnchor>");
                                 }
-                                if(lepk != "")
+                                if (lepk != "")
                                 {
                                     sb.Append("<FlyoutAnchor Id=\"Ribbon.List.EPMLive.EditInPePlanner\" Sequence=\"12\" Command=\"ListEPMLiveEditPE\" Image32by32=\"/_layouts/" + language + "/images/formatmap32x32.png\" Image32by32Top=\"-384\" Image32by32Left=\"-32\" LabelText=\"Edit In Work Planner\" TemplateAlias=\"o1\">");
                                     sb.Append("<Menu Id=\"Ribbon.List.EPMLive.EditInPePlanner.Menu\">");
@@ -1647,7 +1622,7 @@ namespace EPMLiveWebParts
                             }
                         }
 
-                        if(EPKEnabled)
+                        if (EPKEnabled)
                         {
                             //ribbon.TrimById("Ribbon.ListItem.Manage.EditProperties");
 
@@ -1660,25 +1635,25 @@ namespace EPMLiveWebParts
                         }
 
 
-                        if(bAssociatedItems)
+                        if (bAssociatedItems)
                         {
                             StringBuilder sbLists = new StringBuilder();
 
-                            foreach(SPList cList in web.Lists)
+                            foreach (SPList cList in web.Lists)
                             {
                                 try
                                 {
-                                    foreach(SPField field in cList.Fields)
+                                    foreach (SPField field in cList.Fields)
                                     {
-                                        if(field.Type == SPFieldType.Lookup)
+                                        if (field.Type == SPFieldType.Lookup)
                                         {
                                             SPFieldLookup fl = (SPFieldLookup)field;
 
-                                            if(fl.LookupList.ToLower() == "{" + list.ID.ToString().ToLower() + "}")
+                                            if (fl.LookupList.ToLower() == "{" + list.ID.ToString().ToLower() + "}")
                                             {
                                                 EPMLiveCore.GridGanttSettings gSets = new EPMLiveCore.GridGanttSettings(cList);
 
-                                                if(gSets.AssociatedItems)
+                                                if (gSets.AssociatedItems)
                                                 {
                                                     //sbLists.Append("<Button Id=\"Ribbon.ListItem.EPMLive.LinkedItemsButton\" Sequence=\"20\" Command=\"");
                                                     sbLists.Append("<Button Sequence=\"20\" Command=\"");
@@ -1704,7 +1679,7 @@ namespace EPMLiveWebParts
                                 catch { }
                             }
 
-                            if(sbLists.ToString() != "")
+                            if (sbLists.ToString() != "")
                             {
                                 StringBuilder sbLinkedItems = new StringBuilder();
 
@@ -1726,7 +1701,7 @@ namespace EPMLiveWebParts
 
 
 
-                                
+
                                 //sbLinkedItems.Append("<FlyoutAnchor Id=\"Ribbon.List.EPMLive.LinkedItems\" Sequence=\"39\" Command=\"");
 
                                 ////if(!bRollups)
@@ -1757,26 +1732,26 @@ namespace EPMLiveWebParts
 
         protected override void OnPreRender(EventArgs e)
         {
-            
+
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 buildParams();
             });
 
-            if(newGridMode.ToLower() == "gantt")
+            if (newGridMode.ToLower() == "gantt")
             {
                 ScriptLink.Register(Page, "/_layouts/epmlive/treegrid/GridE.js", false);
                 ScriptLink.Register(Page, "/_layouts/epmlive/GanttGrid.js", false);
             }
 
             base.OnPreRender(e);
-            
+
             string webPartPageComponentId = SPRibbon.GetWebPartPageComponentId(this);
 
             if (!Page.ClientScript.IsClientScriptBlockRegistered(base.GetType(), "listviewwebpart" + webPartPageComponentId))
                 Page.ClientScript.RegisterClientScriptBlock(base.GetType(), "listviewwebpart" + webPartPageComponentId, "<script language=\"javascript\">var mygrid" + sFullGridId + ";var myDataProcessor" + sFullGridId + ";</script>");
 
-            if(!Page.ClientScript.IsClientScriptBlockRegistered(base.GetType(), "listviewwebpart"))
+            if (!Page.ClientScript.IsClientScriptBlockRegistered(base.GetType(), "listviewwebpart"))
             {
                 //TODO: fix JS code
 
@@ -1796,13 +1771,13 @@ namespace EPMLiveWebParts
             }
 
 
-            
+
 
 
             CssRegistration.Register("/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.css");
             CssRegistration.Register("/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css");
             CssRegistration.Register("/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css");
-            
+
             CssRegistration.Register("/_layouts/epmlive/dhtml/xcombo/dhtmlxcombo.css");
             CssRegistration.Register("/_layouts/epmlive/modal/modalmain.css");
 
@@ -1813,20 +1788,19 @@ namespace EPMLiveWebParts
 
             //ScriptManager.RegisterClientScriptInclude(Page, this.GetType(), "dhtmlxcommon.js", "");
             //ScriptManager.RegisterClientScriptInclude(Page, this.GetType(), "dhtmlxgrid.js", "/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js");
-            FinishDate = DateTime.Now;
+
         }
 
         protected override void OnLoad(EventArgs e)
         {
-            StartDate = DateTime.Now;
             sFullGridId = this.ZoneIndex + this.ZoneID;
         }
 
         protected override void CreateChildControls()
         {
-            
-            
-            if(SPContext.Current.ViewContext.View != null)
+
+
+            if (SPContext.Current.ViewContext.View != null)
             {
                 try
                 {
@@ -1844,23 +1818,23 @@ namespace EPMLiveWebParts
             {
 
 
-                if(PropLinkType == null)
+                if (PropLinkType == null)
                     boolUseDefaults = true;
 
                 EnsureChildControls();
-                
+
                 SPWeb web = SPContext.Current.Web;
 
                 act = new EPMLiveCore.Act(web);
                 activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.WebParts);
                 //activation = EPMLiveCore.CoreFunctions.getFeatureLicenseStatus(0);
-                if(activation != 0)
+                if (activation != 0)
                     return;
 
 
                 toolbar = new ViewToolBar();
                 toolbar.EnableViewState = false;
-                
+
 
                 //if (!Page.IsPostBack)
                 {
@@ -1871,7 +1845,7 @@ namespace EPMLiveWebParts
                     }
                     catch { }
 
-                    if(PropUseDefaults.Value && list != null)
+                    if (PropUseDefaults.Value && list != null)
                     {
                         EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
                         BOOLShowViewBar = gSettings.ShowViewToolbar;
@@ -1890,13 +1864,13 @@ namespace EPMLiveWebParts
                     switchto = Page.Request["gridmode"];
                 }
                 catch { }
-                if(switchto != "" && switchto != null && this.ID == Page.Request["webpartid"])
+                if (switchto != "" && switchto != null && this.ID == Page.Request["webpartid"])
                 {
-                    if(switchto == "gantt")
+                    if (switchto == "gantt")
                         PropMyDefaultControl = "Gantt";
-                    else if(switchto == "grid")
+                    else if (switchto == "grid")
                         PropMyDefaultControl = "Grid";
-                    else if(switchto == "cost")
+                    else if (switchto == "cost")
                         PropMyDefaultControl = "Cost";
 
                     newGridMode = switchto.ToLower();
@@ -1909,25 +1883,20 @@ namespace EPMLiveWebParts
 
                 buildParams();
 
-                if(BOOLShowViewBar && view != null && list != null)
+                if (BOOLShowViewBar && view != null && list != null)
                 {
-                    if(PropMyDefaultControl == "Gantt")
+                    if (PropMyDefaultControl == "Gantt")
                         toolbar.TemplateName = "GanttViewToolBar";
 
                     SPContext context = SPContext.GetContext(this.Context, view.ID, list.ID, web);
                     toolbar.RenderContext = context;
 
                     Controls.Add(toolbar);
-                    
 
-                    foreach(Control control in toolbar.Controls)
+                    foreach (Control control in toolbar.Controls)
                     {
                         processControls(control, list.Title, list.ID.ToString(), view.ID.ToString(), PropMyDefaultControl, this.ID, sFullGridId, hideNew);
                     }
-
-                    //RightRptControls.Controls.Add(ActionMenu);
-                    //RightRptControls.Controls.Add(SettingMenu);
-                    
                 }
 
                 //if(newGridMode.ToLower() == "gantt")
@@ -1953,13 +1922,13 @@ namespace EPMLiveWebParts
             peSingle.MultiSelect = false;
             peSingle.ID = "userpickersingle";
             this.Controls.Add(peSingle);
-            
+
         }
 
 
         private void processControls(Control parentControl, string listname, string listid, string viewid, string defaultcontrol, string webpartid, string ZoneIndex, bool hideNew)
         {
-            
+
 
             foreach (Control childControl in parentControl.Controls)
             {
@@ -1972,21 +1941,21 @@ namespace EPMLiveWebParts
                     RptControls = childControl;
                 }
 
-                else if(childControl.ToString() == "System.Web.UI.WebControls.HyperLink")
+                else if (childControl.ToString() == "System.Web.UI.WebControls.HyperLink")
                 {
-                    if(childControl.ID == "imgZoomIn")
+                    if (childControl.ID == "imgZoomIn")
                     {
                         HyperLink hl = (HyperLink)childControl;
                         hl.NavigateUrl = "Javascript:GanttZoomIn('" + sFullGridId + "');";
                         hl.Target = "_self";
                     }
-                    if(childControl.ID == "imgZoomOut")
+                    if (childControl.ID == "imgZoomOut")
                     {
                         HyperLink hl = (HyperLink)childControl;
                         hl.NavigateUrl = "Javascript:GanttZoomOut('" + sFullGridId + "');";
                         hl.Target = "_self";
                     }
-                    if(childControl.ID == "hlGanttScrollTo")
+                    if (childControl.ID == "hlGanttScrollTo")
                     {
                         HyperLink hl = (HyperLink)childControl;
                         hl.NavigateUrl = "Javascript:GanttScrollTo('" + sFullGridId + "');";
@@ -2006,7 +1975,7 @@ namespace EPMLiveWebParts
                             System.Web.UI.WebControls.Label lblLink = (System.Web.UI.WebControls.Label)childControl;
                             //lblLink.Text = "<a onclick=\"Javascript:switchFilter" + sFullGridId + "('" + lblFilterText.ClientID + "');\">";
                             lblLink.Text = "<a onclick=\"Javascript:mygrid" + sFullGridId + ".toggleSearch();\">";
-                            
+
                             filterIndex = parentControl.Parent.Controls.IndexOf(parentControl);
 
 
@@ -2017,7 +1986,7 @@ namespace EPMLiveWebParts
                 if (childControl.ToString().ToUpper() == "MICROSOFT.SHAREPOINT.WEBCONTROLS.NEWMENU")
                 {
                     NewMenu menu = (NewMenu)childControl;
-                    
+
 
                     if (hideNew)
                     {
@@ -2026,10 +1995,10 @@ namespace EPMLiveWebParts
                     else if (useNewMenu)
                     {
 
-                        if(hasList)
+                        if (hasList)
                         {
-                            
-                            
+
+
                             try
                             {
                                 Microsoft.SharePoint.WebControls.MenuItemTemplate mnu = menu.GetMenuItem("New0");
@@ -2037,7 +2006,7 @@ namespace EPMLiveWebParts
                                 string txt = mnu.Text;
                                 int spaceloc = txt.IndexOf(" ");
                                 txt = txt.Substring(0, spaceloc);
-                                if(newMenuName == "")
+                                if (newMenuName == "")
                                     mnu.Text = txt + " " + listname;
                                 else
                                     mnu.Text = txt + " " + newMenuName;
@@ -2055,7 +2024,7 @@ namespace EPMLiveWebParts
                                 string txt = mnu.Text;
                                 int spaceloc = txt.IndexOf(" ");
                                 txt = txt.Substring(0, spaceloc);
-                                if(newMenuName == "")
+                                if (newMenuName == "")
                                     mnu.Text = txt + " " + listname;
                                 else
                                     mnu.Text = txt + " " + newMenuName;
@@ -2064,7 +2033,7 @@ namespace EPMLiveWebParts
                             catch { }
                         }
                     }
-                    else if(listname != "Project Center" && listname != "Project Center Rollup" && rollupLists != "" && !disableNewButtonModification)
+                    else if (listname != "Project Center" && listname != "Project Center Rollup" && rollupLists != "" && !disableNewButtonModification)
                     {
                         //NewMenu menu = (NewMenu)childControl;
                         try
@@ -2073,7 +2042,7 @@ namespace EPMLiveWebParts
                             menu.MenuControl.NavigateUrl = "";
                             menu.MenuControl.ClientOnClickScript = "";
                             string[] arrrolluplists = rollupLists.Split(',');
-                            foreach(string rolluplist in arrrolluplists)
+                            foreach (string rolluplist in arrrolluplists)
                             {
                                 string[] arrrolluplist = rolluplist.Split('|');
                                 string image = "";
@@ -2095,13 +2064,14 @@ namespace EPMLiveWebParts
                         {
                             //if(!bUsePopUp)
                             {
-                                if(template.ClientOnClickScript.StartsWith("javascript:NewItem2("))
+                                if (template.ClientOnClickScript.StartsWith("javascript:NewItem2("))
                                 {
                                     template.ClientOnClickScript = "newItem" + sFullGridId + "(" + bUsePopUp.ToString().ToLower() + ");";
                                     menu.MenuControl.ClientOnClickScript = "newItem" + sFullGridId + "(" + bUsePopUp.ToString().ToLower() + ");";
                                 }
                             }
-                        }catch{}
+                        }
+                        catch { }
                     }
 
                     menu.MenuControl.Text = "new item";
@@ -2161,13 +2131,13 @@ namespace EPMLiveWebParts
                         url += "&";
                     else
                         url += "?";
-                    
+
                     string mainurl = url + "webpartid=" + webpartid;
 
-                    if(!String.IsNullOrEmpty(Page.Request["lookupfield"]))
+                    if (!String.IsNullOrEmpty(Page.Request["lookupfield"]))
                         mainurl += "&lookupfield=" + Page.Request["lookupfield"];
 
-                    if(!String.IsNullOrEmpty(Page.Request["LookupFieldList"]))
+                    if (!String.IsNullOrEmpty(Page.Request["LookupFieldList"]))
                         mainurl += "&LookupFieldList=" + Page.Request["LookupFieldList"];
 
                     if (defaultcontrol.ToLower() == "grid")
@@ -2200,7 +2170,7 @@ namespace EPMLiveWebParts
 
         protected override void RenderWebPart(HtmlTextWriter output)
         {
-            
+
             output.Write(error);
             try
             {
@@ -2419,24 +2389,15 @@ namespace EPMLiveWebParts
             //writetime(output);
         }
 
-        private void writetime(HtmlTextWriter output)
-        {
-            {
-                TimeSpan ts = FinishDate - StartDate;
-
-                output.WriteLine(ts.TotalMilliseconds);
-            }
-        }
-
         private void HideListView()
         {
-            if(SPContext.Current.ViewContext.View != null)
+            if (SPContext.Current.ViewContext.View != null)
             {
-                foreach(System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
+                foreach (System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
                 {
                     try
                     {
-                        if(wp.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" || wp.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
+                        if (wp.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" || wp.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
                         {
                             Microsoft.SharePoint.WebPartPages.XsltListViewWebPart wp2 = (Microsoft.SharePoint.WebPartPages.XsltListViewWebPart)wp;
                             wp2.XmlDefinition = wp2.XmlDefinition.Replace("<Toolbar Type=\"Standard\"/>", "<Toolbar Type=\"Standard\" ShowAlways=\"TRUE\"/>");
@@ -2453,13 +2414,13 @@ namespace EPMLiveWebParts
         {
             SPWeb rootWeb = web.Site.RootWeb;
 
-            string username = EPMLiveCore.CoreFunctions.GetCleanUserName(web.CurrentUser.LoginName, web.Site);
+            string username = EPMLiveCore.CoreFunctions.GetRealUserName(web.CurrentUser.LoginName, web.Site);
             string basePath = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
             string ppmId = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
             string ppmCompany = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
             string ppmDbConn = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
 
-            if(basePath != "")
+            if (basePath != "")
             {
 
                 string ids = "";
@@ -2471,18 +2432,18 @@ namespace EPMLiveWebParts
                 XmlNode ndWhere = xmlQuery.SelectSingleNode("//Where");
                 string query = "";
 
-                if(ndWhere != null)
+                if (ndWhere != null)
                 {
                     query = ndWhere.OuterXml;
                 }
 
-                if(rollupLists != "")
+                if (rollupLists != "")
                 {
-                    foreach(string rlist in rollupLists.Split(','))
+                    foreach (string rlist in rollupLists.Split(','))
                     {
                         DataTable dt = EPMLiveCore.CoreFunctions.getSiteItems(web, view, query, Page.Request["FilterField1"], "", rlist, new string[0]);
 
-                        foreach(DataRow dr in dt.Rows)
+                        foreach (DataRow dr in dt.Rows)
                         {
                             ids += "," + dr["WEBID"].ToString().Trim("{}".ToCharArray()) + "." + dr["LISTID"].ToString().Trim("{}".ToCharArray()) + "." + dr["ID"].ToString();
                         }
@@ -2492,7 +2453,7 @@ namespace EPMLiveWebParts
                 {
                     DataTable dt = EPMLiveCore.CoreFunctions.getSiteItems(web, view, query, Page.Request["FilterField1"], "", "", new string[0]);
 
-                    foreach(DataRow dr in dt.Rows)
+                    foreach (DataRow dr in dt.Rows)
                     {
                         ids += "," + dr["WEBID"].ToString().Trim("{}".ToCharArray()) + "." + dr["LISTID"].ToString().Trim("{}".ToCharArray()) + "." + dr["ID"].ToString();
                     }
@@ -2500,11 +2461,12 @@ namespace EPMLiveWebParts
 
                 ids = ids.Trim(',');
 
-                
-                
+
+
                 string ret = "";
 
-                SPSecurity.RunWithElevatedPrivileges(delegate(){
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
                     PortfolioEngineCore.WEIntegration.WEIntegration integration = new PortfolioEngineCore.WEIntegration.WEIntegration(basePath, username, ppmId, ppmCompany, ppmDbConn);
 
                     ret = integration.DisplayProjects("<Display>" + ids + "</Display>");
@@ -2514,7 +2476,7 @@ namespace EPMLiveWebParts
                 doc.LoadXml(ret);
 
                 string status = doc.SelectSingleNode("//STATUS").InnerText;
-                if(status == "0")
+                if (status == "0")
                 {
                     error = false;
                     return doc.SelectSingleNode("//DisplayProjects").Attributes["SessionId"].Value;
@@ -2534,10 +2496,10 @@ namespace EPMLiveWebParts
             bool postErrors = false;
             string ret = postItems(web, out postErrors);
 
-            if(!postErrors)
+            if (!postErrors)
             {
                 int i;
-                if(int.TryParse(EPKView, out i))
+                if (int.TryParse(EPKView, out i))
                     output.WriteLine(WorkEnginePPM.HelperFunctions.outputEPKControl(EPKURL, "WE_LMRPort.LMR_WE", "<Params Ticket=\\\"" + ret + "\\\" ViewID=\\\"" + EPKView + "\\\"/>", "true", Page));
                 else
                     output.WriteLine(WorkEnginePPM.HelperFunctions.outputEPKControl(EPKURL, "WE_LMRPort.LMR_WE", "<Params Ticket=\\\"" + ret + "\\\" ViewName=\\\"" + EPKView + "\\\"/>", "true", Page));
@@ -2554,7 +2516,7 @@ namespace EPMLiveWebParts
             output.WriteLine(@"mygrid" + sFullGridId + @".getSelectedRowId = function(){return 0;};");
             output.WriteLine(@"mygrid" + sFullGridId + @".getUserData = function(rowid, key){ return """"; };");
             output.WriteLine(@"mygrid" + sFullGridId + @".getCheckedIds = function(){return """";};");
-
+            output.WriteLine(@"mygrid" + sFullGridId + @".getTitles = function(){return """";};");
             //output.WriteLine("mygrid" + sFullGridId + @".getGlobalCommands = function($arr){return fnGetGlobalCommands($arr);};");
             //output.WriteLine("mygrid" + sFullGridId + @".canHandleCommand = function(this.$Grid, commandId){return fnCanHandleCommand(this.$Grid, commandId);};");
             //output.WriteLine("mygrid" + sFullGridId + @".addFocusedCommands = function($arr){return fnFocusedCommands($arr);};");
@@ -2574,7 +2536,7 @@ namespace EPMLiveWebParts
 
             string suffix = "";
 
-            if(!string.IsNullOrEmpty(this.Height))
+            if (!string.IsNullOrEmpty(this.Height))
             {
                 MatchCollection mc = Regex.Matches(this.Height, @"^\d+");
 
@@ -2587,16 +2549,16 @@ namespace EPMLiveWebParts
                 catch { }
             }
 
-            if(BOOLShowViewBar)
+            if (BOOLShowViewBar)
                 iHeight -= 45;
 
-            if((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
+            if ((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
             {
                 iHeight -= 30;
             }
 
             string sHeight = "";
-            if(iHeight != 0)
+            if (iHeight != 0)
                 sHeight = "height: " + iHeight.ToString() + suffix;
 
             output.WriteLine("<div id=\"griddiv" + sFullGridId + "\" style=\"width:100%;" + sHeight + "\"><treegrid Data_Url=\"" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "\" Debug=\"\"/></div>");
@@ -2608,7 +2570,7 @@ namespace EPMLiveWebParts
             output.WriteLine("<script language=\"javascript\">");
             output.WriteLine("Grids.OnRenderFinish = function(grid){grid.ActionZoomFit();};");
             output.WriteLine("Grids.OnReady = function(grid, start)  { document.getElementById('loadinggrid" + this.ID + "').style.display = 'none'; }");
-            output.WriteLine("Grids.OnRenderFinish = function(grid)  { clickTab(); }");
+            output.WriteLine("Grids.OnRenderFinish = function(grid)  { clickTab(); grid.ScrollToDate(new Date(), 'Left'); }");
             output.WriteLine(@"Grids.OnClick = function(grid, row, col, x, y, event) 
                                 {
                                     //var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + @"');
@@ -2622,7 +2584,6 @@ namespace EPMLiveWebParts
 		                                                            if(wp2)
 			                                                            fireEvent(wp2.firstChild, 'click'); 
                                 }");  
-            
 
             output.WriteLine("ArrGantts.push('GanttGrid" + sFullGridId + "');");
             output.WriteLine("mygrid" + sFullGridId + " = new Object();");
@@ -2714,12 +2675,12 @@ namespace EPMLiveWebParts
                                                                     };");
 
             output.WriteLine("mygrid" + sFullGridId + @".editStop = function(){  }");
-            
+
             //output.WriteLine("mygrid" + sFullGridId + @".getGlobalCommands = function($arr){return fnGetGlobalCommands($arr);};");
             //output.WriteLine("mygrid" + sFullGridId + @".canHandleCommand = function(this.$Grid, commandId){return fnCanHandleCommand(this.$Grid, commandId);};");
             //output.WriteLine("mygrid" + sFullGridId + @".addFocusedCommands = function($arr){return fnFocusedCommands($arr);};");
             //output.WriteLine("mygrid" + sFullGridId + @".JSGridEvents = function(name){return fnJSGridEvents(name);};");
-                                    output.WriteLine(@"function newItem" + sFullGridId  + @"(usepopup)
+            output.WriteLine(@"function newItem" + sFullGridId + @"(usepopup)
                                     {
 	                                    var wurl = mygrid" + sFullGridId + @"._newitemurl;
 
@@ -2787,14 +2748,35 @@ namespace EPMLiveWebParts
                                     return !element.dispatchEvent(evt);
                                 }
                             }");
-                
-        //output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"GridViewContextualTabPageComponent.js\");");
+            //output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"GridViewContextualTabPageComponent.js\");");
 
-            if(SPContext.Current.ViewContext.View != null)
+            if (SPContext.Current.ViewContext.View != null)
             {
                 output.Write("setTimeout(\"clickTab()\", 100);");
             }
 
+            /*output.WriteLine(@"function GanttZoomIn(gridid) {
+                var grid = Grids[""GanttGrid"" + gridid];
+                grid.ActionZoomIn();
+            }
+
+            function GanttZoomOut(gridid) {
+                var grid = Grids[""GanttGrid"" + gridid];
+                grid.ActionZoomOut();
+            }
+
+            function GanttScrollTo(gridid) {
+                var grid = Grids[""GanttGrid"" + gridid];
+                var row = grid.FRow;
+                if (row != null) {
+                    var sDate = grid.GetValue(row, ""StartDate"")
+                    if (sDate != "") {
+                        var date = new Date(sDate);
+                        grid.ScrollToDate(date, ""left"");
+                    }
+                }
+            }");
+            */
             output.Write("</script>");
 
         }
@@ -2802,7 +2784,7 @@ namespace EPMLiveWebParts
         private string typeoption(string id, string display)
         {
             string ret = "<option value=\"" + id + "\" ";
-            if(sSearchType == id)
+            if (sSearchType == id)
                 ret += "selected";
             ret += ">" + display + "</option>";
             return ret;
@@ -2811,26 +2793,26 @@ namespace EPMLiveWebParts
 
         private void renderGrid(HtmlTextWriter output, SPWeb web)
         {
-            
+
             output.Write("<style>");
             output.Write(".ms-usereditor { width:200px; }");
             output.Write(".grid_hover { border: 10px solid #91CDF2; background-color: #F2FAFF } ");
             //output.Write(".rowselected { background-color: #000000; }");
             output.Write("</style>");
 
-            
+
 
             //========================Multiple People==============================
-           // if (inEditMode)
+            // if (inEditMode)
             {
                 output.Write("<div id=\"peoplegrid" + this.ID + "\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width=200px;\">");
                 output.Write("<div id=\"peoplecheck" + sFullGridId + "\" style=\"overflow: auto; width: 200px; height: 100px;  background-color: #FFFFFF; border: 1px solid #808080; margin-top:2px; padding:3px;\" class=\"ms-descriptiontext\">");
                 output.Write("</div>");
 
                 output.Write("<table border=\"0\" width=\"100%\"><tr><td>");
-                    output.Write("<a onclick=\"javascript:viewChecks" + sFullGridId + "('" + sFullGridId + "');\"><img id=\"peoplecheckimg" + sFullGridId + "\" src=\"_layouts/images/TPMAX1.GIF\" border=\"0\"></a><br>");
-                    output.Write("</td><td align=\"right\">");
-                    output.Write("<font class=\"ms-descriptiontext\"><a onclick=\"javascript:mygrid" + sFullGridId + ".editStop();\">Close</a></font>");
+                output.Write("<a onclick=\"javascript:viewChecks" + sFullGridId + "('" + sFullGridId + "');\"><img id=\"peoplecheckimg" + sFullGridId + "\" src=\"_layouts/images/TPMAX1.GIF\" border=\"0\"></a><br>");
+                output.Write("</td><td align=\"right\">");
+                output.Write("<font class=\"ms-descriptiontext\"><a onclick=\"javascript:mygrid" + sFullGridId + ".editStop();\">Close</a></font>");
                 output.Write("</td></tr></table>");
                 output.Write("<div id=\"divPe" + sFullGridId + "\" style=\"display:none;\">");
                 peMulti.RenderControl(output);
@@ -2842,7 +2824,7 @@ namespace EPMLiveWebParts
                 output.Write("<div id=\"peoplechecksingle" + sFullGridId + "\" style=\"width: 200px; height: 100px;  background-color: #FFFFFF; border: 1px solid #808080; margin-top:2px; padding:0px;\" class=\"ms-descriptiontext\">");
                 output.Write("<select size=\"6\" onclick=\"changeUser" + sFullGridId + "(this);\" id=\"peoplecheckselect" + sFullGridId + "\"  style=\"width:100%;height:100%\"><option>test</option></select>");
                 output.Write("</div>");
-                
+
                 output.Write("<table border=\"0\" width=\"200\"><tr><td>");
                 output.Write("<a onclick=\"javascript:viewDropDown" + sFullGridId + "('" + sFullGridId + "');\"><img id=\"peoplechecksingleimg" + sFullGridId + "\" src=\"_layouts/images/TPMAX1.GIF\" border=\"0\"></a><br>");
                 output.Write("</td><td align=\"right\">");
@@ -2881,7 +2863,7 @@ namespace EPMLiveWebParts
             //output.Write(Properties.Resources.txtGridMenus.Replace("#gridfunc#", "mygrid" + sFullGridId + ".menuaction(this);"));
             output.Write("</ul>");
             output.Write("</div>");
-            
+
 
 
             //===================================
@@ -2902,7 +2884,7 @@ namespace EPMLiveWebParts
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js\"></script>");
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/dhtmlxgridcell.js\"></script>");
             output.Write("<script src=\"_layouts/epmlive/DHTML/xtreegrid/dhtmlxtreegrid.js\"></script>");
-            
+
             output.Write("<script src=\"_layouts/epmlive/DHTML/xtreegrid/ext/dhtmlxtreegrid_filter.js\"></script>");
 
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_post.js\"></script>");
@@ -2910,9 +2892,9 @@ namespace EPMLiveWebParts
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_filter.js\"></script>");
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_math.js\"></script>");
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_srnd.js\"></script>");
-            
+
             //output.Write("<script src=\"/_layouts/epmlive/DHTML/dhtmlxajax.js\"></script>");
-            
+
             //if (inEditMode)
             {
 
@@ -2923,7 +2905,7 @@ namespace EPMLiveWebParts
                 output.Write("<script src=\"_layouts/epmlive/DHTML/calendar/dhtmlxcalendar.js\"></script>");
                 output.Write("<script src=\"_layouts/epmlive/DHTML/xdataproc/dhtmlxdataprocessor.js\"></script>");
             }
-            
+
             output.Write("<script type=\"text/javascript\" src=\"_layouts/epmlive/modal/modal.js\"></script> ");
 
             //output.Write("<script language=\"JavaScript\" src=\"_layouts/epmlive/dhtml/xmenu/dhtmlxprotobar.js\"></script>");
@@ -2942,41 +2924,41 @@ namespace EPMLiveWebParts
                 string jsonfields = "";
                 SortedList slFields = new SortedList();
 
-                if(sSearchField == "")
+                if (sSearchField == "")
                     sSearchField = "Title";
 
-                if(sSearchType == "")
+                if (sSearchType == "")
                     sSearchType = "1";
 
-                foreach(SPField field in list.Fields)
+                foreach (SPField field in list.Fields)
                 {
-                    if(field.Reorderable && !field.Hidden)
+                    if (field.Reorderable && !field.Hidden)
                     {
                         slFields.Add(field.Title, field.InternalName);
 
-                        
-                        if(field.Type == SPFieldType.Choice)
+
+                        if (field.Type == SPFieldType.Choice)
                         {
-                            jsonfields += field.InternalName + ": ["; 
+                            jsonfields += field.InternalName + ": [";
                             SPFieldChoice c = (SPFieldChoice)field;
-                            foreach(string choice in c.Choices)
+                            foreach (string choice in c.Choices)
                             {
                                 jsonfields += "\"" + choice + "\",";
                             }
                             jsonfields = jsonfields.TrimEnd(',') + "],";
                         }
-                        if(field.Type == SPFieldType.Boolean)
+                        if (field.Type == SPFieldType.Boolean)
                         {
                             jsonfields += field.InternalName + ": [ \"Yes\", \"No\" ],";
                         }
                     }
                 }
 
-                foreach(DictionaryEntry de in slFields)
+                foreach (DictionaryEntry de in slFields)
                 {
-                    if(sSearchField == de.Value.ToString())
+                    if (sSearchField == de.Value.ToString())
                         fieldlist += "<option value=\"" + de.Value + "\" selected>" + de.Key.ToString() + "</option>";
-                    else 
+                    else
                         fieldlist += "<option value=\"" + de.Value + "\">" + de.Key.ToString() + "</option>";
                 }
 
@@ -3016,7 +2998,7 @@ namespace EPMLiveWebParts
                 output.WriteLine("searchtext.value = '';");
 
                 output.WriteLine("loadX" + sFullGridId + "();");
-                
+
                 output.WriteLine("}");
 
                 output.WriteLine("function doSearch" + sFullGridId + "(){");
@@ -3043,16 +3025,16 @@ namespace EPMLiveWebParts
                 output.WriteLine("searchvalue = searchtext.value;");
                 output.WriteLine("}");
 
-                if(bLockSearch)
+                if (bLockSearch)
                 {
                     System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
                     StringBuilder sbUrl = new StringBuilder();
 
                     string fListId = list.ID.ToString("N");
 
-                    foreach(string key in nv.AllKeys)
+                    foreach (string key in nv.AllKeys)
                     {
-                        if(key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
+                        if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
                         {
                             sbUrl.Append("&");
                             sbUrl.Append(key);
@@ -3062,7 +3044,7 @@ namespace EPMLiveWebParts
                     }
 
                     string urlParams = sbUrl.ToString().TrimStart('&');
-                    if(!String.IsNullOrEmpty(urlParams))
+                    if (!String.IsNullOrEmpty(urlParams))
                         urlParams = "?" + urlParams;
 
                     string curUrl = Page.Request.Url.ToString();
@@ -3081,7 +3063,7 @@ namespace EPMLiveWebParts
                 }
                 else
                 {
-                    
+
                     output.WriteLine("loadX" + sFullGridId + "(searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);");
                 }
 
@@ -3095,7 +3077,7 @@ namespace EPMLiveWebParts
                 output.WriteLine("</script>");
 
                 output.Write("<div id=\"search" + this.ID + "\" style=\"width:100%; height:25px; padding:10px");
-                if(!bShowSearch)
+                if (!bShowSearch)
                     output.Write(";display:none");
                 output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td>");
                 output.Write("Search: ");
@@ -3129,7 +3111,7 @@ namespace EPMLiveWebParts
                     </div>
                 </div>");
 
-//                output.Write("<input type=\"button\" id=\"searchbutton" + sFullGridId + "\" onclick=\"doSearch" + sFullGridId + "()\" value=\"Search\">");
+                //                output.Write("<input type=\"button\" id=\"searchbutton" + sFullGridId + "\" onclick=\"doSearch" + sFullGridId + "()\" value=\"Search\">");
                 output.WriteLine("</td></tr></table>");
                 output.WriteLine("</div>");
 
@@ -3140,9 +3122,10 @@ namespace EPMLiveWebParts
             output.Write("<div id=\"grid" + this.ID + "\" style=\"width:100%;display:none;\" class=\"ms-listviewtable\"></div>\r\n\r\n");
             output.Write("<div id=\"errordiv" + sFullGridId + "\" style=\"font-color:red;font-size:11px;\"></div>");
 
-            
+
             output.Write("<div  width=\"100%\" id=\"loadinggrid" + this.ID + "\" align=\"center\"");
-            if(bShowSearch && !bHasSearchResults){
+            if (bShowSearch && !bHasSearchResults)
+            {
                 output.Write(" style=\"display:none\"");
             }
             output.Write(">");
@@ -3151,7 +3134,7 @@ namespace EPMLiveWebParts
 
 
             output.Write("<script language=\"javascript\">");
-     
+
 
             output.Write("function viewChecks" + sFullGridId + "(btn)");
             output.Write("{");
@@ -3192,9 +3175,9 @@ namespace EPMLiveWebParts
 
             output.Write("function switchFilterLoad" + sFullGridId + "(){mygrid" + sFullGridId + ".switchFilter();}");
             output.Write("</script>");
-            
+
             output.WriteLine("<script>");
-            
+
             output.WriteLine("var mygrid" + sFullGridId + "Hidden = false;");
             output.WriteLine("var listid" + sFullGridId + " = '" + list.ID.ToString() + "';");
 
@@ -3397,7 +3380,8 @@ namespace EPMLiveWebParts
                     try
                     {
                         h = (int.Parse(h) - 30).ToString();
-                    }catch{}
+                    }
+                    catch { }
                 }
                 output.WriteLine("mygrid" + sFullGridId + ".enableAutoHeight(true," + h + ",true);");
             }
@@ -3413,7 +3397,7 @@ namespace EPMLiveWebParts
             //output.Write("mygrid" + sFullGridId + ".enableDistributedParsing(true, 100, 100);");
 
             System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(web.Locale.LCID);
-            string []dtFormat = cInfo.DateTimeFormat.ShortDatePattern.ToLower().Split(cInfo.DateTimeFormat.DateSeparator.ToCharArray());
+            string[] dtFormat = cInfo.DateTimeFormat.ShortDatePattern.ToLower().Split(cInfo.DateTimeFormat.DateSeparator.ToCharArray());
             string dtFormatComplete = "";
             foreach (string s in dtFormat)
             {
@@ -3424,7 +3408,7 @@ namespace EPMLiveWebParts
                 else if (s.Contains("y"))
                     dtFormatComplete += cInfo.DateTimeFormat.DateSeparator + "%Y";
             }
-            if(dtFormatComplete.Length > 1)
+            if (dtFormatComplete.Length > 1)
                 dtFormatComplete = dtFormatComplete.Substring(1);
             else
                 dtFormatComplete = "%m/%d/%Y";
@@ -3502,112 +3486,112 @@ namespace EPMLiveWebParts
             output.Write("singleItemUrl" + sFullGridId + " = \"" + web.Url + "/_layouts/epmlive/getsingleitem.aspx?data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "\";");
             output.Write("singleEditItemUrl" + sFullGridId + " = \"" + ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/_layouts/epmlive/getedititem.aspx?data=" + sFullParamList + "\";");
             output.Write("inEditMode" + sFullGridId + " = " + inEditMode.ToString().ToLower() + ";");
-            
+
             //if (inEditMode)
             //{
-                output.Write("myDataProcessor" + sFullGridId + " = new dataProcessor(\"" + web.Url + "/_layouts/epmlive/savegrid.aspx?columns=" + getViewFields() + "&data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "\");");
-                output.Write("myDataProcessor" + sFullGridId + ".setUpdateMode(\"off\");");
-                output.Write("myDataProcessor" + sFullGridId + ".defineAction(\"error100\", myErrorHandler" + sFullGridId + ");");
-                output.Write("myDataProcessor" + sFullGridId + ".defineAction(\"error500\", error500" + sFullGridId + ");");
-                output.Write("myDataProcessor" + sFullGridId + ".defineAction(\"alldatareturned\", alldatareturned" + sFullGridId + ");");
-                output.Write("myDataProcessor" + sFullGridId + ".setTransactionMode(\"POST\", true);");
-                //if(inEditMode)    
-                    output.Write("myDataProcessor" + sFullGridId + ".init(mygrid" + sFullGridId + ");");
+            output.Write("myDataProcessor" + sFullGridId + " = new dataProcessor(\"" + web.Url + "/_layouts/epmlive/savegrid.aspx?columns=" + getViewFields() + "&data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "\");");
+            output.Write("myDataProcessor" + sFullGridId + ".setUpdateMode(\"off\");");
+            output.Write("myDataProcessor" + sFullGridId + ".defineAction(\"error100\", myErrorHandler" + sFullGridId + ");");
+            output.Write("myDataProcessor" + sFullGridId + ".defineAction(\"error500\", error500" + sFullGridId + ");");
+            output.Write("myDataProcessor" + sFullGridId + ".defineAction(\"alldatareturned\", alldatareturned" + sFullGridId + ");");
+            output.Write("myDataProcessor" + sFullGridId + ".setTransactionMode(\"POST\", true);");
+            //if(inEditMode)    
+            output.Write("myDataProcessor" + sFullGridId + ".init(mygrid" + sFullGridId + ");");
 
-                if (!titlefound)
+            if (!titlefound)
+            {
+                output.Write("mygrid" + sFullGridId + ".enableTreeCellEdit(false);");
+            }
+
+            output.Write("function viewError" + sFullGridId + "(id){");
+            output.Write("document.getElementById('dlgErrorText" + sFullGridId + "').innerText=mygrid" + sFullGridId + ".getUserData(id,\"lastError\");");
+            output.Write("sm('dlgError" + sFullGridId + "',250,130);");
+            output.Write("}");
+
+            output.Write("function myErrorHandler" + sFullGridId + "(obj){");
+            output.Write("      var id = obj.getAttribute(\"sid\");");
+            if (inEditMode)
+            {
+                output.Write("      mygrid" + sFullGridId + ".cells(id,0).setValue(\"<a href=\\\"javascript:viewError" + sFullGridId + "('\" + id + \"');\\\"><img src='/_layouts/images/EXCLAIM.GIF' border='0'></a>\");");
+            }
+            else
+            {
+                output.Write("var EditCol = getEditCol" + sFullGridId + "();");
+                output.Write("if(EditCol != null){");
+
+                output.Write("      mygrid" + sFullGridId + ".cells(id,EditCol).setValue(\"<a href=\\\"javascript:viewError" + sFullGridId + "('\" + id + \"');\\\"><img src='/_layouts/images/EXCLAIM.GIF' border='0'></a> <a onclick=\\\"javascript:saveEdit" + sFullGridId + "('\" + id + \"');\\\" style=\\\"cursor:hand\\\"><img src=\\\"/_layouts/images/saveitem.gif\\\" border=\\\"0\\\" alt=\\\"Save\\\"></a> <a onclick=\\\"javascript:cancelEditRow" + sFullGridId + "('\" + id + \"');\\\" style=\\\"cursor:hand\\\"><img src=\\\"/_layouts/images/close.gif\\\" border=\\\"0\\\" alt=\\\"Cancel\\\"></a>\");");
+
+                output.Write("}");
+            }
+            output.Write("      mygrid" + sFullGridId + ".setUserData(id,\"lastError\",obj.firstChild.data);");
+            output.Write("      return true;");
+            output.Write("}");
+
+            output.Write("function alldatareturned" + sFullGridId + "(obj){");
+            output.Write("      setRowValues" + sFullGridId + "(obj.firstChild);");
+            output.Write("}");
+
+            output.Write("function error500" + sFullGridId + "(obj){");
+            output.Write("      alert(obj.firstChild.data);");
+            output.Write("      myDataProcessor" + sFullGridId + ".stopOnError = true; ");
+            output.Write("      hm('dlgSaving" + sFullGridId + "');");
+            output.Write("      return false;");
+            output.Write("}");
+
+            output.Write("myDataProcessor" + sFullGridId + ".setOnAfterUpdate(function(id,action,newid){");
+            output.Write("if(action != \"error100\" && action != \"delete\"){mygrid" + sFullGridId + ".cells(id,0).setValue(\"\");mygrid" + sFullGridId + ".cells(id,0).setBgColor('#F0F0F0');}");
+            output.Write("if(myDataProcessor" + sFullGridId + ".getSyncState())");
+            output.Write("{");
+            output.Write("    hm('dlgSaving" + sFullGridId + "');");
+            output.Write("    myDataProcessor" + sFullGridId + ".updatedRows = new Array(0);");
+            output.Write("}");
+            output.Write("});");
+
+            string cExcells = Properties.Resources.txtEditGridJS;
+            cExcells = cExcells.Replace("#gridid#", sFullGridId);
+            cExcells = cExcells.Replace("#peid#", peMulti.ClientID);
+            cExcells = cExcells.Replace("#peuid#", peMulti.UniqueID);
+            cExcells = cExcells.Replace("#pesid#", peSingle.ClientID);
+            cExcells = cExcells.Replace("#pesuid#", peSingle.UniqueID);
+
+            output.Write(cExcells);
+
+
+
+            output.Write("window.onbeforeunload=leavePage" + sFullGridId + ";");
+
+            string minValues = "\"\"";
+            string maxValues = "\"\"";
+
+            foreach (string f in view.ViewFields)
+            {
+                XmlDocument doc = new XmlDocument();
+                SPField field = list.Fields.GetFieldByInternalName(f);
+                doc.LoadXml(field.SchemaXml);
+                //===============Min Values==================
+                string min = "";
+                try
                 {
-                    output.Write("mygrid" + sFullGridId + ".enableTreeCellEdit(false);");
+                    min = doc.ChildNodes[0].Attributes["Min"].Value;
+                    if (doc.ChildNodes[0].OuterXml.Contains("Percentage=\"TRUE\""))
+                        min = (double.Parse(min) * 100).ToString();
                 }
+                catch { }
+                minValues += ",\"" + min + "\"";
 
-                output.Write("function viewError" + sFullGridId + "(id){");
-                output.Write("document.getElementById('dlgErrorText" + sFullGridId + "').innerText=mygrid" + sFullGridId + ".getUserData(id,\"lastError\");");
-                output.Write("sm('dlgError" + sFullGridId + "',250,130);");
-                output.Write("}");
-
-                output.Write("function myErrorHandler" + sFullGridId + "(obj){");
-                output.Write("      var id = obj.getAttribute(\"sid\");");
-                if (inEditMode)
+                //===============Max Values==================
+                string max = "";
+                try
                 {
-                    output.Write("      mygrid" + sFullGridId + ".cells(id,0).setValue(\"<a href=\\\"javascript:viewError" + sFullGridId + "('\" + id + \"');\\\"><img src='/_layouts/images/EXCLAIM.GIF' border='0'></a>\");");
+                    max = doc.ChildNodes[0].Attributes["Max"].Value;
+                    if (doc.ChildNodes[0].OuterXml.Contains("Percentage=\"TRUE\""))
+                        max = (double.Parse(max) * 100).ToString();
                 }
-                else
-                {
-                    output.Write("var EditCol = getEditCol" + sFullGridId + "();");
-                    output.Write("if(EditCol != null){");
-
-                    output.Write("      mygrid" + sFullGridId + ".cells(id,EditCol).setValue(\"<a href=\\\"javascript:viewError" + sFullGridId + "('\" + id + \"');\\\"><img src='/_layouts/images/EXCLAIM.GIF' border='0'></a> <a onclick=\\\"javascript:saveEdit" + sFullGridId + "('\" + id + \"');\\\" style=\\\"cursor:hand\\\"><img src=\\\"/_layouts/images/saveitem.gif\\\" border=\\\"0\\\" alt=\\\"Save\\\"></a> <a onclick=\\\"javascript:cancelEditRow" + sFullGridId + "('\" + id + \"');\\\" style=\\\"cursor:hand\\\"><img src=\\\"/_layouts/images/close.gif\\\" border=\\\"0\\\" alt=\\\"Cancel\\\"></a>\");");
-
-                    output.Write("}");
-                }
-                output.Write("      mygrid" + sFullGridId + ".setUserData(id,\"lastError\",obj.firstChild.data);");
-                output.Write("      return true;");
-                output.Write("}");
-
-                output.Write("function alldatareturned" + sFullGridId + "(obj){");
-                output.Write("      setRowValues" + sFullGridId + "(obj.firstChild);");
-                output.Write("}");
-
-                output.Write("function error500" + sFullGridId + "(obj){");
-                output.Write("      alert(obj.firstChild.data);");
-                output.Write("      myDataProcessor" + sFullGridId + ".stopOnError = true; ");
-                output.Write("      hm('dlgSaving" + sFullGridId + "');");
-                output.Write("      return false;");
-                output.Write("}");
-
-                output.Write("myDataProcessor" + sFullGridId + ".setOnAfterUpdate(function(id,action,newid){");
-                output.Write("if(action != \"error100\" && action != \"delete\"){mygrid" + sFullGridId + ".cells(id,0).setValue(\"\");mygrid" + sFullGridId + ".cells(id,0).setBgColor('#F0F0F0');}");
-                output.Write("if(myDataProcessor" + sFullGridId + ".getSyncState())");
-                output.Write("{");
-                output.Write("    hm('dlgSaving" + sFullGridId + "');");
-                output.Write("    myDataProcessor" + sFullGridId + ".updatedRows = new Array(0);");
-                output.Write("}");
-                output.Write("});");
-
-                string cExcells = Properties.Resources.txtEditGridJS;
-                cExcells = cExcells.Replace("#gridid#", sFullGridId);
-                cExcells = cExcells.Replace("#peid#", peMulti.ClientID);
-                cExcells = cExcells.Replace("#peuid#", peMulti.UniqueID);
-                cExcells = cExcells.Replace("#pesid#", peSingle.ClientID);
-                cExcells = cExcells.Replace("#pesuid#", peSingle.UniqueID);
-
-                output.Write(cExcells);
-
-                
-
-                output.Write("window.onbeforeunload=leavePage" + sFullGridId + ";");
-
-                string minValues = "\"\"";
-                string maxValues = "\"\"";
-
-                foreach (string f in view.ViewFields)
-                {
-                    XmlDocument doc = new XmlDocument();
-                    SPField field = list.Fields.GetFieldByInternalName(f);
-                    doc.LoadXml(field.SchemaXml);
-                    //===============Min Values==================
-                    string min = "";
-                    try
-                    {
-                        min = doc.ChildNodes[0].Attributes["Min"].Value;
-                        if (doc.ChildNodes[0].OuterXml.Contains("Percentage=\"TRUE\""))
-                            min = (double.Parse(min) * 100).ToString();
-                    }
-                    catch { }
-                    minValues += ",\"" + min + "\"";
-
-                    //===============Max Values==================
-                    string max = "";
-                    try
-                    {
-                        max = doc.ChildNodes[0].Attributes["Max"].Value;
-                        if (doc.ChildNodes[0].OuterXml.Contains("Percentage=\"TRUE\""))
-                            max = (double.Parse(max) * 100).ToString();
-                    }
-                    catch { }
-                    maxValues += ",\"" + max + "\"";
-                }
-                output.Write("minValues" + sFullGridId + " = [" + minValues + "];");
-                output.Write("maxValues" + sFullGridId + " = [" + maxValues + "];");
+                catch { }
+                maxValues += ",\"" + max + "\"";
+            }
+            output.Write("minValues" + sFullGridId + " = [" + minValues + "];");
+            output.Write("maxValues" + sFullGridId + " = [" + maxValues + "];");
             //}
             //else
             //{
@@ -3622,11 +3606,11 @@ namespace EPMLiveWebParts
             //}
 
 
-            
+
             output.Write(Properties.Resources.txtInlineEdit.Replace("#gridid#", sFullGridId));
 
             output.WriteLine("function loadX" + sFullGridId + "(searchfield, searchvalue, searchtype){");
-            
+
             output.WriteLine("var ribbontestintervall = null; ");
 
             //output.WriteLine("_ribbonStartInit(\"Ribbon.ListContextualTab\" , false , null );");
@@ -3643,9 +3627,9 @@ namespace EPMLiveWebParts
 
             output.WriteLine("}");
 
-            if(SPContext.Current.ViewContext.View != null)
+            if (SPContext.Current.ViewContext.View != null)
             {
-                if(newGridMode == "datasheet")
+                if (newGridMode == "datasheet")
                 {
                     output.WriteLine("function clickTab(){");
                     output.WriteLine("try{");
@@ -3691,7 +3675,7 @@ namespace EPMLiveWebParts
                 output.Write("}");
             }
 
-            if(SPContext.Current.ViewContext.View != null && !String.IsNullOrEmpty(Page.Request["IsDlg"]))
+            if (SPContext.Current.ViewContext.View != null && !String.IsNullOrEmpty(Page.Request["IsDlg"]))
             {
                 output.WriteLine("function maximizeWindow(){try{");
                 output.WriteLine("var currentDialog = SP.UI.ModalDialog.get_childDialog();");
@@ -3700,9 +3684,9 @@ namespace EPMLiveWebParts
                 output.WriteLine("currentDialog.$z();");
                 output.WriteLine("}}}catch(e){}");
 
-                if(bShowSearch)
+                if (bShowSearch)
                 {
-                    if(bHasSearchResults)
+                    if (bHasSearchResults)
                         output.WriteLine("setTimeout(\"loadX" + sFullGridId + "('" + sSearchField + "','" + sSearchValue + "','" + sSearchType + "'\"), 1000);");
                 }
                 else
@@ -3716,29 +3700,29 @@ namespace EPMLiveWebParts
             }
             else
             {
-                if(bShowSearch)
+                if (bShowSearch)
                 {
-                    if(bHasSearchResults)
+                    if (bHasSearchResults)
                         output.Write("_spBodyOnLoadFunctionNames.push(\"loadX" + sFullGridId + "('" + sSearchField + "','" + sSearchValue + "','" + sSearchType + "')\");");
                 }
                 else
                     output.WriteLine("ExecuteOrDelayUntilScriptLoaded(loadX" + sFullGridId + ", 'sp.ui.dialog.js');");
                 //output.Write("_spBodyOnLoadFunctionNames.push(\"loadX" + sFullGridId + "\");");
             }
-            
+
             output.Write("</script>");
 
             //if (inEditMode)
             {
-                output.Write(Properties.Resources.txtGridSaving.Replace("#gridid#", sFullGridId).Replace("#siteurl#",web.Url));
-                
- 
+                output.Write(Properties.Resources.txtGridSaving.Replace("#gridid#", sFullGridId).Replace("#siteurl#", web.Url));
+
+
                 output.Write("<script>");
                 output.Write("initmb();");
                 output.Write("</script>");
                 //output.Write("<a href=\"javascript:alert(mygrid" + sFullGridId + ".getSelectedRowId());\">getdata</a>");
             }
-            
+
         }
 
         static string EncodeNonAsciiCharacters(string value)
@@ -3746,7 +3730,7 @@ namespace EPMLiveWebParts
             StringBuilder sb = new StringBuilder();
             foreach (char c in value)
             {
-                if (c > 127 || c==47)
+                if (c > 127 || c == 47)
                 {
                     // This character is too big for ASCII 
                     string encodedValue = "\\u" + ((int)c).ToString("x4");
@@ -3763,24 +3747,24 @@ namespace EPMLiveWebParts
         private void addNewButton(HtmlTextWriter output, SPWeb web)
         {
             return;
-            if((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
+            if ((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
             {
                 output.WriteLine(@"<table width=""100%"">");
 
-                switch(newMenuStyle)
+                switch (newMenuStyle)
                 {
-                        
+
                     case 0:
                         output.WriteLine(@"<tr><TD style=""PADDING-BOTTOM: 3px"" class=ms-addnew><SPAN style=""POSITION: relative; WIDTH: 10px; DISPLAY: inline-block; HEIGHT: 10px; OVERFLOW: hidden"" class=s4-clust><IMG style=""POSITION: absolute; TOP: -128px !important; LEFT: 0px !important"" alt="""" src=""/_layouts/images/fgimg.png""></SPAN>&nbsp;");
                         output.WriteLine(@"<A id=idHomePageNewItem class=ms-addnew onclick='newItem" + sFullGridId + @"(" + bUsePopUp.ToString().ToLower() + @");' href=""javascript:void(0);"" target=_self>Add new item</A>");
                         output.WriteLine(@"</td></tr>");
                         break;
                     case 1:
-                        if(rollupLists != "")
+                        if (rollupLists != "")
                         {
                             string[] tRollupLists = rollupLists.ToString().Split(',');
 
-                            if(tRollupLists.Length > 1)
+                            if (tRollupLists.Length > 1)
                             {
                                 output.WriteLine(@"<style media=""all"" type=""text/css"">@import ""/_layouts/epmlive/addmenu.css"";</style>");
                                 output.WriteLine(@"<tr><TD style=""PADDING-BOTTOM: 3px"" class=ms-addnew>");
@@ -3788,7 +3772,7 @@ namespace EPMLiveWebParts
                                 output.WriteLine(@"<li class=""top""><a target=""_self"" class=""top_link ms-addnew""><span><img style=""top: 2px;"" src=""/_layouts/images/newrowheader.png"" valign=""middle"">Add New Item</span></a>");
                                 output.WriteLine(@"<ul class=""sub"">");
 
-                                for(int i = 0; i < tRollupLists.Length; i++)
+                                for (int i = 0; i < tRollupLists.Length; i++)
                                 {
                                     string[] tRlist = tRollupLists[i].Split('|');
                                     output.WriteLine(@"<li><a href=""" + ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + @"/_layouts/epmlive/newitem.aspx?List=" + tRlist[0] + @""" target=""_self"">" + tRlist[0] + "</a></li>");
@@ -3811,7 +3795,7 @@ namespace EPMLiveWebParts
                         break;
                     case 2:
 
-                        if(hasList)
+                        if (hasList)
                         {
                             output.WriteLine(@"<tr><TD style=""PADDING-BOTTOM: 3px"" class=ms-addnew><SPAN style=""POSITION: relative; WIDTH: 10px; DISPLAY: inline-block; HEIGHT: 10px; OVERFLOW: hidden"" class=s4-clust><IMG style=""POSITION: absolute; TOP: -128px !important; LEFT: 0px !important"" alt="""" src=""/_layouts/images/fgimg.png""></SPAN>&nbsp;");
                             output.WriteLine(@"<A id=idHomePageNewItem class=ms-addnew href=""javascript:newAppPopup('" + list.ID.ToString().ToUpper() + @"');"">Add new " + newMenuName + "</A>");
@@ -3827,7 +3811,7 @@ namespace EPMLiveWebParts
                 }
 
                 output.WriteLine(@"</table>");
-                
+
             }
         }
 
@@ -3860,17 +3844,17 @@ namespace EPMLiveWebParts
             output.WriteLine("mygrid" + sFullGridId + ".handleCommand = function($Grid, commandId, properites){if(typeof(properties) != 'undefined')return properties;}");
             output.WriteLine("mygrid" + sFullGridId + "._webpartid = '" + this.ID + "';");
 
-            if(rollupLists == "" && ((uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 107 || (uint)list.BaseTemplate == 10115))
+            if (rollupLists == "" && ((uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 107 || (uint)list.BaseTemplate == 10115))
             {
                 output.WriteLine("var objStsSync = GetStssyncData('tasks','Client', '', '/_layouts/images/menu');");
-                string listurl = EncodeNonAsciiCharacters(System.IO.Path.GetDirectoryName(list.DefaultViewUrl).Replace("\\","/"));
+                string listurl = EncodeNonAsciiCharacters(System.IO.Path.GetDirectoryName(list.DefaultViewUrl).Replace("\\", "/"));
                 output.WriteLine("mygrid" + sFullGridId + "._outlookexport = \"javaScript:ExportHailStorm('tasks','" + EncodeNonAsciiCharacters(web.Url) + "','{" + list.ID.ToString().ToUpper() + "}','" + web.Title + "','" + list.Title + "','" + listurl + "','','" + listurl + "')\";");
             }
             else
                 output.WriteLine("mygrid" + sFullGridId + "._outlookexport = '';");
-            
+
             output.WriteLine("mygrid" + sFullGridId + "._gridMode = '" + newGridMode + "';");
-            
+
 
             string image = "/_layouts/" + web.Language + "/images/formatmap32x32.png";
             string top = "-160";
@@ -3884,13 +3868,13 @@ namespace EPMLiveWebParts
             {
                 case 0:
                     output.WriteLine("mygrid" + sFullGridId + "._newmenumode = " + newMenuStyle + ";");
-                    if(bIsFormWebpart || bIsLinkedItemView)
+                    if (bIsFormWebpart || bIsLinkedItemView)
                     {
-                        if(bUsePopUp)
+                        if (bUsePopUp)
                             output.WriteLine("mygrid" + sFullGridId + "._newitemurl = '" + list.Forms[PAGETYPE.PAGE_NEWFORM].ServerRelativeUrl + "?LookupField=" + LookupFilterField + "&LookupValue=" + LookupFilterValue + "';");
                         else
                             output.WriteLine("mygrid" + sFullGridId + "._newitemurl = '" + list.Forms[PAGETYPE.PAGE_NEWFORM].ServerRelativeUrl + "?LookupField=" + LookupFilterField + "&LookupValue=" + LookupFilterValue + "&Source=" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()) + "';");
-                        
+
                     }
                     else
                     {
@@ -3943,7 +3927,7 @@ namespace EPMLiveWebParts
                     break;
                 case 2:
 
-                    if(hasList)
+                    if (hasList)
                     {
                         output.WriteLine("mygrid" + sFullGridId + "._newmenumode = 3;");
                         output.WriteLine("mygrid" + sFullGridId + @"._newmenu = ""<Button Id=\'Ribbon.ListItem.New.NewListItem." + list.ID + @"\' Command=\'NewItemApp2\' CommandValueId=\'" + newMenuName + @"\' LabelText=\'" + newMenuName + @"\' Description=\'Create a new " + newMenuName + @" item.\' Image32by32=\'" + image + @"\' CommandType=\'OptionSelection\' Image32by32Top=\'" + top + @"\' Image32by32Left=\'" + left + @"\'/>""");
@@ -3959,7 +3943,7 @@ namespace EPMLiveWebParts
                         output.WriteLine("mygrid" + sFullGridId + "._newfolder = false;");
                         output.WriteLine("mygrid" + sFullGridId + "._defaultct = '" + list.ID + "';");
                     }
-                    
+
                     break;
             };
             try
@@ -3997,8 +3981,8 @@ namespace EPMLiveWebParts
             output.WriteLine("mygrid" + sFullGridId + "._usepopup = " + bUsePopUp.ToString().ToLower() + ";");
             output.WriteLine("mygrid" + sFullGridId + "._lookupfield = '" + Page.Request["lookupfield"] + "';");
             output.WriteLine("mygrid" + sFullGridId + "._lookupfieldlist = '" + Page.Request["LookupFieldList"] + "';");
-            
-            
+
+
             StringBuilder sbExcel = new StringBuilder();
 
             sbExcel.Append(HttpUtility.UrlEncode(((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl)).Replace("%", @"\u00"));
@@ -4035,7 +4019,7 @@ namespace EPMLiveWebParts
             }
             output.WriteLine("mygrid" + sFullGridId + "._formmenus = \"" + sbForms + "\";");
         }
-        
+
         private string getViewFields()
         {
             string fields = "";
@@ -4108,7 +4092,7 @@ namespace EPMLiveWebParts
         {
             int retItem = 0;
 
-            if(!string.IsNullOrEmpty(Page.Request["LookupFieldList"]))
+            if (!string.IsNullOrEmpty(Page.Request["LookupFieldList"]))
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -4125,11 +4109,11 @@ namespace EPMLiveWebParts
                             cmd.Parameters.AddWithValue("@listid", Page.Request["LookupFieldList"]);
                             cmd.ExecuteNonQuery();
                             SqlDataReader dr = cmd.ExecuteReader();
-                            if(dr.Read())
+                            if (dr.Read())
                             {
                                 ArrayList lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
 
-                                if(lookupFilterIDs.Count == 1 && !string.IsNullOrEmpty(lookupFilterIDs[0].ToString()))
+                                if (lookupFilterIDs.Count == 1 && !string.IsNullOrEmpty(lookupFilterIDs[0].ToString()))
                                 {
                                     SPQuery query = new SPQuery();
                                     query.Query = "<Where><Eq><FieldRef Name=\"Title\"/><Value Type=\"Text\">" + lookupFilterIDs[0].ToString() + "</Value></Eq></Where>";
@@ -4137,7 +4121,7 @@ namespace EPMLiveWebParts
                                     SPList templist = web.Lists[new Guid(Page.Request["LookupFieldList"])];
 
                                     SPListItemCollection lic = templist.GetItems(query);
-                                    if(lic.Count == 1)
+                                    if (lic.Count == 1)
                                     {
                                         retItem = lic[0].ID;
                                     }
@@ -4146,7 +4130,7 @@ namespace EPMLiveWebParts
                             dr.Close();
                         }
                         catch { }
-                        
+
                         cn.Close();
                     }
                 });
@@ -4166,13 +4150,13 @@ namespace EPMLiveWebParts
             appendParam("LookupFieldList", Page.Request["LookupFieldList"]);
             appendParam("GridName", sFullGridId);
             appendParam("AGroups", getAdditionalGroupings());
-            if(!string.IsNullOrEmpty(Page.Request["lookupfield"]) && !string.IsNullOrEmpty(Page.Request["LookupFieldList"]))
+            if (!string.IsNullOrEmpty(Page.Request["lookupfield"]) && !string.IsNullOrEmpty(Page.Request["LookupFieldList"]))
                 appendParam("Expand", "10");
             else
                 appendParam("Expand", PropExpand);
 
-            if(_myProvider != null)
-                appendParam("ReportID", _myProvider.ReportID.Substring(2).Replace("_","-"));
+            if (_myProvider != null)
+                appendParam("ReportID", _myProvider.ReportID.Substring(2).Replace("_", "-"));
 
             SPWeb web = SPContext.Current.Web;
             try
@@ -4183,16 +4167,16 @@ namespace EPMLiveWebParts
             catch { }
 
 
-            if(SPContext.Current.ListItem != null && list != null)
+            if (SPContext.Current.ListItem != null && list != null)
             {
-                foreach(SPField field in list.Fields)
+                foreach (SPField field in list.Fields)
                 {
-                    if(field.Type == SPFieldType.Lookup)
+                    if (field.Type == SPFieldType.Lookup)
                     {
                         SPFieldLookup oLookup = (SPFieldLookup)field;
                         try
                         {
-                            if(new Guid(oLookup.LookupList) == SPContext.Current.List.ID)
+                            if (new Guid(oLookup.LookupList) == SPContext.Current.List.ID)
                             {
                                 bIsFormWebpart = true;
                                 appendParam("LookupFilterField", field.InternalName);
@@ -4208,7 +4192,7 @@ namespace EPMLiveWebParts
             }
 
             int litem = GetLinkedItemInfo(web);
-            if(litem != 0)
+            if (litem != 0)
             {
                 bIsLinkedItemView = true;
                 LookupFilterField = Page.Request["lookupfield"];
@@ -4226,16 +4210,17 @@ namespace EPMLiveWebParts
                     appendParam("Start", gSettings.StartDate);
                     appendParam("Finish", gSettings.DueDate);
                     appendParam("Percent", gSettings.Progress);
+
                     appendParam("WBS", gSettings.WBS);
                     appendParam("Milestone", gSettings.Milestone);
                     appendParam("Executive", (gSettings.Executive ? "on" : ""));
                     appendParam("Info", gSettings.Information);
                     appendParam("LType", gSettings.ItemLink);
-                    if(!bIsFormWebpart)
+                    if (!bIsFormWebpart)
                     {
                         appendParam("RLists", gSettings.RollupLists);
                         rollupLists = gSettings.RollupLists;
-                        if(gSettings.RollupLists != "")
+                        if (gSettings.RollupLists != "")
                             bRollups = true;
 
                         appendParam("RSites", gSettings.RollupSites.Replace("\r\n", ","));
@@ -4245,17 +4230,17 @@ namespace EPMLiveWebParts
                         appendParam("RLists", "");
                         appendParam("RSites", "");
                     }
-                    
+
                     //appendParam("WBS", props[10]);
-                    
+
                     appendParam("HideNew", gSettings.HideNewButton.ToString());
                     hideNew = gSettings.HideNewButton;
-                    
-                    if(!gSettings.EnableContentReporting)
+
+                    if (!gSettings.EnableContentReporting)
                         appendParam("UsePerf", gSettings.Performance.ToString());
                     else
                         appendParam("UsePerf", "false");
-                    
+
                     appendParam("AllowEdit", gSettings.AllowEdit.ToString());
                     allowEditToggle = gSettings.AllowEdit;
 
@@ -4300,12 +4285,12 @@ namespace EPMLiveWebParts
                 appendParam("Executive", PropExecView);
                 appendParam("Info", PropInformation);
                 appendParam("LType", PropLinkType);
-                if(!bIsFormWebpart)
+                if (!bIsFormWebpart)
                 {
 
                     appendParam("RLists", PropRollupList.Replace(",", "|").Replace("\r\n", ","));
                     rollupLists = PropRollupList.Replace(",", "|").Replace("\r\n", ",");
-                    if(PropRollupList != "")
+                    if (PropRollupList != "")
                         bRollups = true;
 
                     appendParam("RSites", PropRollupSites.Replace("\r\n", ","));
@@ -4343,7 +4328,6 @@ namespace EPMLiveWebParts
                 appendParam("Requests", gSettings.EnableRequests.ToString());
                 requestList = gSettings.EnableRequests;
 
-
                 try
                 {
                     bShowSearch = PropShowSearch.Value;
@@ -4358,16 +4342,16 @@ namespace EPMLiveWebParts
             }
 
             appendParam("UseParent", useParent);
-            
+
             //General Always
             try
             {
-                if(SPContext.Current.ViewContext.View != null)
+                if (SPContext.Current.ViewContext.View != null)
                     appendParam("ShowCheckboxes", view.TabularView.ToString());
             }
             catch { }
 
-            
+
             sFullParamList = sFullParamList.Substring(1);
 
             byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(sFullParamList);
@@ -4375,7 +4359,7 @@ namespace EPMLiveWebParts
             sFullParamList = Convert.ToBase64String(toEncodeAsBytes);
 
 
-           
+
 
             try
             {
@@ -4383,59 +4367,60 @@ namespace EPMLiveWebParts
                 sSearchValue = Page.Request[list.ID.ToString("N") + "_searchvalue"].ToString();
                 sSearchType = Page.Request[list.ID.ToString("N") + "_searchtype"].ToString();
 
-                if(!String.IsNullOrEmpty(sSearchField))
+                if (!String.IsNullOrEmpty(sSearchField))
                     bHasSearchResults = true;
             }
             catch { }
 
 
-
+            if (bHasSearchResults)
+                bShowSearch = true;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
 
-                using(SPSite site = new SPSite(web.Site.ID))
+                using (SPSite site = new SPSite(web.Site.ID))
                 {
-                    using(SPWeb w = site.OpenWeb(web.ID))
+                    using (SPWeb w = site.OpenWeb(web.ID))
                     {
-                        if(useNewMenu)
+                        if (useNewMenu)
                         {
                             newMenuStyle = 2;
                         }
-                        else if(bRollups && !disableNewButtonModification)
+                        else if (bRollups && !disableNewButtonModification)
                         {
-                            if(w.Webs.Count > 0)
+                            if (w.Webs.Count > 0)
                                 newMenuStyle = 1;
                         }
-            
+
                         string webpartid = "";
                         try
                         {
                             // switchto = Page.Request["switchto"];
                             webpartid = Page.Request["webpartid"].ToString();
-                            if(webpartid == this.ID)
+                            if (webpartid == this.ID)
                             {
                                 newGridMode = Page.Request["gridmode"].ToString();
                             }
                         }
                         catch { }
-                        if(webpartid == this.ID)
+                        if (webpartid == this.ID)
                         {
                             try
                             {
-                                if(newGridMode == "datasheet")
+                                if (newGridMode == "datasheet")
                                     inEditMode = true;
-                                else if(newGridMode != "")
+                                else if (newGridMode != "")
                                     inEditMode = false;
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 error = "Error Saving Personalization: " + ex.Message;
                             }
                         }
 
-                        if(rollupLists != "")
+                        if (rollupLists != "")
                             allowInsertRow = false;
-                        if(inEditMode)
+                        if (inEditMode)
                             newGridMode = "datasheet";
                         //case 0:
                         //            output.Write("mygrid" + sFullGridId + "._newitemurl = '" + ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + list.Forms[PAGETYPE.PAGE_NEWFORM].ServerRelativeUrl + "';");
@@ -4449,23 +4434,23 @@ namespace EPMLiveWebParts
                         try
                         {
 
-                            if(web.Site.Features[new Guid("e6df7606-1541-4bf1-a810-e8e9b11819e3")] != null)
+                            if (web.Site.Features[new Guid("e6df7606-1541-4bf1-a810-e8e9b11819e3")] != null)
                             {
                                 System.Collections.Generic.Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(web, null);
 
                                 int bPlanner = 0;
 
-                                foreach(System.Collections.Generic.KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
+                                foreach (System.Collections.Generic.KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
                                 {
                                     string id = (string)de.Key;
                                     EPMLiveCore.PlannerDefinition p = (EPMLiveCore.PlannerDefinition)de.Value;
 
-                                    if(String.Equals(p.commandPrefix, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                                    if (String.Equals(p.commandPrefix, list.Title, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         bPlanner = 1;
                                         break;
                                     }
-                                    if(String.Equals(p.command, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                                    if (String.Equals(p.command, list.Title, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         PlannerV2CurPlanner = id;
                                         bPlanner = 2;
@@ -4473,12 +4458,12 @@ namespace EPMLiveWebParts
                                     }
                                 }
 
-                                if(bPlanner == 1)
+                                if (bPlanner == 1)
                                 {
                                     PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"EPMLivePlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
                                 }
 
-                                else if(bPlanner == 2)
+                                else if (bPlanner == 2)
                                 {
                                     PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"TaskPlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
                                 }
@@ -4513,21 +4498,21 @@ namespace EPMLiveWebParts
                             EPKView = HttpUtility.UrlEncode(view.Title);
                             SPWeb rweb = site.RootWeb;
                             {
-                                if(web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
+                                if (web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                                 {
                                     EPKURL = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKURL");
                                     ArrayList arr = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKLists").ToLower().Split(','));
-                                    if(arr.Contains(list.Title.ToLower()))
+                                    if (arr.Contains(list.Title.ToLower()))
                                     {
                                         EPKEnabled = true;
                                         EPKButtons = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKButtons");
                                         EPKURL = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKURL");
                                         string[] sEPKViews = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKViews").Split('|');
 
-                                        foreach(string sEPKView in sEPKViews)
+                                        foreach (string sEPKView in sEPKViews)
                                         {
                                             string[] sEPKViewMap = sEPKView.Split(',');
-                                            if(sEPKViewMap[0].ToLower() == view.Title.ToLower())
+                                            if (sEPKViewMap[0].ToLower() == view.Title.ToLower())
                                                 EPKView = sEPKViewMap[1];
                                         }
 
@@ -4537,14 +4522,14 @@ namespace EPMLiveWebParts
                                         //EPKView = HttpUtility.UrlEncode(EPKView);
 
                                         EPKCostView = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPK" + list.Title.Replace(" ", "") + "_costview");
-                                        if(EPKCostView == "")
+                                        if (EPKCostView == "")
                                         {
                                             string[] sEPKCostViews = EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKCostViews").Split('|');
 
-                                            foreach(string sEPKView in sEPKCostViews)
+                                            foreach (string sEPKView in sEPKCostViews)
                                             {
                                                 string[] sEPKViewMap = sEPKView.Split(',');
-                                                if(sEPKViewMap[0].ToLower() == view.Title.ToLower())
+                                                if (sEPKViewMap[0].ToLower() == view.Title.ToLower())
                                                     EPKCostView = sEPKViewMap[1];
                                             }
                                         }
@@ -4558,12 +4543,12 @@ namespace EPMLiveWebParts
 
                             try
                             {
-                                using(SPSite tsite = new SPSite(_templateResourceUrl))
+                                using (SPSite tsite = new SPSite(_templateResourceUrl))
                                 {
-                                    using(SPWeb tweb = tsite.OpenWeb())
+                                    using (SPWeb tweb = tsite.OpenWeb())
                                     {
                                         SPList tlist = tweb.Lists.TryGetList("Template Gallery");
-                                        if(tlist != null)
+                                        if (tlist != null)
                                             hasList = true;
                                     }
                                 }
@@ -4577,17 +4562,17 @@ namespace EPMLiveWebParts
                 }
             });
 
-            if(Page.Request["IsDlg"] == "1")
+            if (Page.Request["IsDlg"] == "1")
                 bUsePopUp = true;
 
-            if(!string.IsNullOrEmpty(Page.Request["LookupFieldList"]))
+            if (!string.IsNullOrEmpty(Page.Request["LookupFieldList"]))
             {
                 bLockSearch = false;
                 bShowSearch = false;
             }
         }
 
-        
+
 
         public override ToolPart[] GetToolParts()
         {

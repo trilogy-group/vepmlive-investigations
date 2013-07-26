@@ -80,7 +80,7 @@ namespace EPMLiveWebParts
             public bool project;
         }
 
-        private  Dictionary<Guid, PlannerMenus> hshMenus = new Dictionary<Guid,PlannerMenus>();
+        private Dictionary<Guid, PlannerMenus> hshMenus = new Dictionary<Guid, PlannerMenus>();
 
         protected struct AddItemType
         {
@@ -119,6 +119,7 @@ namespace EPMLiveWebParts
         protected string StartDateField = "";
         protected string DueDateField = "";
         protected string ProgressField = "";
+        protected string InfoField = "";
 
         protected virtual void outputXml()
         {
@@ -174,9 +175,9 @@ namespace EPMLiveWebParts
 
             data = docXml.OuterXml;
 
-            
+
         }
-                
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -334,7 +335,7 @@ namespace EPMLiveWebParts
                                                 }
                                                 break;
                                         };
-                                        if (arrAggregationDef[arrColumns[i]].ToString() == "COUNT")
+                                        if (arrAggregationDef[arrColumns[i]].ToString() == "COUNT" || bCleanValues)
                                             cellValue = val;
                                         else
                                             cellValue = formatField(val, arrColumns[i].ToString(), false, true, null);
@@ -376,7 +377,7 @@ namespace EPMLiveWebParts
                 if (o.GetType().ToString() == "Microsoft.SharePoint.SPListItem")
                 {
                     SPListItem li = (SPListItem)o;
-                    
+
                     if (arrItems.Contains(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID))
                         addItem(li, li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID);
 
@@ -428,7 +429,7 @@ namespace EPMLiveWebParts
                 if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
                     viewMenus[6] = 1;
 
-            if(list.WorkflowAssociations.Count > 0)
+            if (list.WorkflowAssociations.Count > 0)
                 viewMenus[7] = 1;
 
 
@@ -441,15 +442,15 @@ namespace EPMLiveWebParts
                 bool ap = false;
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite site = new SPSite(list.ParentWeb.Site.ID))
+                    using (SPSite site = new SPSite(list.ParentWeb.Site.ID))
                     {
-                        using(SPWeb web = site.OpenWeb())
+                        using (SPWeb web = site.OpenWeb())
                         {
 
                             Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-                            if(lockWeb == Guid.Empty || lockWeb == list.ParentWeb.ID)
+                            if (lockWeb == Guid.Empty || lockWeb == list.ParentWeb.ID)
                             {
-                                if(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveWPProjectCenter") == list.Title)
+                                if (EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveWPProjectCenter") == list.Title)
                                 {
                                     try
                                     {
@@ -457,7 +458,7 @@ namespace EPMLiveWebParts
                                     }
                                     catch { }
                                 }
-                                if(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveAgileProjectCenter") == list.Title)
+                                if (EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveAgileProjectCenter") == list.Title)
                                 {
                                     try
                                     {
@@ -469,9 +470,9 @@ namespace EPMLiveWebParts
                             }
                             else
                             {
-                                using(SPWeb w = site.OpenWeb(lockWeb))
+                                using (SPWeb w = site.OpenWeb(lockWeb))
                                 {
-                                    if(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPProjectCenter") == list.Title)
+                                    if (EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPProjectCenter") == list.Title)
                                     {
                                         try
                                         {
@@ -479,7 +480,7 @@ namespace EPMLiveWebParts
                                         }
                                         catch { }
                                     }
-                                    if(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveAgileProjectCenter") == list.Title)
+                                    if (EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveAgileProjectCenter") == list.Title)
                                     {
                                         try
                                         {
@@ -492,7 +493,7 @@ namespace EPMLiveWebParts
                             }
                         }
                     }
-                    
+
                 });
                 PlannerMenus pm = new PlannerMenus();
                 pm.agile = ap;
@@ -500,7 +501,7 @@ namespace EPMLiveWebParts
                 try
                 {
                     SPDocumentLibrary pschedules = (SPDocumentLibrary)list.ParentWeb.Lists["Project Schedules"];
-                    if(pschedules != null && pubPC.ToLower() == list.Title.ToLower())
+                    if (pschedules != null && pubPC.ToLower() == list.Title.ToLower())
                     {
                         pm.project = true;
                     }
@@ -538,7 +539,7 @@ namespace EPMLiveWebParts
             //if (list.ParentWeb.Features[new Guid("")] != null)
             //    viewMenus[10] = 1;
 
-            if(list.EnableAttachments && list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+            if (list.EnableAttachments && list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                 viewMenus[12] = 1;
 
             //show edit in project (NON PS)
@@ -551,7 +552,7 @@ namespace EPMLiveWebParts
 
             string strViewMenus = "";
 
-            foreach(int v in viewMenus)
+            foreach (int v in viewMenus)
             {
                 strViewMenus += "," + v.ToString();
             }
@@ -570,7 +571,7 @@ namespace EPMLiveWebParts
 
         private void addFilterItems(string field, string value)
         {
-            string strVals =hshColumnSelectFilter[field].ToString();
+            string strVals = hshColumnSelectFilter[field].ToString();
             string[] vals = strVals.Split('\n');
             foreach (string val in vals)
             {
@@ -582,7 +583,7 @@ namespace EPMLiveWebParts
             strVals += "\n" + value;
             hshColumnSelectFilter[field] = strVals;
         }
-        
+
         private void addItem(DataRow dr)
         {
             if (!arrItems.Contains(dr["WebID"].ToString() + "." + dr["ListID"].ToString() + "." + dr["ID"].ToString()))
@@ -616,7 +617,7 @@ namespace EPMLiveWebParts
             //NEED TO DO
 
             bool createworkspace = false;
-            if(dr["WebID"].ToString().Trim("{}".ToCharArray()).Equals(list.ParentWeb.ID.ToString(), StringComparison.CurrentCultureIgnoreCase) && dr.Table.Columns.Contains("_ModerationStatus") && dr["_ModerationStatus"].ToString() == "0")
+            if (dr["WebID"].ToString().Trim("{}".ToCharArray()).Equals(list.ParentWeb.ID.ToString(), StringComparison.CurrentCultureIgnoreCase) && dr.Table.Columns.Contains("_ModerationStatus") && dr["_ModerationStatus"].ToString() == "0")
             {
                 createworkspace = true;
             }
@@ -741,7 +742,7 @@ namespace EPMLiveWebParts
             }
             catch { }
             //===========EditUrl====================
-            if(usePopup && !inEditMode)
+            if (usePopup && !inEditMode)
             {
                 XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
                 XmlAttribute attrName = docXml.CreateAttribute("name");
@@ -799,19 +800,19 @@ namespace EPMLiveWebParts
                         {
                             field = getRealField(list.Fields.GetFieldByInternalName(fieldName));
 
-                            if(bUseReporting)
+                            if (bUseReporting)
                             {
 
-                                if(field.Type == SPFieldType.User || field.Type == SPFieldType.Lookup)
+                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.Lookup)
                                 {
                                     try
                                     {
-                                        if(dr[field.InternalName + "ID"].ToString() != "")
+                                        if (dr[field.InternalName + "ID"].ToString() != "")
                                         {
                                             string[] sids = dr[field.InternalName + "ID"].ToString().Split(',');
                                             string[] svals = dr[field.InternalName + "Text"].ToString().Split(',');
 
-                                            for(int j = 0; j < sids.Length; j++)
+                                            for (int j = 0; j < sids.Length; j++)
                                             {
                                                 val += sids[j] + ";#";
                                                 try
@@ -829,22 +830,24 @@ namespace EPMLiveWebParts
                                     catch { }
 
                                 }
-                                else if(field.Type == SPFieldType.Calculated)
+                                else if (field.Type == SPFieldType.Calculated)
                                 {
                                     SPFieldCalculated calc = (SPFieldCalculated)field;
-                                    if(calc.ShowAsPercentage)
+                                    if (calc.ShowAsPercentage)
                                         try
                                         {
                                             val = (float.Parse(dr[field.InternalName].ToString()) / 100).ToString();
                                         }
                                         catch { }
+                                    else
+                                        val = dr[field.InternalName].ToString();
                                 }
                                 else
                                 {
                                     val = dr[field.InternalName].ToString();
                                 }
                             }
-                            
+
                             else
                             {
                                 val = dr[field.InternalName].ToString();
@@ -926,12 +929,12 @@ namespace EPMLiveWebParts
 
                         //}
                         //else 
-                        else if(field.InternalName == "WorkspaceUrl")
+                        else if (field.InternalName == "WorkspaceUrl")
                         {
                             val = "<a href=\"" + dr["WorkspaceUrl"].ToString().Split(',')[0] + "\"><img src=\"" + list.ParentWeb.ServerRelativeUrl + "/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>"; ;
-                                
+
                             displayValue = val;
-                            
+
                         }
                         else if (field.InternalName == "Title")
                         {
@@ -989,13 +992,13 @@ namespace EPMLiveWebParts
 
                                 if (!inEditMode)
                                 {
-                                    if(url != "")
+                                    if (url != "")
                                     {
                                         val = "<a href=\"" + url + "\">" + val + "</a>";
                                         try
                                         {
                                             DateTime dtCreated = DateTime.Parse(dr["Created"].ToString());
-                                            if(dtCreated.AddDays(2) > DateTime.Now)
+                                            if (dtCreated.AddDays(2) > DateTime.Now)
                                                 val += " <img src=\"/_layouts/" + list.ParentWeb.Language.ToString() + "/images/new.gif\">";
 
 
@@ -1007,9 +1010,9 @@ namespace EPMLiveWebParts
                                         string scomments = dr["CommentCount"].ToString();
                                         double comments = 0;
                                         double.TryParse(scomments, out comments);
-                                        if(comments > 0)
+                                        if (comments > 0)
                                         {
-                                            if(list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                                            if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
                                             {
                                                 ArrayList commenters = new ArrayList();
                                                 int authorid = 0;
@@ -1028,9 +1031,9 @@ namespace EPMLiveWebParts
                                                 try
                                                 {
                                                     SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, dr["AssignedTo"].ToString());
-                                                    foreach(SPFieldUserValue uv in uvc)
+                                                    foreach (SPFieldUserValue uv in uvc)
                                                     {
-                                                        if(uv.LookupId == list.ParentWeb.CurrentUser.ID)
+                                                        if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
                                                         {
                                                             isAssigned = true;
                                                             break;
@@ -1038,7 +1041,7 @@ namespace EPMLiveWebParts
                                                     }
                                                 }
                                                 catch { }
-                                                if(commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
+                                                if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
                                                 {
                                                     ArrayList commentersread = new ArrayList();
                                                     try
@@ -1046,32 +1049,54 @@ namespace EPMLiveWebParts
                                                         commentersread = new ArrayList(dr["CommentersRead"].ToString().Split(','));
                                                     }
                                                     catch { }
-                                                    if(commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
+                                                    if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
                                                     {
-                                                        val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                        val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                                     }
                                                     else
                                                     {
-                                                        val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+                                                        val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
                                                     }
                                                 }
                                                 else
-                                                    val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                    val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                             }
                                             else
-                                                val += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                         }
                                     }
                                     catch { }
                                 }
-                                
+
                                 displayValue = val;
                             }
                         }
                         else
                         {
-
-                            if (inEditMode && editable)
+                            if (bCleanValues)
+                            {
+                                SPField oField = list.Fields.GetFieldByInternalName(field.InternalName);
+                                switch (oField.Type)
+                                {
+                                    case SPFieldType.Calculated:
+                                        if (field.Description == "Indicator")
+                                        {
+                                            if (val != "")
+                                                val = "<img src=\"/_layouts/images/" + val.ToLower() + "\">";
+                                            displayValue = val;
+                                        }
+                                        else
+                                            displayValue = val;
+                                        break;
+                                    case SPFieldType.User:
+                                        displayValue = oField.GetFieldValueAsHtml(val);
+                                        break;
+                                    default:
+                                        displayValue = val;
+                                        break;
+                                }
+                            }
+                            else if (inEditMode && editable)
                             {
                                 /*XmlAttribute attrxmlContent;
                                 XmlAttribute attrAutoComplete;
@@ -1350,12 +1375,12 @@ namespace EPMLiveWebParts
                                     case SPFieldType.Calculated:
                                         if (field.Description == "Indicator")
                                         {
-                                            if(val.IndexOf(";#") == 0)
+                                            if (val.IndexOf(";#") == 0)
                                                 displayValue = "";
                                             //XmlAttribute attrValueFormat = docXml.CreateAttribute("ValueFormat");
                                             //attrValueFormat.Value = "1";
                                             //ndNewCell.Attributes.Append(attrValueFormat);
-                                            if(displayValue != "")
+                                            if (displayValue != "")
                                                 displayValue = "<img src=\"/_layouts/images/" + displayValue.ToLower() + "\">";
                                         }
                                         break;
@@ -1421,7 +1446,7 @@ namespace EPMLiveWebParts
                 }
 
             }
-            
+
             int counter = 1;
 
             foreach (string group in groups)
@@ -1577,11 +1602,11 @@ namespace EPMLiveWebParts
 
         }
 
-        
+
 
         private void addItem(SPListItem li, string indexer)
         {
-            
+
             string wbs = getField(li, usewbs, false);
 
             string[] groups = (string[])arrItems[indexer];
@@ -1600,13 +1625,13 @@ namespace EPMLiveWebParts
             if (!isTimesheet)
                 ndNewItem.Attributes.Append(attrLocked);
 
-            
+
             Dictionary<string, Dictionary<string, string>> fieldProperties = null;
 
-            if(hshFieldProperties.Contains(li.ParentList.ID.ToString()))
+            if (hshFieldProperties.Contains(li.ParentList.ID.ToString()))
                 fieldProperties = (Dictionary<string, Dictionary<string, string>>)hshFieldProperties[li.ParentList.ID.ToString()];
 
-            
+
             if (inEditMode)
             {
                 XmlNode ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
@@ -1687,7 +1712,7 @@ namespace EPMLiveWebParts
                         {
                             if (li.File != null)
                                 val = "<img src=\"" + ((li.Web.ServerRelativeUrl == "/") ? "" : li.Web.ServerRelativeUrl) + "/_layouts/images/" + li.File.IconUrl + "\">";
-                            else if (rolluplists !=null && rolluplists.Length > 0)
+                            else if (rolluplists != null && rolluplists.Length > 0)
                             {
                                 string icon = li.ParentList.ImageUrl;
                                 if (hshLists.Contains(li.ParentList.Title))
@@ -1699,12 +1724,12 @@ namespace EPMLiveWebParts
 
                                 val = "<img src=\"" + ((li.Web.ServerRelativeUrl == "/") ? "" : li.Web.ServerRelativeUrl) + icon + "\">";
                             }
-                            else if(val.Contains("/1"))
+                            else if (val.Contains("/1"))
                                 displayValue = "";
                             else
                                 displayValue = val;
                         }
-                        else if(field.InternalName == "WorkspaceUrl")
+                        else if (field.InternalName == "WorkspaceUrl")
                         {
                             val = "<a href=\"" + li["WorkspaceUrl"].ToString().Split(',')[0] + "\"><img src=\"" + list.ParentWeb.ServerRelativeUrl + "/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>"; ;
 
@@ -1713,7 +1738,7 @@ namespace EPMLiveWebParts
                         }
                         else if (field.InternalName == "ContentType")
                         {
-                            if(li.ID == 0)
+                            if (li.ID == 0)
                                 displayValue = li.ParentList.ContentTypes[0].Name + ";#" + li.ParentList.ContentTypes[0].Name + "\t" + hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
                             else
                                 displayValue = li.ContentType.Name + ";#" + li.ContentType.Name + "\t" + hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
@@ -1766,7 +1791,7 @@ namespace EPMLiveWebParts
                             switch (linktype)
                             {
                                 case "view":
-                                    if(usePopup && !inEditMode)
+                                    if (usePopup && !inEditMode)
                                         url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'view');return false;";
                                     else
                                         url = li.ParentList.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
@@ -1825,25 +1850,25 @@ namespace EPMLiveWebParts
                                 }
                                 catch { }
 
-                                
+
                             }
                             else if (isTimesheet)
                             {
-                                if(url != "")
+                                if (url != "")
                                     displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
                                 //url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'view');return false;";
                                 //displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
                             }
-                            if(!inEditMode)
+                            if (!inEditMode)
                             {
                                 try
                                 {
                                     string scomments = li["CommentCount"].ToString();
                                     double comments = 0;
                                     double.TryParse(scomments, out comments);
-                                    if(comments > 0)
+                                    if (comments > 0)
                                     {
-                                        if(list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                                        if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
                                         {
                                             ArrayList commenters = new ArrayList();
                                             int authorid = 0;
@@ -1862,9 +1887,9 @@ namespace EPMLiveWebParts
                                             try
                                             {
                                                 SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, li["AssignedTo"].ToString());
-                                                foreach(SPFieldUserValue uv in uvc)
+                                                foreach (SPFieldUserValue uv in uvc)
                                                 {
-                                                    if(uv.LookupId == li.ParentList.ParentWeb.CurrentUser.ID)
+                                                    if (uv.LookupId == li.ParentList.ParentWeb.CurrentUser.ID)
                                                     {
                                                         isAssigned = true;
                                                         break;
@@ -1872,7 +1897,7 @@ namespace EPMLiveWebParts
                                                 }
                                             }
                                             catch { }
-                                            if(commenters.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()) || authorid == li.ParentList.ParentWeb.CurrentUser.ID || isAssigned)
+                                            if (commenters.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()) || authorid == li.ParentList.ParentWeb.CurrentUser.ID || isAssigned)
                                             {
                                                 ArrayList commentersread = new ArrayList();
                                                 try
@@ -1880,25 +1905,25 @@ namespace EPMLiveWebParts
                                                     commentersread = new ArrayList(li[list.Fields.GetFieldByInternalName("CommentersRead").Id].ToString().Split(','));
                                                 }
                                                 catch { }
-                                                if(commentersread.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()))
+                                                if (commentersread.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()))
                                                 {
-                                                    displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                    displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                                 }
                                                 else
                                                 {
-                                                    displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+                                                    displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
                                                 }
                                             }
                                             else
-                                                displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                         }
                                         else
-                                            displayValue += " &nbsp;<a href=\"javascript:void(0)\" onclick=\"javascript:viewItem" + gridname + "(this,'comments');\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                            displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                     }
                                 }
                                 catch { }
 
-                                if(!vfc.Exists("WorkspaceUrl"))
+                                if (!vfc.Exists("WorkspaceUrl"))
                                 {
                                     try
                                     {
@@ -1912,19 +1937,23 @@ namespace EPMLiveWebParts
                         }
                         else
                         {
-                            if(bCleanValues)
+                            if (bCleanValues)
                             {
-                                switch(li.Fields.GetFieldByInternalName(field.InternalName).Type)
+                                SPField oField = li.Fields.GetFieldByInternalName(field.InternalName);
+                                switch (oField.Type)
                                 {
                                     case SPFieldType.Calculated:
-                                        if(field.Description == "Indicator")
+                                        if (field.Description == "Indicator")
                                         {
-                                            if(val != "")
+                                            if (val != "")
                                                 val = "<img src=\"/_layouts/images/" + val.ToLower() + "\">";
                                             displayValue = val;
                                         }
                                         else
                                             displayValue = val;
+                                        break;
+                                    case SPFieldType.User:
+                                        displayValue = oField.GetFieldValueAsHtml(val);
                                         break;
                                     default:
                                         displayValue = val;
@@ -2376,7 +2405,7 @@ namespace EPMLiveWebParts
                                 setAggVal(group, fieldName, val, list);
                             }
                         }
-                        if(!editable && inEditMode && field.InternalName != "Title")
+                        if (!editable && inEditMode && field.InternalName != "Title")
                         {
                             XmlAttribute attrType = docXml.CreateAttribute("type");
                             attrType.Value = "ro";
@@ -2394,14 +2423,15 @@ namespace EPMLiveWebParts
 
                 if (wrapInCData)
                     displayValue = "<![CDATA[" + displayValue + "]]>";
-                
+
                 ndNewCell.InnerXml = displayValue;
 
                 try
                 {
                     ndNewItem.AppendChild(ndNewCell);
                 }
-                catch {
+                catch
+                {
                     ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                     ndNewItem.AppendChild(ndNewCell);
                 }
@@ -2412,9 +2442,10 @@ namespace EPMLiveWebParts
             try
             {
                 childitem = li["ChildItem"].ToString();
-            }catch{}
+            }
+            catch { }
 
-            if(li.ParentList.ParentWeb.ID.ToString().Equals(list.ParentWeb.ID.ToString(), StringComparison.CurrentCultureIgnoreCase) && (li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved) && childitem == "")
+            if (li.ParentList.ParentWeb.ID.ToString().Equals(list.ParentWeb.ID.ToString(), StringComparison.CurrentCultureIgnoreCase) && (li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved) && childitem == "")
                 createworkspace = true;
 
             ndNewItem = addMenus(ndNewItem, li.ParentList, createworkspace.ToString());
@@ -2539,12 +2570,12 @@ namespace EPMLiveWebParts
                         ndSiteUrl.InnerText = li.Title;
                         ndNewItem.AppendChild(ndSiteUrl);
                     }
-                    
+
                 }
                 catch { }
             }
             //===========Popup====================
-            if(usePopup && !inEditMode)
+            if (usePopup && !inEditMode)
             {
                 XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
                 XmlAttribute attrName = docXml.CreateAttribute("name");
@@ -2710,7 +2741,7 @@ namespace EPMLiveWebParts
                         data += "\n" + litemp.ID + ";#" + litemp[field].ToString();
                     }
                 }
-                
+
 
                 data = data.Substring(1);
             }
@@ -2763,7 +2794,7 @@ namespace EPMLiveWebParts
             try
             {
 
-                
+
 
                 SPField field = getRealField(aggList.Fields.GetFieldByInternalName(fieldname));
                 fieldname = field.InternalName;
@@ -2880,7 +2911,7 @@ namespace EPMLiveWebParts
                         setAggVal(group.Substring(0, ind), fieldname, val, aggList);
                     }
                 }
-                
+
             }
             catch { }
 
@@ -2904,13 +2935,14 @@ namespace EPMLiveWebParts
                 SPField oLookupFilterField = null;
                 try
                 {
-                    if(!String.IsNullOrEmpty(lookupFilterField))
+                    if (!String.IsNullOrEmpty(lookupFilterField))
                         oLookupFilterField = curList.Fields.GetFieldByInternalName(lookupFilterField);
-                }catch{}
+                }
+                catch { }
                 SPField oReportFilterField = null;
                 try
                 {
-                    if(!String.IsNullOrEmpty(reportFilterField))
+                    if (!String.IsNullOrEmpty(reportFilterField))
                         oReportFilterField = curList.Fields.GetFieldByInternalName(reportFilterField);
                 }
                 catch { }
@@ -2936,25 +2968,25 @@ namespace EPMLiveWebParts
                         catch { }
                     }
 
-                    if(!String.IsNullOrEmpty(lookupFilterField) && lookupFilterIDs.Count >= MAX_LOOKUPFILTER)
+                    if (!String.IsNullOrEmpty(lookupFilterField) && lookupFilterIDs.Count >= MAX_LOOKUPFILTER)
                     {
                         canView = false;
                         try
                         {
                             SPFieldLookupValue lv = new SPFieldLookupValue(li[oLookupFilterField.Id].ToString());
-                            if(lookupFilterIDs.Contains(lv.LookupValue))
+                            if (lookupFilterIDs.Contains(lv.LookupValue))
                                 canView = true;
                         }
                         catch { }
                     }
 
-                    if(!String.IsNullOrEmpty(ReportID) && reportFilterIDs.Count >= MAX_LOOKUPFILTER)
+                    if (!String.IsNullOrEmpty(ReportID) && reportFilterIDs.Count >= MAX_LOOKUPFILTER)
                     {
                         canView = false;
                         try
                         {
                             SPFieldLookupValue lv = new SPFieldLookupValue(li[oReportFilterField.Id].ToString());
-                            if(reportFilterIDs.Contains(lv.LookupValue))
+                            if (reportFilterIDs.Contains(lv.LookupValue))
                                 canView = true;
                         }
                         catch { }
@@ -2981,145 +3013,33 @@ namespace EPMLiveWebParts
                                 //}
                                 //else
                                 //{
-                                    SPField field = list.Fields.GetFieldByInternalName(groupby);
-                                    string newgroup = getField(li, groupby, true);
-                                    
-                                    try
-                                    {
-                                        newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true, li);
-                                    }
-                                    catch { }
-                                    if (newgroup == "")
-                                        newgroup = " No " + field.Title;
-                                    if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
-                                    {
-                                        string[] sGroups = newgroup.Split('\n');
-                                        string[] tmpGroups = new string[group.Length * sGroups.Length];
+                                SPField field = list.Fields.GetFieldByInternalName(groupby);
+                                string newgroup = getField(li, groupby, true);
 
-                                        //group = new string[sGroups.Length];
-                                        int tmpCounter = 0;
-                                        foreach (string g in group)
-                                        {
-                                            foreach (string sGroup in sGroups)
-                                            {
-                                                if (g == null)
-                                                    tmpGroups[tmpCounter] = sGroup.Trim();
-                                                else
-                                                    tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                                if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                                {
-                                                    arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                                }
-                                                tmpCounter++;
-                                            }
-                                        }
-                                        group = tmpGroups;
-                                    }
-                                    else
-                                    {
-                                        for (int i = 0; i < group.Length; i++)
-                                        {
-                                            if (group[i] == null)
-                                                group[i] = newgroup;
-                                            else
-                                                group[i] += "\n" + newgroup;
-                                            if (!arrGTemp.Contains(group[i]))
-                                            {
-                                                arrGTemp.Add(group[i], "");
-                                            }
-                                        }
-                                    }
-                                //}
-
-                            }
-                        }
-                        arrItems.Add(web.ID + "." + li.ParentList.ID + "." + li.ID, group);
-                        queueAllItems.Enqueue(li);
-                    }
-                }
-            }
-            catch { }
-            
-        }
-
-        protected void processListDT(SPWeb web, DataRow []dtRows, SortedList arrGTemp, string listname)
-        {
-            try
-            {
-                foreach(DataRow dr in dtRows)
-                {
-                    bool canView = true;
-
-                    if(!String.IsNullOrEmpty(lookupFilterField) && lookupFilterIDs.Count >= MAX_LOOKUPFILTER)
-                    {
-                        canView = false;
-                        try
-                        {
-                            SPFieldLookupValue lv = new SPFieldLookupValue(dr[lookupFilterField].ToString());
-                            if(lookupFilterIDs.Contains(lv.LookupValue))
-                                canView = true;
-                        }
-                        catch { }
-                    }
-                    if(!String.IsNullOrEmpty(ReportID) && reportFilterIDs.Count >= MAX_LOOKUPFILTER)
-                    {
-                        canView = false;
-                        try
-                        {
-                            SPFieldLookupValue lv = new SPFieldLookupValue(dr[reportFilterField].ToString());
-                            if(reportFilterIDs.Contains(lv.LookupValue))
-                                canView = true;
-                        }
-                        catch { }
-                    }
-                    if(canView)
-                    {
-                        dr["SiteUrl"] = web.Site.Url.ToString();
-                        dr["siteid"] = web.Site.ID.ToString();
-                        if(dr.Table.Columns.Contains("List"))
-                            dr["List"] = listname;
-
-                        string[] group = new string[1] { null };
-                        if(arrGroupFields != null)
-                        {
-                            foreach(string groupfield in arrGroupFields)
-                            {
-                                string groupby = groupfield;
-
-                                SPField field = getRealField(list.Fields.GetFieldByInternalName(groupby));
-                                //string newgroup = getField(li, groupby, true);
-
-                                if(bUseReporting && field.Type == SPFieldType.Lookup)
-                                {
-                                    groupby += "Text";
-                                }
-
-                                string newgroup = dr[groupby].ToString();
                                 try
                                 {
-                                    newgroup = formatField(newgroup, groupby, dr, true);
+                                    newgroup = formatField(newgroup, groupby, field.Type == SPFieldType.Calculated, true, li);
                                 }
                                 catch { }
-                                if(newgroup == "")
+                                if (newgroup == "")
                                     newgroup = " No " + field.Title;
-                                if(field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
+                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice || field.Type == SPFieldType.Lookup || field.TypeAsString == "FilteredLookup")
                                 {
                                     string[] sGroups = newgroup.Split('\n');
                                     string[] tmpGroups = new string[group.Length * sGroups.Length];
 
                                     //group = new string[sGroups.Length];
                                     int tmpCounter = 0;
-                                    foreach(string g in group)
+                                    foreach (string g in group)
                                     {
-                                        foreach(string sGroup in sGroups)
+                                        foreach (string sGroup in sGroups)
                                         {
-                                            if(g == null)
+                                            if (g == null)
                                                 tmpGroups[tmpCounter] = sGroup.Trim();
                                             else
                                                 tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
 
-                                            if(!arrGTemp.Contains(tmpGroups[tmpCounter]))
+                                            if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
                                             {
                                                 arrGTemp.Add(tmpGroups[tmpCounter], "");
                                             }
@@ -3130,13 +3050,125 @@ namespace EPMLiveWebParts
                                 }
                                 else
                                 {
-                                    for(int i = 0; i < group.Length; i++)
+                                    for (int i = 0; i < group.Length; i++)
                                     {
-                                        if(group[i] == null)
+                                        if (group[i] == null)
                                             group[i] = newgroup;
                                         else
                                             group[i] += "\n" + newgroup;
-                                        if(!arrGTemp.Contains(group[i]))
+                                        if (!arrGTemp.Contains(group[i]))
+                                        {
+                                            arrGTemp.Add(group[i], "");
+                                        }
+                                    }
+                                }
+                                //}
+
+                            }
+                        }
+                        arrItems.Add(web.ID + "." + li.ParentList.ID + "." + li.ID, group);
+                        queueAllItems.Enqueue(li);
+                    }
+                }
+            }
+            catch { }
+
+        }
+
+        protected void processListDT(SPWeb web, DataRow[] dtRows, SortedList arrGTemp, string listname)
+        {
+            try
+            {
+                foreach (DataRow dr in dtRows)
+                {
+                    bool canView = true;
+
+                    if (!String.IsNullOrEmpty(lookupFilterField) && lookupFilterIDs.Count >= MAX_LOOKUPFILTER)
+                    {
+                        canView = false;
+                        try
+                        {
+                            SPFieldLookupValue lv = new SPFieldLookupValue(dr[lookupFilterField].ToString());
+                            if (lookupFilterIDs.Contains(lv.LookupValue))
+                                canView = true;
+                        }
+                        catch { }
+                    }
+                    if (!String.IsNullOrEmpty(ReportID) && reportFilterIDs.Count >= MAX_LOOKUPFILTER)
+                    {
+                        canView = false;
+                        try
+                        {
+                            SPFieldLookupValue lv = new SPFieldLookupValue(dr[reportFilterField].ToString());
+                            if (reportFilterIDs.Contains(lv.LookupValue))
+                                canView = true;
+                        }
+                        catch { }
+                    }
+                    if (canView)
+                    {
+                        dr["SiteUrl"] = web.Site.Url.ToString();
+                        dr["siteid"] = web.Site.ID.ToString();
+                        if (dr.Table.Columns.Contains("List"))
+                            dr["List"] = listname;
+
+                        string[] group = new string[1] { null };
+                        if (arrGroupFields != null)
+                        {
+                            foreach (string groupfield in arrGroupFields)
+                            {
+                                string groupby = groupfield;
+
+                                SPField field = getRealField(list.Fields.GetFieldByInternalName(groupby));
+                                //string newgroup = getField(li, groupby, true);
+
+                                if (bUseReporting && field.Type == SPFieldType.Lookup)
+                                {
+                                    groupby += "Text";
+                                }
+
+                                string newgroup = dr[groupby].ToString();
+                                try
+                                {
+                                    newgroup = formatField(newgroup, groupby, dr, true);
+                                }
+                                catch { }
+                                if (newgroup == "")
+                                    newgroup = " No " + field.Title;
+                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice || field.Type == SPFieldType.Lookup || field.TypeAsString == "FilteredLookup")
+                                {
+                                    string[] sGroups = newgroup.Split('\n');
+                                    string[] tmpGroups = new string[group.Length * sGroups.Length];
+
+                                    //group = new string[sGroups.Length];
+                                    int tmpCounter = 0;
+                                    foreach (string g in group)
+                                    {
+                                        foreach (string sGroup in sGroups)
+                                        {
+                                            if (g == null)
+                                                tmpGroups[tmpCounter] = sGroup.Trim();
+                                            else
+                                                tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
+
+                                            if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
+                                            {
+                                                arrGTemp.Add(tmpGroups[tmpCounter], "");
+                                            }
+                                            tmpCounter++;
+                                        }
+                                    }
+                                    group = tmpGroups;
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < group.Length; i++)
+                                    {
+                                        if (group[i] == null)
+                                            group[i] = newgroup;
+                                        else
+                                            group[i] += "\n" + newgroup;
+                                        if (!arrGTemp.Contains(group[i]))
                                         {
                                             arrGTemp.Add(group[i], "");
                                         }
@@ -3160,27 +3192,27 @@ namespace EPMLiveWebParts
             return view.Query;//.Replace("<FieldRef Name=\"SiteURLNoMenu\" />", "");
         }
 
-        
 
-        
+
+
 
         public virtual void addGroups(SPWeb web, string spquery, SortedList arrGTemp)
         {
-            if(bUseReporting)
+            if (bUseReporting)
             {
                 string orderby = "";
                 string query = EPMLiveCore.ReportingData.GetReportQuery(web, list, spquery, out orderby);
-                
-                if(rolluplists == null)
+
+                if (rolluplists == null)
                 {
                     try
                     {
                         DataTable dt = EPMLiveCore.ReportingData.GetReportingData(web, list.Title, false, query, orderby);
-                        if(dt != null)
+                        if (dt != null)
                         {
                             dt.Columns.Add("SiteURL");
                             dt.Columns.Add("siteid");
-                            if(filterfield != "")
+                            if (filterfield != "")
                             {
                                 try
                                 {
@@ -3192,7 +3224,7 @@ namespace EPMLiveWebParts
                                 processListDT(web, dt.Select(), arrGTemp, list.Title);
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         globalError += ex.Message + "<br>";
                     }
@@ -3200,16 +3232,16 @@ namespace EPMLiveWebParts
                 }
                 else
                 {
-                    foreach(string rlist in rolluplists)
+                    foreach (string rlist in rolluplists)
                     {
                         try
                         {
                             DataTable dt = EPMLiveCore.ReportingData.GetReportingData(web, rlist, true, query, orderby);
-                            if(dt != null)
+                            if (dt != null)
                             {
                                 dt.Columns.Add("SiteURL");
                                 dt.Columns.Add("siteid");
-                                if(filterfield != "")
+                                if (filterfield != "")
                                 {
                                     try
                                     {
@@ -3221,16 +3253,16 @@ namespace EPMLiveWebParts
                                     processListDT(web, dt.Select(), arrGTemp, rlist);
                             }
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             globalError += ex.Message + "<br>";
                         }
                     }
                 }
             }
-            else if(rolluplists == null)
+            else if (rolluplists == null)
             {
-                processList(web,spquery,list,arrGTemp);
+                processList(web, spquery, list, arrGTemp);
             }
             else
             {
@@ -3302,7 +3334,7 @@ namespace EPMLiveWebParts
                             globalError += ex.Message + "<br>";
                         }
                     }
-                    
+
                     //string lists = "";
                     //SqlConnection cn = null;
                     //SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -3314,10 +3346,10 @@ namespace EPMLiveWebParts
                     //        cn.Open();
                     //    }
                     //});
-                    
+
                     //if (cn.State == ConnectionState.Open)
                     //{
-                        
+
                     //    try
                     //    {
 
@@ -3357,7 +3389,7 @@ namespace EPMLiveWebParts
                     //            }
                     //        }
 
-                            
+
                     //        if (!arr.Contains("title") && list.Fields.ContainsField("Title"))
                     //        {
                     //            dqFields += "<FieldRef Name='Title' Nullable='TRUE'/>";
@@ -3457,7 +3489,7 @@ namespace EPMLiveWebParts
                 }
             }
 
-            
+
 
             //if (rolluplists != null)
             //{
@@ -3533,13 +3565,13 @@ namespace EPMLiveWebParts
                                 addGroups(web, query, arrGTemp);
                             }
                         }
-                    });   
+                    });
                 }
                 else
                 {
                     addGroups(curWeb, query, arrGTemp);
                 }
-                
+
             }
             else
             {
@@ -3562,7 +3594,7 @@ namespace EPMLiveWebParts
         private string GetLookupValuesQuery()
         {
             StringBuilder sb = new StringBuilder();
-            foreach(string s in lookupFilterIDs)
+            foreach (string s in lookupFilterIDs)
             {
                 sb.Append("<Value Type=\"Text\">");
                 sb.Append(HttpUtility.HtmlEncode(s));
@@ -3575,7 +3607,7 @@ namespace EPMLiveWebParts
         private string GetReportFilters()
         {
             StringBuilder sb = new StringBuilder();
-            foreach(string s in reportFilterIDs)
+            foreach (string s in reportFilterIDs)
             {
                 sb.Append("<Value Type=\"Text\">");
                 sb.Append(HttpUtility.HtmlEncode(s));
@@ -3586,11 +3618,11 @@ namespace EPMLiveWebParts
         }
 
         private void appendLookupQuery(ref XmlDocument xmlQuery, ref ArrayList arrTempGroups)
-        { 
+        {
             SPWeb web = SPContext.Current.Web;
-            if(!string.IsNullOrEmpty(lookupFilterField) && !String.IsNullOrEmpty(lookupFilterFieldList))
+            if (!string.IsNullOrEmpty(lookupFilterField) && !String.IsNullOrEmpty(lookupFilterFieldList))
             {
-               
+
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     //using (SPSite s = SPContext.Current.Site)
@@ -3604,7 +3636,7 @@ namespace EPMLiveWebParts
                         cmd.Parameters.AddWithValue("@listid", lookupFilterFieldList);
                         cmd.ExecuteNonQuery();
                         SqlDataReader dr = cmd.ExecuteReader();
-                        if(dr.Read())
+                        if (dr.Read())
                         {
                             lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
                         }
@@ -3613,14 +3645,11 @@ namespace EPMLiveWebParts
                     }
                 });
 
-                if(lookupFilterIDs.Count < MAX_LOOKUPFILTER)
+                if (lookupFilterIDs.Count < MAX_LOOKUPFILTER)
                 {
                     XmlNode ndWhere = null;
                     ndWhere = xmlQuery.FirstChild.SelectSingleNode("Where");
-
-                    
-
-                    if(ndWhere == null)
+                    if (ndWhere == null)
                     {
                         ndWhere = xmlQuery.CreateElement("Where");
                         xmlQuery.FirstChild.PrependChild(ndWhere);
@@ -3633,7 +3662,7 @@ namespace EPMLiveWebParts
                     }
 
                 }
-                else if(lookupFilterIDs.Count >= MAX_LOOKUPFILTER)
+                else if (lookupFilterIDs.Count >= MAX_LOOKUPFILTER)
                 {
                     arrTempGroups.Add(lookupFilterField);
                 }
@@ -3642,7 +3671,7 @@ namespace EPMLiveWebParts
             try
             {
                 string searchtypedisplay = "Contains";
-                switch(sSearchType)
+                switch (sSearchType)
                 {
                     case "2":
                         searchtypedisplay = "Eq";
@@ -3668,10 +3697,8 @@ namespace EPMLiveWebParts
 
                 };
 
-                if(!String.IsNullOrEmpty(sSearchField))
+                if (!String.IsNullOrEmpty(sSearchField))
                 {
-
-
                     XmlNode ndWhere = null;
                     ndWhere = xmlQuery.FirstChild.SelectSingleNode("Where");
 
@@ -3687,6 +3714,8 @@ namespace EPMLiveWebParts
                         ndWhere = xmlQuery.CreateElement("Where");
                         xmlQuery.FirstChild.PrependChild(ndWhere);
 
+
+
                         ndWhere.InnerXml = query;
                     }
                     else
@@ -3697,11 +3726,11 @@ namespace EPMLiveWebParts
             }
             catch { }
 
-            if(!string.IsNullOrEmpty(LookupFilterField))
+            if (!string.IsNullOrEmpty(LookupFilterField))
             {
                 XmlNode ndWhere = null;
                 ndWhere = xmlQuery.FirstChild.SelectSingleNode("Where");
-                if(ndWhere == null)
+                if (ndWhere == null)
                 {
                     ndWhere = xmlQuery.CreateElement("Where");
                     xmlQuery.FirstChild.PrependChild(ndWhere);
@@ -3714,7 +3743,7 @@ namespace EPMLiveWebParts
                 }
             }
 
-            if(!string.IsNullOrEmpty(ReportID))
+            if (!string.IsNullOrEmpty(ReportID))
             {
                 Guid listid = Guid.Empty;
 
@@ -3732,7 +3761,7 @@ namespace EPMLiveWebParts
                         cmd.Parameters.AddWithValue("@FK", ReportID);
                         cmd.ExecuteNonQuery();
                         SqlDataReader dr = cmd.ExecuteReader();
-                        if(dr.Read())
+                        if (dr.Read())
                         {
                             reportFilterIDs = new ArrayList(dr.GetString(0).Split('|')[0].Split(','));
                             listid = dr.GetGuid(1);
@@ -3743,15 +3772,15 @@ namespace EPMLiveWebParts
                     catch { }
                 });
 
-                if(listid == list.ID)
+                if (listid == list.ID)
                 {
                     reportFilterField = "Title";
 
-                    if(reportFilterIDs.Count < MAX_LOOKUPFILTER)
+                    if (reportFilterIDs.Count < MAX_LOOKUPFILTER)
                     {
                         XmlNode ndWhere = null;
                         ndWhere = xmlQuery.FirstChild.SelectSingleNode("Where");
-                        if(ndWhere == null)
+                        if (ndWhere == null)
                         {
                             ndWhere = xmlQuery.CreateElement("Where");
                             xmlQuery.FirstChild.PrependChild(ndWhere);
@@ -3764,24 +3793,24 @@ namespace EPMLiveWebParts
                         }
 
                     }
-                    else if(reportFilterIDs.Count >= MAX_LOOKUPFILTER)
+                    else if (reportFilterIDs.Count >= MAX_LOOKUPFILTER)
                     {
                         //arrTempGroups.Add(lookupFilterField);
                     }
                 }
-                else if(listid != Guid.Empty)
+                else if (listid != Guid.Empty)
                 {
 
 
 
-                    foreach(SPField oField in list.Fields)
+                    foreach (SPField oField in list.Fields)
                     {
-                        if(oField.Type == SPFieldType.Lookup)
+                        if (oField.Type == SPFieldType.Lookup)
                         {
                             try
                             {
                                 SPFieldLookup oLookup = (SPFieldLookup)oField;
-                                if(new Guid(oLookup.LookupList) == listid)
+                                if (new Guid(oLookup.LookupList) == listid)
                                 {
                                     reportFilterField = oLookup.InternalName;
                                     break;
@@ -3792,11 +3821,11 @@ namespace EPMLiveWebParts
                     }
 
 
-                    if(reportFilterIDs.Count < MAX_LOOKUPFILTER && reportFilterField != "")
+                    if (reportFilterIDs.Count < MAX_LOOKUPFILTER && reportFilterField != "")
                     {
                         XmlNode ndWhere = null;
                         ndWhere = xmlQuery.FirstChild.SelectSingleNode("Where");
-                        if(ndWhere == null)
+                        if (ndWhere == null)
                         {
                             ndWhere = xmlQuery.CreateElement("Where");
                             xmlQuery.FirstChild.PrependChild(ndWhere);
@@ -3809,13 +3838,13 @@ namespace EPMLiveWebParts
                         }
 
                     }
-                    else if(reportFilterIDs.Count >= MAX_LOOKUPFILTER)
+                    else if (reportFilterIDs.Count >= MAX_LOOKUPFILTER)
                     {
                         //arrTempGroups.Add(lookupFilterField);
                     }
                 }
-                
-                
+
+
             }
         }
 
@@ -3838,12 +3867,12 @@ namespace EPMLiveWebParts
             }
             foreach (string additionalgroup in additionalgroups.Split('|'))
             {
-                if(additionalgroup.Trim() != "")
+                if (additionalgroup.Trim() != "")
                     arrTempGroups.Add(additionalgroup);
             }
-            
 
-            
+
+
             XmlDocument xmlQuery = new XmlDocument();
             xmlQuery.LoadXml("<Query>" + query + "</Query>");
 
@@ -3853,14 +3882,14 @@ namespace EPMLiveWebParts
                 xmlQuery.ChildNodes[0].RemoveChild(ndGroupBy);
             }
 
-  
-                appendLookupQuery(ref xmlQuery, ref arrTempGroups);
+
+            appendLookupQuery(ref xmlQuery, ref arrTempGroups);
 
             query = xmlQuery.ChildNodes[0].InnerXml;
 
 
             arrGroupFields = new string[arrTempGroups.Count];
-            foreach(string s in arrTempGroups)
+            foreach (string s in arrTempGroups)
             {
                 arrGroupFields[counter++] = s;
             }
@@ -3869,7 +3898,7 @@ namespace EPMLiveWebParts
             SortedList arrGTemp = new SortedList();
 
             populateGroups(query, arrGTemp, curWeb);
-            
+
             /////////////////////
             foreach (DictionaryEntry e in arrGTemp)
             {
@@ -3907,7 +3936,7 @@ namespace EPMLiveWebParts
 
                     int indentlevel = e.Key.ToString().Split('\n').Length;
 
-                    if(expandlevel == 0 && expanded == "FALSE")
+                    if (expandlevel == 0 && expanded == "FALSE")
                     {
                         XmlAttribute attrExpand = docXml.CreateAttribute("open");
                         attrExpand.Value = "1";
@@ -3937,7 +3966,7 @@ namespace EPMLiveWebParts
                         //XmlAttribute attrType = docXml.CreateAttribute("type");
                         //attrType.Value = "ro";
                         //ndNewCell.Attributes.Append(attrType);
-                        
+
                         newNode.AppendChild(ndNewCell);
                     }
                     if (!titleFieldFound)
@@ -3990,7 +4019,7 @@ namespace EPMLiveWebParts
                     setInitialAggs(e.Key.ToString());
                 }
             }
-            
+
         }
 
         private void addHeader()
@@ -4099,7 +4128,7 @@ namespace EPMLiveWebParts
                 {
                     titleFieldFound = true;
                 }
-                if(f.InternalName == "Edit" || f.InternalName == "DocIcon" || f.InternalName == "WorkspaceUrl")
+                if (f.InternalName == "Edit" || f.InternalName == "DocIcon" || f.InternalName == "WorkspaceUrl")
                 {
                     inWidth -= 60;
                 }
@@ -4147,17 +4176,17 @@ namespace EPMLiveWebParts
 
             foreach (string field in view.ViewFields)
             {
-                
+
                 tooltips += ",true";
                 SPField f = getRealField(list.Fields.GetFieldByInternalName(field));
                 string FieldTitle = f.Title;
-                string width = Math.Round(fwidth,2).ToString(providerEn);
-                
+                string width = Math.Round(fwidth, 2).ToString(providerEn);
+
                 string strType = "ro";
                 string strAlign = "left";
                 string strSort = "str";
                 string inputs = "";
-                
+
                 try
                 {
                     if (f.InternalName == "DocIcon")
@@ -4165,14 +4194,14 @@ namespace EPMLiveWebParts
                         filterfield += ",&nbsp;";
                         width = "60";
                     }
-                    else if(f.InternalName == "WorkspaceUrl")
+                    else if (f.InternalName == "WorkspaceUrl")
                     {
                         filterfield += ",&nbsp;";
                         width = "60";
                         strAlign = "center";
                         FieldTitle = "";
                     }
-                    else  if (f.InternalName == "Edit")
+                    else if (f.InternalName == "Edit")
                     {
                         filterfield += ",&nbsp;";
                         width = "60";
@@ -4188,7 +4217,7 @@ namespace EPMLiveWebParts
                         string items = "<option value=\"\"></option>";
                         foreach (DictionaryEntry de in hshLists)
                         {
-                            items += "<option value=\"" + de.Key + "\">" + de.Key  + "</option>";
+                            items += "<option value=\"" + de.Key + "\">" + de.Key + "</option>";
                         }
                         filterfield += ",<select onClick=\"(arguments[0]||event).cancelBubble=true;\" onChange=\"gridfilter" + gridname + "('" + counter + "|' + this.value);\" style='margin-top: 1px; width: 90%; font-family: Tahoma; font-size: 8pt;'>" + items + "</select>";
                         if (!hshColumnSelectFilter.Contains(f.InternalName))
@@ -4234,7 +4263,7 @@ namespace EPMLiveWebParts
                                 {
                                     if (ct.Parent.Name == "Folder")
                                     {
-                                        if(list.EnableFolderCreation)
+                                        if (list.EnableFolderCreation)
                                             cts += "\n" + ct.Name + ";#" + ct.Name;
                                     }
                                     else
@@ -4244,7 +4273,7 @@ namespace EPMLiveWebParts
                                 }
                             }
 
-                            if(cts.Length > 1)
+                            if (cts.Length > 1)
                                 cts = cts.Substring(1);
 
                             hshComboCells[f.InternalName + "-" + f.ParentList.ID.ToString() + "-" + f.ParentList.ParentWeb.ID.ToString()] = cts;
@@ -4632,8 +4661,8 @@ namespace EPMLiveWebParts
 
                 }
                 XmlNode ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                ndNewColumn.InnerXml = "<![CDATA[<div style=\"width:100%; text-align:" + strAlign + ";padding-right:4px\">" + HttpUtility.HtmlEncode(FieldTitle).Replace(",","&#44;") + "</div>]]>";
-                
+                ndNewColumn.InnerXml = "<![CDATA[<div style=\"width:100%; text-align:" + strAlign + ";padding-right:4px\">" + HttpUtility.HtmlEncode(FieldTitle).Replace(",", "&#44;") + "</div>]]>";
+
                 XmlAttribute attrType = docXml.CreateAttribute("type");
                 attrType.Value = strType;
                 XmlAttribute attrSort = docXml.CreateAttribute("sort");
@@ -4641,12 +4670,12 @@ namespace EPMLiveWebParts
                 XmlAttribute attrWidth = docXml.CreateAttribute("width");
                 attrWidth.Value = width;
                 XmlAttribute attrId = docXml.CreateAttribute("id");
-                attrId.Value = "<![CDATA[" + HttpUtility.HtmlEncode(f.InternalName).Replace(",","&#44;") + "]]>";
+                attrId.Value = "<![CDATA[" + HttpUtility.HtmlEncode(f.InternalName).Replace(",", "&#44;") + "]]>";
                 XmlAttribute attrAlign = docXml.CreateAttribute("align");
                 attrAlign.Value = strAlign;
 
-                
-                
+
+
 
                 ndNewColumn.Attributes.Append(attrType);
                 ndNewColumn.Attributes.Append(attrWidth);
@@ -4671,7 +4700,7 @@ namespace EPMLiveWebParts
             //if (!titleFieldFound)
             //{
             //    fwidth = (100.00 / (float)(view.ViewFields.Count + 1));
-                
+
 
             //    if (inEditMode)
             //    {
@@ -4860,6 +4889,11 @@ namespace EPMLiveWebParts
 
                 try
                 {
+                    InfoField = hshParams["Info"].ToString();
+                }
+                catch { }
+                try
+                {
                     StartDateField = hshParams["Start"].ToString();
                 }
                 catch { }
@@ -4930,7 +4964,7 @@ namespace EPMLiveWebParts
                 catch { }
             }
             catch { }
-            
+
         }
         public string getField(SPListItem li, string field, bool group)
         {
@@ -4975,7 +5009,7 @@ namespace EPMLiveWebParts
                 switch (field)
                 {
                     case "Site":
-                        if(spfield.Type == SPFieldType.URL)
+                        if (spfield.Type == SPFieldType.URL)
                             return "<a href=\"" + li.ParentList.ParentWeb.ServerRelativeUrl + "\">" + li.ParentList.ParentWeb.Title + "</a>";
                         else
                             return li.ParentList.ParentWeb.Title;
@@ -4987,7 +5021,7 @@ namespace EPMLiveWebParts
                     default:
                         spfield = li.Fields.GetFieldByInternalName(field);
                         val = li[spfield.Id].ToString();
-                        
+
                         //if (spfield.TypeAsString == "TotalRollup")
                         //{
                         //    try
@@ -5046,7 +5080,10 @@ namespace EPMLiveWebParts
                                         SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
                                         foreach (SPFieldLookupValue lv in lvc)
                                         {
-                                            retVal += "," + lv.LookupValue;
+                                            if (group)
+                                                retVal += "\n" + lv.LookupValue;
+                                            else
+                                                retVal += "," + lv.LookupValue;
                                         }
                                         return retVal.Substring(1);
                                     }
@@ -5068,10 +5105,15 @@ namespace EPMLiveWebParts
                                 }
                                 catch { }
                                 break;
-
+                            default:
+                                if (spfield.TypeAsString == "FilteredLookup" && group)
+                                {
+                                    val = val.Replace(",", "\n");
+                                }
+                                break;
                         };
                         break;
-                        //return formatField(val, spfield.InternalName, spfield.Type == SPFieldType.Calculated,group, li);
+                    //return formatField(val, spfield.InternalName, spfield.Type == SPFieldType.Calculated,group, li);
                 };
 
             }
@@ -5086,7 +5128,7 @@ namespace EPMLiveWebParts
 
 
             SPField spfield = null;
-            if(li == null)
+            if (li == null)
                 spfield = getRealField(list.Fields.GetFieldByInternalName(fieldname));
             else
                 spfield = getRealField(li.Fields.GetFieldByInternalName(fieldname));
@@ -5151,7 +5193,7 @@ namespace EPMLiveWebParts
                 case SPFieldType.MultiChoice:
                     if (group)
                     {
-                        if(val != "" && val[0] == ';' && val[1] == '#')
+                        if (val != "" && val[0] == ';' && val[1] == '#')
                             val = val.Substring(2, val.Length - 4).Replace(";#", "\n");
                     }
                     else
@@ -5160,7 +5202,7 @@ namespace EPMLiveWebParts
                 case SPFieldType.Lookup:
                     break;
                 case SPFieldType.URL:
-                    if(((SPFieldUrl)spfield).DisplayFormat == SPUrlFieldFormatType.Image)
+                    if (((SPFieldUrl)spfield).DisplayFormat == SPUrlFieldFormatType.Image)
                         val = spfield.GetFieldValueAsHtml(val).Replace("a href", "img src").Replace(">", " alt=\"").Replace("</a alt=\"", "\">");
                     else
                         val = spfield.GetFieldValueAsHtml(val);
@@ -5259,12 +5301,15 @@ namespace EPMLiveWebParts
                     {
                         if (val != "")
                         {
-                            
+
                             SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
                             val = "";
                             foreach (SPFieldLookupValue lv in lvc)
                             {
-                                val += ", " + lv.LookupValue;
+                                if (group)
+                                    val += "\n" + lv.LookupValue;
+                                else
+                                    val += ", " + lv.LookupValue;
                             }
                             if (val.Length > 2)
                                 val = val.Substring(2);
@@ -5464,10 +5509,10 @@ namespace EPMLiveWebParts
             return val;
         }
 
-       
 
 
-public virtual void getParams(SPWeb curWeb, string ganttParams)
+
+        public virtual void getParams(SPWeb curWeb, string ganttParams)
         {
             try
             {
@@ -5492,7 +5537,8 @@ public virtual void getParams(SPWeb curWeb, string ganttParams)
                 try
                 {
                     lookupFilterField = hshParams["LookupField"].ToString();
-                }catch{}
+                }
+                catch { }
                 try
                 {
                     lookupFilterFieldList = hshParams["LookupFieldList"].ToString();
