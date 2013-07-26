@@ -66,7 +66,7 @@ namespace EPMLiveWorkPlanner
                             }
                         }
                     }
-                    
+
                     SPList oProjectCenter = oweb.Lists[new Guid(project[1])];
                     SPList oTaskCenter = oweb.Lists[taskCenterListName];
 
@@ -104,7 +104,7 @@ namespace EPMLiveWorkPlanner
                         }
                     }
 
-                    
+
                 }
 
 
@@ -458,7 +458,7 @@ namespace EPMLiveWorkPlanner
 
             if(cn.State != ConnectionState.Open)
                 cn.Open();
-            
+
             SqlCommand cmd = new SqlCommand("delete from plannerlink where plannerid=@plannerid and destprojectid=@projectid", cn);
             cmd.Parameters.AddWithValue("@plannerid", plannerid);
             cmd.Parameters.AddWithValue("@projectid", projectid);
@@ -479,7 +479,7 @@ namespace EPMLiveWorkPlanner
                 cmd.Parameters.AddWithValue("@successors", sDest[3]);
                 cmd.Parameters.AddWithValue("@linked", sDest[4]);
 
-                
+
                 cmd.ExecuteNonQuery();
             }
             cn.Close();
@@ -498,7 +498,7 @@ namespace EPMLiveWorkPlanner
                     preds = ndTask.SelectSingleNode("Field[@Name='Predecessors']").InnerText;
 
                     string[] sPreds = preds.Split(';');
-                    
+
                     preds = "";
 
                     foreach(string sPred in sPreds)

@@ -296,7 +296,7 @@ namespace EPMLiveWorkPlanner
 
                     if (WBS.Contains("."))
                     {
-                        WBS = WBS.Substring(0, WBS.IndexOf('.'));
+                        WBS = WBS.Substring(0, WBS.LastIndexOf('.'));
 
                         XmlNode ndParent = ndBody.SelectSingleNode("//I[@WBS='" + WBS + "']");
 
@@ -2319,6 +2319,7 @@ namespace EPMLiveWorkPlanner
                             ndNew.AppendChild(ndField);
 
 
+
                         }
                         else
                         {
@@ -2333,6 +2334,15 @@ namespace EPMLiveWorkPlanner
                             ndNew.AppendChild(ndField);
                         }
                     }
+                }
+
+                if (def == "External")
+                {
+                    try
+                    {
+                        ndNew.SelectSingleNode("Field[@Name='Timesheet']").InnerText = "0";
+                    }
+                    catch { }
                 }
 
                 if (ndTask.Attributes["Def"].Value == "Iteration")
@@ -3171,7 +3181,7 @@ namespace EPMLiveWorkPlanner
                 ndTaskDef.Attributes.Append(attrDef);
 
                 attrDef = docOut.CreateAttribute("DueDate");
-                attrDef.Value = DateTime.Parse(oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString()).AddDays(1).ToString("yyyy-MM-dd") + " " + (p.iWorkHours[0] / 60) + ":00"; //getFieldValue(oProject, oProjectCenter.Fields.GetFieldByInternalName("Start"), dsResources);// oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString();
+                attrDef.Value = DateTime.Parse(oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString()).ToString("yyyy-MM-dd") + " " + (p.iWorkHours[3] / 60) + ":00"; //getFieldValue(oProject, oProjectCenter.Fields.GetFieldByInternalName("Start"), dsResources);// oProject[oProjectCenter.Fields.GetFieldByInternalName("Start").Id].ToString();
                 ndTaskDef.Attributes.Append(attrDef);
             }
             catch
@@ -3181,7 +3191,7 @@ namespace EPMLiveWorkPlanner
                 ndTaskDef.Attributes.Append(attrDef);
 
                 attrDef = docOut.CreateAttribute("DueDate");
-                attrDef.Value = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd") + " " + (p.iWorkHours[0] / 60) + ":00";
+                attrDef.Value = DateTime.Now.ToString("yyyy-MM-dd") + " " + (p.iWorkHours[3] / 60) + ":00";
                 ndTaskDef.Attributes.Append(attrDef);
             }
 
