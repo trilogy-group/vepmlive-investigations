@@ -38,15 +38,15 @@ namespace EPMLiveCore.Jobs
 
         private void storeResPlanInfo()
         {
-            if(cn.State == ConnectionState.Open)
+            if (cn.State == ConnectionState.Open)
             {
 
-                using(SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                 {
                     sbc.DestinationTableName = "RESINFO";
                     // Number Of Records Processed In One Go 
                     int iRowCount = dtResInfo.Rows.Count;
-                    if(iRowCount > 500)
+                    if (iRowCount > 500)
                     {
                         iRowCount = 500;
                     }
@@ -58,12 +58,12 @@ namespace EPMLiveCore.Jobs
 
                 }
 
-                using(SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                 {
                     sbc.DestinationTableName = "RESLINK";
                     // Number Of Records Processed In One Go 
                     int iRowCount = dtResLink.Rows.Count;
-                    if(iRowCount > 500)
+                    if (iRowCount > 500)
                     {
                         iRowCount = 500;
                     }
@@ -79,86 +79,100 @@ namespace EPMLiveCore.Jobs
 
         public void execute(SPSite site, SPWeb web, string data)
         {
-            queuetype = 2;
-
-            if(!initJob(site))
-                return;
-
-            //==================Code===================
-
-            string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
-            string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                cn.Open();
-            });
-
-            SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn);
-            cmd.Parameters.AddWithValue("@siteid", site.ID);
-            cmd.ExecuteNonQuery();
-
-            cmd = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn);
-            cmd.Parameters.AddWithValue("@siteid", site.ID);
-            cmd.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
-            cmd.ExecuteNonQuery();
-
-            cmd = new SqlCommand("select timerjobuid from vwQueueTimer where siteguid=@siteguid and jobtype=1", cn);
-            cmd.Parameters.AddWithValue("@siteguid", site.ID);
-            SqlDataReader dr = cmd.ExecuteReader();
             Guid ResJobUid = Guid.Empty;
-            if(dr.Read())
+            try
             {
-                ResJobUid = dr.GetGuid(0);
-            }
-            dr.Close();
+                queuetype = 2;
 
-            cn.Close();
+                if (!initJob(site))
+                    return;
 
-            buildResPlanInfo();
+                //==================Code===================
 
-            int hours = 0;
-            string workdays = " ";
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
-                int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
-                hours = endHour - startHour - 1;
+                string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
+                string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
 
-                int work = site.RootWeb.RegionalSettings.WorkDays;
-                for(byte x = 0; x < 7; x++)
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
-                }
-            });
+                    cn.Open();
+                });
 
-            if(workdays.Length > 1)
-                workdays = workdays.Substring(1);
+                SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn);
+                cmd.Parameters.AddWithValue("@siteid", site.ID);
+                cmd.ExecuteNonQuery();
 
-            float webCount = 0;
-            base.totalCount = site.AllWebs.Count;
+                cmd = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn);
+                cmd.Parameters.AddWithValue("@siteid", site.ID);
+                cmd.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
+                cmd.ExecuteNonQuery();
 
-            foreach(SPWeb w in site.AllWebs)
-            {
-                try
+                cmd = new SqlCommand("select timerjobuid from vwQueueTimer where siteguid=@siteguid and jobtype=1", cn);
+                cmd.Parameters.AddWithValue("@siteguid", site.ID);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                if (dr.Read())
                 {
-                    sErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
-                    sResErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
-                    processWeb(w, sFixLists);
-                    processResPlan(w, resPlanLists, site.ID, hours, workdays);
+                    ResJobUid = dr.GetGuid(0);
                 }
-                catch { }
-                w.Close();
-                w.Dispose();
+                dr.Close();
 
-                updateProgress(webCount++);
+                cn.Close();
+
+                buildResPlanInfo();
+
+                int hours = 0;
+                string workdays = " ";
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
+                    int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
+                    hours = endHour - startHour - 1;
+
+                    int work = site.RootWeb.RegionalSettings.WorkDays;
+                    for (byte x = 0; x < 7; x++)
+                    {
+                        workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
+                    }
+                });
+
+                if (workdays.Length > 1)
+                    workdays = workdays.Substring(1);
+
+                float counter = 0;
+                base.totalCount = site.AllWebs.Count;
+
+                if (sFixLists.Trim().Length > 0)
+                {
+                    string[] arLists = sFixLists.Replace("\r\n", "\n").Split('\n');
+                    base.totalCount = base.totalCount * arLists.Length;
+                }
+
+                foreach (SPWeb w in site.AllWebs)
+                {
+                    try
+                    {
+                        sErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
+                        sResErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
+                        processWeb(w, sFixLists, ref counter);
+                        processResPlan(w, resPlanLists, site.ID, hours, workdays);
+                    }
+                    catch { }
+                    w.Close();
+                    w.Dispose();
+
+
+                }
+
+                //=========================================
+
+
+
             }
-
-            //=========================================
-
-
-            
-
+            catch (Exception ex)
+            {
+                bErrors = true;
+                sErrors += "Execute Error: " + ex.Message;
+            }
             finishJob();
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -167,10 +181,10 @@ namespace EPMLiveCore.Jobs
             });
             storeResPlanInfo();
 
-            if(ResJobUid != Guid.Empty)
+            if (ResJobUid != Guid.Empty)
             {
-                cmd.ExecuteNonQuery();
-                cmd = new SqlCommand("update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn);
+                //cmd.ExecuteNonQuery();
+                SqlCommand cmd = new SqlCommand("update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn);
                 cmd.Parameters.AddWithValue("@timerjobuid", ResJobUid);
                 cmd.ExecuteNonQuery();
 
@@ -179,7 +193,7 @@ namespace EPMLiveCore.Jobs
                 cmd.ExecuteNonQuery();
 
                 cmd = new SqlCommand("INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)", cn);
-                if(bResErrors)
+                if (bResErrors)
                     cmd.Parameters.AddWithValue("@result", "Errors");
                 else
                     cmd.Parameters.AddWithValue("@result", "No Errors");
@@ -191,7 +205,7 @@ namespace EPMLiveCore.Jobs
             cn.Close();
         }
 
-        
+
 
         private string getResUrl(string resUrl)
         {
@@ -210,7 +224,7 @@ namespace EPMLiveCore.Jobs
         {
             string resurl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
 
-            if(resurl.Trim() != "")
+            if (resurl.Trim() != "")
             {
 
 
@@ -227,13 +241,13 @@ namespace EPMLiveCore.Jobs
 
                 dtResLink.Rows.Add(new object[] { web.ServerRelativeUrl, resurl, siteId, workdays, hours });
 
-                if(resPlanLists.Trim().Length > 0)
+                if (resPlanLists.Trim().Length > 0)
                 {
                     string[] arLists = resPlanLists.Replace("\r\n", "\n").Split('\n');
 
-                    foreach(string sList in arLists)
+                    foreach (string sList in arLists)
                     {
-                        if(sList.Trim().Length > 0)
+                        if (sList.Trim().Length > 0)
                         {
                             sResErrors += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing: " + sList;
                             try
@@ -242,7 +256,7 @@ namespace EPMLiveCore.Jobs
                                 SPQuery query = new SPQuery();
                                 query.Query = "<Where><And><And><And><IsNotNull><FieldRef Name=\"StartDate\"/></IsNotNull><IsNotNull><FieldRef Name=\"DueDate\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"Work\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"AssignedTo\"/></IsNotNull></And></Where>";
 
-                                foreach(SPListItem li in list.GetItems(query))
+                                foreach (SPListItem li in list.GetItems(query))
                                 {
                                     string project = "";
                                     string assignedTo = "";
@@ -262,7 +276,7 @@ namespace EPMLiveCore.Jobs
                                     catch { }
 
                                     SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedTo);
-                                    foreach(SPFieldUserValue uv in uvc)
+                                    foreach (SPFieldUserValue uv in uvc)
                                     {
                                         float work = 0;
                                         try
@@ -277,9 +291,9 @@ namespace EPMLiveCore.Jobs
 
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
-                                if(ex.Message != "Value does not fall within the expected range.")
+                                if (ex.Message != "Value does not fall within the expected range.")
                                 {
                                     bResErrors = true;
                                     sResErrors += "...<font color=\"red\">Error: " + ex.Message + "</font>";
@@ -291,51 +305,55 @@ namespace EPMLiveCore.Jobs
             }
         }
 
-        private void processWeb(SPWeb web, string sFixLists)
+        private void processWeb(SPWeb web, string sFixLists, ref float counter)
         {
 
             SPList oList;
 
-            if(sFixLists.Trim().Length > 0)
+            if (sFixLists.Trim().Length > 0)
             {
                 string[] arLists = sFixLists.Replace("\r\n", "\n").Split('\n');
 
-                foreach(string sList in arLists)
+                foreach (string sList in arLists)
                 {
-                    if(sList.Trim().Length > 0)
+                    if (sList.Trim().Length > 0)
                     {
                         try
                         {
                             sErrors += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing List: " + sList;
                             oList = web.Lists.TryGetList(sList);
-                            if(oList != null)
+                            if (oList != null)
                             {
 
                                 try
                                 {
-                                    foreach(SPListItem li in oList.Items)
+                                    SPQuery query = new SPQuery();
+                                    query.Query = "";
+
+                                    SPListItemCollection lic = oList.GetItems(query);
+                                    foreach (SPListItem li in lic)
                                     {
-                                        foreach(SPField f in oList.Fields)
+                                        foreach (SPField f in oList.Fields)
                                         {
-                                            if(f.TypeAsString == "TotalRollup")
+                                            if (f.TypeAsString == "TotalRollup")
                                             {
                                                 li[f.InternalName] = getListItemCount(web, f, li.Title);
                                             }
                                         }
                                         try
                                         {
-                                            if(oList.Fields.ContainsField("PubUpdate"))
+                                            if (oList.Fields.ContainsField("PubUpdate"))
                                                 li["PubUpdate"] = li["PubUpdate"];
                                         }
                                         catch { }
                                         try
                                         {
-                                            if(oList.Fields.ContainsField("IsPublished"))
+                                            if (oList.Fields.ContainsField("IsPublished"))
                                                 li["IsPublished"] = li["IsPublished"];
                                         }
                                         catch { }
 
-                                        if(web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null && sList.ToLower() == "task center")
+                                        if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null && sList.ToLower() == "task center")
                                         {
                                             li["taskuid"] = li["taskuid"].ToString();
                                         }
@@ -343,7 +361,7 @@ namespace EPMLiveCore.Jobs
                                         //li.Update();
                                     }
                                 }
-                                catch(Exception exc)
+                                catch (Exception exc)
                                 {
                                     bErrors = true;
                                     sErrors += "...<font color=\"red\">Error: " + exc.Message + "</font>";
@@ -351,9 +369,9 @@ namespace EPMLiveCore.Jobs
                                 sErrors += "...Success";
                             }
                         }
-                        catch(Exception exc)
+                        catch (Exception exc)
                         {
-                            if(exc.Message != "Value does not fall within the expected range.")
+                            if (exc.Message != "Value does not fall within the expected range.")
                             {
                                 bErrors = true;
                                 sErrors += "...<font color=\"red\">Error: " + exc.Message + "</font>";
@@ -364,6 +382,11 @@ namespace EPMLiveCore.Jobs
                             }
                         }
                     }
+                    try
+                    {
+                        updateProgress(counter++);
+                    }
+                    catch { }
                 }
             }
         }
@@ -395,14 +418,14 @@ namespace EPMLiveCore.Jobs
             {
 
 
-                if(lookup == "")
+                if (lookup == "")
                 {
                     lookup = "Project";
                 }
 
                 SPList tList = web.Lists[list];
 
-                if(query != "")
+                if (query != "")
                 {
                     query = "<And>" + query + "<Eq><FieldRef Name='" + lookup + "'/><Value Type='Lookup'>" + project + "</Value></Eq></And>";
                 }
@@ -412,16 +435,16 @@ namespace EPMLiveCore.Jobs
                 SPQuery q = new SPQuery();
                 q.Query = "<Where>" + query + "</Where>";
 
-                switch(aggtype)
+                switch (aggtype)
                 {
                     case "Sum":
                         double val = 0;
-                        foreach(SPListItem li in tList.GetItems(q))
+                        foreach (SPListItem li in tList.GetItems(q))
                         {
                             try
                             {
                                 string sval = li.Fields.GetFieldByInternalName(aggcolumn).GetFieldValue(li[aggcolumn].ToString()).ToString();
-                                if(sval.Contains(";#"))
+                                if (sval.Contains(";#"))
                                     sval = sval.Replace(";#", "\n").Split('\n')[1];
                                 val += double.Parse(sval);
                             }
@@ -431,19 +454,19 @@ namespace EPMLiveCore.Jobs
                     case "Avg":
                         double val1 = 0;
                         double counter = 0;
-                        foreach(SPListItem li in tList.GetItems(q))
+                        foreach (SPListItem li in tList.GetItems(q))
                         {
                             counter++;
                             try
                             {
                                 string sval = li.Fields.GetFieldByInternalName(aggcolumn).GetFieldValue(li[aggcolumn].ToString()).ToString();
-                                if(sval.Contains(";#"))
+                                if (sval.Contains(";#"))
                                     sval = sval.Replace(";#", "\n").Split('\n')[1];
                                 val1 += double.Parse(sval);
                             }
                             catch { }
                         }
-                        if(counter == 0)
+                        if (counter == 0)
                             return 0;
                         return val1 / counter;
                     default:
@@ -451,7 +474,7 @@ namespace EPMLiveCore.Jobs
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //Response.Write("ERR ROLLUP: " + ex.Message + " " + HttpUtility.HtmlEncode(query) + "<br>");
             }

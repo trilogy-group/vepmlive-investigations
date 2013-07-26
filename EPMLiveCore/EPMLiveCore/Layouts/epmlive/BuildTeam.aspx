@@ -156,12 +156,12 @@
         function doLoad()
         {
 
-
             setHeight();
 
-            sm("dlgLoading", 130, 50);
-
-               setTimeout("loadGrids()", 1000);
+            setTimeout("sm('dlgLoading', 130, 50);", 100);
+           
+            setTimeout("loadGrids()", 1000);
+            
         }
 
         function loadGrids()

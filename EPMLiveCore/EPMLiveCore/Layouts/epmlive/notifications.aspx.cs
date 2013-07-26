@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
 
 namespace EPMLiveCore
 {
-    public partial class Notificiations : LayoutsPageBase 
+    public partial class Notificiations : LayoutsPageBase
     {
         public string strTitle;
         public string strTemplate;
@@ -49,18 +49,18 @@ namespace EPMLiveCore
                         SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
                             //SPSite site = SPContext.Current.Site;
-                            using(SPSite site = new SPSite(SPContext.Current.Site.ID))
+                            using (SPSite site = new SPSite(SPContext.Current.Site.ID))
                             {
                                 site.CatchAccessDeniedException = false;
                                 site.CatchAccessDeniedException = false;
-                                using(SPWeb currWeb = site.OpenWeb())
+                                using (SPWeb currWeb = site.OpenWeb())
                                 {
                                     string sNotificationUsers = "";
-                                    if(currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
+                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
                                     {
                                         sNotificationUsers = currWeb.Properties["EPMLiveNotificationUsers"];
                                     }
-                                    if(sNotificationUsers.Contains(sCurrUser))
+                                    if (sNotificationUsers.Contains(sCurrUser))
                                     {
                                         chkTask.Checked = true;
                                     }
@@ -69,22 +69,22 @@ namespace EPMLiveCore
                                         chkTask.Checked = false;
                                     }
 
-                                    if(currWeb.Properties.ContainsKey("EPMLiveNotificationLock"))
+                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationLock"))
                                     {
-                                        if(currWeb.Properties["EPMLiveNotificationLock"].ToUpper() == "TRUE" || currWeb.Properties["EPMLiveNotificationAllUsers"].ToUpper() == "TRUE")
+                                        if (currWeb.Properties["EPMLiveNotificationLock"].ToUpper() == "TRUE" || currWeb.Properties["EPMLiveNotificationAllUsers"].ToUpper() == "TRUE")
                                             chkTask.Enabled = false;
                                         else
                                             chkTask.Enabled = true;
                                     }
 
-                                    if(currWeb.Properties.ContainsKey("EPMLiveNotificationAllUsers"))
+                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationAllUsers"))
                                     {
-                                        if(currWeb.Properties["EPMLiveNotificationAllUsers"].ToUpper() == "TRUE")
+                                        if (currWeb.Properties["EPMLiveNotificationAllUsers"].ToUpper() == "TRUE")
                                             chkTask.Enabled = false;
                                     }
                                 }
                             }
-                        
+
                         });
                     }
                 }
@@ -107,31 +107,31 @@ namespace EPMLiveCore
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite site = new SPSite(SPContext.Current.Site.ID))
+                    using (SPSite site = new SPSite(SPContext.Current.Site.ID))
                     {
                         site.CatchAccessDeniedException = false;
-                        using(SPWeb currWeb = site.OpenWeb()) 
+                        using (SPWeb currWeb = site.OpenWeb())
                         {
                             currWeb.AllowUnsafeUpdates = true;
                             string sNotificationUsers = "";
-                            if(currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
+                            if (currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
                             {
                                 sNotificationUsers = currWeb.Properties["EPMLiveNotificationUsers"];
                             }
 
                             string sCurrUser = SPContext.Current.Site.RootWeb.CurrentUser.ID + ";#" + SPContext.Current.Site.RootWeb.CurrentUser.Name;
 
-                            if(chkTask.Checked == true)
+                            if (chkTask.Checked == true)
                             {
                                 ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
                                 bool found = false;
-                                foreach(string user in arrUsers)
+                                foreach (string user in arrUsers)
                                 {
                                     string[] userinfo = user.Replace(";#", "\n").Split('\n');
-                                    if(userinfo[0] == SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString())
+                                    if (userinfo[0] == SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString())
                                         found = true;
                                 }
-                                if(!found)
+                                if (!found)
                                     arrUsers.Add(sCurrUser);
 
                                 currWeb.Properties["EPMLiveNotificationUsers"] = String.Join("|", (string[])arrUsers.ToArray(typeof(string)));
@@ -141,10 +141,10 @@ namespace EPMLiveCore
                             {
                                 ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
                                 ArrayList arrNewUsers = new ArrayList();
-                                foreach(string user in arrUsers)
+                                foreach (string user in arrUsers)
                                 {
                                     string[] userinfo = user.Replace(";#", "\n").Split('\n');
-                                    if(userinfo[0] != SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString() && user != "")
+                                    if (userinfo[0] != SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString() && user != "")
                                     {
                                         arrNewUsers.Add(user);
                                     }
