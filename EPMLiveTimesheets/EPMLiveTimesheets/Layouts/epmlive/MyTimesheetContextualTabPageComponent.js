@@ -125,7 +125,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                     return false;
                 if (this.tsObject.Status != 'Unsubmitted')
                     return false;
-                if (curRow != null && curRow["ItemId"] != null)
+                if (curRow != null && curRow["ItemID"] != null)
                     return true;
                 return false;
             case 'Ribbon.MyTimesheet.AddWork':
