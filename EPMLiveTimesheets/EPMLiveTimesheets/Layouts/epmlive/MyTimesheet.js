@@ -1454,16 +1454,21 @@ function fireEvent(element, event) {
 }
 
 function leavePage() {
+
+    var message = "";
+
     if (curGrid.HasChanges()) {
         if (!e) e = window.event;
-
-        e.returnValue = 'You have unsaved changes.';
+        message = 'You have unsaved changes.';
+        e.returnValue = message;
 
         if (e.stopPropagation) {
             e.stopPropagation();
             e.preventDefault();
         }
     }
+
+    return message;
 }
 
 window.onbeforeunload = leavePage;
