@@ -17,7 +17,7 @@ namespace EPMLiveCore
 
             var rb = new EPMLiveReportsAdmin.ReportBiz(web.Site.ID);
 
-            if(rb.SiteExists())
+            if (rb.SiteExists())
             {
                 EPMLiveReportsAdmin.EPMData data = new EPMLiveReportsAdmin.EPMData(web.Site.ID);
 
@@ -26,7 +26,7 @@ namespace EPMLiveCore
                 SqlCommand cmd = new SqlCommand("select * from information_schema.parameters where specific_name='spGetReportListData' and parameter_name='@orderby'", cn);
                 bool borderby = false;
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.Read())
+                if (dr.Read())
                     borderby = true;
                 dr.Close();
 
@@ -39,7 +39,7 @@ namespace EPMLiveCore
                 cmd.Parameters.AddWithValue("@rollup", bRollup);
                 cmd.Parameters.AddWithValue("@list", list);
                 cmd.Parameters.AddWithValue("@query", query);
-                if(borderby)
+                if (borderby)
                     cmd.Parameters.AddWithValue("@orderby", orderby);
 
                 DataSet ds = new DataSet();
@@ -58,7 +58,7 @@ namespace EPMLiveCore
         {
             orderby = "";
 
-            if(spquery == "")
+            if (spquery == "")
                 return "";
 
             XmlDocument doc = new XmlDocument();
@@ -68,24 +68,19 @@ namespace EPMLiveCore
 
             XmlNode ndGroupBy = doc.FirstChild.SelectSingleNode("//OrderBy");
 
-            foreach(XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
+            foreach (XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
             {
-                string orderField = nd.Attributes["Name"].Value;
-                if (orderField == "ID")
-                    orderField = "ItemID";
-
-                orderby += "," + orderField;
-
+                orderby += "," + nd.Attributes["Name"].Value;
                 try
                 {
-                    if(nd.Attributes["Ascending"].Value.ToLower() == "false")
+                    if (nd.Attributes["Ascending"].Value.ToLower() == "false")
                         orderby += " DESC";
                 }
                 catch { }
             }
             orderby = orderby.Trim(',');
 
-            if(ndWhere == null)
+            if (ndWhere == null)
                 return "";
 
             string q = GetReportQueryNode(web, ndWhere.FirstChild, list);
@@ -99,11 +94,11 @@ namespace EPMLiveCore
         private static string GetReportQueryNode(SPWeb web, XmlNode nd, SPList list)
         {
 
-            if(nd.Name == "And")
+            if (nd.Name == "And")
             {
                 return "(" + GetReportQueryNode(web, nd.FirstChild, list) + " And " + GetReportQueryNode(web, nd.FirstChild.NextSibling, list) + ")";
             }
-            else if(nd.Name == "Or")
+            else if (nd.Name == "Or")
             {
                 return "(" + GetReportQueryNode(web, nd.FirstChild, list) + " Or " + GetReportQueryNode(web, nd.FirstChild.NextSibling, list) + ")";
             }
@@ -113,7 +108,7 @@ namespace EPMLiveCore
 
                 string field = nd.SelectSingleNode("FieldRef").Attributes["Name"].Value;
 
-                if(nd.Name == "IsNull")
+                if (nd.Name == "IsNull")
                 {
                     return field + " is null";
                 }
@@ -130,11 +125,11 @@ namespace EPMLiveCore
 
 
 
-                    if(ndVals != null)
+                    if (ndVals != null)
                     {
                         string vals = "(";
 
-                        if(oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
+                        if (oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
                         {
                             field += "Text";
                         }
@@ -161,26 +156,29 @@ namespace EPMLiveCore
 
                         bool bLookup = false;
 
-                        if(oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
+                        if (oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
                         {
                             bLookup = true;
-                            field += "ID";
+                            if (nd.Name == "Contains")
+                                field += "Text";
+                            else
+                                field += "ID";
                         }
 
-                        if(nd.SelectSingleNode("Value").SelectSingleNode("UserID") != null)
+                        if (nd.SelectSingleNode("Value").SelectSingleNode("UserID") != null)
                         {
                             val = web.CurrentUser.ID.ToString();
                         }
-                        if(val.ToLower() == "[today]")
+                        if (val.ToLower() == "[today]")
                         {
                             val = DateTime.Now.ToString("s");
                         }
 
-                        if(nd.Name == "BeginsWith")
+                        if (nd.Name == "BeginsWith")
                         {
                             return field + " Like '" + val + "%'";
                         }
-                        else if(nd.Name == "Contains")
+                        else if (nd.Name == "Contains")
                         {
                             return field + " Like '%" + val + "%'";
                         }
@@ -188,7 +186,7 @@ namespace EPMLiveCore
                         {
                             string sign = GetNodeSign(nd.Name);
 
-                            if(bLookup && sign == "=")
+                            if (bLookup && sign == "=")
 
                                 return "',' + CAST(" + field + " as varchar(MAX)) + ',' LIKE '%," + val + ",%'";
                             else
@@ -201,7 +199,7 @@ namespace EPMLiveCore
 
         public static string GetNodeSign(string name)
         {
-            switch(name.ToLower())
+            switch (name.ToLower())
             {
                 case "eq":
                     return "=";
@@ -223,6 +221,7 @@ namespace EPMLiveCore
                     return "=";
             }
         }
+
         // TEST //
         public static string ProcessReportFilter(SPList list, SPWeb web, string filterWpId)
         {
