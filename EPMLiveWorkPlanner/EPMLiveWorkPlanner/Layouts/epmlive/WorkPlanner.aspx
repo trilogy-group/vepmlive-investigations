@@ -1062,6 +1062,19 @@
         }
     }
     
+    Grids.OnZoom = function(grid, zoom, FirstDate, LastDate) 
+    {
+        if(grid.id == "WorkPlannerGrid" && !bRendering)
+        {
+
+            var N = Grids.AllocationGrid;
+            N.ZoomTo(FirstDate,LastDate,grid.Cols.G.Width);
+            setTimeout(function(){N.SetScrollLeft(grid.GetScrollLeft(2),2);},100);
+
+        }
+    }
+
+
     Grids.OnEnterEdit = function(grid, row, col)
     {
         if(grid.id == "WorkPlannerGrid" )

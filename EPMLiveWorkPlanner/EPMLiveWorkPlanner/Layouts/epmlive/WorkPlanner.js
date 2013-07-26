@@ -2057,9 +2057,9 @@ function ZoomIn()
         //curZoom++;
 
         Grids.WorkPlannerGrid.ActionZoomIn();
-        Grids.AllocationGrid.ChangeZoom(Grids.WorkPlannerGrid.Cols["G"].GanttZoom);
+        //Grids.AllocationGrid.ChangeZoom(Grids.WorkPlannerGrid.Cols["G"].GanttZoom);
 
-        ScrollTo();
+        //ScrollTo();
         RefreshCommandUI();
     }
 }
@@ -2071,8 +2071,8 @@ function ZoomOut()
         //curZoom--;
 
         Grids.WorkPlannerGrid.ActionZoomOut();
-        Grids.AllocationGrid.ChangeZoom(Grids.WorkPlannerGrid.Cols["G"].GanttZoom);
-        ScrollTo();
+        //Grids.AllocationGrid.ChangeZoom(Grids.WorkPlannerGrid.Cols["G"].GanttZoom);
+        //ScrollTo();
         RefreshCommandUI();
     }
 }
