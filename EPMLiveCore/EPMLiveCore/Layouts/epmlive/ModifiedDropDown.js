@@ -692,9 +692,9 @@ function MDInit() {
 
                         if (controlProps.ControlType == "1") {
 
-                            var lookupDdlId = controlProps.ControlInfo.SourceControlId.substr(0, controlProps.ControlInfo.SourceControlId.lastIndexOf('_')) + '_Lookup';
+                            var lookupDdlId = controlProps.ControlInfo.SourceControlId;
                                                     
-                            $('#' + lookupDdlId).find('option').each(function () {
+                            $('SELECT[id="' + lookupDdlId + '"]').find('option').each(function () {
                                 if ($(this).val() == controlProps.ControlInfo.SingleSelectLookupVal) {
                                     $(this).prop('selected', 'selected');
                                 }
