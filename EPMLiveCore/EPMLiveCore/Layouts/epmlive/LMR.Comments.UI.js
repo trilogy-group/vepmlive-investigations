@@ -173,7 +173,7 @@ function ajaxPost(command) {
                         $('#commentItem_' + commentItemId).find('#btnCommentItemEdit_Model').attr('id', 'btnCommentItemEdit_' + commentItemId);
                         $('#commentItem_' + commentItemId).find('#btnCommentItemDelete_Model').attr('id', 'btnCommentItemDelete_' + commentItemId);
 
-                        $('#commentItem_' + commentItemId).find('#commentAvailBubble_Model').attr('onload', 'QueuePopulateIMNRC(\'' + userEmail + '\',this);');
+                        $('#commentItem_' + commentItemId).find('#commentAvailBubble_Model').attr('sip', userEmail);
 
                         //                        var newComment = commentModel.replace(/##commentItem_Model##/g, 'commentItem_' + commentItemId)
                         //                                                                             .replace(/##divComment_Model##/g, 'divComment_' + commentItemId)
