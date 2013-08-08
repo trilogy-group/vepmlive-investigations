@@ -1,0 +1,147 @@
+﻿.cursor-hand {
+  cursor: pointer;
+  cursor: hand;
+}
+#epm-nav-top {
+  -moz-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
+  -webkit-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
+  box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
+  background-color: #E2E2E2;
+  height: 100%;
+  position: absolute;
+  top: 50px;
+  width: 50px;
+}
+#epm-nav-top ul {
+  list-style: none outside none;
+  margin: 0;
+  padding: 0;
+}
+#epm-nav-top ul li {
+  text-align: center;
+  height: 40px;
+}
+#epm-nav-top ul li span {
+  color: #7C7C7C;
+  font-size: 2.2em;
+  margin-top: 5px;
+  cursor: pointer;
+  cursor: hand;
+}
+#epm-nav-top ul .epm-nav-node-opened {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAASCAYAAABrXO8xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH3QcIFDcV8xUe3QAAAGhJREFUOMuV0csNwDAIA1A3e2QA9h+GOxkkPbUS+YDxMdITBD9mNpFkjAERcW+NQac0Bq3TQhihK8zQETJogyxysIJ+WEVUjyHsvQMAVLU+sYrdqhW8/ZHFx+Mw+HrVDId1RDjt8cNrXhAVM+1Af3qrAAAAAElFTkSuQmCC');
+  *background-image: url(/_layouts/15/epmlive/images/notch.png);
+  /* For IE 6 and 7 */
+
+  background-position: 40px 13px;
+  background-repeat: no-repeat;
+}
+#epm-nav-top ul .epm-nav-node-selected span {
+  color: #0090ca !important;
+}
+#epm-nav-top ul .epm-nav-tlnode {
+  -webkit-text-shadow: 0 1px 0 #f8f8f8;
+  text-shadow: 0 1px 0 #f8f8f8;
+}
+#epm-nav-top ul.bottom {
+  position: absolute;
+  bottom: 75px;
+  width: 100%;
+}
+#epm-nav-sub {
+  background-color: #EEEEEE;
+  -moz-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
+  -webkit-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
+  box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
+  display: none;
+  float: left;
+  height: 100%;
+  left: 50px;
+  position: absolute;
+  width: 170px;
+  z-index: 1000;
+}
+#epm-nav-pin {
+  color: #7C7C7C;
+  display: none;
+  padding-right: 4px;
+  padding-top: 3px;
+  position: absolute;
+  right: 0;
+  cursor: pointer;
+  cursor: hand;
+  -webkit-transition: All 0.2s ease;
+  -o-transition: All 0.2s ease;
+  -moz-transition: All 0.2s ease;
+  transition: All 0.2s ease;
+}
+.epm-nav-sub {
+  display: none;
+}
+.epm-nav-sub .epm-nav-sub-menu .epm-nav-node {
+  color: #666666;
+  font-family: 'Open Sans Regular', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  height: 22px;
+  line-height: 22px;
+}
+.epm-nav-sub .epm-nav-sub-menu td.epm-nav-node {
+  width: 134px;
+}
+.epm-nav-sub .epm-nav-sub-menu td.epm-nav-node a.epm-nav-node {
+  padding-left: 6px;
+}
+.epm-nav-sub .epm-nav-sub-menu .epm-nav-node-root {
+  font-size: 1.15em;
+  margin-left: 5px;
+}
+.epm-nav-sub .epm-nav-sub-menu span.epm-nav-node-root {
+  position: relative;
+  top: -2px;
+}
+.epm-nav-sub .epm-nav-sub-menu .epm-nav-node-hover {
+  background-color: #e7e7e7;
+}
+.epm-nav-sub .epm-nav-sub-menu .epm-nav-node-hover a {
+  text-decoration: none;
+}
+.epm-nav-sub .epm-nav-sub-menu table {
+  margin-left: 10px;
+  margin-top: 13px;
+}
+.epm-nav-sub .epm-nav-sub-menu div table {
+  margin: 0;
+  padding-top: 1.5px;
+  padding-bottom: 1.5px;
+}
+.epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected {
+  border-left: 5px solid #0090ca !important;
+  background-color: #e7e7e7;
+}
+.epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected td.epm-nav-node {
+  width: 129px;
+}
+.epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected td.epm-nav-node a {
+  padding-left: 1px !important;
+}
+.epm-nav-unpinned {
+  margin-left: 50px;
+}
+.epm-nav-pinned {
+  margin-left: 220px;
+}
+.epm-nav-pin-unpinned {
+  -webkit-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
+  -moz-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
+  -o-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
+  -ms-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
+  transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
+}
+.epm-nav-pin-pinned {
+  -webkit-transform: rotate(-45deg) scale(1) skew(0deg) translate(0px);
+  -moz-transform: rotate(-45deg) scale(1) skew(0deg) translate(0px);
+  -o-transform: rotate(-45deg) scale(1) skew(0deg) translate(0px);
+  -ms-transform: rotate(-45deg) scale(1) skew(0deg) translate(0px);
+  transform: rotate(-45deg) scale(1) skew(0deg) translate(0px);
+}

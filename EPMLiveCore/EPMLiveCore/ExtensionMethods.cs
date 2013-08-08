@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -838,6 +839,26 @@ namespace EPMLiveCore
 
         #endregion
 
+        #region TreeView Extensions
+
+        public static void Sort(this TreeView treeView)
+        {
+            var nodes = treeView.Nodes;
+
+            var nodeCollection = new TreeNode[nodes.Count];
+            nodes.CopyTo(nodeCollection, 0);
+
+            Array.Sort(nodeCollection, new TreeNodeComparer());
+
+            nodes.Clear();
+            foreach (TreeNode node in nodeCollection)
+            {
+                nodes.Add(node);
+            }
+        }
+
+        #endregion
+
         #region Private Helpers
 
         /// <summary>
@@ -869,5 +890,17 @@ namespace EPMLiveCore
         }
 
         #endregion
+
+        public class TreeNodeComparer : IComparer
+        {
+            #region Implementation of IComparer
+
+            public int Compare(object x, object y)
+            {
+                return String.CompareOrdinal(((TreeNode) x).Text, ((TreeNode) y).Text);
+            }
+
+            #endregion
+        }
     }
 }

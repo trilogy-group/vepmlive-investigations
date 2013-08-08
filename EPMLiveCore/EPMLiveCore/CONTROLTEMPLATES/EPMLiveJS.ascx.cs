@@ -8,19 +8,21 @@ using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.ControlTemplates
 {
+    [MdsCompliant(true)]
     public partial class EPMLiveJS : UserControl
     {
         #region Fields (7) 
 
         protected string EPMFileVersion;
+        protected string Scheme;
         protected string SiteId;
         protected string SiteUrl;
+        protected string WalkMeId;
         protected string WebFullUrl;
         protected string WebId;
         protected string WebUrl;
         private SPWeb _spWeb;
-        protected string WalkMeId; 
-        protected string Scheme;
+
         #endregion Fields 
 
         #region Methods (2) 
@@ -29,8 +31,10 @@ namespace EPMLiveCore.ControlTemplates
 
         protected override void OnPreRender(EventArgs e)
         {
-            ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/libraries/jquery.min.js", false);
-            ManageWalkMeIntegration();
+            foreach (string script in new[] {"libraries/jquery.min", "libraries/jquery.cookie"})
+            {
+                SPPageContentManager.RegisterScriptFile(Page, "/_layouts/15/epmlive/javascripts/" + script + ".js", false);
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -41,14 +45,12 @@ namespace EPMLiveCore.ControlTemplates
             WebFullUrl = _spWeb.Url;
             WebId = _spWeb.ID.ToString();
             WebUrl = _spWeb.SafeServerRelativeUrl();
-            string sWalkMeId = string.Empty;
+
             try
             {
                 WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
             }
-            catch
-            {
-            }
+            catch { }
 
             Scheme = Request.Url.Scheme;
             string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
@@ -58,46 +60,6 @@ namespace EPMLiveCore.ControlTemplates
             }
 
             EPMFileVersion = fileVersion;
-        }
-
-        private void ManageWalkMeIntegration()
-        {
-            //string sWalkMeId = string.Empty;
-            //try
-            //{
-            //    sWalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
-            //}
-            //catch
-            //{
-            //}
-
-
-//            if (!string.IsNullOrEmpty(sWalkMeId))
-//            {
-//                try
-//                {
-//                    Page.ClientScript.RegisterStartupScript(
-//                        //Type type//
-//                        Page.GetType(),
-//                        //string key//
-//                        "WalkMeScript_" + sWalkMeId,
-//                        //string script//
-//                        @"(function () {
-//                            var walkme = document.createElement('script');
-//                            walkme.type = 'text/javascript';
-//                            walkme.async = true;
-//                            walkme.src = '##SCHEME##://d3b3ehuo35wzeh.cloudfront.net/users/##WALKMEID##/walkme_##WALKMEID##_https.js';
-//                            var s = document.getElementsByTagName('script')[0];
-//                            s.parentNode.insertBefore(walkme, s);
-//                        })();".Replace("##SCHEME##", Request.Url.Scheme).Replace("##WALKMEID##", sWalkMeId),
-//                        //bool addScriptTags//
-//                        true
-//                        );
-//                }
-//                catch
-//                {
-//                }
-//            }
         }
 
         #endregion Methods 
