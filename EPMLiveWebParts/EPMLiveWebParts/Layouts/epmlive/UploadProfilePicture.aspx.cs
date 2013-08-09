@@ -1,46 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
-using EPMLiveCore;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
     public partial class UploadProfilePicture : LayoutsPageBase
     {
         private const string ProfilePictureLibraryName = "User Profile Pictures";
-        
-        protected void Page_Load(object sender, EventArgs e)
-        {
-        }
 
-        protected void UploadPictureButton_Click(object sender, EventArgs e)
-        {
-            if (!PictureFileUpload.HasFile) return;
-
-            var pictureFileBytes = PictureFileUpload.FileBytes;
-            var pictureFileName = GetPictureFileName();
-            var pictureDocumentLibrary = GetDocumentLibrary("User Profile Pictures");
-            if (pictureDocumentLibrary == null) return;
-
-            var pictureUrl = GetPictureUrl(pictureFileName);
-
-            DeleteExistingPicturesForUser(pictureDocumentLibrary);
-            UploadPictureToDocumentLibrary(pictureDocumentLibrary, pictureFileName, pictureFileBytes);
-            UpdatePictureUrlInSiteUserInfoList(pictureUrl);
-            UpdatePictureUrlInUserProfile(pictureUrl);
-            CloseDialog(pictureUrl);
-        }
+        protected void Page_Load(object sender, EventArgs e) { }
 
         private void CloseDialog(string pictureUrl)
         {
             if (ClientScript.IsStartupScriptRegistered("CloseDialog")) return;
-            
-            var javascript = @"
+
+            string javascript = @"
                                 SP.SOD.executeFunc('sp.js', 'SP.ClientContext', closeModal);
                                 
                                 function closeModal(){                                
@@ -54,22 +36,22 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private string GetPictureFileName()
         {
-            var loginName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
-            return string.Format("{0}{1}", loginName, Path.GetExtension(PictureFileUpload.FileName));
+            string loginName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
+            return string.Format("{0}{1}", loginName, Path.GetExtension(FileNameField.Value));
         }
 
         private string GetCleanUserName(string loginName)
         {
-            var indexForGettingEverythingAfterPipe = loginName.IndexOf("|") + 1;
-            var loginNameWithDomain = loginName.Mid(indexForGettingEverythingAfterPipe);
+            int indexForGettingEverythingAfterPipe = loginName.IndexOf("|") + 1;
+            string loginNameWithDomain = loginName.Mid(indexForGettingEverythingAfterPipe);
 
-            var indexForGettingEverythingAfterDomain = loginNameWithDomain.IndexOf("\\") + 1;
-            var loginNameWithoutDomain = loginNameWithDomain.Mid(indexForGettingEverythingAfterDomain);
+            int indexForGettingEverythingAfterDomain = loginNameWithDomain.IndexOf("\\") + 1;
+            string loginNameWithoutDomain = loginNameWithDomain.Mid(indexForGettingEverythingAfterDomain);
 
             if (loginNameWithoutDomain.Contains("|"))
             {
-                var indexForAdditionalPipe = loginNameWithoutDomain.IndexOf("|") + 1;
-                var loginNameWithOutExtraPipe = loginNameWithoutDomain.Mid(indexForAdditionalPipe);
+                int indexForAdditionalPipe = loginNameWithoutDomain.IndexOf("|") + 1;
+                string loginNameWithOutExtraPipe = loginNameWithoutDomain.Mid(indexForAdditionalPipe);
                 loginNameWithoutDomain = loginNameWithOutExtraPipe;
             }
 
@@ -79,35 +61,36 @@ namespace EPMLiveWebParts.Layouts.epmlive
         private static SPFolder GetDocumentLibrary(string documentLibraryName)
         {
             SPFolder documentLibrary = null;
-            var web = SPContext.Current.Site.RootWeb;
+            SPWeb web = SPContext.Current.Site.RootWeb;
             SPUtility.ValidateFormDigest();
             SPSecurity.RunWithElevatedPrivileges(delegate
-                                                     {
-                                                         // This is creating a new site and web to operate on because the web variable 
-                                                         // using SPContext above wont elevate since the web object was already created.
-                                                         // Thus we have to create a new web object inside the elevated permission block
-                                                         // in order for it to run under elevated permissions.
-                                                         using (var site = new SPSite(web.Site.Url))
-                                                         {
-                                                             using (var newWeb = site.OpenWeb())
-                                                             {
-                                                                 try
-                                                                 {
-                                                                     documentLibrary = newWeb.Folders[documentLibraryName];
-                                                                 }
-                                                                 catch (ArgumentException)
-                                                                 {
-                                                                     newWeb.Lists.Add(ProfilePictureLibraryName, null, SPListTemplateType.PictureLibrary);
+            {
+                // This is creating a new site and web to operate on because the web variable 
+                // using SPContext above wont elevate since the web object was already created.
+                // Thus we have to create a new web object inside the elevated permission block
+                // in order for it to run under elevated permissions.
+                using (var site = new SPSite(web.Site.Url))
+                {
+                    using (SPWeb newWeb = site.OpenWeb())
+                    {
+                        try
+                        {
+                            documentLibrary = newWeb.Folders[documentLibraryName];
+                        }
+                        catch (ArgumentException)
+                        {
+                            newWeb.Lists.Add(ProfilePictureLibraryName, null, SPListTemplateType.PictureLibrary);
 
-                                                                     documentLibrary = newWeb.Folders[documentLibraryName];
-                                                                 }
-                                                             }
-                                                         }
-                                                     });
+                            documentLibrary = newWeb.Folders[documentLibraryName];
+                        }
+                    }
+                }
+            });
             return documentLibrary;
         }
 
-        private static void UploadPictureToDocumentLibrary(SPFolder pictureDocumentLibrary, string pictureFileName, byte[] pictureFileBytes)
+        private static void UploadPictureToDocumentLibrary(SPFolder pictureDocumentLibrary, string pictureFileName,
+            byte[] pictureFileBytes)
         {
             pictureDocumentLibrary.Files.Add(pictureFileName, pictureFileBytes, true);
             pictureDocumentLibrary.Update();
@@ -115,29 +98,35 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private static void UpdatePictureUrlInSiteUserInfoList(string pictureUrl)
         {
-            var userInformationList = SPContext.Current.Web.SiteUserInfoList;
-            var user = SPContext.Current.Web.CurrentUser;
-            var userItem = userInformationList.GetItemById(user.ID);
+            SPList userInformationList = SPContext.Current.Web.SiteUserInfoList;
+            SPUser user = SPContext.Current.Web.CurrentUser;
+            SPListItem userItem = userInformationList.GetItemById(user.ID);
 
             userItem["Picture"] = pictureUrl;
             userItem.Update();
         }
 
         /// <summary>
-        /// Reflection is being used in this method because this code may be run on an environment hosting Sharepoint Foundation.
-        /// In that case, there will be no Profile, so by using Reflection we can check first to see if they have the DLLs needed
-        /// to update the users Profile (meaning if those DLLs are present, then they have Sharepoint Server installed). If they
-        /// are present, then we update the Profile image, otherwise we just ignore.
+        ///     Reflection is being used in this method because this code may be run on an environment hosting Sharepoint
+        ///     Foundation.
+        ///     In that case, there will be no Profile, so by using Reflection we can check first to see if they have the DLLs
+        ///     needed
+        ///     to update the users Profile (meaning if those DLLs are present, then they have Sharepoint Server installed). If
+        ///     they
+        ///     are present, then we update the Profile image, otherwise we just ignore.
         /// </summary>
         /// <param name="pictureUrl"></param>
         private static void UpdatePictureUrlInUserProfile(string pictureUrl)
         {
             if (string.IsNullOrEmpty(pictureUrl)) return;
-            
+
             Assembly userProfileAssembly;
 
-            var windowsFolderPath = Environment.GetEnvironmentVariable("windir");
-            var pathToServerAssembly = string.Format(@"{0}\assembly\GAC_MSIL\Microsoft.Office.Server.UserProfiles\14.0.0.0__71e9bce111e9429c\Microsoft.Office.Server.UserProfiles.dll", windowsFolderPath);
+            string windowsFolderPath = Environment.GetEnvironmentVariable("windir");
+            string pathToServerAssembly =
+                string.Format(
+                    @"{0}\assembly\GAC_MSIL\Microsoft.Office.Server.UserProfiles\14.0.0.0__71e9bce111e9429c\Microsoft.Office.Server.UserProfiles.dll",
+                    windowsFolderPath);
 
             try
             {
@@ -149,33 +138,41 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 return;
             }
 
-            var userProfileManagerClass = userProfileAssembly.GetType("Microsoft.Office.Server.UserProfiles.UserProfileManager");
+            Type userProfileManagerClass =
+                userProfileAssembly.GetType("Microsoft.Office.Server.UserProfiles.UserProfileManager");
             if (userProfileManagerClass == null) return;
-            
-            var userExistsMethod = userProfileManagerClass.GetMethod("UserExists");
+
+            MethodInfo userExistsMethod = userProfileManagerClass.GetMethod("UserExists");
             if (userExistsMethod == null) return;
-            
-            var getUserProfileMethod = userProfileManagerClass.GetMethod("GetUserProfile", new[]{typeof(string)});
+
+            MethodInfo getUserProfileMethod = userProfileManagerClass.GetMethod("GetUserProfile",
+                new[] {typeof (string)});
             if (getUserProfileMethod == null) return;
-            
-            var instantiatedUserProfileManagerClass = Activator.CreateInstance(userProfileManagerClass);
-            var userExists = (bool)userExistsMethod.Invoke(instantiatedUserProfileManagerClass, new object[] { SPContext.Current.Web.CurrentUser.LoginName });
+
+            object instantiatedUserProfileManagerClass = Activator.CreateInstance(userProfileManagerClass);
+            var userExists =
+                (bool)
+                    userExistsMethod.Invoke(instantiatedUserProfileManagerClass,
+                        new object[] {SPContext.Current.Web.CurrentUser.LoginName});
 
             if (!userExists) return;
-            
-            var userProfileClass = userProfileAssembly.GetType("Microsoft.Office.Server.UserProfiles.UserProfile");
-            var userProfile = getUserProfileMethod.Invoke(instantiatedUserProfileManagerClass, new object[] { SPContext.Current.Web.CurrentUser.LoginName });
 
-            var indexProperty = userProfileClass
-                                .GetProperties()
-                                .Single(p => p.GetIndexParameters().Length == 1 && p.GetIndexParameters()[0].ParameterType == typeof(string));
+            Type userProfileClass = userProfileAssembly.GetType("Microsoft.Office.Server.UserProfiles.UserProfile");
+            object userProfile = getUserProfileMethod.Invoke(instantiatedUserProfileManagerClass,
+                new object[] {SPContext.Current.Web.CurrentUser.LoginName});
 
-            var collection = indexProperty.GetValue(userProfile, new object[] { "PictureUrl" });
+            PropertyInfo indexProperty = userProfileClass
+                .GetProperties()
+                .Single(
+                    p =>
+                        p.GetIndexParameters().Length == 1 && p.GetIndexParameters()[0].ParameterType == typeof (string));
 
-            var valueProperty = collection.GetType().GetProperty("Value");
+            object collection = indexProperty.GetValue(userProfile, new object[] {"PictureUrl"});
+
+            PropertyInfo valueProperty = collection.GetType().GetProperty("Value");
             valueProperty.SetValue(collection, pictureUrl, null);
 
-            var commitMethod = userProfileClass.GetMethod("Commit");
+            MethodInfo commitMethod = userProfileClass.GetMethod("Commit");
             commitMethod.Invoke(userProfile, null);
         }
 
@@ -186,15 +183,15 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private void DeleteExistingPicturesForUser(SPFolder pictureDocumentLibrary)
         {
-            var userName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
+            string userName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
             var picturesToDelete = new List<SPFile>();
-            
+
             foreach (SPFile file in pictureDocumentLibrary.Files)
             {
                 if (Path.GetFileNameWithoutExtension(file.Name) == userName) picturesToDelete.Add(file);
             }
-            
-            foreach(var file in picturesToDelete)
+
+            foreach (SPFile file in picturesToDelete)
             {
                 file.Delete();
             }
@@ -202,5 +199,86 @@ namespace EPMLiveWebParts.Layouts.epmlive
             pictureDocumentLibrary.Update();
         }
 
+        protected void UploadPictureButton_Click(object sender, EventArgs e)
+        {
+            if (!PictureFileUpload.HasFile) return;
+
+            using (var fileStore = new EPMLiveFileStore(Web))
+            {
+                FileNameField.Value = fileStore.Add(PictureFileUpload.FileBytes,
+                    Path.GetExtension(PictureFileUpload.FileName));
+            }
+
+            UploadPanel.Visible = false;
+            ResizePanel.Visible = true;
+        }
+
+        protected void OnSaveButtonClicked(object sender, EventArgs e)
+        {
+            byte[] pic;
+
+            string resizeInfo = ResizeInfoField.Value;
+            if (!string.IsNullOrEmpty(resizeInfo))
+            {
+                pic = ResizeImage(resizeInfo);
+            }
+            else
+            {
+                using (var fileStore = new EPMLiveFileStore(Web))
+                {
+                    pic = fileStore.Get(FileNameField.Value);
+                }
+            }
+
+            using (var fileStore = new EPMLiveFileStore(Web))
+            {
+                fileStore.Delete(FileNameField.Value);
+            }
+
+            SavePicture(pic);
+        }
+
+        private void SavePicture(byte[] pic)
+        {
+            string pictureFileName = GetPictureFileName();
+            SPFolder pictureDocumentLibrary = GetDocumentLibrary("User Profile Pictures");
+            if (pictureDocumentLibrary == null) return;
+
+            string pictureUrl = GetPictureUrl(pictureFileName);
+
+            DeleteExistingPicturesForUser(pictureDocumentLibrary);
+            UploadPictureToDocumentLibrary(pictureDocumentLibrary, pictureFileName, pic);
+            UpdatePictureUrlInSiteUserInfoList(pictureUrl);
+            UpdatePictureUrlInUserProfile(pictureUrl);
+            CloseDialog(pictureUrl);
+        }
+
+        private byte[] ResizeImage(string resizeInfo)
+        {
+            string[] picInfo = resizeInfo.Split('|');
+
+            int width = int.Parse(picInfo[0]);
+            int height = int.Parse(picInfo[1]);
+            int targetWidth = int.Parse(picInfo[2]);
+            int targetHeight = int.Parse(picInfo[3]);
+            int x = int.Parse(picInfo[4]);
+            int y = int.Parse(picInfo[5]);
+
+            Image src;
+
+            using (var fileStore = new EPMLiveFileStore(Web))
+            {
+                src = Image.FromStream(fileStore.GetStream(FileNameField.Value));
+            }
+
+            var pic = new Bitmap(width, height);
+            Graphics.FromImage(pic).DrawImage(src, 0, 0, width, height);
+
+            var bitmap = new Bitmap(pic);
+            Bitmap target = bitmap.Clone(new Rectangle(x, y, targetWidth, targetHeight), bitmap.PixelFormat);
+
+            var converter = new ImageConverter();
+            return (byte[]) converter.ConvertTo(target, typeof (byte[]));
+        }
     }
 }

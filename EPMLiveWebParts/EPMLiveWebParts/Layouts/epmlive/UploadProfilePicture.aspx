@@ -1,4 +1,5 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
+<%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
@@ -8,79 +9,124 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="UploadProfilePicture.aspx.cs" Inherits="EPMLiveWebParts.Layouts.epmlive.UploadProfilePicture" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-<style>
-.profileInput
-{
-    min-width: 6em;
-    padding: 7px 10px;
-    border: 1px solid #ABABAB;
-    background-color: #FDFDFD;
-    background-color: #FDFDFD;
-    margin-left: 10px;
-    font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-    font-size: 11px;
-    color: #444;
-}
+    <link href="/_layouts/15/epmlive/Stylesheets/Vendors/ImageAreaSelect/imgareaselect-default.min.css" rel="stylesheet" />
 
-.profileInput:hover
-{
-    border-color: #92C0E0;
-    background-color: #E6F2FA;
-    cursor:pointer;
-}
+    <style>
+        .profileInput {
+            -moz-min-width: 6em;
+            -ms-min-width: 6em;
+            -o-min-width: 6em;
+            -webkit-min-width: 6em;
+            min-width: 6em;
+            padding: 7px 10px;
+            border: 1px solid #ABABAB;
+            background-color: #FDFDFD;
+            margin-left: 10px;
+            font-family: "Segoe UI", "Segoe", Tahoma, Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #444;
+        }
 
-.profileInput:active
-{
-    border-color: #2A8DD4;
-    background-color: #92C0E0;
-    cursor:pointer;
-}
+        .profileInput:hover {
+            border-color: #92C0E0;
+            background-color: #E6F2FA;
+            cursor: pointer;
+        }
 
-.mainContainer
-{
-    text-align:right;
-}
+        .profileInput:active {
+            border-color: #2A8DD4;
+            background-color: #92C0E0;
+            cursor: pointer;
+        }
 
+        .mainContainer { text-align: right; }
 
-.buttonContainer
-{
-    padding-top: 20px;
-    float:right;
-}
+        .buttonContainer {
+            padding-top: 20px;
+            float: right;
+        }
 
-</style>
+        #pic-frame { text-align: center; }
 
-<script type="text/javascript">
-    function closeDialog() {
-        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, null);    
-    }
+        #pic-frame > img {
+            max-height: 550px;
+            max-width: 550px;
+        }
 
-</script>
+    </style>
 
-
+    <script type="text/javascript">
+        function closeDialog() {
+            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, null);
+        }
+    </script>
+    
+    <script src="/_layouts/15/epmlive/javascripts/libraries/jquery.imgareaselect.pack.js"> </script>
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <div class="mainContainer">
-        <div>
-            <asp:FileUpload ID="PictureFileUpload" runat="server" Width="500" size="60"/>
-        </div>
-        <div class="buttonContainer">
+    <asp:Panel id="UploadPanel" runat="server">
+        <div class="mainContainer">
             <div>
+                <asp:FileUpload ID="PictureFileUpload" runat="server" Width="500" size="60"/>
+            </div>
+            <div class="buttonContainer">
                 <div>
-                    <asp:Button ID="UploadPictureButton" runat="server" Text="Upload" OnClick="UploadPictureButton_Click" CssClass="profileInput" />
-                    <input type="button" value="Cancel" onclick="closeDialog();" class="profileInput"/>
+                    <div>
+                        <asp:Button ID="UploadPictureButton" runat="server" Text="Upload" OnClick="UploadPictureButton_Click" CssClass="profileInput" />
+                        <input type="button" value="Cancel" onclick=" closeDialog(); " class="profileInput"/>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </asp:Panel>
+    <asp:Panel id="ResizePanel" Visible="False" runat="server">
+        <div id="pic-frame">
+            <img id="profile-pic" src="<%= string.Format(@"{0}/EPMLiveFileStore/{1}", Web.Url, FileNameField.Value) %>"/>
+        </div>
+        <div style="margin-top: 15px; text-align: center;">
+            <asp:Button ID="SaveButton" runat="server" Text="Save" OnClick="OnSaveButtonClicked" />
+        </div>
+        <asp:HiddenField ID="FileNameField" runat="server"></asp:HiddenField>
+        <asp:HiddenField ID="ResizeInfoField" ClientIDMode="Static" runat="server"></asp:HiddenField>
+        
+        <script type="text/javascript">
+            (function () {
+                var x1 = 0;
+                var x2 = 0;
+                var y1 = 0;
+                var y2 = 0;
+                
+                var $pic = $('img#profile-pic');
+
+                var h = $pic.height();
+                var w = $pic.width();
+
+                x2 = h < w ? h : w;
+                y2 = x2;
+
+                $(document).ready(function () {
+                    $pic.imgAreaSelect({
+                        handles: true,
+                        aspectRatio: '1:1',
+                        x1: x1,
+                        x2: x2,
+                        y1: y1,
+                        y2: y2,
+                        onSelectEnd: function (img, selection) {
+                            $('#ResizeInfoField').val(w + '|' + h + '|' + selection.width + '|' + selection.height + '|' + selection.x1 + '|' + selection.y1 + '|' + selection.x2 + '|' + selection.y2);
+                        }
+                    });
+                });
+            })();
+        </script>
+    </asp:Panel>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Upload Profile Picture
+    Upload Profile Picture
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Upload Profile Picture
+    Upload Profile Picture
 </asp:Content>
-

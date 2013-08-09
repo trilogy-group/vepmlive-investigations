@@ -30,6 +30,7 @@ net start "WETimer"</PostDeploymentCommand>
     <FileUpgradeFlags>0</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\Backup1\</UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -42,7 +43,6 @@ net start "WETimer"</PostDeploymentCommand>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -801,6 +801,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="javascripts\libraries\bootstrap-fileupload.min.js" />
     <Content Include="javascripts\libraries\bootstrap.js" />
     <Content Include="javascripts\libraries\bootstrap.min.js" />
+    <Content Include="javascripts\libraries\jquery.imgareaselect.pack.js" />
     <Content Include="javascripts\libraries\jquery.watermark.js" />
     <Content Include="javascripts\libraries\Kendo\cultures\kendo.culture.af-ZA.min.js" />
     <Content Include="javascripts\libraries\Kendo\cultures\kendo.culture.af.min.js" />
@@ -1290,6 +1291,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\SL.Visifire.Charts.xap" />
     <Content Include="Layouts\epmlive\slideout.js" />
     <Content Include="Layouts\epmlive\slimScroll.js" />
+    <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\border-h.gif" />
+    <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\border-v.gif" />
+    <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\imgareaselect-default.css" />
+    <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\imgareaselect-default.min.css">
+      <DependentUpon>imgareaselect-default.css</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\styles\ChartWizard\ChartWizardStyle.css" />
     <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-fileupload.css" />
     <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-fileupload.min.css" />
