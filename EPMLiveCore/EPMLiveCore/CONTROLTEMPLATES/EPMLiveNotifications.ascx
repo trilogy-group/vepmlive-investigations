@@ -3,7 +3,7 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveNotifications.ascx.cs" Inherits="EPMLiveCore.ControlTemplates.EPMLiveNotifications" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 
-<script type="text/javascript" src="<%= SiteUrl %>/_layouts/epmlive/javascripts/Notifications.js<%= JsFileVersion %>"></script>
+<script type="text/javascript" src="<%= SiteUrl %>/_layouts/epmlive/javascripts/Notifications.min.js<%= JsFileVersion %>"></script>
 
 <div id="EPMLiveNotificationsWrap" data-bind="slideUpDown: epmLiveNotifications.showNotifications(), slideDuration: 200">
     <div id="EPMLiveNotifications">

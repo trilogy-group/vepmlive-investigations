@@ -185,7 +185,7 @@
                     </div>
                 </div>
                 <div id="suiteBarRight">
-                    <SharePoint:AjaxDelta runat="server" id="DeltaSuiteBarRight" CssClass="ms-core-deltaSuiteBarRight" BlockElement="true">
+                    <SharePoint:AjaxDelta runat="server" id="DeltaSuiteBarRight" CssClass="ms-core-deltaSuiteBarRight ms-table ms-fullWidth" BlockElement="true">
                         <div id="suiteBarButtons">
                             <!--<span id="ms-helpSearchInput">
                                     <SharePoint:AjaxDelta id="DeltaPlaceHolderSearchArea" BlockElement="true" CssClass="ms-mpSearchBox ms-floatRight" runat="server">
@@ -199,25 +199,17 @@
                             
                             <!-- Notification Counter -->
 
-                            <span id="EPMLiveNCWrap" style="display: inline-block; position: relative; width: 25px;">
+                            <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
                                 <epm:NotificationCounter runat="server"></epm:NotificationCounter>
-                            </span>
-                            
-                            <script type="text/javascript">
-                                if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-                                    document.getElementById('EPMLiveNCWrap').style.top = '-5px';
-                                    $('#ms-helpSearchInput').css("height", "20px");
-                                    $('#ms-helpSearchInput').css("top", "0px");
-                                }
-                            </script>
+                            </div>
                             
                             <!-- // Notification Counter -->
                             
-                            <div id="welcomeMenuBox"> 	
+                            <div id="welcomeMenuBox" class="ms-tableCell ms-verticalAlignMiddle"> 	
                                 <wssuc:Welcome id="IdWelcome" runat="server" EnableViewState="false" />
                             </div>
                             
-                            <span class="ms-siteactions-root" id="siteactiontd">
+                            <%--<span class="ms-siteactions-root" id="siteactiontd">
                                 <SharePoint:SiteActions runat="server" accesskey="<%$Resources:wss,tb_SiteActions_AK%>" id="SiteActionsMenuMain"
                                                         PrefixHtml=""
                                                         SuffixHtml=""
@@ -299,7 +291,8 @@
                                             
                                         </SharePoint:FeatureMenuTemplate>
                                     </CustomTemplate>
-                                </SharePoint:SiteActions></span>
+                                </SharePoint:SiteActions>
+                            </span>--%>
                         </div>
                     </SharePoint:AjaxDelta>
                 </div>

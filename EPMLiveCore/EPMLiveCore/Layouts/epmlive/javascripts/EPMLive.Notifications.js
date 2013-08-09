@@ -372,23 +372,17 @@
                 configureScrollbar();
             };
 
-            function hideNotifications(counter, screen) {
+            function hideNotifications(counter) {
                 if (notificationsAreVisible()) {
                     var notificationCounter = counter || $("#EPMLiveNotificationCounter");
-                    var notificationCounterScreen = screen || $("#EPMLiveNotificationCounterScreen");
 
                     epmLiveNotifications.showNotifications(false);
                     epmLiveNotifications.updateNotifications();
                     epmLiveNotifications.activeView('notification');
 
-                    notificationCounter.css("z-index", notificationCounterScreen.css("z-index") - 1);
                     notificationCounter.css("background", "#666666");
                     notificationCounter.css("color", "#fff");
                     notificationCounter.css("font-weight", epmLiveNotifications.notificationCounterFontWeight());
-
-                    notificationCounterScreen.fadeTo('slow', 0.25);
-
-                    $(notificationCounterScreen).fadeTo(400, 0);
                 }
             }
 
@@ -414,8 +408,8 @@
                     $("#EPMLiveNotificationCounter").click(function (event) {
                         event.stopPropagation();
                     });
-
-                    $("#EPMLiveNotificationCounterScreen").click(function (event) {
+                    
+                    $("#EPMLiveNotificationCounterProfilePic").click(function (event) {
                         event.stopPropagation();
                     });
                 } else {
@@ -424,43 +418,14 @@
             }
 
             function renderNotificationCounter() {
-                var topBarHeight = $(".ms-cui-ribbonTopBars").height();
-
                 var notificationCounter = $("#EPMLiveNotificationCounter");
-
-                notificationCounter.css("top", -((topBarHeight - notificationCounter.height()) / 2) + 6);
-                notificationCounter.show();
-
-                var notificationCounterScreen = $("#EPMLiveNotificationCounterScreen");
-                $(notificationCounterScreen).hide();
-
-                notificationCounterScreen.css("background", "#fff");
-
-                notificationCounterScreen.css("top", 0);
-                $(notificationCounterScreen).fadeTo(1, 0);
-
-                notificationCounterScreen.hover(
-                    function () {
-                        if (!notificationsAreVisible()) {
-                            $(notificationCounterScreen).fadeTo(400, 0.25);
-                        }
-                    },
-
-                    function () {
-                        if (!notificationsAreVisible()) {
-                            $(notificationCounterScreen).fadeTo(400, 0);
-                        }
-                    }
-                );
 
                 var toggleNotifications = function () {
                     if (!notificationsAreVisible()) {
-                        notificationCounter.css("z-index", notificationCounterScreen.css("z-index") + 1);
                         notificationCounter.css("background", "#D0D0D0");
                         notificationCounter.css("color", "#000");
                         notificationCounter.css("font-weight", "");
 
-                        notificationCounterScreen.fadeTo('slow', 1);
                         epmLiveNotifications.showNotifications(true);
 
                         configureScrollbar();
@@ -471,7 +436,7 @@
 
                         window.setTimeout(function () { $("#EPMLiveNotificationsWrap").show(); }, 1);
                     } else {
-                        hideNotifications(notificationCounter, notificationCounterScreen);
+                        hideNotifications(notificationCounter);
                     }
                 };
 
@@ -479,11 +444,9 @@
                     toggleNotifications();
                 });
 
-                notificationCounterScreen.click(function () {
+                $('#EPMLiveNotificationCounterProfilePic').click(function() {
                     toggleNotifications();
                 });
-
-                notificationCounterScreen.show();
 
                 notificationsTimeout = setTimeout(initializeNotifications, 1);
             }

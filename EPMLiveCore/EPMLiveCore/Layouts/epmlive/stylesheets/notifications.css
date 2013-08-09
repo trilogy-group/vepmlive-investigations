@@ -1,21 +1,16 @@
 ﻿#EPMLiveNotificationCounter {
-    color: white;
-    width: 22px;
-    height: 22px;
-    line-height: 22px;
-    text-align: center;
-    position: relative !important;
-    border-radius: 3px;
-    -moz-border-radius: 3px; 
-    -webkit-border-radius: 3px;
-    cursor: pointer;
-    font-family: Arial;
+    -ms-border-radius: 15px 15px 15px 15px;
+    border-radius: 15px 15px 15px 15px;
+    bottom: -5px;
+    color: #FFFFFF;
     font-size: 10px;
-}
-
-#EPMLiveNotificationCounterScreen {
-    position: relative !important;
-    z-index: 1200;
+    height: 15px;
+    left: -5px;
+    line-height: 15px;
+    position: absolute;
+    text-align: center;
+    width: 15px;
+    z-index: 2000;
     cursor: pointer;
 }
 
@@ -27,12 +22,13 @@
     background: #fff;
     -webkit-box-shadow: 0 2px 10px #BEBEBE;
     -moz-box-shadow: 0 2px 10px #BEBEBE;
+    -ms-box-shadow: 0 2px 10px #BEBEBE;
     box-shadow: 0 2px 10px #BEBEBE;
     border: #BEBEBE 1px solid;
     border-top: none;
     font-family: Arial;
     font-size: 13px;
-    top: 27px !important;
+    top: 44px !important;
 }
 
 .EPMLiveNotificationsHeader {
@@ -67,18 +63,14 @@
     width: 362px;
 }
 
-.EPMLiveNotificationsH20 {
-    font-size: 20px;
-}
+.EPMLiveNotificationsH20 { font-size: 20px; }
 
 .EPMLiveNotificationDescFooterLink {
     cursor: pointer;
     color: #333;
 }
 
-.EPMLiveNotificationDescFooterLink:hover {
-    color: #666;
-}
+.EPMLiveNotificationDescFooterLink:hover { color: #666; }
 
 .EPMLiveNotificationDescFooterLink span {
     margin-left: 1px;
@@ -105,13 +97,9 @@
     overflow: hidden;
 }
 
-.EPMLiveNotification-NewMessage {
-    background: #EEF0F9;
-}
+.EPMLiveNotification-NewMessage { background: #EEF0F9; }
 
-.EPMLiveNotificationMessage div, .EPMLiveNotification-NewMessage div {
-    line-height: 20px;
-}
+.EPMLiveNotificationMessage div, .EPMLiveNotification-NewMessage div { line-height: 20px; }
 
 .EPMLiveNotificationMessage abbr, .EPMLiveNotification-NewMessage abbr {
     line-height: 15px;
@@ -130,9 +118,7 @@
     width: 374.5px;
 }
 
-.EPMLiveNotificationThumbnail img {
-    position: relative;
-}
+.EPMLiveNotificationThumbnail img { position: relative; }
 
 .EPMLiveNotificationTitle {
     float: left;
@@ -151,9 +137,7 @@
     margin-top: 10px;
 }
 
-.EPMLiveNotificationStrong {
-    font-weight: bold;
-}
+.EPMLiveNotificationStrong { font-weight: bold; }
 
 .EPMLiveNotificationDesc, .EPMLiveNotificationDescFooter {
     padding-left: 10px;
@@ -169,23 +153,38 @@
     float: left;
 }
 
-.EPMLiveNotificationTopBorder {
-    border-top: #DDDFE7 1px solid;
-}
+.EPMLiveNotificationTopBorder { border-top: #DDDFE7 1px solid; }
 
 .EPMLiveNotificationFixed {
     overflow-x: hidden;
     overflow-y: auto;
 }
 
-.EPMLiveNotificationCreatorLink, .EPMLiveNotificationCreatorLink:link, .EPMLiveNotificationCreatorLink:active, .EPMLiveNotificationCreatorLink:visited, .EPMLiveNotificationCreatorLink:hover {
-    color: #0072BC;
+.EPMLiveNotificationCreatorLink, .EPMLiveNotificationCreatorLink:link, .EPMLiveNotificationCreatorLink:active, .EPMLiveNotificationCreatorLink:visited, .EPMLiveNotificationCreatorLink:hover { color: #0072BC; }
+
+.EPMLiveNotificationCreatorLink:hover { text-decoration: underline; }
+
+.EPMLiveNotificationsH30 { color: #666 !important; }
+
+#EPMLiveNCWrap {
+    display: inline-block;
+    margin-right: 15px;
+    position: relative;
+    top: -2px;
 }
 
-.EPMLiveNotificationCreatorLink:hover {
-    text-decoration: underline;
+#EPMLiveNotificationCounterProfilePic {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #00A4E5;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAmCAYAAACoPemuAAACfElEQVRYw+2Y7U8aQRCH7///bKzV1pimtVosEmttuUMRMFQQOJAKiDWI2vTPmM6z9VLL273Qu7YpHybZ7P5m5nFvdnfQanRv5G80awG2AFuALcASAmv1b6X95V4+Pxhj5v4YWPNSga7u5MS9FLt8LgfFhjHGzLGGJlGwliasdwcG5MXesay+sWV584MxxsyxhqYVES40mNtjt4aSOTqTlS1bnm7bspZy5NlOzhhj5lhDgxaf2MHO+3eSr17I87eHZnc8oFFjDQ1afGIHu7j+KpnDqqw+2qWpcKpBi08iYKnsJ1nZzvqCoUH7f4N1B99kxz4NDIYWn1jB2lf3eg24mtS/vn6aY3zwjQ2MT5J2KnoVZAODocUn7OdcgMUKxiO9X6j/ctP7GVp88I0NzDwtnRt5p4m41ddSs4ByRoMWn7DPkhWlq6h3h7L5/kSfHWfGk+QYDdooXUak7oKjn6/oe5me/F6ad1LX0IS9Jubux3p6aeZO27orpTEw5ljrRbhYI9bY0BSxq+NCrSvHZx1J5yqmljwoxsyxhsZ9ODT4/nYwD4jeimR0DOu7R7L8+qP2XuNXB3OsoUGLD75hAH3BvB6+oDuwq0nYkSeadFbhPz4AaPHBlxjeb4TIYLTEBCg1euaCXE8HB5oGSAxiEdP8wTNOqzWtS611BrKXr8mGfo4fQHZooEmnlVjEJDY5pnW3Y2BNrYGy25eX+0UTiP59XqDxGrRNbHKQqzmh7qzRIi+3+rKRyQfqt+Y1cpCLnKOHwhq91Yv1nizpz7C4oTwjFzlHX4cxsJKKOOpJgZGrFBRs6dWBqYEkjFy+YFhdT0qlfS3VhIxc5Pxn/tvzHRX/D5g9gqyKAAAAAElFTkSuQmCC') /*../images/blankprofile.png*/;
+    *background-image: url(/_layouts/15/epmlive/images/blankprofile.png); /* For IE 6 and 7 */
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
 
-.EPMLiveNotificationsH30 {
-    color: #666 !important;
+
+#EPMLiveNotificationCounterProfilePic > img {
+    height: 38px;
+    width: 38px;
 }

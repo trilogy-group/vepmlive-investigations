@@ -12,8 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>SP 2013 Deployment</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -27,10 +27,24 @@ net start "WETimer"</PostDeploymentCommand>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
 "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags>0</FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -203,6 +217,13 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="CONTROLTEMPLATES\EPMLiveNavigation.ascx.designer.cs">
       <DependentUpon>EPMLiveNavigation.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotificationCounter.ascx.cs">
+      <DependentUpon>EPMLiveNotificationCounter.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotificationCounter.ascx.designer.cs">
+      <DependentUpon>EPMLiveNotificationCounter.ascx.cs</DependentUpon>
     </Compile>
     <Compile Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx.cs">
       <DependentUpon>EPMLiveNotifications.ascx</DependentUpon>
@@ -1449,11 +1470,17 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
     </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map">
       <DependentUpon>jquery.cookie.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map">
       <DependentUpon>UplandV5.js</DependentUpon>
+    </None>
+    <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
+      <DependentUpon>Notifications.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\Project1.mpp" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.less" />
@@ -1843,6 +1870,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="CONTROLTEMPLATES\EPMLiveJS.ascx" />
     <Content Include="CONTROLTEMPLATES\epmlivelisttemplates.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNavigation.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveNotificationCounter.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupField.ascx" />
@@ -3017,6 +3045,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\Arrow.gif" />
     <Content Include="Layouts\epmlive\images\backbutton.png" />
     <Content Include="Layouts\epmlive\images\baseline.gif" />
+    <Content Include="Layouts\epmlive\images\blankprofile.png" />
     <Content Include="Layouts\epmlive\images\blanktemplate.png" />
     <Content Include="Layouts\epmlive\images\buildteam.gif" />
     <Content Include="Layouts\epmlive\images\buildteam16.gif" />
@@ -3129,6 +3158,9 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
@@ -3154,6 +3186,9 @@ net start "WETimer"</PostDeploymentCommand>
     </Content>
     <Content Include="Layouts\epmlive\javascripts\masterpages\webfont.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\Notifications.min.js">
+      <DependentUpon>Notifications.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\ResourceImporter.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.5.2.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.6.2.min.js" />
@@ -3253,6 +3288,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.min.css">
       <DependentUpon>opensans.css</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\stylesheets\notifications.min.css">
+      <DependentUpon>notifications.css</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
@@ -3703,13 +3741,41 @@ net start "WETimer"</PostDeploymentCommand>
       </CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ProjectExtensions />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
+        <DeploymentConfigurations>
+          <DeploymentConfiguration Name="SP 2013 Deployment">
+            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
+            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
+          </DeploymentConfiguration>
+        </DeploymentConfigurations>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
   <PropertyGroup>
     <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
 del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>

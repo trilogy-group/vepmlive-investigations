@@ -2,6 +2,12 @@
   cursor: pointer;
   cursor: hand;
 }
+.ms-dialog #epm-nav {
+  display: none;
+}
+.ms-dialog .epm-nav-pinned {
+  margin-left: auto;
+}
 #epm-nav-top {
   -moz-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
   -webkit-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
@@ -29,8 +35,8 @@
   cursor: hand;
 }
 #epm-nav-top ul .epm-nav-node-opened {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAASCAYAAABrXO8xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH3QcIFDcV8xUe3QAAAGhJREFUOMuV0csNwDAIA1A3e2QA9h+GOxkkPbUS+YDxMdITBD9mNpFkjAERcW+NQac0Bq3TQhihK8zQETJogyxysIJ+WEVUjyHsvQMAVLU+sYrdqhW8/ZHFx+Mw+HrVDId1RDjt8cNrXhAVM+1Af3qrAAAAAElFTkSuQmCC');
-  *background-image: url(/_layouts/15/epmlive/images/notch.png);
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAASCAYAAABrXO8xAAAAUklEQVQ4y6XTywkAMAgDUPffy0UcwBXsrSCt3xw8PhBNSESsGmY2VXVDHTSGEUphhkJYoS/soAd2kYMTdOEU4XC9KnQc6B1QAKDIQSGHapUV+QCNF50M5UjTYgAAAABJRU5ErkJggg==') /*../../../images/navigation/notch.png*/;
+  *background-image: url(/_layouts/15/epmlive/images/navigation/notch.png);
   /* For IE 6 and 7 */
 
   background-position: 40px 13px;
