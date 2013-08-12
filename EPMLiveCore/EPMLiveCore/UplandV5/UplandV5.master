@@ -187,16 +187,24 @@
                 <div id="suiteBarRight">
                     <SharePoint:AjaxDelta runat="server" id="DeltaSuiteBarRight" CssClass="ms-core-deltaSuiteBarRight ms-table ms-fullWidth" BlockElement="true">
                         <div id="suiteBarButtons">
-                            <!--<span id="ms-helpSearchInput">
-                                    <SharePoint:AjaxDelta id="DeltaPlaceHolderSearchArea" BlockElement="true" CssClass="ms-mpSearchBox ms-floatRight" runat="server">
-                                        <asp:ContentPlaceHolder id="PlaceHolderSearchArea" runat="server">
-                                            <div id="searchInputBox">
-                                                <SharePoint:DelegateControl ID="DelegateControl4" runat="server" ControlId="SmallSearchInputBox" />
-                                            </div>
-                                        </asp:ContentPlaceHolder>
-                                    </SharePoint:AjaxDelta>
-                                </span>-->
-                            
+                            <div id="search-box-container" class="epm-global-button-right" style="display: none;">
+                                <SharePoint:AjaxDelta id="DeltaPlaceHolderSearchArea" runat="server">
+                                    <asp:ContentPlaceHolder id="PlaceHolderSearchArea" runat="server">
+                                        <div id="searchInputBox">
+                                            <SharePoint:DelegateControl ID="DelegateControl4" runat="server" ControlId="SmallSearchInputBox" />
+                                        </div>
+                                    </asp:ContentPlaceHolder>
+                                </SharePoint:AjaxDelta>
+                            </div>
+
+                            <div id="search-container" class="epm-global-button-right">
+                                <a href="javascript:toggleSearch();"><span class="fui-search"></span></a>
+                            </div>
+
+                            <div id="walkme-container" class="epm-global-button-right">
+                                <a href="#"><span class="fui-question"></span></a>
+                            </div>
+
                             <!-- Notification Counter -->
 
                             <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
