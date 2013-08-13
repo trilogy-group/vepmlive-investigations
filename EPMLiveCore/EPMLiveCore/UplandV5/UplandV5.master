@@ -74,6 +74,13 @@
         <!--[if !IE]><!-->
 	        <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css' rel='stylesheet' type='text/css'>
         <!--<![endif]-->
+        
+        <style>
+            span.ms-welcome-root > span.ms-core-menu-arrow:before,
+            span.ms-welcome-hover > span.ms-core-menu-arrow:before {
+                content: "\e005";
+            }
+        </style>
 
         <link rel="stylesheet" type="text/css" href="/_layouts/15/epmlive/stylesheets/tooltip.css" />
         <link href="/_layouts/15/epmlive/stylesheets/masterpages/UplandV5.min.css" rel="stylesheet" type="text/css" />

@@ -119,11 +119,6 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     cursor: hand;
 }
 
-span.ms-welcome-root > span.ms-core-menu-arrow:before,
-span.ms-welcome-hover > span.ms-core-menu-arrow:before {
-    content: "\e005";
-}
-
 .epm-global-button-right {
     display: inline-block;
     font-size: 1.9em;
@@ -179,12 +174,12 @@ span.ms-welcome-hover > span.ms-core-menu-arrow:before {
     border: medium none !important;
 }
 
-#SearchBox {
+#search-box-container #SearchBox {
     height: 20px;
     line-height: 20px;
 }
 
-#SearchBox input {
+#search-box-container #SearchBox input {
     height: 20px;
     margin: 0;
     position: relative;
