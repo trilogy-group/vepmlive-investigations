@@ -8,7 +8,7 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveNotificationCounter.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.EPMLiveNotificationCounter" %>
 
 <div id="EPMLiveNotificationCounterProfilePic">
-    <img src="<%= PrifilePicUrl %>"/>
+    <img id="EPMLiveProfilePic" src="<%= PrifilePicUrl %>"/>
     <div id="EPMLiveNotificationCounter" data-bind="style: { background: epmLiveNotifications.notificationCounterColor(), fontWeight: epmLiveNotifications.notificationCounterFontWeight() }">
         <span id="EPMLiveNotificationCount" data-bind="text: epmLiveNotifications.totalNewNotifications() > 99 ? '99+' : epmLiveNotifications.totalNewNotifications()">&nbsp;</span>
     </div>
