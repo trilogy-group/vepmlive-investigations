@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using EPMLiveCore.Infrastructure.Navigation;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.CONTROLTEMPLATES
@@ -20,7 +14,19 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         private string _selectedTlNode;
 
-        public IEnumerable<NavLink> TopLevelLinks { get; set; }
+        public IEnumerable<NavNode> TopNodes { get; set; }
+        public IEnumerable<NavNode> BottomNodes { get; set; }
+
+        public IEnumerable<NavNode> AllNodes
+        {
+            get
+            {
+                List<NavNode> nodes = TopNodes.ToList();
+                nodes.AddRange(BottomNodes);
+
+                return nodes;
+            }
+        }
 
         public string SelectedTlNode
         {

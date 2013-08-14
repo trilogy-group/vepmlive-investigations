@@ -209,7 +209,7 @@
                             </div>
 
                             <div id="walkme-container" class="epm-global-button-right">
-                                <a href="#"><span class="fui-question"></span></a>
+                                <a id="epm-support-link" href="http://support.epmlive.com/" target="_blank"><span class="fui-question"></span></a>
                             </div>
 
                             <!-- Notification Counter -->
@@ -223,91 +223,6 @@
                             <div id="welcomeMenuBox" class="ms-tableCell ms-verticalAlignMiddle"> 	
                                 <wssuc:Welcome id="IdWelcome" runat="server" EnableViewState="false" />
                             </div>
-                            
-                            <%--<span class="ms-siteactions-root" id="siteactiontd">
-                                <SharePoint:SiteActions runat="server" accesskey="<%$Resources:wss,tb_SiteActions_AK%>" id="SiteActionsMenuMain"
-                                                        PrefixHtml=""
-                                                        SuffixHtml=""
-                                                        ImageUrl="/_layouts/15/images/spcommon.png?rev=23"
-                                                        ThemeKey="spcommon"
-                                                        MenuAlignment="Right"
-                                                        MenuNotVisibleHtml="&amp;nbsp;"
-                                                        LargeIconMode="false">
-                                    <CustomTemplate>
-                                        <SharePoint:FeatureMenuTemplate ID="FeatureMenuTemplate1" runat="server"
-                                                                        FeatureScope="Site"
-                                                                        Location="Microsoft.SharePoint.StandardMenu"
-                                                                        GroupId="SiteActions"
-                                                                        UseShortId="true">
-                                            <SharePoint:MenuItemTemplate runat="server" id="MenuItem_EditPage"
-                                                                         Text="<%$Resources:wss,siteactions_editpage15%>"
-                                                                         Description="<%$Resources:wss,siteactions_editpagedescriptionv4%>"
-                                                                         ImageUrl="/_layouts/15/images/ActionsEditPage.png?rev=23"
-                                                                         MenuGroupId="200"
-                                                                         Sequence="210"
-                                                                         PermissionsString="EditListItems"
-                                                                         ClientOnClickNavigateUrl="javascript:ChangeLayoutMode(false);" />
-                                            <SharePoint:MenuItemTemplate runat="server" id="MenuItem_CreatePage"
-                                                                         Text="<%$Resources:wss,siteactions_addpage15%>"
-                                                                         Description="<%$Resources:wss,siteactions_createpagedesc%>"
-                                                                         ImageUrl="/_layouts/15/images/NewContentPageHH.png?rev=23"
-                                                                         MenuGroupId="200"
-                                                                         Sequence="220"
-                                                                         UseShortId="true"
-                                                                         ClientOnClickScriptContainingPrefixedUrl="OpenCreateWebPageDialog('~siteLayouts/createwebpage.aspx')"
-                                                                         PermissionsString="AddListItems, EditListItems"
-                                                                         PermissionMode="All" />
-                                            <SharePoint:MenuItemTemplate runat="server" id="MenuItem_Create"
-                                                                         Text="<%$Resources:wss,siteactions_addapp15%>"
-                                                                         Description="<%$Resources:wss,siteactions_createdesc%>"
-                                                                         MenuGroupId="200"
-                                                                         Sequence="230"
-                                                                         UseShortId="true"
-                                                                         ClientOnClickScriptContainingPrefixedUrl="javascript:window.open('http://market.epmlive.com');"
-                                                                         PermissionsString="ManageWeb"
-                                                                         PermissionMode="Any" />
-                                            <SharePoint:MenuItemTemplate runat="server" id="MenuItem_ViewAllSiteContents"
-                                                                         Text="<%$Resources:wss,quiklnch_allcontent_15%>"
-                                                                         Description="<%$Resources:wss,siteactions_allcontentdescription%>"
-                                                                         ImageUrl="/_layouts/15/images/allcontent32.png?rev=23"
-                                                                         MenuGroupId="200"
-                                                                         Sequence="240"
-                                                                         UseShortId="true"
-                                                                         ClientOnClickNavigateUrl="~siteLayouts/viewlsts.aspx"
-                                                                         PermissionsString="ViewFormPages"
-                                                                         PermissionMode="Any" />
-                                            <SharePoint:MenuItemTemplate runat="server" id="MenuItem_ChangeTheLook"
-                                                                         Text="<%$Resources:wss,siteactions_changethelook15%>"
-                                                                         Description="<%$Resources:wss,siteactions_changethelookdesc15%>"
-                                                                         MenuGroupId="300"
-                                                                         Sequence="310"
-                                                                         UseShortId="true"
-                                                                         ClientOnClickNavigateUrl="~siteLayouts/designgallery.aspx"
-                                                                         PermissionsString="ApplyThemeAndBorder,ApplyStyleSheets,Open,ViewPages,OpenItems,ViewListItems"
-                                                                         PermissionMode="All" />
-                                            <SharePoint:MenuItemTemplate runat="server" id="MenuItem_SwitchToMobileView"
-                                                                         Visible="false"
-                                                                         Text="<%$Resources:wss,siteactions_switchtomobileview%>"
-                                                                         Description="<%$Resources:wss,siteactions_switchtomobileviewdesc%>"
-                                                                         MenuGroupId="300"
-                                                                         Sequence="320"
-                                                                         UseShortId="true"
-                                                                         ClientOnClickScript="var mswlh = window.location.href; if (mswlh.indexOf('?')==-1) { window.location = mswlh + '?mobile=1'; } else { window.location = mswlh + '&mobile=1'; }" />
-                                            <SharePoint:MenuItemTemplate runat="server" id="MenuItem_Settings"
-                                                                         Text="<%$Resources:wss,siteactions_settings15%>"
-                                                                         Description="<%$Resources:wss,siteactions_sitesettingsdescriptionv4%>"
-                                                                         ImageUrl="/_layouts/15/images/settingsIcon.png?rev=23"
-                                                                         MenuGroupId="300"
-                                                                         Sequence="330"
-                                                                         UseShortId="true"
-                                                                         ClientOnClickScriptContainingPrefixedUrl="GoToPage('~siteLayouts/epmlive/settings.aspx')"
-                                                                         PermissionsString="EnumeratePermissions,ManageWeb,ManageSubwebs,AddAndCustomizePages,ApplyThemeAndBorder,ManageAlerts,ManageLists,ViewUsageData"
-                                                                         PermissionMode="Any" />
-                                            
-                                        </SharePoint:FeatureMenuTemplate>
-                                    </CustomTemplate>
-                                </SharePoint:SiteActions>
-                            </span>--%>
                         </div>
                     </SharePoint:AjaxDelta>
                 </div>
@@ -318,13 +233,16 @@
             
             <SharePoint:AjaxDelta runat="server" id="EPMLiveNavigation" BlockElement="True">
                 <epm:EPMLiveNavigation runat="server">
-                    <TopLevelLinks>
-                        <epm:NavLink Id="ql" Title="Portal" CssClass="fui-list" />
-                        <epm:NavLink Id="new" Title="Add an app" CssClass="fui-plus" />
-                        <epm:NavLink Id="favorites" Title="Favorites" CssClass="fui-star-2" />
-                        <epm:NavLink Id="recent" Title="Most recent" CssClass="fui-time" />
-                        <epm:NavLink Id="settings" Title="Settings" CssClass="fui-gear" Section="BOTTOM" />
-                    </TopLevelLinks>
+                    <TopNodes>
+                        <epm:NavNode Id="ql" Title="Portal" CssClass="fui-list" />
+                        <epm:NavNode Id="new" Title="Add an app" CssClass="fui-plus" />
+                        <epm:NavNode Separator="True" />
+                        <epm:NavNode Id="favorites" Title="Favorites" CssClass="fui-star-2" />
+                        <epm:NavNode Id="recent" Title="Most recent" CssClass="fui-time" />
+                    </TopNodes>
+                    <BottomNodes>
+                        <epm:NavNode Id="settings" Title="Settings" CssClass="fui-gear" />
+                    </BottomNodes>
                 </epm:EPMLiveNavigation>
             </SharePoint:AjaxDelta>
 

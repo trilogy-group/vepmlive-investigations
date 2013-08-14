@@ -10,11 +10,13 @@ namespace EPMLiveCore.Controls.Navigation
     [ParseChildren(true)]
     public class EPMLiveNavigation : WebControl
     {
-        private readonly List<NavLink> _topLevelLinks;
+        private readonly List<NavNode> _bottomNodes;
+        private readonly List<NavNode> _topNodes;
 
         public EPMLiveNavigation()
         {
-            _topLevelLinks = new List<NavLink>();
+            _topNodes = new List<NavNode>();
+            _bottomNodes = new List<NavNode>();
         }
 
         #region Overrides of Control
@@ -24,22 +26,23 @@ namespace EPMLiveCore.Controls.Navigation
         protected override void CreateChildControls()
         {
             var control = (CONTROLTEMPLATES.EPMLiveNavigation) Page.LoadControl(ASCX_PATH);
-            control.TopLevelLinks = TopLevelLinks;
+            control.TopNodes = TopNodes;
+            control.BottomNodes = BottomNodes;
             Controls.Add(control);
         }
 
         #endregion
 
         [PersistenceMode(PersistenceMode.InnerDefaultProperty)]
-        public List<NavLink> TopLevelLinks
+        public List<NavNode> TopNodes
         {
-            get { return _topLevelLinks; }
+            get { return _topNodes; }
         }
-    }
 
-    public class NavControl
-    {
-        public string LinkId { get; set; }
-        public Control Control { get; set; }
+        [PersistenceMode(PersistenceMode.InnerDefaultProperty)]
+        public List<NavNode> BottomNodes
+        {
+            get { return _bottomNodes; }
+        }
     }
 }

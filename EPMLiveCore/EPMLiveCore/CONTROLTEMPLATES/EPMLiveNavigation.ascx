@@ -11,53 +11,75 @@
 <div id="epm-nav">
     <div id="epm-nav-top">
         <ul>
-            <% foreach (NavLink link in TopLevelLinks.Where(link => link.Visible && link.Section.ToUpper().Equals("TOP")))
+            <% foreach (NavNode node in TopNodes.Where(node => node.Visible))
                {
-                   var lId = "epm-nav-top-" + link.Id;
-                   var classes = new List<string>();
-
-                   if (SelectedTlNode.Equals(lId))
+                   if (node.Separator)
                    {
-                       classes.Add("epm-nav-node-selected");
-                       if (Pinned) classes.Add("epm-nav-node-opened");
-                   }
-
-                   var attr = SelectedTlNode.Equals(lId) ? string.Format(@" class=""{0}""", string.Join(" ", classes.ToArray())) : string.Empty;
             %>
-                <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= link.CssClass %>" title="<%= link.Title %>" data-role="top-nav-node" data-id="<%= link.Id %>"></span></li>
-            <% } %>
+                    <li class="epm-nav-tl-sep"></li>
+                <%
+                   }
+                   else
+                   {
+                       var lId = "epm-nav-top-" + node.Id;
+                       var classes = new List<string>();
+
+                       if (SelectedTlNode.Equals(lId))
+                       {
+                           classes.Add("epm-nav-node-selected");
+                           if (Pinned) classes.Add("epm-nav-node-opened");
+                       }
+
+                       var attr = SelectedTlNode.Equals(lId) ? string.Format(@" class=""{0}""", string.Join(" ", classes.ToArray())) : string.Empty;
+                %>
+                    <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= node.CssClass %>" title="<%= node.Title %>" data-role="top-nav-node" data-id="<%= node.Id %>"></span></li>
+            <%
+                   }
+               }
+            %>
         </ul>
         <ul class="bottom">
-            <% foreach (NavLink link in TopLevelLinks.Where(link => link.Visible && link.Section.ToUpper().Equals("BOTTOM")))
+            <% foreach (NavNode node in BottomNodes.Where(node => node.Visible))
                {
-                   var lId = "epm-nav-top-" + link.Id;
-                   var classes = new List<string>();
-
-                   if (SelectedTlNode.Equals(lId))
+                   if (node.Separator)
                    {
-                       classes.Add("epm-nav-node-selected");
-                       if (Pinned) classes.Add("epm-nav-node-opened");
-                   }
-
-                   var attr = SelectedTlNode.Equals(lId) ? string.Format(@" class=""{0}""", string.Join(" ", classes.ToArray())) : string.Empty;
             %>
-                <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= link.CssClass %>" title="<%= link.Title %>" data-role="top-nav-node"></span></li>
-            <% } %>
+                    <li class="epm-nav-tl-sep"></li>
+                <%
+                   }
+                   else
+                   {
+                       var lId = "epm-nav-top-" + node.Id;
+                       var classes = new List<string>();
+
+                       if (SelectedTlNode.Equals(lId))
+                       {
+                           classes.Add("epm-nav-node-selected");
+                           if (Pinned) classes.Add("epm-nav-node-opened");
+                       }
+
+                       var attr = SelectedTlNode.Equals(lId) ? string.Format(@" class=""{0}""", string.Join(" ", classes.ToArray())) : string.Empty;
+                %>
+                    <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= node.CssClass %>" title="<%= node.Title %>" data-role="top-nav-node"></span></li>
+            <%
+                   }
+               }
+            %>
         </ul>
     </div>
     <div id="epm-nav-sub"<%= Pinned ? @" style=""display:block;""" : string.Empty %>>
         <span id="epm-nav-pin" class="fui-ext-pin <%= Pinned ? "epm-nav-pin-pinned" : "epm-nav-pin-unpinned" %>"></span>
-        <% foreach (NavLink link in TopLevelLinks.Where(link => link.Visible))
+        <% foreach (NavNode node in AllNodes.Where(node => node.Visible && !node.Separator))
            {
                var attr = string.Empty;
 
-               if (Pinned && SelectedTlNode.Equals("epm-nav-top-" + link.Id))
+               if (Pinned && SelectedTlNode.Equals("epm-nav-top-" + node.Id))
                {
                    attr = @"style=""display:block;""";
                }
         %>
-            <div id="epm-nav-sub-<%= link.Id %>" class="epm-nav-sub" data-role="sub-nav-node"<%= attr %>>
-                <% if (link.Id.ToLower().Equals("ql"))
+            <div id="epm-nav-sub-<%= node.Id %>" class="epm-nav-sub" data-role="sub-nav-node"<%= attr %>>
+                <% if (node.Id.ToLower().Equals("ql"))
                    { %>
                     <SharePoint:SPRememberScroll runat="server" ID="EPMNavScroll" onscroll="javascript:_spRecordScrollPositions(this);" style="overflow: auto;">
                         <SharePoint:SPTreeView

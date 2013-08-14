@@ -295,7 +295,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Infrastructure\Interfaces\IGridViewManager.cs" />
     <Compile Include="Infrastructure\Interfaces\ISPListItemManager.cs" />
     <Compile Include="Infrastructure\Navigation\INavObject.cs" />
-    <Compile Include="Infrastructure\Navigation\NavLink.cs" />
+    <Compile Include="Infrastructure\Navigation\NavNode.cs" />
     <Compile Include="Infrastructure\Navigation\NavObject.cs" />
     <Compile Include="Infrastructure\ResourceManagement\DepartmentManager.cs" />
     <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManager.cs" />
