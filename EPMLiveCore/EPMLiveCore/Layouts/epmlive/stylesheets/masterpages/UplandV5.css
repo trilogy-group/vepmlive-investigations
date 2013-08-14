@@ -186,3 +186,8 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     top: -2px;
     width: 210px;
 }
+
+#walkme-menu-closed {
+    position: absolute;
+    right: 50px !important;
+}

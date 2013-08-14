@@ -33,7 +33,7 @@
         $supportLink.removeAttr('target');
 
         $supportLink.click(function () {
-            $('.walkme-menu-click-close').after('<a id="support-link" style="display: none; right: 31px !important; top:  8px !important; width: 220px !important; height: 25px !important; z-index: 2147483647 !important; position: absolute !important; font-size: 14px; color: #1F80C8" href="http://support.epmlive.com" target="_blank">Visit our Support Community</a>');
+            $('.walkme-menu-click-close').after('<a id="support-link" style="right: 31px !important; top:  8px !important; width: 220px !important; height: 25px !important; z-index: 2147483647 !important; position: absolute !important; font-size: 14px; color: #1F80C8" href="http://support.epmlive.com" target="_blank">Visit our Support Community</a>');
             window.WalkMePlayerAPI.toggleMenu();
         });
     };
