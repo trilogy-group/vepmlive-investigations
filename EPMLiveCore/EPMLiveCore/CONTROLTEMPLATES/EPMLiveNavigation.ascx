@@ -32,7 +32,7 @@
 
                        var attr = SelectedTlNode.Equals(lId) ? string.Format(@" class=""{0}""", string.Join(" ", classes.ToArray())) : string.Empty;
                 %>
-                    <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= node.CssClass %>" title="<%= node.Title %>" data-role="top-nav-node" data-id="<%= node.Id %>"></span></li>
+                    <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= node.CssClass %>" title="<%= node.Title %>" data-role="top-nav-node" data-id="<%= node.Id %>" data-linkprovider="<%= node.LinkProvider %>"></span></li>
             <%
                    }
                }
@@ -60,7 +60,7 @@
 
                        var attr = SelectedTlNode.Equals(lId) ? string.Format(@" class=""{0}""", string.Join(" ", classes.ToArray())) : string.Empty;
                 %>
-                    <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= node.CssClass %>" title="<%= node.Title %>" data-role="top-nav-node"></span></li>
+                    <li<%= attr %>><span id="<%= lId %>" class="epm-nav-tlnode <%= node.CssClass %>" title="<%= node.Title %>" data-role="top-nav-node" data-id="<%= node.Id %>" data-linkprovider="<%= node.LinkProvider %>"></span></li>
             <%
                    }
                }

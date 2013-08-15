@@ -235,13 +235,13 @@
                 <epm:EPMLiveNavigation runat="server">
                     <TopNodes>
                         <epm:NavNode Id="ql" Title="Portal" CssClass="fui-list" />
-                        <epm:NavNode Id="new" Title="Add an app" CssClass="fui-plus" />
+                        <epm:NavNode Id="new" Title="Add an app" CssClass="fui-plus" LinkProvider="Applications" />
                         <epm:NavNode Separator="True" />
-                        <epm:NavNode Id="favorites" Title="Favorites" CssClass="fui-star-2" />
-                        <epm:NavNode Id="recent" Title="Most recent" CssClass="fui-time" />
+                        <epm:NavNode Id="favorites" Title="Favorites" CssClass="fui-star-2" LinkProvider="Favorites" />
+                        <epm:NavNode Id="recent" Title="Most recent" CssClass="fui-time" LinkProvider="RecentItems" />
                     </TopNodes>
                     <BottomNodes>
-                        <epm:NavNode Id="settings" Title="Settings" CssClass="fui-gear" />
+                        <epm:NavNode Id="settings" Title="Settings" CssClass="fui-gear" LinkProvider="Settings" />
                     </BottomNodes>
                 </epm:EPMLiveNavigation>
             </SharePoint:AjaxDelta>

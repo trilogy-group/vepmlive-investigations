@@ -129,6 +129,12 @@ namespace EPMLiveCore
      * 19xxx
      * 
      * ===============================
+     * NAVIGATION SERVICE
+     * ===============================
+     * 20xxx
+     * 
+     * 
+     * ===============================
      * SHAREPOINT ADMIN FUNCTIONS
      * ===============================
      * 9001xx - EventReceiverManager
@@ -1367,6 +1373,23 @@ namespace EPMLiveCore
             try
             {
                 return Response.Success(ChartWizardDataHelper.GetListsAndViewsGridLayout(data, oWeb));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        #endregion
+
+        #region Navigation Methods
+
+        public static string GetNavigationLinks(string data, SPWeb oWeb)
+        {
+            try
+            {
+                var navigationService = new NavigationService(data.Split(','), oWeb);
+                return Response.Success(navigationService.GetLinks());
             }
             catch (APIException ex)
             {

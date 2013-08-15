@@ -197,6 +197,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="CommentCCPeopleEditor.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
+    <Compile Include="Infrastructure\AssemblyManager.cs" />
+    <Compile Include="Infrastructure\Navigation\NavLinkProvider.cs" />
+    <Compile Include="Infrastructure\Navigation\NavLinkProviderInfoAttribute.cs" />
+    <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -294,7 +298,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Infrastructure\GridView\PersonalGridViewManager.cs" />
     <Compile Include="Infrastructure\Interfaces\IGridViewManager.cs" />
     <Compile Include="Infrastructure\Interfaces\ISPListItemManager.cs" />
+    <Compile Include="Infrastructure\Navigation\INavLinkProvider.cs" />
     <Compile Include="Infrastructure\Navigation\INavObject.cs" />
+    <Compile Include="Infrastructure\Navigation\NavLink.cs" />
     <Compile Include="Infrastructure\Navigation\NavNode.cs" />
     <Compile Include="Infrastructure\Navigation\NavObject.cs" />
     <Compile Include="Infrastructure\ResourceManagement\DepartmentManager.cs" />
@@ -315,6 +321,7 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>Licensing.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="API\NavigationService.cs" />
     <Compile Include="ISAPI\WorkEngine.asmx.cs">
       <DependentUpon>WorkEngine.asmx</DependentUpon>
       <SubType>Component</SubType>
