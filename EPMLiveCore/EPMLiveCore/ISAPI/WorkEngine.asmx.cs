@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Web.Script.Services;
 using System.Web.Services;
 using System.Xml;
+using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.API.ResourceManagement;
 using EPMLiveCore.API.SPAdmin;
@@ -1388,8 +1390,15 @@ namespace EPMLiveCore
         {
             try
             {
+                var watch = new Stopwatch();
+                watch.Start();
+
                 var navigationService = new NavigationService(data.Split(','), oWeb);
-                return Response.Success(navigationService.GetLinks());
+                var links = navigationService.GetLinks();
+
+                watch.Stop();
+
+                return Response.Success(links + GetDiagnosticsInfo(watch));
             }
             catch (APIException ex)
             {
@@ -1411,5 +1420,17 @@ namespace EPMLiveCore
                 return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
+
+        #region Helper Methods
+
+        private static string GetDiagnosticsInfo(Stopwatch watch)
+        {
+            return
+                new XElement("DiagnosticsInfo",
+                    new XElement("ProcessTime", watch.ElapsedMilliseconds, new XAttribute("Unit", "Milliseconds")))
+                    .ToString();
+        }
+
+        #endregion
     }
 }

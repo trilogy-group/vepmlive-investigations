@@ -6,8 +6,8 @@ namespace EPMLiveCore.Infrastructure
 {
     public sealed class AssemblyManager
     {
-        public static volatile AssemblyManager Instance;
-        public static object Locker = new Object();
+        private static volatile AssemblyManager _instance;
+        private static readonly object Locker = new Object();
         private readonly IEnumerable<Type> _types;
 
         private AssemblyManager()
@@ -19,17 +19,17 @@ namespace EPMLiveCore.Infrastructure
         {
             get
             {
-                if (Instance != null) return Instance;
+                if (_instance != null) return _instance;
 
                 lock (Locker)
                 {
-                    if (Instance == null)
+                    if (_instance == null)
                     {
-                        Instance = new AssemblyManager();
+                        _instance = new AssemblyManager();
                     }
                 }
 
-                return Instance;
+                return _instance;
             }
         }
 

@@ -198,6 +198,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Infrastructure\AssemblyManager.cs" />
+    <Compile Include="Infrastructure\CacheStore.cs" />
     <Compile Include="Infrastructure\Navigation\NavLinkProvider.cs" />
     <Compile Include="Infrastructure\Navigation\NavLinkProviderInfoAttribute.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
@@ -3785,6 +3786,11 @@ net start "WETimer"</PostDeploymentCommand>
   </ProjectExtensions>
   <PropertyGroup>
     <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
-del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
+del "$(ProjectDir)$(TargetName).XmlSerializers.dll"
+"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
+iisreset</PostBuildEvent>
   </PropertyGroup>
 </Project>

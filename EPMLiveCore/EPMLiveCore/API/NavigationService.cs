@@ -31,25 +31,7 @@ namespace EPMLiveCore.API
                 Task t1 = Task.Factory.StartNew(() =>
                 {
                     IEnumerable<Type> types = AssemblyManager.Current.GetTypes();
-
-                    Parallel.ForEach(providers, provider =>
-                    {
-                        provider = provider.Trim();
-                        string key = provider.ToUpper();
-
-                        foreach (Type type in from t in types
-                            where t.BaseType == typeof (INavLinkProvider)
-                            let atr = t.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
-                            where atr.Cast<NavLinkProviderInfoAttribute>().Any(a => a.Name.ToUpper().Equals(key))
-                            select t)
-                        {
-                            lock (Locker1)
-                            {
-                                _linkProviders.Add(provider,
-                                    (INavLinkProvider) Activator.CreateInstance(type, new object[] {_spWeb}));
-                            }
-                        }
-                    });
+                    Parallel.ForEach(providers, provider => LoadProvider(provider, types));
                 });
 
                 tasks.Add(t1);
@@ -75,6 +57,33 @@ namespace EPMLiveCore.API
             }
         }
 
+        private void LoadProvider(string provider, IEnumerable<Type> types)
+        {
+            provider = provider.Trim();
+            string key = provider.ToUpper();
+            string cacheKey = "NAVIGATION_PROVIDER_" + key;
+
+            object navProvider = CacheStore.Current.Get(cacheKey);
+            if (navProvider == null)
+            {
+                foreach (Type t in from t in types.AsParallel()
+                    where t.GetInterfaces().Contains(typeof (INavLinkProvider))
+                    let atr = t.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
+                    where atr.Cast<NavLinkProviderInfoAttribute>().Any(a => a.Name.ToUpper().Equals(key))
+                    select t)
+                {
+                    navProvider = Activator.CreateInstance(t, new object[] {_spWeb});
+                    CacheStore.Current.Set(cacheKey, navProvider);
+                    break;
+                }
+            }
+
+            lock (Locker1)
+            {
+                _linkProviders.Add(provider, (INavLinkProvider) navProvider);
+            }
+        }
+
         public string GetLinks()
         {
             try
@@ -83,16 +92,37 @@ namespace EPMLiveCore.API
 
                 Parallel.ForEach(_linkProviders, provider =>
                 {
+                    INavLinkProvider linkProvider = provider.Value;
+
+                    if (linkProvider == null) return;
+
                     var node = new XElement(provider.Key);
 
-                    foreach (NavLink navLink in provider.Value.GetLinks())
+                    var links = new SortedDictionary<int, NavLink>();
+
+                    foreach (NavLink link in linkProvider.GetLinks())
                     {
+                        int order = link.Order;
+
+                        if (order == 0)
+                        {
+                            order = links.Count == 0 ? 1 : links.Keys.Max() + 1;
+                        }
+
+                        links.Add(order, link);
+                    }
+
+                    foreach (var linkInfo in links)
+                    {
+                        NavLink navLink = linkInfo.Value;
+                        navLink.Order = linkInfo.Key;
+
                         var link = new XElement("NavLink");
 
                         foreach (var property in _navLinkProperties)
                         {
                             string name = property.Key;
-                            string value = (property.Value.GetValue(navLink) as string) ?? string.Empty;
+                            string value = ((property.Value.GetValue(navLink) as string) ?? string.Empty).Trim();
 
                             if (name.Equals("Url"))
                             {

@@ -3,7 +3,42 @@
         $(function() {
             var $ = window.jQuery;
 
-            var epmLiveNavigation = function () {
+            var epmLiveService = (function() {
+                var _execute = function (method, data, onSuccess, onError) {
+                    var $$ = window.epmLive;
+                    
+                    $.ajax({
+                        type: 'POST',
+                        url: $$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                        data: "{ Function: '" + method + "', Dataxml: '" + data + "' }",
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.d) {
+                                var resp = $$.parseJson(response.d);
+                                var result = resp.Result;
+                                
+                                if ($$.responseIsSuccess(result)) {
+                                    onSuccess(result);
+                                } else {
+                                    onError(response);
+                                }
+                            } else {
+                                onError(response);
+                            }
+                        },
+                        error: function(response) {
+                            onError(response);
+                        }
+                    });
+                };
+
+                return {
+                    execute: _execute
+                };
+            })();
+
+            var epmLiveNavigation = (function() {
                 var animSpeed = 300;
                 var nodeClass = 'epm-nav-node';
                 var hoverClass = 'epm-nav-node-hover';
@@ -17,48 +52,48 @@
                 var cookieOptions = { expires: 365, path: '/' };
 
                 var $sn = $('#epm-nav-sub');
-                
+
                 var tlNodes = [];
 
                 var navNode = function (el) {
-                    var ele = el;
-                    var $ele = $(el);
-                    var $sm = $('#epm-nav-sub-' + $ele.data('id'));
+                    var _el = el;
+                    var _$el = $(el);
+                    var _$sm = $('#epm-nav-sub-' + _$el.data('id'));
 
-                    var nodeId = ele.id;
-                    
-                    var isSelected = function () {
-                        return $ele.parent().hasClass(selectedClass);
+                    var _id = _el.id;
+
+                    var _selected = function () {
+                        return _$el.parent().hasClass(selectedClass);
                     };
 
-                    var isOpened = function() {
-                        return $ele.parent().hasClass(openedClass);
+                    var isOpened = function () {
+                        return _$el.parent().hasClass(openedClass);
                     };
 
-                    var changeSelection = function (select) {
+                    var _select = function (select) {
                         if (select) {
-                            $ele.parent().addClass(selectedClass);
+                            _$el.parent().addClass(selectedClass);
                         } else {
-                            $ele.parent().removeClass(selectedClass);
+                            _$el.parent().removeClass(selectedClass);
                         }
                     };
 
-                    var hideNode = function() {
-                        $sm.hide();
-                        $ele.parent().removeClass(openedClass);
+                    var _close = function () {
+                        _$sm.hide();
+                        _$el.parent().removeClass(openedClass);
                     };
 
-                    var closeMenu = function () {
+                    var _closeNav = function () {
                         if ($sn.is(':visible')) {
                             $sn.hide('slide', { direction: 'left' }, animSpeed);
                         }
 
-                        hideNode();
+                        _close();
                     };
 
-                    var showNode = function() {
-                        $sm.show();
-                        $ele.parent().addClass(openedClass);
+                    var showNode = function () {
+                        _$sm.show();
+                        _$el.parent().addClass(openedClass);
                     };
 
                     var openMenu = function () {
@@ -68,11 +103,11 @@
                             $sn.show('slide', { direction: 'left' }, animSpeed);
                         }
                     };
-                    
-                    $ele.click(function () {
-                        if (isSelected()) {
+
+                    _$el.click(function () {
+                        if (_selected()) {
                             if (isOpened() && $.cookie(pinStateCookie) === 'unpinned') {
-                                closeMenu();
+                                _closeNav();
                             } else {
                                 openMenu();
                             }
@@ -80,7 +115,7 @@
                             for (var n in tlNodes) {
                                 var nde = tlNodes[n];
 
-                                if (nde.id !== nodeId) {
+                                if (nde.id !== _id) {
                                     if (nde.selected()) {
                                         nde.select(false);
                                         nde.close();
@@ -88,22 +123,22 @@
                                 }
                             }
 
-                            changeSelection(true);
+                            _select(true);
                             openMenu();
 
-                            $.cookie(selectedTlNodeCookie, nodeId, cookieOptions);
+                            $.cookie(selectedTlNodeCookie, _id, cookieOptions);
                         }
                     });
 
                     return {
-                        id: nodeId,
-                        selected: isSelected,
-                        select: changeSelection,
-                        close: hideNode,
-                        closeNav: closeMenu,
-                        el: ele,
-                        $el: $ele,
-                        $menu: $sm
+                        id: _id,
+                        selected: _selected,
+                        select: _select,
+                        close: _close,
+                        closeNav: _closeNav,
+                        el: _el,
+                        $el: _$el,
+                        $menu: _$sm
                     };
                 };
 
@@ -139,7 +174,7 @@
                     $.cookie(pinStateCookie, state, cookieOptions);
                 };
 
-                var togglePinned = function() {
+                var togglePinned = function () {
                     if ($sn.data('pinstate') === 'pinned') {
                         changePinState('unpinned');
                     } else {
@@ -147,20 +182,20 @@
                     }
                 };
 
-                var saveExpandState = function(nodeId, data) {
+                var saveExpandState = function (nodeId, data) {
                     var state = $.parseJSON($.cookie(expandStateCookie)) || {};
                     state[nodeId] = data;
                     $.cookie(expandStateCookie, JSON.stringify(state), cookieOptions);
                 };
 
-                var registerEvents = function() {
+                var registerEvents = function () {
                     var hoverNode = window.TreeView_HoverNode;
                     var unhoverNode = window.TreeView_UnhoverNode;
                     var toggleNode = window.TreeView_ToggleNode;
 
-                    window.TreeView_HoverNode = function(data, el) {
+                    window.TreeView_HoverNode = function (data, el) {
                         var node = $(el);
-                        
+
                         if (node.hasClass(nodeClass)) {
                             node.parent().parent().parent().addClass(hoverClass);
                         } else {
@@ -168,7 +203,7 @@
                         }
                     };
 
-                    window.TreeView_UnhoverNode = function(el) {
+                    window.TreeView_UnhoverNode = function (el) {
                         var node = $(el);
 
                         if (node.hasClass(nodeClass)) {
@@ -178,26 +213,26 @@
                         }
                     };
 
-                    window.TreeView_ToggleNode = function(data, x, elNav, y, elNodes) {
+                    window.TreeView_ToggleNode = function (data, x, elNav, y, elNodes) {
                         var d = [];
                         var nodeId = null;
-                        
+
                         var parents = $(elNav).parents('div');
                         for (var i = 0; i < parents.length; i++) {
                             var p = parents[i];
                             var $p = $(p);
-                            
+
                             if ($p.hasClass('epm-nav-sub')) {
                                 nodeId = p.id;
                                 var nodes = getLinkNodes(nodeId);
                                 for (var j = 0; j < nodes.length; j++) {
                                     var n = nodes[j];
                                     var state = $(n).is(':visible');
-                                    
+
                                     if ((n.id).replace('Nodes', '') === elNav.id) {
                                         state = !state;
                                     }
-                                    
+
                                     d[j] = state;
                                 }
 
@@ -219,20 +254,20 @@
                     }
 
                     var $pin = $('#epm-nav-pin');
-                    
-                    $pin.click(function() {
+
+                    $pin.click(function () {
                         togglePinned();
                     });
 
-                    $sn.hover(function() {
+                    $sn.hover(function () {
                         $pin.show();
-                    },function() {
+                    }, function () {
                         $pin.hide();
                     });
 
                     $('a.epm-nav-node').click(function () {
                         var index = -1;
-                        
+
                         var $link = $(this);
                         var parent = $link.parents('div')[0];
                         var $siblings = $(parent).siblings('div');
@@ -252,17 +287,17 @@
                     });
                 };
 
-                var getSelectedSubLevelNode = function() {
+                var getSelectedSubLevelNode = function () {
                     return ($.cookie(selectedTlNodeCookie) || 'epm-nav-top-ql').replace('epm-nav-top-', 'epm-nav-sub-');
                 };
 
-                var getLinkNodes = function(menu) {
+                var getLinkNodes = function (menu) {
                     return $('#' + menu).find('.epm-nav-sub-menu').find('div[id^=E]');
                 };
 
-                var expandNodes = function() {
+                var expandNodes = function () {
                     var expandState = $.parseJSON($.cookie(expandStateCookie));
-                    
+
                     if (expandState) {
                         var selectedNode = getSelectedSubLevelNode();
 
@@ -283,7 +318,7 @@
                     }
                 };
 
-                var selectLink = function() {
+                var selectLink = function () {
                     var link = $.parseJSON($.cookie(selectedLinkCookie));
                     if (link) {
                         var index = link.index;
@@ -305,8 +340,31 @@
                         }
                     }
                 };
-                
-                var initialize = function () {
+
+                var loadLinks = function () {
+                    var providers = [];
+
+                    for (var i = 0; i < tlNodes.length; i++) {
+                        var node = tlNodes[i];
+
+                        if (!node.selected()) {
+                            var provider = node.$el.data('linkprovider');
+                            if (provider) {
+                                providers.push(provider);
+                            }
+                        }
+                    }
+
+                    if (providers.length > 0) {
+                        epmLiveService.execute('GetNavigationLinks', providers.join(), function (response) {
+
+                        }, function (response) {
+
+                        });
+                    }
+                };
+
+                var _init = function () {
                     var pinState = $.cookie(pinStateCookie);
 
                     $('#epm-nav-top').find("[data-role='top-nav-node']").each(function () {
@@ -316,16 +374,17 @@
                     changePinState(pinState || 'pinned');
                     expandNodes();
                     selectLink();
-                        
                     registerEvents();
+                    
+                    ExecuteOrDelayUntilScriptLoaded(loadLinks, 'EPMLive.js');
                 };
 
                 return {
-                    init: initialize
+                    init: _init
                 };
-            };
+            })();
 
-            epmLiveNavigation().init();
+            epmLiveNavigation.init();
         });
     };
     
