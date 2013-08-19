@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
 
@@ -24,7 +27,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 new Tuple<SPBasePermissions?, NavLink>(SPBasePermissions.AddAndCustomizePages, new NavLink
                 {
                     Title = "Add a page",
-                    Url = string.Format("javascript:OpenCreateWebPageDialog('{0}/_layouts/15/createwebpage.aspx');", url)
+                    Url =
+                        string.Format("javascript:OpenCreateWebPageDialog('{0}/_layouts/15/createwebpage.aspx');", url)
                 }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
                 {
@@ -35,7 +39,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     Title = "Advance site settings",
                     Url = string.Format("javascript:GoToPage('{0}/_layouts/15/epmlive/settings.aspx');", url)
-                })
+                }),
+                new Tuple<SPBasePermissions?, NavLink>(null, new NavLink {Separator = true})
             };
         }
 
@@ -43,7 +48,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public override IEnumerable<INavObject> GetLinks()
         {
-            foreach (Tuple<SPBasePermissions?, NavLink> link in _links)
+            foreach (var link in _links)
             {
                 if (!link.Item1.HasValue)
                 {
@@ -57,6 +62,54 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     }
                 }
             }
+
+            foreach (INavObject link in GetSettings()) yield return link;
+        }
+
+        private IEnumerable<INavObject> GetSettings()
+        {
+            string key = SPWeb.ID + "_" + "Settings";
+
+            IEnumerable<INavObject> settings;
+            CachedValue cachedSettings = CacheStore.Current.Get(key);
+
+            if (cachedSettings != null)
+            {
+                settings = (IEnumerable<INavObject>) cachedSettings.Value;
+            }
+            else
+            {
+                settings = FetchSettings();
+                CacheStore.Current.Set(key, settings);
+            }
+
+            return settings;
+        }
+
+        private IEnumerable<INavObject> FetchSettings()
+        {
+            SPList settingsList = SPWeb.Lists.TryGetList("EPM Live Settings");
+
+            if (settingsList == null) yield break;
+
+            DataTable settings = settingsList.Items.GetDataTable();
+
+            foreach (NavLink link in from DataRow dataRow in settings.Rows
+                let category = (S(dataRow["Category"]).Split(')')[1]).Trim()
+                select new NavLink
+                {
+                    Title = S(dataRow["Title"]),
+                    Url = S(dataRow["URL"]),
+                    Category = category
+                })
+            {
+                yield return link;
+            }
+        }
+
+        private string S(object o)
+        {
+            return (o ?? string.Empty).ToString();
         }
 
         #endregion
