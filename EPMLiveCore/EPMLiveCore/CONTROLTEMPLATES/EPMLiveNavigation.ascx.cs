@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
+using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint.WebControls;
 
@@ -44,10 +45,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
             }
 
-            foreach (string script in new[] {"EPMLive.Navigation.min"})
-            {
-                SPPageContentManager.RegisterScriptFile(Page, LAYOUT_PATH + "javascripts/" + script + ".js", false);
-            }
+            EPMLiveScriptManager.RegisterScript(Page,
+                new[] {"libraries/jquery.min", "@libraries/jquery.cookie", "@EPMLive.Navigation"});
 
             HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode");
             if (selectedTlNodeCookie != null)

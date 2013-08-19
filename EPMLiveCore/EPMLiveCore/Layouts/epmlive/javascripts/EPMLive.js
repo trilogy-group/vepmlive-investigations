@@ -1,7 +1,4 @@
-﻿/// <version>4.3</version>
-/// <reference path="libraries/knockout-1.2.1.debug.js" />
-
-(function ($$, $, k, undefined) {
+﻿(function ($$, $, k, undefined) {
     var scrollbarWidth = 0;
 
     $$.currentSiteId = null;

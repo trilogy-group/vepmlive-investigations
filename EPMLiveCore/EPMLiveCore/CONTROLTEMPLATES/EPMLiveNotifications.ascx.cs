@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
 using System.Web.UI;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.ControlTemplates
 {
+    [MdsCompliant(true)]
     public partial class EPMLiveNotifications : UserControl
     {
         #region Fields (1) 
@@ -15,28 +15,14 @@ namespace EPMLiveCore.ControlTemplates
 
         #endregion Fields 
 
-        #region Properties (1) 
+        #region Methods (2) 
 
-        protected string JsFileVersion
+        // Protected Methods (2) 
+
+        protected override void OnPreRender(EventArgs e)
         {
-            get
-            {
-                string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-
-                if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
-                {
-                    fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-                }
-
-                return "?v=" + fileVersion;
-            }
+            EPMLiveScriptManager.RegisterScript(Page, "@Notifications");
         }
-
-        #endregion Properties 
-
-        #region Methods (1) 
-
-        // Protected Methods (1) 
 
         /// <summary>
         ///     Handles the Load event of the Page control.
@@ -45,9 +31,7 @@ namespace EPMLiveCore.ControlTemplates
         /// <param name="e">
         ///     The <see cref="System.EventArgs" /> instance containing the event data.
         /// </param>
-        protected void Page_Load(object sender, EventArgs e)
-        {
-        }
+        protected void Page_Load(object sender, EventArgs e) { }
 
         #endregion Methods 
     }

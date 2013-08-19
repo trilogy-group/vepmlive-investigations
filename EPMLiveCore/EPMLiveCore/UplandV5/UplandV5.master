@@ -82,7 +82,6 @@
             }
         </style>
 
-        <link rel="stylesheet" type="text/css" href="/_layouts/15/epmlive/stylesheets/tooltip.css" />
         <link href="/_layouts/15/epmlive/stylesheets/masterpages/UplandV5.min.css" rel="stylesheet" type="text/css" />
         <script src="/_layouts/15/epmlive/javascripts/masterpages/UplandV5.min.js" type="text/javascript"> </script>
 

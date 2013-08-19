@@ -8,11 +8,11 @@ namespace EPMLiveCore.Infrastructure
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
 
-        private readonly Dictionary<string, object> _store;
+        private readonly Dictionary<string, CachedValue> _store;
 
         private CacheStore()
         {
-            _store = new Dictionary<string, object>();
+            _store = new Dictionary<string, CachedValue>();
         }
 
         public static CacheStore Current
@@ -33,22 +33,22 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        public object Get(string key)
+        public CachedValue Get(string key)
         {
             return _store.ContainsKey(key) ? _store[key] : null;
         }
 
-        public void Set(string key, object val)
+        public void Set(string key, object value)
         {
             lock (Locker)
             {
                 if (!_store.ContainsKey(key))
                 {
-                    _store.Add(key, val);
+                    _store.Add(key, new CachedValue(value));
                 }
                 else
                 {
-                    _store[key] = val;
+                    _store[key].Value = value;
                 }
             }
         }
@@ -62,5 +62,30 @@ namespace EPMLiveCore.Infrastructure
                 _store.Remove(key);
             }
         }
+    }
+
+    public class CachedValue
+    {
+        private object _value;
+
+        public CachedValue(object value)
+        {
+            CreatedAt = DateTime.Now;
+            Value = value;
+        }
+
+        public object Value
+        {
+            get { return _value; }
+            set
+            {
+                _value = value;
+                UpdatedAt = DateTime.Now;
+            }
+        }
+
+        public DateTime UpdatedAt { get; private set; }
+
+        public DateTime CreatedAt { get; private set; }
     }
 }

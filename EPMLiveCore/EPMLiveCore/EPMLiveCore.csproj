@@ -90,6 +90,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Reference Include="EPMLiveWorkPlanner">
       <HintPath>..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\bin\Debug\EPMLiveWorkPlanner.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -199,6 +200,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Infrastructure\AssemblyManager.cs" />
     <Compile Include="Infrastructure\CacheStore.cs" />
+    <Compile Include="Infrastructure\EPMLiveScriptManager.cs" />
     <Compile Include="Infrastructure\Navigation\NavLinkProvider.cs" />
     <Compile Include="Infrastructure\Navigation\NavLinkProviderInfoAttribute.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
@@ -1474,6 +1476,9 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="ISAPI\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
+    </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map">
+      <DependentUpon>EPMLive.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
@@ -3161,6 +3166,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\Integration\Properties.aspx" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.min.js">
+      <DependentUpon>EPMLive.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js">
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
@@ -3171,6 +3179,9 @@ net start "WETimer"</PostDeploymentCommand>
     </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\handlebars-1.0.0.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js">

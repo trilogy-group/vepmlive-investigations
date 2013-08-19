@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.UI;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 
@@ -21,6 +22,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected override void OnPreRender(EventArgs e)
         {
             SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/notifications.min.css");
+
+            EPMLiveScriptManager.RegisterScript(Page, new[] {"libraries/jquery.min", "@EPMLive.Notifications"});
 
             GetProfilePicture();
         }

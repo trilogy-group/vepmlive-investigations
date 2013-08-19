@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
 using System.Web.UI;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 
@@ -11,9 +9,8 @@ namespace EPMLiveCore.ControlTemplates
     [MdsCompliant(true)]
     public partial class EPMLiveJS : UserControl
     {
-        #region Fields (7) 
+        #region Fields (9) 
 
-        protected string EPMFileVersion;
         protected string Scheme;
         protected string SiteId;
         protected string SiteUrl;
@@ -22,6 +19,8 @@ namespace EPMLiveCore.ControlTemplates
         protected string WebId;
         protected string WebUrl;
         private SPWeb _spWeb;
+        public string EPMFileVersion { get; private set; }
+        public bool DebugMode { get; private set; }
 
         #endregion Fields 
 
@@ -31,10 +30,25 @@ namespace EPMLiveCore.ControlTemplates
 
         protected override void OnPreRender(EventArgs e)
         {
-            foreach (string script in new[] {"libraries/jquery.min", "libraries/jquery.cookie"})
+            EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                SPPageContentManager.RegisterScriptFile(Page, "/_layouts/15/epmlive/javascripts/" + script + ".js", false);
+                "libraries/jquery.min", "libraries/jquery-ui.min", "@libraries/jquery.cookie", "/xml2json", "/MD5",
+                "jquery.multiselect.min"
+            });
+
+            EPMFileVersion = (string) CacheStore.Current.Get("EPMLiveFileVersion").Value;
+
+            DebugMode = false;
+
+            try
+            {
+                string debug = Request.Params["epmdebug"];
+                if ((debug ?? string.Empty).ToLower().Equals("true"))
+                {
+                    DebugMode = true;
+                }
             }
+            catch { }
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -53,13 +67,6 @@ namespace EPMLiveCore.ControlTemplates
             catch { }
 
             Scheme = Request.Url.Scheme;
-            string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-            if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
-            {
-                fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-            }
-
-            EPMFileVersion = fileVersion;
         }
 
         #endregion Methods 

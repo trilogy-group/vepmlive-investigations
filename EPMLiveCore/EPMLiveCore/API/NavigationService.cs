@@ -63,7 +63,9 @@ namespace EPMLiveCore.API
             string key = provider.ToUpper();
             string cacheKey = "NAVIGATION_PROVIDER_" + key;
 
-            object navProvider = CacheStore.Current.Get(cacheKey);
+            var cachedProvider = CacheStore.Current.Get(cacheKey);
+            object navProvider = cachedProvider == null ? null : cachedProvider.Value;
+
             if (navProvider == null)
             {
                 foreach (Type t in from t in types.AsParallel()
@@ -96,7 +98,9 @@ namespace EPMLiveCore.API
 
                     if (linkProvider == null) return;
 
-                    var node = new XElement(provider.Key);
+                    string providerName = provider.Key;
+
+                    var node = new XElement(providerName);
 
                     var links = new SortedDictionary<int, NavLink>();
 
@@ -116,13 +120,14 @@ namespace EPMLiveCore.API
                     {
                         NavLink navLink = linkInfo.Value;
                         navLink.Order = linkInfo.Key;
+                        navLink.Id = GetLinkId(navLink, providerName);
 
                         var link = new XElement("NavLink");
 
                         foreach (var property in _navLinkProperties)
                         {
                             string name = property.Key;
-                            string value = ((property.Value.GetValue(navLink) as string) ?? string.Empty).Trim();
+                            string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
 
                             if (name.Equals("Url"))
                             {
@@ -149,6 +154,24 @@ namespace EPMLiveCore.API
             {
                 throw new APIException(20001, "[NavigationService:GetLinks] " + exception.Message);
             }
+        }
+
+        private static string GetLinkId(NavLink navLink, string providerName)
+        {
+            return navLink.Id ?? CalculateLinkId(navLink, providerName);
+        }
+
+        private static string CalculateLinkId(NavLink navLink, string providerName)
+        {
+            string key = providerName + "|" + navLink.Order + "|" + navLink.Url;
+
+            var cachedId=CacheStore.Current.Get(key);
+            if (cachedId != null) return (string) cachedId.Value;
+
+            var id = key.Md5();
+            CacheStore.Current.Set(key, id);
+
+            return id;
         }
     }
 }
