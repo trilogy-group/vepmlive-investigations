@@ -8,11 +8,11 @@ namespace EPMLiveCore.Infrastructure
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
 
-        private readonly Dictionary<string, CachedValue> _store;
+        private readonly Dictionary<string, Tuple<string, CachedValue>> _store;
 
         private CacheStore()
         {
-            _store = new Dictionary<string, CachedValue>();
+            _store = new Dictionary<string, Tuple<string, CachedValue>>();
         }
 
         public static CacheStore Current
@@ -33,28 +33,46 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        public CachedValue Get(string key)
+        public CachedValue Get(string key, string category, Func<object> getValue)
         {
-            return _store.ContainsKey(key) ? _store[key] : null;
+            key = key.Trim().ToUpper();
+            category = category.Trim().ToUpper();
+
+            if (_store.ContainsKey(key)) return _store[key].Item2;
+
+            Set(key, getValue(), category);
+
+            return _store[key].Item2;
         }
 
-        public void Set(string key, object value)
+        public CachedValue Get(string key)
         {
+            key = key.Trim().ToUpper();
+            return _store.ContainsKey(key) ? _store[key].Item2 : null;
+        }
+
+        public void Set(string key, object value, string category)
+        {
+            key = key.Trim().ToUpper();
+            category = category.Trim().ToUpper();
+
             lock (Locker)
             {
                 if (!_store.ContainsKey(key))
                 {
-                    _store.Add(key, new CachedValue(value));
+                    _store.Add(key, new Tuple<string, CachedValue>(category, new CachedValue(value)));
                 }
                 else
                 {
-                    _store[key].Value = value;
+                    _store[key].Item2.Value = value;
                 }
             }
         }
 
         public void Remove(string key)
         {
+            key = key.Trim().ToUpper();
+
             if (!_store.ContainsKey(key)) return;
 
             lock (Locker)
@@ -76,7 +94,11 @@ namespace EPMLiveCore.Infrastructure
 
         public object Value
         {
-            get { return _value; }
+            get
+            {
+                LastReadAt = DateTime.Now;
+                return _value;
+            }
             set
             {
                 _value = value;
@@ -87,5 +109,7 @@ namespace EPMLiveCore.Infrastructure
         public DateTime UpdatedAt { get; private set; }
 
         public DateTime CreatedAt { get; private set; }
+
+        public DateTime LastReadAt { get; private set; }
     }
 }

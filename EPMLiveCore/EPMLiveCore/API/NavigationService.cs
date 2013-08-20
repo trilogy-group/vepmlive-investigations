@@ -63,26 +63,36 @@ namespace EPMLiveCore.API
             string key = provider.ToUpper();
             string cacheKey = "NAVIGATION_PROVIDER_" + key;
 
-            var cachedProvider = CacheStore.Current.Get(cacheKey);
-            object navProvider = cachedProvider == null ? null : cachedProvider.Value;
+            //var cachedProvider = CacheStore.Current.Get(cacheKey);
+            //object navProvider = cachedProvider == null ? null : cachedProvider.Value;
 
-            if (navProvider == null)
-            {
-                foreach (Type t in from t in types.AsParallel()
-                    where t.GetInterfaces().Contains(typeof (INavLinkProvider))
-                    let atr = t.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
-                    where atr.Cast<NavLinkProviderInfoAttribute>().Any(a => a.Name.ToUpper().Equals(key))
-                    select t)
-                {
-                    navProvider = Activator.CreateInstance(t, new object[] {_spWeb});
-                    CacheStore.Current.Set(cacheKey, navProvider);
-                    break;
-                }
-            }
+            //if (navProvider == null)
+            //{
+            //    foreach (Type t in from t in types.AsParallel()
+            //        where t.GetInterfaces().Contains(typeof (INavLinkProvider))
+            //        let atr = t.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
+            //        where atr.Cast<NavLinkProviderInfoAttribute>().Any(a => a.Name.ToUpper().Equals(key))
+            //        select t)
+            //    {
+            //        navProvider = Activator.CreateInstance(t, new object[] {_spWeb});
+            //        CacheStore.Current.Set(cacheKey, navProvider);
+            //        break;
+            //    }
+            //}
+
+            var navProvider =
+                (INavLinkProvider)
+                    (CacheStore.Current.Get(cacheKey, "Navigation",
+                        () => Enumerable.FirstOrDefault((from t in types.AsParallel()
+                            where t.GetInterfaces().Contains(typeof (INavLinkProvider))
+                            let atr = t.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
+                            where atr.Cast<NavLinkProviderInfoAttribute>().Any(a => a.Name.ToUpper().Equals(key))
+                            select t).Select(t => (INavLinkProvider) Activator.CreateInstance(t, new object[] {_spWeb})))))
+                        .Value;
 
             lock (Locker1)
             {
-                _linkProviders.Add(provider, (INavLinkProvider) navProvider);
+                _linkProviders.Add(provider, navProvider);
             }
         }
 
@@ -164,14 +174,7 @@ namespace EPMLiveCore.API
         private static string CalculateLinkId(NavLink navLink, string providerName)
         {
             string key = providerName + "|" + navLink.Order + "|" + navLink.Url;
-
-            var cachedId=CacheStore.Current.Get(key);
-            if (cachedId != null) return (string) cachedId.Value;
-
-            var id = key.Md5();
-            CacheStore.Current.Set(key, id);
-
-            return id;
+            return (string) CacheStore.Current.Get(key, "Navigation", key.Md5).Value;
         }
     }
 }

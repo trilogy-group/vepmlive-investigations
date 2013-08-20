@@ -357,9 +357,15 @@
 
                     if (providers.length > 0) {
                         epmLiveService.execute('GetNavigationLinks', providers.join(), function (response) {
-
+                            for (var providerName in response.Nodes) {
+                                var navLink = response.Nodes[providerName].NavLink;
+                                for (var nl in navLink) {
+                                    var link = navLink[nl];
+                                    var fmp = 0;
+                                }
+                            }
                         }, function (response) {
-
+                            console.log(response);
                         });
                     }
                 };

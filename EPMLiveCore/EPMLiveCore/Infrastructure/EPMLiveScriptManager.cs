@@ -74,25 +74,17 @@ namespace EPMLiveCore.Infrastructure
 
         private static string GetFileVersion()
         {
-            string fileVersion = null;
-
-            CachedValue version = CacheStore.Current.Get("EPMLiveFileVersion");
-            if (version != null)
+            return (string) CacheStore.Current.Get("EPMLiveFileVersion", "Infrastructure", () =>
             {
-                fileVersion = (string) version.Value;
-            }
+                string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
 
-            if (!string.IsNullOrEmpty(fileVersion)) return fileVersion;
+                if (string.IsNullOrEmpty(version) || version.Equals("1.0.0.0"))
+                {
+                    version = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+                }
 
-            fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-            if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
-            {
-                fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-            }
-
-            CacheStore.Current.Set("EPMLiveFileVersion", fileVersion);
-
-            return fileVersion;
+                return version;
+            }).Value;
         }
     }
 }

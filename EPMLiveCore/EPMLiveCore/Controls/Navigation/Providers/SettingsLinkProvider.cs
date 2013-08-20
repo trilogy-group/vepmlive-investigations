@@ -68,43 +68,38 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private IEnumerable<INavObject> GetSettings()
         {
-            string key = SPWeb.ID + "_" + "Settings";
+            string key = SPWeb.ID + "_NavLinks_" + "Settings";
 
-            IEnumerable<INavObject> settings;
-            CachedValue cachedSettings = CacheStore.Current.Get(key);
-
-            if (cachedSettings != null)
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(key, "Navigation", () =>
             {
-                settings = (IEnumerable<INavObject>) cachedSettings.Value;
-            }
-            else
-            {
-                settings = FetchSettings();
-                CacheStore.Current.Set(key, settings);
-            }
+                var links = new List<NavLink>();
 
-            return settings;
-        }
-
-        private IEnumerable<INavObject> FetchSettings()
-        {
-            SPList settingsList = SPWeb.Lists.TryGetList("EPM Live Settings");
-
-            if (settingsList == null) yield break;
-
-            DataTable settings = settingsList.Items.GetDataTable();
-
-            foreach (NavLink link in from DataRow dataRow in settings.Rows
-                let category = (S(dataRow["Category"]).Split(')')[1]).Trim()
-                select new NavLink
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    Title = S(dataRow["Title"]),
-                    Url = S(dataRow["URL"]),
-                    Category = category
-                })
-            {
-                yield return link;
-            }
+                    using (var spSite = new SPSite(SPWeb.Site.ID))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb(SPWeb.ID))
+                        {
+                            SPList settingsList = spWeb.Lists.TryGetList("EPM Live Settings");
+
+                            if (settingsList == null) return;
+
+                            DataTable settings = settingsList.Items.GetDataTable();
+
+                            links.AddRange(from DataRow dataRow in settings.Rows
+                                let category = (S(dataRow["Category"]).Split(')')[1]).Trim()
+                                select new NavLink
+                                {
+                                    Title = S(dataRow["Title"]),
+                                    Url = S(dataRow["URL"]) + "?Source={page}&BackTo={page}",
+                                    Category = category
+                                });
+                        }
+                    }
+                });
+
+                return links;
+            }).Value;
         }
 
         private string S(object o)
