@@ -402,4 +402,4 @@
     };
 
     k.applyBindings($$.ui.statusbar, document.getElementById('EPMLiveStatusbar'));
-} (window.epmLive = window.epmLive || {}, jQuery, ko));
+}(window.epmLive = window.epmLive || {}, jQuery, ko));
