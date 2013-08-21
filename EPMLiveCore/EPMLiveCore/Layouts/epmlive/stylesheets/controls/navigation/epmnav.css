@@ -142,6 +142,19 @@
   padding-left: 10px;
   width: 154px;
 }
+.epm-nav-sub ul.epm-nav-node-collapsed {
+  display: none;
+}
+.epm-nav-sub ul.epm-nav-node-expanded {
+  display: block;
+}
+.epm-nav-sub div.epm-nav-sub-sep {
+  border-bottom: 1px solid #000000;
+  border-top: 1px solid #000000;
+  height: 1px;
+  margin: 7px auto 0;
+  width: 95%;
+}
 .epm-nav-sub .epm-nav-cat {
   margin-left: 10px !important;
   margin-top: 13px;
@@ -150,6 +163,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  cursor: pointer;
+  cursor: hand;
 }
 .epm-nav-sub .epm-nav-cat span.epm-nav-node-collapsed,
 .epm-nav-sub .epm-nav-cat span.epm-nav-node-expanded {

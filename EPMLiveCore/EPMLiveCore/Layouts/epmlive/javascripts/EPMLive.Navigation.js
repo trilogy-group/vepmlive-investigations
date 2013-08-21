@@ -44,6 +44,8 @@
                 var hoverClass = 'epm-nav-node-hover';
                 var openedClass = 'epm-nav-node-opened';
                 var selectedClass = 'epm-nav-node-selected';
+                var expandedClass = 'epm-nav-node-expanded';
+                var collapsedClass = 'epm-nav-node-collapsed';
 
                 var selectedTlNodeCookie = 'epmnav-selected-tlnode';
                 var selectedLinkCookie = 'epmnav-selected-link';
@@ -147,14 +149,14 @@
                             }
 
                             if (category !== '__STATIC__') {
-                                _$sm.append('<div id="' + id + '-header" class="epm-nav-node epm-nav-node-root epm-nav-cat"><span class="' + defaultCssClass + '">&nbsp;</span><span class="epm-nav-cat-title" alt="' + category + '">' + category + '</span></div>');
+                                _$sm.append('<div id="' + id + '" class="epm-nav-node epm-nav-node-root epm-nav-cat"><span class="' + defaultCssClass + '">&nbsp;</span><span class="epm-nav-cat-title" alt="' + category + '">' + category + '</span></div>');
                             }
 
-                            _$sm.append('<ul id="' + id + '" class="epm-nav-links ' + defaultCssClass + '"></ul>');
+                            _$sm.append('<ul id="' + id + '-links" class="epm-nav-links ' + defaultCssClass + '"></ul>');
 
                             categories[category] = {
                                 id: id,
-                                $el: $('#' + id)
+                                $el: $('#' + id + '-links')
                             };
                         }
                     };
@@ -352,6 +354,12 @@
                     $sn.css('left', '0');
                     $sb.css('z-index', 1001);
 
+                    $(window).resize(function() {
+                        var height = $('#epm-nav-top').height();
+                        $ss.height(height);
+                        $sn.height(height);
+                    });
+
                     $('a.epm-nav-node').click(function () {
                         var index = -1;
 
@@ -470,6 +478,26 @@
                                     }
                                 }
                             }
+                            
+                            $('.epm-nav-cat').click(function () {
+                                var $cat = $(this);
+                                var catId = $cat.get(0).id;
+                                
+                                var $span = $($cat.find('span')[0]);
+                                var $ul = $('#' + catId + '-links');
+
+                                if ($span.hasClass(collapsedClass)) {
+                                    $span.removeClass(collapsedClass);
+                                    $span.addClass(expandedClass);
+                                    $ul.removeClass(collapsedClass);
+                                    $ul.addClass(expandedClass);
+                                } else {
+                                    $span.removeClass(expandedClass);
+                                    $span.addClass(collapsedClass);
+                                    $ul.removeClass(expandedClass);
+                                    $ul.addClass(collapsedClass);
+                                }
+                            });
                         }, function (response) {
                             console.log(response);
                         });
