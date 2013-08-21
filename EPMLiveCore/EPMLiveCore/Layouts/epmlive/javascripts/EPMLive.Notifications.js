@@ -1,9 +1,4 @@
-﻿/// <version>4.4.1</version>
-/// <reference path="libraries/jquery.timeago.js" />
-/// <reference path="libraries/slimScroll.js" />
-/// <reference path="EPMLive.js" />
-
-(function () {
+﻿(function () {
     function executeEpmLiveNotifications() {
         (function (epmLiveNotifications, $$, $, k, undefined) {
             var notificationsTimeout = null;
