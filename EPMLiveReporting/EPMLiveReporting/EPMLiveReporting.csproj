@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
@@ -20,8 +20,10 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>40</FileUpgradeFlags>
-    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveReporting\Backup1\</UpgradeBackupLocation>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -92,6 +94,7 @@
     </Compile>
     <Compile Include="EPMMenu.cs" />
     <Compile Include="Jobs\CollectJob.cs" />
+    <Compile Include="Jobs\ListDataCleanupJob.cs" />
     <Compile Include="Jobs\RefreshSec.cs" />
     <Compile Include="Jobs\SnapshotJob.cs" />
     <Compile Include="Layouts\EPMLive\Action.aspx.cs">
@@ -114,6 +117,13 @@
     </Compile>
     <Compile Include="Layouts\EPMLive\AllSnapshots.aspx.designer.cs">
       <DependentUpon>AllSnapshots.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\cleanupwarning.aspx.cs">
+      <DependentUpon>cleanupwarning.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\EPMLive\cleanupwarning.aspx.designer.cs">
+      <DependentUpon>cleanupwarning.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\EPMLive\EventAudit.aspx.cs">
       <DependentUpon>EventAudit.aspx</DependentUpon>
@@ -215,6 +225,7 @@
     <Content Include="Layouts\EPMLive\Action.aspx" />
     <Content Include="Layouts\EPMLive\AllSchedules.aspx" />
     <Content Include="Layouts\EPMLive\AllSnapshots.aspx" />
+    <Content Include="Layouts\EPMLive\cleanupwarning.aspx" />
     <Content Include="Layouts\EPMLive\EventAudit.aspx" />
     <Content Include="Layouts\EPMLive\images\EPMAudit.GIF" />
     <Content Include="Layouts\EPMLive\images\EPMEdit.GIF" />
@@ -231,6 +242,7 @@
     <Content Include="Layouts\EPMLive\Snapshot.aspx" />
     <Content Include="Layouts\EPMLive\UpgradeReportingDB.aspx" />
     <Content Include="Layouts\EPMLive\ViewLogDetail.aspx" />
+    <None Include="Resources\spUpdateStatusFields.txt" />
     <None Include="Resources\InitDatabaseCreateTables.sql" />
     <None Include="Resources\InitDatabaseCreateProcedures.sql" />
   </ItemGroup>
