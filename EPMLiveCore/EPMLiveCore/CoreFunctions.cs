@@ -805,6 +805,122 @@ namespace EPMLiveCore
             return deUser;
         }
 
+        public static string GetScheduleStatusField(SPListItem ListItem)
+        {
+            string ss = "green.gif";
+
+            int yellow = 0;
+            int red = 30;
+
+            try
+            {
+                DateTime duedate = DateTime.Parse(ListItem["DueDate"].ToString());
+                DateTime today = DateTime.Now;
+                today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
+
+                TimeSpan ts = today - duedate;
+
+                if (ts.TotalDays > red)
+                {
+                    ss = "red.gif";
+                }
+                else if (ts.TotalDays > yellow)
+                {
+                    ss = "yellow.gif";
+                }
+            }
+            catch { }
+
+            return ss;
+        }
+
+        public static string GetDaysOverdueField(SPListItem ListItem)
+        {
+            string daysoverdue = "0";
+            try
+            {
+                DateTime duedate = DateTime.Parse(ListItem["DueDate"].ToString());
+                DateTime today = DateTime.Now;
+                today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
+
+                TimeSpan ts = today - duedate;
+
+                if (ts.TotalDays > 0)
+                {
+                    daysoverdue = ts.TotalDays.ToString();
+                }
+            }
+            catch
+            {
+                
+            }
+            return daysoverdue;
+        }
+
+        public static string GetDueField(SPListItem ListItem)
+        {
+            string status = "";
+            DateTime duedate = DateTime.MinValue;
+            string due = "";
+            try
+            {
+                try
+                {
+                    status = ListItem["Status"].ToString();
+                }
+                catch { }
+                try
+                {
+                    duedate = DateTime.Parse(ListItem["DueDate"].ToString());
+                }
+                catch
+                {
+                }
+                DateTime today = DateTime.Now;
+                today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
+
+
+                TimeSpan ts = duedate - today;
+                TimeSpan tsnw = duedate - today.AddDays((double)today.DayOfWeek);
+
+                System.Globalization.CalendarWeekRule weekRule = System.Globalization.CalendarWeekRule.FirstDay;
+                DayOfWeek firstWeekDay = DayOfWeek.Sunday;
+                System.Globalization.Calendar calendar = System.Threading.Thread.CurrentThread.CurrentCulture.Calendar;
+
+                int currentWeek = calendar.GetWeekOfYear(DateTime.Now, weekRule, firstWeekDay);
+                int dueWeek = calendar.GetWeekOfYear(duedate, weekRule, firstWeekDay);
+
+                if (status == "Completed")
+                    due = "Completed";
+                else if (duedate == DateTime.MinValue)
+                    due = "No Due Date";
+                else if (duedate < today)
+                    due = "(1) Overdue";
+                else if (duedate == today)
+                    due = "(2) Due Today";
+                else if (ts.TotalDays == 1)
+                    due = "(3) Due Tomorrow";
+                else if (today.Year == duedate.Year && currentWeek == dueWeek)
+                    due = "(4) Due This Week";
+                else if (tsnw.TotalDays <= 14)
+                    due = "(5) Due Next Week";
+                else if (today.Year == duedate.Year && today.Month == duedate.Month)
+                    due = "(6) Due This Month";
+                else
+                    due = "(7) Future";
+
+            }
+            catch
+            {
+                due = "No Due Date";
+            }
+
+            return due;
+        }
+
         public static string getUserString(string usernames, SPWeb web, string sPrefix)
         {
             string[] users = usernames.Split(',');

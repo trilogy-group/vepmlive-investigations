@@ -750,7 +750,50 @@ namespace EPMLiveCore
                 {
                     try
                     {
-                        if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Calculated)
+                        if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName == "Due")
+                        {
+                            tc.Controls[0].RenderControl(writer);
+                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            {
+                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                {
+                                    writer.Write(CoreFunctions.GetDueField(base.ListItem));
+                                }
+                                else
+                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                            }
+                            
+                            tc.Controls[2].RenderControl(writer);
+                        }
+                        else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName == "DaysOverdue")
+                        {
+                            tc.Controls[0].RenderControl(writer);
+                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            {
+                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                {
+                                    writer.Write(CoreFunctions.GetDaysOverdueField(base.ListItem));
+                                }
+                                else
+                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                            }
+                            tc.Controls[2].RenderControl(writer);
+                        }
+                        else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName == "ScheduleStatus")
+                        {
+                            tc.Controls[0].RenderControl(writer);
+                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            {
+                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                {
+                                    writer.Write(@"<img src=""/_layouts/images/" + CoreFunctions.GetScheduleStatusField(base.ListItem) + @""">");
+                                }
+                                else
+                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                            }
+                            tc.Controls[2].RenderControl(writer);
+                        }
+                        else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Calculated)
                         {
                             //tc.RenderControl(writer);
                             tc.Controls[0].RenderControl(writer);
