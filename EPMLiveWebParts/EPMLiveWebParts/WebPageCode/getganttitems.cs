@@ -20,27 +20,27 @@ namespace EPMLiveWebParts
             base.getParams(curWeb);
             ArrayList arrFields = new ArrayList();
 
-            foreach(string field in view.ViewFields)
+            foreach (string field in view.ViewFields)
             {
                 arrFields.Add(field);
             }
 
-            if(!arrFields.Contains(StartDateField))
+            if (!arrFields.Contains(StartDateField))
             {
                 arrHidden.Add(StartDateField);
                 view.ViewFields.Add(StartDateField);
             }
-            if(!arrFields.Contains(DueDateField))
+            if (!arrFields.Contains(DueDateField))
             {
                 arrHidden.Add(DueDateField);
                 view.ViewFields.Add(DueDateField);
             }
-            if(!arrFields.Contains(ProgressField) && ProgressField != "")
+            if (!arrFields.Contains(ProgressField) && ProgressField != "")
             {
                 arrHidden.Add(ProgressField);
                 view.ViewFields.Add(ProgressField);
             }
-            if(!arrFields.Contains("Duration"))
+            if (!arrFields.Contains("Duration"))
             {
                 try
                 {
@@ -49,7 +49,7 @@ namespace EPMLiveWebParts
                 }
                 catch { }
             }
-            if(!arrFields.Contains("Predecessors"))
+            if (!arrFields.Contains("Predecessors"))
             {
                 try
                 {
@@ -58,7 +58,7 @@ namespace EPMLiveWebParts
                 }
                 catch { }
             }
-            if(!arrFields.Contains("Project"))
+            if (!arrFields.Contains("Project"))
             {
                 try
                 {
@@ -67,7 +67,7 @@ namespace EPMLiveWebParts
                 }
                 catch { }
             }
-            if(!arrFields.Contains("taskorder"))
+            if (!arrFields.Contains("taskorder"))
             {
                 try
                 {
@@ -76,7 +76,7 @@ namespace EPMLiveWebParts
                 }
                 catch { }
             }
-            if(!arrFields.Contains("Descendants"))
+            if (!arrFields.Contains("Descendants"))
             {
                 try
                 {
@@ -92,7 +92,7 @@ namespace EPMLiveWebParts
 
         protected override void outputXml()
         {
-            
+
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(Properties.Resources.txtGanttLayout.Replace("#gridid#", base.gridname));
 
@@ -103,7 +103,7 @@ namespace EPMLiveWebParts
 
             ArrayList arrFields = new ArrayList();
 
-            foreach(string field in view.ViewFields)
+            foreach (string field in view.ViewFields)
             {
                 try
                 {
@@ -126,20 +126,20 @@ namespace EPMLiveWebParts
 
                     string sTitle = oField.Title;
 
-                    if(sFormat != "")
+                    if (sFormat != "")
                     {
                         attr = doc.CreateAttribute("Format");
                         attr.Value = sFormat;
                         ndNew.Attributes.Append(attr);
                     }
 
-                    if(oField.InternalName == "Title")
+                    if (oField.InternalName == "Title")
                     {
                         attr = doc.CreateAttribute("Width");
                         attr.Value = "300";
                         ndNew.Attributes.Append(attr);
                     }
-                    else if(oField.InternalName == "WorkspaceUrl")
+                    else if (oField.InternalName == "WorkspaceUrl")
                     {
                         attr = doc.CreateAttribute("Width");
                         attr.Value = "60";
@@ -159,7 +159,7 @@ namespace EPMLiveWebParts
                     {
                         string sWidth = "150";
 
-                        switch(oField.Type)
+                        switch (oField.Type)
                         {
                             case SPFieldType.Text:
                                 sWidth = "150";
@@ -187,14 +187,14 @@ namespace EPMLiveWebParts
                                 break;
                             case SPFieldType.Calculated:
                                 SPFieldCalculated oFC = (SPFieldCalculated)oField;
-                                if(oFC.OutputType == SPFieldType.Number || oFC.OutputType == SPFieldType.Currency || oFC.OutputType == SPFieldType.DateTime)
+                                if (oFC.OutputType == SPFieldType.Number || oFC.OutputType == SPFieldType.Currency || oFC.OutputType == SPFieldType.DateTime)
                                 {
                                     attr = doc.CreateAttribute("Align");
                                     attr.Value = "Right";
                                     ndNew.Attributes.Append(attr);
                                     sType = "Float";
                                 }
-                                else if(oFC.Description == "Indicator")
+                                else if (oFC.Description == "Indicator")
                                 {
                                     attr = doc.CreateAttribute("Align");
                                     attr.Value = "Center";
@@ -221,7 +221,7 @@ namespace EPMLiveWebParts
                                 sWidth = "150";
                                 break;
                             default:
-                                switch(oField.TypeAsString)
+                                switch (oField.TypeAsString)
                                 {
                                     case "TotalRollup":
                                         attr = doc.CreateAttribute("Align");
@@ -243,7 +243,7 @@ namespace EPMLiveWebParts
 
                     ndCols.AppendChild(ndNew);
 
-                    if(oField.InternalName == "Title")
+                    if (oField.InternalName == "Title")
                     {
                         ndCols = doc.FirstChild.SelectSingleNode("//Cols");
                     }
@@ -252,7 +252,7 @@ namespace EPMLiveWebParts
                     attr.Value = sTitle;
                     ndHeader.Attributes.Append(attr);
 
-                    if(arrHidden.Contains(oField.InternalName))
+                    if (arrHidden.Contains(oField.InternalName))
                     {
                         attr = doc.CreateAttribute("Visible");
                         attr.Value = "0";
@@ -268,6 +268,8 @@ namespace EPMLiveWebParts
             ndGantt.Attributes["GanttStart"].Value = StartDateField;
             ndGantt.Attributes["GanttEnd"].Value = DueDateField;
             ndGantt.Attributes["GanttComplete"].Value = ProgressField;
+            ndGantt.Attributes["GanttText"].Value = InfoField;
+
 
             XmlNodeList ndRows = docXml.FirstChild.SelectNodes("row");
             XmlNode ndParent = doc.FirstChild.SelectSingleNode("//B");
@@ -275,21 +277,24 @@ namespace EPMLiveWebParts
             XmlNodeList ndOldCols = docXml.FirstChild.SelectNodes("//head/column");
             XmlNode ndSummary = doc.FirstChild.SelectSingleNode("//Def/D[@Name='Summary']");
 
-            if(StartDateField != "")
+
+
+
+            if (StartDateField != "")
             {
                 XmlAttribute attr = doc.CreateAttribute(StartDateField + "Formula");
                 attr.Value = "ganttstart()";
                 ndSummary.Attributes.Append(attr);
             }
 
-            if(DueDateField != "")
+            if (DueDateField != "")
             {
                 XmlAttribute attr = doc.CreateAttribute(DueDateField + "Formula");
                 attr.Value = "ganttend()";
                 ndSummary.Attributes.Append(attr);
             }
 
-            if(ProgressField != "")
+            if (ProgressField != "")
             {
                 XmlAttribute attr = doc.CreateAttribute(ProgressField + "Formula");
                 attr.Value = "ganttpercent()";
@@ -299,14 +304,14 @@ namespace EPMLiveWebParts
 
             //PercentCompleteFormula="ganttpercent('StartDate','DueDate','d')" 
 
-            foreach(XmlNode ndRow in ndRows)
+            foreach (XmlNode ndRow in ndRows)
                 ProcessItems(ndParent, ndRow, ndOldCols, doc);
 
-            foreach(XmlNode ndRow in doc.FirstChild.SelectNodes("//I[@Predecessors!='']"))
+            foreach (XmlNode ndRow in doc.FirstChild.SelectNodes("//I[@Predecessors!='']"))
             {
                 processPredecessors(ndRow, doc);
             }
-            
+
             data = doc.OuterXml;
         }
 
@@ -314,7 +319,7 @@ namespace EPMLiveWebParts
         {
             try
             {
-                if(nd.Attributes[attribute] != null)
+                if (nd.Attributes[attribute] != null)
                     return nd.Attributes[attribute].Value;
             }
             catch { }
@@ -325,9 +330,9 @@ namespace EPMLiveWebParts
         {
             XmlNode nd = doc.FirstChild.SelectSingleNode("//I[@taskorder='" + pred + "' and @Project='" + project + "']");
 
-            if(nd != null)
+            if (nd != null)
             {
-                if(nd.Attributes["Descendants"] == null)
+                if (nd.Attributes["Descendants"] == null)
                 {
                     XmlAttribute attr = doc.CreateAttribute("Descendants");
                     attr.Value = rowid + suffix;
@@ -346,12 +351,12 @@ namespace EPMLiveWebParts
             string project = getAttribute(ndRow, "Project");
             string rowid = getAttribute(ndRow, "id");
 
-            if(!string.IsNullOrEmpty(predecessors) && !string.IsNullOrEmpty(project))
+            if (!string.IsNullOrEmpty(predecessors) && !string.IsNullOrEmpty(project))
             {
                 string[] sPreds = predecessors.Split(',');
-                foreach(string sPred in sPreds)
+                foreach (string sPred in sPreds)
                 {
-                    if(sPred != "")
+                    if (sPred != "")
                     {
                         MatchCollection mc = Regex.Matches(sPred, @"^\d+");
 
@@ -359,7 +364,8 @@ namespace EPMLiveWebParts
                         try
                         {
                             suffix = Regex.Matches(sPred.Substring(mc[0].Value.Length), @"\w+")[0].Value;
-                        }catch{}
+                        }
+                        catch { }
 
                         processPredecessor(doc, mc[0].Value, project, rowid, suffix);
 
@@ -374,10 +380,10 @@ namespace EPMLiveWebParts
             try
             {
                 SPField oField = base.list.Fields.GetFieldByInternalName(fieldname);
-                switch(oField.Type)
+                switch (oField.Type)
                 {
                     case SPFieldType.DateTime:
-                        if(value != "")
+                        if (value != "")
                         {
                             try
                             {
@@ -389,9 +395,9 @@ namespace EPMLiveWebParts
                         return value;
                     case SPFieldType.Number:
                         SPFieldNumber num = (SPFieldNumber)oField;
-                        if(num.ShowAsPercentage)
+                        if (num.ShowAsPercentage)
                         {
-                            if(value.Contains("%"))
+                            if (value.Contains("%"))
                                 return value.Replace("%", "");
                             else
                                 return (float.Parse(value) * 100).ToString();
@@ -399,15 +405,15 @@ namespace EPMLiveWebParts
                         else
                             return value;
                     case SPFieldType.Calculated:
-                        if(oField.Description == "Indicator")
+                        if (oField.Description == "Indicator")
                         {
-                            if(value != "" && !value.StartsWith("<img src"))
+                            if (value != "" && !value.StartsWith("<img src"))
                                 value = "<img src=\"/_layouts/images/" + value.ToLower() + "\">";
                         }
                         SPFieldCalculated calc = (SPFieldCalculated)oField;
-                        if(calc.ShowAsPercentage)
+                        if (calc.ShowAsPercentage)
                         {
-                            if(value.Contains("%"))
+                            if (value.Contains("%"))
                                 return value.Replace("%", "");
                             else
                                 return (float.Parse(value) * 100).ToString();
@@ -416,7 +422,7 @@ namespace EPMLiveWebParts
                             return value;
 
                     default:
-                        switch(oField.TypeAsString)
+                        switch (oField.TypeAsString)
                         {
                             case "TotalRollup":
                                 return oField.GetFieldValueAsText(value);
@@ -432,14 +438,14 @@ namespace EPMLiveWebParts
         private void ProcessItems(XmlNode ndParent, XmlNode ndRow, XmlNodeList arrFields, XmlDocument doc)
         {
 
-            
+
             XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
 
             XmlNodeList ndCells = ndRow.SelectNodes("cell");
 
             try
             {
-                if(ndRow.SelectSingleNode("row") != null)
+                if (ndRow.SelectSingleNode("row") != null)
                 {
                     string open = "0";
                     try
@@ -459,7 +465,8 @@ namespace EPMLiveWebParts
                 XmlAttribute attr = doc.CreateAttribute("siteid");
                 attr.Value = ndRow.SelectSingleNode("userdata[@name='siteid']").InnerText;
                 ndNew.Attributes.Append(attr);
-            }catch{}
+            }
+            catch { }
             try
             {
                 XmlAttribute attr = doc.CreateAttribute("webid");
@@ -502,19 +509,19 @@ namespace EPMLiveWebParts
                 ndNew.Attributes.Append(attr);
             }
             catch { }
-            
 
-            for(int i = 0; i < ndCells.Count; i++)
+
+            for (int i = 0; i < ndCells.Count; i++)
             {
                 try
                 {
-                    string fieldName = arrFields[i].Attributes["id"].Value.Replace("<![CDATA[","").Replace("]]>","");
+                    string fieldName = arrFields[i].Attributes["id"].Value.Replace("<![CDATA[", "").Replace("]]>", "");
                     string val = getFieldValue(fieldName, ndCells[i].InnerText);
 
-                    if((fieldName == StartDateField || fieldName == DueDateField) && val == "")
+                    if ((fieldName == StartDateField || fieldName == DueDateField) && val == "")
                     {
                     }
-                    else if(fieldName == DueDateField)
+                    else if (fieldName == DueDateField)
                     {
                         val = DateTime.Parse(val).AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -522,7 +529,7 @@ namespace EPMLiveWebParts
                         attr.Value = val;
                         ndNew.Attributes.Append(attr);
                     }
-                    else if(fieldName == "Predecessors")
+                    else if (fieldName == "Predecessors")
                     {
                         XmlAttribute attr = doc.CreateAttribute(fieldName);
                         attr.Value = val;
@@ -543,13 +550,13 @@ namespace EPMLiveWebParts
 
             XmlNodeList ndRows = ndRow.SelectNodes("row");
 
-            if(ndRows.Count > 0)
+            if (ndRows.Count > 0)
             {
                 XmlAttribute attr = doc.CreateAttribute("Def");
                 attr.Value = "Summary";
                 ndNew.Attributes.Append(attr);
 
-                for(int i = 0; i < ndRows.Count; i++)
+                for (int i = 0; i < ndRows.Count; i++)
                 {
                     ProcessItems(ndNew, ndRows[i], arrFields, doc);
                 }
@@ -560,12 +567,13 @@ namespace EPMLiveWebParts
         {
             string format = "";
 
-            switch(oField.Type) 
+            switch (oField.Type)
             {
                 case SPFieldType.DateTime:
                     try
                     {
-                        if(oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
+
+                        if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
                         {
                             format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
                         }
@@ -577,7 +585,7 @@ namespace EPMLiveWebParts
                     catch { }
                     break;
                 case SPFieldType.Number:
-                    if(oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                    if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
                     {
                         format = "0\\%;0\\%;0\\%";
                     }
@@ -591,12 +599,12 @@ namespace EPMLiveWebParts
                         }
                         catch { }
 
-                        for(int i = 0; i < decCount; i++)
+                        for (int i = 0; i < decCount; i++)
                         {
                             decimals += "0";
                         }
 
-                        if(decCount > 0)
+                        if (decCount > 0)
                             decimals = "." + decimals;
 
                         format = ",0" + decimals;
@@ -604,16 +612,18 @@ namespace EPMLiveWebParts
                     }
                     break;
                 case SPFieldType.Currency:
-                    format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
+                    SPFieldCurrency c = (SPFieldCurrency)oField;
+                    System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
+                    format = nInfo.CurrencySymbol + nInfo.CurrencyGroupSeparator + "0" + nInfo.CurrencyDecimalSeparator + "00";
                     break;
                 case SPFieldType.Calculated:
-                    switch(oDoc.FirstChild.Attributes["ResultType"].Value)
+                    switch (oDoc.FirstChild.Attributes["ResultType"].Value)
                     {
                         case "Currency":
                             format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
                             break;
                         case "Number":
-                            if(oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                            if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
                             {
                                 format = "0\\%;0\\%;0\\%";
                             }
@@ -627,12 +637,12 @@ namespace EPMLiveWebParts
                                 }
                                 catch { }
 
-                                for(int i = 0; i < decCount; i++)
+                                for (int i = 0; i < decCount; i++)
                                 {
                                     decimals += "0";
                                 }
 
-                                if(decCount > 0)
+                                if (decCount > 0)
                                     decimals = "." + decimals;
 
                                 format = ",0" + decimals;
@@ -650,7 +660,7 @@ namespace EPMLiveWebParts
         {
             try
             {
-                if(field.Type == SPFieldType.Computed)
+                if (field.Type == SPFieldType.Computed)
                 {
                     {
                         XmlDocument fieldXml = new XmlDocument();
@@ -662,7 +672,7 @@ namespace EPMLiveWebParts
                             parentField = fieldXml.FirstChild.Attributes["DisplayNameSrcField"].Value;
                         }
                         catch { }
-                        if(parentField != "")
+                        if (parentField != "")
                         {
                             try
                             {

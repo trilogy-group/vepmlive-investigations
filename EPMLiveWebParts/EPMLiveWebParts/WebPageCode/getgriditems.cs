@@ -5018,6 +5018,12 @@ namespace EPMLiveWebParts
                             return "<a href=\"" + li.ParentList.DefaultViewUrl + "\">" + li.ParentList.Title + "</a>";
                         else
                             return li.ParentList.Title;
+                    case "Due":
+                        return EPMLiveCore.CoreFunctions.GetDueField(li);
+                    case "DaysOverdue":
+                        return EPMLiveCore.CoreFunctions.GetDaysOverdueField(li);
+                    case "ScheduleStatus":
+                        return EPMLiveCore.CoreFunctions.GetScheduleStatusField(li);
                     default:
                         spfield = li.Fields.GetFieldByInternalName(field);
                         val = li[spfield.Id].ToString();
