@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
@@ -27,10 +27,24 @@ net start "WETimer"</PostDeploymentCommand>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
 "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags>0</FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
-    <UpgradeBackupLocation />
+    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\Backup\</UpgradeBackupLocation>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -137,6 +151,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\MyWork\MyWorkField.cs" />
     <Compile Include="API\MyWork\MyWorkGridView.cs" />
     <Compile Include="API\MyWork\Utils.cs" />
+    <Compile Include="API\NavigationService.cs" />
     <Compile Include="API\Notification\APIEmail.cs" />
     <Compile Include="API\Notification\Notification.cs" />
     <Compile Include="API\Personalization.cs" />
@@ -180,6 +195,9 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="CommentCCPeopleEditor.cs" />
+    <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
+    <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
+    <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1264,6 +1282,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="CONFIG\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ce3e15fd-6a5b-4e21-8c3d-b5d4df121ea3}</SharePointProjectItemId>
     </None>
+    <None Include="Controls\Navigation\EPMLiveNavigationDataSource\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{162ace57-571a-4121-81d0-9d30b19b9934}</SharePointProjectItemId>
+    </None>
     <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{469d37ee-8a39-483a-9bc0-135fa45704a2}</SharePointProjectItemId>
     </None>
@@ -1451,7 +1472,33 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="ISAPI\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
     </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map">
+      <DependentUpon>EPMLive.js</DependentUpon>
+    </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
+      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
+    </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </None>
+    <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
+      <DependentUpon>Notifications.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\Project1.mpp" />
+    <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.less" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.eot" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.ttf" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.woff" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.eot" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.ttf" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.woff" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.eot" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.ttf" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.woff" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.eot" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.ttf" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.woff" />
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{4ac6e44b-916f-4550-98aa-fba67f5cc363}</SharePointProjectItemId>
     </None>
@@ -1813,6 +1860,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="AppsListEvents\Elements.xml" />
     <Content Include="BuildTeam\Elements.xml" />
     <Content Include="CONFIG\webconfig.EPMLIVE.xml" />
+    <Content Include="Controls\Navigation\EPMLiveNavigationDataSource\Elements.xml" />
     <Content Include="CONTROLTEMPLATES\CascadingLookup.FieldControl.ascx" />
     <Content Include="CONTROLTEMPLATES\CascadingLookup.FieldSettings.ascx" />
     <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldControl.ascx" />
@@ -3096,7 +3144,17 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\Integration\Properties.aspx" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.min.js">
+      <DependentUpon>EPMLive.js</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js">
+      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
@@ -3112,7 +3170,13 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\libraries\spjs-utility.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\WalkMe.js" />
+    <Content Include="Layouts\epmlive\javascripts\masterpages\UplandV5.js" />
+    <Content Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\masterpages\webfont.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\Notifications.min.js">
+      <DependentUpon>Notifications.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\ResourceImporter.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.5.2.js" />
     <Content Include="Layouts\epmlive\jQueryLibrary\jquery-1.6.2.min.js" />
@@ -3167,6 +3231,18 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\buildteam.css" />
     <Content Include="Layouts\epmlive\stylesheets\buildteamIE.css" />
     <Content Include="Layouts\epmlive\stylesheets\buttons.css" />
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.css">
+      <DependentUpon>epmnav.less</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css">
+      <DependentUpon>epmnav.less</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\glyphs.css" />
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\glyphs.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
+    <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />
+    <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.svg" />
+    <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap.css" />
@@ -3188,7 +3264,14 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.css" />
     <Content Include="Layouts\epmlive\stylesheets\master.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
+    <Content Include="Layouts\epmlive\stylesheets\notifications.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
     <Content Include="Layouts\epmlive\synchperiods.aspx" />
@@ -3635,6 +3718,23 @@ net start "WETimer"</PostDeploymentCommand>
       <CachedSettingsPropName>
       </CachedSettingsPropName>
     </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
