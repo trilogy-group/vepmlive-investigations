@@ -5,15 +5,24 @@ namespace EPMLiveCore.Infrastructure
 {
     public sealed class CacheStore
     {
+        #region Fields (3) 
+
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
-
         private readonly Dictionary<string, Tuple<string, CachedValue>> _store;
+
+        #endregion Fields 
+
+        #region Constructors (1) 
 
         private CacheStore()
         {
             _store = new Dictionary<string, Tuple<string, CachedValue>>();
         }
+
+        #endregion Constructors 
+
+        #region Properties (1) 
 
         public static CacheStore Current
         {
@@ -33,6 +42,18 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
+        #endregion Properties 
+
+        #region Methods (4) 
+
+        // Public Methods (4) 
+
+        public CachedValue Get(string key)
+        {
+            key = key.Trim().ToUpper();
+            return _store.ContainsKey(key) ? _store[key].Item2 : null;
+        }
+
         public CachedValue Get(string key, string category, Func<object> getValue)
         {
             key = key.Trim().ToUpper();
@@ -45,10 +66,16 @@ namespace EPMLiveCore.Infrastructure
             return _store[key].Item2;
         }
 
-        public CachedValue Get(string key)
+        public void Remove(string key)
         {
             key = key.Trim().ToUpper();
-            return _store.ContainsKey(key) ? _store[key].Item2 : null;
+
+            if (!_store.ContainsKey(key)) return;
+
+            lock (Locker)
+            {
+                _store.Remove(key);
+            }
         }
 
         public void Set(string key, object value, string category)
@@ -69,28 +96,34 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        public void Remove(string key)
-        {
-            key = key.Trim().ToUpper();
-
-            if (!_store.ContainsKey(key)) return;
-
-            lock (Locker)
-            {
-                _store.Remove(key);
-            }
-        }
+        #endregion Methods 
     }
 
     public class CachedValue
     {
+        #region Fields (1) 
+
         private object _value;
+
+        #endregion Fields 
+
+        #region Constructors (1) 
 
         public CachedValue(object value)
         {
             CreatedAt = DateTime.Now;
             Value = value;
         }
+
+        #endregion Constructors 
+
+        #region Properties (4) 
+
+        public DateTime CreatedAt { get; private set; }
+
+        public DateTime LastReadAt { get; private set; }
+
+        public DateTime UpdatedAt { get; private set; }
 
         public object Value
         {
@@ -106,10 +139,6 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        public DateTime UpdatedAt { get; private set; }
-
-        public DateTime CreatedAt { get; private set; }
-
-        public DateTime LastReadAt { get; private set; }
+        #endregion Properties 
     }
 }

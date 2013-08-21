@@ -12,11 +12,14 @@ namespace EPMLiveCore.CONTROLTEMPLATES
     [MdsCompliant(true)]
     public partial class EPMLiveNavigation : UserControl
     {
+        #region Fields (2) 
+
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         private string _selectedTlNode;
 
-        public IEnumerable<NavNode> TopNodes { get; set; }
-        public IEnumerable<NavNode> BottomNodes { get; set; }
+        #endregion Fields 
+
+        #region Properties (5) 
 
         public IEnumerable<NavNode> AllNodes
         {
@@ -29,12 +32,22 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             }
         }
 
+        public IEnumerable<NavNode> BottomNodes { get; set; }
+
+        public bool Pinned { get; private set; }
+
         public string SelectedTlNode
         {
             get { return _selectedTlNode ?? "epm-nav-top-ql"; }
         }
 
-        public bool Pinned { get; private set; }
+        public IEnumerable<NavNode> TopNodes { get; set; }
+
+        #endregion Properties 
+
+        #region Methods (3) 
+
+        // Protected Methods (3) 
 
         protected override void OnPreRender(EventArgs e)
         {
@@ -45,8 +58,10 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
             }
 
-            EPMLiveScriptManager.RegisterScript(Page,
-                new[] {"libraries/jquery.min", "@libraries/jquery.cookie", "@EPMLive.Navigation"});
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "libraries/jquery.min", "@libraries/jquery.cookie", "libraries/slimScroll", "@EPMLive.Navigation"
+            });
 
             HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode");
             if (selectedTlNodeCookie != null)
@@ -63,11 +78,13 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             }
         }
 
-        protected void Page_Load(object sender, EventArgs e) { }
-
         protected void OnTreeViewPreRender(object sender, EventArgs e)
         {
             ((SPTreeView) sender).Sort();
         }
+
+        protected void Page_Load(object sender, EventArgs e) { }
+
+        #endregion Methods 
     }
 }

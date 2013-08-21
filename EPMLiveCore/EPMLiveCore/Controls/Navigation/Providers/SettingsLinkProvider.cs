@@ -11,7 +11,13 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "Settings")]
     public class SettingsLinkProvider : NavLinkProvider
     {
+        #region Fields (1) 
+
         private readonly List<Tuple<SPBasePermissions?, NavLink>> _links;
+
+        #endregion Fields 
+
+        #region Constructors (1) 
 
         public SettingsLinkProvider(SPWeb spWeb) : base(spWeb)
         {
@@ -43,6 +49,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink {Separator = true})
             };
         }
+
+        #endregion Constructors 
 
         #region Implementation of INavLinkProvider
 

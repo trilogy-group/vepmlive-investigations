@@ -50,27 +50,30 @@
                 var expandStateCookie = 'epmnav-expand-state';
                 var pinStateCookie = 'epmnav-pin-state';
                 var cookieOptions = { expires: 365, path: '/' };
-
+                
                 var $sn = $('#epm-nav-sub');
 
                 var tlNodes = [];
 
-                var navNode = function (el) {
+                var navNode = function(el) {
+                    var categories = {};
+
                     var _el = el;
                     var _$el = $(el);
                     var _$sm = $('#epm-nav-sub-' + _$el.data('id'));
 
                     var _id = _el.id;
+                    var _provider = _$el.data('linkprovider');
 
-                    var _selected = function () {
+                    var _selected = function() {
                         return _$el.parent().hasClass(selectedClass);
                     };
 
-                    var isOpened = function () {
+                    var isOpened = function() {
                         return _$el.parent().hasClass(openedClass);
                     };
 
-                    var _select = function (select) {
+                    var _select = function(select) {
                         if (select) {
                             _$el.parent().addClass(selectedClass);
                         } else {
@@ -78,12 +81,12 @@
                         }
                     };
 
-                    var _close = function () {
+                    var _close = function() {
                         _$sm.hide();
                         _$el.parent().removeClass(openedClass);
                     };
 
-                    var _closeNav = function () {
+                    var _closeNav = function() {
                         if ($sn.is(':visible')) {
                             $sn.hide('slide', { direction: 'left' }, animSpeed);
                         }
@@ -91,12 +94,81 @@
                         _close();
                     };
 
-                    var showNode = function () {
+                    var _registerLink = function(link) {
+                        if (link.seprator) {
+                            registerSeprator(link.category);
+                        } else {
+                            registerCategory(link.category);
+                            registerLink(link);
+                        }
+                    };
+
+                    var registerLink = function(link) {
+                        var category = link.category;
+
+                        if (!category) {
+                            category = '__STATIC__';
+                        }
+
+                        var li = '<li id="' + link.id + '" class="epm-nav-node" style="display:none;"><a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '">' + link.title + '</a></li>';
+
+                        categories[category].$el.append(li);
+
+                        if (link.external) {
+                            $('#epm-nav-link-' + link.id).attr('target', '_blank');
+                        }
+
+                        if (link.visible) {
+                            $('#' + link.id).show();
+                        }
+                    };
+
+                    var registerSeprator = function(category) {
+                        var seprator = '<div class="epm-nav-sub-sep"></div>';
+
+                        if (category) {
+                            $('#' + calculateCatId(category)).append(seprator);
+                        } else {
+                            _$sm.append(seprator);
+                        }
+                    };
+
+                    var registerCategory = function(category) {
+                        if (!category) {
+                            category = '__STATIC__';
+                        }
+
+                        if (!categories[category]) {
+                            var id = calculateCatId(category);
+                            var defaultCssClass = 'epm-nav-node-collapsed';
+
+                            if (category === '__STATIC__') {
+                                defaultCssClass = 'epm-nav-node-static';
+                            }
+
+                            if (category !== '__STATIC__') {
+                                _$sm.append('<div id="' + id + '-header" class="epm-nav-node epm-nav-node-root epm-nav-cat"><span class="' + defaultCssClass + '">&nbsp;</span><span class="epm-nav-cat-title" alt="' + category + '">' + category + '</span></div>');
+                            }
+
+                            _$sm.append('<ul id="' + id + '" class="epm-nav-links ' + defaultCssClass + '"></ul>');
+
+                            categories[category] = {
+                                id: id,
+                                $el: $('#' + id)
+                            };
+                        }
+                    };
+
+                    var calculateCatId = function(category) {
+                        return _$sm.get(0).id + '-' + category.toLowerCase().replace(/ /g, '-').replace(/_/g, '').replace(/[^\w-]+/g, '').replace(/--/g, '-');
+                    };
+
+                    var showNode = function() {
                         _$sm.show();
                         _$el.parent().addClass(openedClass);
                     };
 
-                    var openMenu = function () {
+                    var openMenu = function() {
                         showNode();
 
                         if (!$sn.is(':visible')) {
@@ -104,7 +176,7 @@
                         }
                     };
 
-                    _$el.click(function () {
+                    _$el.click(function() {
                         if (_selected()) {
                             if (isOpened() && $.cookie(pinStateCookie) === 'unpinned') {
                                 _closeNav();
@@ -132,10 +204,12 @@
 
                     return {
                         id: _id,
+                        provider: _provider,
                         selected: _selected,
                         select: _select,
                         close: _close,
                         closeNav: _closeNav,
+                        registerLink: _registerLink,
                         el: _el,
                         $el: _$el,
                         $menu: _$sm
@@ -264,6 +338,19 @@
                     }, function () {
                         $pin.hide();
                     });
+                    
+                    $sn.slimScroll({
+                        height: $sn.height(),
+                        width: $sn.width()
+                    });
+
+                    var $ss = $('#epm-nav').find('.slimScrollDiv');
+                    var $sb = $ss.find('.slimScrollBar');
+
+                    $ss.css('position', 'absolute');
+                    $ss.css('left', '50px');
+                    $sn.css('left', '0');
+                    $sb.css('z-index', 1001);
 
                     $('a.epm-nav-node').click(function () {
                         var index = -1;
@@ -348,7 +435,7 @@
                         var node = tlNodes[i];
 
                         if (!node.selected()) {
-                            var provider = node.$el.data('linkprovider');
+                            var provider = node.provider;
                             if (provider) {
                                 providers.push(provider);
                             }
@@ -357,11 +444,30 @@
 
                     if (providers.length > 0) {
                         epmLiveService.execute('GetNavigationLinks', providers.join(), function (response) {
+                            var webUrl = epmLive.currentWebUrl;
+                            var page = webUrl + window.location.href.split(webUrl)[1];
+                            
                             for (var providerName in response.Nodes) {
                                 var navLink = response.Nodes[providerName].NavLink;
                                 for (var nl in navLink) {
                                     var link = navLink[nl];
-                                    var fmp = 0;
+
+                                    for (var j = 0; j < tlNodes.length; j++) {
+                                        var tlNode = tlNodes[j];
+                                        if (tlNode.provider === providerName) {
+                                            tlNode.registerLink({
+                                                id: link['@Id'],
+                                                title: link['@Title'],
+                                                url: link['#cdata'].replace(/{page}/g, page),
+                                                category: link['@Category'],
+                                                cssClass: link['@CssClass'],
+                                                order: parseInt(link['@Order']),
+                                                external: link['@Exernal'] === 'True',
+                                                visible: link['@Visible'] === 'True',
+                                                seprator: link['@Separator'] === 'True'
+                                            });
+                                        }
+                                    }
                                 }
                             }
                         }, function (response) {

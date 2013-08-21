@@ -1,4 +1,11 @@
-﻿.cursor-hand {
+﻿.ellipsis {
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.cursor-hand {
   cursor: pointer;
   cursor: hand;
 }
@@ -7,6 +14,9 @@
 }
 .ms-dialog .epm-nav-pinned {
   margin-left: auto;
+}
+#epm-nav .slimScrollDiv .slimScrollBar {
+  border-radius: 0px !important;
 }
 #epm-nav-top {
   -moz-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
@@ -39,7 +49,7 @@
   *background-image: url(/_layouts/15/epmlive/images/navigation/notch.png);
   /* For IE 6 and 7 */
 
-  background-position: 40px 13px;
+  background-position: 40px 14px;
   background-repeat: no-repeat;
 }
 #epm-nav-top ul .epm-nav-node-selected span {
@@ -77,10 +87,11 @@
 #epm-nav-pin {
   color: #7C7C7C;
   display: none;
-  padding-right: 4px;
+  padding-right: 10px;
   padding-top: 3px;
   position: absolute;
   right: 0;
+  z-index: 5000;
   cursor: pointer;
   cursor: hand;
   -webkit-transition: All 0.2s ease;
@@ -90,14 +101,93 @@
 }
 .epm-nav-sub {
   display: none;
+  position: relative;
 }
-.epm-nav-sub .epm-nav-sub-menu .epm-nav-node {
+.epm-nav-sub ul.epm-nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.epm-nav-sub ul.epm-nav-links li {
+  margin: 0;
+  padding: 1.5px 5px 1.5px 35px;
+  height: 23px;
+  line-height: 23px;
+  width: 129px;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.epm-nav-sub ul.epm-nav-links li a {
+  padding-left: 6px;
   color: #666666;
   font-family: 'Open Sans Regular', sans-serif;
   font-weight: 300;
-  font-size: 15px;
-  height: 22px;
-  line-height: 22px;
+  font-size: 13px;
+  height: 20px;
+  line-height: 20px;
+}
+.epm-nav-sub ul.epm-nav-links li:hover {
+  background-color: #e7e7e7;
+}
+.epm-nav-sub ul.epm-nav-links li:hover a {
+  text-decoration: none;
+}
+.epm-nav-sub ul.epm-nav-node-static {
+  margin-top: 5px;
+}
+.epm-nav-sub ul.epm-nav-node-static li {
+  padding-left: 10px;
+  width: 154px;
+}
+.epm-nav-sub .epm-nav-cat {
+  margin-left: 10px !important;
+  margin-top: 13px;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.epm-nav-sub .epm-nav-cat span.epm-nav-node-collapsed,
+.epm-nav-sub .epm-nav-cat span.epm-nav-node-expanded {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA7ElEQVQoz52SOwrCQBCG1zsE9CD2wqZXr6AE0ikoNgGvJlj4QA+gdtoJNoJiKX6js2FJVgwGPjKPf3aG3THWWuO+OI4jGMAMbspMY5Gny40aWNjAGqbqW7XXmqOPreWdcDoETzDxJ/A7SE405NuuqEFgD6l3kCmN9bFT2JGvi2gEq5DwS/EKhkbn75uKH9oElmJc6djUYIb95H8vILFMNU04vwvFcYUq+lV4EWMLvX9GHcMidKOhyyG/wB+55zjISRWeIyEnT9dwgS4cvy2AxHQBRNPxTwqtXIsCYQrllSuM4pZ8Dg9ED7VLS/4Cnk2YheFbyPsAAAAASUVORK5CYII=') /*../../../images/navigation/collapse.png*/;
+  *background-image: url(/_layouts/15/epmlive/images/navigation/collapse.png);
+  /* For IE 6 and 7 */
+
+  background-position: left center;
+  background-repeat: no-repeat;
+  display: inline-block;
+  width: 14px;
+  margin-right: 5px;
+}
+.epm-nav-sub .epm-nav-cat span.epm-nav-node-expanded {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA+0lEQVQoz32STQrCMBBG2zsIepDuhXRvvYJS6E5BcSN4tYILregB1J3uBDdCwWXxjU5KjLWFR77MTzLpTGCMCewXx3EHJpBDqeRq6zhxtQjBwB52sNK9Ub1TH/eYsL6JTYLxCgu3AvcG8UkM/oFN6mE4QeYFLwXPlsGRnK4kzqDw62ethK83fXQB00DrHzeUV3Jg2WBPYSviQUBky0NXkiC3udqWzRrB7Z0oG+ddlbah8rSbeBdxgFFTqUJbqXPYOK1p/Tn4N+xnth1nOclvBz6/HSk2aV3PGoZw+TcAYtMBkJjEPalp5PokCCv4HTmvuXbI1/Ak6Kn6Z8hfnBiolCTl1+kAAAAASUVORK5CYII=') /*../../../images/navigation/expand.png*/;
+  *background-image: url(/_layouts/15/epmlive/images/navigation/expand.png);
+  /* For IE 6 and 7 */
+
+}
+.epm-nav-sub .epm-nav-cat .epm-nav-cat-title {
+  position: relative;
+  top: -1px;
+}
+.epm-nav-sub .epm-nav-node {
+  color: #666666;
+  font-family: 'Open Sans Regular', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  height: 20px;
+  line-height: 20px;
+}
+.epm-nav-sub div.epm-nav-node {
+  width: 154px;
+}
+.epm-nav-sub div.epm-nav-node-root {
+  font-size: 1.15em;
+  margin-left: 5px;
+  margin-bottom: 1px;
 }
 .epm-nav-sub .epm-nav-sub-menu td.epm-nav-node {
   width: 134px;

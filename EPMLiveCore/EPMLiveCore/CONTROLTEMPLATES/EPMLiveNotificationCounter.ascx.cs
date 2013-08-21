@@ -9,15 +9,25 @@ namespace EPMLiveCore.CONTROLTEMPLATES
     [MdsCompliant(true)]
     public partial class EPMLiveNotificationCounter : UserControl
     {
+        #region Fields (2) 
+
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         private string _prifilePicUrl;
+
+        #endregion Fields 
+
+        #region Properties (1) 
 
         public string PrifilePicUrl
         {
             get { return _prifilePicUrl ?? string.Empty; }
         }
 
-        protected void Page_Load(object sender, EventArgs e) { }
+        #endregion Properties 
+
+        #region Methods (6) 
+
+        // Protected Methods (2) 
 
         protected override void OnPreRender(EventArgs e)
         {
@@ -28,6 +38,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             GetProfilePicture();
         }
 
+        protected void Page_Load(object sender, EventArgs e) { }
+        // Private Methods (4) 
+
         private void GetProfilePicture()
         {
             SPUser currentUser = SPContext.Current.Web.CurrentUser;
@@ -37,6 +50,25 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             currentUser = GetProfileUser(spSite, false, currentUser);
             SPListItem spListItem = spSite.RootWeb.SiteUserInfoList.GetItemById(currentUser.ID);
             _prifilePicUrl = GetProfilePicturePath(spListItem);
+        }
+
+        private string GetProfilePicturePath(SPListItem spListItem)
+        {
+            var profilePicturePath = spListItem["Picture"] as string;
+
+            if (!string.IsNullOrEmpty(profilePicturePath))
+            {
+                if (profilePicturePath.Split(',').Length > 1)
+                {
+                    profilePicturePath = profilePicturePath.Split(',')[0];
+                }
+            }
+            else
+            {
+                profilePicturePath = string.Empty;
+            }
+
+            return profilePicturePath;
         }
 
         private SPUser GetProfileUser(SPSite site, bool revertSystemAccount, SPUser user)
@@ -62,23 +94,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             return (loginName.ToLower() == @"sharepoint\system");
         }
 
-        private string GetProfilePicturePath(SPListItem spListItem)
-        {
-            var profilePicturePath = spListItem["Picture"] as string;
-
-            if (!string.IsNullOrEmpty(profilePicturePath))
-            {
-                if (profilePicturePath.Split(',').Length > 1)
-                {
-                    profilePicturePath = profilePicturePath.Split(',')[0];
-                }
-            }
-            else
-            {
-                profilePicturePath = string.Empty;
-            }
-
-            return profilePicturePath;
-        }
+        #endregion Methods 
     }
 }

@@ -10,10 +10,16 @@ namespace EPMLiveCore.Controls.Navigation
 {
     public class EPMLiveQuickLaunchProvider : SPNavigationProvider
     {
+        #region Fields (4) 
+
         private static object _locker;
         private readonly Dictionary<string, IList<string>> _communityLinks;
         private readonly Dictionary<string, SiteMapNode> _linkNodes;
         private DateTime _lastCachedOn;
+
+        #endregion Fields 
+
+        #region Constructors (1) 
 
         public EPMLiveQuickLaunchProvider()
         {
@@ -23,20 +29,11 @@ namespace EPMLiveCore.Controls.Navigation
             _locker = new object();
         }
 
-        #region Overrides of SPNavigationProvider
+        #endregion Constructors 
 
-        public override SiteMapNodeCollection GetChildNodes(SiteMapNode node)
-        {
-            try
-            {
-                return FindChildNodes(node);
-            }
-            catch { }
+        #region Methods (2) 
 
-            return new SiteMapNodeCollection();
-        }
-
-        #endregion Overrides of SPNavigationProvider
+        // Private Methods (2) 
 
         private SiteMapNodeCollection FindChildNodes(SiteMapNode node)
         {
@@ -144,5 +141,22 @@ namespace EPMLiveCore.Controls.Navigation
 
             _lastCachedOn = DateTime.Now;
         }
+
+        #endregion Methods 
+
+        #region Overrides of SPNavigationProvider
+
+        public override SiteMapNodeCollection GetChildNodes(SiteMapNode node)
+        {
+            try
+            {
+                return FindChildNodes(node);
+            }
+            catch { }
+
+            return new SiteMapNodeCollection();
+        }
+
+        #endregion Overrides of SPNavigationProvider
     }
 }

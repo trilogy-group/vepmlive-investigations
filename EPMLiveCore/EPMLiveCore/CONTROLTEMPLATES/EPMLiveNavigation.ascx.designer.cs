@@ -13,15 +13,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES {
     public partial class EPMLiveNavigation {
         
         /// <summary>
-        /// EPMNavScroll control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Microsoft.SharePoint.WebControls.SPRememberScroll EPMNavScroll;
-        
-        /// <summary>
         /// EPMLiveNav control.
         /// </summary>
         /// <remarks>

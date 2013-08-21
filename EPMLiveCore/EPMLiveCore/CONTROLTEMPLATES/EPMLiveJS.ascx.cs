@@ -9,7 +9,7 @@ namespace EPMLiveCore.ControlTemplates
     [MdsCompliant(true)]
     public partial class EPMLiveJS : UserControl
     {
-        #region Fields (9) 
+        #region Fields (8) 
 
         protected string Scheme;
         protected string SiteId;
@@ -19,10 +19,16 @@ namespace EPMLiveCore.ControlTemplates
         protected string WebId;
         protected string WebUrl;
         private SPWeb _spWeb;
-        public string EPMFileVersion { get; private set; }
-        public bool DebugMode { get; private set; }
 
         #endregion Fields 
+
+        #region Properties (2) 
+
+        public bool DebugMode { get; private set; }
+
+        public string EPMFileVersion { get; private set; }
+
+        #endregion Properties 
 
         #region Methods (2) 
 

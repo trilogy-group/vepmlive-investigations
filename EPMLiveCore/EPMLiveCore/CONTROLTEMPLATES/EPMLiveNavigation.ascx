@@ -81,8 +81,7 @@
             <div id="epm-nav-sub-<%= node.Id %>" class="epm-nav-sub" data-role="sub-nav-node"<%= attr %>>
                 <% if (node.Id.ToLower().Equals("ql"))
                    { %>
-                    <SharePoint:SPRememberScroll runat="server" ID="EPMNavScroll" onscroll="javascript:_spRecordScrollPositions(this);" style="overflow: auto;">
-                        <SharePoint:SPTreeView
+                    <SharePoint:SPTreeView
                             ID="EPMLiveNav"
                             runat="server"
                             ShowLines="False"
@@ -107,7 +106,6 @@
                             ExpandDepth="0" 
                             ClientIDMode="Static" 
                             OnPreRender="OnTreeViewPreRender" />
-                    </SharePoint:SPRememberScroll>
                 <% }
                    else
                    { %>    

@@ -2,6 +2,15 @@
 {
     public abstract class NavObject : INavObject
     {
+        #region Constructors (1) 
+
+        protected NavObject()
+        {
+            Visible = true;
+        }
+
+        #endregion Constructors 
+
         #region Implementation of INavObject
 
         public string Id { get; set; }
@@ -13,10 +22,5 @@
         public string Title { get; set; }
 
         #endregion
-
-        protected NavObject()
-        {
-            Visible = true;
-        }
     }
 }

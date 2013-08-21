@@ -2,12 +2,22 @@
 {
     public interface INavObject
     {
-        string Id { get; }
-        string CssClass { get; set; }
+        #region Data Members (7) 
+
         bool Active { get; set; }
-        bool Visible { get; set; }
+
+        string CssClass { get; set; }
+
         bool External { get; set; }
-        string Url { get; set; }
+
+        string Id { get; }
+
         string Title { get; set; }
+
+        string Url { get; set; }
+
+        bool Visible { get; set; }
+
+        #endregion Data Members 
     }
 }

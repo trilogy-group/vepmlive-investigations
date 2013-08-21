@@ -2,10 +2,12 @@
 @sub-nav-width: 170px;
 @top-nav-li-height: @top-nav-width - 10;
 @node-width: (@sub-nav-width - 40px) + 4px;
-@node-height: 22px;
+@link-width: (@sub-nav-width - 40px) - 1px;
+@node-height: 20px;
 @shadow-color: rgba(0, 0, 0, 0.2) inset;
 @base-blue: #0090CA;
 @hover-color: #E7E7E7;
+@link-font:13px;
 
 .box-shadow (@x: 0, @y: 0, @blur: 1px, @color: #000000) {
     -moz-box-shadow: @arguments;
@@ -33,6 +35,14 @@
     text-shadow: @arguments;
 }
 
+.ellipsis {
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 .cursor-hand {
     cursor: pointer;
     cursor: hand;
@@ -45,6 +55,14 @@
 
     .epm-nav-pinned {
         margin-left: auto;
+    }
+}
+
+#epm-nav {
+    .slimScrollDiv {
+        .slimScrollBar {
+            border-radius: 0px !important;
+        }
     }
 }
 
@@ -76,7 +94,7 @@
         .epm-nav-node-opened {
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAASCAYAAABrXO8xAAAAUklEQVQ4y6XTywkAMAgDUPffy0UcwBXsrSCt3xw8PhBNSESsGmY2VXVDHTSGEUphhkJYoS/soAd2kYMTdOEU4XC9KnQc6B1QAKDIQSGHapUV+QCNF50M5UjTYgAAAABJRU5ErkJggg==') /*../../../images/navigation/notch.png*/;
             *background-image: url(/_layouts/15/epmlive/images/navigation/notch.png); /* For IE 6 and 7 */
-            background-position: 40px 13px;
+            background-position: 40px 14px;
             background-repeat: no-repeat;
         }
 
@@ -99,11 +117,11 @@
         }
     }
 
-        ul.bottom {
-            position: absolute;
-            bottom: @top-nav-width + 25;
-            width: 100%;
-        }
+    ul.bottom {
+        position: absolute;
+        bottom: @top-nav-width + 25;
+        width: 100%;
+    }
 }
 
 #epm-nav-sub {
@@ -121,26 +139,104 @@
 #epm-nav-pin {
     color: #7C7C7C;
     display: none;
-    padding-right: 4px;
+    padding-right: 10px;
     padding-top: 3px;
     position: absolute;
     right: 0;
+    z-index: 5000;
     .cursor-hand;
     .transition;
 }
 
 .epm-nav-sub {
     display: none;
+    position: relative;
+
+    ul.epm-nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            margin: 0;
+            padding: 1.5px 5px 1.5px 35px;
+            height: 23px;
+            line-height: 23px;
+            width: @link-width;
+            .ellipsis;
+
+            a {
+                padding-left: 6px;
+                font-size: @link-font;
+                .epm-nav-node;
+            }
+
+            &:hover {
+                background-color: @hover-color;
+
+                a {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+
+    ul.epm-nav-node-static {
+        margin-top: 5px;
+
+        li {
+            padding-left: 10px;
+            width: @link-width + 25px;
+        }
+    }
+
+    .epm-nav-cat {
+        margin-left: 10px !important;
+        margin-top: 13px;
+        .ellipsis;
+
+        span.epm-nav-node-collapsed,
+        span.epm-nav-node-expanded {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA7ElEQVQoz52SOwrCQBCG1zsE9CD2wqZXr6AE0ikoNgGvJlj4QA+gdtoJNoJiKX6js2FJVgwGPjKPf3aG3THWWuO+OI4jGMAMbspMY5Gny40aWNjAGqbqW7XXmqOPreWdcDoETzDxJ/A7SE405NuuqEFgD6l3kCmN9bFT2JGvi2gEq5DwS/EKhkbn75uKH9oElmJc6djUYIb95H8vILFMNU04vwvFcYUq+lV4EWMLvX9GHcMidKOhyyG/wB+55zjISRWeIyEnT9dwgS4cvy2AxHQBRNPxTwqtXIsCYQrllSuM4pZ8Dg9ED7VLS/4Cnk2YheFbyPsAAAAASUVORK5CYII=') /*../../../images/navigation/collapse.png*/;
+            *background-image: url(/_layouts/15/epmlive/images/navigation/collapse.png); /* For IE 6 and 7 */
+            background-position: left center;
+            background-repeat: no-repeat;
+            display: inline-block;
+            width: 14px;
+            margin-right: 5px;
+        }
+
+        span.epm-nav-node-expanded {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA+0lEQVQoz32STQrCMBBG2zsIepDuhXRvvYJS6E5BcSN4tYILregB1J3uBDdCwWXxjU5KjLWFR77MTzLpTGCMCewXx3EHJpBDqeRq6zhxtQjBwB52sNK9Ub1TH/eYsL6JTYLxCgu3AvcG8UkM/oFN6mE4QeYFLwXPlsGRnK4kzqDw62ethK83fXQB00DrHzeUV3Jg2WBPYSviQUBky0NXkiC3udqWzRrB7Z0oG+ddlbah8rSbeBdxgFFTqUJbqXPYOK1p/Tn4N+xnth1nOclvBz6/HSk2aV3PGoZw+TcAYtMBkJjEPalp5PokCCv4HTmvuXbI1/Ak6Kn6Z8hfnBiolCTl1+kAAAAASUVORK5CYII=') /*../../../images/navigation/expand.png*/;
+            *background-image: url(/_layouts/15/epmlive/images/navigation/expand.png); /* For IE 6 and 7 */
+        }
+
+        .epm-nav-cat-title {
+            position: relative;
+            top: -1px;
+        }
+    }
+
+    .epm-nav-node {
+        color: #666666;
+        font-family: 'Open Sans Regular', sans-serif;
+        font-weight: 300;
+        font-size: @link-font;
+        height: @node-height;
+        line-height: @node-height;
+    }
+
+    div.epm-nav-node {
+        width: @node-width+20;
+    }
+
+    div.epm-nav-node-root {
+        font-size: 1.15em;
+        margin-left: 5px;
+        margin-bottom: 1px;
+    }
 
     .epm-nav-sub-menu {
-        .epm-nav-node {
-            color: #666666;
-            font-family: 'Open Sans Regular', sans-serif;
-            font-weight: 300;
-            font-size: 15px;
-            height: @node-height;
-            line-height: @node-height;
-        }
 
         td.epm-nav-node {
             width: @node-width;

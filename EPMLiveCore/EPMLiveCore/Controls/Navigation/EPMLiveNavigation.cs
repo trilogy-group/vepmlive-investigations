@@ -10,14 +10,38 @@ namespace EPMLiveCore.Controls.Navigation
     [ParseChildren(true)]
     public class EPMLiveNavigation : WebControl
     {
+        #region Fields (2) 
+
         private readonly List<NavNode> _bottomNodes;
         private readonly List<NavNode> _topNodes;
+
+        #endregion Fields 
+
+        #region Constructors (1) 
 
         public EPMLiveNavigation()
         {
             _topNodes = new List<NavNode>();
             _bottomNodes = new List<NavNode>();
         }
+
+        #endregion Constructors 
+
+        #region Properties (2) 
+
+        [PersistenceMode(PersistenceMode.InnerDefaultProperty)]
+        public List<NavNode> BottomNodes
+        {
+            get { return _bottomNodes; }
+        }
+
+        [PersistenceMode(PersistenceMode.InnerDefaultProperty)]
+        public List<NavNode> TopNodes
+        {
+            get { return _topNodes; }
+        }
+
+        #endregion Properties 
 
         #region Overrides of Control
 
@@ -32,17 +56,5 @@ namespace EPMLiveCore.Controls.Navigation
         }
 
         #endregion
-
-        [PersistenceMode(PersistenceMode.InnerDefaultProperty)]
-        public List<NavNode> TopNodes
-        {
-            get { return _topNodes; }
-        }
-
-        [PersistenceMode(PersistenceMode.InnerDefaultProperty)]
-        public List<NavNode> BottomNodes
-        {
-            get { return _bottomNodes; }
-        }
     }
 }
