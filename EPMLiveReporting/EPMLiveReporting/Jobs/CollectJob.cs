@@ -67,6 +67,24 @@ namespace EPMLiveReportsAdmin.Jobs
             return sCn;
         }
 
+        private void CheckSP(SqlConnection cn)
+        {
+            if (cn.State != ConnectionState.Open) cn.Open();
+
+            SqlCommand cmd = new SqlCommand("select * from information_schema.routines where SPECIFIC_NAME = 'spUpdateStatusFields'", cn);
+            bool found = false;
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+                found = true;
+            dr.Close();
+
+            if (!found)
+            {
+                cmd = new SqlCommand(Properties.Resources.spUpdateStatusFields, cn);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void execute(SPSite site, SPWeb web, string data)
         {
             base.totalCount = site.AllWebs.Count;
@@ -190,17 +208,19 @@ namespace EPMLiveReportsAdmin.Jobs
                     MethodInfo m = thisClass.GetMethod("ExecuteReportExtract");
                     string message = (string)m.Invoke(classObject, new object[] { "<ExecuteReportExtract><Params /><Data><ReportExtract Connection=\"" + getReportingConnection(web) + "\" Execute=\"1\" /></Data></ExecuteReportExtract>" });
 
-                    sErrors += "<br>Processed PfE Reporting: " + message + "<br><br>";
+                    sErrors += "Processed PfE Reporting: " + message + "<br>";
                 }
             }
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors += "<br><font color=\"red\">Error Processing PfE Reporting: " + ex.Message + "</font><br><br>";
+                sErrors += "<font color=\"red\">Error Processing PfE Reporting: " + ex.Message + "</font><br>";
             }
 
             #endregion Process PFE Data
-
+            
+            try
+            {
             #region REMOVE DUPLICATES/ORPHANED DATA RECORDS
             DataTable listNames = new DataTable();
             DataTable listIds = new DataTable();
@@ -375,14 +395,46 @@ namespace EPMLiveReportsAdmin.Jobs
                 rptCn.Close();
                 epmliveCn.Close();
             });
+            }catch(Exception ex)
+            {
+                bErrors = true;
+                sErrors += "<font color=\"red\">Error running delete cleanup: " + ex.Message + "</font><br>";
+            }
             #endregion
 
-            foreach (string list in data.Split(','))
+            try
             {
-                if (!hshMessages.Contains(list))
-                    hshMessages.Add(list, "");
-            }
+                CheckSP(epmdata.GetClientReportingConnection);
 
+                foreach (string list in data.Split(','))
+                {
+                    if (list != "")
+                    {
+                        try
+                        {
+                            SqlCommand cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
+                            cmd2.CommandType = CommandType.StoredProcedure;
+                            cmd2.Parameters.AddWithValue("@listname", list);
+
+                            cmd2.ExecuteNonQuery();
+                        }
+                        catch (Exception ex)
+                        {
+                            bErrors = true;
+                            sErrors += "<font color=\"red\">Error running schedule field update for (" + list + "): " + ex.Message + "</font><br>";
+                        }
+                        if (!hshMessages.Contains(list))
+                            hshMessages.Add(list, "");
+                    }
+                }
+
+                sErrors += "<br>Updated Status Fields<br>";
+
+            }catch(Exception ex)
+            {
+                bErrors = true;
+                sErrors += "<font color=\"red\">Error running schedule field update: " + ex.Message + "</font><br>";
+            }
             finishJob();
         }
     }
