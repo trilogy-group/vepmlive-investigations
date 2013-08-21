@@ -2043,6 +2043,60 @@ function Ribbon(ribbonData) {
             }
         }
     };
+    Ribbon.prototype.temporyDisableItem = function (id) {
+        var item = this.FindItemById(id);
+        if (item != null) {
+            item.rememberdisabled = item.disabled;
+            item.disabled = true;
+
+            if (item.rememberdisabled == true)
+                return;
+
+            if (document.getElementById) {
+                if (item.type == "checkbox" || item.type == "select")
+                    document.getElementById(id).disabled = true;
+
+                if (item.type == "select") {
+                    document.getElementById(id + "_textbox").disabled = true;
+                    document.getElementById(id + "_button").disabled = true;
+
+                    item.rememberbclass = document.getElementById(id + "_button").className;
+                    item.remembertclass = document.getElementById(id + "_textbox").className;
+                    document.getElementById(id + "_textbox").className + " ms-cui-disabled";
+                    document.getElementById(id + "_button").className + " ms-cui-disabled";
+                }
+
+
+                document.getElementById(id).className = item.className + " ms-cui-disabled";
+            }
+        }
+    };
+    Ribbon.prototype.resetTemporyDisableItem = function (id) {
+        var item = this.FindItemById(id);
+        if (item != null) {
+            item.disabled = item.rememberdisabled;
+
+            if (item.disabled == true)
+                return;
+
+            if (document.getElementById) {
+                if (item.type == "checkbox" || item.type == "select")
+                    document.getElementById(id).disabled = false;
+
+
+                if (item.type == "select") {
+                    document.getElementById(id + "_textbox").disabled = false;
+                    document.getElementById(id + "_button").disabled = false;
+                    document.getElementById(id + "_textbox").className = item.remembertclass; 
+
+                    document.getElementById(id + "_button").className = item.rememberbclass;
+                }
+
+
+                document.getElementById(id).className = item.className;
+            }
+        }
+    };
     Ribbon.prototype.SetItemName = function (id, newname) {
         var item = this.FindItemById(id);
         if (item != null) {
@@ -2903,6 +2957,13 @@ function Ribbon(ribbonData) {
         return s;
     };
     Ribbon_showPopup = function (idPopup, idSelect, idParent) {
+
+
+        var item = document.getElementById(idSelect);
+        if (item.disabled == true)
+                return;
+        
+
         var popup = document.getElementById(idPopup);
         var tbselect = document.getElementById(idSelect + "_textbox");
         var parent = document.getElementById(idParent);
