@@ -181,7 +181,12 @@ html, body {
     function dgrid1_OnRowSelect(rowid, cellindex) {
         dgrid1_selectedRow = rowid;
         if (rowid != null && rowid > 0) {
-            toolbar.enableItem("btnModify");
+            var isDeprecated = dgrid1.GetCellValue(rowid, "IsDeprecated");
+            if (isDeprecated != "1")
+                toolbar.enableItem("btnModify");
+            else
+                toolbar.disableItem("btnModify");
+
             toolbar.enableItem("btnDelete");
         }
         else {
@@ -191,14 +196,13 @@ html, body {
     };
     var OnResize = function (event) {
         var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
-        dgrid1.SetHeight(newHeight);
-        var newWidth = document.documentElement.clientWidth - 5;
-        dgrid1.SetWidth(newWidth);
+        var newHeight = document.documentElement.clientHeight - top;
+        var newWidth = document.documentElement.clientWidth;
+        dgrid1.SetSizes(newWidth,newHeight);
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         ResizeDialog(idWindow, idAttachObj);
         window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
@@ -222,7 +226,12 @@ html, body {
         return width;
     };
     function CloseDialog (idWindow) {
-        jsf_closeDialog(thiswins, idWindow)
+        switch (idWindow) {
+            case 'winCustomfieldDlg':
+                dgrid1.grid.selectRowById(dgrid1_selectedRow);
+                break;
+        }
+        return jsf_closeDialog(thiswins, idWindow);
     };
     function SendRequest(sXML) {
          sURL = "./Customfields.ashx";
@@ -242,7 +251,12 @@ html, body {
         switch (event) {
             case "btnModify":
                 if (toolbar.isItemDisabled("btnModify") == true) {
-                    alert("Select a row to enable the Modify button");
+                    var isDeprecated = dgrid1.GetCellValue(dgrid1_selectedRow, "IsDeprecated");
+                    if (isDeprecated != "1")
+                        alert("Select a row to enable the Modify button");
+                    else
+                        alert("This Custom Field Type is deprecated and cannot be modified");
+
                     return false;
                 }
                 dlgTitle = "Modify Custom Field";

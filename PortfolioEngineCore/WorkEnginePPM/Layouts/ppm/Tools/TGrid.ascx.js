@@ -21,17 +21,25 @@
         var snewVal = val;
         var def = grid.GetAttribute(null, col, "Defaults");
         var valueField = grid.GetAttribute(null, col, "ValueField");
-        if (def != null && def != "" && valueField != null) {
+        if (def != null && def != "" && valueField != null && val != null && val != "") {
             var list = JSON_ConvertString(def);
             if (list != null && list.Items != null) {
                 var items = list.Items;
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i].Value == val) {
-                        snewVal = items[i].Text;
-                        grid.SetAttribute(row, null, valueField, val, 0, 0);
-                        break;
+                var s = "";
+                var vals = val.toString().split(';');
+                for (var j = 0; j < vals.length; j++) {
+                    var jval = vals[j];
+                    for (var i = 0; i < items.length; i++) {
+                        if (items[i].Value == jval) {
+                            if (s != "")
+                                s += ";";
+                            s += items[i].Text;
+                            break;
+                        }
                     }
                 }
+                snewVal = s;
+                grid.SetAttribute(row, null, valueField, val, 0, 0);
             }
         }
         return snewVal;
@@ -55,7 +63,7 @@
         if (this.grid != null)
             this.grid.Dispose();
         this.grid = null;
-        this.grid = TreeGrid("<treegrid debug='1' sync='1' Data_Tag='" + this.params.DataTag + "' ></treegrid>", this.params.treegrid_div, this.params.tg_id);
+        this.grid = TreeGrid("<treegrid debug='0' sync='1' Data_Tag='" + this.params.DataTag + "' ></treegrid>", this.params.treegrid_div, this.params.tg_id);
         SetEvent("OnValueChanged", this.params.tg_id, this.GridsOnValueChanged);
     };
 
@@ -85,7 +93,6 @@
         var xy = this.findAbsolutePosition(div);
         return xy[1];
     };
-
     TGrid.prototype.SetWidth = function (w) {
         var div = document.getElementById(this.params.treegrid_div);
         div.style.width = w + "px";
@@ -94,6 +101,13 @@
     TGrid.prototype.SetHeight = function (h) {
         var div = document.getElementById(this.params.treegrid_div);
         div.style.height = h + "px";
+    };
+    TGrid.prototype.SetSizes = function (w, h) {
+        var div = document.getElementById(this.params.treegrid_div);
+        if (w > 11)
+            div.style.width = (w - 11) + "px";
+        if (h > 5)
+            div.style.height = (h - 5) + "px";
     };
 
     TGrid.prototype.findAbsolutePosition = function (obj) {

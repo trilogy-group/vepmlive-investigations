@@ -139,6 +139,11 @@ namespace WorkEnginePPM
                         sReply = DeleteLookupInfo(Context, xData);
                         break;
                     }
+                    case "CanDeleteLookupRows":
+                    {
+                        sReply = CanDeleteLookupRows(Context, xData);
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -212,6 +217,29 @@ namespace WorkEnginePPM
         //        }
         //        dba.Close();
             }
+            return sReply;
+        }
+
+        private static string CanDeleteLookupRows(HttpContext Context, CStruct xData)
+        {
+            string sReply = "";
+            string sLVUIDs = xData.InnerText;
+            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            DataAccess da = new DataAccess(sBaseInfo);
+            DBAccess dba = da.dba;
+            if (dba.Open() == StatusEnum.rsSuccess)
+            {
+                try
+                {
+                    dbaLookups.CanDeleteLookupItems(dba, sLVUIDs, out sReply);
+                }
+                catch (Exception ex)
+                {
+                    sReply = WebAdmin.FormatError("exception", "CostCategories.DeleteCostCategoryInfo", ex.Message);
+                }
+                dba.Close();
+            }
+
             return sReply;
         }
         #endregion

@@ -34,7 +34,8 @@
     };
     DGrid.prototype.addEventListener = function (eventName, eventFumction) {
         if (this.grid != null)
-            this.grid.attachEvent(eventName, eventFumction);
+            return this.grid.attachEvent(eventName, eventFumction);
+        return null;
     };
     DGrid.prototype.autoSizeColumns = function () {
         var gridcols = this.columns;
@@ -66,7 +67,14 @@
             div.style.width = w + "px";
         this.grid.setSizes();
     };
-
+    DGrid.prototype.SetSizes = function (w, h) {
+        var div = document.getElementById(params.grid_div);
+        if (w > 11)
+            div.style.width = (w-11) + "px";
+        if (h > 5)
+            div.style.height = (h-5) + "px";
+        this.grid.setSizes();
+    };
     DGrid.prototype.findAbsolutePosition = function (obj) {
         var curleftx = 0;
         var curtopy = 0;

@@ -192,6 +192,10 @@ namespace WorkEnginePPM
                             column.CreateStringAttr("dateFormat", "%m/%d/%Y");
                             column.CreateStringAttr("sort", "date");
                             break;
+                        case Type.checkbox:
+                            column.CreateStringAttr("type", "ch");
+                            column.CreateStringAttr("sort", "int");
+                            break;
                         case Type.combo:
                             if (col.editable) column.CreateStringAttr("type", "coro"); else column.CreateStringAttr("type", "coro");
                             if (col.dicCombo != null)

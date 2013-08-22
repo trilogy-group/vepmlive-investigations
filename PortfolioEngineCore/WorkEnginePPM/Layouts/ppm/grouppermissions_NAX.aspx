@@ -140,15 +140,12 @@ html, body {
             toolbar.disableItem("btnMembers");
         }
     };
-
     var OnResize = function (event) {
         var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
-        dgrid1.SetHeight(newHeight);
-        var newWidth = document.documentElement.clientWidth - 5;
-        dgrid1.SetWidth(newWidth);
+        var newHeight = document.documentElement.clientHeight - top;
+        var newWidth = document.documentElement.clientWidth;
+        dgrid1.SetSizes(newWidth,newHeight);
     };
-
     function SendRequest(sXML) {
          sURL = "./GroupPermissions.ashx";
          return jsf_sendRequest(sURL, sXML);
@@ -202,7 +199,8 @@ html, body {
         DisposeGrids();
         var grid = TreeGrid("<treegrid debug='0' sync='1' Data_Script='treegridData' ></treegrid>", "idtg1");
 
-        DisplayDialog(570, 540, sDlgTitle, "winGroupPermissionsDlg", "idGroupPermissionsDlg", true, false);
+       dgrid1.grid.clearSelection();
+       DisplayDialog(570, 540, sDlgTitle, "winGroupPermissionsDlg", "idGroupPermissionsDlg", true, false);
    };
    function GetGroupMembers(sRowId) {
         var sRequest = '<request function="GroupPermissionsRequest" context="GetGroupMembersInfo"><data><![CDATA[' + sRowId + ']]></data></request>';
@@ -232,12 +230,17 @@ html, body {
     
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         return dlg;
     };
 
     function CloseDialog (idWindow) {
-        jsf_closeDialog(thiswins, idWindow)
+        switch (idWindow) {
+            case 'winGroupPermissionsDlg':
+                dgrid1.grid.selectRowById(dgrid1_selectedRow);
+                break;
+        }
+        return jsf_closeDialog(thiswins, idWindow);
     };
 
     var groupPermissionsDlg_event = function (event) {

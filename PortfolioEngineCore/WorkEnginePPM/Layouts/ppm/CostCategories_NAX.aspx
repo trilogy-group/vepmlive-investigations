@@ -34,6 +34,29 @@ html, body {
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 <div class="modalContent" id="idRatesDlg" style="display:none;">
+	<div style="margin-top:10px;padding-right:10px;">
+		<div style="padding-bottom:3px;">
+            <table width="100%" cellspacing="0">
+                <tr>
+                    <td style="height:1px;" width="250" class="topcell"></td>
+                    <td style="height:1px;" class="topcell"></td>
+                </tr>
+                <tr>
+                    <td width="250" class="descriptioncell">
+                        Base Rate
+                    </td>
+                    <td class="controlcell">
+                        <input type="text" id="txtBaseRate" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="descriptioncell" colspan="2">
+                        Optionally enter rates which will become effective on the specified dates:
+                    </td>
+                </tr>
+            </table>
+		</div>
+    </div>
     <div id="idToolbarRatesDiv"></div>
     <div style="display:block;"><tg1:TGridUserControl id="tgridRates" runat="server" /></div>
 	<div style="float:right;">
@@ -126,8 +149,7 @@ html, body {
                 <tr>
                     <td width="250" class="descriptioncell">Default Major Category Item</td>
                     <td class="controlcell">
-                        <select id="idMajorCategoryItem" style="width:206px;" onchange="ddlChanged('idMajorCategoryItem');">
-                        </select>
+                        <asp:DropDownList ID="ddlMajorCategoryItems" OnChange="ddlChanged('ddlMajorCategoryItems');" runat="server"></asp:DropDownList>
                    </td>
                 </tr>
             </table>
@@ -175,13 +197,31 @@ html, body {
     var tgrid1_selectedRow = 0;
     var tgridRates_selectedRow = 0;
     var tgridFTEs_selectedRow = 0;
+    var tgridFTEs_Width = 770;
+    var tgridFTEs_Height = 275;
     var tgrid1 = window.<%=tgrid1.UID%>;
+    var new_CA_UIDs = 0;
+    var bChanged = false;
  
     var OnLoad = function (event) {
         var tgrid1 = window.<%=tgrid1.UID%>;
         tgrid1_selectedRow = 0;
         tgrid1.addEventListener("OnFocus", tgrid1_OnFocus);
         OnResize();
+    };
+    var OnBeforeUnload = function (event) {
+        if (HasChanges() || bChanged == true)
+            event.returnValue = "You have unsaved changes.\n";
+    };
+    function HasChanges() {
+        var grid = tgrid1.grid;
+        if (grid == null)
+            return false;
+        var hasChanges = grid.HasChanges();
+        if ((hasChanges & (1 << 0)) != 0)
+            return true;
+        else
+            return false;
     };
     function tgrid1_OnFocus(grid, row, col, orow, ocol, pagepos) {
         tgrid1_selectedRow = row;
@@ -210,10 +250,12 @@ html, body {
     var OnResize = function (event) {
         var tgrid1 = window.<%=tgrid1.UID%>;
         var top = tgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
-        tgrid1.SetHeight(newHeight);
+        var newHeight = document.documentElement.clientHeight - top;
+        var newWidth = document.documentElement.clientWidth;
+        tgrid1.SetSizes(newWidth,newHeight);
     };
     function ddlChanged(ddlName) {
+        bChanged = true;
         switch (ddlName) {
             case "ddlMajorCategoryLookups":
                 var idMC = document.getElementById('<%=ddlMajorCategoryLookups.ClientID%>');
@@ -226,20 +268,26 @@ html, body {
                     if (json.reply != null) {
                         if (jsf_alertError(json.reply.error) == true)
                             return false;
-                        var idMajorCategoryItem = document.getElementById('idMajorCategoryItem');
-                        idMajorCategoryItem.options.length = 0;
+                        var ddlMajorCategoryItems = document.getElementById('<%=ddlMajorCategoryItems.ClientID%>');
+                        ddlMajorCategoryItems.options.length = 0;
+                        ddlMajorCategoryItems.selectedIndex = -1;
                         var item = json.reply.MajorCategoryItems.Item;
                         for (var i=0; i<item.length; i++) {
-                            idMajorCategoryItem.options[idMajorCategoryItem.options.length] = new Option(item[i].name, item[i].id);
+                            ddlMajorCategoryItems.options[ddlMajorCategoryItems.options.length] = new Option(item[i].name, item[i].id);
                         }
                     }
+                }
+                else {
+                    var ddlMajorCategoryItems = document.getElementById('<%=ddlMajorCategoryItems.ClientID%>');
+                    ddlMajorCategoryItems.options.length = 0;
+                    ddlMajorCategoryItems.selectedIndex = -1;
                 }
                 break;
         }
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         return dlg;
     };
     function CloseDialog (idWindow) {
@@ -254,10 +302,10 @@ html, body {
         var sMCValue = "";
         if (idMC.selectedIndex > -1)
             sMCValue = idMC.options[idMC.selectedIndex].value;
-        var idMCItem = document.getElementById('idMajorCategoryItem');
+        var ddlMajorCategoryItems = document.getElementById('<%=ddlMajorCategoryItems.ClientID%>');
         var sMCItemValue = "";
-        if (idMCItem.selectedIndex > -1)
-            sMCItemValue = idMCItem.options[idMCItem.selectedIndex].value;
+        if (ddlMajorCategoryItems.selectedIndex > -1)
+            sMCItemValue = ddlMajorCategoryItems.options[ddlMajorCategoryItems.selectedIndex].value;
         var sb = new StringBuilder("");
         sb.append('<data');
         sb.append(' majorcategoryid="' + sMCValue + '"');
@@ -295,7 +343,10 @@ html, body {
         switch (event) {
             case "btnAdd":
                 var row = tgrid1.AddRow();
+                new_CA_UIDs--;
+                tgrid1.SetCellValue(row, "CA_UID", new_CA_UIDs.toString());
                 tgrid1.SetCellValue(row, "CA_NAME", "New Row");
+                tgrid1_OnFocus(tgrid1.grid, row, "CA_NAME");
                 break;
             case "btnAddRole":
                 var grid = tgrid1.grid;
@@ -338,7 +389,8 @@ html, body {
                 if (json.reply != null) {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
-                    __doPostBack('', '');
+                    tgrid1.grid.AcceptChanges();
+                    //__doPostBack('', '');
                 }
                 break;
             case "btnDelete":
@@ -400,16 +452,19 @@ html, body {
                         if (jsf_alertError(json.reply.error) == true)
                             return false;
                     }
+                    var txtBaseRate = document.getElementById('txtBaseRate');
+                    txtBaseRate.value = json.reply.costcategory.baserate;
+
                     var tgridRates = window['<%=tgridRates.UID%>'];
                     tgridRates.Initialize(json.reply.costcategory.tgridRates);
-                    tgridRates.SetWidth(380);
+                    tgridRates.SetWidth(390);
                     tgridRates.SetHeight(150);
                     //var newrow = tgridRates.grid.AddRow(null, null, true);
                     toolbarRates.Render();
                     tgridRates.addEventListener("OnFocus", tgridRates_OnFocus);
                     var s = "Add rates for " + grid.GetAttribute(tgrid1_selectedRow, "CA_NAME", null);
                     tgridRates_selectedRow = 0;
-                    DisplayDialog(400, 300, s, "winRatesDlg", "idRatesDlg", true, false);
+                    DisplayDialog(420, 380, s, "winRatesDlg", "idRatesDlg", true, false);
                 }
                 break;
             case "btnFTEs":
@@ -436,15 +491,15 @@ html, body {
                 }
                 var tgridFTEs = window['<%=tgridFTEs.UID%>'];
                 tgridFTEs.Initialize(json.reply.FTEs.tgridFTEs);
-                tgridFTEs.SetWidth(570);
-                tgridFTEs.SetHeight(250);
+                tgridFTEs.SetWidth(tgridFTEs_Width);
+                tgridFTEs.SetHeight(tgridFTEs_Height);
                 toolbarFTEs.Render();
                 tgridFTEs.addEventListener("OnFocus", tgridFTEs_OnFocus);
                 tgridFTEs.addEventListener("OnAfterValueChanged", tgridFTEs_OnAfterValueChanged);
 
                 var s = "Cost Category FTE Values";
                 tgridFTEs_selectedRow = 0;
-                DisplayDialog(600, 430, s, "winFTEsDlg", "idFTEsDlg", true, false);
+                DisplayDialog(800, 455, s, "winFTEsDlg", "idFTEsDlg", true, false);
 
                 break;
         }
@@ -462,6 +517,8 @@ html, body {
                 sb.append('<request function="CostCategoriesRequest" context="SaveCostCategoryRatesInfo">');
                 sb.append('<data');
                 sb.append(' CA_UID="' + sRowId + '"');
+                var txtBaseRate = document.getElementById('txtBaseRate');
+                sb.append(' baserate="' + txtBaseRate.value + '"');
                 sb.append('>');
                 sb.append('<![CDATA[' + tgridRates.GetXmlData() + ']]>');
                 sb.append('</data>');
@@ -480,15 +537,18 @@ html, body {
                 break;
            case "btnInsert2":
            case "btnAdd2":
-                var newrow;
+                var row;
                 if (event == "btnInsert2") {
-                    newrow = tgridRates.grid.AddRow(null, tgridRates_selectedRow, true);
+                    row = tgridRates.grid.AddRow(null, tgridRates_selectedRow, true);
                 }
                 else {
-                    newrow = tgridRates.grid.AddRow(null, null, true);
+                    row = tgridRates.grid.AddRow(null, null, true);
                 }
-                tgridRates_selectedRow = newrow;
-                tgridRates.Focus(newrow, 'BC_RATE');
+                tgridRates_selectedRow = row;
+                var dt = new Date(); //StringToDate(dateAndRateArr[0], "yyyy.MM.dd");
+                tgridRates.grid.SetAttribute(row, null, "BC_EFFECTIVE_DATE", dt, 1, 0);
+                tgridRates.grid.SetAttribute(row, null, "BC_RATE", 1.0 , 1, 0);
+                tgridRates.Focus(row, 'BC_RATE');
                 break;
           case "btnDelete2":
                tgridRates.grid.DeleteRow(tgridRates_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
@@ -544,8 +604,8 @@ html, body {
                         return false;
                 }
                 tgridFTEs.Initialize(json.reply.FTEs.tgridFTEs);
-                tgridFTEs.SetWidth(570);
-                tgridFTEs.SetHeight(250);
+                tgridFTEs.SetWidth(tgridFTEs_Width);
+                tgridFTEs.SetHeight(tgridFTEs_Height);
                 tgridFTEs.addEventListener("OnFocus", tgridFTEs_OnFocus);
                 tgridFTEs.addEventListener("OnAfterValueChanged", tgridFTEs_OnAfterValueChanged);
                 break;
@@ -587,10 +647,12 @@ html, body {
 
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", OnLoad, true);
+        window.addEventListener("beforeunload", OnBeforeUnload, true);
         window.addEventListener("resize", OnResize, true);
     }
     else { // e.g. IE
         window.attachEvent("onload", OnLoad);
+        window.attachEvent("onbeforeunload", OnBeforeUnload);
         window.attachEvent("onresize", OnResize);
     }
 </script>

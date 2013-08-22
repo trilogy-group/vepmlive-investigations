@@ -326,6 +326,8 @@ namespace PortfolioEngineCore
             StatusEnum eStatus = StatusEnum.rsSuccess;
             string sCommand;
 
+            dba.DBTrace((StatusEnum)0, (TraceChannelEnum)0, "CalculateAvailabilities", "CalcInternalAvailabilities", "start calendar : " + calendar.ToString() + "; reslist : " + reslist, "", true);
+
             //if (_dba.Open() != StatusEnum.rsSuccess)
             //    debug.AddMessage("Open DB Error=" + _dba.FormatErrorText());
 
@@ -473,10 +475,10 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 //sReply = HandleException("CalcAvailabilities", 99999, ex);
+                dba.HandleException("CalcInternalAvailabilities", (StatusEnum)99119, ex);
                 throw ex;
             }
-
-
+            dba.DBTrace((StatusEnum)0, (TraceChannelEnum)0, "CalculateAvailabilities", "CalcInternalAvailabilities", "Finish", "", true);
             return bResult;
         }
 

@@ -174,6 +174,38 @@ html, body {
 		</div>
 	</div>
 </div>
+<div class="modalContent" id="idPostOptionsDlg" style="display:none;">
+    <div style="width:380px; display:block; padding-top: 0px; padding-bottom: 10px;">
+        <table cellpadding="5">
+            <tr>
+                <td colspan="3" class="descriptioncell">
+                    Select the Post Options for this Cost Type</td>
+            </tr>
+            <tr>
+                <td class="descriptioncell">
+                    Available Calendars:<br />
+					<select name="FrmFieldsOut" size="7" id="idCalendarsOut" style="width: 150px; padding: 3px;" ondblclick="javascript:postOptionsDlg_event('include');" >
+					</select>
+                </td>
+                <td>
+                    <input type="button" value=" &gt; " onclick="javascript:postOptionsDlg_event('include');" /><br /><br />
+                    <input type="button" value=" &lt; " onclick="javascript:postOptionsDlg_event('exclude');"/>
+                </td>
+                <td class="descriptioncell">
+                    Selected:<br />
+					<select name="FrmFieldsIn" size="7" id="idCalendarsIn" style="width: 150px; padding: 3px;" ondblclick="javascript:postOptionsDlg_event('exclude');" >
+					</select>
+                </td>
+            </tr>
+        </table>
+    </div>
+	<div style="float:right;">
+		<div class="button-container" >
+			<input id="Button2" type="button" class="epmliveButton" value="OK" onclick="postOptionsDlg_event('ok');"/>
+			<input type="button" class="epmliveButton" value="Cancel" onclick="postOptionsDlg_event('cancel');"/>
+		</div>
+	</div>
+</div>
 <div style="display: block;" >
     <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
     <div id="idToolbarDiv"></div>
@@ -191,7 +223,8 @@ html, body {
             { type: "button", id: "btnModify", name: "MODIFY", img: "formatmap16x16_2.png", style: "top: -243px; left: -55px;", tooltip: "Modify", onclick: "return toolbar_event('btnModify');", disabled: true },
             { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
             { type: "button", id: "btnCostTotals", name: "COST TOTALS", img: "formatmap16x16_2.png", style: "top: -90px; left: -289px;", tooltip: "Cost Totals",  onclick: "toolbar_event('btnCostTotals');", disabled: true },
-            { type: "button", id: "btnSecurity", name: "SECURITY", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Security", onclick: "toolbar_event('btnSecurity');", disabled: true }
+            { type: "button", id: "btnSecurity", name: "SECURITY", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Security", onclick: "toolbar_event('btnSecurity');", disabled: true },
+            { type: "button", id: "btnPostOptions", name: "POST OPTIONS", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Post Cost Options", onclick: "toolbar_event('btnPostOptions');", disabled: true }
         ]
     };
 
@@ -213,12 +246,14 @@ html, body {
             toolbar.enableItem("btnDelete");
             toolbar.enableItem("btnCostTotals");
             toolbar.enableItem("btnSecurity");
+            toolbar.enableItem("btnPostOptions");
         }
         else {
             toolbar.disableItem("btnModify");
             toolbar.disableItem("btnDelete");
             toolbar.disableItem("btnCostTotals");
             toolbar.disableItem("btnSecurity");
+            toolbar.disableItem("btnPostOptions");
         }
     };
 
@@ -231,7 +266,7 @@ html, body {
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         ResizeDialog(idWindow, idAttachObj);
         window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
@@ -260,7 +295,15 @@ html, body {
     };
 
     function CloseDialog (idWindow) {
-        jsf_closeDialog(thiswins, idWindow)
+        switch (idWindow) {
+            case 'winCosttypeDlg':
+            case 'winCostTotalsDlg':
+            case 'winSecurityDlg':
+            case 'winPostOptionsDlg':
+                dgrid1.grid.selectRowById(dgrid1_selectedRow);
+                break;
+        }
+        return jsf_closeDialog(thiswins, idWindow);
     };
     
     function SendRequest(sXML) {
@@ -291,6 +334,7 @@ html, body {
                 tgridCostTotals.Initialize(tableData);
                 tgridCostTotals.SetWidth(420);
                 tgridCostTotals.SetHeight(250);
+                dgrid1.grid.clearSelection();
                 DisplayDialog(450, 350, "Cost Totals for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winCostTotalsDlg", "idCostTotalsDlg", true, false);
                 break;
             case "btnSecurity":
@@ -312,7 +356,37 @@ html, body {
                 tgridSecurity.Initialize(costtype.tgridSecurity);
                 tgridSecurity.SetWidth(310);
                 tgridSecurity.SetHeight(180);
+                dgrid1.grid.clearSelection();
                 DisplayDialog(350, 270, "Security for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winSecurityDlg", "idSecurityDlg", true, false);
+                break;
+            case "btnPostOptions":
+                if (toolbar.isItemDisabled("btnPostOptions") == true) {
+                    alert("Select a row to enable the Post Options button");
+                    return false;
+                }
+                sRowId = dgrid1_selectedRow;
+                var sRequest = '<request function="CostTypesRequest" context="GetPostOptionsInfo"><data><![CDATA[' + sRowId + ']]></data></request>';
+                var jsonString = SendRequest(sRequest);
+                var json = JSON_ConvertString(jsonString);
+                if (json.reply != null) {
+                    if (jsf_alertError(json.reply.error) == true)
+                        return false;
+                }
+                var postOptions = json.reply.postOptions;
+                //var nCalendar = costtype.CT_CB_ID;
+                var idCalendarsOut = document.getElementById('idCalendarsOut');
+                var idCalendarsIn = document.getElementById('idCalendarsIn');
+                idCalendarsOut.options.length = 0;
+                idCalendarsIn.options.length = 0;
+                var item = json.reply.postOptions.calendars.item;
+                for (var i = 0; i < item.length; i++) {
+                    if (item[i].used == 0)
+                        idCalendarsOut.options[idCalendarsOut.options.length] = new Option(item[i].name, item[i].id);
+                    else
+                        idCalendarsIn.options[idCalendarsIn.options.length] = new Option(item[i].name, item[i].id);
+                }
+                dgrid1.grid.clearSelection();
+                DisplayDialog(350, 270, "Post Options for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winPostOptionsDlg", "idPostOptionsDlg", true, false);
                 break;
             case "btnModify":
                 if (toolbar.isItemDisabled("btnModify") == true) {
@@ -374,6 +448,7 @@ html, body {
                 document.getElementById('idFormula').value = sFormula;
 
                 var ht = SetCTDlgState();
+                dgrid1.grid.clearSelection();
                 DisplayDialog(625, ht, dlgTitle, "winCosttypeDlg", "idCostTypeDlg", true, false);
                 break;
             case "btnDelete":
@@ -418,6 +493,7 @@ html, body {
                 var sFormula = jsf_getStringFromValue(json.reply.costtype.formula);
                 document.getElementById('idFormula').value = sFormula;
                 var ht = SetCTDlgState();
+                dgrid1.grid.clearSelection();
                 DisplayDialog(625, ht + 15, "Delete Cost Type - " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME") + "?", "winCosttypeDlg", "idCostTypeDlg", true, false);
                 break;
         }
@@ -653,7 +729,6 @@ html, body {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
                 }
-
                 CloseDialog('winCostTotalsDlg');
                 break;
             case "cancel":
@@ -689,6 +764,46 @@ html, body {
                 CloseDialog('winSecurityDlg');
                 break;
         }
+    };
+    function postOptionsDlg_event(event) {
+        switch (event) {
+            case "include":
+                $("#idCalendarsOut option:selected").appendTo("#idCalendarsIn");
+                break;
+            case "exclude":
+                $("#idCalendarsIn option:selected").appendTo("#idCalendarsOut");
+                break;
+            case "ok":
+                var sRowId = dgrid1_selectedRow;
+                var sb = new StringBuilder();
+                sb.append('<request function="CostTypesRequest" context="UpdatePostOptionsInfo">');
+                sb.append('<data');
+                sb.append(' CT_ID="' + sRowId + '"');
+                var sCBs = "";
+                var idCalendarsIn = document.getElementById('idCalendarsIn');
+                for (var i = 0; i < idCalendarsIn.options.length; i++) {
+                    if (i > 0)
+                        sCBs += ",";
+                    sCBs += idCalendarsIn.options[i].value;
+                }
+                sb.append(' calendars="' + jsf_xml(sCBs) + '"');
+                sb.append('>');
+                sb.append('</data>');
+                sb.append('</request>'); 
+                var sRequest = sb.toString();
+                var jsonString = SendRequest(sRequest);
+                var json = JSON_ConvertString(jsonString);
+                if (json.reply != null) {
+                    if (jsf_alertError(json.reply.error) == true)
+                        return false;
+                }
+                CloseDialog('winPostOptionsDlg');
+                break;
+            case "cancel":
+                CloseDialog('winPostOptionsDlg');
+                break;
+        }
+        return false;
     };
 
     var thiswins = new dhtmlXWindows();

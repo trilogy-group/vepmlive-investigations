@@ -89,6 +89,7 @@
             { type: "button", name: "SAVE", img: "formatmap16x16_2.png", style: "top: -127px; left: -91px;", tooltip: "Save",  onclick: "toolbar_event('btnSave');" }
         ]
     };
+    var pagechanged = false;
     var selected = {};
     var toolbar = new Toolbar(toolbarData);
     var OnLoad = function (event) {
@@ -101,6 +102,10 @@
         selected.calendarIndex = -1;
         if (ddl != null & ddl.selectedIndex >= 0)
             selected.calendarIndex = ddl.selectedIndex;
+    };
+    var OnBeforeUnload = function (event) {
+        if (pagechanged == true)
+            event.returnValue = "You have unsaved changes.\n";
     };
     function toolbar_event(event) {
         switch (event) {
@@ -131,6 +136,8 @@
                     if (r != true) {
                         ddl.selectedIndex = selected.departmentIndex;
                     }
+                    else
+                        pagechanged = true;
                 }
                 break;
             case "ddlCalendar":
@@ -148,6 +155,8 @@
                     var r = confirm (s);
                     if (r != true)
                         ddl.selectedIndex = selected.calendarIndex;
+                    else
+                        pagechanged = true;
                 }
                 break;
             default:
@@ -157,9 +166,11 @@
 
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", OnLoad, true);
+        window.addEventListener("beforeunload", OnBeforeUnload, true);
     }
     else { // e.g. IE
         window.attachEvent("onload", OnLoad);
+        window.attachEvent("onbeforeunload", OnBeforeUnload);
     }
 </script>
 </asp:Content>

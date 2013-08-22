@@ -1472,11 +1472,11 @@ overflow:hidden; width:0px; height:0px; }
 .GMPick2Cell { height:22px; }
 .GMPick2M,.GMPick2Y,.GMPick2MSel,.GMPick2YSel,.GMPick2MHover,.GMPick2YHover,.GMPick2MSelHover,.GMPick2YSelHover {
    font:11px Tahoma; cursor:pointer; _cursor:hand;
-   width:25px; margin-left:5px; margin-right:5px; padding-left:3px; padding-right:3px;
+   margin-left:1px; margin-right:1px; padding-left:1px; padding-right:1px;
    }
-.GMPick2MSel,.GMPick2YSel { background:#c0f3ff; border:1px solid #dad1d1; margin-left:4px; margin-right:4px; }
-.GMPick2MHover,.GMPick2YHover { background:#DDD; border:1px solid white; margin-left:4px; margin-right:4px; }
-.GMPick2MSelHover,.GMPick2YSelHover { background:#80e0f0; border:1px solid white; margin-left:4px; margin-right:4px; }   
+.GMPick2MSel,.GMPick2YSel { background:#c0f3ff; border:1px solid #dad1d1; margin-left:0px; margin-right:0px; }
+.GMPick2MHover,.GMPick2YHover { background:#DDD; border:1px solid white; margin-left:0px; margin-right:0px; }
+.GMPick2MSelHover,.GMPick2YSelHover { background:#80e0f0; border:1px solid white; margin-left:0px; margin-right:0px; }   
 .GMPick2SepH { width:1px; height:1px; overflow:hidden; }
 .GMPick2Sep { width:1px; background:#777; overflow:hidden; margin-right:3px; height:22px; }
 

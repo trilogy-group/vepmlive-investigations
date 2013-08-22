@@ -45,6 +45,18 @@ namespace WorkEnginePPM
                             ddlMajorCategoryLookups.Items.Add(li);
                         }
 
+                        dbaGeneral.SelectLookup(dba, oAdmin.MajorCategoryCode, out dt);
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            int id = DBAccess.ReadIntValue(row["LV_UID"]);
+                            string name = DBAccess.ReadStringValue(row["LV_FULLVALUE"]);
+                            ListItem li = new ListItem(name, id.ToString("0"));
+                            li = new ListItem(name, id.ToString("0"));
+                            if (oAdmin.MajorCategoryDefault == id)
+                                li.Selected = true;
+                            ddlMajorCategoryItems.Items.Add(li);
+                        }
+
                         dbaCostCategories.SelectCostCategories(dba, out dt);
 
                         tg.DragAndDrop = true;

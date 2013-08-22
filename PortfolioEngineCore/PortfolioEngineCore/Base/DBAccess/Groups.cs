@@ -13,6 +13,13 @@ namespace PortfolioEngineCore
             const string cmdText = "SELECT GROUP_ID, GROUP_NAME, GROUP_NOTES FROM EPG_GROUPS Where GROUP_ENTITY=1 ORDER BY GROUP_NAME";
             return dba.SelectData(cmdText, (StatusEnum)99999, out dt);
         }
+        public static StatusEnum SelectEmptyCostTypeSecurityGroups(DBAccess dba, out DataTable dt)
+        {
+            const string cmdText = "Select GROUP_ID, GROUP_NAME, 0 AS DS_READ, 0 AS DS_EDIT From EPG_GROUPS "
+                             + " Where GROUP_ENTITY=1 "
+                             + " Order by GROUP_NAME";
+            return dba.SelectData(cmdText, (StatusEnum)99999, out dt);
+        }
         public static StatusEnum SelectCostTypeSecurityGroups(DBAccess dba, int nCosttypeID, out DataTable dt)
         {
             const string cmdText = "Select sg.GROUP_ID, GROUP_NAME, DS_READ, DS_EDIT "

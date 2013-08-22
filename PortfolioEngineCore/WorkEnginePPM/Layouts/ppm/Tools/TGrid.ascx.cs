@@ -80,7 +80,7 @@ namespace WorkEnginePPM
         {
             return m_dt;
         }
-        public DataTable SetXmlData(string sTreegridData)
+        public DataTable SetXmlData(string sTreegridData,bool bRemoveDeletedRows = true)
         {
             CStruct xGrid = new CStruct();
             xGrid.LoadXML(sTreegridData);
@@ -116,16 +116,16 @@ namespace WorkEnginePPM
             CStruct xBody = xGrid.GetSubStruct("Body");
             CStruct xB = xBody.GetSubStruct("B");
             List<CStruct> listI = xB.GetList("I");
-            HandleRows(dt, 1, listI);
+            HandleRows(dt, 1, listI, bRemoveDeletedRows);
 
             m_dt = dt;
             return dt;
         }
-        public void HandleRows(DataTable dt, int level, List<CStruct> listI)
+        public void HandleRows(DataTable dt, int level, List<CStruct> listI, bool bRemoveDeletedRows)
         {
             foreach (CStruct xI in listI)
             {
-                if (xI.GetBooleanAttr("Deleted") != true)
+                if (bRemoveDeletedRows == false || xI.GetBooleanAttr("Deleted") == false)
                 {
                     DataRow dr = dt.Rows.Add();
                     foreach (TCol col in m_cols)
@@ -148,12 +148,13 @@ namespace WorkEnginePPM
                                     dr[col.name] = Int32.Parse(xI.GetStringAttr(col.name, "0"));
                                     break;
                                 case _TGrid.Type.number:
-                                     dr[col.name] = Decimal.Parse(xI.GetStringAttr(col.name, "0"));
-                                   break;
+                                    dr[col.name] = Decimal.Parse(xI.GetStringAttr(col.name, "0"));
+                                    break;
                                 case _TGrid.Type.date:
                                     //DateTime date = DateTime.Parse(xI.GetStringAttr(col.name));
                                     DateTime date;
-                                    try { date = DateTime.Parse(xI.GetStringAttr(col.name)); } catch { date = DateTime.Parse("1901-01-01"); }
+                                    try { date = DateTime.Parse(xI.GetStringAttr(col.name)); }
+                                    catch { date = DateTime.Parse("1901-01-01"); }
                                     dr[col.name] = date;
                                     break;
                                 default:
@@ -164,7 +165,9 @@ namespace WorkEnginePPM
                     }
                     List<CStruct> listIChildren = xI.GetList("I");
                     if (listIChildren != null && listIChildren.Count > 0)
-                        HandleRows(dt, level + 1, listIChildren);
+                        HandleRows(dt, level + 1, listIChildren, bRemoveDeletedRows);
+                    if (xI.GetBooleanAttr("Deleted") == true)
+                        dr.Delete();
                 }
             }
         }
@@ -307,6 +310,7 @@ namespace WorkEnginePPM
                                 xC.CreateStringAttr("Button", "Defaults");
                                 xC.CreateStringAttr("ValueField", col.name);
                                 xC.CreateIntAttr("MinWidth", 30);
+                                //xC.CreateIntAttr("Range", 1);
                             }
                             break;
                         default:

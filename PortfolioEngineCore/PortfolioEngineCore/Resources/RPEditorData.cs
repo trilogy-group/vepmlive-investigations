@@ -73,6 +73,7 @@ namespace PortfolioEngineCore
             xCfg.CreateIntAttr("SelectingCells", 0);
             xCfg.CreateStringAttr("DragCursor", "w-resize");
             xCfg.CreateIntAttr("StaticCursor", 1);
+            xCfg.CreateIntAttr("StandardFilter", 2);
 
             CStruct xActions = xGrid.CreateSubStruct("Actions");
             xActions.CreateStringAttr("OnDrag", "DragCell");
@@ -201,6 +202,7 @@ namespace PortfolioEngineCore
             xC.CreateIntAttr("ShowHint", 0);
             xHeader1.CreateStringAttr("ItemName", "Item Name");
             xC.CreateIntAttr("Visible", 1);
+            xC.CreateIntAttr("CaseSensitive", 0);
 
 
 
@@ -311,6 +313,7 @@ namespace PortfolioEngineCore
                     xC.CreateIntAttr("CanMove", 1);
                     xC.CreateBooleanAttr("Visible", bVisible);
                     xC.CreateIntAttr("ShowHint", 0);
+                    xC.CreateIntAttr("CaseSensitive", 0);
                     xHeader1.CreateStringAttr(sColIDName, xField.GetStringAttr("Title").Replace("/n", "\n"));
                     if (xLookup != null)
                     {

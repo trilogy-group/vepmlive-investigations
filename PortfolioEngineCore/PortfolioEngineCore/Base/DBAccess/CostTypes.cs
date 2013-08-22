@@ -27,6 +27,13 @@ namespace PortfolioEngineCore
             return dba.SelectDataById(cmdText, nCostType, (StatusEnum)99986, out dt);
         }
 
+        public static StatusEnum SelectCostTypePostOptions(DBAccess dba, int nCostType, out DataTable dt)
+        {
+            // When TOSET_MAINKEY=0 it has a different meaning in the Post World so need to exclude those guys
+            string cmdText = "SELECT cb.CB_ID, CB_NAME, case When (cvts.CT_ID is null) Then 0  Else 1 End as used FROM EPGP_COST_BREAKDOWNS cb LEFT JOIN EPGP_COST_VALUES_TOSET cvts ON (cvts.CB_ID = cb.CB_ID AND CT_ID = @p1) Where (cvts.TOSET_MAINKEY > 0 Or cvts.TOSET_MAINKEY is NULL) ORDER BY CB_NAME";
+            return dba.SelectDataById(cmdText, nCostType, (StatusEnum)99986, out dt);
+        }
+
 //        public static StatusEnum DeleteCostType(DBAccess dba, int nCostType, out int lRowsAffected)
 //        {
 //            string cmdText = "DELETE FROM EPGP_BREAKDOWN_COST_TYPES WHERE CT_ID = @p1";
@@ -701,7 +708,76 @@ namespace PortfolioEngineCore
             }
             catch (Exception ex)
             {
-                sReply = DBAccess.FormatAdminError("exception", "CostTypes.UpdateCostTypeSecurityInfo", ex.Message);
+                sReply = DBAccess.FormatAdminError("exception", "CostTypes.UpdateCostTotalsInfo", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
+        public static StatusEnum UpdatePostOptionsInfo(DBAccess dba, int nCTId, string sCalendars, out string sReply)
+        {
+            string cmdText;
+            SqlCommand oCommand;
+            SqlDataReader reader = null;
+            sReply = "";
+            try
+            {
+                if (nCTId > 0)
+                {
+                    // get the EDIT_MODE for the Cost Type
+                    cmdText = "SELECT CT_EDIT_MODE FROM EPGP_COST_TYPES  WHERE CT_ID = @pCT_ID";
+                    int lEMode = 0;
+                    oCommand = new SqlCommand(cmdText, dba.Connection);
+                    oCommand.Parameters.AddWithValue("@pCT_ID", nCTId);
+                    reader = oCommand.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        lEMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
+
+                        if (lEMode != 9 && lEMode != 41)  // Resource Plans and WE Timesheet Actuals
+                        {
+                            sReply = DBAccess.FormatAdminError("error", "CostTypes.UpdatePostOptionsInfo", "Post Options not valid for this Cost Type");
+                            return StatusEnum.rsRequestCannotBeCompleted;
+                        }
+                    }
+                    reader.Close();
+                    reader = null;
+
+                    int lMainKey = 1;                   // 1 = Resource Plans
+                    if (lEMode == 41) lMainKey = 31;    //31 = WE Timesheet Actuals
+
+                    SqlTransaction transaction = dba.Connection.BeginTransaction();
+                    cmdText = "DELETE FROM EPGP_COST_VALUES_TOSET WHERE TOSET_MAINKEY > 0 And CT_ID = @pCT_ID";
+                    oCommand = new SqlCommand(cmdText, dba.Connection, transaction);
+                    oCommand.Parameters.AddWithValue("@pCT_ID", nCTId);
+                    oCommand.ExecuteNonQuery();
+
+                    if (sCalendars.Length > 0)
+                    {
+                        cmdText = "INSERT INTO EPGP_COST_VALUES_TOSET (TOSET_MAINKEY,CT_ID,CB_ID,CV_TIMESTAMP)"
+                                    + " VALUES(@pMainKey,@pCT_ID,@pCB_ID,GETDATE())";
+                        oCommand = new SqlCommand(cmdText, dba.Connection, transaction);
+                        oCommand.Parameters.AddWithValue("@pMainKey", lMainKey);
+                        oCommand.Parameters.AddWithValue("@pCT_ID", nCTId);
+                        SqlParameter pCB_ID = oCommand.Parameters.Add("@pCB_ID", SqlDbType.Int);
+
+                        string[] cals = sCalendars.Split(',');
+                        foreach (string sentry in cals)
+                        {
+                            int ientry;
+                            int.TryParse(sentry, out ientry);
+                            if (ientry > 0)
+                            {
+                                pCB_ID.Value = ientry;
+                                oCommand.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    transaction.Commit();
+                }
+                return StatusEnum.rsSuccess;
+            }
+            catch (Exception ex)
+            {
+                sReply = DBAccess.FormatAdminError("exception", "CostTypes.UpdatePostOptionsInfo", ex.Message);
                 return StatusEnum.rsRequestCannotBeCompleted;
             }
         }
@@ -907,7 +983,7 @@ namespace PortfolioEngineCore
                                 }
                                 if (itemRow.hasField == false)
                                 {
-                                    sError = DBAccess.FormatAdminError("error", "dbaCostTypes.ValidateAndSaveCostTypeFormula", "Unknown custom field name: " + itemRow.value);
+                                    sError = DBAccess.FormatAdminError("error", "dbaCostTypes.ValidateAndSaveCostTypeFormula", "Unknown Cost Type name: " + itemRow.value);
                                     goto Exit_Function;
                                 }
                             }

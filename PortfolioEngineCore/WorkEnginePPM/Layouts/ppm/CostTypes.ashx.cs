@@ -63,7 +63,7 @@ namespace WorkEnginePPM
         {
             tg.AddColumn(title: "CTID", width: 50, name: "CT_ID", hidden: true);
             tg.AddColumn(title: "CFID", width: 50, name: "FA_FIELD_ID", isId: true, hidden: true);
-            tg.AddColumn(title: "Name", width: 100, name: "FA_NAME",  editable: false);
+            tg.AddColumn(title: "Name", width: 100, name: "FA_NAME", editable: false);
             tg.AddColumn(title: "Visible", width: 60, name: "CF_VISIBLE", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
             tg.AddColumn(title: "Frozen", width: 60, name: "CF_FROZEN", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
             tg.AddColumn(title: "Editable", width: 60, name: "CF_EDITABLE", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
@@ -95,178 +95,188 @@ namespace WorkEnginePPM
                 switch (sRequestContext)
                 {
                     case "GetCostTypesInfo":
-                    {
-                        int nCTId = Int32.Parse(xData.InnerText);
-                        string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        DataAccess da = new DataAccess(sBaseInfo);
-                        DBAccess dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
                         {
-                            DataTable dt;
-                            int nSelectedCalendar = -1;
-                            if (dbaCostTypes.SelectCostType(dba, nCTId, out dt) != StatusEnum.rsSuccess)
+                            int nCTId = Int32.Parse(xData.InnerText);
+                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                            DataAccess da = new DataAccess(sBaseInfo);
+                            DBAccess dba = da.dba;
+                            if (dba.Open() == StatusEnum.rsSuccess)
                             {
-                                sReply = WebAdmin.FormatError("exception", "CostTypes.GetCostTypesInfo", dba.StatusText);
-                            }
-                            else
-                            {
-                                CStruct xCostTypes = new CStruct();
-                                xCostTypes.Initialize("costtype");
-                                int nEditMode = (int)CTEditMode.ctBudget;
-                                if (dt.Rows.Count == 1)
+                                DataTable dt;
+                                int nSelectedCalendar = -1;
+                                if (dbaCostTypes.SelectCostType(dba, nCTId, out dt) != StatusEnum.rsSuccess)
                                 {
-                                    DataRow row = dt.Rows[0];
-                                    xCostTypes.CreateIntAttr("CT_ID", DBAccess.ReadIntValue(row["CT_ID"]));
-                                    xCostTypes.CreateStringAttr("CT_NAME", DBAccess.ReadStringValue(row["CT_NAME"]));
-                                    nEditMode = DBAccess.ReadIntValue(row["CT_EDIT_MODE"]);
-                                    xCostTypes.CreateIntAttr("CT_EDIT_MODE", nEditMode);
-                                    nSelectedCalendar = DBAccess.ReadIntValue(row["CT_CB_ID"]);
-                                    xCostTypes.CreateIntAttr("CT_CB_ID", nSelectedCalendar);
-                                    xCostTypes.CreateIntAttr("CT_INITIAL_LEVEL", DBAccess.ReadIntValue(row["INITIAL_LEVEL"]));
-                                    xCostTypes.CreateIntAttr("CT_NAMEDRATES", DBAccess.ReadIntValue(row["CT_ALLOW_NAMED_RATES"]));
+                                    sReply = WebAdmin.FormatError("exception", "CostTypes.GetCostTypesInfo", dba.StatusText);
                                 }
                                 else
                                 {
-                                    xCostTypes.CreateIntAttr("CT_ID", 0);
-                                    xCostTypes.CreateStringAttr("CT_NAME", "New Cost Type");
-                                    xCostTypes.CreateIntAttr("CT_EDIT_MODE", nEditMode);
-                                    xCostTypes.CreateIntAttr("CT_CB_ID", -1);
-                                    xCostTypes.CreateIntAttr("CT_INITIAL_LEVEL", 1);
-                                    xCostTypes.CreateIntAttr("CT_NAMEDRATES", 0);
-                                }
-
-                                CStruct xCalendars = xCostTypes.CreateSubStruct("calendars");
-                                CStruct xItem = xCalendars.CreateSubStruct("item");
-                                xItem.CreateIntAttr("id", -1);
-                                xItem.CreateStringAttr("name", "[None]");
-                                {
-                                    dbaCalendars.SelectCalendars(dba, out dt);
-                                    foreach (DataRow row in dt.Rows)
+                                    CStruct xCostTypes = new CStruct();
+                                    xCostTypes.Initialize("costtype");
+                                    int nEditMode = (int)CTEditMode.ctBudget;
+                                    if (dt.Rows.Count == 1)
                                     {
-                                        xItem = xCalendars.CreateSubStruct("item");
-                                        int nCalendar = DBAccess.ReadIntValue(row["CB_ID"]);
-                                        xItem.CreateIntAttr("id", nCalendar);
-                                        xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["CB_NAME"]));
+                                        DataRow row = dt.Rows[0];
+                                        xCostTypes.CreateIntAttr("CT_ID", DBAccess.ReadIntValue(row["CT_ID"]));
+                                        xCostTypes.CreateStringAttr("CT_NAME", DBAccess.ReadStringValue(row["CT_NAME"]));
+                                        nEditMode = DBAccess.ReadIntValue(row["CT_EDIT_MODE"]);
+                                        xCostTypes.CreateIntAttr("CT_EDIT_MODE", nEditMode);
+                                        nSelectedCalendar = DBAccess.ReadIntValue(row["CT_CB_ID"]);
+                                        xCostTypes.CreateIntAttr("CT_CB_ID", nSelectedCalendar);
+                                        xCostTypes.CreateIntAttr("CT_INITIAL_LEVEL", DBAccess.ReadIntValue(row["INITIAL_LEVEL"]));
+                                        xCostTypes.CreateIntAttr("CT_NAMEDRATES", DBAccess.ReadIntValue(row["CT_ALLOW_NAMED_RATES"]));
                                     }
-                                }
+                                    else
+                                    {
+                                        xCostTypes.CreateIntAttr("CT_ID", 0);
+                                        xCostTypes.CreateStringAttr("CT_NAME", "New Cost Type");
+                                        xCostTypes.CreateIntAttr("CT_EDIT_MODE", nEditMode);
+                                        xCostTypes.CreateIntAttr("CT_CB_ID", -1);
+                                        xCostTypes.CreateIntAttr("CT_INITIAL_LEVEL", 1);
+                                        xCostTypes.CreateIntAttr("CT_NAMEDRATES", 0);
+                                    }
 
-                                {
-                                    dbaCostTypes.SelectInitializedCostTypeCustomFields(dba, nCTId, out dt);
-                                    _TGrid tg = new _TGrid();
-                                    InitializeCustomFieldColumns(tg);
-                                    tg.SetDataTable(dt);
-                                    string tgridData = "";
-                                    tg.Build(out tgridData);
-                                    xCostTypes.CreateString("tgridCFData", tgridData);
-                                }
+                                    CStruct xCalendars = xCostTypes.CreateSubStruct("calendars");
+                                    CStruct xItem = xCalendars.CreateSubStruct("item");
+                                    xItem.CreateIntAttr("id", -1);
+                                    xItem.CreateStringAttr("name", "[None]");
+                                    {
+                                        dbaCalendars.SelectCalendars(dba, out dt);
+                                        foreach (DataRow row in dt.Rows)
+                                        {
+                                            xItem = xCalendars.CreateSubStruct("item");
+                                            int nCalendar = DBAccess.ReadIntValue(row["CB_ID"]);
+                                            xItem.CreateIntAttr("id", nCalendar);
+                                            xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["CB_NAME"]));
+                                        }
+                                    }
 
-                                dbaCostTypes.SelectCostTypesForCalc(dba, nCTId, out dt);
-                                CStruct xFields = xCostTypes.CreateSubStruct("fields");
-                                foreach (DataRow row2 in dt.Rows)
-                                {
-                                    CStruct xField = xFields.CreateSubStruct("field");
-                                    xField.CreateInt("CT_ID", DBAccess.ReadIntValue(row2["CT_ID"]));
-                                    xField.CreateString("CT_NAME", DBAccess.ReadStringValue(row2["CT_NAME"], ""));
-                                }
+                                    {
+                                        dbaCostTypes.SelectInitializedCostTypeCustomFields(dba, nCTId, out dt);
+                                        _TGrid tg = new _TGrid();
+                                        InitializeCustomFieldColumns(tg);
+                                        tg.SetDataTable(dt);
+                                        string tgridData = "";
+                                        tg.Build(out tgridData);
+                                        xCostTypes.CreateString("tgridCFData", tgridData);
+                                    }
 
-                                if (nEditMode == (int)CTEditMode.ctCalculated || nEditMode == (int)CTEditMode.ctCalculatedCumulative)
-                                {
-                                    //  why is this here?  maybe it is needed to ensure TGrid initializes correctly even when not used? Maybe can switch to it w/o going back to server?
-                                    dbaUsers.SelectAvailCCs(dba, nCTId, out dt);
-                                    _TGrid tg = new _TGrid();
-                                    InitializeCostCategoryColumns(tg);
-                                    tg.SetDataTable(dt);
-                                    string tgridData = "";
-                                    tg.Build(out tgridData);
-                                    xCostTypes.CreateString("tgridData", tgridData);
-
-                                    string sFormula = "";
-                                    dbaCostTypes.SelectCostTypeFormula(dba, nCTId, out dt);
-                                    bool bFirst = true;
+                                    dbaCostTypes.SelectCostTypesForCalc(dba, nCTId, out dt);
+                                    CStruct xFields = xCostTypes.CreateSubStruct("fields");
                                     foreach (DataRow row2 in dt.Rows)
                                     {
-                                        string sComponent = DBAccess.ReadStringValue(row2["CT_NAME"], "");
-                                        int nOp = DBAccess.ReadIntValue(row2["CL_OP"]);
-
-                                        if (bFirst == false)
-                                        {
-                                            switch (nOp)
-                                            {
-                                                case 0:
-                                                    sFormula += " + ";
-                                                    break;
-                                                case 1:
-                                                    sFormula += " - ";
-                                                    break;
-                                            }
-                                        }
-                                        sFormula += sComponent;
-
-                                        bFirst = false;
-
+                                        CStruct xField = xFields.CreateSubStruct("field");
+                                        xField.CreateInt("CT_ID", DBAccess.ReadIntValue(row2["CT_ID"]));
+                                        xField.CreateString("CT_NAME", DBAccess.ReadStringValue(row2["CT_NAME"], ""));
                                     }
-                                    xCostTypes.CreateString("formula", sFormula);
+
+                                    if (nEditMode == (int)CTEditMode.ctCalculated || nEditMode == (int)CTEditMode.ctCalculatedCumulative)
+                                    {
+                                        //  why is this here?  maybe it is needed to ensure TGrid initializes correctly even when not used? Maybe can switch to it w/o going back to server?
+                                        dbaUsers.SelectAvailCCs(dba, nCTId, out dt);
+                                        _TGrid tg = new _TGrid();
+                                        InitializeCostCategoryColumns(tg);
+                                        tg.SetDataTable(dt);
+                                        string tgridData = "";
+                                        tg.Build(out tgridData);
+                                        xCostTypes.CreateString("tgridData", tgridData);
+
+                                        string sFormula = "";
+                                        dbaCostTypes.SelectCostTypeFormula(dba, nCTId, out dt);
+                                        bool bFirst = true;
+                                        foreach (DataRow row2 in dt.Rows)
+                                        {
+                                            string sComponent = DBAccess.ReadStringValue(row2["CT_NAME"], "");
+                                            int nOp = DBAccess.ReadIntValue(row2["CL_OP"]);
+
+                                            if (bFirst == false)
+                                            {
+                                                switch (nOp)
+                                                {
+                                                    case 0:
+                                                        sFormula += " + ";
+                                                        break;
+                                                    case 1:
+                                                        sFormula += " - ";
+                                                        break;
+                                                }
+                                            }
+                                            sFormula += sComponent;
+
+                                            bFirst = false;
+
+                                        }
+                                        xCostTypes.CreateString("formula", sFormula);
+                                    }
+                                    else
+                                    {
+                                        dbaUsers.SelectAvailCCs(dba, nCTId, out dt);
+                                        _TGrid tg = new _TGrid();
+                                        InitializeCostCategoryColumns(tg);
+                                        tg.SetDataTable(dt);
+                                        string tgridData = "";
+                                        tg.Build(out tgridData);
+                                        xCostTypes.CreateString("tgridData", tgridData);
+                                    }
+                                    dba.Close();
+                                    sReply = xCostTypes.XML();
                                 }
-                                else
-                                {
-                                    dbaUsers.SelectAvailCCs(dba, nCTId, out dt);
-                                    _TGrid tg = new _TGrid();
-                                    InitializeCostCategoryColumns(tg);
-                                    tg.SetDataTable(dt);
-                                    string tgridData = "";
-                                    tg.Build(out tgridData);
-                                    xCostTypes.CreateString("tgridData", tgridData);
-                                }
-                                dba.Close();
-                                sReply = xCostTypes.XML();
                             }
+                            break;
                         }
-                        break;
-                    }
                     case "GetCostTotalsInfo":
-                    {
-                        sReply = GetCostTotalsInfo(Context, xData);
-                        break;
-                    }
-                    case "UpdateCostTotalsInfo":
-                    {
-                        sReply = UpdateCostTotalsInfo(Context, xData);
-                        break;
-                    }
-                    case "GetSecurityInfo":
-                    {
-                        sReply = GetSecurityInfo(Context, xData);
-                        break;
-                    }
-                    case "UpdateSecurityInfo":
-                    {
-                        sReply = UpdateSecurityInfo(Context, xData);
-                        break;
-                    }
-                    case "UpdateCosttypeInfo":
-                    {
-                        sReply = UpdateCostTypeInfo(Context, xData);
-                        break;
-                    }
-                    case "DeleteCostType":
-                    {
-                        sReply = DeleteCostType(Context, xData);
-                        break;
-                    }
-                    case "ValidateFormula":
-                    {
-                        string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        DataAccess da = new DataAccess(sBaseInfo);
-                        DBAccess dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
                         {
-                            int nCTId2 = xData.GetIntAttr("CT_ID");
-                            string sFormula = xData.GetStringAttr("formula");
-                            sReply = dbaCostTypes.ValidateAndSaveCostTypeFormula(dba, nCTId2, ref sFormula, false);
+                            sReply = GetCostTotalsInfo(Context, xData);
+                            break;
                         }
-                        dba.Close();
-                        break;
-                    }
+                    case "UpdateCostTotalsInfo":
+                        {
+                            sReply = UpdateCostTotalsInfo(Context, xData);
+                            break;
+                        }
+                    case "GetSecurityInfo":
+                        {
+                            sReply = GetSecurityInfo(Context, xData);
+                            break;
+                        }
+                    case "GetPostOptionsInfo":
+                        {
+                            sReply = GetPostOptionsInfo(Context, xData);
+                            break;
+                        }
+                    case "UpdateSecurityInfo":
+                        {
+                            sReply = UpdateSecurityInfo(Context, xData);
+                            break;
+                        }
+                    case "UpdatePostOptionsInfo":
+                        {
+                            sReply = UpdatePostOptionsInfo(Context, xData);
+                            break;
+                        }
+                    case "UpdateCosttypeInfo":
+                        {
+                            sReply = UpdateCostTypeInfo(Context, xData);
+                            break;
+                        }
+                    case "DeleteCostType":
+                        {
+                            sReply = DeleteCostType(Context, xData);
+                            break;
+                        }
+                    case "ValidateFormula":
+                        {
+                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                            DataAccess da = new DataAccess(sBaseInfo);
+                            DBAccess dba = da.dba;
+                            if (dba.Open() == StatusEnum.rsSuccess)
+                            {
+                                int nCTId2 = xData.GetIntAttr("CT_ID");
+                                string sFormula = xData.GetStringAttr("formula");
+                                sReply = dbaCostTypes.ValidateAndSaveCostTypeFormula(dba, nCTId2, ref sFormula, false);
+                            }
+                            dba.Close();
+                            break;
+                        }
                     default:
                         break;
                 }
@@ -302,7 +312,7 @@ namespace WorkEnginePPM
                     {
                         col.AddKeyValuePair(DBAccess.ReadIntValue(row["FA_FIELD_ID"]), DBAccess.ReadStringValue(row["FA_NAME"]));
                     }
-                    
+
                     dbaCostTypes.SelectCostTotalsInfo(dba, nCTId, out dt);
                     tg.SetDataTable(dt);
                     string tableData;
@@ -562,7 +572,6 @@ namespace WorkEnginePPM
             }
             return sReply;
         }
-
         private static string DeleteCostType(HttpContext Context, CStruct xData)
         {
             string sReply = "";
@@ -584,13 +593,79 @@ namespace WorkEnginePPM
             }
             return sReply;
         }
+        private static string GetPostOptionsInfo(HttpContext Context, CStruct xData)
+        {
+            string sReply = "";
+            int nCTId = Int32.Parse(xData.InnerText);
+            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            DataAccess da = new DataAccess(sBaseInfo);
+            DBAccess dba = da.dba;
+            if (dba.Open() == StatusEnum.rsSuccess)
+            {
+                try
+                {
+                    CStruct xPostOptions = new CStruct();
+                    xPostOptions.Initialize("postOptions");
+                    CStruct xCalendars = xPostOptions.CreateSubStruct("calendars");
+                    DataTable dt;
+                    dbaCostTypes.SelectCostTypePostOptions(dba, nCTId, out dt);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        int calendarId = DBAccess.ReadIntValue(row["CB_ID"]);
+                        //if (editmode != 1 || calendarId != ctCalendarId)
+                        {
+                            CStruct xItem = xCalendars.CreateSubStruct("item");
+                            xItem.CreateIntAttr("id", calendarId);
+                            xItem.CreateStringAttr("name", DBAccess.ReadStringValue(row["CB_NAME"], ""));
+                            xItem.CreateIntAttr("used", DBAccess.ReadIntValue(row["used"]));
+                        }
+                    }
+                    sReply = xPostOptions.XML();
+
+                }
+                catch (Exception ex)
+                {
+                    sReply = WebAdmin.FormatError("exception", "CostTypes.GetPostOptionsInfo", ex.Message);
+                }
+                dba.Close();
+            }
+            return sReply;
+        }
+        private static string UpdatePostOptionsInfo(HttpContext Context, CStruct xData)
+        {
+            int nCTID = xData.GetIntAttr("CT_ID");
+            string sReply = "";
+
+            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            DataAccess da = new DataAccess(sBaseInfo);
+            DBAccess dba = da.dba;
+            if (dba.Open() == StatusEnum.rsSuccess)
+            {
+                try
+                {
+                    // pick up comma separated list of calendars 
+                    string sCalendars = xData.GetStringAttr("calendars");
+
+                    if (dbaCostTypes.UpdatePostOptionsInfo(dba, nCTID, sCalendars, out sReply) != StatusEnum.rsSuccess)
+                    {
+                        if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "CostTypes.UpdatePostOptionsInfo", dba.StatusText);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    sReply = WebAdmin.FormatError("exception", "CostTypes.UpdatePostOptionsInfo", ex.Message);
+                }
+                dba.Close();
+            }
+            return sReply;
+        }
         private static bool GetCCs(List<CStruct> listItems, List<int> availCCs)
         {
             foreach (CStruct xI in listItems)
             {
                 int nId = xI.GetIntAttr("BC_UID");
                 int bChecked = xI.GetIntAttr("BC_UID_incl");
-                if (bChecked > 0) { availCCs.Add(nId);}
+                if (bChecked > 0) { availCCs.Add(nId); }
                 List<CStruct> listIParent = new List<CStruct>();
                 listIParent = xI.GetList("I");
                 if (listIParent.Count > 0) { GetCCs(listIParent, availCCs); }
@@ -601,20 +676,4 @@ namespace WorkEnginePPM
         #endregion
     }
 
- 
-    //#region Nested type: PublicAPI
-
-    //public class PublicAPI : Attribute
-    //{
-    //    // positional parameters
-    //    public PublicAPI(bool isPublic)
-    //    {
-    //        IsPublic = isPublic;
-    //    }
-
-    //    // property for named parameter
-    //    public bool IsPublic { get; set; }
-    //}
-
-    //#endregion
 }

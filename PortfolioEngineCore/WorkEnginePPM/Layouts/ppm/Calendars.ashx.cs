@@ -210,7 +210,7 @@ namespace WorkEnginePPM
                             xQueue.CreateString("Context", "Edit Periods");
                             xQueue.CreateString("Comment", "Calculate Availability");
                             xQueue.CreateString("Data", "No Context Data");
-                            AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
+                            AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
 
                             // this is useful for test
                             //AdminFunctions.CalcRPAllAvailabilities(dba);
@@ -223,7 +223,7 @@ namespace WorkEnginePPM
                         xQueue.CreateString("Context", "Edit Periods");
                         xQueue.CreateString("Comment", "Calculate Default FTE values");
                         xQueue.CreateString("Data", "No Context Data");
-                        AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
+                        AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
 
                         // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
                         AdminFunctions.CalcCategoryRates(dba);

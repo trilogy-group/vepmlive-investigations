@@ -132,8 +132,8 @@ namespace WorkEnginePPM
                 xCustomfield.CreateInt("ENTITY_ID", lEntity);
                 if (lEntity == 2) sEntity = "Portfolio"; else sEntity = "Resource";
                 xCustomfield.CreateString("ENTITY_NAME", sEntity);
-
-                xCustomfield.CreateString("FA_FORMAT_NAME", EPKClass01.GetFieldFormat(iDataType));
+                bool bIsDeprecated;
+                xCustomfield.CreateString("FA_FORMAT_NAME", EPKClass01.GetFieldFormat(iDataType, out bIsDeprecated));
 
                 string sTable;
                 string sField;

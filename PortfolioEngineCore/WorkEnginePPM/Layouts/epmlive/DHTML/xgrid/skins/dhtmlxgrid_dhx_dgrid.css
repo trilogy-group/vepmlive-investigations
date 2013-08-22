@@ -29,7 +29,7 @@ div.gridbox table.hdr td:hover {
 div.gridbox_dhx_skyblue table.obj tr td{
 	font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
 	font-size:13px;
-	font-weight:300;
+	font-weight:400;
 	color:#777;
 	border-width:0px 1px 1px 0px;
 	border-color : #C6C6C6 #C6C6C6 #C6C6C6 #C6C6C6;
@@ -47,7 +47,7 @@ div.gridbox_dhx_skyblue table.hdr tr td {
 	background-color:transparent;
 	font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
 	font-size:13px;
-	font-weight:300;
+	font-weight:400;
 	color:#777;
 	vertical-align:top;
 	text-align:left;
@@ -98,7 +98,7 @@ div.gridbox_dhx_skyblue .odd_dhx_skyblue{
 .dhx_combo_select, .gridbox_dhx_skyblue .dhx_combo_edit, .gridbox_dhx_skyblue .dhx_textarea{
     font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
     font-size:13px;
-	font-weight:300;
+	font-weight:400;
 	color:#777;
 }
 .gridbox_dhx_skyblue .dhx_combo_edit{

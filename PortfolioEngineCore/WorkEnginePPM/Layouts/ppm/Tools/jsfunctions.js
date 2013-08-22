@@ -4,8 +4,7 @@ function jsf_getStringFromValue(val) {
     if (val == null)
         return "";
     return val.toString();
-}
-
+};
 function jsf_alertError(error) {
     if (error == null)
         return false;
@@ -53,11 +52,10 @@ function jsf_displayDialog(wins, left, top, width, height, title, idWindow, idAt
     }
     return null;
 };
-
 function jsf_closeDialog(wins, idWindow) {
     if (wins != null) {
         var dlg = wins.window(idWindow);
-        jsf_closeDialog2(dlg);
+        return jsf_closeDialog2(dlg);
     }
 };
 function jsf_closeDialog2(dlg) {
@@ -66,11 +64,11 @@ function jsf_closeDialog2(dlg) {
         dlg.hide();
         dlg.detachObject();
     }
+    return false;
 };
-
 function jsf_xml(sValue) {
     return sValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+};
 function jsf_sendRequest(sURL, sXML) {
     var sReplyXML = "";
     try {

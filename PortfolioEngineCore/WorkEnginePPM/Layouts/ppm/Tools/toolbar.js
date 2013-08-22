@@ -18,6 +18,22 @@
             }
         }
     };
+    Toolbar.prototype.enable = function () {
+        var items = this.toolbarData.items;
+        if (items.length > 0) {
+            for (var k = 0; k < items.length; k++) {
+                document.getElementById(items[k].id).disabled = false;
+            }
+        }
+    };
+    Toolbar.prototype.disable = function () {
+        var items = this.toolbarData.items;
+        if (items.length > 0) {
+            for (var k = 0; k < items.length; k++) {
+                document.getElementById(items[k].id).disabled = true;
+            }
+        }
+    };
     Toolbar.prototype.enableItem = function (id) {
         var item = this.FindItemById(id);
         if (item != null) {
@@ -67,7 +83,7 @@
             var items = this.toolbarData.items;
             if (items.length > 0) {
                 for (var i = 0; i < items.length; i++) {
-                    sb.append(this.BuildItemHtml(items[i]));
+                    sb.append(this.BuildItemHtml(items[i], i));
                 }
             }
             sb.append("<td class='toolbar-item-td' nowrap='true' style='width:100%;'>&nbsp;</td>");
@@ -82,13 +98,13 @@
             Ribbon_HandleException("Render", e);
         }
     };
-    Toolbar.prototype.BuildItemHtml = function (item) {
+    Toolbar.prototype.BuildItemHtml = function (item, index) {
         var s = "";
         try {
             var sb = new StringBuilder();
-            var id = "";
-            if (item.id != null)
-                id = " id=\"" + item.id + "\"";
+            if (item.id == null || item.id == "")
+                item.id = this.toolbarData.parent + "_" + index.toString();
+            var id = " id=\"" + item.id + "\"";
             var onclick = "";
             if (item.onclick != null)
                 onclick = " onclick=\"" + item.onclick + "\"";

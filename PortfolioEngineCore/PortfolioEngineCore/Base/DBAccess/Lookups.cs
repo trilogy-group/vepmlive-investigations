@@ -220,7 +220,7 @@ namespace PortfolioEngineCore
                             {
                                 if (row.RowState == DataRowState.Deleted)
                                 {
-                                    pUID.Value = row["LV_UID"];
+                                    pUID.Value = row["LV_UID", DataRowVersion.Original];
                                     oCommand.ExecuteNonQuery();
                                 }
                             }
@@ -278,6 +278,209 @@ namespace PortfolioEngineCore
                 return StatusEnum.rsRequestCannotBeCompleted;
             }
         }
+
+        public static StatusEnum CanDeleteLookupItems(DBAccess dba, string sLVUIDs, out string sReply)
+        {
+            // there is a version of this in AdminInfos.cs but that works the old way - passed in ONE item and it determines if there are any children, etc
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            string sCommand;
+            sReply = "";
+            try
+            {
+                // check if each Lookup Item can be deleted
+                string smessage = "";
+                if (sLVUIDs.Length > 0)
+                {
+                    string[] sArrayLVUID = sLVUIDs.Split(',');
+                    int numberofmessagelines = 0;
+                    for (int i = 0; i <= sArrayLVUID.GetUpperBound(0); i++)
+                    {
+                        string sLVUID = sArrayLVUID[i];
+                        int nLVUID = int.Parse(sLVUID);
+                        bool bFirstMessage = true;
+                        //bool bnewBCUID = true;
+                        oCommand = new SqlCommand("EPG_SP_ReadUsedListValue", dba.Connection);
+                        oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                        oCommand.Parameters.AddWithValue("@LV_UID", nLVUID);
+                        reader = oCommand.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            if (numberofmessagelines < 12)
+                            {
+                                if (bFirstMessage == true) { bFirstMessage = false; smessage += "Cannot Delete Lookup Item, it is used as follows: " + "\n"; }
+                                //if (bnewBCUID == true) { bnewBCUID = false; smessage += "For Lookup Item: " + sLVUID + "\n"; }
+                                smessage += DBAccess.ReadStringValue(reader["UsedMessage"]) + ": ";
+                                smessage += DBAccess.ReadStringValue(reader["UsedData"]) + "\n";
+                            }
+                            numberofmessagelines++;
+                        }
+                        reader.Close();
+
+                        //  other chcecks not in SP
+                        //  read list of Code fields used anywhere
+                        sCommand = "Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,0 as Table_ID,0 as Field_IN_TABLE" +
+                                     " From EPGP_FIELD_ATTRIBS" +
+                                     " Where (FA_FIELD_ID >= 9105 And FA_FIELD_ID <= 9109) Or (FA_FIELD_ID >= 9305 And FA_FIELD_ID <= 9309)" +
+                                     " Or (FA_FIELD_ID >= 9505 And FA_FIELD_ID <= 9509)Or (FA_FIELD_ID >= 11801 And FA_FIELD_ID <= 11805)" +
+                                     " Union" +
+                                     " Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,FA_TABLE_ID as Table_ID,FA_FIELD_IN_TABLE as Field_IN_TABLE" +
+                                     " From EPGC_FIELD_ATTRIBS" +
+                                     " Where FA_FORMAT = 4" +
+                                     " Order by Field_ID";
+                        oCommand = new SqlCommand(sCommand, dba.Connection);
+                        reader = oCommand.ExecuteReader();
+
+                        List<CField> clnFields = new List<CField>();
+                        CField oField;
+                        while (reader.Read())
+                        {
+                            oField = new CField();
+                            oField.Id = DBAccess.ReadIntValue(reader["Field_ID"]);
+                            oField.Name = DBAccess.ReadStringValue(reader["Field_Name"]);
+                            oField.CFTable = DBAccess.ReadIntValue(reader["Table_ID"]);
+                            oField.CFField = DBAccess.ReadIntValue(reader["Field_IN_TABLE"]);
+                            clnFields.Add(oField);
+                        }
+                        reader.Close();
+
+                        string sField;
+                        foreach (CField field in clnFields)
+                        {
+                            if (field.Id >= 9105 && field.Id <= 9109)
+                            {
+                                // TS Code fields
+                                sField = string.Format("CAT_CODE_{0:0}", field.Id - 9104);
+                                sCommand = "Select DISTINCT Top 3 RES_NAME,PRD_NAME" +
+                                    " From EPG_TS_CATEGORY_VALUES cv" +
+                                    " Inner Join EPG_TS_CHARGES ch ON ch.CHG_UID = cv.CAT_CHG_UID" +
+                                    " Inner Join EPG_TS_TIMESHEETS ts ON ts.TS_UID = ch.TS_UID" +
+                                    " Inner Join EPG_PERIODS p On p.PRD_ID = ts.PRD_ID and p.CB_ID=0" +
+                                    " Inner Join EPG_RESOURCES r On r.WRES_ID = ts.WRES_ID" +
+                                    " Where cv." + sField + " = " + nLVUID.ToString();
+                                oCommand = new SqlCommand(sCommand, dba.Connection);
+                                reader = oCommand.ExecuteReader();
+                                while (reader.Read())
+                                {
+                                    if (bFirstMessage == true) { bFirstMessage = false; smessage += "Cannot Delete Lookup Item, it is used as follows: " + "\n"; }
+                                    smessage += "Timesheet  " + DBAccess.ReadStringValue(reader["PRD_NAME"]) + "  " +
+                                                               field.Name + ":  " + DBAccess.ReadStringValue(reader["RES_NAME"]) + "\n";
+                                }
+                                reader.Close();
+                            }
+                            else if (field.Id >= 9305 && field.Id <= 9309)
+                            {
+                                // RP Code fields
+                                sField = string.Format("CAT_CODE_{0:0}", field.Id - 9304);
+                                sCommand = "Select DISTINCT TOP 3 PROJECT_NAME" +
+                                    " From EPGP_RP_CATEGORY_VALUES cv" +
+                                    " Inner Join EPG_RESOURCEPLANS c On c.CMT_UID=cv.CAT_CMT_UID" +
+                                    " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=c.PROJECT_ID" +
+                                    " Where cv." + sField + " = " + nLVUID.ToString();
+                                oCommand = new SqlCommand(sCommand, dba.Connection);
+                                reader = oCommand.ExecuteReader();
+                                while (reader.Read())
+                                {
+                                    if (bFirstMessage == true) { bFirstMessage = false; smessage += "Cannot Delete Lookup Item, it is used as follows: " + "\n"; }
+                                    smessage += "Resource Plan  " + field.Name + ":  " + DBAccess.ReadStringValue(reader["PROJECT_NAME"]) + "\n";
+                                }
+                                reader.Close();
+                            }
+                            else if (field.Id >= 11801 && field.Id <= 11805)
+                            {
+                                // CT Code fields
+                                sField = string.Format("OC_{0:00}", field.Id - 11800);
+                                sCommand = "Select DISTINCT Top 3 PROJECT_NAME,CT_NAME,BC_NAME,CB_NAME" +
+                                    " From EPGP_COST_DETAILS cv" +
+                                    " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=cv.PROJECT_ID" +
+                                    " Inner Join EPGP_COST_TYPES ct On ct.CT_ID=cv.CT_ID" +
+                                    " Inner Join EPGP_COST_CATEGORIES cc On cc.BC_UID=cv.BC_UID" +
+                                    " Inner Join EPGP_COST_BREAKDOWNS cb On cb.CB_ID=cv.CB_ID" +
+                                    " Where cv." + sField + " = " + nLVUID.ToString();
+                                oCommand = new SqlCommand(sCommand, dba.Connection);
+                                reader = oCommand.ExecuteReader();
+                                while (reader.Read())
+                                {
+                                    if (bFirstMessage == true) { bFirstMessage = false; smessage += "Cannot Delete Lookup Item, it is used as follows: " + "\n"; }
+                                    smessage += "PI Cost Value  " +
+                                        DBAccess.ReadStringValue(reader["CT_NAME"]) + "  " +
+                                        DBAccess.ReadStringValue(reader["CB_NAME"]) + "  " +
+                                        DBAccess.ReadStringValue(reader["BC_NAME"]) + "  " +
+                                        field.Name + ":  " +
+                                        DBAccess.ReadStringValue(reader["PROJECT_NAME"]) + "\n";
+                                }
+                                reader.Close();
+                            }
+                            else if (field.Id > 20000)
+                            {
+                                // PI or Resource fields Code fields
+                                string tableName;
+                                string fieldName;
+                                Common.CalculateTableFieldName(field.CFField, field.CFTable, out tableName, out fieldName);
+
+                                if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.ResourceINT)
+                                {
+                                    // resource code fields
+                                    sCommand = "Select Top 3 RES_NAME" +
+                                        " From EPGC_RESOURCE_INT_VALUES iv" +
+                                        " Inner Join EPG_RESOURCES r On r.WRES_ID=iv.WRES_ID" +
+                                        " Where iv." + fieldName + " = " + nLVUID.ToString();
+                                    oCommand = new SqlCommand(sCommand, dba.Connection);
+                                    reader = oCommand.ExecuteReader();
+                                    while (reader.Read())
+                                    {
+                                        if (bFirstMessage == true) { bFirstMessage = false; smessage += "Cannot Delete Lookup Item, it is used as follows: " + "\n"; }
+                                        smessage += "Resource  " + field.Name + ":  " + DBAccess.ReadStringValue(reader["RES_NAME"]) + "\n";
+                                    }
+                                    reader.Close();
+                                }
+                                else if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.PortfolioINT)
+                                {
+                                    //  PI code fields
+                                    sCommand = "Select Top 3 PROJECT_NAME" +
+                                        " From EPGP_PROJECT_INT_VALUES iv" +
+                                        " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=iv.PROJECT_ID" +
+                                        " Where iv." + fieldName + " = " + nLVUID.ToString();
+                                    oCommand = new SqlCommand(sCommand, dba.Connection);
+                                    reader = oCommand.ExecuteReader();
+                                    while (reader.Read())
+                                    {
+                                        if (bFirstMessage == true) { bFirstMessage = false; smessage += "Cannot Delete Lookup Item, it is used as follows: " + "\n"; }
+                                        smessage += "PI  " + field.Name + ":  " + DBAccess.ReadStringValue(reader["PROJECT_NAME"]) + "\n";
+                                    }
+                                    reader.Close();
+
+                                    //  PI codes also used for Program Data
+                                    sCommand = "Select Top 3 LV_VALUE as Program_Name" +
+                                        " From EPGP_PROG_INT_VALUES iv" +
+                                        " Inner Join EPGP_LOOKUP_VALUES p On p.LV_UID=iv.PROG_UID" +
+                                        " Where iv." + fieldName + " = " + nLVUID.ToString();
+                                    oCommand = new SqlCommand(sCommand, dba.Connection);
+                                    reader = oCommand.ExecuteReader();
+                                    while (reader.Read())
+                                    {
+                                        if (bFirstMessage == true) { bFirstMessage = false; smessage += "Cannot Delete Lookup Item, it is used as follows: " + "\n"; }
+                                        smessage += "Program Data  " + field.Name + ":  " + DBAccess.ReadStringValue(reader["Program_Name"]) + "\n";
+                                    }
+                                    reader.Close();
+                                }
+                            }
+                        }
+                    }
+                }
+                if (smessage != "")
+                    sReply = DBAccess.FormatAdminError("error", "Lookups.CanDeleteLookupItems", smessage);
+
+                return StatusEnum.rsSuccess;
+            }
+            catch (Exception ex)
+            {
+                sReply = DBAccess.FormatAdminError("exception", "CostCategories.CanDeleteCostCategory", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
+
         private class PFELookupItem
         {
             public int UID;
@@ -289,7 +492,13 @@ namespace PortfolioEngineCore
             public int inactive;
             public bool bflag;
         }
-
+        private class CField
+        {
+            public int CFField;
+            public int CFTable;
+            public int Id;
+            public string Name;
+        }
     }
 }
 

@@ -108,12 +108,10 @@ html, body {
     };
     var OnResize = function (event) {
         var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
-        dgrid1.SetHeight(newHeight);
-        var newWidth = document.documentElement.clientWidth - 5;
-        dgrid1.SetWidth(newWidth);
+        var newHeight = document.documentElement.clientHeight - top;
+        var newWidth = document.documentElement.clientWidth;
+        dgrid1.SetSizes(newWidth,newHeight);
     };
-    
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         return jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
     };

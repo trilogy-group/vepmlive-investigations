@@ -160,14 +160,13 @@ html, body {
     };
     var OnResize = function (event) {
         var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
-        dgrid1.SetHeight(newHeight);
-        var newWidth = document.documentElement.clientWidth - 5;
-        dgrid1.SetWidth(newWidth);
+        var newHeight = document.documentElement.clientHeight - top;
+        var newWidth = document.documentElement.clientWidth;
+        dgrid1.SetSizes(newWidth,newHeight);
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         ResizeDialog(idWindow, idAttachObj);
         window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
@@ -191,7 +190,7 @@ html, body {
         return width;
     };
     function CloseDialog (idWindow) {
-        jsf_closeDialog(thiswins, idWindow)
+        return jsf_closeDialog(thiswins, idWindow);
     };
     function SendRequest(sXML) {
          sURL = "./Costviews.ashx";

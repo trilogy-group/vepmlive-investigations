@@ -124,6 +124,7 @@ namespace PortfolioEngineCore
                 int lContext = m_lContext;
                 if (lContext >= 100 && lContext < 200)
                 {
+                    _dba.UserWResID = m_lWResID;
                     switch (lContext)
                     {
                         case 100: // Report to Reporting DB

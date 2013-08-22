@@ -28,6 +28,7 @@ namespace WorkEnginePPM
                     dg.AddColumn(title: "Field", width: 100, name: "FIELD_NAME");
                     dg.AddColumn(title: "Lookup", width: 80);
                     dg.AddColumn(title: "ID", width: 50, name: "FA_FIELD_ID", isId: true);
+                    dg.AddColumn(title: "IsDeprecated", width: 50, name: "IsDeprecated", hidden: true);
 
                     DataTable dt;
                     dbaCustomFields.SelectCustomFields(dba, out dt);
@@ -54,6 +55,11 @@ namespace WorkEnginePPM
                     col.ColumnName = "FIELD_NAME";
                     col.DefaultValue = "";
                     dt.Columns.Add(col);
+                    col = new DataColumn();
+                    col.DataType = System.Type.GetType("System.String");
+                    col.ColumnName = "IsDeprecated";
+                    col.DefaultValue = "";
+                    dt.Columns.Add(col);
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -63,7 +69,10 @@ namespace WorkEnginePPM
                         row["ENTITY_NAME"] = sEntity;
 
                         int lDataType = DBAccess.ReadIntValue(row["FA_FORMAT"]);
-                        row["FA_FORMAT_NAME"] = EPKClass01.GetFieldFormat(lDataType);
+                        bool bIsDeprecated;
+                        row["FA_FORMAT_NAME"] = EPKClass01.GetFieldFormat(lDataType, out bIsDeprecated);
+
+                        row["IsDeprecated"] = bIsDeprecated ? "1" : "0";
 
                         string sTable;
                         string sField;

@@ -2346,45 +2346,46 @@ namespace PortfolioEngineCore
                 sEntity = "Unknown";
             return sEntity;
         }
-        public static string GetDataType(int iFieldType)
-        {
-            string sDataType = "";
-            FieldType nFieldType = (FieldType)iFieldType;
+        //public static string GetDataType(int iFieldType)
+        //{
+        //    string sDataType = "";
+        //    FieldType nFieldType = (FieldType)iFieldType;
 
-            switch (nFieldType)
-            {
-                case FieldType.TypeCost:
-                    sDataType = "Cost";
-                    break;
-                case FieldType.TypeCode:
-                    sDataType = "Code";
-                    break;
-                case FieldType.TypeDate:
-                    sDataType = "Date";
-                    break;
-                case FieldType.TypeFlag:
-                    sDataType = "Flag";
-                    break;
-                case FieldType.TypeNumber:
-                    sDataType = "Number";
-                    break;
-                case FieldType.TypeText:
-                    sDataType = "Text";
-                    break;
-                case FieldType.TypeNText:
-                    sDataType = "RTF";
-                    break;
-                default:
-                    sDataType = "Unknown";
-                    break;
+        //    switch (nFieldType)
+        //    {
+        //        case FieldType.TypeCost:
+        //            sDataType = "Cost";
+        //            break;
+        //        case FieldType.TypeCode:
+        //            sDataType = "Code";
+        //            break;
+        //        case FieldType.TypeDate:
+        //            sDataType = "Date";
+        //            break;
+        //        case FieldType.TypeFlag:
+        //            sDataType = "Flag";
+        //            break;
+        //        case FieldType.TypeNumber:
+        //            sDataType = "Number";
+        //            break;
+        //        case FieldType.TypeText:
+        //            sDataType = "Text";
+        //            break;
+        //        case FieldType.TypeNText:
+        //            sDataType = "RTF";
+        //            break;
+        //        default:
+        //            sDataType = "Unknown";
+        //            break;
 
-            }
-            return sDataType;
-        }
+        //    }
+        //    return sDataType;
+        //}
 
-        public static string GetFieldFormat(int iDataType)
+        public static string GetFieldFormat(int iDataType, out bool bIsDeprecated)
         {
             string sdatatype = "";
+            bIsDeprecated = false;
             FieldType nDataType = (FieldType)iDataType;
             switch (nDataType)
             {
@@ -2393,9 +2394,11 @@ namespace PortfolioEngineCore
                     break;
                 case FieldType.TypeCode:
                     sdatatype = "Code (Deprecated)";
+                    bIsDeprecated = true;
                     break;
                 case FieldType.TypeMVCode:
                     sdatatype = "MV Code (Deprecated)";
+                    bIsDeprecated = true;
                     break;
                 case FieldType.TypeFlag:
                     sdatatype = "Flag";

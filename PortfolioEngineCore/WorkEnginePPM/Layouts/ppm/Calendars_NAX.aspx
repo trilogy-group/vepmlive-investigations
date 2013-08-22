@@ -152,12 +152,14 @@ html, body {
     
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         return dlg;
     };
 
     function CloseDialog (idWindow) {
-        jsf_closeDialog(thiswins, idWindow)
+        if (idWindow == 'winCalendarDlg')
+           dgrid1.grid.selectRowById(dgrid1_selectedRow);
+        return jsf_closeDialog(thiswins, idWindow);
     };
 
     function SendRequest(sXML) {
@@ -285,7 +287,7 @@ html, body {
         else {
             document.getElementById('idOKButton').value = "Save";
         }
-
+        dgrid1.grid.clearSelection();
         DisplayDialog(570, 550, sDlgTitle, "winCalendarDlg", "idCalendarDlg", true, false);
    };
 

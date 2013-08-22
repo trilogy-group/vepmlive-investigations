@@ -10,34 +10,25 @@
 namespace WorkEnginePPM {
     
     
-    public partial class CostCategories_NAX {
+    public partial class Models_NAX {
         
         /// <summary>
-        /// tgridRates control.
+        /// dgridVersions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WorkEnginePPM.TGrid tgridRates;
+        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.DGrid dgridVersions;
         
         /// <summary>
-        /// tgridFTEs control.
+        /// tgridSecurity control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WorkEnginePPM.TGrid tgridFTEs;
-        
-        /// <summary>
-        /// ddlResourceRoles control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ListBox ddlResourceRoles;
+        protected global::WorkEnginePPM.TGrid tgridSecurity;
         
         /// <summary>
         /// lblGeneralError control.
@@ -49,30 +40,12 @@ namespace WorkEnginePPM {
         protected global::System.Web.UI.WebControls.Label lblGeneralError;
         
         /// <summary>
-        /// ddlMajorCategoryLookups control.
+        /// dgrid1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMajorCategoryLookups;
-        
-        /// <summary>
-        /// ddlMajorCategoryItems control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMajorCategoryItems;
-        
-        /// <summary>
-        /// tgrid1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::WorkEnginePPM.TGrid tgrid1;
+        protected global::WorkEnginePPM.ControlTemplates.WorkEnginePPM.DGrid dgrid1;
     }
 }

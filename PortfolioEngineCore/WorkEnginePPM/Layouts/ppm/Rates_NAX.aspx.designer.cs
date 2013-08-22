@@ -10,7 +10,7 @@
 namespace WorkEnginePPM {
     
     
-    public partial class CostCategories_NAX {
+    public partial class Rates_NAX {
         
         /// <summary>
         /// tgridRates control.
@@ -22,22 +22,13 @@ namespace WorkEnginePPM {
         protected global::WorkEnginePPM.TGrid tgridRates;
         
         /// <summary>
-        /// tgridFTEs control.
+        /// ddlResources control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::WorkEnginePPM.TGrid tgridFTEs;
-        
-        /// <summary>
-        /// ddlResourceRoles control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ListBox ddlResourceRoles;
+        protected global::System.Web.UI.WebControls.ListBox ddlResources;
         
         /// <summary>
         /// lblGeneralError control.
@@ -47,24 +38,6 @@ namespace WorkEnginePPM {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblGeneralError;
-        
-        /// <summary>
-        /// ddlMajorCategoryLookups control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMajorCategoryLookups;
-        
-        /// <summary>
-        /// ddlMajorCategoryItems control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMajorCategoryItems;
         
         /// <summary>
         /// tgrid1 control.

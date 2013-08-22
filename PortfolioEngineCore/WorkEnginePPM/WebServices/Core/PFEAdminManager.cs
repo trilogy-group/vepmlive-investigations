@@ -7,6 +7,7 @@ using PortfolioEngineCore;
 using PortfolioEngineCore.Infrastructure.Entities;
 using WorkEnginePPM.Core;
 using EPMUtils = EPMLiveCore.API.Utils;
+using System.Xml;
 
 namespace WorkEnginePPM.WebServices.Core
 {
@@ -851,7 +852,16 @@ namespace WorkEnginePPM.WebServices.Core
         /// <returns></returns>
         internal string PostCostValues(string data)
         {
+            //<PostCostValues>
+            //  <Params/>
+            //    <Data>
+            //      <CB Id="1"/>
+            //      <CT Id="2"/>
+            //      <PI Id="4"/> - not specified means ALL
+            //    </Data>
+            //</PostCostValues>
             try
+
             {
                 var xInputData = new CStruct();
                 xInputData.LoadXML(data);
@@ -859,13 +869,118 @@ namespace WorkEnginePPM.WebServices.Core
                 if (xDataInputElement == null) throw new Exception("Cannot find the Data element.");
 
                 string sResult = "";
+                string sPostInstruction = "";
                 bool bUpdateOK = true;
 
                 Admininfos adminCore = GetAdminCore(SecurityLevels.Base);
                 try
                 {
-                    bUpdateOK = adminCore.PostCostValues(xDataInputElement.XML(), out sResult);
-                    bUpdateOK = true; // now whether it worked or not at a data level will be contained in the Result
+
+                    bUpdateOK = adminCore.PostCostValues(xDataInputElement.XML(), out sResult, out sPostInstruction);
+                    if (bUpdateOK)
+                    {
+                        // check if we need to post back to WorkEngine
+                        if (sPostInstruction.Length > 0)
+                        {
+                            CStruct xPost = new CStruct();
+                            xPost.LoadXML(sPostInstruction);
+                            CStruct xPIs = xPost.GetSubStruct("PIs");
+                            string sPIs = xPIs.GetStringAttr("IDs");
+
+                            // Generate export XML and send to WorkEngine
+                            
+                            //string sDBConnect = "";
+                            string sDBConnect = WebAdmin.GetConnectionString();  //HELP where is Context
+
+                            DBAccess dba = new DBAccess(sDBConnect);
+                            if (dba.Open() != StatusEnum.rsSuccess)
+                            {
+                                sResult = FormatError("PostError0", (int)dba.Status, dba.FormatErrorText());
+                                bUpdateOK = false;
+                            }
+                            else
+                            {
+                                string sXMLRequest;
+                                if (dbaUsers.ExportPIInfo(dba, sPIs, out sXMLRequest) != StatusEnum.rsSuccess)
+                                {
+                                    sResult = FormatError("PostError1", (int)dba.Status, dba.FormatErrorText());
+                                    bUpdateOK = false;
+                                }
+                                else
+                                {
+                                    XmlNode xNode;
+                                    if (SendXMLToWorkEngine(dba, "UpdateItems", sXMLRequest, out xNode) != StatusEnum.rsSuccess)
+                                    {
+                                        sResult = FormatError("PostError3", (int)dba.Status, dba.FormatErrorText());
+                                        bUpdateOK = false;
+                                    }
+                                    else
+                                    {
+                                        if (xNode == null || xNode.OuterXml == "")
+                                        {
+                                            dba.Status = (StatusEnum)99835;
+                                            dba.StatusText = "No response from WorkEngine WebService";
+                                            sResult = FormatError("PostError4", (int)dba.Status, dba.FormatErrorText());
+                                            bUpdateOK = false;
+                                        }
+                                        else
+                                        {
+                                            CStruct xResult = new CStruct();
+                                            if (xResult.LoadXML(xNode.OuterXml) == false)
+                                            {
+                                                dba.Status = (StatusEnum)99834;
+                                                dba.StatusText = "Invalid XML response from WorkEngine WebService";
+                                                sResult = FormatError("PostError5", (int)dba.Status, dba.FormatErrorText());
+                                                bUpdateOK = false;
+                                            }
+                                            else
+                                            {
+                                                if (xResult.GetIntAttr("Status") != 0)
+                                                {
+                                                    CStruct xError = xResult.GetSubStruct("Error");
+                                                    if (xError != null)
+                                                    {
+                                                        string sError = xError.GetStringAttr("ID") + " : " + xError.GetString("");
+                                                        dba.Status = (StatusEnum)99833;
+                                                        dba.StatusText = "Invalid XML response from WorkEngine WebService. Status=" +
+                                                                         xResult.GetStringAttr("Status") + "; Error=" + sError;
+                                                        sResult = FormatError("PostError6", (int)dba.Status, dba.FormatErrorText());
+                                                        bUpdateOK = false;
+                                                    }
+                                                    else
+                                                    {
+                                                        CStruct xItem = xResult.GetSubStruct("Item");
+                                                        if (xItem != null)
+                                                        {
+                                                            string sError = xItem.GetStringAttr("Error") + " : " + xItem.GetString("");
+                                                            dba.Status = (StatusEnum)99999;
+                                                            dba.StatusText = "Invalid XML response from WorkEngine WebService. Status=" +
+                                                                                xResult.GetStringAttr("Status") + "; Error=" + sError;
+                                                            sResult = FormatError("PostError7", (int)dba.Status, dba.FormatErrorText());
+                                                            bUpdateOK = false;
+                                                        }
+                                                        else
+                                                        {
+                                                            dba.Status = (StatusEnum)99999;
+                                                            dba.StatusText = "XML response from WorkEngine WebService not recognized";
+                                                            sResult = FormatError("PostError8", (int)dba.Status, dba.FormatErrorText());
+                                                            bUpdateOK = false;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+                        }
+                    }
+                    else
+                    {
+                        bUpdateOK = true; // now w/o Post to WE whether it worked or not at a data level will be contained in the Result
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -1321,6 +1436,32 @@ namespace WorkEnginePPM.WebServices.Core
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
+
+        private static StatusEnum SendXMLToWorkEngine(DBAccess dba, string sContext, string sXMLRequest, out XmlNode xNode)
+        {
+            xNode = null;
+            try
+            {
+                Integration weInt = new Integration();
+                dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "WE Request", "Context=" + sContext, sXMLRequest);
+                xNode = weInt.execute(sContext, sXMLRequest);
+                if (xNode != null)
+                    dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "WE Reply", "Context=" + sContext, xNode.OuterXml);
+            }
+            catch (Exception ex)
+            {
+                dba.Status = (StatusEnum)99830;
+                dba.StatusText = ex.Message;
+                dba.StackTrace = ex.StackTrace;
+                dba.DBTrace(dba.Status, TraceChannelEnum.WebServices, "RPEditor.SendXMLToWorkEngine", "Exception", ex.Message, ex.StackTrace);
+            }
+            return dba.Status;
+        }
+        private static string FormatError(string sErrorPosition, int lError, string sErrorText)
+        {
+            return sErrorPosition + ": " + lError.ToString() + " - " + sErrorText;
+        }
+
     }
 }

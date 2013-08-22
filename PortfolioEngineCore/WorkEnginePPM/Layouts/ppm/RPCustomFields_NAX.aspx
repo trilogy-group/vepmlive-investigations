@@ -143,7 +143,7 @@ html, body {
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         ResizeDialog(idWindow, idAttachObj);
         window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
@@ -167,7 +167,12 @@ html, body {
         return width;
     };
     function CloseDialog (idWindow) {
-        jsf_closeDialog(thiswins, idWindow)
+        switch (idWindow) {
+            case 'winCustomfieldDlg':
+                dgrid1.grid.selectRowById(dgrid1_selectedRow);
+                break;
+        }
+        return jsf_closeDialog(thiswins, idWindow);
     };
     
     function SendRequest(sXML) {
@@ -225,6 +230,7 @@ html, body {
                 tgrid2.SetHeight(150);
                 document.getElementById('idDeleteWarning').style.display = "none";
                 document.getElementById('idOKButton').value = "Save";
+                dgrid1.grid.clearSelection();
                 DisplayDialog(400, 420, "Modify Custom Field - " + dgrid1.GetCellValue(dgrid1_selectedRow, "FieldName"), "winCustomfieldDlg", "idCustomfieldDlg", true, false);
                 break;
             case "btnDelete":
@@ -265,6 +271,7 @@ html, body {
                 tgrid2.SetHeight(150);
                 document.getElementById('idDeleteWarning').style.display = "block";
                 document.getElementById('idOKButton').value = "Delete";
+                dgrid1.grid.clearSelection();
                 DisplayDialog(400, 450, "Delete Custom Field - " + dgrid1.GetCellValue(dgrid1_selectedRow, "FieldName"), "winCustomfieldDlg", "idCustomfieldDlg", true, false);
                 break;
         }

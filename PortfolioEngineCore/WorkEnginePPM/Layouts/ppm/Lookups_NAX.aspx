@@ -138,14 +138,13 @@ html, body {
     };
     var OnResize = function (event) {
         var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
-        dgrid1.SetHeight(newHeight);
-        var newWidth = document.documentElement.clientWidth - 5;
-        dgrid1.SetWidth(newWidth);
+        var newHeight = document.documentElement.clientHeight - top;
+        var newWidth = document.documentElement.clientWidth;
+        dgrid1.SetSizes(newWidth,newHeight);
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
-        dlg.attachEvent("onClose", function (win) { jsf_closeDialog2(win); return true; });
+        dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         ResizeDialog(idWindow, idAttachObj);
         window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
@@ -169,7 +168,12 @@ html, body {
         return width;
     };
     function CloseDialog (idWindow) {
-        jsf_closeDialog(thiswins, idWindow)
+        switch (idWindow) {
+            case 'winLookupDlg':
+                dgrid1.grid.selectRowById(dgrid1_selectedRow);
+                break;
+        }
+        return jsf_closeDialog(thiswins, idWindow);
     };
     function SendRequest(sXML) {
          sURL = "./Lookups.ashx";
@@ -215,7 +219,7 @@ html, body {
                 tgridLV.SetWidth(440);
                 tgridLV.SetHeight(120);
                 tgridLV.addEventListener("OnClick", tgridLV_OnClick);
-
+                dgrid1.grid.clearSelection();
                 DisplayDialog(645, 550, dlgTitle, "winLookupDlg", "idLookupDlg", true, false);
                 break;
             case "btnDelete":
@@ -246,7 +250,7 @@ html, body {
                 
                 document.getElementById('idDeleteWarning').style.display = "block";
                 document.getElementById('idOKButton').value = "Delete";
-
+                dgrid1.grid.clearSelection();
                 DisplayDialog(445, 360, "Delete Lookup - " /*+ json.reply.Lookup.LOOKUP_NAME*/, "winLookupDlg", "idLookupDlg", true, false);
                 break;
         }
@@ -297,11 +301,46 @@ html, body {
                 alert("Select a row to enable the Delete button");
                 return false;
             }
+            var sItems = BuildDeleteList(tgridLV.grid, tgridLV_selectedRow);
+
+            var sRequest = '<request function="LookupsRequest" context="CanDeleteLookupRows"><data><![CDATA[' + sItems + ']]></data></request>';
+            var jsonString = SendRequest(sRequest);
+            var json = JSON_ConvertString(jsonString);
+            if (json.reply != null) {
+                if (jsf_alertError(json.reply.error) == true)
+                    return false;
+            }
             tgridLV.grid.DeleteRow(tgridLV_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
             tgridLV_OnClick(tgridLV.grid, null, null)
             break;
     }
     return false;
+};
+function BuildDeleteList(grid, row) {
+    var lvuid = grid.GetAttribute(row, "LV_UID", null);
+    var sItems = lvuid.toString();
+    var childrow = row.firstChild;
+    if (childrow != null)
+        sItems += "," + AddChildrenToList(grid, childrow);
+    return sItems;
+};
+function AddChildrenToList(grid, row) { 
+    var sItems = "";
+    while (row != null) {
+        var lvuid = grid.GetAttribute(row, "LV_UID", null);
+        if (sItems != "")
+            sItems += ",";
+        sItems += lvuid.toString();
+        var childrow = row.firstChild;
+        if (childrow != null) {
+            var sChildItems = AddChildrenToList(grid, childrow);
+            if (sItems != "")
+                sItems += ",";
+            sItems += sChildItems;
+        }
+        row = row.nextSibling;
+    }
+    return sItems;
 };
 function SetChildrenCheckboxStates(rowid) {
         var tgridLV = window['<%=tgridLV.UID%>'];

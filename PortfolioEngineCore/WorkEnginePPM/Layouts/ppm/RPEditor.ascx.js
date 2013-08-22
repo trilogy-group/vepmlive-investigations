@@ -631,6 +631,7 @@
         grid.ShowRow(grid.GetRowById("Filter"));
         switch (grid.id) {
             case "g_RPE":
+                this.viewTab.setButtonStateOn("idViewTab_ShowFilters");
                 break;
             case "g_Res":
                 this.resourcesTab.setButtonStateOn("idResourcesTab_ShowFilters");
@@ -641,6 +642,7 @@
         grid.HideRow(grid.GetRowById("Filter"));
         switch (grid.id) {
             case "g_RPE":
+                this.viewTab.setButtonStateOff("idViewTab_ShowFilters");
                 break;
             case "g_Res":
                 this.resourcesTab.setButtonStateOff("idResourcesTab_ShowFilters");
@@ -863,6 +865,11 @@
                                 items: [
                                     { type: "smallbutton", id: "SelectColumnsBtn", name: "Select Columns", img: "selectcolumn.gif", tooltip: "Select Columns", onclick: "dialogEvent('ViewTab_SelectColumns');" },
                                     { type: "smallbutton", id: "idViewTab_RemoveSorting", name: "Clear Sorting", img: "clearsort.gif", tooltip: "Remove Sorting", onclick: "dialogEvent('ViewTab_RemoveSorting_Click');" }
+                                ]
+                            },
+                            {
+                                items: [
+                                    { type: "smallbutton", id: "idViewTab_ShowFilters", name: "Show Filters", img: "showhidefilters-16.png", tooltip: "Show Filters", onclick: "dialogEvent('ViewTab_ShowFilters_Click');" }
                                 ]
                             }
                         ]
@@ -1831,13 +1838,14 @@
                                 break;
                         }
                         if (jValue != null && jValue.error == null) {
-                            if (jValue.value != "") {
-                                var thisval = parseFloat(jValue.value);
-                                var dblValue = parseFloat(thisval.toFixed(2));
-                                dblValue = parseInt(this.round(dblValue * mpy, 0));
-                                this.SetPeriodValue(grid, row, col, dblValue);
-                                snewVal = this.GetFormattedPeriodCell(grid, row, col, false, false);
+                            if (jValue.value == "") {
+                                jValue.value = "0";
                             }
+                            var thisval = parseFloat(jValue.value);
+                            var dblValue = parseFloat(thisval.toFixed(2));
+                            dblValue = parseInt(this.round(dblValue * mpy, 0));
+                            this.SetPeriodValue(grid, row, col, dblValue);
+                            snewVal = this.GetFormattedPeriodCell(grid, row, col, false, false);
                         }
                     }
                 }
@@ -2639,6 +2647,17 @@
                 case "ViewTab_RemoveSorting_Click":
                     Grids["g_RPE"].ChangeSort('');
                     break;
+                case "ViewTab_ShowFilters_Click":
+                    var stateOn = this.viewTab.getButtonState("idViewTab_ShowFilters");
+                    var grid = Grids["g_RPE"];
+                    if (stateOn == false) {
+                        this.viewTab.setButtonStateOn("idViewTab_ShowFilters");
+                        this.showFilters(grid);
+                    } else {
+                        this.viewTab.setButtonStateOff("idViewTab_ShowFilters");
+                        this.hideFilters(grid);
+                    }
+                    break;
                 case "ViewTab_DisplayedValues_Changed":
                     var modeSelection = document.getElementById("idViewTab_DisplayedValues");
                     if (modeSelection != null && modeSelection.selectedIndex >= 0) {
@@ -2919,6 +2938,18 @@
         this.HideUnusedGroupRowsAsync();
     };
     RPEditor.prototype.GridsOnRowFilter = function (grid, row, show) {
+        if (grid.id == "g_RPE") {
+            var plangrid = grid;
+            var planrow = row;
+            var status = plangrid.GetAttribute(planrow, null, "Status");
+//            switch (status) {
+//                case const_Project:
+//                    return true;
+//                case const_Requirement:
+//                    return true;
+//            }
+            return show;
+        }
         if (grid.id != "g_Res")
             return show;
         if (show == false)
@@ -3598,8 +3629,10 @@
         if (isViewDefault == true) isViewDefault = 1; else if (isViewDefault == false) isViewDefault = 0;
         if (isViewPersonal == true) isViewPersonal = 1; else if (isViewPersonal == false) isViewPersonal = 0;
         var sSettings = this.BuildPlanSettings();
-        var sPlanGrid = this.BuildGridInf("g_RPE", false, false);
-        var bFilter = this.resourcesTab.getButtonState("idResourcesTab_ShowFilters");
+        var bFilter = this.viewTab.getButtonState("idViewTab_ShowFilters");
+        //var bGrouping = this.resourcesTab.getButtonState("idResourcesTab_ShowGrouping");
+        var sPlanGrid = this.BuildGridInf("g_RPE", bFilter, false);
+        bFilter = this.resourcesTab.getButtonState("idResourcesTab_ShowFilters");
         var bGrouping = this.resourcesTab.getButtonState("idResourcesTab_ShowGrouping");
 
 

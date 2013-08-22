@@ -140,7 +140,8 @@ namespace WorkEnginePPM
                 {
                     int nId = Int32.Parse(xData.InnerText);
                     DataTable dt;
-                    dbaCostCategories.ReadCostCategoryRates(dba, nId, out dt);
+                    decimal baserate;
+                    dbaCostCategories.ReadCostCategoryRates(dba, nId, out baserate, out dt);
                     _TGrid tg = new _TGrid();
                     tg.AddColumn(title: "Effective Date", width: 180, name: "BC_EFFECTIVE_DATE", editable: true, type: _TGrid.Type.date);
                     tg.AddColumn(title: "Rate", width: 180, name: "BC_RATE", editable: true, type: _TGrid.Type.number);
@@ -150,6 +151,7 @@ namespace WorkEnginePPM
                     CStruct xCostCategory = new CStruct();
                     xCostCategory.Initialize("costcategory");
                     xCostCategory.CreateIntAttr("BC_UID", nId);
+                    xCostCategory.CreateDecimalAttr("baserate", baserate);
                     xCostCategory.CreateString("tgridRates", tgridRates);
                     sReply = xCostCategory.XML();
                 }
@@ -172,13 +174,14 @@ namespace WorkEnginePPM
                 try
                 {
                     int nCA_UID = xData.GetIntAttr("CA_UID");
+                    decimal baserate = xData.GetDecimalAttr("baserate",0);
                     _TGrid tg = new _TGrid();
                     tg.AddColumn(title: "Effective Date", width: 180, name: "BC_EFFECTIVE_DATE", editable: true, type: _TGrid.Type.date);
                     tg.AddColumn(title: "Rate", width: 180, name: "BC_RATE", editable: true, type: _TGrid.Type.number);
 
                     string stgridRates = xData.InnerText;
                     DataTable dt = tg.SetXmlData(stgridRates);
-                    if (dbaCostCategories.UpdateCostCategoryRates(dba, nCA_UID, dt, out sReply) != StatusEnum.rsSuccess)
+                    if (dbaCostCategories.UpdateCostCategoryRates(dba, nCA_UID, baserate, dt, out sReply) != StatusEnum.rsSuccess)
                     {
                         if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "CostTypes.UpdateCostTypesInfo2", dba.StatusText);
                     }

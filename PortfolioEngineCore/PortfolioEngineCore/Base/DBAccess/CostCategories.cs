@@ -13,11 +13,25 @@ namespace PortfolioEngineCore
             string cmdText = "SELECT * FROM EPGP_CATEGORIES ORDER BY CA_ID";
             return dba.SelectData(cmdText, (StatusEnum)99957, out dt);
         }
-        public static StatusEnum ReadCostCategoryRates(DBAccess dba, int nBCUID, out DataTable dt)
+        public static StatusEnum ReadCostCategoryRates(DBAccess dba, int nBCUID, out decimal baserate, out DataTable dt)
         {
-            string cmdText = "SELECT * FROM EPGP_CATEGORIES cc"
+            baserate = 0;
+            string cmdText = "SELECT BC_RATE FROM EPGP_CATEGORIES cc"
                         + " LEFT JOIN EPG_COST_CATEGORY_RATE_VALUES rv on cc.CA_UID = rv.BC_UID"
-                        + " WHERE rv.BC_UID = @p1"
+                        + " WHERE rv.BC_UID = @p1 AND BC_EFFECTIVE_DATE is null";
+            StatusEnum eStatus = dba.SelectDataById(cmdText, nBCUID, (StatusEnum)99986, out dt);
+            if (eStatus != StatusEnum.rsSuccess)
+                return eStatus;
+
+            if (dt.Rows.Count == 1)
+            {
+                DataRow row = dt.Rows[0];
+                baserate = DBAccess.ReadDecimalValue(row["BC_RATE"]);
+            }
+
+            cmdText = "SELECT * FROM EPGP_CATEGORIES cc"
+                        + " LEFT JOIN EPG_COST_CATEGORY_RATE_VALUES rv on cc.CA_UID = rv.BC_UID"
+                        + " WHERE rv.BC_UID = @p1 AND BC_EFFECTIVE_DATE is not null"
                         + " ORDER BY rv.BC_EFFECTIVE_DATE";
             return dba.SelectDataById(cmdText, nBCUID, (StatusEnum)99986, out dt);
         }
@@ -181,7 +195,7 @@ namespace PortfolioEngineCore
 
             return eStatus;
         }
-        public static StatusEnum UpdateCostCategoryRates(DBAccess dba, int nCA_UID, DataTable dt, out string sReply)
+        public static StatusEnum UpdateCostCategoryRates(DBAccess dba, int nCA_UID, decimal baserate, DataTable dt, out string sReply)
         {
             string cmdText;
             SqlCommand oCommand;
@@ -195,10 +209,25 @@ namespace PortfolioEngineCore
                     Dictionary<DateTime, double> dic = new Dictionary<DateTime, double>();
                     List<DateTime> list = new List<DateTime>();
                     bool bIsNull;
+
+                    //  add baserate as first entry in list of rates as passed seperately here (unlike in Rates Table
+                    DateTime dDate = DateTime.Parse("1901-01-01");  // empty date in list of rates comes across with this value so we mimic here;
+                    double dRate = (double)baserate;
+                    if (dRate <= 0)
+                    {
+                        sReply = DBAccess.FormatAdminError("error", "CostCategories.UpdateRates", "Base Rate must be specified");
+                        return StatusEnum.rsRequestCannotBeCompleted;
+                    }
+                    else
+                    {
+                        dic.Add(dDate, dRate);
+                        list.Add(dDate);
+                    }
+
                     foreach (DataRow row in dt.Rows)
                     {
-                        DateTime dDate = DBAccess.ReadDateValue(row["BC_EFFECTIVE_DATE"], out bIsNull);
-                        double dRate = DBAccess.ReadDoubleValue(row["BC_RATE"]);
+                        dDate = DBAccess.ReadDateValue(row["BC_EFFECTIVE_DATE"], out bIsNull);
+                        dRate = DBAccess.ReadDoubleValue(row["BC_RATE"]);
                         if (dRate > 0 || dDate > DateTime.MinValue)
                         {
                             if (!dic.ContainsKey(dDate)) dic.Add(dDate, dRate);  // realized this error means dup dates but need to know first date and anyway like what's below
@@ -208,17 +237,19 @@ namespace PortfolioEngineCore
                     list.Sort();
 
                     // after sort loop through keys to check for duplicates
-                    DateTime prevDate = DateTime.MinValue;
+                    DateTime prevDate = DateTime.MinValue; 
+                    bool bfirstdate = true;
                     foreach (DateTime dateKey in list)
                     {
-                        if (dateKey == prevDate)
+                        if (bfirstdate == false && dateKey == prevDate)
                         {
-                            sReply = DBAccess.FormatAdminError("error", "CostCategories.UpdateRates", "The first date is empty but all other dates must be unique");
+                            sReply = DBAccess.FormatAdminError("error", "CostCategories.UpdateRates", "Effective dates must be specified and unique");
                             return StatusEnum.rsRequestCannotBeCompleted;
                         }
                         else
                         {
                             prevDate = dateKey;
+                            bfirstdate = false;
                         }
                     }
 
@@ -230,7 +261,7 @@ namespace PortfolioEngineCore
                     oCommand.Parameters.AddWithValue("@pCA_UID", nCA_UID);
                     oCommand.ExecuteNonQuery();
 
-                    if (dt.Rows.Count > 0)
+                    if (list.Count > 0)
                     {
                         cmdText =
                         "INSERT INTO EPG_COST_CATEGORY_RATE_VALUES (BC_UID,BC_EFFECTIVE_DATE,BC_RATE)"
@@ -245,13 +276,13 @@ namespace PortfolioEngineCore
                         //  need sizing data here?
 
                         bool bFirstDate = true;
-                        foreach (DateTime dDate in list)
+                        foreach (DateTime dDate1 in list)
                         {
-                            double dRate = dic[dDate];
-                            if (dRate > 0 || dDate > DateTime.MinValue)  //  make sure we don't get no 'blank' lines
+                            dRate = dic[dDate1];
+                            if (dRate > 0 || dDate1 > DateTime.MinValue)  //  make sure we don't get no 'blank' lines
                             {
                                 pRate.Value = dRate;
-                                if (dDate == DateTime.Parse("1901-01-01") || bFirstDate == true) { pDate.Value = System.DBNull.Value; } else { pDate.Value = dDate; }
+                                if (dDate1 == DateTime.Parse("1901-01-01") || bFirstDate == true) { pDate.Value = System.DBNull.Value; } else { pDate.Value = dDate1; }
                                 oCommand.ExecuteNonQuery();
                                 bFirstDate = false;
                             }
