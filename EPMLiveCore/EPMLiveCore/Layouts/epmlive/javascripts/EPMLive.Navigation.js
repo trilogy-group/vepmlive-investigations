@@ -1,23 +1,25 @@
 ﻿(function () {
-    var loadNav = function() {
-        $(function() {
+    'use strict';
+
+    function initializeNavigation() {
+        $(function () {
             var $ = window.jQuery;
 
-            var epmLiveService = (function() {
+            var epmLiveService = (function () {
                 var _execute = function (method, data, onSuccess, onError) {
                     var $$ = window.epmLive;
-                    
+
                     $.ajax({
                         type: 'POST',
                         url: $$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
                         data: "{ Function: '" + method + "', Dataxml: '" + data + "' }",
                         contentType: 'application/json; charset=utf-8',
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
                             if (response.d) {
                                 var resp = $$.parseJson(response.d);
                                 var result = resp.Result;
-                                
+
                                 if ($$.responseIsSuccess(result)) {
                                     onSuccess(result);
                                 } else {
@@ -27,7 +29,7 @@
                                 onError(response);
                             }
                         },
-                        error: function(response) {
+                        error: function (response) {
                             onError(response);
                         }
                     });
@@ -38,7 +40,7 @@
                 };
             })();
 
-            var epmLiveNavigation = (function() {
+            var epmLiveNavigation = (function () {
                 var animSpeed = 300;
                 var nodeClass = 'epm-nav-node';
                 var hoverClass = 'epm-nav-node-hover';
@@ -52,12 +54,12 @@
                 var expandStateCookie = 'epmnav-expand-state';
                 var pinStateCookie = 'epmnav-pin-state';
                 var cookieOptions = { expires: 365, path: '/' };
-                
+
                 var $sn = $('#epm-nav-sub');
 
                 var tlNodes = [];
 
-                var navNode = function(el) {
+                var navNode = function (el) {
                     var categories = {};
 
                     var _el = el;
@@ -67,15 +69,15 @@
                     var _id = _el.id;
                     var _provider = _$el.data('linkprovider');
 
-                    var _selected = function() {
+                    var _selected = function () {
                         return _$el.parent().hasClass(selectedClass);
                     };
 
-                    var isOpened = function() {
+                    var isOpened = function () {
                         return _$el.parent().hasClass(openedClass);
                     };
 
-                    var _select = function(select) {
+                    var _select = function (select) {
                         if (select) {
                             _$el.parent().addClass(selectedClass);
                         } else {
@@ -83,12 +85,12 @@
                         }
                     };
 
-                    var _close = function() {
+                    var _close = function () {
                         _$sm.hide();
                         _$el.parent().removeClass(openedClass);
                     };
 
-                    var _closeNav = function() {
+                    var _closeNav = function () {
                         if ($sn.is(':visible')) {
                             $sn.hide('slide', { direction: 'left' }, animSpeed);
                         }
@@ -96,7 +98,7 @@
                         _close();
                     };
 
-                    var _registerLink = function(link) {
+                    var _registerLink = function (link) {
                         if (link.seprator) {
                             registerSeprator(link.category);
                         } else {
@@ -105,7 +107,7 @@
                         }
                     };
 
-                    var registerLink = function(link) {
+                    var registerLink = function (link) {
                         var category = link.category;
 
                         if (!category) {
@@ -125,7 +127,7 @@
                         }
                     };
 
-                    var registerSeprator = function(category) {
+                    var registerSeprator = function (category) {
                         var seprator = '<div class="epm-nav-sub-sep"></div>';
 
                         if (category) {
@@ -135,7 +137,7 @@
                         }
                     };
 
-                    var registerCategory = function(category) {
+                    var registerCategory = function (category) {
                         if (!category) {
                             category = '__STATIC__';
                         }
@@ -161,24 +163,24 @@
                         }
                     };
 
-                    var calculateCatId = function(category) {
+                    var calculateCatId = function (category) {
                         return _$sm.get(0).id + '-' + category.toLowerCase().replace(/ /g, '-').replace(/_/g, '').replace(/[^\w-]+/g, '').replace(/--/g, '-');
                     };
 
-                    var showNode = function() {
+                    var showNode = function () {
                         _$sm.show();
                         _$el.parent().addClass(openedClass);
                     };
 
-                    var openMenu = function() {
+                    var openMenu = function () {
                         showNode();
-                        
+
                         if (!$sn.is(':visible')) {
                             $sn.show('slide', { direction: 'left' }, animSpeed);
                         }
                     };
 
-                    _$el.click(function() {
+                    _$el.click(function () {
                         if (_selected()) {
                             if (isOpened() && $.cookie(pinStateCookie) === 'unpinned') {
                                 _closeNav();
@@ -218,7 +220,7 @@
                     };
                 };
 
-                var hideMenu = function () {
+                function hideMenu() {
                     for (var n = 0; n < tlNodes.length; n++) {
                         var node = tlNodes[n];
                         if (node.selected()) {
@@ -226,9 +228,9 @@
                             break;
                         }
                     }
-                };
+                }
 
-                var changePinState = function (state) {
+                function changePinState(state) {
                     var elements = ['s4-ribbonrow', 's4-workspace'];
                     for (var e in elements) {
                         var $e = $('#' + elements[e]);
@@ -248,25 +250,25 @@
 
                     $sn.data('pinstate', state);
                     $.cookie(pinStateCookie, state, cookieOptions);
-                };
+                }
 
-                var togglePinned = function () {
+                function togglePinned() {
                     if ($sn.data('pinstate') === 'pinned') {
                         changePinState('unpinned');
                     } else {
                         changePinState('pinned');
                     }
-                };
+                }
 
-                var getSelectedSubLevelNode = function () {
+                function getSelectedSubLevelNode() {
                     return ($.cookie(selectedTlNodeCookie) || 'epm-nav-top-ql').replace('epm-nav-top-', 'epm-nav-sub-');
-                };
+                }
 
-                var getLinkNodes = function (menu) {
+                function getLinkNodes(menu) {
                     return $('#' + menu).find('.epm-nav-sub-menu').find('div[id^=E]');
-                };
+                }
 
-                var selectLink = function () {
+                function selectLink() {
                     var link = $.parseJSON($.cookie(selectedLinkCookie));
                     if (link) {
                         var index = link.index;
@@ -287,26 +289,26 @@
                             }
                         }
                     }
-                };
+                }
 
-                var saveLinkState = function ($nav) {
+                function saveLinkState($nav) {
                     var data = {};
-                    
-                    $nav.find('.epm-nav-cat').each(function() {
+
+                    $nav.find('.epm-nav-cat').each(function () {
                         var $cat = $(this);
                         data[$cat.text()] = $($cat.find('span')[0]).hasClass(expandedClass);
                     });
 
                     saveExpandState($nav.get(0).id, data);
-                };
-                
-                var saveExpandState = function (nodeId, data) {
+                }
+
+                function saveExpandState(nodeId, data) {
                     var state = $.parseJSON($.cookie(expandStateCookie)) || {};
                     state[nodeId] = data;
                     $.cookie(expandStateCookie, JSON.stringify(state), cookieOptions);
-                };
+                }
 
-                var expandNodes = function (provider) {
+                function expandNodes(provider) {
                     var expandState = $.parseJSON($.cookie(expandStateCookie));
 
                     if (expandState) {
@@ -363,33 +365,33 @@
                             }
                         }
                     }
-                };
+                }
 
-                var expandLinks = function ($cat) {
+                function expandLinks($cat) {
                     var catId = $cat.get(0).id;
 
                     var $span = $($cat.find('span')[0]);
                     var $ul = $('#' + catId + '-links');
-                    
+
                     $span.removeClass(collapsedClass);
                     $span.addClass(expandedClass);
                     $ul.removeClass(collapsedClass);
                     $ul.addClass(expandedClass);
-                };
+                }
 
-                var collapseLinks = function ($cat) {
+                function collapseLinks($cat) {
                     var catId = $cat.get(0).id;
 
                     var $span = $($cat.find('span')[0]);
                     var $ul = $('#' + catId + '-links');
-                    
+
                     $span.removeClass(expandedClass);
                     $span.addClass(collapsedClass);
                     $ul.removeClass(expandedClass);
                     $ul.addClass(collapsedClass);
-                };
+                }
 
-                var registerLinkEvents = function() {
+                function registerLinkEvents() {
                     $('.epm-nav-cat').click(function () {
                         var $cat = $(this);
                         var $span = $($cat.find('span')[0]);
@@ -402,9 +404,9 @@
 
                         saveLinkState($cat.parent());
                     });
-                };
-                
-                var registerEvents = function () {
+                }
+
+                function registerEvents() {
                     var hoverNode = window.TreeView_HoverNode;
                     var unhoverNode = window.TreeView_UnhoverNode;
                     var toggleNode = window.TreeView_ToggleNode;
@@ -532,9 +534,9 @@
 
                         $.cookie(selectedLinkCookie, JSON.stringify({ index: index, uri: $link.attr('href') }), cookieOptions);
                     });
-                };
+                }
 
-                var loadLinks = function () {
+                function loadLinks() {
                     var providers = [];
 
                     for (var i = 0; i < tlNodes.length; i++) {
@@ -552,7 +554,7 @@
                         epmLiveService.execute('GetNavigationLinks', providers.join(), function (response) {
                             var webUrl = epmLive.currentWebUrl;
                             var page = webUrl + window.location.href.split(webUrl)[1];
-                            
+
                             for (var providerName in response.Nodes) {
                                 var navLink = response.Nodes[providerName].NavLink;
                                 for (var nl in navLink) {
@@ -575,7 +577,7 @@
                                         }
                                     }
                                 }
-                                
+
                                 expandNodes(providerName);
                             }
 
@@ -584,7 +586,7 @@
                             console.log(response);
                         });
                     }
-                };
+                }
 
                 var _init = function () {
                     var pinState = $.cookie(pinStateCookie);
@@ -597,7 +599,7 @@
                     expandNodes();
                     selectLink();
                     registerEvents();
-                    
+
                     ExecuteOrDelayUntilScriptLoaded(loadLinks, 'EPMLive.js');
                 };
 
@@ -608,11 +610,11 @@
 
             epmLiveNavigation.init();
         });
-    };
-    
-    function onJqueryLoaded() {
-        ExecuteOrDelayUntilScriptLoaded(loadNav, 'EPMLiveNavigation');
     }
-    
+
+    function onJqueryLoaded() {
+        ExecuteOrDelayUntilScriptLoaded(initializeNavigation, 'EPMLiveNavigation');
+    }
+
     ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
 })();

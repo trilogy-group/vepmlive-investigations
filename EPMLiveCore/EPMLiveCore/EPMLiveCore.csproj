@@ -1475,6 +1475,12 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map">
       <DependentUpon>EPMLive.js</DependentUpon>
     </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
+      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
+    </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
       <DependentUpon>Notifications.js</DependentUpon>
@@ -3146,7 +3152,13 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>EPMLive.js</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js">
+      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
