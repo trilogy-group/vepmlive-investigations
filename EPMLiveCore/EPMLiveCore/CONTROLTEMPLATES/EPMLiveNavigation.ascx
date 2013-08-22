@@ -73,7 +73,8 @@
            {
                var attr = string.Empty;
 
-               if (Pinned && SelectedTlNode.Equals("epm-nav-top-" + node.Id))
+               var currentNode = "epm-nav-top-" + node.Id;
+               if (Pinned && SelectedTlNode.Equals(currentNode))
                {
                    attr = @"style=""display:block;""";
                }
@@ -82,32 +83,32 @@
                 <% if (node.Id.ToLower().Equals("ql"))
                    { %>
                     <SharePoint:SPTreeView
-                            ID="EPMLiveNav"
-                            runat="server"
-                            ShowLines="False"
-                            DataSourceId="QuickLaunchSiteMap"
-                            CssClass="epm-nav-sub-menu" 
-                            NodeStyle-CssClass="epm-nav-node"
-                            SelectedNodeStyle-CssClass="epm-nav-node-selected"
-                            HoverNodeStyle-CssClass="epm-nav-node-hover"
-                            ParentNodeStyle-CssClass="epm-nav-node-parent" 
-                            RootNodeStyle-CssClass="epm-nav-node-root"
-                            SkipLinkText=""
-                            ExpandImageUrl="/_layouts/15/epmlive/images/navigation/expand.png"
-                            ExpandImageUrlRtl="/_layouts/15/images/tvclosedrtl.png?rev=23"
-                            CollapseImageUrl="/_layouts/15/epmlive/images/navigation/collapse.png"
-                            CollapseImageUrlRtl="/_layouts/15/images/tvopenrtl.png?rev=23"
-                            NoExpandImageUrl="/_layouts/15/images/tvblank.gif?rev=23" 
-                            UseInternalDataBindings="False" 
-                            AutoExpandSelectedNode="False" 
-                            EnableTheming="False" 
-                            EnableViewState="False" 
-                            PopulateNodesFromClient="False" 
-                            ExpandDepth="0" 
-                            ClientIDMode="Static" 
-                            OnPreRender="OnTreeViewPreRender" />
+                        ID="EPMLiveNav"
+                        runat="server"
+                        ShowLines="False"
+                        DataSourceId="QuickLaunchSiteMap"
+                        CssClass="epm-nav-sub-menu" 
+                        NodeStyle-CssClass="epm-nav-node"
+                        SelectedNodeStyle-CssClass="epm-nav-node-selected"
+                        HoverNodeStyle-CssClass="epm-nav-node-hover"
+                        ParentNodeStyle-CssClass="epm-nav-node-parent" 
+                        RootNodeStyle-CssClass="epm-nav-node-root"
+                        SkipLinkText=""
+                        ExpandImageUrl="/_layouts/15/epmlive/images/navigation/expand.png"
+                        ExpandImageUrlRtl="/_layouts/15/images/tvclosedrtl.png?rev=23"
+                        CollapseImageUrl="/_layouts/15/epmlive/images/navigation/collapse.png"
+                        CollapseImageUrlRtl="/_layouts/15/images/tvopenrtl.png?rev=23"
+                        NoExpandImageUrl="/_layouts/15/images/tvblank.gif?rev=23" 
+                        UseInternalDataBindings="False" 
+                        AutoExpandSelectedNode="False" 
+                        EnableTheming="False" 
+                        EnableViewState="False" 
+                        PopulateNodesFromClient="False" 
+                        ExpandDepth="0" 
+                        ClientIDMode="Static" 
+                        OnPreRender="OnTreeViewPreRender" />
                 <% }
-                   else
+                   else if (currentNode.Equals(SelectedTlNode))
                    { %>    
                 <% } %>
             </div>       

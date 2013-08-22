@@ -63,6 +63,8 @@ namespace EPMLiveCore.API
             }
         }
 
+        public NavigationService(string provider, SPWeb spWeb) : this(new[] {provider}, spWeb) { }
+
         #endregion Constructors 
 
         #region Methods (4) 

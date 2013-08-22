@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
+using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.CONTROLTEMPLATES
@@ -76,6 +78,22 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             {
                 Pinned = pinStateCookie.Value.Equals("pinned");
             }
+
+            LoadSelectedNodeLinks();
+        }
+
+        private void LoadSelectedNodeLinks()
+        {
+            if (SelectedTlNode.Equals("epm-nav-top-ql")) return;
+
+            var nodeId = SelectedTlNode.Replace("epm-nav-top-", string.Empty);
+            string provider = (from topNode in TopNodes
+                where topNode.Id.Equals(nodeId)
+                select topNode.LinkProvider).FirstOrDefault();
+
+            var navService = new NavigationService(provider, SPContext.Current.Web);
+
+            navService.GetHTMLForProvider(provider);
         }
 
         protected void OnTreeViewPreRender(object sender, EventArgs e)
