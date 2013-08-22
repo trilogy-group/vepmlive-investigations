@@ -24,7 +24,7 @@ namespace WorkEnginePPM
 
 
     /// <summary>
-    /// Summary description for EditCosts
+    /// Summary description for EditCosts   
     /// </summary>
     [WebService(Namespace = "WorkEnginePPM")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
@@ -499,6 +499,8 @@ namespace WorkEnginePPM
             Extradata.AppendXML(sDetails);
 
             Extradata = xResult.CreateSubStruct("FromResGrid");
+
+            RAData.SetCalledFromResources(sFromResGrid == "1");
             Extradata.CreateStringAttr("Value", sFromResGrid);
 
             Extradata = xResult.CreateSubStruct("AllowCSResMode");
@@ -613,6 +615,21 @@ namespace WorkEnginePPM
             return "";
        }
 
+        public static string SetRATotalSelectedFlag(HttpContext Context, string sXML, RPAData RAData)
+        {
+
+            CStruct xData = new CStruct();
+            if (xData.LoadXML(sXML) == false)
+            {
+                return HandleError("SetRATotalSelectedFlag", 99999, "Invalid request xml");
+            }
+
+
+
+
+            RAData.SetSelectedForTotals(xData);
+            return "";
+        }
 
         public static string SetRADragRows(HttpContext Context, string sXML, RPAData RAData)
         {
@@ -926,7 +943,16 @@ namespace WorkEnginePPM
             int statusnum;
             CStruct xResult;
 
-            if (rpcs.GetCapacityScenarioValuesXML(int.Parse(sXML), out sRetXML, out statusnum) == false)
+            CStruct xExecute = new CStruct();
+            if (xExecute.LoadXML(sXML) == false)
+            {
+                return HandleError("GetCapacityScenarioData", 99999, "Invalid request xml");
+            }
+
+            int csid = xExecute.GetIntAttr("ID");
+            int csmode = xExecute.GetIntAttr("MODE");
+
+            if (rpcs.GetCapacityScenarioValuesXML(csid, out sRetXML, out statusnum) == false)
             {
                 xResult = BuildResultXML("GetCapacityScenarioData", statusnum);
                 xResult.AppendXML(sRetXML);
@@ -937,7 +963,7 @@ namespace WorkEnginePPM
             
 
             xResult = BuildResultXML("GetCapacityScenarioData", 0);
-            xResult.AppendXML(RAData.PrepareCSGrid(sRetXML));
+            xResult.AppendXML(RAData.PrepareCSGrid(sRetXML, csmode));
             return xResult.XML();
 
 
@@ -1108,7 +1134,7 @@ namespace WorkEnginePPM
             rpcs.GetCapacityScenarioValuesXML(1,  out sRetXML, out statusnum);
 
 
-            string sRoleData = RAData.GetRoleScrenarioData(sRetXML);
+            string sRoleData = RAData.GetRoleScrenarioData(sRetXML, sXML);
 
             string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
 
@@ -1151,6 +1177,70 @@ namespace WorkEnginePPM
             return xResult.XML();
 
         }
+
+
+
+
+        public static string SetAllCheckMarks(HttpContext Context, string sXML, RPAData RAData)
+        {
+            RAData.SetAllChecks(sXML != "0");
+
+            return "";
+        }
+
+
+        public static string EditResPlanTicket(HttpContext Context, string sXML, RPAData RAData)
+        {
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioEngineCore.CapacityScenarios rpcs = new CapacityScenarios(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+            //string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            //PortfolioEngineCore.CapacityScenarios rpcs = new PortfolioEngineCore.CapacityScenarios(sBaseInfo);
+            string sRetXML = "";
+
+
+
+            string sPids = RAData.GetEditResPlanPIList();
+            string sRids = RAData.GetEditResPlanResList();
+
+            bool bFromRGrid = RAData.GetCalledFromResources();
+
+            if (bFromRGrid == false && sPids != "")
+            {
+
+                sXML = rpcs.GetListTicket(sPids, true);
+            }
+            else if (bFromRGrid == true && sRids != "")
+            {
+                sXML = rpcs.GetListTicket(sRids, false);
+            }
+
+            //rpcs.GetCapacityScenarioValuesXML(1, out sRetXML, out statusnum);
+
+
+            CStruct xResult = new CStruct();
+            xResult = BuildResultXML("EditResPlanTicket", 0);
+            xResult.AppendXML(RAData.GetEditResPlanTicket(sXML));
+            return xResult.XML();
+
+
+        }
+
+
+
+
+        public static string GetTotalsGridChartData(HttpContext Context, string sXML, RPAData RAData)
+        {
+
+
+            CStruct xResult = new CStruct();
+            xResult = BuildResultXML("GetTotalsGridChartData", 0);
+            xResult.AppendXML(RAData.GetTotalsGridChartData());
+            return xResult.XML();
+
+
+        }
+
 
         private static CStruct BuildResultXML(string sContext = "", int nStatus = 0)
         {

@@ -39,7 +39,7 @@ namespace ResourceValues
     internal class clsCatItem
     {
         public int UID, ID, Level, Role_UID, Mode, PID, MajorCategory, Category;
-        public string sUID, UoM, Name, FullName;
+        public string sUID, UoM, Name, FullName, RoleName;
     }
 
     [Serializable()]
@@ -262,6 +262,7 @@ namespace ResourceValues
                     xCat.CreateIntAttr("PID", oCatItemValue.Value.PID);
                     xCat.CreateStringAttr("Name", oCatItemValue.Value.Name);
                     xCat.CreateStringAttr("FName", oCatItemValue.Value.FullName);
+                    xCat.CreateStringAttr("RName", oCatItemValue.Value.RoleName);
                 }
             }
 
@@ -546,7 +547,8 @@ namespace ResourceValues
                 {
                     CStruct xTgt = xTgts.CreateSubStruct("Tgt");
                     xTgt.CreateIntAttr("UID", oTgtItemValue.Value.UID);
-                    xTgt.CreateIntAttr("ID", oTgtItemValue.Value.ID);
+                    xTgt.CreateIntAttr("ID", oTgtItemValue.Value.ID); 
+                    xTgt.CreateIntAttr("Flag", oTgtItemValue.Value.Flag);
                     xTgt.CreateStringAttr("Name", oTgtItemValue.Value.Name);
                 }
             }
@@ -719,6 +721,7 @@ namespace ResourceValues
                         oCatItem.PID = xListEntry.GetIntAttr("PID");
                         oCatItem.Name = xListEntry.GetStringAttr("Name");
                         oCatItem.FullName = xListEntry.GetStringAttr("FName");
+                        oCatItem.RoleName = xListEntry.GetStringAttr("RName");
                         CostCategories.Add(oCatItem.UID, oCatItem);
                         if (oCatItem.Level > lCatMaxLevel) lCatMaxLevel = oCatItem.Level;
                     }
@@ -1125,6 +1128,8 @@ namespace ResourceValues
                         oCapacityItem.UID = xListEntry.GetIntAttr("UID");
                         oCapacityItem.ID = xListEntry.GetIntAttr("ID");
                         oCapacityItem.Name = xListEntry.GetStringAttr("Name");
+                        oCapacityItem.Flag = xListEntry.GetIntAttr("Flag");
+ 
                         CapacityTargets.Add(oCapacityItem.ID, oCapacityItem);
                     }
                 }

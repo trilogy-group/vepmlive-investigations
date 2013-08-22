@@ -2046,6 +2046,42 @@ SELECT *
   FROM EPG_ADMIN
 ')
  
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadAdminRates')
+begin
+    Print 'Creating Stored Procedure EPG_SP_ReadAdminRates'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure EPG_SP_ReadAdminRates'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadAdminRates
+AS
+
+SELECT distinct EPG_RATES.RT_UID,RT_NAME,RT_ID,RT_LEVEL,  
+STUFF((SELECT '','' + convert(nvarchar(MAX), RT_EFFECTIVE_DATE ,102) + ''::'' + convert(nvarchar(MAX), RT_RATE )
+FROM EPGP_COST_RATES
+JOIN EPG_RATE_VALUES ON EPGP_COST_RATES.RT_UID = EPG_RATE_VALUES.RT_UID
+WHERE EPG_RATES.RT_UID = EPGP_COST_RATES.RT_UID
+GROUP BY RT_EFFECTIVE_DATE, RT_RATE
+FOR XML PATH('''')) , 1, 1, '''') as rates, 
+STUFF((SELECT '','' + convert(nvarchar(MAX), EPGP_COST_RATES.WRES_ID )
+FROM EPGP_COST_RATES
+JOIN EPG_RESOURCES ON EPGP_COST_RATES.WRES_ID = EPG_RESOURCES.WRES_ID
+WHERE EPG_RATES.RT_UID = EPGP_COST_RATES.RT_UID
+GROUP BY EPGP_COST_RATES.WRES_ID
+FOR XML PATH('''')) , 1, 1, '''') as wres_ids, 
+STUFF((SELECT '','' + convert(nvarchar(MAX), EPG_RESOURCES.RES_NAME )
+FROM EPGP_COST_RATES
+JOIN EPG_RESOURCES ON EPGP_COST_RATES.WRES_ID = EPG_RESOURCES.WRES_ID
+WHERE EPG_RATES.RT_UID = EPGP_COST_RATES.RT_UID
+GROUP BY EPG_RESOURCES.RES_NAME
+FOR XML PATH('''')) , 1, 1, '''') as res_names
+FROM EPG_RATES
+ORDER BY RT_ID,RT_NAME
+')
+ 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadApprovalProjects')
 begin
     Print 'Creating Stored Procedure EPG_SP_ReadApprovalProjects'
@@ -2354,6 +2390,42 @@ Select * From EPGP_COST_BREAKDOWNS
    Where CB_ID=@CalID			
 ')
  
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadCalendarFTEs')
+begin
+    Print 'Creating Stored Procedure EPG_SP_ReadCalendarFTEs'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure EPG_SP_ReadCalendarFTEs'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadCalendarFTEs
+  @CB_ID INT
+AS
+DECLARE @cols AS NVARCHAR(MAX), @colsas AS NVARCHAR(MAX), @query  AS NVARCHAR(MAX);
+select @cols = STUFF((SELECT  '','' 
+                        + QUOTENAME(convert(nvarchar,PRD_ID)) 
+                    from EPG_PERIODS where CB_ID = @CB_ID order by PRD_ID
+            FOR XML PATH(''''), TYPE
+            ).value(''.'', ''NVARCHAR(MAX)'') 
+        ,1,1,''''); 
+select @colsas = STUFF((SELECT  '','' 
+                        + QUOTENAME(convert(nvarchar,PRD_ID)) + '' as P'' + convert(nvarchar,PRD_ID) 
+                    from EPG_PERIODS where CB_ID = @CB_ID order by PRD_ID
+            FOR XML PATH(''''), TYPE
+            ).value(''.'', ''NVARCHAR(MAX)'') 
+        ,1,1,''''); 
+set @query = 
+''declare @t as table (BC_UID int,BC_NAME nvarchar(255),BC_ID int,BC_LEVEL int,BA_PRD_ID int,BA_FTE_CONV int); '' +
+''insert into @t select BC_UID,BC_NAME,BC_ID,BC_LEVEL,BA_PRD_ID,(BA_FTE_CONV)/100 as BA_FTE_CONV from EPGP_COST_CATEGORIES
+left join EPGP_COST_BREAKDOWN_ATTRIBS on (BA_BC_UID = BC_UID AND EPGP_COST_BREAKDOWN_ATTRIBS.CB_ID = '' + convert(nvarchar,@CB_ID) + '')
+group by BC_ID, BC_LEVEL,BA_PRD_ID, BC_NAME, BC_UID, BA_FTE_CONV
+order by BC_ID, BC_LEVEL,BA_PRD_ID, BC_NAME, BC_UID, BA_FTE_CONV; '' +
+''select BC_NAME,BC_UID,BC_ID,BC_LEVEL,'' + @colsas + '' from @t pivot (max(BA_FTE_CONV) for BA_PRD_ID in ('' + @cols + '')) pivotT ORDER BY BC_ID''
+execute(@query)
+')
+ 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadCapacityTargets')
 begin
     Print 'Creating Stored Procedure EPG_SP_ReadCapacityTargets'
@@ -2367,7 +2439,7 @@ end
 exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadCapacityTargets
   @sList NTEXT
 AS
-SELECT CS_ID,CS_NAME,DEPT_UID
+SELECT CS_ID,CS_NAME,DEPT_UID, CS_ROLE_BASED
   From EPGP_CAPACITY_SETS
   INNER JOIN dbo.EPG_FN_ConvertListToTable(@sList) LT on DEPT_UID=LT.TokenVal 
   Order by DEPT_UID,CS_NAME
@@ -4015,6 +4087,33 @@ SELECT J.*, R.RES_NAME, JM.JMG_TIMESTAMP, JM.JMG_MESSAGE
  INNER JOIN dbo.EPG_FN_ConvertListToTable(@sList) LT on JOB_STATUS=LT.TokenVal
  WHERE JOB_SUBMITTED >= @FromDate AND JOB_SUBMITTED <= @ToDate   
  ORDER BY JOB_SUBMITTED DESC, JMG_UID
+')
+ 
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadJobQueue2')
+begin
+    Print 'Creating Stored Procedure EPG_SP_ReadJobQueue2'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure EPG_SP_ReadJobQueue2'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadJobQueue2
+  @intStartRow int,
+  @intEndRow int
+AS
+ 
+DECLARE @query AS NVARCHAR(MAX);
+ 
+set @query = ''WITH pages AS (SELECT ROW_NUMBER() OVER(ORDER BY JOB_SUBMITTED DESC, JMG_UID) as RowNumber, J.*, R.RES_NAME, JM.JMG_TIMESTAMP, JM.JMG_MESSAGE '' +
+'' FROM EPG_JOBS J '' + 
+'' LEFT JOIN EPG_RESOURCES R ON J.WRES_ID = R.WRES_ID '' + 
+'' LEFT JOIN EPG_JOB_MSGS JM ON JM.JOB_GUID = J.JOB_GUID '' + 
+'' INNER JOIN dbo.EPG_FN_ConvertListToTable(N''''-2,-1,0,1'''') LT on JOB_STATUS=LT.TokenVal ) '' + 
+'' SELECT * FROM pages WHERE RowNumber BETWEEN '' + convert(nvarchar,@intStartRow) + '' AND '' + convert(nvarchar,@intEndRow);
+
+execute(@query)
 ')
  
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadListFields')
@@ -6501,6 +6600,31 @@ AS
 	ORDER BY TAB_ID,TABGROUP_ID
 ')
  
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadTableRowRange')
+begin
+    Print 'Creating Stored Procedure EPG_SP_ReadTableRowRange'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure EPG_SP_ReadTableRowRange'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadTableRowRange
+  @sTable NTEXT,
+  @sOrderByClause NTEXT,
+  @intStartRow int,
+  @intEndRow int
+AS
+ 
+DECLARE @query AS NVARCHAR(MAX);
+
+set @query = ''WITH pages AS (SELECT ROW_NUMBER() OVER('' + convert(nvarchar(MAX),@sOrderByClause) + '') as RowNumber, * FROM '' + convert(nvarchar(MAX),@sTable) + '') '' + 
+''SELECT * FROM pages WHERE RowNumber BETWEEN '' + convert(nvarchar,@intStartRow) + '' AND '' + convert(nvarchar,@intEndRow);
+
+execute(@query)
+')
+ 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadTargetColors')
 begin
     Print 'Creating Stored Procedure EPG_SP_ReadTargetColors'
@@ -7647,7 +7771,7 @@ Select Distinct Top 3 ''10.Task Assignment'' as Type,PROJECT_NAME as Name From E
 Select Distinct Top 3 ''11.Program Manager'' as Type,LV_VALUE as Name From EPGP_PROG_INFOS p 
  Join EPGP_LOOKUP_VALUES v On p.PROG_UID=v.LV_UID Where PROG_MANAGER = @WresID
       UNION
-Select Distinct Top 3 ''12.Scheduled Work'' as Type,PROJECT_NAME as Name From EPGP_PI_WORK1 w 
+Select Distinct Top 3 ''12.Scheduled Work'' as Type,PROJECT_NAME as Name From EPGP_PI_WORK2 w 
  join EPGP_PROJECTS p On w.PROJECT_ID=p.PROJECT_ID Where WRES_ID = @WresID
       UNION
 Select Distinct Top 3 ''13.List Work'' as Type,PROJECT_NAME as Name From EPGP_PI_WORK1 w

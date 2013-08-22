@@ -269,18 +269,23 @@ border-radius: 0px;
 <script src="/_layouts/epmlive/TreeGrid/GridE.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/ribbon/ribbon2.css" />
-
 <script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/ResPlanAnalyzer.ascx.css" />
 <script src="/_layouts/ppm/ResPlanAnalyzer.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css" />
+
+<script src="/_layouts/epmlive/javascripts/libraries/jquery.min.js" type="text/javascript"></script>
+
+
 <div id="idAnalyzerTabDiv"></div>    
 <div id="idViewTabDiv"></div>
 <div id="idBottomTabDiv"></div>
 <div id="ribbonbarEditCapScenDiv"></div>
+<div id="ribbonbarChartDiv"></div>
 <div id="idEditGridDiv" ></div>
+<div id="chart"></div>
 <div id="divLoading" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
 	<img style="margin: 30px 10px; vertical-align: middle" title="Loading..." alt="Loading..." src="../images/PROGRESS-CIRCLE-24.GIF"/>
 	<span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Loading...</span>
@@ -329,7 +334,7 @@ border-radius: 0px;
 			Show
 		</div>
 		<div style="padding-bottom:20px;">
-			<select id="idSelRoleView" name="idSelRoleView" style="vertical-align:middle;padding:0px;margin:0px;">
+			<select id="idSelRoleView" name="idSelRoleView" style="vertical-align:middle;padding:0px;margin:0px;" onchange="dialogEvent('SelectRole_Change');">
 						<option value='1'>Cost Category Roles</option>
 						<option value='2'>Roles Only</option>
 					</select>
@@ -435,11 +440,17 @@ border-radius: 0px;
 		    <select id="idNewCSDept" name="idNewCSDept" style="vertical-align:middle;padding:0px;margin:0px 4px 0px 4px;">
 		    </select>
        </div>
-       <div style="display:none;">
+      <div id="idRolebased" style="display:block;">
+       <div>
+       <br />
+			<input id="chkRoleBased" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">By Role</font>
+	   </div>
+      </div>
+      <div style="display:none;">
        <div>
 			<input id="idNewCSPrivate" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Personal Scenario</font>
-		</div>
-        </div>
+	   </div>
+      </div>
         <div style="width:200px;float:right">
 	        <div class="button-container">
 					<a href="javascript:dialogEvent('SaveCS_OK');" class="button-new green" style="width:75px;">OK</a>
@@ -603,6 +614,9 @@ border-radius: 0px;
 </div>
 <div id="idEditCapScenDlg" style="display:none;">
    <div id="idEditCS" style="position: relative; width: 100%; height: 350px; top: 0px; left: 0px;"></div>    
+</div>
+<div id="idChartDlg" style="display:none;">
+   <div id="idChart" style="position: relative; width: 100%; height: 350px; top: 0px; left: 0px;"></div>    
 </div>
 <div id="idGridExplainDlgObj" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">

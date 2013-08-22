@@ -3116,6 +3116,8 @@ CREATE TABLE dbo.EPGP_CAPACITY_SETS
 (
 	CS_ID  int NOT NULL,
 	DEPT_UID int NOT NULL Default 0,
+	WRES_ID int NOT NULL Default 0,
+    CS_ROLE_BASED int NOT NULL Default 0,
 	CS_NAME nvarchar(255) NOT NULL,
   Primary Key (CS_ID)
 )
@@ -3124,7 +3126,17 @@ CREATE TABLE dbo.EPGP_CAPACITY_SETS
 else
                 begin
                                 Print 'Updating Table EPGP_CAPACITY_SETS'
-                end
+                                 if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_CAPACITY_SETS' and column_name = 'WRES_ID')
+                                begin
+                                                Print '     Add Column WRES_ID'
+                                                ALTER TABLE EPGP_CAPACITY_SETS ADD WRES_ID int NOT NULL Default 0
+                                end
+								if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_CAPACITY_SETS' and column_name = 'CS_ROLE_BASED')
+                                begin
+                                                Print '     Add Column CS_ROLE_BASED'
+                                                ALTER TABLE EPGP_CAPACITY_SETS ADD CS_ROLE_BASED int NOT NULL Default 0
+                                end 
+			    end             
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_CAPACITY_VALUES')
                 begin

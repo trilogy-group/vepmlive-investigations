@@ -252,6 +252,7 @@ namespace RPADataCache
     {
         public clsResxAvail resavail = null;
         public string ResOrRole = "";
+        public bool bSelected = true;
 
         public clsResXData tot_Totals = new clsResXData();
         public clsResXData tot_actual = new clsResXData();
@@ -736,16 +737,16 @@ namespace RPADataCache
         bool m_use_heatmap = true;
         int m_use_heatmapID = -6;
         private int m_use_heatmapColour = 1;
-  
+
 
         clsResourceValues m_cResVals;
         clsLookupList m_maj_Cat_lookup;
- 
+
         Dictionary<int, clsResFullDAta> m_reslist = new Dictionary<int, clsResFullDAta>();
         Dictionary<int, clsResFullDAta> m_ccrolelist = new Dictionary<int, clsResFullDAta>();
         Dictionary<int, clsResFullDAta> m_rolelist = new Dictionary<int, clsResFullDAta>();
 
-        Dictionary <int, clsRXDept> m_cln_depts = new Dictionary<int,clsRXDept>();
+        Dictionary<int, clsRXDept> m_cln_depts = new Dictionary<int, clsRXDept>();
         int m_num_per;
         Dictionary<int, int> m_CCR_Role_Mapping;
         Dictionary<int, clsPIData> m_cln_pis;
@@ -758,7 +759,7 @@ namespace RPADataCache
         List<CPeriod> m_cs_perlist = new List<CPeriod>();
         Dictionary<int, clsResxAvail> m_cs_editdata = new Dictionary<int, clsResxAvail>();
         Dictionary<int, clsRPAFTEConv> m_fte_conv = new Dictionary<int, clsRPAFTEConv>();
-
+        Dictionary<int, clsEPKItem> m_roles = new Dictionary<int, clsEPKItem>();
 
         bool chkOffers = false;
         bool chkPend = false;
@@ -767,22 +768,24 @@ namespace RPADataCache
         bool chkActual = false;
         bool ckkMSPF = false;
         bool chkOpenRequest = false;
+        bool m_fromResGrid = false;
 
         int m_role_mode;
 
-           List<clsResXData> m_clnsort = new List<clsResXData>();
+        List<clsResXData> m_clnsort = new List<clsResXData>();
 
 
         List<RPATGRow> TGStandard;
         List<RPATGRow> TotGeneral;
         List<RPATGRow> TotCapacity;
+        List<RPATGRow> TotCapacityNonRole;
         List<RPATGRow> TotSelectedOrder;
 
         string m_viewsxml = "";
         string m_reload_cs_data = "";
 
-  
- 
+
+
         int m_DispMode = 0;
         int m_StartPerOffset = 1;
         private int m_useingCal = 0;
@@ -802,11 +805,13 @@ namespace RPADataCache
 
         private List<clsEPKItem> UserDepts = new List<clsEPKItem>();
 
+        private string m_totalschartdata = "";
 
+        Dictionary<int, clsResFullDAta> m_usedbottomcln = new Dictionary<int, clsResFullDAta>();
 
         public RPAData()
         {
- 
+
             m_role_mode = 1;
             m_DispMode = 0;
 
@@ -828,7 +833,7 @@ namespace RPADataCache
         internal void GrabRAData(clsResourceValues o_cResVals, string sReturnText, string sApplyView, int StartPerOffset, int iUsingCal, string sParamXML, out string stage_error_logging)
         {
             stage_error_logging = "I001";
-            
+
             m_cResVals = new clsResourceValues();
 
             m_cResVals = o_cResVals;
@@ -949,7 +954,8 @@ namespace RPADataCache
 
         }
 
-        public void StashCSRoleMode(bool bAllowed) {
+        public void StashCSRoleMode(bool bAllowed)
+        {
             m_CSRoleAllowed = bAllowed;
         }
 
@@ -999,6 +1005,7 @@ namespace RPADataCache
             Dictionary<int, clsRXDept> clnOldDepts;
             clnOldDepts = m_cln_depts;
             TotCapacity = new List<RPATGRow>();
+            TotCapacityNonRole = new List<RPATGRow>();
 
 
             m_resdata = new Dictionary<int, clsResXData>();
@@ -1014,6 +1021,27 @@ namespace RPADataCache
             m_reslist = new Dictionary<int, clsResFullDAta>();
             m_ccrolelist = new Dictionary<int, clsResFullDAta>();
             m_rolelist = new Dictionary<int, clsResFullDAta>();
+
+            m_roles = new Dictionary<int, clsEPKItem>();
+
+            foreach (clsCatItem ccat in m_cResVals.CostCategories.Values)
+            {
+                clsEPKItem ocatitem;
+                if (ccat.Role_UID != 0)
+                {
+                    if (m_roles.TryGetValue(ccat.Role_UID, out ocatitem) == false)
+                    {
+                        ocatitem = new clsEPKItem();
+                        ocatitem.UID = ccat.Role_UID;
+                        ocatitem.Name = ccat.RoleName;
+
+                        m_roles.Add(ocatitem.UID, ocatitem);
+
+
+                    }
+                }
+            }
+
 
 
             clsResXData clsRD;
@@ -1672,7 +1700,7 @@ namespace RPADataCache
 
                     if (orx.Status == RPConstants.CONST_Commitment)
                         rFull.committed.Add(orx);
-                    else 
+                    else
                         rFull.openreq.Add(orx);
 
 
@@ -1723,6 +1751,8 @@ namespace RPADataCache
                         capcon.Add(oi.Name, capindx);
 
                         TotCapacity.Add(CreatetgLayout(false, capindx, oi.Name, ""));
+                        if (oi.Flag != 1)
+                            TotCapacityNonRole.Add(CreatetgLayout(false, capindx, oi.Name, ""));
                     }
                 }
 
@@ -1777,23 +1807,38 @@ namespace RPADataCache
                                 --capindx;
                                 perid = oCapacityValue.PeriodID - m_cResVals.FromPeriodID + 1;
 
-                                if (m_ccrolelist.TryGetValue(oCapacityValue.RoleUID, out rFull) == true)
+                                if (oItem.Flag == 0)
                                 {
-                                    clsRD = rFull.CapScen[capindx];
-                                    clsRD.WrkHours[perid] += ConvHRs(oCapacityValue.Hours);
-                                    clsRD.FTEVals[perid] += ConvFTEs(oCapacityValue.FTES);
+
+                                    if (m_ccrolelist.TryGetValue(oCapacityValue.RoleUID, out rFull) == true)
+                                    {
+                                        clsRD = rFull.CapScen[capindx];
+                                        clsRD.WrkHours[perid] += ConvHRs(oCapacityValue.Hours);
+                                        clsRD.FTEVals[perid] += ConvFTEs(oCapacityValue.FTES);
+                                    }
+
+
+                                    // now map the ccrole to the role
+
+                                    int mappedrole = MapCCR2Role(oCapacityValue.RoleUID);
+
+                                    if (m_rolelist.TryGetValue(mappedrole, out rFull) == true)
+                                    {
+                                        clsRD = rFull.CapScen[capindx];
+                                        clsRD.WrkHours[perid] += ConvHRs(oCapacityValue.Hours);
+                                        clsRD.FTEVals[perid] += ConvFTEs(oCapacityValue.FTES);
+                                    }
                                 }
-
-
-                                // now map the ccrole to the role
-
-                                int mappedrole = MapCCR2Role(oCapacityValue.RoleUID);
-
-                                if (m_rolelist.TryGetValue(mappedrole, out rFull) == true)
+                                else
                                 {
-                                    clsRD = rFull.CapScen[capindx];
-                                    clsRD.WrkHours[perid] += ConvHRs(oCapacityValue.Hours);
-                                    clsRD.FTEVals[perid] += ConvFTEs(oCapacityValue.FTES);
+                                    int mappedrole = oCapacityValue.RoleUID;
+
+                                    if (m_rolelist.TryGetValue(mappedrole, out rFull) == true)
+                                    {
+                                        clsRD = rFull.CapScen[capindx];
+                                        clsRD.WrkHours[perid] += ConvHRs(oCapacityValue.Hours);
+                                        clsRD.FTEVals[perid] += ConvFTEs(oCapacityValue.FTES);
+                                    }
                                 }
 
                             }
@@ -1866,7 +1911,7 @@ namespace RPADataCache
             }
             catch (Exception ex)
             { }
-       }
+        }
         private void BuileCCR2RoleMap()
         {
             string sShort = "";
@@ -2576,14 +2621,80 @@ namespace RPADataCache
             else
                 cln = m_ccrolelist;
 
+            CStruct xRoot = new CStruct();
+            xRoot.Initialize("Rows");
 
+            m_usedbottomcln = cln;
 
             foreach (clsResFullDAta oRFull in cln.Values)
             {
                 try
                 {
+                    ++i;
+                    CStruct xRow = xRoot.CreateSubStruct("Row");
+                    xRow.CreateIntAttr("ID",i);
+                    xRow.CreateIntAttr("Sel", (oRFull.bSelected? 1 : 0));
+                    xRow.CreateStringAttr("Name", oRFull.ResOrRole);
 
-                    oGrid.AddDetailRow(oRFull, m_totdispcln, m_cResVals, m_cResVals.TargetColors, ++i, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
+                    int xi = 0;
+
+                    foreach (CPeriod period in m_cResVals.Periods.Values)
+                    {
+                        xi++;
+
+
+                        double tvval = oRFull.tot_Totals.getvarr(xi);
+                        double tfval = oRFull.tot_Totals.getftarr(xi);
+                        double avval = oRFull.tot_avail.getvarr(xi);
+                        double afval = oRFull.tot_avail.getftarr(xi);
+
+                        double tval, aval;
+
+                        if (m_DispMode == 3)
+                        {
+                            if (tfval == 0)
+                                tval = 0;
+                            else
+                                tval = (tvval * 100) / tfval;
+
+                            if (afval == 0)
+                                aval = 0;
+                            else
+                                aval = (avval * 100) / afval;
+                        }
+                        else if (m_DispMode == 0)
+                        {
+
+                            tval = tvval;
+                            aval = avval;
+                        }
+                        else
+                        {
+                            tval = tfval;
+                            aval = afval;
+                        }
+
+
+
+                        if (m_DispMode == 1)
+                        {
+                            aval /= 100;
+                            tval /= 100;
+                        }
+
+
+                        CStruct xTot = xRow.CreateSubStruct("Tot");
+                        CStruct xAvail = xRow.CreateSubStruct("Avail");
+
+                        xTot.CreateDoubleAttr("Value", tval);  
+                        xAvail.CreateDoubleAttr("Value", aval);
+
+
+                    }
+
+
+
+                    oGrid.AddDetailRow(oRFull, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
                 }
                 catch (Exception ex)
                 {
@@ -2593,6 +2704,9 @@ namespace RPADataCache
             }
 
             s = oGrid.GetString();
+
+
+            m_totalschartdata = xRoot.XML();
 
             return s;
 
@@ -2642,7 +2756,27 @@ namespace RPADataCache
                     xWork.CreateBooleanAttr("Selected", otg.bUse);
                     xWork.CreateStringAttr("Name", otg.Name);
                 }
+
+
+                xNode = xRoot.CreateSubStruct("ColumnNROptions");
+
+                foreach (RPATGRow otg in TotGeneral)
+                {
+                    xWork = xNode.CreateSubStruct("ColumnOption");
+                    xWork.CreateIntAttr("ColumnID", otg.fid);
+                    xWork.CreateBooleanAttr("Selected", otg.bUse);
+                    xWork.CreateStringAttr("Name", otg.DisplayName);
+                }
+
+                foreach (RPATGRow otg in TotCapacityNonRole)
+                {
+                    xWork = xNode.CreateSubStruct("ColumnOption");
+                    xWork.CreateIntAttr("ColumnID", otg.fid);
+                    xWork.CreateBooleanAttr("Selected", otg.bUse);
+                    xWork.CreateStringAttr("Name", otg.Name);
+                }
             }
+
 
             xNode = xRoot.CreateSubStruct("SelectedOrderItems");
             foreach (RPATGRow otg in TotSelectedOrder)
@@ -2907,6 +3041,36 @@ namespace RPADataCache
 
         }
 
+        public void SetSelectedForTotals(CStruct xData)
+        {
+            bool bSel = xData.GetBooleanAttr("value", false);
+
+            List<CStruct> rows = xData.GetList("Row");
+            if (rows != null)
+            {
+
+                List<clsResFullDAta> btmlist = m_usedbottomcln.Values.ToList();
+                foreach (CStruct rowval in rows)
+                {
+                    string xrowid = rowval.GetStringAttr("rowid", "");
+                    int rowid;
+                    if (xrowid == "")
+                        rowid = 0;
+                    else
+                        rowid = int.Parse(xrowid);
+
+
+                    if (rowid >= 1 && rowid <= btmlist.Count)
+                    {
+                        clsResFullDAta oDet = btmlist[rowid - 1];
+                        oDet.bSelected = bSel;
+                    }
+                }
+            }
+
+
+        }
+
 
         public void SetRADragRows(CStruct xData)
         {
@@ -3074,7 +3238,7 @@ namespace RPADataCache
             rFull.tot_committed.SetUpPeriods(m_num_per);
             rFull.tot_personel.SetUpPeriods(m_num_per);
             rFull.tot_scheduled.SetUpPeriods(m_num_per);
-            rFull.tot_avail.SetUpPeriods(m_num_per);     
+            rFull.tot_avail.SetUpPeriods(m_num_per);
             rFull.tot_proposal.SetUpPeriods(m_num_per);
 
             return rFull;
@@ -3201,7 +3365,7 @@ namespace RPADataCache
             ReDrawGrid();
         }
 
-        public string PrepareCSGrid(string sXML)
+        public string PrepareCSGrid(string sXML, int csmode)
         {
             CStruct xRoot = new CStruct();
             CStruct xPeriods;
@@ -3247,62 +3411,129 @@ namespace RPADataCache
 
             clsResxAvail oRA;
 
+            Dictionary<int, clsEPKItem> roled = new Dictionary<int, clsEPKItem>();
+            bool bDoRole = (csmode != 0);
+            bool bDoIt;
+            clsEPKItem oItem;
 
             for (int i = clnCC.Count - 1; i >= 0; i--)
             {
-                CStruct xCC = clnCC[i];
-                CStruct xRetCC = xRetCCs.CreateSubStruct("CostCategory");
-                int ccid = xCC.GetIntAttr("ID");
-                xRetCC.CreateIntAttr("ID", ccid);
-                xRetCC.CreateStringAttr("Name", xCC.GetStringAttr("Name"));
 
-                if (m_cs_editdata.TryGetValue(ccid, out oRA) == false)
+                CStruct xCC;
+                CStruct xRetCC;
+                int ccid;
+
+                xCC = clnCC[i];
+                xRetCC = null;
+                bDoIt = false;
+
+                if (bDoRole)
                 {
-                    oRA = new clsResxAvail();
-                    oRA.SetUpPeriods(m_cs_perlist.Count);
-                    oRA.CostCat = ccid;
-                    oRA.DeptID = xCC.GetIntAttr("Level");
-                    oRA.Name = xCC.GetStringAttr("Name");
-                    m_cs_editdata.Add(ccid, oRA);
+                    int iRole = xCC.GetIntAttr("RoleUID");
+                    if (iRole != 0)
+                    {
+
+
+                        if (roled.TryGetValue(iRole, out oItem) == false)
+                        {
+                            if (m_roles.TryGetValue(iRole, out oItem) == true)
+                            {
+
+                                xRetCC = xRetCCs.CreateSubStruct("CostCategory");
+                                ccid = iRole;
+                                xRetCC.CreateIntAttr("ID", ccid);
+                                xRetCC.CreateStringAttr("Name", oItem.Name);
+                                bDoIt = true;
+                                roled.Add(iRole, oItem);
+
+                                if (m_cs_editdata.TryGetValue(ccid, out oRA) == false)
+                                {
+                                    oRA = new clsResxAvail();
+                                    oRA.SetUpPeriods(m_cs_perlist.Count);
+                                    oRA.CostCat = ccid;
+                                    oRA.DeptID = 0;
+                                    oRA.Name = oItem.Name;
+                                    m_cs_editdata.Add(ccid, oRA);
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+                else
+                {
+
+
+                    xRetCC = xRetCCs.CreateSubStruct("CostCategory");
+                    ccid = xCC.GetIntAttr("ID");
+                    xRetCC.CreateIntAttr("ID", ccid);
+                    xRetCC.CreateStringAttr("Name", xCC.GetStringAttr("Name"));
+                    bDoIt = true;
+
+
+                    if (m_cs_editdata.TryGetValue(ccid, out oRA) == false)
+                    {
+                        oRA = new clsResxAvail();
+                        oRA.SetUpPeriods(m_cs_perlist.Count);
+                        oRA.CostCat = ccid;
+                        oRA.DeptID = xCC.GetIntAttr("Level");
+                        oRA.Name = xCC.GetStringAttr("Name");
+                        m_cs_editdata.Add(ccid, oRA);
+
+                        if (roled.TryGetValue(ccid, out oItem) == false)
+                        {
+
+                            oItem = new clsEPKItem();
+                            oItem.UID = ccid;
+
+                            roled.Add(ccid, oItem);
+                        }
+                    }
                 }
 
-                double[] dft = new double[m_cs_perlist.Count];
-
-                for (int j = 0; j < m_cs_perlist.Count; j++)
-                    dft[j] = 0;
-
-                CStruct xwp = xCC.GetSubStruct("Periods");
-                CStruct xfe = xCC.GetSubStruct("FTEToHours");
-
-                if (xwp != null && xfe != null)
+                if (bDoIt)
                 {
-                    string per = xCC.GetString("Periods");
-                    string fte = xCC.GetString("FTEToHours");
-
-                    per = per.Replace(",", " ").Trim();
-                    fte = fte.Replace(",", " ").Trim();
 
 
-                    while (per != "")
+                    double[] dft = new double[m_cs_perlist.Count];
+
+                    for (int j = 0; j < m_cs_perlist.Count; j++)
+                        dft[j] = 0;
+
+                    CStruct xwp = xCC.GetSubStruct("Periods");
+                    CStruct xfe = xCC.GetSubStruct("FTEToHours");
+
+                    if (xwp != null && xfe != null)
                     {
-                        int iper = RPConstants.StripNum(ref per);
-                        double dFte = RPConstants.StripNum(ref fte);
+                        string per = xCC.GetString("Periods");
+                        string fte = xCC.GetString("FTEToHours");
 
-                        dFte /= 100;
+                        per = per.Replace(",", " ").Trim();
+                        fte = fte.Replace(",", " ").Trim();
 
-                        if (iper >= 1 && iper <= m_cs_perlist.Count)
-                            dft[iper - 1] = dFte;
+
+                        while (per != "")
+                        {
+                            int iper = RPConstants.StripNum(ref per);
+                            double dFte = RPConstants.StripNum(ref fte);
+
+                            dFte /= 100;
+
+                            if (iper >= 1 && iper <= m_cs_perlist.Count)
+                                dft[iper - 1] = dFte;
+                        }
+
+
                     }
 
 
-                }
 
-
-
-                for (int j = 0; j < m_cs_perlist.Count; j++)
-                {
-                    CStruct xFTE = xRetCC.CreateSubStruct("FTEs");
-                    xFTE.CreateDoubleAttr("Value", dft[j]);
+                    for (int j = 0; j < m_cs_perlist.Count; j++)
+                    {
+                        CStruct xFTE = xRetCC.CreateSubStruct("FTEs");
+                        xFTE.CreateDoubleAttr("Value", dft[j]);
+                    }
                 }
 
             }
@@ -3355,13 +3586,21 @@ namespace RPADataCache
             if (m_useingCal == iCSCalID)
             {
                 Dictionary<int, clsResFullDAta> cln = m_ccrolelist;
+
+                if (bDoRole)
+                    cln = m_rolelist;
+
                 clsResFullDAta oRole = null;
                 CStruct xRetroledatas = xRetRoot.CreateSubStruct("CapScenRoleDatas");
 
-                for (int i = clnCC.Count - 1; i >= 0; i--)
+                //               for (int i = clnCC.Count - 1; i >= 0; i--)
+
+                foreach (clsEPKItem oi in roled.Values)
                 {
-                    CStruct xCC = clnCC[i];
-                    int ccid = xCC.GetIntAttr("ID");
+                    //  CStruct xCC = clnCC[i];
+                    //  int ccid = xCC.GetIntAttr("ID");
+
+                    int ccid = oi.UID;
 
 
                     if (cln.TryGetValue(ccid, out oRole) == true)
@@ -3590,7 +3829,7 @@ namespace RPADataCache
             if (cslist.Count == 0)
                 return;
 
- 
+
             if (m_cResVals.CapacityTargets == null)
                 return;
 
@@ -3625,7 +3864,7 @@ namespace RPADataCache
             return "";
         }
 
-        public string GetRoleScrenarioData(string sXML)
+        public string GetRoleScrenarioData(string sXML, string capscen)
         {
             CStruct xRoot = new CStruct();
             CStruct xCCRoles;
@@ -3639,43 +3878,91 @@ namespace RPADataCache
             Dictionary<int, clsResFullDAta> cln = m_ccrolelist;
             clsResFullDAta oRole = null;
 
+            bool rolebased = false;
+
+            foreach (clsEPKItem oi in m_cResVals.CapacityTargets.Values)
+            {
+
+                if (oi.Name == capscen)
+                {
+                    rolebased = (oi.Flag == 1);
+                    break;
+                }
+
+
+
+            }
+
 
             CStruct xRetRoot = new CStruct();
             xRetRoot.Initialize("CurrentCSData");
 
-            for (int i = clnCC.Count - 1; i >= 0; i--)
+            double hrs;
+            double ftes;
+            CStruct xRetroledata;
+
+            if (rolebased)
             {
-                CStruct xCC = clnCC[i];
-                int ccid = xCC.GetIntAttr("ID");
-                CStruct xRetroledata;
-
-                if (cln.TryGetValue(ccid, out oRole) == true)
+                foreach (KeyValuePair<int, clsResFullDAta> xRole in m_rolelist)
                 {
-
-
-                    oRole.CreateTotals(chkCommit, chkNonWork, ckkMSPF, chkActual, chkOpenRequest, chkOpenRequire);
-
-                    double hrs;
-                    double ftes;
-
+                    xRole.Value.CreateTotals(chkCommit, chkNonWork, ckkMSPF, chkActual, chkOpenRequest, chkOpenRequire);
                     for (int xj = 1; xj <= m_num_per; xj++)
                     {
 
-                        hrs = oRole.tot_Totals.getvarr(xj);
-                        ftes = oRole.tot_Totals.getftarr(xj);
+                        hrs = xRole.Value.tot_Totals.getvarr(xj);
+                        ftes = xRole.Value.tot_Totals.getftarr(xj);
 
                         if (hrs != 0 || ftes != 0)
                         {
                             xRetroledata = xRetRoot.CreateSubStruct("CS_Value");
-                            xRetroledata.CreateIntAttr("PerID", xj);
-                            xRetroledata.CreateIntAttr("RoleID", ccid);
+                            xRetroledata.CreateIntAttr("Per_ID", xj);
+                            xRetroledata.CreateIntAttr("Role_ID", xRole.Key);
                             xRetroledata.CreateDoubleAttr("Hours", hrs);
                             xRetroledata.CreateDoubleAttr("FTEs", ftes * 100);
                         }
-
                     }
+
+
                 }
 
+            }
+            else
+            {
+
+
+                for (int i = clnCC.Count - 1; i >= 0; i--)
+                {
+                    CStruct xCC = clnCC[i];
+                    int ccid = xCC.GetIntAttr("ID");
+
+
+                    if (cln.TryGetValue(ccid, out oRole) == true)
+                    {
+
+
+                        oRole.CreateTotals(chkCommit, chkNonWork, ckkMSPF, chkActual, chkOpenRequest, chkOpenRequire);
+
+
+
+                        for (int xj = 1; xj <= m_num_per; xj++)
+                        {
+
+                            hrs = oRole.tot_Totals.getvarr(xj);
+                            ftes = oRole.tot_Totals.getftarr(xj);
+
+                            if (hrs != 0 || ftes != 0)
+                            {
+                                xRetroledata = xRetRoot.CreateSubStruct("CS_Value");
+                                xRetroledata.CreateIntAttr("Per_ID", xj);
+                                xRetroledata.CreateIntAttr("Role_ID", ccid);
+                                xRetroledata.CreateDoubleAttr("Hours", hrs);
+                                xRetroledata.CreateDoubleAttr("FTEs", ftes * 100);
+                            }
+
+                        }
+                    }
+
+                }
             }
 
             return xRetRoot.XML();
@@ -3710,7 +3997,7 @@ namespace RPADataCache
             CStruct xRetRoot = new CStruct();
             xRetRoot.Initialize("CSDepts");
 
-             foreach (clsEPKItem oi in UserDepts)
+            foreach (clsEPKItem oi in UserDepts)
             {
                 CStruct xDeptdata;
 
@@ -3725,7 +4012,97 @@ namespace RPADataCache
 
         }
 
+        public void SetAllChecks(bool bchecked)
+        {
 
+            foreach (clsResXData oDet in m_clnsort)
+            {
+                oDet.bTotalize = bchecked;
+            }
+
+            NewRedrawTotals();
+
+        }
+
+        public string GetEditResPlanPIList()
+        {
+            string sRet = " ";
+
+            foreach (clsResXData oDet in m_clnsort)
+            {
+                if (oDet.bTotalize)
+                {
+
+                    int Pid = oDet.ProjectID;
+                    string sPid = Pid.ToString();
+
+                    if (sRet.IndexOf(" " + sPid + " ") == -1)
+                        sRet += sPid + " ";
+                }
+
+            }
+
+            sRet = sRet.Trim();
+            sRet = sRet.Replace(" ", ",");
+            return sRet;
+
+        }
+
+        public string GetEditResPlanResList()
+        {
+            string sRet = " ";
+
+            foreach (clsResXData oDet in m_clnsort)
+            {
+                if (oDet.bTotalize)
+                {
+
+                    int Rid = oDet.WResID;
+                    string sRid = Rid.ToString();
+
+                    if (sRet.IndexOf(" " + sRid + " ") == -1)
+                        sRet += sRid + " ";
+                }
+
+            }
+
+            sRet = sRet.Trim();
+            sRet = sRet.Replace(" ", ",");
+            return sRet;
+
+        }
+
+        public void SetCalledFromResources(bool bFromResGrid)
+        {
+            m_fromResGrid = bFromResGrid;
+        }
+
+        public bool GetCalledFromResources()
+        {
+            return m_fromResGrid;
+        }
+
+
+        public string GetEditResPlanTicket(string ticket)
+        {
+            CStruct xRetRoot = new CStruct();
+            xRetRoot.Initialize("Ticket");
+
+
+            xRetRoot.CreateStringAttr("Value", ticket);
+
+
+            return xRetRoot.XML();
+        }
+
+        public string GetTotalsGridChartData()
+        {
+            return m_totalschartdata; 
+        }
     }
+        
+
+
+    
 
 }

@@ -1238,6 +1238,7 @@ namespace RPADataCache
             xFilter.CreateStringAttr("id", "Filter");
 
            CStruct xC = xLeftCols.CreateSubStruct("C");
+            
 
 
            xC = xLeftCols.CreateSubStruct("C");
@@ -1292,11 +1293,33 @@ namespace RPADataCache
             xC.CreateIntAttr("CanSelect", 0);
 
 
-    //        m_xDefTree.CreateStringAttr("IconFlag", "/_layouts/ppm/images/Green.gif");   //"sum()");
+            xC = xLeftCols.CreateSubStruct("C");
+            xC.CreateStringAttr("Name", "rtSelect");
+            xC.CreateStringAttr("Type", "Bool");
+            xC.CreateBooleanAttr("CanEdit", true);
+            xC.CreateIntAttr("CanMove", 0);
+            xC.CreateIntAttr("CanResize", 0);
+            xC.CreateIntAttr("ShowHint", 0);
+            xC.CreateIntAttr("CanSort", 0);
+            xC.CreateIntAttr("CanFilter", 0);
+            xC.CreateStringAttr("Width", "20");
+            xC.CreateStringAttr("Class", "");
+            xC.CreateIntAttr("Visible", 1);
+            m_xHeader1.CreateStringAttr("rtSelect", " ");
+            m_xHeader2.CreateStringAttr("rtSelect", " ");
+
+
+            xC.CreateIntAttr("CanHide", 0);
+            xC.CreateIntAttr("CanSelect", 0);
+
+            m_xDefTree.CreateBooleanAttr("rtSelectCanEdit", true);
+    //         m_xDefTree.CreateStringAttr("IconFlag", "/_layouts/ppm/images/Green.gif");   //"sum()");
             m_xDefNode.CreateStringAttr("IconFlag", "/_layouts/ppm/images/Nogif.gif");   //"sum()");
   
             CStruct xSolid = xGrid.CreateSubStruct("Solid");
             CStruct xGroup = xSolid.CreateSubStruct("Group");
+
+
 
             foreach (clsRXDisp col in Cols)
             {
@@ -1646,6 +1669,12 @@ namespace RPADataCache
             xI.CreateIntAttr("NoColorState", 1);
             xI.CreateIntAttr("rowid", rID);
             xI.CreateBooleanAttr("rowidCanEdit", false);
+
+
+
+            xI.CreateStringAttr("rtSelect", (oDet.bSelected ? "1" : "0"));
+            xI.CreateBooleanAttr("rtSelectCanEdit", true);
+
     
             foreach (clsRXDisp col in Cols)
             {
@@ -1834,8 +1863,7 @@ namespace RPADataCache
                             {
                                 xI.CreateStringAttr(sCName + "Color", rgb);
                                 xI.CreateStringAttr(sCName + "ExportStyle", "background-color: " + rgb);
-                            } 
-                            
+                            }
                         }
                     }
                                     }

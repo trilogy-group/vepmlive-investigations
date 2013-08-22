@@ -660,8 +660,17 @@ namespace PortfolioEngineCore
                 ResourceValues.clsCatItem oCatItem;
                 RVClass.CostCategories = new Dictionary<int, ResourceValues.clsCatItem>();
 
-                oCommand = new SqlCommand("EPG_SP_ReadCategoryItems", _dba.Connection);
-                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                string sCommand = "SELECT  BC_UID, BC_NAME, BC_ID, BC_LEVEL, BC_ROLE, BC_UOM, MC_UID, CA_UID, EPGP_LOOKUP_VALUES.LV_VALUE FROM EPGP_COST_CATEGORIES LEFT OUTER JOIN  EPGP_LOOKUP_VALUES ON " + 
+                    " EPGP_COST_CATEGORIES.BC_ROLE = EPGP_LOOKUP_VALUES.LV_UID ORDER BY BC_ID";
+
+
+
+                oCommand = new SqlCommand(sCommand, _dba.Connection);
+       //         reader = oCommand.ExecuteReader();
+
+
+       //         oCommand = new SqlCommand("EPG_SP_ReadCategoryItems", _dba.Connection);
+       //         oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                 reader = oCommand.ExecuteReader();
 
                 while (reader.Read())
@@ -674,6 +683,9 @@ namespace PortfolioEngineCore
                     oCatItem.ID = DBAccess.ReadIntValue(reader["BC_ID"]);
                     oCatItem.Level = DBAccess.ReadIntValue(reader["BC_LEVEL"]);
                     oCatItem.Name = reader["BC_NAME"].ToString();
+
+                    oCatItem.RoleName = DBAccess.ReadStringValue(reader["LV_VALUE"]);
+
                     if (oCatItem.Level > lCatMaxLevel) { lCatMaxLevel = oCatItem.Level; }
                     RVClass.CostCategories.Add(oCatItem.UID, oCatItem);
                 }
@@ -1698,9 +1710,18 @@ namespace PortfolioEngineCore
                     if (sManagedDeptList.Length > 0) { sDeptListPlus0 = sManagedDeptList + ",0"; }
                     else { sDeptListPlus0 = "0"; }
 
-                    oCommand = new SqlCommand("EPG_SP_ReadCapacityTargets", _dba.Connection);
-                    oCommand.Parameters.AddWithValue("sList", sDeptListPlus0);
-                    oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+ 
+                    cmdText = "SELECT * From EPGP_CAPACITY_SETS WHERE DEPT_UID IN (" + sDeptListPlus0 + ") Order by DEPT_UID,CS_NAME" ;
+
+                    oCommand = new SqlCommand(cmdText, _dba.Connection);
+
+
+                    
+
+
+                    //oCommand = new SqlCommand("EPG_SP_ReadCapacityTargets", _dba.Connection);
+                    //oCommand.Parameters.AddWithValue("sList", sDeptListPlus0);
+                    //oCommand.CommandType = System.Data.CommandType.StoredProcedure;
 
                     ResourceValues.clsEPKItem oCapacityItem;
 
@@ -1711,6 +1732,17 @@ namespace PortfolioEngineCore
                         oCapacityItem.ID = DBAccess.ReadIntValue(reader["CS_ID"]);
                         oCapacityItem.Name = DBAccess.ReadStringValue(reader["CS_NAME"]);
                         oCapacityItem.UID = DBAccess.ReadIntValue(reader["DEPT_UID"]);
+
+                        try
+                        {
+                            oCapacityItem.Flag = DBAccess.ReadIntValue(reader["CS_ROLE_BASED"]);
+                        }
+                        catch(Exception ex)
+                        {
+                             oCapacityItem.Flag = 0;
+                        }
+
+
                         RVClass.CapacityTargets.Add(oCapacityItem.ID, oCapacityItem);
                     }
                     reader.Close();
@@ -2360,10 +2392,10 @@ namespace PortfolioEngineCore
                     sdatatype = "Cost";
                     break;
                 case FieldType.TypeCode:
-                    sdatatype = "Code";
+                    sdatatype = "Code (Deprecated)";
                     break;
                 case FieldType.TypeMVCode:
-                    sdatatype = "MV Code";
+                    sdatatype = "MV Code (Deprecated)";
                     break;
                 case FieldType.TypeFlag:
                     sdatatype = "Flag";

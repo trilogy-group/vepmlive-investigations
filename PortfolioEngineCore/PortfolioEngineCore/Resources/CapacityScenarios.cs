@@ -184,7 +184,7 @@ namespace PortfolioEngineCore
 
       }
 
-      public int AddCapacityScenarioXML(string sScenarioName, bool bPriv, int deptID)
+      public int AddCapacityScenarioXML(string sScenarioName, bool bPriv, int deptID, int rmode)
       {
 
           if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
@@ -206,11 +206,18 @@ namespace PortfolioEngineCore
 
          bool bPrivate = PrivateAllowed();
 
-          if (bPrivate)
+         bool bCSRole = RoleBasedCSAllowed();
+
+
+         if (bPrivate && bCSRole) 
+              cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME, WRES_ID, CS_ROLE_BASED) VALUES(" + maxid.ToString() + ", " + deptID.ToString() + " ," + DBAccess.PrepareText(sScenarioName) + "," + (bPriv ? _userWResID.ToString() : "0") + "," + rmode.ToString() + ")";
+         else if (bPrivate && bCSRole == false)
               cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME, WRES_ID) VALUES(" + maxid.ToString() + ", " + deptID.ToString() + " ," + DBAccess.PrepareText(sScenarioName) + "," + (bPriv ? _userWResID.ToString() : "0") + ")";
-          else 
-                cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME) VALUES(" + maxid.ToString() + ", " + deptID.ToString() + " ," + DBAccess.PrepareText(sScenarioName) + ")";
-           oCommand = new SqlCommand(cmdText, _sqlConnection);
+         else if (bCSRole)
+             cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME, CS_ROLE_BASED) VALUES(" + maxid.ToString() + ", " + deptID.ToString() + " ," + DBAccess.PrepareText(sScenarioName) + "," + rmode.ToString() + " )";
+         else
+              cmdText = "INSERT INTO EPGP_CAPACITY_SETS (CS_ID,  DEPT_UID, CS_NAME) VALUES(" + maxid.ToString() + ", " + deptID.ToString() + " ," + DBAccess.PrepareText(sScenarioName) + " )";
+oCommand = new SqlCommand(cmdText, _sqlConnection);
            reader = oCommand.ExecuteReader();
 
            return maxid;
@@ -468,14 +475,15 @@ namespace PortfolioEngineCore
 
           string sCapName = xSaveData.GetStringAttr("Name");
           int iCapacityID = xSaveData.GetIntAttr("ID");
-          int wRes = xSaveData.GetIntAttr("WRES"); 
+          int wRes = xSaveData.GetIntAttr("WRES");
           int DeptID = xSaveData.GetIntAttr("DEPT");
+          int rmode = xSaveData.GetIntAttr("RMODE");
 
 
           if (iCapacityID == -1)
           {
 
-              iCapacityID = AddCapacityScenarioXML(sCapName, wRes != 0, DeptID);
+              iCapacityID = AddCapacityScenarioXML(sCapName, wRes != 0, DeptID, rmode);
           }
 
           CStruct CSValues = xSaveData.GetSubStruct("CS_Values");
@@ -523,6 +531,7 @@ namespace PortfolioEngineCore
 
           int wRes = xSaveData.GetIntAttr("WRES");
           int DeptID = xSaveData.GetIntAttr("DEPT");
+          int rmode = xSaveData.GetIntAttr("RMODE");
 
           while (reader.Read())
           {
@@ -532,13 +541,86 @@ namespace PortfolioEngineCore
 
           if (curid == 0)
           {
-              curid = AddCapacityScenarioXML(sSaveToName, wRes != 0, DeptID);
+              curid = AddCapacityScenarioXML(sSaveToName, wRes != 0, DeptID, rmode);
           }
 
           SaveCapacityScenario(curid, sCSDataXML);
 
 
           return true;
+
+      }
+
+      public string GetListTicket(string sList, bool bIsPIList)
+      {
+          if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+          _sqlConnection.Open();
+
+          string sExt = "";
+          string cmdText = "";
+          SqlCommand oCommand;
+
+          try
+          {
+              if (bIsPIList == true)
+              {
+
+
+                  cmdText = "SELECT  PROJECT_EXT_UID FROM  EPGP_PROJECTS WHERE (PROJECT_ID IN (" + sList + "))";
+
+                  oCommand = new SqlCommand(cmdText, _sqlConnection);
+                  SqlDataReader reader = oCommand.ExecuteReader();
+
+                  while (reader.Read())
+                  {
+                      if (sExt != "")
+                          sExt += ",";
+
+                      sExt += DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                  }
+                  reader.Close();
+              }
+              else
+                  sExt = sList;
+
+              if (sExt != "")
+              {
+
+                  Guid newticket = Guid.NewGuid();
+
+
+                  cmdText = "INSERT INTO EPG_DATA_CACHE ( DC_TICKET, DC_TIMESTAMP, DC_DATA) " +
+                                        " VALUES(@pticket,@ptimest,@pdta)";
+                  oCommand = new SqlCommand(cmdText, _sqlConnection);
+
+                  SqlParameter pTicketID = oCommand.Parameters.Add("@pticket", SqlDbType.UniqueIdentifier);
+                  SqlParameter pTimestampID = oCommand.Parameters.Add("@ptimest", SqlDbType.DateTime);
+                  SqlParameter pDataID = oCommand.Parameters.Add("@pdta", SqlDbType.NText);
+
+
+                  pTicketID.Value = newticket;
+                  pTimestampID.Value = DateTime.Now;
+                  pDataID.Value = sExt;
+
+                  int lRowsAffected = oCommand.ExecuteNonQuery();
+
+
+
+                  return newticket.ToString();
+              }
+             
+
+              return "";
+
+          }
+
+          catch (Exception ex)
+          {
+
+
+              return "";
+          }
+
 
       }
 

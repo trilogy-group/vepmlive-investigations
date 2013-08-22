@@ -29,7 +29,7 @@
 			Grids.OnMoveDragCell = GridsOnMoveDragCellDelegate;
 			Grids.OnMouseDown = GridsOnMouseDownDelegate;
 			
-  
+      
 			Grids.OnRenderStart = GridsOnRenderStartDelegate;
 			Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
 
@@ -95,6 +95,8 @@
 
 	        if (this.dlgEditTarget != null)
 	            this.dlgEditTarget.window("winEditTargetDlg").setDimension(this.Width, this.Height);
+	        if (this.dlgChart != null)
+	            this.dlgChart.window("winChartDlg").setDimension(this.Width, this.Height);
 	    }
 	}
 
@@ -342,6 +344,10 @@
 
 
 	        if (gridView.LeftCols !== null) {
+
+	            if (gridId == "bottomg_1" && gridView.LeftCols == "")
+	                gridView.LeftCols = "rtSelect:20";
+
 	            var leftCols = gridView.LeftCols.split(',');
 
 
@@ -548,8 +554,8 @@
 	        if (gridView['Grouping'] === '') {
 	            try {
 	                if (grid.Group != "")
-	                    grid.DoGrouping(null); 
-                } catch (e) { };   
+	                    grid.DoGrouping(null);
+	            } catch (e) { };
 	        } else {
 	            var grouping = gridView['Grouping'].split('|');
 
@@ -1106,161 +1112,230 @@
 	}
 
 	ResPlanAnalyzer.prototype.FinishTotals = function () {
-		if (this.TotalsLoading == true)
-			return;
+	    if (this.TotalsLoading == true)
+	        return;
 
-		var rbtotByRole = document.getElementById('idTotalsByRole');
-		var rbtotByRes = document.getElementById('idTotalsByRes');
-		var selRoleMode = document.getElementById('idSelRoleView');
-		var selAvail = document.getElementById('idSelTotAvailCols');
-		var selSelected = document.getElementById('idSelSelectedCols');
-		var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
-		var selHeatMap = document.getElementById('idSelHeatmap');
-		var selHeatMapColour = document.getElementById('idSelHeatmapColour');
+	    var rbtotByRole = document.getElementById('idTotalsByRole');
+	    var rbtotByRes = document.getElementById('idTotalsByRes');
+	    var selRoleMode = document.getElementById('idSelRoleView');
+	    var selAvail = document.getElementById('idSelTotAvailCols');
+	    var selSelected = document.getElementById('idSelSelectedCols');
+	    var chkEnableHeatMap = document.getElementById('idEnableHeatMap');
+	    var selHeatMap = document.getElementById('idSelHeatmap');
+	    var selHeatMapColour = document.getElementById('idSelHeatmapColour');
 
-		this.selectedHeatMapColour = selHeatMapColour;
+	    var iRoleMode = selRoleMode.value;
 
-		var moveupbtn = document.getElementById('idSelectedColsMoveUp');
-		var movedownbtn = document.getElementById('idSelectedColsMoveDown');
+	    this.selectedHeatMapColour = selHeatMapColour;
 
-
-
-		selRoleMode.disabled = !rbtotByRole.checked;
-		selHeatMap.disabled = !chkEnableHeatMap.checked;
-
-		selHeatMapColour.disabled = !chkEnableHeatMap.checked;
-
-		selAvail.options.length = 0;
-		selSelected.options.length = 0;
-		selHeatMap.options.length = 0;
-
-		this.addbtndisabled = (this.TotAddSel == null);
-		this.setNewButtonDisable('idTotButtonAdd', this.addbtndisabled);
-
-		this.rembtndisabled = (this.TotRemSel == null);
-		this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
-
-		var i;
-		var item;
-		var j = 0;
-
-		if (rbtotByRole.checked == false) {
-			var temparr = new Array();
-
-			for (i = 0; i < this.TotSelectedOrder.length; i++) {
-				if (this.TotSelectedOrder[i] <= 0)
-					temparr[j++] = this.TotSelectedOrder[i];
-			}
-			this.TotSelectedOrder = temparr;
-
-			if (this.TotalsData.EnableHeatField.Value > 0)
-				this.TotalsData.EnableHeatField.Value = -6;
-		}
-
-		var n1 = 0;
-		var usesel = this.TotalsData.EnableHeatField.Value;
-
-		for (i = 0; i < this.TotalsData.ColumnOptions.ColumnOption.length; i++) {
-			item = this.TotalsData.ColumnOptions.ColumnOption[i];
-			item.Selected = 0;
-
-			if (item.ColumnID != 0) {
-				if (item.ColumnID != -7 && item.ColumnID != -8) {
-
-					if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0))
-						selHeatMap.options[n1++] = new Option(item.Name, item.ColumnID, item.ColumnID == usesel, item.ColumnID == usesel);
-				}
-			}
-
-		}
-
-		n1 = 0;
-		var bSel = false;
-
-		var bfound = false;
-		var selval;
-
-		for (i = 0; i < this.TotSelectedOrder.length; i++) {
-			for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
-				item = this.TotalsData.ColumnOptions.ColumnOption[j];
-				if (item.ColumnID == this.TotSelectedOrder[i]) {
-					bSel = false;
-
-					if (this.TotRemSel != null)
-						bSel = (item.ColumnID == this.TotRemSel);
-
-					bfound |= bSel;
-
-					if (bSel)
-						selval = n1;
-
-					selSelected.options[n1] = new Option(item.Name, item.ColumnID, bSel, bSel);
-
-					if (item.ColumnID == 0) {
-						var opt = selSelected.options[n1];
-
-						opt.style.color = "#CCCCCC";    // "LightGrey";
-					}
-
-					++n1;
-					item.Selected = 1;
-					break;
-				}
-			}
-		}
-
-
-		selHeatMapColour.value = this.TotalsData.HeatFieldColour.Value;
-
-		if (bfound == false) {
-			this.TotRemSel = null;
-			moveupbtn.disabled = true;
-			movedownbtn.disabled = true;
-		}
-		else if (selSelected.options.length <= 1) {
-			moveupbtn.disabled = true;
-			movedownbtn.disabled = true;
-		}
-		else {
-
-			if (selval == 0) {
-				moveupbtn.disabled = true;
-				movedownbtn.disabled = false;
-			}
-			else if (selval == (selSelected.options - 1)) {
-				moveupbtn.disabled = false;
-				movedownbtn.disabled = true;
-			}
-			else {
-				moveupbtn.disabled = false;
-				movedownbtn.disabled = false;
-			}
-		}
-		bfound = false;
-
-
-		n1 = 0;
-		for (j = 0; j < this.TotalsData.ColumnOptions.ColumnOption.length; j++) {
-			item = this.TotalsData.ColumnOptions.ColumnOption[j];
-			if (item.Selected == 0) {
-				bSel = false;
+	    var moveupbtn = document.getElementById('idSelectedColsMoveUp');
+	    var movedownbtn = document.getElementById('idSelectedColsMoveDown');
 
 
 
+	    selRoleMode.disabled = !rbtotByRole.checked;
+	    selHeatMap.disabled = !chkEnableHeatMap.checked;
 
-				if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0 && item.ColumnID != -8)) {
-					if (this.TotAddSel != null)
-						bSel = (item.ColumnID == this.TotAddSel);
+	    selHeatMapColour.disabled = !chkEnableHeatMap.checked;
 
-					bfound |= bSel;
+	    selAvail.options.length = 0;
+	    selSelected.options.length = 0;
+	    selHeatMap.options.length = 0;
 
-					selAvail.options[n1++] = new Option(item.Name, item.ColumnID, bSel, bSel);
-				}
-			}
-		}
+	    this.addbtndisabled = (this.TotAddSel == null);
+	    this.setNewButtonDisable('idTotButtonAdd', this.addbtndisabled);
 
-		if (bfound == false)
-			this.TotAddSel = null;
+	    this.rembtndisabled = (this.TotRemSel == null);
+	    this.setNewButtonDisable('idTotButtonRemove', this.rembtndisabled);
+
+	    var i;
+	    var item;
+	    var j = 0;
+
+
+	    var colopt = this.TotalsData.ColumnOptions;
+
+	    if (iRoleMode == 1) {
+	        colopt = this.TotalsData.ColumnNROptions;
+
+	        for (i = 0; i < this.TotalsData.ColumnOptions.ColumnOption.length; i++) {
+	            item = this.TotalsData.ColumnOptions.ColumnOption[i];
+	            var bf = false;
+
+
+	            for (xj = 0; xj < colopt.ColumnOption.length; xj++) {
+	                var ij = colopt.ColumnOption[xj];
+
+	                if (ij.ColumnID == item.ColumnID) {
+	                    bf = true;
+	                    break;
+	                }
+
+	            }
+
+	            if (bf == false) {
+	                item.Selected = 0;
+	                var temparr = new Array();
+
+	                for (xi = 0; xi < this.TotSelectedOrder.length; xi++) {
+	                   if (this.TotSelectedOrder[xi] != item.ColumnID) {
+        	                temparr[j++] = this.TotSelectedOrder[xi];
+                    	}
+	                }
+	                this.TotSelectedOrder = temparr;
+
+
+	            }
+
+	        }
+
+
+	    }
+
+	    j = 0;
+
+	    if (rbtotByRole.checked == false) {
+	        var temparr = new Array();
+
+	        for (i = 0; i < this.TotSelectedOrder.length; i++) {
+	            if (this.TotSelectedOrder[i] <= 0)
+	                temparr[j++] = this.TotSelectedOrder[i];
+	        }
+	        this.TotSelectedOrder = temparr;
+
+	        if (this.TotalsData.EnableHeatField.Value > 0)
+	            this.TotalsData.EnableHeatField.Value = -6;
+	    }
+	    else if (iRoleMode == 1) {
+//	        var temparr = new Array();
+
+//	        for (i = 0; i < this.TotSelectedOrder.length; i++) {
+//	            if (this.TotSelectedOrder[i] <= 0)
+//	                temparr[j++] = this.TotSelectedOrder[i];
+//	            else {
+
+//	                for (xi = 0; xi < this.TotalsData.ColumnOptions.ColumnOption.length; xi++) {
+//	                    item = this.TotalsData.ColumnOptions.ColumnOption[xi];
+
+
+//	                    if (this.TotSelectedOrder[i] == item.ColumnID) {
+//	                        if (item.Selected == 1)
+//	                            temparr[j++] = this.TotSelectedOrder[i];
+
+//	                        break;
+//	                    }
+//	                }
+//	            }
+//	        }
+//	        this.TotSelectedOrder = temparr;
+
+	    }
+
+	    var n1 = 0;
+	    var usesel = this.TotalsData.EnableHeatField.Value;
+
+
+	    for (i = 0; i < colopt.ColumnOption.length; i++) {
+	        item = colopt.ColumnOption[i];
+	        item.Selected = 0;
+
+	        if (item.ColumnID != 0) {
+	            if (item.ColumnID != -7 && item.ColumnID != -8) {
+
+	                if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0))
+	                    selHeatMap.options[n1++] = new Option(item.Name, item.ColumnID, item.ColumnID == usesel, item.ColumnID == usesel);
+	            }
+	        }
+
+	    }
+
+	    n1 = 0;
+	    var bSel = false;
+
+	    var bfound = false;
+	    var selval;
+
+	    for (i = 0; i < this.TotSelectedOrder.length; i++) {
+	        for (j = 0; j < colopt.ColumnOption.length; j++) {
+	            item = colopt.ColumnOption[j];
+	            if (item.ColumnID == this.TotSelectedOrder[i]) {
+	                bSel = false;
+
+	                if (this.TotRemSel != null)
+	                    bSel = (item.ColumnID == this.TotRemSel);
+
+	                bfound |= bSel;
+
+	                if (bSel)
+	                    selval = n1;
+
+	                selSelected.options[n1] = new Option(item.Name, item.ColumnID, bSel, bSel);
+
+	                if (item.ColumnID == 0) {
+	                    var opt = selSelected.options[n1];
+
+	                    opt.style.color = "#CCCCCC";    // "LightGrey";
+	                }
+
+	                ++n1;
+	                item.Selected = 1;
+	                break;
+	            }
+	        }
+	    }
+
+
+	    selHeatMapColour.value = this.TotalsData.HeatFieldColour.Value;
+
+	    if (bfound == false) {
+	        this.TotRemSel = null;
+	        moveupbtn.disabled = true;
+	        movedownbtn.disabled = true;
+	    }
+	    else if (selSelected.options.length <= 1) {
+	        moveupbtn.disabled = true;
+	        movedownbtn.disabled = true;
+	    }
+	    else {
+
+	        if (selval == 0) {
+	            moveupbtn.disabled = true;
+	            movedownbtn.disabled = false;
+	        }
+	        else if (selval == (selSelected.options - 1)) {
+	            moveupbtn.disabled = false;
+	            movedownbtn.disabled = true;
+	        }
+	        else {
+	            moveupbtn.disabled = false;
+	            movedownbtn.disabled = false;
+	        }
+	    }
+	    bfound = false;
+
+
+	    n1 = 0;
+	    for (j = 0; j < colopt.ColumnOption.length; j++) {
+	        item = colopt.ColumnOption[j];
+	        if (item.Selected == 0) {
+	            bSel = false;
+
+
+
+
+	            if (rbtotByRole.checked == true || (rbtotByRole.checked == false && item.ColumnID <= 0 && item.ColumnID != -8)) {
+	                if (this.TotAddSel != null)
+	                    bSel = (item.ColumnID == this.TotAddSel);
+
+	                bfound |= bSel;
+
+	                selAvail.options[n1++] = new Option(item.Name, item.ColumnID, bSel, bSel);
+	            }
+	        }
+	    }
+
+	    if (bfound == false)
+	        this.TotAddSel = null;
 
 
 
@@ -1308,7 +1383,17 @@
 					this.TotAddSel = item.ColumnID;
 					break;
 				}
-			}
+}
+
+                for (j = 0; j < this.TotalsData.ColumnNROptions.ColumnOption.length; j++) {
+                    item = this.TotalsData.ColumnNROptions.ColumnOption[j];
+                    if (item.ColumnID == iRemColID) {
+
+                        item.Selected == 0;
+
+                        break;
+                    }
+                }
 
 			var temparr = new Array();
 
@@ -1365,6 +1450,15 @@
 					}
 				}
 
+                for (j = 0; j < this.TotalsData.ColumnNROptions.ColumnOption.length; j++) {
+                    item = this.TotalsData.ColumnNROptions.ColumnOption[j];
+                    if (item.ColumnID == iAddColID) {
+
+                        item.Selected == 1;
+
+                        break;
+                    }
+                }
 
 				break;
 			}
@@ -1680,9 +1774,10 @@
 
 		this.DetailsSettings = sb.toString();
 		this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
-		this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
-
 		WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDetails", sb.toString());
+
+        this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
+     	this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
 
 		RefreshBothGrids();
 	}
@@ -1719,6 +1814,7 @@
 				this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
 				WorkEnginePPM.ResPlanAnalyzer.Execute("SetRAWorkDisplayMode", sb.toString());
 				this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+
 
 				return true;
 			}
@@ -1803,6 +1899,10 @@
 	        var showpersonal = this.DetailsData.ShowPersonal.Value;
 	        var showopen = this.DetailsData.ShowOpenReq.Value;
 
+            this.ChartATDisableList = new Array();
+            this.ChartVTDisableList = new Array();
+            this.ChartBTDisableList = new Array();
+            this.ChartBlockCommand = new Array();
 
 
 
@@ -1839,7 +1939,18 @@
 							    items: [
 									{ type: "bigbutton", id: "UndoBtn", name: "Undo", img: "formatmap32x32.png", style: "top: -416px; left: -96px;position:relative;", tooltip: "Undo", onclick: "dialogEvent('AnalyzerTab_UnDoDrag');", disabled: true }
 								]
-							}
+							},
+                            {
+                                items: [
+		{ type: "bigbutton", id: "ChangePeriodBtn", name: "Change Analyzer<br/>Periods", img: "formatmap32x32.png", style: "top: -384px; left: 0px;position:relative;", tooltip: "Change Calendar", onclick: "dialogEvent('AnalyzerTab_ChangeCalendar');" }
+								]
+                            },
+                            {
+                                items: [
+									{ type: "smallbutton", id: "chkAll", img: "Approve.gif", name: "Check All", tooltip: "Check all rows", onclick: "dialogEvent('AnalyzerTab_chkAll');" },
+									{ type: "smallbutton", id: "chkNone", img: "Reject.gif", name: "Uncheck All", tooltip: "Uncheck all rows", onclick: "dialogEvent('AnalyzerTab_chkNone');" }
+								]
+                            }
 						]
 					},
 					{
@@ -1878,7 +1989,6 @@
 	        var cbProp = { type: "mediumtext", id: "chkRequests", name: "Show Proposed Work", tooltip: "Show Proposed Work", onclick: "dialogEvent('AnalyzerTab_chkRequests_Click');" };
 	        var cbReq = { type: "mediumtext", id: "chkOpenRequests", name: "Show Open Requirements", tooltip: "Show Open Requirements", onclick: "dialogEvent('AnalyzerTab_chkOpenRequests_Click');" };
 	        var cbNW = { type: "mediumtext", id: "chkNonWork", name: "Show Personal Time Off", tooltip: "Show Personal Time Off", onclick: "dialogEvent('AnalyzerTab_chkNonWork_Click');" };
-
 
 
 
@@ -1936,10 +2046,10 @@
 					    name: "Actions",
 					    columns: [
                              {
-                                items: [
+                                 items: [
 									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
 								]
-                            },
+                             },
 							{
 							    items: [
 									{ type: "bigbutton", id: "idSaveScenario1", name: "Save<br/>Scenario", disabled: (this.fromresource == "1" ? false : true), img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
@@ -2031,6 +2141,8 @@
 	                }
 	            }
 
+	            columns[6] = columns[5];
+	            columns[5] = columns[4];
 	            columns[4] = columns[3];
 	            columns[3] = columns[2];
 	            columns[2] = bbEditRes;
@@ -2049,6 +2161,69 @@
 	            columns[1] = bbEditRes1;
 
 	        }
+
+            
+        this.ChartATDisableList.push("SaveBtn");
+        this.ChartATDisableList.push("idSaveScenario");
+        this.ChartATDisableList.push("UndoBtn");
+        this.ChartATDisableList.push("ChangePeriodBtn");
+        this.ChartATDisableList.push("chkAll");
+        this.ChartATDisableList.push("chkNone");
+        this.ChartATDisableList.push("idExportExcelTop");
+        this.ChartATDisableList.push("idPrintTop");
+        this.ChartATDisableList.push("idEditRes");
+
+        this.ChartVTDisableList.push("idSaveScenario1");
+        this.ChartVTDisableList.push("UndoBtn2");
+        this.ChartVTDisableList.push("idEditRes1");
+        this.ChartVTDisableList.push("SaveViewBtn");
+        this.ChartVTDisableList.push("RenameViewBtn");
+        this.ChartVTDisableList.push("DeleteViewBtn");
+        this.ChartVTDisableList.push("idAnalyzerShowFilters");
+        this.ChartVTDisableList.push("idAnalyzerShowGrouping");
+        this.ChartVTDisableList.push("idViewTab_RemoveSorting");
+        this.ChartVTDisableList.push("idAnalyzerShowBars");
+        this.ChartVTDisableList.push("idAnalyzerHideDetails");
+        this.ChartVTDisableList.push("SelectColumnsBtn");
+        this.ChartVTDisableList.push("idAnalyzerExpandAll");
+        this.ChartVTDisableList.push("idAnalyzerCollapsAll");
+        this.ChartVTDisableList.push("idAnalyzerTab_SelView");
+        this.ChartVTDisableList.push("idAnalyzerTab_SelMode");
+
+        this.ChartBTDisableList.push("idTotCol");
+
+
+       this.ChartBlockCommand.push("AnalyzerTab_SaveDrag");
+       this.ChartBlockCommand.push("AnalyzerTab_SaveScen");
+       this.ChartBlockCommand.push("AnalyzerTab_UnDoDrag");
+       this.ChartBlockCommand.push("AnalyzerTab_ChangeCalendar");
+       this.ChartBlockCommand.push("AnalyzerTab_chkAll");
+       this.ChartBlockCommand.push("AnalyzerTab_chkNone");
+       this.ChartBlockCommand.push("AnalyzerTab_ExporttoExcel");
+       this.ChartBlockCommand.push("AnalyzerTab_Print");
+       this.ChartBlockCommand.push("EditResPlan");
+
+
+       this.ChartBlockCommand.push("AnalyzerTab_SaveView"); 
+       this.ChartBlockCommand.push("AnalyzerTab_RenameView");
+       this.ChartBlockCommand.push("AnalyzerTab_DeleteView");       
+       this.ChartBlockCommand.push("AnalyzerTab_ShowFilters_Click");       
+       this.ChartBlockCommand.push("AnalyzerTab_ShowGrouping_Click");       
+       this.ChartBlockCommand.push("AnalyzerTab_RemoveSorting_Click");       
+       this.ChartBlockCommand.push("AnalyzerTab_ShowBars_Click");       
+       this.ChartBlockCommand.push("AnalyzerTab_HideDetails_Click");
+
+       this.ChartBlockCommand.push("AnalyzerTab_SelectColumns");       
+       this.ChartBlockCommand.push("AnalyzerTab_ExpandAll");
+       this.ChartBlockCommand.push("AnalyzerTab_CollapseAll");
+
+       this.ChartBlockCommand.push("AnalyzerTab_SelView_Changed");
+       this.ChartBlockCommand.push("AnalyzerTab_SelMode_Changed");
+
+       this.ChartBlockCommand.push("AnalyzerTab_CapScen");
+
+
+
 
 	        var BottomTabData = {
 	            parent: "idBottomTabDiv",
@@ -2069,6 +2244,11 @@
 							{
 							    items: [
 									{ type: "mediumbutton", id: "idTotCol", name: "Capacity<br/> Scenarios", disabled: (this.fromresource == "1" ? false : true), img: "capscenariosl20x20.png", tooltip: "Capacity Scenarios", onclick: "dialogEvent('AnalyzerTab_CapScen');" }
+								]
+							},
+							{
+							    items: [
+									{ type: "mediumbutton", id: "idGraph", name: "Show<br/>Graph", img: "ps16x16.png", style: "top: -128px; left: -80px;position:relative;", tooltip: "Show Graph", onclick: "dialogEvent('AnalyzerTab_ShowGraph');" }
 								]
 							}
 						 ]
@@ -2351,6 +2531,9 @@
 				this.TotalsData = jsonObject.Result.TotalsConfiguration.TotalsConfiguration;
 
 				this.fromresource = jsonObject.Result.FromResGrid.Value;
+				this.allowcsmode = jsonObject.Result.AllowCSResMode.Value;
+
+                
 
 				this.TotalsColumnSettings = jsonObject.Result.TotalsConfiguration.Value;
 
@@ -2671,7 +2854,27 @@
 			this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
 			RefreshBottomGrid();
 			return;
-		}
+        }
+
+        if (Grid.id == "bottomg_1" && Col == "rtSelect") {
+            var sb = new StringBuilder();
+            sb.append("<Rows ");
+            sb.append(" value='" + value + "'>");
+
+            this.HandleBottomClick(Grid, Row, Col, value, sb);
+
+            sb.append("</Rows>");
+
+            //       alert(sb.toString());
+
+            WorkEnginePPM.ResPlanAnalyzer.Execute("SetRATotalSelectedFlag", sb.toString());
+
+            if (this.showingGraph == true) {
+                this.createChart();
+            }
+
+            return;
+        }
 	}
 
 	ResPlanAnalyzer.prototype.GridsOnClickCell = function (grid, row, col) {
@@ -2881,7 +3084,6 @@
 	}
 
 
-
 	ResPlanAnalyzer.prototype.GridsOnReady = function (grid, start) {
 	    try {
 
@@ -2889,6 +3091,9 @@
 	            this.topgridready = true;
 
 	        if (grid.id == "bottomg_1") {
+	            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetTotalsGridChartData", "", GetTotalsGridChartDataCompleteDelegate);
+
+
 	            if (this.bottomgridfirstready == false) {
 	                this.HideWorkingPopup("divLoading");
 	                bottomgridfirstready = true;
@@ -3042,18 +3247,44 @@
 		}
 
 		return true;
-	}
+    }
+
+    var AllBottomLeavesChecked = function (Grid, Row) {
+        var children;
+        children = Row.firstChild;
+
+        if (children == null) {
+            var rowck = Grid.GetString(Row, "rtSelect");
+            if (rowck == "0")
+                return false;
+
+        }
+
+        while (children != null) {
+            if (AllBottomLeavesChecked(Grid, children) == false)
+                return false;
+
+            children = children.nextSibling;
+        }
+
+        return true;
+    }
 
 	ResPlanAnalyzer.prototype.HandleRerenderChecks = function () {
 
-		if (this.refreshChecksInDetGrid != null) {
-			for (var i = 0; i < this.refreshChecksInDetGrid.length; i++) {
-				this.DetGrid.RefreshCell(this.refreshChecksInDetGrid[i], "Select");
-			}
-			this.refreshChecksInDetGrid = null;
-		}
+	    if (this.refreshChecksInDetGrid != null) {
+	        for (var i = 0; i < this.refreshChecksInDetGrid.length; i++) {
+	            this.DetGrid.RefreshCell(this.refreshChecksInDetGrid[i], "Select");
+	        }
+	        this.refreshChecksInDetGrid = null;
+	    }
 
-
+	    if (this.refreshBottomChecksInDetGrid != null) {
+	        for (var i = 0; i < this.refreshBottomChecksInDetGrid.length; i++) {
+	            this.TotGrid.RefreshCell(this.refreshBottomChecksInDetGrid[i], "rtSelect");
+	        }
+	        this.refreshBottomChecksInDetGrid = null;
+	    }
 
 	}
 
@@ -3283,6 +3514,29 @@
 
 	    if (grid.id != "bottomg_1")
 	        return null;
+
+
+	    if (col == "rtSelect") {
+
+	        var bAll = AllBottomLeavesChecked(grid, row);
+
+	        var rowck = grid.GetString(row, "rtSelect");
+	        var newck = (bAll == true ? "1" : "0");
+
+	        if (rowck != newck) {
+	            grid.SetAttribute(row, col, null, newck, 1);
+
+
+	            if (this.refreshBottomChecksInDetGrid == null) {
+	                this.refreshBottomChecksInDetGrid = new Array();
+	                window.setTimeout(HandleRerenderChecksDelegate, 400);
+	            }
+
+	            this.refreshBottomChecksInDetGrid[this.refreshBottomChecksInDetGrid.length] = row;
+	            //grid.RefreshCell(row, "Select");
+	        }
+	    }
+
 
 	    if (row.firstChild == null || row.id == "Filter")
 	        return null;
@@ -3675,7 +3929,7 @@
 	        this.viewTab.enableItem("SaveBtn2");
 	    }
 
-	    this.UnDoBtn = true;
+	    this.UnDoBtn = true; RefreshBottomGrid
 	    this.analyzerTab.enableItem("UndoBtn");
 	    this.viewTab.enableItem("UndoBtn2");
 
@@ -3689,6 +3943,30 @@
 	    WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADragRows", sb.toString(), HandleRefreshDelegate);
 
 	}
+
+	ResPlanAnalyzer.prototype.TabDoChecks = function (iMode) {
+	    var Grid = this.DetGrid;
+
+	    var arows = Grid.Rows;
+
+
+	    for (var i in arows) {
+
+
+
+	        var Row = arows[i];
+
+            if (Row.Kind == "Data")
+	            Grid.SetString(Row, "Select", iMode, 1);
+
+        }
+
+
+        this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+
+        WorkEnginePPM.ResPlanAnalyzer.Execute("SetAllCheckMarks", iMode.toString(), RefreshBottomGrid);
+
+	}	
 
 
 	var HandleClick = function (Grid, Row, Col, value, sb) {
@@ -3709,6 +3987,38 @@
 			children = children.nextSibling;
 		}
 	}
+
+	ResPlanAnalyzer.prototype.HandleBottomClick = function (Grid, Row, Col, value, sb) {
+	    var children;
+
+	    Row.Changed = 1;
+	    Grid.SetString(Row, Col, value, 1);
+	    children = Row.firstChild;
+
+	    if (children == null) {
+	        var rowid = Grid.GetString(Row, "rowid");
+	        sb.append("<Row rowid='" + rowid + "'/>");
+
+	        if (this.ChartRawData != null) {
+	            for (var i = 0; i < this.ChartRawData.length; i++) {
+	                if (this.ChartRawData[i].ID == rowid) {
+	                    this.ChartRawData[i].Sel = value;
+	                    break;
+	                }
+	            }
+
+
+
+	        }
+
+	    }
+
+	    while (children != null) {
+	        this.HandleBottomClick(Grid, children, Col, value, sb);
+	        children = children.nextSibling;
+	    }
+	}
+
 
 	ResPlanAnalyzer.prototype.CaptureDragRow = function (Grid, Row) {
 		var children;
@@ -3972,7 +4282,6 @@
 	        }
 
 	        if (this.TotGrid != null) {
-
 	            this.TotGrid.Reload(null);
 	        }
 
@@ -4009,10 +4318,52 @@
 
 		}
 
-     }
+    }
 
-      ResPlanAnalyzer.prototype.PopulateCSDeptList = function (defdept)
-      {
+
+    ResPlanAnalyzer.prototype.GetTotalsGridChartDataComplete = function (jsonString) {
+        try {
+
+            if (jsonString != "") {
+                var jsonObject = JSON_ConvertString(jsonString);
+                if (JSON_ValidateServerResult(jsonObject)) {
+
+                    this.ChartRawData = JSON_GetArray(jsonObject.Result.Rows, "Row");
+
+                    for (var i = 0; i < this.ChartRawData.length; i++) {
+                        var rw = this.ChartRawData[i];
+
+                        var xavail = new Array();
+                        var xtot = new Array();
+
+                        for (var xi = 0; xi < rw.Tot.length; xi++) {
+                            xavail[xi] = rw.Avail[xi].Value;
+                            xtot[xi] = rw.Tot[xi].Value;
+
+                        }
+
+                        rw.Avail = xavail;
+                        rw.Tot = xtot;
+
+                    }
+
+                    if (this.showingGraph == true) {
+                        this.createChart();
+                    }
+
+
+                }
+            }
+        }
+
+        catch (e) {
+
+        }
+
+    }
+
+    ResPlanAnalyzer.prototype.PopulateCSDeptList = function (defdept)
+    {
           var DeptList = document.getElementById("idNewCSDept");
           DeptList.options.length = 0;
           for (var n = 0; n < this.CSDepts.length; n++) 
@@ -4195,6 +4546,23 @@
 	        var csname = this.SelectedCapScenText;
 	        var csid = this.SelectedCapScen;
 
+	        var rolemode = 0;
+
+	        if (this.SelCapScen == null)
+	            rolemode = document.getElementById("chkRoleBased").checked;
+	        else
+	            rolemode = (this.SelCapScen.RMODE == 1);
+
+
+	        sbDataxml = new StringBuilder();
+	        sbDataxml.append('<CSPARAM');
+	        sbDataxml.append(' ID="' + csid + '"');
+	        sbDataxml.append(' MODE="' + (rolemode ? '1' : '0') + '" />');
+
+	        this.RoleMode = (rolemode ? 1 : 0);
+
+	        var parms = sbDataxml.toString();
+
 	        if (this.dlgEditTarget == null) {
 	            this.dlgEditTarget = new dhtmlXWindows();
 	            this.dlgEditTarget.setSkin("dhx_web");
@@ -4229,7 +4597,7 @@
 	            this.EditCSid = this.EditCapScen;
 	            this.EditName = csname;
 
-	            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioData", csid, GetEditCSDataCompleteDelegate);
+	            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioData", parms, GetEditCSDataCompleteDelegate);
 
 	        }
 	        else
@@ -4242,6 +4610,114 @@
 
 	}
 
+	ResPlanAnalyzer.prototype.GoDoChart = function () {
+
+	    try {
+
+
+	        if (this.dlgChart == null) {
+	            this.dlgChart = new dhtmlXWindows();
+	            this.dlgChart.setSkin("dhx_web");
+	            this.dlgChart.enableAutoViewport(false);
+	            this.dlgChart.attachViewportTo(this.clientID + "mainDiv");
+	            this.dlgChart.setImagePath(this.imagePath);
+
+	            if (this.Width == 0) {
+	                this.Width = this.layout.cells(this.mainRibbonArea).getWidth();
+	                this.Height = this.layout.cells(this.mainRibbonArea).getHeight() + this.layout.cells(this.mainArea).getHeight() + this.layout.cells(this.totalsArea).getHeight();
+	            }
+
+	            this.dlgChart.createWindow("winChartDlg", 0, 0, this.Width, this.Height - 10);
+
+
+	            this.dlgChart.window("winChartDlg").setIcon("logo.ico", "logo.ico");
+	            this.dlgChart.window("winChartDlg").allowMove();
+	            this.dlgChart.window("winChartDlg").allowResize();
+	            this.dlgChart.window("winChartDlg").setModal(true);
+
+	            this.dlgChart.window("winChartDlg").showHeader();
+	            this.dlgChart.window("winChartDlg").progressOn();
+	            this.dlgChart.window("winChartDlg").center();
+
+
+	            this.dlgChart.window("winChartDlg").setText("Availability Chart");
+	            this.dlgChart.window("winChartDlg").attachObject("idChartDlg");
+	            this.dlgChart.window("winChartDlg").button("close").disable();
+	            this.dlgChart.window("winChartDlg").button("park").hide();
+
+	            var ChRibonData = {
+	                parent: "ribbonbarChartDiv",
+	                style: "display:none;",
+	                imagePath: this.imagePath,
+	                showstate: "false",
+	                sections: [
+					 { name: "General",
+					     columns: [
+							{
+							    items: [
+									{ type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('Chart_Close');" }
+								]
+							}
+						]
+					 }
+
+				   ]
+	            };
+
+	            if (this.layout_Chart == null) {
+	                this.layout_Chart = new dhtmlXLayoutObject("idChart", "2E", "dhx_skyblue");
+
+	                this.layout_Chart.cells(this.totalsRibbonArea).setText("Ribbon");
+	                this.layout_Chart.cells(this.totalsGridArea).setText("Grid Area");
+	                this.layout_Chart.cells(this.totalsRibbonArea).hideHeader();
+	                this.layout_Chart.cells(this.totalsGridArea).hideHeader();
+	                //this.layout_CS.cells(this.totalsGridArea).setHeight(this.Height - 110);
+	                this.layout_Chart.cells(this.totalsRibbonArea).setHeight(92);
+	                this.layout_Chart.cells(this.totalsRibbonArea).fixSize(false, true);
+
+
+
+	                var parentObj = document.getElementById("idChart");
+	                parentObj.style.height = (this.Height - 53) + "px";
+	                this.layout_Chart.setSizes();
+
+
+	                this.ChartTab = new Ribbon(ChRibonData);
+	                this.ChartTab.Render();
+
+
+	                //        var select = document.getElementById("idCSEdit_SelMode");
+	                //        select.options.length = 0;
+	                //        select.options[0] = new Option("Hours", 1, true, true);
+	                //        select.options[1] = new Option("FTE", 2, false, false);
+
+
+	                this.layout_Chart.cells(this.totalsRibbonArea).attachObject(document.getElementById(this.ChartTab.getRibbonDiv()));
+
+	                this.layout_Chart.cells(this.totalsGridArea).attachObject("chart");
+
+
+
+	            }
+	            else {
+
+	                var parentObj = document.getElementById("idChart");
+	                parentObj.style.height = (this.Height - 53) + "px";
+	                parentObj.style.width = (this.Width - 10) + "px";
+	                this.layout_Chart.setSizes();
+	            }
+
+
+	        }
+	        else
+	            this.dlgChart.window("winChartDlg").show();
+	    }
+
+	    catch (e) {
+	        alert("GoDoChart");
+	    }
+
+	}
 
 	ResPlanAnalyzer.prototype.GetEditCSDataComplete = function (jsonString) {
 
@@ -4354,7 +4830,7 @@
 	    }
 	    this.CSHourMode = true;
 
-
+	    this.loadupenabled = false
 
 	    if (this.analyzerCalID != this.csCalID)
 	        this.CSEditTab.disableItem("LoadUpBtn");
@@ -4362,9 +4838,11 @@
 	        this.CSEditTab.disableItem("LoadUpBtn");
 	    else if (this.CSRoleData.length == 0)
 	        this.CSEditTab.disableItem("LoadUpBtn");
+	    else
+	        this.loadupenabled = true;
 
 
-        this.CSEditTab.selectByValue("idCSEdit_SelMode", 1) 
+	    this.CSEditTab.selectByValue("idCSEdit_SelMode", 1)
 
 	    var sbDataxml = new StringBuilder();
 
@@ -4602,65 +5080,68 @@
 
 
 	ResPlanAnalyzer.prototype.GoDoLoadUp = function () {
-
-		var grid = this.EditGrid;
-
-		var arows = grid.Rows;
-
-		for (var r in arows) {
-			var row = arows[r];
+	    if (this.loadupenabled == false)
+	        return;
 
 
-			if (row != null) {
-				if (row.Kind == "Data") {
+	    var grid = this.EditGrid;
 
-					var i = row.id - 1;
-					var trow = this.CapScenData[i];
-					var frow = this.CostCatFTEData[i];
-					var gval;
+	    var arows = grid.Rows;
 
-
-					for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-						var x = "P" + per.toString() + "V";
-						trow.FTEs[per - 1].Value = 0;
-						trow.Hours[per - 1].Value = 0;
-						this.EditGrid.SetString(row, x, 0, 1)
-					}
-				}
-			}
-		}
-
-		for (var r in arows) {
-			var row = arows[r];
+	    for (var r in arows) {
+	        var row = arows[r];
 
 
-			if (row != null) {
-				if (row.Kind == "Data") {
+	        if (row != null) {
+	            if (row.Kind == "Data") {
 
-					var i = row.id - 1;
-					var trow = this.CapScenData[i];
+	                var i = row.id - 1;
+	                var trow = this.CapScenData[i];
+	                var frow = this.CostCatFTEData[i];
+	                var gval;
 
-					for (var xi = 0; xi < this.CSRoleData.length; xi++) {
-						var ord = this.CSRoleData[xi];
 
-						if (ord.RoleID == trow.ID) {
-							try {
-								for (var per = 1; per <= this.CapScenPeriodCount; per++) {
-									trow.FTEs[per - 1].Value = ord.FTE[per - 1].Value / 100;
-									trow.Hours[per - 1].Value = ord.Hours[per - 1].Value;
-								}
-							}
-							catch (e) { }
-							break;
-						}
+	                for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+	                    var x = "P" + per.toString() + "V";
+	                    trow.FTEs[per - 1].Value = 0;
+	                    trow.Hours[per - 1].Value = 0;
+	                    this.EditGrid.SetString(row, x, 0, 1)
+	                }
+	            }
+	        }
+	    }
 
-					}
+	    for (var r in arows) {
+	        var row = arows[r];
 
-				}
-			}
-		}
 
-		this.RedrawCSGrid();
+	        if (row != null) {
+	            if (row.Kind == "Data") {
+
+	                var i = row.id - 1;
+	                var trow = this.CapScenData[i];
+
+	                for (var xi = 0; xi < this.CSRoleData.length; xi++) {
+	                    var ord = this.CSRoleData[xi];
+
+	                    if (ord.RoleID == trow.ID) {
+	                        try {
+	                            for (var per = 1; per <= this.CapScenPeriodCount; per++) {
+	                                trow.FTEs[per - 1].Value = ord.FTE[per - 1].Value / 100;
+	                                trow.Hours[per - 1].Value = ord.Hours[per - 1].Value;
+	                            }
+	                        }
+	                        catch (e) { }
+	                        break;
+	                    }
+
+	                }
+
+	            }
+	        }
+	    }
+
+	    this.RedrawCSGrid();
 
 	}
 
@@ -4678,6 +5159,8 @@
 	    sbDataxml.append(' Name="' + this.EditName + '"');
 	    sbDataxml.append(' ID="' + this.EditCSid + '"');
 	    sbDataxml.append(' DEPT="' + this.SelectedCapScenDept + '"');
+	    sbDataxml.append(' RMODE="' + this.RoleMode + '"');
+	    
 	    sbDataxml.append(' WRES="' + (this.SelectedCapScenPrivate == true ? '1' : '0') + '" >');
 	    sbDataxml.append('<CS_Values>');
 
@@ -4895,12 +5378,30 @@
 	            }
 	        }
 
+            if (this.showingGraph == true) {
+                for  (var ibc = 0; ibc < this.ChartBlockCommand.length; ibc++)
+                {
+                    if (event == this.ChartBlockCommand[ibc])
+                        return;
+                }
+            }
+
 
 	        switch (event) {
 
+	            case "SelectRole_Change":
+	                if (this.TotalsLoading == true)
+	                    return;
+
+	                window.setTimeout(this.FinishTotalsDelegate, 10);
+	                break;
+
 	            case "AnalyzerTab_SaveScen":
 
-	                if (this.fromresource == "0")
+	                //	                if (this.fromresource == "0")
+	                //	                    break;
+
+	                if (this.analyzerCalID != this.CmtCal || this.fromresource == "0")
 	                    break;
 
 	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetCapacityScenarioList", "", SaveCapacityScenarioListCompleteDelegate);
@@ -4920,6 +5421,21 @@
 
 	                this.flashGridView("g_1", true);
 	                this.flashGridView("bottomg_1", true);
+
+                    if (this.showingGraph == true) 
+                        this.createChart();
+
+	                break;
+
+
+	            case "AnalyzerTab_chkAll":
+
+	                this.TabDoChecks(1);
+	                break;
+
+	            case "AnalyzerTab_chkNone":
+
+	                this.TabDoChecks(0);
 	                break;
 
 
@@ -5055,6 +5571,10 @@
 
 	                this.flashGridView("g_1", true);
 	                this.flashGridView("bottomg_1", true);
+
+                    if (this.showingGraph == true) 
+                        this.createChart();
+
 	                break;
 
 
@@ -5419,10 +5939,11 @@
 	                this.AnalyzerDeleteViewDlg = null;
 	                break;
 
-	            //	            case "TEST":    
-	            //	                this.FromChangePeriods = true;    
-	            //	                this.GetCalendarInfoComplete(null);    
-	            //	                return;    
+	            case "AnalyzerTab_ChangeCalendar":
+	                this.FromChangePeriods = true;
+	                this.GetCalendarInfoComplete(null);
+
+	                return;
 
 
 	            case "AnalyzerTab_Close":
@@ -5437,8 +5958,11 @@
 	                if (this.params.RPEMode == 1)
 	                    break;
 
-	                this.EditResPlan();
+	                WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("EditResPlanTicket", this.params.TicketVal, this.EditResPlanDelegate);
 	                break;
+
+	            //   this.EditResPlan();     
+	            //   break;     
 
 
 	            case "AnalyzerTab_SelectColumns":
@@ -5542,6 +6066,83 @@
 
 	            case "TotalsTab_GridHelpBtn":
 	                this.DisplayGridExplaination();
+	                break;
+
+	            case "AnalyzerTab_ShowGraph":
+	                // this.GoDoChart();
+
+	                try {
+
+
+	                    if (this.showingGraph == false) {
+
+	                         this.totTab.setButtonStateOn("idGraph");
+	                         this.showingGraph = true;
+
+
+                             for (var xi = 0; xi < this.ChartATDisableList.length; xi++)
+                             {
+
+                             	this.analyzerTab.temporyDisableItem(this.ChartATDisableList[xi]);
+                             }
+
+
+                            for (var xi = 0; xi < this.ChartVTDisableList.length; xi++)
+                             {
+
+                             	this.viewTab.temporyDisableItem(this.ChartVTDisableList[xi]);
+                             }
+
+                            for (var xi = 0; xi < this.ChartBTDisableList.length; xi++)
+                             {
+
+                             	this.totTab.temporyDisableItem(this.ChartBTDisableList[xi]);
+                             }
+
+                             
+                          
+	                       var gdiv = document.getElementById('gridDiv_1');
+	                       var cdiv = document.getElementById('chart');
+
+                           cdiv.style.height = gdiv.style.height;
+
+	                        this.layout.cells(this.mainArea).detachObject();
+	                        this.layout.cells(this.totalsGridArea).attachObject("chart");
+
+	                        this.createChart();
+	                    }
+	                    else {
+	                        this.showingGraph = false;
+                            
+                             for (var xi = 0; xi < this.ChartATDisableList.length; xi++)
+                             {
+
+                             	this.analyzerTab.resetTemporyDisableItem(this.ChartATDisableList[xi]);
+                             }
+
+
+                            for (var xi = 0; xi < this.ChartVTDisableList.length; xi++)
+                             {
+
+                             	this.viewTab.resetTemporyDisableItem(this.ChartVTDisableList[xi]);
+                             }
+
+
+                             
+                            for (var xi = 0; xi < this.ChartBTDisableList.length; xi++)
+                             {
+
+                             	this.totTab.resetTemporyDisableItem(this.ChartBTDisableList[xi]);
+                             }
+
+                             
+	                         this.totTab.setButtonStateOff("idGraph");
+	                        this.layout.cells(this.mainArea).detachObject();
+	                        this.layout.cells(this.totalsGridArea).attachObject("gridDiv_1");
+	                    }
+	                }
+	                catch (e) { }
+
 	                break;
 
 	            case "TotalsTab_ExporttoExcel":
@@ -5855,6 +6456,7 @@
 	                this.CapScenDlg.window("winCapScenDlg").detachObject();
 	                this.CapScenDlg.window("winCapScenDlg").close();
 	                this.CapScenDlg = null;
+	                this.SelCapScen = null;
 
 	                document.getElementById("idTxtCapScenName").value = "New Capacity Scenario";
 
@@ -5886,6 +6488,8 @@
 
 	                var csc = this.CapScens[select.selectedIndex];
 
+	                this.SelCapScen = csc;
+
 	                document.getElementById("idNewCSPrivate").checked = (csc.WRES != 0);
 
 	                this.PopulateCSDeptList(csc.DEPT);
@@ -5905,6 +6509,7 @@
 
 	                var selectedItem = select.options[select.selectedIndex];
 
+	                this.SelCapScen = this.CapScens[select.selectedIndex];
 
 	                this.CapScenDlg.window("winCapScenDlg").detachObject();
 	                this.CapScenDlg.window("winCapScenDlg").close();
@@ -5940,7 +6545,7 @@
 	                //      this.GoDoEdit(this.SelectedCapScen, document.getElementById("idTxtCapScenName").value);
 	                break;
 
-	            //  call webservice to edit                                                                         
+	            //  call webservice to edit                                                                                    
 
 
 
@@ -6015,9 +6620,21 @@
 
 	                break;
 
+
+	            case "Chart_Close":
+
+	                this.dlgChart.window("winChartDlg").setModal(false);
+	                this.dlgChart.window("winChartDlg").hide();
+	                this.dlgChart.window("winChartDlg").detachObject();
+	                this.dlgChart = null;
+
+
+	                break;
+
+
 	            case "CSEdit_SelMode_Changed":
 
-                    var vl =  this.ribbonGetSelectValue("idCSEdit_SelMode");
+	                var vl = this.ribbonGetSelectValue("idCSEdit_SelMode");
 
 	                if (this.dlgSpreadDlg != null) {
 	                    this.dlgSpreadDlg.window("winSpreadDlg").setModal(false);
@@ -6027,15 +6644,15 @@
 	                }
 
 
-                    if (vl == 1 && this.CSHourMode == true)
-                        break;
+	                if (vl == 1 && this.CSHourMode == true)
+	                    break;
 
-                    if (vl == 2 && this.CSHourMode == false)
-                        break;
+	                if (vl == 2 && this.CSHourMode == false)
+	                    break;
 
 
 
- 	                this.CSHourMode = (this.CSHourMode == false);
+	                this.CSHourMode = (this.CSHourMode == false);
 
 	                this.RedrawCSGrid();
 
@@ -6325,7 +6942,11 @@
 			this.AnalyzerViewDlg.enableAutoViewport(false);
 			this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 			this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
+
+            if (this.allowcsmode == "0")
+                this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
+            else
+			    this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 215);
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
@@ -6338,6 +6959,12 @@
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
 
 			document.getElementById("idNewCSPrivate").checked = false;
+			var rolediv = document.getElementById("idRolebased");
+
+            if (this.allowcsmode == "0")
+                rolediv.style.display = "none";
+            else
+			    rolediv.style.display = "block";
 
 			
 		}
@@ -6347,31 +6974,34 @@
 	}
 
 	ResPlanAnalyzer.prototype.CapScenCreateCopy = function () {
-		if (this.AnalyzerViewDlg == null) {
-			this.AnalyzerViewDlg = new dhtmlXWindows();
-			this.AnalyzerViewDlg.setSkin("dhx_web");
-			this.AnalyzerViewDlg.enableAutoViewport(false);
-			this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
-			this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-			this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
-			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
-			//this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create Copy of Capacity Scenario");
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
+	    if (this.AnalyzerViewDlg == null) {
+	        this.AnalyzerViewDlg = new dhtmlXWindows();
+	        this.AnalyzerViewDlg.setSkin("dhx_web");
+	        this.AnalyzerViewDlg.enableAutoViewport(false);
+	        this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
+	        this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
+	        this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
+	        //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+	        //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create Copy of Capacity Scenario");
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { NewCapScenDlg_OnCloseDelegate(); return true; });
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idCreateNewCapScen");
+	        var rolediv = document.getElementById("idRolebased");
+
+
+	        rolediv.style.display = "none";
 
 
 
-
-}
-		else {
-			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
-		}
+	    }
+	    else {
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
+	    }
 	}
 					
 	ResPlanAnalyzer.prototype.GridsOnAfterColResize = function (grid, col) {
@@ -6533,17 +7163,24 @@
 
 	function mycallback(dialogResult, returnValue) {
 		WorkEnginePPM.ResPlanAnalyzer.Execute("ReloadPlanData", "", ReloadPlanDataCompleteDelegate);
-		
- 
-		this.analyzerTab.disableItem("UndoBtn");
-		this.viewTab.disableItem("UndoBtn2");
-		 this.analyzerTab.disableItem("SaveBtn");
-		this.viewTab.disableItem("SaveBtn2");  
-		
-		
-		this.dragStack = new Array();
-		this.dragLevel = 0;
-	}
+		try {
+
+		    this.analyzerTab.disableItem("UndoBtn");
+		    this.viewTab.disableItem("UndoBtn2");
+		    this.analyzerTab.disableItem("SaveBtn");
+		    this.viewTab.disableItem("SaveBtn2");
+
+		}
+
+		catch (e) { }
+
+		try {
+		    this.dragStack = new Array();
+		    this.dragLevel = 0;
+        }
+
+        catch (e) { }
+}
 
 
 	ResPlanAnalyzer.prototype.ReloadPlanDataComplete = function () {
@@ -6551,14 +7188,26 @@
 		RefreshBothGrids();
 	}
 
-	ResPlanAnalyzer.prototype.EditResPlan = function () {
+	ResPlanAnalyzer.prototype.EditResPlan = function (jsonString) {
 
 
-	    //       alert(document.URL);
-	    var weburl = document.URL;
+	    //	    alert(jsonString);
+
+
+	    var sTicket = this.params.TicketVal;
+
+	    var jsonObject = JSON_ConvertString(jsonString);
+	    if (JSON_ValidateServerResult(jsonObject)) {
+
+	        sTicket = jsonObject.Result.Ticket.Value;
+	    }
+        
+        var weburl = document.URL;
 	    weburl = weburl.replace("rpanalyzer", "rpeditor");
 
-	    if (this.fromresource == 1) {   
+	    weburl = weburl.replace(this.params.TicketVal, sTicket);
+
+	    if (this.fromresource == 1) {
 	        if (weburl.indexOf("isresource=") == -1) {
 	            weburl += "&isresource=1";
 	        }
@@ -6667,170 +7316,371 @@
 		catch (e) {
 		}
 
-	}
+}
 
-	ResPlanAnalyzer.prototype.InitVars = function () {
-	    this.fromresource = "";
-	    // Initialised fields
-	    this.dlgShowGridEx = null;
+ResPlanAnalyzer.prototype.createChart = function () {
 
-	    this.SelectedCapScenPrivate = false;
+    try {
 
+        var xdata = new Object();
+        //       xdata.title = new Object();
+        //       xdata.title.text = "";
 
-	    this.NegMode = false;
-	    this.NegWarn = false;
+        xdata.legend = new Object();
+        xdata.legend.visible = true;
 
-	    this.TotMaxed = false;
-	    this.groupColour = 0xF8F8F8;
+       // xdata.seriesDefaults = new Object();
+       // xdata.seriesDefaults.type = "column";
 
-	    this.bapplyDefView = false;
+        xdata.valueAxis = new Object();
+      //  xdata.valueAxis.labels = new Object();
+      //  xdata.valueAxis.labels.template = "#= kendo.format('{0:N0}', value) #";
+        xdata.valueAxis.line = new Object();
+        xdata.valueAxis.line.visible = false;
 
-	    this.analyzerCalID = 0;
-	    this.CmtCal = 0;
-	    this.csCalID = 0;
+        xdata.tooltip = new Object();
+        xdata.tooltip.visible = false;
 
-	    this.tg_rollup = null;
-	    this.tg_rollup_render = false;
-
-	    this.topgridready = false;
-	    this.bottomgridready = false;
-	    this.bottomgridfirstready = false;
-
-
-	    this.FilteredTop = new Array();
-
-	    this.AnalyzeGroupingchecked = false;
-	    this.AnalyzerFilterschecked = false;
-
-	    this.AnalyzerShowBarschecked = false;
-	    this.AnalyzerHideDetailschecked = false;
-
-	    this.TotalGroupingchecked = false;
-	    this.TotalFilterschecked = false;
-
-	    this.AnalyzerTabisCollapsed = false;
-	    this.TotalTabisCollapsed = false;
-
-	    this.bInColResize = false;
-	    this.EditCapScen = -1;
-	    this.SelectedMode = 0;
-	    this.HaveDragChanges = false;
-
-	    this.SaveBtn = false;
-	    this.UnDoBtn = false;
+        xdata.categoryAxis = new Object();
+        xdata.categoryAxis.majorGridLines = new Object();
+        xdata.categoryAxis.majorGridLines.visible = false;
+        xdata.categoryAxis.categories = new Array();
 
 
-	    this.CapScenDlg = null;
-	    this.TopGridDragged = false;
+        var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
+        var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
-	    this.params = params;
-	    this.TotSelectedOrder = null;
+        var StartID = parseInt(FromList.options[FromList.selectedIndex].value) - 1;
+        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value) - 1;
 
-	    this.clientID = this.params.ClientID;
-	    this.Webservice = params.Webservice;
+        var avail = new Array();
 
-	    this.mainRibbonArea = "a";
-	    this.mainArea = "b";
-	    this.totalsArea = "c";
-	    this.totalsRibbonArea = "a";
-	    this.totalsGridArea = "b";
+        for (var i = StartID; i <= FinishID; i++) {
+            xdata.categoryAxis.categories.push(FromList.options[i].text);
+            avail.push(Number(0));
 
 
-	    this.TotAddSel = null;
-	    this.TotRemSel = null;
-	    this.CSHourMode = null;
+        }
 
-	    this.dlgShowLegend = null;
-	    this.LegendGrid = null;
+        xdata.series = new Object;
+        var cnt = 0;
 
-	    this.Dirty = false;
-	    this.initialized = false;
-	    this.ExitConfirmed = false;
-	    this.Height = 0;
-	    this.Width = 0;
+        for (var xi = 0; xi < this.ChartRawData.length; xi++) {
+            var rd = this.ChartRawData[xi];
 
+            if (rd.Sel != 0) {
+                var ob = new Object;
+                xdata.series[cnt++] = ob;
+                ob.name = rd.Name;
+                ob.type = "column"
+                ob.stack = true;
+                ob.data = new Array();
 
+                for (var i = StartID; i <= FinishID; i++) {
+                    ob.data.push(Number(rd.Tot[i]));
+                    avail[i - StartID] += Number(rd.Avail[i]);
+                }
 
-	    this.TotGrid = null;
-	    this.DetGrid = null;
-	    this.TotalsGridSettingsData = null;
-
-	    this.FilterDifferent = false;
-	    this.CSChanged = false;
-
-
-	    this.selectCalendarAndPeriods = null;
-	    this.imagePath = "/_layouts/ppm/images/";
-
-	    // dialog handles
-
-	    this.fiscalInfo = null;
-	    this.Views = null;
-	    this.selectedView = null;
-
-	    this.SetTotals = null
-	    this.TotalsLoading = false
-	    this.TotalsData = null;
-	    this.tarlev = 0;
-
-	    this.SetDetails = null;
-	    this.DetailsLoading = false
-	    this.DetailsData = null;
-	    this.DetailsSettings = "";
-	    this.DisplayMode = "";
-
-	    this.TargetData = null;
-	    this.TotalsColumnSettings = "";
-	    this.TotalsGridSupressHeatmap = 0;
-	    this.TotalsGridTotalsCol = 0;
-
-	    this.stashgridsettings = null;
-
-	    this.AnalyzerViewDlg = null;
-	    this.AnalyzerDeleteViewDlg = null;
-
-	    this.doTopApply = true;
-	    this.doBottomApply = true;
-	    this.CapScens = null;
-	    this.SelectedCapScen = 0;
-
-	    this.dlgEditTarget = null;
-	    this.EditGrid = null;
-	    this.dlgSpreadDlg = null;
-	    this.csrow = null;
-	    this.doSetFocus = "";
-
-	    this.bottomgriddragstash = null;
-	    this.topgridstash = null;
-	    this.CSRoleData = null;
-
-	    this.initDataStart = 0;
-	    this.initDataFinish = 0;
-
-	    this.heatmapText = "";
-	    this.bottomgridbyrole = false;
+            }
 
 
-	    this.selectedHeatMapColour = "1";
+        }
 
-	    this.deferredhidedetails = false;
+        
+                
+        var oba = new Object;
+        xdata.series[cnt++] = oba;
+        oba.name = "Availability";
+        oba.color = "#808080";
+
+        // if ussing line type.... for avail
+        oba.type = "line"
+        oba.data = avail;
+
+
+ // do something funcky for the avail....
+
+//         oba.type = "candlestick"
+//         oba.data = new Array();
+
+//        for (var i = StartID; i <= FinishID; i++) {
+//            var obc = new Object();
+//            var adj = 0;
+
+//            if ( avail[i - StartID] != 0)
+//                adj = 2;
+//            else
+//                adj = 0;
+//            obc.high = avail[i - StartID];
+//            obc.low = avail[i - StartID] - adj;
+//            obc.open = avail[i - StartID];
+//            obc.close = avail[i - StartID] - adj;
+
+//            oba.data.push(obc);
+//        }
+
+
+//         oba.type = "scatterLine"
+//         oba.data = new Array();
+
+//        for (var i = StartID; i <= FinishID; i++) {
+//            var obc = new Array();
+//            obc.push(i - StartID);
+//            obc.push(avail[i - StartID]);
+//            oba.data.push(obc);
+
+//            obc = new Array();
+//            obc.push(i - StartID + 1);
+//            obc.push(avail[i - StartID]);
+//            oba.data.push(obc);
+
+//        }
+
+
+        // done!
+
+		var cdata = {
+                legend: {
+                    visible: true
+                },
+                series: [{
+                    name: "Steve Masters",
+                    stack: true,
+					type: "column",
+                    data: [0, 0, 0, 0, 0, 40, 40, 40, 0, 0]
+                },     
+                {
+                    name: "Munjal Patel",
+                    stack: true,
+					type: "column",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 100, 0]
+                },  
+                {
+                    name: "DBA",
+                    stack: true,
+					type: "column",
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                }, 
+				{
+                    name: "Adam Barr",
+                    stack: true,
+					type: "column",
+                    data: [0, 85, 0, 0, 0, 90, 100, 120, 120, 0]
+                }, 
+				{
+                    name: "Availability",
+					type: "line",
+                    data: [352, 336, 552, 504, 528, 552, 480, 552, 528, 488]
+                }],
+                valueAxis: {
+                    line: {
+                        visible: false
+                    }
+                },
+                categoryAxis: {
+                    categories: ["Mar 2012"	,"Apr 2012"	, "May 2012","Jun 2012"	,"Jul 2012","Aug 2012"	,	"Sep 2012"	,	"Oct 2012"	,"Nov 2012"	,	"Dec 2012"],
+                    majorGridLines: {
+                        visible: false
+                    }
+                },
+                tooltip: {
+                    visible: true,
+                }
+            }
+
+            if (this.kendochart != null) {
+                var chart = $("#chart").data("kendoChart");
+                chart.destroy();
+
+                this.kendochart = null;
+            }
+
+            this.kendochart = $("#chart").kendoChart(xdata);
+
+                            
+	                       var gdiv = document.getElementById('gridDiv_1');
+	                       var cdiv = document.getElementById('chart');
+
+                           cdiv.style.height = gdiv.style.height;
+
+    }
+    catch (e) {
+        alert("Create Graph error:" + e.toString());
+    }
+}
+
+
+ResPlanAnalyzer.prototype.InitVars = function () {
+    this.fromresource = "";
+    // Initialised fields
+    this.dlgShowGridEx = null;
+
+    this.SelectedCapScenPrivate = false;
+    this.kendochart = null;
+
+
+    this.NegMode = false;
+    this.NegWarn = false;
+
+    this.TotMaxed = false;
+    this.groupColour = 0xF8F8F8;
+
+    this.bapplyDefView = false;
+
+    this.analyzerCalID = 0;
+
+    this.csCalID = 0;
+
+    this.tg_rollup = null;
+    this.tg_rollup_render = false;
+
+    this.topgridready = false;
+    this.bottomgridready = false;
+    this.bottomgridfirstready = false;
+
+
+    this.FilteredTop = new Array();
+
+    this.AnalyzeGroupingchecked = false;
+    this.AnalyzerFilterschecked = false;
+
+    this.AnalyzerShowBarschecked = false;
+    this.AnalyzerHideDetailschecked = false;
+
+    this.TotalGroupingchecked = false;
+    this.TotalFilterschecked = false;
+
+    this.AnalyzerTabisCollapsed = false;
+    this.TotalTabisCollapsed = false;
+
+    this.bInColResize = false;
+    this.EditCapScen = -1;
+    this.SelectedMode = 0;
+    this.HaveDragChanges = false;
+
+    this.SaveBtn = false;
+    this.UnDoBtn = false;
+
+
+    this.CapScenDlg = null;
+    this.TopGridDragged = false;
+
+    this.params = params;
+    this.TotSelectedOrder = null;
+
+    this.clientID = this.params.ClientID;
+    this.Webservice = params.Webservice;
+
+    this.mainRibbonArea = "a";
+    this.mainArea = "b";
+    this.totalsArea = "c";
+    this.totalsRibbonArea = "a";
+    this.totalsGridArea = "b";
+
+
+    this.TotAddSel = null;
+    this.TotRemSel = null;
+    this.CSHourMode = null;
+
+    this.dlgShowLegend = null;
+    this.LegendGrid = null;
+
+    this.Dirty = false;
+    this.initialized = false;
+    this.ExitConfirmed = false;
+    this.Height = 0;
+    this.Width = 0;
 
 
 
-	    this.LastFilterString = "";
+    this.TotGrid = null;
+    this.DetGrid = null;
+    this.TotalsGridSettingsData = null;
 
-	    this.CapacityScenarios = null;
-	    this.refreshIconsInTotGrid = null;
-	    this.refreshChecksInDetGrid = null;
+    this.FilterDifferent = false;
+    this.CSChanged = false;
 
 
-	    this.dragStack = new Array();
-	    this.dragLevel = 0;
-	    this.FromChangePeriods = false;
+    this.selectCalendarAndPeriods = null;
+    this.imagePath = "/_layouts/ppm/images/";
 
-	    this.CSDepts = null;
-        this.SelectedCapScenDept = 0;
-	}
+    // dialog handles
+
+    this.fiscalInfo = null;
+    this.Views = null;
+    this.selectedView = null;
+
+    this.SetTotals = null
+    this.TotalsLoading = false
+    this.TotalsData = null;
+    this.tarlev = 0;
+
+    this.SetDetails = null;
+    this.DetailsLoading = false
+    this.DetailsData = null;
+    this.DetailsSettings = "";
+    this.DisplayMode = "";
+
+    this.TargetData = null;
+    this.TotalsColumnSettings = "";
+    this.TotalsGridSupressHeatmap = 0;
+    this.TotalsGridTotalsCol = 0;
+
+    this.stashgridsettings = null;
+
+    this.AnalyzerViewDlg = null;
+    this.AnalyzerDeleteViewDlg = null;
+
+    this.doTopApply = true;
+    this.doBottomApply = true;
+    this.CapScens = null;
+    this.SelectedCapScen = 0;
+
+    this.dlgEditTarget = null;
+    this.EditGrid = null;
+    this.dlgSpreadDlg = null;
+    this.csrow = null;
+    this.doSetFocus = "";
+
+    this.bottomgriddragstash = null;
+    this.topgridstash = null;
+    this.CSRoleData = null;
+
+    this.initDataStart = 0;
+    this.initDataFinish = 0;
+
+    this.heatmapText = "";
+    this.bottomgridbyrole = false;
+
+
+    this.selectedHeatMapColour = "1";
+
+    this.deferredhidedetails = false;
+    this.SelCapScen = null;
+
+
+
+    this.LastFilterString = "";
+
+    this.CapacityScenarios = null;
+    this.refreshIconsInTotGrid = null;
+    this.refreshChecksInDetGrid = null;
+    this.refreshBottomChecksInDetGrid = null;
+
+
+    this.dragStack = new Array();
+    this.dragLevel = 0;
+    this.FromChangePeriods = false;
+
+    this.CSDepts = null;
+    this.SelectedCapScenDept = 0;
+    this.loadupenabled = false;
+    this.RoleMode = 0;
+
+    this.dlgChart = null;
+    this.showingGraph = false;
+    this.ChartRawData = null;
+}
 
 	try {
 
@@ -6842,7 +7692,9 @@
 	    this.analyzerTab = null;
 	    this.viewTab = null;
 	    this.totTab = null;
-	    this.layout_CS = null;
+	    this.layout_CS = null; 
+        this.layout_Chart = null;
+	    this.CmtCal = 0;
 
 	    var loadDelegate = MakeDelegate(this, this.OnLoad);
 	    //        var unloadDelegate = MakeDelegate(this, this.OnUnload);
@@ -6878,6 +7730,7 @@
 	    this.GoDoEditDelegate = MakeDelegate(this, this.GoDoEdit);
 	    this.CapScenCreateCopyDelegate = MakeDelegate(this, this.CapScenCreateCopy);
 	    this.CapScenCreateNewDelegate = MakeDelegate(this, this.CapScenCreateNew);
+	    this.EditResPlanDelegate = MakeDelegate(this, this.EditResPlan);
 
 	    var GridsOnGetDefaultColorDelegate = MakeDelegate(this, this.GridsOnGetDefaultColor);
 	    var GridsOnStartDragCellDelegate = MakeDelegate(this, this.GridsOnStartDragCell);
@@ -6915,7 +7768,25 @@
 	    var HandleRerenderDelegate = MakeDelegate(this, this.HandleRerender);
 	    var HandleRerenderChecksDelegate = MakeDelegate(this, this.HandleRerenderChecks);
 	    var HandleRerenderRollupsDelegate = MakeDelegate(this, this.HandleRerenderRollups);
-	    var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);	
+	    var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);
+
+        var GetTotalsGridChartDataCompleteDelegate =  MakeDelegate(this, this.GetTotalsGridChartDataComplete);
+
+//<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
+	    $.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
+
+	        //console.log(data); //data returned
+
+	        //alert(textStatus); //success
+
+	        //console.log(jqxhr.status); //200
+
+	        //console.log('Load was performed.');
+
+	    });
+
+
+ 
 
 		if (document.addEventListener != null) { // e.g. Firefox
 			window.addEventListener("load", loadDelegate, true);
