@@ -142,7 +142,7 @@
 
                         if (!categories[category]) {
                             var id = calculateCatId(category);
-                            var defaultCssClass = 'epm-nav-node-collapsed';
+                            var defaultCssClass = 'epm-nav-node-expanded';
 
                             if (category === '__STATIC__') {
                                 defaultCssClass = 'epm-nav-node-static';
@@ -172,7 +172,7 @@
 
                     var openMenu = function() {
                         showNode();
-
+                        
                         if (!$sn.is(':visible')) {
                             $sn.show('slide', { direction: 'left' }, animSpeed);
                         }
@@ -258,12 +258,152 @@
                     }
                 };
 
+                var getSelectedSubLevelNode = function () {
+                    return ($.cookie(selectedTlNodeCookie) || 'epm-nav-top-ql').replace('epm-nav-top-', 'epm-nav-sub-');
+                };
+
+                var getLinkNodes = function (menu) {
+                    return $('#' + menu).find('.epm-nav-sub-menu').find('div[id^=E]');
+                };
+
+                var selectLink = function () {
+                    var link = $.parseJSON($.cookie(selectedLinkCookie));
+                    if (link) {
+                        var index = link.index;
+                        var uri = link.uri;
+                        if (window.location.href.indexOf(uri) !== -1) {
+                            var $menu = $('#' + getSelectedSubLevelNode());
+
+                            if (!index || index === -1) {
+                                $menu.find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
+                            } else {
+                                var $nodes = getLinkNodes($menu.parent().attr('id'));
+                                for (var i = 0; i < $nodes.length; i++) {
+                                    if (i === index) {
+                                        $($nodes[i]).find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                var saveLinkState = function ($nav) {
+                    var data = {};
+                    
+                    $nav.find('.epm-nav-cat').each(function() {
+                        var $cat = $(this);
+                        data[$cat.text()] = $($cat.find('span')[0]).hasClass(expandedClass);
+                    });
+
+                    saveExpandState($nav.get(0).id, data);
+                };
+                
                 var saveExpandState = function (nodeId, data) {
                     var state = $.parseJSON($.cookie(expandStateCookie)) || {};
                     state[nodeId] = data;
                     $.cookie(expandStateCookie, JSON.stringify(state), cookieOptions);
                 };
 
+                var expandNodes = function (provider) {
+                    var expandState = $.parseJSON($.cookie(expandStateCookie));
+
+                    if (expandState) {
+                        var selectedNode = getSelectedSubLevelNode();
+
+                        if (provider) {
+                            for (var m = 0; m < tlNodes.length; m++) {
+                                var tlNode = tlNodes[m];
+
+                                if (tlNode.provider === provider) {
+                                    selectedNode = tlNode.id.replace('epm-nav-top-', 'epm-nav-sub-');
+                                    break;
+                                }
+                            }
+                        }
+
+                        var snExpandStatus = expandState[selectedNode];
+                        if (snExpandStatus) {
+                            if (selectedNode === 'epm-nav-sub-ql') {
+                                var nodes = getLinkNodes('epm-nav-sub-ql');
+
+                                for (var i = 0; i < nodes.length; i++) {
+                                    var node = nodes[i];
+                                    var nodeId = node.id.replace('Nodes', '');
+
+                                    if (snExpandStatus[$('#' + nodeId.replace('EPMLiveNavn', 'EPMLiveNavt')).text()]) {
+                                        TreeView_ToggleNode(window.EPMLiveNav_Data, 0, document.getElementById(nodeId), ' ', document.getElementById(node.id));
+                                    }
+                                }
+                            } else {
+                                var $cats = $('#' + selectedNode).find('.epm-nav-cat');
+
+                                if (selectedNode === 'epm-nav-sub-settings') {
+                                    $cats.each(function () {
+                                        collapseLinks($(this));
+                                    });
+                                }
+
+                                $cats.each(function () {
+                                    var $cat = $(this);
+                                    var key = $cat.text();
+                                    var expand = snExpandStatus[key];
+
+                                    if ($($cat.find('span')[0]).hasClass(expandedClass)) {
+                                        if (!expand) {
+                                            collapseLinks($cat);
+                                        }
+                                    } else {
+                                        if (expand) {
+                                            expandLinks($cat);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                };
+
+                var expandLinks = function ($cat) {
+                    var catId = $cat.get(0).id;
+
+                    var $span = $($cat.find('span')[0]);
+                    var $ul = $('#' + catId + '-links');
+                    
+                    $span.removeClass(collapsedClass);
+                    $span.addClass(expandedClass);
+                    $ul.removeClass(collapsedClass);
+                    $ul.addClass(expandedClass);
+                };
+
+                var collapseLinks = function ($cat) {
+                    var catId = $cat.get(0).id;
+
+                    var $span = $($cat.find('span')[0]);
+                    var $ul = $('#' + catId + '-links');
+                    
+                    $span.removeClass(expandedClass);
+                    $span.addClass(collapsedClass);
+                    $ul.removeClass(expandedClass);
+                    $ul.addClass(collapsedClass);
+                };
+
+                var registerLinkEvents = function() {
+                    $('.epm-nav-cat').click(function () {
+                        var $cat = $(this);
+                        var $span = $($cat.find('span')[0]);
+
+                        if ($span.hasClass(collapsedClass)) {
+                            expandLinks($cat);
+                        } else {
+                            collapseLinks($cat);
+                        }
+
+                        saveLinkState($cat.parent());
+                    });
+                };
+                
                 var registerEvents = function () {
                     var hoverNode = window.TreeView_HoverNode;
                     var unhoverNode = window.TreeView_UnhoverNode;
@@ -290,7 +430,17 @@
                     };
 
                     window.TreeView_ToggleNode = function (data, x, elNav, y, elNodes) {
-                        var d = [];
+                        var cookieData = null;
+
+                        var cdt = $.parseJSON($.cookie(expandStateCookie));
+                        if (cdt) {
+                            cdt = $.parseJSON($.cookie(expandStateCookie))['epm-nav-sub-ql'];
+                            if (cdt) {
+                                cookieData = cdt;
+                            }
+                        }
+
+                        var d = cookieData || {};
                         var nodeId = null;
 
                         var parents = $(elNav).parents('div');
@@ -305,11 +455,13 @@
                                     var n = nodes[j];
                                     var state = $(n).is(':visible');
 
-                                    if ((n.id).replace('Nodes', '') === elNav.id) {
+                                    var nId = (n.id).replace('Nodes', '');
+
+                                    if (nId === elNav.id) {
                                         state = !state;
                                     }
 
-                                    d[j] = state;
+                                    d[$('#' + nId.replace('EPMLiveNavn', 'EPMLiveNavt')).text()] = state;
                                 }
 
                                 break;
@@ -340,7 +492,7 @@
                     }, function () {
                         $pin.hide();
                     });
-                    
+
                     $sn.slimScroll({
                         height: $sn.height(),
                         width: $sn.width()
@@ -354,7 +506,7 @@
                     $sn.css('left', '0');
                     $sb.css('z-index', 1001);
 
-                    $(window).resize(function() {
+                    $(window).resize(function () {
                         var height = $('#epm-nav-top').height();
                         $ss.height(height);
                         $sn.height(height);
@@ -380,60 +532,6 @@
 
                         $.cookie(selectedLinkCookie, JSON.stringify({ index: index, uri: $link.attr('href') }), cookieOptions);
                     });
-                };
-
-                var getSelectedSubLevelNode = function () {
-                    return ($.cookie(selectedTlNodeCookie) || 'epm-nav-top-ql').replace('epm-nav-top-', 'epm-nav-sub-');
-                };
-
-                var getLinkNodes = function (menu) {
-                    return $('#' + menu).find('.epm-nav-sub-menu').find('div[id^=E]');
-                };
-
-                var expandNodes = function () {
-                    var expandState = $.parseJSON($.cookie(expandStateCookie));
-
-                    if (expandState) {
-                        var selectedNode = getSelectedSubLevelNode();
-
-                        var snExpandStatus = expandState[selectedNode];
-                        if (snExpandStatus) {
-                            if (selectedNode === 'epm-nav-sub-ql') {
-                                var nodes = getLinkNodes('epm-nav-sub-ql');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    if (snExpandStatus[i]) {
-                                        var nodesId = nodes[i].id;
-                                        var nodeId = (nodesId).replace('Nodes', '');
-
-                                        TreeView_ToggleNode(window.EPMLiveNav_Data, 0, document.getElementById(nodeId), ' ', document.getElementById(nodesId));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-
-                var selectLink = function () {
-                    var link = $.parseJSON($.cookie(selectedLinkCookie));
-                    if (link) {
-                        var index = link.index;
-                        var uri = link.uri;
-                        if (window.location.href.indexOf(uri) !== -1) {
-                            var $menu = $('#' + getSelectedSubLevelNode());
-
-                            if (!index || index === -1) {
-                                $menu.find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
-                            } else {
-                                var $nodes = getLinkNodes($menu.parent().attr('id'));
-                                for (var i = 0; i < $nodes.length; i++) {
-                                    if (i === index) {
-                                        $($nodes[i]).find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
                 };
 
                 var loadLinks = function () {
@@ -477,27 +575,11 @@
                                         }
                                     }
                                 }
-                            }
-                            
-                            $('.epm-nav-cat').click(function () {
-                                var $cat = $(this);
-                                var catId = $cat.get(0).id;
                                 
-                                var $span = $($cat.find('span')[0]);
-                                var $ul = $('#' + catId + '-links');
+                                expandNodes(providerName);
+                            }
 
-                                if ($span.hasClass(collapsedClass)) {
-                                    $span.removeClass(collapsedClass);
-                                    $span.addClass(expandedClass);
-                                    $ul.removeClass(collapsedClass);
-                                    $ul.addClass(expandedClass);
-                                } else {
-                                    $span.removeClass(expandedClass);
-                                    $span.addClass(collapsedClass);
-                                    $ul.removeClass(expandedClass);
-                                    $ul.addClass(collapsedClass);
-                                }
-                            });
+                            registerLinkEvents();
                         }, function (response) {
                             console.log(response);
                         });
