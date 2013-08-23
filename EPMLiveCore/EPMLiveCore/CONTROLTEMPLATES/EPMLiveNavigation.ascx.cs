@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
@@ -86,10 +87,21 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         protected void OnTreeViewPreRender(object sender, EventArgs e)
         {
-            ((SPTreeView) sender).Sort();
+            var spTreeView = ((SPTreeView) sender);
+
+            TreeNode wpNode =
+                spTreeView.Nodes.Cast<TreeNode>().FirstOrDefault(n => n.Text.Trim().ToLower().Equals("my workplace"));
+
+            if (wpNode != null)
+            {
+                spTreeView.Nodes.Remove(wpNode);
+            }
+
+            spTreeView.Sort();
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
+
         // Private Methods (1) 
 
         private void LoadSelectedNodeLinks()
