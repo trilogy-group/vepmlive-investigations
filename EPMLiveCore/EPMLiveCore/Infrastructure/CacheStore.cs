@@ -1,23 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EPMLiveCore.Infrastructure
 {
-    public sealed class CacheStore
+    public sealed class CacheStore : IDisposable
     {
-        #region Fields (3) 
+        #region Fields (5) 
 
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
-        private readonly Dictionary<string, Tuple<string, CachedValue>> _store;
+        private readonly Dictionary<string, Tuple<CacheStoreCategory, CachedValue>> _store;
+        private readonly Timer _timer;
+        private bool _disposed;
 
         #endregion Fields 
 
-        #region Constructors (1) 
+        #region Constructors (2) 
 
         private CacheStore()
         {
-            _store = new Dictionary<string, Tuple<string, CachedValue>>();
+            _store = new Dictionary<string, Tuple<CacheStoreCategory, CachedValue>>();
+            _timer = new Timer(Cleanup, null, 300000, 300000);
+        }
+
+        ~CacheStore()
+        {
+            Dispose(false);
         }
 
         #endregion Constructors 
@@ -44,21 +54,17 @@ namespace EPMLiveCore.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (4) 
+        #region Methods (6) 
 
         // Public Methods (4) 
 
         public CachedValue Get(string key)
         {
-            key = key.Trim().ToUpper();
             return _store.ContainsKey(key) ? _store[key].Item2 : null;
         }
 
-        public CachedValue Get(string key, string category, Func<object> getValue)
+        public CachedValue Get(string key, CacheStoreCategory category, Func<object> getValue)
         {
-            key = key.Trim().ToUpper();
-            category = category.Trim().ToUpper();
-
             if (_store.ContainsKey(key)) return _store[key].Item2;
 
             Set(key, getValue(), category);
@@ -68,8 +74,6 @@ namespace EPMLiveCore.Infrastructure
 
         public void Remove(string key)
         {
-            key = key.Trim().ToUpper();
-
             if (!_store.ContainsKey(key)) return;
 
             lock (Locker)
@@ -78,16 +82,13 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        public void Set(string key, object value, string category)
+        public void Set(string key, object value, CacheStoreCategory category)
         {
-            key = key.Trim().ToUpper();
-            category = category.Trim().ToUpper();
-
             lock (Locker)
             {
                 if (!_store.ContainsKey(key))
                 {
-                    _store.Add(key, new Tuple<string, CachedValue>(category, new CachedValue(value)));
+                    _store.Add(key, new Tuple<CacheStoreCategory, CachedValue>(category, new CachedValue(value)));
                 }
                 else
                 {
@@ -96,7 +97,55 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
+        // Private Methods (2) 
+
+        private void Cleanup(object state)
+        {
+            var dateTime = new DateTime();
+
+            lock (Locker)
+            {
+                var locker = new object();
+
+                var keys = new List<string>();
+
+                Parallel.ForEach(_store, pair =>
+                {
+                    if ((dateTime - pair.Value.Item2.LastReadAt).Minutes <= 5) return;
+
+                    lock (locker)
+                    {
+                        keys.Add(pair.Key);
+                    }
+                });
+
+                Parallel.ForEach(keys, k => _store.Remove(k));
+            }
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                _timer.Dispose();
+            }
+
+            _disposed = true;
+        }
+
         #endregion Methods 
+
+        #region Implementation of IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 
     public class CachedValue

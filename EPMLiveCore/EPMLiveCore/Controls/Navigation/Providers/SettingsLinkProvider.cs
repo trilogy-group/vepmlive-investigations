@@ -11,7 +11,10 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "Settings")]
     public class SettingsLinkProvider : NavLinkProvider
     {
-        #region Fields (1) 
+        #region Fields (2) 
+
+        private const string QUERY = @"<OrderBy><FieldRef Name='Category' /><FieldRef Name='Title' /></OrderBy>";
+        private const string VIEW_FIELDS = @"<FieldRef Name='Title' /><FieldRef Name='Category' /><FieldRef Name='Description' />";
 
         private readonly List<Tuple<SPBasePermissions?, NavLink>> _links;
 
@@ -52,11 +55,66 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
+        #region Methods (2) 
+
+        // Private Methods (2) 
+
+        private IEnumerable<INavObject> GetSettings()
+        {
+            string key = SPWeb.ID + "_NavLinks_" + "Settings";
+
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
+            {
+                var links = new List<NavLink>();
+
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    using (var spSite = new SPSite(SPWeb.Site.ID))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb(SPWeb.ID))
+                        {
+                            SPList settingsList = spWeb.Lists.TryGetList("EPM Live Settings");
+
+                            if (settingsList == null) return;
+
+                            SPListItemCollectionPosition position;
+
+                            DataTable settings = settingsList.GetDataTable(new SPQuery
+                            {
+                                Query = QUERY,
+                                ViewFields = VIEW_FIELDS
+                            }, SPListGetDataTableOptions.None, out position);
+
+                            string webUrl = spWeb.Url;
+
+                            links.AddRange(from DataRow dataRow in settings.Rows
+                                let category = (S(dataRow["Category"]).Split(')')[1]).Trim()
+                                select new NavLink
+                                {
+                                    Title = S(dataRow["Title"]),
+                                    Url = webUrl + S(dataRow["URL"]) + "?Source={page}&BackTo={page}",
+                                    Category = category
+                                });
+                        }
+                    }
+                });
+
+                return links;
+            }).Value;
+        }
+
+        private string S(object o)
+        {
+            return (o ?? string.Empty).ToString();
+        }
+
+        #endregion Methods 
+
         #region Implementation of INavLinkProvider
 
         public override IEnumerable<INavObject> GetLinks()
         {
-            foreach (var link in _links)
+            foreach (var link in _links.OrderBy(l => l.Item2.Title))
             {
                 if (!link.Item1.HasValue)
                 {
@@ -72,47 +130,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             }
 
             foreach (INavObject link in GetSettings()) yield return link;
-        }
-
-        private IEnumerable<INavObject> GetSettings()
-        {
-            string key = SPWeb.ID + "_NavLinks_" + "Settings";
-
-            return (IEnumerable<INavObject>) CacheStore.Current.Get(key, "Navigation", () =>
-            {
-                var links = new List<NavLink>();
-
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                {
-                    using (var spSite = new SPSite(SPWeb.Site.ID))
-                    {
-                        using (SPWeb spWeb = spSite.OpenWeb(SPWeb.ID))
-                        {
-                            SPList settingsList = spWeb.Lists.TryGetList("EPM Live Settings");
-
-                            if (settingsList == null) return;
-
-                            DataTable settings = settingsList.Items.GetDataTable();
-
-                            links.AddRange(from DataRow dataRow in settings.Rows
-                                let category = (S(dataRow["Category"]).Split(')')[1]).Trim()
-                                select new NavLink
-                                {
-                                    Title = S(dataRow["Title"]),
-                                    Url = S(dataRow["URL"]) + "?Source={page}&BackTo={page}",
-                                    Category = category
-                                });
-                        }
-                    }
-                });
-
-                return links;
-            }).Value;
-        }
-
-        private string S(object o)
-        {
-            return (o ?? string.Empty).ToString();
         }
 
         #endregion

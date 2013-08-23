@@ -62,7 +62,7 @@ namespace EPMLiveCore.Infrastructure
 
         private static string GetFileVersion()
         {
-            return (string) CacheStore.Current.Get("EPMLiveFileVersion", "Infrastructure", () =>
+            return (string) CacheStore.Current.Get("EPMLiveFileVersion", CacheStoreCategory.Infrastructure, () =>
             {
                 string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
 

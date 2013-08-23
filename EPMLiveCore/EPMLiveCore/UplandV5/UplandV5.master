@@ -239,6 +239,7 @@
                         <epm:NavNode Id="ql" Title="Portal" CssClass="fui-list" />
                         <epm:NavNode Id="new" Title="Add an app" CssClass="fui-plus" LinkProvider="Applications" />
                         <epm:NavNode Separator="True" />
+                        <epm:NavNode Id="workplace" Title="My Workplace" CssClass="fui-checkbox-checked" LinkProvider="MyWorkplace" />
                         <epm:NavNode Id="favorites" Title="Favorites" CssClass="fui-star-2" LinkProvider="Favorites" />
                         <epm:NavNode Id="recent" Title="Most recent" CssClass="fui-time" LinkProvider="RecentItems" />
                     </TopNodes>

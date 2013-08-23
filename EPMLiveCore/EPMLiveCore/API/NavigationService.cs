@@ -79,58 +79,62 @@ namespace EPMLiveCore.API
 
                 Parallel.ForEach(_linkProviders, provider =>
                 {
-                    INavLinkProvider linkProvider = provider.Value;
-
-                    if (linkProvider == null) return;
-
-                    string providerName = provider.Key;
-
-                    var node = new XElement(providerName);
-
-                    var links = new SortedDictionary<int, NavLink>();
-
-                    foreach (NavLink link in linkProvider.GetLinks())
+                    try
                     {
-                        int order = link.Order;
+                        INavLinkProvider linkProvider = provider.Value;
 
-                        if (order == 0)
+                        if (linkProvider == null) return;
+
+                        string providerName = provider.Key;
+
+                        var node = new XElement(providerName);
+
+                        var links = new SortedDictionary<int, NavLink>();
+
+                        foreach (NavLink link in linkProvider.GetLinks())
                         {
-                            order = links.Count == 0 ? 1 : links.Keys.Max() + 1;
+                            int order = link.Order;
+
+                            if (order == 0)
+                            {
+                                order = links.Count == 0 ? 1 : links.Keys.Max() + 1;
+                            }
+
+                            links.Add(order, link);
                         }
 
-                        links.Add(order, link);
-                    }
-
-                    foreach (var linkInfo in links)
-                    {
-                        NavLink navLink = linkInfo.Value;
-                        navLink.Order = linkInfo.Key;
-                        navLink.Id = GetLinkId(navLink, providerName);
-
-                        var link = new XElement("NavLink");
-
-                        foreach (var property in _navLinkProperties)
+                        foreach (var linkInfo in links)
                         {
-                            string name = property.Key;
-                            string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
+                            NavLink navLink = linkInfo.Value;
+                            navLink.Order = linkInfo.Key;
+                            navLink.Id = GetLinkId(navLink, providerName);
 
-                            if (name.Equals("Url"))
+                            var link = new XElement("NavLink");
+
+                            foreach (var property in _navLinkProperties)
                             {
-                                link.Add(new XCData(value));
+                                string name = property.Key;
+                                string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
+
+                                if (name.Equals("Url"))
+                                {
+                                    link.Add(new XCData(value));
+                                }
+                                else
+                                {
+                                    link.Add(new XAttribute(name, value));
+                                }
                             }
-                            else
-                            {
-                                link.Add(new XAttribute(name, value));
-                            }
+
+                            node.Add(link);
                         }
 
-                        node.Add(link);
+                        lock (Locker1)
+                        {
+                            nodes.Add(node);
+                        }
                     }
-
-                    lock (Locker1)
-                    {
-                        nodes.Add(node);
-                    }
+                    catch { }
                 });
 
                 return nodes.ToString();
@@ -146,7 +150,7 @@ namespace EPMLiveCore.API
         private static string CalculateLinkId(NavLink navLink, string providerName)
         {
             string key = providerName + "|" + navLink.Order + "|" + navLink.Url;
-            return (string) CacheStore.Current.Get(key, "Navigation", key.Md5).Value;
+            return (string) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, key.Md5).Value;
         }
 
         private static string GetLinkId(NavLink navLink, string providerName)
@@ -162,7 +166,7 @@ namespace EPMLiveCore.API
 
             var navProvider =
                 (INavLinkProvider)
-                    (CacheStore.Current.Get(cacheKey, "Navigation",
+                    (CacheStore.Current.Get(cacheKey, CacheStoreCategory.Navigation,
                         () => Enumerable.FirstOrDefault((from t in types.AsParallel()
                             where t.GetInterfaces().Contains(typeof (INavLinkProvider))
                             let atr = t.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)

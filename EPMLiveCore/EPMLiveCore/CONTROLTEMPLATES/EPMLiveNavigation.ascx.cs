@@ -89,12 +89,16 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             var spTreeView = ((SPTreeView) sender);
 
-            TreeNode wpNode =
-                spTreeView.Nodes.Cast<TreeNode>().FirstOrDefault(n => n.Text.Trim().ToLower().Equals("my workplace"));
-
-            if (wpNode != null)
+            if (SPContext.Current.Web.IsRootWeb)
             {
-                spTreeView.Nodes.Remove(wpNode);
+                TreeNode wpNode =
+                    spTreeView.Nodes.Cast<TreeNode>()
+                        .FirstOrDefault(n => n.Text.Trim().ToLower().Equals("global my workplace"));
+
+                if (wpNode != null)
+                {
+                    spTreeView.Nodes.Remove(wpNode);
+                }
             }
 
             spTreeView.Sort();
@@ -108,13 +112,17 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             if (SelectedTlNode.Equals("epm-nav-top-ql")) return;
 
-            string nodeId = SelectedTlNode.Replace("epm-nav-top-", string.Empty);
-            string provider = (from topNode in TopNodes
-                where topNode.Id.Equals(nodeId)
-                select topNode.LinkProvider).FirstOrDefault();
+            try
+            {
+                string nodeId = SelectedTlNode.Replace("epm-nav-top-", string.Empty);
+                string provider = (from topNode in TopNodes
+                    where topNode.Id.Equals(nodeId)
+                    select topNode.LinkProvider).FirstOrDefault();
 
-            var navService = new NavigationService(provider, SPContext.Current.Web);
-            StaticProviderLinks = navService.GetLinks().DecodeToBase64();
+                var navService = new NavigationService(provider, SPContext.Current.Web);
+                StaticProviderLinks = navService.GetLinks().DecodeToBase64();
+            }
+            catch { }
         }
 
         #endregion Methods 

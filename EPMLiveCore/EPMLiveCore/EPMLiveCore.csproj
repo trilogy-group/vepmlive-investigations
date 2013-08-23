@@ -198,6 +198,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
+    <Compile Include="Controls\Navigation\Providers\WorkplaceLinkProvider.cs" />
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -288,6 +289,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Infrastructure\BaseClasses\ReportingProxyBase.cs" />
     <Compile Include="Infrastructure\BaseClasses\SPListItemManager.cs" />
     <Compile Include="Infrastructure\CacheStore.cs" />
+    <Compile Include="Infrastructure\CacheStoreCategory.cs" />
     <Compile Include="Infrastructure\EPMLiveFileStore.cs" />
     <Compile Include="Infrastructure\EPMLiveScriptManager.cs" />
     <Compile Include="Infrastructure\Errors.cs" />
