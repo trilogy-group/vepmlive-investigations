@@ -107,17 +107,18 @@
                         ExpandDepth="0" 
                         ClientIDMode="Static" 
                         OnPreRender="OnTreeViewPreRender" />
-                <% }
-                   else if (currentNode.Equals(SelectedTlNode))
-                   { %>    
-                <% } %>
+                <% } %> 
             </div>       
         <% } %>
     </div>
 </div>
 
 <script type="text/javascript">
-    (function() {
+    (function () {
+        window.epmLiveNavigation = {
+            staticProvider: '<%= StaticProviderLinks %>'
+        };
+        
         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
     })();
 </script>

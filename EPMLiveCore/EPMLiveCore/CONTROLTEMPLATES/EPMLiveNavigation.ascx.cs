@@ -21,7 +21,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Fields 
 
-        #region Properties (5) 
+        #region Properties (6) 
 
         public IEnumerable<NavNode> AllNodes
         {
@@ -43,11 +43,13 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             get { return _selectedTlNode ?? "epm-nav-top-ql"; }
         }
 
+        public string StaticProviderLinks { get; private set; }
+
         public IEnumerable<NavNode> TopNodes { get; set; }
 
         #endregion Properties 
 
-        #region Methods (3) 
+        #region Methods (4) 
 
         // Protected Methods (3) 
 
@@ -82,26 +84,26 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             LoadSelectedNodeLinks();
         }
 
-        private void LoadSelectedNodeLinks()
-        {
-            if (SelectedTlNode.Equals("epm-nav-top-ql")) return;
-
-            var nodeId = SelectedTlNode.Replace("epm-nav-top-", string.Empty);
-            string provider = (from topNode in TopNodes
-                where topNode.Id.Equals(nodeId)
-                select topNode.LinkProvider).FirstOrDefault();
-
-            var navService = new NavigationService(provider, SPContext.Current.Web);
-
-            navService.GetHTMLForProvider(provider);
-        }
-
         protected void OnTreeViewPreRender(object sender, EventArgs e)
         {
             ((SPTreeView) sender).Sort();
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
+        // Private Methods (1) 
+
+        private void LoadSelectedNodeLinks()
+        {
+            if (SelectedTlNode.Equals("epm-nav-top-ql")) return;
+
+            string nodeId = SelectedTlNode.Replace("epm-nav-top-", string.Empty);
+            string provider = (from topNode in TopNodes
+                where topNode.Id.Equals(nodeId)
+                select topNode.LinkProvider).FirstOrDefault();
+
+            var navService = new NavigationService(provider, SPContext.Current.Web);
+            StaticProviderLinks = navService.GetLinks().DecodeToBase64();
+        }
 
         #endregion Methods 
     }
