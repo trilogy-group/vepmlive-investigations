@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Navigation;
 
 namespace EPMLiveCore.Controls.Navigation.Providers
 {
@@ -15,64 +16,80 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
-        #region Methods (1) 
+        #region Methods (2) 
 
-        // Private Methods (1) 
+        // Private Methods (2) 
 
         private IEnumerable<INavObject> GetMyWorkplaceLinks()
         {
             string key = SPWeb.ID + "_NavLinks_" + "GlobalMyWorkplace";
+            SPUserToken userToken = SPWeb.GetUserToken(SPWeb.CurrentUser.LoginName);
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
                 var links = new List<NavLink>();
 
-                SPSecurity.RunWithElevatedPrivileges(() =>
+                using (var spSite = new SPSite(SPWeb.Site.ID, userToken))
                 {
-                    using (var spSite = new SPSite(SPWeb.Site.ID))
+                    using (SPWeb spWeb = spSite.OpenWeb())
                     {
-                        using (SPWeb spWeb = spSite.OpenWeb())
+                        var locker = new object();
+                        SPNavigation spNavigation = spWeb.Navigation;
+
+                        Parallel.ForEach(GetNodes(spWeb), nodeId =>
                         {
-                            SPList installedAppsList = null;
+                            SPNavigationNode node = spNavigation.GetNodeById(nodeId);
 
-                            try
+                            if (node == null) return;
+
+                            var link = new NavLink {Title = node.Title, Url = node.Url, External = node.IsExternal};
+
+                            lock (locker)
                             {
-                                installedAppsList = SPContext.Current.Web.Lists["Installed Applications"];
+                                links.Add(link);
                             }
-                            catch { }
-
-                            if (installedAppsList == null) return;
-
-                            var query = new SPQuery
-                            {
-                                Query =
-                                    @"<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Global My Workplace</Value></Eq></Where>",
-                                ViewFields = @"<FieldRef Name='QuickLaunch' />"
-                            };
-
-                            SPListItemCollection communities = installedAppsList.GetItems(query);
-
-                            if (communities.Count > 0)
-                            {
-                                SPListItem workplace = communities[0];
-                                var ql = (string) (workplace["QuickLaunch"] ?? string.Empty);
-
-                                Parallel.ForEach(ql.Split(','), id =>
-                                {
-                                    try
-                                    {
-                                        var nodeId = int.Parse(id);
-
-
-                                    }catch{}
-                                });
-                            }
-                        }
+                        });
                     }
-                });
+                }
 
                 return links;
             }).Value;
+        }
+
+        private static IEnumerable<int> GetNodes(SPWeb spWeb)
+        {
+            SPList installedAppsList = null;
+
+            try
+            {
+                installedAppsList = spWeb.Lists["Installed Applications"];
+            }
+            catch { }
+
+            if (installedAppsList == null) yield break;
+
+            var query = new SPQuery
+            {
+                Query =
+                    @"<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Global My Workplace</Value></Eq></Where>",
+                ViewFields = @"<FieldRef Name='QuickLaunch' />"
+            };
+
+            SPListItemCollection communities = installedAppsList.GetItems(query);
+
+            if (communities.Count <= 0) yield break;
+
+            SPListItem workplace = communities[0];
+            var ql = (string) (workplace["QuickLaunch"] ?? string.Empty);
+
+            foreach (string id in ql.Split(','))
+            {
+                int nodeId;
+                if (int.TryParse(id, out nodeId))
+                {
+                    yield return nodeId;
+                }
+            }
         }
 
         #endregion Methods 

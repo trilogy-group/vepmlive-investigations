@@ -11,10 +11,12 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "Settings")]
     public class SettingsLinkProvider : NavLinkProvider
     {
-        #region Fields (2) 
+        #region Fields (3) 
 
         private const string QUERY = @"<OrderBy><FieldRef Name='Category' /><FieldRef Name='Title' /></OrderBy>";
-        private const string VIEW_FIELDS = @"<FieldRef Name='Title' /><FieldRef Name='Category' /><FieldRef Name='Description' />";
+
+        private const string VIEW_FIELDS =
+            @"<FieldRef Name='Title' /><FieldRef Name='Category' /><FieldRef Name='Description' />";
 
         private readonly List<Tuple<SPBasePermissions?, NavLink>> _links;
 
@@ -62,21 +64,20 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         private IEnumerable<INavObject> GetSettings()
         {
             string key = SPWeb.ID + "_NavLinks_" + "Settings";
+            SPUserToken userToken = SPWeb.GetUserToken(SPWeb.CurrentUser.LoginName);
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
                 var links = new List<NavLink>();
 
-                SPSecurity.RunWithElevatedPrivileges(() =>
+                using (var spSite = new SPSite(SPWeb.Site.ID, userToken))
                 {
-                    using (var spSite = new SPSite(SPWeb.Site.ID))
+                    using (SPWeb spWeb = spSite.OpenWeb(SPWeb.ID))
                     {
-                        using (SPWeb spWeb = spSite.OpenWeb(SPWeb.ID))
+                        SPList settingsList = spWeb.Lists.TryGetList("EPM Live Settings");
+
+                        if (settingsList != null)
                         {
-                            SPList settingsList = spWeb.Lists.TryGetList("EPM Live Settings");
-
-                            if (settingsList == null) return;
-
                             SPListItemCollectionPosition position;
 
                             DataTable settings = settingsList.GetDataTable(new SPQuery
@@ -97,7 +98,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                                 });
                         }
                     }
-                });
+                }
 
                 return links;
             }).Value;

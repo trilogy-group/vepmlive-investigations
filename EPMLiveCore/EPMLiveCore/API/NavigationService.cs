@@ -79,18 +79,18 @@ namespace EPMLiveCore.API
 
                 Parallel.ForEach(_linkProviders, provider =>
                 {
+                    INavLinkProvider linkProvider = provider.Value;
+
+                    if (linkProvider == null) return;
+
+                    string providerName = provider.Key;
+
+                    var node = new XElement(providerName);
+
+                    var links = new SortedDictionary<int, NavLink>();
+
                     try
                     {
-                        INavLinkProvider linkProvider = provider.Value;
-
-                        if (linkProvider == null) return;
-
-                        string providerName = provider.Key;
-
-                        var node = new XElement(providerName);
-
-                        var links = new SortedDictionary<int, NavLink>();
-
                         foreach (NavLink link in linkProvider.GetLinks())
                         {
                             int order = link.Order;
@@ -102,39 +102,39 @@ namespace EPMLiveCore.API
 
                             links.Add(order, link);
                         }
-
-                        foreach (var linkInfo in links)
-                        {
-                            NavLink navLink = linkInfo.Value;
-                            navLink.Order = linkInfo.Key;
-                            navLink.Id = GetLinkId(navLink, providerName);
-
-                            var link = new XElement("NavLink");
-
-                            foreach (var property in _navLinkProperties)
-                            {
-                                string name = property.Key;
-                                string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
-
-                                if (name.Equals("Url"))
-                                {
-                                    link.Add(new XCData(value));
-                                }
-                                else
-                                {
-                                    link.Add(new XAttribute(name, value));
-                                }
-                            }
-
-                            node.Add(link);
-                        }
-
-                        lock (Locker1)
-                        {
-                            nodes.Add(node);
-                        }
                     }
                     catch { }
+
+                    foreach (var linkInfo in links)
+                    {
+                        NavLink navLink = linkInfo.Value;
+                        navLink.Order = linkInfo.Key;
+                        navLink.Id = GetLinkId(navLink, providerName);
+
+                        var link = new XElement("NavLink");
+
+                        foreach (var property in _navLinkProperties)
+                        {
+                            string name = property.Key;
+                            string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
+
+                            if (name.Equals("Url"))
+                            {
+                                link.Add(new XCData(value));
+                            }
+                            else
+                            {
+                                link.Add(new XAttribute(name, value));
+                            }
+                        }
+
+                        node.Add(link);
+                    }
+
+                    lock (Locker1)
+                    {
+                        nodes.Add(node);
+                    }
                 });
 
                 return nodes.ToString();
