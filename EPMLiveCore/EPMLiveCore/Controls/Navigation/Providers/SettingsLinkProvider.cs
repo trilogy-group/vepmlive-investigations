@@ -16,7 +16,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         private const string QUERY = @"<OrderBy><FieldRef Name='Category' /><FieldRef Name='Title' /></OrderBy>";
 
         private const string VIEW_FIELDS =
-            @"<FieldRef Name='Title' /><FieldRef Name='Category' /><FieldRef Name='Description' />";
+            @"<FieldRef Name='Title' /><FieldRef Name='URL' /><FieldRef Name='Category' /><FieldRef Name='Description' />";
 
         private readonly List<Tuple<SPBasePermissions?, NavLink>> _links;
 
@@ -88,14 +88,28 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                             string webUrl = spWeb.Url;
 
-                            links.AddRange(from DataRow dataRow in settings.Rows
-                                let category = (S(dataRow["Category"]).Split(')')[1]).Trim()
-                                select new NavLink
+                            var catLinks = new SortedDictionary<string, List<NavLink>>();
+
+                            foreach (DataRow row in settings.Rows)
+                            {
+                                var category = (S(row["Category"]).Split(')')[1]).Trim();
+
+                                var link = new NavLink
                                 {
-                                    Title = S(dataRow["Title"]),
-                                    Url = webUrl + S(dataRow["URL"]) + "?Source={page}&BackTo={page}",
+                                    Title = S(row["Title"]),
+                                    Url = webUrl + S(row["URL"]) + "?Source={page}&BackTo={page}",
                                     Category = category
-                                });
+                                };
+
+                                if (!catLinks.ContainsKey(category))
+                                {
+                                    catLinks.Add(category,new List<NavLink>());
+                                }
+
+                                catLinks[category].Add(link);
+                            }
+
+                            links.AddRange(catLinks.SelectMany(p => p.Value.OrderBy(l => l.Title)));
                         }
                     }
                 }
@@ -115,7 +129,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public override IEnumerable<INavObject> GetLinks()
         {
-            foreach (var link in _links.OrderBy(l => l.Item2.Title))
+            foreach (var link in _links)
             {
                 if (!link.Item1.HasValue)
                 {
