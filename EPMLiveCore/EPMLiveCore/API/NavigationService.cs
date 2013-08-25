@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Web.Caching;
 using System.Xml.Linq;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
@@ -77,11 +78,11 @@ namespace EPMLiveCore.API
             {
                 var nodes = new XElement("Nodes");
 
-                Parallel.ForEach(_linkProviders, provider =>
+                foreach (var provider in _linkProviders)
                 {
                     INavLinkProvider linkProvider = provider.Value;
 
-                    if (linkProvider == null) return;
+                    if (linkProvider == null) continue;
 
                     string providerName = provider.Key;
 
@@ -104,6 +105,8 @@ namespace EPMLiveCore.API
                         }
                     }
                     catch { }
+
+                    if (links.Count == 0) continue;
 
                     foreach (var linkInfo in links)
                     {
@@ -131,11 +134,8 @@ namespace EPMLiveCore.API
                         node.Add(link);
                     }
 
-                    lock (Locker1)
-                    {
-                        nodes.Add(node);
-                    }
-                });
+                    nodes.Add(node);
+                }
 
                 return nodes.ToString();
             }
@@ -164,19 +164,22 @@ namespace EPMLiveCore.API
             string key = provider.ToUpper();
             string cacheKey = "NAVIGATION_PROVIDER_" + key;
 
-            var navProvider =
-                (INavLinkProvider)
-                    (CacheStore.Current.Get(cacheKey, CacheStoreCategory.Navigation,
-                        () => Enumerable.FirstOrDefault((from t in types.AsParallel()
-                            where t.GetInterfaces().Contains(typeof (INavLinkProvider))
-                            let atr = t.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
-                            where atr.Cast<NavLinkProviderInfoAttribute>().Any(a => a.Name.ToUpper().Equals(key))
-                            select t).Select(t => (INavLinkProvider) Activator.CreateInstance(t, new object[] {_spWeb})))))
-                        .Value;
+            Guid sId = _spWeb.Site.ID;
+            Guid wId = _spWeb.ID;
+            string un = _spWeb.CurrentUser.LoginName;
+
+            var navProvider = CacheStore.Current.Get(cacheKey, CacheStoreCategory.Navigation, () => (from type in types
+                where type.GetInterfaces().Contains(typeof (INavLinkProvider))
+                from NavLinkProviderInfoAttribute attribute in
+                    type.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
+                where attribute.Name.ToUpper().Equals(key)
+                select Activator.CreateInstance(type, new object[] {sId, wId, un})).FirstOrDefault()).Value;
+
+            if (navProvider == null) return;
 
             lock (Locker1)
             {
-                _linkProviders.Add(provider, navProvider);
+                _linkProviders.Add(provider, navProvider as INavLinkProvider);
             }
         }
 

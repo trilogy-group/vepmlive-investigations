@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,13 +8,14 @@ namespace EPMLiveCore.Infrastructure
 {
     public sealed class CacheStore : IDisposable
     {
-        #region Fields (5) 
+        #region Fields (6) 
 
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
         private readonly Dictionary<string, Tuple<CacheStoreCategory, CachedValue>> _store;
         private readonly Timer _timer;
         private bool _disposed;
+        private long _ticks;
 
         #endregion Fields 
 
@@ -22,6 +24,7 @@ namespace EPMLiveCore.Infrastructure
         private CacheStore()
         {
             _store = new Dictionary<string, Tuple<CacheStoreCategory, CachedValue>>();
+            _ticks = DateTime.Now.Ticks;
             _timer = new Timer(Cleanup, null, 300000, 300000);
         }
 
@@ -56,24 +59,24 @@ namespace EPMLiveCore.Infrastructure
 
         #region Methods (6) 
 
-        // Public Methods (4) 
-
-        public CachedValue Get(string key)
-        {
-            return _store.ContainsKey(key) ? _store[key].Item2 : null;
-        }
+        // Public Methods (3) 
 
         public CachedValue Get(string key, CacheStoreCategory category, Func<object> getValue)
         {
+            string originalKey = key;
+            key = BuildKey(key);
+
             if (_store.ContainsKey(key)) return _store[key].Item2;
 
-            Set(key, getValue(), category);
+            Set(originalKey, getValue(), category);
 
             return _store[key].Item2;
         }
 
         public void Remove(string key)
         {
+            key = BuildKey(key);
+
             if (!_store.ContainsKey(key)) return;
 
             lock (Locker)
@@ -84,6 +87,8 @@ namespace EPMLiveCore.Infrastructure
 
         public void Set(string key, object value, CacheStoreCategory category)
         {
+            key = BuildKey(key);
+
             lock (Locker)
             {
                 if (!_store.ContainsKey(key))
@@ -97,30 +102,31 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        // Private Methods (2) 
+        // Private Methods (3) 
+
+        private string BuildKey(string key)
+        {
+            return key + "_" + _ticks;
+        }
 
         private void Cleanup(object state)
         {
-            var dateTime = new DateTime();
+            long ticks = _ticks;
 
             lock (Locker)
             {
-                var locker = new object();
-
-                var keys = new List<string>();
-
-                Parallel.ForEach(_store, pair =>
-                {
-                    if ((dateTime - pair.Value.Item2.LastReadAt).Minutes <= 5) return;
-
-                    lock (locker)
-                    {
-                        keys.Add(pair.Key);
-                    }
-                });
-
-                Parallel.ForEach(keys, k => _store.Remove(k));
+                _ticks = DateTime.Now.Ticks;
             }
+
+            Thread.Sleep(30000);
+
+            Parallel.ForEach(_store.Keys.Where(key => key.EndsWith("_" + ticks)), key =>
+            {
+                lock (Locker)
+                {
+                    _store.Remove(key);
+                }
+            });
         }
 
         private void Dispose(bool disposing)

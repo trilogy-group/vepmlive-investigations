@@ -42,7 +42,7 @@ namespace EPMLiveCore.ControlTemplates
                 "jquery.multiselect.min"
             });
 
-            EPMFileVersion = (string) CacheStore.Current.Get("EPMLiveFileVersion").Value;
+            EPMFileVersion = EPMLiveScriptManager.FileVersion;
 
             DebugMode = false;
 

@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
@@ -12,43 +13,43 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     {
         #region Constructors (1) 
 
-        public WorkplaceLinkProvider(SPWeb spWeb) : base(spWeb) { }
+        public WorkplaceLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username) { }
 
         #endregion Constructors 
 
-        #region Methods (2) 
+        #region Methods (3) 
 
-        // Private Methods (2) 
+        // Private Methods (3) 
+
+        private static string CalculateUrl(string url)
+        {
+            return url;
+        }
 
         private IEnumerable<INavObject> GetMyWorkplaceLinks()
         {
-            string key = SPWeb.ID + "_NavLinks_" + "GlobalMyWorkplace";
-            SPUserToken userToken = SPWeb.GetUserToken(SPWeb.CurrentUser.LoginName);
+            string key = SiteId + "_NavLinks_" + "GlobalMyWorkplace";
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
                 var links = new List<NavLink>();
 
-                using (var spSite = new SPSite(SPWeb.Site.ID, userToken))
+                using (var spSite = new SPSite(SiteId, GetUserToken()))
                 {
                     using (SPWeb spWeb = spSite.OpenWeb())
                     {
-                        var locker = new object();
                         SPNavigation spNavigation = spWeb.Navigation;
 
-                        Parallel.ForEach(GetNodes(spWeb), nodeId =>
-                        {
-                            SPNavigationNode node = spNavigation.GetNodeById(nodeId);
-
-                            if (node == null) return;
-
-                            var link = new NavLink {Title = node.Title, Url = node.Url, External = node.IsExternal};
-
-                            lock (locker)
+                        links.AddRange(from nodeId in GetNodes(spWeb)
+                            select spNavigation.GetNodeById(nodeId)
+                            into node
+                            where node != null
+                            select new NavLink
                             {
-                                links.Add(link);
-                            }
-                        });
+                                Title = node.Title,
+                                Url = CalculateUrl(node.Url),
+                                External = node.IsExternal
+                            });
                     }
                 }
 

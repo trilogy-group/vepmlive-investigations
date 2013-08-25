@@ -24,10 +24,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #region Constructors (1) 
 
-        public SettingsLinkProvider(SPWeb spWeb) : base(spWeb)
+        public SettingsLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username)
         {
-            string url = SPWeb.ServerRelativeUrl;
-
             _links = new List<Tuple<SPBasePermissions?, NavLink>>
             {
                 new Tuple<SPBasePermissions?, NavLink>(SPBasePermissions.AddAndCustomizePages, new NavLink
@@ -39,17 +37,18 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     Title = "Add a page",
                     Url =
-                        string.Format("javascript:OpenCreateWebPageDialog('{0}/_layouts/15/createwebpage.aspx');", url)
+                        string.Format("javascript:OpenCreateWebPageDialog('{0}/_layouts/15/createwebpage.aspx');",
+                            RelativeUrl)
                 }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
                 {
                     Title = "Site contents",
-                    Url = string.Format("{0}/_layouts/15/viewlsts.aspx", url)
+                    Url = string.Format("{0}/_layouts/15/viewlsts.aspx", RelativeUrl)
                 }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
                 {
                     Title = "Advance site settings",
-                    Url = string.Format("javascript:GoToPage('{0}/_layouts/15/epmlive/settings.aspx');", url)
+                    Url = string.Format("javascript:GoToPage('{0}/_layouts/15/epmlive/settings.aspx');", RelativeUrl)
                 }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink {Separator = true})
             };
@@ -63,16 +62,15 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private IEnumerable<INavObject> GetSettings()
         {
-            string key = SPWeb.ID + "_NavLinks_" + "Settings";
-            SPUserToken userToken = SPWeb.GetUserToken(SPWeb.CurrentUser.LoginName);
+            string key = WebId + "_NavLinks_" + "Settings";
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
                 var links = new List<NavLink>();
 
-                using (var spSite = new SPSite(SPWeb.Site.ID, userToken))
+                using (var spSite = new SPSite(SiteId, GetUserToken()))
                 {
-                    using (SPWeb spWeb = spSite.OpenWeb(SPWeb.ID))
+                    using (SPWeb spWeb = spSite.OpenWeb(WebId))
                     {
                         SPList settingsList = spWeb.Lists.TryGetList("EPM Live Settings");
 
@@ -92,7 +90,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                             foreach (DataRow row in settings.Rows)
                             {
-                                var category = (S(row["Category"]).Split(')')[1]).Trim();
+                                string category = (S(row["Category"]).Split(')')[1]).Trim();
 
                                 var link = new NavLink
                                 {
@@ -103,7 +101,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                                 if (!catLinks.ContainsKey(category))
                                 {
-                                    catLinks.Add(category,new List<NavLink>());
+                                    catLinks.Add(category, new List<NavLink>());
                                 }
 
                                 catLinks[category].Add(link);
@@ -129,22 +127,36 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public override IEnumerable<INavObject> GetLinks()
         {
-            foreach (var link in _links)
+            var links = new List<NavLink>();
+
+            using (var spSite = new SPSite(SiteId, GetUserToken()))
             {
-                if (!link.Item1.HasValue)
+                using (SPWeb spWeb = spSite.OpenWeb(WebId))
                 {
-                    yield return link.Item2;
-                }
-                else
-                {
-                    if (SPWeb.DoesUserHavePermissions(link.Item1.Value))
+                    foreach (var link in _links)
                     {
-                        yield return link.Item2;
+                        if (!link.Item1.HasValue)
+                        {
+                            links.Add(link.Item2);
+                        }
+                        else
+                        {
+                            if (spWeb.DoesUserHavePermissions(link.Item1.Value))
+                            {
+                                links.Add(link.Item2);
+                            }
+                        }
+                    }
+
+                    SPUser user = spWeb.CurrentUser;
+                    if (spWeb.DoesUserHavePermissions(SPBasePermissions.FullMask) || user.IsSiteAdmin)
+                    {
+                        links.AddRange(GetSettings().Cast<NavLink>());
                     }
                 }
             }
 
-            foreach (INavObject link in GetSettings()) yield return link;
+            return links;
         }
 
         #endregion

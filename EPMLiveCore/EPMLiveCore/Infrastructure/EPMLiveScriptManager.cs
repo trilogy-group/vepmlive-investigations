@@ -11,12 +11,31 @@ namespace EPMLiveCore.Infrastructure
 {
     public class EPMLiveScriptManager
     {
-        #region Fields (2) 
+        #region Fields (3) 
 
         private const string EPM_PATH = "/_layouts/15/epmlive/";
         private const string JS_PATH = EPM_PATH + "javascripts/";
+        private static string _fileVersion;
 
         #endregion Fields 
+
+        #region Properties (1) 
+
+        public static string FileVersion
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_fileVersion))
+                {
+                    return _fileVersion;
+                }
+
+                _fileVersion = GetFileVersion();
+                return _fileVersion;
+            }
+        }
+
+        #endregion Properties 
 
         #region Methods (4) 
 
@@ -93,7 +112,7 @@ namespace EPMLiveCore.Infrastructure
             bool useEpmPath = script.StartsWith("/");
             if (useEpmPath) script = script.Substring(1, script.Length - 1);
 
-            return Path.Combine(useEpmPath ? EPM_PATH : JS_PATH, string.Format(@"{0}?v={1}", script, GetFileVersion()));
+            return Path.Combine(useEpmPath ? EPM_PATH : JS_PATH, string.Format(@"{0}?v={1}", script, FileVersion));
         }
 
         #endregion Methods 
