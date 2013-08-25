@@ -40,6 +40,15 @@ namespace EPMLiveCore.Layouts.epmlive.Admin {
         protected global::System.Web.UI.WebControls.Panel MainPanel;
         
         /// <summary>
+        /// ServerName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ServerName;
+        
+        /// <summary>
         /// RadAjaxManager control.
         /// </summary>
         /// <remarks>

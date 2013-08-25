@@ -11,6 +11,12 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <style type="text/css">
+        .alert-info {
+            background-color: #D9EDF7;
+            border-color: #BCE8F1;
+            color: #3A87AD;
+        }
+
         .alert-danger {
             background-color: #F2DEDE;
             border-color: #EED3D7;
@@ -47,6 +53,9 @@
         </div>
     </asp:Panel>
     <asp:Panel ID="MainPanel" runat="server">
+        <div class="alert alert-info">
+            <strong>Server: </strong> <asp:Literal ID="ServerName" runat="server"></asp:Literal>
+        </div>
         <telerik:RadAjaxManager ID="RadAjaxManager" runat="server">
             <AjaxSettings>
                 <telerik:AjaxSetting AjaxControlID="CacheGrid">

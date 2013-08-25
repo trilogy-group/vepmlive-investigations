@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Web.UI.WebControls;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
@@ -9,7 +11,7 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
 {
     public partial class CacheManager : LayoutsPageBase
     {
-        #region Methods (10) 
+        #region Methods (12) 
 
         // Protected Methods (5) 
 
@@ -41,10 +43,10 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
             {
                 ValidateAccess();
 
-                if (!IsPostBack)
-                {
-                    LoadData();
-                }
+                if (IsPostBack) return;
+
+                GetServerInfo();
+                LoadData();
             }
             catch (Exception exception)
             {
@@ -55,7 +57,7 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
             }
         }
 
-        // Private Methods (5) 
+        // Private Methods (7) 
 
         private void AddGroupDeleteButton(GridItemEventArgs e)
         {
@@ -91,17 +93,30 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
             CacheGrid.Rebind();
         }
 
-        private void DeleteItemsForCategory(string category)
-        {
-            CacheStore.Current.RemoveCategory(category);
-        }
-
         private static void DeleteItem(GridDataItem item)
         {
             if (item == null) return;
 
             string key = item["Key"].Text;
             CacheStore.Current.Remove(key);
+        }
+
+        private void DeleteItemsForCategory(string category)
+        {
+            CacheStore.Current.RemoveCategory(category);
+        }
+
+        private void GetServerInfo()
+        {
+            ServerName.Text = (string) CacheStore.Current.Get("ServerName", CacheStoreCategory.Infrastructure, () =>
+            {
+                string domainName = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+                string hostName = Dns.GetHostName();
+
+                string fqdn = !hostName.Contains(domainName) ? hostName + "." + domainName : hostName;
+
+                return fqdn.ToUpper();
+            }, true).Value;
         }
 
         private void LoadData()
