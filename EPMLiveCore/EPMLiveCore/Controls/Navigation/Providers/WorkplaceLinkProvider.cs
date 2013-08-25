@@ -21,8 +21,20 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         // Private Methods (3) 
 
-        private static string CalculateUrl(string url)
+        private string CalculateUrl(string url, bool isRootWeb)
         {
+            if (isRootWeb) return url;
+
+            if (url.Contains("_layouts"))
+            {
+                string[] parts = url.Split(new[] {"_layouts"}, StringSplitOptions.None);
+                url = RelativeUrl + "_layouts" + string.Join(string.Empty, parts.Skip(1));
+            }
+            else
+            {
+                url = string.Format(@"javascript:OpenCreateWebPageDialog('{0}');", url);
+            }
+
             return url;
         }
 
@@ -38,6 +50,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     using (SPWeb spWeb = spSite.OpenWeb())
                     {
+                        bool isRootWeb = spWeb.IsRootWeb;
                         SPNavigation spNavigation = spWeb.Navigation;
 
                         links.AddRange(from nodeId in GetNodes(spWeb)
@@ -47,8 +60,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                             select new NavLink
                             {
                                 Title = node.Title,
-                                Url = CalculateUrl(node.Url),
-                                External = node.IsExternal
+                                Url = CalculateUrl(node.Url, isRootWeb)
                             });
                     }
                 }

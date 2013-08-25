@@ -72,7 +72,7 @@ namespace EPMLiveCore.Infrastructure
 
             Set(originalKey, getValue(), category, keepIndefinite);
 
-            return _store[key].Item2;
+            return _store[keepIndefinite ? originalKey : key].Item2;
         }
 
         public void Remove(string key)
