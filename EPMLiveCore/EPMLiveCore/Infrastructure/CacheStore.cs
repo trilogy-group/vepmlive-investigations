@@ -87,7 +87,7 @@ namespace EPMLiveCore.Infrastructure
             dataTable.Columns.Add("UpdatedAt", typeof (DateTime));
             dataTable.Columns.Add("LastReadAt", typeof (DateTime));
 
-            foreach (var pair in _store)
+            foreach (var pair in _store.OrderBy(p => p.Value.Item2.CreatedAt))
             {
                 DataRow row = dataTable.NewRow();
 

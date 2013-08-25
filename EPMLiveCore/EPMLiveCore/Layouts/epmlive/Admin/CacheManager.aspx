@@ -57,7 +57,7 @@
             </AjaxSettings>
         </telerik:RadAjaxManager>
         <telerik:RadGrid ID="CacheGrid" runat=server 
-                         AutoGenerateColumns="False" 
+                         AutoGenerateColumns="False" EnableViewState="False"
                          OnNeedDataSource="CacheGrid_OnNeedDataSource" OnDeleteCommand="CacheGrid_OnDeleteCommand" 
                          OnItemCreated="CacheGrid_OnItemCreated" OnItemDataBound="CacheGrid_OnItemDataBound">
             <MasterTableView Width="100%" Summary="Current Cache">
