@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace EPMLiveCore.Infrastructure
 {
     public sealed class CacheStore : IDisposable
     {
-        #region Fields (6) 
+        #region Fields (7) 
 
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
+        private readonly List<string> _indefiniteKeys;
         private readonly Dictionary<string, Tuple<CacheStoreCategory, CachedValue>> _store;
         private readonly Timer _timer;
         private bool _disposed;
@@ -24,6 +25,7 @@ namespace EPMLiveCore.Infrastructure
         private CacheStore()
         {
             _store = new Dictionary<string, Tuple<CacheStoreCategory, CachedValue>>();
+            _indefiniteKeys = new List<string>();
             _ticks = DateTime.Now.Ticks;
             _timer = new Timer(Cleanup, null, 300000, 300000);
         }
@@ -61,14 +63,15 @@ namespace EPMLiveCore.Infrastructure
 
         // Public Methods (3) 
 
-        public CachedValue Get(string key, CacheStoreCategory category, Func<object> getValue)
+        public CachedValue Get(string key, CacheStoreCategory category, Func<object> getValue,
+            bool keepIndefinite = false)
         {
             string originalKey = key;
             key = BuildKey(key);
 
             if (_store.ContainsKey(key)) return _store[key].Item2;
 
-            Set(originalKey, getValue(), category);
+            Set(originalKey, getValue(), category, keepIndefinite);
 
             return _store[key].Item2;
         }
@@ -85,8 +88,19 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        public void Set(string key, object value, CacheStoreCategory category)
+        public void Set(string key, object value, CacheStoreCategory category, bool keepIndefinite = false)
         {
+            if (keepIndefinite)
+            {
+                if (!_indefiniteKeys.Contains(key))
+                {
+                    lock (Locker)
+                    {
+                        _indefiniteKeys.Add(key);
+                    }
+                }
+            }
+
             key = BuildKey(key);
 
             lock (Locker)
@@ -106,11 +120,13 @@ namespace EPMLiveCore.Infrastructure
 
         private string BuildKey(string key)
         {
-            return key + "_" + _ticks;
+            return _indefiniteKeys.Contains(key) ? key : key + "_" + _ticks;
         }
 
         private void Cleanup(object state)
         {
+            Debugger.Break();
+
             long ticks = _ticks;
 
             lock (Locker)
@@ -123,13 +139,17 @@ namespace EPMLiveCore.Infrastructure
 
             Thread.Sleep(30000);
 
-            Parallel.ForEach(_store.Keys.Where(key => key.EndsWith("_" + ticks)), key =>
+            string oldTicks = "_" + ticks;
+
+            IEnumerable<string> keys = _store.Keys.Where(key => key.EndsWith(oldTicks));
+
+            lock (Locker)
             {
-                lock (Locker)
+                foreach (string key in keys)
                 {
                     _store.Remove(key);
                 }
-            });
+            }
         }
 
         private void Dispose(bool disposing)

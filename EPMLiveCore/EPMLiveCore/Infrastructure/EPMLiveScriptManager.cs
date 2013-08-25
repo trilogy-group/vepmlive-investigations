@@ -91,7 +91,7 @@ namespace EPMLiveCore.Infrastructure
                 }
 
                 return version;
-            }).Value;
+            }, true).Value;
         }
 
         private static string GetScript(string script, bool debugMode)
