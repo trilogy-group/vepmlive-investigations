@@ -118,6 +118,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+    <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -381,6 +382,13 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\addusers.aspx.designer.cs">
       <DependentUpon>addusers.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Admin\CacheManager.aspx.cs">
+      <DependentUpon>CacheManager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Admin\CacheManager.aspx.designer.cs">
+      <DependentUpon>CacheManager.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\adsyncadmin.aspx.cs">
       <DependentUpon>adsyncadmin.aspx</DependentUpon>
@@ -2119,6 +2127,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\addperiod.aspx" />
     <Content Include="Layouts\epmlive\addperiods.aspx" />
     <Content Include="Layouts\epmlive\addusers.aspx" />
+    <Content Include="Layouts\epmlive\Admin\CacheManager.aspx" />
     <Content Include="Layouts\epmlive\adsyncadmin.aspx" />
     <Content Include="Layouts\epmlive\applications\AddCommunity.aspx" />
     <Content Include="Layouts\epmlive\applications\Applications.css" />

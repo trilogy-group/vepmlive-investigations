@@ -173,7 +173,7 @@ namespace EPMLiveCore.API
                 from NavLinkProviderInfoAttribute attribute in
                     type.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
                 where attribute.Name.ToUpper().Equals(key)
-                select Activator.CreateInstance(type, new object[] {sId, wId, un})).FirstOrDefault()).Value;
+                select Activator.CreateInstance(type, new object[] {sId, wId, un})).FirstOrDefault(), true).Value;
 
             if (navProvider == null) return;
 

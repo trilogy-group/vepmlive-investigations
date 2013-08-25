@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 
@@ -58,9 +59,9 @@ namespace EPMLiveCore.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (6) 
+        #region Methods (9) 
 
-        // Public Methods (3) 
+        // Public Methods (5) 
 
         public CachedValue Get(string key, CacheStoreCategory category, Func<object> getValue,
             bool keepIndefinite = false)
@@ -75,6 +76,34 @@ namespace EPMLiveCore.Infrastructure
             return _store[keepIndefinite ? originalKey : key].Item2;
         }
 
+        public DataTable GetDataTable()
+        {
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("Key", typeof (string));
+            dataTable.Columns.Add("Value", typeof (string));
+            dataTable.Columns.Add("Category", typeof (string));
+            dataTable.Columns.Add("CreatedAt", typeof (DateTime));
+            dataTable.Columns.Add("UpdatedAt", typeof (DateTime));
+            dataTable.Columns.Add("LastReadAt", typeof (DateTime));
+
+            foreach (var pair in _store)
+            {
+                DataRow row = dataTable.NewRow();
+
+                row["Key"] = pair.Key;
+                row["Value"] = (pair.Value.Item2.Value ?? string.Empty).ToString();
+                row["Category"] = pair.Value.Item1;
+                row["CreatedAt"] = pair.Value.Item2.CreatedAt;
+                row["UpdatedAt"] = pair.Value.Item2.UpdatedAt;
+                row["LastReadAt"] = pair.Value.Item2.LastReadAt;
+
+                dataTable.Rows.Add(row);
+            }
+
+            return dataTable;
+        }
+
         public void Remove(string key)
         {
             key = BuildKey(key);
@@ -85,6 +114,12 @@ namespace EPMLiveCore.Infrastructure
             {
                 _store.Remove(key);
             }
+        }
+
+        public void RemoveCategory(string category)
+        {
+            List<string> keys = (from p in _store where p.Value.Item1.ToString().Equals(category) select p.Key).ToList();
+            RemoveKeys(keys);
         }
 
         public void Set(string key, object value, CacheStoreCategory category, bool keepIndefinite = false)
@@ -115,7 +150,7 @@ namespace EPMLiveCore.Infrastructure
             }
         }
 
-        // Private Methods (3) 
+        // Private Methods (4) 
 
         private string BuildKey(string key)
         {
@@ -140,17 +175,7 @@ namespace EPMLiveCore.Infrastructure
 
             IEnumerable<string> keys = _store.Keys.Where(key => key.EndsWith(oldTicks)).ToList();
 
-            lock (Locker)
-            {
-                foreach (string key in keys)
-                {
-                    try
-                    {
-                        _store.Remove(key);
-                    }
-                    catch { }
-                }
-            }
+            RemoveKeys(keys);
         }
 
         private void Dispose(bool disposing)
@@ -163,6 +188,21 @@ namespace EPMLiveCore.Infrastructure
             }
 
             _disposed = true;
+        }
+
+        private void RemoveKeys(IEnumerable<string> keys)
+        {
+            lock (Locker)
+            {
+                foreach (string key in keys)
+                {
+                    try
+                    {
+                        _store.Remove(key);
+                    }
+                    catch { }
+                }
+            }
         }
 
         #endregion Methods 
