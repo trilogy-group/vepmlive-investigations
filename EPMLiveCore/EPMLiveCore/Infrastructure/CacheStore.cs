@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -125,8 +124,6 @@ namespace EPMLiveCore.Infrastructure
 
         private void Cleanup(object state)
         {
-            Debugger.Break();
-
             long ticks = _ticks;
 
             lock (Locker)
@@ -141,13 +138,17 @@ namespace EPMLiveCore.Infrastructure
 
             string oldTicks = "_" + ticks;
 
-            IEnumerable<string> keys = _store.Keys.Where(key => key.EndsWith(oldTicks));
+            IEnumerable<string> keys = _store.Keys.Where(key => key.EndsWith(oldTicks)).ToList();
 
             lock (Locker)
             {
                 foreach (string key in keys)
                 {
-                    _store.Remove(key);
+                    try
+                    {
+                        _store.Remove(key);
+                    }
+                    catch { }
                 }
             }
         }
