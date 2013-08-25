@@ -118,6 +118,9 @@ namespace EPMLiveCore.Infrastructure
                 _ticks = DateTime.Now.Ticks;
             }
 
+            // Wait for 30 seconds just in-case if 
+            // something is still using an old key
+
             Thread.Sleep(30000);
 
             Parallel.ForEach(_store.Keys.Where(key => key.EndsWith("_" + ticks)), key =>
