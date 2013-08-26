@@ -6,10 +6,11 @@ namespace EPMLiveCore.Infrastructure.Navigation
 {
     public abstract class NavLinkProvider : INavLinkProvider
     {
-        #region Fields (4) 
+        #region Fields (5) 
 
         protected readonly string RelativeUrl;
         protected readonly Guid SiteId;
+        protected readonly int UserId;
         protected readonly string Username;
         protected readonly Guid WebId;
 
@@ -28,6 +29,7 @@ namespace EPMLiveCore.Infrastructure.Navigation
                 using (SPWeb spWeb = spSite.OpenWeb(webId))
                 {
                     RelativeUrl = spWeb.ServerRelativeUrl;
+                    UserId = spWeb.CurrentUser.ID;
                 }
             }
         }
