@@ -81,7 +81,7 @@ namespace EPMLiveCore.Infrastructure
             var dataTable = new DataTable();
 
             dataTable.Columns.Add("Key", typeof (string));
-            dataTable.Columns.Add("Value", typeof (string));
+            dataTable.Columns.Add("Value", typeof (object));
             dataTable.Columns.Add("Category", typeof (string));
             dataTable.Columns.Add("CreatedAt", typeof (DateTime));
             dataTable.Columns.Add("UpdatedAt", typeof (DateTime));
@@ -92,7 +92,7 @@ namespace EPMLiveCore.Infrastructure
                 DataRow row = dataTable.NewRow();
 
                 row["Key"] = pair.Key;
-                row["Value"] = (pair.Value.Item2.Value ?? string.Empty).ToString();
+                row["Value"] = pair.Value.Item2.Value;
                 row["Category"] = pair.Value.Item1;
                 row["CreatedAt"] = pair.Value.Item2.CreatedAt;
                 row["UpdatedAt"] = pair.Value.Item2.UpdatedAt;

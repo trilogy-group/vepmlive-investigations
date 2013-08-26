@@ -54,7 +54,8 @@
     </asp:Panel>
     <asp:Panel ID="MainPanel" runat="server">
         <div class="alert alert-info">
-            <strong>Server: </strong> <asp:Literal ID="ServerName" runat="server"></asp:Literal>
+            <div><strong>Server: </strong> <asp:Literal ID="ServerName" runat="server"></asp:Literal></div>
+            <div><strong>Memory Allocation: </strong><asp:Literal ID="MemoryAllocation" runat="server"></asp:Literal></div>
         </div>
         <telerik:RadAjaxManager ID="RadAjaxManager" runat="server">
             <AjaxSettings>
@@ -83,6 +84,7 @@
                 <Columns> 
                     <telerik:GridBoundColumn DataField="Key" HeaderText="Key" HeaderStyle-Width="25%" Resizable="True" /> 
                     <telerik:GridBoundColumn DataField="Value" HeaderText="Value" HeaderStyle-Width="25%" Resizable="True" /> 
+                    <telerik:GridBoundColumn DataField="Size" HeaderText="Size (Bytes)" Resizable="True" /> 
                     <telerik:GridBoundColumn DataField="Category" HeaderText="Category" Resizable="True" Visible="False" /> 
                     <telerik:GridBoundColumn DataField="CreatedAt" HeaderText="Created At" HeaderStyle-Width="135px" Resizable="True" /> 
                     <telerik:GridBoundColumn DataField="LastReadAt" HeaderText="Last Read At" HeaderStyle-Width="135px" Resizable="True" /> 

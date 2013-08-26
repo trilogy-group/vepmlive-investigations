@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Web.UI.WebControls;
@@ -11,7 +13,13 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
 {
     public partial class CacheManager : LayoutsPageBase
     {
-        #region Methods (12) 
+        #region Fields (1) 
+
+        private long _totalBytes;
+
+        #endregion Fields 
+
+        #region Methods (14) 
 
         // Protected Methods (5) 
 
@@ -47,6 +55,7 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
 
                 GetServerInfo();
                 LoadData();
+                CalculateMemoryAllocation();
             }
             catch (Exception exception)
             {
@@ -57,7 +66,7 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
             }
         }
 
-        // Private Methods (7) 
+        // Private Methods (9) 
 
         private void AddGroupDeleteButton(GridItemEventArgs e)
         {
@@ -81,6 +90,53 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
             table.Rows[0].Cells.Add(c2);
 
             header.DataCell.Controls.Add(table);
+        }
+
+        private void CalculateMemoryAllocation()
+        {
+            string memoryAllocation;
+
+            if (_totalBytes < 2)
+            {
+                memoryAllocation = _totalBytes + " byte";
+            }
+            else if (_totalBytes < 1024)
+            {
+                memoryAllocation = _totalBytes + " bytes";
+            }
+            else if (_totalBytes < 131072)
+            {
+                memoryAllocation = _totalBytes/1024 + " KB";
+            }
+            else
+            {
+                memoryAllocation = _totalBytes/131072 + " MB";
+            }
+
+            MemoryAllocation.Text = @"~" + memoryAllocation;
+        }
+
+        private void CalculateSize(DataTable dataTable)
+        {
+            dataTable.Columns.Add("Size", typeof (long));
+
+            DataColumnCollection cols = dataTable.Columns;
+
+            foreach (DataRow dataRow in dataTable.Rows)
+            {
+                DataRow row = dataRow;
+                long size = (from DataColumn col in cols
+                    select col.ColumnName
+                    into columnName
+                    where !columnName.Equals("Size")
+                    select row[columnName]
+                    into value
+                    where value != null && value != DBNull.Value
+                    select value).Sum(value => value.GetSize());
+
+                dataRow["Size"] = size;
+                _totalBytes += size;
+            }
         }
 
         private void delButton_Click(object sender, EventArgs e)
@@ -121,7 +177,11 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
 
         private void LoadData()
         {
-            CacheGrid.DataSource = CacheStore.Current.GetDataTable();
+            DataTable dataTable = CacheStore.Current.GetDataTable();
+
+            CalculateSize(dataTable);
+
+            CacheGrid.DataSource = dataTable;
         }
 
         private void ValidateAccess()
