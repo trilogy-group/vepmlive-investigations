@@ -347,6 +347,13 @@
 
 	            if (gridId == "bottomg_1" && gridView.LeftCols == "")
 	                gridView.LeftCols = "rtSelect:20";
+	            else {
+	                if (gridView.LeftCols.indexOf("rtSelect") == -1)
+	                {
+	                    gridView.LeftCols += ",rtSelect:20";
+	                }
+
+	            }
 
 	            var leftCols = gridView.LeftCols.split(',');
 
@@ -7773,17 +7780,17 @@ ResPlanAnalyzer.prototype.InitVars = function () {
         var GetTotalsGridChartDataCompleteDelegate =  MakeDelegate(this, this.GetTotalsGridChartDataComplete);
 
 //<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
-	    $.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
+	    //$.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
 
-	        //console.log(data); //data returned
+	    //    //console.log(data); //data returned
 
-	        //alert(textStatus); //success
+	    //    alert(textStatus); //success
 
-	        //console.log(jqxhr.status); //200
+	    //    //console.log(jqxhr.status); //200
 
-	        //console.log('Load was performed.');
+	    //    //console.log('Load was performed.');
 
-	    });
+	    //});
 
 
  

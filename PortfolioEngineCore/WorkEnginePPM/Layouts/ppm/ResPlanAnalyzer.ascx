@@ -276,8 +276,7 @@ border-radius: 0px;
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css" />
 
-<script src="/_layouts/epmlive/javascripts/libraries/jquery.min.js" type="text/javascript"></script>
-
+<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
 
 <div id="idAnalyzerTabDiv"></div>    
 <div id="idViewTabDiv"></div>
