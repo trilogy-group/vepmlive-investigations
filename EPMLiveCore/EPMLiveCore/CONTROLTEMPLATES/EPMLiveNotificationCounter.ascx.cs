@@ -31,9 +31,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         protected override void OnPreRender(EventArgs e)
         {
-            SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/notifications.v2.min.css");
+            SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/notifications.min.css");
 
-            EPMLiveScriptManager.RegisterScript(Page, new[] {"libraries/jquery.min", "@EPMLive.Notifications.v2"});
+            EPMLiveScriptManager.RegisterScript(Page, new[] {"libraries/jquery.min", "@EPMLive.Notifications"});
 
             GetProfilePicture();
         }

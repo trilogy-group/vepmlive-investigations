@@ -6,10 +6,10 @@ using Microsoft.SharePoint.WebControls;
 namespace EPMLiveCore
 {
     [MdsCompliant(true)]
-    [ToolboxData("<{0}:NotificationCounterV2 runat=server></{0}:NotificationCounterV2>")]
-    public class NotificationCounterV2 : WebControl, INamingContainer
+    [ToolboxData("<{0}:NotificationCounter runat=server></{0}:NotificationCounter>")]
+    public class NotificationCounter : WebControl, INamingContainer
     {
-        private const string ASCX_PATH = @"~/_controltemplates/EPMLiveNotificationCounterV2.ascx";
+        private const string ASCX_PATH = @"~/_controltemplates/EPMLiveNotificationCounter.ascx";
 
         protected override void CreateChildControls()
         {

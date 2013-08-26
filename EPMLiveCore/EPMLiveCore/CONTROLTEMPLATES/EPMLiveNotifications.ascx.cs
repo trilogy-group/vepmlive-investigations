@@ -7,7 +7,7 @@ using Microsoft.SharePoint.WebControls;
 namespace EPMLiveCore.ControlTemplates
 {
     [MdsCompliant(true)]
-    public partial class EPMLiveNotificationsV2 : UserControl
+    public partial class EPMLiveNotifications : UserControl
     {
         #region Fields (1) 
 
