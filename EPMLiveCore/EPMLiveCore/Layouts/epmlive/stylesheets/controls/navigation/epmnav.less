@@ -1,5 +1,5 @@
 ﻿@top-nav-width: 50px;
-@sub-nav-width: 170px;
+@sub-nav-width: 180px;
 @top-nav-li-height: @top-nav-width - 10;
 @node-width: (@sub-nav-width - 40px) + 4px;
 @link-width: (@sub-nav-width - 40px) - 1px;
@@ -7,7 +7,9 @@
 @shadow-color: rgba(0, 0, 0, 0.2) inset;
 @base-blue: #0090CA;
 @hover-color: #E7E7E7;
-@link-font:13px;
+@icon-font:2.2em;
+@header-font:12px;
+@link-font:12px;
 @selected-width:3px;
 
 .box-shadow (@x: 0, @y: 0, @blur: 1px, @color: #000000) {
@@ -86,7 +88,7 @@
 
             span {
                 color: #7C7C7C;
-                font-size: 2.2em;
+                font-size: @icon-font;
                 margin-top: @top-nav-width - @top-nav-li-height - 5;
                 .cursor-hand;
             }
@@ -249,7 +251,7 @@
     }
 
     div.epm-nav-node-root {
-        font-size: 1.15em;
+        font-size: @header-font;
         margin-left: 5px;
         margin-bottom: 1px;
     }
@@ -265,7 +267,7 @@
         }
 
         .epm-nav-node-root {
-            font-size: 1.15em;
+            font-size: @header-font;
             margin-left: 5px;
         }
 
