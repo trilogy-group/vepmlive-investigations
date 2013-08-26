@@ -201,6 +201,20 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Controls\Navigation\Providers\FavoritesLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\RecentItemsLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
+    <Compile Include="CONTROLTEMPLATES\EPMLiveJSV2.ascx.cs">
+      <DependentUpon>EPMLiveJSV2.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveJSV2.ascx.designer.cs">
+      <DependentUpon>EPMLiveJSV2.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotificationsV2.ascx.cs">
+      <DependentUpon>EPMLiveNotificationsV2.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotificationsV2.ascx.designer.cs">
+      <DependentUpon>EPMLiveNotificationsV2.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Infrastructure\Navigation\SPNavLink.cs" />
     <Compile Include="Controls\Navigation\Providers\WorkplaceLinkProvider.cs" />
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
@@ -1049,6 +1063,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="ListDisplayUtils.cs" />
     <Compile Include="MultiAppCustomSiteMapProvider.cs" />
     <Compile Include="NotificationCounter.cs" />
+    <Compile Include="NotificationCounterV2.cs" />
     <Compile Include="NotificationEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -1494,8 +1509,8 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
     </None>
-    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map">
-      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map">
+      <DependentUpon>EPMLive.Notifications.v2.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
@@ -1888,10 +1903,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveControlTemplates.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveJS.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveJSV2.ascx" />
     <Content Include="CONTROLTEMPLATES\epmlivelisttemplates.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNavigation.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotificationCounter.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveNotificationsV2.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupField.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupFieldEditor.ascx" />
@@ -3182,8 +3199,9 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
-    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js">
-      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js">
+      <DependentUpon>EPMLive.Notifications.v2.js</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
@@ -3306,7 +3324,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
-    <Content Include="Layouts\epmlive\stylesheets\notifications.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\notifications.v2.css" />
+    <Content Include="Layouts\epmlive\stylesheets\notifications.v2.min.css">
+      <DependentUpon>notifications.v2.css</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
     <Content Include="Layouts\epmlive\synchperiods.aspx" />

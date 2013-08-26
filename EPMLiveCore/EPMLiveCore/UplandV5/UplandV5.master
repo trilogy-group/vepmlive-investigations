@@ -6,8 +6,8 @@
 <%@ Register TagPrefix="epm" Namespace="EPMLiveCore" Assembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Register TagPrefix="epm" Namespace="EPMLiveCore.Controls.Navigation" Assembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Register TagPrefix="epm" Namespace="EPMLiveCore.Infrastructure.Navigation" Assembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
-<%@ Register TagPrefix="epm" TagName="EPMLiveJS" src="~/_controltemplates/EPMLiveJS.ascx" %>
-<%@ Register TagPrefix="epm" TagName="EPMLiveNotifications" src="~/_controltemplates/EPMLiveNotifications.ascx" %>
+<%@ Register TagPrefix="epm" TagName="EPMLiveJSV2" src="~/_controltemplates/EPMLiveJSV2.ascx" %>
+<%@ Register TagPrefix="epm" TagName="EPMLiveNotificationsV2" src="~/_controltemplates/EPMLiveNotificationsV2.ascx" %>
 <%@ Register TagPrefix="epm" TagName="TemplateVersoning" src="~/_controltemplates/TemplateVersoning.ascx" %>
 <%@ Register TagPrefix="epm" TagName="Statusbar" src="~/_controltemplates/EPMLiveStatusbar.ascx" %>
 
@@ -217,7 +217,7 @@
                             <!-- Notification Counter -->
 
                             <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
-                                <epm:NotificationCounter runat="server"></epm:NotificationCounter>
+                                <epm:NotificationCounterV2 runat="server"></epm:NotificationCounterV2>
                             </div>
                             
                             <!-- // Notification Counter -->
@@ -480,10 +480,10 @@
         <SharePoint:AjaxDelta id="DeltaPlaceHolderUtilityContent" runat="server">
             <asp:ContentPlaceHolder id="PlaceHolderUtilityContent" runat="server">
 				<!-- EPMLive JS -->
-                <epm:EPMLiveJS runat="server"></epm:EPMLiveJS>
+                <epm:EPMLiveJSV2 runat="server"></epm:EPMLiveJSV2>
                 <!-- // EPMLive JS -->
                 <!-- EPMLiveNotifications -->
-                <epm:EPMLiveNotifications runat="server"></epm:EPMLiveNotifications>
+                <epm:EPMLiveNotificationsV2 runat="server"></epm:EPMLiveNotificationsV2>
                 <!-- // EPMLiveNotifications -->		    
                 <!-- Template Versoning -->
                 <epm:TemplateVersoning runat="server"></epm:TemplateVersoning>

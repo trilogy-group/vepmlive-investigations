@@ -1,0 +1,192 @@
+﻿#EPMLiveNotificationCounter {
+    -ms-border-radius: 15px 15px 15px 15px;
+    border-radius: 15px 15px 15px 15px;
+    bottom: -5px;
+    color: #FFFFFF;
+    font-size: 10px;
+    height: 15px;
+    left: -5px;
+    line-height: 15px;
+    position: absolute;
+    text-align: center;
+    width: 15px;
+    z-index: 2000;
+    cursor: pointer;
+}
+
+#EPMLiveNotificationsWrap {
+    width: 450px;
+    display: none;
+    position: absolute;
+    z-index: 1199;
+    background: #fff;
+    -webkit-box-shadow: 0 2px 10px #BEBEBE;
+    -moz-box-shadow: 0 2px 10px #BEBEBE;
+    -ms-box-shadow: 0 2px 10px #BEBEBE;
+    box-shadow: 0 2px 10px #BEBEBE;
+    border: #BEBEBE 1px solid;
+    border-top: none;
+    font-family: Arial;
+    font-size: 13px;
+    top: 44px !important;
+}
+
+.EPMLiveNotificationsHeader {
+    min-height: 50px;
+    line-height: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    overflow: hidden;
+}
+
+.EPMLiveNotificationsHeader h2 {
+    color: #000;
+    font-size: 15px;
+    margin: 0;
+    padding: 0;
+}
+
+.EPMLiveNotificationsHeader h6 {
+    font-size: 12px;
+    font-style: italic;
+    font-weight: normal;
+    color: #666;
+    margin: 0;
+    padding: 0;
+}
+
+.EPMLiveNotificationsHeaderWrap {
+    line-height: 20px;
+    float: left;
+    width: 362px;
+}
+
+.EPMLiveNotificationsH20 { font-size: 20px; }
+
+.EPMLiveNotificationDescFooterLink {
+    cursor: pointer;
+    color: #333;
+}
+
+.EPMLiveNotificationDescFooterLink:hover { color: #666; }
+
+.EPMLiveNotificationDescFooterLink span {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.EPMLiveNotificationDescFooter {
+    height: 25px;
+    line-height: 25px;
+    background: #EEF0F9;
+    width: 430px;
+}
+
+.EPMLiveNotificationMessage, .EPMLiveNotification-NewMessage {
+    min-height: 45px;
+    border-top: #DDDFE7 1px solid;
+    padding-left: 7.5px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #666;
+    cursor: pointer;
+    background: #F9F9F9;
+    overflow: hidden;
+}
+
+.EPMLiveNotification-NewMessage { background: #EEF0F9; }
+
+.EPMLiveNotificationMessage div, .EPMLiveNotification-NewMessage div { line-height: 20px; }
+
+.EPMLiveNotificationMessage abbr, .EPMLiveNotification-NewMessage abbr {
+    line-height: 15px;
+    float: left;
+    font-style: italic;
+    font-size: 11px;
+}
+
+.EPMLiveNotificationThumbnail {
+    float: left;
+    margin-right: 7.5px;
+}
+
+.EPMLiveNotificationDetails {
+    float: left;
+    width: 374.5px;
+}
+
+.EPMLiveNotificationThumbnail img { position: relative; }
+
+.EPMLiveNotificationTitle {
+    float: left;
+    width: 343px;
+    line-height: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.EPMLiveNotificationType {
+    float: right;
+    width: 25px;
+    height: 25px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    margin-top: 10px;
+}
+
+.EPMLiveNotificationStrong { font-weight: bold; }
+
+.EPMLiveNotificationDesc, .EPMLiveNotificationDescFooter {
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top: #DDDFE7 1px solid;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #666;
+}
+
+.EPMLiveNotificationDescFooter span {
+    font-size: 12px;
+    float: left;
+}
+
+.EPMLiveNotificationTopBorder { border-top: #DDDFE7 1px solid; }
+
+.EPMLiveNotificationFixed {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.EPMLiveNotificationCreatorLink, .EPMLiveNotificationCreatorLink:link, .EPMLiveNotificationCreatorLink:active, .EPMLiveNotificationCreatorLink:visited, .EPMLiveNotificationCreatorLink:hover { color: #0072BC; }
+
+.EPMLiveNotificationCreatorLink:hover { text-decoration: underline; }
+
+.EPMLiveNotificationsH30 { color: #666 !important; }
+
+#EPMLiveNCWrap {
+    display: inline-block;
+    margin-right: 15px;
+    position: relative;
+    top: -2px;
+}
+
+#EPMLiveNotificationCounterProfilePic {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #00A4E5;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAEq0lEQVRYw91YbVcaZxDd39ue0/Y0RmONr6iAEBAENeJbjVGjBtFEqqKIiAIqsiqi4ls8aZraJlWT9vPtzINLLcHCYtZ4+mHOLrDs3r3z3Jk7j2R7fohWzxGcnsM7GVLz6AHuckjM4F2O/y9Apv/qZ7v7GPaxY9jcRzl//yIM2gmM5dkeDE82UdkaQrk9gIbeOMxDu2jxvEoDvuaFNAOoPMhIoEot0yg1jaO+zYceTxyDUwmYugL4wTqJr2qGcM80CX2ffCM2JbXA+FjREkCtcwrjgX1Ek++wefgR8v4F4hQbBx+wcZgO/+rPqLYTyN51WEf2i2JSUpfSY1Q4FtDQPkOgPkAmMOupc8T2zsQx+5yBT4dPoH/sQ5UzUBSTkhr2TANJkb7VnfefgMkV/Lt8yWi13YumpwntUszslVpmaJ1tUyrzg7sKktl2DoRR1xkVwtIEoLF/Cw0d81jaPC0IWHYE5V/xTeO4ULeaVBcM0PBkC/qOBUS23xXM3tVYSb7HfdNERiyfHSDXtsoWH8KJ31WDU17I1B1EI9VJm4o0FwzQSmm5b/Ziees31Qwq1zd2+KGn+ml7rgHA5hEGOIlwkQDjdCxpGodlOKWVio/wvfEFpiMnqlPMqvdFX+Nb/QQcnhNtRMI1TPfYj/nYm+JUHH8LfWdQVANNGDSIMhNAtAgVixQTi6aeoDATmoiEU/ydYQKLVM+KUTGvwYpmL8yDO9q0OrZO5WQSBn7aLqjNZSt4hdrj13WjaBmjQq2VWTAPJlHl8CGw/lYVSO7dg94EHtjm0h5RC5EIFqkf67pjKLdMkAH4WBA4Ngtu/55oc/yCmhpWBskpukflxr/6Rvi/fOlNHP+J5r50B+F1rKkfVG7e0LMGe/8itl/9lTfNUerBD21TsKos0DeaSbjhVzlmRU1kJ50LpMJet3sNNe1LmTn3VmYSDl3nCgyuOaztnuV01fLBBbyhI9S2BfDo2e7tT3XMYlnzLNqGwgJMNoMh8o2m3hAVZvn2xs7sFNW6ougcXRWOOTvN7P9s/eSiu9au/OdAG5FkbnrZovR9PAcvwtgTEmmUs9SszCIeKi/11B7FtdQqM3OyivUoFQqMS0TjjzLKrD6Ye5fR/1IWY2UsdXZt91in4+zKa/SMxdDoWkCpdU70dC5V4v4FjKFSPnAMjHcOSh5Nw9gVhGd+X/TjuJiDz6/tKMp3Sq1cWP8Fw9NJ6Nr94l48IXLhzzcrS9ep1Ha5rfGAhFDjmMLL4NEnTqaQVpd9PY8Mbn9KGAdufRZW+H/s50i5dg44qttDKDG4MTyzk2GBH1DMwJTzheh8eCaJ0iYPrdEgOe29nGKUssHVd6+ixDgGF6kzJnrpxY2BXQeU7y0fXtB63kSZeRy6rui/sAiAygnXtdqOMJq6AmK9cOlQ41huApR3Hjj1zoGIwHB1H+eSQQLnisDat4QIXSjnMQFaBC8jrp3OQQYZyYCUlF2DulafmBvi+58/pYWPBRdY2jhFfdssmvoT/6S4zrVMhnJLbJ3F9hQxnN9ypJ/J6X46uQGdKyxGXck6kkJli5dU9QellqhOpeeHLxNn2CAM4cQpqh0zcIwd4G/AZEUZ7Rg/PgAAAABJRU5ErkJggg==') /*../images/blankprofile.png*/;
+    *background-image: url(/_layouts/15/epmlive/images/blankprofile.png); /* For IE 6 and 7 */
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+
+#EPMLiveNotificationCounterProfilePic > img {
+    height: 38px;
+    width: 38px;
+}body
+{
+}
