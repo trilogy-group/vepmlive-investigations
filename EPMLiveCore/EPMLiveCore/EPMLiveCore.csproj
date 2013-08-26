@@ -198,6 +198,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="CommentCCPeopleEditor.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
+    <Compile Include="Controls\Navigation\Providers\ApplicationsLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\FavoritesLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\RecentItemsLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />

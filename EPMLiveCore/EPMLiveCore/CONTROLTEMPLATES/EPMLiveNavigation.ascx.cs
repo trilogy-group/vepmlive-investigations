@@ -22,7 +22,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Fields 
 
-        #region Properties (6) 
+        #region Properties (7) 
 
         public IEnumerable<NavNode> AllNodes
         {
@@ -47,6 +47,11 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         public string StaticProviderLinks { get; private set; }
 
         public IEnumerable<NavNode> TopNodes { get; set; }
+
+        public string WebUrl
+        {
+            get { return SPContext.Current.Web.SafeServerRelativeUrl(); }
+        }
 
         #endregion Properties 
 
@@ -105,7 +110,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
-
         // Private Methods (1) 
 
         private void LoadSelectedNodeLinks()
@@ -115,12 +119,15 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             try
             {
                 string nodeId = SelectedTlNode.Replace("epm-nav-top-", string.Empty);
-                string provider = (from topNode in TopNodes
-                    where topNode.Id.Equals(nodeId)
-                    select topNode.LinkProvider).FirstOrDefault();
+                string provider = (from node in AllNodes
+                    where !node.Separator
+                    let id = node.Id
+                    where !string.IsNullOrEmpty(id)
+                    where id.Equals(nodeId)
+                    select node.LinkProvider).FirstOrDefault();
 
                 var navService = new NavigationService(provider, SPContext.Current.Web);
-                StaticProviderLinks = navService.GetLinks().DecodeToBase64();
+                StaticProviderLinks = navService.GetLinks().EncodeToBase64();
             }
             catch { }
         }

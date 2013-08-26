@@ -5,6 +5,26 @@
         $(function () {
             var $ = window.jQuery;
 
+            var $$ = (function () {
+                var _currentWebUrl = function() {
+                    return window.epmLiveNavigation.currentWebUrl;
+                };
+
+                var _parseJson = function(xml) {
+                    return eval('(' + window.xml2json($.parseXML(xml), "") + ')');
+                };
+
+                var _responseIsSuccess = function(response) {
+                    return response['@Status'] == 0;
+                };
+
+                return {
+                    currentWebUrl: _currentWebUrl,
+                    parseJson: _parseJson,
+                    responseIsSuccess: _responseIsSuccess
+                };
+            })();
+
             var base64Service = (function () {
                 var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
                 
@@ -56,32 +76,38 @@
 
             var epmLiveService = (function () {
                 var _execute = function (method, data, onSuccess, onError) {
-                    var $$ = window.epmLive;
+                    var webUrl = $$.currentWebUrl();
+                    
+                    if (webUrl) {
+                        $.ajax({
+                            type: 'POST',
+                            url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                            data: "{ Function: '" + method + "', Dataxml: '" + data + "' }",
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.d) {
+                                    var resp = $$.parseJson(response.d);
+                                    var result = resp.Result;
 
-                    $.ajax({
-                        type: 'POST',
-                        url: $$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                        data: "{ Function: '" + method + "', Dataxml: '" + data + "' }",
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.d) {
-                                var resp = $$.parseJson(response.d);
-                                var result = resp.Result;
-
-                                if ($$.responseIsSuccess(result)) {
-                                    onSuccess(result);
+                                    if ($$.responseIsSuccess(result)) {
+                                        onSuccess(result);
+                                    } else {
+                                        onError(response);
+                                    }
                                 } else {
                                     onError(response);
                                 }
-                            } else {
+                            },
+                            error: function(response) {
                                 onError(response);
                             }
-                        },
-                        error: function (response) {
-                            onError(response);
-                        }
-                    });
+                        });
+                    } else {
+                        window.setTimeout(function() {
+                            _execute(method, data, onSuccess, onError);
+                        }, 1);
+                    }
                 };
 
                 return {
@@ -586,11 +612,16 @@
                 }
 
                 function registerProviderLinks(response) {
-                    var webUrl = epmLive.currentWebUrl;
+                    var webUrl = $$.currentWebUrl;
                     var page = webUrl + window.location.href.split(webUrl)[1];
 
                     for (var providerName in response.Nodes) {
                         var navLink = response.Nodes[providerName].NavLink;
+                        
+                        if (!navLink.length) {
+                            navLink = [navLink];
+                        }
+                        
                         for (var nl in navLink) {
                             var link = navLink[nl];
 
@@ -600,10 +631,14 @@
                                     tlNode.registerLink({
                                         id: link['@Id'],
                                         title: link['@Title'],
-                                        url: link['#cdata'].replace(/{page}/g, page),
+                                        url: (link['#cdata'] || '').replace(/{page}/g, page),
                                         category: link['@Category'],
                                         cssClass: link['@CssClass'],
                                         order: parseInt(link['@Order']),
+                                        siteId: link['@SiteId'],
+                                        webId: link['@WebId'],
+                                        listId: link['@ListId'],
+                                        itemId: link['@ItemId'],
                                         external: link['@Exernal'] === 'True',
                                         visible: link['@Visible'] === 'True',
                                         seprator: link['@Separator'] === 'True'
@@ -641,8 +676,18 @@
                 }
                 
                 function registerStaticProviderLinks() {
-                    if (epmLiveNavigation.staticProvider) {
-                        registerProviderLinks(base64Service.decode(epmLiveNavigation.staticProvider));
+                    var links = null;
+                    
+                    if (window.epmLiveNavigation) {
+                        links = window.epmLiveNavigation.staticProvider;
+                    }
+
+                    if (links) {
+                        registerProviderLinks($$.parseJson(base64Service.decode(links)));
+                    } else {
+                        window.setTimeout(function() {
+                            registerStaticProviderLinks();
+                        }, 1);
                     }
                 }
                 

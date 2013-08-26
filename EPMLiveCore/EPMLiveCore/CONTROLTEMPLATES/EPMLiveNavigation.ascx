@@ -116,6 +116,7 @@
 <script type="text/javascript">
     (function () {
         window.epmLiveNavigation = {
+            currentWebUrl: '<%= WebUrl %>',
             staticProvider: '<%= StaticProviderLinks %>'
         };
         
