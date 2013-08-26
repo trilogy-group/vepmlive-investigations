@@ -208,6 +208,13 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.designer.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveJS.ascx.cs">
+      <DependentUpon>EPMLiveJS.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveJS.ascx.designer.cs">
+      <DependentUpon>EPMLiveJS.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="CONTROLTEMPLATES\EPMLiveJSV2.ascx.cs">
       <DependentUpon>EPMLiveJSV2.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1892,6 +1899,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldControl.ascx" />
     <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveControlTemplates.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveJS.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveJSV2.ascx" />
     <Content Include="CONTROLTEMPLATES\epmlivelisttemplates.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNavigation.ascx" />
