@@ -198,7 +198,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="CommentCCPeopleEditor.cs" />
     <Compile Include="Controls\Navigation\EPMLiveNavigation.cs" />
     <Compile Include="Controls\Navigation\EPMLiveQuickLaunchProvider.cs" />
+    <Compile Include="Controls\Navigation\Providers\FavoritesLinkProvider.cs" />
+    <Compile Include="Controls\Navigation\Providers\RecentItemsLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
+    <Compile Include="Controls\Navigation\Providers\SPNavLink.cs" />
     <Compile Include="Controls\Navigation\Providers\WorkplaceLinkProvider.cs" />
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx</DependentUpon>

@@ -34,9 +34,9 @@ namespace EPMLiveCore.Infrastructure.Navigation
 
         #endregion Constructors 
 
-        #region Methods (1) 
+        #region Methods (2) 
 
-        // Protected Methods (1) 
+        // Protected Methods (2) 
 
         protected SPUserToken GetUserToken()
         {
@@ -56,6 +56,11 @@ namespace EPMLiveCore.Infrastructure.Navigation
             if (token != null) return token;
 
             throw new Exception("Unable to generate user token for: " + Username);
+        }
+
+        protected string S(object o)
+        {
+            return (o ?? string.Empty).ToString();
         }
 
         #endregion Methods 

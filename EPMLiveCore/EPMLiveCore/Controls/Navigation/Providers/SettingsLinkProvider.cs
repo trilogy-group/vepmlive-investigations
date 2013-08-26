@@ -56,9 +56,9 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
-        #region Methods (2) 
+        #region Methods (1) 
 
-        // Private Methods (2) 
+        // Private Methods (1) 
 
         private IEnumerable<INavObject> GetSettings()
         {
@@ -114,11 +114,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                 return links;
             }).Value;
-        }
-
-        private string S(object o)
-        {
-            return (o ?? string.Empty).ToString();
         }
 
         #endregion Methods 

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Web.Caching;
 using System.Xml.Linq;
+using EPMLiveCore.Controls.Navigation.Providers;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
@@ -45,11 +45,11 @@ namespace EPMLiveCore.API
 
                 Task t2 = Task.Factory.StartNew(() =>
                 {
-                    Parallel.ForEach(typeof (NavLink).GetProperties(), property =>
+                    Parallel.ForEach(typeof (SPNavLink).GetProperties(), property =>
                     {
                         lock (Locker2)
                         {
-                            _navLinkProperties.Add(property.Name, typeof (NavLink).GetProperty(property.Name));
+                            _navLinkProperties.Add(property.Name, typeof (SPNavLink).GetProperty(property.Name));
                         }
                     });
                 });
@@ -118,17 +118,21 @@ namespace EPMLiveCore.API
 
                         foreach (var property in _navLinkProperties)
                         {
-                            string name = property.Key;
-                            string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
+                            try
+                            {
+                                string name = property.Key;
+                                string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
 
-                            if (name.Equals("Url"))
-                            {
-                                link.Add(new XCData(value));
+                                if (name.Equals("Url"))
+                                {
+                                    link.Add(new XCData(value));
+                                }
+                                else
+                                {
+                                    link.Add(new XAttribute(name, value));
+                                }
                             }
-                            else
-                            {
-                                link.Add(new XAttribute(name, value));
-                            }
+                            catch { }
                         }
 
                         node.Add(link);
@@ -168,12 +172,13 @@ namespace EPMLiveCore.API
             Guid wId = _spWeb.ID;
             string un = _spWeb.CurrentUser.LoginName;
 
-            var navProvider = CacheStore.Current.Get(cacheKey, CacheStoreCategory.Navigation, () => (from type in types
-                where type.GetInterfaces().Contains(typeof (INavLinkProvider))
-                from NavLinkProviderInfoAttribute attribute in
-                    type.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
-                where attribute.Name.ToUpper().Equals(key)
-                select Activator.CreateInstance(type, new object[] {sId, wId, un})).FirstOrDefault(), true).Value;
+            object navProvider =
+                CacheStore.Current.Get(cacheKey, CacheStoreCategory.Navigation, () => (from type in types
+                    where type.GetInterfaces().Contains(typeof (INavLinkProvider))
+                    from NavLinkProviderInfoAttribute attribute in
+                        type.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
+                    where attribute.Name.ToUpper().Equals(key)
+                    select Activator.CreateInstance(type, new object[] {sId, wId, un})).FirstOrDefault(), true).Value;
 
             if (navProvider == null) return;
 
