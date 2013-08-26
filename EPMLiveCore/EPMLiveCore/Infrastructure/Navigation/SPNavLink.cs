@@ -1,6 +1,4 @@
-﻿using EPMLiveCore.Infrastructure.Navigation;
-
-namespace EPMLiveCore.Controls.Navigation.Providers
+﻿namespace EPMLiveCore.Infrastructure.Navigation
 {
     public class SPNavLink : NavLink
     {

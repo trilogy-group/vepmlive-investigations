@@ -201,7 +201,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Controls\Navigation\Providers\FavoritesLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\RecentItemsLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
-    <Compile Include="Controls\Navigation\Providers\SPNavLink.cs" />
+    <Compile Include="Infrastructure\Navigation\SPNavLink.cs" />
     <Compile Include="Controls\Navigation\Providers\WorkplaceLinkProvider.cs" />
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx</DependentUpon>
