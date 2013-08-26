@@ -7,7 +7,7 @@ using Microsoft.SharePoint.WebControls;
 namespace EPMLiveCore.ControlTemplates
 {
     [MdsCompliant(true)]
-    public partial class EPMLiveJS : UserControl
+    public partial class EPMLiveJSV2 : UserControl
     {
         #region Fields (8) 
 

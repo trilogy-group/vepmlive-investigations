@@ -217,7 +217,7 @@
                             <!-- Notification Counter -->
 
                             <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
-                                <epm:NotificationCounter runat="server"></epm:NotificationCounter>
+                                <epm:NotificationCounterV2 runat="server"></epm:NotificationCounterV2>
                             </div>
                             
                             <!-- // Notification Counter -->
@@ -480,10 +480,10 @@
         <SharePoint:AjaxDelta id="DeltaPlaceHolderUtilityContent" runat="server">
             <asp:ContentPlaceHolder id="PlaceHolderUtilityContent" runat="server">
 				<!-- EPMLive JS -->
-                <epm:EPMLiveJS runat="server"></epm:EPMLiveJS>
+                <epm:EPMLiveJSV2 runat="server"></epm:EPMLiveJSV2>
                 <!-- // EPMLive JS -->
                 <!-- EPMLiveNotifications -->
-                <epm:EPMLiveNotifications runat="server"></epm:EPMLiveNotifications>
+                <epm:EPMLiveNotificationsV2 runat="server"></epm:EPMLiveNotificationsV2>
                 <!-- // EPMLiveNotifications -->		    
                 <!-- Template Versoning -->
                 <epm:TemplateVersoning runat="server"></epm:TemplateVersoning>

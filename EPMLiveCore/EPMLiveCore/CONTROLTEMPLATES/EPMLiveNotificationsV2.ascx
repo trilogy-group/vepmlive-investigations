@@ -1,6 +1,6 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveNotifications.ascx.cs" Inherits="EPMLiveCore.ControlTemplates.EPMLiveNotifications" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveNotificationsV2.ascx.cs" Inherits="EPMLiveCore.ControlTemplates.EPMLiveNotifications" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 
 <div id="EPMLiveNotificationsWrap" data-bind="slideUpDown: epmLiveNotifications.showNotifications(), slideDuration: 200">

@@ -10,6 +10,6 @@
 namespace EPMLiveCore.ControlTemplates {
     
     
-    public partial class EPMLiveNotifications {
+    public partial class EPMLiveJSV2 {
     }
 }
