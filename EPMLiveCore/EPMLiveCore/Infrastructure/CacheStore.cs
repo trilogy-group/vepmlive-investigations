@@ -13,7 +13,7 @@ namespace EPMLiveCore.Infrastructure
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
         private readonly List<string> _indefiniteKeys;
-        private readonly Dictionary<string, Tuple<CacheStoreCategory, CachedValue>> _store;
+        private readonly Dictionary<string, Tuple<string, CachedValue>> _store;
         private readonly Timer _timer;
         private bool _disposed;
         private long _ticks;
@@ -24,7 +24,7 @@ namespace EPMLiveCore.Infrastructure
 
         private CacheStore()
         {
-            _store = new Dictionary<string, Tuple<CacheStoreCategory, CachedValue>>();
+            _store = new Dictionary<string, Tuple<string, CachedValue>>();
             _indefiniteKeys = new List<string>();
             _ticks = DateTime.Now.Ticks;
             _timer = new Timer(Cleanup, null, 300000, 300000);
@@ -63,7 +63,7 @@ namespace EPMLiveCore.Infrastructure
 
         // Public Methods (5) 
 
-        public CachedValue Get(string key, CacheStoreCategory category, Func<object> getValue,
+        public CachedValue Get(string key, string category, Func<object> getValue,
             bool keepIndefinite = false)
         {
             string originalKey = key;
@@ -118,11 +118,11 @@ namespace EPMLiveCore.Infrastructure
 
         public void RemoveCategory(string category)
         {
-            List<string> keys = (from p in _store where p.Value.Item1.ToString().Equals(category) select p.Key).ToList();
+            List<string> keys = (from p in _store where p.Value.Item1.Equals(category) select p.Key).ToList();
             RemoveKeys(keys);
         }
 
-        public void Set(string key, object value, CacheStoreCategory category, bool keepIndefinite = false)
+        public void Set(string key, object value, string category, bool keepIndefinite = false)
         {
             if (keepIndefinite)
             {
@@ -141,7 +141,7 @@ namespace EPMLiveCore.Infrastructure
             {
                 if (!_store.ContainsKey(key))
                 {
-                    _store.Add(key, new Tuple<CacheStoreCategory, CachedValue>(category, new CachedValue(value)));
+                    _store.Add(key, new Tuple<string, CachedValue>(category, new CachedValue(value)));
                 }
                 else
                 {

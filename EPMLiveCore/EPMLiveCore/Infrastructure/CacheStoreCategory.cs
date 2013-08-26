@@ -1,8 +1,12 @@
 ﻿namespace EPMLiveCore.Infrastructure
 {
-    public enum CacheStoreCategory
+    public static class CacheStoreCategory
     {
-        Navigation,
-        Infrastructure
+        #region Fields (2) 
+
+        public const string Infrastructure = "Infrastructure";
+        public const string Navigation = "Navigation";
+
+        #endregion Fields 
     }
 }
