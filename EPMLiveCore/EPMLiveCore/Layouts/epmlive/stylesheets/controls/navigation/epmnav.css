@@ -149,7 +149,7 @@
 }
 .epm-nav-sub ul.epm-nav-links li {
   margin: 0;
-  padding: 1.5px 5px 1.5px 35px;
+  padding: 1.5px 5px 1.5px 32px;
   height: 23px;
   line-height: 23px;
   width: 139px;
@@ -192,7 +192,7 @@
   width: 160px;
 }
 .epm-nav-sub .epm-nav-cat {
-  margin-left: 10px !important;
+  margin-left: 7px !important;
   margin-top: 13px;
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -244,7 +244,7 @@
   width: 144px;
 }
 .epm-nav-sub .epm-nav-sub-menu td.epm-nav-node a.epm-nav-node {
-  padding-left: 6px;
+  padding-left: 3px;
 }
 .epm-nav-sub .epm-nav-sub-menu .epm-nav-node-root {
   font-size: 12px;
@@ -261,7 +261,7 @@
   text-decoration: none;
 }
 .epm-nav-sub .epm-nav-sub-menu table {
-  margin-left: 10px;
+  margin-left: 7px;
   margin-top: 13px;
 }
 .epm-nav-sub .epm-nav-sub-menu div table {

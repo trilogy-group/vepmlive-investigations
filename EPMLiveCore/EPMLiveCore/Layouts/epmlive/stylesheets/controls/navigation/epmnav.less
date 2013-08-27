@@ -13,6 +13,7 @@
 @header-font:12px;
 @link-font:12px;
 @selected-width:3px;
+@node-margin-left: 7px;
 
 .box-shadow (@x: 0, @y: 0, @blur: 1px, @color: #000000) {
     -moz-box-shadow: @arguments;
@@ -206,7 +207,7 @@
 
         li {
             margin: 0;
-            padding: 1.5px 5px 1.5px 35px;
+            padding: 1.5px 5px 1.5px (@node-margin-left + 25px);
             height: 23px;
             line-height: 23px;
             width: @link-width;
@@ -252,7 +253,7 @@
     }
 
     .epm-nav-cat {
-        margin-left: 10px !important;
+        margin-left: @node-margin-left !important;
         margin-top: 13px;
         .ellipsis;
         .cursor-hand;
@@ -304,7 +305,7 @@
             width: @node-width;
 
             a.epm-nav-node {
-                padding-left: 6px;
+                padding-left: 3px;
             }
         }
 
@@ -327,7 +328,7 @@
         }
 
         table {
-            margin-left: 10px;
+            margin-left: @node-margin-left;
             margin-top: 13px;
         }
 
