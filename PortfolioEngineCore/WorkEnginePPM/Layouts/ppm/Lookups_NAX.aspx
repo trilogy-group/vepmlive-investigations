@@ -118,9 +118,11 @@ html, body {
     };
     var toolbar = new Toolbar(toolbarData);
     var toolbarLV = new Toolbar(toolbarLVData);
+    var tgridLV = window['<%=tgridLV.UID%>'];
     var dgrid1 = window.<%=dgrid1.UID%>;
     var dgrid1_selectedRow = 0;
     var OnLoad = function (event) {
+        Grids.OnClick = GridsOnClick;
         toolbar.Render();
         dgrid1.addEventListener("onRowSelect", dgrid1_OnRowSelect);
         OnResize();
@@ -134,6 +136,28 @@ html, body {
         else {
             toolbar.disableItem("btnModify");
             toolbar.disableItem("btnDelete");
+        }
+    };
+    function GridsOnClick(grid, row, col) {
+        switch (grid.id) {
+            case tgridLV.id:
+                tgridLV_selectedRow = row;
+                if (row != null && row != "") {
+                    toolbarLV.enableItem("btnInsertLV");
+                    toolbarLV.enableItem("btnDeleteLV");
+                }
+                else {
+                    toolbarLV.disableItem("btnInsertLV");
+                    toolbarLV.disableItem("btnDeleteLV");
+                }
+                if (col == "LV_INACTIVE") {
+                    if (row.firstChild != null)
+                        window.setTimeout("SetChildrenCheckboxStates('" + row.id + "');", 10);
+                    if (row.Level > 0) {
+                        window.setTimeout("SetParentCheckboxStates('" + row.id + "');", 10);
+                    }
+                }
+                break;
         }
     };
     var OnResize = function (event) {
@@ -214,11 +238,9 @@ html, body {
                 document.getElementById('txtId').value = fieldId;
                 document.getElementById('txtName').value = GetStringFromValue(json.reply.Lookup.LOOKUP_NAME);
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.Lookup.LOOKUP_DESC);
-                var tgridLV = window['<%=tgridLV.UID%>'];
                 tgridLV.Initialize(json.reply.Lookup.tgridLVData);
                 tgridLV.SetWidth(440);
                 tgridLV.SetHeight(120);
-                tgridLV.addEventListener("OnClick", tgridLV_OnClick);
                 dgrid1.grid.clearSelection();
                 DisplayDialog(645, 550, dlgTitle, "winLookupDlg", "idLookupDlg", true, false);
                 break;
@@ -242,7 +264,6 @@ html, body {
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.Lookup.LOOKUP_DESC);
                 document.getElementById('txtName').disabled = true;
                 document.getElementById('txtDesc').disabled = true;
-                var tgridLV = window['<%=tgridLV.UID%>'];
                 tgridLV.Initialize(json.reply.Lookup.tgridLVData);
                 tgridLV.SetWidth(440);
                 tgridLV.SetHeight(120);
@@ -256,26 +277,7 @@ html, body {
         }
         return false;
     };
-    function tgridLV_OnClick(grid, row, col) {
-        tgridLV_selectedRow = row;
-        if (row != null && row != "") {
-            toolbarLV.enableItem("btnInsertLV");
-            toolbarLV.enableItem("btnDeleteLV");
-        }
-        else {
-            toolbarLV.disableItem("btnInsertLV");
-            toolbarLV.disableItem("btnDeleteLV");
-        }
-        if (col == "LV_INACTIVE") {
-            if (row.firstChild != null)
-                window.setTimeout("SetChildrenCheckboxStates('" + row.id + "');", 10);
-            if (row.Level > 0) {
-                window.setTimeout("SetParentCheckboxStates('" + row.id + "');", 10);
-            }
-        }
-    };
     function toolbarLV_event(event) {
-    var tgridLV = window['<%=tgridLV.UID%>'];
     var dlgTitle = "";
     switch (event) {
         case "btnInsertLV":
@@ -311,7 +313,7 @@ html, body {
                     return false;
             }
             tgridLV.grid.DeleteRow(tgridLV_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
-            tgridLV_OnClick(tgridLV.grid, null, null)
+            GridsOnClick(tgridLV.grid, null, null)
             break;
     }
     return false;
@@ -343,7 +345,6 @@ function AddChildrenToList(grid, row) {
     return sItems;
 };
 function SetChildrenCheckboxStates(rowid) {
-        var tgridLV = window['<%=tgridLV.UID%>'];
         var grid = tgridLV.grid;
         var row = grid.GetRowById(rowid);
         if (row != null) {
@@ -358,7 +359,6 @@ function SetChildrenCheckboxStates(rowid) {
         }
     };
     function SetParentCheckboxStates(rowid) {
-        var tgridLV = window['<%=tgridLV.UID%>'];
         var grid = tgridLV.grid;
         var row = grid.GetRowById(rowid);
         if (row != null && row.Level > 0) {
@@ -378,9 +378,7 @@ var LookupDlg_event = function (event) {
                 switch (action) {
                     case "btnAdd":
                     case "btnModify":
-                        //alert("btnModify.OK");
                         var sRowId = dgrid1_selectedRow;
-                        var tgridLV = window['<%=tgridLV.UID%>'];
                         var sb = new StringBuilder();
                         sb.append('<request function="LookupsRequest" context="UpdateLookupInfo">');
                         sb.append('<data');

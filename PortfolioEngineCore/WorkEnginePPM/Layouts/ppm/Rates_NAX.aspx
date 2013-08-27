@@ -137,12 +137,12 @@ html, body {
     var tgridRates_selectedRow = 0;
     var tgridFTEs_selectedRow = 0;
     var tgrid1 = window.<%=tgrid1.UID%>;
+    var tgridRates = window['<%=tgridRates.UID%>'];
     var bSaving = false;
  
     var OnLoad = function (event) {
-        var tgrid1 = window.<%=tgrid1.UID%>;
+        Grids.OnFocus = GridsOnFocus;
         tgrid1_selectedRow = 0;
-        tgrid1.addEventListener("OnFocus", tgrid1_OnFocus);
         OnResize();
     };
     var OnBeforeUnload = function (event) {
@@ -159,26 +159,29 @@ html, body {
         else
             return false;
     };
-    function tgrid1_OnFocus(grid, row, col, orow, ocol, pagepos) {
-        tgrid1_selectedRow = row;
-        if (row != null) {
-            toolbar.enableItem("btnEdit");
-            toolbar.enableItem("btnDelete");
-            toolbar.enableItem("btnResources");
+    function GridsOnFocus(grid, row, col, orow, ocol, pagepos) {
+        switch (grid.id) {
+            case tgrid1.id:
+                tgrid1_selectedRow = row;
+                if (row != null) {
+                    toolbar.enableItem("btnEdit");
+                    toolbar.enableItem("btnDelete");
+                    toolbar.enableItem("btnResources");
+                }
+                else {
+                    toolbar.disableItem("btnEdit");
+                    toolbar.disableItem("btnDelete");
+                    toolbar.disableItem("btnResources");
+                }
+                break;
+            case tgridRates.id:
+                tgridRates_selectedRow = row;
+                toolbarRates.enableItem("btnInsert2");
+                toolbarRates.enableItem("btnDelete2");
+                break;
         }
-        else {
-            toolbar.disableItem("btnEdit");
-            toolbar.disableItem("btnDelete");
-            toolbar.disableItem("btnResources");
-        }
-    };
-    function tgridRates_OnFocus(grid, row, col, orow, ocol, pagepos) {
-        tgridRates_selectedRow = row;
-        toolbarRates.enableItem("btnInsert2");
-        toolbarRates.enableItem("btnDelete2");
     };
     var OnResize = function (event) {
-        var tgrid1 = window.<%=tgrid1.UID%>;
         var top = tgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top;
         var newWidth = document.documentElement.clientWidth;
@@ -200,7 +203,6 @@ html, body {
         var sb = new StringBuilder("");
         sb.append('<data');
         sb.append('>');
-        var tgrid1 = window.<%=tgrid1.UID%>;
         //if ((tgrid1.grid.HasChanges() & (1 << 0)) != 0) {
             sb.append('<![CDATA[' + tgrid1.GetXmlData() + ']]>');
         //}
@@ -225,19 +227,11 @@ html, body {
         return parentrow;
     }
     function toolbar_event(event) {
-        var tgrid1 = window.<%=tgrid1.UID%>;
         if (toolbar.isItemDisabled(event) == true)
             return;
         switch (event) {
             case "btnAdd":
-                var newrow;
-//                if (event == "btnInsert2") {
-//                    newrow = tgrid1.grid.AddRow(null, tgrid1_selectedRow, true);
-//                }
-//                else {
-                    newrow = tgrid1.grid.AddRow(null, null, true);
-//                }
-                //tgrid1.SetCellValue(newrow, "RT_UID", 0);
+                var newrow = tgrid1.grid.AddRow(null, null, true);
                 tgrid1.SetCellValue(newrow, "RT_NAME", "New Rate");
                 break;
             case "btnSave":
@@ -257,32 +251,9 @@ html, body {
                 }
                 break;
             case "btnDelete":
-//                var ccids = tgrid1.grid.GetAttribute(tgrid1_selectedRow, "CA_UID", null).toString();
-//                var ccrole = tgrid1.grid.GetAttribute(tgrid1_selectedRow, "CA_ROLE", null);
                 var firstrow = tgrid1_selectedRow;
                 var lastrow = tgrid1_selectedRow;
                 var childrow = tgrid1_selectedRow.firstChild;
-//                if (childrow != null) {
-//                    var row = tgrid1.grid.GetNext(tgrid1_selectedRow);
-//                    while (row != null && tgrid1.grid.GetAttribute(row, "CA_ROLE", null) != 0) {
-//                        ccids += "," + tgrid1.grid.GetAttribute(row, "CA_UID", null).toString();
-//                        lastrow = row;
-//                        row = tgrid1.grid.GetNext(row);
-//                    }
-//                }
-//                var sb = new StringBuilder();
-//                sb.append('<request function="CostCategoriesRequest" context="DeleteCostCategoryInfo">');
-//                sb.append('<data');
-//                sb.append(' CA_UIDs="' + ccids + '"');
-//                sb.append('/>');
-//                sb.append('</request>'); 
-//                var sRequest = sb.toString();
-//                var jsonString = SendRequest(sRequest);
-//                var json = JSON_ConvertString(jsonString);
-//                if (json.reply != null) {
-//                    if (jsf_alertError(json.reply.error) == true)
-//                        return false;
-//                }
 
                 var sb = new StringBuilder("");
                 if (childrow != null) {
@@ -309,7 +280,6 @@ html, body {
                     var grid = tgrid1.grid;
                     var wresids = "," + grid.GetAttribute(tgrid1_selectedRow, "wres_ids", null).toString() + ",";
                     var ratePairsArr = grid.GetAttribute(tgrid1_selectedRow, "rates", null).split(",");
-                    var tgridRates = window['<%=tgridRates.UID%>'];
                     tgridRates.Initialize(null); // reset grid data
                     var txtBaseRate = document.getElementById('txtBaseRate');
                     txtBaseRate.value = "";
@@ -331,7 +301,6 @@ html, body {
                     tgridRates.SetWidth(390);
                     tgridRates.SetHeight(150);
                     toolbarRates.Render();
-                    tgridRates.addEventListener("OnFocus", tgridRates_OnFocus);
                     var s = "Modify rates for " + grid.GetAttribute(tgrid1_selectedRow, "RT_NAME", null);
                     tgridRates_selectedRow = 0;
                     DisplayDialog(420, 380, s, "winRatesDlg", "idRatesDlg", true, false);
@@ -391,21 +360,16 @@ html, body {
         }
         return "";
     };
-
     function ratesDlg_event(event) {
-        var tgridRates = window['<%=tgridRates.UID%>'];
         switch (event) {
             case "ok":
                 tgridRates.EndEdit();
                 var rates = "1899.12.30::" + txtBaseRate.value;
                 var row = tgridRates.grid.GetFirst();
                 while (row != null) {
-
                     var deleted = tgridRates.grid.GetAttribute(row, null, "Deleted");
                     if (deleted != 1) {
                         var date = DateToString(tgridRates.grid.GetAttribute(row, "BC_EFFECTIVE_DATE", null), "yyyy.MM.dd");
-    //                    if (date == "") 
-    //                        date = "1899.12.30";
                         var rate = date + "::" + tgridRates.grid.GetAttribute(row, "BC_RATE", null).toString();
                         if (rates != "")
                             rates += ",";
@@ -414,7 +378,6 @@ html, body {
                     row = tgridRates.grid.GetNext(row);
                 }
                 tgrid1.grid.SetAttribute(tgrid1_selectedRow, null, "rates", rates, 1, 0);
-
                 CloseDialog('winRatesDlg');
                 break;
             case "cancel":
@@ -489,7 +452,6 @@ html, body {
                     if (resnames != "")
                         resnames += ",";
                     var resname = idResourcesIn.options[i].text;
-                    //var wresid = idResourcesIn.options[i].value;
                     var nindex = resname.indexOf("(*)");
                     if (nindex > -1) {
                         resname = resname.substr(0,nindex);

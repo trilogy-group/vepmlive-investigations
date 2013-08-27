@@ -230,15 +230,19 @@ html, body {
 
     var toolbar = new Toolbar(toobarData);
     toolbar.Render();
-   
     var dgrid1 = window.<%=dgrid1.UID%>;
     var dgrid1_selectedRow = 0;
+    var tgrid1 = window['<%=tgrid1.UID%>'];
+    var tgrid2 = window['<%=tgrid2.UID%>'];
+    var tgridCostTotals = window['<%=tgridCostTotals.UID%>'];
+    var tgridSecurity = window['<%=tgridSecurity.UID%>'];
     var OnLoad = function (event) {
+//        Grids.OnFocus = GridsOnFocus;
+        Grids.OnClick = GridsOnClick;
+        Grids.OnValueChanged = GridsOnValueChanged;
         dgrid1.addEventListener("onRowSelect", dgrid1_OnRowSelect);
-
         OnResize();
     };
-
     function dgrid1_OnRowSelect(rowid, cellindex) {
         dgrid1_selectedRow = rowid;
         if (rowid != null && rowid > 0) {
@@ -256,7 +260,29 @@ html, body {
             toolbar.disableItem("btnPostOptions");
         }
     };
-
+//    function GridsOnFocus(grid, row, col, orow, ocol, pagepos) {
+//        switch (grid.id) {
+//            case tgrid1.id:
+//                break;
+//        }
+//    };
+    function GridsOnClick(grid, row, col) {
+        switch (grid.id) {
+            case tgrid2.id:
+                if (col == "BC_UID_incl") {
+                    if (row.firstChild != null)
+                        window.setTimeout("SetChildrenCheckboxStates('" + row.id + "');", 10);
+                    if (row.Level > 0) {
+                        window.setTimeout("SetParentCheckboxStates('" + row.id + "');", 10);
+                    }
+                }
+                break;
+        }
+    };
+    function GridsOnValueChanged(grid, row, col, val) {
+        var newval = TGrid_GridsOnValueChanged(grid, row, col, val);
+        return newval;
+    };
     function OnResize(event) {
         var top = dgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top - 5;
@@ -293,7 +319,6 @@ html, body {
         var dimension = thiswins.window(idWindow).getDimension();
         thiswins.window(idWindow).setDimension(dimension[0], newHeight);
     };
-
     function CloseDialog (idWindow) {
         switch (idWindow) {
             case 'winCosttypeDlg':
@@ -305,12 +330,10 @@ html, body {
         }
         return jsf_closeDialog(thiswins, idWindow);
     };
-    
     function SendRequest(sXML) {
         sURL = "./CostTypes.ashx";
         return jsf_sendRequest(sURL, sXML);
     };
-
     function toolbar_event(event) {
         var sRowId = "0";
         var dlgTitle = "Add Cost Type";
@@ -329,7 +352,6 @@ html, body {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
                 }
-                var tgridCostTotals = window.<%=tgridCostTotals.UID%>;
                 var tableData = json.reply.costTotals.tableData;
                 tgridCostTotals.Initialize(tableData);
                 tgridCostTotals.SetWidth(420);
@@ -352,7 +374,6 @@ html, body {
                 }
                 var costtype = json.reply.costtype;
                 document.getElementById('txtId').value = costtype.CT_ID;
-                var tgridSecurity = window['<%=tgridSecurity.UID%>'];
                 tgridSecurity.Initialize(costtype.tgridSecurity);
                 tgridSecurity.SetWidth(310);
                 tgridSecurity.SetHeight(180);
@@ -373,7 +394,6 @@ html, body {
                         return false;
                 }
                 var postOptions = json.reply.postOptions;
-                //var nCalendar = costtype.CT_CB_ID;
                 var idCalendarsOut = document.getElementById('idCalendarsOut');
                 var idCalendarsIn = document.getElementById('idCalendarsIn');
                 idCalendarsOut.options.length = 0;
@@ -410,7 +430,6 @@ html, body {
                 document.getElementById('idCTOptions').value = costtype.CT_EDIT_MODE;
                 document.getElementById('idOpenLevel').value = costtype.CT_INITIAL_LEVEL;
                 document.getElementById('cbNamedRate').checked = (costtype.CT_NAMEDRATES == 1);
-
                 var nCalendar = costtype.CT_CB_ID;
                 var idCalendar = document.getElementById('idCalendar');
                 idCalendar.options.length = 0;
@@ -420,33 +439,25 @@ html, body {
                     if (item[i].id == nCalendar)
                         idCalendar.selectedIndex = idCalendar.options.length - 1;
                 }
-
                 document.getElementById('idDeleteWarning').style.display = "none";
                 document.getElementById('idOKButton').value = "Save";
-                var tgrid1 = window['<%=tgrid1.UID%>'];
                 tgrid1.Initialize(costtype.tgridCFData);
                 tgrid1.SetWidth(440);
                 tgrid1.SetHeight(120);
-                var tgrid2 = window['<%=tgrid2.UID%>'];
                 tgrid2.Initialize(costtype.tgridData);
                 tgrid2.SetWidth(440);
                 tgrid2.SetHeight(150);
-                tgrid2.addEventListener("OnClick", tgrid2_OnClick);
-
                 var select = document.getElementById("idFrmFields");
                 select.options.length = 0;
-
                 var fields = json.reply.costtype.fields;
                 if (fields != null) {
                     var field = fields.field;
-
                     for (var i = 0; i < field.length; i++) {
                             select.options[select.options.length] = new Option(field[i].CT_NAME, field.CT_ID);
                     }
                 }
                 var sFormula = jsf_getStringFromValue(json.reply.costtype.formula);
                 document.getElementById('idFormula').value = sFormula;
-
                 var ht = SetCTDlgState();
                 dgrid1.grid.clearSelection();
                 DisplayDialog(625, ht, dlgTitle, "winCosttypeDlg", "idCostTypeDlg", true, false);
@@ -482,11 +493,9 @@ html, body {
                 }
                 document.getElementById('idDeleteWarning').style.display = "block";
                 document.getElementById('idOKButton').value = "Delete";
-                var tgrid1 = window['<%=tgrid1.UID%>'];
                 tgrid1.Initialize(costtype.tgridCFData);
                 tgrid1.SetWidth(440);
                 tgrid1.SetHeight(120);
-                var tgrid2 = window['<%=tgrid2.UID%>'];
                 tgrid2.Initialize(costtype.tgridData);
                 tgrid2.SetWidth(440);
                 tgrid2.SetHeight(150);
@@ -499,17 +508,7 @@ html, body {
         }
         return false;
     };
-    function tgrid2_OnClick(grid, row, col) {
-        if (col == "BC_UID_incl") {
-            if (row.firstChild != null)
-                window.setTimeout("SetChildrenCheckboxStates('" + row.id + "');", 10);
-            if (row.Level > 0) {
-                window.setTimeout("SetParentCheckboxStates('" + row.id + "');", 10);
-            }
-        }
-    };
     function SetChildrenCheckboxStates(rowid) {
-        var tgrid2 = window['<%=tgrid2.UID%>'];
         var grid = tgrid2.grid;
         var row = grid.GetRowById(rowid);
         if (row != null) {
@@ -524,7 +523,6 @@ html, body {
         }
     };
     function SetParentCheckboxStates(rowid) {
-        var tgrid2 = window['<%=tgrid2.UID%>'];
         var grid = tgrid2.grid;
         var row = grid.GetRowById(rowid);
         if (row != null && row.Level > 0) {
@@ -605,12 +603,10 @@ html, body {
                         if (document.getElementById('cbNamedRate').checked==true) {sb.append(' CT_NAMEDRATES="1"');}  else {sb.append(' CT_NAMEDRATES="0"');}
                         sb.append(' formula="' + document.getElementById('idFormula').value + '"');
                         sb.append('>');
-                        var tgrid1 = window['<%=tgrid1.UID%>'];
                         sb.append('<tgridCFData>');
                         sb.append('<![CDATA[' + tgrid1.GetXmlData() + ']]>');
                         sb.append('</tgridCFData>');
                         sb.append('<tgridData>');
-                        var tgrid2 = window['<%=tgrid2.UID%>'];
                         sb.append('<![CDATA[' + tgrid2.GetXmlData() + ']]>');
                         sb.append('</tgridData>');
                         sb.append('</data>');
@@ -672,7 +668,6 @@ html, body {
                 if (json.reply != null) {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
-                    var tgrid2 = window['<%=tgrid2.UID%>'];
                     tgrid2.Initialize(json.reply.customfield.tgridData);
                     tgrid2.SetWidth(380);
                     tgrid2.SetHeight(150);
@@ -707,7 +702,6 @@ html, body {
         }
     };
     var costtotalsDlg_event = function (event) {
-        var tgridCostTotals = window.<%=tgridCostTotals.UID%>;
         tgridCostTotals.EndEdit();
         var sRowId = dgrid1_selectedRow;
         switch (event) {
@@ -737,7 +731,6 @@ html, body {
         }
     };
     var securityDlg_event = function (event) {
-        var tgridSecurity = window['<%=tgridSecurity.UID%>'];
         tgridSecurity.EndEdit();
         switch (event) {
             case "ok":

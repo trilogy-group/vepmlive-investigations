@@ -17,33 +17,6 @@
         if (jsf_isEmpty(s) == false)
             this.Initialize(null);
     };
-    TGrid.prototype.GridsOnValueChanged = function (grid, row, col, val) {
-        var snewVal = val;
-        var def = grid.GetAttribute(null, col, "Defaults");
-        var valueField = grid.GetAttribute(null, col, "ValueField");
-        if (def != null && def != "" && valueField != null && val != null && val != "") {
-            var list = JSON_ConvertString(def);
-            if (list != null && list.Items != null) {
-                var items = list.Items;
-                var s = "";
-                var vals = val.toString().split(';');
-                for (var j = 0; j < vals.length; j++) {
-                    var jval = vals[j];
-                    for (var i = 0; i < items.length; i++) {
-                        if (items[i].Value == jval) {
-                            if (s != "")
-                                s += ";";
-                            s += items[i].Text;
-                            break;
-                        }
-                    }
-                }
-                snewVal = s;
-                grid.SetAttribute(row, null, valueField, val, 0, 0);
-            }
-        }
-        return snewVal;
-    };
     TGrid.prototype.GetNamePrefix = function (name) {
         // ids in form of g_1
         var s = name.split("_");
@@ -64,12 +37,12 @@
             this.grid.Dispose();
         this.grid = null;
         this.grid = TreeGrid("<treegrid debug='0' sync='1' Data_Tag='" + this.params.DataTag + "' ></treegrid>", this.params.treegrid_div, this.params.tg_id);
-        SetEvent("OnValueChanged", this.params.tg_id, this.GridsOnValueChanged);
+        //SetEvent("OnValueChanged", this.params.tg_id, this.GridsOnValueChanged);
     };
 
     TGrid.prototype.addEventListener = function (eventName, eventFunction) {
-        if (this.grid != null)
-            SetEvent(eventName,this.params.tg_id,eventFunction);
+//        if (this.grid != null)
+//            SetEvent(eventName,this.params.tg_id,eventFunction);
     };
     TGrid.prototype.grid = function () {
         return this.grid;
@@ -155,9 +128,10 @@
     };
     this.grid = null;
     this.params = params;
+    this.id = this.params.tg_id;
     this.focusrow = null;
     this.focuscol = null;
-    var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
+    //var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
     var loadDelegate = this.MakeDelegate(this, this.OnLoad);
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", loadDelegate, true);
@@ -166,3 +140,30 @@
         window.attachEvent("onload", loadDelegate);
     }
 }
+TGrid_GridsOnValueChanged = function (grid, row, col, val) {
+    var snewVal = val;
+    var def = grid.GetAttribute(null, col, "Defaults");
+    var valueField = grid.GetAttribute(null, col, "ValueField");
+    if (def != null && def != "" && valueField != null && val != null && val != "") {
+        var list = JSON_ConvertString(def);
+        if (list != null && list.Items != null) {
+            var items = list.Items;
+            var s = "";
+            var vals = val.toString().split(';');
+            for (var j = 0; j < vals.length; j++) {
+                var jval = vals[j];
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].Value == jval) {
+                        if (s != "")
+                            s += ";";
+                        s += items[i].Text;
+                        break;
+                    }
+                }
+            }
+            snewVal = s;
+            grid.SetAttribute(row, null, valueField, val, 0, 0);
+        }
+    }
+    return snewVal;
+};

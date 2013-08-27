@@ -112,14 +112,15 @@ html, body {
     
     var dgrid1 = window.<%=dgrid1.UID%>;
     var dgrid1_selectedRow = 0;
+    var tgrid1 = window['<%=tgrid1.UID%>'];
     var tgrid1_selectedRow = 0;
 
     function OnLoad(event) {
         toolbar.Render();
+        Grids.OnClickCell = GridsOnClickCell;
         dgrid1.addEventListener("onRowSelect", dgrid1_OnRowSelect);
         OnResize();
     };
-
     function dgrid1_OnRowSelect(rowid, cellindex) {
         dgrid1_selectedRow = rowid;
         if (rowid != null && rowid >= 0) {
@@ -131,43 +132,41 @@ html, body {
             toolbar.disableItem("btnDelete");
         }
     };
-
-    function tgrid1_OnClickCell(grid, row, col) {
-        tgrid1_selectedRow = row;
-        if (row != null && row != "") {
-            toolbar2.enableItem("btnInsert2");
-            toolbar2.enableItem("btnDelete2");
-        }
-        else {
-            toolbar2.disableItem("btnInsert2");
-            toolbar2.disableItem("btnDelete2");
+    function GridsOnClickCell(grid, row, col) {
+        switch (grid.id) {
+            case tgrid1.id:
+                tgrid1_selectedRow = row;
+                if (row != null && row != "") {
+                    toolbar2.enableItem("btnInsert2");
+                    toolbar2.enableItem("btnDelete2");
+                }
+                else {
+                    toolbar2.disableItem("btnInsert2");
+                    toolbar2.disableItem("btnDelete2");
+                }
+                break;
         }
     };
-
     function OnResize(event) {
         var top = dgrid1.GetTop();
         var newHeight = document.documentElement.clientHeight - top - 5;
         dgrid1.SetHeight(newHeight);
     };
-    
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         return dlg;
     };
-
     function CloseDialog (idWindow) {
         if (idWindow == 'winCalendarDlg')
            dgrid1.grid.selectRowById(dgrid1_selectedRow);
         return jsf_closeDialog(thiswins, idWindow);
     };
-
     function SendRequest(sXML) {
          sURL = "./Calendars.ashx";
          return jsf_sendRequest(sURL, sXML);
     };
     function toolbar2_event(event) {
-        var tgrid1 = window['<%=tgrid1.UID%>'];
         var dlgTitle = "";
         switch (event) {
            case "btnInsert2":
@@ -230,7 +229,7 @@ html, body {
                     return false;
                 }
                 tgrid1.grid.DeleteRow(tgrid1_selectedRow, 2); // 1=okmsg+del; 2=del; 3=undel
-                tgrid1_OnClickCell(tgrid1.grid, null, null)
+                GridsOnClickCell(tgrid1.grid, null, null)
                 break;
         }
         return false;
@@ -276,11 +275,9 @@ html, body {
         document.getElementById('txtId').value = json.reply.calendar.calendarid;
         document.getElementById('txtName').value = json.reply.calendar.name;
         toolbar2.Render();
-        var tgrid1 = window['<%=tgrid1.UID%>'];
         tgrid1.Initialize(json.reply.calendar.tgridData);
         tgrid1.SetWidth(400);
         tgrid1.SetHeight(350);
-        tgrid1.addEventListener("OnClickCell", tgrid1_OnClickCell);
         if (sMode == "btnDelete") {
              document.getElementById('idOKButton').value = "Delete";
          }
@@ -289,8 +286,7 @@ html, body {
         }
         dgrid1.grid.clearSelection();
         DisplayDialog(570, 550, sDlgTitle, "winCalendarDlg", "idCalendarDlg", true, false);
-   };
-
+    };
     function calendarDlg_event(event) {
         switch (event) {
             case "ok":
@@ -298,9 +294,7 @@ html, body {
                 switch (action) {
                     case "btnAdd":
                     case "btnModify":
-                        //alert("btnModify.OK");
                         var sb = new StringBuilder();
-                        var tgrid1 = window['<%=tgrid1.UID%>'];
                         tgrid1.grid.EndEdit(true);
                         sb.append('<request function="CalendarRequest" context="UpdateCalendarInfo">');
                         sb.append('<data');
@@ -328,9 +322,7 @@ html, body {
                         dgrid1.SetCellValue(sRowId, "CB_NAME", json.reply.calendar.name);
                         break;
                     case "btnDelete":
-                        //alert("btnDelete.OK");
                         var sb = new StringBuilder();
-                        var tgrid1 = window['<%=tgrid1.UID%>'];
                         sb.append('<request function="CalendarRequest" context="DeleteCalendarInfo">');
                         sb.append('<data');
                         sb.append(' calendarid="' + document.getElementById('txtId').value + '"');
