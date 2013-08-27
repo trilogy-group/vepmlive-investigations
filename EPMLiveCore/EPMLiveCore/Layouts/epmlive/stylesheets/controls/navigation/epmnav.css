@@ -143,6 +143,12 @@
   -webkit-text-shadow: 0 1px 0 #ecf0f3;
   text-shadow: 0 1px 0 #ecf0f3;
 }
+.epm-nav-sub .epm-nav-sub-header:hover,
+.epm-nav-sub li.epm-nav-sub-header:hover,
+.epm-nav-sub .epm-nav-sub-header-bottom:hover,
+.epm-nav-sub li.epm-nav-sub-header-bottom:hover {
+  color: #969696 !important;
+}
 .epm-nav-sub .epm-nav-sub-header-bottom,
 .epm-nav-sub li.epm-nav-sub-header-bottom {
   border-bottom: none;
