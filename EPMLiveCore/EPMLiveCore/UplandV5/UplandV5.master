@@ -242,6 +242,7 @@
                         <epm:NavNode Id="workplace" Title="My Workplace" CssClass="fui-ext-checklist" LinkProvider="MyWorkplace" />
                         <epm:NavNode Id="favorites" Title="Favorites" CssClass="fui-star-2" LinkProvider="Favorites" />
                         <epm:NavNode Id="recent" Title="Most recent" CssClass="fui-time" LinkProvider="RecentItems" />
+                        <epm:NavNode Id="workspaces" Title="Workspaces" CssClass="fui-ext-workspace" LinkProvider="Workspaces" />
                     </TopNodes>
                     <BottomNodes>
                         <epm:NavNode Id="settings" Title="Settings" CssClass="fui-gear" LinkProvider="Settings" />

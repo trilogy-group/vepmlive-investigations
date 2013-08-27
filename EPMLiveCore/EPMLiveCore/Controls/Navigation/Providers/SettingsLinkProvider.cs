@@ -118,7 +118,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
 
                 return links;
-            }).Value;
+            }, true).Value;
         }
 
         #endregion Methods 
