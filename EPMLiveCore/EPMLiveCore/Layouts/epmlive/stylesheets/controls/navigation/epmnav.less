@@ -169,8 +169,8 @@
         margin-left: 10px;
         text-transform: uppercase;
         width: @sub-header-width;
-        height: 24px;
-        line-height: 24px;
+        height: 30px !important;
+        line-height: 30px !important;
         .text-shadow(@color: #ECF0F3);
     }
 
@@ -180,6 +180,12 @@
         border-top: 1px solid #FFFFFF;
         padding: 0;
         height: 0 !important;
+        line-height: 0 !important;
+    }
+
+    li.epm-nav-sub-header-bottom {
+        height: 5px !important;
+        line-height: 5px !important;
     }
 
     li.epm-nav-sub-header,
@@ -223,8 +229,6 @@
     }
 
     ul.epm-nav-node-static {
-        margin-top: 5px;
-
         li {
             padding-left: 5px;
             width: @link-width + 25px;
