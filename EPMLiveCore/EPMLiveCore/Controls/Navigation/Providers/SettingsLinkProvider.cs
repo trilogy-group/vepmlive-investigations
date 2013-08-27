@@ -28,6 +28,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         {
             _links = new List<Tuple<SPBasePermissions?, NavLink>>
             {
+                new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
+                {
+                    Title = "Settings",
+                    Url = "Header"
+                }),
                 new Tuple<SPBasePermissions?, NavLink>(SPBasePermissions.AddAndCustomizePages, new NavLink
                 {
                     Title = "Edit Page",

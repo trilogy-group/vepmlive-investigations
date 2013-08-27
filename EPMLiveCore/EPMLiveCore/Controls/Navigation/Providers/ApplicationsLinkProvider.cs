@@ -26,6 +26,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     new NavLink
                     {
+                        Title = "Add New",
+                        Url = "Header"
+                    },
+                    new NavLink
+                    {
                         Title = "Add new application",
                         Url =
                             string.Format(

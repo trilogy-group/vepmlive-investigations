@@ -173,13 +173,32 @@
                         _close();
                     };
 
-                    var _registerLink = function (link) {
+                    var _registerLink = function(link) {
                         if (link.seprator) {
                             registerSeprator(link.category);
+                        } else if (link.url.toLowerCase() === 'header') {
+                            registerCategory(link.category);
+                            registerHeader(link);
                         } else {
                             registerCategory(link.category);
                             registerLink(link);
                         }
+                    };
+
+                    var registerHeader = function (link) {
+                        var category = link.category;
+
+                        if (!category) {
+                            category = '__STATIC__';
+                        }
+                        
+                        var li = '<li class="epm-nav-sub-header">' + link.title + '</li>';
+                        
+                        categories[category].$el.append(li);
+
+                        li = '<li class="epm-nav-sub-header-bottom"></li>';
+                        
+                        categories[category].$el.append(li);
                     };
 
                     var registerLink = function (link) {

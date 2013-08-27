@@ -44,7 +44,14 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
-                var links = new List<NavLink>();
+                var links = new List<NavLink>
+                {
+                    new NavLink
+                    {
+                        Title = "My Workplace",
+                        Url = "Header"
+                    }
+                };
 
                 using (var spSite = new SPSite(SiteId, GetUserToken()))
                 {

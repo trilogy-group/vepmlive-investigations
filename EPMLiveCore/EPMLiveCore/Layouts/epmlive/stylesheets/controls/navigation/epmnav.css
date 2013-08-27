@@ -72,7 +72,7 @@
   width: 100%;
 }
 #epm-nav-sub {
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   -moz-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
   -webkit-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
   box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
@@ -103,6 +103,40 @@
   display: none;
   position: relative;
 }
+.epm-nav-sub .epm-nav-sub-header,
+.epm-nav-sub li.epm-nav-sub-header,
+.epm-nav-sub .epm-nav-sub-header-bottom,
+.epm-nav-sub li.epm-nav-sub-header-bottom {
+  border-bottom: 1px solid #D6D6D6;
+  color: #969696;
+  font-family: Open Sans Regular;
+  font-size: 1em;
+  letter-spacing: 0.5px;
+  margin-left: 10px;
+  text-transform: uppercase;
+  width: 160px;
+  height: 24px;
+  line-height: 24px;
+  -webkit-text-shadow: 0 1px 0 #ecf0f3;
+  text-shadow: 0 1px 0 #ecf0f3;
+}
+.epm-nav-sub .epm-nav-sub-header-bottom,
+.epm-nav-sub li.epm-nav-sub-header-bottom {
+  border-bottom: none;
+  border-top: 1px solid #FFFFFF;
+  padding: 0;
+  height: 0 !important;
+}
+.epm-nav-sub li.epm-nav-sub-header,
+.epm-nav-sub li.epm-nav-sub-header-bottom {
+  margin: 0 0 0 10px !important;
+  padding: 0 !important;
+  width: 160px !important;
+}
+.epm-nav-sub li.epm-nav-sub-header:hover,
+.epm-nav-sub li.epm-nav-sub-header-bottom:hover {
+  background-color: #eeeeee !important;
+}
 .epm-nav-sub ul.epm-nav-links {
   list-style: none;
   padding: 0;
@@ -129,17 +163,17 @@
   height: 20px;
   line-height: 20px;
 }
+.epm-nav-sub ul.epm-nav-links li a:hover {
+  text-decoration: none;
+}
 .epm-nav-sub ul.epm-nav-links li:hover {
   background-color: #e7e7e7;
-}
-.epm-nav-sub ul.epm-nav-links li:hover a {
-  text-decoration: none;
 }
 .epm-nav-sub ul.epm-nav-node-static {
   margin-top: 5px;
 }
 .epm-nav-sub ul.epm-nav-node-static li {
-  padding-left: 10px;
+  padding-left: 5px;
   width: 164px;
 }
 .epm-nav-sub ul.epm-nav-node-collapsed {
@@ -153,7 +187,7 @@
   border-top: 1px solid #cecece;
   height: 0px;
   margin: 7px auto 0;
-  width: 95%;
+  width: 160px;
 }
 .epm-nav-sub .epm-nav-cat {
   margin-left: 10px !important;

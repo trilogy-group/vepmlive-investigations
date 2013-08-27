@@ -3,9 +3,11 @@
 @top-nav-li-height: @top-nav-width - 10;
 @node-width: (@sub-nav-width - 40px) + 4px;
 @link-width: (@sub-nav-width - 40px) - 1px;
+@sub-header-width: @sub-nav-width - 20px;
 @node-height: 20px;
 @shadow-color: rgba(0, 0, 0, 0.2) inset;
 @base-blue: #0090CA;
+@nav-color:#EEEEEE;
 @hover-color: #E7E7E7;
 @icon-font:2.2em;
 @header-font:12px;
@@ -128,7 +130,7 @@
 }
 
 #epm-nav-sub {
-    background-color: #EEEEEE;
+    background-color: @nav-color;
     .box-shadow(@x: -1px, @color: @shadow-color);
     display: none;
     float: left;
@@ -155,6 +157,42 @@
     display: none;
     position: relative;
 
+    .epm-nav-sub-header,
+    li.epm-nav-sub-header,
+    .epm-nav-sub-header-bottom,
+    li.epm-nav-sub-header-bottom {
+        border-bottom: 1px solid #D6D6D6;
+        color: #969696;
+        font-family: Open Sans Regular;
+        font-size: 1em;
+        letter-spacing: 0.5px;
+        margin-left: 10px;
+        text-transform: uppercase;
+        width: @sub-header-width;
+        height: 24px;
+        line-height: 24px;
+        .text-shadow(@color: #ECF0F3);
+    }
+
+    .epm-nav-sub-header-bottom,
+    li.epm-nav-sub-header-bottom {
+        border-bottom: none;
+        border-top: 1px solid #FFFFFF;
+        padding: 0;
+        height: 0 !important;
+    }
+
+    li.epm-nav-sub-header,
+    li.epm-nav-sub-header-bottom {
+        margin: 0 0 0 10px !important;
+        padding: 0 !important;
+        width: @sub-header-width !important;
+
+        &:hover {
+            background-color: @nav-color !important;
+        }
+    }
+
     ul.epm-nav-links {
         list-style: none;
         padding: 0;
@@ -172,14 +210,14 @@
                 padding-left: 6px;
                 font-size: @link-font;
                 .epm-nav-node;
+
+                &:hover {
+                    text-decoration: none;
+                }
             }
 
             &:hover {
                 background-color: @hover-color;
-
-                a {
-                    text-decoration: none;
-                }
             }
         }
     }
@@ -188,7 +226,7 @@
         margin-top: 5px;
 
         li {
-            padding-left: 10px;
+            padding-left: 5px;
             width: @link-width + 25px;
         }
     }
@@ -206,7 +244,7 @@
         border-top: 1px solid #cecece;
         height: 0px;
         margin: 7px auto 0;
-        width: 95%;
+        width: @sub-header-width;
     }
 
     .epm-nav-cat {

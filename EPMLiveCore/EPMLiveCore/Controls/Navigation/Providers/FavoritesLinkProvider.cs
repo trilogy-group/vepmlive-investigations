@@ -30,7 +30,15 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             string key = SiteId + "_NavLinks_" + "Favorites" + "_" + UserId;
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
-                var links = new List<NavLink>();
+                var links = new List<NavLink>
+                {
+                    new NavLink
+                    {
+                        Title = "Favorites",
+                        Url = "Header"
+                    }
+                };
+
                 DataTable dataTable;
 
                 using (var spSite = new SPSite(SiteId, GetUserToken()))
