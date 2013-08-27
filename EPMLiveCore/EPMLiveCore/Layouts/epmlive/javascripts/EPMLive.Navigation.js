@@ -268,7 +268,7 @@
                     };
 
                     var showNode = function () {
-                        _$sm.show();
+                        _$sm.fadeIn(300);
                         _$el.parent().addClass(openedClass);
                     };
 

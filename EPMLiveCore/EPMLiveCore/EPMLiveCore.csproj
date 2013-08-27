@@ -3302,8 +3302,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css">
       <DependentUpon>epmnav.less</DependentUpon>
     </Content>
-    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\glyphs.css" />
-    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\glyphs.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />
@@ -3330,6 +3330,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.css" />
     <Content Include="Layouts\epmlive\stylesheets\master.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\icomoon.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.min.css" />
@@ -3342,7 +3343,7 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>notifications.v2.css</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
-    <Content Include="Layouts\epmlive\stylesheets\icomoon.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\icomoon.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
     <Content Include="Layouts\epmlive\synchperiods.aspx" />
     <Content Include="Layouts\epmlive\TemplateGalleryRedirect.aspx" />

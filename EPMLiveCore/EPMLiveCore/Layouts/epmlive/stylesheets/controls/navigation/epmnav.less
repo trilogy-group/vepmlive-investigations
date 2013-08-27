@@ -29,8 +29,11 @@
     transition: @arguments;
 }
 
-.trans-ease-in {
-    .transition(@func: ease-in);
+.link-trans {
+    -moz-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+    -o-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+    -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+    transition: background-color 0.2s ease-in, color 0.2s ease-in;
 }
 
 .transform (@rotate: 0deg, @scale: 1, @skew: 0deg, @trans: 0px) {
@@ -235,7 +238,7 @@
             line-height: 23px;
             width: @link-width;
             .ellipsis;
-            .trans-ease-in;
+            .link-trans;
 
             a {
                 padding-left: 6px;
@@ -251,6 +254,10 @@
             &:hover {
                 background-color: @hover-color;
                 color: @link-hover;
+
+                a {
+                    color: @link-hover;
+                }
             }
         }
     }
@@ -363,13 +370,6 @@
                 margin: 0;
                 padding-top: 1.5px;
                 padding-bottom: 1.5px;
-                .trans-ease-in;
-
-                a {
-                     &:hover {
-                        color: @link-hover;
-                    }
-                }
             }
         }
 
