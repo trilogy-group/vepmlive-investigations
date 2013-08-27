@@ -34,7 +34,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         Title = "Add new application",
                         Url =
                             string.Format(
-                                @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/QueueCreateWorkspace.aspx?standalone=true&isDlg=1');",
+                                @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx?standalone=true&isDlg=1');",
                                 RelativeUrl)
                     }
                 };
