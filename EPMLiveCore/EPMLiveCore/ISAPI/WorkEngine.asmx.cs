@@ -1406,6 +1406,26 @@ namespace EPMLiveCore
             }
         }
 
+        public static string ReorderFavorites(string data, SPWeb oWeb)
+        {
+            try
+            {
+                var watch = new Stopwatch();
+                watch.Start();
+
+                var navigationService = new NavigationService(oWeb);
+                navigationService.ReorderFavorites(data);
+
+                watch.Stop();
+
+                return Response.Success(GetDiagnosticsInfo(watch));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         #endregion
 
         public static string GenerateQuickLaunchFromApp(string data, SPWeb spWeb)

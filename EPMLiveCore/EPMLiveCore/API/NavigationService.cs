@@ -23,7 +23,7 @@ namespace EPMLiveCore.API
 
         #endregion Fields 
 
-        #region Constructors (2) 
+        #region Constructors (3) 
 
         public NavigationService(IEnumerable<string> providers, SPWeb spWeb)
         {
@@ -66,11 +66,16 @@ namespace EPMLiveCore.API
 
         public NavigationService(string provider, SPWeb spWeb) : this(new[] {provider}, spWeb) { }
 
+        public NavigationService(SPWeb spWeb)
+        {
+            _spWeb = spWeb;
+        }
+
         #endregion Constructors 
 
-        #region Methods (4) 
+        #region Methods (5) 
 
-        // Public Methods (1) 
+        // Public Methods (2) 
 
         public string GetLinks()
         {
@@ -146,6 +151,42 @@ namespace EPMLiveCore.API
             catch (Exception exception)
             {
                 throw new APIException(20001, "[NavigationService:GetLinks] " + exception.Message);
+            }
+        }
+
+        public void ReorderFavorites(string data)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(data)) return;
+
+                var orders = new Dictionary<Guid, int>();
+
+                foreach (
+                    var parts in
+                        data.Split(',')
+                            .Where(link => !string.IsNullOrEmpty(link))
+                            .Select(link => link.Split(':'))
+                            .Where(parts => parts.Count() == 2))
+                {
+                    Guid id;
+                    if (!Guid.TryParse(parts[0], out id) || orders.ContainsKey(id)) continue;
+
+                    int order;
+                    if (int.TryParse(parts[1], out order))
+                    {
+                        orders.Add(id, order);
+                    }
+                }
+
+                if (!orders.Any()) return;
+
+                var provider = new FavoritesLinkProvider(_spWeb.Site.ID, _spWeb.ID, _spWeb.CurrentUser.LoginName);
+                provider.Reorder(orders);
+            }
+            catch (Exception exception)
+            {
+                throw new APIException(20002, "[NavigationService:ReorderFavorites] " + exception.Message);
             }
         }
 

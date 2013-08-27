@@ -741,6 +741,48 @@
             })();
 
             epmLiveNavigation.init();
+
+            var manageFavorites = function() {
+                var $ul = $('#epm-nav-sub-favorites-static-links');
+
+                var resetOrder = function() {
+                    var orders = [];
+
+                    var lo = 0;
+                    $ul.find('.epm-nav-node').each(function() {
+                        orders.push($(this).get(0).id + ':' + (++lo));
+                    });
+
+                    if (orders.length) {
+                        epmLiveService.execute('ReorderFavorites', orders.join(), function(response) {
+                        }, function(response) {
+                            console.log(response);
+                        });
+                    }
+                };
+
+                $ul.find('.epm-nav-node').each(function() {
+                    var $li = $(this);
+                    $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
+
+                    $li.hover(function() {
+                        $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
+                    }, function() {
+                        $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
+                    });
+                });
+
+                $ul.sortable({
+                    placeholder: 'epm-nav-drag-placeholder',
+                    update: function(event, ui) {
+                        resetOrder();
+                    }
+                });
+
+                $ul.disableSelection();
+            };
+
+            ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
         });
     }
 
@@ -749,31 +791,4 @@
     }
 
     ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
-})();
-
-(function () {
-    'use strict';
-    
-    function manageFavorites() {
-        var $ul = $('#epm-nav-sub-favorites-static-links');
-        
-        $ul.find('.epm-nav-node').each(function() {
-            var $li = $(this);
-            $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
-
-            $li.hover(function() {
-                $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
-            }, function() {
-                $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
-            });
-        });
-        
-        $ul.sortable({
-            placeholder: 'epm-nav-drag-placeholder'
-        });
-        
-        $ul.disableSelection();
-    }
-    
-    ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
 })();
