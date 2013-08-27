@@ -1513,6 +1513,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map">
       <DependentUpon>EPMLive.Notifications.v2.js</DependentUpon>
     </None>
+    <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map">
+      <DependentUpon>icomoon-ie7.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
@@ -1523,6 +1526,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.eot" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.ttf" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.woff" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.eot" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.ttf" />
+    <None Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.woff" />
     <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.eot" />
     <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.ttf" />
     <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.woff" />
@@ -3098,6 +3104,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\delete.GIF" />
     <Content Include="Layouts\epmlive\images\deleteteam.png" />
     <Content Include="Layouts\epmlive\images\down.gif" />
+    <Content Include="Layouts\epmlive\images\dragger.png" />
     <Content Include="Layouts\epmlive\images\dropdown2.gif" />
     <Content Include="Layouts\epmlive\images\dropdown2.png" />
     <Content Include="Layouts\epmlive\images\epmlive-header.png" />
@@ -3206,6 +3213,10 @@ net start "WETimer"</PostDeploymentCommand>
     </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
+    <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.js" />
+    <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js">
+      <DependentUpon>icomoon-ie7.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\handlebars-1.0.0.js" />
@@ -3294,6 +3305,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\glyphs.css" />
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\glyphs.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
+    <Content Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.svg" />
@@ -3330,6 +3342,7 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>notifications.v2.css</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
+    <Content Include="Layouts\epmlive\stylesheets\icomoon.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
     <Content Include="Layouts\epmlive\synchperiods.aspx" />
     <Content Include="Layouts\epmlive\TemplateGalleryRedirect.aspx" />

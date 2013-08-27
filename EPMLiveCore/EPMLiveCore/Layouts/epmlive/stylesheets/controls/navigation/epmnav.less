@@ -9,6 +9,7 @@
 @base-blue: #0090CA;
 @nav-color:#EEEEEE;
 @hover-color: #E7E7E7;
+@link-hover:#3376A4;
 @icon-font:2.2em;
 @header-font:12px;
 @link-font:12px;
@@ -26,6 +27,10 @@
     -o-transition: @arguments;
     -moz-transition: @arguments;
     transition: @arguments;
+}
+
+.trans-ease-in {
+    .transition(@func: ease-in);
 }
 
 .transform (@rotate: 0deg, @scale: 1, @skew: 0deg, @trans: 0px) {
@@ -158,6 +163,24 @@
     display: none;
     position: relative;
 
+    .epm-nav-icon {
+        margin-left: 5px;
+    }
+
+    .epm-nav-dragger {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAA/CAYAAAAL1VP7AAAAkklEQVRYw+3RIQ7DQAxE0YmUWEu9xNz3Ku8RVjlAtEcI7/0aunJISUMqq7zqDPyy0Zu23m+yiMQZsbb2AICsZdt632WREmeMtbX7Z5vdXVQrjuMp11PWsrl7ed+VrM2qNcxMAMR1kLVsqnWYWQEwvrXf20RQghKUoAQlKEEJSlCCEpSgBCUoQQlKUIISlKB/A/oC07C7ok5v51YAAAAASUVORK5CYII=') /*../../../images/dragger.png*/;
+        *background-image: url(/_layouts/15/epmlive/images/dragger.png); /* For IE 6 and 7 */
+        background-repeat: no-repeat;
+        cursor: move;
+        display: inline-block;
+        width: 8px;
+        visibility: hidden;
+    }
+
+    .epm-nav-drag-placeholder {
+        border: 1px dashed @base-blue;
+    }
+
     .epm-nav-sub-header,
     li.epm-nav-sub-header,
     .epm-nav-sub-header-bottom,
@@ -212,6 +235,7 @@
             line-height: 23px;
             width: @link-width;
             .ellipsis;
+            .trans-ease-in;
 
             a {
                 padding-left: 6px;
@@ -220,11 +244,13 @@
 
                 &:hover {
                     text-decoration: none;
+                    color: @link-hover;
                 }
             }
 
             &:hover {
                 background-color: @hover-color;
+                color: @link-hover;
             }
         }
     }
@@ -260,7 +286,7 @@
 
         span.epm-nav-node-collapsed,
         span.epm-nav-node-expanded {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA+0lEQVQoz32STQrCMBBG2zsIepDuhXRvvYJS6E5BcSN4tYILregB1J3uBDdCwWXxjU5KjLWFR77MTzLpTGCMCewXx3EHJpBDqeRq6zhxtQjBwB52sNK9Ub1TH/eYsL6JTYLxCgu3AvcG8UkM/oFN6mE4QeYFLwXPlsGRnK4kzqDw62ethK83fXQB00DrHzeUV3Jg2WBPYSviQUBky0NXkiC3udqWzRrB7Z0oG+ddlbah8rSbeBdxgFFTqUJbqXPYOK1p/Tn4N+xnth1nOclvBz6/HSk2aV3PGoZw+TcAYtMBkJjEPalp5PokCCv4HTmvuXbI1/Ak6Kn6Z8hfnBiolCTl1+kAAAAASUVORK5CYII=') /*../../../images/navigation/expand.png*/;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAABAElEQVQoz2WSOwrCQBRFp9BCXYKCoAhuIx/SidiK7iGL8dNrKRYilqIWWYZgoYiuIYXnyjMMMXDyfvfNvMzEOXvCMKxFUTSADTwN+QPVnP+QaFNYwhFS6Bup5ZbS/MQNWJOcQ105bEeYX4cFmlUQBA3Ha0RwieO46u2YIcq8uEp8wQ4V7GHij0jxRe5VGntKfifnzi5Ngq5Wxpc4x+Zq0k6qQQuuWu0BTYpdK0qUG2rOrKZFb2o4kBiXtlfT30jwHWlE8YyteN+gVYuPTpKkwognab/HimCNnUFxrAj8Y1VtJW1xceBfXI8GkZI/2qW2Xekof7/GFt4I3/KxyhW/xgdIDogikF40/wAAAABJRU5ErkJggg==') /*../../../images/navigation/expand.png*/;
             *background-image: url(/_layouts/15/epmlive/images/navigation/expand.png); /* For IE 6 and 7 */
             background-position: left center;
             background-repeat: no-repeat;
@@ -270,7 +296,7 @@
         }
 
         span.epm-nav-node-expanded {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA7ElEQVQoz52SOwrCQBCG1zsE9CD2wqZXr6AE0ikoNgGvJlj4QA+gdtoJNoJiKX6js2FJVgwGPjKPf3aG3THWWuO+OI4jGMAMbspMY5Gny40aWNjAGqbqW7XXmqOPreWdcDoETzDxJ/A7SE405NuuqEFgD6l3kCmN9bFT2JGvi2gEq5DwS/EKhkbn75uKH9oElmJc6djUYIb95H8vILFMNU04vwvFcYUq+lV4EWMLvX9GHcMidKOhyyG/wB+55zjISRWeIyEnT9dwgS4cvy2AxHQBRNPxTwqtXIsCYQrllSuM4pZ8Dg9ED7VLS/4Cnk2YheFbyPsAAAAASUVORK5CYII=') /*../../../images/navigation/collapse.png*/;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAA7UlEQVQoz42SPQrCQBBGt9BCPYKCRRrxFvkhXZC0onfIYdT0SSkWIpZBLXIMwUIRxEP4PtlIFEQXXmZ25pvZ3ewaY4fneS3f9yNYwtUiP1LO1AeBPokUCkhgaElsLJWmEncgJziHtvkYisECTea6bsfwiZkcgiBoWkFdXDVt4h+wI002MDE/BpopRWs5Z1bpMnHwS7jXDi2/VA56cNSyF+gidGzyjv9WYHNqelLBlsD4ny3Bc0sxRXts49uhwzBssO2dtM/fSiLHzuDbb1Uuk/Z1cVC/uAEdRUK8sJfa/+xUPY0V3BDe5GMVez2NB59Fen3s5n5YAAAAAElFTkSuQmCC') /*../../../images/navigation/collapse.png*/;
             *background-image: url(/_layouts/15/epmlive/images/navigation/collapse.png); /* For IE 6 and 7 */
         }
 
@@ -316,7 +342,7 @@
 
         span.epm-nav-node-root {
             position: relative;
-            top: -2px;
+            top: -1px;
         }
 
         .epm-nav-node-hover {
@@ -337,6 +363,13 @@
                 margin: 0;
                 padding-top: 1.5px;
                 padding-bottom: 1.5px;
+                .trans-ease-in;
+
+                a {
+                     &:hover {
+                        color: @link-hover;
+                    }
+                }
             }
         }
 

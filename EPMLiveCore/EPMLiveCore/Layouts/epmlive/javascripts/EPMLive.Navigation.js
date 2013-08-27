@@ -208,9 +208,15 @@
                             category = '__STATIC__';
                         }
 
-                        var li = '<li id="' + link.id + '" class="epm-nav-node" style="display:none;"><a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '">' + link.title + '</a></li>';
+                        var icon = '';
+                        
+                        if (link.cssClass) {
+                            icon = '<span class="epm-nav-icon ' + link.cssClass + '"></span>';
+                        }
 
-                        categories[category].$el.append(li);
+                        var html = '<li id="' + link.id + '" class="epm-nav-node" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '">' + link.title + '</a></li>';
+
+                        categories[category].$el.append(html);
 
                         if (link.external) {
                             $('#epm-nav-link-' + link.id).attr('target', '_blank');
@@ -667,6 +673,8 @@
                         }
 
                         expandNodes(providerName);
+
+                        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);
                     }
                 }
 
@@ -741,4 +749,31 @@
     }
 
     ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
+})();
+
+(function () {
+    'use strict';
+    
+    function manageFavorites() {
+        var $ul = $('#epm-nav-sub-favorites-static-links');
+        
+        $ul.find('.epm-nav-node').each(function() {
+            var $li = $(this);
+            $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
+
+            $li.hover(function() {
+                $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
+            }, function() {
+                $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
+            });
+        });
+        
+        $ul.sortable({
+            placeholder: 'epm-nav-drag-placeholder'
+        });
+        
+        $ul.disableSelection();
+    }
+    
+    ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
 })();

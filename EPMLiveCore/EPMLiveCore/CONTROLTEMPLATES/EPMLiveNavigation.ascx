@@ -8,6 +8,8 @@
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveNavigation.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.EPMLiveNavigation" %>
 
+<!--[if lte IE 7]><script src="/_layouts/15/epmlive/javascripts/icomoon-ie7.min.js"></script><![endif]-->
+
 <div id="epm-nav">
     <div id="epm-nav-top">
         <ul>

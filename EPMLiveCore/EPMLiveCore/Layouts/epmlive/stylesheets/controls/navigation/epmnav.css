@@ -1,4 +1,10 @@
-﻿.ellipsis {
+﻿.trans-ease-in {
+  -webkit-transition: All 0.2s ease-in;
+  -o-transition: All 0.2s ease-in;
+  -moz-transition: All 0.2s ease-in;
+  transition: All 0.2s ease-in;
+}
+.ellipsis {
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -103,6 +109,23 @@
   display: none;
   position: relative;
 }
+.epm-nav-sub .epm-nav-icon {
+  margin-left: 5px;
+}
+.epm-nav-sub .epm-nav-dragger {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAA/CAYAAAAL1VP7AAAAkklEQVRYw+3RIQ7DQAxE0YmUWEu9xNz3Ku8RVjlAtEcI7/0aunJISUMqq7zqDPyy0Zu23m+yiMQZsbb2AICsZdt632WREmeMtbX7Z5vdXVQrjuMp11PWsrl7ed+VrM2qNcxMAMR1kLVsqnWYWQEwvrXf20RQghKUoAQlKEEJSlCCEpSgBCUoQQlKUIISlKB/A/oC07C7ok5v51YAAAAASUVORK5CYII=') /*../../../images/dragger.png*/;
+  *background-image: url(/_layouts/15/epmlive/images/dragger.png);
+  /* For IE 6 and 7 */
+
+  background-repeat: no-repeat;
+  cursor: move;
+  display: inline-block;
+  width: 8px;
+  visibility: hidden;
+}
+.epm-nav-sub .epm-nav-drag-placeholder {
+  border: 1px dashed #0090ca;
+}
 .epm-nav-sub .epm-nav-sub-header,
 .epm-nav-sub li.epm-nav-sub-header,
 .epm-nav-sub .epm-nav-sub-header-bottom,
@@ -158,6 +181,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  -webkit-transition: All 0.2s ease-in;
+  -o-transition: All 0.2s ease-in;
+  -moz-transition: All 0.2s ease-in;
+  transition: All 0.2s ease-in;
 }
 .epm-nav-sub ul.epm-nav-links li a {
   padding-left: 6px;
@@ -170,9 +197,11 @@
 }
 .epm-nav-sub ul.epm-nav-links li a:hover {
   text-decoration: none;
+  color: #3376a4;
 }
 .epm-nav-sub ul.epm-nav-links li:hover {
   background-color: #e7e7e7;
+  color: #3376a4;
 }
 .epm-nav-sub ul.epm-nav-node-static li {
   padding-left: 5px;
@@ -204,7 +233,7 @@
 }
 .epm-nav-sub .epm-nav-cat span.epm-nav-node-collapsed,
 .epm-nav-sub .epm-nav-cat span.epm-nav-node-expanded {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA+0lEQVQoz32STQrCMBBG2zsIepDuhXRvvYJS6E5BcSN4tYILregB1J3uBDdCwWXxjU5KjLWFR77MTzLpTGCMCewXx3EHJpBDqeRq6zhxtQjBwB52sNK9Ub1TH/eYsL6JTYLxCgu3AvcG8UkM/oFN6mE4QeYFLwXPlsGRnK4kzqDw62ethK83fXQB00DrHzeUV3Jg2WBPYSviQUBky0NXkiC3udqWzRrB7Z0oG+ddlbah8rSbeBdxgFFTqUJbqXPYOK1p/Tn4N+xnth1nOclvBz6/HSk2aV3PGoZw+TcAYtMBkJjEPalp5PokCCv4HTmvuXbI1/Ak6Kn6Z8hfnBiolCTl1+kAAAAASUVORK5CYII=') /*../../../images/navigation/expand.png*/;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAABAElEQVQoz2WSOwrCQBRFp9BCXYKCoAhuIx/SidiK7iGL8dNrKRYilqIWWYZgoYiuIYXnyjMMMXDyfvfNvMzEOXvCMKxFUTSADTwN+QPVnP+QaFNYwhFS6Bup5ZbS/MQNWJOcQ105bEeYX4cFmlUQBA3Ha0RwieO46u2YIcq8uEp8wQ4V7GHij0jxRe5VGntKfifnzi5Ngq5Wxpc4x+Zq0k6qQQuuWu0BTYpdK0qUG2rOrKZFb2o4kBiXtlfT30jwHWlE8YyteN+gVYuPTpKkwognab/HimCNnUFxrAj8Y1VtJW1xceBfXI8GkZI/2qW2Xekof7/GFt4I3/KxyhW/xgdIDogikF40/wAAAABJRU5ErkJggg==') /*../../../images/navigation/expand.png*/;
   *background-image: url(/_layouts/15/epmlive/images/navigation/expand.png);
   /* For IE 6 and 7 */
 
@@ -215,7 +244,7 @@
   margin-right: 5px;
 }
 .epm-nav-sub .epm-nav-cat span.epm-nav-node-expanded {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA7ElEQVQoz52SOwrCQBCG1zsE9CD2wqZXr6AE0ikoNgGvJlj4QA+gdtoJNoJiKX6js2FJVgwGPjKPf3aG3THWWuO+OI4jGMAMbspMY5Gny40aWNjAGqbqW7XXmqOPreWdcDoETzDxJ/A7SE405NuuqEFgD6l3kCmN9bFT2JGvi2gEq5DwS/EKhkbn75uKH9oElmJc6djUYIb95H8vILFMNU04vwvFcYUq+lV4EWMLvX9GHcMidKOhyyG/wB+55zjISRWeIyEnT9dwgS4cvy2AxHQBRNPxTwqtXIsCYQrllSuM4pZ8Dg9ED7VLS/4Cnk2YheFbyPsAAAAASUVORK5CYII=') /*../../../images/navigation/collapse.png*/;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAA7UlEQVQoz42SPQrCQBBGt9BCPYKCRRrxFvkhXZC0onfIYdT0SSkWIpZBLXIMwUIRxEP4PtlIFEQXXmZ25pvZ3ewaY4fneS3f9yNYwtUiP1LO1AeBPokUCkhgaElsLJWmEncgJziHtvkYisECTea6bsfwiZkcgiBoWkFdXDVt4h+wI002MDE/BpopRWs5Z1bpMnHwS7jXDi2/VA56cNSyF+gidGzyjv9WYHNqelLBlsD4ny3Bc0sxRXts49uhwzBssO2dtM/fSiLHzuDbb1Uuk/Z1cVC/uAEdRUK8sJfa/+xUPY0V3BDe5GMVez2NB59Fen3s5n5YAAAAAElFTkSuQmCC') /*../../../images/navigation/collapse.png*/;
   *background-image: url(/_layouts/15/epmlive/images/navigation/collapse.png);
   /* For IE 6 and 7 */
 
@@ -252,7 +281,7 @@
 }
 .epm-nav-sub .epm-nav-sub-menu span.epm-nav-node-root {
   position: relative;
-  top: -2px;
+  top: -1px;
 }
 .epm-nav-sub .epm-nav-sub-menu .epm-nav-node-hover {
   background-color: #e7e7e7;
@@ -268,6 +297,13 @@
   margin: 0;
   padding-top: 1.5px;
   padding-bottom: 1.5px;
+  -webkit-transition: All 0.2s ease-in;
+  -o-transition: All 0.2s ease-in;
+  -moz-transition: All 0.2s ease-in;
+  transition: All 0.2s ease-in;
+}
+.epm-nav-sub .epm-nav-sub-menu div table a:hover {
+  color: #3376a4;
 }
 .epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected {
   border-left: 3px solid #0090ca !important;
