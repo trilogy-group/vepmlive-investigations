@@ -29,15 +29,15 @@ namespace EPMLiveCore
 
     public class UserLevels
     {
-        private Dictionary<int, UserLevel> levels = new Dictionary<int,UserLevel>();
+        private Dictionary<int, UserLevel> levels = new Dictionary<int, UserLevel>();
 
         public UserLevels()
         {
-            levels.Add(0, GetUserLevel("No Access", 0, new int[] {  }));
+            levels.Add(0, GetUserLevel("No Access", 0, new int[] { }));
             levels.Add(1, GetUserLevel("Team Members", 1, new int[] { 0, 3, 4, 8 }));
             levels.Add(2, GetUserLevel("Project Manager", 2, new int[] { 0, 1, 2, 3, 4, 5, 6, 8, 9 }));
             levels.Add(3, GetUserLevel("Full User", 3, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
-      
+
         }
 
         public UserLevel GetById(int id)
@@ -50,7 +50,7 @@ namespace EPMLiveCore
             return levels.Count;
         }
 
-        public IEnumerator<KeyValuePair<int, UserLevel>>  GetEnumerator()
+        public IEnumerator<KeyValuePair<int, UserLevel>> GetEnumerator()
         {
             return levels.GetEnumerator();
         }
@@ -276,7 +276,7 @@ namespace EPMLiveCore
 
             try
             {
-                if(li == null)
+                if (li == null)
                 {
                     string planners = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlannerPlanners");
 
@@ -288,9 +288,9 @@ namespace EPMLiveCore
 
                     bool foundpj = false;
 
-                    foreach(string planner in planners.Split(','))
+                    foreach (string planner in planners.Split(','))
                     {
-                        if(!String.IsNullOrEmpty(planner))
+                        if (!String.IsNullOrEmpty(planner))
                         {
 
                             string[] sPlanner = planner.Split('|');
@@ -301,21 +301,21 @@ namespace EPMLiveCore
                             bool canProject = false;
                             bool canOnline = false;
 
-                            if(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableOnline") == "")
+                            if (EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableOnline") == "")
                                 canOnline = true;
                             else
                                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableOnline"), out canOnline);
                             bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableProject"), out canProject);
 
-                            if((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
+                            if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
                             {
-                                if(canProject)
+                                if (canProject)
                                     foundpj = true;
 
                                 SPList oPC = web.Lists.TryGetList(pc);
                                 SPList oTC = web.Lists.TryGetList(tc);
 
-                                if(oPC != null && oTC != null)
+                                if (oPC != null && oTC != null)
                                 {
                                     pList.Add(sPlanner[0], CreatePlannerDef(sPlanner[1], "/_layouts/epmlive/images/planner16.png", true, oTC.Title, desc, 1, oPC.Title));
                                 }
@@ -323,17 +323,17 @@ namespace EPMLiveCore
                         }
                     }
 
-                    if(!foundpj)
+                    if (!foundpj)
                     {
-                        if(lweb.Lists.TryGetList("Planner Templates") == null)
+                        if (lweb.Lists.TryGetList("Planner Templates") == null)
                         {
                             pList.Add("MPP", CreatePlannerDef("Microsoft Office Project", "/_layouts/epmlive/images/planner16.png", true, "Task Center", "", 1, "Project Center"));
                         }
                     }
 
-                    if(!bDisablePlan)
+                    if (!bDisablePlan)
                     {
-                        if(web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
+                        if (web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
                         {
                             bool enableWP = false;
                             string spc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPProjectCenter");
@@ -345,7 +345,7 @@ namespace EPMLiveCore
                             catch { }
                             SPList oPC = web.Lists.TryGetList(spc);
                             SPList oTC = web.Lists.TryGetList(stc);
-                            if(enableWP && oPC != null && oTC != null)
+                            if (enableWP && oPC != null && oTC != null)
                             {
                                 pList.Add("WorkEngineWorkPlanner", CreatePlannerDef("Work Planner", "/_layouts/epmlive/images/planner16.png", true, oTC.Title, "WorkEngine Work Planner", 3, oPC.Title));
                             }
@@ -363,7 +363,7 @@ namespace EPMLiveCore
 
                             SPList oPC = web.Lists.TryGetList(spca);
                             SPList oTC = web.Lists.TryGetList(stca);
-                            if(enableAgile && oPC != null && oTC != null)
+                            if (enableAgile && oPC != null && oTC != null)
                             {
                                 pList.Add("WorkEngineAgilePlanner", CreatePlannerDef("Agile Planner", "/_layouts/epmlive/images/planner16.png", true, oTC.Title, "WorkEngine Agile Planner", 3, oPC.Title));
                             }
@@ -373,26 +373,26 @@ namespace EPMLiveCore
                     bool disableProject = false;
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out disableProject);
 
-                    if(!disableProject)
+                    if (!disableProject)
                     {
                         string pubPC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-pc", false);
                         string pubTC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-tc", false);
                         bool foundmpp = false;
                         SPList oPC = web.Lists.TryGetList(pubPC);
                         SPList oTC = web.Lists.TryGetList(pubTC);
-                        if(oPC != null && oTC != null)
+                        if (oPC != null && oTC != null)
                         {
                             try
                             {
                                 SPDocumentLibrary lib = (SPDocumentLibrary)web.Lists["Project Schedules"];
-                                if(lib != null)
+                                if (lib != null)
                                 {
-                                    if(lib.ContentTypesEnabled)
+                                    if (lib.ContentTypesEnabled)
                                     {
-                                        foreach(SPContentType ct in lib.ContentTypes)
+                                        foreach (SPContentType ct in lib.ContentTypes)
                                         {
                                             string template = ct.DocumentTemplateUrl;
-                                            if(template.Substring(template.Length - 3, 3) == "mpp")
+                                            if (template.Substring(template.Length - 3, 3) == "mpp")
                                             {
                                                 foundmpp = true;
                                                 break;
@@ -402,7 +402,7 @@ namespace EPMLiveCore
                                     else
                                     {
                                         string template = lib.DocumentTemplateUrl;
-                                        if(template.Substring(template.Length - 3, 3) == "mpp")
+                                        if (template.Substring(template.Length - 3, 3) == "mpp")
                                         {
                                             foundmpp = true;
                                         }
@@ -410,7 +410,7 @@ namespace EPMLiveCore
                                 }
                             }
                             catch { }
-                            if(foundmpp)
+                            if (foundmpp)
                             {
                                 pList.Add("EditInMicrosoftProject", CreatePlannerDef("Microsoft Project", "/_layouts/images/Project2007LogoSmall.gif", true, oTC.Title, "Edit Schedule in Microsoft Office Project", 2, oPC.Title));
                             }
@@ -433,9 +433,9 @@ namespace EPMLiveCore
 
                     bool foundpj = false;
 
-                    foreach(string planner in planners.Split(','))
+                    foreach (string planner in planners.Split(','))
                     {
-                        if(!String.IsNullOrEmpty(planner))
+                        if (!String.IsNullOrEmpty(planner))
                         {
 
                             string[] sPlanner = planner.Split('|');
@@ -446,7 +446,7 @@ namespace EPMLiveCore
                             bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableOnline"), out canOnline);
                             bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableProject"), out canProject);
 
-                            if((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
+                            if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
                             {
                                 string tc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "TaskCenter");
                                 string pc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "ProjectCenter");
@@ -455,14 +455,14 @@ namespace EPMLiveCore
                                 SPList oPC = web.Lists.TryGetList(pc);
                                 SPList oTC = web.Lists.TryGetList(tc);
 
-                                if(oPC != null && oTC != null)
+                                if (oPC != null && oTC != null)
                                 {
                                     foundpj = true;
-                                    if(list.Title == oPC.Title)
+                                    if (list.Title == oPC.Title)
                                     {
                                         pList.Add(sPlanner[0], CreatePlannerDef(sPlanner[1], "/_layouts/epmlive/images/planner16.png", true, "ListEPMLivePlanner", desc, 1, "planner:"));
                                     }
-                                    else if(list.Title == oTC.Title)
+                                    else if (list.Title == oTC.Title)
                                     {
                                         pList.Add(sPlanner[0], CreatePlannerDef(sPlanner[1], "/_layouts/epmlive/images/planner16.png", true, "ListEPMLiveTaskPlanner", desc, 1, "taskplanner:"));
                                     }
@@ -471,18 +471,18 @@ namespace EPMLiveCore
                         }
                     }
 
-                    if(!foundpj && li.ParentList.Title == "Project Center")
+                    if (!foundpj && li.ParentList.Title == "Project Center")
                     {
-                        if(lweb.Lists.TryGetList("Planner Templates") == null)
+                        if (lweb.Lists.TryGetList("Planner Templates") == null)
                         {
                             pList.Add("MPP", CreatePlannerDef("Microsoft Office Project", "/_layouts/epmlive/images/planner16.png", true, "ListEPMLivePlanner", "", 1, "planner:"));
                         }
                     }
 
-                    if(!bDisablePlan)
+                    if (!bDisablePlan)
                     {
                         //================Old Work planner===============
-                        if(web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
+                        if (web.Site.Features[new Guid("91f0c887-2db2-44b2-b15c-47c69809c767")] != null)
                         {
                             bool enableWP = false;
                             string spc = EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLiveWPProjectCenter");
@@ -493,7 +493,7 @@ namespace EPMLiveCore
                             }
                             catch { }
 
-                            if(enableWP && web.Lists.TryGetList(spc) != null && web.Lists.TryGetList(stc) != null && String.Equals(spc, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                            if (enableWP && web.Lists.TryGetList(spc) != null && web.Lists.TryGetList(stc) != null && String.Equals(spc, list.Title, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 pList.Add("WorkEngineWorkPlanner", CreatePlannerDef("Work Planner", "/_layouts/images/epmlivelogosmall.gif", true, "PlannerWP", "WorkEngine Work Planner", 3, ""));
                             }
@@ -508,7 +508,7 @@ namespace EPMLiveCore
                         }
                         catch { }
 
-                        if(enableAgile && web.Lists.TryGetList(spca) != null && web.Lists.TryGetList(stca) != null && String.Equals(spca, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                        if (enableAgile && web.Lists.TryGetList(spca) != null && web.Lists.TryGetList(stca) != null && String.Equals(spca, list.Title, StringComparison.InvariantCultureIgnoreCase))
                         {
                             pList.Add("WorkEngineAgilePlanner", CreatePlannerDef("Agile Planner", "/_layouts/images/epmlivelogosmall.gif", true, "PlannerAgile", "WorkEngine Agile Planner", 3, ""));
                         }
@@ -519,10 +519,10 @@ namespace EPMLiveCore
                     bool disableProject = false;
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out disableProject);
 
-                    if(!disableProject)
+                    if (!disableProject)
                     {
                         string pubPC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-pc", false);
-                        if(String.Equals(pubPC, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                        if (String.Equals(pubPC, list.Title, StringComparison.InvariantCultureIgnoreCase))
                         {
                             string pubTC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "epmlivepub-tc", false);
                             bool foundmpp = false;
@@ -530,14 +530,14 @@ namespace EPMLiveCore
                             try
                             {
                                 SPDocumentLibrary lib = (SPDocumentLibrary)web.Lists["Project Schedules"];
-                                if(lib != null)
+                                if (lib != null)
                                 {
-                                    if(lib.ContentTypesEnabled)
+                                    if (lib.ContentTypesEnabled)
                                     {
-                                        foreach(SPContentType ct in lib.ContentTypes)
+                                        foreach (SPContentType ct in lib.ContentTypes)
                                         {
                                             string template = ct.DocumentTemplateUrl;
-                                            if(template.Substring(template.Length - 3, 3) == "mpp")
+                                            if (template.Substring(template.Length - 3, 3) == "mpp")
                                             {
                                                 foundmpp = true;
                                                 break;
@@ -547,7 +547,7 @@ namespace EPMLiveCore
                                     else
                                     {
                                         string template = lib.DocumentTemplateUrl;
-                                        if(template.Substring(template.Length - 3, 3) == "mpp")
+                                        if (template.Substring(template.Length - 3, 3) == "mpp")
                                         {
                                             foundmpp = true;
                                         }
@@ -555,9 +555,9 @@ namespace EPMLiveCore
                                 }
                             }
                             catch { }
-                            if(foundmpp)
+                            if (foundmpp)
                             {
-                                if(web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
+                                if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null)
                                 {
                                     pList.Add("EditInMicrosoftProject", CreatePlannerDef("Microsoft Project", "/_layouts/images/Project2007LogoSmall.gif", true, "EditInProject", "Edit Schedule in Microsoft Office Project", 2, ""));
                                 }
@@ -652,7 +652,7 @@ namespace EPMLiveCore
             {
                 username = GetJustUsername(username);
 
-                if(!username.Contains("\\"))
+                if (!username.Contains("\\"))
                     username = getMainDomain() + "\\" + username;
             }
             catch { }
@@ -854,7 +854,7 @@ namespace EPMLiveCore
             }
             catch
             {
-                
+
             }
             return daysoverdue;
         }
@@ -1163,7 +1163,7 @@ namespace EPMLiveCore
                     {
                         dqFields += "<FieldRef Name='ParentItem' Nullable='TRUE'/>";
                     }
-                    if(!arr.Contains("workspaceurl"))
+                    if (!arr.Contains("workspaceurl"))
                     {
                         dqFields += "<FieldRef Name='WorkspaceUrl' Nullable='TRUE'/>";
                     }
@@ -1493,6 +1493,92 @@ namespace EPMLiveCore
             return cn;
         }
 
+        public static string getReportingConnectionString(Guid gWebApp, Guid siteId)
+        {
+            string cn = "";
+            string dbServer = string.Empty;
+            string dbName = string.Empty;
+            string userName = string.Empty;
+            string pw = string.Empty;
+            bool isSAAcct = false;
+
+            using (SqlConnection con = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(gWebApp)))
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = "SELECT * FROM RPTDatabases WHERE SiteId = @siteId";
+                cmd.Parameters.AddWithValue("@siteId", siteId);
+                cmd.Connection = con;
+                DataTable dt = GetTable(cmd);
+                con.Close();
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    DataRow dr = dt.Rows[0];
+                    isSAAcct = bool.Parse(dr["SAccount"].ToString());
+                    dbServer = dr["DatabaseServer"].ToString();
+                    dbName = dr["DatabaseName"].ToString();
+                    userName = dr["Username"].ToString();
+                    pw = dr["Password"].ToString();
+                }
+            }
+
+            if (!isSAAcct)
+                cn = string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", dbServer, dbName).Replace("'", "");
+            else
+                cn = string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", dbServer, dbName, userName, Decrypt(pw)).Replace("'", "");
+
+            return cn;
+        }
+
+        static private DataTable GetTable(SqlCommand cmd)
+        {
+            SqlDataAdapter da;
+            var dt = new DataTable();
+            try
+            {
+                da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+                da.Dispose();
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+
+            }
+
+            return dt;
+        }
+
+        /// <summary>
+        /// Decrpyts string value using key.
+        /// </summary>
+        /// <param name="base64Text"></param>
+        /// <returns></returns>
+        static public string Decrypt(string base64Text)
+        {
+            try
+            {
+                byte[] Buffer = new byte[0];
+                string Key = "EPMLIVE";
+                System.Security.Cryptography.TripleDESCryptoServiceProvider DES = new System.Security.Cryptography.TripleDESCryptoServiceProvider();
+                System.Security.Cryptography.MD5CryptoServiceProvider hashMD5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                DES.Key = hashMD5.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(Key));
+                DES.Mode = System.Security.Cryptography.CipherMode.ECB;
+                System.Security.Cryptography.ICryptoTransform DESDecrypt = DES.CreateDecryptor();
+                Buffer = Convert.FromBase64String(base64Text);
+
+                string DecTripleDES = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
+                return DecTripleDES;
+            }
+            catch (Exception ex)
+            {
+                return base64Text;
+            }
+        }
+
         public static bool setConnectionString(Guid gWebApp, string cn, out string sError)
         {
             sError = "";
@@ -1566,7 +1652,7 @@ namespace EPMLiveCore
 
         }
 
-        public static string getListSetting(string setting,SPList list)
+        public static string getListSetting(string setting, SPList list)
         {
             if (list == null)
                 return "";
@@ -1835,6 +1921,285 @@ namespace EPMLiveCore
                 return "0:" + sUrl;
             }
             catch (Exception ex) { return ex.Message.ToString(); }
+        }
+
+        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, SPWeb mySite, out Guid createdSiteId, out string createdSiteUrl, out string createdWebTitle)
+        {
+            createdSiteId = Guid.Empty;
+            createdSiteUrl = string.Empty;
+            createdWebTitle = string.Empty;
+            try
+            {
+                string sUrl = "";
+
+                SPWeb web = mySite.Webs.Add(url, title, "", 1033, template, unique, false);
+                createdSiteId = web.ID;
+                createdSiteUrl = web.Url;
+                createdWebTitle = web.Title;
+
+                if (web.Navigation.TopNavigationBar != null)
+                {
+                    web.Navigation.TopNavigationBar.Navigation.UseShared = toplink;
+                }
+
+                web.AllowUnsafeUpdates = true;
+
+                web.Update();
+
+                API.Applications.GenerateQuickLaunchFromApp(web);
+
+                string strEPMLiveGroupsPermAssignments = "";
+                if (unique)
+                {
+                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    {
+                        using (SPSite s = new SPSite(web.Url))
+                        {
+                            using (SPWeb w = s.OpenWeb())
+                            {
+                                Dictionary<string, SPRoleType> groups = Security.AddBasicSecurityToWorkspace(w, w.Title, w.AllUsers[user]);
+                                strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(w, "EPMLiveGroupsPermAssignments");
+                            }
+                        }
+                    });
+
+                    if (strEPMLiveGroupsPermAssignments.Length > 1)
+                    {
+
+                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
+                        foreach (string strInner in strOuter)
+                        {
+                            string[] strInnerMost = strInner.Split('~');
+                            SPGroup spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
+
+                            //Persist groups & permissions to the database
+                            if (spGroup != null)
+                            {
+                                SPRoleAssignment spRA = new SPRoleAssignment(spGroup);
+                                spRA.RoleDefinitionBindings.Add(web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
+                                web.RoleAssignments.Add(spRA);
+                            }
+                        }
+                    }
+
+                    web.Update();
+
+                }
+                sUrl = web.Url;
+                web.Close();
+                return "0:" + sUrl;
+            }
+            catch (Exception ex) { return "1:" + ex.Message.ToString(); }
+        }
+
+        public static string createSiteFromItem(string title, string url, string template, string user, bool unique, bool toplink,
+            SPWeb parentWeb, SPWeb itemWeb, Guid listId, int itemId, out Guid createdSiteId, out string createdSiteUrl, out string createdWebTitle)
+        {
+            createdSiteId = Guid.Empty;
+            createdSiteUrl = string.Empty;
+            createdWebTitle = string.Empty;
+            try
+            {
+                string sUrl = "";
+                //string user = HttpContext.Current.User.Identity.Name.ToString();
+                //
+                {
+                    SPWeb web = parentWeb.Webs.Add(url, title, "", 1033, template, unique, false);
+                    createdSiteId = web.ID;
+                    createdSiteUrl = web.Url;
+                    createdWebTitle = web.Title;
+
+                    if (web.Navigation.TopNavigationBar != null)
+                    {
+                        web.Navigation.TopNavigationBar.Navigation.UseShared = toplink;
+                    }
+
+                    web.AllowUnsafeUpdates = true;
+
+                    web.Update();
+
+                    API.Applications.GenerateQuickLaunchFromApp(web);
+
+                    if (unique)
+                    {
+                        int iowner = 0;
+                        int imember = 0;
+                        int ivisitor = 0;
+
+                        string strEPMLiveGroupsPermAssignments = "";
+
+
+                        List<int> owners = new List<int>();
+                        List<int> members = new List<int>();
+                        List<int> visitors = new List<int>();
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            using (SPSite es = new SPSite(itemWeb.Site.ID))
+                            {
+                                using (SPWeb ew = es.OpenWeb(itemWeb.ID))
+                                {
+                                    SPList itemList = ew.Lists[listId];
+                                    SPListItem item = itemList.GetItemById(itemId);
+
+                                    SPRoleAssignmentCollection raColl = item.RoleAssignments;
+                                    iowner = (from SPRoleAssignment owner in raColl
+                                              where owner.Member.Name.Contains(title + " Owner")
+                                              select owner.Member.ID).FirstOrDefault<int>();
+                                    owners = (from SPRoleAssignment owner in raColl
+                                              where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Administrator))
+                                              select owner.Member.ID).ToList<int>();
+                                    imember = (from SPRoleAssignment owner in raColl
+                                               where owner.Member.Name.Contains(title + " Member")
+                                               select owner.Member.ID).ToList<int>()[0];
+                                    members = (from SPRoleAssignment owner in raColl
+                                               where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Contributor))
+                                               select owner.Member.ID).ToList<int>();
+                                    ivisitor = (from SPRoleAssignment owner in raColl
+                                                where owner.Member.Name.Contains(title + " Visitor")
+                                                select owner.Member.ID).ToList<int>()[0];
+                                    visitors = (from SPRoleAssignment owner in raColl
+                                                where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Reader))
+                                                select owner.Member.ID).ToList<int>();
+                                }
+                            }
+                        });
+                        SPUser ownerByCreation = web.AllUsers[user];
+
+                        web.Update();
+                        SPMember newOwner = null;
+                        //=========Owner Group========================
+                        SPRole roll = web.Roles["Full Control"];
+                        if (iowner != 0)
+                        {
+                            try
+                            {
+                                web.AssociatedOwnerGroup = web.SiteGroups.GetByID(iowner);
+                                roll.AddGroup(web.SiteGroups.GetByID(iowner));
+                                newOwner = web.SiteGroups.GetByID(iowner);
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            string finalGroupName = string.Empty;
+                            try
+                            {
+                                if (newOwner == null)
+                                    newOwner = ownerByCreation;
+
+                                finalGroupName = AddGroup(web, title, "Administrators", newOwner, ownerByCreation, "");
+                            }
+                            catch (Exception) { }
+                            web.Update();
+                            web.AssociatedOwnerGroup = GetSiteGroup(web, finalGroupName);
+                            roll.AddGroup(web.SiteGroups[finalGroupName]);
+                            newOwner = web.SiteGroups[finalGroupName];
+                        }
+                        if (newOwner == null)
+                            newOwner = ownerByCreation;
+
+                        if (owners.Count() > 0)
+                        {
+                            foreach (int id in owners)
+                            {
+                                roll.AddGroup(web.SiteGroups.GetByID(id));
+                            }
+                            web.Update();
+                        }
+                        //=========Member Group========================
+                        if (imember != 0)
+                        {
+                            try
+                            {
+                                web.AssociatedMemberGroup = web.SiteGroups.GetByID(imember);
+                                roll = web.Roles["Contribute"];
+                                roll.AddGroup(web.SiteGroups.GetByID(imember));
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            string finalGroupName = string.Empty;
+                            try
+                            {
+                                finalGroupName = AddGroup(web, title, "Members", newOwner, ownerByCreation, "");
+                            }
+                            catch (Exception) { }
+                            web.Update();
+                            web.AssociatedMemberGroup = GetSiteGroup(web, finalGroupName);
+                            roll = web.Roles["Contribute"];
+                            roll.AddGroup(web.SiteGroups[finalGroupName]);
+                        }
+
+                        if (members.Count() > 0)
+                        {
+                            foreach (int id in members)
+                            {
+                                roll.AddGroup(web.SiteGroups.GetByID(id));
+                            }
+                            web.Update();
+                        }
+                        //=========Visitor Group========================
+                        if (ivisitor != 0)
+                        {
+                            try
+                            {
+                                web.AssociatedVisitorGroup = web.SiteGroups.GetByID(ivisitor);
+                                roll = web.Roles["Read"];
+                                roll.AddGroup(web.SiteGroups.GetByID(ivisitor));
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            string finalGroupName = string.Empty;
+                            try
+                            {
+                                finalGroupName = AddGroup(web, title, "Visitors", newOwner, ownerByCreation, "");
+                            }
+                            catch (Exception) { }
+                            web.Update();
+                            web.AssociatedVisitorGroup = GetSiteGroup(web, finalGroupName);
+                            roll = web.Roles["Read"];
+                            roll.AddGroup(web.SiteGroups[finalGroupName]);
+                        }
+
+                        if (visitors.Count() > 0)
+                        {
+                            foreach (int id in visitors)
+                            {
+                                roll.AddGroup(web.SiteGroups.GetByID(id));
+                            }
+                        }
+                        web.Update();
+
+                        if (strEPMLiveGroupsPermAssignments.Length > 1)
+                        {
+                            string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
+                            foreach (string strInner in strOuter)
+                            {
+                                string[] strInnerMost = strInner.Split('~');
+                                SPGroup spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
+
+                                //Persist groups & permissions to the database
+                                if (spGroup != null)
+                                {
+                                    SPRoleAssignment spRA = new SPRoleAssignment(spGroup);
+                                    spRA.RoleDefinitionBindings.Add(web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
+                                    web.RoleAssignments.Add(spRA);
+                                }
+                            }
+                        }
+                        web.Update();
+
+                    }
+                    sUrl = web.Url;
+                    web.Close();
+                }
+
+                return "0:" + sUrl;
+            }
+            catch (Exception ex) { return "1:" + ex.Message.ToString(); }
         }
 
         public static string AddGroup(SPWeb web, string safeSiteTitle, string roleName, SPMember owner, SPUser defaultUser, string groupDescription)
@@ -2446,10 +2811,10 @@ namespace EPMLiveCore
                 catch { }
             });
 
-            if(_chrono != null)
+            if (_chrono != null)
             {
-                ArrayList arr = _chrono.UserList;;
-                if(arr.Count == 1 && arr[0].ToString() == "")
+                ArrayList arr = _chrono.UserList; ;
+                if (arr.Count == 1 && arr[0].ToString() == "")
                     arr = new ArrayList();
                 return arr;
             }

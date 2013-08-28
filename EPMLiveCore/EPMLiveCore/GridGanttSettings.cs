@@ -29,6 +29,9 @@ namespace EPMLiveCore
         public string NewMenuName = "";
         public bool UsePopup = false;
         public bool EnableRequests = false;
+        public bool EnableAutoCreation = false;
+        public string AutoCreationTemplateId = "";
+        public string WorkspaceParentSiteLookup = "";
         public bool EnableWorkList = false;
         public bool SendEmails = false;
         public bool DeleteRequest = false;
@@ -39,6 +42,7 @@ namespace EPMLiveCore
         public bool LockSearch = false;
         public bool AssociatedItems = false;
         public bool DisplayFormRedirect = false;
+
 
         public string DisplaySettings = "";
         public bool EnableResourcePlan = false;
@@ -79,7 +83,8 @@ namespace EPMLiveCore
             bool.TryParse(CoreFunctions.getListSetting("EnableResourcePlan", list), out EnableResourcePlan);
             TotalSettings = CoreFunctions.getListSetting("TotalSettings", list);
 
-            try{StartDate = settings[0];}catch{}
+            try { StartDate = settings[0]; }
+            catch { }
             try { DueDate = settings[1]; }
             catch { }
             try { Progress = settings[2]; }
@@ -146,7 +151,13 @@ namespace EPMLiveCore
             catch { }
             try { BuildTeamPermissions = settings[33]; }
             catch { }
-             try { EnableContentReporting = bool.Parse(settings[34]); }
+            try { EnableContentReporting = bool.Parse(settings[34]); }
+            catch { }
+            try { EnableAutoCreation = bool.Parse(settings[35]); }
+            catch { }
+            try { AutoCreationTemplateId = settings[36]; }
+            catch { }
+            try { WorkspaceParentSiteLookup = settings[37]; }
             catch { }
 
         }
@@ -188,7 +199,10 @@ namespace EPMLiveCore
             data += BuildTeam.ToString() + "\n";
             data += BuildTeamSecurity.ToString() + "\n";
             data += BuildTeamPermissions + "\n";
-            data += EnableContentReporting.ToString();
+            data += EnableContentReporting.ToString() + "\n";
+            data += EnableAutoCreation.ToString() + "\n";
+            data += AutoCreationTemplateId + "\n";
+            data += WorkspaceParentSiteLookup + "\n";
 
             return data;
         }

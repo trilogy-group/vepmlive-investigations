@@ -918,6 +918,42 @@ namespace EPMLiveCore
             }
         }
 
+        /// <summary>
+        /// Queues up the job to create workspace
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="oWeb"></param>
+        /// <returns></returns>
+        public static string QueueCreateWorkspace(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(WorkspaceTimerjobAgent.QueueCreateWorkspace(data));
+            }
+            catch (Exception e)
+            {
+                return Response.Failure(8001, e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get all market apps
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="oWeb"></param>
+        /// <returns></returns>
+        public static string GetAllMarketAppsInJSON(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(SolLibTemplatesManager.CreateWorkspace(data));
+            }
+            catch (Exception e)
+            {
+                return Response.Failure(8002, e.Message);
+            }
+        }
+
         #endregion
 
         #region Comment Methods

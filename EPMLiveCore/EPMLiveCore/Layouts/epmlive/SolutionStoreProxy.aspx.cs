@@ -87,6 +87,9 @@ namespace EPMLiveCore
                 case "GetList":
                     List_GetList_InJSON();
                     break;
+                case "GetListItemsInXML":
+                    List_GetListItems_InXml();
+                    break;
                 default:
                     break;
             }
@@ -164,6 +167,59 @@ namespace EPMLiveCore
             {
                 Response.Write(HttpUtility.HtmlEncode(JSONUtil.ConvertXmlToJson(SimplifySPGetListItemsXml(data), "")));
             }
+        }
+
+        private void List_GetListItems_InXml()
+        {
+            // link to web service documentation
+            // http://msdn.microsoft.com/en-us/library/lists.lists.getlistitems%28v=office.12%29.aspx
+
+            System.Xml.XmlNode data = null;
+            string listName = _dataManager.GetPropVal("ListName");
+            string viewName = _dataManager.GetPropVal("ViewName");
+
+            XmlDocument xDoc = new XmlDocument();
+
+            // create query param
+            XmlNode ndQuery = xDoc.CreateNode(XmlNodeType.Element, "Query", "");
+            ndQuery.InnerXml = _dataManager.GetPropVal("Query");
+
+            // create view fields param
+            XmlNode ndViewFields = xDoc.CreateNode(XmlNodeType.Element, "ViewFields", "");
+            ndViewFields.InnerXml = _dataManager.GetPropVal("ViewFields");
+
+            string rowLimit = _dataManager.GetPropVal("RowLimit");
+
+            // create query options param
+            XmlNode ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
+            string queryOptions = _dataManager.GetPropVal("QueryOptions");
+            queryOptions = !string.IsNullOrEmpty(queryOptions) ? queryOptions.Replace(@"\\", @"\") : string.Empty;
+            //ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<queryOptions xmlns:SOAPSDK9=\"http://schemas.microsoft.com/sharepoint/soap/\" ><QueryOptions/></queryOptions>";
+
+            ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
+            string webId = _dataManager.GetPropVal("WebID");
+
+            using (WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists())
+            {
+                // TODO: write a function to get user name and password 
+                listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
+                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                try
+                {
+                    System.Net.ServicePointManager.ServerCertificateValidationCallback =
+                    ((sender, certificate, chain, sslPolicyErrors) => true);
+
+                    data = listSvc.GetListItems(listName, null, ndQuery, null, rowLimit, ndQueryOptions, null);
+                }
+                catch (Exception x)
+                {
+                    Response.Write("{ error : \"" + x.Message + "\" }");
+                    return;
+                }
+            }
+
+            Response.Write(SimplifySPGetListItemsXml(data));
         }
 
         private void List_GetList_InXml(bool inJSON)
@@ -436,45 +492,5 @@ namespace EPMLiveCore
         }
     }
 
-    internal class XMLDataManager
-    {
-        XDocument dataXml = null;
-
-        public XMLDataManager(string xml)
-        {
-            if (!string.IsNullOrEmpty(xml))
-            {
-                dataXml = XDocument.Parse(xml);
-            }
-        }
-
-        public string GetPropVal(string propName)
-        {
-            string propVal = string.Empty;
-
-            if (dataXml != null)
-            {
-                XElement element = dataXml.Elements("Data")
-                    .Elements("Param")
-                    .FirstOrDefault(el => el.Attribute("key").Value == propName);
-
-                if (element != null)
-                {
-                    propVal = element.Value;
-                }
-            }
-
-            return propVal;
-        }
-
-        public void EditProp(string key, string value)
-        {
-            if (dataXml != null)
-            {
-                XElement newEl = new XElement("Param", value);
-                newEl.SetAttributeValue("key", key);
-                dataXml.Add(newEl);
-            }
-        }
-    }
+    
 }

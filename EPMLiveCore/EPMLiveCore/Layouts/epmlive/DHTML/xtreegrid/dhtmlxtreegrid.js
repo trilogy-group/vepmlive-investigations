@@ -616,7 +616,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
         weburl += "&planner=" + taskplanner;
 
     if (action == "createworkspace" && this._hasTemplateList) {
-        newAppPopup(listid, itemid);
+        CreateEPMLiveWorkspace(listid, itemid);
     }
     else if (actiontype == "99") {
         if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {

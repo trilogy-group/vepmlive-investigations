@@ -55,7 +55,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected DataTable dtGroupsPermissions = new DataTable();
 
         const string REPORT_CHECK_URL = "/_layouts/epmlive/ReportCheckActions.aspx";
-        
+
         private string GetGroupsPermissionsAssignment()
         {
             StringBuilder sbGroupsPermissions = new StringBuilder();
@@ -269,6 +269,36 @@ namespace EPMLiveCore.Layouts.epmlive
                     txtNewMenuName.Text = gSettings.NewMenuName;
                     chkUsePopup.Checked = gSettings.UsePopup;
                     chkEnableRequests.Checked = gSettings.EnableRequests;
+                    chkAutoCreate.Checked = gSettings.EnableAutoCreation;
+                    ddlAutoCreateTemplate.DataSource = GetAvailableDefaultTemps();
+                    ddlAutoCreateTemplate.DataTextField = "Key";
+                    ddlAutoCreateTemplate.DataValueField = "Value";
+                    ddlAutoCreateTemplate.DataBind();
+                    ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
+
+                    //fill parentsitelookup ddl
+                    ddlParentSiteLookup.Items.Add(new ListItem("None", "None"));
+                    string[] LookupArray = gSettings.Lookups.Split('|');
+                    foreach (string sLookup in LookupArray)
+                    {
+                        if (sLookup != "")
+                        {
+                            string[] sLookupInfo = sLookup.Split('^');
+                            string fldName = sLookupInfo[0];
+                            SPField fld = null;
+                            if (!string.IsNullOrEmpty(fldName))
+                            {
+                                try{
+                                    fld = list.Fields.GetFieldByInternalName(fldName);
+                                }catch{}
+                            }
+                            if (fld != null)
+                            {
+                                ddlParentSiteLookup.Items.Add(new ListItem(fldName, fldName));
+                            }
+                        }
+                    }
+                    ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
                     chkWorkListFeat.Checked = gSettings.EnableWorkList;
                     chkEmails.Checked = gSettings.SendEmails;
                     chkDeleteRequest.Checked = gSettings.DeleteRequest;
@@ -333,7 +363,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                     ArrayList lists = new ArrayList(CoreFunctions.getConfigSetting(rootWeb, "EPMLiveTSLists").Replace("\r\n", "\n").Split('\n')); ;
 
-                    if(lists.Contains(list.Title))
+                    if (lists.Contains(list.Title))
                     {
                         chkTimesheet.Checked = true;
                     }
@@ -365,6 +395,27 @@ namespace EPMLiveCore.Layouts.epmlive
             }
         }
 
+
+        private Dictionary<string, int> GetAvailableDefaultTemps()
+        {
+            Dictionary<string, int> result = new Dictionary<string, int>();
+            result.Add("None", -1);
+            SPQuery getAllItemsQuery = new SPQuery();
+            getAllItemsQuery.Query = "<Where><Eq><FieldRef Name='Active' /><Value Type='Bool'>True</Value></Eq></Where><OrderBy><FieldRef Name=\"Title0\" Ascending=\"True\" /></OrderBy>";
+            SPList tmpGalList = SPContext.Current.Web.Lists.TryGetList("Template Gallery");
+            SPListItemCollection templates = tmpGalList.GetItems(getAllItemsQuery);
+            foreach (SPListItem template in templates)
+            {
+                // the templatetype is not matching, skip this template
+                if (template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id] != null &&
+                    template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id].ToString().Trim().Equals("workspace", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    result.Add(template["Description"].ToString(), template.ID);
+                }
+            }
+
+            return result;
+        }
 
         private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, List<SPEventReceiverType> types)
         {
@@ -930,6 +981,10 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.BuildTeamSecurity = chkEnableTeamSecurity.Checked;
             gSettings.BuildTeamPermissions = GetGroupsPermissionsAssignment();
             gSettings.EnableContentReporting = chkContentReporting.Checked;
+            gSettings.EnableAutoCreation = chkAutoCreate.Checked;
+            gSettings.AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue.ToString();
+            gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
+            
             gSettings.SaveSettings();
 
             if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)
@@ -1050,7 +1105,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 evtAdded.Update();
                 list.Update();
             }
-            else 
+            else
             {
                 string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                 string className = "EPMLiveCore.ItemEnableTeamEvent";
@@ -1067,7 +1122,46 @@ namespace EPMLiveCore.Layouts.epmlive
                 list.Update();
             }
 
-            if(chkTimesheet.Checked)
+            // attached workspace auto creation event
+            if (chkAutoCreate.Checked)
+            {
+                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                string className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+
+                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
+                                                                     assemblyName,
+                                                                     className,
+                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
+                foreach (SPEventReceiverDefinition evt in evts)
+                {
+                    evt.Delete();
+                }
+
+                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
+                evtAdded.Type = SPEventReceiverType.ItemAdded;
+                evtAdded.Assembly = assemblyName;
+                evtAdded.Class = className;
+                evtAdded.Update();
+                list.Update();
+            }
+            else
+            {
+                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                string className = "EPMLiveCore.ItemWorkspaceEventReceiver";
+
+                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
+                                                                     assemblyName,
+                                                                     className,
+                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
+                foreach (SPEventReceiverDefinition evt in evts)
+                {
+                    evt.Delete();
+                }
+
+                list.Update();
+            }
+
+            if (chkTimesheet.Checked)
                 API.ListCommands.EnableTimesheets(list, web);
             else
                 API.ListCommands.DisableTimesheets(list, web);

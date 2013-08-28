@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using EPMLiveReportsAdmin;
 using System.Threading;
+using EPMLiveCore.API;
 
 namespace EPMLiveCore.Jobs
 {
@@ -15,9 +16,7 @@ namespace EPMLiveCore.Jobs
         public void execute(SPSite site, SPWeb web, Guid ListId, int ItemId, int userid, string data)
         {
             SPList list = web.Lists[ListId];
-
             SPListItem li = list.GetItemById(ItemId);
-
             GridGanttSettings settings = new GridGanttSettings(list);
 
 
@@ -36,58 +35,6 @@ namespace EPMLiveCore.Jobs
                 string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
 
                 web.AllowUnsafeUpdates = true;
-
-                //#region ADD ITEM CREATOR TO TEAM BY DEFAULT
-
-                //SPFieldLookup assignedTo = null;
-                //try
-                //{
-                //    assignedTo = list.Fields.GetFieldByInternalName("AssignedTo") as SPFieldLookup;
-                //}
-                //catch { }
-
-                //object assignedToFv = null;
-                //string sAssignedTo = string.Empty;
-                //try
-                //{
-                //    assignedToFv = li["AssignedTo"];
-                //}
-                //catch { }
-                //if(assignedToFv != null)
-                //{
-                //    sAssignedTo = assignedToFv.ToString();
-                //}
-
-                //SPFieldUserValueCollection uCol = new SPFieldUserValueCollection();
-
-                //if(!string.IsNullOrEmpty(sAssignedTo))
-                //{
-                //    uCol = new SPFieldUserValueCollection(web, sAssignedTo);
-                //}
-
-                //if(assignedTo != null)
-                //{
-                //    if(assignedTo.AllowMultipleValues)
-                //    {
-                //        uCol.Add(new SPFieldUserValue(web, orignalUser.ID, orignalUser.LoginName));
-                //        li["AssignedTo"] = uCol;
-                //    }
-                //    else
-                //    {
-                //        li["AssignedTo"] = new SPFieldUserValue(web, orignalUser.ID, orignalUser.LoginName);
-                //    }
-
-                //    try
-                //    {
-                //        li.SystemUpdate();
-                //    }
-                //    catch(Exception e)
-                //    {
-                //    }
-
-                //}
-
-                //#endregion
 
                 // step 1 perform actions related to "parent item"
                 // ===============================================
@@ -232,8 +179,17 @@ namespace EPMLiveCore.Jobs
             }
 
             ProcessSecurity(site, list, li);
-        }
 
+            // we wait until all groups have been created to createworkspace
+            // only if there isn't a current process creating ws 
+            if (WorkspaceData.IsFirstAttempt(site, web, list.ID.ToString(), li.ID.ToString()) &&
+                settings.EnableAutoCreation && 
+                settings.AutoCreationTemplateId != "-1" )
+            {  
+                QueueCreateWSJob(site, web, list, li, settings, userid);
+            }
+        }
+     
         private void ProcessSecurity(SPSite site, SPList list, SPListItem li)
         {
 
@@ -416,6 +372,39 @@ namespace EPMLiveCore.Jobs
             }
 
             return result;
+        }
+
+        private void QueueCreateWSJob(SPSite site, SPWeb web, SPList list, SPListItem li, GridGanttSettings settings, int userid)
+        {
+            string _creationParams = string.Empty;
+            string _createFromLiveTemp = string.Empty;
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                using (SPSite s = new SPSite(site.ID))
+                {
+                    using (SPWeb lockedWeb = s.OpenWeb(CoreFunctions.getLockedWeb(web)))
+                    {
+                        _createFromLiveTemp = CoreFunctions.getConfigSetting(lockedWeb, "EPMLiveUseLiveTemplates");
+                    }
+                }
+            });
+            _creationParams = "<Data>" +
+                                    "<Param key=\"IsStandAlone\">false</Param>" +
+                                    "<Param key=\"TemplateSource\">downloaded</Param>" +
+                                    "<Param key=\"TemplateItemId\">" + settings.AutoCreationTemplateId + "</Param>" +
+                                    "<Param key=\"IncludeContent\">True</Param>" +
+                                    "<Param key=\"SiteTitle\">" + li.Title + "</Param>" +
+                                    "<Param key=\"AttachedItemId\">" + li.ID.ToString() + "</Param>" +
+                                    "<Param key=\"AttachedItemListGuid\">" + list.ID.ToString() + "</Param>" +
+                                    "<Param key=\"WebUrl\">" + web.Url + "</Param>" +
+                                    "<Param key=\"WebId\">" + web.ID.ToString() + "</Param>" +
+                                    "<Param key=\"SiteId\">" + site.ID.ToString() + "</Param>" +
+                                    "<Param key=\"CreatorId\">" + userid.ToString() + "</Param>" +
+                                    "<Param key=\"CreateFromLiveTemp\">" + _createFromLiveTemp + "</Param>" +
+                                    "<Param key=\"UniquePermission\">" + li.HasUniqueRoleAssignments.ToString() + "</Param>" +
+                                "</Data>";
+
+            WorkspaceTimerjobAgent.QueueCreateWorkspace(_creationParams);
         }
     }
 }
