@@ -4234,14 +4234,14 @@
 
 	 
 
-	            if (this.CSDataCache == null) {
+	  //          if (this.CSDataCache == null) {
 
 	                WorkEnginePPM.Model.GetClientSideCalcData(this.TicketVal, GetClientSideCalcDataCompleteDelegate);
-	            }
-	            else {
+	  //          }
+	  //          else {
 
-	                WorkEnginePPM.Model.PrepareTargetData(this.TicketVal, this.EditTargetid, GetTargetDataCompleteDelegate);
-	            }
+	  //              WorkEnginePPM.Model.PrepareTargetData(this.TicketVal, this.EditTargetid, GetTargetDataCompleteDelegate);
+	   //         }
 
 	        }
 	        else
@@ -4288,9 +4288,30 @@
 	Model.prototype.GetClientSideCalcDataComplete = function (result) {
 		this.CSDataCache = result;
 		
-		WorkEnginePPM.Model.PrepareTargetData(this.TicketVal, this.EditTargetid, GetTargetDataCompleteDelegate);
+		WorkEnginePPM.Model.ExecuteJSON(this.TicketVal,"GetFTEMode",  "", FireupEditTargetDelegate);
 	}
 
+	Model.prototype.FireupEditTarget = function (jsonString) {
+		
+      try {
+            this.RetFTEMode = "0";
+
+            if (jsonString != "") {
+                var jsonObject = JSON_ConvertString(jsonString);
+                if (JSON_ValidateServerResult(jsonObject)) {
+
+                    this.RetFTEMode = jsonObject.Result.Mode.Value;
+
+                }
+            }
+        }
+
+        catch (e) {
+
+        }
+
+		WorkEnginePPM.Model.PrepareTargetData(this.TicketVal, this.EditTargetid, GetTargetDataCompleteDelegate);
+	}
 
 	Model.prototype.GetTargetDataComplete = function (result) {
 
@@ -4326,7 +4347,7 @@
                             {
                                 items: [
                                     { type: "text", name: "Display Mode" },
-                                    { type: "select", id: "idEdit_SelMode", onchange: "etdialogEvent('Edit_SelMode_Changed')", options: "<option value='1'>Hours</option><option value='2'>FTEs</option>", width: "90px" }
+                                    { type: "select", id: "idEdit_SelMode", onchange: "etdialogEvent('Edit_SelMode_Changed')", options: "<option " + (this.RetFTEMode == "0" ? "SELECTED" : "") + "  value='1'>Hours</option><option " + (this.RetFTEMode != "0" ? "SELECTED" : "") + " value='2'>FTEs</option>", width: "90px" }
                                 ]
                             }
                         ]
@@ -4354,9 +4375,10 @@
 
 
         this.EditTab = new Ribbon(TarRibonData);
-	    this.EditTab.Render();
+        this.EditTab.Render();
 
-//	    this.ettoolbar = new dhtmlXToolbarObject(this.toolbarEditTargetData);
+
+ //	    this.ettoolbar = new dhtmlXToolbarObject(this.toolbarEditTargetData);
 //	    this.ettoolbar.attachEvent("onClick", ettoolbarOnClickDelegate);
 
 //	    this.ettoolbar.hideItem("etQTYBtn");
@@ -5604,6 +5626,8 @@
 
 		var GetClientSideCalcDataCompleteDelegate = MakeDelegate(this, this.GetClientSideCalcDataComplete);
 		var GetTargetDataCompleteDelegate =  MakeDelegate(this, this.GetTargetDataComplete);
+		var FireupEditTargetDelegate = MakeDelegate(this, this.FireupEditTarget);
+        
 		this.CSDataCache = null;
 		var GridsOnClickCellDelegate = MakeDelegate(this, this.GridsOnClickCell);
 

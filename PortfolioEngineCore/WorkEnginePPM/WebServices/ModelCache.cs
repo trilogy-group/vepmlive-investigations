@@ -4133,8 +4133,7 @@ namespace ModelDataCache
                 if (versions != "")
                     LoadScenarios(oDataAccess, versions, false, true);
 
-                oDataAccess = null;
-
+                
                 m_allow_grouping = (m_PI_Group_fid != 0 && m_PI_Seq_fid != 0);
 
                 m_allow_grouping = false;
@@ -4143,7 +4142,11 @@ namespace ModelDataCache
                     m_lowlevelDataCount = (m_detaildata.Count == 0 ? 0 : 1);
 
                 if (m_lowlevelDataCount == 0)
+                {
+                    oDataAccess = null;
+
                     return 0;
+                }
 
 
                 StashRateCache();
@@ -4155,6 +4158,8 @@ namespace ModelDataCache
 
                 m_initial_zoom = SelectUserViewData(oDataAccess, m_init_def_view_pos);
 
+
+                oDataAccess = null;
                 ProcessAndCreateDistplayLists();
 
                 
@@ -6543,6 +6548,10 @@ namespace ModelDataCache
             }
             reader.Close();
             reader = null;
+
+            foreach (DetailRowData odat in m_targetdata.Values)
+                PerformCalcs(odat, false);
+
 
             return retv;
         }
@@ -9044,6 +9053,15 @@ namespace ModelDataCache
         {
             bottomgridlayoutcache = "";
             bShowFTEs = (FTEMode != 0);
+        }
+
+        public int GetFTEMode()
+        {
+            bottomgridlayoutcache = "";
+            if (bShowFTEs)
+                return 1;
+
+            return 0;
         }
 
 
@@ -12135,6 +12153,14 @@ namespace ModelDataCache
 
                     case "APVIEW":
                         m_apply_target = StripNum(ref slug);
+
+                        if (m_apply_target != 0)
+                        {
+                            try {
+                                LoadTargets(oDataAccess, m_apply_target.ToString());
+                            }
+                            catch (Exception ex) { }
+                        }
                         break;
 
                     case "DGRP":

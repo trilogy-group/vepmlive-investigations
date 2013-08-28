@@ -147,6 +147,13 @@ namespace WorkEnginePPM
             return ModelData.GetBottomGrid();
         }
 
+        public static string GetFTEMode(HttpContext Context, string sXML, ModelCache ModelData)
+        {
+            CStruct xResult = BuildResultXML("GetFTEMode", 0);
+            CStruct xMode = xResult.CreateSubStruct("Mode");
+            xMode.CreateIntAttr("Value", ModelData.GetFTEMode());
+            return xResult.XML(); 
+        }
 
         /// <summary>
         /// Builds xml to drive the layout of the CostType grid
@@ -1464,7 +1471,15 @@ Status_Error:
             return Context.Session[sKey];
             //return DataCacheAPI.GetCachedData(Context, sKey);
         }
-        
+
+        private static CStruct BuildResultXML(string sContext = "", int nStatus = 0)
+        {
+            CStruct xResult = new CStruct();
+            xResult.Initialize("Result");
+            xResult.CreateStringAttr("Context", sContext);
+            xResult.CreateIntAttr("Status", nStatus);
+            return xResult;
+        }
 
     }
 }
