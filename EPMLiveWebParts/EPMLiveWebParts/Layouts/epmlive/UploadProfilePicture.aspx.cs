@@ -9,14 +9,63 @@ using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
+using System.Drawing.Imaging;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
     public partial class UploadProfilePicture : LayoutsPageBase
     {
+		#region Fields (1) 
+
         private const string ProfilePictureLibraryName = "User Profile Pictures";
 
+		#endregion Fields 
+
+		#region Methods (14) 
+
+		// Protected Methods (3) 
+
+        protected void OnSaveButtonClicked(object sender, EventArgs e)
+        {
+            byte[] pic;
+
+            string resizeInfo = ResizeInfoField.Value;
+            if (!string.IsNullOrEmpty(resizeInfo))
+            {
+                pic = ResizeImage(resizeInfo);
+            }
+            else
+            {
+                using (var fileStore = new EPMLiveFileStore(Web))
+                {
+                    pic = fileStore.Get(FileNameField.Value);
+                }
+            }
+
+            using (var fileStore = new EPMLiveFileStore(Web))
+            {
+                fileStore.Delete(FileNameField.Value);
+            }
+
+            SavePicture(pic);
+        }
+
         protected void Page_Load(object sender, EventArgs e) { }
+
+        protected void UploadPictureButton_Click(object sender, EventArgs e)
+        {
+            if (!PictureFileUpload.HasFile) return;
+
+            using (var fileStore = new EPMLiveFileStore(Web))
+            {
+                FileNameField.Value = fileStore.Add(PictureFileUpload.FileBytes,
+                    Path.GetExtension(PictureFileUpload.FileName));
+            }
+
+            UploadPanel.Visible = false;
+            ResizePanel.Visible = true;
+        }
+		// Private Methods (11) 
 
         private void CloseDialog(string pictureUrl)
         {
@@ -34,10 +83,22 @@ namespace EPMLiveWebParts.Layouts.epmlive
             Page.ClientScript.RegisterStartupScript(GetType(), "CloseDialog", javascript, true);
         }
 
-        private string GetPictureFileName()
+        private void DeleteExistingPicturesForUser(SPFolder pictureDocumentLibrary)
         {
-            string loginName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
-            return string.Format("{0}{1}", loginName, Path.GetExtension(FileNameField.Value));
+            string userName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
+            var picturesToDelete = new List<SPFile>();
+
+            foreach (SPFile file in pictureDocumentLibrary.Files)
+            {
+                if (Path.GetFileNameWithoutExtension(file.Name) == userName) picturesToDelete.Add(file);
+            }
+
+            foreach (SPFile file in picturesToDelete)
+            {
+                file.Delete();
+            }
+
+            pictureDocumentLibrary.Update();
         }
 
         private string GetCleanUserName(string loginName)
@@ -89,11 +150,82 @@ namespace EPMLiveWebParts.Layouts.epmlive
             return documentLibrary;
         }
 
-        private static void UploadPictureToDocumentLibrary(SPFolder pictureDocumentLibrary, string pictureFileName,
-            byte[] pictureFileBytes)
+        private string GetPictureFileName()
         {
-            pictureDocumentLibrary.Files.Add(pictureFileName, pictureFileBytes, true);
-            pictureDocumentLibrary.Update();
+            string loginName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
+            return string.Format("{0}{1}", loginName, Path.GetExtension(FileNameField.Value));
+        }
+
+        private static string GetPictureUrl(string fileName)
+        {
+            return string.Format("{0}/{1}/{2}", SPContext.Current.Site.RootWeb.Url, ProfilePictureLibraryName, fileName);
+        }
+
+        private byte[] ResizeImage(string resizeInfo)
+        {
+            string[] picInfo = resizeInfo.Split('|');
+
+            int width = int.Parse(picInfo[0]);
+            int height = int.Parse(picInfo[1]);
+            int targetWidth = int.Parse(picInfo[2]);
+            int targetHeight = int.Parse(picInfo[3]);
+            int x = int.Parse(picInfo[4]);
+            int y = int.Parse(picInfo[5]);
+
+            Image src;
+
+            using (var fileStore = new EPMLiveFileStore(Web))
+            {
+                src = Image.FromStream(fileStore.GetStream(FileNameField.Value));
+            }
+
+            var pic = new Bitmap(width, height);
+            Graphics.FromImage(pic).DrawImage(src, 0, 0, width, height);
+
+            var bitmap = new Bitmap(pic);
+            Bitmap target = bitmap.Clone(new Rectangle(x, y, targetWidth, targetHeight), bitmap.PixelFormat);
+
+            using (Stream stream = new MemoryStream())
+            {
+                EncoderParameters encoderParameters = new EncoderParameters(1);
+                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+                target.Save(stream, GetEncoder(ImageFormat.Jpeg), encoderParameters);
+
+                var img = new Bitmap(stream);
+                ImageConverter converter = new ImageConverter();
+                return (byte[]) converter.ConvertTo(img, typeof(byte[]));
+            }
+        }
+
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+
+            return null;
+        }
+
+        private void SavePicture(byte[] pic)
+        {
+            string pictureFileName = GetPictureFileName();
+            SPFolder pictureDocumentLibrary = GetDocumentLibrary("User Profile Pictures");
+            if (pictureDocumentLibrary == null) return;
+
+            string pictureUrl = GetPictureUrl(pictureFileName);
+
+            DeleteExistingPicturesForUser(pictureDocumentLibrary);
+            UploadPictureToDocumentLibrary(pictureDocumentLibrary, pictureFileName, pic);
+            UpdatePictureUrlInSiteUserInfoList(pictureUrl);
+            UpdatePictureUrlInUserProfile(pictureUrl);
+            CloseDialog(pictureUrl);
         }
 
         private static void UpdatePictureUrlInSiteUserInfoList(string pictureUrl)
@@ -176,109 +308,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
             commitMethod.Invoke(userProfile, null);
         }
 
-        private static string GetPictureUrl(string fileName)
+        private static void UploadPictureToDocumentLibrary(SPFolder pictureDocumentLibrary, string pictureFileName,
+            byte[] pictureFileBytes)
         {
-            return string.Format("{0}/{1}/{2}", SPContext.Current.Site.RootWeb.Url, ProfilePictureLibraryName, fileName);
-        }
-
-        private void DeleteExistingPicturesForUser(SPFolder pictureDocumentLibrary)
-        {
-            string userName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
-            var picturesToDelete = new List<SPFile>();
-
-            foreach (SPFile file in pictureDocumentLibrary.Files)
-            {
-                if (Path.GetFileNameWithoutExtension(file.Name) == userName) picturesToDelete.Add(file);
-            }
-
-            foreach (SPFile file in picturesToDelete)
-            {
-                file.Delete();
-            }
-
+            pictureDocumentLibrary.Files.Add(pictureFileName, pictureFileBytes, true);
             pictureDocumentLibrary.Update();
         }
 
-        protected void UploadPictureButton_Click(object sender, EventArgs e)
-        {
-            if (!PictureFileUpload.HasFile) return;
-
-            using (var fileStore = new EPMLiveFileStore(Web))
-            {
-                FileNameField.Value = fileStore.Add(PictureFileUpload.FileBytes,
-                    Path.GetExtension(PictureFileUpload.FileName));
-            }
-
-            UploadPanel.Visible = false;
-            ResizePanel.Visible = true;
-        }
-
-        protected void OnSaveButtonClicked(object sender, EventArgs e)
-        {
-            byte[] pic;
-
-            string resizeInfo = ResizeInfoField.Value;
-            if (!string.IsNullOrEmpty(resizeInfo))
-            {
-                pic = ResizeImage(resizeInfo);
-            }
-            else
-            {
-                using (var fileStore = new EPMLiveFileStore(Web))
-                {
-                    pic = fileStore.Get(FileNameField.Value);
-                }
-            }
-
-            using (var fileStore = new EPMLiveFileStore(Web))
-            {
-                fileStore.Delete(FileNameField.Value);
-            }
-
-            SavePicture(pic);
-        }
-
-        private void SavePicture(byte[] pic)
-        {
-            string pictureFileName = GetPictureFileName();
-            SPFolder pictureDocumentLibrary = GetDocumentLibrary("User Profile Pictures");
-            if (pictureDocumentLibrary == null) return;
-
-            string pictureUrl = GetPictureUrl(pictureFileName);
-
-            DeleteExistingPicturesForUser(pictureDocumentLibrary);
-            UploadPictureToDocumentLibrary(pictureDocumentLibrary, pictureFileName, pic);
-            UpdatePictureUrlInSiteUserInfoList(pictureUrl);
-            UpdatePictureUrlInUserProfile(pictureUrl);
-            CloseDialog(pictureUrl);
-        }
-
-        private byte[] ResizeImage(string resizeInfo)
-        {
-            string[] picInfo = resizeInfo.Split('|');
-
-            int width = int.Parse(picInfo[0]);
-            int height = int.Parse(picInfo[1]);
-            int targetWidth = int.Parse(picInfo[2]);
-            int targetHeight = int.Parse(picInfo[3]);
-            int x = int.Parse(picInfo[4]);
-            int y = int.Parse(picInfo[5]);
-
-            Image src;
-
-            using (var fileStore = new EPMLiveFileStore(Web))
-            {
-                src = Image.FromStream(fileStore.GetStream(FileNameField.Value));
-            }
-
-            var pic = new Bitmap(width, height);
-            Graphics.FromImage(pic).DrawImage(src, 0, 0, width, height);
-
-            var bitmap = new Bitmap(pic);
-            Bitmap target = bitmap.Clone(new Rectangle(x, y, targetWidth, targetHeight), bitmap.PixelFormat);
-
-            var converter = new ImageConverter();
-            return (byte[]) converter.ConvertTo(target, typeof (byte[]));
-        }
+		#endregion Methods 
     }
 }
