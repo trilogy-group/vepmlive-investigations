@@ -184,6 +184,30 @@
         border: 1px dashed @base-blue;
     }
 
+    .epm-menu-btn-new {
+        background-color: #DDE4EA;
+        border: 1px solid #C0CCD7;
+        border-radius: 3px 3px 3px 3px;
+        cursor: pointer;
+        font-size: 9px;
+        height: 16px;
+        line-height: 16px;
+        margin-right: 7px;
+        margin-top: 2px;
+        position: absolute;
+        right: 0;
+        text-align: center;
+        width: 16px;
+        visibility: hidden;
+        opacity: 0;
+
+        span {
+            position: relative;
+            left: -1px;
+            top: 1px;
+        }
+    }
+
     .epm-nav-sub-header,
     li.epm-nav-sub-header,
     .epm-nav-sub-header-bottom,
@@ -261,6 +285,11 @@
 
                 a {
                     color: @link-hover;
+                }
+
+                .epm-menu-btn-new {
+                    visibility: visible;
+                    opacity: 1;
                 }
             }
         }

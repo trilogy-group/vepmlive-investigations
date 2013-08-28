@@ -742,47 +742,108 @@
 
             epmLiveNavigation.init();
 
-            var manageFavorites = function() {
-                var $ul = $('#epm-nav-sub-favorites-static-links');
+            var manageFavorites = function () {
+                var favoritesManager = (function () {
+                    var _resetOrder = function ($list) {
+                        var orders = [];
 
-                var resetOrder = function() {
-                    var orders = [];
-
-                    var lo = 0;
-                    $ul.find('.epm-nav-node').each(function() {
-                        orders.push($(this).get(0).id + ':' + (++lo));
-                    });
-
-                    if (orders.length) {
-                        epmLiveService.execute('ReorderFavorites', orders.join(), function(response) {
-                        }, function(response) {
-                            console.log(response);
+                        var lo = 0;
+                        $list.find('.epm-nav-node').each(function () {
+                            orders.push($(this).get(0).id + ':' + (++lo));
                         });
-                    }
-                };
+
+                        if (orders.length) {
+                            epmLiveService.execute('ReorderFavorites', orders.join(), function (response) {
+                            }, function (response) {
+                                console.log(response);
+                            });
+                        }
+                    };
+
+                    var _addDragger = function($li) {
+                        $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
+
+                        $li.hover(function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
+                        }, function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
+                        });
+                    };
+
+                    var _addMenu = function ($li) {
+                        $li.append('<span class="epm-menu-btn-contextual">&nbsp;</span>');
+                    };
+
+                    return {
+                        resetOrder: _resetOrder,
+                        addDragger: _addDragger,
+                        addMenu: _addMenu
+                    };
+                })();
+                
+                var $ul = $('#epm-nav-sub-favorites-static-links');
 
                 $ul.find('.epm-nav-node').each(function() {
                     var $li = $(this);
-                    $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
 
-                    $li.hover(function() {
-                        $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
-                    }, function() {
-                        $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
-                    });
+                    favoritesManager.addDragger($li);
+                    favoritesManager.addMenu($li);
                 });
 
                 $ul.sortable({
                     placeholder: 'epm-nav-drag-placeholder',
                     update: function(event, ui) {
-                        resetOrder();
+                        favoritesManager.resetOrder($ul);
                     }
                 });
 
                 $ul.disableSelection();
             };
 
+            var manageRecentItems = function () {
+                var riManager = (function () {
+                    var _addMenu = function($li, rIndex) {
+                        if ($li.index() < rIndex) {
+                            addNewItemMenu($li);
+                        } else {
+                            addContextualMenu($li);
+                        }
+                    };
+
+                    var addNewItemMenu = function($li) {
+                        $li.append('<span class="epm-menu-btn-new"><span class="icon-plus-2"></span></span>');
+                    };
+                    
+                    var addContextualMenu = function ($li) {
+                        $li.append('<span class="epm-menu-btn-contextual">&nbsp;</span>');
+                    };
+                    
+                    return {
+                        addMenu: _addMenu
+                    };
+                })();
+
+                var $ul = $('#epm-nav-sub-recent-static-links');
+
+                var riIndex;
+
+                $ul.find('.epm-nav-sub-header').each(function () {
+                    var $el = $(this);
+                    var header = $el.text();
+                    var index = $el.index();
+
+                    if (header === 'Recent Items') {
+                        riIndex = index;
+                    }
+                });
+                
+                $ul.find('.epm-nav-node').each(function () {
+                    riManager.addMenu($(this), riIndex);
+                });
+            };
+
             ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
+            ExecuteOrDelayUntilScriptLoaded(manageRecentItems, 'EPMLiveNavigation_RecentItems');
         });
     }
 
