@@ -353,6 +353,9 @@
   padding-top: 1.5px;
   padding-bottom: 1.5px;
 }
+.epm-nav-sub .epm-nav-sub-menu div table a {
+  display: block;
+}
 .epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected {
   border-left: 3px solid #0090ca !important;
   background-color: #e7e7e7;
