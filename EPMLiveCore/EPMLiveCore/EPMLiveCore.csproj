@@ -3302,9 +3302,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css">
       <DependentUpon>epmnav.less</DependentUpon>
     </Content>
+    <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.min.css" />
-    <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.svg" />
