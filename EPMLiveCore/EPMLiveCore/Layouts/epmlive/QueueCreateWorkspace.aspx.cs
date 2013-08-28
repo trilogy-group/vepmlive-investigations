@@ -60,7 +60,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     {
                         // redirect parent window                        
                         ClientScript.RegisterClientScriptBlock(this.GetType(), Guid.NewGuid().ToString(),
-                            @"window.top.location.href = '" + url + "';");
+                            @"<script>$(function(){ window.top.location.href = '" + url + "'; });</script>");
                     }
                     else if (status == "InProgress")
                     {
@@ -83,10 +83,10 @@ namespace EPMLiveCore.Layouts.epmlive
                     {
                         // pop up create modal
                         ClientScript.RegisterClientScriptBlock(this.GetType(), Guid.NewGuid().ToString(),
-                            @"var options = { url: '_layouts/epmlive/QueueCreateWorkspace.aspx?standalone=" + _isStandAlone + "&listid=" + _lstGuid + "&itemid=" + _itemId + "'," +
+                            @"<script>$(function(){ var options = { url: '_layouts/epmlive/QueueCreateWorkspace.aspx?listid=" + _lstGuid + "&itemid=" + _itemId + "'," +
                                              "allowMaximize: false, " +
                                              "showClose: false }; " +
-                            "parent.SP.UI.showModalDialog(options); ");
+                            "parent.SP.UI.showModalDialog(options); });</script>");
 
                     }
                 }
