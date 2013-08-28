@@ -214,7 +214,7 @@
                             icon = '<span class="epm-nav-icon ' + link.cssClass + '"></span>';
                         }
 
-                        var html = '<li id="' + link.id + '" class="epm-nav-node" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '">' + link.title + '</a></li>';
+                        var html = '<li id="' + link.id + '" class="epm-nav-node" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"><span>' + link.title + '</span></a></li>';
 
                         categories[category].$el.append(html);
 
@@ -771,7 +771,7 @@
                     };
 
                     var _addMenu = function ($li) {
-                        $li.append('<span class="epm-menu-btn-contextual">&nbsp;</span>');
+                        $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
                     };
 
                     return {
@@ -811,11 +811,11 @@
                     };
 
                     var addNewItemMenu = function($li) {
-                        $li.append('<span class="epm-menu-btn-new"><span class="icon-plus-2"></span></span>');
+                        $li.append('<span class="epm-menu-btn"><span class="icon-plus-2"></span></span>');
                     };
                     
                     var addContextualMenu = function ($li) {
-                        $li.append('<span class="epm-menu-btn-contextual">&nbsp;</span>');
+                        $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
                     };
                     
                     return {

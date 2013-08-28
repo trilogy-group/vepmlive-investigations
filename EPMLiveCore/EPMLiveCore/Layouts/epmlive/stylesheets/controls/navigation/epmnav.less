@@ -3,6 +3,7 @@
 @top-nav-li-height: @top-nav-width - 10;
 @node-width: (@sub-nav-width - 40px) + 4px;
 @link-width: (@sub-nav-width - 40px) - 1px;
+@link-tag-width: 125px;
 @sub-header-width: @sub-nav-width - 20px;
 @node-height: 20px;
 @shadow-color: rgba(0, 0, 0, 0.2) inset;
@@ -168,6 +169,8 @@
 
     .epm-nav-icon {
         margin-left: 5px;
+        position: relative;
+        top: -3.5px;
     }
 
     .epm-nav-dragger {
@@ -178,13 +181,15 @@
         display: inline-block;
         width: 8px;
         visibility: hidden;
+        position:relative;
+        top:-3px;
     }
 
     .epm-nav-drag-placeholder {
         border: 1px dashed @base-blue;
     }
 
-    .epm-menu-btn-new {
+    .epm-menu-btn {
         background-color: #DDE4EA;
         border: 1px solid #C0CCD7;
         border-radius: 3px 3px 3px 3px;
@@ -199,7 +204,6 @@
         text-align: center;
         width: 16px;
         visibility: hidden;
-        opacity: 0;
 
         span {
             position: relative;
@@ -265,13 +269,15 @@
             height: 23px;
             line-height: 23px;
             width: @link-width;
-            .ellipsis;
             .link-trans;
 
             a {
                 padding-left: 6px;
                 font-size: @link-font;
+                width: @link-tag-width;
+                display: inline-block;
                 .epm-nav-node;
+                .ellipsis;
 
                 &:hover {
                     text-decoration: none;
@@ -287,10 +293,17 @@
                     color: @link-hover;
                 }
 
-                .epm-menu-btn-new {
+                .epm-menu-btn {
                     visibility: visible;
-                    opacity: 1;
                 }
+            }
+        }
+    }
+
+    ul.ui-sortable{
+        li{
+            a{
+                width: @link-tag-width - 10px;
             }
         }
     }
@@ -298,7 +311,7 @@
     ul.epm-nav-node-static {
         li {
             padding-left: 5px;
-            width: @link-width + 25px;
+            width: @link-width + 30px;
         }
     }
 
@@ -395,7 +408,7 @@
 
         table {
             margin-left: @node-margin-left;
-            margin-top: 13px;
+            margin-top: 9px;
         }
 
         div {
@@ -435,4 +448,10 @@
 
 .epm-nav-pin-pinned {
 	.transform(-45deg);
+}
+
+.icon-ellipsis-horizontal:after {
+    content: '•••';
+    position: relative;
+    top: -1px;
 }
