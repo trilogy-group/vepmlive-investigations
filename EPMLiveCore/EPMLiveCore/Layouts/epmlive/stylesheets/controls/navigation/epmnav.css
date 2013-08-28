@@ -252,15 +252,15 @@
 .epm-nav-sub ul.ui-sortable li a {
   width: 115px;
 }
-.epm-nav-sub .epm-nav-node.epm-nav-node-selected {
-  width: 166px;
-}
-.epm-nav-sub .epm-nav-node.epm-nav-node-selected .epm-nav-icon {
-  left: -3px;
-}
 .epm-nav-sub ul.epm-nav-node-static li {
   padding-left: 5px;
   width: 169px;
+}
+.epm-nav-sub ul.epm-nav-node-static .epm-nav-node.epm-nav-node-selected {
+  width: 166px;
+}
+.epm-nav-sub ul.epm-nav-node-static .epm-nav-node.epm-nav-node-selected .epm-nav-icon {
+  left: -3px;
 }
 .epm-nav-sub ul.epm-nav-node-collapsed {
   display: none;
@@ -362,6 +362,9 @@
 }
 .epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected td.epm-nav-node {
   width: 141px;
+}
+.epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected td.epm-nav-node a {
+  padding: 0;
 }
 .epm-nav-unpinned {
   margin-left: 50px;

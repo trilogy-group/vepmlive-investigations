@@ -173,7 +173,7 @@
                         _close();
                     };
 
-                    var _registerLink = function(link) {
+                    var _registerLink = function (link) {
                         if (link.seprator) {
                             registerSeprator(link.category);
                         } else if (link.url.toLowerCase() === 'header') {
@@ -191,13 +191,13 @@
                         if (!category) {
                             category = '__STATIC__';
                         }
-                        
+
                         var li = '<li class="epm-nav-sub-header">' + link.title + '</li>';
-                        
+
                         categories[category].$el.append(li);
 
                         li = '<li class="epm-nav-sub-header-bottom"></li>';
-                        
+
                         categories[category].$el.append(li);
                     };
 
@@ -209,7 +209,7 @@
                         }
 
                         var icon = '';
-                        
+
                         if (link.cssClass) {
                             icon = '<span class="epm-nav-icon ' + link.cssClass + '"></span>';
                         }
@@ -227,8 +227,12 @@
                         }
 
                         $(categories[category].$el.find('a').get(0)).click(function () {
+                            $sn.find('a').each(function () {
+                                $(this).parent().removeClass(selectedClass);
+                            });
+
                             var $a = $(this);
-                            $a.parent().addClass('epm-nav-node-selected');
+                            $a.parent().addClass(selectedClass);
 
                             $.cookie(selectedLinkCookie, JSON.stringify({ id: $a.get(0).id, url: $a.attr('href') }), cookieOptions);
                         });
@@ -626,9 +630,16 @@
                     });
 
                     $('a.epm-nav-node').click(function () {
+                        var $link = $(this);
+
+                        $('#epm-nav-sub-ql').find('a').each(function () {
+                            $(this).parent().parent().parent().parent().removeClass(selectedClass);
+                        });
+
+                        $link.parent().parent().parent().parent().addClass(selectedClass);
+
                         var index = -1;
 
-                        var $link = $(this);
                         var parent = $link.parents('div')[0];
                         var $siblings = $(parent).siblings('div');
 
