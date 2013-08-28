@@ -181,8 +181,8 @@
         display: inline-block;
         width: 8px;
         visibility: hidden;
-        position:relative;
-        top:-3px;
+        position: relative;
+        top: -3px;
     }
 
     .epm-nav-drag-placeholder {
@@ -263,6 +263,15 @@
         padding: 0;
         margin: 0;
 
+        .epm-nav-node-selected {
+            border-left: @selected-width solid @base-blue !important;
+            background-color: @hover-color;
+
+            a {
+                padding-left: @selected-width !important;
+            }
+        }
+
         li {
             margin: 0;
             padding: 1.5px 5px 1.5px (@node-margin-left + 25px);
@@ -300,10 +309,20 @@
         }
     }
 
-    ul.ui-sortable{
-        li{
-            a{
+    ul.ui-sortable {
+        li {
+            a {
                 width: @link-tag-width - 10px;
+            }
+        }
+
+        .epm-nav-node-selected {
+            .epm-nav-icon {
+                left: -@selected-width;
+            }
+
+            .epm-nav-node {
+                width: 166px;
             }
         }
     }
@@ -425,10 +444,6 @@
 
             td.epm-nav-node {
                 width: @node-width - @selected-width;
-
-                a {
-                    padding-left: 1px !important;
-                }
             }
         }
     }

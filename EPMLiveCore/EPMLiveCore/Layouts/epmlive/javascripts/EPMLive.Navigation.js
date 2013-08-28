@@ -225,6 +225,13 @@
                         if (link.visible) {
                             $('#' + link.id).show();
                         }
+
+                        $(categories[category].$el.find('a').get(0)).click(function () {
+                            var $a = $(this);
+                            $a.parent().addClass('epm-nav-node-selected');
+
+                            $.cookie(selectedLinkCookie, JSON.stringify({ id: $a.get(0).id, url: $a.attr('href') }), cookieOptions);
+                        });
                     };
 
                     var registerSeprator = function (category) {
@@ -412,7 +419,7 @@
                     var expandState = $.parseJSON($.cookie(expandStateCookie));
 
                     if (expandState) {
-                        var selectedNode = getSelectedSubLevelNode();
+                        var selectedNode = 'epm-nav-sub-ql';
 
                         if (provider) {
                             for (var m = 0; m < tlNodes.length; m++) {
@@ -434,7 +441,7 @@
                                     var node = nodes[i];
                                     var nodeId = node.id.replace('Nodes', '');
 
-                                    if (snExpandStatus[$('#' + nodeId.replace('EPMLiveNavn', 'EPMLiveNavt')).text()]) {
+                                    if (!snExpandStatus[$('#' + nodeId.replace('EPMLiveNavn', 'EPMLiveNavt')).text()]) {
                                         TreeView_ToggleNode(window.EPMLiveNav_Data, 0, document.getElementById(nodeId), ' ', document.getElementById(node.id));
                                     }
                                 }
@@ -637,7 +644,7 @@
                 }
 
                 function registerProviderLinks(response) {
-                    var webUrl = $$.currentWebUrl;
+                    var webUrl = $$.currentWebUrl();
                     var page = webUrl + window.location.href.split(webUrl)[1];
 
                     for (var providerName in response.Nodes) {
@@ -672,9 +679,11 @@
                             }
                         }
 
-                        expandNodes(providerName);
-
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);
+
+                        if (providerName !== 'Settings') {
+                            expandNodes(providerName);
+                        }
                     }
                 }
 
@@ -736,11 +745,42 @@
                 };
 
                 return {
-                    init: _init
+                    init: _init,
+                    expandProviderNodes: expandNodes
                 };
             })();
 
             epmLiveNavigation.init();
+
+            var manageSettings = function () {
+                var settingsManager = (function () {
+                    var _collapseAll = function ($ul) {
+                        $ul.find('.epm-nav-cat').each(function () {
+                            var $span = $($(this).find('span').get(0));
+                            $span.removeClass('epm-nav-node-expanded');
+                            $span.addClass('epm-nav-node-collapsed');
+                        });
+
+                        $ul.find('.epm-nav-links').each(function () {
+                            var $list = $(this);
+
+                            if (!$list.hasClass('epm-nav-node-static')) {
+                                $list.removeClass('epm-nav-node-expanded');
+                                $list.addClass('epm-nav-node-collapsed');
+                            }
+                        });
+                    };
+
+                    return {
+                        collapseAll: _collapseAll
+                    };
+                })();
+
+                var $ul = $('#epm-nav-sub-settings');
+
+                settingsManager.collapseAll($ul);
+                epmLiveNavigation.expandProviderNodes('Settings');
+            };
 
             var manageFavorites = function () {
                 var favoritesManager = (function () {
@@ -842,6 +882,7 @@
                 });
             };
 
+            ExecuteOrDelayUntilScriptLoaded(manageSettings, 'EPMLiveNavigation_Settings');
             ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
             ExecuteOrDelayUntilScriptLoaded(manageRecentItems, 'EPMLiveNavigation_RecentItems');
         });

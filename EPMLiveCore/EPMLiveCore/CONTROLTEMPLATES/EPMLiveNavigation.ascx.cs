@@ -107,9 +107,11 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             }
 
             spTreeView.Sort();
+            spTreeView.ExpandAll();
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
+
         // Private Methods (1) 
 
         private void LoadSelectedNodeLinks()
