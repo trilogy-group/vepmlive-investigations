@@ -255,7 +255,7 @@
 .epm-nav-sub ul.ui-sortable .epm-nav-node-selected .epm-nav-icon {
   left: -3px;
 }
-.epm-nav-sub ul.ui-sortable .epm-nav-node-selected .epm-nav-node {
+.epm-nav-sub ul.ui-sortable .epm-nav-node.epm-nav-node-selected {
   width: 166px;
 }
 .epm-nav-sub ul.epm-nav-node-static li {
