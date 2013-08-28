@@ -18,6 +18,7 @@ namespace EPMLiveCore
             ViewList viewList;
             string resUrl;
             SPSite site = SPContext.Current.Site;
+    
             {
                 SPWeb web = SPContext.Current.Web;
                 {

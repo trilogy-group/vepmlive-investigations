@@ -66,7 +66,57 @@ namespace EPMLiveCore.API.Integration
 
                 WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
 
-                return integrator.iIntegrator.InstallIntegration(webprops, log, out message, integrator.IntKey, GetAPIUrl(_site.WebApplication.Id));
+                if (integrator.iIntegrator.InstallIntegration(webprops, log, out message, integrator.IntKey, GetAPIUrl(_site.WebApplication.Id)))
+                {
+                    EPMLiveIntegration.IIntegratorControls controls = null;
+                    try
+                    {
+                        controls = (EPMLiveIntegration.IIntegratorControls)integrator.iIntegrator;
+                    }
+                    catch { }
+
+                    OpenConnection();
+
+                    SqlCommand cmd = new SqlCommand("DELETE FROM INT_CONTROLS where INT_LIST_ID=@intlistid", cn);
+                    cmd.Parameters.AddWithValue("@intlistid", intlistid);
+                    cmd.ExecuteNonQuery();
+
+                    if (controls != null)
+                    {
+                        List<IntegrationControl> ctls = controls.GetControls(webprops, log);
+
+                        DataTable dtResInfo = new DataTable();
+                        dtResInfo.Columns.Add("INT_CONTROL_ID", typeof(Guid));
+                        dtResInfo.Columns.Add("INT_LIST_ID", typeof(Guid));
+                        dtResInfo.Columns.Add("CONTROL");
+                        dtResInfo.Columns.Add("URL");
+
+                        foreach (IntegrationControl ictl in ctls)
+                        {
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, ictl.URL });
+                        }
+
+                        using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                        {
+                            sbc.DestinationTableName = "INT_CONTROLS";
+
+                            sbc.BatchSize = dtResInfo.Rows.Count;
+                            sbc.WriteToServer(dtResInfo);
+                            sbc.Close();
+
+                        }
+
+
+                    }
+
+                    CloseConnection(false);
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -108,7 +158,22 @@ namespace EPMLiveCore.API.Integration
 
                 WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
 
-                return integrator.iIntegrator.RemoveIntegration(webprops, log, out message, integrator.IntKey);
+                if (integrator.iIntegrator.RemoveIntegration(webprops, log, out message, integrator.IntKey))
+                {
+                    OpenConnection();
+
+                    SqlCommand cmd = new SqlCommand("DELETE FROM INT_CONTROLS where INT_LIST_ID=@intlistid", cn);
+                    cmd.Parameters.AddWithValue("@intlistid", intlistid);
+                    cmd.ExecuteNonQuery();
+
+                    CloseConnection(false);
+
+                    return true;
+                }
+                else
+                    return false;
+
+
             }
             catch (Exception ex)
             {
@@ -962,9 +1027,9 @@ namespace EPMLiveCore.API.Integration
                 }
             }
 
-            CloseConnection(false);
-
             return hsh;
+
+            CloseConnection(false);
         }
 
         internal void PostIntegration(DataTable dtItems, DataTable dtUserFields, DataTable dtColumns, SPList list)
@@ -1126,6 +1191,25 @@ namespace EPMLiveCore.API.Integration
 
             integrator.iIntegrator.DeleteItems(webprops, dtItems, log);
 
+        }
+
+        public string GetControlURL(Guid intlistid, Guid listid, string control, string url)
+        {
+
+            IntegratorDef integrator = GetIntegrator(intlistid);
+
+            IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
+
+            Hashtable hshProps = GetProperties(intlistid);
+
+            WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
+
+            try
+            {
+                return ((IIntegratorControls)integrator.iIntegrator).GetURL(webprops, log, control, url);
+            }
+            catch { }
+            return "";
         }
 
         internal DataTable PullData(DataTable dtItems, Guid intlistid, Guid listid, DateTime dtLastSynched)
