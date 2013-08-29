@@ -333,6 +333,8 @@
 .epm-nav-sub .epm-nav-sub-menu .epm-nav-node-root {
   font-size: 12px;
   margin-left: 5px;
+  cursor: pointer;
+  cursor: hand;
 }
 .epm-nav-sub .epm-nav-sub-menu span.epm-nav-node-root {
   position: relative;

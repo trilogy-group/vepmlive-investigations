@@ -589,6 +589,13 @@
                         toggleNode(data, x, elNav, y, elNodes);
                     };
 
+                    $('td.epm-nav-node-root').click(function () {
+                        var $td = $(this);
+                        var id = $td.parent().find('a').get(0).id;
+
+                        TreeView_ToggleNode(EPMLiveNav_Data, 0, document.getElementById(id), ' ', document.getElementById(id + 'Nodes'));
+                    });
+
                     var clickables = ['suiteBar', 's4-ribbonrow', 's4-workspace'];
                     for (var c in clickables) {
                         $('#' + clickables[c]).click(function () {
