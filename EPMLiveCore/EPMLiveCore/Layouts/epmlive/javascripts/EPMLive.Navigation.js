@@ -233,13 +233,15 @@
                             cssClass = 'epm-nav-node';
                         }
 
-                        var html = '<li id="' + link.id + '" class="' + cssClass + '" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"><span>' + link.title + '</span></a></li>';
-
-                        categories[category].$el.append(html);
+                        var target = '';
 
                         if (link.external) {
-                            $('#epm-nav-link-' + link.id).attr('target', '_blank');
+                            target = ' target="_blank"';
                         }
+
+                        var html = '<li id="' + link.id + '" class="' + cssClass + '" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"' + target + '><span>' + link.title + '</span></a></li>';
+
+                        categories[category].$el.append(html);
 
                         if (link.visible) {
                             $('#' + link.id).show();
@@ -712,7 +714,7 @@
                                         webId: link['@WebId'],
                                         listId: link['@ListId'],
                                         itemId: link['@ItemId'],
-                                        external: link['@Exernal'] === 'True',
+                                        external: link['@External'] === 'True',
                                         visible: link['@Visible'] === 'True',
                                         seprator: link['@Separator'] === 'True'
                                     });

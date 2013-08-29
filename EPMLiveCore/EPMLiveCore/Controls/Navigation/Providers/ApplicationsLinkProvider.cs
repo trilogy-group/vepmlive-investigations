@@ -32,10 +32,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     new NavLink
                     {
                         Title = "Add new application",
-                        Url =
-                            string.Format(
-                                @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx?standalone=true&isDlg=1');",
-                                RelativeUrl)
+                        Url = string.Format(@"http://market.epmlive.com/?source={0}", Url),
+                        External = true
                     }
                 };
 
