@@ -272,13 +272,22 @@
             }
         }
 
+        li.epm-nav-trans {
+            .link-trans;
+
+            a {
+                &:hover {
+                    color: @link-hover;
+                }
+            }
+        }
+
         li {
             margin: 0;
             padding: 1.5px 5px 1.5px (@node-margin-left + 25px);
             height: 23px;
             line-height: 23px;
             width: @link-width;
-            .link-trans;
 
             a {
                 padding-left: 6px;
@@ -290,17 +299,12 @@
 
                 &:hover {
                     text-decoration: none;
-                    color: @link-hover;
                 }
             }
 
             &:hover {
                 background-color: @hover-color;
                 color: @link-hover;
-
-                a {
-                    color: @link-hover;
-                }
 
                 .epm-menu-btn {
                     visibility: visible;

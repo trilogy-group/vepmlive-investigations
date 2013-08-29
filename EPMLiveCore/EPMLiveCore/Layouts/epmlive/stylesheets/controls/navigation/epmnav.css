@@ -208,16 +208,21 @@
 .epm-nav-sub ul.epm-nav-links .epm-nav-node-selected a {
   padding-left: 3px !important;
 }
+.epm-nav-sub ul.epm-nav-links li.epm-nav-trans {
+  -moz-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+  -o-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+  -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+  transition: background-color 0.2s ease-in, color 0.2s ease-in;
+}
+.epm-nav-sub ul.epm-nav-links li.epm-nav-trans a:hover {
+  color: #3376a4;
+}
 .epm-nav-sub ul.epm-nav-links li {
   margin: 0;
   padding: 1.5px 5px 1.5px 32px;
   height: 23px;
   line-height: 23px;
   width: 139px;
-  -moz-transition: background-color 0.2s ease-in, color 0.2s ease-in;
-  -o-transition: background-color 0.2s ease-in, color 0.2s ease-in;
-  -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
-  transition: background-color 0.2s ease-in, color 0.2s ease-in;
 }
 .epm-nav-sub ul.epm-nav-links li a {
   padding-left: 6px;
@@ -237,13 +242,9 @@
 }
 .epm-nav-sub ul.epm-nav-links li a:hover {
   text-decoration: none;
-  color: #3376a4;
 }
 .epm-nav-sub ul.epm-nav-links li:hover {
   background-color: #e7e7e7;
-  color: #3376a4;
-}
-.epm-nav-sub ul.epm-nav-links li:hover a {
   color: #3376a4;
 }
 .epm-nav-sub ul.epm-nav-links li:hover .epm-menu-btn {

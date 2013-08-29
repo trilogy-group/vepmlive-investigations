@@ -214,7 +214,15 @@
                             icon = '<span class="epm-nav-icon ' + link.cssClass + '"></span>';
                         }
 
-                        var html = '<li id="' + link.id + '" class="epm-nav-node" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"><span>' + link.title + '</span></a></li>';
+                        var cssClass = 'epm-nav-node epm-nav-trans';
+
+                        var providerId = categories[category].$el.parent().get(0).id;
+
+                        if (providerId === 'epm-nav-sub-settings') {
+                            cssClass = 'epm-nav-node';
+                        }
+
+                        var html = '<li id="' + link.id + '" class="' + cssClass + '" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"><span>' + link.title + '</span></a></li>';
 
                         categories[category].$el.append(html);
 
