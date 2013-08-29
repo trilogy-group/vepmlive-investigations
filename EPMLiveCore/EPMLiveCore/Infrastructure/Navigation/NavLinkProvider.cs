@@ -24,7 +24,7 @@ namespace EPMLiveCore.Infrastructure.Navigation
             WebId = webId;
             Username = username;
 
-            using (var spSite = new SPSite(siteId))
+            using (var spSite = new SPSite(siteId, GetUserToken()))
             {
                 using (SPWeb spWeb = spSite.OpenWeb(webId))
                 {

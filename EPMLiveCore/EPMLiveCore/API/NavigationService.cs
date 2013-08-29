@@ -194,8 +194,22 @@ namespace EPMLiveCore.API
 
         private static string CalculateLinkId(NavLink navLink, string providerName)
         {
-            string key = providerName + "|" + navLink.Order + "|" + navLink.Url;
-            return (string) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, key.Md5).Value;
+            string cacheKey = "NavLink_ID_Dict";
+            string linkKey = providerName + "|" + navLink.Order + "|" + navLink.Url;
+
+            var dict = (Dictionary<string, string>) CacheStore.Current.Get(cacheKey, CacheStoreCategory.Navigation, () =>
+            {
+                return new Dictionary<string, string>();
+            }).Value;
+
+            if (dict.ContainsKey(linkKey)) return dict[linkKey];
+
+            var linkId = linkKey.Md5();
+
+            dict.Add(linkKey, linkId);
+            CacheStore.Current.Set(cacheKey, dict, CacheStoreCategory.Navigation);
+
+            return linkId;
         }
 
         private static string GetLinkId(NavLink navLink, string providerName)
@@ -207,19 +221,16 @@ namespace EPMLiveCore.API
         {
             provider = provider.Trim();
             string key = provider.ToUpper();
-            string cacheKey = "NAVIGATION_PROVIDER_" + key;
 
             Guid sId = _spWeb.Site.ID;
             Guid wId = _spWeb.ID;
             string un = _spWeb.CurrentUser.LoginName;
 
-            object navProvider =
-                CacheStore.Current.Get(cacheKey, CacheStoreCategory.Navigation, () => (from type in types
-                    where type.GetInterfaces().Contains(typeof (INavLinkProvider))
-                    from NavLinkProviderInfoAttribute attribute in
-                        type.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
-                    where attribute.Name.ToUpper().Equals(key)
-                    select Activator.CreateInstance(type, new object[] {sId, wId, un})).FirstOrDefault(), true).Value;
+            var navProvider = (from type in types
+                               where type.GetInterfaces().Contains(typeof(INavLinkProvider))
+                               from NavLinkProviderInfoAttribute attribute in type.GetCustomAttributes(typeof(NavLinkProviderInfoAttribute), false)
+                               where attribute.Name.ToUpper().Equals(key)
+                               select Activator.CreateInstance(type, new object[] { sId, wId, un })).FirstOrDefault();
 
             if (navProvider == null) return;
 
