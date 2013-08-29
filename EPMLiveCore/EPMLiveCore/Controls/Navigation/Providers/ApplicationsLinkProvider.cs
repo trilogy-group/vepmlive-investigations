@@ -18,7 +18,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public override IEnumerable<INavObject> GetLinks()
         {
-            string key = SiteId + "_NavLinks_" + "Applications";
+            string key = "NavLinks_Applications_W_" + WebId + "_U_" + UserId;
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {

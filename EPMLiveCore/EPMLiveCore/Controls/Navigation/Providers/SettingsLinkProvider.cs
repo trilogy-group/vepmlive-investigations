@@ -67,7 +67,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private IEnumerable<INavObject> GetSettings()
         {
-            string key = WebId + "_NavLinks_" + "Settings";
+            string key = "NavLinks_Settings_W_" + WebId;
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {

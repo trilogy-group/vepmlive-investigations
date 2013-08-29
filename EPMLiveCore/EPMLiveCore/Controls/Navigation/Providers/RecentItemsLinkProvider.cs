@@ -32,7 +32,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public override IEnumerable<INavObject> GetLinks()
         {
-            string key = SiteId + "_NavLinks_" + "RecentItems" + "_" + UserId;
+            string key = "NavLinks_RecentItems_S_" + SiteId + "_U_" + UserId;
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
                 List<NavLink> links = GetFrequentApps();

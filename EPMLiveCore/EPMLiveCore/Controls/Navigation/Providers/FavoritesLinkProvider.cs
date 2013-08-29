@@ -23,7 +23,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public FavoritesLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username)
         {
-            _key = SiteId + "_NavLinks_" + "Favorites" + "_" + UserId;
+            _key = "NavLinks_Favorites_S_" + SiteId + "_U_" + UserId;
         }
 
         #endregion Constructors 

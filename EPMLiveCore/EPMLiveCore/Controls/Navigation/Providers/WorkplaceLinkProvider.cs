@@ -40,7 +40,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private IEnumerable<INavObject> GetMyWorkplaceLinks()
         {
-            string key = SiteId + "_NavLinks_" + "GlobalMyWorkplace";
+            string key = "NavLinks_MyWorkplace_W_" + WebId + "_U_" + UserId;
 
             return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
             {
