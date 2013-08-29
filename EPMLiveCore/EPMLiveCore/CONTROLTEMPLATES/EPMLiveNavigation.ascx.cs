@@ -53,6 +53,11 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             get { return SPContext.Current.Web.SafeServerRelativeUrl(); }
         }
 
+        public string UserId
+        {
+            get { return SPContext.Current.Web.CurrentUser.ID.ToString(); }
+        }
+
         #endregion Properties 
 
         #region Methods (4) 

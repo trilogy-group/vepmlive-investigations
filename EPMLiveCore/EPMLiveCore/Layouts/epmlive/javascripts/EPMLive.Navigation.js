@@ -115,6 +115,17 @@
                 };
             })();
 
+            var jqCookie = $.cookie;
+            $.cookie = function (cookieName, data, options) {
+                cookieName = cookieName + '-u-' + window.epmLiveNavigation.currentUserId;
+
+                if (!data) {
+                    return jqCookie(cookieName);
+                }
+
+                jqCookie(cookieName, data, options);
+            }
+
             var epmLiveNavigation = (function () {
                 var animSpeed = 300;
                 var nodeClass = 'epm-nav-node';

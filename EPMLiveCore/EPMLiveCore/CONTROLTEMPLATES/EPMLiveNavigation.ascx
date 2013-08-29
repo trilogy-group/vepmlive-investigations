@@ -121,6 +121,7 @@
     (function () {
         window.epmLiveNavigation = {
             currentWebUrl: '<%= WebUrl %>',
+            currentUserId: <%= UserId %>,
             staticProvider: '<%= StaticProviderLinks %>'
         };
         

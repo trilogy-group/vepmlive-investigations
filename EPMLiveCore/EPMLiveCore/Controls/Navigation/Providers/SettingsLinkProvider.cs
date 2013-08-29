@@ -149,7 +149,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     }
 
                     SPUser user = spWeb.CurrentUser;
-                    if (spWeb.DoesUserHavePermissions(SPBasePermissions.FullMask) || user.IsSiteAdmin)
+                    if (spWeb.DoesUserHavePermissions(SPBasePermissions.ManageWeb) || user.IsSiteAdmin)
                     {
                         links.AddRange(GetSettings().Cast<NavLink>());
                     }
