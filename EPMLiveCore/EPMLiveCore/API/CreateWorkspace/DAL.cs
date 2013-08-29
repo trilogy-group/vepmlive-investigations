@@ -177,12 +177,11 @@ namespace EPMLiveCore.API
             {
                 using (SPSite eSite = new SPSite(siteId))
                 {
-                    using (SqlConnection con = new SqlConnection(CoreFunctions.getReportingConnectionString(eSite.WebApplication.Id, eSite.ID)))
+                    using (SqlConnection con = new SqlConnection(CoreFunctions.getConnectionString(eSite.WebApplication.Id)))
                     {   
                         con.Open();
-                        SqlCommand cmd = new SqlCommand("SELECT q.[Status] FROM TIMERJOBS j JOIN [QUEUE] q ON j.timerjobuid = q.timerjobuid WHERE q.[siteguid] = '" + siteId.ToString() + "' AND j.[webguid] = '" + webId.ToString() + "' AND j.[listguid] = '" + listId.ToString() + "' AND j.[itemid] = " + itemId.ToString());
-                                                        
-
+                        SqlCommand cmd = new SqlCommand("SELECT q.[Status] FROM TIMERJOBS j JOIN [QUEUE] q ON j.timerjobuid = q.timerjobuid WHERE j.[siteguid] = '" + siteId.ToString() + "' AND j.[webguid] = '" + webId.ToString() + "' AND j.[listguid] = '" + listId.ToString() + "' AND j.[itemid] = " + itemId.ToString());
+                        cmd.Connection = con;
                         SqlDataReader rdr = cmd.ExecuteReader();
 
                         while (rdr.Read())
