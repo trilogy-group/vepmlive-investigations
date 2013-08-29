@@ -905,16 +905,30 @@ namespace EPMLiveCore
             {
                 size += 8;
             }
+            else if (typeName.StartsWith("System.Collections.Generic.Dictionary"))
+            {
+                var dict = (IDictionary) obj;
+
+                foreach (var key in dict.Keys)
+                {
+                    size += GetSize(key);
+                }
+
+                foreach (var value in dict.Values)
+                {
+                    size += GetSize(value);
+                }
+            }
             else
             {
                 IEnumerable<FieldInfo> fields = GetFields(t);
 
                 size += (from fieldInfo in fields
-                    select fieldInfo.GetValue(obj)
-                    into subObj
-                    where subObj != obj
-                    where subObj != null
-                    select GetSize(subObj)).Sum();
+                         select fieldInfo.GetValue(obj)
+                             into subObj
+                             where subObj != obj
+                             where subObj != null
+                             select GetSize(subObj)).Sum();
             }
 
             return size;
