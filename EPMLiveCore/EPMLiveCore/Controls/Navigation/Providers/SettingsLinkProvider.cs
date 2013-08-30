@@ -52,8 +52,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
                 {
-                    Title = "Site settings",
-                    Url = string.Format("javascript:GoToPage('{0}/_layouts/15/epmlive/settings.aspx');", RelativeUrl)
+                    Title = "SharePoint Site settings",
+                    Url = string.Format("javascript:GoToPage('{0}/_layouts/15/settings.aspx');", RelativeUrl)
                 }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink {Separator = true})
             };

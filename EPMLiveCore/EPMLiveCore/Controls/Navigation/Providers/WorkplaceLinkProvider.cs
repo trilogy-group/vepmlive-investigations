@@ -51,6 +51,15 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         Title = "My Workplace",
                         Url = "Header"
                     }
+                    //,
+                    //new NavLink
+                    //{
+                    //    Title="Create a workspace",
+                    //    Url =
+                    //        string.Format(
+                    //            @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx?standalone=true&isDlg=1');",
+                    //            RelativeUrl)
+                    //}
                 };
 
                 using (var spSite = new SPSite(SiteId, GetUserToken()))

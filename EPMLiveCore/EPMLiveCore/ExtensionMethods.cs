@@ -876,62 +876,82 @@ namespace EPMLiveCore
 
         public static long GetSize(this object obj)
         {
-            long size = 0L;
+            try
+            {
+                long size = 0L;
 
-            if (obj == null || obj == DBNull.Value) return size;
+                if (obj == null || obj == DBNull.Value) return size;
 
-            Type t = obj.GetType();
+                Type t = obj.GetType();
 
-            Type baseType = t.BaseType;
-            string typeName = t.FullName;
+                Type baseType = t.BaseType;
+                string typeName = t.FullName;
 
-            if (baseType != null && baseType.FullName.Equals("System.ValueType"))
-            {
-                size += GetTypeSize(typeName);
-            }
-            else if (baseType != null && baseType.FullName.Equals("System.Array"))
-            {
-                size += GetTypeSizeArray(typeName, obj);
-            }
-            else if (baseType != null && baseType.FullName.Equals("System.Enum"))
-            {
-                size += Marshal.SizeOf(Enum.GetUnderlyingType(t));
-            }
-            else if (typeName.Equals("System.String"))
-            {
-                size += obj.ToString().Length*sizeof (Char);
-            }
-            else if (typeName.Equals("System.DateTime"))
-            {
-                size += 8;
-            }
-            else if (typeName.StartsWith("System.Collections.Generic.Dictionary"))
-            {
-                var dict = (IDictionary) obj;
-
-                foreach (var key in dict.Keys)
+                if (baseType != null && baseType.FullName.Equals("System.ValueType"))
                 {
-                    size += GetSize(key);
+                    size += GetTypeSize(typeName);
+                }
+                else if (baseType != null && baseType.FullName.Equals("System.Array"))
+                {
+                    size += GetTypeSizeArray(typeName, obj);
+                }
+                else if (baseType != null && baseType.FullName.Equals("System.Enum"))
+                {
+                    size += Marshal.SizeOf(Enum.GetUnderlyingType(t));
+                }
+                else if (typeName.Equals("System.String"))
+                {
+                    size += obj.ToString().Length * sizeof(Char);
+                }
+                else if (typeName.Equals("System.DateTime"))
+                {
+                    size += 8L;
+                }
+                else if (typeName.Equals("EPMLiveCore.Controls.Navigation.EPMLiveQuickLaunchProvider"))
+                {
+                    size += 0L;
+                }
+                else if (typeName.StartsWith("System.Collections.Generic.Dictionary"))
+                {
+                    var dict = (IDictionary) obj;
+
+                    foreach (var key in dict.Keys)
+                    {
+                        size += GetSize(key);
+                    }
+
+                    foreach (var value in dict.Values)
+                    {
+                        size += GetSize(value);
+                    }
+                }
+                else if (typeName.StartsWith("System.Collections.Generic.List"))
+                {
+                    var list = (IList) obj;
+
+                    foreach (var o in list)
+                    {
+                        size += GetSize(o);
+                    }
+                }
+                else
+                {
+                    IEnumerable<FieldInfo> fields = GetFields(t);
+
+                    size += (from fieldInfo in fields
+                             select fieldInfo.GetValue(obj)
+                                 into subObj
+                                 where subObj != obj
+                                 where subObj != null
+                                 select GetSize(subObj)).Sum();
                 }
 
-                foreach (var value in dict.Values)
-                {
-                    size += GetSize(value);
-                }
+                return size;
             }
-            else
+            catch
             {
-                IEnumerable<FieldInfo> fields = GetFields(t);
-
-                size += (from fieldInfo in fields
-                         select fieldInfo.GetValue(obj)
-                             into subObj
-                             where subObj != obj
-                             where subObj != null
-                             select GetSize(subObj)).Sum();
+                return 0L;
             }
-
-            return size;
         }
 
         private static IEnumerable<FieldInfo> GetFields(Type type)

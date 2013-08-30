@@ -78,7 +78,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 "libraries/jquery.min", "@libraries/jquery.cookie", "libraries/slimScroll", "@EPMLive.Navigation"
             });
 
-            HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode");
+            var userId = SPContext.Current.Web.CurrentUser.ID;
+
+            HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode-u-" + userId);
             if (selectedTlNodeCookie != null)
             {
                 _selectedTlNode = selectedTlNodeCookie.Value;
@@ -86,7 +88,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
             Pinned = true;
 
-            HttpCookie pinStateCookie = Request.Cookies.Get("epmnav-pin-state");
+            HttpCookie pinStateCookie = Request.Cookies.Get("epmnav-pin-state-u-" + userId);
             if (pinStateCookie != null)
             {
                 Pinned = pinStateCookie.Value.Equals("pinned");
