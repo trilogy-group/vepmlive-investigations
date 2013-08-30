@@ -229,7 +229,7 @@
 
                         var providerId = categories[category].$el.parent().get(0).id;
 
-                        if (providerId === 'epm-nav-sub-settings') {
+                        if (providerId === 'epm-nav-sub-settings' || providerId === 'epm-nav-sub-workplace') {
                             cssClass = 'epm-nav-node';
                         }
 

@@ -26,7 +26,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     new NavLink
                     {
-                        Title = "Add New",
+                        Title = "Create New",
                         Url = "Header"
                     },
                     new NavLink
