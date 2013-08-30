@@ -1,174 +1,158 @@
 ﻿@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
 
 body {
-
-font-family:Open Sans !important;
-
+    font-family: Open Sans !important;
 }
 
 h4 {
-
-font-family:Open Sans !important;
-
+    font-family: Open Sans !important;
 }
 
 .titleInput {
-
     padding: 2px 5px !important;
     background-color: rgba(255, 255, 255, 0.85) !important;
     border: 1px solid #ABABAB !important;
     color: #444444 !important;
-    color: inherit !important;  
-    font-family:Open Sans !important;
-    font-size:16px !important;
+    color: inherit !important;
+    font-family: Open Sans !important;
+    font-size: 16px !important;
     vertical-align: middle !important;
     outline: none !important;
-    height:30px !important;
-    width:300px !important;
-
+    height: 30px !important;
+    width: 300px !important;
 }
 
 
-.titleInput:hover
-{
-    border-color:#92C0E0 !important;
-}
+    .titleInput:hover {
+        border-color: #92C0E0 !important;
+    }
 
-.titleInput:focus
-{
-border-color:#92C0E0 !important;
-}
+    .titleInput:focus {
+        border-color: #92C0E0 !important;
+    }
 
 
 ol {
+    padding: 10px;
+    overflow: auto;
+    list-style: none;
+    margin: 0;
+    width: 800px;
+}
 
-padding: 10px;
-overflow: auto;
-list-style: none;
-margin: 0;
-width: 840px;
-
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+    /*padding: 15px;*/
+    position: relative;
 }
 
 .modal-dialog {
-    
     width: 860px;
-    
     margin-left: -430px;
 }
 
 .template {
-
-float: left;
-vertical-align: top;
-margin: 0;
-padding: 10px;
-border: 1px solid white;
-border-radius: 3px;
-cursor: pointer;
-width: 388px;
-height: 80px;
--webkit-user-select: none;
--moz-user-select: none;
-user-select: none;
-font-family:Open Sans !important;
+    float: left;
+    vertical-align: top;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 388px;
+    height: 80px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    font-family: Open Sans !important;
 }
 
 
 .template-preview {
-
-float: left;
-width: 48px;
-height: 48px;
-vertical-align: text-bottom;
-
+    float: left;
+    width: 48px;
+    height: 48px;
+    vertical-align: text-bottom;
 }
 
 .template-meta {
-padding-left: 60px;
+    padding-left: 60px;
 }
 
 .template-name {
-
-font-weight: bold;
-margin-top: 0;
-text-overflow: ellipsis;
-overflow: hidden;
-white-space: nowrap;
+    font-weight: bold;
+    margin-top: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .template-description {
-height: 40px;
+    height: 40px;
 }
 
 
 .template-selected {
-
-background-color: #e6eff8;
-border: 1px solid #ccd9ea;
-border-radius: 3px;
-
+    background-color: #e6eff8;
+    border: 1px solid #ccd9ea;
+    border-radius: 3px;
 }
 
 
-.modal-header  {
-
-background-color: #f8f8f8;
-
+.modal-header {
+    background-color: #f8f8f8;
 }
 
 
 .modal-footer {
-
-background-color: #f8f8f8;
-margin-top:0px !important;
-
+    background-color: #f8f8f8;
+    margin-top: 0px !important;
+    height: 30px;
+    padding: 20px;
 }
 
-.toggle
-{
-    background-color:#B6B6B6;
-    width:136px;
-    height:30px;
-    color:#ffffff;
-    font-weight:600;
-    z-index:10;
+.toggle {
+    background-color: #B6B6B6;
+    width: 136px;
+    height: 30px;
+    color: #ffffff;
+    font-weight: 600;
+    z-index: 10;
     margin: 0 auto;
-    margin-top:10px;
+    margin-top: 10px;
 }
 
 
 
 .slider {
-    background-color:#279FCA;
-    width:65px;
-    height:24px;
-    top:3px;
-    left:3px;
-    position:relative;
-    z-index:20;
+    background-color: #279FCA;
+    width: 65px;
+    height: 24px;
+    top: 3px;
+    left: 3px;
+    position: relative;
+    z-index: 20;
 }
 
 .slider-selected {
-    cursor:default !important;
+    cursor: default !important;
 }
 
 .toggle span {
-    vertical-align:middle;
-    margin-top:5px;
-    position:relative;
-    z-index:30;
-    cursor:pointer;
+    vertical-align: middle;
+    margin-top: 5px;
+    position: relative;
+    z-index: 30;
+    cursor: pointer;
 }
 
 #OuterContainer {
-    overflow:hidden;
+    overflow: hidden;
+    width: 860px;
 }
 
-#localTemplates  {
-
-left: -1000px;
-position: absolute;
-
-
+#localTemplates {
+    left: -1000px;
+    position: absolute;
 }

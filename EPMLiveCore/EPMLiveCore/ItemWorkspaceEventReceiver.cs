@@ -30,11 +30,11 @@ namespace EPMLiveCore
             {
                 if (_settings.BuildTeamSecurity)
                 {
-                    //SetUrlFieldMessage(properties);
+                    WorkspaceTimerjobAgent.AddCreateWorkspaceJobAndWait(_creationParams);
                 }
                 else
                 {
-                    WorkspaceTimerjobAgent.QueueCreateWorkspace(_creationParams);
+                    WorkspaceTimerjobAgent.AddAndQueueCreateWorkspaceJob(_creationParams);
                 }
             }
         }
@@ -87,9 +87,9 @@ namespace EPMLiveCore
 
                 SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    using (SPSite s = new SPSite(properties.SiteId))
+                    using (var s = new SPSite(properties.SiteId))
                     {
-                        using (SPWeb lockedWeb = s.OpenWeb(CoreFunctions.getLockedWeb(properties.Web)))
+                        using (var lockedWeb = s.OpenWeb(CoreFunctions.getLockedWeb(properties.Web)))
                         {
                             _createFromLiveTemp = CoreFunctions.getConfigSetting(lockedWeb, "EPMLiveUseLiveTemplates");
                         }

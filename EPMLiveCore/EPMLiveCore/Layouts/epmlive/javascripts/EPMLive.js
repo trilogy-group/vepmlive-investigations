@@ -190,22 +190,7 @@
             }
         }
     };
-
-    $$.CreateEPMLiveWorkspace = function (listid, itemid)
-    {
-        if(listid)
-            var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx?listid=' + listid + '&itemid=' + itemid);
-        else
-            var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx');
-
-        var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
-        var tUrl = urlBuilder.get_url();
-
-        var options = { url: tUrl, title: 'Create', allowMaximize: false };
-
-        SP.UI.ModalDialog.showModalDialog(options);
-    }
-
+    
     $$.getFormattedTime = function (dateTime) {
         var hours = dateTime.getHours();
         var minutes = dateTime.getMinutes();
@@ -419,3 +404,16 @@
     k.applyBindings($$.ui.statusbar, document.getElementById('EPMLiveStatusbar'));
 }(window.epmLive = window.epmLive || {}, jQuery, ko));
 
+function CreateEPMLiveWorkspace (listid, itemid) {
+    if (listid)
+        var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx?listid=' + listid + '&itemid=' + itemid);
+    else
+        var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx');
+
+    var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
+    var tUrl = urlBuilder.get_url();
+
+    var options = { url: tUrl, title: 'Create', allowMaximize: false };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}

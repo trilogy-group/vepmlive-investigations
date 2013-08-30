@@ -33,6 +33,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected string _showInProgress = "false";
         protected bool _isDlg = false;
         protected bool _redirectToModal = false;
+        protected bool _hideEverything = false;
 
         private string _projectWorkspaceSetting = string.Empty;
         private bool _isCreateFromOnlineAvail = false;
@@ -81,12 +82,13 @@ namespace EPMLiveCore.Layouts.epmlive
                     }
                     else 
                     {
+                        _hideEverything = true;
                         // pop up create modal
                         ClientScript.RegisterClientScriptBlock(this.GetType(), Guid.NewGuid().ToString(),
                             @"<script>$(function(){ var options = { url: '_layouts/epmlive/QueueCreateWorkspace.aspx?listid=" + _lstGuid + "&itemid=" + _itemId + "'," +
                                              "allowMaximize: false, " +
                                              "showClose: false }; " +
-                            "parent.SP.UI.showModalDialog(options); });</script>");
+                            "SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); });</script>");
 
                     }
                 }
@@ -257,7 +259,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 SPListItem i = null;
                 try { i = tempList.GetItemById(int.Parse(_itemId)); }
                 catch { }
-                _workspaceTitle = (i != null) ? i.Title : string.Empty;
+                title = (i != null) ? i.Title : string.Empty;
             }
             return title;
         }

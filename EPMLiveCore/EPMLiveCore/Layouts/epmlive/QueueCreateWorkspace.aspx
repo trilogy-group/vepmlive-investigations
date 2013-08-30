@@ -15,7 +15,6 @@
 <asp:content id="Main" contentplaceholderid="PlaceHolderMain" runat="server">
     <link href="/_layouts/epmlive/stylesheets/QueueCreateWorkspace.css" rel="stylesheet">
     <link href="/_layouts/epmlive/stylesheets/libraries/epmlive/buttons.css" rel="stylesheet">
-    <link href="/_layouts/epmlive/stylesheets/libraries/bootstrap/css/bootstrap.css" rel="stylesheet">
     <script type="text/javascript" src="QueueCreateWorkspace.js"></script>
     <%--JS variables--%>
     <script type="text/javascript">
@@ -53,7 +52,7 @@
 	            <input id="permsPrivate" name="rPermGrp" type="radio" value="true" data-bind="checked: uniquePermission"/> Private - Invite only
 	        </div>
             <%--bottom section--%>
-	        <div style="border-top:1px solid #ffffff;width:790px;height:230px;">
+	        <div style="border-top:1px solid #ffffff;width:860px;height:315px;overflow: hidden">
 		        <div class="toggle">
                     <span style="float:left;padding-left:8px;" class="toggleButton slider-selected" id="online" data-bind="click: function (data, event) { loadMarketApps(); toggle(data,event); }">ONLINE</span>
                     <span style="float:right;padding-right:12px;" class="toggleButton" id="local" data-bind="click: function (data, event) { loadDownloadedApps(); toggle(data,event); }">LOCAL</span>
@@ -113,8 +112,9 @@
             </div>
         </div>
         <div class="modal-footer" data-bind="visible: !loading()">
-            <button type="button" class="epmliveButton" data-dismiss="modal" data-bind="click: cancelCreation">Cancel</button>
-            <button type="button" class="epmliveButton" data-bind="click: createWorkspace">Create Workspace</button>
+            <button type="button" class="epmliveButton" style="float:right;" data-bind="click: createWorkspace">Create Workspace</button>
+            <button type="button" class="epmliveButton" style="float:right;" data-dismiss="modal" data-bind="click: cancelCreation">Cancel</button>
+            
         </div>
     </div>
     

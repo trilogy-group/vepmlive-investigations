@@ -37,8 +37,6 @@ namespace EPMLiveCore
                 base.EventFiringEnabled = false;
                 GridGanttSettings settings = new GridGanttSettings(properties.List);
 
-
-
                 bool isSecure = false;
                 try
                 {
@@ -64,9 +62,6 @@ namespace EPMLiveCore
                 cmd.ExecuteNonQuery();
 
                 cn.Close();
-
-
-
                 SPUser orignalUser = properties.Web.AllUsers.GetByID(properties.CurrentUserId);
 
                 if (isSecure)

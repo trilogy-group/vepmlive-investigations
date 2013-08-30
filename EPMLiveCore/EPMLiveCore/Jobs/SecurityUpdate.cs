@@ -13,10 +13,10 @@ namespace EPMLiveCore.Jobs
 {
     public class SecurityUpdate
     {
-        public void execute(SPSite site, SPWeb web, Guid ListId, int ItemId, int userid, string data)
+        public void execute(SPSite site, SPWeb web, Guid listId, int itemId, int userid, string data)
         {
-            SPList list = web.Lists[ListId];
-            SPListItem li = list.GetItemById(ItemId);
+            SPList list = web.Lists[listId];
+            SPListItem li = list.GetItemById(itemId);
             GridGanttSettings settings = new GridGanttSettings(list);
 
 
@@ -182,12 +182,7 @@ namespace EPMLiveCore.Jobs
 
             // we wait until all groups have been created to createworkspace
             // only if there isn't a current process creating ws 
-            if (WorkspaceData.IsFirstAttempt(site, web, list.ID.ToString(), li.ID.ToString()) &&
-                settings.EnableAutoCreation && 
-                settings.AutoCreationTemplateId != "-1" )
-            {  
-                QueueCreateWSJob(site, web, list, li, settings, userid);
-            }
+            WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
         }
      
         private void ProcessSecurity(SPSite site, SPList list, SPListItem li)
@@ -374,37 +369,5 @@ namespace EPMLiveCore.Jobs
             return result;
         }
 
-        private void QueueCreateWSJob(SPSite site, SPWeb web, SPList list, SPListItem li, GridGanttSettings settings, int userid)
-        {
-            string _creationParams = string.Empty;
-            string _createFromLiveTemp = string.Empty;
-            SPSecurity.RunWithElevatedPrivileges(() =>
-            {
-                using (SPSite s = new SPSite(site.ID))
-                {
-                    using (SPWeb lockedWeb = s.OpenWeb(CoreFunctions.getLockedWeb(web)))
-                    {
-                        _createFromLiveTemp = CoreFunctions.getConfigSetting(lockedWeb, "EPMLiveUseLiveTemplates");
-                    }
-                }
-            });
-            _creationParams = "<Data>" +
-                                    "<Param key=\"IsStandAlone\">false</Param>" +
-                                    "<Param key=\"TemplateSource\">downloaded</Param>" +
-                                    "<Param key=\"TemplateItemId\">" + settings.AutoCreationTemplateId + "</Param>" +
-                                    "<Param key=\"IncludeContent\">True</Param>" +
-                                    "<Param key=\"SiteTitle\">" + li.Title + "</Param>" +
-                                    "<Param key=\"AttachedItemId\">" + li.ID.ToString() + "</Param>" +
-                                    "<Param key=\"AttachedItemListGuid\">" + list.ID.ToString() + "</Param>" +
-                                    "<Param key=\"WebUrl\">" + web.Url + "</Param>" +
-                                    "<Param key=\"WebId\">" + web.ID.ToString() + "</Param>" +
-                                    "<Param key=\"SiteId\">" + site.ID.ToString() + "</Param>" +
-                                    "<Param key=\"CreatorId\">" + userid.ToString() + "</Param>" +
-                                    "<Param key=\"CreateFromLiveTemp\">" + _createFromLiveTemp + "</Param>" +
-                                    "<Param key=\"UniquePermission\">" + li.HasUniqueRoleAssignments.ToString() + "</Param>" +
-                                "</Data>";
-
-            WorkspaceTimerjobAgent.QueueCreateWorkspace(_creationParams);
-        }
     }
 }

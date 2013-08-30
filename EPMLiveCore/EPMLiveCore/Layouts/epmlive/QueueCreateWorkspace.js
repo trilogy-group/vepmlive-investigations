@@ -279,7 +279,7 @@ function registerCreateWorkspace2Script() {
 
                     $('#localTemplates').animate({
                         opacity: 1,
-                        left: "20px"
+                        left: "0px"
                     }, 500, function () {
                         //$('#localTemplates').css("position","relative");
                     });
