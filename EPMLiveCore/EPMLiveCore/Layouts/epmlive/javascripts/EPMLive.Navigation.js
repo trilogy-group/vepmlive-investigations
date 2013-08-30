@@ -795,6 +795,68 @@
 
             epmLiveNavigation.init();
 
+            var menuManager = (function () {
+                var _setupMenu = function ($li) {
+                    var liId = $li.get(0).id;
+
+                    if ($li.find('.epm-nav-contextual-menu').length === 0) {
+                        $li.append('<ul class="epm-nav-contextual-menu"><li><a href="#">Rename</a></li><li class="seprator"></li><li><a href="#">Remove</a></li></ul>');
+                    }
+
+                    var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+
+                    var showMenu = function () {
+                        $menu.fadeIn(300);
+                    };
+
+                    var hideMenu = function () {
+                        $menu.fadeOut(300);
+                    };
+
+                    $menu.hover(function () {
+                        window.epmNavHoveredNode = liId;
+                    });
+
+                    $('.epm-nav-node').hover(function () {
+                        var id = this.id;
+                        window.epmNavHoveredNode = id;
+
+                        if (id !== liId) {
+                            window.setTimeout(function () {
+                                if (window.epmNavHoveredNode === id) {
+                                    hideMenu();
+                                }
+                            }, 300);
+                        }
+                    });
+
+                    $('.epm-nav-links').hover(function () {
+                    }, function () {
+                        window.epmNavHoveredNode = null;
+
+                        window.setTimeout(function () {
+                            if (window.epmNavHoveredNode === null) {
+                                hideMenu();
+                            }
+                        }, 300);
+                    });
+
+                    $('.epm-nav-dragger').click(function () {
+                        hideMenu();
+                    });
+
+                    if ($menu.is(':visible')) {
+                        hideMenu();
+                    } else {
+                        showMenu();
+                    }
+                };
+
+                return {
+                    setupMenu: _setupMenu
+                };
+            })();
+
             var manageSettings = function () {
                 var settingsManager = (function () {
                     var _collapseAll = function ($ul) {
@@ -855,6 +917,10 @@
 
                     var _addMenu = function ($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
+
+                        $($li.find('.epm-menu-btn').get(0)).click(function () {
+                            menuManager.setupMenu($li);
+                        });
                     };
 
                     return {
