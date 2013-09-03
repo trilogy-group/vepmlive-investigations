@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
-using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveCore.Controls.Navigation
 {
@@ -32,7 +32,7 @@ namespace EPMLiveCore.Controls.Navigation
             {
                 foreach (var community in _communityLinks)
                 {
-                    nodes.Add(new SiteMapNode(this, community.Key) { Title = community.Key });
+                    nodes.Add(new SiteMapNode(this, community.Key) {Title = community.Key});
                 }
 
                 return nodes;
@@ -54,10 +54,10 @@ namespace EPMLiveCore.Controls.Navigation
 
         private void PopulateCommunityLinks()
         {
-            var currentWeb = SPContext.Current.Web;
-            var siteId = currentWeb.Site.ID;
-            var webId = currentWeb.ID;
-            var username = currentWeb.CurrentUser.LoginName;
+            SPWeb currentWeb = SPContext.Current.Web;
+            Guid siteId = currentWeb.Site.ID;
+            Guid webId = currentWeb.ID;
+            string username = currentWeb.CurrentUser.LoginName;
 
             SPUserToken token = null;
 
@@ -77,76 +77,79 @@ namespace EPMLiveCore.Controls.Navigation
                 throw new Exception("Unable to generate user token for: " + username);
             }
 
-            var navLinks = (object[]) CacheStore.Current.Get("NavLinks_Navigation_W_" + webId + "_U_" + currentWeb.CurrentUser.ID, CacheStoreCategory.Navigation, () =>
-            {
-                var communityLinks = new Dictionary<string, IList<string>>();
-                var linkNodes = new Dictionary<string, SiteMapNode>();
-
-                using (var spSite = new SPSite(siteId, token))
-                {
-                    using (SPWeb spWeb = spSite.OpenWeb(webId))
-                    {
-                        SPList installedAppsList = spWeb.Lists["Installed Applications"];
-
-                        var query = new SPQuery
+            var navLinks =
+                (object[])
+                    CacheStore.Current.Get("NavLinks_Navigation_W_" + webId + "_U_" + currentWeb.CurrentUser.ID,
+                        CacheStoreCategory.Navigation, () =>
                         {
-                            Query = @"<Where><IsNotNull><FieldRef Name='QuickLaunch' /></IsNotNull></Where>",
-                            ViewFields = @"<FieldRef Name='Title' /><FieldRef Name='QuickLaunch' />"
-                        };
+                            var communityLinks = new Dictionary<string, IList<string>>();
+                            var linkNodes = new Dictionary<string, SiteMapNode>();
 
-                        SPListItemCollection communities = installedAppsList.GetItems(query);
-
-                        var locker = new Object();
-
-                        Task.WaitAll((from SPListItem c in communities
-                                      select Task.Factory.StartNew(() =>
-                                      {
-                                          var communityName = (string) (c["Title"] ?? string.Empty);
-                                          if (string.IsNullOrEmpty(communityName)) return;
-
-                                          var ql = (string) (c["QuickLaunch"] ?? string.Empty);
-                                          if (string.IsNullOrEmpty(ql)) return;
-
-                                          foreach (string linkId in ql.Split(','))
-                                          {
-                                              string id = linkId;
-
-                                              if (!communityLinks.ContainsKey(communityName))
-                                              {
-                                                  lock (locker)
-                                                  {
-                                                      communityLinks.Add(communityName, new List<string>());
-                                                  }
-                                              }
-
-                                              lock (locker)
-                                              {
-                                                  communityLinks[communityName].Add(id);
-                                              }
-
-                                              if (linkNodes.ContainsKey(id)) continue;
-
-                                              lock (locker)
-                                              {
-                                                  linkNodes.Add(id, null);
-                                              }
-                                          }
-                                      })).ToArray());
-
-                        string[] links = linkNodes.Keys.ToArray();
-                        foreach (string nodeKey in links)
-                        {
-                            try
+                            using (var spSite = new SPSite(siteId, token))
                             {
-                                linkNodes[nodeKey] = FindSiteMapNodeFromKey(nodeKey);
-                            }
-                            catch { }
-                        }
-                    }
-                }
+                                using (SPWeb spWeb = spSite.OpenWeb(webId))
+                                {
+                                    SPList installedAppsList = spWeb.Lists["Installed Applications"];
 
-                return new object[] { communityLinks, linkNodes };
-            }).Value;
+                                    var query = new SPQuery
+                                    {
+                                        Query = @"<Where><IsNotNull><FieldRef Name='QuickLaunch' /></IsNotNull></Where>",
+                                        ViewFields = @"<FieldRef Name='Title' /><FieldRef Name='QuickLaunch' />"
+                                    };
+
+                                    SPListItemCollection communities = installedAppsList.GetItems(query);
+
+                                    var locker = new Object();
+
+                                    Task.WaitAll((from SPListItem c in communities
+                                        select Task.Factory.StartNew(() =>
+                                        {
+                                            var communityName = (string) (c["Title"] ?? string.Empty);
+                                            if (string.IsNullOrEmpty(communityName)) return;
+
+                                            var ql = (string) (c["QuickLaunch"] ?? string.Empty);
+                                            if (string.IsNullOrEmpty(ql)) return;
+
+                                            foreach (string linkId in ql.Split(','))
+                                            {
+                                                string id = linkId;
+
+                                                if (!communityLinks.ContainsKey(communityName))
+                                                {
+                                                    lock (locker)
+                                                    {
+                                                        communityLinks.Add(communityName, new List<string>());
+                                                    }
+                                                }
+
+                                                lock (locker)
+                                                {
+                                                    communityLinks[communityName].Add(id);
+                                                }
+
+                                                if (linkNodes.ContainsKey(id)) continue;
+
+                                                lock (locker)
+                                                {
+                                                    linkNodes.Add(id, null);
+                                                }
+                                            }
+                                        })).ToArray());
+
+                                    string[] links = linkNodes.Keys.ToArray();
+                                    foreach (string nodeKey in links)
+                                    {
+                                        try
+                                        {
+                                            linkNodes[nodeKey] = FindSiteMapNodeFromKey(nodeKey);
+                                        }
+                                        catch { }
+                                    }
+                                }
+                            }
+
+                            return new object[] {communityLinks, linkNodes};
+                        }).Value;
 
             _communityLinks = (Dictionary<string, IList<string>>) navLinks[0];
             _linkNodes = (Dictionary<string, SiteMapNode>) navLinks[1];

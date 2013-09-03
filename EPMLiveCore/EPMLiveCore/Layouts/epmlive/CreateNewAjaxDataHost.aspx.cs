@@ -3,6 +3,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web;
 using System.Text;
+using System.Collections.Generic;
 
 namespace EPMLiveCore
 {
@@ -44,7 +45,6 @@ namespace EPMLiveCore
         private string BuildListItemHTML()
         {
             StringBuilder itemsHtml = new StringBuilder();
-            SPSite cSite = SPContext.Current.Site;
             SPWeb cWeb = SPContext.Current.Web;
             itemsHtml.Append("<ul class=\"ms-core-menu-list\">");
             itemsHtml.Append("<li class=\"ms-MenuUIULItem\"><div style=\"background-color: #F0F2F5 !important;border-bottom: 1px solid #E2E4E7;color: #4C535C;font-weight: bold !important;padding: 4px 2px !important;\"><span style=\"margin-left:5px\">Lists</span></div></li>");
@@ -58,12 +58,37 @@ namespace EPMLiveCore
         private string BuildListSection()
         {
             StringBuilder itemsHtml = new StringBuilder();
-            SPSite cSite = SPContext.Current.Site;
             SPWeb cWeb = SPContext.Current.Web;
 
-            for (int i = 0; i < cWeb.Lists.Count; i++)
+            Dictionary<int, string[]> dict = GetCreatableLists(cWeb, _requestUrl);
+
+            if (dict.Count > 0)
             {
-                if ((cWeb.Lists[i] is SPDocumentLibrary))
+                foreach (var pair in dict)
+                {
+                    var desc = pair.Value[0];
+                    var text = pair.Value[1];
+                    var imgUrl = pair.Value[2];
+                    var url = pair.Value[3];
+                    var onClick = pair.Value[4];
+
+                    itemsHtml.Append(String.Format(LIST_ITEM_HTML, "MenuItem" + pair.Key, desc, text, imgUrl, url, onClick));
+                }
+            }
+
+            return itemsHtml.ToString();
+        }
+
+        public static Dictionary<int, string[]> GetCreatableLists(SPWeb cWeb, string requestUrl = null)
+        {
+            var dict = new Dictionary<int, string[]>();
+            requestUrl = requestUrl ?? string.Empty;
+
+            var count = cWeb.Lists.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var list = cWeb.Lists[i];
+                if ((list is SPDocumentLibrary))
                 {
                     continue;
                 }
@@ -75,14 +100,13 @@ namespace EPMLiveCore
                 string onclick = string.Empty;
                 bool hideNewBtn = true;
 
-                GridGanttSettings gSettings = new GridGanttSettings(cWeb.Lists[i]);
-
+                GridGanttSettings gSettings = new GridGanttSettings(list);
 
                 // if list is not hidden or 
                 // the hide new button option is not true
-                if (!cWeb.Lists[i].Hidden)
+                if (!list.Hidden)
                 {
-                    if (!cWeb.Lists[i].DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                    if (!list.DoesUserHavePermissions(SPBasePermissions.AddListItems))
                     {
                         continue;
                     }
@@ -92,7 +116,7 @@ namespace EPMLiveCore
 
                     if (!hideNewBtn)
                     {
-                        itemText = cWeb.Lists[i].Title;
+                        itemText = list.Title;
                         string newItemText = gSettings.NewMenuName;
 
                         if (!string.IsNullOrEmpty(newItemText))
@@ -100,8 +124,8 @@ namespace EPMLiveCore
                             itemText = newItemText;
                         }
 
-                        description = cWeb.Lists[i].Description;
-                        imageUrl = cWeb.Lists[i].ImageUrl;
+                        description = list.Description;
+                        imageUrl = list.ImageUrl;
 
                         string rlists = string.Empty;
                         rlists = gSettings.RollupLists;
@@ -119,7 +143,7 @@ namespace EPMLiveCore
                         if (useEnhancedNewMenu && !disableNewButtonMod)
                         {
                             linkUrl = "#";
-                            string createNewWorkspaceUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/createnewworkspace.aspx?list=" + cWeb.Lists[i].ID.ToString("B") + "&type=site&source=" + _requestUrl;
+                            string createNewWorkspaceUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/createnewworkspace.aspx?list=" + list.ID.ToString("B") + "&type=site&source=" + requestUrl;
                             onclick = "javascript:HideLayers();var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                         }
                         // check for roll up lists
@@ -128,48 +152,75 @@ namespace EPMLiveCore
                         {
                             onclick = "";
                             string firstListLName = rlists.Split(',')[0];
-                            linkUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + _requestUrl;
+                            linkUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + requestUrl;
                         }
                         // if content management is allowed
-                        else if (cWeb.Lists[i].AllowContentTypes)
+                        else if (list.AllowContentTypes)
                         {
-                            if (cWeb.Lists[i].NavigateForFormsPages)
+                            if (list.NavigateForFormsPages)
                             {
-                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(cWeb.Lists[i]) + "'; return false;";
+                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
                         else
                         {
-                            if (cWeb.Lists[i].NavigateForFormsPages)
+                            if (list.NavigateForFormsPages)
                             {
-                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(cWeb.Lists[i]) + "'; return false;";
+                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
 
-                        itemsHtml.Append(String.Format(LIST_ITEM_HTML, "MenuItem" + i, description, itemText, imageUrl, linkUrl, onclick));
+                        dict.Add(i, new [] { description, itemText, imageUrl, linkUrl, onclick });
                     }
                 }
             }
-            return itemsHtml.ToString();
+
+            return dict;
         }
 
         private string BuildDocumentLibrarySection()
         {
             StringBuilder itemsHtml = new StringBuilder();
-            SPSite cSite = SPContext.Current.Site;
             SPWeb cWeb = SPContext.Current.Web;
 
-            for (int i = 0; i < cWeb.Lists.Count; i++)
+            Dictionary<int, string[]> dict = GetCreatableLibraries(cWeb, _requestUrl);
+
+            if (dict.Count > 0)
             {
-                if (!(cWeb.Lists[i] is SPDocumentLibrary))
+                foreach (var pair in dict)
+                {
+                    var desc = pair.Value[0];
+                    var text = pair.Value[1];
+                    var imgUrl = pair.Value[2];
+                    var url = pair.Value[3];
+                    var onClick = pair.Value[4];
+
+                    itemsHtml.Append(String.Format(LIST_ITEM_HTML, "MenuItem" + pair.Key, desc, text, imgUrl, url, onClick));
+                }
+            }
+
+            return itemsHtml.ToString();
+        }
+
+        public static Dictionary<int, string[]> GetCreatableLibraries(SPWeb cWeb, string requestUrl = null)
+        {
+            var dict = new Dictionary<int, string[]>();
+            requestUrl = requestUrl ?? string.Empty;
+
+            var count = cWeb.Lists.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var list = cWeb.Lists[i];
+
+                if (!(list is SPDocumentLibrary))
                 {
                     continue;
                 }
@@ -181,13 +232,13 @@ namespace EPMLiveCore
                 string onclick = string.Empty;
                 bool hideNewBtn = true;
 
-                GridGanttSettings gSettings = new GridGanttSettings(cWeb.Lists[i]);
+                GridGanttSettings gSettings = new GridGanttSettings(list);
 
                 // if list is not hidden or 
                 // the hide new button option is not true
-                if (!cWeb.Lists[i].Hidden)
+                if (!list.Hidden)
                 {
-                    if (!cWeb.Lists[i].DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                    if (!list.DoesUserHavePermissions(SPBasePermissions.AddListItems))
                     {
                         continue;
                     }
@@ -197,11 +248,11 @@ namespace EPMLiveCore
 
                     if (!hideNewBtn)
                     {
-                        itemText = cWeb.Lists[i].Title;
-                        itemText = !string.IsNullOrEmpty(gSettings.NewMenuName) ? gSettings.NewMenuName : cWeb.Lists[i].Title;
+                        itemText = list.Title;
+                        itemText = !string.IsNullOrEmpty(gSettings.NewMenuName) ? gSettings.NewMenuName : list.Title;
 
-                        description = cWeb.Lists[i].Description;
-                        imageUrl = cWeb.Lists[i].ImageUrl;
+                        description = list.Description;
+                        imageUrl = list.ImageUrl;
 
                         string rlists = string.Empty;
                         rlists = gSettings.RollupLists;
@@ -219,7 +270,7 @@ namespace EPMLiveCore
                         if (useEnhancedNewMenu && !disableNewButtonMod)
                         {
                             linkUrl = "#";
-                            string createNewWorkspaceUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/createnewworkspace.aspx?list=" + cWeb.Lists[i].ID.ToString("B") + "&type=site&source=" + _requestUrl;
+                            string createNewWorkspaceUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/createnewworkspace.aspx?list=" + list.ID.ToString("B") + "&type=site&source=" + requestUrl;
                             onclick = "javascript:var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                         }
                         // check for roll up lists
@@ -228,54 +279,53 @@ namespace EPMLiveCore
                         {
                             onclick = "";
                             string firstListLName = rlists.Split(',')[0];
-                            linkUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + _requestUrl;
+                            linkUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + requestUrl;
                         }
                         // if content management is allowed
-                        else if (cWeb.Lists[i].AllowContentTypes)
+                        else if (list.AllowContentTypes)
                         {
-                            if (cWeb.Lists[i].NavigateForFormsPages)
+                            if (list.NavigateForFormsPages)
                             {
-                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(cWeb.Lists[i]) + "'; return false;";
+                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
                         else
                         {
-                            if (cWeb.Lists[i].NavigateForFormsPages)
+                            if (list.NavigateForFormsPages)
                             {
-                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(cWeb.Lists[i]) + "'; return false;";
+                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(cWeb.Lists[i]) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                             }
                         }
 
-                        itemsHtml.Append(String.Format(LIST_ITEM_HTML, "MenuItem" + i, description, itemText, imageUrl, linkUrl, onclick));
+                        dict.Add(i, new[] { description, itemText, imageUrl, linkUrl, onclick });
                     }
                 }
             }
-            return itemsHtml.ToString();
+
+            return dict;
         }
 
         #region helper methods
 
-        private string GetDefaultFormUrl(SPList list)
+        private static string GetDefaultFormUrl(SPList list, string requestUrl)
         {
-            SPWeb cWeb = SPContext.Current.Web;
-
             string defaultNewFormUrl = list.DefaultNewFormUrl;
 
             if (defaultNewFormUrl.IndexOf('?') == -1)
             {
-                defaultNewFormUrl += "?source=" + _requestUrl;
+                defaultNewFormUrl += "?source=" + requestUrl;
             }
             else
             {
-                defaultNewFormUrl += "&source=" + _requestUrl;
+                defaultNewFormUrl += "&source=" + requestUrl;
             }
 
             return defaultNewFormUrl;

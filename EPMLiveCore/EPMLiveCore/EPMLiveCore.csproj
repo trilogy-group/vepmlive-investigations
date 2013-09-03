@@ -132,10 +132,16 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
     <Compile Include="API\Applications\Applications.cs" />
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
+    <Compile Include="API\AppsStoreHelper.cs" />
     <Compile Include="API\BaseJob.cs" />
     <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
     <Compile Include="API\Comments\CommentManager.cs" />
     <Compile Include="API\Comments\XmlDataManager.cs" />
+    <Compile Include="API\CreateWorkspace\DAL.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceController.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceFactory.cs" />
+    <Compile Include="API\CreateWorkspace\WorkspaceTimerjobAgent.cs" />
+    <Compile Include="API\CreateWorkspace\WSTempType.cs" />
     <Compile Include="API\ExecutionStatus.asmx.cs" />
     <Compile Include="API\Integration\Generic.cs" />
     <Compile Include="API\Integration\IntegrationAdmin.cs" />
@@ -350,9 +356,11 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="ItemEnableTeamEvent.cs" />
     <Compile Include="ItemSecurityEventReceiver.cs" />
+    <Compile Include="ItemWorkspaceEventReceiver.cs" />
     <Compile Include="Jobs\AdSynchJob.cs" />
     <Compile Include="Jobs\Applications\InstallAndConfigure.cs" />
     <Compile Include="Jobs\Applications\Uninstall.cs" />
+    <Compile Include="Jobs\CreateWorkspaceJob.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\IUpgradeStep.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeHelper.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeStep.cs" />
@@ -877,6 +885,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\publishersettings.aspx.designer.cs">
       <DependentUpon>publishersettings.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\QueueCreateWorkspace.aspx.cs">
+      <DependentUpon>QueueCreateWorkspace.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\QueueCreateWorkspace.aspx.designer.cs">
+      <DependentUpon>QueueCreateWorkspace.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\regionalsetng.aspx.cs">
       <DependentUpon>regionalsetng.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1081,6 +1095,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
     <Compile Include="ResourceTools.cs" />
+    <Compile Include="Security.cs" />
     <Compile Include="SiteNavigationRibbonButton.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownField.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownFieldControl.cs" />
@@ -1120,6 +1135,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="TEMPLATE\admin\epmlive\usersv2.aspx.designer.cs">
       <DependentUpon>usersv2.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="TimeDebug.cs" />
     <Compile Include="TotalsRollup\TotalsRollup.Field.cs" />
     <Compile Include="TotalsRollup\TotalsRollupFieldControl.cs" />
     <Compile Include="TotalsRollup\TotalsRollupProperties.cs">
@@ -1300,6 +1316,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="WorkEngineActivation.cs" />
     <Compile Include="WorkEngineActivationInstaller.cs" />
     <Compile Include="WorkEngineListEventsFeatureReceiver.cs" />
+    <Compile Include="XmlDataManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AppsListEvents\SharePointProjectItem.spdata">
@@ -3217,6 +3234,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js">
       <DependentUpon>icomoon-ie7.js</DependentUpon>
     </Content>
+    <Content Include="Layouts\epmlive\javascripts\libraries\bootstrap3\bootstrap.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\bootstrap3\bootstrap.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\handlebars-1.0.0.js" />
@@ -3273,6 +3292,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\permissions.aspx" />
     <Content Include="Layouts\epmlive\prjsetng.aspx" />
     <Content Include="Layouts\epmlive\publishersettings.aspx" />
+    <Content Include="Layouts\epmlive\QueueCreateWorkspace.aspx" />
+    <Content Include="Layouts\epmlive\QueueCreateWorkspace.js" />
     <Content Include="Layouts\epmlive\refreshind.aspx" />
     <Content Include="Layouts\epmlive\refreshpc.aspx" />
     <Content Include="Layouts\epmlive\regionalsetng.aspx" />
@@ -3303,6 +3324,9 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>epmnav.less</DependentUpon>
     </Content>
     <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap3\bootstrap.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap3\bootstrap.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\epmlive\buttons.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.svg" />
@@ -3342,6 +3366,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\notifications.v2.min.css">
       <DependentUpon>notifications.v2.css</DependentUpon>
     </Content>
+    <Content Include="Layouts\epmlive\stylesheets\QueueCreateWorkspace.css" />
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\icomoon.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />

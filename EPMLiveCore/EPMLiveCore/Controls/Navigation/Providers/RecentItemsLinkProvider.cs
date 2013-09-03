@@ -22,9 +22,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                                         Title, Icon AS CssClass, F_String AS Url FROM dbo.FRF
                                         WHERE (SITE_ID = @SiteId) AND (WEB_ID = @WebId) AND (USER_ID = @UserId) AND (Type = 2)
                                         ORDER BY F_Date DESC";
-
-        private const string FA_QUERY = @"SELECT TOP (5) FRF_ID AS LinkId, LIST_ID AS ListId, ITEM_ID AS ItemId, Title, 
-                                        Icon AS CssClass, F_String AS Url FROM dbo.FRF 
+        private const string FA_QUERY = @"SELECT TOP (5) FRF_ID AS LinkId, LIST_ID AS ListId, ITEM_ID AS ItemId, Title,
+                                        Icon AS CssClass, F_String AS Url FROM dbo.FRF
                                         WHERE (SITE_ID = @SiteId) AND (WEB_ID = @WebId) AND (USER_ID = @UserId) AND (Type = 3)
                                         ORDER BY F_Int DESC, Title";
 
