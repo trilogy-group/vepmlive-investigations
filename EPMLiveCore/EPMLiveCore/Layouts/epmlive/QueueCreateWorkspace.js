@@ -250,19 +250,25 @@ function registerCreateWorkspace2Script() {
                     $(".toggleButton").removeClass("slider-selected");
                     $(target).addClass("slider-selected");
 
-                    $('#localTemplates').animate({
-                        opacity: 0,
-                        left: "-1000px"
-                    }, 500, function () {
-                        $('#localTemplates').css("position", "absolute");
-                    });
+                    //$('#localTemplates').animate({
+                    //    opacity: 0,
+                    //    left: "-1000px"
+                    //}, 500, function () {
+                    //    $('#localTemplates').css("position", "absolute");
+                    //});
 
-                    $('#onlineTemplates').animate({
-                        opacity: 1,
-                        left: "0px",
-                    }, 500, function () {
-                        $('#onlineTemplates').css("position", "relative");
-                    });
+                    //$('#onlineTemplates').animate({
+                    //    opacity: 1,
+                    //    left: "0px",
+                    //}, 500, function () {
+                    //    $('#onlineTemplates').css("position", "relative");
+                    //});
+
+                    $('#localTemplates').hide();
+                    $('#localTemplates').parent().hide();
+                    $('#onlineTemplates').show();
+                    $('#onlineTemplates').parent().show('slide', { direction: 'right' }, 500);
+                    
                 }
 
                 if (target.id == "local" && !$(target).hasClass("slider-selected")) {
@@ -270,23 +276,38 @@ function registerCreateWorkspace2Script() {
                     $(".toggleButton").removeClass("slider-selected");
                     $(target).addClass("slider-selected");
 
-                    $('#onlineTemplates').css("position", "relative").animate({
-                        opacity: 0,
-                        left: "1000px"
-                    }, 500, function () {
+                    //$('#onlineTemplates').css("position", "relative").animate({
+                    //    opacity: 0,
+                    //    left: "1000px"
+                    //}, 500, function () {
 
-                    });
+                    //});
 
-                    $('#localTemplates').animate({
-                        opacity: 1,
-                        left: "0px"
-                    }, 500, function () {
-                        //$('#localTemplates').css("position","relative");
-                    });
+                    //$('#localTemplates').animate({
+                    //    opacity: 1,
+                    //    left: "0px"
+                    //}, 500, function () {
+                    //    //$('#localTemplates').css("position","relative");
+                    //});
+
+                    $('#onlineTemplates').hide();
+                    $('#onlineTemplates').parent().hide();
+                    $('#localTemplates').show();
+                    $('#localTemplates').parent().show('slide', { direction: 'left' }, 500);
+                  
                 }
             };
 
             self.pageInit = function () {
+                $('#onlineTemplates').slimScroll({
+                    height: '200px',
+                    width: '850px'
+                });
+               
+                $('#localTemplates').slimScroll({
+                    height: '200px',
+                    width: '850px'
+                });
                 // set display setting
                 if (self.currentView() == 'market') {
                     self.loadMarketApps();

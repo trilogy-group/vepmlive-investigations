@@ -16,6 +16,7 @@
     <link href="/_layouts/epmlive/stylesheets/QueueCreateWorkspace.css" rel="stylesheet">
     <link href="/_layouts/epmlive/stylesheets/libraries/epmlive/buttons.css" rel="stylesheet">
     <script type="text/javascript" src="QueueCreateWorkspace.js"></script>
+    <script type="text/javascript" src="/_layouts/epmlive/javascripts/libraries/slimScroll.js"></script>
     <%--JS variables--%>
     <script type="text/javascript">
         var isStandAlone = '<%=_isStandAlone%>';
@@ -52,7 +53,7 @@
 	            <input id="permsPrivate" name="rPermGrp" type="radio" value="true" data-bind="checked: uniquePermission"/> Private - Invite only
 	        </div>
             <%--bottom section--%>
-	        <div style="border-top:1px solid #ffffff;width:860px;height:315px;overflow: hidden">
+	        <div style="border-top:1px solid #ffffff;width:860px;height:285px;overflow: hidden">
 		        <div class="toggle">
                     <span style="float:left;padding-left:8px;" class="toggleButton slider-selected" id="online" data-bind="click: function (data, event) { loadMarketApps(); toggle(data,event); }">ONLINE</span>
                     <span style="float:right;padding-right:12px;" class="toggleButton" id="local" data-bind="click: function (data, event) { loadDownloadedApps(); toggle(data,event); }">LOCAL</span>
@@ -63,10 +64,11 @@
                     <div style="background:url('/_layouts/15/epmlive/images/progress_ring.gif') no-repeat scroll center center transparent;height:50px;width:100%">
                     </div>
                 </div>
-	            <div id="onlineTemplates">
+	            <div id="templateContainer">
+	                <div id="onlineTemplates">
 		            <ol data-bind="visible: shouldShowMarket(), foreach: marketApps">
 			            <li class="template" data-bind="click: $root.gotoTemplate">
-				            <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }">
+			                <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
 				            <div class="template-meta">
 					            <div class="template-name">
                                     <span data-bind="text: $data.Title['#cdata']"></span>
@@ -89,7 +91,7 @@
 	            <div id="localTemplates">
 		            <ol data-bind="visible: shouldShowDownloaded(), foreach: downloadedApps">
 			            <li class="template" data-bind="click: $root.gotoTemplate">
-				            <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }">
+			                <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
 				            <div class="template-meta">
 					            <div class="template-name" >
                                      <span data-bind="text: $data.Title['#cdata']"></span>
@@ -108,6 +110,7 @@
                             <input type="hidden" id="localTemplateLevels" name="localTemplateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
 			            </li>
 		            </ol>
+	            </div>
 	            </div>
             </div>
         </div>
