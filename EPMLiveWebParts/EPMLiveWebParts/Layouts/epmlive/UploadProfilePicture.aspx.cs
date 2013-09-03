@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,21 +10,20 @@ using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
-using System.Drawing.Imaging;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
     public partial class UploadProfilePicture : LayoutsPageBase
     {
-		#region Fields (1) 
+        #region Fields (1) 
 
-        private const string ProfilePictureLibraryName = "User Profile Pictures";
+        private const string PROFILE_PICTURE_LIBRARY_NAME = "User Profile Pictures";
 
-		#endregion Fields 
+        #endregion Fields 
 
-		#region Methods (14) 
+        #region Methods (15) 
 
-		// Protected Methods (3) 
+        // Protected Methods (3) 
 
         protected void OnSaveButtonClicked(object sender, EventArgs e)
         {
@@ -65,7 +65,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
             UploadPanel.Visible = false;
             ResizePanel.Visible = true;
         }
-		// Private Methods (11) 
+
+        // Private Methods (12) 
 
         private void CloseDialog(string pictureUrl)
         {
@@ -103,15 +104,15 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private string GetCleanUserName(string loginName)
         {
-            int indexForGettingEverythingAfterPipe = loginName.IndexOf("|") + 1;
+            int indexForGettingEverythingAfterPipe = loginName.IndexOf("|", StringComparison.Ordinal) + 1;
             string loginNameWithDomain = loginName.Mid(indexForGettingEverythingAfterPipe);
 
-            int indexForGettingEverythingAfterDomain = loginNameWithDomain.IndexOf("\\") + 1;
+            int indexForGettingEverythingAfterDomain = loginNameWithDomain.IndexOf("\\", StringComparison.Ordinal) + 1;
             string loginNameWithoutDomain = loginNameWithDomain.Mid(indexForGettingEverythingAfterDomain);
 
             if (loginNameWithoutDomain.Contains("|"))
             {
-                int indexForAdditionalPipe = loginNameWithoutDomain.IndexOf("|") + 1;
+                int indexForAdditionalPipe = loginNameWithoutDomain.IndexOf("|", StringComparison.Ordinal) + 1;
                 string loginNameWithOutExtraPipe = loginNameWithoutDomain.Mid(indexForAdditionalPipe);
                 loginNameWithoutDomain = loginNameWithOutExtraPipe;
             }
@@ -140,7 +141,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         }
                         catch (ArgumentException)
                         {
-                            newWeb.Lists.Add(ProfilePictureLibraryName, null, SPListTemplateType.PictureLibrary);
+                            newWeb.Lists.Add(PROFILE_PICTURE_LIBRARY_NAME, null, SPListTemplateType.PictureLibrary);
 
                             documentLibrary = newWeb.Folders[documentLibraryName];
                         }
@@ -148,6 +149,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 }
             });
             return documentLibrary;
+        }
+
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+            return codecs.FirstOrDefault(codec => codec.FormatID == format.Guid);
         }
 
         private string GetPictureFileName()
@@ -158,7 +165,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private static string GetPictureUrl(string fileName)
         {
-            return string.Format("{0}/{1}/{2}", SPContext.Current.Site.RootWeb.Url, ProfilePictureLibraryName, fileName);
+            return string.Format("{0}/{1}/{2}", SPContext.Current.Site.RootWeb.Url, PROFILE_PICTURE_LIBRARY_NAME,
+                fileName);
         }
 
         private byte[] ResizeImage(string resizeInfo)
@@ -187,30 +195,14 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
             using (Stream stream = new MemoryStream())
             {
-                EncoderParameters encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+                var encoderParameters = new EncoderParameters(1);
+                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
                 target.Save(stream, GetEncoder(ImageFormat.Jpeg), encoderParameters);
 
                 var img = new Bitmap(stream);
-                ImageConverter converter = new ImageConverter();
-                return (byte[]) converter.ConvertTo(img, typeof(byte[]));
+                var converter = new ImageConverter();
+                return (byte[]) converter.ConvertTo(img, typeof (byte[]));
             }
-        }
-
-        private static ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-
-            foreach (ImageCodecInfo codec in codecs)
-            {
-                if (codec.FormatID == format.Guid)
-                {
-                    return codec;
-                }
-            }
-
-            return null;
         }
 
         private void SavePicture(byte[] pic)
@@ -315,6 +307,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
             pictureDocumentLibrary.Update();
         }
 
-		#endregion Methods 
+        #endregion Methods 
     }
 }
