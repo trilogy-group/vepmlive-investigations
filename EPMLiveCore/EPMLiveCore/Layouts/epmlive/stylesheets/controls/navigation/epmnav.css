@@ -422,8 +422,13 @@ ul.epm-nav-contextual-menu li {
 ul.epm-nav-contextual-menu li:hover {
   background: #ffffff !important;
 }
+ul.epm-nav-contextual-menu li img {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
 ul.epm-nav-contextual-menu li a {
-  width: 157px !important;
+  width: 136px !important;
   color: #999999 !important;
   padding: 0 !important;
 }

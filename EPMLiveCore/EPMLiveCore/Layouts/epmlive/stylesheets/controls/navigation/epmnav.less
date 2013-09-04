@@ -5,6 +5,8 @@
 @link-width: (@sub-nav-width - 40px) - 1px;
 @link-tag-width: 125px;
 @menu-width: 157px;
+@menu-img-width: 16px;
+@menu-img-offset: 5px;
 @sub-header-width: @sub-nav-width - 20px;
 @node-height: 20px;
 @shadow-color: rgba(0, 0, 0, 0.2) inset;
@@ -511,8 +513,14 @@ ul.epm-nav-contextual-menu {
             background: #ffffff !important;
         }
 
+        img {
+            width: @menu-img-width;
+            height: @menu-img-width;
+            margin-right: @menu-img-offset;
+        }
+
         a {
-            width: @menu-width !important;
+            width: @menu-width - @menu-img-width - @menu-img-offset !important;
             color: @menu-color !important;
             padding: 0 !important;
 

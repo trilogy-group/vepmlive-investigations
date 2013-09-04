@@ -541,9 +541,45 @@
                         saveLinkState($cat.parent());
                     });
                 }
-                
-                function handleContextualCommand(siteId, webId, listId, itemId, command, kind) {
 
+                function handleContextualCommand(id, siteId, webId, listId, itemId, command, kind) {
+                    var url = window.epmLiveNavigation.currentWebUrl;
+                    var gaUrl = url + '/_layouts/15/epmlive/gridaction.aspx?siteid=' + siteId + '&webid=' + webId;
+                    var rpUrl = url + '/_layouts/15/epmlive/redirectionproxy.aspx?siteid=' + siteId + '&webid=' + webId;
+
+                    var redirectUrl = '';
+
+                    switch(command) {
+                        case 'nav:add':
+                            redirectUrl = rpUrl + '&action=new&listid=' + listId;
+                            break;
+                    }
+                    
+                    if (redirectUrl) {
+                        switch(kind) {
+                            case '0':
+                                OpenCreateWebPageDialog(redirectUrl);
+                                break;
+                            case '1':
+                                location.href = redirectUrl;
+                                break;
+                            case '2':
+                                window.open(redirectUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                                break;
+                            case '3':
+                                window.open(redirectUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                                break;
+                            case '5':
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 600, height: 500 });
+                                break;
+                            case '6':
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
+                                break;
+                            default:
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700 });
+                                break;
+                        }
+                    }
                 }
 
                 function registerEvents() {
@@ -614,8 +650,8 @@
                         toggleNode(data, x, elNav, y, elNodes);
                     };
 
-                    window.epmLiveNav_handleContextualCommand = function(siteId, webId, listId, itemId, command, kind) {
-                        handleContextualCommand(siteId, webId, listId, itemId, command, kind);
+                    window.epmLiveNavigation.handleContextualCommand = function(id, siteId, webId, listId, itemId, command, kind) {
+                        handleContextualCommand(id, siteId, webId, listId, itemId, command, kind);
                     };
 
                     $('td.epm-nav-node-root').click(function () {
@@ -834,7 +870,9 @@
                                     $cl.append('<li class="seprator"></li>');
                                 }
                             } else {
-                                $cl.append('<li><a href="javascript:epmLiveNav_handleContextualCommand(\'' + $ca.data('siteid') + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
+                                var imgUrl = cmd.imgUrl || '/_layouts/images/blank.gif';
+
+                                $cl.append('<li><img src="' + imgUrl + '" /><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('siteid') + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
                             }
                         }
 
@@ -906,7 +944,7 @@
 
                                 for (var i = 0; i < items.length; i++) {
                                     var item = items[i];
-                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'] });
+                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
                                 }
                             }
 
@@ -987,8 +1025,7 @@
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
-                                { title: 'Rename', command: 'rename', kind: '' },
-                                { title: 'Remove', command: 'remove', kind: '99' }
+                                { title: 'Remove', command: 'nav:remove', kind: '99' }
                             ]);
                         });
                     };
@@ -1031,13 +1068,20 @@
 
                     var addNewItemMenu = function($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-plus-2"></span></span>');
+                        
+                        $($li.find('.epm-menu-btn').get(0)).click(function () {
+                            var $a = $($li.find('a').get(0));
+                            window.epmLiveNavigation.handleContextualCommand(null, $a.data('siteid'), $a.data('webid'), $a.data('listid'), null, 'nav:add', 0);
+                        });
                     };
                     
                     var addContextualMenu = function ($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
                         
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
-                            menuManager.setupMenu($li);
+                            menuManager.setupMenu($li, [
+                                { title: 'Remove', command: 'nav:remove', kind: '99' }
+                            ]);
                         });
                     };
                     

@@ -887,6 +887,7 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\QueueCreateWorkspace.aspx.cs">
       <DependentUpon>QueueCreateWorkspace.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\QueueCreateWorkspace.aspx.designer.cs">
       <DependentUpon>QueueCreateWorkspace.aspx.cs</DependentUpon>
@@ -3366,7 +3367,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\notifications.v2.min.css">
       <DependentUpon>notifications.v2.css</DependentUpon>
     </Content>
-    <Content Include="Layouts\epmlive\stylesheets\QueueCreateWorkspace.css" />
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\icomoon.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
