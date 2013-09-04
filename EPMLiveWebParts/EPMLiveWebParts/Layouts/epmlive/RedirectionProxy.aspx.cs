@@ -24,6 +24,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             {
                 string action = Request.QueryString["action"];
                 string id = Request.QueryString["id"];
+                string listId = Request.QueryString["listid"];
                 string listName = Request.QueryString["listname"];
                 string isDlg = Request.QueryString["isdlg"] ?? "1";
 
@@ -35,6 +36,18 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 string safeServerRelativeUrl = spWeb.SafeServerRelativeUrl();
 
                 string redirectUrl = string.Empty;
+
+                if (string.IsNullOrEmpty(listName))
+                {
+                    if (!string.IsNullOrEmpty(listId))
+                    {
+                        try
+                        {
+                            listName = spWeb.Lists.GetList(new Guid(listId), true).Title;
+                        }
+                        catch { }
+                    }
+                }
 
                 switch (action)
                 {
