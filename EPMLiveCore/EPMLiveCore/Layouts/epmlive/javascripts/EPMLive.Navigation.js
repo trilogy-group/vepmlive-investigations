@@ -541,6 +541,10 @@
                         saveLinkState($cat.parent());
                     });
                 }
+                
+                function handleContextualCommand(siteId, webId, listId, itemId, command, kind) {
+
+                }
 
                 function registerEvents() {
                     var hoverNode = window.TreeView_HoverNode;
@@ -608,6 +612,10 @@
 
                         saveExpandState(nodeId, d);
                         toggleNode(data, x, elNav, y, elNodes);
+                    };
+
+                    window.epmLiveNav_handleContextualCommand = function(siteId, webId, listId, itemId, command, kind) {
+                        handleContextualCommand(siteId, webId, listId, itemId, command, kind);
                     };
 
                     $('td.epm-nav-node-root').click(function () {
@@ -796,15 +804,75 @@
             epmLiveNavigation.init();
 
             var menuManager = (function () {
-                var _setupMenu = function ($li) {
-                    var liId = $li.get(0).id;
-
-                    if ($li.find('.epm-nav-contextual-menu').length === 0) {
-                        $li.append('<ul class="epm-nav-contextual-menu"><li><a href="#">Rename</a></li><li class="seprator"></li><li><a href="#">Remove</a></li></ul>');
-                    }
-
+                var _setupMenu = function ($li, defaultCommands) {
+                    defaultCommands = defaultCommands || [];
+                    
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                    
+                    var setup = function(commands,$ca) {
+                        var liId = $li.get(0).id;
 
+                        if (commands.length) {
+                            commands.push({ title: '--SEP--' });
+                        }
+
+                        for (var dc in defaultCommands) {
+                            commands.push(defaultCommands[dc]);
+                        }
+
+                        $li.append('<ul class="epm-nav-contextual-menu"></ul>');
+                        
+                        $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+
+                        var $cl = $($li.find('.epm-nav-contextual-menu').get(0));
+
+                        for (var i = 0; i < commands.length; i++) {
+                            var cmd = commands[i];
+
+                            if (cmd.title === '--SEP--') {
+                                if (i !== commands.length - 1) {
+                                    $cl.append('<li class="seprator"></li>');
+                                }
+                            } else {
+                                $cl.append('<li><a href="javascript:epmLiveNav_handleContextualCommand(\'' + $ca.data('siteid') + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
+                            }
+                        }
+
+                        $menu.hover(function () {
+                            window.epmNavHoveredNode = liId;
+                        });
+
+                        $('.epm-nav-node').hover(function () {
+                            var id = this.id;
+                            window.epmNavHoveredNode = id;
+
+                            if (id !== liId) {
+                                window.setTimeout(function () {
+                                    if (window.epmNavHoveredNode === id) {
+                                        hideMenu();
+                                    }
+                                }, 300);
+                            }
+                        });
+
+                        $('.epm-nav-links').hover(function () {
+                        }, function () {
+                            window.epmNavHoveredNode = null;
+
+                            window.setTimeout(function () {
+                                if (window.epmNavHoveredNode === null) {
+                                    hideMenu();
+                                }
+                            }, 300);
+                        });
+
+                        $('.epm-nav-dragger').click(function () {
+                            hideMenu();
+                        });
+                        
+                        toggleMenu();
+                    };
+                    
                     var showMenu = function () {
                         $menu.fadeIn(300);
                     };
@@ -813,42 +881,41 @@
                         $menu.fadeOut(300);
                     };
 
-                    $menu.hover(function () {
-                        window.epmNavHoveredNode = liId;
-                    });
-
-                    $('.epm-nav-node').hover(function () {
-                        var id = this.id;
-                        window.epmNavHoveredNode = id;
-
-                        if (id !== liId) {
-                            window.setTimeout(function () {
-                                if (window.epmNavHoveredNode === id) {
-                                    hideMenu();
-                                }
-                            }, 300);
+                    var toggleMenu = function() {
+                        if ($menu.is(':visible')) {
+                            hideMenu();
+                        } else {
+                            showMenu();
                         }
-                    });
+                    };
 
-                    $('.epm-nav-links').hover(function () {
-                    }, function () {
-                        window.epmNavHoveredNode = null;
+                    if ($li.find('.epm-nav-contextual-menu').length === 0) {
+                        var $a = $($li.find('a').get(0));
 
-                        window.setTimeout(function () {
-                            if (window.epmNavHoveredNode === null) {
-                                hideMenu();
+                        var data = '<Request><Params><SiteId>' + $a.data('siteid') + '</SiteId><WebId>' + $a.data('webid') + '</WebId><ListId>' + $a.data('listid') + '</ListId><ItemId>' + $a.data('itemid') + '</ItemId></Params></Request>';
+
+                        epmLiveService.execute('GetContextualMenuItems', data, function (response) {
+                            var commands = [];
+
+                            var items = response.Items.Item;
+                            
+                            if (items) {
+                                if (!items.length) {
+                                    items = [items];
+                                }
+
+                                for (var i = 0; i < items.length; i++) {
+                                    var item = items[i];
+                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'] });
+                                }
                             }
-                        }, 300);
-                    });
 
-                    $('.epm-nav-dragger').click(function () {
-                        hideMenu();
-                    });
-
-                    if ($menu.is(':visible')) {
-                        hideMenu();
+                            setup(commands, $a);
+                        }, function(response) {
+                            setup([], $a);
+                        });
                     } else {
-                        showMenu();
+                        toggleMenu();
                     }
                 };
 
@@ -859,14 +926,14 @@
 
             var manageSettings = function () {
                 var settingsManager = (function () {
-                    var _collapseAll = function ($ul) {
-                        $ul.find('.epm-nav-cat').each(function () {
+                    var _collapseAll = function ($sl) {
+                        $sl.find('.epm-nav-cat').each(function () {
                             var $span = $($(this).find('span').get(0));
                             $span.removeClass('epm-nav-node-expanded');
                             $span.addClass('epm-nav-node-collapsed');
                         });
 
-                        $ul.find('.epm-nav-links').each(function () {
+                        $sl.find('.epm-nav-links').each(function () {
                             var $list = $(this);
 
                             if (!$list.hasClass('epm-nav-node-static')) {
@@ -919,7 +986,10 @@
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
-                            menuManager.setupMenu($li);
+                            menuManager.setupMenu($li, [
+                                { title: 'Rename', command: 'rename', kind: '' },
+                                { title: 'Remove', command: 'remove', kind: '99' }
+                            ]);
                         });
                     };
 
@@ -965,6 +1035,10 @@
                     
                     var addContextualMenu = function ($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
+                        
+                        $($li.find('.epm-menu-btn').get(0)).click(function () {
+                            menuManager.setupMenu($li);
+                        });
                     };
                     
                     return {
