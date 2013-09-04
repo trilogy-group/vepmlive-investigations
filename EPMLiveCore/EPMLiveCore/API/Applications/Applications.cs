@@ -1410,7 +1410,7 @@ namespace EPMLiveCore.API
 
         }
 
-        private static string GetVersionFolder(WorkEngineSolutionStoreListSvc.Lists listSvc, string applicationfolder)
+        private static string GetVersionFolder(ProductionStore.Lists listSvc, string applicationfolder)
         {
             XmlDocument xmlDoc = new XmlDocument();
             XmlNode queryOptions = xmlDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
@@ -1470,7 +1470,7 @@ namespace EPMLiveCore.API
                 return true;
             };
 
-            WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists();
+            var listSvc = new ProductionStore.Lists();
             listSvc.Url = storeurl + "/_vti_bin/lists.asmx";
             listSvc.Credentials = CoreFunctions.GetStoreCreds();
 
@@ -1620,7 +1620,7 @@ namespace EPMLiveCore.API
                 return true;
             };
 
-            WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists();
+            var listSvc = new ProductionStore.Lists();
             listSvc.Url = storeurl + "/_vti_bin/lists.asmx";
             listSvc.Credentials = CoreFunctions.GetStoreCreds();
 

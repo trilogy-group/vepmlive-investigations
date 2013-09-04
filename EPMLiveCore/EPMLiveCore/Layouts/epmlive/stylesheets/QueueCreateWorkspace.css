@@ -37,11 +37,11 @@ ol {
     overflow: auto;
     list-style: none;
     margin: 0;
-    width: 800px;
+    width: 860px;
 }
 
 .modal-body {
-    max-height: 400px;
+    /*max-height: 400px;*/
     overflow-y: auto;
     /*padding: 15px;*/
     position: relative;
@@ -58,12 +58,15 @@ ol {
     margin: 0;
     padding: 10px;
     border: 1px solid white;
+    -ms-border-radius: 3px;
     border-radius: 3px;
     cursor: pointer;
-    width: 388px;
+    width: 390px;
     height: 80px;
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
     user-select: none;
     font-family: Open Sans !important;
 }
@@ -106,7 +109,7 @@ ol {
 
 
 .modal-footer {
-    background-color: #f8f8f8;
+    /*background-color: #f8f8f8;*/
     margin-top: 0px !important;
     height: 30px;
     padding: 20px;
@@ -147,12 +150,19 @@ ol {
     cursor: pointer;
 }
 
-#OuterContainer {
+#OuterContainer,
+#localTemplates {
     overflow: hidden;
-    width: 860px;
+    float: left;
 }
 
 #localTemplates {
-    left: -1000px;
-    position: absolute;
+    display: none;
+}
+
+#templateContainer {
+    width: 860px;
+    height: 220px;
+    max-width: 860px;
+    max-height: 220px;
 }

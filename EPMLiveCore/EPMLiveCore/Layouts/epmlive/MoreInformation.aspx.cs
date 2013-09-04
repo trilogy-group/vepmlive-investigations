@@ -134,7 +134,7 @@ namespace EPMLiveCore
             XmlNode ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
             //ndQueryOptions.InnerXml = "<queryOptions xmlns:SOAPSDK9=\"http://schemas.microsoft.com/sharepoint/soap/\" ><QueryOptions/></queryOptions>";
             ndQueryOptions.InnerXml = "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
-            using (WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists())
+            using (var listSvc = new ProductionStore.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");

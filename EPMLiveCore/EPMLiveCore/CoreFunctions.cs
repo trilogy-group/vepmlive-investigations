@@ -1399,7 +1399,7 @@ namespace EPMLiveCore
                         cn = "5";
                         break;
                     case "workenginestore":
-                        cn = "https://store.workengine.com/";
+                        cn = "https://store.workengine.com";
                         break;
                     case "notificationinterval":
                         cn = "5";
@@ -1959,6 +1959,52 @@ namespace EPMLiveCore
                             {
                                 Dictionary<string, SPRoleType> groups = Security.AddBasicSecurityToWorkspace(w, w.Title, w.AllUsers[user]);
                                 strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(w, "EPMLiveGroupsPermAssignments");
+                                List<SPEventReceiverDefinition> evts = null;
+                                List<string> listsToBeMapped = new List<string>();
+                                string EPMLiveReportingAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+                                foreach (SPList l in w.Lists)
+                                {   
+                                    string sClass = "EPMLiveReportsAdmin.ListEvents";
+
+                                     evts = CoreFunctions.GetListEvents(l,
+                                                                        EPMLiveReportingAssembly,
+                                                                        sClass,
+                                                                        new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
+                                                                                    SPEventReceiverType.ItemUpdated,
+                                                                                    SPEventReceiverType.ItemDeleting});
+
+                                     if (evts.Count > 0 &&
+                                         !listsToBeMapped.Contains(l.Title))
+                                     {
+                                         listsToBeMapped.Add(l.Title);
+                                         continue;
+                                     }
+                                }
+
+                                if (listsToBeMapped.Count > 0)
+                                {
+                                    MethodInfo m = null;
+                                    Assembly assemblyInstance = null;
+                                    Type thisClass = null;
+                                    object apiClass = null;
+                                    // use reflection to map list
+                                    try
+                                    {
+                                        assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                        thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                        m = thisClass.GetMethod("MapDefaultList", BindingFlags.Public | BindingFlags.Instance);
+                                        apiClass = Activator.CreateInstance(thisClass, new object[] { SPContext.Current.Site.ID });
+                                    }
+                                    catch { }
+
+                                    if (m != null && 
+                                        assemblyInstance != null && 
+                                        thisClass != null && 
+                                        apiClass != null)
+                                    {
+                                        m.Invoke(apiClass, new object[] { string.Join(",", listsToBeMapped) });
+                                    }
+                                }
                             }
                         }
                     });

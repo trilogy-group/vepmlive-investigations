@@ -109,7 +109,7 @@ namespace EPMLiveCore
                                     "<Param key=\"SiteId\">" + _siteId.ToString() + "</Param>" +
                                     "<Param key=\"CreatorId\">" + properties.Web.CurrentUser.ID.ToString() + "</Param>" +
                                     "<Param key=\"CreateFromLiveTemp\">" + _createFromLiveTemp + "</Param>" +
-                                    "<Param key=\"UniquePermission\">" + properties.ListItem.HasUniqueRoleAssignments.ToString() + "</Param>" +
+                                    "<Param key=\"UniquePermission\">" + _settings.BuildTeamSecurity.ToString() + "</Param>" +
                                 "</Data>";
                 return true;
             }

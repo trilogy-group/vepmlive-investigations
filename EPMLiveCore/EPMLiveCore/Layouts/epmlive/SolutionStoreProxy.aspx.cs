@@ -139,12 +139,12 @@ namespace EPMLiveCore
             ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
             string webId = _dataManager.GetPropVal("WebID");
 
-            using (WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists())
+            using (var listSvc = new ProductionStore.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
                 //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
-                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
                 try
                 {
                     System.Net.ServicePointManager.ServerCertificateValidationCallback =
@@ -199,12 +199,12 @@ namespace EPMLiveCore
             ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
             string webId = _dataManager.GetPropVal("WebID");
 
-            using (WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists())
+            using (var listSvc = new ProductionStore.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
                 //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
-                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
                 try
                 {
                     System.Net.ServicePointManager.ServerCertificateValidationCallback =
@@ -230,11 +230,11 @@ namespace EPMLiveCore
             System.Xml.XmlNode data = null;
             string listName = _dataManager.GetPropVal("ListName");
 
-            using (WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists())
+            using (var listSvc = new ProductionStore.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
-                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
 
                 try
                 {

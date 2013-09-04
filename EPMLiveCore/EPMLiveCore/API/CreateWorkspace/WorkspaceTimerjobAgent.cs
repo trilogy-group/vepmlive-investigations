@@ -186,8 +186,7 @@ namespace EPMLiveCore.API
         /// <param name="itemid"></param>
         /// <returns></returns>
         public static string QueueWorkspaceJobOnHoldForSecurity(Guid sid, Guid wid, Guid listguid, int itemid)
-        {
-            string result = string.Empty;
+        {   
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 using (var s = new SPSite(sid))
@@ -236,12 +235,11 @@ namespace EPMLiveCore.API
                 }
             });
 
-            return result;
+            return "success";
         }
 
         public static string QueueCreateWorkspace(string xmlData)
         {
-            string result = string.Empty;
             var mgr = new XMLDataManager(xmlData);
             var sid = new Guid(mgr.GetPropVal("SiteId"));
             var wid = new Guid(mgr.GetPropVal("WebId"));
@@ -294,14 +292,11 @@ namespace EPMLiveCore.API
                     }
                 }
             });
-
-            return result;
+            return "sucess";
         }
 
         public static string QueueCreateWorkspace(Guid sid, Guid wid, Guid listguid, int itemid)
         {
-            string result = string.Empty;
-
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 using (var s = new SPSite(sid))
@@ -342,13 +337,59 @@ namespace EPMLiveCore.API
                 }
             });
 
-            return result;
+            return "success";
         }
 
-        public static void AddAndQueueCreateWorkspaceJob(string xmlData)
+        public static string AddAndQueueCreateWorkspaceJob(string xmlData)
         {
-            AddCreateWorkspaceJob(xmlData);
-            QueueCreateWorkspace(xmlData);
+            string result = "success";
+            var mgr = new XMLDataManager(xmlData);
+            var sid = new Guid(mgr.GetPropVal("SiteId"));
+            var wid = new Guid(mgr.GetPropVal("WebId"));
+            Guid listguid = Guid.Empty;
+            if (!string.IsNullOrEmpty(mgr.GetPropVal("AttachedItemListGuid")))
+            {
+                listguid = new Guid(mgr.GetPropVal("AttachedItemListGuid"));
+            }
+            int itemid = -1;
+            if (!string.IsNullOrEmpty(mgr.GetPropVal("AttachedItemId")))
+            {
+                itemid = int.Parse(mgr.GetPropVal("AttachedItemId"));
+            }
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                using (var site = new SPSite(sid))
+                {
+                    using (SPWeb web = site.OpenWeb(wid))
+                    {
+                        using (var con = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
+                        {
+                            con.Open();
+                            Guid timerjobguid = Guid.NewGuid();
+                            var cmd = new SqlCommand
+                            {
+                                CommandText =
+                                    "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, listguid, itemid, jobdata) VALUES (@timerjobuid,@siteguid, 100, 'Create Workspace', 0, @webguid, @listguid, @itemid, @jobdata)",
+                                Connection = con
+                            };
+
+                            cmd.Parameters.Add(new SqlParameter("@timerjobuid", timerjobguid));
+                            cmd.Parameters.Add(new SqlParameter("@siteguid", site.ID.ToString()));
+                            cmd.Parameters.Add(new SqlParameter("@webguid", web.ID.ToString()));
+                            cmd.Parameters.Add(new SqlParameter("@listguid", listguid.ToString()));
+                            cmd.Parameters.Add(new SqlParameter("@itemid", itemid.ToString()));
+                            cmd.Parameters.Add(new SqlParameter("@jobdata", xmlData));
+                            cmd.ExecuteNonQuery();
+
+                            CoreFunctions.enqueue(timerjobguid, 0, site);
+                        }
+                    }
+                }
+            });
+
+            return result;
+
+           
         }
     }
 }

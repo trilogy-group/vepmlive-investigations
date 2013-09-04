@@ -12,7 +12,7 @@ function registerCreateWorkspace2Script() {
             self.workEngineSvcUrl = w.workEngineSvcUrl;
             self.solutionLibPath = w.epmLive.currentWebFullUrl + '/_layouts/EPMLive/SolutionStoreProxy.aspx';
             self.currentView = ko.observable("market");
-            self.loading = ko.observable();
+            self.loading = ko.observable(true);
             self.createFromLiveTemp = ko.observable(w.createFromLiveTemps);
             self.marketApps = ko.observableArray();
             self.downloadedApps = ko.observableArray();
@@ -92,12 +92,11 @@ function registerCreateWorkspace2Script() {
             // BEHAVIORS
             self.loadMarketApps = function () {
                 if (self.marketApps().length === 0) {
-                    self.loading(true);
                     $.ajax({
                         type: "POST",
                         url: self.solutionLibPath,
                         data: { data: self.loadMarketAppsParams() },
-                        success: function (result) {
+                        success: function(result) {
                             if (result !== "<Templates />") {
                                 var oJson = w.epmLive.parseJson(result);
                                 // make sure all properties exist, 
@@ -105,11 +104,15 @@ function registerCreateWorkspace2Script() {
                                 var qualifiedTemps = self.getCleanTempCollection(oJson.Templates.Template);
                                 self.marketApps(qualifiedTemps);
                             }
+                            self.loading(false);
+                            self.AutosizeDialog();
                         },
-                        error: function (jqXhr, textStatus, errorThrown) {
+                        error: function(jqXhr, textStatus, errorThrown) {
                             alert(errorThrown);
+                            self.loading(false);
                         }
                     });
+                } else {
                     self.loading(false);
                 }
 
@@ -119,14 +122,13 @@ function registerCreateWorkspace2Script() {
 
             self.loadDownloadedApps = function () {
                 if (self.downloadedApps().length === 0) {
-                    self.loading(true);
                     $.ajax({
                         type: "POST",
                         url: self.workEngineSvcUrl,
                         data: "{Function: 'GetAllTempGalTemps', Dataxml: '" + self.loadDownloadedAppParams() + "' }",
                         contentType: 'application/json; charset=utf-8',
                         dataType: 'json',
-                        success: function (result) {
+                        success: function(result) {
                             if (result.d != '<Result Status=\"0\"><Templates /></Result>') {
                                 var oJson = w.epmLive.parseJson(result.d);
                                 // make sure all properties exist, 
@@ -134,11 +136,14 @@ function registerCreateWorkspace2Script() {
                                 var qualifiedTemps = self.getCleanTempCollection(oJson.Result.Templates.Template);
                                 self.downloadedApps(qualifiedTemps);
                             }
+                            self.loading(false);
                         },
-                        error: function (jqXhr, textStatus, errorThrown) {
+                        error: function(jqXhr, textStatus, errorThrown) {
                             alert(errorThrown);
+                            self.loading(false);
                         }
                     });
+                } else {
                     self.loading(false);
                 }
                 self.currentView('downloaded');
@@ -191,18 +196,19 @@ function registerCreateWorkspace2Script() {
                 $.ajax({
                     type: "POST",
                     url: self.workEngineSvcUrl,
-                    data: "{Function: 'QueueCreateWorkspace', Dataxml: '" + self.createWSParams() + "' }",
+                    data: "{Function: 'AddAndQueueCreateWorkspaceJob', Dataxml: '" + self.createWSParams() + "' }",
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     success: function (result) {
-                        alert(result);
+                        //var r = result;
+                        parent.SP.UI.ModalDialog.commonModalDialogClose('', '');
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
                         alert(errorThrown);
                     }
                 });
 
-                //parent.SP.UI.ModalDialog.commonModalDialogClose('', '');
+                
             };
 
             self.gotoTemplate = function (data, event) {
@@ -300,14 +306,17 @@ function registerCreateWorkspace2Script() {
 
             self.pageInit = function () {
                 $('#onlineTemplates').slimScroll({
-                    height: '200px',
+                    height: '220px',
                     width: '850px'
                 });
                
                 $('#localTemplates').slimScroll({
-                    height: '200px',
+                    height: '220px',
                     width: '850px'
                 });
+                $('#localTemplates').hide();
+                $('#localTemplates').parent().hide();
+                
                 // set display setting
                 if (self.currentView() == 'market') {
                     self.loadMarketApps();
@@ -315,6 +324,7 @@ function registerCreateWorkspace2Script() {
                 else {
                     self.loadDownloadedApps();
                 }
+                
             };
 
             self.pageInit();

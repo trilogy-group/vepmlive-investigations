@@ -936,6 +936,18 @@ namespace EPMLiveCore
             }
         }
 
+        public static string AddAndQueueCreateWorkspaceJob(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(WorkspaceTimerjobAgent.AddAndQueueCreateWorkspaceJob(data));
+            }
+            catch (Exception e)
+            {
+                return Response.Failure(8002, e.Message);
+            }
+        }
+
         /// <summary>
         /// Get all market apps
         /// </summary>
