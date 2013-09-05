@@ -286,7 +286,7 @@
                             $('#' + link.id).show();
                         }
 
-                        $(categories[category].$el.find('a').get(0)).click(function () {
+                        categories[category].$el.find('a').click(function () {
                             var $a = $(this);
                             var $parent = $a.parent();
                             
