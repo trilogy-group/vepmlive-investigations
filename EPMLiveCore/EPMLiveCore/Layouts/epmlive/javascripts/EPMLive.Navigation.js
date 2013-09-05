@@ -1057,7 +1057,7 @@
                         });
 
                         if (orders.length) {
-                            epmLiveService.execute('ReorderFavorites', orders.join(), function (response) {
+                            epmLiveService.execute('ReorderLinks', orders.join(), function (response) {
                             }, function (response) {
                                 console.log(response);
                             });
@@ -1165,9 +1165,81 @@
                     riManager.addMenu($(this), riIndex);
                 });
             };
+            
+            var manageWorkspaces = function () {
+                var workspacesManager = (function () {
+                    var _resetOrder = function ($list) {
+                        var orders = [];
+
+                        var lo = 0;
+                        $list.find('li.epm-nav-sortable').each(function () {
+                            orders.push($(this).get(0).id + ':' + (++lo));
+                        });
+
+                        if (orders.length) {
+                            epmLiveService.execute('ReorderLinks', orders.join(), function (response) {
+                            }, function (response) {
+                                console.log(response);
+                            });
+                        }
+                    };
+
+                    var _addDragger = function ($li) {
+                        $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
+
+                        $li.hover(function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
+                        }, function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
+                        });
+                    };
+
+                    var _addMenu = function ($li) {
+                        $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
+
+                        $($li.find('.epm-menu-btn').get(0)).click(function () {
+                            menuManager.setupMenu($li, [
+                                { title: 'Remove from favorites', command: 'nav:remove', kind: '99' }
+                            ]);
+                        });
+                    };
+
+                    return {
+                        resetOrder: _resetOrder,
+                        addDragger: _addDragger,
+                        addMenu: _addMenu
+                    };
+                })();
+                
+                var $ul = $('#epm-nav-sub-workspaces-static-links');
+
+                $ul.find('.epm-nav-sortable').each(function () {
+                    var $li = $(this).parent();
+
+                    $li.addClass('epm-nav-sortable');
+                    $($li.find('a').get(0)).attr('style', 'width:125px !important;');
+
+                    workspacesManager.addDragger($li);
+                    workspacesManager.addMenu($li);
+                });
+
+                try {
+                    $ul.sortable({
+                        items: 'li.epm-nav-sortable',
+                        placeholder: 'epm-nav-drag-placeholder',
+                        update: function(event, ui) {
+                            workspacesManager.resetOrder($ul);
+                        }
+                    });
+
+                    $ul.disableSelection();
+                } catch (e) {
+                }
+            };
 
             ExecuteOrDelayUntilScriptLoaded(manageSettings, 'EPMLiveNavigation_Settings');
             ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
+            ExecuteOrDelayUntilScriptLoaded(manageWorkspaces, 'EPMLiveNavigation_Workspaces');
             ExecuteOrDelayUntilScriptLoaded(manageRecentItems, 'EPMLiveNavigation_RecentItems');
         });
     }

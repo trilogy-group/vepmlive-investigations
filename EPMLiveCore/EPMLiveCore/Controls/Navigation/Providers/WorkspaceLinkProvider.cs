@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
+using EPMLiveCore.ReportingProxy;
+using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Controls.Navigation.Providers
 {
@@ -20,6 +24,10 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         public WorkspaceLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username) { }
 
         #endregion Constructors 
+
+        private const string F_QUERY = @"SELECT FRF_ID AS LinkId, Title, Icon AS CssClass, F_String AS Url,
+                                         SITE_ID AS SiteId, WEB_ID AS WebId, F_Int AS Position FROM dbo.FRF
+                                         WHERE (USER_ID = @UserId) AND (Type = 4) ORDER BY Position, Title";
 
         #region Overrides of NavLinkProvider
 
@@ -40,12 +48,54 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     {
                         Title = "New Workspace",
                         Url = string.Format(CREATE_WORKSPACE_URL, RelativeUrl),
-                        CssClass = "epm-nav-button icon-cube"
+                        CssClass = "epm-nav-button icon-tree"
                     }
                 };
 
+                links.AddRange(GetFavoriteWorkspaces());
+
                 return links;
             }).Value;
+        }
+
+        private IEnumerable<NavLink> GetFavoriteWorkspaces()
+        {
+            yield return new NavLink
+            {
+                Title = "Favorite Workspaces",
+                Url = "Header"
+            };
+
+            DataTable dataTable;
+
+            using (var spSite = new SPSite(SiteId, GetUserToken()))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(WebId))
+                {
+                    var queryExecutor = new QueryExecutor(spWeb);
+                    dataTable = queryExecutor.ExecuteEpmLiveQuery(F_QUERY,
+                        new Dictionary<string, object>
+                        {
+                            {"@UserId", spWeb.CurrentUser.ID}
+                        });
+                }
+            }
+
+            if (dataTable == null) yield break;
+
+            foreach (SPNavLink navLink in from DataRow row in dataTable.Rows
+                select new SPNavLink
+                {
+                    Id = S(row["LinkId"]),
+                    Title = S(row["Title"]),
+                    Url = S(row["Url"]),
+                    CssClass = "epm-nav-sortable " + S(row["CssClass"]),
+                    SiteId = S(SiteId),
+                    WebId = S(WebId)
+                })
+            {
+                yield return navLink;
+            }
         }
 
         #endregion

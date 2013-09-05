@@ -279,7 +279,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        public void ReorderFavorites(string data)
+        public void ReorderLinks(string data)
         {
             try
             {
@@ -306,12 +306,12 @@ namespace EPMLiveCore.API
 
                 if (!orders.Any()) return;
 
-                var provider = new FavoritesLinkProvider(_spWeb.Site.ID, _spWeb.ID, _spWeb.CurrentUser.LoginName);
+                var provider = new GenericLinkProvider(_spWeb.Site.ID, _spWeb.ID, _spWeb.CurrentUser.LoginName);
                 provider.Reorder(orders);
             }
             catch (Exception exception)
             {
-                throw new APIException(20002, "[NavigationService:ReorderFavorites] " + exception.Message);
+                throw new APIException(20002, "[NavigationService:ReorderLinks] " + exception.Message);
             }
         }
 

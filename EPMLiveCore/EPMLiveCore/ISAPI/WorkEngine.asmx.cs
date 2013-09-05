@@ -1454,7 +1454,7 @@ namespace EPMLiveCore
             }
         }
 
-        public static string ReorderFavorites(string data, SPWeb oWeb)
+        public static string ReorderLinks(string data, SPWeb oWeb)
         {
             try
             {
@@ -1462,7 +1462,7 @@ namespace EPMLiveCore
                 watch.Start();
 
                 var navigationService = new NavigationService(oWeb);
-                navigationService.ReorderFavorites(data);
+                navigationService.ReorderLinks(data);
 
                 watch.Stop();
 

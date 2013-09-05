@@ -12,9 +12,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "Favorites")]
     public class FavoritesLinkProvider : NavLinkProvider
     {
-        #region Fields (2) 
+        #region Fields (1) 
 
-        private const string REORDER_QUERY = @"UPDATE dbo.FRF SET F_Int = @Order WHERE FRF_ID = @Id";
         private readonly string _key;
 
         #endregion Fields 
@@ -28,9 +27,9 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
-        #region Methods (2) 
+        #region Methods (1) 
 
-        // Public Methods (2) 
+        // Public Methods (1) 
 
         public override IEnumerable<INavObject> GetLinks()
         {
@@ -80,30 +79,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                 return links;
             }).Value;
-        }
-
-        public void Reorder(Dictionary<Guid, int> data)
-        {
-            if (!data.Any()) return;
-
-            using (var spSite = new SPSite(SiteId, GetUserToken()))
-            {
-                using (SPWeb spWeb = spSite.OpenWeb(WebId))
-                {
-                    var queryExecutor = new QueryExecutor(spWeb);
-
-                    foreach (var pair in data)
-                    {
-                        queryExecutor.ExecuteEpmLiveNonQuery(REORDER_QUERY, new Dictionary<string, object>
-                        {
-                            {"@Id", pair.Key},
-                            {"@Order", pair.Value}
-                        });
-                    }
-                }
-            }
-
-            CacheStore.Current.Remove(_key, CacheStoreCategory.Navigation);
         }
 
         #endregion Methods 

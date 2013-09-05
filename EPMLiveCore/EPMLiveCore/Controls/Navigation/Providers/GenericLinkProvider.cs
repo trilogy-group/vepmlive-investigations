@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.ReportingProxy;
@@ -10,10 +11,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 {
     public class GenericLinkProvider : NavLinkProvider
     {
-        #region Fields (3) 
+        #region Fields (4) 
 
         private const string A_QUERY = @"SELECT FRF_ID FROM dbo.FRF WHERE (FRF_ID = @Id) AND (Type = 1 OR Type = 2)";
         private const string D_QUERY = @"DELETE FROM dbo.FRF WHERE (FRF_ID = @Id)";
+        private const string R_QUERY = @"UPDATE dbo.FRF SET F_Int = @Order WHERE FRF_ID = @Id";
 
         private const string U_QUERY =
             @"SELECT FRF_ID FROM dbo.FRF WHERE (FRF_ID = @Id) AND (USER_ID = @UserId) AND (Type = 1 OR Type = 2)";
@@ -26,9 +28,9 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
-        #region Methods (1) 
+        #region Methods (3) 
 
-        // Public Methods (1) 
+        // Public Methods (2) 
 
         public void Remove(Guid linkId)
         {
@@ -65,12 +67,44 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         {"@Id", linkId}
                     });
 
-                    string postfix = SiteId + "_U_" + UserId;
-
-                    CacheStore.Current.Remove("NavLinks_Favorites_S_" + postfix, CacheStoreCategory.Navigation);
-                    CacheStore.Current.Remove("NavLinks_RecentItems_S_" + postfix, CacheStoreCategory.Navigation);
+                    CleareCache();
                 }
             }
+        }
+
+        public void Reorder(Dictionary<Guid, int> data)
+        {
+            if (!data.Any()) return;
+
+            using (var spSite = new SPSite(SiteId, GetUserToken()))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(WebId))
+                {
+                    var queryExecutor = new QueryExecutor(spWeb);
+
+                    foreach (var pair in data)
+                    {
+                        queryExecutor.ExecuteEpmLiveNonQuery(R_QUERY, new Dictionary<string, object>
+                        {
+                            {"@Id", pair.Key},
+                            {"@Order", pair.Value}
+                        });
+                    }
+                }
+            }
+
+            CleareCache();
+        }
+
+        // Private Methods (1) 
+
+        private void CleareCache()
+        {
+            string postfix = SiteId + "_U_" + UserId;
+
+            CacheStore.Current.Remove("NavLinks_Favorites_S_" + postfix, CacheStoreCategory.Navigation);
+            CacheStore.Current.Remove("NavLinks_Workspaces_S_" + postfix, CacheStoreCategory.Navigation);
+            CacheStore.Current.Remove("NavLinks_RecentItems_S_" + postfix, CacheStoreCategory.Navigation);
         }
 
         #endregion Methods 
