@@ -289,6 +289,13 @@
   margin-left: 10px !important;
   width: 109px !important;
 }
+.epm-nav-sub li.epm-nav-button a:active {
+  outline: none;
+}
+.epm-nav-sub li.epm-nav-button a:focus {
+  -moz-outline-style: none;
+  outline-style: none;
+}
 .epm-nav-sub li.epm-nav-button span {
   top: -6px !important;
   margin-left: 0 !important;
