@@ -327,11 +327,9 @@
             }
         }
 
-    ul.ui-sortable {
-        li {
-            a {
-                width: @link-tag-width - 10px;
-            }
+    li.epm-nav-node.epm-nav-trans {
+        a {
+            width: @link-tag-width - 10px !important;
         }
     }
 
@@ -420,6 +418,8 @@
 
             a.epm-nav-node {
                 padding-left: 3px;
+                width:@node-width - 3px - 5px;
+                .ellipsis;
             }
         }
 
