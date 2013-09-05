@@ -176,6 +176,7 @@ namespace PortfolioEngineCore
         gpBudgetAnalyzer = 3021,      // EPK P12 Save Changes made in Modeler,
         gpProjectVerCenter = 3022,    // EPK P13 CT Analyzer,
         gpProjectVersions = 3023,     // EPK P21 View Project Details,
+        gpOptimizerAnalyzer = 3023,     // EPK P21 change made for optimizer,
         gpProjectsTab = 3024,         // EPK P22 Create/Link Projects,
         gpPortAdmin = 3025,   // EPK A03 Portfolio and Capacity SysAdmin,
         gpResourcePlan = 3026,        // EPK C02 Edit Resource Plan,

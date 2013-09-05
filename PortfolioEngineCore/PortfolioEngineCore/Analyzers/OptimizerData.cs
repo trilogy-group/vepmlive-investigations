@@ -191,7 +191,7 @@ namespace PortfolioEngineCore
                 }
                 else
                 {
-                    bPMOAdmin = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpBudgetAnalyzer);
+                    bPMOAdmin = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpOptimizerAnalyzer);
                 }
                 
                  if (sPIListIn == "")
