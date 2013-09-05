@@ -816,6 +816,12 @@ namespace EPMLiveCore.API
             WorkspaceData.AddToFRF(SiteId, _createdWebId, _createdWebTitle, _createdWebUrl, CreatorId, 4);
         }
 
+        public void AddPermission()
+        {
+            // TODO: add ws info to favorites table in db
+            WorkspaceData.AddWsPermission(SiteId, _createdWebId);
+        }
+
         private Hashtable BuildEmailData(string url, string wsName)
         {
             //{ItemUrl}
@@ -878,6 +884,7 @@ namespace EPMLiveCore.API
                         BuildWebInfoXml();
                         Notify(eWeb);
                         AddToFavorites();
+                        AddPermission();
                         ModifyNewWSProperty();
                         RemoveSolutionFromGallery(eSite, eWeb);
 
@@ -955,6 +962,7 @@ namespace EPMLiveCore.API
                         BuildWebInfoXml();
                         Notify(eWeb);
                         AddToFavorites();
+                        AddPermission();
                         ModifyNewWSProperty();
                         RemoveSolutionFromGallery(eSite, eWeb);
                     }

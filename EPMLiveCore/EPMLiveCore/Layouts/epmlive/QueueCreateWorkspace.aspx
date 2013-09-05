@@ -60,13 +60,16 @@
                     <div class="slider">&nbsp;
                     </div>
                 </div>
-                <div style="height: 80px;" data-bind="visible: loading()">
-                    <div style="background:url('/_layouts/15/epmlive/images/progress_ring.gif') no-repeat scroll center center transparent;height:50px;width:100%">
-                    </div>
+                <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 152px;" data-bind="visible: loading()">
+                    <div style="background: url('/_layouts/15/epmlive/images/progress_ring.gif') no-repeat scroll 0% 0% transparent; height: 35px; width: 40px; float: left;"> </div>
+                    <p style="line-height: 35px;">Loading Templates</p>
                 </div>
 	            <div id="templateContainer">
 	                <div id="onlineTemplates">
-		            <ol data-bind="visible: shouldShowMarket(), foreach: marketApps">
+	                <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 200px;" data-bind="fadeVisible: (marketApps().length === 0) && !loading()">
+                        <div style="">There are no online templates available</div>
+                    </div>
+		            <ol data-bind="fadeVisible: shouldShowMarket(), foreach: marketApps">
 			            <li class="template" data-bind="click: $root.gotoTemplate">
 			                <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
 				            <div class="template-meta">
@@ -89,7 +92,10 @@
 		            </ol>
 	            </div>
 	            <div id="localTemplates">
-		            <ol data-bind="visible: shouldShowDownloaded(), foreach: downloadedApps">
+	                <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 200px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !loading()">
+                        <div style="">There are no local templates available</div>
+                    </div>
+		            <ol data-bind="fadeVisible: shouldShowDownloaded(), foreach: downloadedApps">
 			            <li class="template" data-bind="click: $root.gotoTemplate">
 			                <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
 				            <div class="template-meta">
@@ -114,7 +120,7 @@
 	            </div>
             </div>
         </div>
-        <div class="modal-footer" data-bind="visible: !loading()">
+        <div class="modal-footer" data-bind="fadeVisible: !loading()">
             <button type="button" class="epmliveButton" style="float:right;" data-bind="click: createWorkspace">Create Workspace</button>
             <button type="button" class="epmliveButton" style="float:right;" data-dismiss="modal" data-bind="click: cancelCreation">Cancel</button>
             

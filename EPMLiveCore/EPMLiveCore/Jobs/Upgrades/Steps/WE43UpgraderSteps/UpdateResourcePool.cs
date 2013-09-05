@@ -415,7 +415,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                             SPList resourcePool = spWeb.Lists.GetList(oResourcePool.ID, false);
 
                             var gSettings = new GridGanttSettings(resourcePool) {HideNewButton = false};
-                            gSettings.SaveSettings();
+                            gSettings.SaveSettings(resourcePool);
                         }
                     }
 

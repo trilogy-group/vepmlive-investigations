@@ -20,12 +20,12 @@ namespace EPMLiveCore.API
                 {
                     using (SqlConnection con = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
                     {
-                        con.Open();                       
+                        con.Open();
 
                         SqlCommand cmd = new SqlCommand("IF EXISTS (SELECT 1 FROM TIMERJOBS j JOIN [QUEUE] q ON j.timerjobuid = q.timerjobuid WHERE j.[siteguid] = '" + site.ID.ToString() + "' AND j.[webguid] = '" + web.ID.ToString() + "' AND j.[listguid] = '" + listId.ToString() + "' AND j.[itemid] = " + itemId.ToString() + ")" +
                                                          "BEGIN " +
                                                             "SELECT 1 " +
-                                                         "END " + 
+                                                         "END " +
                                                          "ELSE " +
                                                          "BEGIN " +
                                                             "SELECT 0 " +
@@ -73,10 +73,10 @@ namespace EPMLiveCore.API
                     using (SqlConnection con = new SqlConnection(CoreFunctions.getReportingConnectionString(eSite.WebApplication.Id, eSite.ID)))
                     {
                         con.Open();
-                        
+
                         SqlCommand cmd = new SqlCommand("IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWeb]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +
                                                         "BEGIN " +
-                                                            // if record exists, delete then insert
+                            // if record exists, delete then insert
                                                             "IF EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId.ToString() + "') " +
                                                             "BEGIN " +
                                                                 "DELETE FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId.ToString() + "' " +
@@ -88,9 +88,9 @@ namespace EPMLiveCore.API
                                                         "END " +
                                                         "ELSE " +
                                                         "BEGIN " +
-                                                        // create table
+                            // create table
                                                             "CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max)) " +
-                                                        // insert
+                            // insert
                                                             "INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl]) VALUES ('" + siteId.ToString() + "', '" + itemWeb.ID.ToString() + "', '" + listId.ToString() + "', " + itemId.ToString() + ", '" + parentWeb.ID.ToString() + "', '" + createdWebId.ToString() + "', '" + createdWebUrl.ToString() + "') " +
                                                         "END ");
                         cmd.Connection = con;
@@ -115,7 +115,8 @@ namespace EPMLiveCore.API
                     {
                         con.Open();
                         SqlCommand cmd = new SqlCommand();
-                        switch (type){
+                        switch (type)
+                        {
                             case 1:
                                 //cmd = new SqlCommand("INSERT INTO [dbo].[FRF] ([SITE_ID], [WEB_ID], [USER_ID], [Title], [Type]) VALUES ('" + siteId.ToString() + "', '" + createdWebId.ToString() + "', " + userId.ToString() + ", '" + createdWebUrl.ToString() + "', 1)");
                                 break;
@@ -129,11 +130,120 @@ namespace EPMLiveCore.API
                                 cmd = new SqlCommand("INSERT INTO [dbo].[FRF] ([SITE_ID], [WEB_ID], [USER_ID], [Title], [F_String], [Type]) VALUES ('" + siteId.ToString() + "', '" + createdWebId.ToString() + "', " + userId.ToString() + ", '" + siteTitle + "', '" + createdWebUrl.ToString() + "', 4)");
                                 break;
                             default:
-                                break;  
+                                break;
                         }
 
                         cmd.Connection = con;
                         cmd.ExecuteNonQuery();
+                    }
+                }
+            });
+        }
+
+        public static void AddWsPermission(Guid siteId, Guid createdWebId)
+        {
+//            const string script = @"
+//                            IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1)
+//                            BEGIN
+//                                SET ANSI_NULLS ON
+//                                GO
+//
+//                                SET QUOTED_IDENTIFIER ON
+//                                GO
+//
+//                                CREATE TABLE [dbo].[RPTWEBGROUPS](
+//                                        [RPTWEBGROUPID] [uniqueidentifier] NOT NULL,
+//                                        [SITEID] [uniqueidentifier] NULL,
+//                                        [WEBID] [uniqueidentifier] NULL,
+//                                        [GROUPID] [int] NULL,
+//                                        [SECTYPE] [int] NULL,
+//                                CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED 
+//                                (
+//                                        [RPTWEBGROUPID] ASC
+//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+//                                ) ON [PRIMARY]
+//
+//                                GO
+//
+//                                ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [DF_RPTWEBGROUPS_RPTWEBGROUPID]  DEFAULT (newid()) FOR [RPTWEBGROUPID]
+//                                GO
+//
+//                                /****** Object:  Index [PK_RPTWEBGROUPS]    Script Date: 09/04/2013 13:18:33 ******/
+//                                IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[RPTWEBGROUPS]') AND name = N'PK_RPTWEBGROUPS')
+//                                ALTER TABLE [dbo].[RPTWEBGROUPS] DROP CONSTRAINT [PK_RPTWEBGROUPS]
+//                                GO
+//                       
+//                                /****** Object:  Index [PK_RPTWEBGROUPS]    Script Date: 09/04/2013 13:18:33 ******/
+//                                ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED 
+//                                (
+//                                        [RPTWEBGROUPID] ASC
+//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+//                                GO
+//
+//                                /****** Object:  Index [IX_RPTWEBGROUPS_GROUPID_SECTYPE]    Script Date: 09/04/2013 13:18:49 ******/
+//                                CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID_SECTYPE] ON [dbo].[RPTWEBGROUPS] 
+//                                (
+//                                        [GROUPID] ASC,
+//                                        [SECTYPE] ASC
+//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+//                                GO
+//
+//                                /****** Object:  Index [IX_RPTWEBGROUPS_GROUPID]    Script Date: 09/04/2013 13:19:06 ******/
+//                                CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID] ON [dbo].[RPTWEBGROUPS] 
+//                                (
+//                                        [GROUPID] ASC
+//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+//                                GO
+//                            END                          
+//                            ";
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                using (var s = new SPSite(siteId))
+                {  
+                    using (var w = s.OpenWeb(createdWebId))
+                    {
+                        using (var con = new SqlConnection(CoreFunctions.getReportingConnectionString(s.WebApplication.Id, s.ID)))
+                        {
+                            con.Open();
+                            //var cmd = new SqlCommand(script) { Connection = con };
+                            //cmd.ExecuteNonQuery();
+
+                           
+                            var dt = new DataTable();
+                            var dc = new DataColumn("RPTWEBGROUPS") { DataType = System.Type.GetType("System.Guid") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("SITEID") { DataType = System.Type.GetType("System.Guid") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("WEBID") { DataType = System.Type.GetType("System.Guid") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("GROUPID") { DataType = System.Type.GetType("System.Int32") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("SECTYPE") { DataType = System.Type.GetType("System.Int32") };
+                            dt.Columns.Add(dc);
+
+                            foreach (SPRoleAssignment ra in w.RoleAssignments)
+                            {
+                                var type = 0;
+                                if (ra.Member is SPGroup)
+                                {
+                                    type = 1;
+                                }
+                                var found = ra.RoleDefinitionBindings.Cast<SPRoleDefinition>().Any(def => (def.BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems);
+                                if (found)
+                                {
+                                    dt.Rows.Add(new object[] { Guid.NewGuid(), s.ID, w.ID, ra.Member.ID, type });
+                                }
+                            }
+
+                            using (var bulkCopy = new SqlBulkCopy(con))
+                            {
+                                bulkCopy.DestinationTableName =
+                                    "dbo.RPTWEBGROUPS";
+
+                                bulkCopy.WriteToServer(dt);
+                            }
+                        }
                     }
                 }
             });
@@ -178,7 +288,7 @@ namespace EPMLiveCore.API
                 using (SPSite eSite = new SPSite(siteId))
                 {
                     using (SqlConnection con = new SqlConnection(CoreFunctions.getConnectionString(eSite.WebApplication.Id)))
-                    {   
+                    {
                         con.Open();
                         SqlCommand cmd = new SqlCommand("SELECT q.[Status] FROM TIMERJOBS j JOIN [QUEUE] q ON j.timerjobuid = q.timerjobuid WHERE j.[siteguid] = '" + siteId.ToString() + "' AND j.[webguid] = '" + webId.ToString() + "' AND j.[listguid] = '" + listId.ToString() + "' AND j.[itemid] = " + itemId.ToString());
                         cmd.Connection = con;
@@ -203,7 +313,7 @@ namespace EPMLiveCore.API
 
         public static string GetWorkspaceUrl(Guid siteId, Guid webId, Guid listId, int itemId)
         {
-            string url = string.Empty;   
+            string url = string.Empty;
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 using (SPSite s = new SPSite(siteId))
@@ -252,7 +362,7 @@ namespace EPMLiveCore.API
         //}
 
         public static Guid GetParentWebId(Guid itemSiteId, Guid itemWebId, Guid itemListId, int itemId)
-        {   
+        {
             Guid id = Guid.Empty;
             SPFieldUrlValue url = null;
             SPSecurity.RunWithElevatedPrivileges(() =>

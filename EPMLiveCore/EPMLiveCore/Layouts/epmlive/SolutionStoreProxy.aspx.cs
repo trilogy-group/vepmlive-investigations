@@ -139,7 +139,7 @@ namespace EPMLiveCore
             ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
             string webId = _dataManager.GetPropVal("WebID");
 
-            using (var listSvc = new ProductionStore.Lists())
+            using (var listSvc = new DevStoreSolutionStore.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
@@ -199,7 +199,7 @@ namespace EPMLiveCore
             ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
             string webId = _dataManager.GetPropVal("WebID");
 
-            using (var listSvc = new ProductionStore.Lists())
+            using (var listSvc = new DevStoreSolutionStore.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
@@ -230,7 +230,7 @@ namespace EPMLiveCore
             System.Xml.XmlNode data = null;
             string listName = _dataManager.GetPropVal("ListName");
 
-            using (var listSvc = new ProductionStore.Lists())
+            using (var listSvc = new DevStoreSolutionStore.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");

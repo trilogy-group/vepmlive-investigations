@@ -3,8 +3,21 @@
 
 function registerCreateWorkspace2Script() {
 
-    (function (CWS2, EPMLive, $, k, w, undefined) {
+    (function(CWS2, EPMLive, $, k, w, undefined) {
 
+        k.bindingHandlers.fadeVisible = {
+            init: function (element, valueAccessor) {
+                // Start visible/invisible according to initial value
+                var shouldDisplay = valueAccessor();
+                $(element).toggle(shouldDisplay);
+            },
+            update: function (element, valueAccessor) {
+                // On update, fade in/out
+                var shouldDisplay = valueAccessor();
+                shouldDisplay ? $(element).fadeIn() : $(element).fadeOut();
+            }
+        };
+        
         // declare viewmodel
         function CreateWorkspaceViewModel() {
             // DATA - UI related
@@ -23,7 +36,12 @@ function registerCreateWorkspace2Script() {
             self.shouldShowDownloaded = ko.computed(function () {
                 return self.loading() != true && self.currentView() == 'downloaded' && self.showInProgress() == 'false';
             });
-
+            self.noOnlineTemplate = ko.computed(function() {
+                return self.marketApps().length === 0;
+            });
+            self.noLocalTemplate = ko.computed(function () {
+                return self.downloadedApps().length === 0;
+            });
             // DATA - workspace creation related
             self.isStandAlone = ko.observable(w.isStandAlone);
             self.templateSource = ko.observable();
