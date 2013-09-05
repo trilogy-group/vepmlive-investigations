@@ -220,7 +220,13 @@
                             category = '__STATIC__';
                         }
 
-                        var li = '<li class="epm-nav-sub-header">' + link.title + '</li>';
+                        var cssClass = 'epm-nav-sub-header';
+                        
+                        if (_$sm.find('li.epm-nav-section-header').length === 0) {
+                            cssClass = 'epm-nav-section-header';
+                        }
+
+                        var li = '<li class="' + cssClass + '">' + link.title + '</li>';
 
                         categories[category].$el.append(li);
 

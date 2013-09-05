@@ -230,7 +230,8 @@
     .epm-nav-sub-header,
     li.epm-nav-sub-header,
     .epm-nav-sub-header-bottom,
-    li.epm-nav-sub-header-bottom {
+    li.epm-nav-sub-header-bottom,
+    li.epm-nav-section-header {
         border-bottom: 1px solid #D6D6D6;
         color: #969696;
         font-family: Open Sans Regular;
@@ -263,14 +264,22 @@
     }
 
     li.epm-nav-sub-header,
+    li.epm-nav-section-header,
     li.epm-nav-sub-header-bottom {
         margin: 0 0 0 10px !important;
-        padding: 0 !important;
         width: @sub-header-width !important;
 
         &:hover {
             background-color: @nav-color !important;
         }
+    }
+
+    li.epm-nav-section-header {
+        padding: 0 !important;
+    }
+
+    li.epm-nav-sub-header {
+        padding-top: 15px !important;
     }
 
     li.epm-nav-sub-placeholder {

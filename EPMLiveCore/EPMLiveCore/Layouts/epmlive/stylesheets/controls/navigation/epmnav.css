@@ -162,7 +162,8 @@
 .epm-nav-sub .epm-nav-sub-header,
 .epm-nav-sub li.epm-nav-sub-header,
 .epm-nav-sub .epm-nav-sub-header-bottom,
-.epm-nav-sub li.epm-nav-sub-header-bottom {
+.epm-nav-sub li.epm-nav-sub-header-bottom,
+.epm-nav-sub li.epm-nav-section-header {
   border-bottom: 1px solid #D6D6D6;
   color: #969696;
   font-family: Open Sans Regular;
@@ -179,7 +180,8 @@
 .epm-nav-sub .epm-nav-sub-header:hover,
 .epm-nav-sub li.epm-nav-sub-header:hover,
 .epm-nav-sub .epm-nav-sub-header-bottom:hover,
-.epm-nav-sub li.epm-nav-sub-header-bottom:hover {
+.epm-nav-sub li.epm-nav-sub-header-bottom:hover,
+.epm-nav-sub li.epm-nav-section-header:hover {
   color: #969696 !important;
 }
 .epm-nav-sub .epm-nav-sub-header-bottom,
@@ -195,14 +197,21 @@
   line-height: 5px !important;
 }
 .epm-nav-sub li.epm-nav-sub-header,
+.epm-nav-sub li.epm-nav-section-header,
 .epm-nav-sub li.epm-nav-sub-header-bottom {
   margin: 0 0 0 10px !important;
-  padding: 0 !important;
   width: 160px !important;
 }
 .epm-nav-sub li.epm-nav-sub-header:hover,
+.epm-nav-sub li.epm-nav-section-header:hover,
 .epm-nav-sub li.epm-nav-sub-header-bottom:hover {
   background-color: #eeeeee !important;
+}
+.epm-nav-sub li.epm-nav-section-header {
+  padding: 0 !important;
+}
+.epm-nav-sub li.epm-nav-sub-header {
+  padding-top: 15px !important;
 }
 .epm-nav-sub li.epm-nav-sub-placeholder {
   color: #CCCCCC;
