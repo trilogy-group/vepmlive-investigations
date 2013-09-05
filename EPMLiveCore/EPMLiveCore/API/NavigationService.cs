@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using DocumentFormat.OpenXml.Bibliography;
 using EPMLiveCore.Controls.Navigation.Providers;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
@@ -75,9 +74,9 @@ namespace EPMLiveCore.API
 
         #endregion Constructors 
 
-        #region Methods (11) 
+        #region Methods (12) 
 
-        // Public Methods (4) 
+        // Public Methods (5) 
 
         public object GetContextualMenuItems(string data)
         {
@@ -232,10 +231,10 @@ namespace EPMLiveCore.API
                     Task<Tuple<string, string, string, string, bool>[]> t5 =
                         Task.Factory.StartNew(() => GetPFEActions(list));
 
-                    var actions = new[] {t1, t2, t3, t4, t5}
+                    List<Tuple<string, string, string, string, bool>> actions = new[] {t1, t2, t3, t4, t5}
                         .SelectMany(t => t.Result ?? new Tuple<string, string, string, string, bool>[] {}).ToList();
 
-                    var lastTitle = string.Empty;
+                    string lastTitle = string.Empty;
 
                     Tuple<string, string, string, string, bool> lastAction = actions.Last();
                     if (lastAction.Item1.Equals("--SEP--"))
@@ -263,6 +262,21 @@ namespace EPMLiveCore.API
             }
 
             return dataTable;
+        }
+
+        public void RemoveNavigationLink(string data)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(data)) return;
+
+                var provider = new GenericLinkProvider(_spWeb.Site.ID, _spWeb.ID, _spWeb.CurrentUser.LoginName);
+                provider.Remove(new Guid(data));
+            }
+            catch (Exception exception)
+            {
+                throw new APIException(20004, "[NavigationService:RemoveNavigationLink] " + exception.Message);
+            }
         }
 
         public void ReorderFavorites(string data)

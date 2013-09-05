@@ -1474,6 +1474,26 @@ namespace EPMLiveCore
             }
         }
 
+        public static string RemoveNavigationLink(string data, SPWeb oWeb)
+        {
+            try
+            {
+                var watch = new Stopwatch();
+                watch.Start();
+
+                var navigationService = new NavigationService(oWeb);
+                navigationService.RemoveNavigationLink(data);
+
+                watch.Stop();
+
+                return Response.Success(GetDiagnosticsInfo(watch));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         public static string GetContextualMenuItems(string data, SPWeb oWeb)
         {
             try

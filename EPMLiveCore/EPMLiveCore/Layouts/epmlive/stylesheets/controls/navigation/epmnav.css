@@ -418,6 +418,7 @@ ul.epm-nav-contextual-menu li {
   margin-bottom: 2.5px !important;
   width: 157px !important;
   color: #999999 !important;
+  list-style: none outside none;
 }
 ul.epm-nav-contextual-menu li:hover {
   background: #ffffff !important;

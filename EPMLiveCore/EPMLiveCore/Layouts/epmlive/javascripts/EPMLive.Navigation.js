@@ -116,15 +116,17 @@
             })();
 
             var jqCookie = $.cookie;
-            $.cookie = function (cookieName, data, options) {
+            $.cookie = function(cookieName, data, options) {
                 cookieName = cookieName + '-u-' + window.epmLiveNavigation.currentUserId;
 
-                if (!data) {
-                    return jqCookie(cookieName);
-                }
+                if (jqCookie) {
+                    if (!data) {
+                        return jqCookie(cookieName);
+                    }
 
-                jqCookie(cookieName, data, options);
-            }
+                    jqCookie(cookieName, data, options);
+                }
+            };
 
             var epmLiveNavigation = (function () {
                 var animSpeed = 300;
@@ -542,43 +544,74 @@
                     });
                 }
 
-                function handleContextualCommand(id, siteId, webId, listId, itemId, command, kind) {
+                function handleContextualCommand(id, webId, listId, itemId, command, kind) {
+                    var removeLink = function (linkId, notifId) {
+                        var remove = function(lid, nid) {
+                            $('#' + lid).remove();
+                            SP.UI.Notify.removeNotification(nid);
+                        };
+                        
+                        epmLiveService.execute('RemoveNavigationLink', linkId, function (response) {
+                            remove(linkId, notifId);
+                        }, function (response) {
+                            remove(linkId, notifId);
+                        });
+                    };
+                    
                     var url = window.epmLiveNavigation.currentWebUrl;
-                    var gaUrl = url + '/_layouts/15/epmlive/gridaction.aspx?siteid=' + siteId + '&webid=' + webId;
-                    var rpUrl = url + '/_layouts/15/epmlive/redirectionproxy.aspx?siteid=' + siteId + '&webid=' + webId;
+                    var gaUrl = url + '/_layouts/15/epmlive/gridaction.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
+                    var rpUrl = url + '/_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
 
                     var redirectUrl = '';
 
                     switch(command) {
                         case 'nav:add':
-                            redirectUrl = rpUrl + '&action=new&listid=' + listId;
+                            redirectUrl = rpUrl + 'action=new';
                             break;
                     }
-                    
-                    if (redirectUrl) {
-                        switch(kind) {
-                            case '0':
-                                OpenCreateWebPageDialog(redirectUrl);
-                                break;
-                            case '1':
-                                location.href = redirectUrl;
-                                break;
-                            case '2':
-                                window.open(redirectUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
-                                break;
-                            case '3':
-                                window.open(redirectUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
-                                break;
-                            case '5':
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 600, height: 500 });
-                                break;
-                            case '6':
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
-                                break;
-                            default:
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700 });
-                                break;
+
+                    if (!redirectUrl && command) {
+                        if (command.indexOf('epkcommand:') !== -1) {
+                            redirectUrl = gaUrl + 'action=epkcommand&subaction=' + command.split(':')[1];
+                        } else {
+                            redirectUrl = gaUrl + 'action=' + command;
                         }
+                    }
+
+                    switch (kind) {
+                        case '0':
+                            OpenCreateWebPageDialog(redirectUrl);
+                            break;
+                        case '1':
+                            location.href = redirectUrl;
+                            break;
+                        case '2':
+                            window.open(redirectUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            break;
+                        case '3':
+                            window.open(redirectUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            break;
+                        case '5':
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 600, height: 500 });
+                            break;
+                        case '6':
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
+                            break;
+                        case '99':
+                            if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
+                                var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
+                                if (command !== 'nav:remove') {
+                                    $.get(redirectUrl).always(function() {
+                                        removeLink(id, nId);
+                                    });
+                                } else {
+                                    removeLink(id, nId);
+                                }
+                            }
+                            break;
+                        default:
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700 });
+                            break;
                     }
                 }
 
@@ -650,8 +683,8 @@
                         toggleNode(data, x, elNav, y, elNodes);
                     };
 
-                    window.epmLiveNavigation.handleContextualCommand = function(id, siteId, webId, listId, itemId, command, kind) {
-                        handleContextualCommand(id, siteId, webId, listId, itemId, command, kind);
+                    window.epmLiveNavigation.handleContextualCommand = function(id, webId, listId, itemId, command, kind) {
+                        handleContextualCommand(id, webId, listId, itemId, command, kind);
                     };
 
                     $('td.epm-nav-node-root').click(function () {
@@ -682,10 +715,13 @@
                         $pin.hide();
                     });
 
-                    $sn.slimScroll({
-                        height: $sn.height(),
-                        width: $sn.width()
-                    });
+                    try {
+                        $sn.slimScroll({
+                            height: $sn.height(),
+                            width: $sn.width()
+                        });
+                    } catch(e) {
+                    }
 
                     var $ss = $('#epm-nav').find('.slimScrollDiv');
                     var $sb = $ss.find('.slimScrollBar');
@@ -872,7 +908,7 @@
                             } else {
                                 var imgUrl = cmd.imgUrl || '/_layouts/images/blank.gif';
 
-                                $cl.append('<li><img src="' + imgUrl + '" /><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('siteid') + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
+                                $cl.append('<li><img src="' + imgUrl + '" /><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
                             }
                         }
 
@@ -1046,14 +1082,17 @@
                     favoritesManager.addMenu($li);
                 });
 
-                $ul.sortable({
-                    placeholder: 'epm-nav-drag-placeholder',
-                    update: function(event, ui) {
-                        favoritesManager.resetOrder($ul);
-                    }
-                });
+                try {
+                    $ul.sortable({
+                        placeholder: 'epm-nav-drag-placeholder',
+                        update: function (event, ui) {
+                            favoritesManager.resetOrder($ul);
+                        }
+                    });
 
-                $ul.disableSelection();
+                    $ul.disableSelection();
+                } catch(e) {
+                }
             };
 
             var manageRecentItems = function () {
@@ -1071,7 +1110,7 @@
                         
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             var $a = $($li.find('a').get(0));
-                            window.epmLiveNavigation.handleContextualCommand(null, $a.data('siteid'), $a.data('webid'), $a.data('listid'), null, 'nav:add', 0);
+                            window.epmLiveNavigation.handleContextualCommand(null, $a.data('webid'), $a.data('listid'), null, 'nav:add', 0);
                         });
                     };
                     
