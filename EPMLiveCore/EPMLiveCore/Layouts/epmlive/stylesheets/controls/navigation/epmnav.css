@@ -441,3 +441,9 @@ ul.epm-nav-contextual-menu li.seprator {
   height: 0 !important;
   border-bottom: 1px solid #E9E9E9;
 }
+li.epm-nav-node-selected ul.epm-nav-contextual-menu li img {
+  margin-right: 2px;
+}
+li.epm-nav-node-selected ul.epm-nav-contextual-menu li a {
+  width: 133px !important;
+}

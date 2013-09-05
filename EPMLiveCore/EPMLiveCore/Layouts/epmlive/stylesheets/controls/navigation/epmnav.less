@@ -537,3 +537,17 @@ ul.epm-nav-contextual-menu {
             border-bottom: 1px solid #E9E9E9;
         }
 }
+
+li.epm-nav-node-selected {
+    ul.epm-nav-contextual-menu {
+        li {
+            img {
+                margin-right: @menu-img-offset - @selected-width;
+            }
+
+            a {
+                width: @menu-width - @menu-img-width - @menu-img-offset - @selected-width !important;
+            }
+        }
+    }
+}
