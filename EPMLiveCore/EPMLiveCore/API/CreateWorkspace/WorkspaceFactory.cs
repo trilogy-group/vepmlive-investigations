@@ -901,7 +901,7 @@ namespace EPMLiveCore.API
         private void GrabOnlineFiles(SPSite cESite, SPWeb cEWeb)
         {
             //string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Solutions/" + dataMgr.GetPropVal("SolutionName");
-            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Solutions/" + CoreFunctions.GetAssemblyVersion() + "/" + _xmlDataMgr.GetPropVal("SolutionName");
+            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Solutions/" + CoreFunctions.GetAssemblyVersion() + "/" + _xmlDataMgr.GetPropVal("SolutionName");
             string sXML = string.Empty;
             // read feature.xml with WebClient class
             using (WebClient webClient = new WebClient())

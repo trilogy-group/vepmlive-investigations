@@ -2896,7 +2896,7 @@ namespace EPMLiveCore.API
                     return true;
                 };
 
-                var listSvc = new ProductionStore.Lists();
+                var listSvc = new WorkEngineSolutionStoreListSvc.Lists();
                 listSvc.Url = storeurl + "_vti_bin/lists.asmx";
                 listSvc.Credentials = CoreFunctions.GetStoreCreds();
 

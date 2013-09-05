@@ -1399,7 +1399,7 @@ namespace EPMLiveCore
                         cn = "5";
                         break;
                     case "workenginestore":
-                        cn = "https://store.workengine.com";
+                        cn = "https://store.workengine.com/";
                         break;
                     case "notificationinterval":
                         cn = "5";

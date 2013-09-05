@@ -139,11 +139,11 @@ namespace EPMLiveCore
             ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
             string webId = _dataManager.GetPropVal("WebID");
 
-            using (var listSvc = new DevStoreSolutionStore.Lists())
+            using (var listSvc = new WorkEngineSolutionStoreListSvc.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
-                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "_vti_bin/Lists.asmx";
                 //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
                 try
                 {
@@ -199,11 +199,11 @@ namespace EPMLiveCore
             ndQueryOptions.InnerXml = !string.IsNullOrEmpty(queryOptions) ? queryOptions : "<Folder>Solutions/" + CoreFunctions.GetAssemblyVersion() + "</Folder>";
             string webId = _dataManager.GetPropVal("WebID");
 
-            using (var listSvc = new DevStoreSolutionStore.Lists())
+            using (var listSvc = new WorkEngineSolutionStoreListSvc.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
-                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "_vti_bin/Lists.asmx";
                 //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
                 try
                 {
@@ -230,11 +230,11 @@ namespace EPMLiveCore
             System.Xml.XmlNode data = null;
             string listName = _dataManager.GetPropVal("ListName");
 
-            using (var listSvc = new DevStoreSolutionStore.Lists())
+            using (var listSvc = new WorkEngineSolutionStoreListSvc.Lists())
             {
                 // TODO: write a function to get user name and password 
                 listSvc.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
-                //listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/_vti_bin/Lists.asmx";
+                listSvc.Url = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "_vti_bin/Lists.asmx";
 
                 try
                 {

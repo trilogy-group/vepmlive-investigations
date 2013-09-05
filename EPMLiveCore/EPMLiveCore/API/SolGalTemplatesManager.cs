@@ -608,7 +608,7 @@ namespace EPMLiveCore.API
         private static string CreateNewWorkspaceFromOnlineTemps(List<string> tempSolNames, XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             //string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Solutions/" + dataMgr.GetPropVal("SolutionName");
-            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Solutions/" + CoreFunctions.GetAssemblyVersion() + "/" + dataMgr.GetPropVal("SolutionName");
+            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Solutions/" + CoreFunctions.GetAssemblyVersion() + "/" + dataMgr.GetPropVal("SolutionName");
             string sXML = string.Empty;
             // read feature.xml with WebClient class
             using (WebClient webClient = new WebClient())
