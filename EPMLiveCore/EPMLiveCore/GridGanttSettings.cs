@@ -55,9 +55,8 @@ namespace EPMLiveCore
 
         public bool EnableContentReporting = false;
 
-        private SPList _list;
 
-        public bool SaveSettings()
+        public bool SaveSettings(SPList _list)
         {
             try
             {
@@ -65,6 +64,7 @@ namespace EPMLiveCore
                 CoreFunctions.setListSetting("DisplaySettings", DisplaySettings, _list);
                 CoreFunctions.setListSetting("EnableResourcePlan", EnableResourcePlan.ToString(), _list);
                 CoreFunctions.setListSetting("TotalSettings", TotalSettings, _list);
+                Infrastructure.CacheStore.Current.RemoveCategory("GridSettings");
             }
             catch
             {
@@ -75,7 +75,7 @@ namespace EPMLiveCore
 
         public GridGanttSettings(SPList list)
         {
-            _list = list;
+            //_list = list;
 
             string AllGeneral = CoreFunctions.getListSetting("GeneralSettings", list);
             string[] settings = AllGeneral.Split('\n');
