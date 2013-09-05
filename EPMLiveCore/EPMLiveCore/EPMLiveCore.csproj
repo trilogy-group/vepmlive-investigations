@@ -209,6 +209,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Controls\Navigation\Providers\GenericLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\RecentItemsLinkProvider.cs" />
     <Compile Include="Controls\Navigation\Providers\SettingsLinkProvider.cs" />
+    <Compile Include="Controls\Navigation\Providers\WorkspaceLinkProvider.cs" />
     <Compile Include="CONTROLTEMPLATES\EPMLiveJSV2.ascx.cs">
       <DependentUpon>EPMLiveJSV2.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

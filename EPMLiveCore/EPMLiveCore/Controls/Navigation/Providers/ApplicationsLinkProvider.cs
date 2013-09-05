@@ -34,7 +34,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     },
                     new NavLink
                     {
-                        Title = "Add new app",
+                        Title = "Add App",
                         Url = string.Format(@"http://market.epmlive.com/?source={0}", Url),
                         External = true,
                         CssClass = "epm-nav-button icon-cube"
