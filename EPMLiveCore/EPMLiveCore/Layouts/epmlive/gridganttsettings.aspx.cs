@@ -55,7 +55,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected DataTable dtGroupsPermissions = new DataTable();
 
         const string REPORT_CHECK_URL = "/_layouts/epmlive/ReportCheckActions.aspx";
-
+        
         private string GetGroupsPermissionsAssignment()
         {
             StringBuilder sbGroupsPermissions = new StringBuilder();
@@ -411,8 +411,8 @@ namespace EPMLiveCore.Layouts.epmlive
                     template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id].ToString().Trim().Equals("workspace", StringComparison.CurrentCultureIgnoreCase))
                 {
                     result.Add(template["Description"].ToString(), template.ID);
-                }
             }
+        }
 
             return result;
         }
@@ -981,11 +981,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.BuildTeamSecurity = chkEnableTeamSecurity.Checked;
             gSettings.BuildTeamPermissions = GetGroupsPermissionsAssignment();
             gSettings.EnableContentReporting = chkContentReporting.Checked;
-            gSettings.EnableAutoCreation = chkAutoCreate.Checked;
-            gSettings.AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue.ToString();
-            gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
-            
-            gSettings.SaveSettings();
+            gSettings.SaveSettings(list);
 
             if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)
             {
@@ -1105,7 +1101,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 evtAdded.Update();
                 list.Update();
             }
-            else
+            else 
             {
                 string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                 string className = "EPMLiveCore.ItemEnableTeamEvent";

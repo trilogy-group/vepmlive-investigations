@@ -887,7 +887,7 @@ namespace EPMLiveCore.API
                                         }
 
                                         gSettings.TotalSettings = output.Trim('\n');
-                                        gSettings.SaveSettings();
+                                        gSettings.SaveSettings(list);
                                     }
                                 }
 

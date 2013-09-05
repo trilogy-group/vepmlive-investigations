@@ -221,7 +221,7 @@ namespace EPMLiveCore
 
             GridGanttSettings gSettings = new GridGanttSettings(CurrentList);
             gSettings.DisplaySettings = ListDisplayUtils.ConvertToString(fieldProperties);
-            gSettings.SaveSettings();
+            gSettings.SaveSettings(CurrentList);
 
             //CoreFunctions.setListSetting(CurrentList, "DisplaySettings", ListDisplayUtils.ConvertToString(fieldProperties));
 

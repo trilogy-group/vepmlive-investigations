@@ -194,7 +194,7 @@ namespace EPMLiveCore.Layouts.epmlive
             }
 
             gSettings.Lookups = output.Trim('|');
-            gSettings.SaveSettings();
+            gSettings.SaveSettings(list);
             
             string lookups = gSettings.Lookups;
             EnhancedLookupConfigValuesHelper x = new EnhancedLookupConfigValuesHelper(lookups);

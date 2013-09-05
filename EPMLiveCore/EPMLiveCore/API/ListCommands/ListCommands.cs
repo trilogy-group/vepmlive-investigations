@@ -7,8 +7,69 @@ using System.Collections;
 
 namespace EPMLiveCore.API
 {
-    internal class ListCommands
+    public class AssociatedListInfo
     {
+        public Guid ListId = Guid.Empty;
+        public string Title = "";
+        public string LinkedField = "";
+        public string icon = "";
+    }
+
+    public class ListCommands
+    {
+        public static ArrayList GetAssociatedLists(SPList list)
+        {
+            return (ArrayList)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GAI", "GridSettings-" + list.ID.ToString(), () =>
+            {
+                return iGetAssociatedLists(list);
+            }).Value;
+        }
+
+        private static ArrayList iGetAssociatedLists(SPList list)
+        {
+            ArrayList a = new ArrayList();
+
+            foreach (SPList cList in list.ParentWeb.Lists)
+            {
+                try
+                {
+                    foreach (SPField field in cList.Fields)
+                    {
+                        if (field.Type == SPFieldType.Lookup)
+                        {
+                            SPFieldLookup fl = (SPFieldLookup)field;
+
+                            if (fl.LookupList.ToLower() == "{" + list.ID.ToString().ToLower() + "}")
+                            {
+
+
+                                EPMLiveCore.GridGanttSettings gSets = (EPMLiveCore.GridGanttSettings)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GGS", "GridSettings-" + cList.ID.ToString(), () =>
+                                {
+                                    return new EPMLiveCore.GridGanttSettings(cList);
+                                }).Value;
+
+                                if (gSets.AssociatedItems)
+                                {
+                                    AssociatedListInfo lInfo = new AssociatedListInfo();
+
+                                    lInfo.icon = cList.ImageUrl;
+                                    lInfo.LinkedField = field.InternalName;
+                                    lInfo.ListId = cList.ID;
+                                    lInfo.Title = cList.Title;
+
+                                    a.Add(lInfo);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            return a;
+        }
+
         public static bool EnableTeamFeatures(SPList list)
         {
             bool success = true;

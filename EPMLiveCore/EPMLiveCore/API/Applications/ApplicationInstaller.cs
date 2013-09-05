@@ -2091,7 +2091,7 @@ namespace EPMLiveCore.API
                         output += "\n" + sInternalName + "|" + sTotal;
 
                         gSettings.TotalSettings = output.Trim('\n');
-                        gSettings.SaveSettings();
+                        gSettings.SaveSettings(list);
                     }
                 }
             }
@@ -2243,7 +2243,7 @@ namespace EPMLiveCore.API
                                 output += "|" + sInternalName + "^" + sAdvancedLookup;
 
                                 gSettings.Lookups = output.Trim('|');
-                                gSettings.SaveSettings();
+                                gSettings.SaveSettings(list);
 
                                 addMessage(ErrorLevels.NoError, "Enabled Advanced Lookup", "", tParentFieldMessage);
 

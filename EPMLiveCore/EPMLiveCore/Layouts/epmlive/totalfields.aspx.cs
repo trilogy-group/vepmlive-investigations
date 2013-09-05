@@ -183,7 +183,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 GridGanttSettings gSettings = new GridGanttSettings(list);
                 gSettings.TotalSettings = sb.ToString();
-                gSettings.SaveSettings();
+                gSettings.SaveSettings(list);
 
                 //CoreFunctions.setListSetting(list, "TotalSettings", sb.ToString());
 
