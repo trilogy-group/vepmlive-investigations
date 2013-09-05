@@ -103,7 +103,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
             }
 
-            CacheStore.Current.Remove(_key);
+            CacheStore.Current.Remove(_key, CacheStoreCategory.Navigation);
         }
 
         #endregion Methods 

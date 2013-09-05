@@ -65,8 +65,10 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         {"@Id", linkId}
                     });
 
-                    CacheStore.Current.Remove("NavLinks_Favorites_S_" + SiteId + "_U_" + UserId);
-                    CacheStore.Current.Remove("NavLinks_RecentItems_S_" + SiteId + "_U_" + UserId);
+                    string postfix = SiteId + "_U_" + UserId;
+
+                    CacheStore.Current.Remove("NavLinks_Favorites_S_" + postfix, CacheStoreCategory.Navigation);
+                    CacheStore.Current.Remove("NavLinks_RecentItems_S_" + postfix, CacheStoreCategory.Navigation);
                 }
             }
         }

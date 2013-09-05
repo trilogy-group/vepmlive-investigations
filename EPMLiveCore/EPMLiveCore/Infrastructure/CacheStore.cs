@@ -13,7 +13,7 @@ namespace EPMLiveCore.Infrastructure
         private static volatile CacheStore _instance;
         private static readonly object Locker = new Object();
         private readonly List<string> _indefiniteKeys;
-        private readonly Dictionary<string, Tuple<string, CachedValue>> _store;
+        private readonly Dictionary<string, Dictionary<string, CachedValue>> _store;
         private readonly Timer _timer;
         private bool _disposed;
         private long _ticks;
@@ -24,7 +24,7 @@ namespace EPMLiveCore.Infrastructure
 
         private CacheStore()
         {
-            _store = new Dictionary<string, Tuple<string, CachedValue>>();
+            _store = new Dictionary<string, Dictionary<string, CachedValue>>();
             _indefiniteKeys = new List<string>();
             _ticks = DateTime.Now.Ticks;
             _timer = new Timer(Cleanup, null, 300000, 300000);
@@ -67,13 +67,13 @@ namespace EPMLiveCore.Infrastructure
             bool keepIndefinite = false)
         {
             string originalKey = key;
-            key = BuildKey(key);
+            key = BuildKey(key, category);
 
-            if (_store.ContainsKey(key)) return _store[key].Item2;
+            if (_store.ContainsKey(category) && _store[category].ContainsKey(key)) return _store[category][key];
 
             Set(originalKey, getValue(), category, keepIndefinite);
 
-            return _store[keepIndefinite ? originalKey : key].Item2;
+            return _store[category][keepIndefinite ? originalKey : key];
         }
 
         public DataTable GetDataTable()
@@ -87,74 +87,88 @@ namespace EPMLiveCore.Infrastructure
             dataTable.Columns.Add("UpdatedAt", typeof (DateTime));
             dataTable.Columns.Add("LastReadAt", typeof (DateTime));
 
-            foreach (var pair in _store.OrderBy(p => p.Value.Item2.CreatedAt))
+            foreach (var p in _store.OrderBy(p => p.Key))
             {
-                DataRow row = dataTable.NewRow();
+                foreach (var pair in p.Value.OrderBy(v => v.Value.CreatedAt))
+                {
+                    DataRow row = dataTable.NewRow();
 
-                row["Key"] = pair.Key;
-                row["Value"] = pair.Value.Item2.Value;
-                row["Category"] = pair.Value.Item1;
-                row["CreatedAt"] = pair.Value.Item2.CreatedAt;
-                row["UpdatedAt"] = pair.Value.Item2.UpdatedAt;
-                row["LastReadAt"] = pair.Value.Item2.LastReadAt;
+                    row["Key"] = pair.Key;
+                    row["Value"] = pair.Value.Value;
+                    row["Category"] = p.Key;
+                    row["CreatedAt"] = pair.Value.CreatedAt;
+                    row["UpdatedAt"] = pair.Value.UpdatedAt;
+                    row["LastReadAt"] = pair.Value.LastReadAt;
 
-                dataTable.Rows.Add(row);
+                    dataTable.Rows.Add(row);
+                }
             }
 
             return dataTable;
         }
 
-        public void Remove(string key)
+        public void Remove(string key, string category)
         {
-            key = BuildKey(key);
+            key = BuildKey(key, category);
 
-            if (!_store.ContainsKey(key)) return;
+            if (!_store.ContainsKey(category)) return;
+            if (!_store[category].ContainsKey(key)) return;
 
             lock (Locker)
             {
-                _store.Remove(key);
+                _store[category].Remove(key);
             }
         }
 
         public void RemoveCategory(string category)
         {
-            List<string> keys = (from p in _store where p.Value.Item1.Equals(category) select p.Key).ToList();
-            RemoveKeys(keys);
+            if (_store.ContainsKey(category)) _store.Remove(category);
         }
 
         public void Set(string key, object value, string category, bool keepIndefinite = false)
         {
             if (keepIndefinite)
             {
-                if (!_indefiniteKeys.Contains(key))
+                string iKey = category + key;
+
+                if (!_indefiniteKeys.Contains(iKey))
                 {
                     lock (Locker)
                     {
-                        _indefiniteKeys.Add(key);
+                        _indefiniteKeys.Add(iKey);
                     }
                 }
             }
 
-            key = BuildKey(key);
+            key = BuildKey(key, category);
 
             lock (Locker)
             {
-                if (!_store.ContainsKey(key))
+                var cachedValue = new CachedValue(value);
+
+                if (!_store.ContainsKey(category))
                 {
-                    _store.Add(key, new Tuple<string, CachedValue>(category, new CachedValue(value)));
+                    _store.Add(category, new Dictionary<string, CachedValue> {{key, cachedValue}});
                 }
                 else
                 {
-                    _store[key].Item2.Value = value;
+                    if (!_store[category].ContainsKey(key))
+                    {
+                        _store[category].Add(key, cachedValue);
+                    }
+                    else
+                    {
+                        _store[category][key].Value = value;
+                    }
                 }
             }
         }
 
         // Private Methods (4) 
 
-        private string BuildKey(string key)
+        private string BuildKey(string key, string category)
         {
-            return _indefiniteKeys.Contains(key) ? key : key + "_" + _ticks;
+            return _indefiniteKeys.Contains(category + key) ? key : key + "_" + _ticks;
         }
 
         private void Cleanup(object state)
@@ -173,7 +187,26 @@ namespace EPMLiveCore.Infrastructure
 
             string oldTicks = "_" + ticks;
 
-            IEnumerable<string> keys = _store.Keys.Where(key => key.EndsWith(oldTicks)).ToList();
+            var keys = new Dictionary<string, List<string>>();
+
+            foreach (var pair in _store)
+            {
+                foreach (var p in pair.Value)
+                {
+                    string key = p.Key;
+
+                    if (!key.EndsWith(oldTicks)) continue;
+
+                    string category = pair.Key;
+
+                    if (!keys.ContainsKey(category))
+                    {
+                        keys.Add(category, new List<string>());
+                    }
+
+                    keys[category].Add(key);
+                }
+            }
 
             RemoveKeys(keys);
         }
@@ -190,15 +223,29 @@ namespace EPMLiveCore.Infrastructure
             _disposed = true;
         }
 
-        private void RemoveKeys(IEnumerable<string> keys)
+        private void RemoveKeys(Dictionary<string, List<string>> keys)
         {
             lock (Locker)
             {
-                foreach (string key in keys)
+                foreach (var pair in keys)
+                {
+                    foreach (string key in pair.Value)
+                    {
+                        try
+                        {
+                            _store[pair.Key].Remove(key);
+                        }
+                        catch { }
+                    }
+                }
+
+                List<string> categories = (from pair in _store where pair.Value.Count == 0 select pair.Key).ToList();
+
+                foreach (string category in categories)
                 {
                     try
                     {
-                        _store.Remove(key);
+                        _store.Remove(category);
                     }
                     catch { }
                 }

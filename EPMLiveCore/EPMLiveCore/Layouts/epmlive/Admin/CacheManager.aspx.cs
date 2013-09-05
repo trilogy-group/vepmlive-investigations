@@ -154,7 +154,7 @@ namespace EPMLiveCore.Layouts.epmlive.Admin
             if (item == null) return;
 
             string key = item["Key"].Text;
-            CacheStore.Current.Remove(key);
+            CacheStore.Current.Remove(key, CacheStoreCategory.Navigation);
         }
 
         private void DeleteItemsForCategory(string category)

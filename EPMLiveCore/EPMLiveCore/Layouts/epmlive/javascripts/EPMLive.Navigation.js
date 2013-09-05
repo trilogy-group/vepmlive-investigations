@@ -880,8 +880,8 @@
                     defaultCommands = defaultCommands || [];
                     
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
-                    
-                    var setup = function(commands,$ca) {
+
+                    var setup = function(commands, $ca) {
                         var liId = $li.get(0).id;
 
                         if (commands.length) {
@@ -893,35 +893,33 @@
                         }
 
                         $li.append('<ul class="epm-nav-contextual-menu"></ul>');
-                        
-                        $menu = $($li.find('.epm-nav-contextual-menu').get(0));
 
-                        var $cl = $($li.find('.epm-nav-contextual-menu').get(0));
+                        $menu = $($li.find('.epm-nav-contextual-menu').get(0));
 
                         for (var i = 0; i < commands.length; i++) {
                             var cmd = commands[i];
 
                             if (cmd.title === '--SEP--') {
                                 if (i !== commands.length - 1) {
-                                    $cl.append('<li class="seprator"></li>');
+                                    $menu.append('<li class="seprator"></li>');
                                 }
                             } else {
                                 var imgUrl = cmd.imgUrl || '/_layouts/images/blank.gif';
 
-                                $cl.append('<li><img src="' + imgUrl + '" /><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
+                                $menu.append('<li><img src="' + imgUrl + '" /><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
                             }
                         }
 
-                        $menu.hover(function () {
+                        $menu.hover(function() {
                             window.epmNavHoveredNode = liId;
                         });
 
-                        $('.epm-nav-node').hover(function () {
+                        $('.epm-nav-node').hover(function() {
                             var id = this.id;
                             window.epmNavHoveredNode = id;
 
                             if (id !== liId) {
-                                window.setTimeout(function () {
+                                window.setTimeout(function() {
                                     if (window.epmNavHoveredNode === id) {
                                         hideMenu();
                                     }
@@ -929,21 +927,21 @@
                             }
                         });
 
-                        $('.epm-nav-links').hover(function () {
-                        }, function () {
+                        $('.epm-nav-links').hover(function() {
+                        }, function() {
                             window.epmNavHoveredNode = null;
 
-                            window.setTimeout(function () {
+                            window.setTimeout(function() {
                                 if (window.epmNavHoveredNode === null) {
                                     hideMenu();
                                 }
                             }, 300);
                         });
 
-                        $('.epm-nav-dragger').click(function () {
+                        $('.epm-nav-dragger').click(function() {
                             hideMenu();
                         });
-                        
+
                         toggleMenu();
                     };
                     
@@ -1061,7 +1059,7 @@
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
-                                { title: 'Remove', command: 'nav:remove', kind: '99' }
+                                { title: 'Remove from favorites', command: 'nav:remove', kind: '99' }
                             ]);
                         });
                     };
@@ -1119,7 +1117,7 @@
                         
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
-                                { title: 'Remove', command: 'nav:remove', kind: '99' }
+                                { title: 'Remove from recent', command: 'nav:remove', kind: '99' }
                             ]);
                         });
                     };
