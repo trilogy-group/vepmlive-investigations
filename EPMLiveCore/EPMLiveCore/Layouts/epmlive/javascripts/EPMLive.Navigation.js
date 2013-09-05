@@ -931,7 +931,7 @@
             var menuManager = (function () {
                 var _setupMenu = function ($li, defaultCommands) {
                     defaultCommands = defaultCommands || [];
-                    
+
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
 
                     var setup = function (commands, $ca) {

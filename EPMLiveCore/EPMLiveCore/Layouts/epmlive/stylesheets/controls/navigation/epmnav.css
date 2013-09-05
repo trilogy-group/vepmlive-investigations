@@ -284,6 +284,8 @@
 }
 .epm-nav-sub li.epm-nav-node.epm-nav-trans a {
   width: 145px !important;
+  position: relative;
+  top: 1px;
 }
 .epm-nav-sub li.epm-nav-button {
   background: #6abd3d;
