@@ -69,7 +69,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                             Id = S(row["LinkId"]),
                             Title = S(row["Title"]),
                             Url = S(row["Url"]),
-                            CssClass = S(row["CssClass"]),
+                            CssClass = "epm-nav-sortable " + S(row["CssClass"]),
                             SiteId = S(SiteId),
                             WebId = S(WebId),
                             ListId = S(row["ListId"]),

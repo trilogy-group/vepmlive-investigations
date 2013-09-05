@@ -922,7 +922,30 @@
                     
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
 
-                    var setup = function(commands, $ca) {
+                    var setup = function (commands, $ca) {
+                        var getIcon = function(command) {
+                            switch(command.toLowerCase()) {
+                                case 'nav:remove':
+                                    return 'icon-star-6';
+                                case 'view':
+                                    return 'icon-info';
+                                case 'edit':
+                                    return 'icon-pencil-2';
+                                case 'delete':
+                                    return 'icon-close-3';
+                                case 'approve':
+                                    return 'icon-thumbs-up-4';
+                                case 'comments':
+                                    return 'icon-bubble-dots';
+                                case 'buildteam':
+                                    return 'icon-user-plus-3';
+                                case 'workspace':
+                                    return 'icon-tree-2';
+                                default:
+                                    return 'epm-nav-cm-blank';
+                            }
+                        };
+                        
                         var liId = $li.get(0).id;
 
                         if (commands.length) {
@@ -945,9 +968,7 @@
                                     $menu.append('<li class="seprator"></li>');
                                 }
                             } else {
-                                var imgUrl = cmd.imgUrl || '/_layouts/images/blank.gif';
-
-                                $menu.append('<li><img src="' + imgUrl + '" /><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');">' + cmd.title + '</a></li>');
+                                $menu.append('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>');
                             }
                         }
 
@@ -964,7 +985,7 @@
                                     if (window.epmNavHoveredNode === id) {
                                         hideMenu();
                                     }
-                                }, 300);
+                                }, 200);
                             }
                         });
 
@@ -976,7 +997,7 @@
                                 if (window.epmNavHoveredNode === null) {
                                     hideMenu();
                                 }
-                            }, 300);
+                            }, 200);
                         });
 
                         $('.epm-nav-dragger').click(function() {
@@ -987,11 +1008,11 @@
                     };
                     
                     var showMenu = function () {
-                        $menu.fadeIn(300);
+                        $menu.fadeIn(200);
                     };
 
                     var hideMenu = function () {
-                        $menu.fadeOut(300);
+                        $menu.fadeOut(200);
                     };
 
                     var toggleMenu = function() {
@@ -1100,7 +1121,7 @@
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
-                                { title: 'Remove from favorites', command: 'nav:remove', kind: '99' }
+                                { title: 'Remove', command: 'nav:remove', kind: '99' }
                             ]);
                         });
                     };
@@ -1114,8 +1135,11 @@
                 
                 var $ul = $('#epm-nav-sub-favorites-static-links');
 
-                $ul.find('.epm-nav-node').each(function() {
-                    var $li = $(this);
+                $ul.find('.epm-nav-sortable').each(function () {
+                    var $li = $(this).parent();
+
+                    $li.addClass('epm-nav-sortable');
+                    $($li.find('a').get(0)).attr('style', 'width:115px !important;');
 
                     favoritesManager.addDragger($li);
                     favoritesManager.addMenu($li);
@@ -1123,6 +1147,7 @@
 
                 try {
                     $ul.sortable({
+                        items: 'li.epm-nav-sortable',
                         placeholder: 'epm-nav-drag-placeholder',
                         update: function (event, ui) {
                             favoritesManager.resetOrder($ul);
@@ -1130,7 +1155,7 @@
                     });
 
                     $ul.disableSelection();
-                } catch(e) {
+                } catch (e) {
                 }
             };
 
@@ -1139,27 +1164,17 @@
                     var _addMenu = function($li, rIndex) {
                         if ($li.index() < rIndex) {
                             addNewItemMenu($li);
-                        } else {
-                            addContextualMenu($li);
                         }
                     };
 
                     var addNewItemMenu = function($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-plus-2"></span></span>');
                         
+                        $($li.find('a').get(0)).attr('style', 'width:115px !important;');
+
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             var $a = $($li.find('a').get(0));
                             window.epmLiveNavigation.handleContextualCommand(null, $a.data('webid'), $a.data('listid'), null, 'nav:add', 0);
-                        });
-                    };
-                    
-                    var addContextualMenu = function ($li) {
-                        $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
-                        
-                        $($li.find('.epm-menu-btn').get(0)).click(function () {
-                            menuManager.setupMenu($li, [
-                                { title: 'Remove from recent', command: 'nav:remove', kind: '99' }
-                            ]);
                         });
                     };
                     
@@ -1220,7 +1235,7 @@
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
-                                { title: 'Remove from favorites', command: 'nav:remove', kind: '99' }
+                                { title: 'Remove', command: 'nav:remove', kind: '99' }
                             ]);
                         });
                     };
@@ -1238,7 +1253,7 @@
                     var $li = $(this).parent();
 
                     $li.addClass('epm-nav-sortable');
-                    $($li.find('a').get(0)).attr('style', 'width:125px !important;');
+                    $($li.find('a').get(0)).attr('style', 'width:125px !important; position: relative; top: 2px;');
 
                     workspacesManager.addDragger($li);
                     workspacesManager.addMenu($li);

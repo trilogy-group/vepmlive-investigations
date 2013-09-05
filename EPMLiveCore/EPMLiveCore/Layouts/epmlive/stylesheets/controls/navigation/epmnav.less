@@ -253,7 +253,7 @@
     li.epm-nav-sub-header-bottom {
         border-bottom: none;
         border-top: 1px solid #FFFFFF;
-        padding: 0;
+        padding: 0 !important;
         height: 0 !important;
         line-height: 0 !important;
     }
@@ -279,7 +279,9 @@
     }
 
     li.epm-nav-sub-header {
-        padding-top: 15px !important;
+        padding-left: 0 !important;
+        padding-top: 10px !important;
+        width: 155px !important;
     }
 
     li.epm-nav-sub-placeholder {
@@ -359,7 +361,7 @@
 
     li.epm-nav-node.epm-nav-trans {
         a {
-            width: @link-tag-width - 10px !important;
+            width: @link-tag-width + 20px !important;
         }
     }
 
@@ -369,20 +371,20 @@
         color: #ffffff;
         font-family: Helvetica;
         font-weight: 300;
-        font-size: 1.5em !important;
         margin: 5px auto !important;
         padding-left: 10px !important;
         padding-right: 10px !important;
-        width: @node-width + 5px - 10px !important;
+        width: 130px !important;
         border-radius: 5px;
-        height: 30px !important;
+        height: 25px !important;
         .no-trans;
         .cursor-hand;
 
         a {
-            font-size: 0.7em !important;
+            font-size: 0.8em !important;
             margin-left: 10px !important;
-            width: @link-tag-width - 16px !important;
+            width: 100px !important;
+            text-align: center;
 
             &:active {
                 outline: none;
@@ -395,15 +397,16 @@
         }
 
         span {
-            top: -6px !important;
+            font-size: 1.4em;
             margin-left: 0 !important;
+            top: -4px !important;
         }
 
         a, span {
             color: #ffffff !important;
             padding: 0 !important;
-            height: 30px !important;
-            line-height: 30px !important;
+            height: 25px !important;
+            line-height: 25px !important;
 
             &:hover {
                 color: #ffffff;
@@ -599,32 +602,32 @@ ul.epm-nav-contextual-menu {
     .box-shadow(@y: 2px, @blur: 5px, @color: rgba(0, 0, 0, 0.15));
 
     li {
-        padding: 0 !important;
-        margin: 0 !important;
-        margin-left: 5px !important;
-        margin-top: 2.5px !important;
-        margin-bottom: 2.5px !important;
-        width: @menu-width !important;
+        padding: 0 0 0 10px !important;
+        margin: 5px 0 !important;
+        width: @menu-width + 2px !important;
         color: @menu-color !important;
         list-style: none outside none;
 
         &:hover {
-            background: #ffffff !important;
+            background: #E6F2FB !important;
         }
 
-        img {
-            width: @menu-img-width;
-            height: @menu-img-width;
+        span.epm-nav-cm-icon {
             margin-right: @menu-img-offset;
+            position: relative;
+            top: -3.5px;
+        }
+
+        span.epm-nav-cm-blank {
+            margin-right: 17px !important;
         }
 
         a {
-            width: @menu-width - @menu-img-width - @menu-img-offset !important;
             color: @menu-color !important;
             padding: 0 !important;
 
             &:hover {
-                background: #ffffff !important;
+                background: #E6F2FB !important;
                 color: @menu-color !important;
             }
         }
@@ -633,13 +636,14 @@ ul.epm-nav-contextual-menu {
         li.seprator {
             height: 0 !important;
             border-bottom: 1px solid #E9E9E9;
+            width: @menu-width - 8px !important;
         }
 }
 
 li.epm-nav-node-selected {
     ul.epm-nav-contextual-menu {
         li {
-            img {
+            span.epm-nav-cm-icon {
                 margin-right: @menu-img-offset - @selected-width;
             }
 
@@ -647,5 +651,15 @@ li.epm-nav-node-selected {
                 width: @menu-width - @menu-img-width - @menu-img-offset - @selected-width !important;
             }
         }
+    }
+}
+
+#epm-nav-sub-new-static-links {
+    .epm-nav-sub-header {
+        border-bottom: none;
+    }
+
+    .epm-nav-sub-header-bottom {
+        border-top: none;
     }
 }

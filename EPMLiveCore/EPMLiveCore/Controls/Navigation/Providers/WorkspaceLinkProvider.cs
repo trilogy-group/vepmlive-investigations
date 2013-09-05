@@ -48,7 +48,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     {
                         Title = "New Workspace",
                         Url = string.Format(CREATE_WORKSPACE_URL, RelativeUrl),
-                        CssClass = "epm-nav-button icon-tree"
+                        CssClass = "epm-nav-button fui-ext-workspace"
                     }
                 };
 
