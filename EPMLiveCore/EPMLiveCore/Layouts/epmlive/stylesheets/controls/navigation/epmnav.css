@@ -308,7 +308,6 @@
   font-size: 0.8em !important;
   margin-left: 10px !important;
   width: 100px !important;
-  text-align: center;
 }
 .epm-nav-sub li.epm-nav-button a:active {
   outline: none;
@@ -320,7 +319,7 @@
 .epm-nav-sub li.epm-nav-button span {
   font-size: 1.4em;
   margin-left: 0 !important;
-  top: -4px !important;
+  top: -5px !important;
 }
 .epm-nav-sub li.epm-nav-button a,
 .epm-nav-sub li.epm-nav-button span {
@@ -546,4 +545,8 @@ li.epm-nav-node-selected ul.epm-nav-contextual-menu li a {
 }
 #epm-nav-sub-new-static-links .epm-nav-sub-header-bottom {
   border-top: none;
+}
+#epm-nav-sub-new-static-links .epm-nav-button a {
+  margin-left: 15px !important;
+  width: 70px !important;
 }

@@ -589,7 +589,10 @@
                     var removeLink = function (linkId, notifId) {
                         var remove = function(lid, nid) {
                             $('#' + lid).remove();
-                            SP.UI.Notify.removeNotification(nid);
+                            
+                            if (nId) {
+                                SP.UI.Notify.removeNotification(nid);
+                            }
                         };
                         
                         epmLiveService.execute('RemoveNavigationLink', linkId, function (response) {
@@ -637,6 +640,15 @@
                             break;
                         case '6':
                             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
+                            break;
+                        case '98':
+                            if (command !== 'nav:remove') {
+                                $.get(redirectUrl).always(function () {
+                                    removeLink(id);
+                                });
+                            } else {
+                                removeLink(id);
+                            }
                             break;
                         case '99':
                             if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
@@ -1121,7 +1133,7 @@
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
-                                { title: 'Remove', command: 'nav:remove', kind: '99' }
+                                { title: 'Remove', command: 'nav:remove', kind: '98' }
                             ]);
                         });
                     };
@@ -1235,7 +1247,7 @@
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
-                                { title: 'Remove', command: 'nav:remove', kind: '99' }
+                                { title: 'Remove', command: 'nav:remove', kind: '98' }
                             ]);
                         });
                     };
