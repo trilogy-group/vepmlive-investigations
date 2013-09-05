@@ -4,6 +4,12 @@
   -webkit-transition: background-color 0.1s ease-in, color 0.1s ease-in;
   transition: background-color 0.1s ease-in, color 0.1s ease-in;
 }
+.no-trans {
+  -moz-transition: none;
+  -o-transition: none;
+  -webkit-transition: none;
+  transition: none;
+}
 .ellipsis {
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -257,6 +263,53 @@
 }
 .epm-nav-sub li.epm-nav-node.epm-nav-trans a {
   width: 115px !important;
+}
+.epm-nav-sub li.epm-nav-button {
+  background: #6abd3d;
+  border: 1px solid #66b23a;
+  color: #ffffff;
+  font-family: Helvetica;
+  font-weight: 300;
+  font-size: 1.5em !important;
+  margin: 5px auto !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  width: 139px !important;
+  border-radius: 5px;
+  height: 30px !important;
+  -moz-transition: none;
+  -o-transition: none;
+  -webkit-transition: none;
+  transition: none;
+  cursor: pointer;
+  cursor: hand;
+}
+.epm-nav-sub li.epm-nav-button a {
+  font-size: 0.7em !important;
+  margin-left: 10px !important;
+  width: 109px !important;
+}
+.epm-nav-sub li.epm-nav-button span {
+  top: -6px !important;
+  margin-left: 0 !important;
+}
+.epm-nav-sub li.epm-nav-button a,
+.epm-nav-sub li.epm-nav-button span {
+  color: #ffffff !important;
+  padding: 0 !important;
+  height: 30px !important;
+  line-height: 30px !important;
+}
+.epm-nav-sub li.epm-nav-button a:hover,
+.epm-nav-sub li.epm-nav-button span:hover {
+  color: #ffffff;
+}
+.epm-nav-sub li.epm-nav-button:hover {
+  background: #6abd3d !important;
+}
+.epm-nav-sub li.epm-nav-button:hover span.epm-nav-icon {
+  -webkit-text-shadow: 0 1px 10px #ffffff;
+  text-shadow: 0 1px 10px #ffffff;
 }
 .epm-nav-sub ul.epm-nav-node-static li {
   padding-left: 5px;

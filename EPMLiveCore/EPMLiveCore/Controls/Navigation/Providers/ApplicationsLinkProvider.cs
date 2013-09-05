@@ -34,9 +34,10 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     },
                     new NavLink
                     {
-                        Title = "Add new application",
+                        Title = "Add new app",
                         Url = string.Format(@"http://market.epmlive.com/?source={0}", Url),
-                        External = true
+                        External = true,
+                        CssClass = "epm-nav-button icon-cube"
                     }
                 };
 
@@ -81,7 +82,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             Task.WaitAll(tasks.ToArray());
 
-            links.Add(new NavLink {Title = "Applications", Url = "Header"});
+            links.Add(new NavLink {Title = "Apps", Url = "Header"});
 
             links.AddRange(lists.Select(list => list.Value).Select(l => new NavLink
             {

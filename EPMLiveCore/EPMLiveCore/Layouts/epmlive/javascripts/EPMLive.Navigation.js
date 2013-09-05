@@ -221,6 +221,17 @@
                             category = '__STATIC__';
                         }
 
+                        var isButton = false;
+
+                        var classes = link.cssClass.split(' ');
+                        for (var i = 0; i < classes.length; i++) {
+                            if (classes[i] === 'epm-nav-button') {
+                                isButton = true;
+                                link.cssClass = link.cssClass.replace(/epm-nav-button/g, '');
+                                break;
+                            }
+                        }
+
                         var icon = '';
 
                         if (link.cssClass) {
@@ -233,6 +244,11 @@
 
                         if (providerId === 'epm-nav-sub-settings' || providerId === 'epm-nav-sub-workplace') {
                             cssClass = 'epm-nav-node';
+                        }
+                        
+                        if (isButton) {
+                            cssClass = cssClass + ' epm-nav-button';
+                            cssClass = cssClass.replace(/epm-nav-trans/g, '');
                         }
 
                         var target = '';
@@ -250,14 +266,18 @@
                         }
 
                         $(categories[category].$el.find('a').get(0)).click(function () {
-                            $sn.find('a').each(function () {
-                                $(this).parent().removeClass(selectedClass);
-                            });
-
                             var $a = $(this);
-                            $a.parent().addClass(selectedClass);
+                            var $parent = $a.parent();
+                            
+                            if (!$parent.hasClass('epm-nav-button')) {
+                                $sn.find('a').each(function () {
+                                    $(this).parent().removeClass(selectedClass);
+                                });
 
-                            $.cookie(selectedLinkCookie, JSON.stringify({ id: $a.get(0).id, url: $a.attr('href') }), cookieOptions);
+                                $parent.addClass(selectedClass);
+
+                                $.cookie(selectedLinkCookie, JSON.stringify({ id: $a.get(0).id, url: $a.attr('href') }), cookieOptions);
+                            }
                         });
                     };
 
