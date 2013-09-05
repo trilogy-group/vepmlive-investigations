@@ -714,7 +714,7 @@
             }
 
             var bIsCloseDisabled = true;
-            if (this.params.IsDlg != "0")
+            if (this.params.IsDlg == "1")
                 bIsCloseDisabled = false;
             var editorTabData = {
                 parent: "idEditorTabDiv",
@@ -1614,10 +1614,6 @@
         var sId = col.substring(1);
         var value = this.GetPeriodValue(grid, row, col);
         if (value == dbl) return;
-        var origH = grid.GetAttribute(row, null, "H" + sId + "Orig");
-        if (origH == null) {
-            grid.SetAttribute(row, null, "H" + sId + "Orig", this.SetZeroIfNull(value), 0, 0);
-        }
         var ccruid = grid.GetAttribute(row, null, "CCRole_UID");
         var status = grid.GetAttribute(row, null, "Status");
         var h = "h";
@@ -1626,6 +1622,7 @@
             h = "t";
             f = "u";
         }
+        var origvalue = value;
         var fteconv = this.GetFTEConv(ccruid, sId);
         if (fteconv > 0) {
             switch (this.displayMode) {
@@ -1638,6 +1635,7 @@
                     break;
                 case 1: /* FTE mode - so calc Hours */
                 case 2: /* FTE %*/
+                    origvalue = (value * fteconv) / 10000;
                     grid.SetAttribute(row, null, f + sId, dbl, 0, 0);
                     grid.SetAttribute(row, null, f + sId + "Changed", 1, 0, 0);
                     if (dbl == null) value = null; else value = parseInt((dbl * fteconv) / 10000);
@@ -1645,6 +1643,10 @@
                     grid.SetAttribute(row, null, "m" + sId, 1, 0, 0);
                     break;
             }
+        }
+        var origH = grid.GetAttribute(row, null, "H" + sId + "Orig");
+        if (origH == null) {
+            grid.SetAttribute(row, null, "H" + sId + "Orig", this.SetZeroIfNull(origvalue), 0, 0);
         }
         grid.SetAttribute(row, null, "Changed", 1, 0, 0);
         if (status == const_Requirement)
@@ -1881,6 +1883,7 @@
     };
     RPEditor.prototype.GridsOnAfterSave = function (grid, result, autoupdate) {
         this.HideWorkingPopup("divSaving");
+        this.savingPlan = false;
         if (result == 0) {
             var planrow = grid.GetFirst(null, 0);
             while (planrow != null) {
@@ -2215,9 +2218,18 @@
     };
     RPEditor.prototype.OnResizeInternal = function (event) {
         try {
+            var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
+            var xy = jsf_findAbsolutePosition(divLayout);
             var body = document.body;
+//            if (this.params.IsDlg == "1") {
+//                this.Width = body.offsetWidth;
+//                this.Height = body.offsetHeight - 5;
+//            } else {
+//                this.Width = body.offsetWidth - 4;
+//                this.Height = body.offsetHeight - 195;
+//            }
             this.Width = body.offsetWidth;
-            this.Height = body.offsetHeight - 5;
+            this.Height = body.offsetHeight - xy[1] - 5;
             this.OnResize();
             if (this.initialized == true)
                 this.GridsOnSectionResize(this.plangrid, 2, 0);
@@ -2294,6 +2306,7 @@
                     planrow = plangrid.GetPrev(planrow);
                 }
                 this.ShowWorkingPopup("divSaving");
+                this.savingPlan = true;
                 plangrid.Save();
             }
         }
@@ -5267,6 +5280,7 @@
         this.finishPeriod = null;
         this.projectuids = "";
         this.showHeatmap = false;
+        this.savingPlan = false;
 
         var const_HoursFormat = "0.##";
         var const_FTEFormat = "0.####";

@@ -55,6 +55,7 @@
 <script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
 <script src="/_layouts/ppm/rpeditor.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
+<script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
 
 <style type="text/css">
     html, body {

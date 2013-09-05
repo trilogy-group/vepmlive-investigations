@@ -187,6 +187,7 @@ namespace PortfolioEngineCore
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     oCommand.ExecuteNonQuery();
                 }
+                //  note that calculating default FTEs and recalculating rates are handled back in WorkEnginePPM after we get back from here
             }
             catch (Exception ex)
             {

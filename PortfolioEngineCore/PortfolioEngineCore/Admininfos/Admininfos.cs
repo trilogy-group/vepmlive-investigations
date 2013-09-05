@@ -1552,7 +1552,7 @@ namespace PortfolioEngineCore
 
                 // are we in auto update categories mode?
 
-                // no Major Categories - this could work but it needs more work to generate Cost Categories from Categories and doesn't seem worth it right now (May 2012)
+                // no Major Categories - this could work but it needs more work to generate Cost Categories from Categories -changed now
                 int MajorCategoryLookup=0;
                 sCommand = "Select ADM_MC_LOOKUP From EPG_ADMIN";
                 SqlCommand = new SqlCommand(sCommand, _sqlConnection);
@@ -1872,6 +1872,10 @@ namespace PortfolioEngineCore
                 //                                                                                _dbcnstring, secLevel);
                 //bool bret = pec.CalcAllDefaultFTEs();
                 bool bret = AdminFunctions.CalcAllDefaultFTEs(_dba);
+
+                // recalculate Cost Category Periodic Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
+                string sReply;
+                bret = AdminFunctions.CalcCategoryRates(_dba, out sReply);
 
                 _sqlConnection.Close();
 

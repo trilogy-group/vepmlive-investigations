@@ -232,16 +232,21 @@ namespace WorkEnginePPM
                         AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
 
                         // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
-                        AdminFunctions.CalcCategoryRates(dba);
-
-                        // If we are  in version >= V43 then need to push updated cost categories to WE
-                        xQueue = new CStruct();
-                        xQueue.Initialize("Queue");
-                        xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcRefreshRoles);
-                        xQueue.CreateString("Context", "CostCategories");
-                        xQueue.CreateString("Comment", "Refresh Roles");
-                        xQueue.CreateString("Data", "No Context Data");
-                        AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
+                        if (!AdminFunctions.CalcCategoryRates(dba, out sReply))
+                        {
+                            sReply = DBAccess.FormatAdminError("error", "CostCategories.SaveCpstCategoryInfo", sReply);
+                        }
+                        else
+                        {
+                            // If we are  in version >= V43 then need to push updated cost categories to WE
+                            xQueue = new CStruct();
+                            xQueue.Initialize("Queue");
+                            xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcRefreshRoles);
+                            xQueue.CreateString("Context", "CostCategories");
+                            xQueue.CreateString("Comment", "Refresh Roles");
+                            xQueue.CreateString("Data", "No Context Data");
+                            AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
+                        }
                     }
                 }
                 catch (Exception ex)

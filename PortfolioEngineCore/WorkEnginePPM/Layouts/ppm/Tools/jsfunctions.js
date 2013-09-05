@@ -91,3 +91,14 @@ function jsf_sendRequest(sURL, sXML) {
     }
     return sReplyXML;
 };
+function jsf_findAbsolutePosition(obj) {
+    var curleft = curtop = 0;
+    if (obj && obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+    }
+    return [curleft, curtop];
+    //returns an array
+};

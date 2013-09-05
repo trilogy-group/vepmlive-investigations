@@ -39,7 +39,7 @@ namespace PortfolioEngineCore
                     switch (sFunction)
                     {
                         case "CalcCategoryRates":
-                            return CalcCategoryRates(_dba);
+                            return CalcCategoryRates(_dba, out sReply);
                         case "CalcDefaultFTEs":
                             return CalcAllDefaultFTEs(_dba);
                         case "CalcRPAllAvailabilities":
@@ -66,7 +66,7 @@ namespace PortfolioEngineCore
         }
 
 
-        public static bool CalcCategoryRates(DBAccess dba)
+        public static bool CalcCategoryRates(DBAccess dba, out string sReply)
         {
             SqlCommand oCommand;
             SqlDataReader reader;
@@ -74,40 +74,50 @@ namespace PortfolioEngineCore
             string sCommand;
             
             bool bResult = false;
-            string sReply = "";
+            sReply = "";
             try
             {
-                sCommand = "SELECT * FROM EPG_COST_CATEGORY_RATE_VALUES Order By BC_UID,BC_EFFECTIVE_DATE";
-                oCommand = new SqlCommand(sCommand, dba.Connection);
-                reader = oCommand.ExecuteReader();
-
                 CategoryRate categoryrate;
                 List<CategoryRate> rates = new List<CategoryRate>();
                 Dictionary<int, List<CategoryRate>> categoryrates = new Dictionary<int, List<CategoryRate>>();
-                int prevuid = 0;
-                while (reader.Read())
+                
+                try
                 {
-                    int nBCUID = DBAccess.ReadIntValue(reader["BC_UID"]);
-                    DateTime dEffectiveDate = DBAccess.ReadDateValue(reader["BC_EFFECTIVE_DATE"]);
-                    double dRate = DBAccess.ReadDoubleValue(reader["BC_RATE"]);
-                    double dOvertimeRate = DBAccess.ReadDoubleValue(reader["BC_OVERTIME_RATE"]);
+                    sCommand = "SELECT * FROM EPG_COST_CATEGORY_RATE_VALUES Order By BC_UID,BC_EFFECTIVE_DATE";
+                    oCommand = new SqlCommand(sCommand, dba.Connection);
+                    reader = oCommand.ExecuteReader();
 
-                    if (prevuid > 0 && prevuid != nBCUID)
+                    int prevuid = 0;
+                    while (reader.Read())
                     {
-                        categoryrates.Add(prevuid, rates);
-                        rates = null;
+                        int nBCUID = DBAccess.ReadIntValue(reader["BC_UID"]);
+                        DateTime dEffectiveDate = DBAccess.ReadDateValue(reader["BC_EFFECTIVE_DATE"]);
+                        double dRate = DBAccess.ReadDoubleValue(reader["BC_RATE"]);
+                        double dOvertimeRate = DBAccess.ReadDoubleValue(reader["BC_OVERTIME_RATE"]);
+
+                        if (prevuid > 0 && prevuid != nBCUID)
+                        {
+                            categoryrates.Add(prevuid, rates);
+                            rates = null;
+                        }
+                        if (rates == null) rates = new List<CategoryRate>();
+                        prevuid = nBCUID;
+                        categoryrate = new CategoryRate();
+                        categoryrate.UID = prevuid;
+                        categoryrate.EffectiveDate = dEffectiveDate;
+                        categoryrate.Rate = dRate;
+                        categoryrate.OvertimeRate = dOvertimeRate;
+                        rates.Add(categoryrate);
                     }
-                    if (rates == null) rates = new List<CategoryRate>();
-                    prevuid = nBCUID;
-                    categoryrate = new CategoryRate(); 
-                    categoryrate.UID = prevuid;
-                    categoryrate.EffectiveDate = dEffectiveDate;
-                    categoryrate.Rate = dRate;
-                    categoryrate.OvertimeRate = dOvertimeRate;
-                    rates.Add (categoryrate);
+                    if (rates != null && rates.Count > 0) categoryrates.Add(prevuid, rates);
                 }
-                if (rates != null && rates.Count > 0) categoryrates.Add(prevuid, rates);
+                catch (Exception ex)
+                {
+                    return true;   // thinking an error here will be because the rates table added in X5 doesn't exist and we want to leave the existing Periodic rates alone w/o error
+                }
                 reader.Close();
+
+                if (categoryrates.Count == 0) return true;    //  no rates found - don't do anything - will leave old Periodic Rates as is
 
                 //  read list of calendars
                 sCommand = "SELECT * FROM EPGP_COST_BREAKDOWNS";
@@ -169,6 +179,7 @@ namespace PortfolioEngineCore
                             rateitem.UID = category.Key;
                             List<CategoryRate> ratelist = category.Value;
                             rateitem.dValue1 = GetPeriodRate(dStartDate, rateitem.UID, ratelist);
+                            // after first attempt at migration the following stmnt failed because we're adding the Cost Categories because of Major Cateories below but then also reading from rates the migration created - need to settle
                             catrates.Add(rateitem.UID, rateitem);
                             // add copies of the rate tables for Cost Categories from Major Categories
                             if (listccs.ContainsKey(rateitem.UID))
@@ -281,26 +292,31 @@ namespace PortfolioEngineCore
                             }
                         }
                     }
-
-                    //  execute a delete to clear out possible left overs where a rate was deleted and there is no FTE either
-                    //    (?) this means any rates left over or entered in old Calendar page will remain there - which is what we want for now at least
-                    if (bupdateOK)
-                    {
-                        sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
-                            " Where (BA_FTE_CONV = 0 Or BA_FTE_CONV is NULL) And (BA_RATE = 0 Or BA_RATE is NULL)";
-                        oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
-                        oCommand.CommandType = CommandType.Text;
-                        oCommand.ExecuteNonQuery();
-                    }
-
                     if (bupdateOK) dba.CommitTransaction();
+                }
+
+                //  execute a delete to clear out possible left overs where a rate was deleted and there is no FTE either
+                //    (?) this means any rates left over or entered in old Calendar page will remain there - which is what we want for now at least
+                {
+                    sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
+                        " Where (BA_FTE_CONV = 0 Or BA_FTE_CONV is NULL) And (BA_RATE = 0 Or BA_RATE is NULL)";
+                    oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
+                    oCommand.CommandType = CommandType.Text;
+                    oCommand.ExecuteNonQuery();
+
+                    // might as well run a clean up just in case
+                    sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
+                       " Where BA_BC_UID Not in (Select BC_UID From EPGP_COST_CATEGORIES) or CB_ID Not in (Select CB_ID From EPGP_COST_BREAKDOWNS)";
+                    oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
+                    oCommand.CommandType = CommandType.Text;
+                    oCommand.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
                 sReply = HandleException("CalcCategoryRates", 99999, ex);
+                return false;
             }
-
             bResult = (dba.Status == StatusEnum.rsSuccess);
             if (bResult == false)
             {
@@ -735,26 +751,30 @@ namespace PortfolioEngineCore
                             }
                         }
                     }
-
-                    //  execute a delete to clear out possible left overs where a rate was deleted and there is no FTE either
-                    if (bupdateOK)
-                    {
-                        sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
-                            " Where (BA_FTE_CONV = 0 Or BA_FTE_CONV is NULL) And (BA_RATE = 0 Or BA_RATE is NULL)";
-                        oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
-                        oCommand.CommandType = CommandType.Text;
-                        oCommand.ExecuteNonQuery();
-                    }
-
                     if (bupdateOK) dba.CommitTransaction();
                 }
-            bResult = true;
+                //  execute a delete to clear out possible left overs where a rate was deleted and there is no FTE either
+                {
+                    sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
+                        " Where (BA_FTE_CONV = 0 Or BA_FTE_CONV is NULL) And (BA_RATE = 0 Or BA_RATE is NULL)";
+                    oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
+                    oCommand.CommandType = CommandType.Text;
+                    oCommand.ExecuteNonQuery();
+
+                    // might as well run a clean up just in case
+                    sCommand = @"Delete From EPGP_COST_BREAKDOWN_ATTRIBS" +
+                       " Where BA_BC_UID Not in (Select BC_UID From EPGP_COST_CATEGORIES) or CB_ID Not in (Select CB_ID From EPGP_COST_BREAKDOWNS)";
+                    oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
+                    oCommand.CommandType = CommandType.Text;
+                    oCommand.ExecuteNonQuery();
+                }
+                bResult = true;
             }
             catch (Exception ex)
             {
                 sReply = HandleException("CalcDefaultFTEs", 99999, ex);
+                bResult = false;
             }
-
             return bResult;
         }
 

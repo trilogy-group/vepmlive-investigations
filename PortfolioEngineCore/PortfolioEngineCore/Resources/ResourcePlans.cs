@@ -2372,7 +2372,33 @@ namespace PortfolioEngineCore
                 foreach (CStruct xI in clnPlanRows)
                 {
                     Common.AddIDToList(ref sTeamPIs, xI.GetIntAttr("Project_UID", 0));
-                    if (xI.GetBooleanAttr("Deleted") == true && xI.GetBooleanAttr("Added") == false)
+                    // check for a project row
+                    if (xI.GetIntAttr("Status") == 0)
+                    {
+                        // check to see if option set to delete existing data
+                        if (xI.GetBooleanAttr("Changed") == true && xI.GetBooleanAttr("DeleteExistingPlan") == true)
+                        {
+                            int lProjectID = xI.GetIntAttr("Project_UID");
+                            if (lProjectID > 0)
+                            {
+                                string sCommand = "DELETE FROM EPGP_RP_CATEGORY_VALUES WHERE CAT_CMT_UID IN (SELECT CMT_UID FROM EPG_RESOURCEPLANS WHERE PROJECT_ID = " + lProjectID.ToString("0") + ")";
+                                SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                                int lRowsAffected = oCommand.ExecuteNonQuery();
+                                // Delete existing actual hours
+                                //int lStartPeriodID = 1;
+                                sCommand = "DELETE FROM EPG_RESOURCEPLANS_HOURS WHERE CMT_UID IN (SELECT CMT_UID FROM EPG_RESOURCEPLANS WHERE PROJECT_ID = " + lProjectID.ToString("0") + ")";
+                                oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                                lRowsAffected = oCommand.ExecuteNonQuery();
+                                sCommand = "DELETE FROM EPG_RPE_NOTES WHERE RPEN_CMT_GUID IN (SELECT CMT_GUID FROM EPG_RESOURCEPLANS WHERE PROJECT_ID = " + lProjectID.ToString("0") + ")";
+                                oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                                lRowsAffected = oCommand.ExecuteNonQuery();
+                                sCommand = "DELETE FROM EPG_RESOURCEPLANS WHERE PROJECT_ID = " + lProjectID.ToString("0");
+                                oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                                lRowsAffected = oCommand.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    else if (xI.GetBooleanAttr("Deleted") == true && xI.GetBooleanAttr("Added") == false)
                     {
                         string sCommand = "DELETE FROM EPG_RESOURCEPLANS WHERE CMT_UID = " + xI.GetIntAttr("UID", 0).ToString("0");
                         SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
@@ -2421,7 +2447,24 @@ namespace PortfolioEngineCore
                             Common.AddIDToList(ref sDeleteCMTUIDs, xI.GetIntAttr("UID", 0));
                             sSQL = BuildSQLPlanRowUpdate(xI, dblHours);
                             SqlCommand oCommand = new SqlCommand(sSQL, _dba.Connection, _dba.Transaction);
-                            oCommand.ExecuteNonQuery();
+                            int lRowsAffected = oCommand.ExecuteNonQuery();
+                            if (lRowsAffected != 1)
+                            {
+                                string itemname = xI.GetStringAttr("ItemName");
+                                string sCommand = "SELECT CMT_ENTEREDBY_WRES_ID,RES_NAME FROM EPG_RESOURCEPLANS LEFT JOIN EPG_RESOURCES on CMT_ENTEREDBY_WRES_ID=EPG_RESOURCES.WRES_ID WHERE CMT_UID = " + xI.GetIntAttr("UID", 0).ToString("0");
+                                SqlDataReader reader;
+                                string changedby = "unknown user";
+                                if (_dba.ExecuteReader(sCommand, (StatusEnum)99999, out reader) == StatusEnum.rsSuccess)
+                                {
+                                    if (reader.Read())
+                                        changedby = DBAccess.ReadStringValue(reader["RES_NAME"]) + "(" + DBAccess.ReadIntValue(reader["CMT_ENTEREDBY_WRES_ID"]).ToString() + ")";
+                                    reader.Close();
+                                }
+                                
+                                _dba.Status = (StatusEnum)123456;
+                                _dba.StatusText = "Row '" + itemname + "' has been updated by '" + changedby + "'.\nPlease refresh your plan and resubmit your changes.";
+                                goto Exit_Transaction;
+                            }
                             sSQL = BuildSQLPlanCategoryRowUpdate(xI);
                             if (sSQL != "")
                             {
@@ -2558,6 +2601,8 @@ namespace PortfolioEngineCore
                     }
                 }
 
+
+        Exit_Transaction:
                 if (_dba.Status == StatusEnum.rsSuccess)
                     _dba.CommitTransaction();
                 else

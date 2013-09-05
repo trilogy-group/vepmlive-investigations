@@ -142,6 +142,7 @@ namespace WorkEnginePPM
             int nCTId = xData.GetIntAttr("CT_ID");
             int nCBId = xData.GetIntAttr("CB_ID");
 
+            // add job to ueue for immediate execution
             CStruct xRequest = new CStruct();
             xRequest.Initialize("Request");
             CStruct xSet = xRequest.CreateSubStruct("EPKSet");

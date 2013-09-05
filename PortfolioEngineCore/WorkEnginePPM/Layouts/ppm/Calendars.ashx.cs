@@ -172,7 +172,10 @@ namespace WorkEnginePPM
                         {
                             dbaCalendars.DeletePeriods(dba, nCalendarId, out lRowsAffected);
                             if (dbaCalendars.InsertPeriods(dba, nCalendarId, dt, out lRowsAffected) != StatusEnum.rsSuccess)
+                            {
                                 sReply = WebAdmin.FormatError("error", "Calendars.InsertPeriods", dba.StatusText);
+                                dba.Status = StatusEnum.rsRequestCannotBeCompleted;
+                            }
                         }
                     }
                 }
@@ -207,7 +210,7 @@ namespace WorkEnginePPM
                             xQueue = new CStruct();
                             xQueue.Initialize("Queue");
                             xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcCalcAvailability);
-                            xQueue.CreateString("Context", "Edit Periods");
+                            xQueue.CreateString("Context", "Edit Calendar");
                             xQueue.CreateString("Comment", "Calculate Availability");
                             xQueue.CreateString("Data", "No Context Data");
                             AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
@@ -216,7 +219,7 @@ namespace WorkEnginePPM
                             //AdminFunctions.CalcRPAllAvailabilities(dba);
                         }
 
-                        // recalculate FTE values IF using default values
+                        // recalculate FTE values if using default values
                         xQueue = new CStruct();
                         xQueue.Initialize("Queue");
                         xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcCalcDefaultFTEs);
@@ -226,13 +229,19 @@ namespace WorkEnginePPM
                         AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
 
                         // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
-                        AdminFunctions.CalcCategoryRates(dba);
-
-                        CStruct xCalendar = new CStruct();
-                        xCalendar.Initialize("calendar");
-                        xCalendar.CreateIntAttr("calendarid", nCalendarId);
-                        xCalendar.CreateStringAttr("name", sCalendarName);
-                        sReply = xCalendar.XML();
+                        if (!AdminFunctions.CalcCategoryRates(dba, out sReply))
+                        {
+                            sReply = DBAccess.FormatAdminError("error", "Calendars.UpdateCalendarInfo", sReply);
+                            dba.Status = StatusEnum.rsRequestCannotBeCompleted;
+                        }
+                        else
+                        {
+                            CStruct xCalendar = new CStruct();
+                            xCalendar.Initialize("calendar");
+                            xCalendar.CreateIntAttr("calendarid", nCalendarId);
+                            xCalendar.CreateStringAttr("name", sCalendarName);
+                            sReply = xCalendar.XML();
+                        }
                     }
                     catch (Exception ex)
                     {
