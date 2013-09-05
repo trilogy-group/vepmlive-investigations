@@ -252,6 +252,9 @@
 .epm-nav-sub ul.epm-nav-links li:hover .epm-menu-btn {
   visibility: visible;
 }
+.epm-nav-sub ul.epm-nav-links.epm-nav-node-static li a {
+  width: 160px;
+}
 .epm-nav-sub ul.ui-sortable li a {
   width: 115px;
 }
