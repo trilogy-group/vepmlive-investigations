@@ -1162,11 +1162,13 @@ net start "WETimer"</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\DevStoreSolutionStore\Reference.cs" />
     <Compile Include="Web References\FeatureActivationSvc\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\ProductionStore\Reference.cs" />
     <Compile Include="Web References\SalesforceApexService\Reference.cs" />
     <Compile Include="Web References\SalesforceMetadataService\Reference.cs" />
     <Compile Include="Web References\SalesforcePartnerService\Reference.cs" />
@@ -1632,11 +1634,15 @@ net start "WETimer"</PostDeploymentCommand>
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Web References\DevStoreSolutionStore\lists.wsdl" />
+    <None Include="Web References\DevStoreSolutionStore\Reference.map" />
     <None Include="Web References\FeatureActivationSvc\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\FeatureActivationSvc\service.wsdl" />
+    <None Include="Web References\ProductionStore\lists.wsdl" />
+    <None Include="Web References\ProductionStore\Reference.map" />
     <None Include="Web References\SalesforceApexService\apex.wsdl" />
     <None Include="Web References\SalesforceApexService\CompileAndTestResult.datasource" />
     <None Include="Web References\SalesforceApexService\CompileClassResult.datasource" />
@@ -3691,6 +3697,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="UplandV5\Elements.xml" />
     <Content Include="ViewPermissions\Elements.xml" />
     <Content Include="ViewSelectorDelegate\Elements.xml" />
+    <Content Include="Web References\DevStoreSolutionStore\lists.disco" />
+    <Content Include="Web References\ProductionStore\lists.disco" />
     <Content Include="WorkEngineActivation\Elements.xml" />
     <Content Include="WorkEngineApps\Elements.xml" />
     <Content Include="WorkEngineApps\Schema.xml" />
