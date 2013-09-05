@@ -204,6 +204,16 @@
 .epm-nav-sub li.epm-nav-sub-header-bottom:hover {
   background-color: #eeeeee !important;
 }
+.epm-nav-sub li.epm-nav-sub-placeholder {
+  color: #CCCCCC;
+  margin-bottom: 30px !important;
+  margin-top: 30px !important;
+  text-align: center;
+}
+.epm-nav-sub li.epm-nav-sub-placeholder:hover {
+  color: #CCCCCC !important;
+  background: #eeeeee !important;
+}
 .epm-nav-sub ul.epm-nav-links {
   list-style: none;
   padding: 0;

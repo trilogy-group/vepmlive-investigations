@@ -61,7 +61,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     }
                 }
 
-                if (dataTable != null)
+                if (dataTable.Rows.Count > 0)
                 {
                     links.AddRange(from DataRow row in dataTable.Rows
                         select new SPNavLink
@@ -75,6 +75,14 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                             ListId = S(row["ListId"]),
                             ItemId = S(row["ItemId"])
                         });
+                }
+                else
+                {
+                    links.Add(new NavLink
+                    {
+                        Title = "No favorites",
+                        Url = "PlaceHolder"
+                    });
                 }
 
                 return links;

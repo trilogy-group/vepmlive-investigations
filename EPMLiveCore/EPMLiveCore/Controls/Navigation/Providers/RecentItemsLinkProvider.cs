@@ -53,7 +53,19 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             };
 
             DataTable dataTable = GetData(FA_QUERY);
-            GetLinks(dataTable, links);
+
+            if (dataTable.Rows.Count > 0)
+            {
+                GetLinks(dataTable, links);
+            }
+            else
+            {
+                links.Add(new NavLink
+                {
+                    Title = "No frequent apps",
+                    Url = "PlaceHolder"
+                });
+            }
 
             return links;
         }
@@ -70,7 +82,19 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             };
 
             DataTable dataTable = GetData(RI_QUERY);
-            GetLinks(dataTable, links);
+
+            if (dataTable.Rows.Count > 0)
+            {
+                GetLinks(dataTable, links);
+            }
+            else
+            {
+                links.Add(new NavLink
+                {
+                    Title = "No recent items",
+                    Url = "PlaceHolder"
+                });
+            }
 
             return links;
         }

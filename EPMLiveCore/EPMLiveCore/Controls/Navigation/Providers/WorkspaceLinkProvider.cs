@@ -81,20 +81,29 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
             }
 
-            if (dataTable == null) yield break;
-
-            foreach (SPNavLink navLink in from DataRow row in dataTable.Rows
-                select new SPNavLink
-                {
-                    Id = S(row["LinkId"]),
-                    Title = S(row["Title"]),
-                    Url = S(row["Url"]),
-                    CssClass = "epm-nav-sortable " + S(row["CssClass"]),
-                    SiteId = S(SiteId),
-                    WebId = S(WebId)
-                })
+            if (dataTable.Rows.Count > 0)
             {
-                yield return navLink;
+                foreach (SPNavLink navLink in from DataRow row in dataTable.Rows
+                    select new SPNavLink
+                    {
+                        Id = S(row["LinkId"]),
+                        Title = S(row["Title"]),
+                        Url = S(row["Url"]),
+                        CssClass = "epm-nav-sortable " + S(row["CssClass"]),
+                        SiteId = S(SiteId),
+                        WebId = S(WebId)
+                    })
+                {
+                    yield return navLink;
+                }
+            }
+            else
+            {
+                yield return new NavLink
+                {
+                    Title = "No favorite workspace",
+                    Url = "PlaceHolder"
+                };
             }
         }
 

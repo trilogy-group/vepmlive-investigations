@@ -192,12 +192,27 @@
                         } else if (link.url.toLowerCase() === 'header') {
                             registerCategory(link.category);
                             registerHeader(link);
+                        } else if (link.url.toLowerCase() === 'placeholder') {
+                            registerCategory(link.category);
+                            registerPlaceHolder(link);
                         } else {
                             registerCategory(link.category);
                             registerLink(link);
                         }
                     };
 
+                    var registerPlaceHolder = function (link) {
+                        var category = link.category;
+
+                        if (!category) {
+                            category = '__STATIC__';
+                        }
+
+                        var li = '<li class="epm-nav-sub-placeholder">' + link.title + '</li>';
+
+                        categories[category].$el.append(li);
+                    };
+                    
                     var registerHeader = function (link) {
                         var category = link.category;
 
