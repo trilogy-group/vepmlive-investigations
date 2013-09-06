@@ -12,8 +12,15 @@ namespace EPMLiveCore.Jobs
     {
         public void execute(SPSite site, SPWeb web, string data)
         {
-            WorkspaceController wsCon = new WorkspaceController(data);
-            wsCon.CreateWorkspace();
+            try
+            {
+                WorkspaceController wsCon = new WorkspaceController(data);
+                wsCon.CreateWorkspace();
+            }
+            catch (Exception ex) {
+                bErrors = true;
+                sErrors = "General Error: " + ex.Message;
+            }
         }
     }
 }
