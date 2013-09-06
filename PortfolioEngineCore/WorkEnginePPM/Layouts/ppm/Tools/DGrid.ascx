@@ -25,7 +25,7 @@
 
 <asp:HiddenField ID="hiddenTableData" runat="server"></asp:HiddenField>
 <asp:HiddenField ID="hiddenColumnData" runat="server"></asp:HiddenField>
-<div style="margin-left:4px; margin-right:4px;" id="<%=ClientID%>_dgrid_div" >
+<div style="margin-left:2px; margin-right:4px;" id="<%=ClientID%>_dgrid_div" >
 <div id="<%=ClientID%>_grid_div" style="width:inherit; height:500px;"></div>
 </div>
 <script type="text/javascript">

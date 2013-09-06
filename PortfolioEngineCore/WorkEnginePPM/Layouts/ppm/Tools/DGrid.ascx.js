@@ -54,6 +54,12 @@
         return xy[1];
     };
 
+    DGrid.prototype.GetLeftTopPositions = function () {
+        var div = document.getElementById(params.dgrid_div);
+        var xy = this.findAbsolutePosition(div);
+        return xy;
+    };
+
     DGrid.prototype.SetHeight = function (h) {
         var div = document.getElementById(params.grid_div);
         if (h > 0)

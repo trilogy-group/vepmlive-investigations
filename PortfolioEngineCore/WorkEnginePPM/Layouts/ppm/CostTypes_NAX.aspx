@@ -284,10 +284,10 @@ html, body {
         return newval;
     };
     function OnResize(event) {
-        var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
+        var lefttop = dgrid1.GetLeftTopPositions();
+        var newHeight = document.documentElement.clientHeight - lefttop[1] - 5;
         dgrid1.SetHeight(newHeight);
-        var newWidth = document.documentElement.clientWidth - 5;
+        var newWidth = document.documentElement.clientWidth - 2*lefttop[0] - 3;
         dgrid1.SetWidth(newWidth);
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
