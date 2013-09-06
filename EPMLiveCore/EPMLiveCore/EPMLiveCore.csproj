@@ -30,6 +30,7 @@ net start "WETimer"</PostDeploymentCommand>
     <FileUpgradeFlags>0</FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -42,7 +43,6 @@ net start "WETimer"</PostDeploymentCommand>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -721,6 +721,13 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\gridganttsettings.aspx.designer.cs">
       <DependentUpon>gridganttsettings.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\IconPicker.aspx.cs">
+      <DependentUpon>IconPicker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\IconPicker.aspx.designer.cs">
+      <DependentUpon>IconPicker.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\ImportResources.aspx.cs">
       <DependentUpon>ImportResources.aspx</DependentUpon>
@@ -3097,6 +3104,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\gotoresources.aspx" />
     <Content Include="Layouts\epmlive\gridganttsettings.aspx" />
     <Content Include="Layouts\epmlive\GridGanttSettings.js" />
+    <Content Include="Layouts\epmlive\IconPicker.aspx" />
     <Content Include="Layouts\epmlive\images\16x16Text.gif" />
     <Content Include="Layouts\epmlive\images\add.GIF" />
     <Content Include="Layouts\epmlive\images\addcommunity16.gif" />
