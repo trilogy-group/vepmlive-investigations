@@ -776,7 +776,7 @@ namespace EPMLiveCore.API
             }
             else
             {
-                WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId, _createdWebId, _createdWebUrl);
+                WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId, _createdWebId, _createdWebUrl, _createdWebTitle);
             }
 
 

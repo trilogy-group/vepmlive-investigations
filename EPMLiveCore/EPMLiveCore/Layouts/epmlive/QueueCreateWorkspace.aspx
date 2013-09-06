@@ -72,27 +72,29 @@
 	                    <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 250px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
                             <div style="">There are no online templates available</div>
                         </div>
-		                <ol data-bind="foreach: marketApps">
-			                <li class="template" data-bind="click: $root.gotoTemplate">
-			                    <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
-				                <div class="template-meta">
-					                <div class="template-name">
-                                        <span data-bind="text: $data.Title['#cdata']"></span>
-					                </div>
-					                <div class="template-description">
-                                        <span data-bind="text: $data.Description['#cdata']"></span>
-					                </div>
-				                </div>
-                                <input type="hidden" id="templateTitle" name="templateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
-                                <input type="hidden" id="templateType" name="templateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
-                                <input type="hidden" id="templateDescription" name="templateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
-                                <input type="hidden" id="templateMoreInfo" name="templateMoreInfo"/>
-                                <input type="hidden" id="templateSalesInfo" name="templateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
-                                <input type="hidden" id="templateImageUrl" name="templateImageUrl"/>
-                                <input type="hidden" id="templateLevels" name="templateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
-                                <input type="hidden" id="templateOnlineFolder" name="templateOnlineFolder" data-bind="attr: { value: $data.Title['#cdata'] }"/>
-			                </li>
-		                </ol>
+                        <div  data-bind="fadeVisible: (marketApps().length > 0)">
+		                    <ol data-bind="foreach: marketApps">
+			                    <li class="template" data-bind="click: $root.gotoTemplate">
+			                        <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
+				                    <div class="template-meta">
+					                    <div class="template-name">
+                                            <span data-bind="text: $data.Title['#cdata']"></span>
+					                    </div>
+					                    <div class="template-description">
+                                            <span data-bind="text: $data.Description['#cdata']"></span>
+					                    </div>
+				                    </div>
+                                    <input type="hidden" id="templateTitle" name="templateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
+                                    <input type="hidden" id="templateType" name="templateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
+                                    <input type="hidden" id="templateDescription" name="templateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
+                                    <input type="hidden" id="templateMoreInfo" name="templateMoreInfo"/>
+                                    <input type="hidden" id="templateSalesInfo" name="templateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
+                                    <input type="hidden" id="templateImageUrl" name="templateImageUrl"/>
+                                    <input type="hidden" id="templateLevels" name="templateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
+                                    <input type="hidden" id="templateOnlineFolder" name="templateOnlineFolder" data-bind="attr: { value: $data.Title['#cdata'] }"/>
+			                    </li>
+		                    </ol>
+                        </div>
 	                </div>
 	                <div id="localTemplates">
 	                    <%--<div class="workspace-loading" id="localLoading" >
@@ -101,27 +103,29 @@
 	                    <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 250px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
                             <div style="">There are no local templates available</div>
                         </div>
-		                <ol data-bind="foreach: downloadedApps">
-			                <li class="template" data-bind="click: $root.gotoTemplate">
-			                    <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
-				                <div class="template-meta">
-					                <div class="template-name" >
-                                         <span data-bind="text: $data.Title['#cdata']"></span>
-					                </div>
-					                <div class="template-description" >
-                                        <span data-bind="text: $data.Description['#cdata']"></span>
-					                </div>
-				                </div>
-                                <input type="hidden" id="localTemplateId" name="localTemplateId" data-bind="attr: { value: $data['@Id'] }"/>
-                                <input type="hidden" id="localTemplateTitle" name="localTemplateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
-                                <input type="hidden" id="localTemplateType" name="localTemplateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
-                                <input type="hidden" id="localTemplateDescription" name="localTemplateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
-                                <input type="hidden" id="localTemplateMoreInfo" name="localTemplateMoreInfo"/>
-                                <input type="hidden" id="localTemplateSalesInfo" name="localTemplateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
-                                <input type="hidden" id="localTemplateImageUrl" name="localTemplateImageUrl"/>
-                                <input type="hidden" id="localTemplateLevels" name="localTemplateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
-			                </li>
-		                </ol>
+                        <div  data-bind="fadeVisible: (downloadedApps().length > 0)">
+		                    <ol data-bind="foreach: downloadedApps">
+			                    <li class="template" data-bind="click: $root.gotoTemplate">
+			                        <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
+				                    <div class="template-meta">
+					                    <div class="template-name" >
+                                             <span data-bind="text: $data.Title['#cdata']"></span>
+					                    </div>
+					                    <div class="template-description" >
+                                            <span data-bind="text: $data.Description['#cdata']"></span>
+					                    </div>
+				                    </div>
+                                    <input type="hidden" id="localTemplateId" name="localTemplateId" data-bind="attr: { value: $data['@Id'] }"/>
+                                    <input type="hidden" id="localTemplateTitle" name="localTemplateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
+                                    <input type="hidden" id="localTemplateType" name="localTemplateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
+                                    <input type="hidden" id="localTemplateDescription" name="localTemplateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
+                                    <input type="hidden" id="localTemplateMoreInfo" name="localTemplateMoreInfo"/>
+                                    <input type="hidden" id="localTemplateSalesInfo" name="localTemplateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
+                                    <input type="hidden" id="localTemplateImageUrl" name="localTemplateImageUrl"/>
+                                    <input type="hidden" id="localTemplateLevels" name="localTemplateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
+			                    </li>
+		                    </ol>
+                        </div>
 	                </div>
 	            </div>
             </div>

@@ -64,7 +64,7 @@ namespace EPMLiveCore.API
         //    });
         //}
 
-        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb itemWeb, SPWeb parentWeb, Guid listId, int itemId, Guid createdWebId, string createdWebUrl)
+        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb itemWeb, SPWeb parentWeb, Guid listId, int itemId, Guid createdWebId, string createdWebUrl, string createdWebTitle)
         {
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -83,15 +83,15 @@ namespace EPMLiveCore.API
                                                             "END " +
                                                             "ELSE " +
                                                             "BEGIN " +
-                                                                "INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl]) VALUES ('" + siteId.ToString() + "', '" + itemWeb.ID.ToString() + "', '" + listId.ToString() + "', " + itemId.ToString() + ", '" + parentWeb.ID.ToString() + "', '" + createdWebId.ToString() + "', '" + createdWebUrl.ToString() + "') " +
+                                                                "INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId.ToString() + "', '" + itemWeb.ID.ToString() + "', '" + listId.ToString() + "', " + itemId.ToString() + ", '" + parentWeb.ID.ToString() + "', '" + createdWebId.ToString() + "', '" + createdWebUrl.ToString() + "', '" + createdWebTitle + "') " +
                                                             "END " +
                                                         "END " +
                                                         "ELSE " +
                                                         "BEGIN " +
                             // create table
-                                                            "CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max)) " +
+                                                            "CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max)) " +
                             // insert
-                                                            "INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl]) VALUES ('" + siteId.ToString() + "', '" + itemWeb.ID.ToString() + "', '" + listId.ToString() + "', " + itemId.ToString() + ", '" + parentWeb.ID.ToString() + "', '" + createdWebId.ToString() + "', '" + createdWebUrl.ToString() + "') " +
+                                                            "INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId.ToString() + "', '" + itemWeb.ID.ToString() + "', '" + listId.ToString() + "', " + itemId.ToString() + ", '" + parentWeb.ID.ToString() + "', '" + createdWebId.ToString() + "', '" + createdWebUrl.ToString() + "', '" + createdWebTitle + "') " +
                                                         "END ");
                         cmd.Connection = con;
                         cmd.ExecuteNonQuery();
@@ -235,6 +235,8 @@ namespace EPMLiveCore.API
                                     dt.Rows.Add(new object[] { Guid.NewGuid(), s.ID, w.ID, ra.Member.ID, type });
                                 }
                             }
+
+                            dt.Rows.Add(new object[] { Guid.NewGuid(), s.ID, w.ID, 999999, 1 });
 
                             using (var bulkCopy = new SqlBulkCopy(con))
                             {
