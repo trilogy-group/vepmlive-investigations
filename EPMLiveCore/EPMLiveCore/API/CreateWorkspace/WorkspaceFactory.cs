@@ -881,25 +881,33 @@ namespace EPMLiveCore.API
             SPSite site = new SPSite(SiteId);
             SPWeb web = site.OpenWeb(WebId);
 
-            SPSecurity.RunWithElevatedPrivileges(() =>
+            try
             {
-                using (SPSite eSite = new SPSite(SiteId))
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                    using (SPSite eSite = new SPSite(SiteId))
                     {
-                        GrabOnlineFiles(eSite, eWeb);
-                        BaseProvision(site, web, eSite, eWeb);
-                        EnsureFieldsInRequestItem();
-                        BuildWebInfoXml();
-                        Notify(eWeb);
-                        AddToFavorites();
-                        AddPermission();
-                        ModifyNewWSProperty();
-                        RemoveSolutionFromGallery(eSite, eWeb);
+                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                        {
+                            GrabOnlineFiles(eSite, eWeb);
+                            BaseProvision(site, web, eSite, eWeb);
+                            EnsureFieldsInRequestItem();
+                            BuildWebInfoXml();
+                            Notify(eWeb);
+                            AddToFavorites();
+                            AddPermission();
+                            ModifyNewWSProperty();
+                            RemoveSolutionFromGallery(eSite, eWeb);
 
+                        }
                     }
-                }
-            });
+                });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
             return new OnlineWorkspaceInfo(_xmlResult.ToString());
         }
 
@@ -969,24 +977,32 @@ namespace EPMLiveCore.API
             SPSite site = new SPSite(SiteId);
             SPWeb web = site.OpenWeb(WebId);
 
-            SPSecurity.RunWithElevatedPrivileges(() =>
+            try
             {
-                using (SPSite eSite = new SPSite(SiteId))
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                    using (SPSite eSite = new SPSite(SiteId))
                     {
-                        GetTempName(eSite, eWeb);
-                        BaseProvision(site, web, eSite, eWeb);
-                        EnsureFieldsInRequestItem();
-                        BuildWebInfoXml();
-                        Notify(eWeb);
-                        AddToFavorites();
-                        AddPermission();
-                        ModifyNewWSProperty();
-                        RemoveSolutionFromGallery(eSite, eWeb);
+                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                        {
+                            GetTempName(eSite, eWeb);
+                            BaseProvision(site, web, eSite, eWeb);
+                            EnsureFieldsInRequestItem();
+                            BuildWebInfoXml();
+                            Notify(eWeb);
+                            AddToFavorites();
+                            AddPermission();
+                            ModifyNewWSProperty();
+                            RemoveSolutionFromGallery(eSite, eWeb);
+                        }
                     }
-                }
-            });
+                });
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
 
             return new DownloadedWorkspaceInfo(_xmlResult.ToString());
         }

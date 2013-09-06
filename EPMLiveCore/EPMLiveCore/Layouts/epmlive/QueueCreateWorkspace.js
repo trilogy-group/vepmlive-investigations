@@ -22,19 +22,24 @@ function registerCreateWorkspace2Script() {
         function CreateWorkspaceViewModel() {
             // DATA - UI related
             var self = this;
+            self.isStandAlone = ko.observable(w.isStandAlone);
+            self.createDefault = ko.observable(w.createDefault);
+            self.onlineAvail = ko.observable(w.onlineAvail);
+            self.localAvail = ko.observable(w.localAvail);
             self.workEngineSvcUrl = w.workEngineSvcUrl;
             self.solutionLibPath = w.epmLive.currentWebFullUrl + '/_layouts/EPMLive/SolutionStoreProxy.aspx';
-            self.currentView = ko.observable("market");
-            self.loading = ko.observable(true);
+            self.currentView = ko.observable();
+            self.marketAppsLoading = ko.observable(true);
+            self.downloadedAppsLoading = ko.observable(true);
             self.createFromLiveTemp = ko.observable(w.createFromLiveTemps);
             self.marketApps = ko.observableArray();
             self.downloadedApps = ko.observableArray();
             self.showInProgress = ko.observable(w.showIsInProgressMsg);
             self.shouldShowMarket = ko.computed(function () {
-                return self.loading() != true && self.currentView() == 'market' && self.showInProgress() == 'false';
+                return !self.marketAppsLoading() && self.currentView() == 'market' && self.showInProgress() == 'false';
             });
             self.shouldShowDownloaded = ko.computed(function () {
-                return self.loading() != true && self.currentView() == 'downloaded' && self.showInProgress() == 'false';
+                return !self.downloadedAppsLoading() && self.currentView() == 'downloaded' && self.showInProgress() == 'false';
             });
             self.noOnlineTemplate = ko.computed(function() {
                 return self.marketApps().length === 0;
@@ -42,9 +47,24 @@ function registerCreateWorkspace2Script() {
             self.noLocalTemplate = ko.computed(function () {
                 return self.downloadedApps().length === 0;
             });
+            self.hasTempSelected = ko.observable(false);
+            
             // DATA - workspace creation related
-            self.isStandAlone = ko.observable(w.isStandAlone);
-            self.templateSource = ko.observable();
+            self.templateSource = ko.computed(function() {
+                if (self.onlineAvail() === 'True' && self.localAvail() === 'True') {
+                    if ($('#online').hasClass('slider-selected')) {
+                        return 'online';
+                    } else {
+                        return 'downloaded';
+                    }
+                }
+                else if (onlineAvail() === 'True' && localAvail() === 'False') {
+                    return 'online';
+                }
+                else if (localAvail() === 'True' && onlineAvail() === 'False') {
+                    return 'downloaded';
+                }
+            });
             self.solutionName = ko.observable();
             self.templateName = ko.observable();
             self.workspaceUrl = ko.observable();
@@ -59,6 +79,7 @@ function registerCreateWorkspace2Script() {
             self.currentWebFullUrl = ko.observable(w.epmLive.currentWebFullUrl);
             self.currentWebId = ko.observable(w.epmLive.currentWebId);
             self.currentSiteId = ko.observable(w.epmLive.currentSiteId);
+            
 
             self.loadMarketAppsParams = ko.computed(function () {
                 return "<Data>" +
@@ -122,20 +143,22 @@ function registerCreateWorkspace2Script() {
                                 var qualifiedTemps = self.getCleanTempCollection(oJson.Templates.Template);
                                 self.marketApps(qualifiedTemps);
                             }
-                            self.loading(false);
-                            self.AutosizeDialog();
+                            self.marketAppsLoading(false);
+                            //$('#marketLoading').fadeOut();
+
                         },
                         error: function(jqXhr, textStatus, errorThrown) {
-                            alert(errorThrown);
-                            self.loading(false);
+                            //alert(errorThrown);
+                            self.marketAppsLoading(false);
+                            //('#marketLoading').fadeOut();
                         }
                     });
                 } else {
-                    self.loading(false);
+                    self.marketAppsLoading(false);
+                    //('#marketLoading').fadeOut();
                 }
 
-                self.currentView('market');
-                self.templateSource('online');
+                
             };
 
             self.loadDownloadedApps = function () {
@@ -154,21 +177,84 @@ function registerCreateWorkspace2Script() {
                                 var qualifiedTemps = self.getCleanTempCollection(oJson.Result.Templates.Template);
                                 self.downloadedApps(qualifiedTemps);
                             }
-                            self.loading(false);
+
+                            self.downloadedAppsLoading(false);
+                            //$('#localLoading').fadeOut();
                         },
                         error: function(jqXhr, textStatus, errorThrown) {
-                            alert(errorThrown);
-                            self.loading(false);
+                            //alert(errorThrown);
+                            self.downloadedAppsLoading(false);
+                            //$('#localLoading').fadeOut();
                         }
                     });
                 } else {
-                    self.loading(false);
+                    self.downloadedAppsLoading(false);
+                    //$('#localLoading').fadeOut();
                 }
-                self.currentView('downloaded');
-                self.templateSource('downloaded');
+                
             };
 
-            self.getCleanTempCollection = function (objColl) {
+            //self.loadMarketThenDownloaded = function() {
+            //    if (self.marketApps().length === 0) {
+            //        $.ajax({
+            //            type: "POST",
+            //            url: self.solutionLibPath,
+            //            data: { data: self.loadMarketAppsParams() },
+            //            success: function (result) {
+            //                if (result !== "<Templates />") {
+            //                    var oJson = w.epmLive.parseJson(result);
+            //                    // make sure all properties exist, 
+            //                    // so no error occurs when I bind with knockout.js
+            //                    var qualifiedTemps = self.getCleanTempCollection(oJson.Templates.Template);
+            //                    self.marketApps(qualifiedTemps);
+            //                }
+            //                self.marketAppsLoading(false);
+                            
+            //                self.loadDownloadedApps();
+            //            },
+            //            error: function (jqXhr, textStatus, errorThrown) {
+            //                //alert(errorThrown);
+            //                self.marketAppsLoading(false);
+            //            }
+            //        });
+            //    } else {
+            //        self.marketAppsLoading(false);
+            //    }
+
+               
+            //};
+            
+            //self.loadDownloadedThenMarket = function () {
+            //    if (self.marketApps().length === 0) {
+            //        $.ajax({
+            //            type: "POST",
+            //            url: self.solutionLibPath,
+            //            data: { data: self.loadMarketAppsParams() },
+            //            success: function (result) {
+            //                if (result !== "<Templates />") {
+            //                    var oJson = w.epmLive.parseJson(result);
+            //                    // make sure all properties exist, 
+            //                    // so no error occurs when I bind with knockout.js
+            //                    var qualifiedTemps = self.getCleanTempCollection(oJson.Templates.Template);
+            //                    self.marketApps(qualifiedTemps);
+            //                }
+                            
+            //                $('#marketLoading').fadeOut();
+            //                self.loadMarketApps();
+            //            },
+            //            error: function (jqXhr, textStatus, errorThrown) {
+            //                //alert(errorThrown);
+            //                $('#marketLoading').fadeOut();
+            //            }
+            //        });
+            //    } else {
+            //        $('#marketLoading').fadeOut();
+            //    }
+
+               
+            //};
+
+            self.getCleanTempCollection = function(objColl) {
                 var qualifiedTemps = [];
                 if ($(objColl).length > 1) {
                     for (var j in objColl) {
@@ -178,8 +264,7 @@ function registerCreateWorkspace2Script() {
                             qualifiedTemps.push(self.GetCleanTemp(temp));
                         }
                     }
-                }
-                else if ($(objColl).length == 1) {
+                } else if ($(objColl).length == 1) {
                     var temp = objColl;
                     if (temp.TemplateType !== undefined &&
                         temp.TemplateType['#cdata'].indexOf("Workspace") != -1) {
@@ -188,28 +273,31 @@ function registerCreateWorkspace2Script() {
                 }
 
                 return qualifiedTemps;
-            }
+            };
 
-            self.GetCleanTemp = function (temp) {
+            self.GetCleanTemp = function(temp) {
                 for (var k in self.propArray) {
                     if (self.propArray[k] == 'ImageUrl') {
                         if (!temp.hasOwnProperty(self.propArray[k]) || temp[self.propArray[k]]['#cdata'] == '') {
                             temp[self.propArray[k]] = [];
                             temp[self.propArray[k]]['#cdata'] = '/_layouts/EPMLive/Images/blanktemplate.png';
                         }
-                        // if it has image src, clean it up
+                            // if it has image src, clean it up
                         else {
                             temp[self.propArray[k]]['#cdata'] = temp[self.propArray[k]]['#cdata'].replace(",", "");
                         }
-                    }
-                    else if (!temp.hasOwnProperty(self.propArray[k])) {
+                    } else if (!temp.hasOwnProperty(self.propArray[k])) {
                         temp[self.propArray[k]] = '';
                     }
                 }
                 return temp;
-            }
+            };
 
             self.createWorkspace = function () {
+                if (!self.hasTempSelected()) {
+                    alert('You must select a template first');
+                    return;
+                }
                 alert("We'll notify you when your workspace has been provisioned!");
                 $.ajax({
                     type: "POST",
@@ -229,22 +317,23 @@ function registerCreateWorkspace2Script() {
                 
             };
 
-            self.gotoTemplate = function (data, event) {
+            self.gotoTemplate = function(data, event) {
                 // UI behavior
                 var target = (event.currentTarget) ? event.currentTarget : event.srcElement;
                 $('.template').removeClass('template-selected');
                 $(target).addClass('template-selected');
 
                 // DATA setting
-                if (self.currentView() === "market"){
+                if (self.currentView() === "market") {
                     self.solutionName($(target).find('#templateOnlineFolder').val());
-                }
-                else if (self.currentView() === "downloaded") {
+                } else if (self.currentView() === "downloaded") {
                     self.templateItemId($(target).find('#localTemplateId').val());
                 }
-            }
 
-            self.AutosizeDialog = function () {
+                self.hasTempSelected(true);
+            };
+
+            self.AutosizeDialog = function() {
                 //resize dialog if we are in one    
                 var dlg = parent.SP.UI.ModalDialog.get_childDialog();
                 if (dlg != null) {
@@ -255,44 +344,30 @@ function registerCreateWorkspace2Script() {
                             top: ($(w.top).height() / 2 - dlgWin.height() / 2) + "px",
                             left: $(w.top).width() / 2 - dlgWin.width() / 2
                         });
-                    }
-                    catch (e) {
+                    } catch(e) {
                     }
                 }
-            }
+            };
 
 
-
-            self.cancelCreation = function () {
+            self.cancelCreation = function() {
                 parent.SP.UI.ModalDialog.commonModalDialogClose('', '');
-            }
+            };
 
             self.toggle = function (data, event) {
+                self.hasTempSelected(false);
                 var target = (event.currentTarget) ? event.currentTarget : event.srcElement;
                 if (target.id == "online" && !$(target).hasClass("slider-selected")) {
                     $(".slider").animate({ "margin-left": '0' }, "fast");
                     $(".toggleButton").removeClass("slider-selected");
                     $(target).addClass("slider-selected");
 
-                    //$('#localTemplates').animate({
-                    //    opacity: 0,
-                    //    left: "-1000px"
-                    //}, 500, function () {
-                    //    $('#localTemplates').css("position", "absolute");
-                    //});
-
-                    //$('#onlineTemplates').animate({
-                    //    opacity: 1,
-                    //    left: "0px",
-                    //}, 500, function () {
-                    //    $('#onlineTemplates').css("position", "relative");
-                    //});
-
                     $('#localTemplates').hide();
                     $('#localTemplates').parent().hide();
                     $('#onlineTemplates').show();
                     $('#onlineTemplates').parent().show('slide', { direction: 'right' }, 500);
-                    
+                    self.currentView('market');
+                    //$('#marketLoading').fadeOut();
                 }
 
                 if (target.id == "local" && !$(target).hasClass("slider-selected")) {
@@ -300,25 +375,12 @@ function registerCreateWorkspace2Script() {
                     $(".toggleButton").removeClass("slider-selected");
                     $(target).addClass("slider-selected");
 
-                    //$('#onlineTemplates').css("position", "relative").animate({
-                    //    opacity: 0,
-                    //    left: "1000px"
-                    //}, 500, function () {
-
-                    //});
-
-                    //$('#localTemplates').animate({
-                    //    opacity: 1,
-                    //    left: "0px"
-                    //}, 500, function () {
-                    //    //$('#localTemplates').css("position","relative");
-                    //});
-
                     $('#onlineTemplates').hide();
                     $('#onlineTemplates').parent().hide();
                     $('#localTemplates').show();
                     $('#localTemplates').parent().show('slide', { direction: 'left' }, 500);
-                  
+                    self.currentView('downloaded');
+                    //$('#localLoading').fadeOut();
                 }
             };
 
@@ -332,17 +394,51 @@ function registerCreateWorkspace2Script() {
                     height: '220px',
                     width: '850px'
                 });
-                $('#localTemplates').hide();
-                $('#localTemplates').parent().hide();
-                
-                // set display setting
-                if (self.currentView() == 'market') {
+
+                if (self.onlineAvail() === 'True' && self.localAvail() === 'True') {
+                    self.loadMarketApps();
+                    self.loadDownloadedApps();
+                    if (self.createDefault() === 'online') {
+                        
+                        self.currentView('market');
+                        $(".toggleButton").removeClass("slider-selected");
+                        $('#online').addClass('slider-selected');
+                        $(".slider").css('margin-left', '0px');
+                        $('#localTemplates').hide();
+                        $('#localTemplates').parent().hide();
+                        
+                        $('#onlineTemplates').show();
+                        $('#onlineTemplates').parent().show();
+
+                        //self.loadMarketThenDownloaded();
+                    }
+                    else if (self.createDefault() === 'local') {
+                        self.currentView('downloaded');
+                        $(".toggleButton").removeClass("slider-selected");
+                        $('#local').addClass('slider-selected');
+                        $(".slider").css('margin-left', '65px');
+                        $('#localTemplates').show();
+                        $('#localTemplates').parent().show();
+                        
+                        $('#onlineTemplates').hide();
+                        $('#onlineTemplates').parent().hide();
+                        
+                        //self.loadDownloadedThenMarket();
+                    }
+                }
+                else if (onlineAvail() === 'True' && localAvail() === 'False') {
+                    self.currentView('market');
+                    $('#localTemplates').hide();
+                    $('#localTemplates').parent().hide();
                     self.loadMarketApps();
                 }
-                else {
+                else if (localAvail() === 'True' && onlineAvail() === 'False') {
+                    self.currentView('downloaded');
+                    $('#onlineTemplates').hide();
+                    $('#onlineTemplates').parent().hide();
                     self.loadDownloadedApps();
                 }
-                
+
             };
 
             self.pageInit();

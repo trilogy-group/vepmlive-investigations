@@ -37,6 +37,17 @@
             }
         }
     }
+    
+    function OpenIconSelect() {
+
+        var options = {
+            url: "/_layouts/epmlive/iconpicker.aspx",
+            width: 800,
+            height: 600
+        };
+
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+    }
 
 </script>
 
@@ -466,6 +477,21 @@
 			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
                     <asp:CheckBox ID="chkWorkListFeat" runat="server" Text="Enable Work List Features" />
+				 </Template_Control>
+			</wssuc:InputFormControl>
+		</Template_InputFormControls>
+	</wssuc:InputFormSection>
+    
+    <wssuc:InputFormSection Title="Select Icon"
+		Description=""
+		runat="server">
+		<Template_Description>
+		    Select icon
+		</Template_Description>
+		<Template_InputFormControls>
+			<wssuc:InputFormControl LabelText="" runat="server">
+				 <Template_Control>
+                    <asp:Button runat="server" OnClientClick="OpenIconSelect()"/>
 				 </Template_Control>
 			</wssuc:InputFormControl>
 		</Template_InputFormControls>

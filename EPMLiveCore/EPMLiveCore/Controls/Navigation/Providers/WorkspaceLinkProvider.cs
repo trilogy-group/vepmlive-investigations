@@ -15,7 +15,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         #region Fields (1) 
 
         private const string CREATE_WORKSPACE_URL =
-            @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx');";
+            @"javascript:var options = {{url: '{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx', width: 880, height:500}}; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);";
 
         #endregion Fields 
 

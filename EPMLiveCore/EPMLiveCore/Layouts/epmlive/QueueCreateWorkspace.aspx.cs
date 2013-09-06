@@ -36,9 +36,9 @@ namespace EPMLiveCore.Layouts.epmlive
         protected bool _hideEverything = false;
 
         private string _projectWorkspaceSetting = string.Empty;
-        private bool _isCreateFromOnlineAvail = false;
-        private bool _isCreateFromLocalAvail = false;
-        private bool _isCreateFromExistingAvail = false;
+        protected bool _isCreateFromOnlineAvail = false;
+        protected bool _isCreateFromLocalAvail = false;
+        protected bool _isCreateFromExistingAvail = false;
         protected string _createFromLiveTemp = string.Empty;
         private ArrayList _features;
 

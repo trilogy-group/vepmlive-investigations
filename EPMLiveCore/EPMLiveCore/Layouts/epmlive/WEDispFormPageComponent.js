@@ -143,7 +143,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.CreateWorkspace') {
 
-            var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/CreateNewWorkspace.aspx?list=' + WEListId + '&type=site&CopyFrom=' + WEItemId);
+            var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx?standalone=false&list=' + WEListId + '&item=' + WEItemId);
             var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
             var tUrl = urlBuilder.get_url();
 

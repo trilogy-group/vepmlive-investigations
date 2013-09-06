@@ -29,6 +29,9 @@
         var creatorId = '<%=_currentUserId%>';
         var createFromLiveTemps = '<%=_createFromLiveTemp%>';
         var showIsInProgressMsg = '<%=_showInProgress%>';
+        var createDefault = '<%=_defaultCreateNewOpt%>';
+        var onlineAvail = '<%=_isCreateFromOnlineAvail%>';
+        var localAvail = '<%=_isCreateFromLocalAvail%>';
     </script>
     <div id="OuterContainer">
         <div class="modal-body">
@@ -54,73 +57,76 @@
 	        </div>
             <%--bottom section--%>
 	        <div style="border-top:1px solid #ffffff;width:860px;height:285px;overflow: hidden">
-		        <div class="toggle">
-                    <span style="float:left;padding-left:8px;" class="toggleButton slider-selected" id="online" data-bind="click: function (data, event) { loadMarketApps(); toggle(data,event); }">ONLINE</span>
-                    <span style="float:right;padding-right:12px;" class="toggleButton" id="local" data-bind="click: function (data, event) { loadDownloadedApps(); toggle(data,event); }">LOCAL</span>
+		        <div class="toggle" data-bind="visible: onlineAvail() === 'True' && localAvail() === 'True'">
+                    <span style="float:left;padding-left:8px;" class="toggleButton slider-selected" id="online" data-bind="click: function (data, event) { toggle(data, event); }">ONLINE</span>
+                    <span style="float:right;padding-right:12px;" class="toggleButton" id="local" data-bind="click: function (data, event) { toggle(data, event); }">LOCAL</span>
                     <div class="slider">&nbsp;
                     </div>
                 </div>
-                <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 152px;" data-bind="visible: loading()">
-                    <div style="background: url('/_layouts/15/epmlive/images/progress_ring.gif') no-repeat scroll 0% 0% transparent; height: 35px; width: 40px; float: left;"> </div>
-                    <p style="line-height: 35px;">Loading Templates</p>
-                </div>
+                
 	            <div id="templateContainer">
 	                <div id="onlineTemplates">
-	                <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 200px;" data-bind="fadeVisible: (marketApps().length === 0) && !loading()">
-                        <div style="">There are no online templates available</div>
-                    </div>
-		            <ol data-bind="fadeVisible: shouldShowMarket(), foreach: marketApps">
-			            <li class="template" data-bind="click: $root.gotoTemplate">
-			                <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
-				            <div class="template-meta">
-					            <div class="template-name">
-                                    <span data-bind="text: $data.Title['#cdata']"></span>
-					            </div>
-					            <div class="template-description">
-                                    <span data-bind="text: $data.Description['#cdata']"></span>
-					            </div>
-				            </div>
-                            <input type="hidden" id="templateTitle" name="templateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
-                            <input type="hidden" id="templateType" name="templateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
-                            <input type="hidden" id="templateDescription" name="templateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
-                            <input type="hidden" id="templateMoreInfo" name="templateMoreInfo"/>
-                            <input type="hidden" id="templateSalesInfo" name="templateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
-                            <input type="hidden" id="templateImageUrl" name="templateImageUrl"/>
-                            <input type="hidden" id="templateLevels" name="templateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
-                            <input type="hidden" id="templateOnlineFolder" name="templateOnlineFolder" data-bind="attr: { value: $data.Title['#cdata'] }"/>
-			            </li>
-		            </ol>
-	            </div>
-	            <div id="localTemplates">
-	                <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 200px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !loading()">
-                        <div style="">There are no local templates available</div>
-                    </div>
-		            <ol data-bind="fadeVisible: shouldShowDownloaded(), foreach: downloadedApps">
-			            <li class="template" data-bind="click: $root.gotoTemplate">
-			                <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
-				            <div class="template-meta">
-					            <div class="template-name" >
-                                     <span data-bind="text: $data.Title['#cdata']"></span>
-					            </div>
-					            <div class="template-description" >
-                                    <span data-bind="text: $data.Description['#cdata']"></span>
-					            </div>
-				            </div>
-                            <input type="hidden" id="localTemplateId" name="localTemplateId" data-bind="attr: { value: $data['@Id'] }"/>
-                            <input type="hidden" id="localTemplateTitle" name="localTemplateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
-                            <input type="hidden" id="localTemplateType" name="localTemplateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
-                            <input type="hidden" id="localTemplateDescription" name="localTemplateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
-                            <input type="hidden" id="localTemplateMoreInfo" name="localTemplateMoreInfo"/>
-                            <input type="hidden" id="localTemplateSalesInfo" name="localTemplateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
-                            <input type="hidden" id="localTemplateImageUrl" name="localTemplateImageUrl"/>
-                            <input type="hidden" id="localTemplateLevels" name="localTemplateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
-			            </li>
-		            </ol>
-	            </div>
+	                    <%--<div class="workspace-loading"  id="marketLoading" >
+                            <div class="loading-message">Loading Workspaces...</div>
+                        </div>--%>
+	                    <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 250px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
+                            <div style="">There are no online templates available</div>
+                        </div>
+		                <ol data-bind="foreach: marketApps">
+			                <li class="template" data-bind="click: $root.gotoTemplate">
+			                    <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
+				                <div class="template-meta">
+					                <div class="template-name">
+                                        <span data-bind="text: $data.Title['#cdata']"></span>
+					                </div>
+					                <div class="template-description">
+                                        <span data-bind="text: $data.Description['#cdata']"></span>
+					                </div>
+				                </div>
+                                <input type="hidden" id="templateTitle" name="templateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
+                                <input type="hidden" id="templateType" name="templateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
+                                <input type="hidden" id="templateDescription" name="templateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
+                                <input type="hidden" id="templateMoreInfo" name="templateMoreInfo"/>
+                                <input type="hidden" id="templateSalesInfo" name="templateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
+                                <input type="hidden" id="templateImageUrl" name="templateImageUrl"/>
+                                <input type="hidden" id="templateLevels" name="templateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
+                                <input type="hidden" id="templateOnlineFolder" name="templateOnlineFolder" data-bind="attr: { value: $data.Title['#cdata'] }"/>
+			                </li>
+		                </ol>
+	                </div>
+	                <div id="localTemplates">
+	                    <%--<div class="workspace-loading" id="localLoading" >
+                            <div class="loading-message">Loading Workspaces...</div>
+                        </div>--%>
+	                    <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 250px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
+                            <div style="">There are no local templates available</div>
+                        </div>
+		                <ol data-bind="foreach: downloadedApps">
+			                <li class="template" data-bind="click: $root.gotoTemplate">
+			                    <img class="template-preview" data-bind="attr: { src: $data.ImageUrl['#cdata'] }"/>
+				                <div class="template-meta">
+					                <div class="template-name" >
+                                         <span data-bind="text: $data.Title['#cdata']"></span>
+					                </div>
+					                <div class="template-description" >
+                                        <span data-bind="text: $data.Description['#cdata']"></span>
+					                </div>
+				                </div>
+                                <input type="hidden" id="localTemplateId" name="localTemplateId" data-bind="attr: { value: $data['@Id'] }"/>
+                                <input type="hidden" id="localTemplateTitle" name="localTemplateTitle" data-bind="attr: { value: $data.Title['#cdata'] }"/>
+                                <input type="hidden" id="localTemplateType" name="localTemplateType" data-bind="attr: { value: $data.TemplateType['#cdata'] }"/>
+                                <input type="hidden" id="localTemplateDescription" name="localTemplateDescription" data-bind="attr: { value: $data.Description['#cdata'] }"/>
+                                <input type="hidden" id="localTemplateMoreInfo" name="localTemplateMoreInfo"/>
+                                <input type="hidden" id="localTemplateSalesInfo" name="localTemplateSalesInfo" data-bind="attr: { value: $data.SalesInfo['#cdata'] }"/>
+                                <input type="hidden" id="localTemplateImageUrl" name="localTemplateImageUrl"/>
+                                <input type="hidden" id="localTemplateLevels" name="localTemplateLevels" data-bind="attr: { value: $data.Levels['#cdata'] }"/>
+			                </li>
+		                </ol>
+	                </div>
 	            </div>
             </div>
         </div>
-        <div class="modal-footer" data-bind="fadeVisible: !loading()">
+        <div class="modal-footer" >
             <button type="button" class="epmliveButton" style="float:right;" data-bind="click: createWorkspace">Create Workspace</button>
             <button type="button" class="epmliveButton" style="float:right;" data-dismiss="modal" data-bind="click: cancelCreation">Cancel</button>
             
