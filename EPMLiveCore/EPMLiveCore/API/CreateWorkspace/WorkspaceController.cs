@@ -19,7 +19,6 @@ namespace EPMLiveCore.API
         public WorkspaceController(string data)
         {
             Init(data);
-            CreateWorkspace();
         }
 
         private void Init(string data)
