@@ -81,7 +81,7 @@
                     if (webUrl) {
                         $.ajax({
                             type: 'POST',
-                            url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                            url: (webUrl + '/_vti_bin/WorkEngine.asmx/Execute').replace(/\/\//g, '/'),
                             data: "{ Function: '" + method + "', Dataxml: '" + data + "' }",
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
@@ -588,7 +588,10 @@
                 function handleContextualCommand(id, webId, listId, itemId, command, kind) {
                     var removeLink = function (linkId, notifId) {
                         var remove = function(lid, nid) {
-                            $('#' + lid).remove();
+                            var $item = $('#' + lid);
+                            $item.fadeOut(300, function() {
+                                $item.remove();
+                            });
                             
                             if (nId) {
                                 SP.UI.Notify.removeNotification(nid);
@@ -603,8 +606,8 @@
                     };
                     
                     var url = window.epmLiveNavigation.currentWebUrl;
-                    var gaUrl = url + '/_layouts/15/epmlive/gridaction.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
-                    var rpUrl = url + '/_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
+                    var gaUrl = url + '_layouts/15/epmlive/gridaction.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
+                    var rpUrl = url + '_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
 
                     var redirectUrl = '';
 

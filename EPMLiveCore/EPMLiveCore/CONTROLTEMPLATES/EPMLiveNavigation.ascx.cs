@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -22,7 +23,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Fields 
 
-        #region Properties (7) 
+        #region Properties (8) 
 
         public IEnumerable<NavNode> AllNodes
         {
@@ -48,14 +49,14 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         public IEnumerable<NavNode> TopNodes { get; set; }
 
-        public string WebUrl
-        {
-            get { return SPContext.Current.Web.SafeServerRelativeUrl(); }
-        }
-
         public string UserId
         {
-            get { return SPContext.Current.Web.CurrentUser.ID.ToString(); }
+            get { return SPContext.Current.Web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture); }
+        }
+
+        public string WebUrl
+        {
+            get { return SPContext.Current.Web.ServerRelativeUrl; }
         }
 
         #endregion Properties 
@@ -68,7 +69,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             base.OnPreRender(e);
 
-            foreach (string style in new[] {"masterpages/glyphs.min", "masterpages/icomoon.min", "controls/navigation/epmnav.min"})
+            foreach (
+                string style in
+                    new[] {"masterpages/glyphs.min", "masterpages/icomoon.min", "controls/navigation/epmnav.min"})
             {
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
             }
@@ -78,7 +81,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 "libraries/jquery.min", "@libraries/jquery.cookie", "libraries/slimScroll", "@EPMLive.Navigation"
             });
 
-            var userId = SPContext.Current.Web.CurrentUser.ID;
+            int userId = SPContext.Current.Web.CurrentUser.ID;
 
             HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode-u-" + userId);
             if (selectedTlNodeCookie != null)
@@ -118,7 +121,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
-
+        
         // Private Methods (1) 
 
         private void LoadSelectedNodeLinks()
