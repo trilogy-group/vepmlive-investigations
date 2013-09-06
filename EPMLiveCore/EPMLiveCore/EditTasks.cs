@@ -18,7 +18,10 @@ namespace EPMLiveCore
             //EnsureChildControls();
             //base.OnLoad(e);
 
-            sListName = ((Microsoft.SharePoint.WebPartPages.ListFormWebPart)Parent.Parent.Parent.Parent.Parent.Parent).ItemContext.List.Title;
+            if (Parent.Parent.Parent.Parent.Parent.Parent.GetType().ToString() == "FormsDesigner.Sharepoint.FDDataFormWebPart")
+                sListName = ((Microsoft.SharePoint.WebPartPages.ListFormWebPart)Parent.Parent.Parent.Parent.Parent.Parent).ItemContext.List.Title;
+            else
+                sListName = ((Microsoft.SharePoint.WebPartPages.ListFormWebPart)Parent.Parent.Parent.Parent.Parent.Parent).ItemContext.List.Title;
         }
 
         protected override void CreateChildControls()
