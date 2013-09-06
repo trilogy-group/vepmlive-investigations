@@ -1,4 +1,6 @@
-﻿using Microsoft.SharePoint;
+﻿using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using System;
 using System.Collections;
@@ -861,8 +863,15 @@ namespace EPMLiveCore.API
     /// </summary>
     public class OnlineTempWorkspaceFactory : WorkspaceFactory
     {
-        public OnlineTempWorkspaceFactory(string data)
-            : base(data) { }
+        public OnlineTempWorkspaceFactory(string data) : base(data)
+        {
+            ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
+        }
+
+        private bool ValidateRemoteCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslpolicyerrors)
+        {
+            return true;
+        }
 
         #region class specific implementation of base abstract methods
 
