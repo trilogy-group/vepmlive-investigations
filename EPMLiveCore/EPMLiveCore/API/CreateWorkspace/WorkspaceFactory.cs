@@ -913,14 +913,24 @@ namespace EPMLiveCore.API
             string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Solutions/" + CoreFunctions.GetAssemblyVersion() + "/" + _xmlDataMgr.GetPropVal("SolutionName");
             string sXML = string.Empty;
             // read feature.xml with WebClient class
-            using (WebClient webClient = new WebClient())
+
+            string address = rootFilePath + "/Feature.xml";
+            
+            try
             {
-                webClient.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
-                byte[] fileBytes = null;
-                fileBytes = webClient.DownloadData(rootFilePath + "/Feature.xml");
-                System.Text.Encoding enc = System.Text.Encoding.ASCII;
-                sXML = enc.GetString(fileBytes);
-                fileBytes = null;
+                using (WebClient webClient = new WebClient())
+                {
+                    webClient.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
+                    byte[] fileBytes = null;
+                    fileBytes = webClient.DownloadData(address);
+                    System.Text.Encoding enc = System.Text.Encoding.ASCII;
+                    sXML = enc.GetString(fileBytes);
+                    fileBytes = null;
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new Exception(string.Format("URL: {0}. Exception Message: {1}", address, exception.Message));
             }
 
             string tempName = string.Empty;
