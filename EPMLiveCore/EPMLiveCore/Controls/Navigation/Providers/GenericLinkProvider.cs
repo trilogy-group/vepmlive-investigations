@@ -14,7 +14,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     {
         #region Fields (4) 
 
-        private const string A_QUERY = @"SELECT FRF_ID FROM dbo.FRF WHERE (FRF_ID = @Id) AND (Type = 1 OR Type = 2)";
+        private const string A_QUERY = @"SELECT FRF_ID FROM dbo.FRF WHERE (FRF_ID = @Id) AND (Type = 1 OR Type = 2 OR Type = 4)";
         private const string D_QUERY = @"DELETE FROM dbo.FRF WHERE (FRF_ID = @Id)";
         private const string R_QUERY = @"UPDATE dbo.FRF SET F_Int = @Order WHERE FRF_ID = @Id";
 
