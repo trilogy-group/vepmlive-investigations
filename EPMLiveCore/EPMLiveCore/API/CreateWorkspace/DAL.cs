@@ -142,60 +142,43 @@ namespace EPMLiveCore.API
 
         public static void AddWsPermission(Guid siteId, Guid createdWebId)
         {
-//            const string script = @"
-//                            IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1)
-//                            BEGIN
-//                                SET ANSI_NULLS ON
-//                                GO
-//
-//                                SET QUOTED_IDENTIFIER ON
-//                                GO
-//
-//                                CREATE TABLE [dbo].[RPTWEBGROUPS](
-//                                        [RPTWEBGROUPID] [uniqueidentifier] NOT NULL,
-//                                        [SITEID] [uniqueidentifier] NULL,
-//                                        [WEBID] [uniqueidentifier] NULL,
-//                                        [GROUPID] [int] NULL,
-//                                        [SECTYPE] [int] NULL,
-//                                CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED 
-//                                (
-//                                        [RPTWEBGROUPID] ASC
-//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-//                                ) ON [PRIMARY]
-//
-//                                GO
-//
-//                                ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [DF_RPTWEBGROUPS_RPTWEBGROUPID]  DEFAULT (newid()) FOR [RPTWEBGROUPID]
-//                                GO
-//
-//                                /****** Object:  Index [PK_RPTWEBGROUPS]    Script Date: 09/04/2013 13:18:33 ******/
-//                                IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[RPTWEBGROUPS]') AND name = N'PK_RPTWEBGROUPS')
-//                                ALTER TABLE [dbo].[RPTWEBGROUPS] DROP CONSTRAINT [PK_RPTWEBGROUPS]
-//                                GO
-//                       
-//                                /****** Object:  Index [PK_RPTWEBGROUPS]    Script Date: 09/04/2013 13:18:33 ******/
-//                                ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED 
-//                                (
-//                                        [RPTWEBGROUPID] ASC
-//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-//                                GO
-//
-//                                /****** Object:  Index [IX_RPTWEBGROUPS_GROUPID_SECTYPE]    Script Date: 09/04/2013 13:18:49 ******/
-//                                CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID_SECTYPE] ON [dbo].[RPTWEBGROUPS] 
-//                                (
-//                                        [GROUPID] ASC,
-//                                        [SECTYPE] ASC
-//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-//                                GO
-//
-//                                /****** Object:  Index [IX_RPTWEBGROUPS_GROUPID]    Script Date: 09/04/2013 13:19:06 ******/
-//                                CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID] ON [dbo].[RPTWEBGROUPS] 
-//                                (
-//                                        [GROUPID] ASC
-//                                )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-//                                GO
-//                            END                          
-//                            ";
+                string script = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +
+                                  "BEGIN " +
+                                    "CREATE TABLE [dbo].[RPTWEBGROUPS]( " +
+                                            "[RPTWEBGROUPID] [uniqueidentifier] NOT NULL, " +
+                                            "[SITEID] [uniqueidentifier] NULL, " +
+                                            "[WEBID] [uniqueidentifier] NULL, " +
+                                            "[GROUPID] [int] NULL, " +
+                                            "[SECTYPE] [int] NULL, " +
+                                    "CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
+                                    "( " +
+                                            "[RPTWEBGROUPID] ASC " +
+                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                    ") ON [PRIMARY] " +
+                                    
+                                    "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [DF_RPTWEBGROUPS_RPTWEBGROUPID]  DEFAULT (newid()) FOR [RPTWEBGROUPID] " +
+                                
+                                    "IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[RPTWEBGROUPS]') AND name = N'PK_RPTWEBGROUPS') " +
+                                    "ALTER TABLE [dbo].[RPTWEBGROUPS] DROP CONSTRAINT [PK_RPTWEBGROUPS] " +
+                                
+                                    "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
+                                    "( " +
+                                            "[RPTWEBGROUPID] ASC " +
+                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                    
+                                    "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID_SECTYPE] ON [dbo].[RPTWEBGROUPS]  " +
+                                    "( " +
+                                            "[GROUPID] ASC, " +
+                                            "[SECTYPE] ASC " +
+                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                    
+                                    "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID] ON [dbo].[RPTWEBGROUPS]  " +
+                                    "( " +
+                                            "[GROUPID] ASC " +
+                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                    
+                                "END ";     
+                                
 
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -206,8 +189,8 @@ namespace EPMLiveCore.API
                         using (var con = new SqlConnection(CoreFunctions.getReportingConnectionString(s.WebApplication.Id, s.ID)))
                         {
                             con.Open();
-                            //var cmd = new SqlCommand(script) { Connection = con };
-                            //cmd.ExecuteNonQuery();
+                            var cmd = new SqlCommand(script) { Connection = con };
+                            cmd.ExecuteNonQuery();
 
                            
                             var dt = new DataTable();
