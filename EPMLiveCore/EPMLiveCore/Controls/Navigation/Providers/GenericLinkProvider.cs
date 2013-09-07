@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Web.Caching;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.ReportingProxy;
@@ -67,7 +68,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         {"@Id", linkId}
                     });
 
-                    CleareCache();
+                    ResetCache();
                 }
             }
         }
@@ -93,23 +94,37 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
             }
 
-            CleareCache();
+            ResetCache();
         }
 
         // Private Methods (1) 
 
-        private void CleareCache()
+        private void ResetCache()
         {
-            string postfix = SiteId + "_U_" + UserId;
-
-            CacheStore.Current.Remove("NavLinks_Favorites_S_" + postfix, CacheStoreCategory.Navigation);
-            CacheStore.Current.Remove("NavLinks_Workspaces_S_" + postfix, CacheStoreCategory.Navigation);
-            CacheStore.Current.Remove("NavLinks_RecentItems_S_" + postfix, CacheStoreCategory.Navigation);
+            new FavoritesLinkProvider(SiteId, WebId, Username).ClearCache();
+            new RecentItemsLinkProvider(SiteId, WebId, Username).ClearCache();
+            new WorkspaceLinkProvider(SiteId, WebId, Username).ClearCache();
         }
 
         #endregion Methods 
 
         #region Overrides of NavLinkProvider
+
+        protected override string Key
+        {
+            get { throw new Exception("Generic Link Provider does not support this property."); }
+        }
+
+        public override void ClearCache()
+        {
+            CacheStore.Current.Remove("NavLinks_Navigation_W_" + WebId + "_U_" + UserId, CacheStoreCategory.Navigation);
+
+            new ApplicationsLinkProvider(SiteId, WebId, Username).ClearCache();
+            new SettingsLinkProvider(SiteId, WebId, Username).ClearCache();
+            new WorkplaceLinkProvider(SiteId, WebId, Username).ClearCache();
+            
+            ResetCache();
+        }
 
         public override IEnumerable<INavObject> GetLinks()
         {

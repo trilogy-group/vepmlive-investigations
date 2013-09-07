@@ -12,27 +12,40 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "RecentItems")]
     public class RecentItemsLinkProvider : NavLinkProvider
     {
+        #region Fields (1) 
+
+        private readonly string _key;
+
+        #endregion Fields 
+
         #region Constructors (1) 
 
-        public RecentItemsLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username) { }
+        public RecentItemsLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username)
+        {
+            _key = "NavLinks_RecentItems_S_" + SiteId + "_U_" + UserId;
+        }
 
         #endregion Constructors 
 
         private const string RI_QUERY = @"SELECT TOP (30) FRF_ID AS LinkId, LIST_ID AS ListId, ITEM_ID AS ItemId,
                                         Title, Icon AS CssClass, F_String AS Url FROM dbo.FRF
-                                        WHERE (SITE_ID = @SiteId) AND (WEB_ID = @WebId) AND (USER_ID = @UserId) AND (Type = 2)
+                                        WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 2)
                                         ORDER BY F_Date DESC";
         private const string FA_QUERY = @"SELECT TOP (5) FRF_ID AS LinkId, LIST_ID AS ListId, ITEM_ID AS ItemId, Title,
                                         Icon AS CssClass, F_String AS Url FROM dbo.FRF
-                                        WHERE (SITE_ID = @SiteId) AND (WEB_ID = @WebId) AND (USER_ID = @UserId) AND (Type = 3)
+                                        WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 3)
                                         ORDER BY F_Int DESC, Title";
 
         #region Overrides of NavLinkProvider
 
+        protected override string Key
+        {
+            get { return _key; }
+        }
+
         public override IEnumerable<INavObject> GetLinks()
         {
-            string key = "NavLinks_RecentItems_S_" + SiteId + "_U_" + UserId;
-            return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
             {
                 List<NavLink> links = GetFrequentApps();
                 links.AddRange(GetRecentItems());
@@ -131,7 +144,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         new Dictionary<string, object>
                         {
                             {"@SiteId", SiteId},
-                            {"@WebId", WebId},
                             {"@UserId", spWeb.CurrentUser.ID}
                         });
                 }

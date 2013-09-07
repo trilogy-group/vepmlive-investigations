@@ -11,9 +11,18 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "MyWorkplace")]
     public class WorkplaceLinkProvider : NavLinkProvider
     {
+        #region Fields (1) 
+
+        private readonly string _key;
+
+        #endregion Fields 
+
         #region Constructors (1) 
 
-        public WorkplaceLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username) { }
+        public WorkplaceLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username)
+        {
+            _key = "NavLinks_MyWorkplace_W_" + WebId + "_U_" + UserId;
+        }
 
         #endregion Constructors 
 
@@ -40,9 +49,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private IEnumerable<INavObject> GetMyWorkplaceLinks()
         {
-            string key = "NavLinks_MyWorkplace_W_" + WebId + "_U_" + UserId;
-
-            return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
             {
                 var links = new List<NavLink>
                 {
@@ -51,15 +58,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         Title = "My Workplace",
                         Url = "Header"
                     }
-                    //,
-                    //new NavLink
-                    //{
-                    //    Title="Create a workspace",
-                    //    Url =
-                    //        string.Format(
-                    //            @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx?standalone=true&isDlg=1');",
-                    //            RelativeUrl)
-                    //}
                 };
 
                 using (var spSite = new SPSite(SiteId, GetUserToken()))
@@ -124,6 +122,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         #endregion Methods 
 
         #region Overrides of NavLinkProvider
+
+        protected override string Key
+        {
+            get { return _key; }
+        }
 
         public override IEnumerable<INavObject> GetLinks()
         {

@@ -11,13 +11,14 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "Settings")]
     public class SettingsLinkProvider : NavLinkProvider
     {
-        #region Fields (3) 
+        #region Fields (4) 
 
         private const string QUERY = @"<OrderBy><FieldRef Name='Category' /><FieldRef Name='Title' /></OrderBy>";
 
         private const string VIEW_FIELDS =
             @"<FieldRef Name='Title' /><FieldRef Name='URL' /><FieldRef Name='Category' /><FieldRef Name='Description' />";
 
+        private readonly string _key;
         private readonly List<Tuple<SPBasePermissions?, NavLink>> _links;
 
         #endregion Fields 
@@ -26,6 +27,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public SettingsLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username)
         {
+            _key = "NavLinks_Settings_W_" + WebId;
+
             _links = new List<Tuple<SPBasePermissions?, NavLink>>
             {
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
@@ -67,9 +70,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private IEnumerable<INavObject> GetSettings()
         {
-            string key = "NavLinks_Settings_W_" + WebId;
-
-            return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
             {
                 var links = new List<NavLink>();
 
@@ -124,6 +125,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         #endregion Methods 
 
         #region Implementation of INavLinkProvider
+
+        protected override string Key
+        {
+            get { return _key; }
+        }
 
         public override IEnumerable<INavObject> GetLinks()
         {

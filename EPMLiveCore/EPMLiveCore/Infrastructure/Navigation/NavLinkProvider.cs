@@ -38,7 +38,20 @@ namespace EPMLiveCore.Infrastructure.Navigation
 
         #endregion Constructors 
 
-        #region Methods (2) 
+        #region Properties (1) 
+
+        protected abstract string Key { get; }
+
+        #endregion Properties 
+
+        #region Methods (3) 
+
+        // Public Methods (1) 
+
+        public virtual void ClearCache()
+        {
+            CacheStore.Current.Remove(Key, CacheStoreCategory.Navigation);
+        }
 
         // Protected Methods (2) 
 

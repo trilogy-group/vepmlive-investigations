@@ -11,19 +11,31 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "Applications")]
     public class ApplicationsLinkProvider : NavLinkProvider
     {
+        #region Fields (1) 
+
+        private readonly string _key;
+
+        #endregion Fields 
+
         #region Constructors (1) 
 
-        public ApplicationsLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username) { }
+        public ApplicationsLinkProvider(Guid siteId, Guid webId, string username) : base(siteId, webId, username)
+        {
+            _key = "NavLinks_Applications_W_" + WebId + "_U_" + UserId;
+        }
 
         #endregion Constructors 
 
         #region Overrides of NavLinkProvider
 
+        protected override string Key
+        {
+            get { return _key; }
+        }
+
         public override IEnumerable<INavObject> GetLinks()
         {
-            string key = "NavLinks_Applications_W_" + WebId + "_U_" + UserId;
-
-            return (IEnumerable<INavObject>) CacheStore.Current.Get(key, CacheStoreCategory.Navigation, () =>
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
             {
                 var links = new List<NavLink>
                 {

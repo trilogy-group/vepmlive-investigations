@@ -27,6 +27,15 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
+        #region Properties (1) 
+
+        protected override string Key
+        {
+            get { return _key; }
+        }
+
+        #endregion Properties 
+
         #region Methods (1) 
 
         // Public Methods (1) 
@@ -55,7 +64,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                             new Dictionary<string, object>
                             {
                                 {"@SiteId", SiteId},
-                                {"@WebId", WebId},
                                 {"@UserId", spWeb.CurrentUser.ID}
                             });
                     }
@@ -93,7 +101,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private const string QUERY = @"SELECT FRF_ID AS LinkId, LIST_ID AS ListId, ITEM_ID AS ItemId,
                                Title, Icon AS CssClass, F_String AS Url FROM dbo.FRF
-                               WHERE (SITE_ID = @SiteId) AND (WEB_ID = @WebId) AND (USER_ID = @UserId) AND (Type = 1)
+                               WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 1)
                                ORDER BY F_Int";
     }
 }
