@@ -186,6 +186,25 @@
                         _close();
                     };
 
+                    var _registerWorkspace = function(link, workspaceTree) {
+                        var node = new window.Telerik.Web.UI.RadTreeNode();
+
+                        var parent = workspaceTree;
+
+                        if (link.category) {
+                            parent = workspaceTree.findNodeByValue(link.category) || parent;
+                        }
+
+                        node.set_text(link.title);
+                        node.set_value(link.webId);
+
+                        if (link.active) {
+                            node.set_navigateUrl(link.url);
+                        }
+
+                        parent.get_nodes().add(node);
+                    };
+
                     var _registerLink = function (link) {
                         if (link.seprator) {
                             registerSeprator(link.category);
@@ -389,6 +408,7 @@
                         close: _close,
                         closeNav: _closeNav,
                         registerLink: _registerLink,
+                        registerWorkspace: _registerWorkspace,
                         el: _el,
                         $el: _$el,
                         $menu: _$sm
@@ -823,8 +843,28 @@
                 }
 
                 function registerProviderLinks(response) {
+                    var buildLink = function(link, page) {
+                        return {
+                            id: link['@Id'],
+                            title: link['@Title'],
+                            url: (link['#cdata'] || '').replace(/{page}/g, page),
+                            category: link['@Category'],
+                            cssClass: link['@CssClass'],
+                            order: parseInt(link['@Order']),
+                            siteId: link['@SiteId'],
+                            webId: link['@WebId'],
+                            listId: link['@ListId'],
+                            itemId: link['@ItemId'],
+                            external: link['@External'] === 'True',
+                            visible: link['@Visible'] === 'True',
+                            active: link['@Active'] === 'True',
+                            seprator: link['@Separator'] === 'True'
+                        };
+                    };
+                    
                     var webUrl = $$.currentWebUrl();
-                    var page = webUrl + window.location.href.split(webUrl)[1];
+                    var pg = webUrl + window.location.href.split(webUrl)[1];
+                    var workspacesTitleRegistered = false;
 
                     for (var providerName in response.Nodes) {
                         var navLink = response.Nodes[providerName].NavLink;
@@ -834,28 +874,56 @@
                         }
                         
                         for (var nl in navLink) {
-                            var link = navLink[nl];
+                            var lnk = navLink[nl];
 
                             for (var j = 0; j < tlNodes.length; j++) {
                                 var tlNode = tlNodes[j];
+                                
                                 if (tlNode.provider === providerName) {
-                                    tlNode.registerLink({
-                                        id: link['@Id'],
-                                        title: link['@Title'],
-                                        url: (link['#cdata'] || '').replace(/{page}/g, page),
-                                        category: link['@Category'],
-                                        cssClass: link['@CssClass'],
-                                        order: parseInt(link['@Order']),
-                                        siteId: link['@SiteId'],
-                                        webId: link['@WebId'],
-                                        listId: link['@ListId'],
-                                        itemId: link['@ItemId'],
-                                        external: link['@External'] === 'True',
-                                        visible: link['@Visible'] === 'True',
-                                        seprator: link['@Separator'] === 'True'
-                                    });
+                                    if (providerName !== 'Workspaces') {
+                                        tlNode.registerLink(buildLink(lnk, pg));
+                                    } else {
+                                        var workspaceTree = window.epmLiveNavigation.workspaceTree();
+                                        
+                                        workspaceTree.trackChanges();
+                                        
+                                        var title = lnk['@Title'];
+                                        
+                                        if (workspacesTitleRegistered) {
+                                            tlNode.registerWorkspace(buildLink(lnk, pg), workspaceTree);
+                                        } else {
+                                            tlNode.registerLink(buildLink(lnk, pg));
+
+                                            if (title === 'All Workspaces') {
+                                                workspacesTitleRegistered = true;
+                                                $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#' + workspaceTree._element.id);
+                                            }
+                                        }
+                                        
+                                        workspaceTree.commitChanges();
+                                    }
                                 }
                             }
+                        }
+
+                        if (providerName === 'Workspaces') {
+                            var wsTree = window.epmLiveNavigation.workspaceTree();
+
+                            var expandNode = function(webId) {
+                                var node = wsTree.findNodeByValue(webId);
+
+                                if (node && node != wsTree) {
+                                    var parent = node.get_parent();
+
+                                    if (parent !== wsTree && !parent.get_expanded()) {
+                                        parent.set_expanded(true);
+
+                                        expandNode(parent.get_value());
+                                    }
+                                }
+                            };
+
+                            expandNode(window.epmLiveNavigation.currentWebId);
                         }
 
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);

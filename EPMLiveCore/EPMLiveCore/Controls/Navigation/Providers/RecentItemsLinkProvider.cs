@@ -67,7 +67,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             DataTable dataTable = GetData(FA_QUERY);
 
-            if (dataTable.Rows.Count > 0)
+            if (dataTable != null && dataTable.Rows.Count > 0)
             {
                 GetLinks(dataTable, links);
             }
@@ -96,7 +96,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             DataTable dataTable = GetData(RI_QUERY);
 
-            if (dataTable.Rows.Count > 0)
+            if (dataTable != null && dataTable.Rows.Count > 0)
             {
                 GetLinks(dataTable, links);
             }

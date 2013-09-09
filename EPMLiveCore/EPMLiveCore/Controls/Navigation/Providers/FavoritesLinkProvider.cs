@@ -69,7 +69,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     }
                 }
 
-                if (dataTable.Rows.Count > 0)
+                if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     links.AddRange(from DataRow row in dataTable.Rows
                         select new SPNavLink

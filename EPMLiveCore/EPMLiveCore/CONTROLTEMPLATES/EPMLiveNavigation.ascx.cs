@@ -23,7 +23,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Fields 
 
-        #region Properties (8) 
+        #region Properties (9) 
 
         public IEnumerable<NavNode> AllNodes
         {
@@ -52,6 +52,11 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         public string UserId
         {
             get { return SPContext.Current.Web.CurrentUser.ID.ToString(CultureInfo.InvariantCulture); }
+        }
+
+        public string WebId
+        {
+            get { return SPContext.Current.Web.ID.ToString(); }
         }
 
         public string WebUrl
@@ -121,7 +126,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
-        
         // Private Methods (1) 
 
         private void LoadSelectedNodeLinks()

@@ -6,9 +6,10 @@
 <%@ Import Namespace="EPMLiveCore.Infrastructure.Navigation" %>
 <%@ Import Namespace="Microsoft.SharePoint" %> 
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register Assembly="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveNavigation.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.EPMLiveNavigation" %>
 
-<!--[if lte IE 7]><script src="/_layouts/15/epmlive/javascripts/icomoon-ie7.min.js"></script><![endif]-->
+<!--[if lte IE 7]><script src="/_layouts/15/epmlive/javascripts/icomoon-ie7.min.js"> </script><![endif]-->
 
 <div id="epm-nav">
     <div id="epm-nav-top">
@@ -111,6 +112,11 @@
                         ExpandDepth="0" 
                         ClientIDMode="Static" 
                         OnPreRender="OnTreeViewPreRender" />
+                <% }
+                   else if (node.Id.ToLower().Equals("workspaces"))
+                   { %>
+                    <telerik:RadTreeView ID="WorkspacesNavTree" runat="server" 
+                        EnableTheming="False" EnableViewState="False" />                    
                 <% } %> 
             </div>       
         <% } %>
@@ -118,13 +124,17 @@
 </div>
 
 <script type="text/javascript">
-    (function () {
+    (function() {
         window.epmLiveNavigation = {
+            currentWebId: '<%= WebId %>',
             currentWebUrl: '<%= WebUrl %>',
             currentUserId: <%= UserId %>,
-            staticProvider: '<%= StaticProviderLinks %>'
+            staticProvider: '<%= StaticProviderLinks %>',
+            workspaceTree: function() {
+                return window.$find('<%= WorkspacesNavTree.ClientID %>');
+            }
         };
-        
+
         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
     })();
 </script>

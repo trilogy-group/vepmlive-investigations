@@ -20,5 +20,14 @@ namespace EPMLiveCore.CONTROLTEMPLATES {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Microsoft.SharePoint.WebControls.SPTreeView EPMLiveNav;
+        
+        /// <summary>
+        /// WorkspacesNavTree control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTreeView WorkspacesNavTree;
     }
 }

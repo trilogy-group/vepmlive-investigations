@@ -77,6 +77,7 @@ namespace EPMLiveCore.Infrastructure.Navigation
 
         protected string S(object o)
         {
+            o = o == DBNull.Value ? null : o;
             return (o ?? string.Empty).ToString();
         }
 
