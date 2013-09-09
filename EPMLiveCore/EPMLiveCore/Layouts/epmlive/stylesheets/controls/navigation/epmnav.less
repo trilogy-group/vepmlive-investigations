@@ -15,8 +15,7 @@
 @hover-color: #E7E7E7;
 @link-hover:#3376A4;
 @menu-color: #999999;
-@green-btn:#6ABD3D;
-@green-btn-border:#66B23A;
+@link-color:#666666;
 @icon-font:2.2em;
 @header-font:12px;
 @link-font:12px;
@@ -372,7 +371,7 @@
     li.epm-nav-button {
         background: #F5F5F5;
         border: 1px solid #CCCCCC;
-        color: #666666;
+        color: @link-color;
         font-family: Helvetica;
         font-weight: 300;
         margin: 5px auto !important;
@@ -414,13 +413,13 @@
         }
 
         a, span {
-            color: #666666 !important;
+            color: @link-color !important;
             padding: 0 !important;
             height: 25px !important;
             line-height: 25px !important;
 
             &:hover {
-                color: #666666;
+                color: @link-color;
             }
         }
 
@@ -493,7 +492,7 @@
     }
 
     .epm-nav-node {
-        color: #666666;
+        color: @link-color;
         font-family: 'Open Sans Regular', sans-serif;
         font-weight: 300;
         font-size: @link-font;
@@ -569,6 +568,35 @@
                 a {
                     padding: 0;
                 }
+            }
+        }
+    }
+
+    .RadTreeView {
+        margin-left: 10px;
+
+        a {
+            color: @link-color;
+            font-family: 'Open Sans Regular',sans-serif;
+        }
+
+        div.rtHover {
+            a {
+                background: none repeat scroll 0 0 transparent !important;
+                border: medium none;
+                color: @link-color;
+                left: 1px;
+                position: relative;
+            }
+        }
+
+        div.rtSelected {
+            a {
+                background: @hover-color !important;
+                border: medium none;
+                color: @link-color;
+                left: 1px;
+                position: relative;
             }
         }
     }

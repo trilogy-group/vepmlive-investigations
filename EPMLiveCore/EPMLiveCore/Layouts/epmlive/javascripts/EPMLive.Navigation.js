@@ -934,6 +934,8 @@
                                 cNode.set_expanded(true);
                             }
                             
+                            cNode.set_selected(true);
+                            
                             wsTree.commitChanges();
                         }
 

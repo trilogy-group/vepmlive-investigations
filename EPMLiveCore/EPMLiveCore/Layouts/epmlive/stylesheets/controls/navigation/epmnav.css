@@ -473,6 +473,27 @@
 .epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected td.epm-nav-node a {
   padding: 0;
 }
+.epm-nav-sub .RadTreeView {
+  margin-left: 10px;
+}
+.epm-nav-sub .RadTreeView a {
+  color: #666666;
+  font-family: 'Open Sans Regular', sans-serif;
+}
+.epm-nav-sub .RadTreeView div.rtHover a {
+  background: none repeat scroll 0 0 transparent !important;
+  border: medium none;
+  color: #666666;
+  left: 1px;
+  position: relative;
+}
+.epm-nav-sub .RadTreeView div.rtSelected a {
+  background: #e7e7e7 !important;
+  border: medium none;
+  color: #666666;
+  left: 1px;
+  position: relative;
+}
 .epm-nav-unpinned {
   margin-left: 50px;
 }
