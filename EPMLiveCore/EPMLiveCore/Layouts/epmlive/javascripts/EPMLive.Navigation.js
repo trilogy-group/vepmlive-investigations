@@ -6,15 +6,15 @@
             var $ = window.jQuery;
 
             var $$ = (function () {
-                var _currentWebUrl = function() {
+                var _currentWebUrl = function () {
                     return window.epmLiveNavigation.currentWebUrl;
                 };
 
-                var _parseJson = function(xml) {
+                var _parseJson = function (xml) {
                     return eval('(' + window.xml2json($.parseXML(xml), "") + ')');
                 };
 
-                var _responseIsSuccess = function(response) {
+                var _responseIsSuccess = function (response) {
                     return response['@Status'] == 0;
                 };
 
@@ -27,8 +27,8 @@
 
             var base64Service = (function () {
                 var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-                
-                var _decode = function(input) {
+
+                var _decode = function (input) {
                     var output = '';
                     var chr1, chr2, chr3 = '';
                     var enc1, enc2, enc3, enc4 = '';
@@ -38,7 +38,7 @@
                     if (base64Test.exec(input)) {
                         console.log('There were invalid base64 characters in the input text.\nValid base64 characters are A-Z, a-z, 0-9, "+", "/",and "="\nExpect errors in decoding.');
                     }
-                    
+
                     input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
 
                     do {
@@ -56,7 +56,7 @@
                         if (enc3 != 64) {
                             output = output + String.fromCharCode(chr2);
                         }
-                        
+
                         if (enc4 != 64) {
                             output = output + String.fromCharCode(chr3);
                         }
@@ -68,7 +68,7 @@
 
                     return unescape(output);
                 };
-                
+
                 return {
                     decode: _decode
                 };
@@ -77,7 +77,7 @@
             var epmLiveService = (function () {
                 var _execute = function (method, data, onSuccess, onError) {
                     var webUrl = $$.currentWebUrl();
-                    
+
                     if (webUrl) {
                         $.ajax({
                             type: 'POST',
@@ -85,7 +85,7 @@
                             data: "{ Function: '" + method + "', Dataxml: '" + data + "' }",
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
-                            success: function(response) {
+                            success: function (response) {
                                 if (response.d) {
                                     var resp = $$.parseJson(response.d);
                                     var result = resp.Result;
@@ -99,12 +99,12 @@
                                     onError(response);
                                 }
                             },
-                            error: function(response) {
+                            error: function (response) {
                                 onError(response);
                             }
                         });
                     } else {
-                        window.setTimeout(function() {
+                        window.setTimeout(function () {
                             _execute(method, data, onSuccess, onError);
                         }, 1);
                     }
@@ -116,7 +116,7 @@
             })();
 
             var jqCookie = $.cookie;
-            $.cookie = function(cookieName, data, options) {
+            $.cookie = function (cookieName, data, options) {
                 cookieName = cookieName + '-u-' + window.epmLiveNavigation.currentUserId;
 
                 if (jqCookie) {
@@ -186,7 +186,7 @@
                         _close();
                     };
 
-                    var _registerWorkspace = function(link, workspaceTree) {
+                    var _registerWorkspace = function (link, workspaceTree) {
                         var node = new window.Telerik.Web.UI.RadTreeNode();
 
                         var parent = workspaceTree;
@@ -231,7 +231,7 @@
 
                         categories[category].$el.append(li);
                     };
-                    
+
                     var registerHeader = function (link) {
                         var category = link.category;
 
@@ -240,7 +240,7 @@
                         }
 
                         var cssClass = 'epm-nav-sub-header';
-                        
+
                         if (_$sm.find('li.epm-nav-section-header').length === 0) {
                             cssClass = 'epm-nav-section-header';
                         }
@@ -285,7 +285,7 @@
                         if (providerId === 'epm-nav-sub-settings' || providerId === 'epm-nav-sub-workplace') {
                             cssClass = 'epm-nav-node';
                         }
-                        
+
                         if (isButton) {
                             cssClass = cssClass + ' epm-nav-button';
                             cssClass = cssClass.replace(/epm-nav-trans/g, '');
@@ -300,7 +300,7 @@
                         var html = '<li id="' + link.id + '" class="' + cssClass + '" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"' + target + '><span>' + link.title + '</span></a></li>';
 
                         categories[category].$el.append(html);
-                        
+
                         var $link = $('#' + link.id);
 
                         if (link.visible) {
@@ -310,7 +310,7 @@
                         $link.find('a').click(function () {
                             var $a = $(this);
                             var $parent = $a.parent();
-                            
+
                             if (!$parent.hasClass('epm-nav-button')) {
                                 $sn.find('a').each(function () {
                                     $(this).parent().removeClass(selectedClass);
@@ -593,6 +593,22 @@
                 }
 
                 function registerLinkEvents() {
+                    var addTooltip = function() {
+                        $('li.epm-nav-node').find('a').each(function () {
+                            var $a = $(this);
+
+                            if (!$a.attr('title')) {
+                                var $span = $a.find('span');
+                                if ($span) {
+                                    if ($a.width() < $span.width()) {
+                                        $a.attr('title', $span.text());
+                                        $a.tooltip({ placement: 'right', delay: { show: 600, hide: 100 } });
+                                    }
+                                }
+                            }
+                        });
+                    };
+                    
                     $('.epm-nav-cat').click(function () {
                         var $cat = $(this);
                         var $span = $($cat.find('span')[0]);
@@ -605,35 +621,41 @@
 
                         saveLinkState($cat.parent());
                     });
+
+                    $('#epm-nav-top li').click(function() {
+                        addTooltip();
+                    });
+
+                    addTooltip();
                 }
 
                 function handleContextualCommand(id, webId, listId, itemId, command, kind) {
                     var removeLink = function (linkId, notifId) {
-                        var remove = function(lid, nid) {
+                        var remove = function (lid, nid) {
                             var $item = $('#' + lid);
-                            $item.fadeOut(300, function() {
+                            $item.fadeOut(300, function () {
                                 $item.remove();
                             });
-                            
+
                             if (nId) {
                                 SP.UI.Notify.removeNotification(nid);
                             }
                         };
-                        
+
                         epmLiveService.execute('RemoveNavigationLink', linkId, function (response) {
                             remove(linkId, notifId);
                         }, function (response) {
                             remove(linkId, notifId);
                         });
                     };
-                    
+
                     var url = window.epmLiveNavigation.currentWebUrl;
                     var gaUrl = url + '_layouts/15/epmlive/gridaction.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
                     var rpUrl = url + '_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
 
                     var redirectUrl = '';
 
-                    switch(command) {
+                    switch (command) {
                         case 'nav:add':
                             redirectUrl = rpUrl + 'action=new';
                             break;
@@ -679,7 +701,7 @@
                             if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
                                 var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
                                 if (command !== 'nav:remove') {
-                                    $.get(redirectUrl).always(function() {
+                                    $.get(redirectUrl).always(function () {
                                         removeLink(id, nId);
                                     });
                                 } else {
@@ -761,7 +783,7 @@
                         toggleNode(data, x, elNav, y, elNodes);
                     };
 
-                    window.epmLiveNavigation.handleContextualCommand = function(id, webId, listId, itemId, command, kind) {
+                    window.epmLiveNavigation.handleContextualCommand = function (id, webId, listId, itemId, command, kind) {
                         handleContextualCommand(id, webId, listId, itemId, command, kind);
                     };
 
@@ -798,7 +820,7 @@
                             height: $sn.height(),
                             width: $sn.width()
                         });
-                    } catch(e) {
+                    } catch (e) {
                     }
 
                     var $ss = $('#epm-nav').find('.slimScrollDiv');
@@ -845,7 +867,7 @@
                 }
 
                 function registerProviderLinks(response) {
-                    var buildLink = function(link, page) {
+                    var buildLink = function (link, page) {
                         return {
                             id: link['@Id'],
                             title: link['@Title'],
@@ -863,34 +885,34 @@
                             seprator: link['@Separator'] === 'True'
                         };
                     };
-                    
+
                     var webUrl = $$.currentWebUrl();
                     var pg = webUrl + window.location.href.split(webUrl)[1];
                     var workspacesTitleRegistered = false;
 
                     for (var providerName in response.Nodes) {
                         var navLink = response.Nodes[providerName].NavLink;
-                        
+
                         if (!navLink.length) {
                             navLink = [navLink];
                         }
-                        
+
                         for (var nl in navLink) {
                             var lnk = navLink[nl];
 
                             for (var j = 0; j < tlNodes.length; j++) {
                                 var tlNode = tlNodes[j];
-                                
+
                                 if (tlNode.provider === providerName) {
                                     if (providerName !== 'Workspaces') {
                                         tlNode.registerLink(buildLink(lnk, pg));
                                     } else {
                                         var workspaceTree = window.epmLiveNavigation.workspaceTree();
-                                        
+
                                         workspaceTree.trackChanges();
-                                        
+
                                         var title = lnk['@Title'];
-                                        
+
                                         if (workspacesTitleRegistered) {
                                             tlNode.registerWorkspace(buildLink(lnk, pg), workspaceTree);
                                         } else {
@@ -901,7 +923,7 @@
                                                 $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#' + workspaceTree._element.id);
                                             }
                                         }
-                                        
+
                                         workspaceTree.commitChanges();
                                     }
                                 }
@@ -913,7 +935,7 @@
 
                             wsTree.trackChanges();
 
-                            var expandNode = function(webId) {
+                            var expandNode = function (webId) {
                                 var node = wsTree.findNodeByValue(webId);
 
                                 if (node && node != wsTree) {
@@ -928,22 +950,22 @@
                             };
 
                             var wId = window.epmLiveNavigation.currentWebId;
-                            
+
                             var cNode = wsTree.findNodeByValue(wId);
                             if (cNode.get_parent() !== wsTree) {
                                 expandNode(wId);
                             } else {
                                 cNode.set_expanded(true);
                             }
-                            
+
                             cNode.set_selected(true);
-                            
+
                             wsTree.commitChanges();
                         }
                         else if (providerName === 'Applications') {
-                            $($('#epm-nav-sub-new-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important;');
+                            $($('#epm-nav-sub-new-static-links').find('.epm-nav-sub-header').get(0)).css('padding-top', '0px !important');
                         }
-                        
+
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);
 
                         if (providerName !== 'Settings') {
@@ -975,10 +997,10 @@
                         });
                     }
                 }
-                
+
                 function registerStaticProviderLinks() {
                     var links = null;
-                    
+
                     if (window.epmLiveNavigation) {
                         links = window.epmLiveNavigation.staticProvider;
                     }
@@ -986,12 +1008,12 @@
                     if (links) {
                         registerProviderLinks($$.parseJson(base64Service.decode(links)));
                     } else {
-                        window.setTimeout(function() {
+                        window.setTimeout(function () {
                             registerStaticProviderLinks();
                         }, 1);
                     }
                 }
-                
+
                 function registerTopLevelNodes() {
                     $('#epm-nav-top').find("[data-role='top-nav-node']").each(function () {
                         tlNodes.push(new navNode(this));
@@ -1024,8 +1046,8 @@
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
 
                     var setup = function (commands, $ca) {
-                        var getIcon = function(command) {
-                            switch(command.toLowerCase()) {
+                        var getIcon = function (command) {
+                            switch (command.toLowerCase()) {
                                 case 'nav:remove':
                                     return 'icon-star-6';
                                 case 'view':
@@ -1046,7 +1068,7 @@
                                     return 'epm-nav-cm-blank';
                             }
                         };
-                        
+
                         var liId = $li.get(0).id;
 
                         if (commands.length) {
@@ -1073,16 +1095,16 @@
                             }
                         }
 
-                        $menu.hover(function() {
+                        $menu.hover(function () {
                             window.epmNavHoveredNode = liId;
                         });
 
-                        $('.epm-nav-node').hover(function() {
+                        $('.epm-nav-node').hover(function () {
                             var id = this.id;
                             window.epmNavHoveredNode = id;
 
                             if (id !== liId) {
-                                window.setTimeout(function() {
+                                window.setTimeout(function () {
                                     if (window.epmNavHoveredNode === id) {
                                         hideMenu();
                                     }
@@ -1090,24 +1112,24 @@
                             }
                         });
 
-                        $('.epm-nav-links').hover(function() {
-                        }, function() {
+                        $('.epm-nav-links').hover(function () {
+                        }, function () {
                             window.epmNavHoveredNode = null;
 
-                            window.setTimeout(function() {
+                            window.setTimeout(function () {
                                 if (window.epmNavHoveredNode === null) {
                                     hideMenu();
                                 }
                             }, 200);
                         });
 
-                        $('.epm-nav-dragger').click(function() {
+                        $('.epm-nav-dragger').click(function () {
                             hideMenu();
                         });
 
                         toggleMenu();
                     };
-                    
+
                     var showMenu = function () {
                         $menu.fadeIn(200);
                     };
@@ -1116,7 +1138,7 @@
                         $menu.fadeOut(200);
                     };
 
-                    var toggleMenu = function() {
+                    var toggleMenu = function () {
                         if ($menu.is(':visible')) {
                             hideMenu();
                         } else {
@@ -1133,7 +1155,7 @@
                             var commands = [];
 
                             var items = response.Items.Item;
-                            
+
                             if (items) {
                                 if (!items.length) {
                                     items = [items];
@@ -1146,7 +1168,7 @@
                             }
 
                             setup(commands, $a);
-                        }, function(response) {
+                        }, function (response) {
                             setup([], $a);
                         });
                     } else {
@@ -1207,7 +1229,7 @@
                         }
                     };
 
-                    var _addDragger = function($li) {
+                    var _addDragger = function ($li) {
                         $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
 
                         $li.hover(function () {
@@ -1233,7 +1255,7 @@
                         addMenu: _addMenu
                     };
                 })();
-                
+
                 var $ul = $('#epm-nav-sub-favorites-static-links');
 
                 $ul.find('.epm-nav-sortable').each(function () {
@@ -1262,15 +1284,15 @@
 
             var manageRecentItems = function () {
                 var riManager = (function () {
-                    var _addMenu = function($li, rIndex) {
+                    var _addMenu = function ($li, rIndex) {
                         if ($li.index() < rIndex) {
                             addNewItemMenu($li);
                         }
                     };
 
-                    var addNewItemMenu = function($li) {
+                    var addNewItemMenu = function ($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-plus-2"></span></span>');
-                        
+
                         $($li.find('a').get(0)).attr('style', 'width:115px !important;');
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
@@ -1278,7 +1300,7 @@
                             window.epmLiveNavigation.handleContextualCommand(null, $a.data('webid'), $a.data('listid'), null, 'nav:add', 0);
                         });
                     };
-                    
+
                     return {
                         addMenu: _addMenu
                     };
@@ -1297,12 +1319,12 @@
                         riIndex = index;
                     }
                 });
-                
+
                 $ul.find('.epm-nav-node').each(function () {
                     riManager.addMenu($(this), riIndex);
                 });
             };
-            
+
             var manageWorkspaces = function () {
                 var workspacesManager = (function () {
                     var _resetOrder = function ($list) {
@@ -1347,7 +1369,7 @@
                         addMenu: _addMenu
                     };
                 })();
-                
+
                 var $ul = $('#epm-nav-sub-workspaces-static-links');
 
                 $ul.find('.epm-nav-sortable').each(function () {
@@ -1364,7 +1386,7 @@
                     $ul.sortable({
                         items: 'li.epm-nav-sortable',
                         placeholder: 'epm-nav-drag-placeholder',
-                        update: function(event, ui) {
+                        update: function (event, ui) {
                             workspacesManager.resetOrder($ul);
                         }
                     });
