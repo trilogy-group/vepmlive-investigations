@@ -413,7 +413,21 @@ function CreateEPMLiveWorkspace (listid, itemid) {
     var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
     var tUrl = urlBuilder.get_url();
 
-    var options = { url: tUrl, title: 'Create', allowMaximize: false };
+    var options = {
+        url: tUrl,
+        title: 'Create',
+        width: 880,
+        height: 500,
+        dialogReturnValueCallback: function (dialogResult, returnValue) {
+            {
+                if (dialogResult === 1) {
+                    {
+                        SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false);
+                    }
+                }
+            }
+        }
+    };
 
     SP.UI.ModalDialog.showModalDialog(options);
 }
