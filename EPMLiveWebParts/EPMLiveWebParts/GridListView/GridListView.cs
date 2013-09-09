@@ -48,18 +48,10 @@ namespace EPMLiveWebParts
             public string EPKCostView = "";
             public string EPKView = "";
             public bool hasList = false;
-            public string PlannerV2Menu = "";
             public bool EPKEnabled = false;
         }
 
-        private class RibbonProperties
-        {
-            public bool bBuildTeam = false;
-            public bool bDisableProject = false;
-            public bool bDisablePlan = false;
-            public ArrayList aEPKButtons = new ArrayList();
-            public ArrayList aEPKActivex = new ArrayList();
-        }
+        
 
         private EPMLiveCore.TimeDebug tb;
 
@@ -1083,7 +1075,7 @@ namespace EPMLiveWebParts
             return getPlanner(plannerName, web, pDisplay, "_layouts/images/epmlivelogosmall.gif");
         }
 
-        private string getEPKButtons(RibbonProperties rp, Ribbon ribbon1, string language)
+        private string getEPKButtons(EPMLiveCore.API.RibbonProperties rp, Ribbon ribbon1, string language)
         {
             StringBuilder sb = new StringBuilder();
             
@@ -1382,9 +1374,9 @@ namespace EPMLiveWebParts
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.EditComments\" Sequence=\"140\" Command=\"EditComments\" LabelText=\"Comments\" TemplateAlias=\"o2\" Image16by16=\"_layouts/epmlive/images/comments16.gif\"/>");
                         ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Manage.Controls._children");
 
-                        RibbonProperties rp = (RibbonProperties)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GR-" + list.ParentWeb.CurrentUser.ID, "GridSettings-" + list.ID, () =>
+                        EPMLiveCore.API.RibbonProperties rp = (EPMLiveCore.API.RibbonProperties)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GR-" + list.ParentWeb.CurrentUser.ID, "GridSettings-" + list.ID, () =>
                         {
-                            return GetRibbonProps();
+                            return EPMLiveCore.API.ListCommands.GetRibbonProps(list);
                         }).Value;
 
 
@@ -4440,8 +4432,11 @@ namespace EPMLiveWebParts
             EPKCostView = bp.EPKCostView;
             EPKView = bp.EPKView;
             hasList = bp.hasList;
-            PlannerV2Menu = bp.PlannerV2Menu;
             EPKEnabled = bp.EPKEnabled;
+
+
+            EPMLiveCore.API.ListPlannerProps plan = EPMLiveCore.API.ListCommands.GetListPlannerInfo(list);
+            PlannerV2Menu = plan.PlannerV2Menu;
 
             if (Page.Request["IsDlg"] == "1")
                 bUsePopUp = true;
@@ -4468,86 +4463,7 @@ namespace EPMLiveWebParts
         }
 
         #region GridLoadHelpers
-        private RibbonProperties GetRibbonProps()
-        {
-            RibbonProperties rp = new RibbonProperties();
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                using (SPSite site = new SPSite(SPContext.Current.Web.Url))
-                {
-                    using (SPWeb web = site.OpenWeb())
-                    {
-                        string pubPC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLivePublisherProjectCenter", false);
-                        string pubTC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLivePublisherTaskCenter", false);
-                        bool foundmpp = false;
-
-                        try
-                        {
-                            SPDocumentLibrary lib = (SPDocumentLibrary)web.Lists["Project Schedules"];
-                            if (lib != null)
-                            {
-                                if (lib.ContentTypesEnabled)
-                                {
-                                    foreach (SPContentType ct in lib.ContentTypes)
-                                    {
-                                        string template = ct.DocumentTemplateUrl;
-                                        if (template.Substring(template.Length - 3, 3) == "mpp")
-                                        {
-                                            foundmpp = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    string template = lib.DocumentTemplateUrl;
-                                    if (template.Substring(template.Length - 3, 3) == "mpp")
-                                    {
-                                        foundmpp = true;
-                                    }
-                                }
-                            }
-                        }
-                        catch { }
-
-                        if (gSettings.BuildTeam && list.Fields.GetFieldByInternalName("AssignedTo") != null)
-                        {
-                            if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
-                            {
-                                rp.bBuildTeam = true;
-                            }
-                        }
-
-                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out rp.bDisableProject);
-                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePlanners"), out rp.bDisablePlan);
-
-
-                        if(EPKEnabled)
-                        {
-                            string menus = "";
-                            menus = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPK" + list.Title.Replace(" ","") + "_menus");
-                            if(menus == "")
-                                menus = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKMenus");
-
-                            rp.aEPKButtons = new ArrayList(menus.Split('|'));
-
-                            string noactivex = "";
-                            noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_nonactivexs");
-                            if(noactivex == "")
-                                noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "epknonactivexs");
-
-                            rp.aEPKActivex = new ArrayList(noactivex.Split('|'));
-
-
-                        }
-                    }
-                }
-            });
-            return rp;
-
-        }
-
+        
         private BuildParamProps GetBuildParamsProps(SPWeb web)
         {
             BuildParamProps b = new BuildParamProps();
@@ -4572,68 +4488,8 @@ namespace EPMLiveWebParts
 
                         try
                         {
-
-                            if (web.Site.Features[new Guid("e6df7606-1541-4bf1-a810-e8e9b11819e3")] != null)
-                            {
-                                System.Collections.Generic.Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(web, null);
-
-                                int bPlanner = 0;
-
-                                foreach (System.Collections.Generic.KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
-                                {
-                                    string id = (string)de.Key;
-                                    EPMLiveCore.PlannerDefinition p = (EPMLiveCore.PlannerDefinition)de.Value;
-
-                                    if (String.Equals(p.commandPrefix, list.Title, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        bPlanner = 1;
-                                        break;
-                                    }
-                                    if (String.Equals(p.command, list.Title, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        b.PlannerV2CurPlanner = id;
-                                        bPlanner = 2;
-                                        break;
-                                    }
-                                }
-
-                                if (bPlanner == 1)
-                                {
-                                    b.PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"EPMLivePlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
-                                }
-
-                                else if (bPlanner == 2)
-                                {
-                                    b.PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"TaskPlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
-                                }
-
-                                /*string planners = EPMLiveCore.CoreFunctions.getLockConfigSetting(w, "EPMLivePlannerPlanners", false);
-
-                                foreach(string planner in planners.Split(','))
-                                {
-                                    if(!String.IsNullOrEmpty(planner))
-                                    {
-                                        string[] sPlanner = planner.Split('|');
-                                        string tc = EPMLiveCore.CoreFunctions.getLockConfigSetting(w, "EPMLivePlanner" + sPlanner[0] + "TaskCenter", false);
-                                        string pc = EPMLiveCore.CoreFunctions.getLockConfigSetting(w, "EPMLivePlanner" + sPlanner[0] + "ProjectCenter", false);
-
-                                        if(String.Equals(list.Title, tc, StringComparison.CurrentCultureIgnoreCase))
-                                        {
-                                            PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"TaskPlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
-                                            PlannerV2CurPlanner = sPlanner[0];
-                                            break;
-                                        }
-
-                                        if(String.Equals(list.Title, pc, StringComparison.CurrentCultureIgnoreCase))
-                                        {
-
-                                            //PlannerV2Menu = "<FlyoutAnchor Id=\"Ribbon.List.EPMLive.Planner\" Sequence=\"30\" PopulateDynamically=\"true\" PopulateOnlyOnce=\"false\" PopulateQueryCommand=\"ListEPMLivePlannerPopulate\" Command=\"ListEPMLivePlanner\" Image32by32=\"_layouts/epmlive/images/planner32.png\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\"></FlyoutAnchor>";
-                                            PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"EPMLivePlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
-                                            break;
-                                        }
-                                    }
-                                }*/
-                            }
+                            
+                            
                             b.EPKView = HttpUtility.UrlEncode(view.Title);
                             SPWeb rweb = site.RootWeb;
                             {
