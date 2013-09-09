@@ -437,14 +437,12 @@ function registerCreateWorkspace2Script() {
                     $('#onlineTemplates').parent().hide();
                     self.loadDownloadedApps();
                 }
-                
-                if ($('#contentBox').length > 0) {
-                    $('#contentBox').css('margin-left', '10px');
-                }
-
+              
                 if (self.showInProgress() === 'true') {
                     $('#divProgress').show();
                 }
+
+                $('.titleInput').focus();
             };
 
             self.pageInit();
