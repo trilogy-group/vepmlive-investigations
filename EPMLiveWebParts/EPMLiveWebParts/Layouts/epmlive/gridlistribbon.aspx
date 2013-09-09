@@ -853,7 +853,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 var rowId = this.$Grid.getSelectedRowId();
                 var itemid = this.$Grid.getUserData(rowId,"itemid");
                 var listid = this.$Grid.getUserData(rowId,"listid");
-                newAppPopup(listid, itemid);
+                CreateEPMLiveWorkspace(listid, itemid);
             }
             else
             {
