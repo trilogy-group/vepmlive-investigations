@@ -1019,6 +1019,26 @@ namespace EPMLiveCore
             return evts;
         }
 
+        public static List<SPEventReceiverDefinition> GetWebEvents(SPWeb web, string assemblyName, string className, List<SPEventReceiverType> types)
+        {
+            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+
+            try
+            {
+                evts = (from e in web.EventReceivers.OfType<SPEventReceiverDefinition>()
+                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                              types.Contains(e.Type)
+                        select e).ToList<SPEventReceiverDefinition>();
+            }
+            catch
+            {
+
+            }
+
+            return evts;
+        }
+
         public static SPField getRealField(SPField field)
         {
             try
@@ -1923,7 +1943,7 @@ namespace EPMLiveCore
             catch (Exception ex) { return ex.Message.ToString(); }
         }
 
-        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, SPWeb mySite, out Guid createdSiteId, out string createdSiteUrl, out string createdWebTitle)
+        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, SPWeb parentWeb, out Guid createdSiteId, out string createdSiteUrl, out string createdWebTitle)
         {
             createdSiteId = Guid.Empty;
             createdSiteUrl = string.Empty;
@@ -1932,7 +1952,16 @@ namespace EPMLiveCore
             {
                 string sUrl = "";
 
-                SPWeb web = mySite.Webs.Add(url, title, "", 1033, template, unique, false);
+                string finalTitle = title;
+                bool exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
+                int i = 1;
+                while (exists)
+                {
+                    finalTitle = finalTitle + i++;
+                    exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
+                }
+                SPWeb web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
+
                 createdSiteId = web.ID;
                 createdSiteUrl = web.Url;
                 createdWebTitle = web.Title;
@@ -2038,6 +2067,20 @@ namespace EPMLiveCore
             catch (Exception ex) { return "1:" + ex.Message.ToString(); }
         }
 
+        public static bool WebExistsUnderParentWeb(SPWeb parentWeb, string webName)
+        {
+            bool exists = false;
+            try
+            {
+                exists = parentWeb.Webs[webName].Exists;
+            }
+            catch
+            {
+                
+            }
+            return exists;
+        }
+
         public static string createSiteFromItem(string title, string url, string template, string user, bool unique, bool toplink,
             SPWeb parentWeb, SPWeb itemWeb, Guid listId, int itemId, out Guid createdSiteId, out string createdSiteUrl, out string createdWebTitle)
         {
@@ -2047,10 +2090,19 @@ namespace EPMLiveCore
             try
             {
                 string sUrl = "";
-                //string user = HttpContext.Current.User.Identity.Name.ToString();
-                //
+               
                 {
-                    SPWeb web = parentWeb.Webs.Add(url, title, "", 1033, template, unique, false);
+                    string finalTitle = title;
+                    bool exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
+                    int i = 1;
+                    while (exists)
+                    {
+                        finalTitle = finalTitle + i++;
+                        exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
+                    }
+
+                    SPWeb web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
+
                     createdSiteId = web.ID;
                     createdSiteUrl = web.Url;
                     createdWebTitle = web.Title;
