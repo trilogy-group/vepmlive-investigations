@@ -49,7 +49,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         Title = "Create App",
                         Url = string.Format(@"http://market.epmlive.com/?source={0}", Url),
                         External = true,
-                        CssClass = "epm-nav-button icon-cube"
+                        CssClass = "epm-nav-button"
                     }
                 };
 

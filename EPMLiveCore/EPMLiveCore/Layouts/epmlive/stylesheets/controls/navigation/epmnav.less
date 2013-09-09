@@ -370,26 +370,33 @@
     }
 
     li.epm-nav-button {
-        background: @green-btn;
-        border: 1px solid @green-btn-border;
-        color: #ffffff;
+        background: #F5F5F5;
+        border: 1px solid #CCCCCC;
+        color: #666666;
         font-family: Helvetica;
         font-weight: 300;
         margin: 5px auto !important;
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-        width: 130px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        width: 140px !important;
         border-radius: 5px;
         height: 25px !important;
         position: relative;
         left: -1px;
+        text-align: center;
+        text-transform: uppercase;
+        background: -webkit-linear-gradient(top,#fff 0,#f2f2f2 100%);
+        background: -moz-linear-gradient(top,#fff 0,#f2f2f2 100%);
+        background: -ms-linear-gradient(top,#fff 0,#f2f2f2 100%);
+        background: -o-linear-gradient(top,#fff 0,#f2f2f2 100%);
+        background: linear-gradient(to bottom,#fff 0,#f2f2f2 100%);
         .no-trans;
         .cursor-hand;
+        .text-shadow;
 
         a {
             font-size: 0.8em !important;
-            margin-left: 10px !important;
-            width: 100px !important;
+            width: 140px !important;
 
             &:active {
                 outline: none;
@@ -403,27 +410,22 @@
 
         span {
             font-size: 1.4em;
-            margin-left: 0 !important;
             top: -5px !important;
         }
 
         a, span {
-            color: #ffffff !important;
+            color: #666666 !important;
             padding: 0 !important;
             height: 25px !important;
             line-height: 25px !important;
 
             &:hover {
-                color: #ffffff;
+                color: #666666;
             }
         }
 
         &:hover {
-            background: @green-btn !important;
-
-            span.epm-nav-icon {
-                .text-shadow(@y: 10px);
-            }
+            background: #F5F5F5 !important;
         }
     }
 
@@ -666,14 +668,5 @@ li.epm-nav-node-selected {
 
     .epm-nav-sub-header-bottom {
         border-top: none;
-    }
-}
-
-#epm-nav-sub-new-static-links {
-    .epm-nav-button {
-        a {
-            margin-left: 15px !important;
-            width: 70px !important;
-        }
     }
 }
