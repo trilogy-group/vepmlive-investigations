@@ -15,8 +15,187 @@ namespace EPMLiveCore.API
         public string icon = "";
     }
 
+    public class RibbonProperties
+    {
+        public bool bBuildTeam = false;
+        public bool bDisableProject = false;
+        public bool bDisablePlan = false;
+        public ArrayList aEPKButtons = new ArrayList();
+        public ArrayList aEPKActivex = new ArrayList();
+    }
+
+    public class ListPlannerProps
+    {
+        public string PlannerV2CurPlanner = "";
+        public string PlannerV2Menu = "";
+    }
+
     public class ListCommands
     {
+
+        public static ListPlannerProps GetListPlannerInfo(SPList list)
+        {
+            ListPlannerProps props = (ListPlannerProps)EPMLiveCore.Infrastructure.CacheStore.Current.Get("LPP", "GridSettings-" + list.ID.ToString(), () =>
+            {
+                return iGetListPlannerInfo(list);
+            }).Value;
+
+            return props;
+        }
+
+        private static ListPlannerProps iGetListPlannerInfo(SPList list)
+        {
+            ListPlannerProps b = new ListPlannerProps();
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+
+                using (SPSite site = new SPSite(list.ParentWeb.Site.ID))
+                {
+                    using (SPWeb w = site.OpenWeb(list.ParentWeb.ID))
+                    {
+
+                        try
+                        {
+
+                            if (site.Features[new Guid("e6df7606-1541-4bf1-a810-e8e9b11819e3")] != null)
+                            {
+                                System.Collections.Generic.Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(w, null);
+
+                                int bPlanner = 0;
+
+                                foreach (System.Collections.Generic.KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
+                                {
+                                    string id = (string)de.Key;
+                                    EPMLiveCore.PlannerDefinition p = (EPMLiveCore.PlannerDefinition)de.Value;
+
+                                    if (String.Equals(p.commandPrefix, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        bPlanner = 1;
+                                        break;
+                                    }
+                                    if (String.Equals(p.command, list.Title, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        b.PlannerV2CurPlanner = id;
+                                        bPlanner = 2;
+                                        break;
+                                    }
+                                }
+
+                                if (bPlanner == 1)
+                                {
+                                    b.PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"EPMLivePlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
+                                }
+
+                                else if (bPlanner == 2)
+                                {
+                                    b.PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"33\" Command=\"TaskPlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            });
+
+            return b;
+        }
+
+        public static GridGanttSettings GetGridGanttSettings(SPList list)
+        {
+            GridGanttSettings gSettings = (EPMLiveCore.GridGanttSettings)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GGS", "GridSettings-" + list.ID.ToString(), () =>
+            {
+                return new EPMLiveCore.GridGanttSettings(list);
+            }).Value;
+
+            return gSettings;
+        }
+
+        public static  RibbonProperties GetRibbonProps(SPList list)
+        {
+            RibbonProperties rp = new RibbonProperties();
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite site = new SPSite(SPContext.Current.Web.Url))
+                {
+                    using (SPWeb web = site.OpenWeb())
+                    {
+
+                        GridGanttSettings gSettings = GetGridGanttSettings(list);
+
+                        string pubPC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLivePublisherProjectCenter", false);
+                        string pubTC = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLivePublisherTaskCenter", false);
+                        bool foundmpp = false;
+
+                        try
+                        {
+                            SPDocumentLibrary lib = (SPDocumentLibrary)web.Lists["Project Schedules"];
+                            if (lib != null)
+                            {
+                                if (lib.ContentTypesEnabled)
+                                {
+                                    foreach (SPContentType ct in lib.ContentTypes)
+                                    {
+                                        string template = ct.DocumentTemplateUrl;
+                                        if (template.Substring(template.Length - 3, 3) == "mpp")
+                                        {
+                                            foundmpp = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    string template = lib.DocumentTemplateUrl;
+                                    if (template.Substring(template.Length - 3, 3) == "mpp")
+                                    {
+                                        foundmpp = true;
+                                    }
+                                }
+                            }
+                        }
+                        catch { }
+
+                        if (gSettings.BuildTeam && list.Fields.GetFieldByInternalName("AssignedTo") != null)
+                        {
+                            if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                            {
+                                rp.bBuildTeam = true;
+                            }
+                        }
+
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing"), out rp.bDisableProject);
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveDisablePlanners"), out rp.bDisablePlan);
+
+                        if (site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
+                        {
+                            ArrayList arr = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKLists").ToLower().Split(','));
+                            if (arr.Contains(list.Title.ToLower()))
+                            {
+                                string menus = "";
+                                menus = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_menus");
+                                if (menus == "")
+                                    menus = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKMenus");
+
+                                rp.aEPKButtons = new ArrayList(menus.Split('|'));
+
+                                string noactivex = "";
+                                noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_nonactivexs");
+                                if (noactivex == "")
+                                    noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "epknonactivexs");
+
+                                rp.aEPKActivex = new ArrayList(noactivex.Split('|'));
+                            }
+                        }
+                    }
+                }
+            });
+            return rp;
+
+        }
+
+
         public static ArrayList GetAssociatedLists(SPList list)
         {
             return (ArrayList)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GAI", "GridSettings-" + list.ID.ToString(), () =>

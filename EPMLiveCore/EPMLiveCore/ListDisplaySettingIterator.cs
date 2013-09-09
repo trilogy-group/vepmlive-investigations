@@ -88,59 +88,30 @@ namespace EPMLiveCore
                     "Ribbon.ListForm.Display.Manage.Controls._children");
 
 
-                    EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
+                    EPMLiveCore.GridGanttSettings gSettings = API.ListCommands.GetGridGanttSettings(List);
+
+                    ArrayList arrAssoc = API.ListCommands.GetAssociatedLists(list);
 
                     if (gSettings.AssociatedItems)
                     {
-                        //=======================Lists==================================
                         StringBuilder sbLists = new StringBuilder();
-                        SPUser user = SPContext.Current.Web.CurrentUser;
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+
+                        foreach (EPMLiveCore.API.AssociatedListInfo ali in arrAssoc)
                         {
-                            using (SPSite es = new SPSite(SPContext.Current.Web.Url))
-                            {
-                                using (SPWeb ew = es.OpenWeb())
-                                {
-                                    foreach (SPList cList in ew.Lists)
-                                    {
-                                        if (!cList.DoesUserHavePermissions(user, SPBasePermissions.ViewListItems))
-                                        {
-                                            continue;
-                                        }
-
-                                        foreach (SPField field in cList.Fields)
-                                        {
-                                            if (field.Type == SPFieldType.Lookup)
-                                            {
-                                                SPFieldLookup fl = (SPFieldLookup)field;
-
-                                                if (fl.LookupList.ToLower() == "{" + base.List.ID.ToString().ToLower() + "}")
-                                                {
-                                                    EPMLiveCore.GridGanttSettings gSets = new EPMLiveCore.GridGanttSettings(cList);
-
-                                                    if (gSets.AssociatedItems)
-                                                    {
-                                                        //sbLists.Append("<Button Id=\"Ribbon.ListForm.Display.Manage.LinkedItemsButton\" Sequence=\"20\" Command=\"");
-                                                        sbLists.Append("<Button Sequence=\"20\" Command=\"");
-                                                        sbLists.Append("Ribbon.ListForm.Display.Associated.LinkedItemsButton");
-                                                        sbLists.Append("\" Id=\"Ribbon.ListForm.Display.Associated.");
-                                                        sbLists.Append(HttpUtility.HtmlEncode(cList.Title));
-                                                        sbLists.Append(".");
-                                                        sbLists.Append(field.InternalName);
-                                                        sbLists.Append("\" LabelText=\"");
-                                                        sbLists.Append(HttpUtility.HtmlEncode(cList.Title));
-                                                        sbLists.Append("\" TemplateAlias=\"o1\" Image16by16=\"");
-                                                        sbLists.Append(cList.ImageUrl);
-                                                        sbLists.Append("\"/>");
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        });
+                            //sbLists.Append("<Button Id=\"Ribbon.ListForm.Display.Manage.LinkedItemsButton\" Sequence=\"20\" Command=\"");
+                            sbLists.Append("<Button Sequence=\"20\" Command=\"");
+                            sbLists.Append("Ribbon.ListForm.Display.Associated.LinkedItemsButton");
+                            sbLists.Append("\" Id=\"Ribbon.ListForm.Display.Associated.");
+                            sbLists.Append(HttpUtility.HtmlEncode(ali.Title));
+                            sbLists.Append(".");
+                            sbLists.Append(ali.LinkedField);
+                            sbLists.Append("\" LabelText=\"");
+                            sbLists.Append(HttpUtility.HtmlEncode(ali.Title));
+                            sbLists.Append("\" TemplateAlias=\"o1\" Image16by16=\"");
+                            sbLists.Append(ali.icon);
+                            sbLists.Append("\"/>");
+                        }
+                                                    
 
                         if (sbLists.Length > 0)
                         {
@@ -187,67 +158,26 @@ namespace EPMLiveCore
                         }
                     }
                     //======================Planner==================
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    
+                    API.ListPlannerProps p = API.ListCommands.GetListPlannerInfo(List);
+
+                    if (p.PlannerV2Menu != "")
                     {
+                        ribbonExtensions.LoadXml(p.PlannerV2Menu.Replace("EPMLivePlanner", "Ribbon.ListForm.Display.Manage.EPMLivePlanner").Replace("TaskPlanner", "Ribbon.ListForm.Display.Manage.TaskPlanner"));
 
-                        using (SPSite site = new SPSite(Web.Site.ID))
-                        {
-                            using (SPWeb w = site.OpenWeb(Web.ID))
-                            {
-                                System.Collections.Generic.Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(Web, ListItem);
-
-                                int bPlanner = 0;
-                                string PlannerV2Menu = "";
-                                string sPlannerID = "";
-                                foreach (System.Collections.Generic.KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
-                                {
-                                    string id = (string)de.Key;
-                                    EPMLiveCore.PlannerDefinition p = (EPMLiveCore.PlannerDefinition)de.Value;
-
-                                    if (String.Equals(p.command, "ListEPMLivePlanner", StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        bPlanner = 1;
-                                        break;
-                                    }
-                                    else if (String.Equals(p.command, "ListEPMLiveTaskPlanner", StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        bPlanner = 2;
-                                        break;
-                                    }
-                                }
-
-                                if (bPlanner == 1)
-                                {
-                                    PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"40\" Command=\"Ribbon.ListForm.Display.Manage.EPMLivePlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
-                                }
-
-                                else if (bPlanner == 2)
-                                {
-                                    PlannerV2Menu = "<Button Id=\"Ribbon.ListItem.EPMLive.Planner\" Sequence=\"40\" Command=\"Ribbon.ListForm.Display.Manage.TaskPlanner\" LabelText=\"Edit Plan\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/planner32.png\"/>";
-                                }
-
-                                if (PlannerV2Menu != "")
-                                {
-                                    ribbonExtensions.LoadXml(PlannerV2Menu);
-
-                                    ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
-                                    "Ribbon.ListForm.Display.Manage.Controls._children");
+                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
+                        "Ribbon.ListForm.Display.Manage.Controls._children");
 
 
-                                    //if(bPlanner == 1)
-                                    //{
-                                    //    EPMLiveWorkPlanner.WorkPlannerAPI.PlannerProps props = EPMLiveWorkPlanner.WorkPlannerAPI.getSettings(Web, sPlannerID);
-                                    //    bUseTeam = props.bUseTeam;
-                                    //    ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.BuildTeam\" Sequence=\"41\" Command=\"Ribbon.ListForm.Display.Manage.BuildTeam\" LabelText=\"Build Team\" TemplateAlias=\"o1\" Image32by32=\"/_layouts/epmlive/images/editteam32.gif\"/>");
+                        //if(bPlanner == 1)
+                        //{
+                        //    EPMLiveWorkPlanner.WorkPlannerAPI.PlannerProps props = EPMLiveWorkPlanner.WorkPlannerAPI.getSettings(Web, sPlannerID);
+                        //    bUseTeam = props.bUseTeam;
+                        //    ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.BuildTeam\" Sequence=\"41\" Command=\"Ribbon.ListForm.Display.Manage.BuildTeam\" LabelText=\"Build Team\" TemplateAlias=\"o1\" Image32by32=\"/_layouts/epmlive/images/editteam32.gif\"/>");
 
-                                    //    ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
-                                    //}
-                                }
-
-
-                            }
-                        }
-                    });
+                        //    ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
+                        //}
+                    }
 
                     //=====================Create Workspace===========
 
@@ -268,19 +198,20 @@ namespace EPMLiveCore
                         }
                     }
 
+                    EPMLiveCore.API.RibbonProperties rp = (EPMLiveCore.API.RibbonProperties)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GR-" + list.ParentWeb.CurrentUser.ID, "GridSettings-" + list.ID, () =>
+                    {
+                        return EPMLiveCore.API.ListCommands.GetRibbonProps(List);
+                    }).Value;
 
                     //=====================Build Team===========
-
+                    
                     try
                     {
-                        if (gSettings.BuildTeam && list.Fields.GetFieldByInternalName("AssignedTo") != null)
+                        if(rp.bBuildTeam)
                         {
-                            if (ListItem.DoesUserHavePermissions(SPBasePermissions.EditListItems))
-                            {
-                                ribbonExtensions = new XmlDocument();
-                                ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.BuildTeam\" Sequence=\"50\" Command=\"Ribbon.ListForm.Display.Manage.BuildTeam\" LabelText=\"Edit Team\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/buildteam.gif\"/>");
-                                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
-                            }
+                            ribbonExtensions = new XmlDocument();
+                            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.BuildTeam\" Sequence=\"50\" Command=\"Ribbon.ListForm.Display.Manage.BuildTeam\" LabelText=\"Edit Team\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/buildteam.gif\"/>");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
                         }
                     }
                     catch { }
@@ -302,73 +233,56 @@ namespace EPMLiveCore
 
                     //================EPK===================
 
-                    if (Web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
+                    
+
+                    if (rp.aEPKButtons.Contains("costs"))
                     {
-                        ArrayList arr = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKLists").ToLower().Split(','));
-                        if (arr.Contains(list.Title.ToLower()))
+                        ribbonExtensions = new XmlDocument();
+                        ribbonExtensions.LoadXml(@"<Button
+                    Id=""Ribbon.ListItem.Manage.EPKCosts""
+                    Sequence=""101""
+                    Command=""Ribbon.ListForm.Display.Manage.EPKCost""
+                    Image32by32=""/_layouts/epmlive/images/editcosts.png""
+                    LabelText=""Edit Costs""
+                    TemplateAlias=""o1""
+                    />");
+
+                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
+                    }
+
+                    if (rp.aEPKButtons.Contains("resplan"))
+                    {
+                        if (rp.aEPKActivex.Contains("resplan"))
                         {
-                            string menus = "";
-                            menus = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_menus");
-                            if (menus == "")
-                                menus = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKMenus");
+                            ribbonExtensions = new XmlDocument();
+                            ribbonExtensions.LoadXml(@"<Button
+                        Id=""Ribbon.ListItem.Manage.EPKResourcePlanner""
+                        Sequence=""103""
+                        Command=""Ribbon.ListForm.Display.Manage.EPKRP""
+                        Image32by32=""/_layouts/1033/images/formatmap32x32.png"" Image32by32Top=""-352"" Image32by32Left=""-288""
+                        LabelText=""Edit Resource Plan""
+                        TemplateAlias=""o1""
+                        />");
 
-                            ArrayList arrButtons = new ArrayList(menus.Split('|'));
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
+                        }
+                        else
+                        {
+                            ribbonExtensions = new XmlDocument();
+                            ribbonExtensions.LoadXml(@"<Button
+                        Id=""Ribbon.ListItem.Manage.EPKResourcePlanner""
+                        Sequence=""103""
+                        Command=""Ribbon.ListForm.Display.Manage.EPKRPM""
+                        Image16by16=""/_layouts/1033/images/formatmap16x16.png"" Image16by16Top=""-64"" Image16by16Left=""-128""
+                        LabelText=""Resource Planner""
+                        TemplateAlias=""o2""
+                        />");
 
-                            string noactivex = "";
-                            noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_nonactivexs");
-                            if (noactivex == "")
-                                noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "epknonactivexs");
-
-                            ArrayList arrActivex = new ArrayList(menus.Split('|'));
-
-                            if (arrButtons.Contains("costs"))
-                            {
-                                ribbonExtensions = new XmlDocument();
-                                ribbonExtensions.LoadXml(@"<Button
-                            Id=""Ribbon.ListItem.Manage.EPKCosts""
-                            Sequence=""101""
-                            Command=""Ribbon.ListForm.Display.Manage.EPKCost""
-                            Image32by32=""/_layouts/epmlive/images/editcosts.png""
-                            LabelText=""Edit Costs""
-                            TemplateAlias=""o1""
-                            />");
-
-                                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
-                            }
-
-                            if (arrButtons.Contains("resplan"))
-                            {
-                                if (arrActivex.Contains("resplan"))
-                                {
-                                    ribbonExtensions = new XmlDocument();
-                                    ribbonExtensions.LoadXml(@"<Button
-                                Id=""Ribbon.ListItem.Manage.EPKResourcePlanner""
-                                Sequence=""103""
-                                Command=""Ribbon.ListForm.Display.Manage.EPKRP""
-                                Image32by32=""/_layouts/1033/images/formatmap32x32.png"" Image32by32Top=""-352"" Image32by32Left=""-288""
-                                LabelText=""Edit Resource Plan""
-                                TemplateAlias=""o1""
-                                />");
-
-                                    ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
-                                }
-                                else
-                                {
-                                    ribbonExtensions = new XmlDocument();
-                                    ribbonExtensions.LoadXml(@"<Button
-                                Id=""Ribbon.ListItem.Manage.EPKResourcePlanner""
-                                Sequence=""103""
-                                Command=""Ribbon.ListForm.Display.Manage.EPKRPM""
-                                Image16by16=""/_layouts/1033/images/formatmap16x16.png"" Image16by16Top=""-64"" Image16by16Left=""-128""
-                                LabelText=""Resource Planner""
-                                TemplateAlias=""o2""
-                                />");
-
-                                    ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
-                                }
-                            }
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
                         }
                     }
+                
+
                     //===============================================
 
                     var commands = new List<IRibbonCommand>();
