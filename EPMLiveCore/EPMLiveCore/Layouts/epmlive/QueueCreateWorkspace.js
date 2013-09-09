@@ -14,7 +14,7 @@ function registerCreateWorkspace2Script() {
             update: function (element, valueAccessor) {
                 // On update, fade in/out
                 var shouldDisplay = valueAccessor();
-                shouldDisplay ? $(element).fadeIn() : $(element).fadeOut();
+                shouldDisplay ? $(element).fadeIn(1000) : $(element).fadeOut();
             }
         };
         
@@ -22,6 +22,7 @@ function registerCreateWorkspace2Script() {
         function CreateWorkspaceViewModel() {
             // DATA - UI related
             var self = this;
+            self.notifyId = ko.observable();
             self.isStandAlone = ko.observable(w.isStandAlone);
             self.createDefault = ko.observable(w.createDefault);
             self.onlineAvail = ko.observable(w.onlineAvail);
@@ -298,7 +299,7 @@ function registerCreateWorkspace2Script() {
                     alert('You must select a template first');
                     return;
                 }
-                alert("We'll notify you when your workspace has been provisioned!");
+
                 $.ajax({
                     type: "POST",
                     url: self.workEngineSvcUrl,
@@ -307,14 +308,12 @@ function registerCreateWorkspace2Script() {
                     dataType: 'json',
                     success: function (result) {
                         //var r = result;
-                        parent.SP.UI.ModalDialog.commonModalDialogClose('', '');
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
                         alert(errorThrown);
                     }
                 });
-
-                
             };
 
             self.gotoTemplate = function(data, event) {
@@ -438,7 +437,14 @@ function registerCreateWorkspace2Script() {
                     $('#onlineTemplates').parent().hide();
                     self.loadDownloadedApps();
                 }
+                
+                if ($('#contentBox').length > 0) {
+                    $('#contentBox').css('margin-left', '10px');
+                }
 
+                if (self.showInProgress() === 'true') {
+                    $('#divProgress').show();
+                }
             };
 
             self.pageInit();

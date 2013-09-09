@@ -35,19 +35,19 @@
     </script>
     <div id="OuterContainer">
         <div class="modal-body">
-            <div style="height:200px;width:300px;" data-bind="visible: showInProgress() === 'true'">
+            <div id="divProgress" style="height:200px;width:300px;display:none;">
                 <p>
                     Workspace is being created, please wait.
                 </p>
             </div>
             <%--top section--%>
 	        <div style="border-bottom:1px solid #D6D6D6;padding-bottom: 10px;" data-bind="visible: isStandAlone() === 'true'">    
-	            <label style="font-family:Open Sans;font-weight:400;padding-right:10px;">
+	            <label style="font-family:Open Sans Regular;font-size:15px;padding-right:10px;">
                     What is the title of this Workspace?
 	            </label>  
 	            <input type="textbox" class="titleInput" data-bind="value: workspaceTitle, valueUpdate: 'afterkeydown'" />
 	            <br><br>
-	            <label style="font-family:Open Sans;font-weight:400;">
+	            <label style="font-family:Open Sans Regular;font-size:15px;">
                     Permissions
 	            </label> 
 	            <br> 
