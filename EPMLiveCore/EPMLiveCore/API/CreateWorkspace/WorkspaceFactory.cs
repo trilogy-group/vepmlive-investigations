@@ -21,6 +21,32 @@ namespace EPMLiveCore.API
     /// </summary>
     public abstract class WorkspaceFactory
     {
+		#region Constructors (1) 
+
+        protected WorkspaceFactory(string data)
+        {
+            // param "data" should be
+            // in XML format like below
+            // ===========================
+            //<Data>
+            //<Param key="IsStandAlone"></Param>
+            //<Param key="SiteTitle"></Param>
+            //<Param key="SiteURL"></Param>
+            //<Param key="TemplateId"></Param>
+            //<Param key="UniquePermission"></Param>
+            //<Param key="ContextWebUrl"></Param>
+            //<Param key="ListId"></Param>
+            //<Param key="ItemId"></Param>
+            //</Data>
+
+            _createParams = data;
+            _xmlDataMgr = new XMLDataManager(data);
+        }
+
+		#endregion Constructors 
+
+
+
         #region base class properties and fields
 
         protected const string temp_gal_title = "Template Gallery";
@@ -181,26 +207,6 @@ namespace EPMLiveCore.API
             }
         }
         #endregion
-
-        protected WorkspaceFactory(string data)
-        {
-            // param "data" should be
-            // in XML format like below
-            // ===========================
-            //<Data>
-            //<Param key="IsStandAlone"></Param>
-            //<Param key="SiteTitle"></Param>
-            //<Param key="SiteURL"></Param>
-            //<Param key="TemplateId"></Param>
-            //<Param key="UniquePermission"></Param>
-            //<Param key="ContextWebUrl"></Param>
-            //<Param key="ListId"></Param>
-            //<Param key="ItemId"></Param>
-            //</Data>
-
-            _createParams = data;
-            _xmlDataMgr = new XMLDataManager(data);
-        }
 
         #region Abstract Methods To Be Overridden
         /// <summary>
@@ -778,15 +784,11 @@ namespace EPMLiveCore.API
             {
                 WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId, _createdWebId, _createdWebUrl, _createdWebTitle);
             }
-
-
             if (parentWeb != null && !parentWeb.ID.Equals(web.ID))
             {
                 parentWeb.Dispose();
             }
         }
-
-
         public void BuildWebInfoXml()
         {
             _xmlResult.Append("<WebInfo>");
@@ -794,7 +796,6 @@ namespace EPMLiveCore.API
             _xmlResult.Append("<ServerRelativeUrl>" + _createdWebUrl + "</ServerRelativeUrl>");
             _xmlResult.Append("</WebInfo>");
         }
-
         /// <summary>
         /// Notifies user that workspace has been created
         /// </summary>
@@ -812,19 +813,16 @@ namespace EPMLiveCore.API
                 APIEmail.QueueItemMessage(6, true, BuildEmailData(_createdWebUrl, _createdWebTitle), new string[] { originalUser.ID.ToString() }, null, false, true, cWeb, originalUser, true);
             }
         }
-
         public void AddToFavorites()
         {
             // TODO: add ws info to favorites table in db
             WorkspaceData.AddToFRF(SiteId, _createdWebId, _createdWebTitle, _createdWebUrl, CreatorId, 4);
         }
-
         public void AddPermission()
         {
             // TODO: add ws info to favorites table in db
             WorkspaceData.AddWsPermission(SiteId, _createdWebId);
         }
-
         private Hashtable BuildEmailData(string url, string wsName)
         {
             //{ItemUrl}
@@ -842,19 +840,29 @@ namespace EPMLiveCore.API
         {
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (SPSite eSite = new SPSite(SiteId))
+                using (var s = new SPSite(SiteId))
                 {
-                    using (SPWeb eWeb = eSite.OpenWeb(_createdWebId))
+                    using (var w = s.OpenWeb(_createdWebId))
                     {
                         // stamp info on new site
-                        eWeb.AllProperties["ParentItem"] = WebId.ToString() + "^^" + AttachedItemListId.ToString() + "^^" + AttachedItemId.ToString() + "^^" + AttachedItemTitle;
-                        eWeb.Update();
+                        w.AllProperties["ParentItem"] = WebId.ToString() + "^^" + AttachedItemListId.ToString() + "^^" + AttachedItemId.ToString() + "^^" + AttachedItemTitle;
+                        
+                        // add deleted event
+                        string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                        string className = "EPMLiveCore.WorkspaceEvents";
+                        var evts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.ItemDeleted});
+                        foreach (SPEventReceiverDefinition evt in evts)
+                        {
+                            evt.Delete();
+                        }
+                        w.EventReceivers.Add(SPEventReceiverType.ItemDeleted, assemblyName, className);
+                        List<SPEventReceiverDefinition> newEvts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.ItemDeleted });
+                       
+                        w.Update();
                     }
                 }
             });
         }
-
-
         #endregion
     }
 
@@ -969,8 +977,16 @@ namespace EPMLiveCore.API
     /// </summary>
     public class DownloadedTempWorkspaceFactory : WorkspaceFactory
     {
+		#region Constructors (1) 
+
         public DownloadedTempWorkspaceFactory(string data)
             : base(data) { }
+
+		#endregion Constructors 
+
+		#region Methods (3) 
+
+		// Public Methods (1) 
 
         public override ICreatedWorkspaceInfo CreateWorkspace()
         {
@@ -1007,6 +1023,7 @@ namespace EPMLiveCore.API
 
             return new DownloadedWorkspaceInfo(_xmlResult.ToString());
         }
+		// Private Methods (2) 
 
         /// <summary>
         /// Get template name from the splistitem
@@ -1082,6 +1099,8 @@ namespace EPMLiveCore.API
 
             return success;
         }
+
+		#endregion Methods 
     }
 
     /// <summary>
@@ -1089,31 +1108,49 @@ namespace EPMLiveCore.API
     /// </summary>
     public interface ICreatedWorkspaceInfo
     {
-    }
+
+}
 
     public abstract class CreatedWorkspaceInfo
     {
+		#region Fields (1) 
+
         protected string sXml = string.Empty;
+
+		#endregion Fields 
+
+		#region Constructors (1) 
+
         public CreatedWorkspaceInfo(string data)
         {
             sXml = data;
         }
+
+		#endregion Constructors 
     }
 
     public class OnlineWorkspaceInfo : CreatedWorkspaceInfo, ICreatedWorkspaceInfo
     {
+		#region Constructors (1) 
+
         public OnlineWorkspaceInfo(string data)
             : base(data)
         {
         }
+
+		#endregion Constructors 
     }
 
     public class DownloadedWorkspaceInfo : CreatedWorkspaceInfo, ICreatedWorkspaceInfo
     {
+		#region Constructors (1) 
+
         public DownloadedWorkspaceInfo(string data)
             : base(data)
         {
         }
+
+		#endregion Constructors 
     }
 
 }
