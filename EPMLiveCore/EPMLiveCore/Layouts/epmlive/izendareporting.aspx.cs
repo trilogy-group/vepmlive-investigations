@@ -44,7 +44,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (rn != "")
                     url += "&rn=" + rn;
 
-                Response.Redirect(url);
+                Response.Redirect(url + "&InFrame=1");
             }
             catch (Exception ex)
             {
