@@ -909,6 +909,8 @@
                         if (providerName === 'Workspaces') {
                             var wsTree = window.epmLiveNavigation.workspaceTree();
 
+                            wsTree.trackChanges();
+
                             var expandNode = function(webId) {
                                 var node = wsTree.findNodeByValue(webId);
 
@@ -923,7 +925,16 @@
                                 }
                             };
 
-                            expandNode(window.epmLiveNavigation.currentWebId);
+                            var wId = window.epmLiveNavigation.currentWebId;
+                            
+                            var cNode = wsTree.findNodeByValue(wId);
+                            if (cNode.get_parent() !== wsTree) {
+                                expandNode(wId);
+                            } else {
+                                cNode.set_expanded(true);
+                            }
+                            
+                            wsTree.commitChanges();
                         }
 
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);
