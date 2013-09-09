@@ -188,3 +188,7 @@ ol {
     padding-top:85px;
     text-align:center;
 }
+
+#contentBox {
+    margin-left: 10px !important;
+}
