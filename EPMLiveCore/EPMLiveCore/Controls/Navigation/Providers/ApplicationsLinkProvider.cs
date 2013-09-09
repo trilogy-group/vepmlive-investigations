@@ -43,13 +43,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     {
                         Title = "Create New",
                         Url = "Header"
-                    },
-                    new NavLink
-                    {
-                        Title = "Create App",
-                        Url = string.Format(@"http://market.epmlive.com/?source={0}", Url),
-                        External = true,
-                        CssClass = "epm-nav-button"
                     }
                 };
 

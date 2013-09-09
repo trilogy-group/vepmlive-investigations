@@ -48,6 +48,12 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         string.Format("javascript:OpenCreateWebPageDialog('{0}/_layouts/15/createwebpage.aspx');",
                             RelativeUrl)
                 }),
+                new Tuple<SPBasePermissions?, NavLink>(SPBasePermissions.ManageWeb, new NavLink
+                {
+                    Title = "Add an app",
+                    Url = string.Format("http://market.epmlive.com/?source={0}", Url),
+                    External = true
+                }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
                 {
                     Title = "Site contents",

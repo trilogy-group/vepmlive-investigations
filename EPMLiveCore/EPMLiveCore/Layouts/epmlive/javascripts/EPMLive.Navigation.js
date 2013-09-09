@@ -300,12 +300,14 @@
                         var html = '<li id="' + link.id + '" class="' + cssClass + '" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"' + target + '><span>' + link.title + '</span></a></li>';
 
                         categories[category].$el.append(html);
+                        
+                        var $link = $('#' + link.id);
 
                         if (link.visible) {
-                            $('#' + link.id).show();
+                            $link.show();
                         }
 
-                        categories[category].$el.find('a').click(function () {
+                        $link.find('a').click(function () {
                             var $a = $(this);
                             var $parent = $a.parent();
                             
@@ -938,7 +940,10 @@
                             
                             wsTree.commitChanges();
                         }
-
+                        else if (providerName === 'Applications') {
+                            $($('#epm-nav-sub-new-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important;');
+                        }
+                        
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);
 
                         if (providerName !== 'Settings') {

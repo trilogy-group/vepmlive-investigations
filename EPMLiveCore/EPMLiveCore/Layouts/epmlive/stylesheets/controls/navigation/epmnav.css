@@ -24,7 +24,8 @@
 .ms-dialog #epm-nav {
   display: none;
 }
-.ms-dialog .epm-nav-pinned {
+.ms-dialog .epm-nav-pinned,
+.ms-dialog .epm-nav-unpinned {
   margin-left: auto;
 }
 #epm-nav .slimScrollDiv .slimScrollBar {
@@ -321,6 +322,8 @@
 }
 .epm-nav-sub li.epm-nav-button a {
   font-size: 0.8em !important;
+  left: -1px;
+  position: relative;
   width: 140px !important;
 }
 .epm-nav-sub li.epm-nav-button a:active {

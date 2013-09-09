@@ -59,14 +59,24 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     Title = "Workspaces",
                     Url = "Header"
-                },
-                new NavLink
-                {
-                    Title = "New Workspace",
-                    Url = string.Format(CREATE_WORKSPACE_URL, RelativeUrl),
-                    CssClass = "epm-nav-button"
                 }
             };
+
+            using (var spSite = new SPSite(SiteId))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(WebId))
+                {
+                    if (spWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs))
+                    {
+                        links.Add(new NavLink
+                        {
+                            Title = "New Workspace",
+                            Url = string.Format(CREATE_WORKSPACE_URL, RelativeUrl),
+                            CssClass = "epm-nav-button"
+                        });
+                    }
+                }
+            }
 
             var fLinks = (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
             {
