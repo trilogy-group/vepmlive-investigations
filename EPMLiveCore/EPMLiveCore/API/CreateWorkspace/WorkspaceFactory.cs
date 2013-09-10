@@ -850,13 +850,12 @@ namespace EPMLiveCore.API
                         // add deleted event
                         string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                         string className = "EPMLiveCore.WorkspaceEvents";
-                        var evts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.ItemDeleted});
+                        var evts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.WebDeleted});
                         foreach (SPEventReceiverDefinition evt in evts)
                         {
                             evt.Delete();
                         }
-                        w.EventReceivers.Add(SPEventReceiverType.ItemDeleted, assemblyName, className);
-                        List<SPEventReceiverDefinition> newEvts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.ItemDeleted });
+                        w.EventReceivers.Add(SPEventReceiverType.WebDeleted, assemblyName, className);
                        
                         w.Update();
                     }
