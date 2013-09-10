@@ -111,6 +111,12 @@
             text-align: center;
             height: @top-nav-li-height;
 
+            &:hover {
+                span {
+                    color: #555555;
+                }
+            }
+
             span {
                 color: #7C7C7C;
                 font-size: @icon-font;
@@ -147,11 +153,11 @@
         }
     }
 
-    ul.bottom {
-        position: absolute;
-        bottom: @top-nav-width + 25;
-        width: 100%;
-    }
+        ul.bottom {
+            position: absolute;
+            bottom: @top-nav-width + 25;
+            width: 100%;
+        }
 }
 
 #epm-nav-sub {
@@ -597,9 +603,9 @@
 
         div.rtSelected {
             a {
-                background: @hover-color !important;
+                background: #7C7C7C !important;
                 border: medium none;
-                color: @link-color;
+                color: #FFFFFF;
                 left: 1px;
                 position: relative;
             }
