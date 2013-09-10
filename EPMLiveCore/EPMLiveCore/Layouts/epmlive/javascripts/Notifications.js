@@ -95,34 +95,37 @@ function initializeEPMLiveNotifications() {
 
                                 for (var no in nf) {
                                     if (nf.hasOwnProperty(no)) {
-                                        var key = no.replace(/@/, '').toLowerCase();
-                                        var value = nf[no];
+                                        try {
+                                            var key = no.replace(/@/, '').toLowerCase();
+                                            var value = nf[no];
 
-                                        if (key !== 'createdatdatestring') {
-                                            if (!$$.isGuid(value)) {
-                                                if (value['#cdata']) {
-                                                    value = value['#cdata'];
-                                                } else if (value === 'true') {
-                                                    value = true;
-                                                } else if (value === 'false') {
-                                                    value = false;
-                                                } else {
-                                                    if (value.indexOf(' ') === -1) {
-                                                        var number = parseInt(value);
-                                                        if (!isNaN(number)) {
-                                                            value = number;
-                                                        }
+                                            if (key !== 'createdatdatestring') {
+                                                if (!$$.isGuid(value)) {
+                                                    if (value['#cdata']) {
+                                                        value = value['#cdata'];
+                                                    } else if (value === 'true') {
+                                                        value = true;
+                                                    } else if (value === 'false') {
+                                                        value = false;
                                                     } else {
-                                                        var date = Date.parse(value);
-                                                        if (!isNaN(date)) {
-                                                            value = new Date(value);
+                                                        if (value.indexOf(' ') === -1) {
+                                                            var number = parseInt(value);
+                                                            if (!isNaN(number)) {
+                                                                value = number;
+                                                            }
+                                                        } else {
+                                                            var date = Date.parse(value);
+                                                            if (!isNaN(date)) {
+                                                                value = new Date(value);
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
 
-                                        notification[key] = ko.observable(value);
+                                            notification[key] = ko.observable(value);
+                                        } catch(ex) {
+                                        } 
                                     }
                                 }
 

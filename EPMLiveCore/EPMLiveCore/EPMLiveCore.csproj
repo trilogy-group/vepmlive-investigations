@@ -1549,7 +1549,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
+      <DependentUpon>Notifications.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\Project1.mpp" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.less" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.eot" />
