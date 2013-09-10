@@ -82,21 +82,29 @@ BEGIN
 		if @pagesize <> 0 
 		begin
 
+			if @page = 0
+			begin
+				set @page = 1
+			end
+
 			if @orderby = '''' begin
 				set @orderby = ''itemid''
 			end
 
-			declare @topval int;
-			set @topval = (@page + 1) * @pagesize
+			declare @topval int
+			set @topval = @page * @pagesize
 
-			set @sql = ''WITH MyCTE AS (
+			set @sql = ''
+			select * INTO #tmp '' + @sql + '';
+			
+			WITH MyCTE AS (
 				SELECT top '' + convert(varchar(15),@topval) + '' ROW_NUMBER () OVER  (order by + '' + @orderby + '') as RowID,*
-				'' + @sql + ''
+				from #tmp
 			)
 			SELECT *
 			FROM MyCTE
-			WHERE RowID BETWEEN '' + convert(varchar(15),@page * @pagesize) + '' and '' + convert(varchar(15),@topval )
-			
+			WHERE RowID BETWEEN '' + convert(varchar(15),(@page - 1) * @pagesize + 1) + '' and '' + convert(varchar(15),@topval) 
+			+ ''select count(*) from #tmp''
 		end
 		else
 		begin
@@ -112,5 +120,6 @@ BEGIN
 
 	print @sql
 
-END
+ENd
+
 ')
