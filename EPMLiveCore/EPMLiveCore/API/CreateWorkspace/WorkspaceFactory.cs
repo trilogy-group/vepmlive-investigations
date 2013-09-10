@@ -864,9 +864,26 @@ namespace EPMLiveCore.API
         }
         #endregion
 
-        protected void ClearCache(Guid siteId, Guid webId,string username)
+        protected void ClearCache()
         {
-            new WorkspaceLinkProvider(siteId, webId, username).ClearCache();
+            try
+            {
+                try
+                {
+                    using (var spSite = new SPSite(SiteId))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb(WebId))
+                        {
+                            new WorkspaceLinkProvider(SiteId, WebId, spWeb.Users.GetByID(CreatorId).LoginName).ClearCache();
+                        }
+                    }
+                }
+                catch
+                {
+                    CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                }
+            }
+            catch { }
         }
     }
 
@@ -915,7 +932,7 @@ namespace EPMLiveCore.API
                     }
                 });
 
-                ClearCache(SiteId, WebId, web.CurrentUser.LoginName);
+                ClearCache();
             }
             catch (Exception e)
             {
@@ -1020,7 +1037,7 @@ namespace EPMLiveCore.API
                     }
                 });
 
-                ClearCache(SiteId, WebId, web.CurrentUser.LoginName);
+                ClearCache();
             }
             catch (Exception e)
             {
