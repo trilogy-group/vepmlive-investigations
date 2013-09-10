@@ -478,6 +478,8 @@
 }
 .epm-nav-sub .RadTreeView {
   margin-left: 10px;
+  white-space: nowrap;
+  display: inline-block;
 }
 .epm-nav-sub .RadTreeView a {
   color: #666666;

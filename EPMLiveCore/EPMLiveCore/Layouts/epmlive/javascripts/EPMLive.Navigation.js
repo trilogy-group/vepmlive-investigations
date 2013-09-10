@@ -720,6 +720,30 @@
                     var unhoverNode = window.TreeView_UnhoverNode;
                     var toggleNode = window.TreeView_ToggleNode;
 
+                    var snWidth = $sn.width();
+
+                    var $wsMenu = $('#epm-nav-sub-workspaces');
+
+                    var expandWorkspacesMenu = function () {
+                        if ($wsMenu.is(':visible')) {
+                            var wsWidth = $('#' + window.epmLiveNavigation.workspaceTree()._element.id).width();
+                            
+                            if (snWidth < wsWidth) {
+                                var newWidth = wsWidth + 20;
+
+                                $sn.animate({ width: newWidth }, 300);
+                                $sn.parent().animate({ width: newWidth }, 300);
+                            }
+                        }
+                    };
+
+                    var collapseWorkspacesMenu = function() {
+                        if ($wsMenu.is(':visible')) {
+                            $sn.animate({ width: snWidth }, 300);
+                            $sn.parent().animate({ width: snWidth }, 300);
+                        }
+                    };
+
                     window.TreeView_HoverNode = function (data, el) {
                         var node = $(el);
 
@@ -811,8 +835,10 @@
 
                     $sn.hover(function () {
                         $pin.show();
+                        expandWorkspacesMenu();
                     }, function () {
                         $pin.hide();
+                        collapseWorkspacesMenu();
                     });
 
                     try {

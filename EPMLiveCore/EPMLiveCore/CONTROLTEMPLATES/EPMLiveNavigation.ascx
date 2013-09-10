@@ -116,7 +116,8 @@
                    else if (node.Id.ToLower().Equals("workspaces"))
                    { %>
                     <telerik:RadTreeView ID="WorkspacesNavTree" runat="server" 
-                        EnableTheming="False" EnableViewState="False" />                    
+                        EnableTheming="False"  
+                        EnableViewState="False" />                    
                 <% } %> 
             </div>       
         <% } %>
