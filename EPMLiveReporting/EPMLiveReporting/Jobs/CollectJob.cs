@@ -92,6 +92,7 @@ namespace EPMLiveReportsAdmin.Jobs
             bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
             EPMLiveReportsAdmin.EPMData epmdata = new EPMLiveReportsAdmin.EPMData(site.ID);
 
+
             #region Process security
 
             try
@@ -218,77 +219,78 @@ namespace EPMLiveReportsAdmin.Jobs
             }
 
             #endregion Process PFE Data
-            
+
+            #region Database checks
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {   
+                CheckReqSP(epmdata.GetClientReportingConnection);
+                CheckSchema(epmdata.GetClientReportingConnection);
+            });
+            #endregion
+
+            #region REMOVE DUPLICATES/ORPHANED DATA RECORDS
             try
             {
-            #region REMOVE DUPLICATES/ORPHANED DATA RECORDS
-            DataTable listNames = new DataTable();
-            DataTable listIds = new DataTable();
-            listIds.Columns.Add(new DataColumn("Id", typeof(Guid)));
-            DataTable listIdsTest = new DataTable();
-            SqlCommand cmd;
-            string errMsg = string.Empty;
-            bool hasError = false;
-            string sDelSql = string.Empty;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                SqlConnection rptCn = epmdata.GetClientReportingConnection;
-                SqlConnection epmliveCn = epmdata.GetEPMLiveConnection;
-                if (rptCn.State != ConnectionState.Open) rptCn.Open();
-                if (epmliveCn.State != ConnectionState.Open) epmliveCn.Open();
-
-                #region Ensure table ReportListIds existence
-                cmd = new SqlCommand("SELECT [ListName], [TableName] FROM RPTList");
-                cmd.Connection = rptCn;
-                SqlDataAdapter adapter = new SqlDataAdapter();
-                adapter.SelectCommand = cmd;
-                adapter.Fill(listNames);
-
-                cmd = new SqlCommand("IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[ReportListIds]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +
-                                        "DROP TABLE [dbo].[ReportListIds]; " +
-                                        "CREATE TABLE [dbo].[ReportListIds] ( Id uniqueidentifier )");
-                cmd.Connection = rptCn;
-                cmd.ExecuteNonQuery();
-                #endregion
-
-                #region Get ListIds and Bulk Insert into REPORTING DB
-                using (SPSite es = new SPSite(site.ID))
+                DataTable listNames = new DataTable();
+                DataTable listIds = new DataTable();
+                listIds.Columns.Add(new DataColumn("Id", typeof(Guid)));
+                DataTable listIdsTest = new DataTable();
+                SqlCommand cmd;
+                string errMsg = string.Empty;
+                bool hasError = false;
+                string sDelSql = string.Empty;
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    foreach (SPWeb w in es.AllWebs)
+                    cmd = new SqlCommand("SELECT [ListName], [TableName] FROM RPTList");
+                    cmd.Connection = epmdata.GetClientReportingConnection;
+                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    adapter.SelectCommand = cmd;
+                    adapter.Fill(listNames);
+
+                    #region Get ListIds and Bulk Insert into REPORTING DB
+                    using (SPSite es = new SPSite(site.ID))
                     {
-                        // IGNOTE SPDispose 130, Web is being disposed
-                        try
+                        foreach (SPWeb w in es.AllWebs)
                         {
-                            if (listNames.Rows.Count > 0)
+                            // IGNOTE SPDispose 130, Web is being disposed
+                            try
                             {
-                                SPList tempList = null;
-                                string sName = string.Empty;
-
-                                foreach (DataRow r in listNames.Rows)
+                                if (listNames.Rows.Count > 0)
                                 {
-                                    try
-                                    {
-                                        sName = r["ListName"].ToString();
-                                    }
-                                    catch { }
+                                    SPList tempList = null;
+                                    string sName = string.Empty;
 
-                                    if (!string.IsNullOrEmpty(sName))
+                                    foreach (DataRow r in listNames.Rows)
                                     {
-                                        tempList = w.Lists.TryGetList(sName);
-                                        if (tempList != null)
+                                        try
                                         {
-                                            DataRow dr = listIds.Rows.Add();
-                                            dr["Id"] = tempList.ID;
+                                            sName = r["ListName"].ToString();
+                                        }
+                                        catch { }
+
+                                        if (!string.IsNullOrEmpty(sName))
+                                        {
+                                            tempList = w.Lists.TryGetList(sName);
+                                            if (tempList != null)
+                                            {
+                                                DataRow dr = listIds.Rows.Add();
+                                                dr["Id"] = tempList.ID;
+                                            }
                                         }
                                     }
-                                }
 
+                                }
                             }
-                        }
-                        catch (Exception e1)
-                        {
-                            hasError = true;
-                            errMsg += e1.Message;
+                            catch (Exception e1)
+                            {
+                                hasError = true;
+                                errMsg += e1.Message;
+
+                                if (w != null)
+                                {
+                                    w.Dispose();
+                                }
+                            }
 
                             if (w != null)
                             {
@@ -296,106 +298,98 @@ namespace EPMLiveReportsAdmin.Jobs
                             }
                         }
 
-                        if (w != null)
+                        if (listIds.Rows.Count > 0)
                         {
-                            w.Dispose();
-                        }
-                    }
-
-                    if (listIds.Rows.Count > 0)
-                    {
-                        SqlTransaction tx = rptCn.BeginTransaction();
-                        using (var sbc = new SqlBulkCopy(rptCn, new SqlBulkCopyOptions(), tx))
-                        {
-                            try
+                            SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
+                            using (var sbc = new SqlBulkCopy(epmdata.GetClientReportingConnection, new SqlBulkCopyOptions(), tx))
                             {
-                                sbc.DestinationTableName = "ReportListIds";
-                                sbc.ColumnMappings.Add("Id", "Id");
-                                sbc.WriteToServer(listIds);
-                                sbc.Close();
-                                tx.Commit();
-                                tx.Dispose();
-                            }
-                            catch (Exception e2)
-                            {
-                                hasError = true;
-                                errMsg += e2.Message;
+                                try
+                                {
+                                    sbc.DestinationTableName = "ReportListIds";
+                                    sbc.ColumnMappings.Add("Id", "Id");
+                                    sbc.WriteToServer(listIds);
+                                    sbc.Close();
+                                    tx.Commit();
+                                    tx.Dispose();
+                                }
+                                catch (Exception e2)
+                                {
+                                    hasError = true;
+                                    errMsg += e2.Message;
+                                }
                             }
                         }
                     }
-                }
-                #endregion
+                    #endregion
 
-                #region Build SQL Delete Statement and execute
-                cmd = new SqlCommand("SELECT [Id] FROM ReportListIds");
-                cmd.Connection = rptCn;
-                SqlDataAdapter ad = new SqlDataAdapter();
-                ad.SelectCommand = cmd;
-                ad.Fill(listIdsTest);
+                    #region Build SQL Delete Statement and execute
+                    cmd = new SqlCommand("SELECT [Id] FROM ReportListIds");
+                    cmd.Connection = epmdata.GetClientReportingConnection;
+                    SqlDataAdapter ad = new SqlDataAdapter();
+                    ad.SelectCommand = cmd;
+                    ad.Fill(listIdsTest);
 
-                if (listIdsTest.Rows.Count == 0)
-                {
-                    epmdata.LogStatus("",
-                                    "Data cleaning in Refresh process.",
-                                    "Cleaning has been cancelled.",
-                                    "No ids in ReportListIds table.",
-                                    0, 1, "");
-                    //no report ids found, 
-                    //something might be wrong so we cancel
-                    return;
-                }
-
-                foreach (DataRow r in listNames.Rows)
-                {
-                    string tableName = string.Empty;
-                    try
-                    {
-                        tableName = r["TableName"].ToString();
-                    }
-                    catch { }
-
-                    if (!string.IsNullOrEmpty(tableName))
-                    {
-                        sDelSql += "DELETE FROM " + tableName + " WHERE [ListID] NOT IN (SELECT Id FROM ReportListIds) ";
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(sDelSql) && !hasError)
-                {
-                    try
-                    {
-                        cmd = new SqlCommand(sDelSql);
-                        cmd.Connection = rptCn;
-                        cmd.ExecuteNonQuery();
-                        epmdata.LogStatus("",
-                                    "Data cleaning in Refresh process.",
-                                    "Success.",
-                                    "Success.",
-                                    0, 1, "");
-                    }
-                    catch
+                    if (listIdsTest.Rows.Count == 0)
                     {
                         epmdata.LogStatus("",
-                                    "Data cleaning in Refresh process.",
-                                    "Error cleaning.",
-                                    errMsg,
-                                    0, 1, "");
+                                        "Data cleaning in Refresh process.",
+                                        "Cleaning has been cancelled.",
+                                        "No ids in ReportListIds table.",
+                                        0, 1, "");
+                        //no report ids found, 
+                        //something might be wrong so we cancel
+                        return;
                     }
-                }
-                else
-                {
-                    epmdata.LogStatus("",
-                                    "Data cleaning in Refresh process.",
-                                    "Cleaning has been cancelled.",
-                                    "Error: " + errMsg,
-                                    0, 1, "");
-                }
-                #endregion
 
-                rptCn.Close();
-                epmliveCn.Close();
-            });
-            }catch(Exception ex)
+                    foreach (DataRow r in listNames.Rows)
+                    {
+                        string tableName = string.Empty;
+                        try
+                        {
+                            tableName = r["TableName"].ToString();
+                        }
+                        catch { }
+
+                        if (!string.IsNullOrEmpty(tableName))
+                        {
+                            sDelSql += "DELETE FROM " + tableName + " WHERE [ListID] NOT IN (SELECT Id FROM ReportListIds) ";
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(sDelSql) && !hasError)
+                    {
+                        try
+                        {
+                            cmd = new SqlCommand(sDelSql);
+                            cmd.Connection = epmdata.GetClientReportingConnection;
+                            cmd.ExecuteNonQuery();
+                            epmdata.LogStatus("",
+                                        "Data cleaning in Refresh process.",
+                                        "Success.",
+                                        "Success.",
+                                        0, 1, "");
+                        }
+                        catch
+                        {
+                            epmdata.LogStatus("",
+                                        "Data cleaning in Refresh process.",
+                                        "Error cleaning.",
+                                        errMsg,
+                                        0, 1, "");
+                        }
+                    }
+                    else
+                    {
+                        epmdata.LogStatus("",
+                                        "Data cleaning in Refresh process.",
+                                        "Cleaning has been cancelled.",
+                                        "Error: " + errMsg,
+                                        0, 1, "");
+                    }
+                    #endregion
+                });
+            }
+            catch (Exception ex)
             {
                 bErrors = true;
                 sErrors += "<font color=\"red\">Error running delete cleanup: " + ex.Message + "</font><br>";
@@ -430,12 +424,28 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 sErrors += "<br>Updated Status Fields<br>";
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 bErrors = true;
                 sErrors += "<font color=\"red\">Error running schedule field update: " + ex.Message + "</font><br>";
             }
             finishJob();
+        }
+
+
+        private void CheckSchema(SqlConnection cn)
+        {
+            var cmd = new SqlCommand(Properties.Resources.CheckReqSP, cn);
+            cmd.CommandType = CommandType.Text;
+            cmd.ExecuteNonQuery();
+        }
+
+        private void CheckReqSP(SqlConnection cn)
+        {
+            var cmd = new SqlCommand(Properties.Resources.CheckSchema, cn);
+            cmd.CommandType = CommandType.Text;
+            cmd.ExecuteNonQuery();
         }
     }
 }
