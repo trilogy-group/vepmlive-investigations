@@ -12,7 +12,7 @@ namespace EPMLiveCore
 {
     public class ReportingData
     {
-        public static DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby)
+        public static DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby, int page, int pagesize)
         {
 
             var rb = new EPMLiveReportsAdmin.ReportBiz(web.Site.ID);
@@ -39,6 +39,8 @@ namespace EPMLiveCore
                 cmd.Parameters.AddWithValue("@rollup", bRollup);
                 cmd.Parameters.AddWithValue("@list", list);
                 cmd.Parameters.AddWithValue("@query", query);
+                cmd.Parameters.AddWithValue("@pagesize", pagesize);
+                cmd.Parameters.AddWithValue("@page", page);
                 if (borderby)
                     cmd.Parameters.AddWithValue("@orderby", orderby);
 
@@ -52,6 +54,12 @@ namespace EPMLiveCore
             }
             else
                 throw new Exception("Reporting Not Setup.");
+        }
+
+        public static DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby)
+        {
+            return GetReportingData(web, list, bRollup, query, orderby, 0, 0);
+            
         }
 
         public static string GetReportQuery(SPWeb web, SPList list, string spquery, out string orderby)
