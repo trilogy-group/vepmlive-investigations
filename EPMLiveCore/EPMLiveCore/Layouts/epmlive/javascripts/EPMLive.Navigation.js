@@ -297,7 +297,7 @@
                             target = ' target="_blank"';
                         }
 
-                        var html = '<li id="' + link.id + '" class="' + cssClass + '" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" alt="' + link.title + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"' + target + '><span>' + link.title + '</span></a></li>';
+                        var html = '<li id="' + link.id + '" class="' + cssClass + '" style="display:none;">' + icon + '<a id="epm-nav-link-' + link.id + '" href="' + link.url + '" data-siteid="' + link.siteId + '" data-webid="' + link.webId + '" data-listid="' + link.listId + '" data-itemid="' + link.itemId + '"' + target + '><span>' + link.title + '</span></a></li>';
 
                         categories[category].$el.append(html);
 
@@ -347,7 +347,7 @@
                             }
 
                             if (category !== '__STATIC__') {
-                                _$sm.append('<div id="' + id + '" class="epm-nav-node epm-nav-node-root epm-nav-cat"><span class="' + defaultCssClass + '">&nbsp;</span><span class="epm-nav-cat-title" alt="' + category + '">' + category + '</span></div>');
+                                _$sm.append('<div id="' + id + '" class="epm-nav-node epm-nav-node-root epm-nav-cat"><span class="' + defaultCssClass + '">&nbsp;</span><span class="epm-nav-cat-title">' + category + '</span></div>');
                             }
 
                             _$sm.append('<ul id="' + id + '-links" class="epm-nav-links ' + defaultCssClass + '"></ul>');
@@ -597,12 +597,12 @@
                         $('li.epm-nav-node').find('a').each(function () {
                             var $a = $(this);
 
-                            if (!$a.attr('title')) {
+                            if (!$a.attr('alt')) {
                                 var $span = $a.find('span');
                                 if ($span) {
                                     if ($a.width() < $span.width()) {
+                                        $a.attr('alt', $span.text());
                                         $a.attr('title', $span.text());
-                                        $a.tooltip({ placement: 'right', delay: { show: 600, hide: 100 } });
                                     }
                                 }
                             }
@@ -720,30 +720,6 @@
                     var unhoverNode = window.TreeView_UnhoverNode;
                     var toggleNode = window.TreeView_ToggleNode;
 
-                    var snWidth = $sn.width();
-
-                    var $wsMenu = $('#epm-nav-sub-workspaces');
-
-                    var expandWorkspacesMenu = function () {
-                        if ($wsMenu.is(':visible')) {
-                            var wsWidth = $('#' + window.epmLiveNavigation.workspaceTree()._element.id).width();
-                            
-                            if (snWidth < wsWidth) {
-                                var newWidth = wsWidth + 20;
-
-                                $sn.animate({ width: newWidth }, 300);
-                                $sn.parent().animate({ width: newWidth }, 300);
-                            }
-                        }
-                    };
-
-                    var collapseWorkspacesMenu = function() {
-                        if ($wsMenu.is(':visible')) {
-                            $sn.animate({ width: snWidth }, 300);
-                            $sn.parent().animate({ width: snWidth }, 300);
-                        }
-                    };
-
                     window.TreeView_HoverNode = function (data, el) {
                         var node = $(el);
 
@@ -833,12 +809,10 @@
                         togglePinned();
                     });
 
-                    $sn.hover(function () {
+                    $sn.hover(function (event) {
                         $pin.show();
-                        expandWorkspacesMenu();
                     }, function () {
                         $pin.hide();
-                        collapseWorkspacesMenu();
                     });
 
                     try {
@@ -889,6 +863,84 @@
                         }
 
                         $.cookie(selectedLinkCookie, JSON.stringify({ index: index, uri: $link.attr('href') }), cookieOptions);
+                    });
+
+                    window.epmLiveNavigation.snWidth = $sn.width();
+
+                    var $wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
+                    var snWidth = $sn.width();
+
+                    var expandWorkspaceMenu = function () {
+                        var wsWidth = $wsTree.width();
+
+                        if (snWidth < wsWidth) {
+                            var newWidth = wsWidth + 20;
+
+                            $sn.animate({ width: newWidth }, 300);
+                            $sn.parent().animate({ width: newWidth }, 300);
+                        }
+                    };
+
+                    var collapseWorkspaceTree = function () {
+                        $sn.animate({ width: snWidth }, 300);
+                        $sn.parent().animate({ width: snWidth }, 300);
+                    };
+
+                    var expandOrCollapseWorkspaceMenu = function($el) {
+                        var classes = $el.attr('class').toLowerCase();
+
+                        if (classes.indexOf('plus') !== -1) {
+                            var onReady1 = function() {
+                                if ($el.attr('class').toLowerCase().indexOf('minus') !== -1) {
+                                    window.setTimeout(function() {
+                                        expandWorkspaceMenu();
+                                    }, 100);
+                                } else {
+                                    window.setTimeout(function() {
+                                        onReady1();
+                                    }, 1);
+                                }
+                            };
+
+                            onReady1();
+                        } else {
+                            var onReady2 = function() {
+                                if ($el.attr('class').toLowerCase().indexOf('plus') !== -1) {
+                                    window.setTimeout(function() {
+                                        collapseWorkspaceTree();
+                                    }, 100);
+                                } else {
+                                    window.setTimeout(function() {
+                                        onReady2();
+                                    }, 1);
+                                }
+                            };
+
+                            onReady2();
+                        }
+                    };
+
+                    $wsTree.hover(function () {
+                        expandWorkspaceMenu();
+                    }, function () {
+                        collapseWorkspaceTree();
+                    });
+
+                    $('a.rtIn').each(function() {
+                        var $spans = $(this).parent().find('span');
+                        if ($spans.length === 2) {
+                            var $span = $($spans.get(1));
+
+                            if ($span) {
+                                $span.click(function() {
+                                    expandOrCollapseWorkspaceMenu($(this));
+                                });
+
+                                $span.hover(function() {
+                                    window.epmLiveNavigation.wsNodeSelectorClass = $(this).attr('class');
+                                });
+                            }
+                        }
                     });
                 }
 
