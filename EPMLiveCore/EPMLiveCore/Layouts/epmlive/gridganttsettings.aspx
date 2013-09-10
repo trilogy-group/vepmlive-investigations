@@ -47,6 +47,7 @@
         };
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+        return false;
     }
 
 </script>
@@ -491,7 +492,7 @@
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
-                    <asp:Button runat="server" OnClientClick="OpenIconSelect()"/>
+                    <asp:Button runat="server" UseSubmitBehavior="false" Text="Select" OnClientClick="return OpenIconSelect();"/>
 				 </Template_Control>
 			</wssuc:InputFormControl>
 		</Template_InputFormControls>

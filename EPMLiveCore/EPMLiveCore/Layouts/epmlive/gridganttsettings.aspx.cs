@@ -55,7 +55,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected DataTable dtGroupsPermissions = new DataTable();
 
         const string REPORT_CHECK_URL = "/_layouts/epmlive/ReportCheckActions.aspx";
-        
+
         private string GetGroupsPermissionsAssignment()
         {
             StringBuilder sbGroupsPermissions = new StringBuilder();
@@ -277,28 +277,12 @@ namespace EPMLiveCore.Layouts.epmlive
                     ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
 
                     //fill parentsitelookup ddl
-                    ddlParentSiteLookup.Items.Add(new ListItem("None", "None"));
-                    string[] LookupArray = gSettings.Lookups.Split('|');
-                    foreach (string sLookup in LookupArray)
-                    {
-                        if (sLookup != "")
-                        {
-                            string[] sLookupInfo = sLookup.Split('^');
-                            string fldName = sLookupInfo[0];
-                            SPField fld = null;
-                            if (!string.IsNullOrEmpty(fldName))
-                            {
-                                try{
-                                    fld = list.Fields.GetFieldByInternalName(fldName);
-                                }catch{}
-                            }
-                            if (fld != null)
-                            {
-                                ddlParentSiteLookup.Items.Add(new ListItem(fldName, fldName));
-                            }
-                        }
-                    }
+                    ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
+                    ddlParentSiteLookup.DataTextField = "Key";
+                    ddlParentSiteLookup.DataValueField = "Value";
+                    ddlParentSiteLookup.DataBind();
                     ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
+
                     chkWorkListFeat.Checked = gSettings.EnableWorkList;
                     chkEmails.Checked = gSettings.SendEmails;
                     chkDeleteRequest.Checked = gSettings.DeleteRequest;
@@ -411,8 +395,37 @@ namespace EPMLiveCore.Layouts.epmlive
                     template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id].ToString().Trim().Equals("workspace", StringComparison.CurrentCultureIgnoreCase))
                 {
                     result.Add(template["Description"].ToString(), template.ID);
+                }
             }
+
+            return result;
         }
+
+        private Dictionary<string, string> GetAvailableParentSiteLookups(SPList list, GridGanttSettings gSettings)
+        {
+            var result = new Dictionary<string, string> {{"None", "None"}};
+            string[] LookupArray = gSettings.Lookups.Split('|');
+            foreach (string sLookup in LookupArray)
+            {
+                if (sLookup != "")
+                {
+                    string[] sLookupInfo = sLookup.Split('^');
+                    string fldName = sLookupInfo[0];
+                    SPField fld = null;
+                    if (!string.IsNullOrEmpty(fldName))
+                    {
+                        try
+                        {
+                            fld = list.Fields.GetFieldByInternalName(fldName);
+                        }
+                        catch { }
+                    }
+                    if (fld != null)
+                    {
+                        result.Add(fldName, fldName);
+                    }
+                }
+            }
 
             return result;
         }
@@ -967,6 +980,9 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.NewMenuName = txtNewMenuName.Text;
             gSettings.UsePopup = chkUsePopup.Checked;
             gSettings.EnableRequests = chkEnableRequests.Checked;
+            gSettings.EnableAutoCreation = chkAutoCreate.Checked;
+            gSettings.AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue;
+            gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
             gSettings.EnableWorkList = chkWorkListFeat.Checked;
             gSettings.SendEmails = chkEmails.Checked;
             gSettings.DeleteRequest = chkDeleteRequest.Checked;
@@ -1101,7 +1117,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 evtAdded.Update();
                 list.Update();
             }
-            else 
+            else
             {
                 string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                 string className = "EPMLiveCore.ItemEnableTeamEvent";
