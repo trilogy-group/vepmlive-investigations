@@ -15,17 +15,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         #region Fields (2) 
 
         private const string CREATE_WORKSPACE_URL =
-            @"javascript:var options = {{
-                                url: '{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx', 
-                                width: 880, 
-                                height:500,
-                                dialogReturnValueCallback: function(dialogResult, returnValue){{
-                                    if (dialogResult === 1){{
-                                        SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false);
-                                    }}
-                                }}
-                            }}; 
-                         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);";
+            @"javascript:var options = {{url: '{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx', width: 880, height:500, dialogReturnValueCallback: function(dialogResult, returnValue){{ if (dialogResult === 1){{ SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false); }} }} }}; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);";
 
         private readonly string _key;
 
@@ -40,57 +30,16 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
-        private const string F_QUERY = @"SELECT FRF_ID AS LinkId, Title, Icon AS CssClass, F_String AS Url,
-                                         SITE_ID AS SiteId, WEB_ID AS WebId, F_Int AS Position FROM dbo.FRF
-                                         WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 4) ORDER BY Position, Title";
+        #region Methods (5) 
 
-        #region Overrides of NavLinkProvider
+        // Private Methods (5) 
 
-        protected override string Key
+        private Guid G(object value)
         {
-            get { return _key; }
-        }
+            Guid guid;
+            Guid.TryParse(S(value), out guid);
 
-        public override IEnumerable<INavObject> GetLinks()
-        {
-            var links = new List<NavLink>
-            {
-                new NavLink
-                {
-                    Title = "Workspaces",
-                    Url = "Header"
-                }
-            };
-
-            using (var spSite = new SPSite(SiteId))
-            {
-                using (SPWeb spWeb = spSite.OpenWeb(WebId))
-                {
-                    if (spWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs))
-                    {
-                        links.Add(new NavLink
-                        {
-                            Title = "New Workspace",
-                            Url = string.Format(CREATE_WORKSPACE_URL, RelativeUrl),
-                            CssClass = "epm-nav-button"
-                        });
-                    }
-                }
-            }
-
-            var fLinks = (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
-            {
-                var navLinks = new List<NavLink>();
-
-                navLinks.AddRange(GetFavoriteWorkspaces());
-                navLinks.AddRange(GetAllWorkspaces());
-
-                return navLinks;
-            }).Value;
-
-            links.AddRange(fLinks.Cast<NavLink>());
-
-            return links;
+            return guid;
         }
 
         private IEnumerable<NavLink> GetAllWorkspaces()
@@ -166,35 +115,6 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             }
         }
 
-        private SPNavLink GetRootWebLink(EnumerableRowCollection<DataRow> rows)
-        {
-            DataRow rootWeb = (from r in rows
-                where r["ParentWebId"] == null ||
-                      r["ParentWebId"] == DBNull.Value ||
-                      G(r["ParentWebId"]) == Guid.Empty
-                select r).First();
-
-            string webId = S(rootWeb["WebId"]);
-
-            return new SPNavLink
-            {
-                Id = webId,
-                Title = S(rootWeb["WebTitle"]),
-                Url = S(rootWeb["WebUrl"]),
-                SiteId = S(SiteId),
-                WebId = webId,
-                Active = S(rootWeb["HasAccess"]).Equals("1")
-            };
-        }
-
-        private Guid G(object value)
-        {
-            Guid guid;
-            Guid.TryParse(S(value), out guid);
-
-            return guid;
-        }
-
         private IEnumerable<NavLink> GetFavoriteWorkspaces()
         {
             yield return new NavLink
@@ -243,6 +163,82 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     Url = "PlaceHolder"
                 };
             }
+        }
+
+        private SPNavLink GetRootWebLink(EnumerableRowCollection<DataRow> rows)
+        {
+            DataRow rootWeb = (from r in rows
+                where r["ParentWebId"] == null ||
+                      r["ParentWebId"] == DBNull.Value ||
+                      G(r["ParentWebId"]) == Guid.Empty
+                select r).First();
+
+            string webId = S(rootWeb["WebId"]);
+
+            return new SPNavLink
+            {
+                Id = webId,
+                Title = S(rootWeb["WebTitle"]),
+                Url = S(rootWeb["WebUrl"]),
+                SiteId = S(SiteId),
+                WebId = webId,
+                Active = S(rootWeb["HasAccess"]).Equals("1")
+            };
+        }
+
+        #endregion Methods 
+
+        private const string F_QUERY = @"SELECT FRF_ID AS LinkId, Title, Icon AS CssClass, F_String AS Url,
+                                         SITE_ID AS SiteId, WEB_ID AS WebId, F_Int AS Position FROM dbo.FRF
+                                         WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 4) ORDER BY Position, Title";
+
+        #region Overrides of NavLinkProvider
+
+        protected override string Key
+        {
+            get { return _key; }
+        }
+
+        public override IEnumerable<INavObject> GetLinks()
+        {
+            var links = new List<NavLink>
+            {
+                new NavLink
+                {
+                    Title = "Workspaces",
+                    Url = "Header"
+                }
+            };
+
+            using (var spSite = new SPSite(SiteId))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(WebId))
+                {
+                    if (spWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs))
+                    {
+                        links.Add(new NavLink
+                        {
+                            Title = "New Workspace",
+                            Url = string.Format(CREATE_WORKSPACE_URL, RelativeUrl),
+                            CssClass = "epm-nav-button"
+                        });
+                    }
+                }
+            }
+
+            var fLinks = (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
+            {
+                var navLinks = new List<NavLink>();
+
+                navLinks.AddRange(GetFavoriteWorkspaces());
+                navLinks.AddRange(GetAllWorkspaces());
+
+                return navLinks;
+            }).Value;
+
+            links.AddRange(fLinks.Cast<NavLink>());
+
+            return links;
         }
 
         #endregion

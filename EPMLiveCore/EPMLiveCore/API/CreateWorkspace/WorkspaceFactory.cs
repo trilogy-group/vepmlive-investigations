@@ -1,5 +1,7 @@
 ﻿using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using System;
@@ -44,8 +46,6 @@ namespace EPMLiveCore.API
         }
 
 		#endregion Constructors 
-
-
 
         #region base class properties and fields
 
@@ -864,6 +864,11 @@ namespace EPMLiveCore.API
             });
         }
         #endregion
+
+        protected void ClearCache(Guid siteId, Guid webId,string username)
+        {
+            new WorkspaceLinkProvider(siteId, webId, username).ClearCache();
+        }
     }
 
     /// <summary>
@@ -907,10 +912,11 @@ namespace EPMLiveCore.API
                             AddPermission();
                             ModifyNewWSProperty();
                             RemoveSolutionFromGallery(eSite, eWeb);
-
                         }
                     }
                 });
+
+                ClearCache(SiteId, WebId, web.CurrentUser.LoginName);
             }
             catch (Exception e)
             {
@@ -1014,6 +1020,8 @@ namespace EPMLiveCore.API
                         }
                     }
                 });
+
+                ClearCache(SiteId, WebId, web.CurrentUser.LoginName);
             }
             catch (Exception e)
             {

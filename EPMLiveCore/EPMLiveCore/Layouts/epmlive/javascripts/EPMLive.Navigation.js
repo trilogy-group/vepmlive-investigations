@@ -978,13 +978,16 @@
                             var wId = window.epmLiveNavigation.currentWebId;
 
                             var cNode = wsTree.findNodeByValue(wId);
-                            if (cNode.get_parent() !== wsTree) {
-                                expandNode(wId);
-                            } else {
-                                cNode.set_expanded(true);
-                            }
+                            
+                            if (cNode) {
+                                if (cNode.get_parent() !== wsTree) {
+                                    expandNode(wId);
+                                } else {
+                                    cNode.set_expanded(true);
+                                }
 
-                            cNode.set_selected(true);
+                                cNode.set_selected(true);
+                            }
 
                             wsTree.commitChanges();
                         }
