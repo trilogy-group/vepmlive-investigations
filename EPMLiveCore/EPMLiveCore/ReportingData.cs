@@ -12,7 +12,7 @@ namespace EPMLiveCore
 {
     public class ReportingData
     {
-        public static DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby, int page, int pagesize)
+        public static DataSet GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby, int page, int pagesize)
         {
 
             var rb = new EPMLiveReportsAdmin.ReportBiz(web.Site.ID);
@@ -50,7 +50,7 @@ namespace EPMLiveCore
 
                 cn.Close();
 
-                return ds.Tables[0];
+                return ds;
             }
             else
                 throw new Exception("Reporting Not Setup.");
@@ -58,7 +58,7 @@ namespace EPMLiveCore
 
         public static DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby)
         {
-            return GetReportingData(web, list, bRollup, query, orderby, 0, 0);
+            return GetReportingData(web, list, bRollup, query, orderby, 0, 0).Tables[0];
             
         }
 
