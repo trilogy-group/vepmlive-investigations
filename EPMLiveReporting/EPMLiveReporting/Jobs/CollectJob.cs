@@ -83,6 +83,9 @@ namespace EPMLiveReportsAdmin.Jobs
                 cmd = new SqlCommand(Properties.Resources.spUpdateStatusFields, cn);
                 cmd.ExecuteNonQuery();
             }
+
+            cmd = new SqlCommand(Properties.Resources.spGetReportListData, cn);
+            cmd.ExecuteNonQuery();
         }
 
         public void execute(SPSite site, SPWeb web, string data)

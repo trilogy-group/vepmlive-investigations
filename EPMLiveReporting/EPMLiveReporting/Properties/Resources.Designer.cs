@@ -262,6 +262,32 @@ namespace EPMLiveReportsAdmin.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to declare @createoralter varchar(10)
+        ///if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = &apos;spGetReportListData&apos;)
+        ///begin
+        ///    Print &apos;Creating Function spGetReportListData&apos;
+        ///    SET @createoralter = &apos;CREATE&apos;
+        ///end
+        ///else
+        ///begin
+        ///    Print &apos;Updating Function spGetReportListData&apos;
+        ///    SET @createoralter = &apos;ALTER&apos;
+        ///end
+        ///exec(@createoralter + &apos; PROCEDURE [dbo].[spGetReportListData]
+        ///
+        ///@siteid uniqueidentifier,
+        ///@webid uniqueidentifier,
+        ///@weburl varchar(255),
+        ///@userid	int,
+        ///@rollup [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string spGetReportListData {
+            get {
+                return ResourceManager.GetString("spGetReportListData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CREATE PROCEDURE spUpdateStatusFields
         ///
         ///@listname varchar(255),

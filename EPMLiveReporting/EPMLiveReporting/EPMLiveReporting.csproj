@@ -242,6 +242,7 @@
     <Content Include="Layouts\EPMLive\Snapshot.aspx" />
     <Content Include="Layouts\EPMLive\UpgradeReportingDB.aspx" />
     <Content Include="Layouts\EPMLive\ViewLogDetail.aspx" />
+    <None Include="Resources\spGetReportListData.txt" />
     <None Include="Resources\spUpdateStatusFields.txt" />
     <None Include="Resources\InitDatabaseCreateTables.sql" />
     <None Include="Resources\InitDatabaseCreateProcedures.sql" />
@@ -250,6 +251,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

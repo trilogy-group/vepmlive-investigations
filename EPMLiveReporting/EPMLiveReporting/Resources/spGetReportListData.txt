@@ -1,0 +1,116 @@
+declare @createoralter varchar(10)
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spGetReportListData')
+begin
+    Print 'Creating Function spGetReportListData'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Function spGetReportListData'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spGetReportListData]
+
+@siteid uniqueidentifier,
+@webid uniqueidentifier,
+@weburl varchar(255),
+@userid	int,
+@rollup bit,
+@list varchar(255),
+@query varchar(5000),
+@orderby varchar(5000) = '''',
+@page int = 0,
+@pagesize int = 0
+
+AS
+BEGIN
+
+	declare @sql varchar(MAX)
+
+	set @list = REPLACE(@list, '' '', '''')
+	if @list = ''lstResources'' 
+	begin
+		set @list = ''lstResourcePool''
+	end
+
+	if @rollup = 1
+		begin
+
+			declare @tquery varchar(5000)
+
+                  if @weburl = ''/''
+                  begin 
+                        set @tquery = '' AND (RPTITEMGROUPS.siteid='''''' + CAST(@siteid as varchar(255)) + '''''')''
+                  end
+                  else
+                  begin
+                        set @tquery = '' AND (weburl='''''' + @weburl + '''''' or weburl like '''''' + @weburl + ''/%'''')''
+                  end
+      
+                  if @query != ''''
+                  begin
+                        set @query = @tquery + '' AND '' + @query
+                  end
+                  else
+                  begin
+                        set @query = @tquery 
+                  end
+
+		end
+	else
+		begin
+
+			if @query != ''''
+				begin
+					set @query = '' AND webid='''''' + convert(varchar(50), @webid) + '''''' AND '' + @query
+				end
+			else
+				begin
+					set @query = '' AND webid='''''' + convert(varchar(50), @webid) + ''''''''
+				end
+
+			
+		end
+
+		set @sql = ''from lst'' + @list + '' where cast(listid as varchar(40)) + cast(itemid as varchar(20)) in (
+		SELECT     CAST(dbo.RPTITEMGROUPS.LISTID AS varchar(40)) + CAST(dbo.RPTITEMGROUPS.ITEMID AS varchar(20)) AS Expr1
+		FROM         dbo.RPTITEMGROUPS LEFT OUTER JOIN
+							  dbo.RPTGROUPUSER ON dbo.RPTITEMGROUPS.SITEID = dbo.RPTGROUPUSER.SITEID AND dbo.RPTITEMGROUPS.GROUPID = dbo.RPTGROUPUSER.GROUPID
+		where (''''1073741823'''' = '''''' + convert(varchar(10), @userid) + '''''' OR (userid='''''' + convert(varchar(10), @userid) + '''''' AND RPTITEMGROUPS.SECTYPE = 1) OR (RPTITEMGROUPS.GROUPID='''''' + convert(varchar(10), @userid) + '''''' AND RPTITEMGROUPS.SECTYPE = 0))
+		) '' + @query
+
+		if @pagesize <> 0 
+		begin
+
+			if @orderby = '''' begin
+				set @orderby = ''itemid''
+			end
+
+			declare @topval int;
+			set @topval = (@page + 1) * @pagesize
+
+			set @sql = ''WITH MyCTE AS (
+				SELECT top '' + convert(varchar(15),@topval) + '' ROW_NUMBER () OVER  (order by + '' + @orderby + '') as RowID,*
+				'' + @sql + ''
+			)
+			SELECT *
+			FROM MyCTE
+			WHERE RowID BETWEEN '' + convert(varchar(15),@page * @pagesize) + '' and '' + convert(varchar(15),@topval )
+			
+		end
+		else
+		begin
+			set @sql = ''select * '' + @sql;
+		
+			if @orderby <> '''' begin
+			
+				set @sql = @sql + '' order by '' + @orderby
+			
+			end
+		end
+	exec(@sql)
+
+	print @sql
+
+END
+')
