@@ -69,7 +69,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
-                GetLinks(dataTable, links);
+                try
+                {
+                    GetLinks(dataTable, links);
+                }
+                catch { }
             }
             else
             {
@@ -98,7 +102,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
-                GetLinks(dataTable, links);
+                try
+                {
+                    GetLinks(dataTable, links);
+                }
+                catch { }
             }
             else
             {

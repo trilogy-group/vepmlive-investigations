@@ -60,23 +60,42 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     }
                 };
 
+                var wpLinks = new List<NavLink>();
+
                 using (var spSite = new SPSite(SiteId, GetUserToken()))
                 {
                     using (SPWeb spWeb = spSite.OpenWeb())
                     {
-                        bool isRootWeb = spWeb.IsRootWeb;
-                        SPNavigation spNavigation = spWeb.Navigation;
+                        try
+                        {
+                            bool isRootWeb = spWeb.IsRootWeb;
+                            SPNavigation spNavigation = spWeb.Navigation;
 
-                        links.AddRange(from nodeId in GetNodes(spWeb)
-                            select spNavigation.GetNodeById(nodeId)
-                            into node
-                            where node != null
-                            select new NavLink
-                            {
-                                Title = node.Title,
-                                Url = CalculateUrl(node.Url, isRootWeb)
-                            });
+                            wpLinks.AddRange(from nodeId in GetNodes(spWeb)
+                                select spNavigation.GetNodeById(nodeId)
+                                into node
+                                where node != null
+                                select new NavLink
+                                {
+                                    Title = node.Title,
+                                    Url = CalculateUrl(node.Url, isRootWeb)
+                                });
+                        }
+                        catch { }
                     }
+                }
+
+                if (wpLinks.Count > 0)
+                {
+                    links.AddRange(wpLinks);
+                }
+                else
+                {
+                    links.Add(new NavLink
+                    {
+                        Title = "No workplace",
+                        Url = "PlaceHolder"
+                    });
                 }
 
                 return links;

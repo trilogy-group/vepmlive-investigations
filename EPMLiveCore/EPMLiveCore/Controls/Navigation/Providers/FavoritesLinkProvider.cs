@@ -53,19 +53,23 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     }
                 };
 
-                DataTable dataTable;
+                DataTable dataTable = null;
 
                 using (var spSite = new SPSite(SiteId, GetUserToken()))
                 {
                     using (SPWeb spWeb = spSite.OpenWeb(WebId))
                     {
-                        var queryExecutor = new QueryExecutor(spWeb);
-                        dataTable = queryExecutor.ExecuteEpmLiveQuery(QUERY,
-                            new Dictionary<string, object>
-                            {
-                                {"@SiteId", SiteId},
-                                {"@UserId", spWeb.CurrentUser.ID}
-                            });
+                        try
+                        {
+                            var queryExecutor = new QueryExecutor(spWeb);
+                            dataTable = queryExecutor.ExecuteEpmLiveQuery(QUERY,
+                                new Dictionary<string, object>
+                                {
+                                    {"@SiteId", SiteId},
+                                    {"@UserId", spWeb.CurrentUser.ID}
+                                });
+                        }
+                        catch { }
                     }
                 }
 

@@ -50,18 +50,23 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 Url = "Header"
             };
 
-            DataTable dataTable;
+            DataTable dataTable = null;
 
             using (var spSite = new SPSite(SiteId, GetUserToken()))
             {
                 using (SPWeb spWeb = spSite.OpenWeb(WebId))
                 {
-                    var queryExecutor = new QueryExecutor(spWeb);
-                    dataTable = queryExecutor.ExecuteReportingDBStoredProc("spGetWebs", new Dictionary<string, object>
+                    try
                     {
-                        {"@SiteId", SiteId},
-                        {"@UserId", spWeb.CurrentUser.ID}
-                    });
+                        var queryExecutor = new QueryExecutor(spWeb);
+                        dataTable = queryExecutor.ExecuteReportingDBStoredProc("spGetWebs",
+                            new Dictionary<string, object>
+                            {
+                                {"@SiteId", SiteId},
+                                {"@UserId", spWeb.CurrentUser.ID}
+                            });
+                    }
+                    catch { }
                 }
             }
 
@@ -123,19 +128,23 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 Url = "Header"
             };
 
-            DataTable dataTable;
+            DataTable dataTable = null;
 
             using (var spSite = new SPSite(SiteId, GetUserToken()))
             {
                 using (SPWeb spWeb = spSite.OpenWeb(WebId))
                 {
-                    var queryExecutor = new QueryExecutor(spWeb);
-                    dataTable = queryExecutor.ExecuteEpmLiveQuery(F_QUERY,
-                        new Dictionary<string, object>
-                        {
-                            {"@SiteId", SiteId},
-                            {"@UserId", spWeb.CurrentUser.ID}
-                        });
+                    try
+                    {
+                        var queryExecutor = new QueryExecutor(spWeb);
+                        dataTable = queryExecutor.ExecuteEpmLiveQuery(F_QUERY,
+                            new Dictionary<string, object>
+                            {
+                                {"@SiteId", SiteId},
+                                {"@UserId", spWeb.CurrentUser.ID}
+                            });
+                    }
+                    catch { }
                 }
             }
 

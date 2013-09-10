@@ -65,7 +65,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     using (SPWeb spWeb = spSite.OpenWeb(WebId))
                     {
-                        lists = CreateNewAjaxDataHost.GetCreatableLists(spWeb);
+                        try
+                        {
+                            lists = CreateNewAjaxDataHost.GetCreatableLists(spWeb);
+                        }
+                        catch { }
                     }
                 }
             });
@@ -78,7 +82,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     using (SPWeb spWeb = spSite.OpenWeb(WebId))
                     {
-                        libraries = CreateNewAjaxDataHost.GetCreatableLibraries(spWeb);
+                        try
+                        {
+                            libraries = CreateNewAjaxDataHost.GetCreatableLibraries(spWeb);
+                        }
+                        catch { }
                     }
                 }
             });
@@ -89,19 +97,41 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             links.Add(new NavLink {Title = "Apps", Url = "Header"});
 
-            links.AddRange(lists.Select(list => list.Value).Select(l => new NavLink
+            if (lists.Count > 0)
             {
-                Title = l[1],
-                Url = GetUrl(l)
-            }));
+                links.AddRange(lists.Select(list => list.Value).Select(l => new NavLink
+                {
+                    Title = l[1],
+                    Url = GetUrl(l)
+                }));
+            }
+            else
+            {
+                links.Add(new NavLink
+                {
+                    Title = "No apps",
+                    Url = "PlaceHolder"
+                });
+            }
 
             links.Add(new NavLink {Title = "Libraries", Url = "Header"});
 
-            links.AddRange(libraries.Select(lib => lib.Value).Select(l => new NavLink
+            if (libraries.Count > 0)
             {
-                Title = l[1],
-                Url = GetUrl(l)
-            }));
+                links.AddRange(libraries.Select(lib => lib.Value).Select(l => new NavLink
+                {
+                    Title = l[1],
+                    Url = GetUrl(l)
+                }));
+            }
+            else
+            {
+                links.Add(new NavLink
+                {
+                    Title = "No libraries",
+                    Url = "PlaceHolder"
+                });
+            }
         }
 
         private static string GetUrl(string[] info)
