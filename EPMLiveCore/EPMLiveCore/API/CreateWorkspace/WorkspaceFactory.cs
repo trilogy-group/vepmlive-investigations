@@ -119,7 +119,7 @@ namespace EPMLiveCore.API
                                             }
                                         }
                                     }
-                                    else if (sPFldName == "None")
+                                    else
                                     {
                                         tempParentWebId = WebId;
                                     }
