@@ -3,6 +3,14 @@ var arrColumnLookups#gridid#;
 var defaultxml#gridid#;
 var minValues#gridid#;
 var maxValues#gridid#;
+var curPage#gridid# = 0;
+
+var firstItem#gridid# = 0;
+var lastItem#gridid# = 0;
+var fItemHide#gridid# = 0;
+var sf#gridid#;
+var sv#gridid#;
+var st#gridid#;
 
 function selectRow#gridid#(id, ind)
 {
@@ -191,6 +199,65 @@ function insertBlankRow#gridid#(id)
 
 dhtmlXGridObject.prototype.alerterror=function(msg){
     document.getElementById("errordiv" + this._gridid).innerHTML = "Error: " + msg;
+};
+
+dhtmlXGridObject.prototype.setuppaging=function(records){
+    
+	var pages = records / this.PageSize;
+
+	var prev = document.getElementById("PagePrevious"+ this._gridid);
+	var next = document.getElementById("PageNext"+ this._gridid);
+	var pagediv = document.getElementById("pagediv"+ this._gridid);
+
+	if(this.UseReporting)
+	{
+		if(pages > 1)
+		{
+			pagediv.style.display = "";
+			if(curPage#gridid# < pages)
+			{
+				next.style.display="";
+			}
+			else
+				next.style.display="none";
+
+			if(curPage#gridid# > 1)
+			{
+				prev.style.display="";
+			}
+			else
+				prev.style.display="none";
+		}
+		else
+		{
+			pagediv.style.display = "none";
+		}
+	}
+	else
+	{
+		pagediv.style.display = "";
+
+		var rec = records.split('|');
+		firstItem#gridid# = parseInt(rec[2]) * -1;
+		lastItem#gridid# = rec[1];
+
+		if(rec[0] == "0" || fItemHide#gridid# == firstItem#gridid#)
+		{
+			prev.style.display="none";
+
+			fItemHide#gridid# = firstItem#gridid#;
+
+		}
+		else
+		{
+			prev.style.display="";
+		}
+
+		if(rec[3] == "true")
+			next.style.display="";
+		else
+			next.style.display="none";
+	}
 };
 
 dhtmlXGridObject.prototype.registerLookup#gridid#=function(col,vals){

@@ -46,6 +46,9 @@ namespace EPMLiveWebParts
         protected bool usePopup;
         protected bool requestsenabled;
         protected bool showCheckboxes;
+        protected int iPageSize = 0;
+        protected int iPage = 0;
+        protected string WPID = "";
 
         protected string expanded;
 
@@ -199,7 +202,7 @@ namespace EPMLiveWebParts
                 getParams(curWeb);
 
 
-
+                
                 docXml = new XmlDocument();
                 docXml.LoadXml("<rows></rows>");
                 ndMainParent = docXml.ChildNodes[0];
@@ -229,7 +232,7 @@ namespace EPMLiveWebParts
                     }
                 }
 
-                EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
+                EPMLiveCore.GridGanttSettings gSettings = EPMLiveCore.API.ListCommands.GetGridGanttSettings(list);
                 if (gSettings.TotalSettings != "")
                 {
                     string[] fieldList = gSettings.TotalSettings.Split('\n');
@@ -2919,6 +2922,14 @@ namespace EPMLiveWebParts
 
         protected void processList(SPWeb web, string spquery, SPList curList, SortedList arrGTemp)
         {
+            int lastid = 0;
+            int firstid = 0;
+
+            string lastsort = "";
+            string firstsort = "";
+            SPListItem lastLi = null;
+            ArrayList arrSort = new ArrayList();
+            bool bHasMore = false;
             try
             {
                 EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
@@ -2932,6 +2943,44 @@ namespace EPMLiveWebParts
                 SPQuery query = new SPQuery();
                 query.Query = spquery;
 
+                
+                if(iPageSize != 0)
+                {
+                    XmlDocument docQ = new XmlDocument();
+                    docQ.LoadXml(spquery);
+
+                    XmlNode ndSort = docQ.FirstChild.SelectSingleNode("//OrderBy");
+                    if (ndSort != null)
+                    {
+                        foreach (XmlNode ndF in ndSort.SelectNodes("FieldRef"))
+                        {
+                            arrSort.Add(ndF.Attributes["Name"].Value);
+                        }
+                    }
+
+                    query.RowLimit = (uint)iPageSize;
+                    if (iPage != 0)
+                    {
+
+                        
+                        if (iPage > 0)
+                        {
+                            string f = (string)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GVPageL-" + WPID + "-" + web.CurrentUser.ID, "GridSettings-" + list.ID.ToString(), () =>
+                            {
+                                return "";
+                            }, true).Value;
+                            query.ListItemCollectionPosition = new SPListItemCollectionPosition("Paged=TRUE&p_ID=" + iPage.ToString() + f);
+                        }
+                        else
+                        {
+                            string f = (string)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GVPageF-" + WPID + "-" + web.CurrentUser.ID, "GridSettings-" + list.ID.ToString(), () =>
+                            {
+                                return "";
+                            }, true).Value;
+                            query.ListItemCollectionPosition = new SPListItemCollectionPosition("Paged=TRUE&PagedPrev=TRUE&p_ID=" + (iPage * -1).ToString() + f);
+                        }
+                    }
+                }
                 SPField oLookupFilterField = null;
                 try
                 {
@@ -2947,8 +2996,30 @@ namespace EPMLiveWebParts
                 }
                 catch { }
 
-                foreach (SPListItem li in curList.GetItems(query))
+                SPListItemCollection lic = curList.GetItems(query);
+
+                bHasMore = lic.ListItemCollectionPosition != null;
+
+                foreach (SPListItem li in lic)
                 {
+                    if(iPageSize != 0)
+                    {
+                        if (firstid == 0)
+                        {
+                            firstid = li.ID;
+                            firstsort = "";
+
+                            foreach (string sort in arrSort)
+                            {
+                                firstsort += "&p_" + sort + "=";
+                                try
+                                {
+                                    firstsort += HttpUtility.UrlEncode(li[sort].ToString());
+                                }
+                                catch { }
+                            }
+                        }
+                    }
                     bool canView = true;
                     if (filterfield != "")
                     {
@@ -3069,10 +3140,50 @@ namespace EPMLiveWebParts
                         arrItems.Add(web.ID + "." + li.ParentList.ID + "." + li.ID, group);
                         queueAllItems.Enqueue(li);
                     }
+
+                    lastid = li.ID;
+                    lastLi = li;
                 }
             }
             catch { }
 
+            if (iPageSize > 0)
+            {
+                if (lastLi != null)
+                {
+                    lastsort = "";
+
+                    foreach (string sort in arrSort)
+                    {
+                        lastsort += "&p_" + sort + "=";
+                        try
+                        {
+                            lastsort += HttpUtility.UrlEncode(lastLi[sort].ToString());
+                        }
+                        catch { }
+                    }
+                }
+
+                EPMLiveCore.Infrastructure.CacheStore.Current.Set("GVPageF-" + WPID + "-" + web.CurrentUser.ID, firstsort, "GridSettings-" + list.ID.ToString(), true);
+                EPMLiveCore.Infrastructure.CacheStore.Current.Set("GVPageL-" + WPID + "-" + web.CurrentUser.ID, lastsort, "GridSettings-" + list.ID.ToString(), true);
+
+                XmlNode nd = docXml.FirstChild.SelectSingleNode("//afterInit");
+                if (nd != null)
+                {
+                    
+
+                    XmlNode ndCall = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
+                    XmlAttribute attrName = docXml.CreateAttribute("command");
+                    attrName.Value = "setuppaging";
+                    ndCall.Attributes.Append(attrName);
+
+                    XmlNode ndParam = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                    ndParam.InnerText = iPage + "|" + lastid.ToString() + "|" + firstid.ToString() + "|" + bHasMore.ToString().ToLower();
+
+                    ndCall.AppendChild(ndParam);
+                    nd.AppendChild(ndCall);
+                }
+            }
         }
 
         protected void processListDT(SPWeb web, DataRow[] dtRows, SortedList arrGTemp, string listname)
@@ -3202,14 +3313,15 @@ namespace EPMLiveWebParts
             {
                 string orderby = "";
                 string query = EPMLiveCore.ReportingData.GetReportQuery(web, list, spquery, out orderby);
-
+                
                 if (rolluplists == null)
                 {
                     try
                     {
-                        DataTable dt = EPMLiveCore.ReportingData.GetReportingData(web, list.Title, false, query, orderby);
-                        if (dt != null)
+                        DataSet ds = EPMLiveCore.ReportingData.GetReportingData(web, list.Title, false, query, orderby, iPage, iPageSize);
+                        if (ds != null)
                         {
+                            DataTable dt = ds.Tables[0];
                             dt.Columns.Add("SiteURL");
                             dt.Columns.Add("siteid");
                             if (filterfield != "")
@@ -3222,6 +3334,24 @@ namespace EPMLiveWebParts
                             }
                             else
                                 processListDT(web, dt.Select(), arrGTemp, list.Title);
+
+                            if (iPageSize > 0 && ds.Tables.Count > 1)
+                            {
+                                XmlNode nd = docXml.FirstChild.SelectSingleNode("//afterInit");
+                                if (nd != null)
+                                {
+                                    XmlNode ndCall = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
+                                    XmlAttribute attrName = docXml.CreateAttribute("command");
+                                    attrName.Value = "setuppaging";
+                                    ndCall.Attributes.Append(attrName);
+
+                                    XmlNode ndParam = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                                    ndParam.InnerText = ds.Tables[1].Rows[0][0].ToString();
+
+                                    ndCall.AppendChild(ndParam);
+                                    nd.AppendChild(ndCall);
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -4962,6 +5092,21 @@ namespace EPMLiveWebParts
                     bUseReporting = bool.Parse(hshParams["UseReporting"].ToString());
                 }
                 catch { }
+                try
+                {
+                    iPageSize = int.Parse(hshParams["PageSize"].ToString());
+                }
+                catch { }
+                try
+                {
+                    iPage = int.Parse(Request["Page"].ToString());
+                }
+                catch { }
+                try
+                {
+                    WPID = hshParams["WPID"].ToString();
+                }
+                catch { }
             }
             catch { }
 
@@ -5513,154 +5658,6 @@ namespace EPMLiveWebParts
                     break;
             };
             return val;
-        }
-
-
-
-
-        public virtual void getParams(SPWeb curWeb, string ganttParams)
-        {
-            try
-            {
-                Hashtable hshParams = new Hashtable();
-
-                byte[] encodedDataAsBytes = System.Convert.FromBase64String(ganttParams);
-
-                string[] props = System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
-
-                foreach (string s in props)
-                {
-                    hshParams.Add(s.Split('\t')[0], s.Split('\t')[1]);
-                }
-
-                strlist = hshParams["List"].ToString();
-                strview = hshParams["View"].ToString();
-                try
-                {
-                    usewbs = hshParams["WBS"].ToString();
-                }
-                catch { }
-                try
-                {
-                    lookupFilterField = hshParams["LookupField"].ToString();
-                }
-                catch { }
-                try
-                {
-                    lookupFilterFieldList = hshParams["LookupFieldList"].ToString();
-                }
-                catch { }
-                try
-                {
-                    executive = hshParams["Executive"].ToString();
-                }
-                catch { }
-                try
-                {
-                    linktype = hshParams["LType"].ToString();
-                }
-                catch { }
-
-                try
-                {
-                    if (hshParams["RLists"].ToString() != "")
-                    {
-                        string[] tRollupLists = hshParams["RLists"].ToString().Split(',');
-                        rolluplists = new string[tRollupLists.Length];
-                        for (int i = 0; i < tRollupLists.Length; i++)
-                        {
-                            string[] tRlist = tRollupLists[i].Split('|');
-                            rolluplists[i] = tRlist[0];
-                            string icon = "";
-                            try
-                            {
-                                icon = tRlist[1];
-                            }
-                            catch { }
-                            hshLists.Add(rolluplists[i], icon);
-                        }
-                    }
-                }
-                catch { }
-
-                filterfield = hshParams["FilterField"].ToString();
-                filtervalue = hshParams["FilterValue"].ToString();
-
-                try
-                {
-                    if (hshParams["RSites"].ToString() != "")
-                    {
-                        rollupsites = hshParams["RSites"].ToString().Split(',');
-                    }
-                }
-                catch { }
-                gridname = hshParams["GridName"].ToString();
-                try
-                {
-                    additionalgroups = hshParams["AGroups"].ToString();
-                }
-                catch { }
-                expandlevel = 0;
-                try
-                {
-                    expandlevel = int.Parse(hshParams["Expand"].ToString());
-                }
-                catch { }
-
-                SPList tempList = null;
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    using (SPSite s = new SPSite(curWeb.Url))
-                    {
-                        using (SPWeb w = s.OpenWeb())
-                        {
-                            tempList = w.GetListFromUrl(strlist);
-                        }
-                    }
-                });
-
-                list = curWeb.Lists[tempList.ID];
-                view = list.Views[strview];
-                try
-                {
-                    inEditMode = bool.Parse(Request["edit"]);
-                }
-                catch { }
-                try
-                {
-                    showinsertrow = bool.Parse(hshParams["ShowInsert"].ToString());
-                }
-                catch { }
-                try
-                {
-                    usePerformance = false;
-                    usePerformance = bool.Parse(hshParams["UsePerf"].ToString());
-                }
-                catch { }
-                try
-                {
-                    usePopup = false;
-                    usePopup = bool.Parse(hshParams["UsePopup"].ToString());
-                }
-                catch { }
-                try
-                {
-                    requestsenabled = false;
-                    requestsenabled = bool.Parse(hshParams["Requests"].ToString());
-                }
-                catch { }
-                try
-                {
-                    showCheckboxes = false;
-                    showCheckboxes = bool.Parse(hshParams["ShowCheckboxes"].ToString());
-                }
-                catch { }
-
-            }
-            catch { }
-
-
         }
 
     }

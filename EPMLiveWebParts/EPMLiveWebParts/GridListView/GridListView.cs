@@ -2994,6 +2994,14 @@ namespace EPMLiveWebParts
                 output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
                 output.WriteLine("searchtext.value = '';");
 
+                if(gSettings.EnableContentReporting)
+                    output.WriteLine("curPage" + sFullGridId + " = 1;");
+                else
+                    output.WriteLine("curPage" + sFullGridId + " = 0;");
+
+                output.WriteLine("sf" + sFullGridId + " = null;");
+                output.WriteLine("sv" + sFullGridId + " = null;");
+                output.WriteLine("st" + sFullGridId + " = null;");
                 output.WriteLine("loadX" + sFullGridId + "();");
 
                 output.WriteLine("}");
@@ -3021,6 +3029,14 @@ namespace EPMLiveWebParts
                 output.WriteLine("}else{");
                 output.WriteLine("searchvalue = searchtext.value;");
                 output.WriteLine("}");
+                if (gSettings.EnableContentReporting)
+                    output.WriteLine("curPage" + sFullGridId + " = 1;");
+                else
+                    output.WriteLine("curPage" + sFullGridId + " = 0;");
+
+                output.WriteLine("sf" + sFullGridId + " = searchfield;");
+                output.WriteLine("sv" + sFullGridId + " = searchvalue;");
+                output.WriteLine("st" + sFullGridId + " = searchtype;");
 
                 if (bLockSearch)
                 {
@@ -3114,6 +3130,11 @@ namespace EPMLiveWebParts
 
                 output.WriteLine("<script language=\"javascript\">switchsearch" + sFullGridId + "();</script>");
 
+            }
+
+            if (view.RowLimit > 0)
+            {
+                output.Write("<div id=\"pagediv" + sFullGridId + "\" style=\"\"><div style=\"height:15px;width:60px;float:left;\">Paging: </div><div id=\"PagePrevious" + sFullGridId + "\" style=\"height:18px;width:80px;border:1px solid #CACACA;float:left;padding-left:5px\" onClick=\"javascript:PreviousPage" + sFullGridId + "()\"><a href=\"javascript:void(0);\" style=\"text-decoration:none;color:#666\">&lt; Previous</a></div> <div id=\"PageNext" + sFullGridId + "\" style=\"height:18px;width:80px;border:1px solid #CACACA;float:left;margin-left:10px;padding-right:5px;text-align:right\" onClick=\"javascript:NextPage" + sFullGridId + "()\"><a style=\"text-decoration:none;color:#666\" href=\"javascript:void(0);\">Next &gt;</a></div></div>");
             }
 
             output.Write("<div id=\"grid" + this.ID + "\" style=\"width:100%;display:none;\" class=\"ms-listviewtable\"></div>\r\n\r\n");
@@ -3603,8 +3624,22 @@ namespace EPMLiveWebParts
             //}
 
 
-
             output.Write(Properties.Resources.txtInlineEdit.Replace("#gridid#", sFullGridId));
+
+            output.WriteLine("function NextPage" + sFullGridId + "(){");
+            if(gSettings.EnableContentReporting)
+                output.WriteLine("if(curPage" + sFullGridId + "==0){curPage" + sFullGridId + "=2;}else{curPage" + sFullGridId + "++;}");
+            else
+                output.WriteLine("curPage" + sFullGridId + " = lastItem" + sFullGridId + ";");
+            output.WriteLine("loadX" + sFullGridId + "(sf" + sFullGridId + ", sv" + sFullGridId + ", st" + sFullGridId + ");");
+            output.WriteLine("}");
+            output.WriteLine("function PreviousPage" + sFullGridId + "(){");
+            if (gSettings.EnableContentReporting)
+                output.WriteLine("curPage" + sFullGridId + "--;");
+            else
+                output.WriteLine("curPage" + sFullGridId + " = firstItem" + sFullGridId + ";");
+            output.WriteLine("loadX" + sFullGridId + "(sf" + sFullGridId + ", sv" + sFullGridId + ", st" + sFullGridId + ");");
+            output.WriteLine("}");
 
             output.WriteLine("function loadX" + sFullGridId + "(searchfield, searchvalue, searchtype){");
 
@@ -3616,10 +3651,10 @@ namespace EPMLiveWebParts
 
             output.WriteLine("if(searchfield){");
             output.WriteLine("searchvalue = escape(searchvalue);");
-            output.WriteLine("mygrid" + sFullGridId + ".post(\"" + web.Url + "/_layouts/epmlive/getgriditems.aspx\",\"data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "&insertrow=" + allowInsertRow + "&width=\" + mygridwidth" + sFullGridId + " + \"&searchfield=\" + searchfield + \"&searchvalue=\" + searchvalue + \"&searchtype=\" + searchtype + \"&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "\");");
+            output.WriteLine("mygrid" + sFullGridId + ".post(\"" + web.Url + "/_layouts/epmlive/getgriditems.aspx\",\"data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "&insertrow=" + allowInsertRow + "&width=\" + mygridwidth" + sFullGridId + " + \"&searchfield=\" + searchfield + \"&searchvalue=\" + searchvalue + \"&searchtype=\" + searchtype + \"&page=\" + curPage" + sFullGridId + " + \"&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "\");");
             //output.WriteLine("mygrid" + sFullGridId + ".post(\"" + web.Url + "/_layouts/epmlive/getgriditems.aspx\",\"data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "&insertrow=" + allowInsertRow + "&width=\" + mygridwidth" + sFullGridId + " + \"&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "\");");
             output.WriteLine("}else{");
-            output.WriteLine("mygrid" + sFullGridId + ".post(\"" + web.Url + "/_layouts/epmlive/getgriditems.aspx\",\"data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "&insertrow=" + allowInsertRow + "&width=\" + mygridwidth" + sFullGridId + " + \"&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "\");");
+            output.WriteLine("mygrid" + sFullGridId + ".post(\"" + web.Url + "/_layouts/epmlive/getgriditems.aspx\",\"data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "&insertrow=" + allowInsertRow + "&width=\" + mygridwidth" + sFullGridId + " + \"&page=\" + curPage" + sFullGridId + " + \"&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "\");");
             output.WriteLine("}");
 
             output.WriteLine("}");
@@ -3814,6 +3849,13 @@ namespace EPMLiveWebParts
 
         private void addGridProperties(HtmlTextWriter output, SPWeb web)
         {
+            output.WriteLine("mygrid" + sFullGridId + ".PageSize = '" + view.RowLimit + "';");
+            output.WriteLine("mygrid" + sFullGridId + ".UseReporting = " + gSettings.EnableContentReporting.ToString().ToLower() + ";");
+            if (gSettings.EnableContentReporting)
+                output.WriteLine("curPage" + sFullGridId + " = 1;");
+            else
+                output.WriteLine("curPage" + sFullGridId + " = 0;");
+
             output.WriteLine("mygrid" + sFullGridId + "._epkview = '" + EPKView + "';");
             output.WriteLine("mygrid" + sFullGridId + "._useparent = " + useParent + ";");
             output.WriteLine("mygrid" + sFullGridId + "._curPlanner = '" + PlannerV2CurPlanner.Trim() + "';");
@@ -4349,6 +4391,12 @@ namespace EPMLiveWebParts
             }
             catch { }
 
+            if (view.RowLimit > 0)
+            {
+                appendParam("PageSize", view.RowLimit.ToString());
+            }
+
+            appendParam("WPID", this.ID);
 
             sFullParamList = sFullParamList.Substring(1);
 
@@ -4375,7 +4423,7 @@ namespace EPMLiveWebParts
                 bShowSearch = true;
 
             
-
+            
             string webpartid = "";
             try
             {

@@ -19,13 +19,10 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts
-"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPMLiveWebParts" /f</PreDeploymentCommand>
-    <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
-"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll" /f
-iisreset
-net stop "WETimer"
-net start "WETimer"</PostDeploymentCommand>
+    <PreDeploymentCommand>
+    </PreDeploymentCommand>
+    <PostDeploymentCommand>
+    </PostDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
