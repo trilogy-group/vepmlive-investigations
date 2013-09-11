@@ -257,6 +257,11 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 			next.style.display="";
 		else
 			next.style.display="none";
+
+		if(rec[3] != "true" && rec[0] == "0")
+		{
+			pagediv.style.display = "none";
+		}
 	}
 };
 
