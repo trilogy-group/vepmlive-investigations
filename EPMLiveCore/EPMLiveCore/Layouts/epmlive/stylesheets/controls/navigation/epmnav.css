@@ -479,28 +479,50 @@
 .epm-nav-sub .epm-nav-sub-menu table.epm-nav-node-selected td.epm-nav-node a {
   padding: 0;
 }
-.epm-nav-sub .RadTreeView {
+.epm-nav-sub #EPMNavWorkspacesTree {
+  display: none;
+}
+.epm-nav-sub #EPMNavWorkspacesTree #EPMNavWSTSearch {
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-top: 5px;
+  width: 148px;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView {
   margin-left: 10px;
   white-space: nowrap;
   display: inline-block;
 }
-.epm-nav-sub .RadTreeView a {
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView a {
   color: #666666;
   font-family: 'Open Sans Regular', sans-serif;
 }
-.epm-nav-sub .RadTreeView div.rtHover a {
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtHover,
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected {
+  height: 23px;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtHover a,
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected a {
   background: none repeat scroll 0 0 transparent !important;
   border: medium none;
   color: #666666;
   left: 1px;
   position: relative;
 }
-.epm-nav-sub .RadTreeView div.rtSelected a {
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected a {
   background: #7C7C7C !important;
-  border: medium none;
-  color: #FFFFFF;
-  left: 1px;
-  position: relative;
+  color: #ffffff;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView div.epm-nav-ws-node {
+  display: inline-block;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView div.epm-nav-ws-node a {
+  display: inline-block;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .epm-nav-unpinned {
   margin-left: 50px;

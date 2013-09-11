@@ -1547,6 +1547,9 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js.map">
+      <DependentUpon>bindWithDelay.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
@@ -3242,6 +3245,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js">
+      <DependentUpon>bindWithDelay.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.js" />

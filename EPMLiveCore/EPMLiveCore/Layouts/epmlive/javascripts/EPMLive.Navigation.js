@@ -194,10 +194,10 @@
                         if (link.category) {
                             parent = workspaceTree.findNodeByValue(link.category) || parent;
                         }
-
+                        
                         node.set_text(link.title);
                         node.set_value(link.webId);
-
+                        
                         if (link.active) {
                             node.set_navigateUrl(link.url);
                         }
@@ -871,6 +871,11 @@
                     var snWidth = $sn.width();
 
                     var expandWorkspaceMenu = function () {
+                        $('a.rtIn').each(function () {
+                            var $a = $(this);
+                            $a.attr('style', '');
+                        });
+                        
                         var wsWidth = $wsTree.width();
 
                         if (snWidth < wsWidth) {
@@ -884,6 +889,8 @@
                     var collapseWorkspaceTree = function () {
                         $sn.animate({ width: snWidth }, 300);
                         $sn.parent().animate({ width: snWidth }, 300);
+                        
+                        window.epmLiveNavigation.resetWSNodeWidth();
                     };
 
                     var expandOrCollapseWorkspaceMenu = function($el) {
@@ -926,9 +933,27 @@
                         collapseWorkspaceTree();
                     });
 
+                    var $wsMenu = $('#epm-nav-sub-workspaces');
+
+                    $sn.hover(function(event) {
+                        if ($wsMenu.is(':visible')) {
+                            var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
+                            if (event.clientY > _$wsTree.height() + _$wsTree.offset().top) {
+                                expandWorkspaceMenu();
+                            }
+                        }
+                    }, function(event) {
+                        if ($wsMenu.is(':visible')) {
+                            var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
+                            if (event.clientY > _$wsTree.height() + _$wsTree.offset().top) {
+                                collapseWorkspaceTree();
+                            }
+                        }
+                    });
+
                     $('a.rtIn').each(function() {
-                        var $spans = $(this).parent().find('span');
-                        if ($spans.length === 2) {
+                        var $spans = $(this).parent().parent().find('span');
+                        if ($spans.length > 1) {
                             var $span = $($spans.get(1));
 
                             if ($span) {
@@ -998,7 +1023,7 @@
 
                                             if (title === 'All Workspaces') {
                                                 workspacesTitleRegistered = true;
-                                                $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#' + workspaceTree._element.id);
+                                                $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#EPMNavWorkspacesTree');
                                             }
                                         }
 
@@ -1009,39 +1034,63 @@
                         }
 
                         if (providerName === 'Workspaces') {
-                            var wsTree = window.epmLiveNavigation.workspaceTree();
+                            window.epmLiveNavigation.resetWorkspaceTree = function() {
+                                var wsTree = window.epmLiveNavigation.workspaceTree();
 
-                            wsTree.trackChanges();
+                                wsTree.trackChanges();
 
-                            var expandNode = function (webId) {
-                                var node = wsTree.findNodeByValue(webId);
-
-                                if (node && node != wsTree) {
-                                    var parent = node.get_parent();
-
-                                    if (parent !== wsTree && !parent.get_expanded()) {
-                                        parent.set_expanded(true);
-
-                                        expandNode(parent.get_value());
-                                    }
+                                var nodes = wsTree.get_allNodes();
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].set_expanded(false);
                                 }
+
+                                var expandNode = function (webId) {
+                                    var node = wsTree.findNodeByValue(webId);
+
+                                    if (node && node != wsTree) {
+                                        var parent = node.get_parent();
+
+                                        if (parent !== wsTree && !parent.get_expanded()) {
+                                            parent.set_expanded(true);
+
+                                            expandNode(parent.get_value());
+                                        }
+                                    }
+                                };
+
+                                var wId = window.epmLiveNavigation.currentWebId;
+
+                                var cNode = wsTree.findNodeByValue(wId);
+
+                                if (cNode) {
+                                    if (cNode.get_parent() !== wsTree) {
+                                        expandNode(wId);
+                                    } else {
+                                        cNode.set_expanded(true);
+                                    }
+
+                                    cNode.set_selected(true);
+                                }
+
+                                wsTree.commitChanges();
                             };
 
-                            var wId = window.epmLiveNavigation.currentWebId;
+                            $('a.rtIn').each(function() {
+                                var $a = $(this);
+                                
+                                var $parent = $a.parent();
+                                
+                                $parent.append('<div class="epm-nav-ws-node"></div>');
+                                $a.remove();
 
-                            var cNode = wsTree.findNodeByValue(wId);
-                            
-                            if (cNode) {
-                                if (cNode.get_parent() !== wsTree) {
-                                    expandNode(wId);
-                                } else {
-                                    cNode.set_expanded(true);
-                                }
+                                var text = $a.text();
+                                $a.text('');
+                                $a.append('<span>' + text + '</span>');
+                                $parent.find('.epm-nav-ws-node').append($a);
+                            });
 
-                                cNode.set_selected(true);
-                            }
-
-                            wsTree.commitChanges();
+                            window.epmLiveNavigation.resetWorkspaceTree();
+                            $('#EPMNavWorkspacesTree').fadeIn(300);
                         }
                         else if (providerName === 'Applications') {
                             $($('#epm-nav-sub-new-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important');
@@ -1444,10 +1493,92 @@
                         });
                     };
 
+                    var _configNodeWidth = function() {
+                        window.epmLiveNavigation.resetWSNodeWidth = function() {
+                            $('a.rtIn').each(function () {
+                                var $a = $(this);
+                                var $span = $($a.find('span').get(0));
+                                var padding = 15;
+
+                                var width = $span.width();
+                                if (width) {
+                                    var offset = $a.offset().left - 50;
+                                    var total = (width + offset);
+
+                                    if (total > 180 - padding) {
+                                        var newWidth = 180 - offset - padding;
+
+                                        $a.data('originalwidth', $a.width());
+                                        $a.data('newwidth', newWidth);
+                                        $a.width(newWidth);
+                                    }
+                                }
+                            });
+                        };
+
+                        window.epmLiveNavigation.resetWSNodeWidth();
+                    };
+
+                    var _initSearch = function () {
+                        var $sb = $('#EPMNavWSTSearch');
+                        
+                        $sb.val('');
+                        $sb.bindWithDelay('keyup', function() {
+                            var term = $(this).val().trim();
+                            if (term) {
+                                if (term.length > 1) {
+                                    filterTree(term.toLowerCase());
+                                } else {
+                                    showAllNodes();
+                                }
+                            } else {
+                                showAllNodes();
+                            }
+                        }, 200);
+                    };
+
+                    var filterTree = function (term) {
+                        var nodes = window.epmLiveNavigation.workspaceTree().get_allNodes();
+
+                        for (var i = 0; i < nodes.length; i++) {
+                            var node = nodes[i];
+                            var nodeText = node.get_text().trim();
+
+                            if (nodeText && nodeText.toLowerCase().indexOf(term) !== -1) {
+                                setParentNodesVisible(node);
+                                node.set_visible(true);
+                            } else {
+                                node.set_visible(false);
+                            }
+                        }
+                    };
+
+                    var showAllNodes = function() {
+                        var nodes = window.epmLiveNavigation.workspaceTree().get_allNodes();
+
+                        for (var i = 0; i < nodes.length; i++) {
+                            nodes[i].set_visible(true);
+                        }
+                        
+                        window.epmLiveNavigation.resetWorkspaceTree();
+                    };
+
+                    var setParentNodesVisible = function(node) {
+                        var pn = node.get_parent();
+                        
+                        if (pn && pn !== window.epmLiveNavigation.workspaceTree()) {
+                            pn.set_visible(true);
+                            pn.set_expanded(true);
+                            setParentNodesVisible(pn);
+                        }
+                    };
+
                     return {
                         resetOrder: _resetOrder,
                         addDragger: _addDragger,
-                        addMenu: _addMenu
+                        addMenu: _addMenu,
+                        initializeSearch: _initSearch,
+                        configureNodeWidth: _configNodeWidth
                     };
                 })();
 
@@ -1475,6 +1606,9 @@
                     $ul.disableSelection();
                 } catch (e) {
                 }
+
+                workspacesManager.configureNodeWidth();
+                workspacesManager.initializeSearch();
             };
 
             ExecuteOrDelayUntilScriptLoaded(manageSettings, 'EPMLiveNavigation_Settings');
