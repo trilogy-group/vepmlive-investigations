@@ -74,6 +74,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
                                                         Request["id"], isDlg);
                         }
                         break;
+                    case "gotolist":
+                        using (spWeb)
+                        {
+                            redirectUrl = string.Format(@"{0}/{1}?IsDlg={2}", safeServerRelativeUrl,
+                                spWeb.Lists[listName].Forms[PAGETYPE.PAGE_DEFAULTVIEW].Url, isDlg);
+                        }
+                        break;
                     case "comments":
                         using (spWeb)
                         {
