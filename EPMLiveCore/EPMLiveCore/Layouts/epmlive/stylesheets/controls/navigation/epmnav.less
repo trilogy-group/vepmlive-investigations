@@ -82,7 +82,7 @@
 
     .epm-nav-pinned,
     .epm-nav-unpinned {
-        margin-left: auto;
+        margin-left: auto !important;
     }
 }
 
@@ -653,6 +653,10 @@
 
 .epm-nav-pinned {
 	margin-left: @top-nav-width + @sub-nav-width;
+}
+
+#Ribbon.epm-nav-pinned {
+    margin-left:  @sub-nav-width;
 }
 
 .epm-nav-pin-unpinned {

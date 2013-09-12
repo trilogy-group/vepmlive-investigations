@@ -83,7 +83,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "@libraries/jquery.cookie", "libraries/slimScroll", "@libraries/bindWithDelay", "@EPMLive.Navigation"
+                "libraries/jquery.min", "@libraries/jquery.cookie", "libraries/slimScroll", "@libraries/bindWithDelay",
+                "@EPMLive.Navigation"
             });
 
             int userId = SPContext.Current.Web.CurrentUser.ID;

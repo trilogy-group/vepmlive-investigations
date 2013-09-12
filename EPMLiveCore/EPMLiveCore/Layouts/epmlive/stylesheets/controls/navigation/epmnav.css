@@ -26,7 +26,7 @@
 }
 .ms-dialog .epm-nav-pinned,
 .ms-dialog .epm-nav-unpinned {
-  margin-left: auto;
+  margin-left: auto !important;
 }
 #epm-nav .slimScrollDiv .slimScrollBar {
   border-radius: 0px !important;
@@ -537,6 +537,9 @@
 }
 .epm-nav-pinned {
   margin-left: 230px;
+}
+#Ribbon.epm-nav-pinned {
+  margin-left: 180px;
 }
 .epm-nav-pin-unpinned {
   -webkit-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);

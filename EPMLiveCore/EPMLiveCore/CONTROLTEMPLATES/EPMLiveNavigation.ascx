@@ -11,6 +11,17 @@
 
 <!--[if lte IE 7]><script src="/_layouts/15/epmlive/javascripts/icomoon-ie7.min.js"> </script><![endif]-->
 
+<% if (Pinned)
+   { %>
+    <style>
+        #Ribbon { margin-left: 180px !important; }
+        .ms-dialog .epm-nav-pinned, .ms-dialog #Ribbon {
+            margin-left: 0 !important;
+        }
+    </style>
+<%
+   } %>
+
 <div id="epm-nav">
     <div id="epm-nav-top">
         <ul>
