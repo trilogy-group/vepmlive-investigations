@@ -27,7 +27,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         #endregion Constructors 
 
         private const string RI_QUERY =
-            @"SELECT TOP (30) FRF_ID AS LinkId, WEB_ID AD WebId, LIST_ID AS ListId, ITEM_ID AS ItemId,
+            @"SELECT TOP (30) FRF_ID AS LinkId, WEB_ID AS WebId, LIST_ID AS ListId, ITEM_ID AS ItemId,
                                         Title, Icon AS CssClass FROM dbo.FRF
                                         WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 2)
                                         ORDER BY F_Date DESC";
