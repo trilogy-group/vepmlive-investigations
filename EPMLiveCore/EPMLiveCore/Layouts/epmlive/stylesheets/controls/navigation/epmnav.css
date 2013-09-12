@@ -524,6 +524,14 @@
   white-space: nowrap;
   overflow: hidden;
 }
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView div.epm-nav-ws-node .epm-menu-btn {
+  font-size: 8px;
+  margin-top: 2px;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView div.epm-nav-ws-node:hover .epm-menu-btn {
+  visibility: visible;
+  margin-top: 2px;
+}
 .epm-nav-unpinned {
   margin-left: 50px;
 }

@@ -200,6 +200,8 @@
                         
                         if (link.active) {
                             node.set_navigateUrl(link.url);
+                        } else {
+                            node.set_navigateUrl('javascript:;');
                         }
 
                         parent.get_nodes().add(node);
@@ -650,8 +652,8 @@
                     };
 
                     var url = window.epmLiveNavigation.currentWebUrl;
-                    var gaUrl = url + '_layouts/15/epmlive/gridaction.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
-                    var rpUrl = url + '_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&';
+                    var gaUrl = (url + '/_layouts/15/epmlive/gridaction.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&').replace(/\/\//g, '/');
+                    var rpUrl = (url + '/_layouts/15/epmlive/redirectionproxy.aspx?webid=' + webId + '&listid=' + listId + '&id=' + itemId + '&').replace(/\/\//g, '/');
 
                     var redirectUrl = '';
 
@@ -876,20 +878,34 @@
                             $a.attr('style', '');
                         });
                         
+                        $('.epm-nav-ws-node').each(function () {
+                            $(this).attr('style', '');
+                        });
+                        
                         var wsWidth = $wsTree.width();
-
+                        var newWidth;
+                        
                         if (snWidth < wsWidth) {
-                            var newWidth = wsWidth + 20;
+                            newWidth = wsWidth + 20 + 20;
 
                             $sn.animate({ width: newWidth }, 300);
                             $sn.parent().animate({ width: newWidth }, 300);
                         }
+
+                        $('.epm-nav-ws-node').each(function() {
+                            var $div = $(this);
+                            $div.attr('style', 'width:' + ((50 + newWidth) - $div.offset().left) + 'px');
+                        });
                     };
 
                     var collapseWorkspaceTree = function () {
                         $sn.animate({ width: snWidth }, 300);
                         $sn.parent().animate({ width: snWidth }, 300);
                         
+                        $('.epm-nav-ws-node').each(function () {
+                            $(this).attr('style', '');
+                        });
+
                         window.epmLiveNavigation.resetWSNodeWidth();
                     };
 
@@ -927,9 +943,9 @@
                         }
                     };
 
-                    $wsTree.hover(function () {
+                    $('#EPMNavWorkspacesTree').hover(function() {
                         expandWorkspaceMenu();
-                    }, function () {
+                    }, function() {
                         collapseWorkspaceTree();
                     });
 
@@ -1075,12 +1091,14 @@
                                 wsTree.commitChanges();
                             };
 
+                            var wsTree = window.epmLiveNavigation.workspaceTree();
+
                             $('a.rtIn').each(function() {
                                 var $a = $(this);
                                 
                                 var $parent = $a.parent();
                                 
-                                $parent.append('<div class="epm-nav-ws-node"></div>');
+                                $parent.append('<div id="' + wsTree.findNodeByText($a.text()).get_value() + '" class="epm-nav-ws-node"></div>');
                                 $a.remove();
 
                                 var text = $a.text();
@@ -1179,6 +1197,7 @@
                         var getIcon = function (command) {
                             switch (command.toLowerCase()) {
                                 case 'nav:remove':
+                                case 'nav:addtofav':
                                     return 'icon-star-6';
                                 case 'view':
                                     return 'icon-info';
@@ -1487,9 +1506,10 @@
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
-                            menuManager.setupMenu($li, [
-                                { title: 'Remove', command: 'nav:remove', kind: '98' }
-                            ]);
+                            var fWs = [{ title: 'Remove', command: 'nav:remove', kind: '98' }];
+                            var tWs = [{ title: 'Add', command: 'nav:addToFav' }];
+
+                            menuManager.setupMenu($li, $li.hasClass('epm-nav-ws-node') ? tWs : fWs);
                         });
                     };
 
@@ -1504,9 +1524,11 @@
                                 if (width) {
                                     var offset = $a.offset().left - 50;
                                     var total = (width + offset);
-
-                                    if (total > 180 - padding) {
-                                        var newWidth = 180 - offset - padding;
+                                    
+                                    var menuWidth = 180;
+                                    
+                                    if (total > menuWidth - padding) {
+                                        var newWidth = menuWidth - offset - padding;
 
                                         $a.data('originalwidth', $a.width());
                                         $a.data('newwidth', newWidth);
@@ -1598,7 +1620,7 @@
                     $ul.sortable({
                         items: 'li.epm-nav-sortable',
                         placeholder: 'epm-nav-drag-placeholder',
-                        update: function (event, ui) {
+                        update: function () {
                             workspacesManager.resetOrder($ul);
                         }
                     });
@@ -1609,6 +1631,10 @@
 
                 workspacesManager.configureNodeWidth();
                 workspacesManager.initializeSearch();
+
+                $('#EPMNavWorkspacesTree').find('a').each(function() {
+                    workspacesManager.addMenu($(this).parent());
+                });
             };
 
             ExecuteOrDelayUntilScriptLoaded(manageSettings, 'EPMLiveNavigation_Settings');

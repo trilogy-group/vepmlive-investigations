@@ -75,18 +75,35 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-                    links.AddRange(from DataRow row in dataTable.Rows
-                        select new SPNavLink
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        var linkUrl = S(row["Url"]);
+                        var itemId = S(row["ItemId"]);
+                        string webId = S(WebId);
+                        string listId = S(row["ListId"]);
+
+                        if (!string.IsNullOrEmpty(itemId))
+                        {
+                            linkUrl =
+                                string.Format(
+                                    @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid={1}&listid={2}&id={3}');",
+                                    RelativeUrl, webId, listId, itemId);
+                        }
+
+                        var link = new SPNavLink
                         {
                             Id = S(row["LinkId"]),
                             Title = S(row["Title"]),
-                            Url = S(row["Url"]),
+                            Url = linkUrl,
                             CssClass = "epm-nav-sortable " + S(row["CssClass"]),
                             SiteId = S(SiteId),
-                            WebId = S(WebId),
-                            ListId = S(row["ListId"]),
-                            ItemId = S(row["ItemId"])
-                        });
+                            WebId = webId,
+                            ListId = listId,
+                            ItemId = itemId
+                        };
+
+                        links.Add(link);
+                    }
                 }
                 else
                 {

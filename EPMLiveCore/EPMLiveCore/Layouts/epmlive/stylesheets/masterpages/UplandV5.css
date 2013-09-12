@@ -76,7 +76,7 @@ a.ms-core-menu-root:link {
     display: none !important;
 }
 
-.ms-core-pageTitle, .ms-core-pageTitle a {
+#page-title a {
     color: #ffffff !important;
 }
 

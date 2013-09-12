@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.ReportingProxy;
@@ -27,12 +26,14 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
-        private const string RI_QUERY = @"SELECT TOP (30) FRF_ID AS LinkId, LIST_ID AS ListId, ITEM_ID AS ItemId,
-                                        Title, Icon AS CssClass, F_String AS Url FROM dbo.FRF
+        private const string RI_QUERY =
+            @"SELECT TOP (30) FRF_ID AS LinkId, WEB_ID AD WebId, LIST_ID AS ListId, ITEM_ID AS ItemId,
+                                        Title, Icon AS CssClass FROM dbo.FRF
                                         WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 2)
                                         ORDER BY F_Date DESC";
-        private const string FA_QUERY = @"SELECT TOP (5) FRF_ID AS LinkId, LIST_ID AS ListId, ITEM_ID AS ItemId, Title,
-                                        Icon AS CssClass, F_String AS Url FROM dbo.FRF
+
+        private const string FA_QUERY = @"SELECT TOP (5) FRF_ID AS LinkId, WEB_ID AS WebId, LIST_ID AS ListId, Title,
+                                        Icon AS CssClass FROM dbo.FRF
                                         WHERE (SITE_ID = @SiteId) AND (USER_ID = @UserId) AND (Type = 3)
                                         ORDER BY F_Int DESC, Title";
 
@@ -122,20 +123,47 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private void GetLinks(DataTable dataTable, List<NavLink> links)
         {
-            if (dataTable != null)
+            if (dataTable == null || dataTable.Rows.Count == 0) return;
+
+            foreach (DataRow row in dataTable.Rows)
             {
-                links.AddRange(from DataRow row in dataTable.Rows
-                    select new SPNavLink
-                    {
-                        Id = S(row["LinkId"]),
-                        Title = S(row["Title"]),
-                        Url = S(row["Url"]),
-                        CssClass = S(row["CssClass"]),
-                        SiteId = S(SiteId),
-                        WebId = S(WebId),
-                        ListId = S(row["ListId"]),
-                        ItemId = S(row["ItemId"])
-                    });
+                string itemId = string.Empty;
+
+                try
+                {
+                    itemId = S(row["ItemId"]);
+                }
+                catch { }
+
+                string webId = S(WebId);
+                string listId = S(row["ListId"]);
+
+                string url =
+                    string.Format(
+                        @"{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=gotolist&webid={1}&listid={2}&isdlg=0",
+                        RelativeUrl, webId, listId);
+
+                if (!string.IsNullOrEmpty(itemId))
+                {
+                    url =
+                        string.Format(
+                            @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid={1}&listid={2}&id={3}');",
+                            RelativeUrl, webId, listId, itemId);
+                }
+
+                var link = new SPNavLink
+                {
+                    Id = S(row["LinkId"]),
+                    Title = S(row["Title"]),
+                    Url = url,
+                    CssClass = S(row["CssClass"]),
+                    SiteId = S(SiteId),
+                    WebId = webId,
+                    ListId = listId,
+                    ItemId = itemId
+                };
+
+                links.Add(link);
             }
         }
 
