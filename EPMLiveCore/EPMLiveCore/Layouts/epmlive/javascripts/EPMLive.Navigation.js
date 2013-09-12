@@ -1112,6 +1112,8 @@
                         }
                         else if (providerName === 'Applications') {
                             $($('#epm-nav-sub-new-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important');
+                        } else if (providerName === 'Favorites') {
+                            $($('#epm-nav-sub-favorites-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important');
                         }
 
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);

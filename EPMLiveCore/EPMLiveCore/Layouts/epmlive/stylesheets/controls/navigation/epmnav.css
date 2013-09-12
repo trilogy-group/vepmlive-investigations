@@ -608,9 +608,11 @@ li.epm-nav-node-selected ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
 li.epm-nav-node-selected ul.epm-nav-contextual-menu li a {
   width: 133px !important;
 }
-#epm-nav-sub-new-static-links .epm-nav-sub-header {
+#epm-nav-sub-new-static-links .epm-nav-sub-header,
+#epm-nav-sub-favorites-static-links .epm-nav-sub-header {
   border-bottom: none;
 }
-#epm-nav-sub-new-static-links .epm-nav-sub-header-bottom {
+#epm-nav-sub-new-static-links .epm-nav-sub-header-bottom,
+#epm-nav-sub-favorites-static-links .epm-nav-sub-header-bottom {
   border-top: none;
 }

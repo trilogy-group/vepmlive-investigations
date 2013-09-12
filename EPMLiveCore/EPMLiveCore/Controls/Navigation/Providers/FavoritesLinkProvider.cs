@@ -36,7 +36,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Properties 
 
-        #region Methods (1) 
+        #region Methods (2) 
 
         // Public Methods (1) 
 
@@ -75,34 +75,49 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
+                    var pages = new List<DataRow>();
+                    var items = new List<DataRow>();
+
                     foreach (DataRow row in dataTable.Rows)
                     {
-                        var linkUrl = S(row["Url"]);
-                        var itemId = S(row["ItemId"]);
-                        string webId = S(WebId);
-                        string listId = S(row["ListId"]);
-
-                        if (!string.IsNullOrEmpty(itemId))
+                        if (string.IsNullOrEmpty(S(row["ItemId"])))
                         {
-                            linkUrl =
-                                string.Format(
-                                    @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid={1}&listid={2}&id={3}');",
-                                    RelativeUrl, webId, listId, itemId);
+                            pages.Add(row);
                         }
-
-                        var link = new SPNavLink
+                        else
                         {
-                            Id = S(row["LinkId"]),
-                            Title = S(row["Title"]),
-                            Url = linkUrl,
-                            CssClass = "epm-nav-sortable " + S(row["CssClass"]),
-                            SiteId = S(SiteId),
-                            WebId = webId,
-                            ListId = listId,
-                            ItemId = itemId
-                        };
+                            items.Add(row);
+                        }
+                    }
 
-                        links.Add(link);
+                    links.Add(new NavLink {Title = "Pages", Url = "Header"});
+
+                    if (pages.Any())
+                    {
+                        links.AddRange(pages.Select(GetNavLink));
+                    }
+                    else
+                    {
+                        links.Add(new NavLink
+                        {
+                            Title = "No pages",
+                            Url = "PlaceHolder"
+                        });
+                    }
+
+                    links.Add(new NavLink {Title = "Items", Url = "Header"});
+
+                    if (items.Any())
+                    {
+                        links.AddRange(items.Select(GetNavLink));
+                    }
+                    else
+                    {
+                        links.Add(new NavLink
+                        {
+                            Title = "No items",
+                            Url = "PlaceHolder"
+                        });
                     }
                 }
                 else
@@ -116,6 +131,38 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                 return links;
             }).Value;
+        }
+
+        // Private Methods (1) 
+
+        private SPNavLink GetNavLink(DataRow row)
+        {
+            string linkUrl = S(row["Url"]);
+            string itemId = S(row["ItemId"]);
+            string webId = S(WebId);
+            string listId = S(row["ListId"]);
+
+            if (!string.IsNullOrEmpty(itemId))
+            {
+                linkUrl =
+                    string.Format(
+                        @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid={1}&listid={2}&id={3}');",
+                        RelativeUrl, webId, listId, itemId);
+            }
+
+            var link = new SPNavLink
+            {
+                Id = S(row["LinkId"]),
+                Title = S(row["Title"]),
+                Url = linkUrl,
+                CssClass = "epm-nav-sortable " + S(row["CssClass"]),
+                SiteId = S(SiteId),
+                WebId = webId,
+                ListId = listId,
+                ItemId = itemId
+            };
+
+            return link;
         }
 
         #endregion Methods 
