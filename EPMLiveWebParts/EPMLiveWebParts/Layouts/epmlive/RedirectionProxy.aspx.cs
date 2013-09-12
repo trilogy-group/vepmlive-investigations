@@ -77,8 +77,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     case "gotolist":
                         using (spWeb)
                         {
-                            redirectUrl = string.Format(@"{0}/{1}?IsDlg={2}", safeServerRelativeUrl,
-                                spWeb.Lists[listName].Forms[PAGETYPE.PAGE_DEFAULTVIEW].Url, isDlg);
+                            redirectUrl = string.Format(@"{0}{1}", spWeb.Lists[listName].DefaultViewUrl,
+                                isDlg.Equals("1") ? "?isdlg=1" : string.Empty);
                         }
                         break;
                     case "comments":
