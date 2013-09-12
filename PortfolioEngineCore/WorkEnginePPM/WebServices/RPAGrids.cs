@@ -1114,6 +1114,9 @@ namespace RPADataCache
         private CStruct m_xDef;
         private CStruct m_xDefTree;
         private CStruct m_xDefNode;
+        private CStruct m_xDefPI;
+
+        private CStruct m_lastnode;
 
         private CStruct[] m_xLevels = new CStruct[64];
         private int m_nLevel = 0;
@@ -1211,6 +1214,17 @@ namespace RPADataCache
             m_xDefNode.CreateStringAttr("HoverCell", "Color");
             m_xDefNode.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             m_xDefNode.CreateIntAttr("NoColorState", 1);
+
+            m_xDefPI = m_xDef.CreateSubStruct("D");
+            m_xDefPI.CreateStringAttr("Name", "PI");
+            m_xDefPI.CreateStringAttr("Calculated", "0");
+
+            m_xDefPI.CreateStringAttr("HoverCell", "Color");
+            m_xDefPI.CreateStringAttr("HoverRow", "Color");
+            m_xDefPI.CreateStringAttr("FocusCell", "");
+            m_xDefPI.CreateStringAttr("HoverCell", "Color");
+            m_xDefPI.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
+            m_xDefPI.CreateIntAttr("NoColorState", 1);
 
             CStruct xHead = xGrid.CreateSubStruct("Head");
  //           xHead.CreateIntAttr("Visible", 0);
@@ -1368,6 +1382,9 @@ namespace RPADataCache
 
                         m_xDefNode.CreateStringAttr(sn + "HtmlPrefix", "");
                         m_xDefNode.CreateStringAttr(sn + "HtmlPostfix", "");
+
+                        m_xDefPI.CreateStringAttr(sn + "HtmlPrefix", "");
+                        m_xDefPI.CreateStringAttr(sn + "HtmlPostfix", "");
 
                         xC.CreateStringAttr("Class", "GMCellMain");
                         if (col.m_type == 2)
@@ -1557,9 +1574,12 @@ namespace RPADataCache
                     {
                         m_xDefNode.CreateStringAttr("X" + sId + "C" + cnt.ToString() + "Formula", "");
                         m_xDefNode.CreateStringAttr("Y" + sId + "C" + cnt.ToString() + "Formula", "");
+                        m_xDefPI.CreateStringAttr("X" + sId + "C" + cnt.ToString() + "Formula", "");
+                        m_xDefPI.CreateStringAttr("Y" + sId + "C" + cnt.ToString() + "Formula", "");
                     }
 
                     m_xDefNode.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Formula", "");
+                    m_xDefPI.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Formula", "");
 
 
                     xC.CreateIntAttr("MinWidth", 45);
@@ -1661,6 +1681,9 @@ namespace RPADataCache
             clsCatItem oc;
 
             m_xLevels[1] = xI;
+
+            m_lastnode = xI;
+
             xI.CreateStringAttr("id", rID.ToString());
             xI.CreateStringAttr("Color", "white");
             xI.CreateStringAttr("Def", "Leaf");
@@ -1875,6 +1898,204 @@ namespace RPADataCache
             }
         }
 
+        public void AddPIRow(clsResXData oDet, List<clsRXDisp> Cols, clsResourceValues o_cResVals, Dictionary<int, clsViewTargetColours> TargetColors, int rID, int iMode, bool by_role, List<RPATGRow> disp, bool bUseHeatmap, int iHeatMapID, bool bDoZeroRowCleverStuff, int HeatFieldColour)
+        {
+
+            int tarlev;
+
+            double xval;
+            double cval;
+            int i;
+            string cellval;
+            int cnt = 0;
+
+            bool bDoIt = true;
+
+            if (bDoZeroRowCleverStuff)
+            {
+                bDoIt = false;
+                i = 0;
+                cnt = disp.Count;
+
+                if (cnt != 0)
+                {
+
+                    foreach (CPeriod oPer in o_cResVals.Periods.Values)
+                    {
+                        if (bDoIt)
+                            break;
+
+                        try
+                        {
+
+                            ++i;
+
+
+                            cnt = 0;
+                            foreach (RPATGRow ot in disp)
+                            {
+                                ++cnt;
+
+                                xval = GetPIDataValue(oDet, iMode, i);
+
+                                if (xval != 0)
+                                {
+                                    bDoIt = true;
+                                    break;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+
+
+                }
+            }
+
+            if (bDoIt == false)
+                return;
+
+
+            CStruct xIParent = m_xLevels[0];
+            CStruct xI = m_lastnode.CreateSubStruct("I");
+            clsEPKItem oItem;
+            clsListItem oListItem;
+            clsCatItem oc;
+
+            m_xLevels[2] = xI;
+
+            xI.CreateStringAttr("id", rID.ToString());
+            xI.CreateStringAttr("Color", "white");
+            xI.CreateStringAttr("Def", "PI");
+
+            xI.CreateBooleanAttr("CanEdit", false);
+            xI.CreateIntAttr("NoColorState", 1);
+            xI.CreateIntAttr("rowid", rID);
+            xI.CreateBooleanAttr("rowidCanEdit", false);
+
+
+            xI.CreateStringAttr("rtSelectType", "Text");
+            xI.CreateStringAttr("rtSelect", " ");
+            xI.CreateBooleanAttr("rtSelectCanEdit", false);
+
+
+            foreach (clsRXDisp col in Cols)
+            {
+                try
+                {
+
+
+                    if ((col.m_id == RPConstants.TGRID_TOTITEM_ID) || (!((by_role == true && col.m_id > 100) || (by_role == true && col.m_id == RPConstants.TGRID_TOTDEPT_ID))))
+                    {
+                        string sn = col.m_realname.Replace("/n", "");
+                        sn = sn.Replace(" ", "");
+
+                        sn = sn.Replace("\r", "");
+                        sn = sn.Replace("\n", "");
+
+                        if (col.m_id == RPConstants.TGRID_TOTRESRES_ID)
+                            sn = "ResOrRole";
+
+
+                        switch (col.m_id)
+                        {
+
+                            case RPConstants.TGRID_TOTDEPT_ID:
+                                 break;
+
+                            case RPConstants.TGRID_TOTRESRES_ID:
+
+                                break;
+
+                            case RPConstants.TGRID_TOTROLE_ID:
+                                break;
+
+
+                            case RPConstants.TGRID_TOTITEM_ID:
+
+
+                                xI.CreateStringAttr(sn, oDet.ProjectName);
+                                break;
+
+                            case RPConstants.TGRID_TOTCC_ID:
+
+                                break;
+
+                            case RPConstants.TGRID_TOTCCFULL_ID:
+
+                                break;
+
+
+
+                            default:
+
+                                break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+
+            }
+
+
+
+
+            i = 0;
+            cnt = disp.Count;
+
+            if (cnt == 0)
+                return;
+
+            foreach (CPeriod oPer in o_cResVals.Periods.Values)
+            {
+                try
+                {
+
+                    string sCName;
+                    ++i;
+                    cval = 0;
+
+                    cnt = 0;
+                    foreach (RPATGRow ot in disp)
+                    {
+                        ++cnt;
+                        sCName = "P" + oPer.PeriodID.ToString() + "C" + cnt.ToString();
+
+                        if (ot.fid == 0) 
+                        {
+
+                            xval = GetPIDataValue(oDet, iMode, i);
+                            cellval = "";
+
+
+                            if (iMode == 0)
+                                cellval = xval.ToString("0.##");
+                            else if (iMode == 2)
+                                cellval = xval.ToString("0.###");
+                            else
+                                cellval = xval.ToString("0.###");
+
+
+                            xI.CreateStringAttr(sCName, cellval);
+
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+        }
+        
         private string GetStatusText(int stat)
         {
 
@@ -2040,8 +2261,40 @@ namespace RPADataCache
             return retval;
         }
 
+        private double GetPIDataValue(clsResXData oDet, int iMode, int i)
+        {
+            double retval = 0;
+            double vval = 0;
+            double fval = 0;
+
+
+            vval = oDet.getvarr(i);
+            fval = oDet.getftarr(i);
+ 
+            if (iMode == 3)
+            {
+                if (fval == 0)
+                    retval = 0;
+                else
+                    retval = (vval * 100) / fval;
+            }
+            else if (iMode == 0)
+                retval = vval;
+            else
+                retval = fval;
+
+
+
+            if (iMode == 1)
+                retval /= 100;
+
+            return retval;
+        }
+
 
     }
+
+
     internal class RPATargetGrid
     {
         private CStruct xGrid;

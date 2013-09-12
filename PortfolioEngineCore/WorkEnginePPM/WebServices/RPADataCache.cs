@@ -5,7 +5,7 @@ using System.Xml;
 using System.Linq;
 using WorkEnginePPM;
 using ResourceValues;
-using PortfolioEngineCore;
+using PortfolioEngineCore;   
 
 
 namespace RPADataCache
@@ -271,6 +271,9 @@ namespace RPADataCache
         public List<clsResXData> proposal = new List<clsResXData>();
         public List<clsResXData> avail = new List<clsResXData>();
 
+        public List<clsResXData> used4totals = new List<clsResXData>();
+        public Dictionary<int,clsResXData> PerPItotals = new Dictionary<int, clsResXData>();
+
         public List<clsResXData> CapScen = new List<clsResXData>();
 
         public Dictionary<int, string> PIList = new Dictionary<int, string>(); 
@@ -280,6 +283,8 @@ namespace RPADataCache
 
             PIList = new Dictionary<int, string>(); 
             tot_Totals.SetPeriodsToZero();
+
+            used4totals = new List<clsResXData>();
 
             CreateTotalsForList(tot_actual, actual, chkActual, true);
             CreateTotalsForList(tot_openreq, openreq, chkOpenRequest, true);
@@ -304,6 +309,7 @@ namespace RPADataCache
                     {
                         string sPI;
                         tot_Totals.AddToPeriods(oDet);
+                        used4totals.Add(oDet);
 
                         if (PIList.TryGetValue(oDet.ProjectID, out sPI) == false && oDet.ProjectName != "")
                             PIList.Add(oDet.ProjectID, oDet.ProjectName);
@@ -311,6 +317,34 @@ namespace RPADataCache
                 }
             }
        }
+
+        public void ProcessPITotals(int PeriodsCount)
+        {
+
+            PerPItotals = new Dictionary<int, clsResXData>();
+
+            foreach (clsResXData oDet in used4totals)
+            {
+                if (oDet.bTotalize == true && oDet.bFilteredOut == false)
+                {
+                    clsResXData oPI;
+
+
+                    if (PerPItotals.TryGetValue(oDet.ProjectID, out oPI) == false)
+                    {
+                        oPI = new clsResXData();
+                        oPI.SetPeriodsToZero();
+                        oPI.SetUpPeriods(PeriodsCount);
+                        oPI.ProjectID = oDet.ProjectID;
+                        oPI.ProjectName = oDet.ProjectName;
+
+                        PerPItotals.Add(oPI.ProjectID, oPI);
+                    }
+
+                    oPI.AddToPeriods(oDet);
+                }
+            }
+        }
 
         public void MoveOverAvail()
         {
@@ -808,6 +842,7 @@ namespace RPADataCache
         private string m_totalschartdata = "";
 
         Dictionary<int, clsResFullDAta> m_usedbottomcln = new Dictionary<int, clsResFullDAta>();
+        private bool m_DisplayTotDetails = false;
 
         public RPAData()
         {
@@ -2695,6 +2730,21 @@ namespace RPADataCache
 
 
                     oGrid.AddDetailRow(oRFull, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
+                    if (m_DisplayTotDetails)
+                    {
+                            oRFull.ProcessPITotals(m_cResVals.Periods.Count);
+
+                        int xIi = 0;
+                        foreach (clsResXData odt in oRFull.PerPItotals.Values)
+                        {
+                            ++xIi;
+
+                            oGrid.AddPIRow(odt, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i * 10000000 + xIi, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
+
+
+                        }
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -2711,6 +2761,12 @@ namespace RPADataCache
             return s;
 
         }
+
+        public void BottomDetailsDisplay(string sIn)
+        {
+            m_DisplayTotDetails = (sIn == "1");
+        }
+
 
         public string GetTotalsData(bool bRetColumnData)
         {
@@ -3277,6 +3333,9 @@ namespace RPADataCache
                 {
 
                     CStruct OtherData = oNode.GetSubStruct("OtherData");
+                    CStruct ViewSettings = oNode.GetSubStruct("ViewSettings");
+
+                    // <ViewSettings ShowBars="0" HideDetails="0" ShowBotDet="0" />
 
                     if (OtherData != null)
                     {
@@ -3299,6 +3358,17 @@ namespace RPADataCache
 
                     }
 
+                    if (ViewSettings != null)
+                    {
+
+                        m_DisplayTotDetails = (ViewSettings.GetIntAttr("ShowBotDet") == 1);  
+
+                    }
+                    else
+                        m_DisplayTotDetails = false;
+
+                    CStruct oDet = xReply.CreateSubStruct("BottomDetailsState");
+                    oDet.CreateIntAttr("Value", (m_DisplayTotDetails ? 1 : 0));
 
                     xReply.AppendXML(GetDetailsData());
                     break;

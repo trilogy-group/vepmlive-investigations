@@ -24,7 +24,7 @@ namespace WorkEnginePPM
 
 
     /// <summary>
-    /// Summary description for EditCosts   
+    /// Summary description for EditCosts
     /// </summary>
     [WebService(Namespace = "WorkEnginePPM")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
@@ -573,6 +573,12 @@ namespace WorkEnginePPM
             string s = RAData.GetBottomGrid();
             return s;
         }
+        public static string SetBottomDetailsDisplay(HttpContext Context, string sXML, RPAData RAData)
+        {
+            RAData.BottomDetailsDisplay(sXML);
+            return "";
+        }
+
 
         public static string GetTotalsColumnsConfiguration(HttpContext Context, string sXML, RPAData RAData)
         {

@@ -9,11 +9,11 @@
 			return method.apply(target, arguments);
 		}
 	}
-
+      
 	//  General page settings
 
 
-	ResPlanAnalyzer.prototype.OnLoad = function (event) {
+	ResPlanAnalyzer.prototype.OnLoad = function (event) {  
 		try {
 
 			Grids.OnValueChanged = GridsOnValueChangedDelegate;
@@ -206,7 +206,7 @@
 
 		var ssbf = (this.AnalyzerShowBarschecked ? "1" : "0");
 		var shdf = (this.AnalyzerHideDetailschecked ? "1" : "0");
-			
+		var shbd = (this.showingTotDet ? "1" : "0");			
 
 		var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
 				+ isViewDefault + '" Personal="' + isViewPersonal + '">'
@@ -217,7 +217,7 @@
 				+ this.DetailsSettings
 				+ this.DisplayMode
 				+ '</OtherData>'
-				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '"/>'
+				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '" ShowBotDet="' + shbd + '"/>'
 				+'</View>';
 
 		if (bConvToJSON != true)
@@ -347,13 +347,14 @@
 
 	            if (gridId == "bottomg_1" && gridView.LeftCols == "")
 	                gridView.LeftCols = "rtSelect:20";
-	            else {
+                else {
 	                if (gridView.LeftCols.indexOf("rtSelect") == -1)
 	                {
 	                    gridView.LeftCols += ",rtSelect:20";
 	                }
 
 	            }
+
 
 	            var leftCols = gridView.LeftCols.split(',');
 
@@ -1681,6 +1682,20 @@
 
 				this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
 				this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
+
+                var bdstate = jsonObject.Result.ViewData.BottomDetailsState.Value;
+
+                this.showingTotDet = (bdstate == "1")
+	            if (this.showingTotDet == true) {
+
+	                    this.totTab.setButtonStateOn("idBTSDet");
+
+                }
+	            else {
+                            
+	                this.totTab.setButtonStateOff("idBTSDet");
+ 	            }
+
 				
 				var wmode = jsonObject.Result.ViewData.WorkDisplayMode.Mode;
 
@@ -2257,6 +2272,11 @@
 							    items: [
 									{ type: "mediumbutton", id: "idGraph", name: "Show<br/>Graph", img: "ps16x16.png", style: "top: -128px; left: -80px;position:relative;", tooltip: "Show Graph", onclick: "dialogEvent('AnalyzerTab_ShowGraph');" }
 								]
+							},
+							{
+							    items: [
+									{ type: "mediumbutton", id: "idBTSDet", name: "Show<br/>Details", img: "ps16x16.png", style: "top: -128px; left: -192px;position:relative;", tooltip: "Show Details", onclick: "dialogEvent('AnalyzerTab_ShowBottomDetails');" }
+								]
 							}
 						 ]
 					},
@@ -2741,6 +2761,21 @@
 
 	                this.TotalsGridSupressHeatmap = this.TotalsGridSettingsData.HeatMap.HeapMapSubCol;
 	                this.TotalsGridTotalsCol = this.TotalsGridSettingsData.HeatMap.HeapMapTotalsCol;
+
+                    var bdstate = jsonObject.Result.ViewData.BottomDetailsState.Value;
+
+                    this.showingTotDet = (bdstate == "1")
+	                if (this.showingTotDet == true) {
+
+	                        this.totTab.setButtonStateOn("idBTSDet");
+
+                    }
+	                else {
+                            
+	                    this.totTab.setButtonStateOff("idBTSDet");
+ 	                }
+
+                        
 	                this.heatmapText = "";
 
 	                try {
@@ -3119,7 +3154,7 @@
 	            this.bottomgriddragstash = null;
 	            return;
 	        }
-	        else if (this.topgridstash != null && grid.id == "g_1") {
+	        else if (this.topgridstash != null && grid.id == "g_1") {  
 	            this.ApplyGridView(grid.id, this.topgridstash.View, false);
 	            this.topgridstash = null;
 	            return;
@@ -3268,6 +3303,15 @@
         }
 
         while (children != null) {
+            if (Grid.GetAttribute(children, "rtSelect", "CanEdit") == "0") {
+
+                var rowck = Grid.GetString(Row, "rtSelect");
+                if (rowck == "0")
+                    return false;
+
+                return true;
+            }
+
             if (AllBottomLeavesChecked(Grid, children) == false)
                 return false;
 
@@ -3551,6 +3595,8 @@
 	    if (col == "RowSel")
 	        return null;
 
+	    if (col === "PortfolioItem") 
+            return null;
 
 	    if (col.charAt(0) === "P") {
 
@@ -4001,6 +4047,12 @@
 	    Row.Changed = 1;
 	    Grid.SetString(Row, Col, value, 1);
 	    children = Row.firstChild;
+
+        if (children != null) {
+            if (Grid.GetAttribute(children, "rtSelect", "CanEdit") == "0") 
+                children = null;
+        }
+
 
 	    if (children == null) {
 	        var rowid = Grid.GetString(Row, "rowid");
@@ -5271,6 +5323,15 @@
 			} catch (e) {
 			}
 
+			try {
+				this.showingTotDet = (this.selectedView.ViewSettings.ShowBotDet == "1");
+			} catch (e) {
+                this.showingTotDet = false;
+			}
+
+     	
+
+
 			if (this.AnalyzerShowBarschecked == true) {
 				this.viewTab.setButtonStateOn("idAnalyzerShowBars");
 			} else {
@@ -5283,6 +5344,14 @@
 			} else {
 				this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
 			}
+
+            
+			if (this.AnalyzerHideDetailschecked == true) {
+				this.totTab.setButtonStateOn("idBTSDet");
+			} else {
+				this.totTab.setButtonStateOff("idBTSDet");
+			}
+
 
 			this.deferredhidedetails = true;
 
@@ -6074,6 +6143,33 @@
 	            case "TotalsTab_GridHelpBtn":
 	                this.DisplayGridExplaination();
 	                break;
+
+	            case "AnalyzerTab_ShowBottomDetails":
+ 	                try {
+   
+   			            this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+	                    if (this.showingTotDet == false) {
+
+	                         this.totTab.setButtonStateOn("idBTSDet");
+	                         this.showingTotDet = true;
+                             WorkEnginePPM.ResPlanAnalyzer.Execute("SetBottomDetailsDisplay", "1" , RefreshBottomGrid);
+
+                        }
+	                    else {
+	                        this.showingTotDet = false;
+                            
+                             
+	                        this.totTab.setButtonStateOff("idBTSDet");
+                             WorkEnginePPM.ResPlanAnalyzer.Execute("SetBottomDetailsDisplay", "0" , RefreshBottomGrid);
+	                    }
+
+                        
+	                }
+	                catch (e) { }
+
+	                break;
+                       
+     
 
 	            case "AnalyzerTab_ShowGraph":
 	                // this.GoDoChart();
@@ -7687,6 +7783,8 @@ ResPlanAnalyzer.prototype.InitVars = function () {
     this.dlgChart = null;
     this.showingGraph = false;
     this.ChartRawData = null;
+
+    this.showingTotDet = false;
 }
 
 	try {
@@ -7780,17 +7878,17 @@ ResPlanAnalyzer.prototype.InitVars = function () {
         var GetTotalsGridChartDataCompleteDelegate =  MakeDelegate(this, this.GetTotalsGridChartDataComplete);
 
 //<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
-	    //$.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
+	    $.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
 
-	    //    //console.log(data); //data returned
+	        //console.log(data); //data returned
 
-	    //    alert(textStatus); //success
+	        //alert(textStatus); //success
 
-	    //    //console.log(jqxhr.status); //200
+	        //console.log(jqxhr.status); //200
 
-	    //    //console.log('Load was performed.');
+	        //console.log('Load was performed.');
 
-	    //});
+	    });
 
 
  
