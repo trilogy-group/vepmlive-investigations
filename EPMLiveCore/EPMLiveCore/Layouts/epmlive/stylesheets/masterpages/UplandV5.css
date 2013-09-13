@@ -128,11 +128,11 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     -ms-text-shadow: 0 1px 0 #00A9ED;
     -webkit-text-shadow: 0 1px 0 #00A9ED;
     text-shadow: 0 1px 0 #00A9ED;
-    -webkit-transition: color 0.3s ease 0s;
-    -moz-transition: color 0.3s ease 0s;
-    -ms-transition: color 0.3s ease 0s;
-    -o-transition: color 0.3s ease 0s;
-    transition: color 0.3s ease 0s;
+    -webkit-transition: color 0.2s ease 0s;
+    -moz-transition: color 0.2s ease 0s;
+    -ms-transition: color 0.2s ease 0s;
+    -o-transition: color 0.2s ease 0s;
+    transition: color 0.2s ease 0s;
 }
 
 .epm-global-button-right a:hover {
