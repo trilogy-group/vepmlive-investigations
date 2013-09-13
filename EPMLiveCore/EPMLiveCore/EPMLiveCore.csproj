@@ -1551,7 +1551,9 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>bindWithDelay.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map">
+      <DependentUpon>UplandV5.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
       <DependentUpon>Notifications.js</DependentUpon>
     </None>

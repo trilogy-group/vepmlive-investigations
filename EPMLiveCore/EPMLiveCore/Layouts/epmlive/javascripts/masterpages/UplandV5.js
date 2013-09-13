@@ -1,5 +1,51 @@
-﻿(function() {
+﻿var uvOptions = {};
+
+(function() {
     'use strict';
+
+    function loadUserVoice() {
+        var uv = document.createElement('script');
+        uv.type = 'text/javascript';
+        uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/yEDMyjE4NNMKmmRoDiWQ.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(uv, s);
+    }
+
+    window.showUserVoicePopup = function() {
+        if (window.isIE8 && window.userVoiceIgnored) {
+            alert('User Voice is not supported on this page in IE 8.');
+        } else {
+            window.UserVoice.showPopupWidget();
+        }
+    };
+
+    if (window.isIE8) {
+        window.ie8StringContains = function(str1, str2) {
+            var arr = str1.split(str2);
+            if (arr.length > 1) return true;
+            return false;
+        };
+
+        var currentUrl = (window.location + '').toLowerCase();
+
+        var ignore = false;
+        var ignoredUrls = ['EditableFields.aspx', 'ViewEdit.aspx'];
+        for (var i = 0; i < ignoredUrls.length; i++) {
+            if (window.ie8StringContains(currentUrl, ignoredUrls[i].toLowerCase())) {
+                ignore = true;
+                break;
+            }
+        }
+
+        if (!ignore) {
+            loadUserVoice();
+        }
+
+        window.userVoiceIgnored = ignore;
+    } else {
+        loadUserVoice();
+    }
 
     window.toggleSearch = function() {
         var $sbox = $('#search-box-container');
@@ -32,13 +78,13 @@
         $supportLink.attr('href', '#');
         $supportLink.removeAttr('target');
 
-        $supportLink.click(function () {
+        $supportLink.click(function() {
             $('.walkme-menu-click-close').after('<a id="support-link" style="right: 31px !important; top:  8px !important; width: 220px !important; height: 25px !important; z-index: 2147483647 !important; position: absolute !important; font-size: 14px; color: #1F80C8" href="http://support.epmlive.com" target="_blank">Visit our Support Community</a>');
             window.WalkMePlayerAPI.toggleMenu();
         });
     };
 
-    window.walkme_player_event = function (eventData) {
+    window.walkme_player_event = function(eventData) {
         if (eventData.Type === "AfterMenuOpen") {
             $('#epm-support-link').css('color', '#FFFFFF');
         }
