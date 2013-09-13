@@ -18,6 +18,8 @@
 
     #Ribbon.epm-nav-pinned { margin-left: 180px; }
 
+    #Ribbon.epm-nav-unpinned { margin-left: 0; }
+
     .ms-dialog .epm-nav-pinned, .ms-dialog .epm-nav-unpinned { margin-left: auto !important; }
 </style>
 

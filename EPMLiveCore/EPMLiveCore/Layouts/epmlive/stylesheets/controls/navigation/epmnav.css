@@ -603,3 +603,6 @@ li.epm-nav-node-selected ul.epm-nav-contextual-menu li a {
 #epm-nav-sub-favorites-static-links .epm-nav-sub-header-bottom {
   border-top: none;
 }
+.ms-dialog #epm-nav {
+  display: none;
+}
