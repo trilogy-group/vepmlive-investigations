@@ -59,7 +59,7 @@ namespace EPMLiveCore.API
             // </Data>
 
             // load data into XML manager
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
             SPList commentsList = cWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
 
             StringBuilder sbResult = new StringBuilder();
@@ -211,7 +211,7 @@ namespace EPMLiveCore.API
             // </Data>
 
             // load data into XML manager
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
             SPList commentsList = currentWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
             //SPUser user = currentWeb.AllUsers.GetByID(Convert.ToInt32(dataMgr.GetPropVal("UserId")));
 
@@ -263,7 +263,7 @@ namespace EPMLiveCore.API
             // </Data>
 
             // load data into XML manager
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
             SPList commentsList = cWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
 
             if (commentsList != null)
@@ -405,7 +405,7 @@ namespace EPMLiveCore.API
             // </Data>
 
             // load data into XML manager
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
             SPList commentsList = currentWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
 
             if (commentsList != null)
@@ -779,7 +779,7 @@ namespace EPMLiveCore.API
             // </Data>
 
             // load data into XML manager
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
 
             string sItemIds = dataMgr.GetPropVal("ItemIds");
             if (!string.IsNullOrEmpty(sItemIds))

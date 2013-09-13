@@ -15,6 +15,7 @@ using System.Web;
 using System.Data;
 using System.Reflection;
 using System.Diagnostics;
+using EPMLiveCore;
 
 namespace EPMLiveCore.API
 {
@@ -46,7 +47,7 @@ namespace EPMLiveCore.API
             //</Data>
 
             StringBuilder result = new StringBuilder();
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
             string type = dataMgr.GetPropVal("Type");
             SPList tmpGalList = cWeb.Lists.TryGetList(TEMP_GAL_TITLE);
 
@@ -197,7 +198,7 @@ namespace EPMLiveCore.API
             SPWeb cWeb = SPContext.Current.Web;
 
             StringBuilder result = new StringBuilder();
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
             SPList solGallery = (SPDocumentLibrary)cWeb.Site.GetCatalog(SPListTemplateType.SolutionCatalog);
             XmlWriter writer = XmlWriter.Create(result, GetDefaultXMLWriterSettings());
 
@@ -331,7 +332,7 @@ namespace EPMLiveCore.API
             SPWeb cWeb = SPContext.Current.Web;
             string xml = string.Empty;
 
-            XmlDataManager dataMgr = new XmlDataManager(data);
+            XMLDataManager dataMgr = new XMLDataManager(data);
             if (UserCanCreateSubSite(cSite, dataMgr.GetPropVal("ParentWebUrl")))
             {
                 string sRetWebId = string.Empty;
@@ -355,7 +356,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        private static string BuildWebInfoXml(string sRetWebId, XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string BuildWebInfoXml(string sRetWebId, XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             string listName = dataMgr.GetPropVal("RListName");
             if (string.IsNullOrEmpty(dataMgr.GetPropVal("RListName")))
@@ -435,7 +436,7 @@ namespace EPMLiveCore.API
             return resultWebXML.ToString();
         }
 
-        private static string ExecuteCreateWorkspaceProcedures(XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string ExecuteCreateWorkspaceProcedures(XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             //string resultUrl = string.Empty;
             string sResultWebId = string.Empty;
@@ -605,7 +606,7 @@ namespace EPMLiveCore.API
             return success;
         }
 
-        private static string CreateNewWorkspaceFromOnlineTemps(List<string> tempSolNames, XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string CreateNewWorkspaceFromOnlineTemps(List<string> tempSolNames, XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             //string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Solutions/" + dataMgr.GetPropVal("SolutionName");
             string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Solutions/" + CoreFunctions.GetAssemblyVersion() + "/" + dataMgr.GetPropVal("SolutionName");
@@ -705,7 +706,7 @@ namespace EPMLiveCore.API
 
         }
 
-        private static string CreateNewWorkspaceFromInstalledTemps(List<string> tempSolNames, SPListItem tempGalItem, XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string CreateNewWorkspaceFromInstalledTemps(List<string> tempSolNames, SPListItem tempGalItem, XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             cSite.CatchAccessDeniedException = false;
             cWeb.Site.CatchAccessDeniedException = false;
@@ -758,14 +759,14 @@ namespace EPMLiveCore.API
             return CreateNewWorkspace(dataMgr, cSite, cWeb, cESite, cEWeb);
         }
 
-        private static string CreateNewWorkspaceFromSolutionGallery(XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string CreateNewWorkspaceFromSolutionGallery(XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             dataMgr.EditProp("TemplateName", dataMgr.GetPropVal("TemplateInternalName"));
             dataMgr.EditProp("ParentWebUrl", cWeb.ServerRelativeUrl);
             return CreateNewWorkspace(dataMgr, cSite, cWeb, cESite, cEWeb);
         }
 
-        private static string CreateNewWorkspaceFromExistingWorkspace(List<string> tempSolNames, XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string CreateNewWorkspaceFromExistingWorkspace(List<string> tempSolNames, XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             string targetWebUrl = dataMgr.GetPropVal("TargetWebUrl");
             string tempSolGuid = Guid.NewGuid().ToString("N");
@@ -800,7 +801,7 @@ namespace EPMLiveCore.API
             return CreateNewWorkspace(dataMgr, cSite, cWeb, cESite, cEWeb);
         }
 
-        private static string CreateProjectInExistingWorkspace(XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string CreateProjectInExistingWorkspace(XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             string resultUrl = string.Empty;
             string sResultWebId;
@@ -904,7 +905,7 @@ namespace EPMLiveCore.API
             return sResultWebId + ',' + itemID;
         }
 
-        private static string CreateNewWorkspace(XmlDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
+        private static string CreateNewWorkspace(XMLDataManager dataMgr, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
             string sResultWebId = string.Empty;
             string sResultWebUrl = string.Empty;

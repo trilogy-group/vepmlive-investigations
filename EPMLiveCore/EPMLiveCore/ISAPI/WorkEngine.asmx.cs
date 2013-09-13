@@ -135,6 +135,10 @@ namespace EPMLiveCore
      * ===============================
      * 20xxx
      * 
+     * ===============================
+     * EPMLIVE FAVORITES SERVICE
+     * ===============================
+     * 21xxx 
      * 
      * ===============================
      * SHAREPOINT ADMIN FUNCTIONS
@@ -1515,6 +1519,46 @@ namespace EPMLiveCore
         }
 
         #endregion
+
+        #region EPMLIVE ANALYTICS
+
+        public static string LoadFavoriteStatus(string data, SPWeb spWeb)
+        {
+            try
+            {
+                return Response.Success(Favorites.IsFav(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        public static string AddFavorites(string data, SPWeb spWeb)
+        {
+            try
+            {  
+                return Response.Success(Favorites.AddFav(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        public static string RemoveFavorites(string data, SPWeb spWeb)
+        {
+            try
+            {
+                return Response.Success(Favorites.RemoveFav(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        #endregion  
 
         public static string GenerateQuickLaunchFromApp(string data, SPWeb spWeb)
         {

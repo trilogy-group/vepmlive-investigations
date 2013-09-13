@@ -1,18 +1,124 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="IconPicker.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.IconPicker" DynamicMasterPageFile="~masterurl/default.master" %>
 
-<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+<asp:content id="PageHead" contentplaceholderid="PlaceHolderAdditionalPageHead" runat="server">
 
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <link rel="stylesheet" href="style.css" />
+<asp:content id="Main" contentplaceholderid="PlaceHolderMain" runat="server">
+    
+    <style>
+        section, header, footer {
+            display: block;
+        }
+
+        body {
+            font-family: sans-serif;
+            color: #444;
+            line-height: 1.5;
+            font-size: 1em;
+        }
+
+        * {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .glyph {
+            font-size: 16px;
+            float: left;
+            text-align: center;
+            background: #eee;
+            padding: .75em;
+            margin: .75em 1.5em .75em 0;
+            width: 7.5em;
+            border-radius: .25em;
+            box-shadow: inset 0 0 0 1px #f8f8f8, 0 0 0 1px #CCC;
+        }
+
+            .glyph input {
+                font-family: consolas, monospace;
+                font-size: 13px;
+                width: 100%;
+                text-align: center;
+                border: 0;
+                box-shadow: 0 0 0 1px #ccc;
+                padding: .125em;
+            }
+
+        .w-main {
+            width: 80%;
+        }
+
+        .centered {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .fs1 {
+            font-size: 2em;
+        }
+
+        header {
+            margin: 2em 0;
+            padding-bottom: .5em;
+            color: #666;
+            box-shadow: 0 2px #eee;
+        }
+
+            header h1 {
+                font-size: 2em;
+                font-weight: normal;
+            }
+
+        .clearfix:before, .clearfix:after {
+            content: "";
+            display: table;
+        }
+
+        .clearfix:after, .clear {
+            clear: both;
+        }
+
+        footer {
+            margin-top: 2em;
+            padding: .5em 0;
+            box-shadow: 0 -2px #eee;
+        }
+
+        a, a:visited {
+            color: #B35047;
+            text-decoration: none;
+        }
+
+            a:hover, a:focus {
+                color: #000;
+            }
+
+        .box1 {
+            font-size: 16px;
+            display: inline-block;
+            width: 15em;
+            padding: .25em .5em;
+            background: #eee;
+            margin: .5em 1em .5em 0;
+        }
+
+        .mtm span {
+            cursor: pointer;
+        }
+    </style>
+
     <div class="w-main centered">
 	
 	<div class="clear"></div>
@@ -5092,25 +5198,24 @@
 	</section>
 	
 	</div>
-    
-    <script>
-        document.getElementById("glyphs").addEventListener("click", function (e) {
-            var target = e.target;
-            if (target.tagName === "INPUT") {
-                target.select();
-            }
-        });
+	<script>
+	    document.getElementById("glyphs").addEventListener("click", function (e) {
+	        var target = e.target;
+	        if (target.tagName === "INPUT") {
+	            target.select();
+	        }
+	    });
 
-        $(".mtm span").click(function () {
-            alert($(this).find('span').attr('class'));
-        });
+	    $(".mtm span").click(function () {
+	        parent.SP.UI.ModalDialog.commonModalDialogClose(1, $(this).find('span').attr('class'));
+	    });
 	</script>
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+<asp:content id="PageTitle" contentplaceholderid="PlaceHolderPageTitle" runat="server">
 Application Page
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
+<asp:content id="PageTitleInTitleArea" contentplaceholderid="PlaceHolderPageTitleInTitleArea" runat="server">
 My Application Page
-</asp:Content>
+</asp:content>

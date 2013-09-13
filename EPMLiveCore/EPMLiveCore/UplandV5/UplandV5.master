@@ -10,6 +10,7 @@
 <%@ Register TagPrefix="epm" TagName="EPMLiveNotificationsV2" src="~/_controltemplates/EPMLiveNotificationsV2.ascx" %>
 <%@ Register TagPrefix="epm" TagName="TemplateVersoning" src="~/_controltemplates/TemplateVersoning.ascx" %>
 <%@ Register TagPrefix="epm" TagName="Statusbar" src="~/_controltemplates/EPMLiveStatusbar.ascx" %>
+<%@ Register TagPrefix="epm" TagName="FavoriteStatus" src="~/_controltemplates/FavoriteStatus.ascx" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -272,6 +273,7 @@
                                         Location="TabRowRight"
                                         ID="RibbonTabRowRight"
                                         CssClass="s4-trc-container s4-notdlg ms-core-defaultFont">
+                                        <epm:FavoriteStatus runat="server"></epm:FavoriteStatus>
                                         <SharePoint:SPSharePromotedActionButton runat="server"/>
                                         <SharePoint:DelegateControl runat="server" ControlId="PromotedActions" AllowMultipleControls="true" />
                                         <SharePoint:SPSyncPromotedActionButton runat="server"/>

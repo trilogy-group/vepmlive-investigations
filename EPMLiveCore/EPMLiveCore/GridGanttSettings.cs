@@ -42,6 +42,7 @@ namespace EPMLiveCore
         public bool LockSearch = false;
         public bool AssociatedItems = false;
         public bool DisplayFormRedirect = false;
+        public string ListIcon = "";
 
 
         public string DisplaySettings = "";
@@ -159,6 +160,8 @@ namespace EPMLiveCore
             catch { }
             try { WorkspaceParentSiteLookup = settings[37]; }
             catch { }
+            try { ListIcon = settings[38]; }
+            catch{}
 
         }
 
@@ -203,6 +206,7 @@ namespace EPMLiveCore
             data += EnableAutoCreation.ToString() + "\n";
             data += AutoCreationTemplateId + "\n";
             data += WorkspaceParentSiteLookup + "\n";
+            data += ListIcon + "\n";
 
             return data;
         }

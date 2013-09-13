@@ -283,6 +283,9 @@ namespace EPMLiveCore.Layouts.epmlive
                     ddlParentSiteLookup.DataBind();
                     ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
 
+                    //load list icon
+                    spnListIcon.CssClass = gSettings.ListIcon;
+
                     chkWorkListFeat.Checked = gSettings.EnableWorkList;
                     chkEmails.Checked = gSettings.SendEmails;
                     chkDeleteRequest.Checked = gSettings.DeleteRequest;
@@ -983,6 +986,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.EnableAutoCreation = chkAutoCreate.Checked;
             gSettings.AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue;
             gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
+            gSettings.ListIcon = spnListIcon.CssClass;
             gSettings.EnableWorkList = chkWorkListFeat.Checked;
             gSettings.SendEmails = chkEmails.Checked;
             gSettings.DeleteRequest = chkDeleteRequest.Checked;

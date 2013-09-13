@@ -41,15 +41,25 @@
     function OpenIconSelect() {
 
         var options = {
-            url: "/_layouts/epmlive/iconpicker.aspx",
+            url: epmLive.currentSiteUrl + "/_layouts/epmlive/iconpicker.aspx",
             width: 800,
-            height: 600
+            height: 600,
+            dialogReturnValueCallback: function(dialogResult, returnValue) {
+                if (dialogResult === 1) {
+                    if ($('#<%=spnListIcon.ClientID%>').length > 0 && !$('#<%=spnListIcon.ClientID%>').hasClass(returnValue)) {
+                        $('#<%=spnListIcon.ClientID%>').removeClass();
+                        $('#<%=spnListIcon.ClientID%>').addClass(returnValue);
+                    }
+                }
+            }
         };
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         return false;
     }
 
+
+    
 </script>
 
 <script type="text/javascript" src="/_layouts/epmlive/GridGanttSettings.js"></script>
@@ -492,6 +502,11 @@
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
+				     <div style="line-height: 20px;">
+				         <span class="box1" style="float:left;">
+				             <asp:Label id="spnListIcon" runat="server" CssClass="" ></asp:Label>
+	                    </span>
+				     </div>
                     <asp:Button runat="server" UseSubmitBehavior="false" Text="Select" OnClientClick="return OpenIconSelect();"/>
 				 </Template_Control>
 			</wssuc:InputFormControl>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Web.UI;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
@@ -16,6 +17,12 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected string WebFullUrl;
         protected string WebId;
         protected string WebUrl;
+        protected string ListId;
+        protected string ItemId;
+        protected string CurrentUserId;
+        protected string CurrentUrl;
+        protected string ListIconClass;
+        protected string ListViewUrl;
         private SPWeb _spWeb;
 
         #endregion Fields 
@@ -37,7 +44,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
                 "libraries/jquery.min", "libraries/jquery-ui.min", "@libraries/jquery.cookie", "/xml2json", "/MD5",
-                "jquery.multiselect.min"
+                "jquery.multiselect.min", "@EPMLive.Analytics"
             });
 
             EPMFileVersion = EPMLiveScriptManager.FileVersion;
@@ -63,6 +70,51 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             WebFullUrl = _spWeb.Url;
             WebId = _spWeb.ID.ToString();
             WebUrl = _spWeb.SafeServerRelativeUrl();
+            ListId = Guid.Empty.ToString();
+            try
+            {
+                if (!(SPContext.Current.List is SPDocumentLibrary))
+                {
+                    ListId = SPContext.Current.ListId.ToString();
+                }
+            }
+            catch{}
+            ListViewUrl = string.Empty;
+            try
+            {
+                ListViewUrl = SPContext.Current.ViewContext.View.Url;
+            }catch{}
+            ListIconClass = string.Empty;
+            try
+            {
+                ListIconClass = new GridGanttSettings(SPContext.Current.List).ListIcon;
+            }
+            catch{}
+            ItemId = "-1";
+            try
+            {
+                if (!(SPContext.Current.List is SPDocumentLibrary) && string.IsNullOrEmpty(ListViewUrl))
+                {
+                    ItemId = SPContext.Current.ItemId.ToString();
+                }
+            }
+            catch
+            {
+            }
+            CurrentUserId = "-1";
+            try
+            {
+                CurrentUserId = SPContext.Current.Web.CurrentUser.ID.ToString();
+            }
+            catch
+            {
+            }
+            CurrentUrl = string.Empty;
+            try
+            {
+                CurrentUrl = HttpContext.Current.Request.Url.AbsoluteUri;
+            }
+            catch{}
 
             try
             {

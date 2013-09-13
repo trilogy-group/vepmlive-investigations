@@ -29,8 +29,12 @@
                         epmLive.currentWebId = '<%= WebId %>';
                         epmLive.currentWebUrl = '<%= WebUrl %>';
                         epmLive.currentWebFullUrl = '<%= WebFullUrl %>';
+                        epmLive.currentListId = '<%= ListId %>';
+                        epmLive.currentListIcon = '<%= ListIconClass %>';
+                        epmLive.currentItemID = '<%= ItemId %>';
+                        epmLive.currentUserId = '<%= CurrentUserId %>';
+                        epmLive.currentUrl = '<%= CurrentUrl %>';
                         epmLive.fileVersion = '<%= EPMFileVersion %>';
-
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
                     }, true);
                 }, true);

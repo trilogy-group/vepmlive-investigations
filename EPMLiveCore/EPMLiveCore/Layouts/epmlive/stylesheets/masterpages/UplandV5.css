@@ -190,3 +190,12 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     position: absolute;
     right: 50px !important;
 }
+
+/*.ms-trcnoti-border {
+    background-color: #6abd3d !important;
+    color: white !important;
+}*/
+
+.ms-promotedActionButton, #fullscreenmodebox {
+    display: none !important;
+}
