@@ -3596,7 +3596,7 @@
 	        return null;
 
 	    if (col === "PortfolioItem") 
-            return null;
+	        return 0xFFFFFF;
 
 	    if (col.charAt(0) === "P") {
 
