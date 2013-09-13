@@ -130,6 +130,11 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Act.cs" />
     <Compile Include="ADSync.cs" />
+    <Compile Include="API\Analytics\AnalyticsData.cs" />
+    <Compile Include="API\Analytics\AnalyticsType.cs" />
+    <Compile Include="API\Analytics\Favorites.cs" />
+    <Compile Include="API\Analytics\FrequentApps.cs" />
+    <Compile Include="API\Analytics\RecentItems.cs" />
     <Compile Include="API\APIException.cs" />
     <Compile Include="API\APITeam.cs" />
     <Compile Include="API\Applications\ApplicationInstaller.cs" />
@@ -270,6 +275,13 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx.designer.cs">
       <DependentUpon>EPMLiveStatusbar.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="CONTROLTEMPLATES\FavoriteStatus.ascx.cs">
+      <DependentUpon>FavoriteStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\FavoriteStatus.ascx.designer.cs">
+      <DependentUpon>FavoriteStatus.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="CONTROLTEMPLATES\TemplateVersoning.ascx.cs">
       <DependentUpon>TemplateVersoning.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -339,6 +351,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Infrastructure\Navigation\SPNavLink.cs" />
     <Compile Include="Infrastructure\ResourceManagement\DepartmentManager.cs" />
     <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManager.cs" />
+    <Compile Include="Infrastructure\SessionManager.cs" />
     <Compile Include="Infrastructure\WEFeatures.cs" />
     <Compile Include="IntegrateEvents\IntegrateEvents.cs" />
     <Compile Include="Integrations\Office365\Infrastructure\AESCryptographyService.cs" />
@@ -406,6 +419,12 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\acttest.aspx.designer.cs">
       <DependentUpon>acttest.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\AddFavorite.aspx.cs">
+      <DependentUpon>AddFavorite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\AddFavorite.aspx.designer.cs">
+      <DependentUpon>AddFavorite.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\addusers.aspx.cs">
       <DependentUpon>addusers.aspx</DependentUpon>
@@ -1336,6 +1355,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="WorkEngineActivation.cs" />
     <Compile Include="WorkEngineActivationInstaller.cs" />
     <Compile Include="WorkEngineListEventsFeatureReceiver.cs" />
+    <Compile Include="WorkspaceEvents.cs" />
     <Compile Include="XmlDataManager.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1541,6 +1561,7 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="ISAPI\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
     </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
@@ -1954,6 +1975,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotificationsV2.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx" />
+    <Content Include="CONTROLTEMPLATES\FavoriteStatus.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupField.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupFieldEditor.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupMultiField.ascx" />
@@ -2188,6 +2210,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmliverollups.js" />
     <Content Include="Layouts\epmlive\acttest.aspx" />
     <Content Include="Layouts\epmlive\addcode.aspx" />
+    <Content Include="Layouts\epmlive\AddFavorite.aspx" />
     <Content Include="Layouts\epmlive\addperiod.aspx" />
     <Content Include="Layouts\epmlive\addperiods.aspx" />
     <Content Include="Layouts\epmlive\addusers.aspx" />
@@ -3236,7 +3259,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\Integration\OpenControl.aspx" />
     <Content Include="Layouts\epmlive\Integration\Properties.aspx" />
     <Content Include="Layouts\epmlive\izendareporting.aspx" />
+    <Content Include="Layouts\epmlive\javascripts\AddFavorite.js" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Analytics.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
