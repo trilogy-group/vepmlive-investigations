@@ -136,7 +136,7 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 }
 
 .epm-global-button-right a:hover {
-    color: #FFFFFF;
+    color: #FFFFFF !important;
 }
 
 #search-box-container {
