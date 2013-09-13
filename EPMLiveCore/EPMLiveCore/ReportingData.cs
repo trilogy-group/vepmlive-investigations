@@ -190,6 +190,10 @@ namespace EPMLiveCore
                         {
                             return field + " Like '%" + val + "%'";
                         }
+                        else if (nd.Name == "Neq")
+                        {
+                            return "(" + field + " <> '" + val + "' OR " + field + " IS NULL)";
+                        }
                         else
                         {
                             string sign = GetNodeSign(nd.Name);
