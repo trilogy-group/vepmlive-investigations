@@ -2947,7 +2947,7 @@ namespace EPMLiveWebParts
                 if(iPageSize != 0)
                 {
                     XmlDocument docQ = new XmlDocument();
-                    docQ.LoadXml(spquery);
+                    docQ.LoadXml("<Query>" + spquery + "</Query>");
 
                     XmlNode ndSort = docQ.FirstChild.SelectSingleNode("//OrderBy");
                     if (ndSort != null)
