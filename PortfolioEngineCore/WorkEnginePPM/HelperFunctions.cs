@@ -78,8 +78,10 @@ namespace WorkEnginePPM
         public static string outputEPKControl(string sEpkurl, string sControl, string sParams, string resizable, Page page, string subPage = "", bool bTest = false)
         {
             string url = (SPContext.Current.Web.ServerRelativeUrl == "/") ? "" : SPContext.Current.Web.ServerRelativeUrl;
-            string sCABVersion = "43,2,0,600";
+            string sCABVersion = "45,0,0,900";
             string sCABRootUrl = ".";
+            if(sControl == "WE_LMRPort.LMR_WE")
+                sCABRootUrl = "/_layouts/ppm";
             //string sCABRootUrl = sEpkurl;
             return Properties.Resources.txtEPKWebpart.Replace("***EPKURL***", sCABRootUrl).Replace("***CONTROL***", sControl).Replace("***PAGE***", subPage).Replace("***PARAMS***", sParams).Replace("***TestMode***", bTest ? "Yes" : "No").Replace("***RESIZE***", resizable).Replace("***WEBURL***", url).Replace("***SessionInfo***", getSessionInfo(page)).Replace("***CABVERSION***", sCABVersion);
         }
