@@ -1556,6 +1556,7 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>Notifications.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\Project1.mpp" />
+    <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.less" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.less" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.eot" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.ttf" />
@@ -3323,6 +3324,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\SmallParentUrlDialog.aspx" />
     <Content Include="Layouts\epmlive\SocialData.css" />
     <Content Include="Layouts\epmlive\SolutionStoreProxy.aspx" />
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.css">
+      <DependentUpon>epmnav.chrome.less</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.min.css">
+      <DependentUpon>epmnav.chrome.less</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\stylesheets\tooltip.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\buildteam.css" />
     <Content Include="Layouts\epmlive\stylesheets\buildteamIE.css" />

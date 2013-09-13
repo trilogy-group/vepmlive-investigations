@@ -11,13 +11,28 @@
 
 <!--[if lte IE 7]><script src="/_layouts/15/epmlive/javascripts/icomoon-ie7.min.js"> </script><![endif]-->
 
+<style>
+    .epm-nav-unpinned { margin-left: 50px; }
+
+    .epm-nav-pinned { margin-left: 230px; }
+
+    #Ribbon.epm-nav-pinned { margin-left: 180px; }
+
+    .ms-dialog .epm-nav-pinned, .ms-dialog .epm-nav-unpinned { margin-left: auto !important; }
+</style>
+
+<% if (Request.UserAgent.Contains("Chrome"))
+   { %>
+    <link href="/_layouts/15/epmlive/stylesheets/controls/navigation/epmnav.chrome.min.css" rel="stylesheet" />
+<%
+   } %>
+
 <% if (Pinned)
    { %>
     <style>
-        #Ribbon { margin-left: 180px !important; }
-        .ms-dialog .epm-nav-pinned, .ms-dialog #Ribbon {
-            margin-left: 0 !important;
-        }
+        #Ribbon { margin-left: 180px; }
+
+        .ms-dialog .epm-nav-pinned, .ms-dialog #Ribbon { margin-left: 0; }
     </style>
 <%
    } %>
