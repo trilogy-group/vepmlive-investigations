@@ -42,8 +42,8 @@
                                 var options = {
                                     url: epmLive.currentWebUrl + '/_layouts/epmlive/AddFavorite.aspx?' +
                                         'listid=' + epmLive.currentListId + '&itemid=' + epmLive.currentItemID + '&currentUrl=' + epmLive.currentUrl + '&userid=' + epmLive.currentUserId,
-                                    height: 150,
-                                    width: 400,
+                                    height: 100,
+                                    width: 200,
                                     allowMaximize: false,
                                     autoResize: false,
                                     dialogReturnValueCallback: function (result, returnVal) {
@@ -56,35 +56,32 @@
 
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             } else {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                                    data: "{ Function: 'RemoveFavorites', Dataxml: '" + favoritesData + "' }",
+                                    contentType: 'application/json; charset=utf-8',
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        if (response.d) {
+                                            var resp = epmLive.parseJson(response.d);
+                                            var result = resp.Result;
 
-                                if (confirm('Unfavorite?')) {
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                                        data: "{ Function: 'RemoveFavorites', Dataxml: '" + favoritesData + "' }",
-                                        contentType: 'application/json; charset=utf-8',
-                                        dataType: 'json',
-                                        success: function (response) {
-                                            if (response.d) {
-                                                var resp = epmLive.parseJson(response.d);
-                                                var result = resp.Result;
-
-                                                if (epmLive.responseIsSuccess(result)) {
-                                                    $('#favoritesStar').removeClass('icon-star-active');
-                                                    SP.UI.Notify.addNotification('Favorite removed', false);
+                                            if (epmLive.responseIsSuccess(result)) {
+                                                $('#favoritesStar').removeClass('icon-star-active');
+                                                SP.UI.Notify.addNotification('Favorite removed', false);
                                                     
-                                                } else {
-                                                    //onError(response);
-                                                }
                                             } else {
                                                 //onError(response);
                                             }
-                                        },
-                                        error: function (response) {
+                                        } else {
                                             //onError(response);
                                         }
-                                    });
-                                }
+                                    },
+                                    error: function (response) {
+                                        //onError(response);
+                                    }
+                                });
                             }
 
                         });

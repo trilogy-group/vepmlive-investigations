@@ -14,9 +14,9 @@ namespace EPMLiveCore.Jobs
         {
             try
             {
-                WorkspaceController wsCon = new WorkspaceController(data);
-                wsCon.CreateWorkspace();
-            }
+            WorkspaceController wsCon = new WorkspaceController(data);
+            wsCon.CreateWorkspace();
+        }
             catch (Exception ex) {
                 bErrors = true;
                 sErrors = "General Error: " + ex.Message;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure;
 using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using EPMLiveCore;
@@ -44,7 +46,7 @@ namespace EPMLiveCore.API
                 qExec.ExecuteEpmLiveNonQuery(
                     FavQueryFactory.GetAddQuery(data),
                     FavQueryParamFactory.GetAddFavoriteQueryParams(data));
-
+                ClearCache(data);
             }
             catch (Exception e)
             {
@@ -63,7 +65,7 @@ namespace EPMLiveCore.API
                 qExec.ExecuteEpmLiveNonQuery(
                     FavQueryFactory.GetRemoveQuery(data),
                     FavQueryParamFactory.GetRemoveFavoriteQueryParams(data));
-                   
+                ClearCache(data);
             }
             catch (Exception e)
             {
@@ -72,15 +74,41 @@ namespace EPMLiveCore.API
 
             return "success";
         }
+
+
+        private static void ClearCache(AnalyticsData data)
+        {
+            try
+            {
+                try
+                {
+                    using (var spSite = new SPSite(data.SiteId))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb(data.WebId))
+                        {
+                            new WorkspaceLinkProvider(data.SiteId, data.WebId, spWeb.Users.GetByID(data.UserId).LoginName).ClearCache();
+                        }
+                    }
+                }
+                catch
+                {
+                    CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                }
+            }
+            catch { }
+        }
     }
 
     public static class FavQueryFactory
     {
         private static string queryCheckFavStatus_Item =
-                   @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Icon]=@icon AND [Title]=@title AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
+                   @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
-	                    INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Favorite) + @", (SELECT MAX([F_Int]) FROM FRF) + 1 )
+	                    SELECT 'true'
+                    END
+                    ELSE
+                    BEGIN
+                        SELECT 'false'
                     END";
         private static string queryCheckFavStatus_NonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
@@ -101,8 +129,16 @@ namespace EPMLiveCore.API
         private static string queryAddFav_NonItem =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Icon]=@icon AND [Title]=@title AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
-	                    INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Title], [Icon], [Type], [F_String], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", @fstring, (SELECT MAX([F_Int]) FROM FRF) + 1)
+                        IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
+                        BEGIN
+	                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Title], [Icon], [Type], [F_String], [F_Int])
+                                    VALUES (@siteid, @webid, @listid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", @fstring, 1)
+                        END
+                        ELSE
+                        BEGIN
+                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Title], [Icon], [Type], [F_String], [F_Int])
+                                    VALUES (@siteid, @webid, @listid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", @fstring, (SELECT MAX([F_Int]) FROM FRF WHERE [Type] = 1) + 1)
+                        END
                     END";
 
         private static string queryRemoveFav_Item =
