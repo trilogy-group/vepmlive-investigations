@@ -93,7 +93,7 @@
   left: 50px;
   position: absolute;
   width: 180px;
-  z-index: 1000;
+  z-index: 500;
 }
 #epm-nav-pin {
   color: #7C7C7C;
