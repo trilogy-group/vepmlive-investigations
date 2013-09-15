@@ -1508,10 +1508,31 @@
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
-                            var fWs = [{ title: 'Remove', command: 'nav:remove', kind: '98' }];
-                            var tWs = [{ title: 'Add', command: 'nav:addToFav' }];
+                            var liId = $li.get(0).id;
+                            
+                            var commands = [];
+                            
+                            if ($li.hasClass('epm-nav-ws-node')) {
+                                var found = false;
 
-                            menuManager.setupMenu($li, $li.hasClass('epm-nav-ws-node') ? tWs : fWs);
+                                $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
+                                    if ($(this).data('webid') === liId) {
+                                        found = true;
+                                    }
+                                });
+
+                                if (found) {
+                                    commands.push({ title: 'Remove', command: 'nav:remove', kind: 98 });
+                                } else {
+                                    commands.push({ title: 'Add', command: 'nav:addToFav' });
+                                }
+                            } else {
+                                commands.push({ title: 'Remove', command: 'nav:remove', kind: 98 });
+                            }
+
+                            commands.push({ title: 'Manage team', command: 'nav:team' });
+
+                            menuManager.setupMenu($li, commands);
                         });
                     };
 
