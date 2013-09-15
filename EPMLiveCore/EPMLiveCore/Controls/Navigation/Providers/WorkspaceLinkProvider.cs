@@ -42,9 +42,9 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             return guid;
         }
 
-        private IEnumerable<NavLink> GetAllWorkspaces()
+        private IEnumerable<SPNavLink> GetAllWorkspaces()
         {
-            yield return new NavLink
+            yield return new SPNavLink
             {
                 Title = "All Workspaces",
                 Url = "Header"
@@ -84,7 +84,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             }
             else
             {
-                yield return new NavLink
+                yield return new SPNavLink
                 {
                     Title = "No workspace",
                     Url = "PlaceHolder"
@@ -102,6 +102,12 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             {
                 string cWebId = S(childWeb["WebId"]);
 
+                string itemId = string.Empty;
+                if(!S(childWeb["ItemId"]).Equals("-1"))
+                {
+                    itemId = S(childWeb["ItemWebId"]) + "." + S(childWeb["ItemListId"]) + "." + S(childWeb["ItemId"]);
+                }
+
                 yield return new SPNavLink
                 {
                     Id = cWebId,
@@ -110,7 +116,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     SiteId = S(SiteId),
                     WebId = cWebId,
                     Active = S(childWeb["HasAccess"]).Equals("1"),
-                    Category = S(webId)
+                    Category = S(webId),
+                    ItemId = itemId
                 };
 
                 foreach (SPNavLink navLink in GetChildWebs(rows, cWebId))
@@ -120,7 +127,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             }
         }
 
-        private IEnumerable<NavLink> GetFavoriteWorkspaces()
+        private IEnumerable<NavLink> GetFavoriteWorkspaces(List<SPNavLink> allWorkspaces)
         {
             yield return new NavLink
             {
@@ -150,18 +157,25 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
-                foreach (SPNavLink navLink in from DataRow row in dataTable.Rows
-                    select new SPNavLink
-                    {
-                        Id = S(row["LinkId"]),
-                        Title = S(row["Title"]),
-                        Url = S(row["Url"]),
-                        CssClass = "epm-nav-sortable " + S(row["CssClass"]),
-                        SiteId = S(SiteId),
-                        WebId = S(WebId)
-                    })
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    yield return navLink;
+                    string webId = S(row["WebId"]);
+
+                    SPNavLink navLink = allWorkspaces.FirstOrDefault(w => (w.WebId ?? string.Empty).Equals(webId));
+
+                    if (navLink != null)
+                    {
+                        yield return new SPNavLink
+                        {
+                            Id = S(row["LinkId"]),
+                            Title = S(row["Title"]),
+                            Url = S(row["Url"]),
+                            CssClass = "epm-nav-sortable " + S(row["CssClass"]),
+                            SiteId = S(row["SiteId"]),
+                            WebId = webId,
+                            ItemId = navLink.ItemId
+                        };
+                    }
                 }
             }
             else
@@ -237,10 +251,13 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             var fLinks = (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
             {
+                List<SPNavLink> allWorkspaces = GetAllWorkspaces().ToList();
+                IEnumerable<NavLink> favoriteWorkspaces = GetFavoriteWorkspaces(allWorkspaces);
+
                 var navLinks = new List<NavLink>();
 
-                navLinks.AddRange(GetFavoriteWorkspaces());
-                navLinks.AddRange(GetAllWorkspaces());
+                navLinks.AddRange(favoriteWorkspaces);
+                navLinks.AddRange(allWorkspaces);
 
                 return navLinks;
             }).Value;
