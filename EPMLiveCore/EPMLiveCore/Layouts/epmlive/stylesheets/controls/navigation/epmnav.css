@@ -140,6 +140,7 @@
   border: 1px solid #C0CCD7;
   border-radius: 3px 3px 3px 3px;
   cursor: pointer;
+  font-family: 'Open Sans Regular';
   font-size: 9px;
   height: 16px;
   line-height: 16px;
@@ -490,6 +491,9 @@
   color: #666666;
   font-family: 'Open Sans Regular', sans-serif;
 }
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.epm-nav-ws-node {
+  height: 23px;
+}
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtHover,
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected {
   height: 23px;
@@ -499,8 +503,12 @@
   background: none repeat scroll 0 0 transparent !important;
   border: medium none;
   color: #666666;
-  left: 1px;
-  position: relative;
+  padding-top: 4px;
+  padding-right: 3px;
+  padding-bottom: 3px;
+  padding-left: 3px;
+  margin-left: 1px;
+  position: static;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected a.rtIn {
   background: #DDDDDD !important;
@@ -536,12 +544,11 @@
   overflow: hidden;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView div.epm-nav-ws-node .epm-menu-btn {
-  font-size: 8px;
-  margin-top: 2px;
+  right: auto !important;
+  margin-left: 7px;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView div.epm-nav-ws-node:hover .epm-menu-btn {
   visibility: visible;
-  margin-top: 2px;
 }
 .epm-nav-pin-unpinned {
   -webkit-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);

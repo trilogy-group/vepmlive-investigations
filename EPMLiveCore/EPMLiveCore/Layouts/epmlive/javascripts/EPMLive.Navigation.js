@@ -913,8 +913,8 @@
                         if (snWidth < wsWidth) {
                             newWidth = wsWidth + 20 + 20;
 
-                            $sn.animate({ width: newWidth }, 300);
-                            $sn.parent().animate({ width: newWidth }, 300);
+                            $sn.stop().animate({ width: newWidth }, 300);
+                            $sn.parent().stop().animate({ width: newWidth }, 300);
                         }
                         
                         $('.epm-nav-ws-node').each(function () {
@@ -928,8 +928,8 @@
                     };
 
                     var collapseWorkspaceTree = function () {
-                        $sn.animate({ width: snWidth }, 300);
-                        $sn.parent().animate({ width: snWidth }, 300);
+                        $sn.stop().animate({ width: snWidth }, 300);
+                        $sn.parent().stop().animate({ width: snWidth }, 300);
 
                         $('.epm-nav-ws-node').each(function () {
                             $(this).attr('style', '');

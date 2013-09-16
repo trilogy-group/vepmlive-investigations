@@ -204,6 +204,7 @@
         border: 1px solid #C0CCD7;
         border-radius: 3px 3px 3px 3px;
         cursor: pointer;
+        font-family: 'Open Sans Regular';
         font-size: 9px;
         height: 16px;
         line-height: 16px;
@@ -591,6 +592,10 @@
             }
 
             li.rtLI {
+                div.epm-nav-ws-node {
+                    height: 23px;
+                }
+
                 div.rtHover,
                 div.rtSelected {
                     height: 23px;
@@ -599,8 +604,12 @@
                         background: none repeat scroll 0 0 transparent !important;
                         border: medium none;
                         color: @link-color;
-                        left: 1px;
-                        position: relative;
+                        padding-top: 4px;
+                        padding-right: 3px;
+                        padding-bottom: 3px;
+                        padding-left: 3px;
+                        margin-left: 1px;
+                        position: static;
                     }
                 }
 
@@ -645,14 +654,13 @@
                 }
 
                 .epm-menu-btn {
-                    font-size: 8px;
-                    margin-top: 2px;
+                    right: auto !important;
+                    margin-left: 7px;
                 }
 
                 &:hover {
                     .epm-menu-btn {
                         visibility: visible;
-                        margin-top: 2px;
                     }
                 }
             }
