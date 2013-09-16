@@ -204,6 +204,9 @@
                             node.set_navigateUrl('javascript:;');
                         }
 
+                        window.epmLiveNavigation.wsTeamDict = window.epmLiveNavigation.wsTeamDict || {};
+                        window.epmLiveNavigation.wsTeamDict[link.webId] = link.itemId;
+
                         parent.get_nodes().add(node);
                     };
 
@@ -661,6 +664,28 @@
                         case 'nav:add':
                             redirectUrl = rpUrl + 'action=new';
                             break;
+                        case 'nav:team':
+                            var wId = '';
+                            var lId = '';
+                            var iId = '';
+
+                            if (itemId === 'undefined') {
+                                try {
+                                    var info = window.epmLiveNavigation.wsTeamDict[webId].split('.');
+                                    if (info[2] !== '-1') {
+                                        wId = info[0];
+                                        lId = info[1];
+                                        iId = info[2];
+                                    }
+                                } catch(e) {
+                                }
+                            }
+
+                            redirectUrl = (url + '/_layouts/15/epmlive/gridaction.aspx?').replace(/\/\//g, '/') + 'action=buildteam&webid=' + (wId || webId);
+
+                            if (iId) {
+                                redirectUrl = redirectUrl + '&listid=' + lId + '&id=' + iId;
+                            }
                     }
 
                     if (!redirectUrl && command) {
@@ -1237,12 +1262,21 @@
                         for (var i = 0; i < commands.length; i++) {
                             var cmd = commands[i];
 
+                            var webId = $ca.data('webid');
+
+                            if (!webId || webId === 'undefined') {
+                                try {
+                                    webId = $ca.parent().get(0).id;
+                                } catch(e) {
+                                } 
+                            }
+
                             if (cmd.title === '--SEP--') {
                                 if (i !== commands.length - 1) {
                                     $menu.append('<li class="seprator"></li>');
                                 }
                             } else {
-                                $menu.append('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + $ca.data('webid') + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>');
+                                $menu.append('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>');
                             }
                         }
 
@@ -1530,7 +1564,7 @@
                                 commands.push({ title: 'Remove', command: 'nav:remove', kind: 98 });
                             }
 
-                            commands.push({ title: 'Manage team', command: 'nav:team' });
+                            commands.push({ title: 'Manage team', command: 'nav:team', kind: 6 });
 
                             menuManager.setupMenu($li, commands);
                         });
