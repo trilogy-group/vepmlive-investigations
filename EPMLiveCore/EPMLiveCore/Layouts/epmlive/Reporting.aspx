@@ -12,7 +12,7 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <iframe src="izendareporting.aspx" id="frmReport" style="width:100%;height:100%">
+    <iframe src="izendareporting.aspx?rn=<%=Request["rn"]%>" id="frmReport" style="width:100%;height:100%">
 
     </iframe>
 
