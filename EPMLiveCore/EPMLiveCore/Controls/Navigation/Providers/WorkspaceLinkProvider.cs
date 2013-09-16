@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
+using DataTable = System.Data.DataTable;
 
 namespace EPMLiveCore.Controls.Navigation.Providers
 {
@@ -72,7 +74,10 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
-                EnumerableRowCollection<DataRow> rows = dataTable.AsEnumerable();
+                DataView defaultView = dataTable.DefaultView;
+                defaultView.Sort = "WebTitle";
+
+                EnumerableRowCollection<DataRow> rows = defaultView.ToTable().AsEnumerable();
 
                 SPNavLink rootWebLink = GetRootWebLink(rows);
                 yield return rootWebLink;

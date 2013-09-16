@@ -194,10 +194,10 @@
                         if (link.category) {
                             parent = workspaceTree.findNodeByValue(link.category) || parent;
                         }
-                        
+
                         node.set_text(link.title);
                         node.set_value(link.webId);
-                        
+
                         if (link.active) {
                             node.set_navigateUrl(link.url);
                         } else {
@@ -595,7 +595,7 @@
                 }
 
                 function registerLinkEvents() {
-                    var addTooltip = function() {
+                    var addTooltip = function () {
                         $('li.epm-nav-node').find('a').each(function () {
                             var $a = $(this);
 
@@ -610,7 +610,7 @@
                             }
                         });
                     };
-                    
+
                     $('.epm-nav-cat').click(function () {
                         var $cat = $(this);
                         var $span = $($cat.find('span')[0]);
@@ -624,7 +624,7 @@
                         saveLinkState($cat.parent());
                     });
 
-                    $('#epm-nav-top li').click(function() {
+                    $('#epm-nav-top li').click(function () {
                         addTooltip();
                     });
 
@@ -877,14 +877,14 @@
                             var $a = $(this);
                             $a.attr('style', '');
                         });
-                        
+
                         $('.epm-nav-ws-node').each(function () {
                             $(this).attr('style', '');
                         });
-                        
+
                         var wsWidth = $wsTree.width();
                         var newWidth;
-                        
+
                         if (snWidth < wsWidth) {
                             newWidth = wsWidth + 20 + 20;
 
@@ -892,7 +892,7 @@
                             $sn.parent().animate({ width: newWidth }, 300);
                         }
 
-                        $('.epm-nav-ws-node').each(function() {
+                        $('.epm-nav-ws-node').each(function () {
                             var $div = $(this);
                             $div.attr('style', 'width:' + ((50 + newWidth) - $div.offset().left) + 'px');
                         });
@@ -901,7 +901,7 @@
                     var collapseWorkspaceTree = function () {
                         $sn.animate({ width: snWidth }, 300);
                         $sn.parent().animate({ width: snWidth }, 300);
-                        
+
                         $('.epm-nav-ws-node').each(function () {
                             $(this).attr('style', '');
                         });
@@ -909,17 +909,17 @@
                         window.epmLiveNavigation.resetWSNodeWidth();
                     };
 
-                    var expandOrCollapseWorkspaceMenu = function($el) {
+                    var expandOrCollapseWorkspaceMenu = function ($el) {
                         var classes = $el.attr('class').toLowerCase();
 
                         if (classes.indexOf('plus') !== -1) {
-                            var onReady1 = function() {
+                            var onReady1 = function () {
                                 if ($el.attr('class').toLowerCase().indexOf('minus') !== -1) {
-                                    window.setTimeout(function() {
+                                    window.setTimeout(function () {
                                         expandWorkspaceMenu();
                                     }, 100);
                                 } else {
-                                    window.setTimeout(function() {
+                                    window.setTimeout(function () {
                                         onReady1();
                                     }, 1);
                                 }
@@ -927,13 +927,13 @@
 
                             onReady1();
                         } else {
-                            var onReady2 = function() {
+                            var onReady2 = function () {
                                 if ($el.attr('class').toLowerCase().indexOf('plus') !== -1) {
-                                    window.setTimeout(function() {
+                                    window.setTimeout(function () {
                                         collapseWorkspaceTree();
                                     }, 100);
                                 } else {
-                                    window.setTimeout(function() {
+                                    window.setTimeout(function () {
                                         onReady2();
                                     }, 1);
                                 }
@@ -943,22 +943,22 @@
                         }
                     };
 
-                    $('#EPMNavWorkspacesTree').hover(function() {
+                    $('#EPMNavWorkspacesTree').hover(function () {
                         expandWorkspaceMenu();
-                    }, function() {
+                    }, function () {
                         collapseWorkspaceTree();
                     });
 
                     var $wsMenu = $('#epm-nav-sub-workspaces');
 
-                    $sn.hover(function(event) {
+                    $sn.hover(function (event) {
                         if ($wsMenu.is(':visible')) {
                             var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
                             if (event.clientY > _$wsTree.height() + _$wsTree.offset().top) {
                                 expandWorkspaceMenu();
                             }
                         }
-                    }, function(event) {
+                    }, function (event) {
                         if ($wsMenu.is(':visible')) {
                             var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
                             if (event.clientY > _$wsTree.height() + _$wsTree.offset().top) {
@@ -967,17 +967,17 @@
                         }
                     });
 
-                    $('a.rtIn').each(function() {
+                    $('a.rtIn').each(function () {
                         var $spans = $(this).parent().parent().find('span');
                         if ($spans.length > 1) {
                             var $span = $($spans.get(1));
 
                             if ($span) {
-                                $span.click(function() {
+                                $span.click(function () {
                                     expandOrCollapseWorkspaceMenu($(this));
                                 });
 
-                                $span.hover(function() {
+                                $span.hover(function () {
                                     window.epmLiveNavigation.wsNodeSelectorClass = $(this).attr('class');
                                 });
                             }
@@ -1050,7 +1050,7 @@
                         }
 
                         if (providerName === 'Workspaces') {
-                            window.epmLiveNavigation.resetWorkspaceTree = function() {
+                            window.epmLiveNavigation.resetWorkspaceTree = function () {
                                 var wsTree = window.epmLiveNavigation.workspaceTree();
 
                                 wsTree.trackChanges();
@@ -1093,11 +1093,11 @@
 
                             var wsTree = window.epmLiveNavigation.workspaceTree();
 
-                            $('a.rtIn').each(function() {
+                            $('a.rtIn').each(function () {
                                 var $a = $(this);
-                                
+
                                 var $parent = $a.parent();
-                                
+
                                 $parent.append('<div id="' + wsTree.findNodeByText($a.text()).get_value() + '" class="epm-nav-ws-node"></div>');
                                 $a.remove();
 
@@ -1509,13 +1509,13 @@
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             var liId = $li.get(0).id;
-                            
+
                             var commands = [];
-                            
+
                             if ($li.hasClass('epm-nav-ws-node')) {
                                 var found = false;
 
-                                $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
+                                $('#epm-nav-sub-workspaces-static-links').find('a').each(function () {
                                     if ($(this).data('webid') === liId) {
                                         found = true;
                                     }
@@ -1536,8 +1536,8 @@
                         });
                     };
 
-                    var _configNodeWidth = function() {
-                        window.epmLiveNavigation.resetWSNodeWidth = function() {
+                    var _configNodeWidth = function () {
+                        window.epmLiveNavigation.resetWSNodeWidth = function () {
                             $('a.rtIn').each(function () {
                                 var $a = $(this);
                                 var $span = $($a.find('span').get(0));
@@ -1547,9 +1547,9 @@
                                 if (width) {
                                     var offset = $a.offset().left - 50;
                                     var total = (width + offset);
-                                    
+
                                     var menuWidth = 180;
-                                    
+
                                     if (total > menuWidth - padding) {
                                         var newWidth = menuWidth - offset - padding;
 
@@ -1566,9 +1566,9 @@
 
                     var _initSearch = function () {
                         var $sb = $('#EPMNavWSTSearch');
-                        
+
                         $sb.val('');
-                        $sb.bindWithDelay('keyup', function() {
+                        $sb.bindWithDelay('keyup', function () {
                             var term = $(this).val().trim();
                             if (term) {
                                 if (term.length > 1) {
@@ -1598,19 +1598,19 @@
                         }
                     };
 
-                    var showAllNodes = function() {
+                    var showAllNodes = function () {
                         var nodes = window.epmLiveNavigation.workspaceTree().get_allNodes();
 
                         for (var i = 0; i < nodes.length; i++) {
                             nodes[i].set_visible(true);
                         }
-                        
+
                         window.epmLiveNavigation.resetWorkspaceTree();
                     };
 
-                    var setParentNodesVisible = function(node) {
+                    var setParentNodesVisible = function (node) {
                         var pn = node.get_parent();
-                        
+
                         if (pn && pn !== window.epmLiveNavigation.workspaceTree()) {
                             pn.set_visible(true);
                             pn.set_expanded(true);
@@ -1655,7 +1655,7 @@
                 workspacesManager.configureNodeWidth();
                 workspacesManager.initializeSearch();
 
-                $('#EPMNavWorkspacesTree').find('a').each(function() {
+                $('#EPMNavWorkspacesTree').find('a').each(function () {
                     workspacesManager.addMenu($(this).parent());
                 });
             };
