@@ -6,6 +6,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using System.Xml;
+using System.Reflection;
 
 namespace EPMLiveCore
 {
@@ -13,19 +15,23 @@ namespace EPMLiveCore
     {
         private string sListName;
 
+        
+
         protected override void OnLoad(EventArgs e)
         {
             //EnsureChildControls();
             //base.OnLoad(e);
 
-            if (Parent.Parent.Parent.Parent.Parent.Parent.GetType().ToString() == "FormsDesigner.Sharepoint.FDDataFormWebPart")
-                sListName = ((Microsoft.SharePoint.WebPartPages.ListFormWebPart)Parent.Parent.Parent.Parent.Parent.Parent).ItemContext.List.Title;
-            else
+            if (Parent.Parent.Parent.Parent.Parent.Parent.GetType().ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart")
                 sListName = ((Microsoft.SharePoint.WebPartPages.ListFormWebPart)Parent.Parent.Parent.Parent.Parent.Parent).ItemContext.List.Title;
         }
 
         protected override void CreateChildControls()
         {
+
+            if (sListName == "")
+                return;
+
             SPWeb web = SPContext.Current.Web;
 
             if(web.Site.Features[new Guid("e6df7606-1541-4bf1-a810-e8e9b11819e3")] == null)

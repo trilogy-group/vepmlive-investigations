@@ -48,7 +48,7 @@ namespace EPMLiveCore
         private bool bUseTeam = false;
 
         private int ActivationType = 0;
-
+        /*
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
@@ -305,7 +305,7 @@ namespace EPMLiveCore
                 }
             }
         }
-
+        */
         private void FindSaveButtons(Control Parent, ref ArrayList Controls)
         {
             foreach (Control child in Parent.Controls)
