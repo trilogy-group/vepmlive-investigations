@@ -1202,6 +1202,65 @@
                     });
                 }
 
+                window.epmLiveNavigation.registerLink = function(link) {
+                    if (link) {
+                        var providerName;
+
+                        switch (link.kind) {
+                        case 0:
+                        case 1:
+                            providerName = 'Favorites';
+                            break;
+                        case 2:
+                        case 3:
+                            providerName = 'Workspaces';
+                            break;
+                        }
+
+                        if (providerName) {
+                            for (var j = 0; j < tlNodes.length; j++) {
+                                var tlNode = tlNodes[j];
+
+                                if (tlNode.provider === providerName) {
+
+                                    if (link.kind !== 3) {
+                                        link.cssClass = 'epm-nav-sortable ' + link.cssClass;
+                                    }
+
+                                    tlNode.registerLink(link);
+
+                                    var $li = $sn.find('#' + link.id);
+
+                                    if (link.kind > -1 && link.kind < 3) {
+                                        if (link.kind === 0 || link.kind === 2) {
+                                            try {
+                                                $li.remove().insertBefore($($('#epm-nav-sub-' + providerName.toLowerCase() + '-static-links').find('.epm-nav-sub-header').get(1)));
+                                            } catch(e) {
+                                            }
+                                        }
+
+                                        if (link.kind !== 2) {
+                                            window.epmLiveNavigation.addFavoritesMenu($li);
+                                        } else {
+                                            window.epmLiveNavigation.addFavoriteWSMenu($li);
+                                        }
+                                    }
+
+                                    if (link.kind !== 3) {
+                                        $li.addClass('epm-nav-sortable');
+
+                                        window.epmLiveNavigation.addDragger($li);
+                                    }
+
+                                    $li.fadeIn(300);
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                };
+
                 var _init = function () {
                     registerTopLevelNodes();
                     registerStaticProviderLinks();
@@ -1315,7 +1374,7 @@
                             }, 200);
                         });
 
-                        $('.epm-nav-dragger').click(function () {
+                        $(document).on('click', '.epm-nav-dragger', function() {
                             hideMenu();
                         });
 
@@ -1405,6 +1464,26 @@
 
             var manageFavorites = function () {
                 var favoritesManager = (function () {
+                    window.epmLiveNavigation.addDragger = function ($li) {
+                        $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
+
+                        $li.hover(function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
+                        }, function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
+                        });
+                    };
+
+                    window.epmLiveNavigation.addFavoritesMenu = function ($li) {
+                        $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
+
+                        $($li.find('.epm-menu-btn').get(0)).click(function() {
+                            menuManager.setupMenu($li, [
+                                { title: 'Remove', command: 'nav:remove', kind: '98' }
+                            ]);
+                        });
+                    };
+
                     var _resetOrder = function ($list) {
                         var orders = [];
 
@@ -1422,23 +1501,11 @@
                     };
 
                     var _addDragger = function ($li) {
-                        $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
-
-                        $li.hover(function () {
-                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
-                        }, function () {
-                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
-                        });
+                        window.epmLiveNavigation.addDragger($li);
                     };
 
                     var _addMenu = function ($li) {
-                        $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
-
-                        $($li.find('.epm-menu-btn').get(0)).click(function () {
-                            menuManager.setupMenu($li, [
-                                { title: 'Remove', command: 'nav:remove', kind: '98' }
-                            ]);
-                        });
+                        window.epmLiveNavigation.addFavoritesMenu($li);
                     };
 
                     return {
@@ -1519,33 +1586,7 @@
 
             var manageWorkspaces = function () {
                 var workspacesManager = (function () {
-                    var _resetOrder = function ($list) {
-                        var orders = [];
-
-                        var lo = 0;
-                        $list.find('li.epm-nav-sortable').each(function () {
-                            orders.push($(this).get(0).id + ':' + (++lo));
-                        });
-
-                        if (orders.length) {
-                            epmLiveService.execute('ReorderLinks', orders.join(), function (response) {
-                            }, function (response) {
-                                console.log(response);
-                            });
-                        }
-                    };
-
-                    var _addDragger = function ($li) {
-                        $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
-
-                        $li.hover(function () {
-                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
-                        }, function () {
-                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
-                        });
-                    };
-
-                    var _addMenu = function ($li) {
+                    window.epmLiveNavigation.addFavoriteWSMenu = function($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
@@ -1575,6 +1616,36 @@
 
                             menuManager.setupMenu($li, commands);
                         });
+                    };
+                    
+                    var _resetOrder = function ($list) {
+                        var orders = [];
+
+                        var lo = 0;
+                        $list.find('li.epm-nav-sortable').each(function () {
+                            orders.push($(this).get(0).id + ':' + (++lo));
+                        });
+
+                        if (orders.length) {
+                            epmLiveService.execute('ReorderLinks', orders.join(), function (response) {
+                            }, function (response) {
+                                console.log(response);
+                            });
+                        }
+                    };
+
+                    var _addDragger = function ($li) {
+                        $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
+
+                        $li.hover(function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
+                        }, function () {
+                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
+                        });
+                    };
+
+                    var _addMenu = function ($li) {
+                        window.epmLiveNavigation.addFavoriteWSMenu($li);
                     };
 
                     var _configNodeWidth = function () {
