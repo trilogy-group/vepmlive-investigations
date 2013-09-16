@@ -7447,7 +7447,9 @@ ResPlanAnalyzer.prototype.createChart = function () {
         xdata.categoryAxis = new Object();
         xdata.categoryAxis.majorGridLines = new Object();
         xdata.categoryAxis.majorGridLines.visible = false;
-        xdata.categoryAxis.categories = new Array();
+
+        xdata.categoryAxis.labels = new Object();
+        xdata.categoryAxis.labels.rotation = 45;
 
 
         var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
@@ -7455,6 +7457,17 @@ ResPlanAnalyzer.prototype.createChart = function () {
 
         var StartID = parseInt(FromList.options[FromList.selectedIndex].value) - 1;
         var FinishID = parseInt(ToList.options[ToList.selectedIndex].value) - 1;
+
+        var ycnt = FinishID - StartID;
+        var ystp = 0;
+
+        if (ycnt > 40) {
+            ystp = Math.floor(ycnt / 40) + 1;
+            xdata.categoryAxis.labels.step = ystp;
+        }
+
+
+        xdata.categoryAxis.categories = new Array();
 
         var avail = new Array();
 
