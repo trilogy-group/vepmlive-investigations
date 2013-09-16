@@ -44,7 +44,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (rn != "")
                     url += "&rn=" + rn;
 
-                Response.Redirect(url + "&InFrame=1");
+                Response.Redirect(url + "&InFrame=1&RepUrl=" + System.Web.HttpUtility.UrlEncode(SPContext.Current.Web.Url  + "/_layouts/epmlive/reporting.aspx"));
             }
             catch (Exception ex)
             {
