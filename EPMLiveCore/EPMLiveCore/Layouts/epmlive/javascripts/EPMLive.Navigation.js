@@ -908,7 +908,7 @@
                         });
 
                         var wsWidth = $wsTree.width();
-                        var newWidth;
+                        var newWidth = 0;
 
                         if (snWidth < wsWidth) {
                             newWidth = wsWidth + 20 + 20;
@@ -916,11 +916,15 @@
                             $sn.animate({ width: newWidth }, 300);
                             $sn.parent().animate({ width: newWidth }, 300);
                         }
-
+                        
                         $('.epm-nav-ws-node').each(function () {
                             var $div = $(this);
-                            $div.attr('style', 'width:' + ((50 + newWidth) - $div.offset().left) + 'px');
+
+                            var width = (50 + (newWidth === 0 ? snWidth : newWidth)) - $div.offset().left;
+                            $div.attr('style', 'width:' + width + 'px');
                         });
+
+                        window.epmLiveNavigation.wsTreeExpanded = true;
                     };
 
                     var collapseWorkspaceTree = function () {
@@ -932,6 +936,7 @@
                         });
 
                         window.epmLiveNavigation.resetWSNodeWidth();
+                        window.epmLiveNavigation.wsTreeExpanded = false;
                     };
 
                     var expandOrCollapseWorkspaceMenu = function ($el) {
@@ -968,27 +973,29 @@
                         }
                     };
 
-                    $('#EPMNavWorkspacesTree').hover(function () {
-                        expandWorkspaceMenu();
-                    }, function () {
-                        collapseWorkspaceTree();
-                    });
-
                     var $wsMenu = $('#epm-nav-sub-workspaces');
+
+                    $('#EPMNavWorkspacesTree').hover(function () {
+                        if (!window.epmLiveNavigation.wsTreeExpanded) {
+                            expandWorkspaceMenu();
+                        }
+                    }, function (event) {
+                        var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
+                        if (event.clientY < _$wsTree.offset().top) {
+                            collapseWorkspaceTree();
+                        }
+                    });
 
                     $sn.hover(function (event) {
                         if ($wsMenu.is(':visible')) {
                             var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
-                            if (event.clientY > _$wsTree.height() + _$wsTree.offset().top) {
+                            if (event.clientY > _$wsTree.offset().top) {
                                 expandWorkspaceMenu();
                             }
                         }
-                    }, function (event) {
+                    }, function () {
                         if ($wsMenu.is(':visible')) {
-                            var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
-                            if (event.clientY > _$wsTree.height() + _$wsTree.offset().top) {
-                                collapseWorkspaceTree();
-                            }
+                            collapseWorkspaceTree();
                         }
                     });
 
@@ -1583,13 +1590,15 @@
                                     var total = (width + offset);
 
                                     var menuWidth = 180;
+                                    var newWidth = menuWidth - offset - padding;
 
-                                    if (total > menuWidth - padding) {
-                                        var newWidth = menuWidth - offset - padding;
-
-                                        $a.data('originalwidth', $a.width());
-                                        $a.data('newwidth', newWidth);
+                                    $a.data('originalwidth', $a.width());
+                                    $a.data('newwidth', newWidth);
+                                    
+                                    if (total > menuWidth) {
                                         $a.width(newWidth);
+                                    } else {
+                                        $a.parent().width(newWidth);
                                     }
                                 }
                             });
