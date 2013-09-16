@@ -3180,6 +3180,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\navigation\collapse.png" />
     <Content Include="Layouts\epmlive\images\navigation\expand.png" />
     <Content Include="Layouts\epmlive\images\navigation\notch.png" />
+    <Content Include="Layouts\epmlive\images\navigation\search-white.png" />
     <Content Include="Layouts\epmlive\images\navtipwhite.png" />
     <Content Include="Layouts\epmlive\images\notavailable.png" />
     <Content Include="Layouts\epmlive\images\notification-icons\assigned-to.png" />

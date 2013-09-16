@@ -144,7 +144,7 @@
                    else if (node.Id.ToLower().Equals("workspaces"))
                    { %>
                     <div id="EPMNavWorkspacesTree">
-                        <input placeholder="Search Workspaces..." type="text" id="EPMNavWSTSearch"/>
+                        <input placeholder="Search..." type="text" id="EPMNavWSTSearch"/>
                         <telerik:RadTreeView ID="WorkspacesNavTree" runat="server" EnableTheming="False" EnableViewState="False" />
                     </div>
                 <% } %> 

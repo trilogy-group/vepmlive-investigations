@@ -979,20 +979,11 @@
                         if (!window.epmLiveNavigation.wsTreeExpanded) {
                             expandWorkspaceMenu();
                         }
-                    }, function (event) {
-                        var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
-                        if (event.clientY < _$wsTree.offset().top) {
-                            collapseWorkspaceTree();
-                        }
+                    }, function () {
+                        collapseWorkspaceTree();
                     });
 
-                    $sn.hover(function (event) {
-                        if ($wsMenu.is(':visible')) {
-                            var _$wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
-                            if (event.clientY > _$wsTree.offset().top) {
-                                expandWorkspaceMenu();
-                            }
-                        }
+                    $sn.hover(function () {
                     }, function () {
                         if ($wsMenu.is(':visible')) {
                             collapseWorkspaceTree();
