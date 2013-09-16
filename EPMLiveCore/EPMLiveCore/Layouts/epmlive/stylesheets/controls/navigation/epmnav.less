@@ -605,10 +605,24 @@
                 }
 
                 div.rtSelected {
-                    a {
+                    a.rtIn {
                         background: #DDDDDD !important;
                         border: 1px solid #cccccc;
                         color: #666666;
+                    }
+                }
+
+                ul.epm-nav-contextual-menu {
+                    width: 98% !important;
+
+                    li {
+                        width: auto !important;
+                    }
+
+                    a {
+                        &:hover {
+                            text-decoration: none;
+                        }
                     }
                 }
             }

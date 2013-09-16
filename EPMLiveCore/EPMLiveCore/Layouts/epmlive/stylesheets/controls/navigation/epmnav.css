@@ -502,10 +502,19 @@
   left: 1px;
   position: relative;
 }
-.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected a {
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected a.rtIn {
   background: #DDDDDD !important;
   border: 1px solid #cccccc;
   color: #666666;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu {
+  width: 98% !important;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu li {
+  width: auto !important;
+}
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu a:hover {
+  text-decoration: none;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView div.epm-nav-ws-node {
   display: inline-block;
