@@ -1284,7 +1284,7 @@
                             window.epmNavHoveredNode = liId;
                         });
 
-                        $('.epm-nav-node').hover(function () {
+                        $('.epm-nav-node, .epm-nav-ws-node').hover(function () {
                             var id = this.id;
                             window.epmNavHoveredNode = id;
 
@@ -1297,7 +1297,7 @@
                             }
                         });
 
-                        $('.epm-nav-links').hover(function () {
+                        $('.epm-nav-links, #EPMNavWorkspacesTree').hover(function () {
                         }, function () {
                             window.epmNavHoveredNode = null;
 
