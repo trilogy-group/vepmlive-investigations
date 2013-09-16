@@ -83,17 +83,24 @@ namespace EPMLiveCore.API.Integration
 
                     if (controls != null)
                     {
-                        List<IntegrationControl> ctls = controls.GetControls(webprops, log);
+                        List<IntegrationControl> ctls = controls.GetRemoteControls(webprops, log);
+                        List<string> lctls = controls.GetLocalControls(webprops, log);
 
                         DataTable dtResInfo = new DataTable();
                         dtResInfo.Columns.Add("INT_CONTROL_ID", typeof(Guid));
                         dtResInfo.Columns.Add("INT_LIST_ID", typeof(Guid));
                         dtResInfo.Columns.Add("CONTROL");
                         dtResInfo.Columns.Add("URL");
+                        dtResInfo.Columns.Add("LOCAL");
 
                         foreach (IntegrationControl ictl in ctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, ictl.URL });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, ictl.URL, "0" });
+                        }
+
+                        foreach (string ictl in lctls)
+                        {
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, "", "1" });
                         }
 
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
