@@ -212,8 +212,6 @@ namespace EPMLiveCore.Layouts.epmlive
                         }
                     });
 
-                    //
-
                     foreach (SPField field in list.Fields)
                     {
                         if (!field.Hidden && field.Type != SPFieldType.Computed)
@@ -240,13 +238,11 @@ namespace EPMLiveCore.Layouts.epmlive
                                 default:
                                     ddlInformation.Items.Add(new ListItem(field.Title, field.InternalName));
                                     break;
-
                             };
                         }
                     }
 
-
-                    GridGanttSettings gSettings = new GridGanttSettings(list);
+                    var gSettings = new GridGanttSettings(list);
 
                     ddlStartDate.SelectedValue = gSettings.StartDate;
                     ddlDueDate.SelectedValue = gSettings.DueDate;
@@ -285,6 +281,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                     //load list icon
                     spnListIcon.CssClass = gSettings.ListIcon;
+                    hdnListIcon.Value = gSettings.ListIcon;
 
                     chkWorkListFeat.Checked = gSettings.EnableWorkList;
                     chkEmails.Checked = gSettings.SendEmails;
@@ -960,7 +957,7 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             SPWeb web = SPContext.Current.Web;
             SPList list = web.Lists[new Guid(Request["List"])];
-            GridGanttSettings gSettings = new GridGanttSettings(list);
+            var gSettings = new GridGanttSettings(list);
 
             gSettings.StartDate = ddlStartDate.SelectedValue;
             gSettings.DueDate = ddlDueDate.SelectedValue;
@@ -986,7 +983,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.EnableAutoCreation = chkAutoCreate.Checked;
             gSettings.AutoCreationTemplateId = ddlAutoCreateTemplate.SelectedValue;
             gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
-            gSettings.ListIcon = spnListIcon.CssClass;
+            gSettings.ListIcon = hdnListIcon.Value;
             gSettings.EnableWorkList = chkWorkListFeat.Checked;
             gSettings.SendEmails = chkEmails.Checked;
             gSettings.DeleteRequest = chkDeleteRequest.Checked;

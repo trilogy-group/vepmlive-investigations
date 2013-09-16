@@ -27,71 +27,16 @@
         }
     </style>
 
-    <span style="display: none;color:#D1D1D1;" class="icon-star icon-star-disabled" id="favoritesStar" ></span>
+    <span style="display: none;color:#D1D1D1;font-size:18px;" class="icon-star icon-star-disabled" id="favoritesStar" ></span>
+</div>
 
-   <%-- <script>
-        var favoritesData =
-            "<Data>" +
-                "<Param key=\"SiteId\">" + epmLive.currentSiteId + "</Param>" +
-                "<Param key=\"WebId\">" + epmLive.currentWebId + "</Param>" +
-                "<Param key=\"ListId\">" + epmLive.currentListId + "</Param>" +
-                "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
-                "<Param key=\"ItemId\">" + epmLive.currentItemID + "</Param>" +
-                "<Param key=\"FString\">" + epmLive.currentUrl + "</Param>" +
-                "<Param key=\"Type\">1</Param>" +
-                "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
-                "<Param key=\"Title\">" + $('#favTitle').text() + "</Param>" +
-                "</Data>";
-        
-        $("#favoritesStar").click(function () {
-            //$(this).toggleClass('icon-star-active');
 
-            if ($(this).hasClass('icon-star-disabled')) {
-                var options = {
-                    url: epmLive.currentWebUrl + '/_layouts/epmlive/AddFavorite.aspx?listid=' + epmLive.currentListId + '&itemid=' + epmLive.currentItemID + '&currentUrl=' + epmLive.currentUrl,
-                    height: 150,
-                    width: 400,
-                    allowMaximize: false,
-                    autoResize: false,
-                    dialogReturnValueCallback: function (result, returnVal) {
-                        if (result == 1) {
-
-                        }
-                    }
-                };
-
-                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
-            } else {
-
-                if (confirm('Unfavorite?')) {
-                    $.ajax({
-                        type: 'POST',
-                        url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                        data: "{ Function: 'AddFavorites', Dataxml: '" + favoritesData + "' }",
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.d) {
-                                var resp = epmLive.parseJson(response.d);
-                                var result = resp.Result;
-
-                                if (epmLive.responseIsSuccess(result)) {
-                                    //onSuccess(result);
-                                } else {
-                                    //onError(response);
-                                }
-                            } else {
-                                //onError(response);
-                            }
-                        },
-                        error: function (response) {
-                            //onError(response);
-                        }
-                    });
-                }
-            }
-
-        });
-
-    </script>--%>
+<div id="fav_Add_DivTemp" style="display:none">
+      <div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;
+        <input id="favTitle" name="favTitle" type="text" value="<%=defaultFavTitle %>" />
+        <br />
+        <div style="clear:both;height:10px;"></div>
+        <input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, document.getElementById('favTitle').value);return false;" class="ms-ButtonHeightWidth" target="_self" />
+        <input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" target="_self" />
+      </div>
 </div>

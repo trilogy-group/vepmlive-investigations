@@ -1558,6 +1558,18 @@ namespace EPMLiveCore
             }
         }
 
+        public static string CountFrequentApps(string data, SPWeb spWeb)
+        {
+            try
+            {
+                return Response.Success(FrequentApps.Count(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         #endregion  
 
         public static string GenerateQuickLaunchFromApp(string data, SPWeb spWeb)

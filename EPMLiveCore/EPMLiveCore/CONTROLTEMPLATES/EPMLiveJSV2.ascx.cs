@@ -18,11 +18,13 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected string WebId;
         protected string WebUrl;
         protected string ListId;
+        protected string ListTitle;
         protected string ItemId;
         protected string CurrentUserId;
         protected string CurrentUrl;
         protected string ListIconClass;
         protected string ListViewUrl;
+        protected string CurrentFileIsNull;
         private SPWeb _spWeb;
 
         #endregion Fields 
@@ -70,57 +72,33 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             WebFullUrl = _spWeb.Url;
             WebId = _spWeb.ID.ToString();
             WebUrl = _spWeb.SafeServerRelativeUrl();
+            
+            ListTitle = string.Empty;
+            try{ListTitle = SPContext.Current.List.Title;}catch{}
+            
             ListId = Guid.Empty.ToString();
-            try
-            {
-                if (!(SPContext.Current.List is SPDocumentLibrary))
-                {
-                    ListId = SPContext.Current.ListId.ToString();
-                }
-            }
-            catch{}
-            ListViewUrl = string.Empty;
-            try
-            {
-                ListViewUrl = SPContext.Current.ViewContext.View.Url;
-            }catch{}
-            ListIconClass = string.Empty;
-            try
-            {
-                ListIconClass = new GridGanttSettings(SPContext.Current.List).ListIcon;
-            }
-            catch{}
-            ItemId = "-1";
-            try
-            {
-                if (!(SPContext.Current.List is SPDocumentLibrary) && string.IsNullOrEmpty(ListViewUrl))
-                {
-                    ItemId = SPContext.Current.ItemId.ToString();
-                }
-            }
-            catch
-            {
-            }
-            CurrentUserId = "-1";
-            try
-            {
-                CurrentUserId = SPContext.Current.Web.CurrentUser.ID.ToString();
-            }
-            catch
-            {
-            }
-            CurrentUrl = string.Empty;
-            try
-            {
-                CurrentUrl = HttpContext.Current.Request.Url.AbsoluteUri;
-            }
-            catch{}
+            try{ListId = SPContext.Current.ListId.ToString();}catch{}
 
-            try
-            {
-                WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
-            }
-            catch { }
+            ListViewUrl = string.Empty;
+            try{ListViewUrl = SPContext.Current.ViewContext.View.Url;}catch{}
+
+            ListIconClass = string.Empty;
+            try{ListIconClass = new GridGanttSettings(SPContext.Current.List).ListIcon;}catch{}
+
+            ItemId = "-1";
+            try{ItemId = SPContext.Current.ItemId.ToString();}catch{}
+
+            CurrentFileIsNull = "true";
+            try { CurrentFileIsNull = (SPContext.Current.File == null).ToString(); }catch { }
+
+            CurrentUserId = "-1";
+            try{CurrentUserId = SPContext.Current.Web.CurrentUser.ID.ToString();}catch{}
+
+            CurrentUrl = string.Empty;
+            try{CurrentUrl = HttpContext.Current.Request.Url.AbsoluteUri;}catch{}
+
+            try{WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");}catch { }
+           
 
             Scheme = Request.Url.Scheme;
         }

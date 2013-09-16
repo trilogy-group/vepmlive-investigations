@@ -31,6 +31,9 @@
                         epmLive.currentWebFullUrl = '<%= WebFullUrl %>';
                         epmLive.currentListId = '<%= ListId %>';
                         epmLive.currentListIcon = '<%= ListIconClass %>';
+                        epmLive.currentListTitle = '<%= ListTitle %>';
+                        epmLive.currentListViewUrl = '<%= ListViewUrl %>';
+                        epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
                         epmLive.currentItemID = '<%= ItemId %>';
                         epmLive.currentUserId = '<%= CurrentUserId %>';
                         epmLive.currentUrl = '<%= CurrentUrl %>';

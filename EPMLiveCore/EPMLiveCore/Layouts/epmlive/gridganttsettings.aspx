@@ -49,6 +49,7 @@
                     if ($('#<%=spnListIcon.ClientID%>').length > 0 && !$('#<%=spnListIcon.ClientID%>').hasClass(returnValue)) {
                         $('#<%=spnListIcon.ClientID%>').removeClass();
                         $('#<%=spnListIcon.ClientID%>').addClass(returnValue);
+                        $('#<%=hdnListIcon.ClientID%>').val(returnValue);
                     }
                 }
             }
@@ -504,10 +505,10 @@
 				 <Template_Control>
 				     <div style="line-height: 20px;">
 				         <span class="box1" style="float:left;">
-				             <asp:Label id="spnListIcon" runat="server" CssClass="" ></asp:Label>
+				             <asp:Label id="spnListIcon" runat="server" style="cursor:pointer;font-size:18px;" onclick="OpenIconSelect();return false;" ></asp:Label>
+                             <asp:HiddenField runat="server" ID="hdnListIcon"/>
 	                    </span>
 				     </div>
-                    <asp:Button runat="server" UseSubmitBehavior="false" Text="Select" OnClientClick="return OpenIconSelect();"/>
 				 </Template_Control>
 			</wssuc:InputFormControl>
 		</Template_InputFormControls>

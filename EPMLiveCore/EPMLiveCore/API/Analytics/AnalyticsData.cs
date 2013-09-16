@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,6 +63,20 @@ namespace EPMLiveCore.API
             }
         }
 
+        public bool FileIsNull
+        {
+            get
+            {
+                var fileIsNull = true;
+                var sFileIsNull = mgr.GetPropVal("FileIsNull");
+                if (!string.IsNullOrEmpty(sFileIsNull))
+                {
+                    bool.TryParse(sFileIsNull, out fileIsNull);
+                }
+
+                return fileIsNull;
+            }
+        }
         public int ItemId
         {
             get
@@ -104,7 +119,7 @@ namespace EPMLiveCore.API
         {
             get
             {
-                return mgr.GetPropVal("IconClass");
+                return mgr.GetPropVal("ListIconClass");
             }
         }
 
@@ -152,15 +167,7 @@ namespace EPMLiveCore.API
         {
             get
             {
-                return ItemId != -1;
-            }
-        }
-
-        public bool IsNonItem
-        {
-            get
-            {
-                return ItemId == -1;
+                return (ItemId != -1 && !FileIsNull);
             }
         }
 
