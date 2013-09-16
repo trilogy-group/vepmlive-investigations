@@ -508,7 +508,10 @@
   color: #666666;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu {
-  width: 98% !important;
+  width: auto !important;
+  position: absolute;
+  right: 0;
+  margin-right: 5px;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu li {
   width: auto !important;
