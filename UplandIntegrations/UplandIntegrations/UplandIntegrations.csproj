@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="FileBound.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tenrox\Adapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EPMLiveLists.snk" />
