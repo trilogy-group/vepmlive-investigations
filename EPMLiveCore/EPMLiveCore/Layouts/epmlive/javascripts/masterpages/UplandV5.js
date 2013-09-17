@@ -1010,7 +1010,7 @@
                 // The opacity of the notice (if it's non-blocking) when the mouse is over it.
                 nonblock_opacity: .2,
                 // Display a pull down menu to redisplay previous notices, and place the notice in the history.
-                history: true,
+                history: false,
                 // Width of the notice.
                 width: "300px",
                 // Minimum height of the notice. It will expand to fit content.
@@ -1038,7 +1038,7 @@
                 // After a delay, remove the notice.
                 hide: true,
                 // Delay in milliseconds before the notice is removed.
-                delay: 8000,
+                delay: 5000,
                 // Reset the hide timer if the mouse moves over the notice.
                 mouse_reset: true,
                 // Remove the notice's elements from the DOM after it is removed.

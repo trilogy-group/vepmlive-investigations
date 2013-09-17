@@ -23,7 +23,7 @@ namespace EPMLiveCore.API
     /// </summary>
     public abstract class WorkspaceFactory
     {
-		#region Constructors (1) 
+        #region Constructors (1)
 
         protected WorkspaceFactory(string data)
         {
@@ -45,7 +45,7 @@ namespace EPMLiveCore.API
             _xmlDataMgr = new XMLDataManager(data);
         }
 
-		#endregion Constructors 
+        #endregion Constructors
 
         #region base class properties and fields
 
@@ -66,6 +66,21 @@ namespace EPMLiveCore.API
                 bool bAlone = false;
                 bool.TryParse(_xmlDataMgr.GetPropVal("IsStandAlone"), out bAlone);
                 return bAlone;
+            }
+        }
+
+        protected bool UniquePermission
+        {
+            get
+            {
+                bool unique = false;
+                try
+                {
+                    unique = bool.Parse(_xmlDataMgr.GetPropVal("UniquePermission"));
+                }
+                catch { }
+
+                return unique;
             }
         }
         protected Guid ParentWebId
@@ -144,7 +159,7 @@ namespace EPMLiveCore.API
                     }
                     catch { }
                 }
-               
+
                 return id;
             }
         }
@@ -161,7 +176,7 @@ namespace EPMLiveCore.API
                     }
                     catch { }
                 }
-                
+
                 return id;
             }
         }
@@ -632,7 +647,7 @@ namespace EPMLiveCore.API
                                                             cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
                         }
                         else
-                        {   
+                        {
                             err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
                         }
                     }
@@ -846,21 +861,36 @@ namespace EPMLiveCore.API
                     {
                         // stamp info on new site
                         w.AllProperties["ParentItem"] = WebId.ToString() + "^^" + AttachedItemListId.ToString() + "^^" + AttachedItemId.ToString() + "^^" + AttachedItemTitle;
-                        
+
                         // add deleted event
                         string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                         string className = "EPMLiveCore.WorkspaceEvents";
-                        var evts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.WebDeleted});
+                        var evts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.WebDeleted });
                         foreach (SPEventReceiverDefinition evt in evts)
                         {
                             evt.Delete();
                         }
                         w.EventReceivers.Add(SPEventReceiverType.WebDeleted, assemblyName, className);
-                       
+
                         w.Update();
                     }
                 }
             });
+        }
+
+        public void ActivateFeature()
+        {
+            if (_isStandAlone && UniquePermission)
+            {
+                using (var s = new SPSite(SiteId))
+                {
+                    if (s.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                    {
+                        s.Features.Add(new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01"));
+                    }
+                }
+            }
+
         }
         #endregion
 
@@ -893,7 +923,8 @@ namespace EPMLiveCore.API
     /// </summary>
     public class OnlineTempWorkspaceFactory : WorkspaceFactory
     {
-        public OnlineTempWorkspaceFactory(string data) : base(data)
+        public OnlineTempWorkspaceFactory(string data)
+            : base(data)
         {
             ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
         }
@@ -907,17 +938,17 @@ namespace EPMLiveCore.API
 
         public override ICreatedWorkspaceInfo CreateWorkspace()
         {
-            string id = string.Empty;
-            SPSite site = new SPSite(SiteId);
-            SPWeb web = site.OpenWeb(WebId);
+            var id = string.Empty;
+            var site = new SPSite(SiteId);
+            var web = site.OpenWeb(WebId);
 
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    using (SPSite eSite = new SPSite(SiteId))
+                    using (var eSite = new SPSite(SiteId))
                     {
-                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                        using (var eWeb = eSite.OpenWeb(WebId))
                         {
                             GrabOnlineFiles(eSite, eWeb);
                             BaseProvision(site, web, eSite, eWeb);
@@ -927,6 +958,7 @@ namespace EPMLiveCore.API
                             AddToFavorites();
                             AddPermission();
                             ModifyNewWSProperty();
+                            ActivateFeature();
                             RemoveSolutionFromGallery(eSite, eWeb);
                         }
                     }
@@ -954,7 +986,7 @@ namespace EPMLiveCore.API
             // read feature.xml with WebClient class
 
             string address = rootFilePath + "/Feature.xml";
-            
+
             try
             {
                 using (WebClient webClient = new WebClient())
@@ -999,30 +1031,30 @@ namespace EPMLiveCore.API
     /// </summary>
     public class DownloadedTempWorkspaceFactory : WorkspaceFactory
     {
-		#region Constructors (1) 
+        #region Constructors (1)
 
         public DownloadedTempWorkspaceFactory(string data)
             : base(data) { }
 
-		#endregion Constructors 
+        #endregion Constructors
 
-		#region Methods (3) 
+        #region Methods (3)
 
-		// Public Methods (1) 
+        // Public Methods (1) 
 
         public override ICreatedWorkspaceInfo CreateWorkspace()
         {
-            string id = string.Empty;
-            SPSite site = new SPSite(SiteId);
-            SPWeb web = site.OpenWeb(WebId);
+            var id = string.Empty;
+            var site = new SPSite(SiteId);
+            var web = site.OpenWeb(WebId);
 
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    using (SPSite eSite = new SPSite(SiteId))
+                    using (var eSite = new SPSite(SiteId))
                     {
-                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                        using (var eWeb = eSite.OpenWeb(WebId))
                         {
                             GetTempName(eSite, eWeb);
                             BaseProvision(site, web, eSite, eWeb);
@@ -1032,6 +1064,7 @@ namespace EPMLiveCore.API
                             AddToFavorites();
                             AddPermission();
                             ModifyNewWSProperty();
+                            ActivateFeature();
                             RemoveSolutionFromGallery(eSite, eWeb);
                         }
                     }
@@ -1047,7 +1080,7 @@ namespace EPMLiveCore.API
 
             return new DownloadedWorkspaceInfo(_xmlResult.ToString());
         }
-		// Private Methods (2) 
+        // Private Methods (2) 
 
         /// <summary>
         /// Get template name from the splistitem
@@ -1124,7 +1157,7 @@ namespace EPMLiveCore.API
             return success;
         }
 
-		#endregion Methods 
+        #endregion Methods
     }
 
     /// <summary>
@@ -1133,48 +1166,48 @@ namespace EPMLiveCore.API
     public interface ICreatedWorkspaceInfo
     {
 
-}
+    }
 
     public abstract class CreatedWorkspaceInfo
     {
-		#region Fields (1) 
+        #region Fields (1)
 
         protected string sXml = string.Empty;
 
-		#endregion Fields 
+        #endregion Fields
 
-		#region Constructors (1) 
+        #region Constructors (1)
 
         public CreatedWorkspaceInfo(string data)
         {
             sXml = data;
         }
 
-		#endregion Constructors 
+        #endregion Constructors
     }
 
     public class OnlineWorkspaceInfo : CreatedWorkspaceInfo, ICreatedWorkspaceInfo
     {
-		#region Constructors (1) 
+        #region Constructors (1)
 
         public OnlineWorkspaceInfo(string data)
             : base(data)
         {
         }
 
-		#endregion Constructors 
+        #endregion Constructors
     }
 
     public class DownloadedWorkspaceInfo : CreatedWorkspaceInfo, ICreatedWorkspaceInfo
     {
-		#region Constructors (1) 
+        #region Constructors (1)
 
         public DownloadedWorkspaceInfo(string data)
             : base(data)
         {
         }
 
-		#endregion Constructors 
+        #endregion Constructors
     }
 
 }

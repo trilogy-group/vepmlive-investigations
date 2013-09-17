@@ -305,3 +305,10 @@ height: 17px;
 line-height: 17px;
 min-height: 17px;
 }
+
+/*MODIFICATION ON OTHER CSS LIBRARIES*/
+/*Modification on jQuery-UI.css*/
+.ui-widget {
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 1em !important;
+}

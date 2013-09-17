@@ -424,14 +424,16 @@ function CreateEPMLiveWorkspace(listid, itemid) {
                 $.pnotify({
                     title: 'Workspace Status',
                     text: 'Your workspace is being created - we will notify you when it is ready.',
-                    type: 'success'
+                    type: 'info',
+                    styling: 'jqueryui'
                 });
             }
             else if (dialogResult === -1) {
                 $.pnotify({
                     title: 'Workspace Status',
                     text: 'Something went wrong. Workspace is not being created. Error: ' + returnValue,
-                    type: 'error'
+                    type: 'error',
+                    styling: 'jqueryui'
                 });
             }
         }
