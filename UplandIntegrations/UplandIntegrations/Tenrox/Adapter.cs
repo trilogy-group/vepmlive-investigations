@@ -1,12 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Security;
 using EPMLiveIntegration;
+using UplandIntegrations.Tenrox.Services;
 
 namespace UplandIntegrations.Tenrox
 {
     public class Adapter : IIntegrator, IIntegratorControls
     {
+        #region Methods (2) 
+
+        // Private Methods (2) 
+
+        private void GetAuthInfo(WebProperties webProps, out string orgUrl, out string orgName, out string username,
+            out SecureString password)
+        {
+            if (!webProps.Properties.ContainsKey("OrgUrl"))
+            {
+                throw new Exception("Please provide organization url.");
+            }
+
+            orgUrl = webProps.Properties["OrgUrl"] as string;
+            if (string.IsNullOrEmpty(orgUrl))
+            {
+                throw new Exception("Invalid organization url.");
+            }
+
+            if (!webProps.Properties.ContainsKey("OrgName"))
+            {
+                throw new Exception("Please provide organization name.");
+            }
+
+            orgName = webProps.Properties["OrgName"] as string;
+            if (string.IsNullOrEmpty(orgName))
+            {
+                throw new Exception("Invalid organization nname.");
+            }
+
+            if (!webProps.Properties.ContainsKey("Username"))
+            {
+                throw new Exception("Please provide username.");
+            }
+
+            username = webProps.Properties["Username"] as string;
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new Exception("Invalid username.");
+            }
+
+            if (!webProps.Properties.ContainsKey("Password"))
+            {
+                throw new Exception("Please provide password.");
+            }
+
+            var pwd = webProps.Properties["Password"] as string;
+            if (string.IsNullOrEmpty(pwd))
+            {
+                throw new Exception("Invalid password.");
+            }
+
+            password = pwd.ToSecureString();
+        }
+
+        private TenroxService GetTenroxService(WebProperties webProps)
+        {
+            string orgUrl;
+            string orgName;
+            string username;
+            SecureString password;
+
+            GetAuthInfo(webProps, out orgUrl, out orgName, out username, out password);
+
+            return new TenroxService(orgUrl, orgName, username, password);
+        }
+
+        #endregion Methods 
+
         #region Implementation of IIntegrator
 
         public TransactionTable UpdateItems(WebProperties webProps, DataTable items, IntegrationLog log)
@@ -42,8 +112,23 @@ namespace UplandIntegrations.Tenrox
 
         public bool TestConnection(WebProperties webProps, IntegrationLog log, out string message)
         {
-            throw new NotImplementedException();
+            message = null;
+
+            try
+            {
+                GetTenroxService(webProps);
+            }
+            catch (Exception e)
+            {
+                message = e.Message;
+                log.LogMessage(message, IntegrationLogType.Error);
+
+                return false;
+            }
+
+            return true;
         }
+
 
         public bool InstallIntegration(WebProperties webProps, IntegrationLog log, out string message,
             string integrationKey,
