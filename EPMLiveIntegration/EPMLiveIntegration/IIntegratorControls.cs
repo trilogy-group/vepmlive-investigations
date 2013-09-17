@@ -7,14 +7,9 @@ namespace EPMLiveIntegration
 {
     public class IntegrationControl
     {
-        public IntegrationControl(string Control, string URL)
-        {
-            this.Control = Control;
-            this.URL = URL;
-        }
-
         public string Control;
-        public string URL;
+        public string Image;
+        public string Title;
     }
 
     public interface IIntegratorControls
