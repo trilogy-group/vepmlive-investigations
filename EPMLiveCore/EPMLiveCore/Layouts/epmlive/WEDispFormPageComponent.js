@@ -62,6 +62,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPKCost');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPKRP');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPKRPM');
+        Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPMINT');
         return $arr;
     },
     isFocusable: function () {
@@ -90,6 +91,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
             case "Ribbon.ListForm.Display.Manage.EPKCost":
             case "Ribbon.ListForm.Display.Manage.EPKRP":
             case "Ribbon.ListForm.Display.Manage.EPKRPM":
+            case "Ribbon.ListForm.Display.Manage.EPMINT":
                 return true;
             default:
                 return commandEnabled(commandId);
@@ -190,6 +192,11 @@ WEDispFormPageComponent.PageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRPM') {
             this.epkmulti('rpeditor');
+        }
+        else if (commandId === 'Ribbon.ListForm.Display.Manage.EPMINT')
+        {
+            OpenIntegrationPage(properties.SourceControlId.replace("EPMINT.", ""), WEListId, WEItemId);
+            
         }
         else {
             return handleCommand(commandId, properties, sequence);
