@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Presentation;
 using Microsoft.SharePoint;
 using EPMLiveCore;
 
@@ -63,6 +64,14 @@ namespace EPMLiveCore.API
             }
         }
 
+        public string ListViewUrl
+        {
+            get
+            {
+                return mgr.GetPropVal("ListViewUrl");
+            }
+        }
+
         public bool FileIsNull
         {
             get
@@ -119,7 +128,12 @@ namespace EPMLiveCore.API
         {
             get
             {
-                return mgr.GetPropVal("ListIconClass");
+                string sIcon = IsPage ? "icon-file-5" : "icon-square";
+                if (!string.IsNullOrEmpty(mgr.GetPropVal("ListIconClass")))
+                {
+                    sIcon = mgr.GetPropVal("ListIconClass");
+                }
+                return sIcon;
             }
         }
 
@@ -167,7 +181,28 @@ namespace EPMLiveCore.API
         {
             get
             {
-                return (ItemId != -1 && !FileIsNull);
+                bool isItem = (string.IsNullOrEmpty(ListViewUrl)
+                                && ListId != Guid.Empty
+                                && ItemId != -1
+                                && FileIsNull);
+                return isItem;
+            }
+        }
+
+        public bool IsListView
+        {
+            get
+            {
+                bool isListView = !string.IsNullOrEmpty(ListViewUrl) && ListId != Guid.Empty;
+                return isListView;
+            }
+        }
+
+        public bool IsPage
+        {
+            get
+            {
+                return (!IsItem && !IsListView);
             }
         }
 

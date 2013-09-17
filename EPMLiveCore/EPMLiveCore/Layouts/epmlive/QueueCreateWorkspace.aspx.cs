@@ -28,6 +28,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected string _tempGalRedirect = string.Empty;
         protected string _curWebUrl = string.Empty;
         protected string _requestProjectName = string.Empty;
+        protected string _uniquePermission = "false";
         protected string _defaultCreateNewOpt = string.Empty;
         protected string _currentUserId = string.Empty;
         protected string _showInProgress = "false";
@@ -104,7 +105,7 @@ namespace EPMLiveCore.Layouts.epmlive
             GetFeatures();
 
             _currentUserId = _cWeb.CurrentUser.ID.ToString();
-
+            
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 using (SPSite s = new SPSite(SPContext.Current.Site.ID))
@@ -161,6 +162,13 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 _isStandAlone = "true";
             }
+
+            try
+            {
+                _uniquePermission = bool.Parse(_isStandAlone)
+                    ? "false": SPContext.Current.Web.Lists[new Guid(_lstGuid)].GetItemById(int.Parse(_itemId)).HasUniqueRoleAssignments.ToString();
+            }
+            catch { }
 
             if (!string.IsNullOrEmpty(Request["isDlg"]))
             {   

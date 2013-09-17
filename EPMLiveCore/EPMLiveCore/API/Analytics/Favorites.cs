@@ -15,6 +15,7 @@ namespace EPMLiveCore.API
 {
     public static class Favorites
     {
+        private static string DEFAULT_PAGE_ICON = "icon-square-5";
         public static string IsFav(string xml)
         {
             var result = "false";

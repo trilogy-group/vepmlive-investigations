@@ -28,7 +28,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 else if (SPContext.Current.ViewContext.View == null 
                     && SPContext.Current.List != null 
                     && SPContext.Current.Item != null
-                    && SPContext.Current.File != null)
+                    && SPContext.Current.File == null)
                 {
                     defaultFavTitle = SPContext.Current.ListItemDisplayName;
                 }

@@ -32,6 +32,7 @@
         var createDefault = '<%=_defaultCreateNewOpt%>';
         var onlineAvail = '<%=_isCreateFromOnlineAvail%>';
         var localAvail = '<%=_isCreateFromLocalAvail%>';
+        var uniquePerm = '<%=_uniquePermission %>';
     </script>
     <div id="OuterContainer">
         <div class="modal-body">

@@ -33,7 +33,8 @@
 
 <div id="fav_Add_DivTemp" style="display:none">
       <div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;
-        <input id="favTitle" name="favTitle" type="text" value="<%=defaultFavTitle %>" />
+          <script> var sDefault = "<%=defaultFavTitle %>"; </script>
+        <input id="favTitle" name="favTitle" type="text" />
         <br />
         <div style="clear:both;height:10px;"></div>
         <input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, document.getElementById('favTitle').value);return false;" class="ms-ButtonHeightWidth" target="_self" />

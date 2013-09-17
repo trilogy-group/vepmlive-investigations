@@ -42,7 +42,7 @@ namespace EPMLiveCore
         public bool LockSearch = false;
         public bool AssociatedItems = false;
         public bool DisplayFormRedirect = false;
-        public string ListIcon = "";
+        public string ListIcon = "icon-square";
 
 
         public string DisplaySettings = "";

@@ -70,7 +70,7 @@ function registerCreateWorkspace2Script() {
             self.templateName = ko.observable();
             self.workspaceUrl = ko.observable();
             self.parentWebUrl = ko.observable();
-            self.uniquePermission = ko.observable('false');
+            self.uniquePermission = ko.observable(w.uniquePerm);
             self.workspaceTitle = ko.observable(w.workspaceTitle);
             self.itemId = ko.observable(w.itemId);
             self.templateItemId = ko.observable(-1);
@@ -296,7 +296,12 @@ function registerCreateWorkspace2Script() {
 
             self.createWorkspace = function () {
                 if (!self.hasTempSelected()) {
-                    alert('You must select a template first');
+                    alert('You must select a template.');
+                    return;
+                }
+                
+                if (!self.workspaceTitle().trim()) {
+                    alert('You must enter a site title.');
                     return;
                 }
 
@@ -311,7 +316,7 @@ function registerCreateWorkspace2Script() {
                         parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
-                        alert(errorThrown);
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(-1, errorThrown);
                     }
                 });
             };

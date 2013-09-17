@@ -88,7 +88,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ItemId = "-1";
             try{ItemId = SPContext.Current.ItemId.ToString();}catch{}
 
-            CurrentFileIsNull = "true";
+            CurrentFileIsNull = "True";
             try { CurrentFileIsNull = (SPContext.Current.File == null).ToString(); }catch { }
 
             CurrentUserId = "-1";

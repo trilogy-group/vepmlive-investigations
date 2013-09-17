@@ -8,6 +8,7 @@
                 "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
                 "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
                 "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
+                "<Param key=\"ListView\">" + $$.currentListViewUrl + "</Param>" +
                 "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
                 "<Param key=\"FileIsNull\">" + $$.currentFileIsNull + "</Param>" +
                 "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
@@ -66,7 +67,14 @@
 
                                             if (epmLive.responseIsSuccess(result) && result['#text']) {
                                                 $('#favoritesStar').removeClass('icon-star-active');
-                                                SP.UI.Notify.addNotification('Favorite removed', false);
+                                                //SP.UI.Notify.addNotification('Favorite removed', false);
+                                                $.pnotify({
+                                                    title: 'Favorite Removed',
+                                                    text: 'An existing item has been removed from your favorites list.',
+                                                    type: 'success',
+                                                    styling: 'jqueryui'
+                                                });
+
                                                 var sa = result['#text'].split(',');
                                                 // asynchronously update nav
                                                 window.epmLiveNavigation.removeLink({
@@ -105,12 +113,14 @@
                     "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
                     "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
                     "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
+                    "<Param key=\"ListViewUrl\">" + $$.currentListViewUrl + "</Param>" +
                     "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
                     "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
                     "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
                     "<Param key=\"Type\">1</Param>" +
                     "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
                     "<Param key=\"Title\">" + title + "</Param>" +
+                    "<Param key=\"FileIsNull\">" + $$.currentFileIsNull + "</Param>" +
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
@@ -122,11 +132,24 @@
                         if (epmLive.responseIsSuccess(result) && result['#text']) {
                             //onSuccess(result);
                             $('#favoritesStar').addClass('icon-star-active');
-                            SP.UI.Notify.addNotification('New favorite added', false);
+                            //SP.UI.Notify.addNotification('New favorite added', false);
+                            
+                            $.pnotify({
+                                title: 'New Favorite Added',
+                                text: 'A new item has been added to your favorites list.',
+                                type: 'success',
+                                styling: 'jqueryui'
+                            });
+                            
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
+                            // 1 is page, 0 is item
+                            var favKindInt = 1;
+                            if ($$.currentFileIsNull == 'True') {
+                                favKindInt = 0;
+                            }
                             window.epmLiveNavigation.registerLink({
-                                kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
                                 id: sa[0],
                                 title: sa[6],
                                 url: sa[9],

@@ -190,7 +190,7 @@
             }
         }
     };
-    
+
     $$.getFormattedTime = function (dateTime) {
         var hours = dateTime.getHours();
         var minutes = dateTime.getMinutes();
@@ -404,7 +404,7 @@
     k.applyBindings($$.ui.statusbar, document.getElementById('EPMLiveStatusbar'));
 }(window.epmLive = window.epmLive || {}, jQuery, ko));
 
-function CreateEPMLiveWorkspace (listid, itemid) {
+function CreateEPMLiveWorkspace(listid, itemid) {
     if (listid)
         var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx?listid=' + listid + '&itemid=' + itemid);
     else
@@ -419,14 +419,23 @@ function CreateEPMLiveWorkspace (listid, itemid) {
         width: 880,
         height: 500,
         dialogReturnValueCallback: function (dialogResult, returnValue) {
-            {
-                if (dialogResult === 1) {
-                    {
-                        SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false);
-                    }
-                }
+            if (dialogResult === 1) {
+                //SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false);
+                $.pnotify({
+                    title: 'Workspace Status',
+                    text: 'Your workspace is being created - we will notify you when it is ready.',
+                    type: 'success'
+                });
+            }
+            else if (dialogResult === -1) {
+                $.pnotify({
+                    title: 'Workspace Status',
+                    text: 'Something went wrong. Workspace is not being created. Error: ' + returnValue,
+                    type: 'error'
+                });
             }
         }
+
     };
 
     SP.UI.ModalDialog.showModalDialog(options);
