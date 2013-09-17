@@ -31,6 +31,12 @@ namespace EPMLiveCore.API.Integration
             public Guid intlistid;
         }
 
+        public class IntegrationControlDef
+        {
+            public string id;
+            public string HTML;
+        }
+
         public IntegrationCore(Guid SiteId, Guid WebId)
         {
             _site = new SPSite(SiteId);
@@ -90,17 +96,18 @@ namespace EPMLiveCore.API.Integration
                         dtResInfo.Columns.Add("INT_CONTROL_ID", typeof(Guid));
                         dtResInfo.Columns.Add("INT_LIST_ID", typeof(Guid));
                         dtResInfo.Columns.Add("CONTROL");
-                        dtResInfo.Columns.Add("URL");
                         dtResInfo.Columns.Add("LOCAL");
+                        dtResInfo.Columns.Add("TITLE");
+                        dtResInfo.Columns.Add("IMAGE");
 
                         foreach (IntegrationControl ictl in ctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, ictl.URL, "0" });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, "0", ictl.Title, ictl.Image });
                         }
 
                         foreach (string ictl in lctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, "", "1" });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, "1", ictl, "" });
                         }
 
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
@@ -1217,6 +1224,52 @@ namespace EPMLiveCore.API.Integration
             }
             catch { }
             return "";
+        }
+
+        public List<IntegrationControlDef> GetLocalControls(Guid listid, string ItemID, out string Errors)
+        {
+            List<IntegrationControlDef> icds = new List<IntegrationControlDef>();
+            Errors = "";
+            try
+            {
+                DataTable dtInts = new DataTable();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    dtInts = GetIntegrationsForList(listid);
+                
+                    foreach (DataRow dr in dtInts.Rows)
+                    {
+                        Guid intlistid = new Guid(dr["intlistid"].ToString());
+
+                        IntegratorDef integrator = GetIntegrator(intlistid);
+
+                        IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
+
+                        Hashtable hshProps = GetProperties(intlistid);
+
+                        WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
+
+                        try
+                        {
+                            List<string> conts = ((IIntegratorControls)integrator.iIntegrator).GetLocalControls(webprops, log);
+
+                            foreach (string cont in conts)
+                            {
+                                IntegrationControlDef icd = new IntegrationControlDef();
+                                icd.HTML = ((IIntegratorControls)integrator.iIntegrator).GetControlCode(webprops, log, ItemID, cont);
+                                icd.id = dr["intlistid"].ToString();
+                                icds.Add(icd);
+                            }
+                        }
+                        catch { }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Errors += ex.Message;
+            }
+            return icds;
         }
 
         internal DataTable PullData(DataTable dtItems, Guid intlistid, Guid listid, DateTime dtLastSynched)
