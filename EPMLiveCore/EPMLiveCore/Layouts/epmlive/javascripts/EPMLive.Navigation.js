@@ -1656,8 +1656,8 @@
 
                                     $a.data('originalwidth', $a.width());
                                     $a.data('newwidth', newWidth);
-                                    
-                                    if (total > menuWidth) {
+
+                                    if (total > (menuWidth - padding)) {
                                         $a.width(newWidth);
                                     } else {
                                         $a.parent().width(newWidth);
