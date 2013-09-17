@@ -36,6 +36,21 @@ namespace UplandIntegrations
         }
         public string GetControlCode(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control)
         {
+            try
+            {
+                GetFBGuid(WebProps);
+
+                switch (Control)
+                {
+                    case "WorkflowButtons":
+                        return Properties.Resources.txtFBWorkFlow.Replace("#FBGUID#", FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString());
+                        break;
+                }
+            }
+            catch(Exception ex)
+            {
+                return "Error: " + ex.Message;
+            }
             return "";
         }
 
@@ -78,45 +93,80 @@ namespace UplandIntegrations
 
                 foreach(DataRow dr in Items.Rows)
                 {
-                    WebClient wc = new WebClient();
-                    string resp = wc.DownloadString(WebProps.Properties["APIUrl"].ToString() + "files/" + dr["ID"].ToString() + "?fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + FBGUID);
-
-                    dynamic c = System.Web.Helpers.Json.Decode(resp);
-
-                    var httpWebRequest = (HttpWebRequest)WebRequest.Create(WebProps.Properties["APIUrl"].ToString() + "files/" + dr["ID"].ToString() + "?fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + FBGUID);
-                    httpWebRequest.ContentType = "text/json";
-                    httpWebRequest.Method = "PUT";
-
-                    int indexOfField = resp.IndexOf("\"field\":[");
-                    int indexOfEndField = resp.IndexOf("\"],", indexOfField);
-
-                    string firstResp = resp.Substring(0, indexOfField + 9);
-                    string lastResp = resp.Substring(indexOfEndField + 1);
-
-                    string field = "";
-
-                    for (int i = 0; i < 21; i++)
+                    if (dr["ID"].ToString() != "")
                     {
-                        string val = "";
-                        try
+                        WebClient wc = new WebClient();
+                        string resp = wc.DownloadString(WebProps.Properties["APIUrl"].ToString() + "files/" + dr["ID"].ToString() + "?fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + FBGUID);
+
+                        dynamic c = System.Web.Helpers.Json.Decode(resp);
+
+                        var httpWebRequest = (HttpWebRequest)WebRequest.Create(WebProps.Properties["APIUrl"].ToString() + "files/" + dr["ID"].ToString() + "?fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + FBGUID);
+                        httpWebRequest.ContentType = "text/json";
+                        httpWebRequest.Method = "PUT";
+
+                        int indexOfField = resp.IndexOf("\"field\":[");
+                        int indexOfEndField = resp.IndexOf("\"],", indexOfField);
+
+                        string firstResp = resp.Substring(0, indexOfField + 9);
+                        string lastResp = resp.Substring(indexOfEndField + 1);
+
+                        string field = "";
+
+                        for (int i = 0; i < 21; i++)
                         {
-                            val = dr[i.ToString()].ToString();
+                            string val = "";
+                            try
+                            {
+                                val = dr[i.ToString()].ToString();
+                            }
+                            catch { }
+                            field += "\"" + val + "\",";
                         }
-                        catch { }
-                        field += "\"" + val + "\",";
-                    }
-                    field = field.Trim(',');
+                        field = field.Trim(',');
 
-                    using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                    {
-                        streamWriter.Write(firstResp + field + lastResp);
-                        streamWriter.Flush();
-                        streamWriter.Close();
+                        using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                        {
+                            streamWriter.Write(firstResp + field + lastResp);
+                            streamWriter.Flush();
+                            streamWriter.Close();
+                        }
+                        var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                        using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                        {
+                            var responseText = streamReader.ReadToEnd();
+                        }
                     }
-                    var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                    using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                    else
                     {
-                        var responseText = streamReader.ReadToEnd();
+                        var httpWebRequest = (HttpWebRequest)WebRequest.Create(WebProps.Properties["APIUrl"].ToString() + "files?fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + FBGUID);
+                        httpWebRequest.ContentType = "text/json";
+                        httpWebRequest.Method = "POST";
+
+                        string field = "";
+
+                        for (int i = 0; i < 21; i++)
+                        {
+                            string val = "";
+                            try
+                            {
+                                val = dr[i.ToString()].ToString();
+                            }
+                            catch { }
+                            field += "\"" + val + "\",";
+                        }
+                        field = field.Trim(',');
+
+                        using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                        {
+                            streamWriter.Write("{\"fields\": [" + field + "],\"projectId\":" + WebProps.Properties["Folder"].ToString() + "}");
+                            streamWriter.Flush();
+                            streamWriter.Close();
+                        }
+                        var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                        using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                        {
+                            var responseText = streamReader.ReadToEnd();
+                        }
                     }
                 }
             }

@@ -1,0 +1,296 @@
+
+        <style type="text/css">
+        
+            .vr-main
+            {
+                border: 1px solid black;
+                -webkit-box-sizing: border-box;
+	            -moz-box-sizing: border-box;
+	            box-sizing: border-box;
+                overflow:hidden; 
+            }
+            
+            .vr-base
+            {
+                font-size: 16px !important;
+            }
+            
+            #vr-top
+            {
+                height: 100px;
+            }
+            
+            #vr-content
+            {
+                min-width: 500px;
+            }
+            
+            #vr-info-table
+            {
+	            width: 100%;
+            }
+
+            #vr-info-table td
+            {
+	            vertical-align: center;
+            }
+
+            #vr-info-table tbody tr td:first-child
+            {
+	            width: 25%;
+	            text-align: right;
+            }
+
+			#vwf-top-section
+			{
+				height: 80px !important;
+			}
+            
+        </style>
+
+        <script type="text/javascript" language="javascript">
+		var tabmain;
+            var WebAPIUrl = "#APIUrl#";
+            var FBSiteURL = "#SiteUrl#";
+            var Param = "guid=#FBGUID#&fbsite=" + FBSiteURL;
+            var getTabs = true;
+            var getTaskButtons = true;
+            var currentRoutes;
+
+
+            $(function () {
+
+                // when the project changes, re-load processes:
+                $("#ddlProjects").bind("change", function () {
+                    LoadRoutes($(this).val());
+                });
+
+                // when the process changes, re-load the visual workflow:
+                $("#ddlRoutes").bind("change", function () {
+                    var selectedRouteId = $("#ddlRoutes option:selected").val();
+                    var xml = GetXML(selectedRouteId);
+                    if (selectedRouteId > 0 && xml != "") {
+                        LoadVisualWorkflow(selectedRouteId, xml);
+                    }
+                });
+
+                // open process designer to the current route when button is clicked:
+                $("#btnProcessDesigner").bind("click", function () {
+
+                    var projectId = $("#ddlProjects option:selected").val();
+                    var routeId = $("#ddlRoutes option:selected").val();
+
+                    // for published processes, routeId from the drop down is actually the PublishedRouteId, 
+                    // we must look up the actual routeId:
+                    if (IsPublishedProcess(routeId)) {
+                        $.get(WebAPIUrl + "ProcessRouteRevision/" + routeId + "?" + Param, function (prr) {
+                            // got back a ProcessRouteRevision, use it's routeId:
+                            //$.get(WebAPIUrl + "viewer/designer?routeId=" + prr.routeId + "&projectId=" + projectId + "&" + Param);
+                            window.location = WebAPIUrl + "viewer/designer?routeId=" + prr.routeId + "&projectId=" + projectId + "&" + Param;
+                        });
+                    } else {
+                        //$.get(WebAPIUrl + "viewer/designer?routeId=" + routeId + "&projectId=" + projectId + "&" + Param);
+                        window.location = WebAPIUrl + "viewer/designer?routeId=" + routeId + "&projectId=" + projectId + "&" + Param;
+                    }
+                });
+
+                // get the VisualWorkflow Scripts:
+                $.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
+									$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''"));
+
+									$.get(WebAPIUrl + "projects?" + Param, function (projects) {
+													var p = eval(projects);
+													for (var i = 0; i < p.length; i++) {
+														$("#ddlProjects").append($("<option></option").attr("value", p[i].projectId).text(p[i].name));
+													}
+													LoadRoutes($("#ddlProjects option:selected").val());
+											});
+
+									}
+                );
+
+                function LoadRoutes(projectId) {
+
+                    $("#ddlRoutes option").remove(); //clear our current values
+                    $.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
+                        currentRoutes = routes;
+                        for (var i = 0; i < currentRoutes.length; i++) {
+                            // make sure this isn't an old (v4/5) Workflow Route:
+                            if (currentRoutes[i].routeType != 0) {
+                                $("#ddlRoutes").append($("<option></option").attr("value", currentRoutes[i].routeId).text(currentRoutes[i].name));
+                            }
+                        }
+
+                        if ($("#ddlRoutes option").length > 0) {
+                            var selectedRouteId = $("#ddlRoutes option:selected").val();
+                            var xml = GetXML(selectedRouteId);
+
+                            if (selectedRouteId > 0 && xml != "") {
+                                LoadVisualWorkflow(selectedRouteId, xml);
+                            }
+                        } else {
+                            // no routes found:
+                            $("#vr-content").empty();
+                        }
+                    });
+                }
+
+
+                // when the window size changes, readjust the visual workflow containers:
+                $(window).unbind("resize").bind("resize", function () {
+
+                    VWF.UpdateLayout(getTabs, GetMaxHeight(), $("#vr-content").outerWidth(), parseFloat($("#vr-content").css("min-height")), false);
+                });
+
+            });
+
+            function LoadVisualWorkflow(routeId, xml) {
+
+                // make sure vr-content is empty:
+                $("#vr-content").empty();
+
+                // ---------------------------------------------
+                // - EXAMPLE: original, Visual Workflow style:
+                // ---------------------------------------------
+                $.get(WebAPIUrl + "visualworkflow/data?routeid=" + routeId + "&routedItemId=0&" + Param, function (vwfData) {
+
+                    if (vwfData != null) {
+
+                        // show button:
+                        $("#btnProcessDesigner").show();
+
+                        $.get(WebAPIUrl + "visualworkflow?taskbuttons=" + getTaskButtons + "&tabs=" + getTabs + "&" + Param, function (html) {
+
+                            $("#vr-content").append(html);
+							
+							document.getElementById("vwf-tab-main-container").style.display="none";
+
+                            $.get(WebAPIUrl + "routeditems/" + vwfData.routedItemId + "?localtreeonly=true&lookupIdCode=true&visualWorkflow=true&" + Param, function (routedItems) {
+
+                                // need to make sure this only gets called if we have the VWF scripts downloaded already:
+                                VWF.GenerateDiagram(xml, routedItems, getTabs, vwfData.stepId);
+
+                                // update the layout (positioning, etc.):
+                                VWF.UpdateLayout(getTabs, GetMaxHeight(), $("#vr-content").outerWidth(), parseFloat($("#vr-content").css("min-height")), true);
+
+                                // make web api call to get task buttons:
+                                $.get(WebAPIUrl + "AssignmentActions?" + Param + "&RoutedItemID=" + vwfData.routedItemId + "&formatted=true&includeJquery=false&zindex=15005&callback=TaskButtonCallback", function (taskButtons) {
+                                    $("#vwf-top-task-buttons").append(taskButtons);
+                                });
+
+								
+                            });
+
+                        });
+                    } else {
+                        // no diagram
+
+                        // hide button
+                        $("#btnProcessDesigner").hide();
+                    }
+                });
+
+
+
+                // ----------------------------------------------
+                // - EXAMPLE: new, Visual Reports style:
+                //-----------------------------------------------
+                // need to make sure this only gets called if we have the VWF scripts downloaded already:
+                //VWF.GenerateDiagram(xml, null, null);
+
+                // update the layout (positioning, etc.):
+                //VWF.UpdateLayout(getTabs, GetMaxHeight(), $("#vr-content").outerWidth(), parseFloat($("#vr-content").css("min-height")));
+
+            }
+
+            function IsPublishedProcess(routeId){
+                if (currentRoutes != null && currentRoutes.length > 0) {
+                    for (var i = 0; i < currentRoutes.length; i++) {
+                        if (currentRoutes[i].routeId == routeId) {
+                            if(currentRoutes[i].routeType == 4){
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            // returns the max available height for the workflow container:
+            function GetMaxHeight() {
+                // available height = 
+                // Window height - Topbar - VR top - 100 (cushion)
+                return $(window).height() - $("#top-bar").outerHeight() - $("#vr-top").outerHeight() - 100;
+            }
+
+            function GetXML(routeId) {
+                if (currentRoutes != null && currentRoutes.length > 0) {
+                    for (var i = 0; i < currentRoutes.length; i++) {
+                        if (currentRoutes[i].routeId == routeId) {
+                            return currentRoutes[i].xml;
+                        }
+                    }
+                }
+                return "";
+            }
+
+            function TaskButtonCallback(action, url) {
+                // for anything other than "set due date" (action -9999),
+                // load the next routed item into view:
+                //                    if (action != "-9999") {
+                //                        GlobalWorkflow.GlobalWorkflow_switchToVisualWorkflow(0, RouteID, SearchAssignments);
+                //                    } else {
+                //                        // re-load the header
+                //                        $("#vwf-info-table").empty();
+                //                        GlobalWorkflow.GlobalWorkflow_ReloadVisualWorkflowHeader();
+                //}
+
+                // reload the diagram:
+                var routeId = $("#ddlRoutes option:selected").val();
+                var xml = GetXML(routeId);
+                LoadVisualWorkflow(routeId, xml);
+
+            }
+
+			
+
+			function ViewWorkflow()
+			{
+
+				document.getElementById("vwf-tab-main-container").style.display = "";
+
+				var options = { html: document.getElementById("vwf-tab-main-container"), showMaximized: true, title: "Workflow" };
+
+				SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+
+				
+			}
+
+        </script>
+
+    <div id="vr-top">
+                <table id="vr-info-table" class="vr-base">
+                    <tr>
+                        <td>Project: </td>
+                        <td><select id="ddlProjects" class="vr-base"/></td>
+                    </tr>
+                    <tr>
+                        <td>Process:</td>
+                        <td><select id="ddlRoutes" class="vr-base" /></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="button" id="btnProcessDesigner" value="Open Process Designer" style="display:none;"/></td>
+                    </tr>
+                </table>
+            </div>
+
+        <div class="vr-main">
+            
+            <div id="vr-content">
+            
+            </div><br>
+			<div >
+				<a href="javascript:ViewWorkflow();">View Workflow</a>
+			</div>
+        </div>
