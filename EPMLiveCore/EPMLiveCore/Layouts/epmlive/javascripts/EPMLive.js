@@ -440,3 +440,24 @@ function CreateEPMLiveWorkspace(listid, itemid) {
 
     SP.UI.ModalDialog.showModalDialog(options);
 }
+
+
+function OpenIntegrationPage(control, listid, itemid) {
+
+    var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/integration/gotoremote.aspx?control=' + listid + '&listid=' + listid + 'itemid=' + itemid);
+
+    var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
+    var tUrl = urlBuilder.get_url();
+
+    var options = {
+        url: tUrl,
+        showMaximized: true,
+        title: 'Integration',
+
+        dialogReturnValueCallback: function (dialogResult, returnValue) {
+            
+        }
+    };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}

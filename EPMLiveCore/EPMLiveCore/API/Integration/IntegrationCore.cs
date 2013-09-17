@@ -50,7 +50,7 @@ namespace EPMLiveCore.API.Integration
 
             OpenConnection();
 
-            SqlCommand cmd = new SqlCommand("select INT_LIST_ID as intlistid, priority, Title as intname , CASE WHEN ACTIVE = 1 THEN 'Yes' ELSE 'No' END AS Active FROM dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID where LIST_ID=@listid order by priority", cn);
+            SqlCommand cmd = new SqlCommand("select INT_LIST_ID as intlistid, priority, Title as intname , CASE WHEN ACTIVE = 1 THEN 'Yes' ELSE 'No' END AS Active, INT_COLID FROM dbo.INT_LISTS INNER JOIN dbo.INT_MODULES ON dbo.INT_LISTS.MODULE_ID = dbo.INT_MODULES.MODULE_ID where LIST_ID=@listid order by priority", cn);
             cmd.Parameters.AddWithValue("@listid", ListId);
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             da.Fill(ds);
@@ -102,12 +102,12 @@ namespace EPMLiveCore.API.Integration
 
                         foreach (IntegrationControl ictl in ctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, "0", ictl.Title, ictl.Image });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image });
                         }
 
                         foreach (string ictl in lctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, "1", ictl, "" });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "" });
                         }
 
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
@@ -1226,7 +1226,45 @@ namespace EPMLiveCore.API.Integration
             return "";
         }
 
-        public List<IntegrationControlDef> GetLocalControls(Guid listid, string ItemID, out string Errors)
+        public List<IntegrationControl> GetRemoteControls(Guid listid, SPListItem li, out string Errors)
+        {
+            List<IntegrationControl> ics = new List<IntegrationControl>();
+            Errors = "";
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    OpenConnection();
+
+                    DataSet ds = new DataSet();
+
+                    SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0", cn);
+                    cmd.Parameters.AddWithValue("@listid", listid);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(ds);
+
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    {
+                        IntegrationControl i = new IntegrationControl();
+                        i.Control = dr["CONTROL"].ToString();
+                        i.Image = dr["IMAGE"].ToString();
+                        i.Title = dr["TITLE"].ToString();
+
+                        ics.Add(i);
+                    }
+
+                    CloseConnection(false);
+                });
+
+            }
+            catch (Exception ex)
+            {
+                Errors += ex.Message;
+            }
+            return ics;
+        }
+
+        public List<IntegrationControlDef> GetLocalControls(Guid listid, SPListItem li, out string Errors)
         {
             List<IntegrationControlDef> icds = new List<IntegrationControlDef>();
             Errors = "";
@@ -1248,20 +1286,29 @@ namespace EPMLiveCore.API.Integration
                         Hashtable hshProps = GetProperties(intlistid);
 
                         WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
-
+                        
+                        string ItemId = "";
                         try
                         {
-                            List<string> conts = ((IIntegratorControls)integrator.iIntegrator).GetLocalControls(webprops, log);
+                            ItemId = li["INTUID" + dr["INT_COLID"].ToString()].ToString();
+                        }catch{}
 
-                            foreach (string cont in conts)
+                        if(ItemId != "")
+                        {
+                            try
                             {
-                                IntegrationControlDef icd = new IntegrationControlDef();
-                                icd.HTML = ((IIntegratorControls)integrator.iIntegrator).GetControlCode(webprops, log, ItemID, cont);
-                                icd.id = dr["intlistid"].ToString();
-                                icds.Add(icd);
+                                List<string> conts = ((IIntegratorControls)integrator.iIntegrator).GetLocalControls(webprops, log);
+
+                                foreach (string cont in conts)
+                                {
+                                    IntegrationControlDef icd = new IntegrationControlDef();
+                                    icd.HTML = ((IIntegratorControls)integrator.iIntegrator).GetControlCode(webprops, log, ItemId, cont);
+                                    icd.id = dr["intlistid"].ToString();
+                                    icds.Add(icd);
+                                }
                             }
+                            catch { }
                         }
-                        catch { }
                     }
                 });
             }

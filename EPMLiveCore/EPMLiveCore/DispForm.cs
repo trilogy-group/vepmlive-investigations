@@ -15,6 +15,16 @@ namespace EPMLiveCore
 {
     public class DispForm : WebControl
     {
+        protected override void Render(HtmlTextWriter writer)
+        {
+            base.Render(writer);
+            writer.WriteLine("<script>");
+            writer.WriteLine("WEWebId = '" + SPContext.Current.Web.ID + "';");
+            writer.WriteLine("WEListId = '" + SPContext.Current.List.ID + "';");
+            writer.WriteLine("WEItemId = '" + SPContext.Current.Item.ID + "';");
+            writer.WriteLine("</script>");
+        }
+
         protected override void OnPreRender(System.EventArgs e)
         {
             SPWeb Web = SPContext.Current.Web;
@@ -239,10 +249,37 @@ namespace EPMLiveCore
                 }
             }
 
+            API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(Web.Site.ID, Web.ID);
+            string Errors = "";
+
+            int seq = 130;
+            
+            var commands = new List<IRibbonCommand>();
+
+            List<EPMLiveIntegration.IntegrationControl> ics = core.GetRemoteControls(ListItem.ParentList.ID, ListItem, out Errors);
+            foreach (EPMLiveIntegration.IntegrationControl ic in ics)
+            {
+
+                ribbonExtensions = new XmlDocument();
+                ribbonExtensions.LoadXml(@"<Button
+                        Id=""EPMINT." + ic.Control + @"""
+                        Sequence=""" + (seq++).ToString() + @"""
+                        Command=""Ribbon.ListForm.Display.Manage.EPMINT""
+                        Image32by32=""/_layouts/15/images/" + ic.Image + @"""
+                        LabelText=""" + ic.Title + @"""
+                        TemplateAlias=""o1""
+                        />");
+
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
+
+            }
+
+
+
 
             //===============================================
 
-            var commands = new List<IRibbonCommand>();
+            
 
             // register the command at the ribbon. Include the callback to the server     // to generate the xml
             //commands.Add(new SPRibbonCommand("Ribbon.ListForm.Display.Manage.EditItem2", "alert('test');", "true"));
