@@ -1193,6 +1193,11 @@
                     });
                 }
 
+                window.epmLiveNavigation.removeLink = function (link) {
+                    var $a = $sn.find('#epm-nav-link-' + link.id);
+                    epmLiveNavigation.handleContextualCommand(link.id, $a.data('webid'), $a.data('listid'), $a.data('itemid'), 'nav:remove', '98');
+                };
+                
                 window.epmLiveNavigation.registerLink = function(link) {
                     if (link) {
                         var providerName;
