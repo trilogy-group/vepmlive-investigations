@@ -276,6 +276,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx.designer.cs">
       <DependentUpon>EPMLiveStatusbar.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="CONTROLTEMPLATES\FavoriteStatus.ascx.cs">
+      <DependentUpon>FavoriteStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\FavoriteStatus.ascx.designer.cs">
+      <DependentUpon>FavoriteStatus.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="CONTROLTEMPLATES\TemplateVersoning.ascx.cs">
       <DependentUpon>TemplateVersoning.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1969,6 +1975,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotificationsV2.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx" />
+    <Content Include="CONTROLTEMPLATES\FavoriteStatus.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupField.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupFieldEditor.ascx" />
     <Content Include="CONTROLTEMPLATES\FilteredLookupMultiField.ascx" />
