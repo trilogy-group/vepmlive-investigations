@@ -44,6 +44,24 @@ namespace EPMLiveCore.API.Integration
             cn = new SqlConnection(CoreFunctions.getConnectionString(_site.WebApplication.Id));
         }
 
+        public DataTable GetIntegrationControl(Guid ListId, string control)
+        {
+            DataSet ds = new DataSet();
+
+            OpenConnection();
+
+            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_LISTS.INT_LIST_ID, dbo.INT_LISTS.INT_COLID FROM         dbo.INT_CONTROLS INNER JOIN dbo.INT_LISTS ON dbo.INT_CONTROLS.INT_LIST_ID = dbo.INT_LISTS.INT_LIST_ID where LIST_ID=@listid and control=@control", cn);
+            cmd.Parameters.AddWithValue("@listid", ListId);
+            cmd.Parameters.AddWithValue("@control", control);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            da.Fill(ds);
+
+            CloseConnection(false);
+
+            return ds.Tables[0];
+        }
+
+
         public DataTable GetIntegrationsForList(Guid ListId)
         {
             DataSet ds = new DataSet();
@@ -99,15 +117,16 @@ namespace EPMLiveCore.API.Integration
                         dtResInfo.Columns.Add("LOCAL");
                         dtResInfo.Columns.Add("TITLE");
                         dtResInfo.Columns.Add("IMAGE");
+                        dtResInfo.Columns.Add("WINDOW");
 
                         foreach (IntegrationControl ictl in ctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image, ictl.Window });
                         }
 
                         foreach (string ictl in lctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "" });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "", false });
                         }
 
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
@@ -1207,7 +1226,7 @@ namespace EPMLiveCore.API.Integration
 
         }
 
-        public string GetControlURL(Guid intlistid, Guid listid, string control, string url)
+        public string GetControlURL(Guid intlistid, Guid listid, string control, string ItemId)
         {
 
             IntegratorDef integrator = GetIntegrator(intlistid);
@@ -1220,7 +1239,7 @@ namespace EPMLiveCore.API.Integration
 
             try
             {
-                return ((IIntegratorControls)integrator.iIntegrator).GetURL(webprops, log, control, url);
+                return ((IIntegratorControls)integrator.iIntegrator).GetURL(webprops, log, control, ItemId);
             }
             catch { }
             return "";
