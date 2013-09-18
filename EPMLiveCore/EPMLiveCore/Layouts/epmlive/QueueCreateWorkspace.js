@@ -51,21 +51,7 @@ function registerCreateWorkspace2Script() {
             self.hasTempSelected = ko.observable(false);
             
             // DATA - workspace creation related
-            self.templateSource = ko.computed(function() {
-                if (self.onlineAvail() === 'true' && self.localAvail() === 'true') {
-                    if ($('#online').hasClass('slider-selected')) {
-                        return 'online';
-                    } else {
-                        return 'downloaded';
-                    }
-                }
-                else if (self.onlineAvail() === 'true' && self.localAvail() === 'false') {
-                    return 'online';
-                }
-                else if (self.localAvail() === 'true' && self.onlineAvail() === 'false') {
-                    return 'downloaded';
-                }
-            });
+            self.templateSource = ko.observable();
             self.solutionName = ko.observable();
             self.templateName = ko.observable();
             self.workspaceUrl = ko.observable();
@@ -79,6 +65,7 @@ function registerCreateWorkspace2Script() {
             self.compLvls = ko.observable(w.compLvls);
             self.currentWebFullUrl = ko.observable(w.epmLive.currentWebFullUrl);
             self.currentWebId = ko.observable(w.epmLive.currentWebId);
+            self.tempGalWebId = ko.observable(w.tempGalWebId);
             self.currentSiteId = ko.observable(w.epmLive.currentSiteId);
             
 
@@ -118,6 +105,7 @@ function registerCreateWorkspace2Script() {
                             "<Param key=\"AttachedItemListGuid\">" + self.listGuid() + "</Param>" +
                             "<Param key=\"WebUrl\">" + self.currentWebFullUrl() + "</Param>" +
                             "<Param key=\"WebId\">" + self.currentWebId() + "</Param>" +
+                            "<Param key=\"TempGalWebId\">" + self.tempGalWebId() + "</Param>" +
                             "<Param key=\"SiteId\">" + self.currentSiteId() + "</Param>" +
                             "<Param key=\"CreatorId\">" + w.creatorId + "</Param>" +
                             "<Param key=\"CreateFromLiveTemp\">" + self.createFromLiveTemp() + "</Param>" +
@@ -334,6 +322,20 @@ function registerCreateWorkspace2Script() {
                     self.templateItemId($(target).find('#localTemplateId').val());
                 }
 
+                if (self.onlineAvail() === 'true' && self.localAvail() === 'true') {
+                    if ($('#online').hasClass('slider-selected')) {
+                        self.templateSource('online');
+                    } else {
+                        self.templateSource('downloaded');
+                    }
+                }
+                else if (self.onlineAvail() === 'true' && self.localAvail() === 'false') {
+                    self.templateSource('online');
+                }
+                else if (self.localAvail() === 'true' && self.onlineAvail() === 'false') {
+                    self.templateSource('downloaded');
+                }
+                
                 self.hasTempSelected(true);
             };
 

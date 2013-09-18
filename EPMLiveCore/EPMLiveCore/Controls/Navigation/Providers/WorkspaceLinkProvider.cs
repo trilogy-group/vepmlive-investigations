@@ -17,7 +17,20 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         #region Fields (2) 
 
         private const string CREATE_WORKSPACE_URL =
-            @"javascript:var options = {{url: '{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx', width: 880, height:500, dialogReturnValueCallback: function(dialogResult, returnValue){{ if (dialogResult === 1){{ SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false); }} }} }}; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);";
+            @"javascript:var options = {{
+                    url: '{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx', 
+                    dialogReturnValueCallback: function(dialogResult, returnValue){{ 
+                        if (dialogResult === 1){{ 
+                             $.pnotify({{
+                                        title: 'Workspace Queued',
+                                        text: 'Your workspace is being created - we will notify you when it is ready.',
+                                        type: 'info',
+                                        styling: 'jqueryui'
+                                    }});
+                        }}
+                    }} 
+                }}; 
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);";
 
         private readonly string _key;
 

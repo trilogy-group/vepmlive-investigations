@@ -210,6 +210,16 @@ namespace EPMLiveCore.API
             }
         }
 
+        protected Guid TempGalWebId
+        {
+            get
+            {
+                Guid id = Guid.Empty;
+                Guid.TryParse(_xmlDataMgr.GetPropVal("TempGalWebId"), out id);
+                return id;
+            }
+        }
+
         protected Guid SiteId
         {
             get
@@ -1138,7 +1148,7 @@ namespace EPMLiveCore.API
                     {
                         using (SPWeb eWeb = eSite.OpenWeb(WebId))
                         {
-                            GetTempName(eSite, eWeb);
+                            GetTempName(eSite, TempGalWebId);
                             BaseProvision(site, web, eSite, eWeb);
                             EnsureFieldsInRequestItem();
                             BuildWebInfoXml();
@@ -1170,56 +1180,60 @@ namespace EPMLiveCore.API
         /// </summary>
         /// <param name="eSite"></param>
         /// <param name="eWeb"></param>
-        private void GetTempName(SPSite eSite, SPWeb eWeb)
+        private void GetTempName(SPSite eSite, Guid TempGalWebId)
         {
             SPList tmpGalList = null;
             SPListItem tempGalItem = null;
-            if (TryGetListAndItem(eSite, eWeb, out tmpGalList, out tempGalItem,
-                "Template Gallery", int.Parse(_xmlDataMgr.GetPropVal("TemplateItemId"))))
+            using (var eWeb = eSite.OpenWeb(TempGalWebId))
             {
-                string targetWebUrl =
-                    new SPFieldUrlValue(tempGalItem[tmpGalList.Fields.GetFieldByInternalName("URL").Id].ToString()).Url;
-                string relativeWebUrl = GetSiteRelativeWebUrl(targetWebUrl, eSite);
-                string tempSolGuid = Guid.NewGuid().ToString("N");
-                string sTempName = string.Empty;
-
-                if (bool.Parse(_xmlDataMgr.GetPropVal("CreateFromLiveTemp")))
+                if (TryGetListAndItem(eSite, eWeb, out tmpGalList, out tempGalItem,
+                    "Template Gallery", int.Parse(_xmlDataMgr.GetPropVal("TemplateItemId"))))
                 {
-                    using (SPWeb web = eSite.OpenWeb(relativeWebUrl))
+                    string targetWebUrl =
+                        new SPFieldUrlValue(tempGalItem[tmpGalList.Fields.GetFieldByInternalName("URL").Id].ToString())
+                            .Url;
+                    string relativeWebUrl = GetSiteRelativeWebUrl(targetWebUrl, eSite);
+                    string tempSolGuid = Guid.NewGuid().ToString("N");
+                    string sTempName = string.Empty;
+
+                    if (bool.Parse(_xmlDataMgr.GetPropVal("CreateFromLiveTemp")))
                     {
-                        eSite.CatchAccessDeniedException = false;
-                        eSite.AllowUnsafeUpdates = true;
-                        eSite.RootWeb.AllowUnsafeUpdates = true;
-                        web.AllowUnsafeUpdates = true;
-
-                        web.SaveAsTemplate(tempSolGuid, tempSolGuid, "", true);
-                        _lstSolutionsToBeRemoved.Add(tempSolGuid);
-
-                        List<SPWebTemplate> tempL =
-                            (from t in web.Site.RootWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                                where t.Name.Split('#')[1] == tempSolGuid
-                                select t).ToList<SPWebTemplate>();
-
-                        if (tempL.Count > 0)
+                        using (SPWeb web = eSite.OpenWeb(relativeWebUrl))
                         {
-                            sTempName = tempL[0].Name;
+                            eSite.CatchAccessDeniedException = false;
+                            eSite.AllowUnsafeUpdates = true;
+                            eSite.RootWeb.AllowUnsafeUpdates = true;
+                            web.AllowUnsafeUpdates = true;
+
+                            web.SaveAsTemplate(tempSolGuid, tempSolGuid, "", true);
+                            _lstSolutionsToBeRemoved.Add(tempSolGuid);
+
+                            List<SPWebTemplate> tempL =
+                                (from t in web.Site.RootWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
+                                    where t.Name.Split('#')[1] == tempSolGuid
+                                    select t).ToList<SPWebTemplate>();
+
+                            if (tempL.Count > 0)
+                            {
+                                sTempName = tempL[0].Name;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    List<SPWebTemplate> tempList =
-                        (from t in eWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                            where t.Name.EndsWith(relativeWebUrl, StringComparison.CurrentCultureIgnoreCase)
-                            select t).ToList<SPWebTemplate>();
-
-                    if (tempList.Count > 0)
+                    else
                     {
-                        sTempName = tempList[0].Name;
-                    }
-                }
+                        List<SPWebTemplate> tempList =
+                            (from t in eWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
+                                where t.Name.EndsWith(relativeWebUrl, StringComparison.CurrentCultureIgnoreCase)
+                                select t).ToList<SPWebTemplate>();
 
-                _xmlDataMgr.EditProp("TemplateName", sTempName);
+                        if (tempList.Count > 0)
+                        {
+                            sTempName = tempList[0].Name;
+                        }
+                    }
+
+                    _xmlDataMgr.EditProp("TemplateName", sTempName);
+                }
             }
         }
 
