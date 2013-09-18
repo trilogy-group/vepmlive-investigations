@@ -143,10 +143,10 @@
                             
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
-                            // 1 is page, 0 is item
-                            var favKindInt = 1;
-                            if ($$.currentFileIsNull == 'True') {
-                                favKindInt = 0;
+                            // 0 is page, 1 is item
+                            var favKindInt = 0;
+                            if ($$.currentItemId != '-1' && $$.currentFileIsNull == 'True') {
+                                favKindInt = 1;
                             }
                             window.epmLiveNavigation.registerLink({
                                 kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
@@ -218,17 +218,45 @@
 
         //====== HELPER FUNCTIONS =============
 
-        var turnOnFav = function() {
+        a.turnOnFav = function() {
             if (!$('#favoritesStar').hasClass('icon-star-active')) {
                 $('#favoritesStar').addClass('icon-star-active');
             }
         };
 
-        var turnOffFav = function() {
-            if ($('#favoritesStar').hasClass('icon-star-active')) {
-                $('#favoritesStar').removeClass('icon-star-active');
+        a.turnOffFav = function (data) {
+            // a page
+            if (data.itemid == '-1') {
+                if (removeSource(data.url) == removeSource($$.currentUrl)) {
+                    if ($('#favoritesStar').hasClass('icon-star-active')) {
+                        $('#favoritesStar').removeClass('icon-star-active');
+                    }
+                }
+                // an item
+            } else {
+                
             }
         };
+        
+        function removeSource(url) {
+            var retVal = url;
+            if (url.indexOf('Source') != -1) {
+                var sRemove = '';
+                var sa = url.split('?');
+                var sa2 = sa[1].split('&');
+                for (var i in sa2) {
+                    if (sa2[i].split('=')[0].toLowerCase() === "source") {
+                        sRemove = sa2;
+                        break;
+                    } 
+                }
+                
+                if (sRemove) {
+                    retVal = retVal.replace(sRemove, '');
+                }
+            }
+            return retVal;
+        }
 
     })(window.Analytics = window.Analytics || {}, window.epmLive, window.jQuery);
 }

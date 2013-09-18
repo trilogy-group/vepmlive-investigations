@@ -1,4 +1,5 @@
 ﻿using System;
+using EPMLiveCore.Controls.Navigation.Providers;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Navigation;
@@ -84,6 +85,7 @@ namespace EPMLiveCore
         protected void OnSubmit(object sender, EventArgs e)
         {
             UpdateNodeOrder();
+            ClearCache();
             RedirectToQuikLnch();
         }
 
@@ -95,6 +97,11 @@ namespace EPMLiveCore
         #endregion
 
         #region private methods
+
+        private void ClearCache()
+        {
+            new GenericLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
+        }
 
         private void UpdateNodeOrder()
         {

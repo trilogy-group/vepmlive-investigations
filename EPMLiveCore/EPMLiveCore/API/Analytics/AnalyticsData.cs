@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,10 @@ namespace EPMLiveCore.API
 {
     public class AnalyticsData
     {
+        private static string DEFAULT_PAGE_ICON = "icon-file-5";
+        private static string DEFAULT_LIST_ICON = "icon-square";
+
+
         protected XMLDataManager mgr;
 
         public AnalyticsData(string xml)
@@ -128,7 +133,7 @@ namespace EPMLiveCore.API
         {
             get
             {
-                string sIcon = IsPage ? "icon-file-5" : "icon-square";
+                string sIcon = IsPage ? DEFAULT_PAGE_ICON : DEFAULT_LIST_ICON;
                 if (!string.IsNullOrEmpty(mgr.GetPropVal("ListIconClass")))
                 {
                     sIcon = mgr.GetPropVal("ListIconClass");
@@ -154,7 +159,7 @@ namespace EPMLiveCore.API
                             var asa = sa[1].Split('&');
                             foreach (var s1 in asa)
                             {
-                                if (s1[0].ToString().ToLower() == "source")
+                                if (s1.Split('=')[0].ToString(CultureInfo.InvariantCulture).ToLower() == "source")
                                 {
                                     sRemove = s1;
                                     break;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.UI.WebControls;
+using EPMLiveCore.Controls.Navigation.Providers;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
 
@@ -45,6 +46,7 @@ namespace EPMLiveCore
         private void OnSubmit(object sender, EventArgs e)
         {
             CreateNodes();
+            ClearCache();
         }
 
         private void OnCancel(object sender, EventArgs e)
@@ -188,6 +190,11 @@ namespace EPMLiveCore
         #endregion
 
         #region private methods
+
+        private void ClearCache()
+        {
+            new GenericLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
+        }
 
         private void RegisterControlEvents()
         {

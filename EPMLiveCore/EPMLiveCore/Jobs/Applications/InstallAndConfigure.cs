@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using EPMLiveCore.Controls.Navigation.Providers;
 using Microsoft.SharePoint;
 using System.Data;
 using System.IO;
@@ -46,6 +48,9 @@ namespace EPMLiveCore.Jobs.Applications
                 {
                     base.bErrors = true;
                 }
+
+                // clear nav cache
+                new GenericLinkProvider(osite.ID, oweb.ID, oweb.CurrentUser.LoginName).ClearCache(true);
             }
             catch(Exception ex)
             {

@@ -14,8 +14,7 @@ using EPMLiveCore;
 namespace EPMLiveCore.API
 {
     public static class Favorites
-    {
-        private static string DEFAULT_PAGE_ICON = "icon-square-5";
+    {   
         public static string IsFav(string xml)
         {
             var result = "false";
@@ -71,22 +70,32 @@ namespace EPMLiveCore.API
         }
 
         public static string RemoveFav(string xmlConfig)
-        {  
+        {
+            var result = string.Empty;
+            var dt = new System.Data.DataTable(); 
             var data = new AnalyticsData(xmlConfig);
             try
             {
                 var qExec = new QueryExecutor(SPContext.Current.Web);
-                qExec.ExecuteEpmLiveNonQuery(
+                dt = qExec.ExecuteEpmLiveQuery(
                     FavQueryFactory.GetRemoveQuery(data),
                     FavQueryParamFactory.GetRemoveFavoriteQueryParams(data));
                 ClearCache(data);
+                if (dt.Rows.Count > 0)
+                {
+                    result = string.Join(",", dt.Rows[0].ItemArray);
+                }
+                else
+                {
+                    throw new APIException(21000, "[FavoritesService-AddFav] No fav was removed.");
+                }
             }
             catch (Exception e)
             {
                 throw new APIException(21000, "[FavoritesService-RemoveFav] " + e.Message);
             }
 
-            return "success";
+            return result;
         }
 
 
@@ -146,14 +155,14 @@ namespace EPMLiveCore.API
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
                         BEGIN
-	                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Title], [Icon], [Type], [F_String], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", @fstring, 1)
+	                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_String], [F_Int])
+                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", @fstring, 1)
                             SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @"
                         END
                         ELSE
                         BEGIN
-                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Title], [Icon], [Type], [F_String], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", @fstring, (SELECT MAX([F_Int]) FROM FRF WHERE [Type] = 1) + 1)
+                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_String], [F_Int])
+                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", @fstring, (SELECT MAX([F_Int]) FROM FRF WHERE [Type] = 1) + 1)
                             SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @"
                         END
                     END";
@@ -167,7 +176,10 @@ namespace EPMLiveCore.API
         private static string queryRemoveFav_NonItem =
                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
+                        DECLARE @dbid uniqueidentifier
+                        SET @dbid = (SELECT FRF_ID FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
 	                    DELETE FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @"
+                        SELECT @dbid
                     END";
 
         public static string GetAddQuery(AnalyticsData data)
@@ -263,6 +275,7 @@ namespace EPMLiveCore.API
                         {"@siteid", data.SiteId},
                         {"@webid", data.WebId},
                         {"@listid", data.ListId},
+                        {"@itemid", -1},
                         {"@fstring", data.FString},
                         {"@userid", data.UserId},
                         {"@icon", data.Icon},

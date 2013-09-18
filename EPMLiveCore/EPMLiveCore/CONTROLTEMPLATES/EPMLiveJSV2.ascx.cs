@@ -86,7 +86,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             try{ListIconClass = new GridGanttSettings(SPContext.Current.List).ListIcon;}catch{}
 
             ItemId = "-1";
-            try{ItemId = SPContext.Current.ItemId.ToString();}catch{}
+            try{ItemId = (SPContext.Current.Item != null) ? SPContext.Current.ItemId.ToString() : "-1";}catch{}
 
             CurrentFileIsNull = "True";
             try { CurrentFileIsNull = (SPContext.Current.File == null).ToString(); }catch { }

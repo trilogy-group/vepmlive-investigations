@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.UI.WebControls;
+using EPMLiveCore.Controls.Navigation.Providers;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
 
@@ -286,6 +287,7 @@ namespace EPMLiveCore
                 }
 
                 eNode.Delete();
+                ClearCache();
             }
 
             Redirect();
@@ -294,6 +296,7 @@ namespace EPMLiveCore
         protected void OnSubmit(object sender, EventArgs e)
         {
             UpdateNode();
+            ClearCache();
             Redirect();
         }
 
@@ -302,6 +305,10 @@ namespace EPMLiveCore
             Redirect();
         }
 
+        private void ClearCache()
+        {
+            new GenericLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
+        }
         #endregion
 
         #region page lifecycle events
