@@ -256,6 +256,13 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="CONTROLTEMPLATES\EPMLiveNotificationCounter.ascx.designer.cs">
       <DependentUpon>EPMLiveNotificationCounter.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotificationCounterV2.ascx.cs">
+      <DependentUpon>EPMLiveNotificationCounterV2.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveNotificationCounterV2.ascx.designer.cs">
+      <DependentUpon>EPMLiveNotificationCounterV2.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx.cs">
       <DependentUpon>EPMLiveNotifications.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1583,6 +1590,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
     </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js.map">
       <DependentUpon>EPMLive.TemplateVersoning.js</DependentUpon>
@@ -1986,6 +1996,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="CONTROLTEMPLATES\epmlivelisttemplates.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNavigation.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotificationCounter.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveNotificationCounterV2.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotifications.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveNotificationsV2.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveStatusbar.ascx" />
@@ -3284,6 +3295,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js">
+      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
@@ -3417,6 +3431,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
+    <Content Include="Layouts\epmlive\stylesheets\notifications.min.css">
+      <DependentUpon>notifications.css</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\stylesheets\notifications.v2.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.v2.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\QueueCreateWorkspace.css" />
