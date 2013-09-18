@@ -52,17 +52,17 @@ function registerCreateWorkspace2Script() {
             
             // DATA - workspace creation related
             self.templateSource = ko.computed(function() {
-                if (self.onlineAvail() === 'True' && self.localAvail() === 'True') {
+                if (self.onlineAvail() === 'true' && self.localAvail() === 'true') {
                     if ($('#online').hasClass('slider-selected')) {
                         return 'online';
                     } else {
                         return 'downloaded';
                     }
                 }
-                else if (onlineAvail() === 'True' && localAvail() === 'False') {
+                else if (self.onlineAvail() === 'true' && self.localAvail() === 'false') {
                     return 'online';
                 }
-                else if (localAvail() === 'True' && onlineAvail() === 'False') {
+                else if (self.localAvail() === 'true' && self.onlineAvail() === 'false') {
                     return 'downloaded';
                 }
             });
@@ -399,7 +399,7 @@ function registerCreateWorkspace2Script() {
                     width: '850px'
                 });
 
-                if (self.onlineAvail() === 'True' && self.localAvail() === 'True') {
+                if (self.onlineAvail() === 'true' && self.localAvail() === 'true') {
                     self.loadMarketApps();
                     self.loadDownloadedApps();
                     if (self.createDefault() === 'online') {
@@ -430,13 +430,13 @@ function registerCreateWorkspace2Script() {
                         //self.loadDownloadedThenMarket();
                     }
                 }
-                else if (onlineAvail() === 'True' && localAvail() === 'False') {
+                else if (self.onlineAvail() === 'true' && self.localAvail() === 'false') {
                     self.currentView('market');
                     $('#localTemplates').hide();
                     $('#localTemplates').parent().hide();
                     self.loadMarketApps();
                 }
-                else if (localAvail() === 'True' && onlineAvail() === 'False') {
+                else if (self.localAvail() === 'true' && self.onlineAvail() === 'false') {
                     self.currentView('downloaded');
                     $('#onlineTemplates').hide();
                     $('#onlineTemplates').parent().hide();

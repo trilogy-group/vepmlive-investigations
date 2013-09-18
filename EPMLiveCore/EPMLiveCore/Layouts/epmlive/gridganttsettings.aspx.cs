@@ -271,6 +271,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     ddlAutoCreateTemplate.DataValueField = "Value";
                     ddlAutoCreateTemplate.DataBind();
                     ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
+                    ddlAutoCreateTemplate.Enabled = chkAutoCreate.Checked;
 
                     //fill parentsitelookup ddl
                     ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
@@ -278,6 +279,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     ddlParentSiteLookup.DataValueField = "Value";
                     ddlParentSiteLookup.DataBind();
                     ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
+                    ddlParentSiteLookup.Enabled = chkAutoCreate.Checked;
 
                     //load list icon
                     spnListIcon.CssClass = gSettings.ListIcon;

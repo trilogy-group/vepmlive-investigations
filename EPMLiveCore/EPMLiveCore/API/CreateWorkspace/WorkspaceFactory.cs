@@ -1,25 +1,22 @@
-﻿using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using EPMLiveCore.Controls.Navigation.Providers;
-using EPMLiveCore.Infrastructure;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
+using EPMLiveCore.Controls.Navigation.Providers;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore.API
 {
     /// <summary>
-    /// abstract factory class for different
-    /// workspace factories
+    ///     abstract factory class for different
+    ///     workspace factories
     /// </summary>
     public abstract class WorkspaceFactory
     {
@@ -50,14 +47,14 @@ namespace EPMLiveCore.API
         #region base class properties and fields
 
         protected const string temp_gal_title = "Template Gallery";
-        protected Guid _createdWebId = Guid.Empty;
-        protected string _createdWebUrl = string.Empty;
         protected string _createParams = string.Empty;
+        protected Guid _createdWebId = Guid.Empty;
         protected string _createdWebTitle = string.Empty;
+        protected string _createdWebUrl = string.Empty;
+        protected List<string> _lstSolutionsToBeRemoved = new List<string>();
 
         protected XMLDataManager _xmlDataMgr;
         protected StringBuilder _xmlResult = new StringBuilder();
-        protected List<string> _lstSolutionsToBeRemoved = new List<string>();
 
         protected bool _isStandAlone
         {
@@ -78,11 +75,14 @@ namespace EPMLiveCore.API
                 {
                     unique = bool.Parse(_xmlDataMgr.GetPropVal("UniquePermission"));
                 }
-                catch { }
+                catch
+                {
+                }
 
                 return unique;
             }
         }
+
         protected Guid ParentWebId
         {
             get
@@ -91,61 +91,65 @@ namespace EPMLiveCore.API
                 {
                     return WebId;
                 }
-                else
+                Guid tempParentWebId = Guid.Empty;
+                if (WebId != Guid.Empty &&
+                    AttachedItemListId != Guid.Empty)
                 {
-                    Guid tempParentWebId = Guid.Empty;
-                    if (WebId != Guid.Empty &&
-                        AttachedItemListId != Guid.Empty)
+                    SPSecurity.RunWithElevatedPrivileges(() =>
                     {
-                        SPSecurity.RunWithElevatedPrivileges(() =>
+                        using (var s = new SPSite(SiteId))
                         {
-                            using (SPSite s = new SPSite(SiteId))
+                            using (SPWeb w = s.OpenWeb(WebId))
                             {
-                                using (SPWeb w = s.OpenWeb(WebId))
+                                // if there is a parent site lookup, 
+                                // find that web and use its url as the new parent web url
+                                SPList list = null;
+                                SPListItem pItem = null;
+                                SPFieldLookup pFld = null;
+                                SPFieldLookupValueCollection valColl = null;
+                                try
                                 {
-                                    // if there is a parent site lookup, 
-                                    // find that web and use its url as the new parent web url
-                                    SPList list = null;
-                                    SPListItem pItem = null;
-                                    SPFieldLookup pFld = null;
-                                    SPFieldLookupValueCollection valColl = null;
+                                    list = w.Lists[AttachedItemListId];
+                                    pItem = list.GetItemById(AttachedItemId);
+                                }
+                                catch
+                                {
+                                }
+                                var settings = new GridGanttSettings(list);
+                                string sPFldName = settings.WorkspaceParentSiteLookup;
+                                if (list != null && !string.IsNullOrEmpty(sPFldName) && sPFldName != "None")
+                                {
                                     try
                                     {
-                                        list = w.Lists[AttachedItemListId];
-                                        pItem = list.GetItemById(AttachedItemId);
+                                        pFld = (SPFieldLookup) list.Fields.GetFieldByInternalName(sPFldName);
+                                        valColl = new SPFieldLookupValueCollection(pItem[sPFldName].ToString());
                                     }
-                                    catch { }
-                                    GridGanttSettings settings = new GridGanttSettings(list);
-                                    string sPFldName = settings.WorkspaceParentSiteLookup;
-                                    if (list != null && !string.IsNullOrEmpty(sPFldName) && sPFldName != "None")
+                                    catch
                                     {
-                                        try
-                                        {
-                                            pFld = (SPFieldLookup)list.Fields.GetFieldByInternalName(sPFldName);
-                                            valColl = new SPFieldLookupValueCollection(pItem[sPFldName].ToString());
-                                        }
-                                        catch { }
-                                        if (pFld != null && valColl != null)
-                                        {
-                                            tempParentWebId = WorkspaceData.GetParentWebId(SiteId, WebId, new Guid(pFld.LookupList), valColl[0].LookupId);
-                                            if (tempParentWebId == Guid.Empty)
-                                            {
-                                                throw new Exception("Parent site either does not exist or is currently being provisioned. No item workspace will be created.");
-                                            }
-                                        }
                                     }
-                                    else
+                                    if (pFld != null && valColl != null)
                                     {
-                                        tempParentWebId = WebId;
+                                        tempParentWebId = WorkspaceData.GetParentWebId(SiteId, WebId,
+                                            new Guid(pFld.LookupList), valColl[0].LookupId);
+                                        if (tempParentWebId == Guid.Empty)
+                                        {
+                                            throw new Exception(
+                                                "Parent site either does not exist or is currently being provisioned. No item workspace will be created.");
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    tempParentWebId = WebId;
+                                }
                             }
-                        });
-                    }
-                    return tempParentWebId;
+                        }
+                    });
                 }
+                return tempParentWebId;
             }
         }
+
         protected int AttachedItemId
         {
             get
@@ -157,12 +161,15 @@ namespace EPMLiveCore.API
                     {
                         id = int.Parse(_xmlDataMgr.GetPropVal("AttachedItemId"));
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
 
                 return id;
             }
         }
+
         protected Guid AttachedItemListId
         {
             get
@@ -174,12 +181,15 @@ namespace EPMLiveCore.API
                     {
                         id = Guid.Parse(_xmlDataMgr.GetPropVal("AttachedItemListGuid"));
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
 
                 return id;
             }
         }
+
         protected string AttachedItemTitle
         {
             get
@@ -189,6 +199,7 @@ namespace EPMLiveCore.API
                 return title;
             }
         }
+
         protected Guid WebId
         {
             get
@@ -198,6 +209,7 @@ namespace EPMLiveCore.API
                 return id;
             }
         }
+
         protected Guid SiteId
         {
             get
@@ -207,6 +219,7 @@ namespace EPMLiveCore.API
                 return id;
             }
         }
+
         protected int CreatorId
         {
             get
@@ -221,16 +234,19 @@ namespace EPMLiveCore.API
                 return creatorId;
             }
         }
+
         #endregion
 
         #region Abstract Methods To Be Overridden
+
         /// <summary>
-        /// The main method that figures
-        /// out if we're creating from online/downloaded template
-        /// and whether the ws is standalone or based on item
+        ///     The main method that figures
+        ///     out if we're creating from online/downloaded template
+        ///     and whether the ws is standalone or based on item
         /// </summary>
         /// <returns></returns>
         public abstract ICreatedWorkspaceInfo CreateWorkspace();
+
         #endregion
 
         #region Abstract Base Methods
@@ -247,15 +263,15 @@ namespace EPMLiveCore.API
 
                 ew.Site.CatchAccessDeniedException = false;
 
-                SPList solGallery = (SPDocumentLibrary)es.GetCatalog(SPListTemplateType.SolutionCatalog);
+                SPList solGallery = es.GetCatalog(SPListTemplateType.SolutionCatalog);
 
                 // deactivate solution(s) in solution gallery
                 // =======================================
-                List<SPUserSolution> delSols = new List<SPUserSolution>();
+                var delSols = new List<SPUserSolution>();
 
                 delSols = (from s in es.Solutions.OfType<SPUserSolution>()
-                           where _lstSolutionsToBeRemoved.Contains(s.SolutionId.ToString("N"))
-                           select s).ToList<SPUserSolution>();
+                    where _lstSolutionsToBeRemoved.Contains(s.SolutionId.ToString("N"))
+                    select s).ToList<SPUserSolution>();
 
                 if (delSols.Count > 0)
                 {
@@ -266,11 +282,11 @@ namespace EPMLiveCore.API
                 }
                 // delete solution(s) from solution gallery
                 // =====================================
-                List<SPListItem> delItems = new List<SPListItem>();
+                var delItems = new List<SPListItem>();
 
                 delItems = (from i in solGallery.Items.OfType<SPListItem>()
-                            where _lstSolutionsToBeRemoved.Contains(i.File.Name.Replace(".wsp", ""))
-                            select i).ToList<SPListItem>();
+                    where _lstSolutionsToBeRemoved.Contains(i.File.Name.Replace(".wsp", ""))
+                    select i).ToList<SPListItem>();
 
                 if (delItems.Count > 0)
                 {
@@ -293,7 +309,9 @@ namespace EPMLiveCore.API
                     hasPerm = web.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs);
                 }
             }
-            catch { }
+            catch
+            {
+            }
 
             return hasPerm;
         }
@@ -328,7 +346,8 @@ namespace EPMLiveCore.API
             return retVal;
         }
 
-        public void InstallOnlineSolutionByFeatureXml(string xmlString, string rootFilePath, out string tempName, SPSite cESite, SPWeb cEWeb)
+        public void InstallOnlineSolutionByFeatureXml(string xmlString, string rootFilePath, out string tempName,
+            SPSite cESite, SPWeb cEWeb)
         {
             tempName = string.Empty;
             bool tempNameAssigned = false;
@@ -354,7 +373,7 @@ namespace EPMLiveCore.API
             byte[] fileBytes;
             SPList solGallery = null;
 
-            using (WebClient client = new WebClient())
+            using (var client = new WebClient())
             {
                 client.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
 
@@ -362,7 +381,9 @@ namespace EPMLiveCore.API
                 {
                     case "Solution":
                         fileBytes = client.DownloadData(rootFilePath + "/" + file.Attribute("Name").Value);
-                        string fileDestination = (cEWeb.Site.ServerRelativeUrl == "/" ? "" : cEWeb.Site.ServerRelativeUrl) + "/_catalogs/solutions/" + tempSolGuid + ".wsp";
+                        string fileDestination = (cEWeb.Site.ServerRelativeUrl == "/"
+                            ? ""
+                            : cEWeb.Site.ServerRelativeUrl) + "/_catalogs/solutions/" + tempSolGuid + ".wsp";
                         SPFile newSolutionfile = null;
 
                         cESite.CatchAccessDeniedException = false;
@@ -371,7 +392,7 @@ namespace EPMLiveCore.API
                         cEWeb.AllowUnsafeUpdates = true;
                         cEWeb.Update();
 
-                        solGallery = (SPDocumentLibrary)cESite.GetCatalog(SPListTemplateType.SolutionCatalog);
+                        solGallery = cESite.GetCatalog(SPListTemplateType.SolutionCatalog);
                         newSolutionfile = solGallery.RootFolder.Files.Add(fileDestination, fileBytes);
                         SPUserSolution solution = cEWeb.Site.Solutions.Add(newSolutionfile.Item.ID);
                         EnsureSiteCollectionFeaturesActivated(solution, cESite);
@@ -409,7 +430,7 @@ namespace EPMLiveCore.API
 
         public List<SPFeatureDefinition> GetFeatureDefinitionsInSolution(SPUserSolution solution, SPSite site)
         {
-            List<SPFeatureDefinition> list = new List<SPFeatureDefinition>();
+            var list = new List<SPFeatureDefinition>();
 
             foreach (SPFeatureDefinition definition in site.FeatureDefinitions)
             {
@@ -499,9 +520,9 @@ namespace EPMLiveCore.API
                 return success;
             }
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                using (SPSite es = new SPSite(SiteId))
+                using (var es = new SPSite(SiteId))
                 {
                     using (SPWeb ew = es.OpenWeb(WebId))
                     {
@@ -511,7 +532,8 @@ namespace EPMLiveCore.API
                         {
                             SPList newList = ew.Lists[attachedItemList.ID];
                             string fldWorkspaceUrlIntName = newList.Fields.Add("WorkspaceUrl", SPFieldType.URL, false);
-                            SPFieldUrl fldWorkspaceUrl = newList.Fields.GetFieldByInternalName(fldWorkspaceUrlIntName) as SPFieldUrl;
+                            var fldWorkspaceUrl =
+                                newList.Fields.GetFieldByInternalName(fldWorkspaceUrlIntName) as SPFieldUrl;
                             fldWorkspaceUrl.Update();
                         }
 
@@ -524,7 +546,7 @@ namespace EPMLiveCore.API
                         //    fldChildItem.Update();
                         //}
 
-                        SPFieldUrlValue newVal = new SPFieldUrlValue();
+                        var newVal = new SPFieldUrlValue();
                         newVal.Url = _createdWebUrl;
                         newVal.Description = newVal.Url.Substring(newVal.Url.LastIndexOf("/") + 1);
                         SPList spList = ew.Lists[attachedItemList.ID];
@@ -542,7 +564,7 @@ namespace EPMLiveCore.API
 
         private void RenameProjectFileByProjectItem(SPWeb web, string oldName, string newName)
         {
-            SPDocumentLibrary projectSchedule = (SPDocumentLibrary)web.Lists.TryGetList("Project Schedules");
+            var projectSchedule = (SPDocumentLibrary) web.Lists.TryGetList("Project Schedules");
             if (projectSchedule != null)
             {
                 foreach (SPListItem item in projectSchedule.Items)
@@ -557,14 +579,18 @@ namespace EPMLiveCore.API
                     }
                 }
             }
-
         }
 
         private bool FieldExistsInList(SPList list, string fieldInternalName)
         {
             SPField testFld = null;
-            try { testFld = list.Fields.GetFieldByInternalName(fieldInternalName); }
-            catch { }
+            try
+            {
+                testFld = list.Fields.GetFieldByInternalName(fieldInternalName);
+            }
+            catch
+            {
+            }
             return (testFld != null);
         }
 
@@ -575,22 +601,22 @@ namespace EPMLiveCore.API
             {
                 result = grpName;
                 result = result.Replace("\"", "")
-                           .Replace("/", "")
-                           .Replace("\\", "")
-                           .Replace("[", "")
-                           .Replace("]", "")
-                           .Replace(":", "")
-                           .Replace("|", "")
-                           .Replace("<", "")
-                           .Replace(">", "")
-                           .Replace("+", "")
-                           .Replace("=", "")
-                           .Replace(";", "")
-                           .Replace(",", "")
-                           .Replace("?", "")
-                           .Replace("*", "")
-                           .Replace("'", "")
-                           .Replace("@", "");
+                    .Replace("/", "")
+                    .Replace("\\", "")
+                    .Replace("[", "")
+                    .Replace("]", "")
+                    .Replace(":", "")
+                    .Replace("|", "")
+                    .Replace("<", "")
+                    .Replace(">", "")
+                    .Replace("+", "")
+                    .Replace("=", "")
+                    .Replace(";", "")
+                    .Replace(",", "")
+                    .Replace("?", "")
+                    .Replace("*", "")
+                    .Replace("'", "")
+                    .Replace("@", "");
             }
 
             return result;
@@ -631,24 +657,30 @@ namespace EPMLiveCore.API
                         if (!isStandAlone)
                         {
                             //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true,
+                                inheritTopLink,
+                                cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl,
+                                out _createdWebTitle);
                         }
                         else
                         {
-                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, true,
+                                inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
                         }
                     }
                     else
                     {
                         if (!isStandAlone)
                         {
-                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
-                                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName,
+                                false, inheritTopLink,
+                                cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl,
+                                out _createdWebTitle);
                         }
                         else
                         {
-                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, false,
+                                inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
                         }
                     }
                 }
@@ -664,25 +696,32 @@ namespace EPMLiveCore.API
                             if (!isStandAlone)
                             {
                                 //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                    eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName,
+                                    true, inheritTopLink,
+                                    eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId,
+                                    out _createdWebUrl, out _createdWebTitle);
                             }
                             else
                             {
-                                err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, true,
+                                    inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
                             }
                         }
                         else
                         {
                             if (!_isStandAlone)
                             {
-                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
-                                    eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName,
+                                    false, inheritTopLink,
+                                    eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId,
+                                    out _createdWebUrl, out _createdWebTitle);
                             }
                             else
                             {
                                 //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink, eParentWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, false,
+                                    inheritTopLink, eParentWeb, out _createdWebId, out _createdWebUrl,
+                                    out _createdWebTitle);
                             }
                         }
                     }
@@ -696,14 +735,17 @@ namespace EPMLiveCore.API
             // try to recreate if error says we need to activate features
             if (err.Substring(0, 1) == "1")
             {
-                if (err.Substring(2).StartsWith("The site template requires that the Feature") && err.EndsWith("be activated in the site collection."))
+                if (err.Substring(2).StartsWith("The site template requires that the Feature") &&
+                    err.EndsWith("be activated in the site collection."))
                 {
                     int trys = 0;
 
-                    while (err.Substring(2).StartsWith("The site template requires that the Feature") && err.EndsWith("be activated in the site collection.") && (trys < 5))
+                    while (err.Substring(2).StartsWith("The site template requires that the Feature") &&
+                           err.EndsWith("be activated in the site collection.") && (trys < 5))
                     {
                         #region retry workspace creation
-                        Guid neededFeatureId = new Guid(err.Substring(err.IndexOf("{") + 1).Split('}')[0]);
+
+                        var neededFeatureId = new Guid(err.Substring(err.IndexOf("{") + 1).Split('}')[0]);
                         cESite.Features.Add(neededFeatureId, true);
                         if (parentWeb.DoesUserHavePermissions(siteOwnerName, SPBasePermissions.ManageSubwebs))
                         {
@@ -720,26 +762,34 @@ namespace EPMLiveCore.API
                                     if (!isStandAlone)
                                     {
                                         //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,
+                                            siteOwnerName, true, inheritTopLink,
+                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId,
+                                            out _createdWebUrl, out _createdWebTitle);
                                     }
                                     else
                                     {
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,
+                                            siteOwnerName, true, inheritTopLink,
+                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId,
+                                            out _createdWebUrl, out _createdWebTitle);
                                     }
                                 }
                                 else
                                 {
                                     if (!isStandAlone)
                                     {
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
-                                                                        cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,
+                                            siteOwnerName, false, inheritTopLink,
+                                            cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId,
+                                            out _createdWebUrl, out _createdWebTitle);
                                     }
                                     else
                                     {
                                         //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                        err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                        err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName,
+                                            false, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl,
+                                            out _createdWebTitle);
                                     }
                                 }
                             }
@@ -755,25 +805,33 @@ namespace EPMLiveCore.API
                                         if (!isStandAlone)
                                         {
                                             //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
-                                                eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,
+                                                siteOwnerName, true, inheritTopLink,
+                                                eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId,
+                                                out _createdWebUrl, out _createdWebTitle);
                                         }
                                         else
                                         {
-                                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink, cEWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName,
+                                                siteOwnerName, true, inheritTopLink, cEWeb, out _createdWebId,
+                                                out _createdWebUrl, out _createdWebTitle);
                                         }
                                     }
                                     else
                                     {
                                         if (!_isStandAlone)
                                         {
-                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
-                                                eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,
+                                                siteOwnerName, false, inheritTopLink,
+                                                eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId,
+                                                out _createdWebUrl, out _createdWebTitle);
                                         }
                                         else
                                         {
                                             //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink, eParentWeb, out _createdWebId, out _createdWebUrl, out _createdWebTitle);
+                                            err = CoreFunctions.createSite(siteTitle, siteUrl, templateName,
+                                                siteOwnerName, false, inheritTopLink, eParentWeb, out _createdWebId,
+                                                out _createdWebUrl, out _createdWebTitle);
                                         }
                                     }
                                 }
@@ -781,10 +839,12 @@ namespace EPMLiveCore.API
                         }
                         else
                         {
-                            throw new Exception("You do have have permission to create subsite on the parent web selected.");
+                            throw new Exception(
+                                "You do have have permission to create subsite on the parent web selected.");
                         }
 
                         trys++;
+
                         #endregion
                     }
                 }
@@ -797,22 +857,25 @@ namespace EPMLiveCore.API
             }
             else
             {
-                WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId, _createdWebId, _createdWebUrl, _createdWebTitle);
+                WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId,
+                    _createdWebId, _createdWebUrl, _createdWebTitle);
             }
             if (parentWeb != null && !parentWeb.ID.Equals(web.ID))
             {
                 parentWeb.Dispose();
             }
         }
+
         public void BuildWebInfoXml()
         {
             _xmlResult.Append("<WebInfo>");
-            _xmlResult.Append("<ID><![CDATA[" + _createdWebId.ToString() + "]]></ID>");
+            _xmlResult.Append("<ID><![CDATA[" + _createdWebId + "]]></ID>");
             _xmlResult.Append("<ServerRelativeUrl>" + _createdWebUrl + "</ServerRelativeUrl>");
             _xmlResult.Append("</WebInfo>");
         }
+
         /// <summary>
-        /// Notifies user that workspace has been created
+        ///     Notifies user that workspace has been created
         /// </summary>
         public void Notify(SPWeb cWeb)
         {
@@ -821,35 +884,41 @@ namespace EPMLiveCore.API
             {
                 SPListItem li = cWeb.Lists[AttachedItemListId].GetItemById(AttachedItemId);
                 // send notification and email user
-                APIEmail.QueueItemMessage(6, true, BuildEmailData(_createdWebUrl, _createdWebTitle), new string[] { originalUser.ID.ToString() }, null, false, true, li, originalUser, true);
+                APIEmail.QueueItemMessage(6, true, BuildEmailData(_createdWebUrl, _createdWebTitle),
+                    new[] {originalUser.ID.ToString()}, null, false, true, li, originalUser, true);
             }
             else
             {
-                APIEmail.QueueItemMessage(6, true, BuildEmailData(_createdWebUrl, _createdWebTitle), new string[] { originalUser.ID.ToString() }, null, false, true, cWeb, originalUser, true);
+                APIEmail.QueueItemMessage(6, true, BuildEmailData(_createdWebUrl, _createdWebTitle),
+                    new[] {originalUser.ID.ToString()}, null, false, true, cWeb, originalUser, true);
             }
         }
+
         public void AddToFavorites()
         {
             // TODO: add ws info to favorites table in db
             WorkspaceData.AddToFRF(SiteId, _createdWebId, _createdWebTitle, _createdWebUrl, CreatorId, 4);
         }
+
         public void AddPermission()
         {
             // TODO: add ws info to favorites table in db
             WorkspaceData.AddWsPermission(SiteId, _createdWebId);
         }
+
         private Hashtable BuildEmailData(string url, string wsName)
         {
             //{ItemUrl}
             //{Workspace_Name}
-            Hashtable result = new Hashtable();
+            var result = new Hashtable();
             result.Add("ItemUrl", url);
             result.Add("Workspace_Name", wsName);
             return result;
         }
+
         /// <summary>
-        /// Record fresh workspace info
-        /// in reporting DB
+        ///     Record fresh workspace info
+        ///     in reporting DB
         /// </summary>
         public void ModifyNewWSProperty()
         {
@@ -857,15 +926,18 @@ namespace EPMLiveCore.API
             {
                 using (var s = new SPSite(SiteId))
                 {
-                    using (var w = s.OpenWeb(_createdWebId))
+                    using (SPWeb w = s.OpenWeb(_createdWebId))
                     {
                         // stamp info on new site
-                        w.AllProperties["ParentItem"] = WebId.ToString() + "^^" + AttachedItemListId.ToString() + "^^" + AttachedItemId.ToString() + "^^" + AttachedItemTitle;
+                        w.AllProperties["ParentItem"] = WebId + "^^" + AttachedItemListId + "^^" + AttachedItemId + "^^" +
+                                                        AttachedItemTitle;
 
                         // add deleted event
-                        string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                        string assemblyName =
+                            "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                         string className = "EPMLiveCore.WorkspaceEvents";
-                        var evts = CoreFunctions.GetWebEvents(w, assemblyName, className, new List<SPEventReceiverType> { SPEventReceiverType.WebDeleted });
+                        List<SPEventReceiverDefinition> evts = CoreFunctions.GetWebEvents(w, assemblyName, className,
+                            new List<SPEventReceiverType> {SPEventReceiverType.WebDeleted});
                         foreach (SPEventReceiverDefinition evt in evts)
                         {
                             evt.Delete();
@@ -890,36 +962,41 @@ namespace EPMLiveCore.API
                     }
                 }
             }
-
         }
+
         #endregion
 
         protected void ClearCache()
         {
             try
             {
-                try
+                using (var spSite = new SPSite(SiteId))
                 {
-                    using (var spSite = new SPSite(SiteId))
+                    using (SPWeb spWeb = spSite.OpenWeb(WebId))
                     {
-                        using (SPWeb spWeb = spSite.OpenWeb(WebId))
+                        string loginName = spWeb.AllUsers.GetByID(CreatorId).LoginName;
+
+                        try
                         {
-                            new WorkspaceLinkProvider(SiteId, WebId, spWeb.Users.GetByID(CreatorId).LoginName).ClearCache();
+                            new WorkspaceLinkProvider(SiteId, WebId, loginName).ClearCache(true);
+                            new FavoritesLinkProvider(SiteId, WebId, loginName).ClearCache(true);
+                        }
+                        catch
+                        {
+                            new GenericLinkProvider(SiteId, WebId, loginName).ClearCache(true);
                         }
                     }
                 }
-                catch
-                {
-                    CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
-                }
             }
-            catch { }
+            catch
+            {
+            }
         }
     }
 
     /// <summary>
-    /// Concrete factory class for 
-    /// workspace created from online templates
+    ///     Concrete factory class for
+    ///     workspace created from online templates
     /// </summary>
     public class OnlineTempWorkspaceFactory : WorkspaceFactory
     {
@@ -929,7 +1006,8 @@ namespace EPMLiveCore.API
             ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
         }
 
-        private bool ValidateRemoteCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslpolicyerrors)
+        private bool ValidateRemoteCertificate(object sender, X509Certificate certificate, X509Chain chain,
+            SslPolicyErrors sslpolicyerrors)
         {
             return true;
         }
@@ -938,9 +1016,9 @@ namespace EPMLiveCore.API
 
         public override ICreatedWorkspaceInfo CreateWorkspace()
         {
-            var id = string.Empty;
+            string id = string.Empty;
             var site = new SPSite(SiteId);
-            var web = site.OpenWeb(WebId);
+            SPWeb web = site.OpenWeb(WebId);
 
             try
             {
@@ -948,7 +1026,7 @@ namespace EPMLiveCore.API
                 {
                     using (var eSite = new SPSite(SiteId))
                     {
-                        using (var eWeb = eSite.OpenWeb(WebId))
+                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
                         {
                             GrabOnlineFiles(eSite, eWeb);
                             BaseProvision(site, web, eSite, eWeb);
@@ -981,7 +1059,8 @@ namespace EPMLiveCore.API
         private void GrabOnlineFiles(SPSite cESite, SPWeb cEWeb)
         {
             //string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Solutions/" + dataMgr.GetPropVal("SolutionName");
-            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Solutions/" + CoreFunctions.GetAssemblyVersion() + "/" + _xmlDataMgr.GetPropVal("SolutionName");
+            string rootFilePath = CoreFunctions.getFarmSetting("WorkEngineStore") + "Solutions/" +
+                                  CoreFunctions.GetAssemblyVersion() + "/" + _xmlDataMgr.GetPropVal("SolutionName");
             string sXML = string.Empty;
             // read feature.xml with WebClient class
 
@@ -989,12 +1068,12 @@ namespace EPMLiveCore.API
 
             try
             {
-                using (WebClient webClient = new WebClient())
+                using (var webClient = new WebClient())
                 {
                     webClient.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
                     byte[] fileBytes = null;
                     fileBytes = webClient.DownloadData(address);
-                    System.Text.Encoding enc = System.Text.Encoding.ASCII;
+                    Encoding enc = Encoding.ASCII;
                     sXML = enc.GetString(fileBytes);
                     fileBytes = null;
                 }
@@ -1011,14 +1090,15 @@ namespace EPMLiveCore.API
             string originalSolName = tempName.Replace(".wsp", "");
             string SolNameWOSpace = originalSolName.Replace(" ", "");
             string sTempName = (from t in cEWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                                where t.Name.EndsWith(originalSolName, StringComparison.CurrentCultureIgnoreCase) ||
-                                      t.Name.EndsWith(SolNameWOSpace, StringComparison.CurrentCultureIgnoreCase)
-                                select t).ToList<SPWebTemplate>()[0].Name;
+                where t.Name.EndsWith(originalSolName, StringComparison.CurrentCultureIgnoreCase) ||
+                      t.Name.EndsWith(SolNameWOSpace, StringComparison.CurrentCultureIgnoreCase)
+                select t).ToList<SPWebTemplate>()[0].Name;
             _xmlDataMgr.EditProp("TemplateName", sTempName);
 
             if (string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("TemplateName")))
             {
-                throw new ArgumentOutOfRangeException("Could not find template during workspace creation, please make sure template name matches .wsp file name. e.g., If temp Name = AppManagement, .wsp file name should = AppManagement.wsp");
+                throw new ArgumentOutOfRangeException(
+                    "Could not find template during workspace creation, please make sure template name matches .wsp file name. e.g., If temp Name = AppManagement, .wsp file name should = AppManagement.wsp");
             }
         }
 
@@ -1026,15 +1106,17 @@ namespace EPMLiveCore.API
     }
 
     /// <summary>
-    /// Concrete factory class for workspace
-    /// created from downloaded templates
+    ///     Concrete factory class for workspace
+    ///     created from downloaded templates
     /// </summary>
     public class DownloadedTempWorkspaceFactory : WorkspaceFactory
     {
         #region Constructors (1)
 
         public DownloadedTempWorkspaceFactory(string data)
-            : base(data) { }
+            : base(data)
+        {
+        }
 
         #endregion Constructors
 
@@ -1044,9 +1126,9 @@ namespace EPMLiveCore.API
 
         public override ICreatedWorkspaceInfo CreateWorkspace()
         {
-            var id = string.Empty;
+            string id = string.Empty;
             var site = new SPSite(SiteId);
-            var web = site.OpenWeb(WebId);
+            SPWeb web = site.OpenWeb(WebId);
 
             try
             {
@@ -1054,7 +1136,7 @@ namespace EPMLiveCore.API
                 {
                     using (var eSite = new SPSite(SiteId))
                     {
-                        using (var eWeb = eSite.OpenWeb(WebId))
+                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
                         {
                             GetTempName(eSite, eWeb);
                             BaseProvision(site, web, eSite, eWeb);
@@ -1074,17 +1156,17 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-
                 throw e;
             }
 
             return new DownloadedWorkspaceInfo(_xmlResult.ToString());
         }
+
         // Private Methods (2) 
 
         /// <summary>
-        /// Get template name from the splistitem
-        /// that represents the template site
+        ///     Get template name from the splistitem
+        ///     that represents the template site
         /// </summary>
         /// <param name="eSite"></param>
         /// <param name="eWeb"></param>
@@ -1095,7 +1177,8 @@ namespace EPMLiveCore.API
             if (TryGetListAndItem(eSite, eWeb, out tmpGalList, out tempGalItem,
                 "Template Gallery", int.Parse(_xmlDataMgr.GetPropVal("TemplateItemId"))))
             {
-                string targetWebUrl = new SPFieldUrlValue(tempGalItem[tmpGalList.Fields.GetFieldByInternalName("URL").Id].ToString()).Url;
+                string targetWebUrl =
+                    new SPFieldUrlValue(tempGalItem[tmpGalList.Fields.GetFieldByInternalName("URL").Id].ToString()).Url;
                 string relativeWebUrl = GetSiteRelativeWebUrl(targetWebUrl, eSite);
                 string tempSolGuid = Guid.NewGuid().ToString("N");
                 string sTempName = string.Empty;
@@ -1112,9 +1195,10 @@ namespace EPMLiveCore.API
                         web.SaveAsTemplate(tempSolGuid, tempSolGuid, "", true);
                         _lstSolutionsToBeRemoved.Add(tempSolGuid);
 
-                        List<SPWebTemplate> tempL = (from t in web.Site.RootWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                                                     where t.Name.Split('#')[1] == tempSolGuid
-                                                     select t).ToList<SPWebTemplate>();
+                        List<SPWebTemplate> tempL =
+                            (from t in web.Site.RootWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
+                                where t.Name.Split('#')[1] == tempSolGuid
+                                select t).ToList<SPWebTemplate>();
 
                         if (tempL.Count > 0)
                         {
@@ -1124,10 +1208,10 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-
-                    List<SPWebTemplate> tempList = (from t in eWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                                                    where t.Name.EndsWith(relativeWebUrl, StringComparison.CurrentCultureIgnoreCase)
-                                                    select t).ToList<SPWebTemplate>();
+                    List<SPWebTemplate> tempList =
+                        (from t in eWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
+                            where t.Name.EndsWith(relativeWebUrl, StringComparison.CurrentCultureIgnoreCase)
+                            select t).ToList<SPWebTemplate>();
 
                     if (tempList.Count > 0)
                     {
@@ -1139,7 +1223,8 @@ namespace EPMLiveCore.API
             }
         }
 
-        private bool TryGetListAndItem(SPSite site, SPWeb web, out SPList list, out SPListItem item, string listName, int itemId)
+        private bool TryGetListAndItem(SPSite site, SPWeb web, out SPList list, out SPListItem item, string listName,
+            int itemId)
         {
             list = null;
             item = null;
@@ -1152,7 +1237,8 @@ namespace EPMLiveCore.API
                 success = true;
             }
             catch
-            { }
+            {
+            }
 
             return success;
         }
@@ -1161,11 +1247,10 @@ namespace EPMLiveCore.API
     }
 
     /// <summary>
-    /// Stores information for newly created workspace
+    ///     Stores information for newly created workspace
     /// </summary>
     public interface ICreatedWorkspaceInfo
     {
-
     }
 
     public abstract class CreatedWorkspaceInfo
@@ -1209,5 +1294,4 @@ namespace EPMLiveCore.API
 
         #endregion Constructors
     }
-
 }

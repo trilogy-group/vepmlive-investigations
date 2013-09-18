@@ -415,9 +415,7 @@ function CreateEPMLiveWorkspace(listid, itemid) {
 
     var options = {
         url: tUrl,
-        title: 'Create',
-        width: 880,
-        height: 500,
+        title: 'Create Workspace',
         dialogReturnValueCallback: function (dialogResult, returnValue) {
             if (dialogResult === 1) {
                 //SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false);

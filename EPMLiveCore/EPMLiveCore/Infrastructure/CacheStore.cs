@@ -138,6 +138,7 @@ namespace EPMLiveCore.Infrastructure
             using (var weApi = new WorkEngine())
             {
                 weApi.Url = webUrl + (webUrl.EndsWith("/") ? string.Empty : "/") + "_vti_bin/WorkEngine.asmx";
+                weApi.UseDefaultCredentials = true;
                 weApi.Execute("ClearCache", data.ToString());
             }
         }

@@ -281,9 +281,24 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (props != null && props[0].Keys.Count > 0)
                 {
                     _defaultCreateNewOpt = props[0]["Default"].ToString();
-                    _isCreateFromOnlineAvail = bool.Parse(props[1]["Online"].ToString());
-                    _isCreateFromLocalAvail = bool.Parse(props[1]["Local"].ToString());
-                    _isCreateFromExistingAvail = bool.Parse(props[1]["Existing"].ToString());
+                    try { _isCreateFromOnlineAvail = bool.Parse(props[1]["Online"].ToString()); }catch { }
+                    if (_defaultCreateNewOpt == "online")
+                    {
+                        _isCreateFromOnlineAvail = true;
+                    }
+                    
+                    try{_isCreateFromLocalAvail = bool.Parse(props[1]["Local"].ToString());}catch{}
+                    if (_defaultCreateNewOpt == "local")
+                    {
+                        _isCreateFromLocalAvail = true;
+                    }
+                    
+                    try{_isCreateFromExistingAvail = bool.Parse(props[1]["Existing"].ToString());}catch { }
+                    if (_defaultCreateNewOpt == "existing")
+                    {
+                        _isCreateFromExistingAvail = true;
+                    }
+
                 }
                 else
                 {

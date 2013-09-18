@@ -30,8 +30,8 @@
         var createFromLiveTemps = '<%=_createFromLiveTemp%>';
         var showIsInProgressMsg = '<%=_showInProgress%>';
         var createDefault = '<%=_defaultCreateNewOpt%>';
-        var onlineAvail = '<%=_isCreateFromOnlineAvail%>';
-        var localAvail = '<%=_isCreateFromLocalAvail%>';
+        var onlineAvail = '<%=_isCreateFromOnlineAvail.ToString().ToLower()%>';
+        var localAvail = '<%=_isCreateFromLocalAvail.ToString().ToLower()%>';
         var uniquePerm = '<%=_uniquePermission %>';
     </script>
     <div id="OuterContainer">
@@ -58,7 +58,7 @@
 	        </div>
             <%--bottom section--%>
 	        <div style="border-top:1px solid #ffffff;width:860px;height:285px;overflow: hidden">
-		        <div class="toggle" data-bind="visible: onlineAvail() === 'True' && localAvail() === 'True'">
+		        <div class="toggle" data-bind="visible: onlineAvail() === 'true' && localAvail() === 'true'">
                     <span style="float:left;padding-left:8px;" class="toggleButton slider-selected" id="online" data-bind="click: function (data, event) { toggle(data, event); }">ONLINE</span>
                     <span style="float:right;padding-right:12px;" class="toggleButton" id="local" data-bind="click: function (data, event) { toggle(data, event); }">LOCAL</span>
                     <div class="slider">&nbsp;

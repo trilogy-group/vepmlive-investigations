@@ -76,7 +76,7 @@ namespace EPMLiveCore.API
 
                         SqlCommand cmd = new SqlCommand("IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWeb]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +
                                                         "BEGIN " +
-                                                            "IF NOT EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + eSite.RootWeb.ToString() + "') " +
+                                                            "IF NOT EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + eSite.RootWeb.ID.ToString() + "') " +
                                                             "BEGIN " +
                                                                 "INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID.ToString() + "', '" + Guid.Empty.ToString() + "', '" + Guid.Empty.ToString() + "', " + (-1).ToString() + ", '" + Guid.Empty.ToString() + "', '" + eSite.RootWeb.ID.ToString() + "', '" + eSite.RootWeb.Url.ToString() + "', '" + eSite.RootWeb.Title + "') " +
                                                             "END " +
