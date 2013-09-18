@@ -258,6 +258,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         ProcessGroups(web, w.CurrentUser);
                         ProcessExcel(web);
                         ProcessLists(web);
+
+                        ClearNavigationCache(w);
+
                         if(rdoYes.Checked)
                         {
                             if(url != "")
@@ -285,8 +288,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     }
                 }
             });
-
-            ClearNavigationCache();
         }
 
         private void ProcessLists(SPWeb web)
@@ -514,7 +515,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //hideWizard(web);
             Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">SP.UI.ModalDialog.commonModalDialogClose(0, '');</script>");
 
-            ClearNavigationCache();
+            ClearNavigationCache(web);
         }
 
         private void ProcessTimerJob(SPWeb web)
@@ -842,10 +843,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
         }
 
-        private void ClearNavigationCache()
+        private void ClearNavigationCache(SPWeb web)
         {
-            var w = SPContext.Current.Web;
-            new GenericLinkProvider(w.Site.ID, w.ID, w.CurrentUser.LoginName).ClearCache();
+            new GenericLinkProvider(web.Site.ID, web.ID, web.CurrentUser.LoginName).ClearCache();
         }
     }
 }
