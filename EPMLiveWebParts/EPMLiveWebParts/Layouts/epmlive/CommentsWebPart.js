@@ -141,7 +141,7 @@ function GetData() {
             $.ajax({
                 type: 'POST',
                 url: curWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                data: "{ Function: 'GetNotifications', Dataxml: '<Notifications Status=\"ALL\" />' }",
+                data: "{ Function: 'GetNotifications', Dataxml: '<Notifications Status=\"ALL\" Limit=\"0\" FirstPage=\"0\" LastPage=\"0\" FirstLoad=\"true\"/>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
 
@@ -191,7 +191,7 @@ function GetData() {
             $.ajax({
                 type: 'POST',
                 url: curWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                data: "{ Function: 'GetNotifications', Dataxml: '<Notifications Status=\"ALL\" />' }",
+                data: "{ Function: 'GetNotifications', Dataxml: '<Notifications Status=\"ALL\" Limit=\"0\" FirstPage=\"0\" LastPage=\"0\" FirstLoad=\"true\"/>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
 
