@@ -1228,9 +1228,31 @@
                                     var $li = $sn.find('#' + link.id);
 
                                     if (link.kind > -1 && link.kind < 3) {
+                                        var $menu = $('#epm-nav-sub-' + providerName.toLowerCase() + '-static-links');
+                                        
+                                        $menu.find('.epm-nav-sub-placeholder').each(function() {
+                                            var $ph = $(this);
+                                            var remove = false;
+                                            var text = $ph.text();
+                                            
+                                            if (link.kind === 0 && text === 'No pages') {
+                                                remove = true;
+                                            } else if (link.kind === 1 && text === 'No items') {
+                                                remove = true;
+                                            }
+                                            
+                                            if (remove) {
+                                                $ph.remove();
+                                            }
+                                        });
+                                        
+                                        if (link.kind < 2) {
+                                            $li.find('a').attr('style', 'width:115px !important;');
+                                        }
+
                                         if (link.kind === 0 || link.kind === 2) {
                                             try {
-                                                $li.remove().insertBefore($($('#epm-nav-sub-' + providerName.toLowerCase() + '-static-links').find('.epm-nav-sub-header').get(1)));
+                                                $li.remove().insertBefore($($menu.find('.epm-nav-sub-header').get(1)));
                                             } catch(e) {
                                             }
                                         }

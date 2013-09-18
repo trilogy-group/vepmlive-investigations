@@ -73,11 +73,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     }
                 }
 
+                var pages = new List<DataRow>();
+                var items = new List<DataRow>();
+
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-                    var pages = new List<DataRow>();
-                    var items = new List<DataRow>();
-
                     foreach (DataRow row in dataTable.Rows)
                     {
                         if (string.IsNullOrEmpty(S(row["ItemId"])))
@@ -89,42 +89,34 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                             items.Add(row);
                         }
                     }
+                }
 
-                    links.Add(new NavLink {Title = "Pages", Url = "Header"});
+                links.Add(new NavLink { Title = "Pages", Url = "Header" });
 
-                    if (pages.Any())
-                    {
-                        links.AddRange(pages.Select(GetNavLink));
-                    }
-                    else
-                    {
-                        links.Add(new NavLink
-                        {
-                            Title = "No pages",
-                            Url = "PlaceHolder"
-                        });
-                    }
-
-                    links.Add(new NavLink {Title = "Items", Url = "Header"});
-
-                    if (items.Any())
-                    {
-                        links.AddRange(items.Select(GetNavLink));
-                    }
-                    else
-                    {
-                        links.Add(new NavLink
-                        {
-                            Title = "No items",
-                            Url = "PlaceHolder"
-                        });
-                    }
+                if (pages.Any())
+                {
+                    links.AddRange(pages.Select(GetNavLink));
                 }
                 else
                 {
                     links.Add(new NavLink
                     {
-                        Title = "No favorites",
+                        Title = "No pages",
+                        Url = "PlaceHolder"
+                    });
+                }
+
+                links.Add(new NavLink { Title = "Items", Url = "Header" });
+
+                if (items.Any())
+                {
+                    links.AddRange(items.Select(GetNavLink));
+                }
+                else
+                {
+                    links.Add(new NavLink
+                    {
+                        Title = "No items",
                         Url = "PlaceHolder"
                     });
                 }
