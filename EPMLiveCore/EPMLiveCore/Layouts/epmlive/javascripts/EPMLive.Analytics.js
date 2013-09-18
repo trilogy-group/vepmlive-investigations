@@ -145,7 +145,7 @@
                             // asynchronously update nav
                             // 0 is page, 1 is item
                             var favKindInt = 0;
-                            if ($$.currentItemId != '-1' && $$.currentFileIsNull == 'True') {
+                            if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
                                 favKindInt = 1;
                             }
                             window.epmLiveNavigation.registerLink({
