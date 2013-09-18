@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.API.ResourceManagement;
 using EPMLiveCore.API.SPAdmin;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using FieldInfo = EPMLiveCore.API.FieldInfo;
 
@@ -1399,6 +1400,19 @@ namespace EPMLiveCore
             {
                 var featureEventsManager = new FeatureEventsManager(spWeb);
                 return Response.Success(featureEventsManager.Manage(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        public static string ClearCache(string data, SPWeb spWeb)
+        {
+            try
+            {
+                CacheStore.Current.Clear(data);
+                return Response.Success(string.Empty);
             }
             catch (APIException ex)
             {

@@ -48,9 +48,16 @@ namespace EPMLiveCore.Infrastructure.Navigation
 
         // Public Methods (1) 
 
-        public virtual void ClearCache()
+        public virtual void ClearCache(bool safeRemove = false)
         {
-            CacheStore.Current.Remove(Key, CacheStoreCategory.Navigation);
+            if (!safeRemove)
+            {
+                CacheStore.Current.Remove(Key, CacheStoreCategory.Navigation);
+            }
+            else
+            {
+                CacheStore.Current.RemoveSafely(Url, CacheStoreCategory.Navigation, Key);
+            }
         }
 
         // Protected Methods (2) 

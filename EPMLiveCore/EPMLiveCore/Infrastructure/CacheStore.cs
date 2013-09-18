@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
+using EPMLiveCore.WorkEngineService;
 
 namespace EPMLiveCore.Infrastructure
 {
@@ -59,9 +61,9 @@ namespace EPMLiveCore.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (9) 
+        #region Methods (11) 
 
-        // Public Methods (5) 
+        // Public Methods (6) 
 
         public CachedValue Get(string key, string category, Func<object> getValue,
             bool keepIndefinite = false)
@@ -123,6 +125,21 @@ namespace EPMLiveCore.Infrastructure
         public void RemoveCategory(string category)
         {
             if (_store.ContainsKey(category)) _store.Remove(category);
+        }
+
+        public void RemoveSafely(string webUrl, string category, string key = null)
+        {
+            if (string.IsNullOrEmpty(webUrl) || string.IsNullOrEmpty(category)) return;
+
+            var data = new XElement("ClearCache",
+                new XElement("Category", new XCData(category)),
+                new XElement("Key", new XCData(key ?? string.Empty)));
+
+            using (var weApi = new WorkEngine())
+            {
+                weApi.Url = webUrl + (webUrl.EndsWith("/") ? string.Empty : "/") + "_vti_bin/WorkEngine.asmx";
+                weApi.Execute("ClearCache", data.ToString());
+            }
         }
 
         public void Set(string key, object value, string category, bool keepIndefinite = false)
@@ -249,6 +266,39 @@ namespace EPMLiveCore.Infrastructure
                     }
                     catch { }
                 }
+            }
+        }
+
+        // Internal Methods (1) 
+
+        internal void Clear(string data)
+        {
+            XDocument document = XDocument.Parse(data);
+
+            XElement root = document.Root;
+            if (root == null) return;
+
+            XElement catElement = root.Element("Category");
+            if (catElement == null) return;
+
+            string category = catElement.Value;
+            if (string.IsNullOrEmpty(category)) return;
+
+            string key = null;
+
+            XElement keyElement = root.Element("Key");
+            if (keyElement != null)
+            {
+                key = keyElement.Value;
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                RemoveCategory(category);
+            }
+            else
+            {
+                Remove(key, category);
             }
         }
 

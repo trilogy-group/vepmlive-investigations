@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Web.Caching;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.ReportingProxy;
@@ -14,7 +13,9 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     {
         #region Fields (4) 
 
-        private const string A_QUERY = @"SELECT FRF_ID FROM dbo.FRF WHERE (FRF_ID = @Id) AND (Type = 1 OR Type = 2 OR Type = 4)";
+        private const string A_QUERY =
+            @"SELECT FRF_ID FROM dbo.FRF WHERE (FRF_ID = @Id) AND (Type = 1 OR Type = 2 OR Type = 4)";
+
         private const string D_QUERY = @"DELETE FROM dbo.FRF WHERE (FRF_ID = @Id)";
         private const string R_QUERY = @"UPDATE dbo.FRF SET F_Int = @Order WHERE FRF_ID = @Id";
 
@@ -99,11 +100,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         // Private Methods (1) 
 
-        private void ResetCache()
+        private void ResetCache(bool safeRemove = false)
         {
-            new FavoritesLinkProvider(SiteId, WebId, Username).ClearCache();
-            new RecentItemsLinkProvider(SiteId, WebId, Username).ClearCache();
-            new WorkspaceLinkProvider(SiteId, WebId, Username).ClearCache();
+            new FavoritesLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
+            new RecentItemsLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
+            new WorkspaceLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
         }
 
         #endregion Methods 
@@ -115,15 +116,24 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             get { throw new Exception("Generic Link Provider does not support this property."); }
         }
 
-        public override void ClearCache()
+        public override void ClearCache(bool safeRemove = false)
         {
-            CacheStore.Current.Remove("NavLinks_Navigation_W_" + WebId + "_U_" + UserId, CacheStoreCategory.Navigation);
+            string navKey = "NavLinks_Navigation_W_" + WebId + "_U_" + UserId;
 
-            new ApplicationsLinkProvider(SiteId, WebId, Username).ClearCache();
-            new SettingsLinkProvider(SiteId, WebId, Username).ClearCache();
-            new WorkplaceLinkProvider(SiteId, WebId, Username).ClearCache();
-            
-            ResetCache();
+            if (safeRemove)
+            {
+                CacheStore.Current.RemoveSafely(Url, CacheStoreCategory.Navigation, navKey);
+            }
+            else
+            {
+                CacheStore.Current.Remove(navKey, CacheStoreCategory.Navigation);
+            }
+
+            new ApplicationsLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
+            new SettingsLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
+            new WorkplaceLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
+
+            ResetCache(safeRemove);
         }
 
         public override IEnumerable<INavObject> GetLinks()
