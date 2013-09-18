@@ -12,6 +12,8 @@ var sf#gridid#;
 var sv#gridid#;
 var st#gridid#;
 
+var bPageSetup#gridid# = false;
+
 function selectRow#gridid#(id, ind)
 {
 	
@@ -205,15 +207,40 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
     
 	var pages = records / this.PageSize;
 
-	var prev = document.getElementById("PagePrevious"+ this._gridid);
-	var next = document.getElementById("PageNext"+ this._gridid);
+	//var prev = document.getElementById("PagePrevious"+ this._gridid);
+	//var next = document.getElementById("PageNext"+ this._gridid);
 	var pagediv = document.getElementById("pagediv"+ this._gridid);
 
 	if(this.UseReporting)
 	{
+
+		
+
 		if(pages > 1)
 		{
-			pagediv.style.display = "";
+			if(!bPageSetup#gridid#)
+			{
+				bPageSetup#gridid# = true;
+
+				$("#pagediv#gridid#").paginate({
+					count 		: pages,
+					start 		: 1,
+					display     : 12,
+					border					: true,
+					border_color			: '#CCCCCC',
+					text_color  			: '#666666',
+					background_color    	: '#DDDDDD',	
+					border_hover_color		: '#878787',
+					text_hover_color  		: '#ffffff',
+					background_hover_color	: '#9B9B9B', 
+					rotate      : false,
+					images		: false,
+					mouse		: 'press',
+					onChange	: ChangePage#gridid#
+				});
+			}
+			
+			/*pagediv.style.display = "";
 			if(curPage#gridid# < pages)
 			{
 				next.style.display="";
@@ -226,7 +253,7 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 				prev.style.display="";
 			}
 			else
-				prev.style.display="none";
+				prev.style.display="none";*/
 		}
 		else
 		{

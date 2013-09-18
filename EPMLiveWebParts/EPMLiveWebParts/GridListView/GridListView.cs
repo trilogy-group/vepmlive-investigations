@@ -1716,6 +1716,15 @@ namespace EPMLiveWebParts
 
         protected override void OnPreRender(EventArgs e)
         {
+            if (view.RowLimit > 0)
+            {
+                EPMLiveCore.Infrastructure.EPMLiveScriptManager.RegisterScript(Page, new[]
+                {
+                    "libraries/jquery.min", "libraries/jquery.paginate"
+                });
+                SPPageContentManager.RegisterStyleFile("/_layouts/15/epmlive/stylesheets/jpaginate.css");
+            }
+
             tb.AddTimer();
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
@@ -3134,7 +3143,11 @@ namespace EPMLiveWebParts
 
             if (view.RowLimit > 0)
             {
-                output.Write("<div id=\"pagediv" + sFullGridId + "\" style=\"\"><div style=\"height:15px;width:60px;float:left;\">Paging: </div><div id=\"PagePrevious" + sFullGridId + "\" style=\"height:18px;width:80px;border:1px solid #CACACA;float:left;padding-left:5px\" onClick=\"javascript:PreviousPage" + sFullGridId + "()\"><a href=\"javascript:void(0);\" style=\"text-decoration:none;color:#666\">&lt; Previous</a></div> <div id=\"PageNext" + sFullGridId + "\" style=\"height:18px;width:80px;border:1px solid #CACACA;float:left;margin-left:10px;padding-right:5px;text-align:right\" onClick=\"javascript:NextPage" + sFullGridId + "()\"><a style=\"text-decoration:none;color:#666\" href=\"javascript:void(0);\">Next &gt;</a></div></div>");
+
+                
+                output.Write("<div><div id=\"pagediv" + sFullGridId + "\"></div>");
+
+                //output.Write("<div id=\"pagediv" + sFullGridId + "\" style=\"\"><div style=\"height:15px;width:60px;float:left;\">Paging: </div><div id=\"PagePrevious" + sFullGridId + "\" style=\"height:18px;width:80px;border:1px solid #CACACA;float:left;padding-left:5px\" onClick=\"javascript:PreviousPage" + sFullGridId + "()\"><a href=\"javascript:void(0);\" style=\"text-decoration:none;color:#666\">&lt; Previous</a></div> <div id=\"PageNext" + sFullGridId + "\" style=\"height:18px;width:80px;border:1px solid #CACACA;float:left;margin-left:10px;padding-right:5px;text-align:right\" onClick=\"javascript:NextPage" + sFullGridId + "()\"><a style=\"text-decoration:none;color:#666\" href=\"javascript:void(0);\">Next &gt;</a></div></div>");
             }
 
             output.Write("<div id=\"grid" + this.ID + "\" style=\"width:100%;display:none;\" class=\"ms-listviewtable\"></div>\r\n\r\n");
@@ -3626,6 +3639,11 @@ namespace EPMLiveWebParts
 
             output.Write(Properties.Resources.txtInlineEdit.Replace("#gridid#", sFullGridId));
 
+            output.WriteLine("function ChangePage" + sFullGridId + "(pg){");
+            output.WriteLine("curPage" + sFullGridId + " = pg;");
+            output.WriteLine("loadX" + sFullGridId + "(sf" + sFullGridId + ", sv" + sFullGridId + ", st" + sFullGridId + ");");
+            output.WriteLine("}");
+
             output.WriteLine("function NextPage" + sFullGridId + "(){");
             if(gSettings.EnableContentReporting)
                 output.WriteLine("if(curPage" + sFullGridId + "==0){curPage" + sFullGridId + "=2;}else{curPage" + sFullGridId + "++;}");
@@ -3633,6 +3651,7 @@ namespace EPMLiveWebParts
                 output.WriteLine("curPage" + sFullGridId + " = lastItem" + sFullGridId + ";");
             output.WriteLine("loadX" + sFullGridId + "(sf" + sFullGridId + ", sv" + sFullGridId + ", st" + sFullGridId + ");");
             output.WriteLine("}");
+
             output.WriteLine("function PreviousPage" + sFullGridId + "(){");
             if (gSettings.EnableContentReporting)
                 output.WriteLine("curPage" + sFullGridId + "--;");
