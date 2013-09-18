@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Web.UI;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.ControlTemplates
 {
     public partial class TemplateVersoning : UserControl
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
         protected readonly string SiteUrl = SPContext.Current.Web.SafeServerRelativeUrl();
         protected bool UseLiveTemplates;
@@ -28,10 +29,19 @@ namespace EPMLiveCore.ControlTemplates
                 {
                     using (SPWeb web = site.OpenWeb(webid))
                     {
-                        UseLiveTemplates = bool.Parse(CoreFunctions.getLockConfigSetting(web, "EPMLiveUseLiveTemplates", false));
+                        UseLiveTemplates =
+                            bool.Parse(CoreFunctions.getLockConfigSetting(web, "EPMLiveUseLiveTemplates", false));
                     }
                 }
             });
+
+            if (!UseLiveTemplates)
+            {
+                EPMLiveScriptManager.RegisterScript(Page, new[]
+                {
+                    "libraries/jquery.min", "@EPMLive.TemplateVersoning"
+                });
+            }
         }
 
         #endregion Methods 

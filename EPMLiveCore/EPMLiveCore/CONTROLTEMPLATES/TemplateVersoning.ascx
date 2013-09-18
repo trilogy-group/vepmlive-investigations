@@ -24,6 +24,4 @@
 </div>
 </script>
 
-<script src="<%= SiteUrl %>/_layouts/epmlive/javascripts/EPMLive.TemplateVersoning.js" type="text/javascript"> </script>
-
 <% } %>

@@ -1584,6 +1584,9 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js.map">
+      <DependentUpon>EPMLive.TemplateVersoning.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
@@ -3284,6 +3287,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js">
+      <DependentUpon>EPMLive.TemplateVersoning.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js" />
