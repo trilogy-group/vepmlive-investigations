@@ -207,14 +207,12 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
     
 	var pages = records / this.PageSize;
 
-	//var prev = document.getElementById("PagePrevious"+ this._gridid);
-	//var next = document.getElementById("PageNext"+ this._gridid);
+	var prev = document.getElementById("PagePrevious"+ this._gridid);
+	var next = document.getElementById("PageNext"+ this._gridid);
 	var pagediv = document.getElementById("pagediv"+ this._gridid);
 
 	if(this.UseReporting)
 	{
-
-		
 
 		if(pages > 1)
 		{
@@ -239,21 +237,7 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 					onChange	: ChangePage#gridid#
 				});
 			}
-			
-			/*pagediv.style.display = "";
-			if(curPage#gridid# < pages)
-			{
-				next.style.display="";
-			}
-			else
-				next.style.display="none";
 
-			if(curPage#gridid# > 1)
-			{
-				prev.style.display="";
-			}
-			else
-				prev.style.display="none";*/
 		}
 		else
 		{
@@ -270,25 +254,29 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 
 		if(rec[0] == "0" || fItemHide#gridid# == firstItem#gridid#)
 		{
-			prev.style.display="none";
+
+			prev.style.background = "#EFEFEF";
 
 			fItemHide#gridid# = firstItem#gridid#;
 
 		}
 		else
 		{
-			prev.style.display="";
+			prev.style.background = "#DDDDDD";
 		}
 
 		if(rec[3] == "true")
-			next.style.display="";
+			next.style.background = "#DDDDDD";
 		else
-			next.style.display="none";
+		{
+			prev.style.background = "#EFEFEF";
+			lastItem#gridid# = 0;
+		}
 
-		if(rec[3] != "true" && rec[0] == "0")
+		/*if(rec[3] != "true" && rec[0] == "0")
 		{
 			pagediv.style.display = "none";
-		}
+		}*/
 	}
 };
 
