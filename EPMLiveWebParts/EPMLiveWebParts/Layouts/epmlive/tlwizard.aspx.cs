@@ -1,4 +1,5 @@
 ﻿using System;
+using EPMLiveCore.Controls.Navigation.Providers;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Data.SqlClient;
@@ -284,6 +285,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     }
                 }
             });
+
+            ClearNavigationCache();
         }
 
         private void ProcessLists(SPWeb web)
@@ -510,6 +513,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
             processQuickLaunch(web);
             //hideWizard(web);
             Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">SP.UI.ModalDialog.commonModalDialogClose(0, '');</script>");
+
+            ClearNavigationCache();
         }
 
         private void ProcessTimerJob(SPWeb web)
@@ -835,6 +840,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 web.Properties.Update();
                 web.Update();
             }
+        }
+
+        private void ClearNavigationCache()
+        {
+            var w = SPContext.Current.Web;
+            new GenericLinkProvider(w.Site.ID, w.ID, w.CurrentUser.LoginName).ClearCache();
         }
     }
 }
