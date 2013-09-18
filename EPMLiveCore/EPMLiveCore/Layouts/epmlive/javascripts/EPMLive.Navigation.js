@@ -716,12 +716,46 @@
                             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
                             break;
                         case '98':
-                            if (command !== 'nav:remove') {
-                                $.get(redirectUrl).always(function () {
+                            if (command !== 'nav:addToFav') {
+                                if (command !== 'nav:remove' && command !== 'nav:removeFavWS') {
+                                    $.get(redirectUrl).always(function() {
+                                        removeLink(id);
+                                    });
+                                } else {
+                                    if (command === 'nav:removeFavWS') {
+                                        $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
+                                            var $ws = $(this);
+                                            if ($ws.data('webid') === webId) {
+                                                id = $ws.parent().get(0).id;
+                                            }
+                                        });
+                                    }
+
                                     removeLink(id);
-                                });
+
+                                    if (command === 'nav:remove') {
+                                        var $a = $('#' + id).find('a');
+
+                                        window.Analytics.turnOffFav({
+                                            siteid: $a.data('siteid'),
+                                            webid: $a.data('webid'),
+                                            listid: $a.data('listid'),
+                                            itemid: $a.data('itemid'),
+                                            url: $a.get(0).href
+                                        });
+                                    }
+                                }
                             } else {
-                                removeLink(id);
+                                //var title = $($('#' + id).find('a').get(0)).text();
+
+                                //var _$$ = window.epmLive;
+
+                                //var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + _$$.currentWebId + '</Param><Param key="ListId">' + _$$.currentListId + '</Param><Param key="ListViewUrl">' + _$$.currentListViewUrl + '</Param><Param key="ListIconClass">' + _$$.currentListIcon + '</Param><Param key="ItemId">' + _$$.currentItemID + '</Param><Param key="FString">' + _$$.currentUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull">' + _$$.currentFileIsNull + '</Param></Data>';
+                                
+                                //epmLiveService.execute('AddFavorites', data, function (response) {
+                                //    var i = 0;
+                                //}, function (response) {
+                                //});
                             }
                             break;
                         case '99':
@@ -1309,6 +1343,7 @@
                             switch (command.toLowerCase()) {
                                 case 'nav:remove':
                                 case 'nav:addtofav':
+                                case 'nav:removefavws':
                                     return 'icon-star-6';
                                 case 'view':
                                     return 'icon-info';
@@ -1361,6 +1396,10 @@
                                 }
                             } else {
                                 $menu.append('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>');
+
+                                $menu.find('a').click(function() {
+                                    hideMenu();
+                                });
                             }
                         }
 
@@ -1622,12 +1661,12 @@
                                 });
 
                                 if (found) {
-                                    commands.push({ title: 'Remove', command: 'nav:remove', kind: 98 });
+                                    commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
                                 } else {
-                                    commands.push({ title: 'Add', command: 'nav:addToFav' });
+                                    commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
                                 }
                             } else {
-                                commands.push({ title: 'Remove', command: 'nav:remove', kind: 98 });
+                                commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
                             }
 
                             commands.push({ title: 'Manage team', command: 'nav:team', kind: 6 });
