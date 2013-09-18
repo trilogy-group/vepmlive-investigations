@@ -794,6 +794,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\Integration\Delete.aspx.designer.cs">
       <DependentUpon>Delete.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Integration\gotoremote.aspx.cs">
+      <DependentUpon>gotoremote.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Integration\gotoremote.aspx.designer.cs">
+      <DependentUpon>gotoremote.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Integration\IntegrationList.aspx.cs">
       <DependentUpon>IntegrationList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3260,6 +3266,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\Integration\Columns.aspx" />
     <Content Include="Layouts\epmlive\Integration\Connection.aspx" />
     <Content Include="Layouts\epmlive\Integration\Delete.aspx" />
+    <Content Include="Layouts\epmlive\Integration\gotoremote.aspx" />
     <Content Include="Layouts\epmlive\Integration\IntegrationList.aspx" />
     <Content Include="Layouts\epmlive\Integration\Log.aspx" />
     <Content Include="Layouts\epmlive\Integration\OpenControl.aspx" />
@@ -3287,6 +3294,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.endless-scroll.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\jquery.paginate.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.placeholder.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.timeago.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.tmpl.min.js" />
@@ -3369,6 +3377,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.svg" />
+    <Content Include="Layouts\epmlive\stylesheets\jpaginate.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap.css" />
