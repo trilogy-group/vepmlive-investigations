@@ -40,6 +40,7 @@ namespace PortfolioEngineCore
             sReply = "";
             if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
             _sqlConnection.Open();
+            DateTime dtnow = DateTime.Now;
 
             CStruct xRPA = new CStruct();
             xRPA.Initialize("ResourceAnalyzerCalendars");
@@ -101,11 +102,13 @@ namespace PortfolioEngineCore
                 }
                 reader.Close();
 
-                cmdText = "SELECT PRD_ID, CB_ID, PRD_NAME FROM EPG_PERIODS ORDER BY CB_ID, PRD_ID";
+                cmdText = "SELECT * FROM EPG_PERIODS ORDER BY CB_ID, PRD_ID";
 
                 oCommand = new SqlCommand(cmdText,  _sqlConnection);
                 reader = oCommand.ExecuteReader();
 
+
+                
 
                 while (reader.Read())
                 {
@@ -115,6 +118,10 @@ namespace PortfolioEngineCore
                     {
                         per_id = DBAccess.ReadIntValue(reader["PRD_ID"]);
                         per_name = DBAccess.ReadStringValue(reader["PRD_NAME"]);
+                        DateTime pers = DBAccess.ReadDateValue(reader["PRD_START_DATE"]);
+                        DateTime perf = DBAccess.ReadDateValue(reader["PRD_FINISH_DATE"]);
+
+     
 
                         if (cal_id == first_cal_id)
                         {
@@ -128,6 +135,12 @@ namespace PortfolioEngineCore
                         CStruct xPeriod = xPeriods.CreateSubStruct("Period");
                         xPeriod.CreateIntAttr("perID", per_id);
                         xPeriod.CreateStringAttr("perName", per_name);
+
+                        if (pers <= dtnow && perf >= dtnow)
+                        {
+                            CStruct xCurrPeriod = xPeriods.CreateSubStruct("CurrentPeriod");
+                            xCurrPeriod.CreateIntAttr("Value", per_id);
+                        }
                     }
 
                 }

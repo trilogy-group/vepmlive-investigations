@@ -7891,7 +7891,7 @@ ResPlanAnalyzer.prototype.InitVars = function () {
         var GetTotalsGridChartDataCompleteDelegate =  MakeDelegate(this, this.GetTotalsGridChartDataComplete);
 
 //<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
-	    $.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
+//	    $.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
 
 	        //console.log(data); //data returned
 
@@ -7901,7 +7901,7 @@ ResPlanAnalyzer.prototype.InitVars = function () {
 
 	        //console.log('Load was performed.');
 
-	    });
+//	    });
 
 
  
