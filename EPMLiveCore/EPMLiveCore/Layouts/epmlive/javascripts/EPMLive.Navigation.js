@@ -951,7 +951,7 @@
 
                         try {
                             wsWidth = $wsTree.width();
-                        } catch(e) {
+                        } catch(ex) {
                         } 
                         
                         var newWidth = 0;
