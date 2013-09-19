@@ -9,7 +9,7 @@
 
 <div id="EPMAllWork">
 
-    <style type="text/css">
+    <SharePoint:StyleBlock runat="server">
         .EPMLiveMyWorkGroup {
             border-bottom: 1px solid #ABABAB;
         }
@@ -34,12 +34,12 @@
         .EPMLiveMyWorkGroupPostfix {
             font-weight: normal;
         }
-    </style>
+    </SharePoint:StyleBlock>
 
     <div id="MWG_Loader_<%= WebPartId %>" class="epmlive-loader">  
     </div>
 
-    <script type="text/javascript">
+    <SharePoint:ScriptBlock runat="server">
         function initializeEPMLoader() {
             $(function() {
                 if (document.location.href.toLowerCase().indexOf('my%20work.aspx') !== -1) {
@@ -61,7 +61,7 @@
         }
 
         SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, "jquery.min.js");
-    </script>
+    </SharePoint:ScriptBlock>
     
     <div id="MWG_Header" style="display: <%= ShowToolbar ? "block" : "none" %>">
         <h2>My Work</h2>
@@ -131,7 +131,7 @@
     
     <div id="EPMMyWorkGrid" style="width:100%;height:800px;">
 
-        <script type="text/javascript">
+        <SharePoint:ScriptBlock runat="server">
             $(function () {
                 var loadMyWorkGrid = function () {
                     window.TreeGrid('<treegrid Data_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Data_Timeout="0" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Function="GetMyWorkGridData" Data_Param_Dataxml="<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>" Layout_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Layout_Timeout="0" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Function="GetMyWorkGridLayout" Layout_Param_Dataxml="<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>" SuppressMessage="3" <%= DebugTag %>></treegrid>', 'EPMMyWorkGrid');
@@ -139,7 +139,7 @@
 
                 ExecuteOrDelayUntilScriptLoaded(loadMyWorkGrid, 'EPMLive.js');
             });
-        </script>
+        </SharePoint:ScriptBlock>
 
     </div>
 
@@ -175,8 +175,8 @@
       </div>
     </div>
 
-    <script type="text/javascript">
+    <SharePoint:ScriptBlock runat="server">
         var siteUrl = '<%= WebUrl %>', mwWebPartHeight = <%= !string.IsNullOrEmpty(WebPartHeight) ? WebPartHeight : "0" %>, allowGlobalViewCreation = <%= UserHasDesignerPermission ? "true" : "false" %>, myWorkWebPartSelectionCheckBox = 'SelectionCbx<%= WebPartPageComponentId %>', masterView = '<%= DefaultGlobalView %>', nonCompleteQuery = '<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>', completeQuery = '<%= CompleteQuery.Replace(Environment.NewLine, string.Empty) %>', newItemLists = [<%= NewItemButtonLists %>], myWorkWebPartId = '<%= WebPartId %>', myWorkWebPartQualifier = '<%= Qualifier %>', selectMyWorkWebPart = <%= TotalWebPartCount == 1 ? "true" : "false" %>, userId = <%= UserId %>, requestedView = '<%= RequestedView != null ? Convert.ToBase64String(Encoding.ASCII.GetBytes(RequestedView)) : string.Empty %>', requestedViewType = '<%= RequestedViewType != null ? Convert.ToBase64String(Encoding.ASCII.GetBytes(RequestedViewType)) : string.Empty %>', currentWebId = '<%= WebId %>', workFilters = { daysAgoEnabled: <%= DaysAgoEnabled.ToString().ToLower() %>, daysAgo: <%= DaysAgo %>, daysAfterEnabled: <%= DaysAfterEnabled.ToString().ToLower() %>, daysAfter: <%= DaysAfter %> }, mwNewItemIndicator = { enabled: <%= IsNewItemIndicatorEnabled.ToString().ToLower() %>, days: <%= NewItemIndicatorDays %> };
-    </script>
+    </SharePoint:ScriptBlock>
 
 </div>
