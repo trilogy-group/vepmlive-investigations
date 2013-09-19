@@ -16,8 +16,10 @@
 
     .epm-nav-pinned { margin-left: 230px; }
 
+    #WebPartAdderUpdatePanelContainer.epm-nav-pinned,
     #Ribbon.epm-nav-pinned { margin-left: 180px; }
 
+    #WebPartAdderUpdatePanelContainer.epm-nav-unpinned,
     #Ribbon.epm-nav-unpinned { margin-left: 0; }
 
     .ms-dialog .epm-nav-pinned, .ms-dialog .epm-nav-unpinned { margin-left: auto !important; }
@@ -32,7 +34,8 @@
 <% if (Pinned)
    { %>
     <style>
-        #Ribbon { margin-left: 180px; }
+         #WebPartAdderUpdatePanelContainer,
+         #Ribbon { margin-left: 180px; }
 
         .ms-dialog .epm-nav-pinned, .ms-dialog #Ribbon { margin-left: 0; }
     </style>

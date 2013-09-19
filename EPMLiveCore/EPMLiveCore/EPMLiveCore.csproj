@@ -803,6 +803,7 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\Integration\gotoremote.aspx.cs">
       <DependentUpon>gotoremote.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\Integration\gotoremote.aspx.designer.cs">
       <DependentUpon>gotoremote.aspx.cs</DependentUpon>
