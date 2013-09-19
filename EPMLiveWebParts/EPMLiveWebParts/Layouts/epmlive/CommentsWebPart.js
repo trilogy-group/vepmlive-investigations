@@ -155,15 +155,16 @@ function GetData() {
                             if (responseJson.Result.Notifications) {
                                 data += '<Param key="ItemIds">';
                                 var notifications;
-                                if (!responseJson.Result.Notifications.Notification.length) {
-                                    notifications = [responseJson.Result.Notifications.Notification];
-                                }
-                                else {
-                                    notifications = responseJson.Result.Notifications.Notification;
-                                }
-                                for (var i in notifications) {
-                                    if (notifications[i]['@Type'] == '3') {
-                                        data += (notifications[i]['@ListId'] + '.' + notifications[i]['@ItemId'] + ',');
+                                if (responseJson.Result.Notifications.Notification) {
+                                    if (!responseJson.Result.Notifications.Notification.length) {
+                                        notifications = [responseJson.Result.Notifications.Notification];
+                                    } else {
+                                        notifications = responseJson.Result.Notifications.Notification;
+                                    }
+                                    for (var i in notifications) {
+                                        if (notifications[i]['@Type'] == '3') {
+                                            data += (notifications[i]['@ListId'] + '.' + notifications[i]['@ItemId'] + ',');
+                                        }
                                     }
                                 }
                                 data += '</Param>';
