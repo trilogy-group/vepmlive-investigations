@@ -11,36 +11,44 @@
 
 <!--[if lte IE 7]><script src="/_layouts/15/epmlive/javascripts/icomoon-ie7.min.js"> </script><![endif]-->
 
-<style>
-    .epm-nav-unpinned { margin-left: 50px; }
+<sharepoint:StyleBlock runat="server">
+    .epm-nav-unpinned { margin-left: 50px !important; }
 
-    .epm-nav-pinned { margin-left: 230px; }
-
-    #WebPartAdderUpdatePanelContainer.epm-nav-pinned,
-    #Ribbon.epm-nav-pinned { margin-left: 180px; }
-
-    #WebPartAdderUpdatePanelContainer.epm-nav-unpinned,
-    #Ribbon.epm-nav-unpinned { margin-left: 0; }
+    .epm-nav-pinned { margin-left: 230px !important; }
 
     .ms-dialog .epm-nav-pinned, .ms-dialog .epm-nav-unpinned { margin-left: auto !important; }
-</style>
-
-<% if (Request.UserAgent.Contains("Chrome"))
-   { %>
-    <link href="/_layouts/15/epmlive/stylesheets/controls/navigation/epmnav.chrome.min.css" rel="stylesheet" />
-<%
-   } %>
+</sharepoint:StyleBlock>
 
 <% if (Pinned)
-   { %>
-    <style>
-         #WebPartAdderUpdatePanelContainer,
-         #Ribbon { margin-left: 180px; }
+   {
+%>
+    <Sharepoint:StyleBlock runat="server">
+        #s4-ribbonrow,
+        #s4-workspace {
+            margin-left: 230px;
+        }
 
-        .ms-dialog .epm-nav-pinned, .ms-dialog #Ribbon { margin-left: 0; }
-    </style>
+        .ms-dialog .epm-nav-pinned,
+        .ms-dialog #s4-ribbonrow {
+            margin-left: 0;
+        }
+    </Sharepoint:StyleBlock>
 <%
-   } %>
+   }
+   else
+   { %>
+    <Sharepoint:StyleBlock runat="server">
+        #s4-ribbonrow,
+        #s4-workspace {
+            margin-left: 50px;
+        }
+        
+        .ms-dialog .epm-nav-unpinned,
+        .ms-dialog  #s4-ribbonrow {
+            margin-left: 0;
+        }
+    </Sharepoint:StyleBlock>
+<% } %>
 
 <div id="epm-nav">
     <div id="epm-nav-top">
@@ -156,18 +164,18 @@
     </div>
 </div>
 
-<script type="text/javascript">
+<SharePoint:ScriptBlock runat="server">
     (function() {
-        window.epmLiveNavigation = {
-            currentWebId: '<%= WebId %>',
-            currentWebUrl: '<%= WebUrl %>',
-            currentUserId: <%= UserId %>,
-            staticProvider: '<%= StaticProviderLinks %>',
-            workspaceTree: function() {
-                return window.$find('<%= WorkspacesNavTree.ClientID %>');
-            }
-        };
+    window.epmLiveNavigation = {
+    currentWebId: '<%= WebId %>',
+    currentWebUrl: '<%= WebUrl %>',
+    currentUserId: <%= UserId %>,
+    staticProvider: '<%= StaticProviderLinks %>',
+    workspaceTree: function() {
+    return window.$find('<%= WorkspacesNavTree.ClientID %>');
+    }
+    };
 
-        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
+    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
     })();
-</script>
+</SharePoint:ScriptBlock>

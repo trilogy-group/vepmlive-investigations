@@ -93,7 +93,7 @@
   left: 50px;
   position: absolute;
   width: 180px;
-  z-index: 50;
+  z-index: 150;
 }
 #epm-nav-pin {
   color: #7C7C7C;
@@ -102,7 +102,7 @@
   padding-top: 3px;
   position: absolute;
   right: 0;
-  z-index: 55;
+  z-index: 155;
   cursor: pointer;
   cursor: hand;
   -webkit-transition: All 0.2s ease;
@@ -587,7 +587,7 @@ ul.epm-nav-contextual-menu {
   padding-bottom: 2.5px;
   background: #ffffff;
   position: relative;
-  z-index: 60;
+  z-index: 160;
   border-radius: 5px;
   -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
@@ -640,4 +640,10 @@ li.epm-nav-node-selected ul.epm-nav-contextual-menu li a {
 }
 .ms-dialog #epm-nav {
   display: none;
+}
+.ms-dialog #contentBox {
+  margin-left: 0;
+}
+.js-callout-mainElement {
+  z-index: 200 !important;
 }

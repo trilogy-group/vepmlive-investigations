@@ -66,7 +66,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Properties 
 
-        #region Methods (4) 
+        #region Methods (5) 
 
         // Protected Methods (3) 
 
@@ -74,9 +74,10 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             base.OnPreRender(e);
 
-            foreach (
-                string style in
-                    new[] {"masterpages/glyphs.min", "masterpages/icomoon.min", "controls/navigation/epmnav.min"})
+            foreach (string style in new[]
+            {
+                "masterpages/glyphs.min", "masterpages/icomoon.min", "controls/navigation/epmnav.min"
+            })
             {
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
             }
@@ -87,20 +88,13 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 "@EPMLive.Navigation"
             });
 
-            int userId = SPContext.Current.Web.CurrentUser.ID;
+            CalculatePinState();
 
-            HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode-u-" + userId);
-            if (selectedTlNodeCookie != null)
+            string userAgent = Request.UserAgent;
+            if (userAgent != null && userAgent.Contains("Chrome"))
             {
-                _selectedTlNode = selectedTlNodeCookie.Value;
-            }
-
-            Pinned = true;
-
-            HttpCookie pinStateCookie = Request.Cookies.Get("epmnav-pin-state-u-" + userId);
-            if (pinStateCookie != null)
-            {
-                Pinned = pinStateCookie.Value.Equals("pinned");
+                SPPageContentManager.RegisterStyleFile(LAYOUT_PATH +
+                                                       "stylesheets/controls/navigation/epmnav.chrome.min.css");
             }
 
             LoadSelectedNodeLinks();
@@ -127,7 +121,27 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
-        // Private Methods (1) 
+        
+        // Private Methods (2) 
+
+        private void CalculatePinState()
+        {
+            int userId = SPContext.Current.Web.CurrentUser.ID;
+
+            HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode-u-" + userId);
+            if (selectedTlNodeCookie != null)
+            {
+                _selectedTlNode = selectedTlNodeCookie.Value;
+            }
+
+            Pinned = true;
+
+            HttpCookie pinStateCookie = Request.Cookies.Get("epmnav-pin-state-u-" + userId);
+            if (pinStateCookie != null)
+            {
+                Pinned = pinStateCookie.Value.Equals("pinned");
+            }
+        }
 
         private void LoadSelectedNodeLinks()
         {

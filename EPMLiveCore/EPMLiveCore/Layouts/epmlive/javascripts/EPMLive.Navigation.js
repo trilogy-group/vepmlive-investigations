@@ -433,7 +433,7 @@
                 }
 
                 function changePinState(state) {
-                    var elements = ['Ribbon', 's4-workspace', 'WebPartAdderUpdatePanelContainer'];
+                    var elements = ['s4-ribbonrow', 's4-workspace'];
                     for (var e in elements) {
                         var $e = $('#' + elements[e]);
                         $e.removeClass('epm-nav-pinned');
