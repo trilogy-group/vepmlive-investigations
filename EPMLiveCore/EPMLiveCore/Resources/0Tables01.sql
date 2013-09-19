@@ -560,15 +560,16 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		print 'Creating Table INT_MODULES'
 
 		CREATE TABLE [dbo].[INT_MODULES](
-			[MODULE_ID] [uniqueidentifier] NOT NULL,
-			[NetAssembly] [varchar](8000) NOT NULL,
-			[NetClass] [varchar](255) NOT NULL,
-			[Title] [varchar](50) NOT NULL,
-			[Description] [varchar](8000) NULL,
-			[Icon] [varchar](50) NULL,
-			[CustomProps] [varchar](max) NULL,
-			[AvailableOnline] [bit] NULL
-		) ON [PRIMARY]
+		[MODULE_ID] [uniqueidentifier] NOT NULL,
+		[NetAssembly] [varchar](8000) NOT NULL,
+		[NetClass] [varchar](255) NOT NULL,
+		[Title] [varchar](50) NOT NULL,
+		[Description] [varchar](8000) NULL,
+		[Icon] [varchar](50) NULL,
+		[CustomProps] [varchar](max) NULL,
+		[AvailableOnline] [bit] NULL,
+		[INT_CAT_ID] [uniqueidentifier] NULL
+	) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 
 end
@@ -577,9 +578,32 @@ begin
 
 	print 'Updating Table INT_MODULES'
 
-
+	if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'INT_MODULES' and column_name = 'INT_CAT_ID')
+	begin
+		alter table INT_MODULES
+		ADD [INT_CAT_ID] [uniqueidentifier] NULL
+	end
 end
 
+------------------------INT_CATEGORY--------------------
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'INT_CATEGORY')
+	begin
+		
+		print 'Creating Table INT_CATEGORY'
+
+		CREATE TABLE [dbo].[INT_CATEGORY](
+			[INT_CAT_ID] [uniqueidentifier] NULL DEFAULT (newid()),
+			[CATEGORY] [varchar](255) NULL,
+			[ICON] [varchar](50) NULL,
+			[ORDERBY] [int] NULL
+		) ON [PRIMARY]
+end
+else
+begin
+
+	print 'Updating Table INT_CATEGORY'
+
+end
 
 -------------------------INT_PROPS-----------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'INT_PROPS')
@@ -673,6 +697,93 @@ begin
 	end
 
 end
+
+
+-----------------------------INT_AUTH-----------------------
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'INT_AUTH')
+	begin
+		
+		print 'Creating Table INT_AUTH'
+
+		
+		CREATE TABLE [dbo].[INT_AUTH](
+			[AUTH_ID] [uniqueidentifier] NULL,
+			[username] [varchar](255) NULL,
+			[email] [varchar](500) NULL,
+			[datetime] [datetime] NULL
+		) ON [PRIMARY]
+
+end
+else
+begin
+
+	print 'Updating Table INT_AUTH'
+
+
+end
+
+-----------------------------INT_CONTROLS-----------------------
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'INT_CONTROLS')
+	begin
+		
+		print 'Creating Table INT_CONTROLS'
+
+		CREATE TABLE [dbo].[INT_CONTROLS](
+			[INT_CONTROL_ID] [uniqueidentifier] NULL DEFAULT (newid()),
+			[INT_LIST_ID] [uniqueidentifier] NULL,
+			[CONTROL] [varchar](255) NULL,
+			[LOCAL] [bit] NULL,
+			[TITLE] [varchar](255) NULL,
+			[IMAGE] [varchar](255) NULL,
+			[WINDOW] [bit] NULL
+		) ON [PRIMARY]
+end
+else
+begin
+
+	print 'Updating Table INT_CONTROLS'
+
+
+end
+
+
+-----------------------------FRF-------------------------
+
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'FRF')
+	begin
+		
+		print 'Creating Table FRF'
+
+		
+		CREATE TABLE [dbo].[FRF](
+                [FRF_ID] [uniqueidentifier] NOT NULL default newid(),
+                [SITE_ID] [uniqueidentifier] NULL,
+                [WEB_ID] [uniqueidentifier] NULL,
+                [LIST_ID] [uniqueidentifier] NULL,
+                [ITEM_ID] [int] NULL,
+                [USER_ID] [int] NULL,
+                [Title] [varchar](max) NULL,
+                [Icon] [varchar](50) NULL,
+                [Type] [int] NULL,
+                [F_String] [varchar](max) NULL,
+                [F_Date] [datetime] NULL,
+                [F_Int] [int] NULL,
+			CONSTRAINT [PK_FRF] PRIMARY KEY CLUSTERED 
+			(
+							[FRF_ID] ASC
+			)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+			) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+end
+else
+begin
+
+	print 'Updating Table FRF'
+
+
+end
+
+
 
 
 -------------------------Constraints-----------------

@@ -206,6 +206,17 @@ else
 begin
     UPDATE TIMERJOBTYPES SET NetAssembly='EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050', NetClass='EPMLiveReportsAdmin.Jobs.ListDataCleanupJob', [Title]='List Data Cleanup', Priority=99 where jobtype_id=6
 end
+if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 100)
+begin
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (100,'EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Jobs.CreateWorkspaceJob','Create Workspace',9)
+end
+else
+begin
+    UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.CreateWorkspaceJob', [Title]='Create Workspace', Priority=9 where jobtype_id=100
+end
+
+
+
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc499')
 begin
     INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc499','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.SQL','SQL','This provides access to data located in Microsoft SQL Server','sql.png','<Properties>

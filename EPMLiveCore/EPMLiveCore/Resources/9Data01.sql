@@ -394,3 +394,53 @@ begin
 </body>
 </html>' where emailid=5
 end
+if not exists (select emailid from EMAILTEMPLATES where emailid = 6)
+begin
+    INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (6,'Workspace Created Notification','Your new workspace {Workspace_Name} is now ready!','        <table width="100%" cellpadding="0" cellspacing="0">  
+            <tr>  
+                <td style="font-size:18px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Workspace <a href="{ItemUrl}" style="font-size:16px;color:#3366CC;">{Workspace_Name}</a> is now ready!
+                </td>  
+            </tr>  
+            <tr>
+                <td>
+                    <table cellpadding="0" cellspacing="0" style="margin-top:15px;margin-bottom:15px;">
+                        <tr>
+                            <td style="width: 100%; height: 20px; text-align: center; color: #ffffff; padding-top: 10px; padding-right: 20px; padding-bottom: 10px; padding-left: 20px; border-top-color: #5ea736; border-right-color: #5ea736; border-bottom-color: #5ea736; border-left-color: #5ea736; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; background-color: rgb(106, 189, 61);"><a style="color: rgb(255, 255, 255); font-family:Helvetica,Arial; font-size: 16px; font-weight: bold; text-decoration: none;" href="#">{Workspace_Name}</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>  
+                <td style="font-size:15px;color:#666666;font-family:Segoe UI,Helvetica,Arial">
+                    A link to this Workspace has also been added to your "Workspaces" navigation menu.
+                </td>  
+            </tr>                                   
+</table>  
+')
+end
+else
+begin
+    UPDATE EMAILTEMPLATES SET subject='Your new workspace {Workspace_Name} is now ready!', body='        <table width="100%" cellpadding="0" cellspacing="0">  
+            <tr>  
+                <td style="font-size:18px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Workspace <a href="{ItemUrl}" style="font-size:16px;color:#3366CC;">{Workspace_Name}</a> is now ready!
+                </td>  
+            </tr>  
+            <tr>
+                <td>
+                    <table cellpadding="0" cellspacing="0" style="margin-top:15px;margin-bottom:15px;">
+                        <tr>
+                            <td style="width: 100%; height: 20px; text-align: center; color: #ffffff; padding-top: 10px; padding-right: 20px; padding-bottom: 10px; padding-left: 20px; border-top-color: #5ea736; border-right-color: #5ea736; border-bottom-color: #5ea736; border-left-color: #5ea736; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; background-color: rgb(106, 189, 61);"><a style="color: rgb(255, 255, 255); font-family:Helvetica,Arial; font-size: 16px; font-weight: bold; text-decoration: none;" href="#">{Workspace_Name}</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>  
+                <td style="font-size:15px;color:#666666;font-family:Segoe UI,Helvetica,Arial">
+                    A link to this Workspace has also been added to your "Workspaces" navigation menu.
+                </td>  
+            </tr>                                   
+</table>  
+' where emailid=6
+end

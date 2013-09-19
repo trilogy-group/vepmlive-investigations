@@ -1887,3 +1887,31 @@ BEGIN
 END
 ')
  
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spAddAuth')
+begin
+    Print 'Creating Stored Procedure spAddAuth'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spAddAuth'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spAddAuth]
+
+@authid uniqueidentifier,
+@username varchar(255),
+@email varchar(500)
+
+AS
+BEGIN
+
+delete from INT_AUTH where username=@username
+
+delete from INT_AUTH where DATEDIFF(mi, datetime, GETDATE()) > 60
+
+INSERT INTO INT_AUTH (AUTH_ID, Username, Email, DateTime) VALUES (@authid, @username, @email, GETDATE())
+
+END
+
+')
