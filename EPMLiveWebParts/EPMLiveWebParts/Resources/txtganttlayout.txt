@@ -30,7 +30,7 @@
 	</Cols>
 	<RightCols>
 		
-		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttComplete="PercentComplete"
+		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttComplete="PercentComplete" GanttText=""
 		GanttHideExclude="0" GanttChartRound="w" GanttHeader1="w#dddddd MMMM yyyy" GanttHeader2="d#ddddd"
 		GanttZoom="weeks and days" GanttEndLast="0" CanExport="0" CanEdit="1" GanttMin="1/1/1990" GanttMax="1/1/2100" GanttDescendants="Descendants" GanttEdit="Main,Dependency"/>
 

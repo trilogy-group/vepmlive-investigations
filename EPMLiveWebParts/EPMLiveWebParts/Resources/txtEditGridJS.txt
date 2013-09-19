@@ -205,7 +205,7 @@ dhtmlXGridObject.prototype.alerterror=function(msg){
 
 dhtmlXGridObject.prototype.setuppaging=function(records){
     
-	var pages = records / this.PageSize;
+	var pages = Math.ceil(records / this.PageSize);
 
 	var prev = document.getElementById("PagePrevious"+ this._gridid);
 	var next = document.getElementById("PageNext"+ this._gridid);
