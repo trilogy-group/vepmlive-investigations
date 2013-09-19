@@ -20,43 +20,57 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
                 API.Integration.IntegrationCore integration = new API.Integration.IntegrationCore(Web.Site.ID, Web.ID);
 
-                DataTable dt = integration.GetIntegrations(act.IsOnline);
+                DataSet dsIntegrations = integration.GetIntegrations(act.IsOnline);
 
                 StringBuilder sb = new StringBuilder();
 
-                foreach(DataRow dr in dt.Rows)
+                DataTable dtCat = dsIntegrations.Tables[0];
+
+                foreach (DataRow drCat in dtCat.Rows)
                 {
-                    sb.Append("<div style=\"\">");
+                    sb.Append("<div style=\"width:100%;\">");
+                    sb.Append("<h2>" + drCat["CATEGORY"].ToString() + "</h2>");
+                    sb.Append("</div>");
+                    sb.Append("<div style=\"width:100%;overflow: hidden;\">");
+                    
 
-                    string icon = dr["Icon"].ToString();
-
-                    if(icon == "")
-                        icon = "/_layouts/epmlive/images/integration/base.png";
-                    else
-                        icon = "/_layouts/epmlive/images/integration/" + icon;
-
-                    string desc = dr["Description"].ToString();
-
-
-                    sb.Append("<a href=\"javascript:void(0);\" onclick=\"AddIntegration('");
-                    sb.Append(dr["MODULE_ID"].ToString());
-                    sb.Append("')\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
-                    sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
-                    sb.Append("<img src=\"");
-                    sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
-                    sb.Append(icon);
-                    sb.Append("\"></td>");
-                    sb.Append("<td class=\"titletd\"><b>");
-                    sb.Append(dr["Title"].ToString());
-                    sb.Append("</b>");
-                    if(desc != "")
+                    DataTable dtMods = dsIntegrations.Tables[drCat["INT_CAT_ID"].ToString()];
+                    foreach(DataRow dr in dtMods.Rows)
                     {
-                        sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
-                        sb.Append(desc);
+                        sb.Append("<div style=\"width:400px;float:left;\">");
+
+                        string icon = dr["Icon"].ToString();
+
+                        if (icon == "")
+                            icon = "/_layouts/epmlive/images/integration/base.png";
+                        else
+                            icon = "/_layouts/epmlive/images/integration/" + icon;
+
+                        string desc = dr["Description"].ToString();
+
+
+                        sb.Append("<a href=\"javascript:void(0);\" onclick=\"AddIntegration('");
+                        sb.Append(dr["MODULE_ID"].ToString());
+                        sb.Append("')\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
+                        sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
+                        sb.Append("<img src=\"");
+                        sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
+                        sb.Append(icon);
+                        sb.Append("\"></td>");
+                        sb.Append("<td class=\"titletd\"><b>");
+                        sb.Append(dr["Title"].ToString());
+                        sb.Append("</b>");
+                        if (desc != "")
+                        {
+                            sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
+                            sb.Append(desc);
+                            sb.Append("</div>");
+                        }
+                        sb.Append("</td>");
+                        sb.Append("</tr></table></a>");
+
                         sb.Append("</div>");
                     }
-                    sb.Append("</td>");
-                    sb.Append("</tr></table></a>");
 
                     sb.Append("</div>");
                 }

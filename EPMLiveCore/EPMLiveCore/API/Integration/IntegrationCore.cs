@@ -215,7 +215,7 @@ namespace EPMLiveCore.API.Integration
             }
         }
 
-        public DataTable GetIntegrations(bool bOnline)
+        public DataSet GetIntegrations(bool bOnline)
         {
             DataSet ds = new DataSet();
 
@@ -223,18 +223,35 @@ namespace EPMLiveCore.API.Integration
 
             string sql = "";
             if (bOnline)
-                sql = "SELECT * FROM INT_MODULES WHERE AvailableOnline = 1";
+                sql = "SELECT * FROM INT_MODULES WHERE AvailableOnline = 1 AND INT_CAT_ID=@cat";
             else
-                sql = "SELECT * FROM INT_MODULES";
+                sql = "SELECT * FROM INT_MODULES WHERE INT_CAT_ID=@cat";
 
-            SqlCommand cmd = new SqlCommand(sql, cn);
-
+            DataSet dsCats = new DataSet();
+            SqlCommand cmd = new SqlCommand("SELECT * FROM INT_CATEGORY ORDER BY ORDERBY", cn);
             SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
+            da.Fill(dsCats);
+            ds.Tables.Add(dsCats.Tables[0].Copy());
+            ds.Tables[0].TableName = "Categories";
+
+            DataTable dtCats =  dsCats.Tables[0];
+
+            for (int i = 0; i <dtCats.Rows.Count; i++)
+            {
+                DataSet dsTemp = new DataSet();
+
+                cmd = new SqlCommand(sql, cn);
+                cmd.Parameters.AddWithValue("@cat", dtCats.Rows[i]["INT_CAT_ID"].ToString());
+                da = new SqlDataAdapter(cmd);
+                da.Fill(dsTemp);
+
+                ds.Tables.Add(dsTemp.Tables[0].Copy());
+                ds.Tables[i + 1].TableName = dtCats.Rows[i]["INT_CAT_ID"].ToString();
+            }
 
             CloseConnection(false);
 
-            return ds.Tables[0];
+            return ds;
         }
 
         public void ExecuteEvent(DataRow dr)
