@@ -159,6 +159,12 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     right: 50px !important;
 }
 
+.ms-dlgLoadingTextDiv .ms-core-pageTitle {
+    color: #262626 !important;
+    position: relative;
+    top: -5px;
+}
+
 /*.ms-trcnoti-border {
     background-color: #6abd3d !important;
     color: white !important;

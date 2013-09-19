@@ -928,7 +928,13 @@
 
                     window.epmLiveNavigation.snWidth = $sn.width();
 
-                    var $wsTree = $('#' + window.epmLiveNavigation.workspaceTree()._element.id);
+                    var $wsTree;
+                    
+                    var workspaceTree = window.epmLiveNavigation.workspaceTree();                    
+                    if (workspaceTree) {
+                        $wsTree = $('#' + workspaceTree._element.id);
+                    }
+
                     var snWidth = $sn.width();
 
                     var expandWorkspaceMenu = function () {
@@ -941,7 +947,13 @@
                             $(this).attr('style', '');
                         });
 
-                        var wsWidth = $wsTree.width();
+                        var wsWidth = 0;
+
+                        try {
+                            wsWidth = $wsTree.width();
+                        } catch(e) {
+                        } 
+                        
                         var newWidth = 0;
 
                         if (snWidth < wsWidth) {
