@@ -592,7 +592,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		print 'Creating Table INT_CATEGORY'
 
 		CREATE TABLE [dbo].[INT_CATEGORY](
-			[INT_CAT_ID] [uniqueidentifier] NULL DEFAULT (newid()),
+			[INT_CAT_ID] [uniqueidentifier] NOT NULL,
 			[CATEGORY] [varchar](255) NULL,
 			[ICON] [varchar](50) NULL,
 			[ORDERBY] [int] NULL
