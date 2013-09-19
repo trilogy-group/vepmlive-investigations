@@ -13,12 +13,12 @@ using EPMLiveCore;
 
 namespace EPMLiveCore.API
 {
-    public static class Favorites
+    public static class FavoritesWorkspace
     {
-        public static string IsFav(string xml)
+        public static string IsFavWorkspace(string xml)
         {
             var result = "false";
-            var data = new AnalyticsData(xml, AnalyticsType.Favorite, AnalyticsAction.Read);
+            var data = new AnalyticsData(xml, AnalyticsType.FavoriteWorkspace, AnalyticsAction.Read);
             try
             {
                 var qExec = new QueryExecutor(SPContext.Current.Web);
@@ -32,17 +32,17 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException(21000, "[FavoritesService-IsFav] " + e.Message);
+                throw new APIException(21000, "[FavoritesWorkspaceService-IsFavWorkspace] " + e.Message);
             }
 
             return result;
         }
         // insert data
-        public static string AddFav(string xml)
+        public static string AddFavWorkspace(string xml)
         {
             var result = string.Empty;
             var dt = new System.Data.DataTable();
-            var data = new AnalyticsData(xml, AnalyticsType.Favorite, AnalyticsAction.Create);
+            var data = new AnalyticsData(xml, AnalyticsType.FavoriteWorkspace, AnalyticsAction.Create);
             try
             {
                 var qExec = new QueryExecutor(SPContext.Current.Web);
@@ -56,22 +56,22 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    throw new APIException(21000, "[FavoritesService-AddFav]");
+                    throw new APIException(21000, "[FavoritesWorkspaceService-AddFavWorkspace] No new fav was added.");
                 }
             }
             catch (Exception e)
             {
-                throw new APIException(21000, "[FavoritesService-AddFav] " + e.Message);
+                throw new APIException(21000, "[FavoritesWorkspaceService-AddFavWorkspace] " + e.Message);
             }
 
             return result;
         }
 
-        public static string RemoveFav(string xml)
+        public static string RemoveFavWorkspace(string xml)
         {
             var result = string.Empty;
             var dt = new System.Data.DataTable();
-            var data = new AnalyticsData(xml, AnalyticsType.Favorite, AnalyticsAction.Delete);
+            var data = new AnalyticsData(xml, AnalyticsType.FavoriteWorkspace, AnalyticsAction.Delete);
             try
             {
                 var qExec = new QueryExecutor(SPContext.Current.Web);
@@ -85,12 +85,12 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    throw new APIException(21000, "[FavoritesService-RemoveFav] ");
+                    throw new APIException(21000, "[FavoritesWorkspaceService-RemoveFavWorkspace] No fav was removed.");
                 }
             }
             catch (Exception e)
             {
-                throw new APIException(21000, "[FavoritesService-RemoveFav] " + e.Message);
+                throw new APIException(21000, "[FavoritesWorkspaceService-RemoveFavWorkspace] " + e.Message);
             }
 
             return result;

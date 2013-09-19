@@ -19,10 +19,16 @@ namespace EPMLiveCore.API
 
         protected XMLDataManager mgr;
 
-        public AnalyticsData(string xml)
+        public AnalyticsData(string xml, AnalyticsType t, AnalyticsAction a)
         {
             mgr = new XMLDataManager(xml);
+            Type = t;
+            Action = a;
         }
+
+        public AnalyticsType Type { get; set; }
+
+        public AnalyticsAction Action { get; set; }
 
         public Guid SiteId
         {
@@ -133,10 +139,14 @@ namespace EPMLiveCore.API
         {
             get
             {
-                string sIcon = IsPage ? DEFAULT_PAGE_ICON : DEFAULT_LIST_ICON;
+                string sIcon;
                 if (!string.IsNullOrEmpty(mgr.GetPropVal("ListIconClass")))
                 {
                     sIcon = mgr.GetPropVal("ListIconClass");
+                }
+                else
+                {
+                    sIcon = IsPage ? DEFAULT_PAGE_ICON : DEFAULT_LIST_ICON;
                 }
                 return sIcon;
             }
@@ -210,34 +220,7 @@ namespace EPMLiveCore.API
                 return (!IsItem && !IsListView);
             }
         }
-
-        public int Type
-        {
-            get
-            {
-                var type = -1;
-                var sType = mgr.GetPropVal("Type");
-                if (!string.IsNullOrEmpty(sType))
-                {
-                    int.TryParse(sType, out type);
-                }
-
-                return type;
-            }
-        }
-
-
     }
 
-    public class DataFactory
-    {
-        private AnalyticsData data;
-
-        public DataFactory(string xml)
-        {
-            data = new AnalyticsData(xml);
-        }
-
-        
-    }
+    
 }

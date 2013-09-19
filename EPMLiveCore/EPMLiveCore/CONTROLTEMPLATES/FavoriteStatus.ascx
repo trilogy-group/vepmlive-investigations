@@ -32,22 +32,11 @@
 
 
 <div id="fav_Add_DivTemp" style="display:none">
-      <div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;
-          <script>
-            var sDefault = "<%=defaultFavTitle %>"; 
-            function closeAndAdd() {
-                var s = document.getElementById('favTitle').value ? document.getElementById('favTitle').value : sDefault;
-                SP.UI.ModalDialog.commonModalDialogClose(1, s);
-            }
-
-            window.onLoad = function() {
-                document.getElementById('favTitle').value = sDefault;
-            };
-          </script>
+        <div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;
         <input id="favTitle" name="favTitle" type="text" value="<%=defaultFavTitle %>" />
         <br />
         <div style="clear:both;height:10px;"></div>
-        <input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="closeAndAdd();" class="ms-ButtonHeightWidth" target="_self" />
+        <input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, document.getElementById('favTitle').value);" class="ms-ButtonHeightWidth" target="_self" />
         <input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked');" class="ms-ButtonHeightWidth" target="_self" />
       </div>
 </div>

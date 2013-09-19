@@ -295,3 +295,7 @@ Description:
     font-family: Verdana, Arial, sans-serif;
     font-size: 1em !important;
 }
+
+.ms-core-overlay {
+    background-color: #FFF !important;
+}

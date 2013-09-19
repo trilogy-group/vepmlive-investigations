@@ -82,20 +82,26 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListViewUrl = string.Empty;
             try{ListViewUrl = SPContext.Current.ViewContext.View.Url;}catch{}
 
-            ListIconClass = string.Empty;
-            try{ListIconClass = new GridGanttSettings(SPContext.Current.List).ListIcon;}catch{}
-
             ItemId = "-1";
             try{ItemId = (SPContext.Current.Item != null) ? SPContext.Current.ItemId.ToString() : "-1";}catch{}
 
             CurrentFileIsNull = "True";
             try { CurrentFileIsNull = (SPContext.Current.File == null).ToString(); }catch { }
 
+            ListIconClass = string.Empty;
+            try
+            {
+                ListIconClass = (ItemId != "-1" && CurrentFileIsNull == "True")
+                    ? new GridGanttSettings(SPContext.Current.List).ListIcon
+                    : "icon-file-5";
+            }catch{}
+
             CurrentUserId = "-1";
             try{CurrentUserId = SPContext.Current.Web.CurrentUser.ID.ToString();}catch{}
 
             CurrentUrl = string.Empty;
-            try{CurrentUrl = HttpContext.Current.Request.Url.AbsoluteUri;}catch{}
+            try { CurrentUrl = new Uri(new Uri(SPContext.Current.Web.Url), HttpContext.Current.Request.RawUrl).AbsoluteUri; }
+            catch { }
 
             try{WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");}catch { }
            

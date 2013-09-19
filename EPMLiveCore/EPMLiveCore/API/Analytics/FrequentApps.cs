@@ -12,29 +12,29 @@ namespace EPMLiveCore.API
 
         // Public Methods (1) 
 
-        public static string Count(string xml)
-        {
-            var result = "success";
-            var sOrigList = SessionManager.CurrList;
-            var sCurList = string.Empty;
-            try { sCurList = SPContext.Current.List.Title; } catch{}
-            SessionManager.CurrList = sCurList;
+        //public static string Count(string xml)
+        //{
+        //    var result = "success";
+        //    var sOrigList = SessionManager.CurrList;
+        //    var sCurList = string.Empty;
+        //    try { sCurList = SPContext.Current.List.Title; } catch{}
+        //    SessionManager.CurrList = sCurList;
 
-            if (!IsDifferentList()) return result;
+        //    if (!IsDifferentList()) return result;
             
-            var data = new AnalyticsData(xml);
-            try
-            {
-                var exec = new QueryExecutor(SPContext.Current.Web);
-                exec.ExecuteReportingDBNonQuery(InsertQuery, InsertParams(data));
-            }
-            catch (Exception e)
-            {
-                SessionManager.CurrList = sOrigList;
-                result = "error: " + e.Message;
-            }
-            return result;
-        }
+        //    var data = new AnalyticsData(xml);
+        //    try
+        //    {
+        //        var exec = new QueryExecutor(SPContext.Current.Web);
+        //        exec.ExecuteReportingDBNonQuery(InsertQuery, InsertParams(data));
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        SessionManager.CurrList = sOrigList;
+        //        result = "error: " + e.Message;
+        //    }
+        //    return result;
+        //}
 
         // Private Methods (1) 
 

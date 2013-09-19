@@ -1572,17 +1572,53 @@ namespace EPMLiveCore
             }
         }
 
-        public static string CountFrequentApps(string data, SPWeb spWeb)
+        public static string LoadFavoriteWsStatus(string data, SPWeb spWeb)
         {
             try
             {
-                return Response.Success(FrequentApps.Count(data));
+                return Response.Success(FavoritesWorkspace.IsFavWorkspace(data));
             }
             catch (APIException ex)
             {
                 return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
+
+        public static string AddFavoritesWs(string data, SPWeb spWeb)
+        {
+            try
+            {
+                return Response.Success(FavoritesWorkspace.AddFavWorkspace(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        public static string RemoveFavoritesWs(string data, SPWeb spWeb)
+        {
+            try
+            {
+                return Response.Success(FavoritesWorkspace.RemoveFavWorkspace(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        //public static string CountFrequentApps(string data, SPWeb spWeb)
+        //{
+        //    try
+        //    {
+        //        return Response.Success(FrequentApps.Count(data));
+        //    }
+        //    catch (APIException ex)
+        //    {
+        //        return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+        //    }
+        //}
 
         #endregion  
 

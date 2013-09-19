@@ -144,20 +144,20 @@ WEDispFormPageComponent.PageComponent.prototype = {
             } catch (e) { }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.CreateWorkspace') {
-
             var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx?listid=' + WEListId + '&itemid=' + WEItemId);
             var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
             var tUrl = urlBuilder.get_url();
-
-            var options = { url: tUrl, title: 'Create', allowMaximize: false, width: 800, height: 600, dialogReturnValueCallback: Function.createDelegate(null, HandleCreateNewWorkspaceCreate) };
-
-            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
-
-            function HandleCreateNewWorkspaceCreate(result, value) {
-                if (result == '1') {
-                    window.location.href = value;
+            var options = {
+                url: tUrl,
+                title: 'Create Workspace',
+                allowMaximize: false,
+                dialogReturnValueCallback: function (dialogResult, returnVal) {
+                    if (dialogResult == '1') {
+                        window.location.href = value;
+                    }
                 }
-            }
+            };
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.GoToWorkspace') {
             if (parent) {

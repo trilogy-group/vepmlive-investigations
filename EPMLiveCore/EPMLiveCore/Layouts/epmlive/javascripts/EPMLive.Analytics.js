@@ -117,7 +117,6 @@
                     "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
                     "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
                     "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
-                    "<Param key=\"Type\">1</Param>" +
                     "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
                     "<Param key=\"Title\">" + title + "</Param>" +
                     "<Param key=\"FileIsNull\">" + $$.currentFileIsNull + "</Param>" +
@@ -226,7 +225,7 @@
 
         a.turnOffFav = function (data) {
             // a page
-            if (data.itemid == '-1') {
+            if (data.itemid === '') {
                 if (removeSource(data.url) == removeSource($$.currentUrl)) {
                     if ($('#favoritesStar').hasClass('icon-star-active')) {
                         $('#favoritesStar').removeClass('icon-star-active');

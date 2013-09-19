@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace EPMLiveCore.API
 {
-    public enum AnalyticsType
+    public enum AnalyticsAction
     {
-        Favorite = 1,
-        Recent = 2,
-        Frequent = 3,
-        FavoriteWorkspace = 4
+        Create, 
+        Read, 
+        Update,
+        Delete
     }
 }

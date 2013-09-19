@@ -265,13 +265,20 @@ namespace EPMLiveCore.Layouts.epmlive
                     txtNewMenuName.Text = gSettings.NewMenuName;
                     chkUsePopup.Checked = gSettings.UsePopup;
                     chkEnableRequests.Checked = gSettings.EnableRequests;
+
+                    var defaultTemps = GetAvailableDefaultTemps();
+                    bool showAutoCreate = defaultTemps.Count > 1;
+
                     chkAutoCreate.Checked = gSettings.EnableAutoCreation;
-                    ddlAutoCreateTemplate.DataSource = GetAvailableDefaultTemps();
+                    chkAutoCreate.Visible = showAutoCreate;
+
+                    ddlAutoCreateTemplate.DataSource = defaultTemps;
                     ddlAutoCreateTemplate.DataTextField = "Key";
                     ddlAutoCreateTemplate.DataValueField = "Value";
                     ddlAutoCreateTemplate.DataBind();
                     ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
                     ddlAutoCreateTemplate.Enabled = chkAutoCreate.Checked;
+                    ddlAutoCreateTemplate.Visible = showAutoCreate;
 
                     //fill parentsitelookup ddl
                     ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
@@ -280,6 +287,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     ddlParentSiteLookup.DataBind();
                     ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
                     ddlParentSiteLookup.Enabled = chkAutoCreate.Checked;
+                    ddlParentSiteLookup.Visible = showAutoCreate;
 
                     //load list icon
                     spnListIcon.CssClass = gSettings.ListIcon;
