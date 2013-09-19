@@ -29,7 +29,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 foreach (DataRow drCat in dtCat.Rows)
                 {
                     sb.Append("<div style=\"width:100%;\">");
-                    sb.Append("<h2>" + drCat["CATEGORY"].ToString() + "</h2>");
+                    sb.Append("<h4>" + drCat["CATEGORY"].ToString() + "</h4>");
                     sb.Append("</div>");
                     sb.Append("<div style=\"width:100%;overflow: hidden;\">");
                     
