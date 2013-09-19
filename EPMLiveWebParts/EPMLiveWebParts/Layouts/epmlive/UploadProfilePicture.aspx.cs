@@ -27,6 +27,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         protected void OnSaveButtonClicked(object sender, EventArgs e)
         {
+            SPUtility.ValidateFormDigest();
+
             byte[] pic;
 
             string resizeInfo = ResizeInfoField.Value;
@@ -42,10 +44,19 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 }
             }
 
-            using (var fileStore = new EPMLiveFileStore(Web))
+            SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                fileStore.Delete(FileNameField.Value);
-            }
+                using (var spSite = new SPSite(Web.Site.ID))
+                {
+                    using (SPWeb spWeb = spSite.OpenWeb(Web.ID))
+                    {
+                        using (var fileStore = new EPMLiveFileStore(spWeb))
+                        {
+                            fileStore.Delete(FileNameField.Value);
+                        }
+                    }
+                }
+            });
 
             SavePicture(pic);
         }
