@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,40 +12,22 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>SP13 Deploy</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
-"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
+    <PostDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
+"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\EPM Live\Solutions\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
 iisreset
-net stop "WETimer"
-net start "WETimer"</PostDeploymentCommand>
-    <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
-"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
-    <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>0</FileUpgradeFlags>
-    <OldToolsVersion>4.0</OldToolsVersion>
-    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\Backup\</UpgradeBackupLocation>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <IncludeAssemblyInPackage>True</IncludeAssemblyInPackage>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+net stop "WorkEngine Timer"
+net start "WorkEngine Timer"
+</PostDeploymentCommand>
+    <PreDeploymentCommand>"C:\Workspace\EPM Live\Solutions\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
+"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f
+</PreDeploymentCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -80,7 +61,8 @@ net start "WETimer"</PostDeploymentCommand>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files (x86)\Open XML SDK\V2.0\lib\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveIntegration">
+    <Reference Include="EPMLiveIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveReportsAdmin">
@@ -92,19 +74,23 @@ net start "WETimer"</PostDeploymentCommand>
     <Reference Include="EPMLiveWorkPlanner">
       <HintPath>..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\bin\Debug\EPMLiveWorkPlanner.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.dll</HintPath>
+      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Client.Runtime, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
+      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.Web.CommandUI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -119,10 +105,14 @@ net start "WETimer"</PostDeploymentCommand>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
     <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Telerik.Web.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Web.UI.Skins">
+      <HintPath>..\..\Telerik.Web.UI.Skins.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -132,10 +122,14 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Act.cs" />
     <Compile Include="ADSync.cs" />
+    <Compile Include="API\Analytics\AnalyticsAction.cs" />
     <Compile Include="API\Analytics\AnalyticsData.cs" />
     <Compile Include="API\Analytics\AnalyticsType.cs" />
     <Compile Include="API\Analytics\Favorites.cs" />
+    <Compile Include="API\Analytics\FavoritesWorkspace.cs" />
     <Compile Include="API\Analytics\FrequentApps.cs" />
+    <Compile Include="API\Analytics\FRFQueryFactory.cs" />
+    <Compile Include="API\Analytics\FRFQueryParamFactory.cs" />
     <Compile Include="API\Analytics\RecentItems.cs" />
     <Compile Include="API\APIException.cs" />
     <Compile Include="API\APITeam.cs" />
@@ -1394,7 +1388,7 @@ net start "WETimer"</PostDeploymentCommand>
       <SharePointProjectItemId>{ce3e15fd-6a5b-4e21-8c3d-b5d4df121ea3}</SharePointProjectItemId>
     </None>
     <None Include="Controls\Navigation\EPMLiveNavigationDataSource\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{25bc015a-7e4b-4133-8f3c-f643e9b8c60f}</SharePointProjectItemId>
+      <SharePointProjectItemId>{939641f5-6580-4ae0-afa5-747038c594dc}</SharePointProjectItemId>
     </None>
     <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{469d37ee-8a39-483a-9bc0-135fa45704a2}</SharePointProjectItemId>
@@ -1491,7 +1485,7 @@ net start "WETimer"</PostDeploymentCommand>
       <FeatureId>{486f402b-54f9-46e1-b33c-bd7f7c3662e2}</FeatureId>
     </None>
     <None Include="Features\EPMLiveNurunUI\EPMLiveNurunUI.feature">
-      <FeatureId>{70363247-b4eb-488b-ba39-1a80873fe7dd}</FeatureId>
+      <FeatureId>{eb2d342f-9c62-403c-b945-e67bcb7f7f5c}</FeatureId>
     </None>
     <None Include="Features\EPMLiveProjectCenter\EPMLiveProjectCenter.feature">
       <FeatureId>{16a6747e-132d-4e25-a467-20d3fd0e9baf}</FeatureId>
@@ -1588,16 +1582,10 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
-      <DependentUpon>EPMLive.Navigation.js</DependentUpon>
-    </None>
-    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map">
-      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
-    </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js.map">
-      <DependentUpon>EPMLive.TemplateVersoning.js</DependentUpon>
-    </None>
+    <None Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
@@ -1672,7 +1660,7 @@ net start "WETimer"</PostDeploymentCommand>
       <SharePointProjectItemId>{fb58384f-11d7-4a86-991b-0057bb656fd2}</SharePointProjectItemId>
     </None>
     <None Include="UplandV5\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{d11a16d7-084f-4f80-b834-28d243fb9d49}</SharePointProjectItemId>
+      <SharePointProjectItemId>{b85a9741-f46c-4e85-9728-c920276a5051}</SharePointProjectItemId>
     </None>
     <None Include="UplandV5\UplandV5.master" />
     <None Include="ViewPermissions\SharePointProjectItem.spdata">
@@ -3205,13 +3193,16 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\integration\base.png" />
     <Content Include="Layouts\epmlive\images\integration\editcols.png" />
     <Content Include="Layouts\epmlive\images\integration\editcon.png" />
+    <Content Include="Layouts\epmlive\images\integration\fb.png" />
     <Content Include="Layouts\epmlive\images\integration\log.png" />
     <Content Include="Layouts\epmlive\images\integration\office365.png" />
+    <Content Include="Layouts\epmlive\images\integration\ps.png" />
     <Content Include="Layouts\epmlive\images\integration\salesforce.png" />
     <Content Include="Layouts\epmlive\images\integration\sql.png" />
     <Content Include="Layouts\epmlive\images\integration\status1.gif" />
     <Content Include="Layouts\epmlive\images\integration\status2.gif" />
     <Content Include="Layouts\epmlive\images\integration\status3.gif" />
+    <Content Include="Layouts\epmlive\images\integration\tenrox.png" />
     <Content Include="Layouts\epmlive\images\iReportsLibrary.png" />
     <Content Include="Layouts\epmlive\images\itemworkspace.png" />
     <Content Include="Layouts\epmlive\images\left.GIF" />
@@ -3296,20 +3287,21 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.js" />
-    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js">
-      <DependentUpon>EPMLive.Notifications.js</DependentUpon>
-    </Content>
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
-    <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js">
-      <DependentUpon>EPMLive.TemplateVersoning.js</DependentUpon>
-    </Content>
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\bootstrap3\bootstrap.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\bootstrap3\bootstrap.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\ember-1.0.0-rc.7.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\emberjs\handlebars-1.0.0.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js" />
@@ -3399,6 +3391,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Regular-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.svg" />
     <Content Include="Layouts\epmlive\stylesheets\jpaginate.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap3\bootstrap.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap3\bootstrap.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap-responsive.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\bootstrap\css\bootstrap.css" />
@@ -3420,6 +3414,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_888888_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.css" />
+    <Content Include="Layouts\epmlive\stylesheets\libraries\jquery-ui.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\master.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\glyphs.min.css" />
@@ -3432,9 +3427,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
-    <Content Include="Layouts\epmlive\stylesheets\notifications.min.css">
-      <DependentUpon>notifications.css</DependentUpon>
-    </Content>
+    <Content Include="Layouts\epmlive\stylesheets\notifications.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.v2.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.v2.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\QueueCreateWorkspace.css" />
@@ -3536,6 +3529,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\BackgroundsOLD.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\Button.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\MYTS\ButtonSpace.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\critgantt.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\critganttpct.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\MYTS\FastPanel1.gif" />
@@ -3888,23 +3882,6 @@ net start "WETimer"</PostDeploymentCommand>
       </CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -3913,9 +3890,14 @@ net start "WETimer"</PostDeploymentCommand>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
-      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
+      <FlavorProperties GUID="{BB1F664B-9266-4fd6-B973-E1E44974B511}">
         <DeploymentConfigurations>
-          <DeploymentConfiguration Name="SP13 Deploy">
+          <DeploymentConfiguration Name="New Deployment Configuration">
+            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.RetractSolution;Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.AddSolution;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand;Microsoft.VisualStudio.SharePoint.ActivateFeatures;Microsoft.VisualStudio.SharePoint.RecycleApplicationPool</DeploymentSteps>
+            <RetractionSteps>
+            </RetractionSteps>
+          </DeploymentConfiguration>
+          <DeploymentConfiguration Name="Munjal's Deploy Config">
             <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
             <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
           </DeploymentConfiguration>
@@ -3926,10 +3908,5 @@ net start "WETimer"</PostDeploymentCommand>
   <PropertyGroup>
     <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
 del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
-iisreset
-</PostBuildEvent>
   </PropertyGroup>
 </Project>
