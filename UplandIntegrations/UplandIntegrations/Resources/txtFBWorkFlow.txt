@@ -3,7 +3,7 @@
         
             .vr-main
             {
-                border: 1px solid black;
+                border: 1px solid #cacaca;
                 -webkit-box-sizing: border-box;
 	            -moz-box-sizing: border-box;
 	            box-sizing: border-box;
@@ -46,6 +46,12 @@
 				height: 80px !important;
 			}
             
+			#vr-view
+			{
+				width: 100%;
+				text-align:center;
+				padding: 3px;
+			}
         </style>
 
         <script type="text/javascript" language="javascript">
@@ -56,23 +62,42 @@
             var getTabs = true;
             var getTaskButtons = true;
             var currentRoutes;
+			var fileId = "#fileId#";
+			var projectId = "#projectId#";
 
+
+			$.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
+				$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''"));
+
+				$.get(WebAPIUrl + "files/" + fileId + "/documents?" + Param, function (docs) {
+								var p = eval(docs);
+								if(p.length > 0)
+								{
+									var docid = p[0].documentId;
+
+									$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + docid + ",routedobjecttype_6", function (routeobj) {
+
+										var routId = routeobj[0].routeId;
+
+										 $.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
+											currentRoutes = routes;
+
+												var xml = GetXML(routId);
+												if (routId > 0 && xml != "") {
+													LoadVisualWorkflow(routId, xml);
+												}
+
+											});
+										
+
+									});
+								}
+						});
+
+				}
+            );
 
             $(function () {
-
-                // when the project changes, re-load processes:
-                $("#ddlProjects").bind("change", function () {
-                    LoadRoutes($(this).val());
-                });
-
-                // when the process changes, re-load the visual workflow:
-                $("#ddlRoutes").bind("change", function () {
-                    var selectedRouteId = $("#ddlRoutes option:selected").val();
-                    var xml = GetXML(selectedRouteId);
-                    if (selectedRouteId > 0 && xml != "") {
-                        LoadVisualWorkflow(selectedRouteId, xml);
-                    }
-                });
 
                 // open process designer to the current route when button is clicked:
                 $("#btnProcessDesigner").bind("click", function () {
@@ -94,24 +119,10 @@
                     }
                 });
 
-                // get the VisualWorkflow Scripts:
-                $.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
-									$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''"));
-
-									$.get(WebAPIUrl + "projects?" + Param, function (projects) {
-													var p = eval(projects);
-													for (var i = 0; i < p.length; i++) {
-														$("#ddlProjects").append($("<option></option").attr("value", p[i].projectId).text(p[i].name));
-													}
-													LoadRoutes($("#ddlProjects option:selected").val());
-											});
-
-									}
-                );
 
                 function LoadRoutes(projectId) {
 
-                    $("#ddlRoutes option").remove(); //clear our current values
+                    
                     $.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
                         currentRoutes = routes;
                         for (var i = 0; i < currentRoutes.length; i++) {
@@ -176,6 +187,10 @@
                                 // make web api call to get task buttons:
                                 $.get(WebAPIUrl + "AssignmentActions?" + Param + "&RoutedItemID=" + vwfData.routedItemId + "&formatted=true&includeJquery=false&zindex=15005&callback=TaskButtonCallback", function (taskButtons) {
                                     $("#vwf-top-task-buttons").append(taskButtons);
+
+										document.getElementById("vr-content").style.display = "";
+										document.getElementById("vr-view").style.display = "";
+										document.getElementById("vr-load").style.display = "none";
                                 });
 
 								
@@ -266,18 +281,13 @@
 				
 			}
 
+
+
         </script>
 
-    <div id="vr-top">
+    <div id="vr-top" style="display:none">
                 <table id="vr-info-table" class="vr-base">
-                    <tr>
-                        <td>Project: </td>
-                        <td><select id="ddlProjects" class="vr-base"/></td>
-                    </tr>
-                    <tr>
-                        <td>Process:</td>
-                        <td><select id="ddlRoutes" class="vr-base" /></td>
-                    </tr>
+
                     <tr>
                         <td></td>
                         <td><input type="button" id="btnProcessDesigner" value="Open Process Designer" style="display:none;"/></td>
@@ -286,11 +296,13 @@
             </div>
 
         <div class="vr-main">
-            
-            <div id="vr-content">
+			<div id="vr-load" style="height:60px;padding:30px">
+				<font color="#cacaca">Loading...</font>
+			</div>
+            <div id="vr-content" style="display:none;">
             
             </div><br>
-			<div >
+			<div id="vr-view" style="display:none;">
 				<a href="javascript:ViewWorkflow();">View Workflow</a>
 			</div>
         </div>
