@@ -93,7 +93,7 @@
   left: 50px;
   position: absolute;
   width: 180px;
-  z-index: 200;
+  z-index: 50;
 }
 #epm-nav-pin {
   color: #7C7C7C;
@@ -102,7 +102,7 @@
   padding-top: 3px;
   position: absolute;
   right: 0;
-  z-index: 205;
+  z-index: 55;
   cursor: pointer;
   cursor: hand;
   -webkit-transition: All 0.2s ease;
@@ -587,7 +587,7 @@ ul.epm-nav-contextual-menu {
   padding-bottom: 2.5px;
   background: #ffffff;
   position: relative;
-  z-index: 210;
+  z-index: 60;
   border-radius: 5px;
   -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
