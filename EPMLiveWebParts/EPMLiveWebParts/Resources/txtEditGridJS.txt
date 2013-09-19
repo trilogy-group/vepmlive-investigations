@@ -273,10 +273,10 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 			lastItem#gridid# = 0;
 		}
 
-		/*if(rec[3] != "true" && rec[0] == "0")
+		if(rec[3] != "true" && rec[0] == "0")
 		{
 			pagediv.style.display = "none";
-		}*/
+		}
 	}
 };
 
