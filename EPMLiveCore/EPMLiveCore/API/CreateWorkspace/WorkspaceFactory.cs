@@ -966,9 +966,12 @@ namespace EPMLiveCore.API
             {
                 using (var s = new SPSite(SiteId))
                 {
-                    if (s.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                    using (var w = s.OpenWeb(_createdWebId))
                     {
-                        s.Features.Add(new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01"));
+                        if (w.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                        {
+                            w.Features.Add(new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01"));
+                        }
                     }
                 }
             }
