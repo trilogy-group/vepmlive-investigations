@@ -132,10 +132,14 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Act.cs" />
     <Compile Include="ADSync.cs" />
+    <Compile Include="API\Analytics\AnalyticsAction.cs" />
     <Compile Include="API\Analytics\AnalyticsData.cs" />
     <Compile Include="API\Analytics\AnalyticsType.cs" />
     <Compile Include="API\Analytics\Favorites.cs" />
+    <Compile Include="API\Analytics\FavoritesWorkspace.cs" />
     <Compile Include="API\Analytics\FrequentApps.cs" />
+    <Compile Include="API\Analytics\FRFQueryFactory.cs" />
+    <Compile Include="API\Analytics\FRFQueryParamFactory.cs" />
     <Compile Include="API\Analytics\RecentItems.cs" />
     <Compile Include="API\APIException.cs" />
     <Compile Include="API\APITeam.cs" />
@@ -318,6 +322,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="EPMLiveTimePhased.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Events\ClearCacheEvent.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FilteredLookup\FilteredLookupField.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldControl.cs" />

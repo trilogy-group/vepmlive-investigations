@@ -166,16 +166,16 @@
 
 <SharePoint:ScriptBlock runat="server">
     (function() {
-    window.epmLiveNavigation = {
-    currentWebId: '<%= WebId %>',
-    currentWebUrl: '<%= WebUrl %>',
-    currentUserId: <%= UserId %>,
-    staticProvider: '<%= StaticProviderLinks %>',
-    workspaceTree: function() {
-    return window.$find('<%= WorkspacesNavTree.ClientID %>');
-    }
-    };
+        window.epmLiveNavigation = {
+            currentWebId: '<%= WebId %>',
+            currentWebUrl: '<%= WebUrl %>',
+            currentUserId: <%= UserId %>,
+            staticProvider: '<%= StaticProviderLinks %>',
+            workspaceTree: function() {
+                return window.$find('<%= WorkspacesNavTree.ClientID %>');
+            }
+        };
 
-    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
+        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
     })();
 </SharePoint:ScriptBlock>
