@@ -12,6 +12,7 @@
     padding:2px 5px;
     margin:2px;
     float:left;
+    text-decoration: none;
 }
 .jPag-control-back{
 	position:absolute;

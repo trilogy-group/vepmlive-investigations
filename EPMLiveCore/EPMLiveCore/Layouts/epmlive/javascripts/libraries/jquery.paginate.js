@@ -109,7 +109,15 @@
 		}
 		else{
 			_ulwrapdiv.css('width',outsidewidth+'px');
-			_divwrapright.css('left',outsidewidth_tmp+6+'px');
+			//_divwrapright.css('left',outsidewidth_tmp+6+'px');
+			if($(".jPag-pages").width() >= 301)
+			{
+				_divwrapright.css('left',347+'px');
+			}
+			else
+			{
+				_divwrapright.css('left',$(".jPag-pages").width()+50+'px');
+			}
 		}
 		
 		if(o.rotate){
@@ -242,8 +250,18 @@
 						if(i == (o.display-1)){
 							outsidewidth_tmp = this.offsetLeft + this.offsetWidth ;
 						}
-						insidewidth += this.offsetWidth;
+						
+						insidewidth += this.getBoundingClientRect().width;
+
+						
 					})
-					_ul.css('width',insidewidth+500+'px');
-	}
+					
+					_ul.css('width',insidewidth+'px');
+					
+					
+	}				
+					
+	
+
+
 })(jQuery);
