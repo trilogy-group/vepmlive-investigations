@@ -1759,8 +1759,9 @@ namespace RPADataCache
                                         sPIVal += "," + sval;
                                 }
 
-                                xI.CreateStringAttr(sn, sPIVal);
+                                xI.CreateStringAttr(sn, ""); // sPIVal);
                                 break;
+
 
                             case RPConstants.TGRID_TOTCC_ID:
                                 if (by_role == false)
