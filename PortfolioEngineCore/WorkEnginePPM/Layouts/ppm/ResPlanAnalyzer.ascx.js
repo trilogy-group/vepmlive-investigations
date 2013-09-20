@@ -889,6 +889,12 @@
 	                    ToList.options[n1] = new Option(perName, perId, perId == this.ficalInfo.LastUserData.lastFinishPerID, perId == this.ficalInfo.LastUserData.lastFinishPerID);
 	                }
 	            }
+
+
+
+	            window.setTimeout(SetInitialDisplayFocus, 100);
+
+
 	        }
 	    }
 
@@ -903,6 +909,12 @@
 
 	    return;
 	}
+
+
+	function SetInitialDisplayFocus() {
+	    document.getElementById("idDisplayPress").focus();
+	}
+
 
 	ResPlanAnalyzer.prototype.SelectCalendar_Change = function () {
 		var CalList = document.getElementById('idCalList');

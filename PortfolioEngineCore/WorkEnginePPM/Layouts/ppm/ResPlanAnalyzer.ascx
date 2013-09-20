@@ -312,7 +312,7 @@ border-radius: 0px;
 				<select id="idPerToList" name="idPerToList" style="vertical-align:middle;padding:0px;margin:0px;"></select>
 		</div>
 		<div class="button-container">
-				<a href="javascript:dialogEvent('Display_RPA');" class="button-new green" style="width:75px;">Display</a>
+				<a id="idDisplayPress" href="javascript:dialogEvent('Display_RPA');" class="button-new green" style="width:75px;">Display</a>
 				<a href="javascript:dialogEvent('Cancel_RPA');" class="button-new silver" style="width:75px;">Cancel</a>
 		</div>
 	</div>
