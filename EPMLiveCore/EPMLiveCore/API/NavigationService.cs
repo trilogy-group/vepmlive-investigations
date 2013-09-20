@@ -631,7 +631,7 @@ namespace EPMLiveCore.API
 
             try
             {
-                debugMode = bool.Parse(xUsePopup.Value);
+                debugMode = bool.Parse(xdebugMode.Value);
             }
             catch { }
         }
