@@ -86,16 +86,20 @@ namespace EPMLiveCore.API
                 Guid webId;
                 Guid listId;
                 int itemId;
+                int userId;
                 bool rollups;
                 bool requestList;
                 bool usePopup;
 
-                GetContextualMenuItems_ParseRequest(data, out siteId, out webId, out listId, out itemId, out rollups,
+                GetContextualMenuItems_ParseRequest(data, out siteId, out webId, out listId, out itemId, out userId,
+                    out rollups,
                     out requestList, out usePopup);
 
                 var items = new XElement("Items");
 
-                DataTable dataTable = GetMenuItems(siteId, webId, listId, itemId, rollups, requestList, usePopup);
+                Dictionary<string, string> diagnosticInfo;
+                DataTable dataTable = GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo, rollups,
+                    requestList, usePopup);
 
                 List<string> columns =
                     (from DataColumn column in dataTable.Columns select column.ColumnName).ToList();
@@ -112,19 +116,18 @@ namespace EPMLiveCore.API
                     items.Add(item);
                 }
 
-                return items.ToString();
+                var di = new XElement("DiagnosticsInfo");
+
+                foreach (var pair in diagnosticInfo)
+                {
+                    di.Add(new XElement(pair.Key.Replace(' ', '_'), new XCData(pair.Value)));
+                }
+
+                return new XElement("ContextualMenus", items, di).ToString();
             }
             catch (Exception exception)
             {
-                string message = string.Empty;
-
-                try
-                {
-                    message = exception.InnerException.Message;
-                }
-                catch { }
-
-                throw new APIException(20003, "[NavigationService:GetContextualMenuItems] " + exception.Message + " Inner Message: " + message);
+                throw new APIException(20003, "[NavigationService:GetContextualMenuItems] " + exception.Message);
             }
         }
 
@@ -205,9 +208,12 @@ namespace EPMLiveCore.API
             }
         }
 
-        public DataTable GetMenuItems(Guid siteId, Guid webId, Guid listId, int itemId, bool rollups = false,
-            bool requestList = false, bool usePopup = false)
+        public DataTable GetMenuItems(Guid siteId, Guid webId, Guid listId, int itemId, int userId,
+            out Dictionary<string, string> diagnosticInfo, bool rollups = false, bool requestList = false,
+            bool usePopup = false)
         {
+            var info = new Dictionary<string, string>();
+
             var dataTable = new DataTable();
 
             dataTable.Columns.Add("Title", typeof (string));
@@ -215,59 +221,129 @@ namespace EPMLiveCore.API
             dataTable.Columns.Add("ImageUrl", typeof (string));
             dataTable.Columns.Add("Kind", typeof (string));
 
-            using (var spSite = new SPSite(siteId))
+            SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                using (SPWeb spWeb = spSite.OpenWeb(webId))
+                using (var site = new SPSite(siteId))
                 {
-                    SPList list = spWeb.Lists.GetList(listId, true);
-                    SPListItem item = list.GetItemById(itemId);
-
-                    var settings = new GridGanttSettings(list);
-
-                    Task<Tuple<string, string, string, string, bool>[]> t1 =
-                        Task.Factory.StartNew(() => GetGeneralActions(usePopup, list));
-
-                    Task<Tuple<string, string, string, string, bool>[]> t2 =
-                        Task.Factory.StartNew(() => GetPlannerActions(list));
-
-                    Task<Tuple<string, string, string, string, bool>[]> t3 =
-                        Task.Factory.StartNew(() => GetSocialActions(item, settings));
-
-                    Task<Tuple<string, string, string, string, bool>[]> t4 =
-                        Task.Factory.StartNew(() => GetWorkspaceActions(item, rollups, requestList));
-
-                    Task<Tuple<string, string, string, string, bool>[]> t5 =
-                        Task.Factory.StartNew(() => GetPFEActions(list));
-
-                    List<Tuple<string, string, string, string, bool>> actions = new[] {t1, t2, t3, t4, t5}
-                        .SelectMany(t => t.Result ?? new Tuple<string, string, string, string, bool>[] {}).ToList();
-
-                    string lastTitle = string.Empty;
-
-                    Tuple<string, string, string, string, bool> lastAction = actions.Last();
-                    if (lastAction.Item1.Equals("--SEP--"))
+                    using (SPWeb web = site.OpenWeb(webId))
                     {
-                        actions.Remove(lastAction);
-                    }
+                        info.Add("Web", web.Url);
 
-                    foreach (var action in actions)
-                    {
-                        if (!action.Item5) continue;
-                        if (action.Item1.Equals("--SEP--") && action.Item1.Equals(lastTitle)) continue;
+                        SPUser user = web.AllUsers.GetByID(userId);
 
-                        lastTitle = action.Item1;
+                        info.Add("Username", user.LoginName);
+                        info.Add("User", user.Name);
 
-                        DataRow row = dataTable.NewRow();
+                        using (var spSite = new SPSite(siteId, user.UserToken))
+                        {
+                            using (SPWeb spWeb = spSite.OpenWeb(webId))
+                            {
+                                SPList list = spWeb.Lists.GetList(listId, true);
 
-                        row["Title"] = action.Item1;
-                        row["Command"] = action.Item2;
-                        row["ImageUrl"] = action.Item3;
-                        row["Kind"] = action.Item4;
+                                info.Add("List", list.Title);
 
-                        dataTable.Rows.Add(row);
+                                SPListItem item = list.GetItemById(itemId);
+
+                                info.Add("Item", item.Title);
+
+                                var settings = new GridGanttSettings(list);
+
+                                Task<object[]> t1 = Task.Factory.StartNew(() =>
+                                {
+                                    Dictionary<string, string> di;
+                                    Tuple<string, string, string, string, bool>[] result = GetGeneralActions(usePopup,
+                                        list, out di);
+
+                                    return new object[] {result, di};
+                                });
+
+                                Task<object[]> t2 = Task.Factory.StartNew(() =>
+                                {
+                                    Dictionary<string, string> di;
+                                    Tuple<string, string, string, string, bool>[] result = GetPlannerActions(list,
+                                        out di);
+
+                                    return new object[] {result, di};
+                                });
+
+                                Task<object[]> t3 = Task.Factory.StartNew(() =>
+                                {
+                                    Dictionary<string, string> di;
+                                    Tuple<string, string, string, string, bool>[] result = GetSocialActions(item,
+                                        settings, out di);
+
+                                    return new object[] {result, di};
+                                });
+
+                                Task<object[]> t4 = Task.Factory.StartNew(() =>
+                                {
+                                    Dictionary<string, string> di;
+                                    Tuple<string, string, string, string, bool>[] result = GetWorkspaceActions(item,
+                                        rollups, requestList, out di);
+
+                                    return new object[] {result, di};
+                                });
+
+                                Task<object[]> t5 = Task.Factory.StartNew(() =>
+                                {
+                                    Dictionary<string, string> di;
+                                    Tuple<string, string, string, string, bool>[] result = GetPFEActions(list, out di);
+
+                                    return new object[] {result, di};
+                                });
+
+                                var actions = new List<Tuple<string, string, string, string, bool>>();
+
+                                foreach (var t in new[] {t1, t2, t3, t4, t5})
+                                {
+                                    object[] result = t.Result;
+
+                                    var et = new Tuple<string, string, string, string, bool>(null, null, null, null, false);
+                                    var tuples = (Tuple<string, string, string, string, bool>[]) (result[0] ?? new[] {et});
+
+                                    actions.AddRange(tuples);
+
+                                    var di = result[1] as Dictionary<string, string>;
+
+                                    if (di == null) continue;
+
+                                    foreach (var pair in di)
+                                    {
+                                        info.Add(pair.Key, pair.Value);
+                                    }
+                                }
+
+                                string lastTitle = string.Empty;
+
+                                Tuple<string, string, string, string, bool> lastAction = actions.Last();
+                                if (lastAction.Item1.Equals("--SEP--"))
+                                {
+                                    actions.Remove(lastAction);
+                                }
+
+                                foreach (var action in actions)
+                                {
+                                    if (!action.Item5) continue;
+                                    if (action.Item1.Equals("--SEP--") && action.Item1.Equals(lastTitle)) continue;
+
+                                    lastTitle = action.Item1;
+
+                                    DataRow row = dataTable.NewRow();
+
+                                    row["Title"] = action.Item1;
+                                    row["Command"] = action.Item2;
+                                    row["ImageUrl"] = action.Item3;
+                                    row["Kind"] = action.Item4;
+
+                                    dataTable.Rows.Add(row);
+                                }
+                            }
+                        }
                     }
                 }
-            }
+            });
+
+            diagnosticInfo = info;
 
             return dataTable;
         }
@@ -352,7 +428,7 @@ namespace EPMLiveCore.API
         }
 
         private static void GetContextualMenuItems_ParseRequest(string data, out Guid siteId, out Guid webId,
-            out Guid listId, out int itemId, out bool rollups, out bool requestList, out bool usePopup)
+            out Guid listId, out int itemId, out int userId, out bool rollups, out bool requestList, out bool usePopup)
         {
             rollups = false;
             requestList = false;
@@ -432,6 +508,21 @@ namespace EPMLiveCore.API
                 throw new Exception("(ItemId) " + exception.Message);
             }
 
+            XElement xUserId = parameters.Element("UserId");
+            if (xUserId == null)
+            {
+                throw new Exception("GetContextualMenuItems/Params/UserId element is missing.");
+            }
+
+            try
+            {
+                userId = int.Parse(xUserId.Value);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception("(UserId) " + exception.Message);
+            }
+
             XElement xRollups = parameters.Element("Rollups");
             if (xRollups != null)
             {
@@ -503,158 +594,234 @@ namespace EPMLiveCore.API
 
         #endregion Methods 
 
-        private Tuple<string, string, string, string, bool>[] GetPFEActions(SPList list)
+        private Tuple<string, string, string, string, bool>[] GetPFEActions(SPList list,
+            out Dictionary<string, string> di)
         {
-            SPWeb web = list.ParentWeb;
-            if (web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] == null) return null;
+            di = new Dictionary<string, string> { { "PFE Actions", true.ToString() } };
 
-            SPWeb rootWeb = web.Site.RootWeb;
+            var actions = new List<Tuple<string, string, string, string, bool>>();
 
-            string[] pfeLists = CoreFunctions.getConfigSetting(rootWeb, "EPKLists").ToLower().Split(',');
-
-            string listTitle = list.Title;
-
-            if (!pfeLists.Contains(listTitle.ToLower())) return null;
-
-            var actions = new List<Tuple<string, string, string, string, bool>>
+            try
             {
-                AT("--SEP--", null, null, true)
-            };
+                SPWeb web = list.ParentWeb;
+                if (web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] == null) return null;
 
-            string menus = CoreFunctions.getConfigSetting(rootWeb,
-                "EPK" + listTitle.Replace(" ", string.Empty) + "_menus");
+                di.Add("PFE Feature Enabled", true.ToString());
 
-            if (string.IsNullOrEmpty(menus))
-            {
-                CoreFunctions.getConfigSetting(rootWeb, "EPKMenus");
+                SPWeb rootWeb = web.Site.RootWeb;
+
+                string epkLists = CoreFunctions.getConfigSetting(rootWeb, "EPKLists").ToLower();
+                string[] pfeLists = epkLists.Split(',');
+
+                di.Add("EPK Lists", epkLists);
+
+                string listTitle = list.Title;
+
+                if (!pfeLists.Contains(listTitle.ToLower())) return null;
+
+                actions = new List<Tuple<string, string, string, string, bool>>
+                {
+                    AT("--SEP--", null, null, true)
+                };
+
+                string menus = CoreFunctions.getConfigSetting(rootWeb,
+                    "EPK" + listTitle.Replace(" ", string.Empty) + "_menus");
+
+                if (string.IsNullOrEmpty(menus))
+                {
+                    menus = CoreFunctions.getConfigSetting(rootWeb, "EPKMenus");
+                }
+
+                di.Add("PFE Menus", menus);
+
+                if (string.IsNullOrEmpty(menus)) return actions.ToArray();
+
+                string[] buttons = menus.Split('|');
+
+                actions.Add(AT("PI Details", "epkcommand:Details", "/_layouts/images/edititem.gif",
+                    buttons.Contains("details")));
+
+                actions.Add(AT("Edit Costs", "epkcommand:Costs", "/_layouts/epmlive/images/editcosts16.png",
+                    buttons.Contains("costs"), "6"));
+
+                actions.Add(AT("Work Planner", "epkcommand:workplan", "/_layouts/epmlive/images/workitems.gif",
+                    buttons.Contains("workplan"), "6"));
+
+                actions.Add(AT("Edit Resource Plan", "epkcommand:rpeditor", "/_layouts/epmlive/images/resplan.gif",
+                    buttons.Contains("resplan"), "6"));
             }
-
-            if (string.IsNullOrEmpty(menus)) return actions.ToArray();
-
-            string[] buttons = menus.Split('|');
-
-            actions.Add(AT("PI Details", "epkcommand:Details", "/_layouts/images/edititem.gif",
-                buttons.Contains("details")));
-
-            actions.Add(AT("Edit Costs", "epkcommand:Costs", "/_layouts/epmlive/images/editcosts16.png",
-                buttons.Contains("costs"), "6"));
-
-            actions.Add(AT("Work Planner", "epkcommand:workplan", "/_layouts/epmlive/images/workitems.gif",
-                buttons.Contains("workplan"), "6"));
-
-            actions.Add(AT("Edit Resource Plan", "epkcommand:rpeditor", "/_layouts/epmlive/images/resplan.gif",
-                buttons.Contains("resplan"), "6"));
+            catch (Exception e)
+            {
+                di.Add("PFE Actions Exception", e.Message);
+            }
 
             return actions.ToArray();
         }
 
         private Tuple<string, string, string, string, bool>[] GetSocialActions(SPListItem listItem,
-            GridGanttSettings settings)
+            GridGanttSettings settings, out Dictionary<string, string> di)
         {
-            var actions = new[]
+            di = new Dictionary<string, string> { { "Social Actions", true.ToString() } };
+
+            var actions = new Tuple<string, string, string, string, bool>[] {};
+
+            try
             {
-                AT("Comments", "comments", "/_layouts/epmlive/images/comments16.gif",
-                    LIP(listItem, SPBasePermissions.EditListItems), "5"),
-                AT("Edit Team", "buildteam", "/_layouts/epmlive/images/buildteam16.gif",
-                    LIP(listItem, SPBasePermissions.EditListItems) && settings.BuildTeam, "6")
-            };
+                actions = new[]
+                {
+                    AT("Comments", "comments", "/_layouts/epmlive/images/comments16.gif",
+                        LIP(listItem, SPBasePermissions.EditListItems), "5"),
+                    AT("Edit Team", "buildteam", "/_layouts/epmlive/images/buildteam16.gif",
+                        LIP(listItem, SPBasePermissions.EditListItems) && settings.BuildTeam, "6")
+                };
+            }
+            catch (Exception e)
+            {
+                di.Add("Social Actions Exception", e.Message);
+            }
 
             return actions;
         }
 
         private Tuple<string, string, string, string, bool>[] GetWorkspaceActions(SPListItem li, bool rollups,
-            bool requestList)
+            bool requestList, out Dictionary<string, string> di)
         {
+            di = new Dictionary<string, string> { { "Workspace Actions", true.ToString() } };
+
             var actions = new List<Tuple<string, string, string, string, bool>>();
-
-            if (rollups && li.Web.ID != _spWeb.ID)
-            {
-                actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif", true, "1"));
-            }
-            else if (requestList)
-            {
-                string url = string.Empty;
-
-                try
-                {
-                    url = li["WorkspaceUrl"].ToString();
-                }
-                catch { }
-
-                actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif",
-                    !string.IsNullOrEmpty(url), "1"));
-            }
-
-            if (!requestList) return actions.ToArray();
-
-            string childitem = string.Empty;
 
             try
             {
-                childitem = li["ChildItem"].ToString();
+                if (rollups && li.Web.ID != _spWeb.ID)
+                {
+                    actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif", true, "1"));
+
+                    di.Add("WSA_Condition1", "rollups && li.Web.ID != _spWeb.ID");
+                }
+                else if (requestList)
+                {
+                    string url = string.Empty;
+
+                    try
+                    {
+                        url = li["WorkspaceUrl"].ToString();
+                    }
+                    catch { }
+
+                    actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif",
+                        !string.IsNullOrEmpty(url), "1"));
+
+                    di.Add("WSA_Condition1", "requestList");
+                }
+
+                if (!requestList)
+                {
+                    di.Add("WSA_Condition2", "!requestList");
+
+                    return actions.ToArray();
+                }
+
+                string childitem = string.Empty;
+
+                try
+                {
+                    childitem = li["ChildItem"].ToString();
+                }
+                catch { }
+
+                bool allowed = (li.ModerationInformation == null ||
+                                li.ModerationInformation.Status == SPModerationStatusType.Approved) &&
+                               li.Web.ID == _spWeb.ID && string.IsNullOrEmpty(childitem);
+
+                actions.Add(AT("Create Workspace", "createworkspace", "/_layouts/images/STSICON.gif", allowed, "1"));
+
+                di.Add("WSA_Condition2", "requestList 2");
             }
-            catch { }
-
-            bool allowed = (li.ModerationInformation == null ||
-                            li.ModerationInformation.Status == SPModerationStatusType.Approved) &&
-                           li.Web.ID == _spWeb.ID && string.IsNullOrEmpty(childitem);
-
-            actions.Add(AT("Create Workspace", "createworkspace", "/_layouts/images/STSICON.gif", allowed, "1"));
+            catch (Exception e)
+            {
+                di.Add("Workspace Actions Exception", e.Message);
+            }
 
             return actions.ToArray();
         }
 
-        private static Tuple<string, string, string, string, bool>[] GetGeneralActions(bool usePopup, SPList list)
+        private static Tuple<string, string, string, string, bool>[] GetGeneralActions(bool usePopup, SPList list,
+            out Dictionary<string, string> di)
         {
-            var actions = new[]
+            di = new Dictionary<string, string> { { "Item Actions", true.ToString() } };
+
+            var actions = new Tuple<string, string, string, string, bool>[] {};
+
+            try
             {
-                AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems),
-                    usePopup ? "1" : string.Empty),
-                AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems),
-                    usePopup ? "1" : string.Empty),
-                AT("--SEP--", null, null, true),
-                AT("Approve Item", "approve", "/_layouts/images/apprj.gif",
-                    list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
-                AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
-                    "1"),
-                AT("--SEP--", null, null, true),
-                AT("Permissions", "perms", "/_layouts/images/permissions16.png",
-                    LP(list, SPBasePermissions.ManagePermissions), "1"),
-                AT("Delete Item", "delete", "/_layouts/images/delitem.gif",
-                    LP(list, SPBasePermissions.DeleteListItems),
-                    "99"),
-                AT("--SEP--", null, null, true)
-            };
+                actions = new[]
+                {
+                    AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems),
+                        usePopup ? "1" : string.Empty),
+                    AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems),
+                        usePopup ? "1" : string.Empty),
+                    AT("--SEP--", null, null, true),
+                    AT("Approve Item", "approve", "/_layouts/images/apprj.gif",
+                        list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
+                    AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
+                        "1"),
+                    AT("--SEP--", null, null, true),
+                    AT("Permissions", "perms", "/_layouts/images/permissions16.png",
+                        LP(list, SPBasePermissions.ManagePermissions), "1"),
+                    AT("Delete Item", "delete", "/_layouts/images/delitem.gif",
+                        LP(list, SPBasePermissions.DeleteListItems),
+                        "99"),
+                    AT("--SEP--", null, null, true)
+                };
+            }
+            catch (Exception e)
+            {
+                di.Add("Item Actions Exception", e.Message);
+            }
 
             return actions;
         }
 
-        private Tuple<string, string, string, string, bool>[] GetPlannerActions(SPList list)
+        private Tuple<string, string, string, string, bool>[] GetPlannerActions(SPList list,
+            out Dictionary<string, string> di)
         {
-            string listTitle = list.Title;
-            SPWeb spWeb = list.ParentWeb;
+            di = new Dictionary<string, string> { { "Planner Actions", true.ToString() } };
 
-            Dictionary<string, PlannerDefinition> planners = CoreFunctions.GetPlannerList(spWeb, null);
+            var actions = new Tuple<string, string, string, string, bool>[] {};
 
-            string command = string.Empty;
-
-            foreach (PlannerDefinition planner in planners.Select(p => p.Value))
+            try
             {
-                if (planner.commandPrefix.Equals(listTitle))
+                string listTitle = list.Title;
+                SPWeb spWeb = list.ParentWeb;
+
+                Dictionary<string, PlannerDefinition> planners = CoreFunctions.GetPlannerList(spWeb, null);
+
+                string command = string.Empty;
+
+                foreach (PlannerDefinition planner in planners.Select(p => p.Value))
                 {
-                    command = "gotoplanner";
+                    if (planner.commandPrefix.Equals(listTitle))
+                    {
+                        command = "gotoplanner";
+                        break;
+                    }
+
+                    if (!planner.command.Equals(listTitle)) continue;
+
+                    command = "GoToTaskPlanner";
                     break;
                 }
 
-                if (!planner.command.Equals(listTitle)) continue;
-
-                command = "GoToTaskPlanner";
-                break;
+                actions = string.IsNullOrEmpty(command)
+                    ? null
+                    : new[] {AT("Edit Plan", "gotoplanner", "/_layouts/epmlive/images/planner16.png", true, "1")};
+            }
+            catch (Exception e)
+            {
+                di.Add("Planner Actions Exception", e.Message);
             }
 
-            return string.IsNullOrEmpty(command)
-                ? null
-                : new[] {AT("Edit Plan", "gotoplanner", "/_layouts/epmlive/images/planner16.png", true, "1")};
+            return actions;
         }
     }
 }
