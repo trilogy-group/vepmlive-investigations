@@ -9,11 +9,11 @@
 			return method.apply(target, arguments);
 		}
 	}
-      
+
 	//  General page settings
 
 
-	ResPlanAnalyzer.prototype.OnLoad = function (event) {  
+	ResPlanAnalyzer.prototype.OnLoad = function (event) {
 		try {
 
 			Grids.OnValueChanged = GridsOnValueChangedDelegate;
@@ -206,7 +206,16 @@
 
 		var ssbf = (this.AnalyzerShowBarschecked ? "1" : "0");
 		var shdf = (this.AnalyzerHideDetailschecked ? "1" : "0");
-		var shbd = (this.showingTotDet ? "1" : "0");			
+		var shbd = (this.showingTotDet ? "1" : "0");	
+        
+        
+        var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
+	    var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
+
+	    var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+	    var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+        
+        		
 
 		var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
 				+ isViewDefault + '" Personal="' + isViewPersonal + '">'
@@ -217,8 +226,16 @@
 				+ this.DetailsSettings
 				+ this.DisplayMode
 				+ '</OtherData>'
-				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '" ShowBotDet="' + shbd + '"/>'
-				+'</View>';
+				+ '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '" ShowBotDet="' + shbd + '"';
+                
+                
+        if (StartID == -1) 
+            dataXml += ' PerInc = "1" FinishPeriod="' + FinishID + '" ';
+        else
+            dataXml += ' PerInc = "0" '
+                
+                
+        dataXml += '/>' +'</View>';
 
 		if (bConvToJSON != true)
 			return dataXml;
@@ -333,6 +350,14 @@
 	        var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
 	        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+
+
+                              
+            if (StartID == -1)
+            {
+                StartID = this.UsingPeriods.CurrentPeriod.Value;
+            }
+
 	        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
 	        for (var i = 0; i < gcols.length; i++) {
@@ -605,6 +630,16 @@
 
 			var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
 			var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+
+
+            
+
+            if (StartID == -1)
+            {
+                StartID = this.UsingPeriods.CurrentPeriod.Value;
+            }
+
+
 
 			for (var i = 0; i < gcols.length; i++) {
 				if (gcols[i] == "P1C1") {
@@ -2427,17 +2462,28 @@
 	        this.initDataStart = this.initDataStart - 1;
 	        this.initDataFinish = this.initDataFinish - 1;
 
+	        FromList.options[0] = new Option("Current", -1, this.initDataStart == -1, this.initDataStart == -1);
+
+	        if (this.UsingPeriods.CurrentPeriod == undefined) {
+	            this.UsingPeriods.CurrentPeriod = new Object;
+	            this.UsingPeriods.CurrentPeriod.Value = this.UsingPeriods.Period.length
+	        }
+
 
 	        for (var n1 = 0; n1 < this.UsingPeriods.Period.length; n1++) {
 	            var per = this.UsingPeriods.Period[n1];
 	            var perId = per.perID;
 	            var perName = per.perName;
 
-	            FromList.options[n1] = new Option(perName, perId, n1 == this.initDataStart, n1 == this.initDataStart);
+	            FromList.options[n1 + 1] = new Option(perName, perId, n1 == this.initDataStart, n1 == this.initDataStart);
 	            ToList.options[n1] = new Option(perName, perId, n1 == this.initDataFinish, n1 == this.initDataFinish);
 
-	            if (n1 == 0)
-	                this.PerStart = perId;
+	            if (n1 == 0) {
+                    if (this.initDataStart != -1)
+	                    this.PerStart = perId;
+                    else
+                        this.PerStart = this.UsingPeriods.CurrentPeriod.Value;
+                }
 
 	            this.PerEnd = perId;
 
@@ -3596,7 +3642,7 @@
 	        return null;
 
 	    if (col === "PortfolioItem") 
-	        return 0xFFFFFF;
+            return 0xFFFFFF;
 
 	    if (col.charAt(0) === "P") {
 
@@ -5329,7 +5375,27 @@
                 this.showingTotDet = false;
 			}
 
-     	
+            try {
+				if (this.AnalyzerHideDetailschecked = (this.selectedView.ViewSettings.PerInc == "1")) 
+                { 
+                    var perf = this.selectedView.ViewSettings.FinishPeriod;
+                    var pers = this.UsingPeriods.CurrentPeriod.Value;
+
+                    if (perf < pers) 
+                        perf = pers;
+                    else if (perf > this.UsingPeriods.Period.length)
+                            perf = this.UsingPeriods.Period.length
+
+                    this.PerStart = pers;
+                    this.PerEnd = perf;
+
+                    document.getElementById("idAnalyzerTab_FromPeriod").selectedIndex = 0;
+                    document.getElementById("idAnalyzerTab_ToPeriod").selectedIndex = perf -1;
+                    this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
+                    this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                }
+			} catch (e) {
+			}	
 
 
 			if (this.AnalyzerShowBarschecked == true) {
@@ -5493,6 +5559,19 @@
 	                    return;
 	                }
 
+                    if (fp == -1)
+                    {
+                        fp = this.UsingPeriods.CurrentPeriod.Value;
+                        if (tp < fp) {
+                            tp = fp;
+
+                            this.PerEnd = tp;
+
+                            document.getElementById("idAnalyzerTab_ToPeriod").selectedIndex = tp -1;
+                            this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                        }
+                    }
+
 	                this.PerStart = fp;
 
 	                this.flashGridView("g_1", true);
@@ -5636,6 +5715,12 @@
 
 	                var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
 	                var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
+
+                    
+                    if (fp == -1)
+                    {
+                        fp = this.UsingPeriods.CurrentPeriod.Value;
+                    }
 
 	                if (tp < fp) {
 	                    alert("The To period cannot be before the From Period");
@@ -7447,7 +7532,6 @@ ResPlanAnalyzer.prototype.createChart = function () {
         xdata.categoryAxis = new Object();
         xdata.categoryAxis.majorGridLines = new Object();
         xdata.categoryAxis.majorGridLines.visible = false;
-
         xdata.categoryAxis.labels = new Object();
         xdata.categoryAxis.labels.rotation = 45;
 
@@ -7455,19 +7539,30 @@ ResPlanAnalyzer.prototype.createChart = function () {
         var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
         var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
-        var StartID = parseInt(FromList.options[FromList.selectedIndex].value) - 1;
+        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+
+
+        if (StartID == -1)
+        {
+            StartID = this.UsingPeriods.CurrentPeriod.Value;
+        }
+
+        StartID -= 1;
         var FinishID = parseInt(ToList.options[ToList.selectedIndex].value) - 1;
 
         var ycnt = FinishID - StartID;
         var ystp = 0;
 
         if (ycnt > 40) {
-            ystp = Math.floor(ycnt / 40) + 1;
+            ystp = Math.floor(ycnt/40) + 1;
             xdata.categoryAxis.labels.step = ystp;
         }
 
 
         xdata.categoryAxis.categories = new Array();
+
+
+
 
         var avail = new Array();
 
