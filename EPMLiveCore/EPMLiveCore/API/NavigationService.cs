@@ -627,12 +627,12 @@ namespace EPMLiveCore.API
                 catch { }
             }
 
-            XElement xdebugMode = parameters.Element("DebugMode");
-            if (xdebugMode == null) return;
+            XElement xDebugMode = parameters.Element("DebugMode");
+            if (xDebugMode == null) return;
 
             try
             {
-                debugMode = bool.Parse(xdebugMode.Value);
+                debugMode = bool.Parse(xDebugMode.Value);
             }
             catch { }
         }
