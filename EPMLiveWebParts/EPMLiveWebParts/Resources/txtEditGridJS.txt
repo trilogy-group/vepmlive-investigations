@@ -246,7 +246,7 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 	}
 	else
 	{
-		pagediv.style.display = "";
+		pagediv.style.display = "inline-block";
 
 		var rec = records.split('|');
 		firstItem#gridid# = parseInt(rec[2]) * -1;
