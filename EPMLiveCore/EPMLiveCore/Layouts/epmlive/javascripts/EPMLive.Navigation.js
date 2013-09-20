@@ -1469,7 +1469,7 @@
                     if ($li.find('.epm-nav-contextual-menu').length === 0) {
                         var $a = $($li.find('a').get(0));
 
-                        var data = '<Request><Params><SiteId>' + $a.data('siteid') + '</SiteId><WebId>' + $a.data('webid') + '</WebId><ListId>' + $a.data('listid') + '</ListId><ItemId>' + $a.data('itemid') + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId></Params></Request>';
+                        var data = '<Request><Params><SiteId>' + $a.data('siteid') + '</SiteId><WebId>' + $a.data('webid') + '</WebId><ListId>' + $a.data('listid') + '</ListId><ItemId>' + $a.data('itemid') + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
 
                         epmLiveService.execute('GetContextualMenuItems', data, function (response) {
                             var commands = [];

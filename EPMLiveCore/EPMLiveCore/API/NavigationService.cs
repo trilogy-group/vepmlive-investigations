@@ -90,10 +90,10 @@ namespace EPMLiveCore.API
                 bool rollups;
                 bool requestList;
                 bool usePopup;
+                bool debugMode;
 
                 GetContextualMenuItems_ParseRequest(data, out siteId, out webId, out listId, out itemId, out userId,
-                    out rollups,
-                    out requestList, out usePopup);
+                    out rollups, out requestList, out usePopup, out debugMode);
 
                 var items = new XElement("Items");
 
@@ -115,6 +115,8 @@ namespace EPMLiveCore.API
 
                     items.Add(item);
                 }
+
+                if (!debugMode) return new XElement("ContextualMenus", items).ToString();
 
                 var di = new XElement("DiagnosticsInfo");
 
@@ -230,114 +232,186 @@ namespace EPMLiveCore.API
                         info.Add("Web", web.Url);
 
                         SPUser user = web.AllUsers.GetByID(userId);
+                        SPUserToken userToken = user.UserToken;
 
                         info.Add("Username", user.LoginName);
                         info.Add("User", user.Name);
 
-                        using (var spSite = new SPSite(siteId, user.UserToken))
+                        Task<object[]> t1 = Task.Factory.StartNew(() =>
                         {
-                            using (SPWeb spWeb = spSite.OpenWeb(webId))
+                            Dictionary<string, string> di;
+
+                            var result = new Tuple<string, string, string, string, bool>[] {};
+
+                            try
                             {
-                                SPList list = spWeb.Lists.GetList(listId, true);
-
-                                info.Add("List", list.Title);
-
-                                SPListItem item = list.GetItemById(itemId);
-
-                                info.Add("Item", item.Title);
-
-                                var settings = new GridGanttSettings(list);
-
-                                Task<object[]> t1 = Task.Factory.StartNew(() =>
+                                using (var spSite = new SPSite(siteId, userToken))
                                 {
-                                    Dictionary<string, string> di;
-                                    Tuple<string, string, string, string, bool>[] result = GetGeneralActions(usePopup,
-                                        list, out di);
-
-                                    return new object[] {result, di};
-                                });
-
-                                Task<object[]> t2 = Task.Factory.StartNew(() =>
-                                {
-                                    Dictionary<string, string> di;
-                                    Tuple<string, string, string, string, bool>[] result = GetPlannerActions(list,
-                                        out di);
-
-                                    return new object[] {result, di};
-                                });
-
-                                Task<object[]> t3 = Task.Factory.StartNew(() =>
-                                {
-                                    Dictionary<string, string> di;
-                                    Tuple<string, string, string, string, bool>[] result = GetSocialActions(item,
-                                        settings, out di);
-
-                                    return new object[] {result, di};
-                                });
-
-                                Task<object[]> t4 = Task.Factory.StartNew(() =>
-                                {
-                                    Dictionary<string, string> di;
-                                    Tuple<string, string, string, string, bool>[] result = GetWorkspaceActions(item,
-                                        rollups, requestList, out di);
-
-                                    return new object[] {result, di};
-                                });
-
-                                Task<object[]> t5 = Task.Factory.StartNew(() =>
-                                {
-                                    Dictionary<string, string> di;
-                                    Tuple<string, string, string, string, bool>[] result = GetPFEActions(list, out di);
-
-                                    return new object[] {result, di};
-                                });
-
-                                var actions = new List<Tuple<string, string, string, string, bool>>();
-
-                                foreach (var t in new[] {t1, t2, t3, t4, t5})
-                                {
-                                    object[] result = t.Result;
-
-                                    var et = new Tuple<string, string, string, string, bool>(null, null, null, null, false);
-                                    var tuples = (Tuple<string, string, string, string, bool>[]) (result[0] ?? new[] {et});
-
-                                    actions.AddRange(tuples);
-
-                                    var di = result[1] as Dictionary<string, string>;
-
-                                    if (di == null) continue;
-
-                                    foreach (var pair in di)
+                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
                                     {
-                                        info.Add(pair.Key, pair.Value);
+                                        SPList list = spWeb.Lists.GetList(listId, true);
+                                        result = GetGeneralActions(usePopup, list, out di);
                                     }
                                 }
+                            }
+                            catch (Exception e)
+                            {
+                                di = new Dictionary<string, string> {{"General Actions Exception", e.Message}};
+                            }
 
-                                string lastTitle = string.Empty;
+                            return new object[] {result, di};
+                        });
 
-                                Tuple<string, string, string, string, bool> lastAction = actions.Last();
-                                if (lastAction.Item1.Equals("--SEP--"))
+                        Task<object[]> t2 = Task.Factory.StartNew(() =>
+                        {
+                            Dictionary<string, string> di;
+
+                            var result = new Tuple<string, string, string, string, bool>[] {};
+
+                            try
+                            {
+                                using (var spSite = new SPSite(siteId, userToken))
                                 {
-                                    actions.Remove(lastAction);
-                                }
-
-                                foreach (var action in actions)
-                                {
-                                    if (!action.Item5) continue;
-                                    if (action.Item1.Equals("--SEP--") && action.Item1.Equals(lastTitle)) continue;
-
-                                    lastTitle = action.Item1;
-
-                                    DataRow row = dataTable.NewRow();
-
-                                    row["Title"] = action.Item1;
-                                    row["Command"] = action.Item2;
-                                    row["ImageUrl"] = action.Item3;
-                                    row["Kind"] = action.Item4;
-
-                                    dataTable.Rows.Add(row);
+                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
+                                    {
+                                        SPList list = spWeb.Lists.GetList(listId, true);
+                                        result = GetPlannerActions(list, out di);
+                                    }
                                 }
                             }
+                            catch (Exception e)
+                            {
+                                di = new Dictionary<string, string> {{"Planner Actions Exception", e.Message}};
+                            }
+
+                            return new object[] {result, di};
+                        });
+
+                        Task<object[]> t3 = Task.Factory.StartNew(() =>
+                        {
+                            Dictionary<string, string> di;
+
+                            var result = new Tuple<string, string, string, string, bool>[] {};
+
+                            try
+                            {
+                                using (var spSite = new SPSite(siteId, userToken))
+                                {
+                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
+                                    {
+                                        SPList list = spWeb.Lists.GetList(listId, true);
+                                        SPListItem item = list.GetItemById(itemId);
+
+                                        var settings = new GridGanttSettings(list);
+
+                                        result = GetSocialActions(item, settings, out di);
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                di = new Dictionary<string, string> {{"Social Actions Exception", e.Message}};
+                            }
+
+                            return new object[] {result, di};
+                        });
+
+                        Task<object[]> t4 = Task.Factory.StartNew(() =>
+                        {
+                            Dictionary<string, string> di;
+
+                            var result = new Tuple<string, string, string, string, bool>[] {};
+
+                            try
+                            {
+                                using (var spSite = new SPSite(siteId, userToken))
+                                {
+                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
+                                    {
+                                        SPList list = spWeb.Lists.GetList(listId, true);
+                                        SPListItem item = list.GetItemById(itemId);
+
+                                        result = GetWorkspaceActions(item, rollups, requestList, out di);
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                di = new Dictionary<string, string> {{"Workspace Actions Exception", e.Message}};
+                            }
+
+                            return new object[] {result, di};
+                        });
+
+                        Task<object[]> t5 = Task.Factory.StartNew(() =>
+                        {
+                            Dictionary<string, string> di;
+
+                            var result = new Tuple<string, string, string, string, bool>[] {};
+
+                            try
+                            {
+                                using (var spSite = new SPSite(siteId, userToken))
+                                {
+                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
+                                    {
+                                        SPList list = spWeb.Lists.GetList(listId, true);
+                                        result = GetPFEActions(list, out di);
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                di = new Dictionary<string, string> {{"PFE Actions Exception", e.Message}};
+                            }
+
+                            return new object[] {result, di};
+                        });
+
+                        var actions = new List<Tuple<string, string, string, string, bool>>();
+
+                        foreach (var t in new[] {t1, t2, t3, t4, t5})
+                        {
+                            object[] result = t.Result;
+
+                            var et = new Tuple<string, string, string, string, bool>(null, null, null, null, false);
+                            var tuples = (Tuple<string, string, string, string, bool>[]) (result[0] ?? new[] {et});
+
+                            actions.AddRange(tuples);
+
+                            var di = result[1] as Dictionary<string, string>;
+
+                            if (di == null) continue;
+
+                            foreach (var pair in di)
+                            {
+                                info.Add(pair.Key, pair.Value);
+                            }
+                        }
+
+                        string lastTitle = string.Empty;
+
+                        Tuple<string, string, string, string, bool> lastAction = actions.Last();
+                        if (lastAction.Item1.Equals("--SEP--"))
+                        {
+                            actions.Remove(lastAction);
+                        }
+
+                        foreach (var action in actions)
+                        {
+                            if (!action.Item5) continue;
+                            if (action.Item1.Equals("--SEP--") && action.Item1.Equals(lastTitle)) continue;
+
+                            lastTitle = action.Item1;
+
+                            DataRow row = dataTable.NewRow();
+
+                            row["Title"] = action.Item1;
+                            row["Command"] = action.Item2;
+                            row["ImageUrl"] = action.Item3;
+                            row["Kind"] = action.Item4;
+
+                            dataTable.Rows.Add(row);
                         }
                     }
                 }
@@ -427,12 +501,12 @@ namespace EPMLiveCore.API
             return linkId;
         }
 
-        private static void GetContextualMenuItems_ParseRequest(string data, out Guid siteId, out Guid webId,
-            out Guid listId, out int itemId, out int userId, out bool rollups, out bool requestList, out bool usePopup)
+        private static void GetContextualMenuItems_ParseRequest(string data, out Guid siteId, out Guid webId, out Guid listId, out int itemId, out int userId, out bool rollups, out bool requestList, out bool usePopup, out bool debugMode)
         {
             rollups = false;
             requestList = false;
             usePopup = false;
+            debugMode = false;
 
             XDocument xmlData = XDocument.Parse(data);
 
@@ -551,6 +625,15 @@ namespace EPMLiveCore.API
                 usePopup = bool.Parse(xUsePopup.Value);
             }
             catch { }
+
+            XElement xdebugMode = parameters.Element("DebugMode");
+            if (xdebugMode == null) return;
+
+            try
+            {
+                debugMode = bool.Parse(xUsePopup.Value);
+            }
+            catch { }
         }
 
         private static string GetLinkId(NavLink navLink, string providerName)
@@ -597,7 +680,8 @@ namespace EPMLiveCore.API
         private Tuple<string, string, string, string, bool>[] GetPFEActions(SPList list,
             out Dictionary<string, string> di)
         {
-            di = new Dictionary<string, string> { { "PFE Actions", true.ToString() } };
+            bool success = true;
+            di = new Dictionary<string, string> {{"PFE Actions", true.ToString()}};
 
             var actions = new List<Tuple<string, string, string, string, bool>>();
 
@@ -634,7 +718,12 @@ namespace EPMLiveCore.API
 
                 di.Add("PFE Menus", menus);
 
-                if (string.IsNullOrEmpty(menus)) return actions.ToArray();
+                if (string.IsNullOrEmpty(menus))
+                {
+                    di.Add("PFE Actions Success", true.ToString());
+
+                    return actions.ToArray();
+                }
 
                 string[] buttons = menus.Split('|');
 
@@ -652,8 +741,11 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
+                success = false;
                 di.Add("PFE Actions Exception", e.Message);
             }
+
+            di.Add("PFE Actions Success", success.ToString());
 
             return actions.ToArray();
         }
@@ -661,7 +753,8 @@ namespace EPMLiveCore.API
         private Tuple<string, string, string, string, bool>[] GetSocialActions(SPListItem listItem,
             GridGanttSettings settings, out Dictionary<string, string> di)
         {
-            di = new Dictionary<string, string> { { "Social Actions", true.ToString() } };
+            bool success = true;
+            di = new Dictionary<string, string> {{"Social Actions", true.ToString()}};
 
             var actions = new Tuple<string, string, string, string, bool>[] {};
 
@@ -677,8 +770,11 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
+                success = false;
                 di.Add("Social Actions Exception", e.Message);
             }
+
+            di.Add("Social Actions Success", success.ToString());
 
             return actions;
         }
@@ -686,7 +782,8 @@ namespace EPMLiveCore.API
         private Tuple<string, string, string, string, bool>[] GetWorkspaceActions(SPListItem li, bool rollups,
             bool requestList, out Dictionary<string, string> di)
         {
-            di = new Dictionary<string, string> { { "Workspace Actions", true.ToString() } };
+            bool success = true;
+            di = new Dictionary<string, string> {{"Workspace Actions", true.ToString()}};
 
             var actions = new List<Tuple<string, string, string, string, bool>>();
 
@@ -717,6 +814,7 @@ namespace EPMLiveCore.API
                 if (!requestList)
                 {
                     di.Add("WSA_Condition2", "!requestList");
+                    di.Add("Workspace Actions Success", true.ToString());
 
                     return actions.ToArray();
                 }
@@ -739,8 +837,11 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
+                success = false;
                 di.Add("Workspace Actions Exception", e.Message);
             }
+
+            di.Add("Workspace Actions Success", success.ToString());
 
             return actions.ToArray();
         }
@@ -748,7 +849,9 @@ namespace EPMLiveCore.API
         private static Tuple<string, string, string, string, bool>[] GetGeneralActions(bool usePopup, SPList list,
             out Dictionary<string, string> di)
         {
-            di = new Dictionary<string, string> { { "Item Actions", true.ToString() } };
+            bool success = true;
+
+            di = new Dictionary<string, string> {{"Item Actions", true.ToString()}};
 
             var actions = new Tuple<string, string, string, string, bool>[] {};
 
@@ -776,8 +879,11 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
+                success = false;
                 di.Add("Item Actions Exception", e.Message);
             }
+
+            di.Add("Item Actions Success", success.ToString());
 
             return actions;
         }
@@ -785,7 +891,8 @@ namespace EPMLiveCore.API
         private Tuple<string, string, string, string, bool>[] GetPlannerActions(SPList list,
             out Dictionary<string, string> di)
         {
-            di = new Dictionary<string, string> { { "Planner Actions", true.ToString() } };
+            bool success = true;
+            di = new Dictionary<string, string> {{"Planner Actions", true.ToString()}};
 
             var actions = new Tuple<string, string, string, string, bool>[] {};
 
@@ -818,8 +925,11 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
+                success = false;
                 di.Add("Planner Actions Exception", e.Message);
             }
+
+            di.Add("Planner Actions Success", success.ToString());
 
             return actions;
         }

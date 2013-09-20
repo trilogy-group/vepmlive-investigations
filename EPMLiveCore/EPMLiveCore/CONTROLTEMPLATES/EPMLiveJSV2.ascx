@@ -38,6 +38,7 @@
                         epmLive.currentUserId = '<%= CurrentUserId %>';
                         epmLive.currentUrl = '<%= CurrentUrl %>';
                         epmLive.fileVersion = '<%= EPMFileVersion %>';
+                        epmLive.debugMode = <%= DebugMode.ToString().ToLower() %>;
                         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
                     }, true);
                 }, true);
