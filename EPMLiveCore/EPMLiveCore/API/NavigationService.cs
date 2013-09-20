@@ -618,13 +618,14 @@ namespace EPMLiveCore.API
             }
 
             XElement xUsePopup = parameters.Element("Popup");
-            if (xUsePopup == null) return;
-
-            try
+            if (xUsePopup != null)
             {
-                usePopup = bool.Parse(xUsePopup.Value);
+                try
+                {
+                    usePopup = bool.Parse(xUsePopup.Value);
+                }
+                catch { }
             }
-            catch { }
 
             XElement xdebugMode = parameters.Element("DebugMode");
             if (xdebugMode == null) return;
