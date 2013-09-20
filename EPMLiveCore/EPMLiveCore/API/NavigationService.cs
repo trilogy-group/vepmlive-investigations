@@ -392,7 +392,9 @@ namespace EPMLiveCore.API
                         string lastTitle = string.Empty;
 
                         Tuple<string, string, string, string, bool> lastAction = actions.Last();
-                        if (lastAction.Item1.Equals("--SEP--"))
+
+                        string sepItem = lastAction.Item1;
+                        if (!string.IsNullOrEmpty(sepItem) && sepItem.Equals("--SEP--"))
                         {
                             actions.Remove(lastAction);
                         }
