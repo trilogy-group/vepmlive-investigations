@@ -963,7 +963,8 @@ a.ms-cui-ctl-lowerlarge {
     border: 1px solid transparent;
     cursor: default;
     height: 52px;
-    padding: 2px 0;
+    padding: 2px 2px 2px 2px;
+    margin-right: 2px;
 }
 a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hover *, a.ms-cui-ctl-thin:hover *, .ms-cui-ctl-a2:hover *, .ms-cui-ctl:hover *, .ms-cui-jewel-jewelMenuLauncher:hover, .ms-cui-jewel-jewelMenuLauncher:hover * {
     cursor: default;
