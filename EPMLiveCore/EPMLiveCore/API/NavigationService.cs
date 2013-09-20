@@ -116,7 +116,15 @@ namespace EPMLiveCore.API
             }
             catch (Exception exception)
             {
-                throw new APIException(20003, "[NavigationService:GetContextualMenuItems] " + exception.Message);
+                string message = string.Empty;
+
+                try
+                {
+                    message = exception.InnerException.Message;
+                }
+                catch { }
+
+                throw new APIException(20003, "[NavigationService:GetContextualMenuItems] " + exception.Message + " Inner Message: " + message);
             }
         }
 
