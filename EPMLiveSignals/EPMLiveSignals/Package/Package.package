@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="24535baf-d51b-461b-bbfb-5f43e844b074" solutionId="24535baf-d51b-461b-bbfb-5f43e844b074" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveSignals" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <assemblies>
+    <customAssembly location="Microsoft.AspNet.SignalR.Core.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Microsoft.AspNet.SignalR.Core.dll" />
+    <customAssembly location="Microsoft.AspNet.SignalR.SystemWeb.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Microsoft.AspNet.SignalR.SystemWeb.dll" />
+    <customAssembly location="Owin.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Owin.dll" />
+    <customAssembly location="Microsoft.Owin.Host.SystemWeb.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Microsoft.Owin.Host.SystemWeb.dll" />
+    <customAssembly location="Microsoft.AspNet.SignalR.Owin.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Microsoft.AspNet.SignalR.Owin.dll" />
+    <customAssembly location="Newtonsoft.Json.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Newtonsoft.Json.dll" />
+  </assemblies>
+  <projectItems>
+    <projectItemReference itemId="58359c75-a9e8-4f43-88d4-bf55b74b369e" />
+  </projectItems>
+</package>
