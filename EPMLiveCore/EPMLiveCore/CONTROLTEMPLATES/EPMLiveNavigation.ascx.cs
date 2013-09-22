@@ -64,6 +64,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             get { return SPContext.Current.Web.ServerRelativeUrl; }
         }
 
+        public string SelectedNode { get; private set; }
+
         #endregion Properties 
 
         #region Methods (5) 
@@ -156,6 +158,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                     where !string.IsNullOrEmpty(id)
                     where id.Equals(nodeId)
                     select node.LinkProvider).FirstOrDefault();
+
+                SelectedNode = provider;
 
                 var navService = new NavigationService(provider, SPContext.Current.Web);
                 StaticProviderLinks = navService.GetLinks().EncodeToBase64();

@@ -9,6 +9,7 @@ using EPMLiveCore.Controls.Navigation.Providers;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
+using Telerik.Web.UI;
 
 namespace EPMLiveCore.API
 {
@@ -92,14 +93,12 @@ namespace EPMLiveCore.API
                 bool usePopup;
                 bool debugMode;
 
-                GetContextualMenuItems_ParseRequest(data, out siteId, out webId, out listId, out itemId, out userId,
-                    out rollups, out requestList, out usePopup, out debugMode);
+                GetContextualMenuItems_ParseRequest(data, out siteId, out webId, out listId, out itemId, out userId, out debugMode);
 
                 var items = new XElement("Items");
 
                 Dictionary<string, string> diagnosticInfo;
-                DataTable dataTable = GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo, rollups,
-                    requestList, usePopup);
+                DataTable dataTable = GetMenuItems(siteId, webId, listId, itemId, userId, out diagnosticInfo);
 
                 List<string> columns =
                     (from DataColumn column in dataTable.Columns select column.ColumnName).ToList();
@@ -210,9 +209,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        public DataTable GetMenuItems(Guid siteId, Guid webId, Guid listId, int itemId, int userId,
-            out Dictionary<string, string> diagnosticInfo, bool rollups = false, bool requestList = false,
-            bool usePopup = false)
+        public DataTable GetMenuItems(Guid siteId, Guid webId, Guid listId, int itemId, int userId, out Dictionary<string, string> diagnosticInfo)
         {
             var info = new Dictionary<string, string>();
 
@@ -250,7 +247,7 @@ namespace EPMLiveCore.API
                                     using (SPWeb spWeb = spSite.OpenWeb(webId))
                                     {
                                         SPList list = spWeb.Lists.GetList(listId, true);
-                                        result = GetGeneralActions(usePopup, list, out di);
+                                        result = GetGeneralActions(ListCommands.GetGridGanttSettings(list).UsePopup, list, out di);
                                     }
                                 }
                             }
@@ -302,9 +299,7 @@ namespace EPMLiveCore.API
                                         SPList list = spWeb.Lists.GetList(listId, true);
                                         SPListItem item = list.GetItemById(itemId);
 
-                                        var settings = new GridGanttSettings(list);
-
-                                        result = GetSocialActions(item, settings, out di);
+                                        result = GetSocialActions(item, ListCommands.GetGridGanttSettings(list), out di);
                                     }
                                 }
                             }
@@ -331,7 +326,7 @@ namespace EPMLiveCore.API
                                         SPList list = spWeb.Lists.GetList(listId, true);
                                         SPListItem item = list.GetItemById(itemId);
 
-                                        result = GetWorkspaceActions(item, rollups, requestList, out di);
+                                        result = GetWorkspaceActions(item, out di);
                                     }
                                 }
                             }
@@ -503,11 +498,8 @@ namespace EPMLiveCore.API
             return linkId;
         }
 
-        private static void GetContextualMenuItems_ParseRequest(string data, out Guid siteId, out Guid webId, out Guid listId, out int itemId, out int userId, out bool rollups, out bool requestList, out bool usePopup, out bool debugMode)
+        private static void GetContextualMenuItems_ParseRequest(string data, out Guid siteId, out Guid webId, out Guid listId, out int itemId, out int userId, out bool debugMode)
         {
-            rollups = false;
-            requestList = false;
-            usePopup = false;
             debugMode = false;
 
             XDocument xmlData = XDocument.Parse(data);
@@ -597,36 +589,6 @@ namespace EPMLiveCore.API
             catch (Exception exception)
             {
                 throw new Exception("(UserId) " + exception.Message);
-            }
-
-            XElement xRollups = parameters.Element("Rollups");
-            if (xRollups != null)
-            {
-                try
-                {
-                    rollups = bool.Parse(xRollups.Value);
-                }
-                catch { }
-            }
-
-            XElement xRequestList = parameters.Element("RequestList");
-            if (xRequestList != null)
-            {
-                try
-                {
-                    requestList = bool.Parse(xRequestList.Value);
-                }
-                catch { }
-            }
-
-            XElement xUsePopup = parameters.Element("Popup");
-            if (xUsePopup != null)
-            {
-                try
-                {
-                    usePopup = bool.Parse(xUsePopup.Value);
-                }
-                catch { }
             }
 
             XElement xDebugMode = parameters.Element("DebugMode");
@@ -782,8 +744,7 @@ namespace EPMLiveCore.API
             return actions;
         }
 
-        private Tuple<string, string, string, string, bool>[] GetWorkspaceActions(SPListItem li, bool rollups,
-            bool requestList, out Dictionary<string, string> di)
+        private Tuple<string, string, string, string, bool>[] GetWorkspaceActions(SPListItem li, out Dictionary<string, string> di)
         {
             bool success = true;
             di = new Dictionary<string, string> {{"Workspace Actions", true.ToString()}};
@@ -792,35 +753,15 @@ namespace EPMLiveCore.API
 
             try
             {
-                if (rollups && li.Web.ID != _spWeb.ID)
+                string url = string.Empty;
+
+                try
                 {
-                    actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif", true, "1"));
-
-                    di.Add("WSA_Condition1", "rollups && li.Web.ID != _spWeb.ID");
+                    url = li["WorkspaceUrl"].ToString();
                 }
-                else if (requestList)
-                {
-                    string url = string.Empty;
+                catch { }
 
-                    try
-                    {
-                        url = li["WorkspaceUrl"].ToString();
-                    }
-                    catch { }
-
-                    actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif",
-                        !string.IsNullOrEmpty(url), "1"));
-
-                    di.Add("WSA_Condition1", "requestList");
-                }
-
-                if (!requestList)
-                {
-                    di.Add("WSA_Condition2", "!requestList");
-                    di.Add("Workspace Actions Success", true.ToString());
-
-                    return actions.ToArray();
-                }
+                actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif", !string.IsNullOrEmpty(url), "1"));
 
                 string childitem = string.Empty;
 
@@ -830,13 +771,12 @@ namespace EPMLiveCore.API
                 }
                 catch { }
 
-                bool allowed = (li.ModerationInformation == null ||
-                                li.ModerationInformation.Status == SPModerationStatusType.Approved) &&
-                               li.Web.ID == _spWeb.ID && string.IsNullOrEmpty(childitem);
+                bool allowed = string.IsNullOrEmpty(url) && (li.ModerationInformation == null ||
+                                                             li.ModerationInformation.Status ==
+                                                             SPModerationStatusType.Approved)
+                               && li.Web.ID == _spWeb.ID && string.IsNullOrEmpty(childitem);
 
                 actions.Add(AT("Create Workspace", "createworkspace", "/_layouts/images/STSICON.gif", allowed, "1"));
-
-                di.Add("WSA_Condition2", "requestList 2");
             }
             catch (Exception e)
             {

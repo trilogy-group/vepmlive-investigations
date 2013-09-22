@@ -1199,11 +1199,9 @@
                     for (var i = 0; i < tlNodes.length; i++) {
                         var node = tlNodes[i];
 
-                        if (!node.selected()) {
-                            var provider = node.provider;
-                            if (provider) {
-                                providers.push(provider);
-                            }
+                        var provider = node.provider;
+                        if (provider && provider !== window.epmLiveNavigation.selectedNode) {
+                            providers.push(provider);
                         }
                     }
 

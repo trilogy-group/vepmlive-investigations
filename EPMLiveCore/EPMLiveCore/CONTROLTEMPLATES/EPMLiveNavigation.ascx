@@ -171,6 +171,7 @@
             currentWebUrl: '<%= WebUrl %>',
             currentUserId: <%= UserId %>,
             staticProvider: '<%= StaticProviderLinks %>',
+            selectedNode: '<%= SelectedNode %>',
             workspaceTree: function() {
                 return window.$find('<%= WorkspacesNavTree.ClientID %>');
             }
