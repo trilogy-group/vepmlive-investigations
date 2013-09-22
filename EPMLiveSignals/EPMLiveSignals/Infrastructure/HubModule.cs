@@ -3,9 +3,9 @@ using System.Data.SqlClient;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Routing;
-using EPMLiveCore;
 using Microsoft.AspNet.SignalR;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveSignals.Infrastructure
 {
@@ -54,7 +54,17 @@ namespace EPMLiveSignals.Infrastructure
         private static string GetConnectionString()
         {
             Guid webAppId = SPContext.Current.Web.Site.WebApplication.Id;
-            string connectionString = CoreFunctions.getWebAppSetting(webAppId, "EPMLiveSignalRCN");
+            string connectionString = null;
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    SPWebApplication webapp = SPWebService.ContentService.WebApplications[webAppId];
+                    connectionString = webapp.Properties["EPMLiveSignalRCN"].ToString();
+                }
+                catch { }
+            });
 
             if (string.IsNullOrEmpty(connectionString))
             {
