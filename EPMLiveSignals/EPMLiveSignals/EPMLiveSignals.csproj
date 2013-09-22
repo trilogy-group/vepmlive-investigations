@@ -88,7 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hubs\ChatHub.cs" />
-    <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\HubModule.cs" />
     <Compile Include="Infrastructure\SignalRVirtualPathProvider.cs" />
     <Compile Include="Layouts\EPMLive\Chat.aspx.cs">
