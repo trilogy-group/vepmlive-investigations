@@ -7,6 +7,7 @@
     <customAssembly location="Microsoft.Owin.Host.SystemWeb.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Microsoft.Owin.Host.SystemWeb.dll" />
     <customAssembly location="Microsoft.AspNet.SignalR.Owin.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Microsoft.AspNet.SignalR.Owin.dll" />
     <customAssembly location="Newtonsoft.Json.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Newtonsoft.Json.dll" />
+    <customAssembly location="Microsoft.AspNet.SignalR.SqlServer.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\Libraries\Microsoft.AspNet.SignalR.SqlServer.dll" />
   </assemblies>
   <projectItems>
     <projectItemReference itemId="58359c75-a9e8-4f43-88d4-bf55b74b369e" />

@@ -56,6 +56,9 @@
     <Reference Include="Microsoft.AspNet.SignalR.Owin">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.1.3\lib\net45\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SqlServer">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SqlServer.1.1.3\lib\net40\Microsoft.AspNet.SignalR.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.SystemWeb">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.3\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
@@ -85,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hubs\ChatHub.cs" />
+    <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\HubModule.cs" />
     <Compile Include="Infrastructure\SignalRVirtualPathProvider.cs" />
     <Compile Include="Layouts\EPMLive\Chat.aspx.cs">
@@ -95,6 +99,11 @@
       <DependentUpon>Chat.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />
@@ -116,6 +125,13 @@
     <Content Include="Layouts\EPMLive\Chat.aspx" />
     <Content Include="Layouts\EPMLive\Javascripts\jquery.signalR-1.1.3.js" />
     <Content Include="Layouts\EPMLive\Javascripts\jquery.signalR-1.1.3.min.js" />
+    <None Include="Resources\SignalRUserCreationCommand.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
