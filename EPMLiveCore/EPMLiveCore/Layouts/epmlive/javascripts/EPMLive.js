@@ -418,21 +418,42 @@ function CreateEPMLiveWorkspace(listid, itemid) {
         title: 'Create Workspace',
         dialogReturnValueCallback: function (dialogResult, returnValue) {
             if (dialogResult === 1) {
-                //SP.UI.Notify.addNotification('Your workspace is being created - we will notify you when it is ready.', false);
-                $.pnotify({
-                    title: 'Workspace Status',
-                    text: 'Your workspace is being created - we will notify you when it is ready.',
-                    type: 'info',
-                    styling: 'jqueryui'
-                });
+                
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "positionClass": "toast-top-right",
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+
+                toastr.info("Your workspace is being created - we will notify you when it is ready.");
             }
             else if (dialogResult === -1) {
-                $.pnotify({
-                    title: 'Workspace Status',
-                    text: 'Something went wrong. Workspace is not being created. Error: ' + returnValue,
-                    type: 'error',
-                    styling: 'jqueryui'
-                });
+
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "positionClass": "toast-top-right",
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+
+                toastr.error('Something went wrong. Workspace is not being created. Error: ' + returnValue);
             }
         }
 

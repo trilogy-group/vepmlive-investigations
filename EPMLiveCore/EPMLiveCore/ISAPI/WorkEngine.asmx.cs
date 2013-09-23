@@ -1608,17 +1608,29 @@ namespace EPMLiveCore
             }
         }
 
-        //public static string CountFrequentApps(string data, SPWeb spWeb)
-        //{
-        //    try
-        //    {
-        //        return Response.Success(FrequentApps.Count(data));
-        //    }
-        //    catch (APIException ex)
-        //    {
-        //        return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
-        //    }
-        //}
+        public static string CreateFrequentApp(string data, SPWeb spWeb)
+        {
+            try
+            {
+                return Response.Success(FrequentApps.Create(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        public static string CreateRecentItem(string data, SPWeb spWeb)
+        {
+            try
+            {
+                return Response.Success(RecentItems.Create(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
 
         #endregion  
 

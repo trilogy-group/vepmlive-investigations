@@ -270,15 +270,15 @@ namespace EPMLiveCore.Layouts.epmlive
                     bool showAutoCreate = defaultTemps.Count > 1;
 
                     chkAutoCreate.Checked = gSettings.EnableAutoCreation;
-                    chkAutoCreate.Visible = showAutoCreate;
+                    ifcAutoCreate.Visible = showAutoCreate;
 
                     ddlAutoCreateTemplate.DataSource = defaultTemps;
                     ddlAutoCreateTemplate.DataTextField = "Key";
                     ddlAutoCreateTemplate.DataValueField = "Value";
                     ddlAutoCreateTemplate.DataBind();
                     ddlAutoCreateTemplate.SelectedValue = gSettings.AutoCreationTemplateId;
-                    ddlAutoCreateTemplate.Enabled = chkAutoCreate.Checked;
-                    ddlAutoCreateTemplate.Visible = showAutoCreate;
+                    ifcAutoCreateTemplate.Visible = showAutoCreate;
+                    ddlAutoCreateTemplate.Enabled = (showAutoCreate && chkAutoCreate.Checked);
 
                     //fill parentsitelookup ddl
                     ddlParentSiteLookup.DataSource = GetAvailableParentSiteLookups(list, gSettings);
@@ -286,8 +286,6 @@ namespace EPMLiveCore.Layouts.epmlive
                     ddlParentSiteLookup.DataValueField = "Value";
                     ddlParentSiteLookup.DataBind();
                     ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
-                    ddlParentSiteLookup.Enabled = chkAutoCreate.Checked;
-                    ddlParentSiteLookup.Visible = showAutoCreate;
 
                     //load list icon
                     spnListIcon.CssClass = gSettings.ListIcon;

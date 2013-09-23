@@ -8,7 +8,6 @@ namespace EPMLiveCore.API
 {
     public static class FRFQueryFactory
     {
-
         public static string GetQuery(AnalyticsData data)
         {
             var query = string.Empty;
@@ -18,8 +17,10 @@ namespace EPMLiveCore.API
                     query = GetFavoriteQueries(data);
                     break;
                 case AnalyticsType.Frequent:
+                    query = GetFrequentQueries(data);
                     break;
                 case AnalyticsType.Recent:
+                    query = GetRecentQueries(data);
                     break;
                 case AnalyticsType.FavoriteWorkspace:
                     query = GetFavoriteWorkspaceQueries(data);
@@ -36,7 +37,7 @@ namespace EPMLiveCore.API
             switch (data.Action)
             {
                 case AnalyticsAction.Create:
-                    query = GetAddFavQuery(data);
+                    query = GetCreateFavoriteQuery(data);
                     break;
                 case AnalyticsAction.Read:
                     query = GetReadFavoriteQuery(data);
@@ -45,7 +46,7 @@ namespace EPMLiveCore.API
 
                     break;
                 case AnalyticsAction.Delete:
-                    query = GetRemoveFavQuery(data);
+                    query = GetRemoveFavoriteQuery(data);
                     break;
             }
             return query;
@@ -57,7 +58,7 @@ namespace EPMLiveCore.API
             switch (data.Action)
             {
                 case AnalyticsAction.Create:
-                    query = GetAddFavWorkSpaceQuery(data);
+                    query = GetCreateFavWorkSpaceQuery(data);
                     break;
                 case AnalyticsAction.Read:
                     query = GetReadFavWorkSpaceQuery(data);
@@ -72,14 +73,50 @@ namespace EPMLiveCore.API
             return query;
         }
 
-        #region FAVORITE 
-
-        private static string GetAddFavQuery(AnalyticsData data)
+        private static string GetFrequentQueries(AnalyticsData data)
         {
-            return data.IsItem ? queryAddFav_Item : queryAddFav_NonItem;
+            var query = string.Empty;
+            switch (data.Action)
+            {
+                case AnalyticsAction.Create:
+                    query = GetCreateFrequentQuery(data);
+                    break;
+                case AnalyticsAction.Read:
+                    query = GetReadFrequentQuery(data);
+                    break;
+                case AnalyticsAction.Update:
+                    query = GetUpdateFrequentQuery(data);
+                    break;
+                case AnalyticsAction.Delete:
+                    query = GetRemoveFrequentQuery(data);
+                    break;
+            }
+            return query;
         }
 
-        private static string GetRemoveFavQuery(AnalyticsData data)
+        private static string GetRecentQueries(AnalyticsData data)
+        {
+            var query = string.Empty;
+            switch (data.Action)
+            {
+                case AnalyticsAction.Create:
+                    query = GetCreateRecentItemQuery(data);
+                    break;
+            }
+            return query;
+        }
+
+		
+
+
+        #region FAVORITE 
+
+        private static string GetCreateFavoriteQuery(AnalyticsData data)
+        {
+            return data.IsItem ? queryCreateFav_Item : queryCreateFav_NonItem;
+        }
+
+        private static string GetRemoveFavoriteQuery(AnalyticsData data)
         {
             return data.IsItem ? queryRemoveFav_Item : queryRemoveFav_NonItem;
         }
@@ -108,14 +145,14 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        private static string queryAddFav_Item =
+        private static string queryCreateFav_Item =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Icon]=@icon AND [Title]=@title AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
 	                    INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Int])
                                     VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Favorite) + @", (SELECT MAX([F_Int]) FROM FRF) + 1 )
                         
                     END";
-        private static string queryAddFav_NonItem =
+        private static string queryCreateFav_NonItem =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
@@ -150,9 +187,9 @@ namespace EPMLiveCore.API
 
         #region FAVORITE WORKSPACE
 
-        private static string GetAddFavWorkSpaceQuery(AnalyticsData data)
+        private static string GetCreateFavWorkSpaceQuery(AnalyticsData data)
         {
-            return data.IsItem ? queryAddFavWS_Item : queryAddFavWS_NonItem;
+            return data.IsItem ? queryCreateFavWS_Item : queryCreateFavWS_NonItem;
         }
 
         private static string GetRemoveFavWorkSpaceQuery(AnalyticsData data)
@@ -185,14 +222,14 @@ namespace EPMLiveCore.API
                         SELECT 'false'
                     END";
 
-        private static string queryAddFavWS_Item =
+        private static string queryCreateFavWS_Item =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Icon]=@icon AND [Title]=@title AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
 	                    INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Int])
                                     VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @", (SELECT MAX([F_Int]) FROM FRF) + 1 )
                         
                     END";
-        private static string queryAddFavWS_NonItem =
+        private static string queryCreateFavWS_NonItem =
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
@@ -225,6 +262,97 @@ namespace EPMLiveCore.API
                     END";
         #endregion
 
+        #region FREQUENTS
 
+        private static string GetCreateFrequentQuery(AnalyticsData data)
+        {
+            return queryCreateFrequent;
+        }
+
+        private static string GetRemoveFrequentQuery(AnalyticsData data)
+        {
+            return data.IsItem ? queryRemoveFrequent_Item : queryRemoveFrequent_NonItem;
+        }
+
+        private static string GetReadFrequentQuery(AnalyticsData data)
+        {
+            return data.IsItem ? queryCheckFrequentStatus_Item : queryCheckFrequentStatus_NonItem;
+        }
+
+        private static string GetUpdateFrequentQuery(AnalyticsData data)
+        {
+            return data.IsItem ? queryCheckFrequentStatus_Item : queryCheckFrequentStatus_NonItem;
+        }
+
+        private static string queryCheckFrequentStatus_Item =
+                   @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
+                    BEGIN
+	                    SELECT 'true'
+                    END
+                    ELSE
+                    BEGIN
+                        SELECT 'false'
+                    END";
+        private static string queryCheckFrequentStatus_NonItem =
+                   @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
+                    BEGIN
+	                    SELECT 'true'
+                    END
+                    ELSE
+                    BEGIN
+                        SELECT 'false'
+                    END";
+
+        private static string queryCreateFrequent =
+                   @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
+                    BEGIN
+	                    INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Icon], [Title], [Type], [F_Date], [F_Int])
+                                    VALUES (@siteid, @webid, @listid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Frequent) + @", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"', 1)
+                        SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"
+                    END
+                    ELSE 
+                    BEGIN
+                        UPDATE FRF SET [F_Int] = [F_Int] + 1 
+                        WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"                                    
+                        SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"
+                    END";
+        
+
+        private static string queryRemoveFrequent_Item =
+                   @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
+                    BEGIN
+	                    DELETE FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"
+                    END";
+
+        private static string queryRemoveFrequent_NonItem =
+                   @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
+                    BEGIN
+                        DECLARE @dbid uniqueidentifier
+                        SET @dbid = (SELECT FRF_ID FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
+	                    DELETE FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"
+                        SELECT @dbid
+                    END";
+        #endregion
+
+        #region RECENT ITEMS
+
+        private static string GetCreateRecentItemQuery(AnalyticsData data)
+        {
+            return queryCreateRecentItem;
+        }
+
+        private static string queryCreateRecentItem =
+                    @"IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 2) > 20)
+                    BEGIN
+	                    DELETE FROM FRF 
+	                    WHERE [Type] = 2 
+	                    AND [F_Date] NOT IN (SELECT TOP 20 [F_Date] FROM FRF WHERE [Type] = 2 ORDER BY [F_Date] DESC)
+                    END
+
+	                INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Date])
+                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Recent) + @", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"')
+                    SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Recent) + @"
+                    ";
+        #endregion
     }
 }

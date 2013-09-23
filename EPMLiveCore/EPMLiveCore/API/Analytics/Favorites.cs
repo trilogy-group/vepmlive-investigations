@@ -49,6 +49,7 @@ namespace EPMLiveCore.API
                 dt = qExec.ExecuteEpmLiveQuery(
                     FRFQueryFactory.GetQuery(data),
                     FRFQueryParamFactory.GetParam(data));
+
                 ClearCache(data);
                 if (dt.Rows.Count > 0)
                 {
@@ -96,7 +97,6 @@ namespace EPMLiveCore.API
             return result;
         }
 
-
         private static void ClearCache(AnalyticsData data)
         {
             try
@@ -118,6 +118,7 @@ namespace EPMLiveCore.API
             }
             catch { }
         }
+        
     }
 
 

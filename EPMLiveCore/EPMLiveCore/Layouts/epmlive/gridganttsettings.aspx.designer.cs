@@ -229,6 +229,15 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.TextBox txtRequestList;
         
         /// <summary>
+        /// ifcAutoCreate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifcAutoCreate;
+        
+        /// <summary>
         /// chkAutoCreate control.
         /// </summary>
         /// <remarks>
@@ -238,6 +247,15 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.CheckBox chkAutoCreate;
         
         /// <summary>
+        /// ifcAutoCreateTemplate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifcAutoCreateTemplate;
+        
+        /// <summary>
         /// ddlAutoCreateTemplate control.
         /// </summary>
         /// <remarks>
@@ -245,6 +263,15 @@ namespace EPMLiveCore.Layouts.epmlive {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlAutoCreateTemplate;
+        
+        /// <summary>
+        /// ifcParentSiteLookup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl ifcParentSiteLookup;
         
         /// <summary>
         /// ddlParentSiteLookup control.

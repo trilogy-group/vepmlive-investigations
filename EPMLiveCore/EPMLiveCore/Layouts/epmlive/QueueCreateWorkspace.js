@@ -182,67 +182,7 @@ function registerCreateWorkspace2Script() {
                 }
                 
             };
-
-            //self.loadMarketThenDownloaded = function() {
-            //    if (self.marketApps().length === 0) {
-            //        $.ajax({
-            //            type: "POST",
-            //            url: self.solutionLibPath,
-            //            data: { data: self.loadMarketAppsParams() },
-            //            success: function (result) {
-            //                if (result !== "<Templates />") {
-            //                    var oJson = w.epmLive.parseJson(result);
-            //                    // make sure all properties exist, 
-            //                    // so no error occurs when I bind with knockout.js
-            //                    var qualifiedTemps = self.getCleanTempCollection(oJson.Templates.Template);
-            //                    self.marketApps(qualifiedTemps);
-            //                }
-            //                self.marketAppsLoading(false);
-                            
-            //                self.loadDownloadedApps();
-            //            },
-            //            error: function (jqXhr, textStatus, errorThrown) {
-            //                //alert(errorThrown);
-            //                self.marketAppsLoading(false);
-            //            }
-            //        });
-            //    } else {
-            //        self.marketAppsLoading(false);
-            //    }
-
-               
-            //};
             
-            //self.loadDownloadedThenMarket = function () {
-            //    if (self.marketApps().length === 0) {
-            //        $.ajax({
-            //            type: "POST",
-            //            url: self.solutionLibPath,
-            //            data: { data: self.loadMarketAppsParams() },
-            //            success: function (result) {
-            //                if (result !== "<Templates />") {
-            //                    var oJson = w.epmLive.parseJson(result);
-            //                    // make sure all properties exist, 
-            //                    // so no error occurs when I bind with knockout.js
-            //                    var qualifiedTemps = self.getCleanTempCollection(oJson.Templates.Template);
-            //                    self.marketApps(qualifiedTemps);
-            //                }
-                            
-            //                $('#marketLoading').fadeOut();
-            //                self.loadMarketApps();
-            //            },
-            //            error: function (jqXhr, textStatus, errorThrown) {
-            //                //alert(errorThrown);
-            //                $('#marketLoading').fadeOut();
-            //            }
-            //        });
-            //    } else {
-            //        $('#marketLoading').fadeOut();
-            //    }
-
-               
-            //};
-
             self.getCleanTempCollection = function(objColl) {
                 var qualifiedTemps = [];
                 if ($(objColl).length > 1) {

@@ -70,7 +70,6 @@
     var cbEnableReport = "<%=cbEnableReporting.ClientID%>";
     var cbEnableWSCreation = "<%=chkEnableRequests.ClientID%>";
     var ddlAutoCreateTemplateId = "<%=ddlAutoCreateTemplate.ClientID%>";
-    var ddlParentSiteLookupId = "<%=ddlParentSiteLookup.ClientID%>";
     var cbAutoCreateId = "<%=chkAutoCreate.ClientID%>";
 </script>
 
@@ -309,19 +308,19 @@
 				 </Template_Control>
 			</wssuc:InputFormControl>
 
-            <wssuc:InputFormControl LabelText="Auto Create" runat="server">
+            <wssuc:InputFormControl ID="ifcAutoCreate" runat="server" LabelText="Auto Create">
 				 <Template_Control>
-                    <asp:CheckBox ID="chkAutoCreate" runat="server" Text="Auto Create" />
+                    <asp:CheckBox ID="chkAutoCreate" runat="server" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
 
-            <wssuc:InputFormControl LabelText="Select Template" runat="server">
+            <wssuc:InputFormControl ID="ifcAutoCreateTemplate" runat="server" LabelText="Select Template">
 				 <Template_Control>
                     <asp:DropDownList ID="ddlAutoCreateTemplate" runat="Server" ></asp:DropDownList>
 				 </Template_Control>
 			</wssuc:InputFormControl>
 
-            <wssuc:InputFormControl LabelText="Select Parent Site Lookup" runat="server">
+            <wssuc:InputFormControl ID="ifcParentSiteLookup" runat="server" LabelText="Parent Site Template">
 				 <Template_Control>
                     <asp:DropDownList ID="ddlParentSiteLookup" runat="Server" ></asp:DropDownList>
 				 </Template_Control>

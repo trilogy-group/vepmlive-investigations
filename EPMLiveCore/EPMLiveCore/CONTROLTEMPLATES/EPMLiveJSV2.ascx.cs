@@ -20,6 +20,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected string ListId;
         protected string ListTitle;
         protected string ItemId;
+        protected string ItemTitle;
         protected string CurrentUserId;
         protected string CurrentUrl;
         protected string ListIconClass;
@@ -84,6 +85,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
             ItemId = "-1";
             try{ItemId = (SPContext.Current.Item != null) ? SPContext.Current.ItemId.ToString() : "-1";}catch{}
+
+            ItemTitle = string.Empty;
+            try { ItemTitle = (SPContext.Current.Item != null) ? SPContext.Current.ListItemDisplayName : string.Empty; }catch { }
 
             CurrentFileIsNull = "True";
             try { CurrentFileIsNull = (SPContext.Current.File == null).ToString(); }catch { }

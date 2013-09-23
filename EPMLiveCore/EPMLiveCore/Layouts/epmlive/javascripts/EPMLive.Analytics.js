@@ -67,13 +67,23 @@
 
                                             if (epmLive.responseIsSuccess(result) && result['#text']) {
                                                 $('#favoritesStar').removeClass('icon-star-active');
-                                                //SP.UI.Notify.addNotification('Favorite removed', false);
-                                                $.pnotify({
-                                                    title: 'Favorite Removed',
-                                                    text: 'An existing item has been removed from your favorites list.',
-                                                    type: 'success',
-                                                    styling: 'jqueryui'
-                                                });
+                                               
+                                                toastr.options = {
+                                                    "closeButton": false,
+                                                    "debug": false,
+                                                    "positionClass": "toast-top-right",
+                                                    "onclick": null,
+                                                    "showDuration": "300",
+                                                    "hideDuration": "1000",
+                                                    "timeOut": "5000",
+                                                    "extendedTimeOut": "1000",
+                                                    "showEasing": "swing",
+                                                    "hideEasing": "linear",
+                                                    "showMethod": "fadeIn",
+                                                    "hideMethod": "fadeOut"
+                                                };
+
+                                                toastr.success("An existing item has been removed from your favorites list.");
 
                                                 var sa = result['#text'].split(',');
                                                 // asynchronously update nav
@@ -131,14 +141,23 @@
                         if (epmLive.responseIsSuccess(result) && result['#text']) {
                             //onSuccess(result);
                             $('#favoritesStar').addClass('icon-star-active');
-                            //SP.UI.Notify.addNotification('New favorite added', false);
                             
-                            $.pnotify({
-                                title: 'New Favorite Added',
-                                text: 'A new item has been added to your favorites list.',
-                                type: 'success',
-                                styling: 'jqueryui'
-                            });
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "positionClass": "toast-top-right",
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            };
+
+                            toastr.success("A new item has been added to your favorites list.");
                             
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
@@ -179,41 +198,82 @@
                 "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
                 "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
                 "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
-                "<Param key=\"ListTitle\">" + $$.currentListTitle + "</Param>" +
+                "<Param key=\"Title\">" + $$.currentListTitle + "</Param>" +
                 "<Param key=\"Type\">3</Param>" +
                 "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
             "</Data>";
         
         function countFrequentApps() {
-            $.ajax({
-                type: 'POST',
-                url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                data: "{ Function: 'LoadFavoriteStatus', Dataxml: '" + frequentData + "' }",
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                success: function (response) {
-                    if (response.d) {
-                        var resp = $$.parseJson(response.d);
-                        var result = resp.Result;
-                        if ($$.responseIsSuccess(result) && result['#text'] === 'false') {
-                            $('#favoritesStar').fadeIn(1000);
-                        } else if ($$.responseIsSuccess(result) && result['#text'] === 'true') {
-                            $('#favoritesStar').addClass('icon-star-active');
-                            $('#favoritesStar').fadeIn(1000);
+            
+            var sPrevList = '';
+            if ($.cookie('FrequentApp_CurrentList')) {
+                sPrevList = $.cookie('FrequentApp_CurrentList');
+            }
+            var sCurrentList = $$.currentListTitle;
+            if ($$.currentListViewUrl && sCurrentList && (sPrevList != sCurrentList)) {
+                // set the cookie
+                var date = new Date();
+                var minutes = 30;
+                date.setTime(date.getTime() + (minutes * 60 * 1000));
+                $.cookie("FrequentApp_CurrentList", sCurrentList, { expires: date, path: '/' });
+                // add frequent app
+                $.ajax({
+                    type: 'POST',
+                    url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    data: "{ Function: 'CreateFrequentApp', Dataxml: '" + frequentData + "' }",
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.d) {
+                            
                         }
-                        
-                        
+                    },
+                    error: function (response) {
+                        alert(response);
                     }
-                },
-                error: function (response) {
-                    //onError(response);
-                }
-            });
+                });
+            }
+            
         }
         
         countFrequentApps();
         
         //====== RECENT ========================
+        var RecentData =
+            "<Data>" +
+                "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
+                "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
+                "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
+                "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
+                "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
+                "<Param key=\"Title\">" + $$.currentItemTitle + "</Param>" +
+                "<Param key=\"Type\">2</Param>" +
+                "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
+            "</Data>";
+
+        function countRecentItem() {
+            if (!$$.currentListViewUrl && $$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
+                // add recent item
+                $.ajax({
+                    type: 'POST',
+                    url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    data: "{ Function: 'CreateRecentItem', Dataxml: '" + RecentData + "' }",
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.d) {
+
+                        }
+                    },
+                    error: function (response) {
+                        alert(response);
+                    }
+                });
+            }
+
+        }
+
+        countRecentItem();
 
         //====== HELPER FUNCTIONS =============
 
@@ -235,6 +295,10 @@
             } else {
                 
             }
+        };
+
+        a.getAddFavDynamicValue = function(ele) {
+            return $($(ele).parent().find('#favTitle').get(0)).val();
         };
         
         function removeSource(url) {

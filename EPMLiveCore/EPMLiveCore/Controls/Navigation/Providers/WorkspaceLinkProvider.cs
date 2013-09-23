@@ -21,12 +21,22 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     url: '{0}/_layouts/15/epmlive/QueueCreateWorkspace.aspx', 
                     dialogReturnValueCallback: function(dialogResult, returnValue){{ 
                         if (dialogResult === 1){{ 
-                             $.pnotify({{
-                                        title: 'Workspace Queued',
-                                        text: 'Your workspace is being created - we will notify you when it is ready.',
-                                        type: 'info',
-                                        styling: 'jqueryui'
-                                    }});
+                            toastr.options = {{
+                                'private closeButton': false,
+                                'debug': false,
+                                'positionClass': 'toast-top-right',
+                                'onclick': null,
+                                'showDuration': '300',
+                                'hideDuration': '1000',
+                                'timeOut': '5000',
+                                'extendedTimeOut': '1000',
+                                'showEasing': 'swing',
+                                'hideEasing': 'linear',
+                                'showMethod': 'fadeIn',
+                                'hideMethod': 'fadeOut'
+                            }} ;
+
+                            toastr.info('Your workspace is being created - we will notify you when it is ready.');
                         }}
                     }} 
                 }}; 
