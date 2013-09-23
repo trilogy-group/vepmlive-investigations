@@ -69,6 +69,7 @@
     <Compile Include="Tenrox\Infrastructure\IObjectManager.cs" />
     <Compile Include="Tenrox\Infrastructure\ObjectManager.cs" />
     <Compile Include="Tenrox\Infrastructure\ObjectManagerFactory.cs" />
+    <Compile Include="Tenrox\Infrastructure\TenroxObject.cs" />
     <Compile Include="Tenrox\Managers\ProjectManager.cs" />
     <Compile Include="Tenrox\Services\Proxies\TenroxAuthService.cs">
       <SubType>Code</SubType>

@@ -5,9 +5,11 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 {
     internal interface IObjectManager
     {
-        #region Operations (1) 
+        #region Operations (2) 
 
         List<ColumnProperty> GetColumns();
+
+        IEnumerable<TenroxObject> GetItems(int[] itemIds);
 
         #endregion Operations 
     }

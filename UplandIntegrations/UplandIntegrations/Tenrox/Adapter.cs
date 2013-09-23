@@ -103,8 +103,7 @@ namespace UplandIntegrations.Tenrox
 
                 if (string.IsNullOrEmpty(objectName)) throw new Exception("Please provide an object.");
 
-                TenroxService txService = GetTenroxService(webProps);
-                return txService.GetObjectFields(objectName);
+                return GetTenroxService(webProps).GetObjectFields(objectName);
             }
             catch (Exception e)
             {
@@ -121,7 +120,19 @@ namespace UplandIntegrations.Tenrox
 
         public DataTable GetItem(WebProperties webProps, IntegrationLog log, string itemId, DataTable items)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var txService = GetTenroxService(webProps);
+                txService.GetObjectItemsById((string) webProps.Properties["Object"], itemId, items);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, e.Message.StartsWith("No records found")
+                                              ? IntegrationLogType.Warning
+                                              : IntegrationLogType.Error);
+            }
+
+            return items;
         }
 
         public Dictionary<string, string> GetDropDownValues(WebProperties webProps, IntegrationLog log, string property,
