@@ -33,7 +33,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 });
 
-                string b64 = EncodeTo64(CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "epmliveapiurl") + "/integration.asmx`" + gAuth + "`" + SPContext.Current.Web.Url + "_layouts/epmlive/reporting.aspx");
+                string b64 = EncodeTo64(CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "epmliveapiurl") + "/integration.asmx`" + gAuth + "`" + SPContext.Current.Web.Url + "/_layouts/epmlive/reporting.aspx");
 
                 string url = "https://reports.epmlive.com/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&authid=" + b64;
 
