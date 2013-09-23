@@ -307,7 +307,7 @@ namespace EPMLiveCore.API
                    @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @")
                     BEGIN
 	                    INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [USER_ID], [Icon], [Title], [Type], [F_Date], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Frequent) + @", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"', 1)
+                                    VALUES (@siteid, @webid, @listid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Frequent) + @", GETDATE(), 1)
                         SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Frequent) + @"
                     END
                     ELSE 
@@ -350,7 +350,7 @@ namespace EPMLiveCore.API
                     END
 
 	                INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Date])
-                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Recent) + @", '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + @"')
+                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Recent) + @", GETDATE())
                     SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Recent) + @"
                     ";
         #endregion
