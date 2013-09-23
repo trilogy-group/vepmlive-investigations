@@ -2567,6 +2567,16 @@ namespace EPMLiveWebParts
             if (iHeight != 0)
                 sHeight = "height: " + iHeight.ToString() + suffix;
 
+            output.Write("<table><tr><td>");
+            if (view.RowLimit > 0)
+            {
+                if (gSettings.EnableContentReporting)
+                    output.Write("<div style=\"display:inline-block;margin:5px 0 5px 0;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
+                else
+                    output.Write("<div id=\"pagediv" + sFullGridId + "\" style=\"display:none;margin:5px 0 5px 0;\"><div id=\"PagePrevious" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;padding-left:5px;background-color:#EFEFEF\" onClick=\"javascript:PreviousPage" + sFullGridId + "()\"><a href=\"javascript:void(0);\" style=\"text-decoration:none;color:#666\">&lt; Previous</a></div> <div id=\"PageNext" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;margin-left:10px;padding-right:5px;text-align:right;background-color:#EFEFEF\" onClick=\"javascript:NextPage" + sFullGridId + "()\"><a style=\"text-decoration:none;color:#666\" href=\"javascript:void(0);\">Next &gt;</a></div></div>");
+            }
+            output.Write("</td></tr></table>");
+
             output.WriteLine("<div id=\"griddiv" + sFullGridId + "\" style=\"width:100%;" + sHeight + "\"><treegrid Data_Url=\"" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "\" Debug=\"\"/></div>");
 
             output.Write("<div  width=\"100%\" id=\"loadinggrid" + this.ID + "\" align=\"center\">");
@@ -2574,14 +2584,44 @@ namespace EPMLiveWebParts
             output.Write("</div>");
 
             output.WriteLine("<script language=\"javascript\">");
-            output.WriteLine("Grids.OnRenderFinish = function(grid){grid.ActionZoomFit();};");
+
+            output.WriteLine("function NextPage" + sFullGridId + "(){");
+            output.WriteLine("if(lastItem" + sFullGridId + " != 0){");
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + lastItem" + sFullGridId + ";");
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Reload();");
+
+            output.WriteLine("}}");
+
+            output.WriteLine("function PreviousPage" + sFullGridId + "(){");
+            output.WriteLine("if(fItemHide" + sFullGridId + " != firstItem" + sFullGridId + "){");
+
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + firstItem" + sFullGridId + ";");
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Reload();");
+            output.WriteLine("}}");
+            output.WriteLine("DataUrl" + sFullGridId + " = '" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "'");
+            output.WriteLine(@"Grids.OnRenderFinish = function(grid){
+                               
+                                grid.ActionZoomFit();
+
+
+                        };");
             output.WriteLine("Grids.OnReady = function(grid, start)  { document.getElementById('loadinggrid" + this.ID + "').style.display = 'none'; }");
-            output.WriteLine("Grids.OnRenderFinish = function(grid)  { clickTab(); grid.ScrollToDate(new Date(), 'Left'); }");
+            output.WriteLine(@"Grids.OnRenderFinish = function(grid)  { 
+                    clickTab();
+                    grid.ScrollToDate(new Date(), 'Left'); 
+                    if(ArrGantts.indexOf(grid.id) > -1)
+                        setupPage" + sFullGridId + @"(grid.PagInfo, " + gSettings.EnableContentReporting.ToString().ToLower() + @", grid.PagSize);
+                }");
+            output.WriteLine(@"Grids.OnReload = function(grid)  { 
+                    if(ArrGantts.indexOf(grid.id) > -1)
+                        setupPage" + sFullGridId + @"(grid.PagInfo, " + gSettings.EnableContentReporting.ToString().ToLower() + @", grid.PagSize);
+                }");
             output.WriteLine(@"Grids.OnClick = function(grid, row, col, x, y, event) 
                                 {
+                                    SelectRibbonTab('Ribbon.ListItem', true);
                                     //var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + @"');
                                     //fireEvent(wp, 'mouseup');
-                                    setTimeout('showribbon()', 100);
+                                    //setTimeout('showribbon()', 100);
                                     
                                 };
                                 function showribbon()
@@ -2589,7 +2629,12 @@ namespace EPMLiveWebParts
                                 var wp2 = document.getElementById('Ribbon.ListItem-title');
 		                                                            if(wp2)
 			                                                            fireEvent(wp2.firstChild, 'click'); 
-                                }");  
+                                }");
+
+            output.WriteLine("function ChangePage" + sFullGridId + "(pg){");
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + pg;");
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].ReloadBody();");
+            output.WriteLine("}");
 
             output.WriteLine("ArrGantts.push('GanttGrid" + sFullGridId + "');");
             output.WriteLine("mygrid" + sFullGridId + " = new Object();");

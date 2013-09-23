@@ -63,3 +63,88 @@
         </tr>
     </table>
 </div> 
+
+<script>
+
+var bPageSetup#gridid#;
+var firstItem#gridid#;
+var lastItem#gridid#;
+var fItemHide#gridid#;
+
+function setupPage#gridid#(records, UseReporting, PageSize)
+{
+
+	var pages = Math.ceil(records / PageSize);
+
+	var prev = document.getElementById("PagePrevious#gridid#");
+	var next = document.getElementById("PageNext#gridid#");
+	var pagediv = document.getElementById("pagediv#gridid#");
+
+	if(UseReporting)
+	{
+		if(pages > 1)
+		{
+			if(!bPageSetup#gridid#)
+			{
+				bPageSetup#gridid# = true;
+
+				$("#pagediv#gridid#").paginate({
+					count 		: pages,
+					start 		: 1,
+					display     : 12,
+					border					: true,
+					border_color			: '#CCCCCC',
+					text_color  			: '#666666',
+					background_color    	: '#DDDDDD',	
+					border_hover_color		: '#878787',
+					text_hover_color  		: '#ffffff',
+					background_hover_color	: '#9B9B9B', 
+					rotate      : false,
+					images		: false,
+					mouse		: 'press',
+					onChange	: ChangePage#gridid#
+				});
+			}
+
+		}
+		else
+		{
+			pagediv.style.display = "none";
+		}
+	}
+	else
+	{
+		pagediv.style.display = "inline-block";
+
+		var rec = records.split('|');
+		firstItem#gridid# = parseInt(rec[2]) * -1;
+		lastItem#gridid# = rec[1];
+
+		if(rec[0] == "0" || fItemHide#gridid# == firstItem#gridid#)
+		{
+
+			prev.style.background = "#EFEFEF";
+
+			fItemHide#gridid# = firstItem#gridid#;
+
+		}
+		else
+		{
+			prev.style.background = "#DDDDDD";
+		}
+
+		if(rec[3] == "true")
+			next.style.background = "#DDDDDD";
+		else
+		{
+			prev.style.background = "#EFEFEF";
+			lastItem#gridid# = 0;
+		}
+
+		if(rec[3] != "true" && rec[0] == "0")
+		{
+			pagediv.style.display = "none";
+		}
+	}
+}
+</script>

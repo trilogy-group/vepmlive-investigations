@@ -312,6 +312,24 @@ namespace EPMLiveWebParts
                 processPredecessors(ndRow, doc);
             }
 
+            XmlNode ndPag = docXml.SelectSingleNode("//call[@command='setuppaging']");
+
+            if (ndPag != null)
+            {
+                XmlNode ndCfg = doc.SelectSingleNode("//Cfg");
+
+                XmlAttribute attr = doc.CreateAttribute("PagInfo");
+                attr.Value = ndPag.InnerText;
+                ndSummary.Attributes.Append(attr);
+
+                ndCfg.Attributes.Append(attr);
+
+                attr = doc.CreateAttribute("PagSize");
+                attr.Value = view.RowLimit.ToString();
+                ndSummary.Attributes.Append(attr);
+                
+                ndCfg.Attributes.Append(attr);
+            }
             data = doc.OuterXml;
         }
 
