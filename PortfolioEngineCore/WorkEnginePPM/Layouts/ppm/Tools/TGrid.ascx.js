@@ -107,6 +107,13 @@
             this.grid.SetValue(row, col, value, 1);
     };
 
+    TGrid.prototype.SetComboCellDefaults = function (row, col, defaults) {
+        if (this.grid != null) {
+            this.grid.SetAttribute(row, col, "Defaults", defaults, 1, 0);
+            this.grid.RefreshCell(row, col);
+        }
+    };
+
     TGrid.prototype.AddRow = function () {
         if (this.grid != null)
             return this.grid.AddRow(this.grid.FRow, null, true);
@@ -143,8 +150,10 @@
 TGrid_GridsOnValueChanged = function (grid, row, col, val) {
     var snewVal = val;
     var def = grid.GetAttribute(null, col, "Defaults");
+    if (def == null)
+        def = grid.GetAttribute(row, col, "Defaults");
     var valueField = grid.GetAttribute(null, col, "ValueField");
-    if (def != null && def != "" && valueField != null && val != null && val != "") {
+    if (def != null && def != "" && valueField != null && val != null) {
         var list = JSON_ConvertString(def);
         if (list != null && list.Items != null) {
             var items = list.Items;

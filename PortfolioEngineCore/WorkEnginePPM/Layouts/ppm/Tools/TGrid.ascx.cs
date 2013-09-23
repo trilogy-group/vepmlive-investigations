@@ -208,7 +208,7 @@ namespace WorkEnginePPM
             //xCfg.CreateIntAttr("CaseSensitiveId", 0);
             xCfg.CreateIntAttr("SelectingCells", 1);
             xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "RPEditor");
+            xCfg.CreateStringAttr("CSS", "TGrid");
             xCfg.CreateIntAttr("Sorting", 0);
             xCfg.CreateIntAttr("FastColumns", 1);
             xCfg.CreateIntAttr("StaticCursor", 1);
@@ -297,21 +297,22 @@ namespace WorkEnginePPM
                         case _TGrid.Type.combo:
                             xC.CreateStringAttr("Type", "Text");
                             //xC.CreateIntAttr("CanEdit", 2);
+                            string sJSON = "";
                             if (col.dicCombo != null)
                             {
-                                string sJSON = "";
                                 foreach (KeyValuePair<int, string> item in col.dicCombo)
                                 {
                                     if (sJSON != "")
                                         sJSON += ",";
                                     sJSON += "{Name:'" + item.Key + "',Text:'" + item.Value + "',Value:'" + item.Key + "'}";
                                 }
-                                xC.CreateStringAttr("Defaults", "{Items:[" + sJSON + "]}");
-                                xC.CreateStringAttr("Button", "Defaults");
-                                xC.CreateStringAttr("ValueField", col.name);
-                                xC.CreateIntAttr("MinWidth", 30);
-                                //xC.CreateIntAttr("Range", 1);
                             }
+                            if (sJSON != "")
+                                xC.CreateStringAttr("Defaults", "{Items:[" + sJSON + "]}");
+                            xC.CreateStringAttr("Button", "Defaults");
+                            xC.CreateStringAttr("ValueField", col.name);
+                            xC.CreateIntAttr("MinWidth", 30);
+                            //xC.CreateIntAttr("Range", 1);
                             break;
                         default:
                             xC.CreateStringAttr("Type", "Text");
@@ -367,17 +368,18 @@ namespace WorkEnginePPM
                                     //s = "0";
                                     break;
                                 case _TGrid.Type.combo:
-                                    if (col.dicCombo != null)
+                                    bool bIsNull;
+                                    s = DBAccess.ReadStringValue(row[col.name]);
+                                    int key = DBAccess.ReadIntValue(row[col.name], out bIsNull);
+                                    if (bIsNull == false)
                                     {
-                                        bool bIsNull;
-                                        s = DBAccess.ReadStringValue(row[col.name]);
-                                        int key = DBAccess.ReadIntValue(row[col.name], out bIsNull);
-                                        if (bIsNull == false)
+                                        string sval = string.Empty;
+                                        if (col.dicCombo != null && col.dicCombo.TryGetValue(key, out sval) == true)
                                         {
-                                            string sval = "Unknown";
-                                            col.dicCombo.TryGetValue(key, out sval);
                                             xI.CreateStringAttr(col.name + "_value", sval);
                                         }
+                                        else
+                                            xI.CreateStringAttr(col.name + "_value", "");
                                     }
                                     break;
                                 default:
