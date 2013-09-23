@@ -5388,7 +5388,7 @@
 			}
 
             try {
-				if (this.AnalyzerHideDetailschecked = (this.selectedView.ViewSettings.PerInc == "1")) 
+				if (this.selectedView.ViewSettings.PerInc == "1")
                 { 
                     var perf = this.selectedView.ViewSettings.FinishPeriod;
                     var pers = this.UsingPeriods.CurrentPeriod.Value;
