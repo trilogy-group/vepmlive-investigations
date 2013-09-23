@@ -258,6 +258,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         ProcessGroups(web, w.CurrentUser);
                         ProcessExcel(web);
                         ProcessLists(web);
+                        ProcessIzenda(web);
+
 
                         ClearNavigationCache(w);
 
@@ -288,6 +290,16 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     }
                 }
             });
+        }
+
+        private void ProcessIzenda(SPWeb web)
+        {
+            SPList list = web.Lists.TryGetList("IzendaReports");
+            if(list != null)
+            {
+                string errors = "";
+                EPMLiveCore.API.Reporting.ProcessIzendaReportsFromList(list, out errors);
+            }
         }
 
         private void ProcessLists(SPWeb web)
