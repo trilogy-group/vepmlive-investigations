@@ -620,9 +620,15 @@ namespace EPMLiveWebParts
             //NEED TO DO
 
             bool createworkspace = false;
-            if (dr["WebID"].ToString().Trim("{}".ToCharArray()).Equals(list.ParentWeb.ID.ToString(), StringComparison.CurrentCultureIgnoreCase) && dr.Table.Columns.Contains("_ModerationStatus") && dr["_ModerationStatus"].ToString() == "0")
+            if (dr["WebID"].ToString().Trim("{}".ToCharArray()).Equals(list.ParentWeb.ID.ToString(), StringComparison.CurrentCultureIgnoreCase) && ((dr.Table.Columns.Contains("_ModerationStatus") && dr["_ModerationStatus"].ToString() == "0") || (!dr.Table.Columns.Contains("_ModerationStatus"))))
             {
-                createworkspace = true;
+                if (dr.Table.Columns.Contains("WorkspaceUrl"))
+                {
+                    if (dr["WorkspaceUrl"].ToString() == "")
+                        createworkspace = true;
+                }
+                else
+                    createworkspace = true;
             }
 
             ndNewItem = addMenus(ndNewItem, list, createworkspace.ToString());

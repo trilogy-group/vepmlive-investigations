@@ -151,13 +151,19 @@ namespace EPMLiveWebParts
                 if(Request["requestlist"] == "true")
                 {
                     string childitem = "";
+                    string wsurl = "";
                     try
                     {
                         childitem = li["ChildItem"].ToString();
                     }
                     catch { }
+                    try
+                    {
+                        wsurl = li["WorkspaceUrl"].ToString();
+                    }
+                    catch { }
 
-                    if((li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved) && web.ID == SPContext.Current.Web.ID && childitem == "")
+                    if((li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved) && web.ID == SPContext.Current.Web.ID && childitem == "" && wsurl == "")
                     {
                         items.Add("Create Workspace", getMenuItem(Request["grid"], "Create Workspace", "/_layouts/images/STSICON.gif", "createworkspace", "1"));
                     }
