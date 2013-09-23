@@ -91,7 +91,27 @@ namespace UplandIntegrations.Tenrox
 
         public List<ColumnProperty> GetColumns(WebProperties webProps, IntegrationLog log, string listName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string objectName = null;
+
+                try
+                {
+                    objectName = webProps.Properties["Object"] as string;
+                }
+                catch { }
+
+                if (string.IsNullOrEmpty(objectName)) throw new Exception("Please provide an object.");
+
+                TenroxService txService = GetTenroxService(webProps);
+                return txService.GetObjectFields(objectName);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, IntegrationLogType.Error);
+            }
+
+            return null;
         }
 
         public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynchDate)
@@ -107,7 +127,31 @@ namespace UplandIntegrations.Tenrox
         public Dictionary<string, string> GetDropDownValues(WebProperties webProps, IntegrationLog log, string property,
             string parentpropertyValue)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (property.Equals("Object"))
+                {
+                    return new Dictionary<string, string>
+                    {
+                        {"Client", "Client"},
+                        {"Project", "Project"},
+                        {"Task", "Task"}
+                    };
+                }
+
+                if (property.Equals("UserMapType"))
+                {
+                    return new Dictionary<string, string> {{"Email", "Email"}};
+                }
+
+                throw new Exception("Invalid property.");
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, IntegrationLogType.Error);
+            }
+
+            return null;
         }
 
         public bool TestConnection(WebProperties webProps, IntegrationLog log, out string message)

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security;
 using System.ServiceModel;
+using EPMLiveIntegration;
 using Tenrox.Shared.Utilities;
+using UplandIntegrations.Tenrox.Infrastructure;
 
 namespace UplandIntegrations.Tenrox.Services
 {
@@ -34,5 +37,16 @@ namespace UplandIntegrations.Tenrox.Services
         }
 
         #endregion Constructors 
+
+        #region Methods (1) 
+
+        // Public Methods (1) 
+
+        public List<ColumnProperty> GetObjectFields(string objectName)
+        {
+            return ObjectManagerFactory.GetManager(objectName).GetColumns();
+        }
+
+        #endregion Methods 
     }
 }
