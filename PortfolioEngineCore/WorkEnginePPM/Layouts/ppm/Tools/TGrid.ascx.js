@@ -36,7 +36,7 @@
         if (this.grid != null)
             this.grid.Dispose();
         this.grid = null;
-        this.grid = TreeGrid("<treegrid debug='0' sync='1' Data_Tag='" + this.params.DataTag + "' ></treegrid>", this.params.treegrid_div, this.params.tg_id);
+        this.grid = TreeGrid("<treegrid SuppressMessage='3' debug='0' sync='1' Data_Tag='" + this.params.DataTag + "' ></treegrid>", this.params.treegrid_div, this.params.tg_id);
         //SetEvent("OnValueChanged", this.params.tg_id, this.GridsOnValueChanged);
     };
 
