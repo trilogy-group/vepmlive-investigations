@@ -125,6 +125,7 @@ namespace CADataCache
 
         private List<clsDetailRowData> m_editTargetList = new List<clsDetailRowData>();
 
+        private int m_curr_period = 0;
  
         public CostAnalyzerDataCache()
         {
@@ -136,6 +137,30 @@ namespace CADataCache
         {
 
             m_clsda = clsda;
+
+            m_curr_period = 0;
+            foreach (clsPeriodData oper in clsda.m_Periods.Values)
+            {
+                if (oper.PeriodID > m_curr_period)
+                    m_curr_period = oper.PeriodID;
+            }
+
+            DateTime dt = DateTime.Now;
+
+
+            foreach (clsPeriodData oper in clsda.m_Periods.Values)
+            {
+                if (oper.StartDate <= dt && oper.FinishDate >= dt)
+                {
+                    m_curr_period = oper.PeriodID;
+                    break;
+                }
+            }
+
+
+
+
+
             bool bdefsel = true;
 
             foreach (clsDataItem oItem in m_clsda.m_CostTypes.Values)
@@ -465,6 +490,8 @@ namespace CADataCache
 
                 CStruct xRoot = new CStruct();
                 xRoot.Initialize("Periods");
+                CStruct xCurrPeriod = xRoot.CreateSubStruct("CurrentPeriod");
+                xCurrPeriod.CreateIntAttr("Value", m_curr_period);
 
                 foreach (clsPeriodData oPer in m_clsda.m_Periods.Values)
                 {

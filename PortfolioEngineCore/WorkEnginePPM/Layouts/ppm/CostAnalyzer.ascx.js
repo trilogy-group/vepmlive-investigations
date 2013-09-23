@@ -202,6 +202,13 @@
         this.SelectDetails_OKOnClick(false);
         this.SetSelectedMode(false);
 
+        var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
+        var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
+
+        var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+        var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+        
+
         var dataXml = '<View ViewGUID="' + XMLValue(viewGUID) + '" Name="' + XMLValue(viewName) + '" Default="'
                 + isViewDefault + '" Personal="' + isViewPersonal + '">'
                 + sTopGrid
@@ -211,8 +218,16 @@
                 + this.ModeSettings
                 + this.TotalsColumnSettings
                 + '</OtherData>'
-                + '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '"/>'
-				+ '</View>';
+                + '<ViewSettings ShowBars="' + ssbf + '" HideDetails="' + shdf + '"';
+
+
+                if (StartID == -1)
+                    dataXml += ' PerInc = "1" FinishPeriod="' + FinishID + '" ';
+                else
+                    dataXml += ' PerInc = "0" '
+
+
+                dataXml += '/>' + '</View>';
 
         if (bConvToJSON != true)
             return dataXml;
@@ -326,8 +341,18 @@
             var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
             var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
+
             var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+
+
+
+            if (StartID == -1) {
+                StartID = this.CurrentPeriod;
+            }
+
             var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
+
+
 
             for (var i = 0; i < gcols.length; i++) {
                 if (gcols[i] == "P1C1") {
@@ -575,7 +600,16 @@
             var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
             var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
+
+
             var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
+
+
+
+            if (StartID == -1) {
+                StartID = this.CurrentPeriod;
+            }
+
             var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
             for (var i = 0; i < gcols.length; i++) {
@@ -1930,13 +1964,15 @@
             this.initDataStart = this.initDataStart - 1;
             this.initDataFinish = this.initDataFinish - 1;
 
+            FromList.options[0] = new Option("Current", -1, this.initDataStart == -1, this.initDataStart == -1);
+
 
             for (var n1 = 0; n1 < this.UsingPeriods.Period.length; n1++) {
                 var per = this.UsingPeriods.Period[n1];
                 var perId = per.perID;
                 var perName = per.perName;
 
-                FromList.options[n1] = new Option(perName, perId, n1 == this.initDataStart, n1 == this.initDataStart);
+                FromList.options[n1 + 1] = new Option(perName, perId, n1 == this.initDataStart, n1 == this.initDataStart);
                 ToList.options[n1] = new Option(perName, perId, n1 == this.initDataFinish, n1 == this.initDataFinish);
 
                 if (n1 == 0)
@@ -2023,17 +2059,18 @@
 
 
                 if (jsonObject.Result.Perms.Value == 0) {
-                
-  	                alert("You do not have the Global Permission set to access this functionality!");
 
-	                if (parent.SP.UI.DialogResult)
-	                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-	                else
-	                    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
-                    return;               
+                    alert("You do not have the Global Permission set to access this functionality!");
+
+                    if (parent.SP.UI.DialogResult)
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                    else
+                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+                    return;
                 }
 
                 this.UsingPeriods = jsonObject.Result.Periods;
+                this.CurrentPeriod = this.UsingPeriods.CurrentPeriod.Value;
                 this.CTsPresent = jsonObject.Result.CostTypes;
                 this.CTsPresent.CostType = JSON_GetArray(this.CTsPresent, "CostType");
 
@@ -4227,6 +4264,29 @@
                 this.viewTab.setButtonStateOff("idAnalyzerHideDetails");
             }
 
+
+            try {
+                if (this.selectedView.ViewSettings.PerInc == "1") {
+                    var perf = this.selectedView.ViewSettings.FinishPeriod;
+                    var pers = this.CurrentPeriod;
+
+                    if (perf < pers)
+                        perf = pers;
+                    else if (perf > this.UsingPeriods.Period.length)
+                        perf = this.UsingPeriods.Period.length
+
+                    this.PerStart = pers;
+                    this.PerEnd = perf;
+
+                    document.getElementById("idAnalyzerTab_FromPeriod").selectedIndex = 0;
+                    document.getElementById("idAnalyzerTab_ToPeriod").selectedIndex = perf - 1;
+                    this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
+                    this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                }
+            } catch (e) {
+            }	
+
+
             this.deferredhidedetails = true;
 
         }
@@ -4384,6 +4444,21 @@
                         return;
                     }
 
+
+                    if (fp == -1) {
+                        fp = this.CurrentPeriod;
+
+                        if (tp < fp) {
+                            tp = fp;
+
+                            this.PerEnd = tp;
+
+                            document.getElementById("idAnalyzerTab_ToPeriod").selectedIndex = tp - 1;
+                            this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                        }
+                    }
+
+
                     this.PerStart = fp;
 
                     this.flashGridView("g_1", true);
@@ -4396,6 +4471,10 @@
 
                     var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
                     var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
+
+                    if (fp == -1) {
+                        fp = this.CurrentPeriod;
+                    }
 
                     if (tp < fp) {
                         alert("The To period cannot be before the From Period");
