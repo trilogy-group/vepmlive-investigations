@@ -4,11 +4,90 @@ using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
 using System.Xml;
+using System.Data.SqlClient ;
 
 namespace EPMLiveCore.API
 {
-    internal class Reporting
+    public class Reporting
     {
+        public static void ProcessIzendaReportsFromList(SPList list, out string sError)
+        {
+            string iError = "";
+            sError = "";
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(list.ParentWeb.Site.WebApplication.Id));
+                cn.Open();
+                try
+                {
+                    foreach (SPListItem li in list.Items)
+                    {
+
+                        iAddIzendaReport(li.Title, li["Xml"].ToString(), cn, list.ParentWeb.Site.ID.ToString());
+
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+                    iError = ex.Message;
+                }
+                cn.Close();
+            });
+            sError = iError;
+            
+
+        }
+
+        public static void AddIzendaReport(SPWeb web, string title, string xml, out string sError)
+        {
+            string iError = "";
+            sError = "";
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                cn.Open();
+                try
+                {
+                    iAddIzendaReport(title, xml, cn, web.Site.ID.ToString());
+                }
+                catch (Exception ex)
+                {
+                    iError = ex.Message;
+                }
+                cn.Close();
+            });
+            sError = iError;
+        }
+
+        private static void iAddIzendaReport(string title, string xml, SqlConnection cn, string siteid)
+        {
+
+            SqlCommand cmd = new SqlCommand("select * from IzendaAdHocReports where Name=@name and TenantID=@siteid", cn);
+            cmd.Parameters.AddWithValue("@name", title);
+            cmd.Parameters.AddWithValue("@siteid", siteid);
+            SqlDataReader dr = cmd.ExecuteReader();
+            bool bFound = false;
+            if (dr.Read())
+            {
+                bFound = true;
+            }
+            dr.Close();
+
+            if (!bFound)
+            {
+                cmd = new SqlCommand("INSERT INTO IzendaAdHocReports (Name,Xml,CreatedDate,ModifiedDate,TenantID) VALUES (@name,@xml,GETDATE(),GETDATE(),@siteid)", cn);
+                cmd.Parameters.AddWithValue("@name", title);
+                cmd.Parameters.AddWithValue("@siteid", siteid);
+                cmd.Parameters.AddWithValue("@xml", xml);
+                cmd.ExecuteNonQuery();
+            }
+            else
+            {
+                throw new Exception("Report Already Exists");
+            }
+        }
+
         public static void ProcessReportDataSources(SPWeb web, string FileList)
         {
             XmlDocument docFiles = new XmlDocument();
