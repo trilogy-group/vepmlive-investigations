@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
-using Tenrox.Shared.Utilities;
 using UplandIntegrations.Tenrox.Managers;
+using UplandIntegrations.TenroxAuthService;
 
 namespace UplandIntegrations.Tenrox.Infrastructure
 {

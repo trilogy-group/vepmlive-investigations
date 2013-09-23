@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -7,7 +8,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text.RegularExpressions;
 using EPMLiveIntegration;
-using Tenrox.Shared.Utilities;
+using UplandIntegrations.TenroxAuthService;
 
 namespace UplandIntegrations.Tenrox.Infrastructure
 {
@@ -17,7 +18,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         protected readonly Binding Binding;
         protected readonly EndpointAddress EndpointAddress;
-        protected readonly UserToken Token;
+        protected readonly object Token;
         private readonly Type _objectType;
         protected Dictionary<string, string> DisplayNameDict;
         protected Dictionary<string, string> MappingDict;
@@ -26,22 +27,23 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         #region Constructors (1) 
 
-        protected ObjectManager(Binding binding, string endpointAddress, UserToken token, Type objectType)
+        protected ObjectManager(Binding binding, string endpointAddress, UserToken token, Type objectType,
+            Type tokenType)
         {
             MappingDict = new Dictionary<string, string>();
             DisplayNameDict = new Dictionary<string, string>();
 
             Binding = binding;
+            Token = TranslateToken(token, tokenType);
             EndpointAddress = new EndpointAddress(endpointAddress);
-            Token = token;
             _objectType = objectType;
         }
 
         #endregion Constructors 
 
-        #region Methods (3) 
+        #region Methods (5) 
 
-        // Public Methods (2) 
+        // Public Methods (3) 
 
         public virtual List<ColumnProperty> GetColumns()
         {
@@ -93,7 +95,11 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         }
 
         public abstract IEnumerable<TenroxObject> GetItems(int[] itemIds);
-        // Private Methods (1) 
+
+        public abstract IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, Guid integrationId,
+            string integrationKey);
+
+        // Private Methods (2) 
 
         private Type GetProperType(Type propertyType)
         {
@@ -103,6 +109,23 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
 
             return propertyType;
+        }
+
+        private object TranslateToken(UserToken token, Type tokenType)
+        {
+            object newToken = Activator.CreateInstance(tokenType);
+
+            foreach (PropertyInfo property in typeof (UserToken).GetProperties())
+            {
+                newToken.GetType().GetProperty(property.Name).SetValue(newToken, property.GetValue(token));
+            }
+
+            foreach (FieldInfo field in typeof (UserToken).GetFields())
+            {
+                newToken.GetType().GetField(field.Name).SetValue(newToken, field.GetValue(token));
+            }
+
+            return newToken;
         }
 
         #endregion Methods 

@@ -1,17 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Security;
 using EPMLiveIntegration;
+using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.Tenrox.Services;
 
 namespace UplandIntegrations.Tenrox
 {
     public class Adapter : IIntegrator, IIntegratorControls
     {
-        #region Methods (2) 
+        #region Fields (1) 
 
-        // Private Methods (2) 
+        private const string UPSERT_ERROR_MESSAGE =
+            @"Could not upsert record. Tenrox ID: {0}.EPMLive ID: {1}. Reason: {2}";
+
+        #endregion Fields 
+
+        #region Methods (3) 
+
+        // Private Methods (3) 
+
+        private static Dictionary<string, string> BuildIdMap(DataTable items, out List<string> ids)
+        {
+            var idMap = new Dictionary<string, string>();
+            ids = new List<string>();
+
+            foreach (DataRow dataRow in items.Rows)
+            {
+                object oId = dataRow["ID"];
+
+                if (oId == null || oId == DBNull.Value) continue;
+
+                string id = oId.ToString();
+                if (ids.Contains(id)) continue;
+
+                ids.Add(id);
+                idMap.Add(id, dataRow["SPID"].ToString());
+            }
+
+            return idMap;
+        }
 
         private void GetAuthInfo(WebProperties webProps, out string orgUrl, out string orgName, out string username,
             out SecureString password)
@@ -81,7 +111,54 @@ namespace UplandIntegrations.Tenrox
 
         public TransactionTable UpdateItems(WebProperties webProps, DataTable items, IntegrationLog log)
         {
-            throw new NotImplementedException();
+            var transactionTable = new TransactionTable();
+
+            try
+            {
+                TenroxService txService = GetTenroxService(webProps);
+
+                List<string> ids;
+                Dictionary<string, string> idMap = BuildIdMap(items, out ids);
+
+                int index = 0;
+
+                IEnumerable<TenroxUpsertResult> results = txService.UpsertItems((string) webProps.Properties["Object"],
+                    items, webProps.IntegrationId, "EPM12345");
+
+                foreach (TenroxUpsertResult result in results)
+                {
+                    string txId = result.Id.ToString(CultureInfo.InvariantCulture);
+                    string spId;
+
+                    try
+                    {
+                        spId = idMap[txId];
+                    }
+                    catch
+                    {
+                        spId = items.Rows[index]["SPID"].ToString();
+                    }
+
+                    if (result.Success)
+                    {
+                        transactionTable.AddRow(spId, txId, result.TransactionType);
+                    }
+                    else
+                    {
+                        transactionTable.AddRow(spId, txId, TransactionType.FAILED);
+                        log.LogMessage(string.Format(UPSERT_ERROR_MESSAGE, txId, spId, result.Error),
+                            IntegrationLogType.Warning);
+                    }
+
+                    index++;
+                }
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message, IntegrationLogType.Error);
+            }
+
+            return transactionTable;
         }
 
         public TransactionTable DeleteItems(WebProperties webProps, DataTable items, IntegrationLog log)
@@ -122,14 +199,14 @@ namespace UplandIntegrations.Tenrox
         {
             try
             {
-                var txService = GetTenroxService(webProps);
+                TenroxService txService = GetTenroxService(webProps);
                 txService.GetObjectItemsById((string) webProps.Properties["Object"], itemId, items);
             }
             catch (Exception e)
             {
                 log.LogMessage(e.Message, e.Message.StartsWith("No records found")
-                                              ? IntegrationLogType.Warning
-                                              : IntegrationLogType.Error);
+                    ? IntegrationLogType.Warning
+                    : IntegrationLogType.Error);
             }
 
             return items;

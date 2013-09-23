@@ -5,8 +5,8 @@ using System.Linq;
 using System.Security;
 using System.ServiceModel;
 using EPMLiveIntegration;
-using Tenrox.Shared.Utilities;
 using UplandIntegrations.Tenrox.Infrastructure;
+using UplandIntegrations.TenroxAuthService;
 
 namespace UplandIntegrations.Tenrox.Services
 {
@@ -41,9 +41,9 @@ namespace UplandIntegrations.Tenrox.Services
 
         #endregion Constructors 
 
-        #region Methods (4) 
+        #region Methods (6) 
 
-        // Public Methods (2) 
+        // Public Methods (3) 
 
         public List<ColumnProperty> GetObjectFields(string objectName)
         {
@@ -70,13 +70,13 @@ namespace UplandIntegrations.Tenrox.Services
                         switch (column)
                         {
                             case "SPID":
-                                value = item.GetType().GetProperty("Id").GetValue(item);
+                                value = GetValue(item, "Id");
                                 break;
                             case "ID":
-                                value = item.GetType().GetProperty("UniqueId").GetValue(item);
+                                value = GetValue(item, "UniqueId");
                                 break;
                             default:
-                                value = item.GetType().GetProperty(column).GetValue(item);
+                                value = GetValue(item, column);
                                 break;
                         }
 
@@ -89,7 +89,13 @@ namespace UplandIntegrations.Tenrox.Services
             }
         }
 
-        // Private Methods (2) 
+        public IEnumerable<TenroxUpsertResult> UpsertItems(string objectName, DataTable items, Guid integrationId,
+            string integrationKey)
+        {
+            return GetManager(objectName).UpsertItems(items, integrationId, integrationKey);
+        }
+
+        // Private Methods (3) 
 
         private static IEnumerable<int> GetIds(string itemId)
         {
@@ -106,6 +112,11 @@ namespace UplandIntegrations.Tenrox.Services
         private IObjectManager GetManager(string objectName)
         {
             return ObjectManagerFactory.GetManager(objectName, _binding, _svcUrl, _token);
+        }
+
+        private static object GetValue(object item, string property)
+        {
+            return item.GetType().GetProperty(property).GetValue(item);
         }
 
         #endregion Methods 
