@@ -29,7 +29,8 @@
         }
 
         .ms-dialog .epm-nav-pinned,
-        .ms-dialog #s4-ribbonrow {
+        .ms-dialog #s4-ribbonrow,
+        .ms-dialog #s4-workspace {
             margin-left: 0;
         }
     </Sharepoint:StyleBlock>
@@ -44,7 +45,8 @@
         }
         
         .ms-dialog .epm-nav-unpinned,
-        .ms-dialog  #s4-ribbonrow {
+        .ms-dialog #s4-ribbonrow,
+        .ms-dialog #s4-workspace {
             margin-left: 0;
         }
     </Sharepoint:StyleBlock>

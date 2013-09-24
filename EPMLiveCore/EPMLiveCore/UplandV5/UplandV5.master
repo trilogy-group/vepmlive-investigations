@@ -505,7 +505,6 @@
             <!-- Template Versoning -->
             <epm:TemplateVersoning runat="server"></epm:TemplateVersoning>
             <!-- // Template Versoning -->
-
             <asp:ContentPlaceHolder id="PlaceHolderUtilityContent" runat="server" />
         </SharePoint:AjaxDelta>
         <SharePoint:ScriptBlock runat="server">
