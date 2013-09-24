@@ -234,7 +234,7 @@
                 moveinfos: moveInfos
             };
 
-            $.post(webUrl + asyncNavActionsUrl, postData, function (data) {
+            $.post(epmLive.currentWebFullUrl + asyncNavActionsUrl, postData, function (data) {
                 if (data.indexOf('success') != -1) {
                     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', '1', '');
                     return false;
