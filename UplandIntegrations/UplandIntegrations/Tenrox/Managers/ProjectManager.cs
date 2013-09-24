@@ -21,7 +21,7 @@ namespace UplandIntegrations.Tenrox.Managers
         #region Constructors (1) 
 
         public ProjectManager(Binding binding, string endpointAddress, TenroxAuthService.UserToken token)
-            : base(binding, endpointAddress + "sdk/projects.svc", token, typeof (Project), typeof (UserToken))
+            : base(binding, endpointAddress, "projects.svc", token, typeof (Project), typeof (UserToken))
         {
             MappingDict = new Dictionary<string, string>
             {
@@ -64,8 +64,7 @@ namespace UplandIntegrations.Tenrox.Managers
             }
         }
 
-        public override IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, Guid integrationId,
-            string integrationKey)
+        public override IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, string integrationKey)
         {
             using (var projectsClient = new ProjectsClient(Binding, EndpointAddress))
             {
@@ -124,6 +123,8 @@ namespace UplandIntegrations.Tenrox.Managers
                     try
                     {
                         Project p = projectsClient.Save(_token, proj);
+                        UpdateBinding(p.UniqueId, 2, integrationKey);
+
                         return new TenroxUpsertResult(p.UniqueId, TransactionType.INSERT);
                     }
                     catch (Exception exception)

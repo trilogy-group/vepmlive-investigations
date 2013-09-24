@@ -123,7 +123,7 @@ namespace UplandIntegrations.Tenrox
                 int index = 0;
 
                 IEnumerable<TenroxUpsertResult> results = txService.UpsertItems((string) webProps.Properties["Object"],
-                    items, webProps.IntegrationId, "EPM12345");
+                    items, "EPM12345");
 
                 foreach (TenroxUpsertResult result in results)
                 {

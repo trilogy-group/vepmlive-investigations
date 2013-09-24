@@ -89,10 +89,9 @@ namespace UplandIntegrations.Tenrox.Services
             }
         }
 
-        public IEnumerable<TenroxUpsertResult> UpsertItems(string objectName, DataTable items, Guid integrationId,
-            string integrationKey)
+        public IEnumerable<TenroxUpsertResult> UpsertItems(string objectName, DataTable items, string integrationKey)
         {
-            return GetManager(objectName).UpsertItems(items, integrationId, integrationKey);
+            return GetManager(objectName).UpsertItems(items, integrationKey);
         }
 
         // Private Methods (3) 

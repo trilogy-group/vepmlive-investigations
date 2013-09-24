@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using EPMLiveIntegration;
 
@@ -7,13 +6,15 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 {
     internal interface IObjectManager
     {
-        #region Operations (3) 
+        #region Operations (4) 
 
         List<ColumnProperty> GetColumns();
 
         IEnumerable<TenroxObject> GetItems(int[] itemIds);
 
-        IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, Guid integrationId, string integrationKey);
+        void UpdateBinding(int itemId, int objectType, string integrationKey);
+
+        IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, string integrationKey);
 
         #endregion Operations 
     }
