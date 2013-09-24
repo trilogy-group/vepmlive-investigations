@@ -432,7 +432,7 @@
                     }
                 }
 
-                function changePinState(state) {
+                function changePinState(state,remember) {
                     var elements = ['s4-ribbonrow', 's4-workspace'];
                     for (var e in elements) {
                         var $e = $('#' + elements[e]);
@@ -451,16 +451,19 @@
                     }
 
                     $sn.data('pinstate', state);
-                    $.cookie(pinStateCookie, state, cookieOptions);
-                }
-
-                function togglePinned() {
-                    if ($sn.data('pinstate') === 'pinned') {
-                        changePinState('unpinned');
-                    } else {
-                        changePinState('pinned');
+                    
+                    if (remember) {
+                        $.cookie(pinStateCookie, state, cookieOptions);
                     }
                 }
+
+                window.epmLiveNavigation.togglePinned = function(remember) {
+                    if ($sn.data('pinstate') === 'pinned') {
+                        changePinState('unpinned', remember);
+                    } else {
+                        changePinState('pinned', remember);
+                    }
+                };
 
                 function getSelectedSubLevelNode() {
                     return ($.cookie(selectedTlNodeCookie) || 'epm-nav-top-ql').replace('epm-nav-top-', 'epm-nav-sub-');
@@ -848,16 +851,6 @@
                         handleContextualCommand(id, webId, listId, itemId, command, kind);
                     };
 
-                    window.epmLiveNavigation.unpin = function() {
-                        $sn.parent().fadeOut(300);
-                        
-                        $('.epm-nav-pinned').each(function () {
-                            var $el = $(this);
-                            $el.removeClass('epm-nav-pinned');
-                            $el.addClass('epm-nav-unpinned');
-                        });
-                    };
-
                     $('td.epm-nav-node-root').click(function () {
                         var $td = $(this);
                         var id = $td.parent().find('a').get(0).id;
@@ -877,7 +870,7 @@
                     var $pin = $('#epm-nav-pin');
 
                     $pin.click(function () {
-                        togglePinned();
+                        window.epmLiveNavigation.togglePinned(true);
                     });
 
                     $sn.hover(function (event) {
