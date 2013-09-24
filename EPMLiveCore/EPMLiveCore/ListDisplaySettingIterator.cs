@@ -325,8 +325,23 @@ namespace EPMLiveCore
             {
                 string sUrl = (List.ParentWeb.ServerRelativeUrl == "/") ? "" : List.ParentWeb.ServerRelativeUrl;
 
-                RedirectUrl = String.Concat(sUrl, "/", List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl); 
+                RedirectUrl = String.Concat(sUrl, "/", List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl);
+
+                ProcessNewItemRecent();
             }
+        }
+
+        protected void HandleNewItemRecent(object sender, EventArgs e)
+        {
+            if (SaveButton.SaveItem(SPContext.Current, false, ""))
+            {
+                ProcessNewItemRecent();
+            }
+        }
+
+        protected void ProcessNewItemRecent()
+        {
+            //YOURCODEHERE
         }
 
         protected override void OnInit(EventArgs e)
@@ -366,7 +381,12 @@ namespace EPMLiveCore
                         SPContext.Current.FormContext.OnSaveHandler += new EventHandler(CustomHandler);
                     }
                     else if (!string.IsNullOrEmpty(Page.Request["Source"]))
+                    {
                         RedirectUrl = Page.Request["Source"];
+                        SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
+                    }
+                    else
+                        SPContext.Current.FormContext.OnSaveHandler += new EventHandler(HandleNewItemRecent);
                     //string strDisplay = CoreFunctions.getListSetting(List, "DisplaySettings");
                     //string[] strGeneral = CoreFunctions.getListSetting(List, "GeneralSettings").Split('\n');
                     if (gSettings.DisplaySettings != "")
