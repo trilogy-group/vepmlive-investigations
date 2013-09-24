@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Web;
 using System.Web.UI;
 using System.Xml.Linq;
 using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
@@ -17,12 +15,13 @@ namespace EPMLiveWebParts
 {
     public partial class ResourceGridUserControl : UserControl
     {
-        #region Fields (4) 
+        #region Fields (5) 
 
-        private string _debugTag;
-        private string _webPartHeight;
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         protected string WcReportId = "Resource Work vs. Capacity".Md5();
         protected string WebUrl = SPContext.Current.Web.SafeServerRelativeUrl();
+        private string _debugTag;
+        private string _webPartHeight;
 
         #endregion Fields 
 
@@ -50,11 +49,11 @@ namespace EPMLiveWebParts
                 Guid lockedWeb = CoreFunctions.getLockedWeb(theWeb);
 
                 using (SPWeb configWeb = (theWeb.ID != lockedWeb
-                                              ? theWeb.Site.OpenWeb(lockedWeb)
-                                              : theWeb.Site.OpenWeb(theWeb.ID)))
+                    ? theWeb.Site.OpenWeb(lockedWeb)
+                    : theWeb.Site.OpenWeb(theWeb.ID)))
                 {
                     return configWeb.DoesUserHavePermissions(theWeb.CurrentUser.LoginName,
-                                                             SPBasePermissions.AddAndCustomizePages);
+                        SPBasePermissions.AddAndCustomizePages);
                 }
             }
         }
@@ -101,8 +100,8 @@ namespace EPMLiveWebParts
             get
             {
                 return !string.IsNullOrEmpty(WebPartHeight)
-                           ? Convert.ToInt32(WebPartHeight.Replace("height:", string.Empty).Replace("px", string.Empty))
-                           : 0;
+                    ? Convert.ToInt32(WebPartHeight.Replace("height:", string.Empty).Replace("px", string.Empty))
+                    : 0;
             }
         }
 
@@ -169,35 +168,15 @@ namespace EPMLiveWebParts
 
             if (resourcesList != null)
             {
-                string version = string.Empty;
-
-                string temp;
-                if (!IsInDebugMode(out temp))
+                foreach (string style in new[] {"libraries/jquery-ui"})
                 {
-                    string fileVersion =
-                        FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-
-                    if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
-                    {
-                        fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-                    }
-
-                    version = "?v=" + fileVersion;
+                    SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
                 }
 
-                var stylesheets = new[] {"stylesheets/libraries/jquery-ui.css"};
-
-                foreach (string stylesheet in stylesheets)
+                EPMLiveScriptManager.RegisterScript(Page, new[]
                 {
-                    CssRegistration.Register(string.Format("/_layouts/epmlive/{0}", stylesheet));
-                }
-
-                var javascripts = new[] {"treegrid/GridE.js", "javascripts/EPMLive.ResourceGrid.js" + version};
-
-                foreach (string javascript in javascripts)
-                {
-                    ScriptLink.Register(Page, string.Format("/_layouts/epmlive/{0}", javascript), false);
-                }
+                    "libraries/jquery.min", "/treegrid/GridE", "@EPMLive.ResourceGrid"
+                });
 
                 ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
             }
@@ -232,8 +211,8 @@ namespace EPMLiveWebParts
             foreach (string keyword in epmDebug.Split(',').Select(k => k.ToLower()))
             {
                 info.AddRange(keyword.Equals("all")
-                                  ? keywords.Where(k => !k.Equals("Event"))
-                                  : keywords.Where(k => keyword.Equals(k.ToLower())));
+                    ? keywords.Where(k => !k.Equals("Event"))
+                    : keywords.Where(k => keyword.Equals(k.ToLower())));
             }
 
             _debugTag = string.Format(@"debug=""{0}""", string.Join(",", info.Distinct().ToArray()));

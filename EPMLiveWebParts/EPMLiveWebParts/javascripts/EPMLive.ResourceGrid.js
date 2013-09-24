@@ -752,7 +752,7 @@ function registerEpmLiveResourceGridScript() {
                     g.Update();
                     g.Render();
 
-                    $('.EPMLiveResourceGridGroup').click(function () {
+                    $('.EPMLiveResourceGridGroup').click(function (event) {
                         try {
                             var row = $(this).parent();
                             if (row) {
@@ -770,6 +770,8 @@ function registerEpmLiveResourceGridScript() {
                                                 } else {
                                                     g.Expand(row);
                                                 }
+
+                                                event.stopPropagation();
                                             }
                                         }
                                     }

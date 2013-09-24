@@ -11,7 +11,7 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ResourceGridUserControl.ascx.cs" Inherits="EPMLiveWebParts.ResourceGridUserControl" %>
 
 <asp:Panel ID="pnlGrid" runat="server">
-    <style type="text/css">
+    <SharePoint:StyleBlock runat="server">
         input[type=text]::-ms-clear {
             display: none !important;
         }
@@ -136,7 +136,7 @@
         
         .EPMLiveResourceGridPanelHovered {
             background-color: #E6F2FB !important;
-            background-image: url(<%= WebUrl %>/_layouts/epmlive/treegrid/resourcegrid/blackcheck.png) !important;
+            background-image: url(/_layouts/15/epmlive/treegrid/resourcegrid/blackcheck.png) !important;
             background-position: center center !important;
             background-repeat: no-repeat !important;
             cursor: pointer;
@@ -144,7 +144,7 @@
         }
         
         .EPMLiveResourceGridPanelHoveredSelected {
-            background-image:url(<%= WebUrl %>/_layouts/epmlive/treegrid/resourcegrid/whitecheck.png) !important;
+            background-image:url(/_layouts/15/epmlive/treegrid/resourcegrid/whitecheck.png) !important;
             background-position: center center !important;
             background-color: #0072C6 !important;
             border-right-color: rgba(156, 206, 240, 0.5) !important;
@@ -196,7 +196,7 @@
         .s4-wpTopTable {
             border: none !important;
         }
-    </style>
+    </SharePoint:StyleBlock>
     
     <div id="ResourceGridLoader" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
         <div class="ms-dlgBorder" style="width: 365px; height: 144px;">
@@ -237,7 +237,7 @@
     </div>
     
     <div id="EPMResourceGrid" class="rg-clear-fix" style="width:100%;height:800px;">
-         <script type="text/javascript">
+         <SharePoint:ScriptBlock runat="server">
              function initializeResourceGridWP() {
                  if (document.location.href.toLowerCase().indexOf('resource.aspx') !== -1) {
                      function showLoading() {
@@ -270,7 +270,7 @@
              }
 
              SP.SOD.executeOrDelayUntilScriptLoaded(initializeResourceGridWP, "EPMLive.ResourceGrid.js");
-         </script>
+         </SharePoint:ScriptBlock>
     </div>
 
     <script id="RWPSaveView-<%= WebPartId %>" type="text/html">
