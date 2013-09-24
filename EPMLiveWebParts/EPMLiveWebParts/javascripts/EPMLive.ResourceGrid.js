@@ -1701,25 +1701,7 @@ function registerEpmLiveResourceGridScript() {
             $$.actions.loadRibbon();
             $$.actions.hideEasyScroll(true);
 
-            var isIe = false;
-            var cellClass = '';
-
-            try {
-                cellClass = evt.explicitOriginalTarget.className;
-            } catch (e) {
-                isIe = true;
-                cellClass = evt.srcElement.className;
-            }
-
-            if (cellClass && (cellClass.indexOf('GSPanel') !== -1 || cellClass.indexOf('GSCellPanel') !== -1)) {
-                if (!isIe) {
-                    if (cellClass.indexOf('GSPanelSelect') !== -1) {
-                        grid.GetSelRows().length === 0 ? grid.SelectAllRows(1) : grid.SelectAllRows(0);
-                    } else {
-                        grid.SelectRow(row, !row.Selected);
-                    }
-                }
-            } else if (row.Kind === 'Data' && row.Def.Name === 'R') {
+            if (row.Kind === 'Data' && row.Def.Name === 'R') {
                 var status;
 
                 if ((evt.shiftKey && evt.ctrlKey) || (!evt.shiftKey && !evt.ctrlKey)) {
