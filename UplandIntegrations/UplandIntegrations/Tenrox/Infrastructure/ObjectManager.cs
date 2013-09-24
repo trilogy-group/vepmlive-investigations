@@ -7,7 +7,6 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text.RegularExpressions;
-using System.Web.ModelBinding;
 using EPMLiveIntegration;
 using UplandIntegrations.TenroxIntegrationService;
 using UserToken = UplandIntegrations.TenroxAuthService.UserToken;
@@ -16,16 +15,16 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 {
     internal abstract class ObjectManager : IObjectManager
     {
-        #region Fields (7) 
+        #region Fields (8) 
 
         protected readonly Binding Binding;
         protected readonly EndpointAddress EndpointAddress;
         protected readonly object Token;
         private readonly string _endpointAddress;
+        private readonly Dictionary<string, Type> _objectFields;
         private readonly Type _objectType;
         protected Dictionary<string, string> DisplayNameDict;
         protected Dictionary<string, string> MappingDict;
-        private readonly Dictionary<string, Type> _objectFields;
 
         #endregion Fields 
 
@@ -47,7 +46,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         #endregion Constructors 
 
-        #region Methods (6) 
+        #region Methods (7) 
 
         // Public Methods (4) 
 
@@ -65,7 +64,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                 _objectFields.Add(property.Name, GetProperType(property.PropertyType));
             }
 
-            var columns = (from pair in _objectFields
+            List<ColumnProperty> columns = (from pair in _objectFields
                 let field = pair.Key
                 let valid = !(field.EndsWith("Id") && _objectFields.ContainsKey(field.Substring(0, field.Length - 2)))
                 where valid
@@ -125,6 +124,55 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         }
 
         public abstract IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, string integrationKey);
+        // Protected Methods (1) 
+
+        protected object GetValue(object value, PropertyInfo property)
+        {
+            try
+            {
+                Type type = GetProperType(property.PropertyType);
+
+                string val = value.ToString();
+
+                if (type == typeof (string))
+                {
+                    return val;
+                }
+
+                if (type == typeof (DateTime))
+                {
+                    return DateTime.Parse(val);
+                }
+
+                if (type == typeof (int))
+                {
+                    return int.Parse(val);
+                }
+
+                if (type == typeof (decimal))
+                {
+                    return decimal.Parse(val);
+                }
+
+                if (type == typeof (float))
+                {
+                    return float.Parse(val);
+                }
+
+                if (type == typeof (double))
+                {
+                    return double.Parse(val);
+                }
+
+                if (type == typeof (bool))
+                {
+                    return bool.Parse(val);
+                }
+            }
+            catch { }
+
+            return value;
+        }
 
         // Private Methods (2) 
 

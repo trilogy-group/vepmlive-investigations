@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using EPMLiveIntegration;
@@ -83,12 +84,19 @@ namespace UplandIntegrations.Tenrox.Managers
                     }
                     catch { }
 
-                    try
+                    if (project == null)
                     {
-                        project = projectsClient.CreateNew(_token);
-                        project.Id = row["SPID"].ToString();
+                        try
+                        {
+                            project = projectsClient.CreateNew(_token);
+                            project.Id = row["SPID"].ToString();
+                        }
+                        catch { }
                     }
-                    catch { }
+
+                    if (project == null) continue;
+
+                    Type type = project.GetType();
 
                     foreach (
                         string column in
@@ -99,12 +107,12 @@ namespace UplandIntegrations.Tenrox.Managers
                     {
                         try
                         {
-                            typeof (Project).GetProperty(column).SetValue(project, row[column]);
+                            PropertyInfo property = type.GetProperty(column);
+                            property.SetValue(project, GetValue(row[column], property));
                         }
                         catch { }
                     }
 
-                    if (project == null) continue;
 
                     if (project.UniqueId > 0)
                     {
