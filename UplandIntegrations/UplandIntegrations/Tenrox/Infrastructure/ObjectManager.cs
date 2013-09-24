@@ -36,12 +36,13 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             MappingDict = new Dictionary<string, string>();
             DisplayNameDict = new Dictionary<string, string>();
 
-            Binding = binding;
             _endpointAddress = endpointAddress;
-            Token = TranslateToken(token, tokenType);
-            EndpointAddress = new EndpointAddress(_endpointAddress + "sdk/" + svcUrl);
             _objectType = objectType;
             _objectFields = new Dictionary<string, Type>();
+
+            Binding = binding;
+            Token = TranslateToken(token, tokenType);
+            EndpointAddress = new EndpointAddress(_endpointAddress + "sdk/" + svcUrl);
         }
 
         #endregion Constructors 
@@ -124,6 +125,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         }
 
         public abstract IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, string integrationKey);
+        
         // Protected Methods (1) 
 
         protected object GetValue(object value, PropertyInfo property)
