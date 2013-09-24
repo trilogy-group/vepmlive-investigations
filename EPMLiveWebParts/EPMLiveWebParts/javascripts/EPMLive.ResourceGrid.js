@@ -752,7 +752,7 @@ function registerEpmLiveResourceGridScript() {
                     g.Update();
                     g.Render();
 
-                    $('.EPMLiveResourceGridGroupTitle').click(function () {
+                    $('.EPMLiveResourceGridGroup').click(function () {
                         try {
                             var row = $(this).parent();
                             if (row) {

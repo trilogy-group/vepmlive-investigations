@@ -483,6 +483,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="IntegrationModuleDisplay\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ddf10ea0-4cf8-42fa-909a-45d8279e9792}</SharePointProjectItemId>
     </None>
+    <None Include="javascripts\EPMLive.ResourceGrid.min.js.map">
+      <DependentUpon>EPMLive.ResourceGrid.js</DependentUpon>
+    </None>
     <None Include="javascripts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b4edbe17-7726-46f6-b2e7-0bb1cf6b3477}</SharePointProjectItemId>
     </None>
@@ -800,6 +803,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="javascripts\EPMLive.AssignmentPlanner.js" />
     <Content Include="javascripts\EPMLive.ResourceGrid.ContextualTabPageComponent.js" />
     <Content Include="javascripts\EPMLive.ResourceGrid.js" />
+    <Content Include="javascripts\EPMLive.ResourceGrid.min.js">
+      <DependentUpon>EPMLive.ResourceGrid.js</DependentUpon>
+    </Content>
     <Content Include="javascripts\EPMLive.WorkCenter.js" />
     <Content Include="javascripts\GridGantt.js" />
     <Content Include="javascripts\jquery.multiselect.min.js" />
