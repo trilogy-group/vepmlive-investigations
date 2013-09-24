@@ -15,8 +15,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
 {
     public partial class UploadProfilePicture : LayoutsPageBase
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         private const string PROFILE_PICTURE_LIBRARY_NAME = "User Profile Pictures";
 
         #endregion Fields 
@@ -61,7 +62,18 @@ namespace EPMLiveWebParts.Layouts.epmlive
             SavePicture(pic);
         }
 
-        protected void Page_Load(object sender, EventArgs e) { }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            foreach (string style in new[] {"Vendors/ImageAreaSelect/imgareaselect-default.min"})
+            {
+                SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
+            }
+
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "libraries/jquery.min", "libraries/jquery.imgareaselect.pack.js"
+            });
+        }
 
         protected void UploadPictureButton_Click(object sender, EventArgs e)
         {

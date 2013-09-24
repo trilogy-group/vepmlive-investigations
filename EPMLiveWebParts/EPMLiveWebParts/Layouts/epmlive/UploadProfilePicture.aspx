@@ -9,9 +9,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="UploadProfilePicture.aspx.cs" Inherits="EPMLiveWebParts.Layouts.epmlive.UploadProfilePicture" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    <link href="/_layouts/15/epmlive/Stylesheets/Vendors/ImageAreaSelect/imgareaselect-default.min.css" rel="stylesheet" />
-
-    <style>
+    <SharePoint:StyleBlock runat="server">
         .profileInput {
             -moz-min-width: 6em;
             -ms-min-width: 6em;
@@ -49,19 +47,16 @@
         #pic-frame { text-align: center; }
 
         #pic-frame > img {
-            max-height: 550px;
-            max-width: 550px;
+            max-height: 515px;
+            max-width: 515px;
         }
+    </SharePoint:StyleBlock>
 
-    </style>
-
-    <script type="text/javascript">
+    <SharePoint:ScriptBlock runat="server">
         function closeDialog() {
             parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, null);
         }
-    </script>
-    
-    <script src="/_layouts/15/epmlive/javascripts/libraries/jquery.imgareaselect.pack.js"> </script>
+    </SharePoint:ScriptBlock>
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -90,36 +85,57 @@
         <asp:HiddenField ID="FileNameField" runat="server"></asp:HiddenField>
         <asp:HiddenField ID="ResizeInfoField" ClientIDMode="Static" runat="server"></asp:HiddenField>
         
-        <script type="text/javascript">
+        <SharePoint:ScriptBlock runat="server">
             (function () {
-                var x1 = 0;
-                var x2 = 0;
-                var y1 = 0;
-                var y2 = 0;
-                
-                var $pic = $('img#profile-pic');
+                function prepareImage($pic) {
+                    var x1 = 0;
+                    var x2 = 0;
+                    var y1 = 0;
+                    var y2 = 0;
 
-                var h = $pic.height();
-                var w = $pic.width();
+                    var h = $pic.height();
+                    var w = $pic.width();
 
-                x2 = h < w ? h : w;
-                y2 = x2;
+                    x2 = h < w ? h : w;
+                    y2 = x2;
 
-                $(document).ready(function () {
-                    $pic.imgAreaSelect({
-                        handles: true,
-                        aspectRatio: '1:1',
-                        x1: x1,
-                        x2: x2,
-                        y1: y1,
-                        y2: y2,
-                        onSelectEnd: function (img, selection) {
-                            $('#ResizeInfoField').val(w + '|' + h + '|' + selection.width + '|' + selection.height + '|' + selection.x1 + '|' + selection.y1 + '|' + selection.x2 + '|' + selection.y2);
-                        }
+                    $(document).ready(function () {
+                        $pic.imgAreaSelect({
+                            handles: true,
+                            aspectRatio: '1:1',
+                            x1: x1,
+                            x2: x2,
+                            y1: y1,
+                            y2: y2,
+                            onSelectEnd: function (img, selection) {
+                                $('#ResizeInfoField').val(w + '|' + h + '|' + selection.width + '|' + selection.height + '|' + selection.x1 + '|' + selection.y1 + '|' + selection.x2 + '|' + selection.y2);
+                            }
+                        });
                     });
-                });
+                }
+
+                function tryLoadingImage() {
+                    var ready = false;
+                    var $pic = $('img#profile-pic');
+
+                    if ($pic.length > 0) {
+                        if ($pic.height() > 0) {
+                            ready = true;
+                        }
+                    }
+                    
+                    if (ready) {
+                        prepareImage($pic);
+                    } else {
+                        window.setTimeout(function () {
+                            tryLoadingImage();
+                        }, 1);
+                    }
+                }
+
+                tryLoadingImage();
             })();
-        </script>
+        </SharePoint:ScriptBlock>
     </asp:Panel>
 </asp:Content>
 
