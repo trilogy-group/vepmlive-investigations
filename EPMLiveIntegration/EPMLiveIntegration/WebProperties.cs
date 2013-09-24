@@ -28,6 +28,7 @@ namespace EPMLiveIntegration
         public Hashtable Properties;
         public Guid IntegrationId;
         public ArrayList EnabledFeatures;
+        public string IntegrationAPIUrl;
     }
 
 }
