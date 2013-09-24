@@ -1499,6 +1499,9 @@ namespace EPMLiveCore.API.Integration
                 }
                 catch { }
             }
+
+            props.IntegrationAPIUrl = GetAPIUrl(_site.WebApplication.Id);
+
             return props;
         }
 
