@@ -53,7 +53,7 @@ namespace EPMLiveCore.API
             _id = id;
             _cn = cn;
             _configJob = configJob;
-
+            
             _dtMessages.Columns.Add(new DataColumn("ID", typeof(int)));
             _dtMessages.Columns.Add(new DataColumn("ParentID", typeof(int)));
             _dtMessages.Columns.Add(new DataColumn("ErrorLevel", typeof(int)));
@@ -3182,7 +3182,7 @@ namespace EPMLiveCore.API
 
                     if (!bVerifyOnly)
                     {
-
+                        EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(oWeb.Url, Infrastructure.CacheStoreCategory.Navigation);
                         try
                         {
                             oListItem["InstallXML"] = appDef.ApplicationXml.OuterXml;

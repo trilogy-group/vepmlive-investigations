@@ -1273,6 +1273,9 @@ namespace EPMLiveCore.API
                             CreateTopNavXML(li.ID, web);
                         }
                     }
+
+                    EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(web.Url, Infrastructure.CacheStoreCategory.Navigation);
+
                     return li.ID;
                 }
                 catch (Exception ex)
