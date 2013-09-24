@@ -848,6 +848,16 @@
                         handleContextualCommand(id, webId, listId, itemId, command, kind);
                     };
 
+                    window.epmLiveNavigation.unpin = function() {
+                        $sn.parent().fadeOut(300);
+                        
+                        $('.epm-nav-pinned').each(function () {
+                            var $el = $(this);
+                            $el.removeClass('epm-nav-pinned');
+                            $el.addClass('epm-nav-unpinned');
+                        });
+                    };
+
                     $('td.epm-nav-node-root').click(function () {
                         var $td = $(this);
                         var id = $td.parent().find('a').get(0).id;
