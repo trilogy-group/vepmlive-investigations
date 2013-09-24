@@ -146,7 +146,7 @@ namespace UplandIntegrations.Tenrox.Managers
                     try
                     {
                         Project p = projectsClient.Save(_token, proj);
-                        return new TenroxUpsertResult(p.UniqueId, TransactionType.INSERT);
+                        return new TenroxUpsertResult(p.UniqueId, TransactionType.UPDATE);
                     }
                     catch (Exception exception)
                     {
