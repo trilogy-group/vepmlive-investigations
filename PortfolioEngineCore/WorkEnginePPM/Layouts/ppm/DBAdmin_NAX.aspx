@@ -12,10 +12,6 @@
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxtabbar.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxtabbar_start.js" type="text/javascript"></script>
 
-
-<link rel="stylesheet" type="text/css" href="/_layouts/ppm/ribbon/ribbon2.css" />
-<script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
-
 <style type="text/css">
     .dhx_tabbar_row { background-color:#eeeeee !important;}
 </style>
@@ -25,9 +21,9 @@
 .ms-cui-tabBody {
     border-bottom: 0 !important;
 }
-BODY #s4-workspace {
+/*BODY #s4-workspace {
     height: 100% !important;
-}
+}*/
 html, body {
     width: 100%;
     height: 100%;
@@ -67,14 +63,16 @@ html, body {
     };
 
     var OnResize = function (event) {
-        var width = document.documentElement.clientWidth - 3;
         var divMain = document.getElementById("mainDiv");
-        var d = findAbsolutePosition(divMain);
-        var height = document.documentElement.clientHeight - d[1];
+        var lefttop = findAbsolutePosition(divMain);
+        var width = document.documentElement.clientWidth - lefttop[0] - 26;
+        var height = document.documentElement.clientHeight - lefttop[1] - 26;
         if (width != null && height != null && width > 400 && height > 300) {
             //window.setTimeout("tabbar.setSize(" + width + "," + height + ");", 100);
-            tabbar.setSize(width, height);
-            tabbar.normalize(null, false);
+            if (tabbar != null) {
+                tabbar.setSize(width, height);
+                tabbar.normalize(null, false);
+            }
         }
     };
 

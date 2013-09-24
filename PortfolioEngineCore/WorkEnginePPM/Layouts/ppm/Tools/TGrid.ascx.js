@@ -60,17 +60,20 @@
         }
         return "";
     };
-
     TGrid.prototype.GetTop = function () {
         var div = document.getElementById(this.params.treegrid_div);
         var xy = this.findAbsolutePosition(div);
         return xy[1];
     };
+    TGrid.prototype.GetLeftTopPositions = function () {
+        var div = document.getElementById(this.params.treegrid_div);
+        var xy = this.findAbsolutePosition(div);
+        return xy;
+    };
     TGrid.prototype.SetWidth = function (w) {
         var div = document.getElementById(this.params.treegrid_div);
         div.style.width = w + "px";
     };
-
     TGrid.prototype.SetHeight = function (h) {
         var div = document.getElementById(this.params.treegrid_div);
         div.style.height = h + "px";
@@ -78,11 +81,10 @@
     TGrid.prototype.SetSizes = function (w, h) {
         var div = document.getElementById(this.params.treegrid_div);
         if (w > 11)
-            div.style.width = (w - 11) + "px";
+            div.style.width = w + "px";
         if (h > 5)
-            div.style.height = (h - 5) + "px";
+            div.style.height = h + "px";
     };
-
     TGrid.prototype.findAbsolutePosition = function (obj) {
         var curleftx = 0;
         var curtopy = 0;
@@ -94,26 +96,22 @@
         }
         return [curleftx, curtopy];
     };
-
     TGrid.prototype.GetCellValue = function (row, col) {
         //return this.grid.GetValue(row, col);
         if (this.grid != null)
             return this.grid.GetAttribute(row, col, null);
         return null;
     };
-
     TGrid.prototype.SetCellValue = function (row, col, value) {
         if (this.grid != null)
             this.grid.SetValue(row, col, value, 1);
     };
-
     TGrid.prototype.SetComboCellDefaults = function (row, col, defaults) {
         if (this.grid != null) {
             this.grid.SetAttribute(row, col, "Defaults", defaults, 1, 0);
             this.grid.RefreshCell(row, col);
         }
     };
-
     TGrid.prototype.AddRow = function () {
         if (this.grid != null)
             return this.grid.AddRow(this.grid.FRow, null, true);

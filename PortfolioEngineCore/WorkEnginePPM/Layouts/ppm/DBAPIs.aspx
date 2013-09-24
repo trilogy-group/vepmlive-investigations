@@ -83,10 +83,10 @@
     };
 
     function OnResize(event) {
-        var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 15;
+        var lefttop = dgrid1.GetLeftTopPositions();
+        var newHeight = document.documentElement.clientHeight - lefttop[1] - 8;
         dgrid1.SetHeight(newHeight);
-        var newWidth = document.documentElement.clientWidth - 9;
+        var newWidth = document.documentElement.clientWidth - lefttop[0] - 8;
         dgrid1.SetWidth(newWidth);
     };
 

@@ -142,22 +142,73 @@ namespace WorkEnginePPM
             int nCTId = xData.GetIntAttr("CT_ID");
             int nCBId = xData.GetIntAttr("CB_ID");
 
-            // add job to ueue for immediate execution
-            CStruct xRequest = new CStruct();
-            xRequest.Initialize("Request");
-            CStruct xSet = xRequest.CreateSubStruct("EPKSet");
-            xSet.CreateString("EPKAuth", "");
-            CStruct xProcess = xSet.CreateSubStruct("EPKProcess");
-            xProcess.CreateInt("RequestNo", 2);
-            CStruct xCBCTs = xProcess.CreateSubStruct("CBCTs");
-            CStruct xCBCT = xCBCTs.CreateSubStruct("CBCT");
-            xCBCT.CreateIntAttr("CTID", nCTId);
-            xCBCT.CreateIntAttr("CBID", nCBId);
-            int lRowsAffected;
-            dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), out lRowsAffected);
+            int lMethod = 1;
+            if (lMethod == 0)
+            {
+                // add job to Queue for immediate execution
+                CStruct xRequest = new CStruct();
+                xRequest.Initialize("Request");
+                CStruct xSet = xRequest.CreateSubStruct("EPKSet");
+                xSet.CreateString("EPKAuth", "");
+                CStruct xProcess = xSet.CreateSubStruct("EPKProcess");
+                xProcess.CreateInt("RequestNo", 2);
+                CStruct xCBCTs = xProcess.CreateSubStruct("CBCTs");
+                CStruct xCBCT = xCBCTs.CreateSubStruct("CBCT");
+                xCBCT.CreateIntAttr("CTID", nCTId);
+                xCBCT.CreateIntAttr("CBID", nCBId);
+                int lRowsAffected;
+                dbaQueueManager.PostCostValues(dba, "Post Cost Values for CTID=" + nCTId.ToString("0") + " and CBID=" + nCBId.ToString("0"), xRequest.XML(), out lRowsAffected);
+            }
+            else if (lMethod == 1)
+            {
+                // execute synchronously - NAX Version
+                CStruct xRequest = new CStruct();
+                xRequest.Initialize("Data");
+                CStruct xCB = xRequest.CreateSubStruct("CB");
+                xCB.CreateIntAttr("Id", nCBId);
+                CStruct xCT = xRequest.CreateSubStruct("CT");
+                xCT.CreateIntAttr("Id", nCTId);
+
+                string sResult = "";
+                string sPostInstruction = "";
+                bool bUpdateOK = true;
+
+                bUpdateOK = dbaCostValues.PostCostValues(dba, xRequest.XML(), out sResult, out sPostInstruction);
+
+                //Admininfos adminCore = GetAdminCore(SecurityLevels.Base);
+                //bUpdateOK = adminCore.PostCostValues(xDataInputElement.XML(), out sResult, out sPostInstruction);
+
+                //if (!AdminFunctions.CalcCategoryRates(dba, out sReply))
+                //{
+                //    sReply = DBAccess.FormatAdminError("error", "Post Cost Values.Post", sReply);
+                //    dba.Status = StatusEnum.rsRequestCannotBeCompleted;
+                //}
+                //else
+                //{
+                //    //CStruct xCalendar = new CStruct();
+                //    //xCalendar.Initialize("calendar");
+                //    //xCalendar.CreateIntAttr("calendarid", nCalendarId);
+                //    //xCalendar.CreateStringAttr("name", sCalendarName);
+                //    //sReply = xCalendar.XML();
+                //}
+            }
+            else if (lMethod == 2)
+            {
+                // add job to Queue for immediate execution - NAX version
+            }
 
             return sReply;
         }
+
+        //private Admininfos GetAdminCore(SecurityLevels secLevel, bool debugging = false)
+        //{
+        //    Admininfos adminClass = null;
+
+        //    SPSecurity.RunWithElevatedPrivileges(
+        //        () => { adminClass = InitilizeAdminCore(secLevel, debugging, Username); });
+
+        //    return adminClass;
+        //}
 
         #endregion
     }

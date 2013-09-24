@@ -141,10 +141,11 @@ html, body {
         }
     };
     var OnResize = function (event) {
-        var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top;
-        var newWidth = document.documentElement.clientWidth;
-        dgrid1.SetSizes(newWidth,newHeight);
+        var lefttop = dgrid1.GetLeftTopPositions();
+        var newHeight = document.documentElement.clientHeight - lefttop[1] - 8;
+        dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - lefttop[0] - 24;
+        dgrid1.SetWidth(newWidth);
     };
     function SendRequest(sXML) {
          sURL = "./GroupPermissions.ashx";

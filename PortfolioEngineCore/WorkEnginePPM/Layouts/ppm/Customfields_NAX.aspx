@@ -195,10 +195,13 @@ html, body {
         }
     };
     var OnResize = function (event) {
-        var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top;
-        var newWidth = document.documentElement.clientWidth;
-        dgrid1.SetSizes(newWidth,newHeight);
+        var lefttop = dgrid1.GetLeftTopPositions();
+        var newHeight = document.documentElement.clientHeight - lefttop[1] - 8;
+        dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - lefttop[0] - 24;
+        //var toolbardiv=document.getElementById('idToolbarDiv');
+        //var newWidth = toolbardiv.offsetWidth;
+        dgrid1.SetWidth(newWidth);
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);

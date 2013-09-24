@@ -182,9 +182,9 @@ html, body {
         }
     };
     var OnResize = function (event) {
-        var top = tgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top;
-        var newWidth = document.documentElement.clientWidth;
+        var lefttop = tgrid1.GetLeftTopPositions();
+        var newHeight = document.documentElement.clientHeight - lefttop[1] - 18;
+        var newWidth = document.documentElement.clientWidth - lefttop[0] - 23;
         tgrid1.SetSizes(newWidth,newHeight);
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {

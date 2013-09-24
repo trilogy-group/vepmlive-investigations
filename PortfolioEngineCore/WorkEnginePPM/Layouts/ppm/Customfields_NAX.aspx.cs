@@ -26,7 +26,7 @@ namespace WorkEnginePPM
                     dg.AddColumn(title: "Field Type", width: 80, name: "FA_FORMAT_NAME");
                     dg.AddColumn(title: "Table", width: 200, name: "TABLE_NAME");
                     dg.AddColumn(title: "Field", width: 100, name: "FIELD_NAME");
-                    dg.AddColumn(title: "Lookup", width: 80);
+                    //dg.AddColumn(title: "Lookup", width: 80);
                     dg.AddColumn(title: "ID", width: 50, name: "FA_FIELD_ID", isId: true);
                     dg.AddColumn(title: "IsDeprecated", width: 50, name: "IsDeprecated", hidden: true);
 

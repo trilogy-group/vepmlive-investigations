@@ -68,10 +68,10 @@ html, body {
 </div>
 <div class="modalContent" id="idFTEsDlg" style="display:none;">
 	<div style="padding-bottom:3px;">
-        <table width="100%" cellspacing="0">
+        <table cellspacing="0">
             <tr id="trCalendar">
-                <td>Calendar : </td>
-                <td class="controlcell">
+                <td>Calendar&nbsp:&nbsp&nbsp</td>
+                <td>
                     <select id="idCalendar"  onchange="FTEsDlg_event('calendarOnChange');"></select>
                 </td>
             </tr>
@@ -256,9 +256,9 @@ html, body {
         }
     };
     var OnResize = function (event) {
-        var top = tgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top;
-        var newWidth = document.documentElement.clientWidth;
+        var lefttop = tgrid1.GetLeftTopPositions();
+        var newHeight = document.documentElement.clientHeight - lefttop[1] - 18;
+        var newWidth = document.documentElement.clientWidth - lefttop[0] - 23;
         tgrid1.SetSizes(newWidth,newHeight);
     };
     function ddlChanged(ddlName) {
