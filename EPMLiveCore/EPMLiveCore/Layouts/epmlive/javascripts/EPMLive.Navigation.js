@@ -1598,11 +1598,34 @@
                 });
 
                 try {
+                    var $favMenu = $('#epm-nav-sub-favorites');
+                    var offset = $($favMenu.find('.epm-nav-sub-header').get(1)).offset();
+                    
                     $ul.sortable({
                         items: 'li.epm-nav-sortable',
                         placeholder: 'epm-nav-drag-placeholder',
                         update: function (event, ui) {
-                            favoritesManager.resetOrder($ul);
+                            var valid = true;
+                            
+                            if ($favMenu.is(':visible')) {
+                                if (ui.originalPosition.top > offset.top) {
+                                    if (ui.position.top < offset.top) {
+                                        valid = false;
+                                    }
+                                } else {
+                                    if (ui.position.top > offset.top) {
+                                        valid = false;
+                                    }
+                                }
+                            }
+                            
+                            if (valid) {
+                                favoritesManager.resetOrder($ul);
+                            } else {
+                                $($(ui.item).parent()).sortable('cancel');
+                            }
+                            
+                            offset = $($favMenu.find('.epm-nav-sub-header').get(1)).offset();
                         }
                     });
 
