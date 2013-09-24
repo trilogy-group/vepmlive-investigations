@@ -36,7 +36,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
         #endregion Constructors 
 
-        #region Methods (2) 
+        #region Methods (3) 
 
         // Public Methods (2) 
 
@@ -74,55 +74,7 @@ namespace UplandIntegrations.Tenrox.Managers
                 var newProjects = new List<Project>();
                 var existingProjects = new List<Project>();
 
-                foreach (DataRow row in items.Rows)
-                {
-                    Project project = null;
-
-                    try
-                    {
-                        project = projectsClient.QueryByUniqueId(_token, (int) row["ID"]);
-                    }
-                    catch { }
-
-                    if (project == null)
-                    {
-                        try
-                        {
-                            project = projectsClient.CreateNew(_token);
-                            project.Id = row["SPID"].ToString();
-                        }
-                        catch { }
-                    }
-
-                    if (project == null) continue;
-
-                    Type type = project.GetType();
-
-                    foreach (
-                        string column in
-                            from column in columns
-                            let col = column.ToLower()
-                            where !col.Equals("id") && !col.Equals("spid")
-                            select column)
-                    {
-                        try
-                        {
-                            PropertyInfo property = type.GetProperty(column);
-                            property.SetValue(project, GetValue(row[column], property));
-                        }
-                        catch { }
-                    }
-
-
-                    if (project.UniqueId > 0)
-                    {
-                        existingProjects.Add(project);
-                    }
-                    else
-                    {
-                        newProjects.Add(project);
-                    }
-                }
+                BuildProjects(items, projectsClient, columns, existingProjects, newProjects);
 
                 var tasks = new List<Task<TenroxUpsertResult>>();
 
@@ -157,6 +109,63 @@ namespace UplandIntegrations.Tenrox.Managers
                 foreach (var task in tasks)
                 {
                     yield return task.Result;
+                }
+            }
+        }
+
+        // Private Methods (1) 
+
+        private void BuildProjects(DataTable items, ProjectsClient projectsClient, List<string> columns,
+            List<Project> existingProjects,
+            List<Project> newProjects)
+        {
+            foreach (DataRow row in items.Rows)
+            {
+                Project project = null;
+
+                try
+                {
+                    project = projectsClient.QueryByUniqueId(_token, (int) row["ID"]);
+                }
+                catch { }
+
+                if (project == null)
+                {
+                    try
+                    {
+                        project = projectsClient.CreateNew(_token);
+                        project.Id = row["SPID"].ToString();
+                    }
+                    catch { }
+                }
+
+                if (project == null) continue;
+
+                Type type = project.GetType();
+
+                foreach (
+                    string column in
+                        from column in columns
+                        let col = column.ToLower()
+                        where !col.Equals("id") && !col.Equals("spid")
+                        select column)
+                {
+                    try
+                    {
+                        PropertyInfo property = type.GetProperty(column);
+                        property.SetValue(project, GetValue(row[column], property));
+                    }
+                    catch { }
+                }
+
+
+                if (project.UniqueId > 0)
+                {
+                    existingProjects.Add(project);
+                }
+                else
+                {
+                    newProjects.Add(project);
                 }
             }
         }
