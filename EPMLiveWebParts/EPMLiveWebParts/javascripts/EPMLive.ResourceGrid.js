@@ -1118,7 +1118,12 @@ function registerEpmLiveResourceGridScript() {
             loadRibbon: function () {
                 SP.SOD.executeOrDelayUntilScriptLoaded(function () {
                     var selectTab = function (tabId) {
-                        window._ribbonStartInit(tabId, false, null);
+                        window._ribbonStartInit(tabId, true, null);
+
+                        $('#s4-ribbonrow').height(35);
+
+                        window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 50);
+                        window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 100);
 
                         window.setTimeout(function () {
                             try {
@@ -1856,7 +1861,7 @@ function registerEpmLiveResourceGridScript() {
             grid.Update();
             grid.Render();
 
-            window.setTimeout(function() { $$.actions.loadRibbon(); }, 3000);
+            window.setTimeout(function() { $$.actions.loadRibbon(); }, 1500);
         };
 
         window.Grids.OnGetHtmlValue = function (grid, row, col, val) {
