@@ -450,9 +450,24 @@ namespace EPMLiveReportsAdmin
 
         private string GetDefaultLists(SPWeb rootWeb)
         {
-            if (_DefaultLists == null || _DefaultLists == string.Empty)
+            if (string.IsNullOrEmpty(_DefaultLists))
             {
-                _DefaultLists = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "EPMLiveFixLists").Replace("\r\n", ",");
+                // ORIGINAL CODE
+                //_DefaultLists = CoreFunctions.getConfigSetting(rootWeb, "EPMLiveFixLists").Replace("\r\n", ",");
+                // get lists that have reporting events
+                
+                const string sAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+                const string sClass = "EPMLiveReportsAdmin.ListEvents";
+
+                var dLists = new List<string>();
+                foreach (var l in from SPList l in rootWeb.Lists let e = (from SPEventReceiverDefinition erd in l.EventReceivers
+                    where erd.Assembly == sAssembly && erd.Class == sClass
+                    select erd).ToList() where e.Count > 0 where !dLists.Contains(l.Title) select l)
+                {
+                    dLists.Add(l.Title);
+                }
+
+                _DefaultLists = string.Join(",", dLists);
             }
 
             string resourceList = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "EPMLiveResourcePool").Replace("\r\n", ",").ToString();

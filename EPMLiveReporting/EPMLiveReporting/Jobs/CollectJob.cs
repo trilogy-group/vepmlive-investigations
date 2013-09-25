@@ -228,6 +228,7 @@ namespace EPMLiveReportsAdmin.Jobs
             {   
                 CheckReqSP(epmdata.GetClientReportingConnection);
                 CheckSchema(epmdata.GetClientReportingConnection);
+                InsertRootWebInfo(site, epmdata.GetClientReportingConnection);
             });
             #endregion
 
@@ -448,6 +449,29 @@ namespace EPMLiveReportsAdmin.Jobs
         {
             var cmd = new SqlCommand(Properties.Resources.CheckSchema, cn);
             cmd.CommandType = CommandType.Text;
+            cmd.ExecuteNonQuery();
+        }
+
+        private void InsertRootWebInfo(SPSite site, SqlConnection cn)
+        {
+            var cmd = new SqlCommand("INSERT INTO RPTWeb ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES (@siteid, @itemwebid, @itemlistid, @itemid, @parentwebid, @webid, @weburl, @webtitle)")
+            {
+                Connection = cn,
+                CommandType = CommandType.Text
+            };
+
+            cmd.Parameters.AddRange(new[]
+            {
+                new SqlParameter("@siteid", SqlDbType.UniqueIdentifier){Value = site.ID},
+                new SqlParameter("@itemwebid", SqlDbType.UniqueIdentifier){Value = Guid.Empty},
+                new SqlParameter("@itemlistid", SqlDbType.UniqueIdentifier){Value = Guid.Empty},
+                new SqlParameter("@itemid", SqlDbType.Int){Value = -1},
+                new SqlParameter("@parentwebid", SqlDbType.UniqueIdentifier){Value = Guid.Empty},
+                new SqlParameter("@webid", SqlDbType.UniqueIdentifier){Value = site.ID},
+                new SqlParameter("@weburl", SqlDbType.VarChar){Value = site.RootWeb.Url},
+                new SqlParameter("@webtitle", SqlDbType.VarChar){Value = site.RootWeb.Title}
+            });
+
             cmd.ExecuteNonQuery();
         }
     }
