@@ -20,7 +20,7 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-
+    
    <asp:GridView ID="GridView2" runat="server" AutoGenerateColumns="False" Width="100%" OnRowDataBound="GridView_RowDataBound" CellPadding="6">
         <Columns>
             <asp:BoundField DataField="Title" HeaderText="" HeaderStyle-HorizontalAlign="Left" ItemStyle-VerticalAlign="top" HtmlEncode="false" ItemStyle-Width="100%" ItemStyle-Wrap="false" ItemStyle-CssClass="itemtd"/>

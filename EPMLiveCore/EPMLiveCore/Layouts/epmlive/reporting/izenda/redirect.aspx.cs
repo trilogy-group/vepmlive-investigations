@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
-    public partial class izendareporting : LayoutsPageBase
+    public partial class redirect : LayoutsPageBase
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -44,7 +44,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (rn != "")
                     url += "&rn=" + rn;
 
-                Response.Redirect(url + "&InFrame=1&RepUrl=" + System.Web.HttpUtility.UrlEncode(SPContext.Current.Web.Url  + "/_layouts/epmlive/reporting.aspx"));
+                Response.Redirect(url + "&InFrame=1&RepUrl=" + System.Web.HttpUtility.UrlEncode(SPContext.Current.Web.Url  + "/_layouts/epmlive/reporting/izenda/reporting.aspx"));
             }
             catch (Exception ex)
             {
