@@ -55,7 +55,10 @@ namespace UplandIntegrations.FileBound
                 switch (Control)
                 {
                     case "WorkflowButtons":
-                        return Properties.Resources.txtFBWorkFlow.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+                        if (WebProps.Properties["DataType"].ToString() == "Item")
+                            return Properties.Resources.txtFBWorkFlow.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+                        else if (WebProps.Properties["DataType"].ToString() == "Assignment")
+                            return Properties.Resources.txtFBWorkflowAssignment.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
                         break;
                 }
             }
@@ -111,47 +114,7 @@ namespace UplandIntegrations.FileBound
             return trans;
         }
 
-        private string StartWorkflow(WebProperties WebProps, string docid, string FBGUID)
-        {
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(WebProps.Properties["APIUrl"].ToString() + "routes/" + WebProps.Properties["Folder"].ToString() + "?documentId=" + docid + "&notes=startworkflow&fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + FBGUID);
-            httpWebRequest.ContentType = "text/json";
-            httpWebRequest.Method = "GET";
-            string routes = "";
-            
-            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-            {
-                routes = streamReader.ReadToEnd();
-            }
-
-            string routeId = "";
-
-            if (routeId != "")
-            {
-
-                httpWebRequest = (HttpWebRequest)WebRequest.Create(WebProps.Properties["APIUrl"].ToString() + "routes/" + routeId + "?documentId=" + docid + "&notes=startworkflow&fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + FBGUID);
-                httpWebRequest.ContentType = "text/json";
-                httpWebRequest.Method = "PUT";
-
-                string wfid = "";
-
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write("");
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }
-
-                httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    wfid = streamReader.ReadToEnd();
-                }
-
-                return wfid;
-            }
-            return "0";
-        }
+        
 
         
 
@@ -207,6 +170,11 @@ namespace UplandIntegrations.FileBound
                     p.DiplayName = "ID";
                     cols.Add(p);
 
+                    p = new ColumnProperty();
+                    p.ColumnName = "stepName";
+                    p.DiplayName = "Current Step";
+                    cols.Add(p);
+
                     dynamic c = System.Web.Helpers.Json.Decode(resp);
                     for (int i = 0; i < c.Length; i++)
                     {
@@ -222,24 +190,42 @@ namespace UplandIntegrations.FileBound
                     //string resp = wc.DownloadString(WebProps.Properties["APIUrl"].ToString() + "assignments/fields?fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
 
                     ColumnProperty p = new ColumnProperty();
-                    p.ColumnName = "taskId";
+                    p.ColumnName = "routedItemId";
                     p.DiplayName = "Assignment Id (Unique ID)";
                     cols.Add(p);
 
                     p = new ColumnProperty();
-                    p.ColumnName = "itemId";
-                    p.DiplayName = "Item ID";
+                    p.ColumnName = "relFileId";
+                    p.DiplayName = "Item Id";
                     cols.Add(p);
 
                     p = new ColumnProperty();
-                    p.ColumnName = "itemName";
-                    p.DiplayName = "Item Name";
+                    p.ColumnName = "comment";
+                    p.DiplayName = "Comment";
                     cols.Add(p);
 
                     p = new ColumnProperty();
-                    p.ColumnName = "Body";
-                    p.DiplayName = "Description";
+                    p.ColumnName = "stepName";
+                    p.DiplayName = "Current Step";
                     cols.Add(p);
+
+                    p = new ColumnProperty();
+                    p.ColumnName = "userId";
+                    p.DiplayName = "User";
+                    cols.Add(p);
+
+                    p = new ColumnProperty();
+                    p.ColumnName = "dueDate";
+                    p.DiplayName = "Due Date";
+                    cols.Add(p);
+
+                    for (int i = 1; i <= 20; i++)
+                    {
+                        p = new ColumnProperty();
+                        p.ColumnName = "itemfield:" + i;
+                        p.DiplayName = "Item Field " + i;
+                        cols.Add(p);
+                    }
                 }
             }
             catch (Exception ex)
@@ -273,43 +259,13 @@ namespace UplandIntegrations.FileBound
         {
             try
             {
-                FBConnection cn = new FBConnection(WebProps, Log);
+                FileBoundSystem fs = new FileBoundSystem(WebProps, Log);
 
-                WebClient wc = new WebClient();
-                string resp = wc.DownloadString(WebProps.Properties["APIUrl"].ToString() + "files/" + ItemID + "?fbsite=" + WebProps.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
-
-                dynamic c = System.Web.Helpers.Json.Decode(resp);
-
-                //for(int i = 0;i<c.Length;i++)
-                {
-                    DataRow dr = Items.NewRow();
-
-                    foreach (DataColumn dc in Items.Columns)
-                    {
-                        if (dc.ColumnName == "ID")
-                        {
-                            dr[dc.ColumnName] = c.fileId;
-                        }
-                        else
-                        {
-                            int field = 0;
-                            int.TryParse(dc.ColumnName, out field);
-                            if (field != 0)
-                            {
-                                try
-                                {
-                                    dr[dc.ColumnName] = c.field[field];
-                                }
-                                catch { }
-                            }
-                        }
-
-
-                    }
-                    Items.Rows.Add(dr);
-
-
-                }
+                if (WebProps.Properties["DataType"].ToString() == "Item")
+                    return fs.GetItem(Items, ItemID);
+                else if (WebProps.Properties["DataType"].ToString() == "Assignment")
+                    return fs.GetAssignment(Items, ItemID);
+                
             }
             catch (Exception ex)
             {
@@ -348,6 +304,9 @@ namespace UplandIntegrations.FileBound
                     case "DataType":
                         DDls.Add("Item", "Item");
                         DDls.Add("Assignment", "Assignment");
+                        break;
+                    case "UserMapType":
+                        DDls.Add("Email", "Email");
                         break;
                 }
  

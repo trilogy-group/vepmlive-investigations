@@ -66,7 +66,7 @@ namespace UplandIntegrations.Properties {
         ///        
         ///            .vr-main
         ///            {
-        ///                border: 1px solid black;
+        ///                border: 1px solid #cacaca;
         ///                -webkit-box-sizing: border-box;
         ///	            -moz-box-sizing: border-box;
         ///	            box-sizing: border-box;
@@ -81,12 +81,20 @@ namespace UplandIntegrations.Properties {
         ///            #vr-top
         ///            {
         ///                height: 100px;
-        ///            }
-        /// [rest of string was truncated]&quot;;.
+        ///            } [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtFBWorkFlow {
             get {
                 return ResourceManager.GetString("txtFBWorkFlow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string txtFBWorkflowAssignment {
+            get {
+                return ResourceManager.GetString("txtFBWorkflowAssignment", resourceCulture);
             }
         }
     }

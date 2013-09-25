@@ -69,30 +69,23 @@
 			$.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
 				$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''").replace(/http:\/\//g, 'https://').replace(/:80/g, ''));
 
-				$.get(WebAPIUrl + "files/" + fileId + "/documents?" + Param, function (docs) {
-								var p = eval(docs);
-								if(p.length > 0)
-								{
-									var docid = p[0].documentId;
+				
+							$.get(WebAPIUrl + "routeditems/" + fileId + "?" + Param, function (routeobj) {
 
-									$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + docid + ",routedobjecttype_6", function (routeobj) {
+								var routId = routeobj[0].routeId;
 
-										var routId = routeobj[0].routeId;
+									$.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
+										currentRoutes = routes;
 
-										 $.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
-											currentRoutes = routes;
-
-												var xml = GetXML(routId);
-												if (routId > 0 && xml != "") {
-													LoadVisualWorkflow(routId, xml);
-												}
-
-											});
-										
+										var xml = GetXML(routId);
+										if (routId > 0 && xml != "") {
+											LoadVisualWorkflow(routId, xml);
+										}
 
 									});
-								}
-						});
+										
+
+							});
 
 				}
             );

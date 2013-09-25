@@ -28,7 +28,7 @@ namespace UplandIntegrations.FileBound
         {
 
             WebClient wc = new WebClient();
-            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routeditems?projectID=" + _webprops.Properties["Folder"].ToString() + "&fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routeditems?projectid=" + _webprops.Properties["Folder"].ToString() + "&userid=0&routedobjecttype=6&fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
 
             dynamic c = System.Web.Helpers.Json.Decode(resp);
 
@@ -37,30 +37,113 @@ namespace UplandIntegrations.FileBound
 
                 DataRow dr = Items.NewRow();
 
+                Items.Rows.Add(ProcessAssignmentRow(dr, c[i], Items.Columns));
+
+            }
+        
+            return Items;
+        }
+
+        private DataRow ProcessAssignmentRow(DataRow dr, dynamic o, DataColumnCollection Columns)
+        {
+            foreach (DataColumn dc in Columns)
+            {
+                if (dc.ColumnName == "ID")
+                {
+                    dr[dc.ColumnName] = o.routedItemId;
+                }
+                else if (dc.ColumnName == "relFileId")
+                {
+                    dr[dc.ColumnName] = o.relFileId;
+                }
+                else if (dc.ColumnName == "comment")
+                {
+                    dr[dc.ColumnName] = "You have a Workflow Task. Use the Worklow buttons to accept or reject your task.<br><br>Item: " + o.field[1];
+                }
+                else if (dc.ColumnName == "stepName")
+                {
+                    dr[dc.ColumnName] = o.stepName;
+                }
+                else if (dc.ColumnName == "userId")
+                {
+                    try
+                    {
+                        WebClient wc = new WebClient();
+                        string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "users/" + o.userId + "?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+
+                        dynamic c = System.Web.Helpers.Json.Decode(resp);
+
+
+                    }
+                    catch { }
+
+                }
+                else if (dc.ColumnName == "dueDate")
+                {
+                    dr[dc.ColumnName] = o.dueDate;
+                }
+                else if (dc.ColumnName.StartsWith("itemfield:"))
+                {
+                    dr[dc.ColumnName] = o.field[int.Parse(dc.ColumnName.Substring(10))];
+                }
+            }
+
+            return dr;
+        }
+
+        public DataTable GetItem(DataTable Items, string ItemID)
+        {
+            WebClient wc = new WebClient();
+            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "files/" + ItemID + "?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+
+            dynamic c = System.Web.Helpers.Json.Decode(resp);
+
+            //for(int i = 0;i<c.Length;i++)
+            {
+                DataRow dr = Items.NewRow();
+
                 foreach (DataColumn dc in Items.Columns)
                 {
                     if (dc.ColumnName == "ID")
                     {
-                        dr[dc.ColumnName] = c[i].taskId;
+                        dr[dc.ColumnName] = c.fileId;
                     }
-                    else if (dc.ColumnName == "itemId")
+                    else
                     {
-                        dr[dc.ColumnName] = c[i].fileId;
+                        int field = 0;
+                        int.TryParse(dc.ColumnName, out field);
+                        if (field != 0)
+                        {
+                            try
+                            {
+                                dr[dc.ColumnName] = c.field[field];
+                            }
+                            catch { }
+                        }
                     }
-                    else if (dc.ColumnName == "itemName")
-                    {
-                        dr[dc.ColumnName] = c[i].fileId + " - Workflow Task";
-                    }
-                    else if (dc.ColumnName == "Body")
-                    {
-                        dr[dc.ColumnName] = "You have a Workflow Task. Use the Worklow buttons to accept or reject your task.<br><br>Item: " + c[i].fileId;
-                    }
-                }
 
+
+                }
                 Items.Rows.Add(dr);
 
+
             }
-        
+
+            return Items;
+        }
+
+
+        public DataTable GetAssignment(DataTable Items, string ItemID)
+        {
+            WebClient wc = new WebClient();
+            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routedItems/" + ItemID + "?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+
+            dynamic c = System.Web.Helpers.Json.Decode(resp);
+            
+            DataRow dr = Items.NewRow();
+
+            Items.Rows.Add(ProcessAssignmentRow(dr, c[0], Items.Columns));
+
             return Items;
         }
 
@@ -221,11 +304,24 @@ namespace UplandIntegrations.FileBound
                 streamWriter.Close();
             }
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            string r = "";
             using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
             {
-                var id = streamReader.ReadToEnd();
+                r = streamReader.ReadToEnd();
             }
 
+            c = System.Web.Helpers.Json.Decode(r);
+
+            if (_webprops.IntegrationAPIUrl != "")
+            {
+                try
+                {
+                    IntegrationAPI.Integration i = new IntegrationAPI.Integration();
+                    i.Url = _webprops.IntegrationAPIUrl;
+                    i.PostItemSimple(_webprops.Properties["RelatedAssign"].ToString(), c.id);
+                }
+                catch { }
+            }
         }
 
         public void DeleteItem(DataRow dr, ref TransactionTable trans)
