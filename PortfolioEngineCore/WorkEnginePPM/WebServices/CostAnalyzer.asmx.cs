@@ -104,7 +104,8 @@ namespace WorkEnginePPM
                     //if (Function == "CALoadData" && bNew == true)
                     //    this.Context.Session[cakey] = datacache;
 
-                    SaveCachedData(this.Context, cakey, datacache);
+                    if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket")) 
+                        SaveCachedData(this.Context, cakey, datacache);
                     return result.ToString();
                 }
                 catch (Exception ex)

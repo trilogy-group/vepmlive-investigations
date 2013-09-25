@@ -105,8 +105,9 @@ namespace WorkEnginePPM
                     //    if (Function == "RALoadData" && bNew == true)
                     //        this.Context.Session[rpkey] = RAData;
 
-
-                        SaveCachedData(Context, rpkey, RAData);
+                        if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket"))
+                            SaveCachedData(Context, rpkey, RAData);
+                       
 
                         return result.ToString();
                     }

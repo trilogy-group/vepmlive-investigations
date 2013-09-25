@@ -99,8 +99,12 @@ namespace WorkEnginePPM
         public string Execute(string Ticket, string Function, string Dataxml)
         {
             string sStage;
+            ModelCache ModelData;
+            if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket"))
+                ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
+            else
+                ModelData = new ModelCache();
 
-            ModelCache ModelData = (ModelCache) GetCachedData(this.Context, Ticket);
             if (WebAdmin.AuthenticateUserAndProduct(this.Context, out sStage) == true)
             {
                 try
@@ -116,8 +120,8 @@ namespace WorkEnginePPM
                 {
                     return HandleError("Execute", 99999, string.Format("Error executing function: {0}", ex.Message));
                 }
-
-                SaveCachedData(this.Context, Ticket, ModelData);
+                if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket"))
+                    SaveCachedData(this.Context, Ticket, ModelData);
             }
             else
                 return HandleError("Execute", 99999, string.Format("PfE User Authentication Failed. Stage: {0}", sStage));
