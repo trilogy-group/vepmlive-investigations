@@ -9,11 +9,14 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using EPMLiveCore;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Text;
 using System.Data.SqlClient;
+using EPMLiveCore.API;
 
 namespace EPMLiveWebParts
 {
@@ -38,6 +41,7 @@ namespace EPMLiveWebParts
 
             bool bUsePopup = false;
             bool.TryParse(Request["popups"], out bUsePopup);
+            
 
             StringBuilder sb = new StringBuilder();
 
@@ -51,9 +55,19 @@ namespace EPMLiveWebParts
 
                 EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
 
+                bool isFav = IsFav(list, li, web, gSettings);
+
+                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
+                {
+                    if (!isFav)
+                        items.Add("Add Favorite", getMenuItem(Request["grid"], "Add Favorite", "/_layouts/images/blank.gif", "AddFavorite", ""));
+                    else
+                        items.Add("Remove Favorite", getMenuItem(Request["grid"], "Remove Favorite", "/_layouts/images/blank.gif", "RemoveFavorite", ""));
+                }
+
                 if(list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
                 {
-                    if(bUsePopup)
+                    if (!isFav)
                         items.Add("View Item", getMenuItem(Request["grid"], "View Item", "/_layouts/images/blank.gif", "view", ""));
                     else
                         items.Add("View Item", getMenuItem(Request["grid"], "View Item", "/_layouts/images/blank.gif", "view", "1"));
@@ -230,6 +244,46 @@ namespace EPMLiveWebParts
                 return "Error: " + ex.Message;
             }
             return sb.ToString();
+        }
+
+        private bool IsFav(SPList l, SPListItem li, SPWeb web, GridGanttSettings gSettings)
+        {
+            var result = false;
+            var queryCheckFavStatus_Item =
+                   @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @")
+                    BEGIN
+	                    SELECT 'true'
+                    END
+                    ELSE
+                    BEGIN
+                        SELECT 'false'
+                    END";
+
+            var qParams =
+            new Dictionary<string, object>
+            {
+                {"@siteid", web.Site.ID},
+                {"@webid", web.ID},
+                {"@listid", l.ID},
+                {"@itemid", li.ID},
+                {"@userid", web.CurrentUser.ID},
+                {"@icon", gSettings.ListIcon},
+                {"@title", li.Title},
+            };
+
+            var qExec = new QueryExecutor(SPContext.Current.Web);
+            var table = qExec.ExecuteEpmLiveQuery(queryCheckFavStatus_Item, qParams);
+           
+            if (table != null)
+            {
+                try
+                {
+                    result = bool.Parse(table.Rows[0][0].ToString());
+                }
+                catch{}
+            }
+
+            return result;
         }
 
         private string getplannerlist(SPWeb web, SPListItem li)
