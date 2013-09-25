@@ -112,7 +112,7 @@ namespace EPMLiveCore.Controls.Navigation
 
                                             foreach (string linkId in ql.Split(','))
                                             {
-                                                string id = linkId;
+                                                string id = linkId.Split(':')[0];
 
                                                 if (!communityLinks.ContainsKey(communityName))
                                                 {
