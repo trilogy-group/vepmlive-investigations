@@ -22,6 +22,8 @@ using Microsoft.SharePoint;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Analyzers;
 using Microsoft.Win32;
+using PortfolioEngineCore.PortfolioItems;
+
 
 
 namespace WorkEnginePPM
@@ -85,6 +87,14 @@ namespace WorkEnginePPM
     public class Model : System.Web.Services.WebService
     {
 
+        private static string basePath;
+        private static string ppmId;
+        private static string ppmCompany;
+        private static string ppmDbConn;
+        private static string username;
+        private static SecurityLevels securityLevel;
+
+
         [WebMethod(EnableSession = true)]
         public string Execute(string Ticket, string Function, string Dataxml)
         {
@@ -137,6 +147,66 @@ namespace WorkEnginePPM
             return CStruct.ConvertXMLToJSON(sReply);
         }
 
+
+        public static string GetPortfolioItemList(HttpContext Context, string sXML, ModelCache ModelData)
+        {
+            string sReply = "";
+
+
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioItems oPI = new PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
+
+            try
+            {
+                string sPIDs = "";
+                string sExts = "";
+                string sxml = "";
+
+                oPI.ObtainManagedPortfolioItems(out sExts, out sPIDs, out sxml);
+                CStruct xResult = BuildResultXML("GetPortfolioItemList", 0);
+                CStruct xData = xResult.CreateSubStruct("IDLists");
+                xData.CreateStringAttr("EXTLIST", sExts);
+                xData.CreateStringAttr("IDLIST", sPIDs);
+                xData.AppendXML(sxml);
+
+                sReply = xResult.XML();
+
+            }
+            catch (Exception ex)
+            {
+                sReply = HandleError("GetPortfolioItemList", 99999, string.Format("Error executing function: {0}", ex.Message));
+            }
+            return sReply;
+        }
+
+        public static string GetGeneratedPortfolioItemTicket(HttpContext Context, string sXML, ModelCache ModelData)
+        {
+            string sReply = "";
+
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioItems oPI = new PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
+
+            try
+            {
+                string sGUID = "";
+
+
+                sGUID = oPI.GeneratePortfolioItemTicket(sXML);
+                CStruct xResult = BuildResultXML("GetGeneratedPortfolioItemTicket", 0);
+                CStruct xData = xResult.CreateSubStruct("Ticket");
+                xData.CreateStringAttr("Value", sGUID);
+
+                sReply = xResult.XML();
+
+            }
+            catch (Exception ex)
+            {
+                sReply = HandleError("GetGeneratedPortfolioItemTicket", 99999, string.Format("Error executing function: {0}", ex.Message));
+            }
+            return sReply;
+        }
 
         public static string GetTopGrid(HttpContext Context, string sXML, ModelCache ModelData)
         {

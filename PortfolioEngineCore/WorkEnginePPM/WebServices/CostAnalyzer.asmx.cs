@@ -21,6 +21,7 @@ using PortfolioEngineCore;
 using PortfolioEngineCore.Analyzers;
 using CostDataValues;
 using CADataCache;
+using PortfolioEngineCore.PortfolioItems;
 
 namespace WorkEnginePPM
 {
@@ -138,6 +139,68 @@ namespace WorkEnginePPM
 
             return CStruct.ConvertXMLToJSON(sReply);
         }
+
+
+        public static string GetPortfolioItemList(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+            string sReply = "";
+
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioItems oPI = new PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
+
+            try
+            {
+                string sPIDs = "";
+                string sExts = "";
+                string sxml = "";
+
+                oPI.ObtainManagedPortfolioItems(out sExts, out sPIDs, out sxml);
+                CStruct xResult = BuildResultXML("GetPortfolioItemList", 0);
+                CStruct xData = xResult.CreateSubStruct("IDLists");
+                xData.CreateStringAttr("EXTLIST", sExts);
+                xData.CreateStringAttr("IDLIST", sPIDs);
+                xData.AppendXML(sxml);
+
+                sReply = xResult.XML();
+
+            }
+            catch (Exception ex)
+            {
+                sReply = HandleException("GetPortfolioItemList", 99999, ex, "");
+            }
+            return sReply;
+        }
+
+        public static string GetGeneratedPortfolioItemTicket(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
+        {
+            string sReply = "";
+
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioItems oPI = new PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
+
+            try
+            {
+                string sGUID = "";
+
+
+                sGUID = oPI.GeneratePortfolioItemTicket(sXML);
+                CStruct xResult = BuildResultXML("GetGeneratedPortfolioItemTicket", 0);
+                CStruct xData = xResult.CreateSubStruct("Ticket");
+                xData.CreateStringAttr("Value", sGUID);
+
+                sReply = xResult.XML();
+
+            }
+            catch (Exception ex)
+            {
+                sReply = HandleException("GetGeneratedPortfolioItemTicket", 99999, ex, "");
+            }
+            return sReply;
+        }
+
+
 
         public static string CASessionPing(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
         {
