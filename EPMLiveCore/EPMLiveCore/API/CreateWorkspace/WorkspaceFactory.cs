@@ -121,8 +121,12 @@ namespace EPMLiveCore.API
                                 {
                                     try
                                     {
-                                        pFld = (SPFieldLookup) list.Fields.GetFieldByInternalName(sPFldName);
-                                        valColl = new SPFieldLookupValueCollection(pItem[sPFldName].ToString());
+                                        pFld = (SPFieldLookup)list.Fields.GetFieldByInternalName(sPFldName);
+                                        var v = pItem[sPFldName];
+                                        if (v != null)
+                                        {
+                                            valColl = new SPFieldLookupValueCollection(pItem[sPFldName].ToString());
+                                        }
                                     }
                                     catch
                                     {
@@ -138,10 +142,8 @@ namespace EPMLiveCore.API
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    tempParentWebId = WebId;
-                                }
+
+                                tempParentWebId = tempParentWebId == Guid.Empty ? WebId : tempParentWebId;
                             }
                         }
                     });
@@ -215,7 +217,51 @@ namespace EPMLiveCore.API
             get
             {
                 Guid id = Guid.Empty;
-                Guid.TryParse(_xmlDataMgr.GetPropVal("TempGalWebId"), out id);
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        var lockedWId = Guid.Empty;
+                        using (var s = new SPSite(SiteId))
+                        {
+                            using (var w = s.OpenWeb(WebId))
+                            {
+                                if (w.Exists)
+                                {
+                                    lockedWId = CoreFunctions.getLockedWeb(w);
+                                }
+                            }
+                            using (var lw = s.OpenWeb(lockedWId))
+                            {
+                                if (lw.Exists)
+                                {
+                                    var token = CoreFunctions.getConfigSetting(
+                                        lw, "EPMLiveTemplateGalleryURL", false, true);
+                                    switch (token)
+                                    {
+                                        case "{Site}":
+                                            id = WebId;
+                                            break;
+                                        case "{site}":
+                                            id = WebId;
+                                            break;
+                                        case "{Root}":
+                                            id = lw.ID;
+                                            break;
+                                        case "{root}":
+                                            id = lw.ID;
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                catch
+                {
+                    id = Guid.Empty;
+                }
+
                 return id;
             }
         }
@@ -280,8 +326,8 @@ namespace EPMLiveCore.API
                 var delSols = new List<SPUserSolution>();
 
                 delSols = (from s in es.Solutions.OfType<SPUserSolution>()
-                    where _lstSolutionsToBeRemoved.Contains(s.SolutionId.ToString("N"))
-                    select s).ToList<SPUserSolution>();
+                           where _lstSolutionsToBeRemoved.Contains(s.SolutionId.ToString("N"))
+                           select s).ToList<SPUserSolution>();
 
                 if (delSols.Count > 0)
                 {
@@ -295,8 +341,8 @@ namespace EPMLiveCore.API
                 var delItems = new List<SPListItem>();
 
                 delItems = (from i in solGallery.Items.OfType<SPListItem>()
-                    where _lstSolutionsToBeRemoved.Contains(i.File.Name.Replace(".wsp", ""))
-                    select i).ToList<SPListItem>();
+                            where _lstSolutionsToBeRemoved.Contains(i.File.Name.Replace(".wsp", ""))
+                            select i).ToList<SPListItem>();
 
                 if (delItems.Count > 0)
                 {
@@ -574,7 +620,7 @@ namespace EPMLiveCore.API
 
         private void RenameProjectFileByProjectItem(SPWeb web, string oldName, string newName)
         {
-            var projectSchedule = (SPDocumentLibrary) web.Lists.TryGetList("Project Schedules");
+            var projectSchedule = (SPDocumentLibrary)web.Lists.TryGetList("Project Schedules");
             if (projectSchedule != null)
             {
                 foreach (SPListItem item in projectSchedule.Items)
@@ -895,12 +941,12 @@ namespace EPMLiveCore.API
                 SPListItem li = cWeb.Lists[AttachedItemListId].GetItemById(AttachedItemId);
                 // send notification and email user
                 APIEmail.QueueItemMessage(6, true, BuildEmailData(_createdWebUrl, _createdWebTitle),
-                    new[] {originalUser.ID.ToString()}, null, false, true, li, originalUser, true);
+                    new[] { originalUser.ID.ToString() }, null, false, true, li, originalUser, true);
             }
             else
             {
                 APIEmail.QueueItemMessage(6, true, BuildEmailData(_createdWebUrl, _createdWebTitle),
-                    new[] {originalUser.ID.ToString()}, null, false, true, cWeb, originalUser, true);
+                    new[] { originalUser.ID.ToString() }, null, false, true, cWeb, originalUser, true);
             }
         }
 
@@ -947,7 +993,7 @@ namespace EPMLiveCore.API
                             "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                         string className = "EPMLiveCore.WorkspaceEvents";
                         List<SPEventReceiverDefinition> evts = CoreFunctions.GetWebEvents(w, assemblyName, className,
-                            new List<SPEventReceiverType> {SPEventReceiverType.WebDeleted});
+                            new List<SPEventReceiverType> { SPEventReceiverType.WebDeleted });
                         foreach (SPEventReceiverDefinition evt in evts)
                         {
                             evt.Delete();
@@ -1103,9 +1149,9 @@ namespace EPMLiveCore.API
             string originalSolName = tempName.Replace(".wsp", "");
             string SolNameWOSpace = originalSolName.Replace(" ", "");
             string sTempName = (from t in cEWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                where t.Name.EndsWith(originalSolName, StringComparison.CurrentCultureIgnoreCase) ||
-                      t.Name.EndsWith(SolNameWOSpace, StringComparison.CurrentCultureIgnoreCase)
-                select t).ToList<SPWebTemplate>()[0].Name;
+                                where t.Name.EndsWith(originalSolName, StringComparison.CurrentCultureIgnoreCase) ||
+                                      t.Name.EndsWith(SolNameWOSpace, StringComparison.CurrentCultureIgnoreCase)
+                                select t).ToList<SPWebTemplate>()[0].Name;
             _xmlDataMgr.EditProp("TemplateName", sTempName);
 
             if (string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("TemplateName")))
@@ -1213,8 +1259,8 @@ namespace EPMLiveCore.API
 
                             List<SPWebTemplate> tempL =
                                 (from t in web.Site.RootWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                                    where t.Name.Split('#')[1] == tempSolGuid
-                                    select t).ToList<SPWebTemplate>();
+                                 where t.Name.Split('#')[1] == tempSolGuid
+                                 select t).ToList<SPWebTemplate>();
 
                             if (tempL.Count > 0)
                             {
@@ -1226,8 +1272,8 @@ namespace EPMLiveCore.API
                     {
                         List<SPWebTemplate> tempList =
                             (from t in eWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                                where t.Name.EndsWith(relativeWebUrl, StringComparison.CurrentCultureIgnoreCase)
-                                select t).ToList<SPWebTemplate>();
+                             where t.Name.EndsWith(relativeWebUrl, StringComparison.CurrentCultureIgnoreCase)
+                             select t).ToList<SPWebTemplate>();
 
                         if (tempList.Count > 0)
                         {

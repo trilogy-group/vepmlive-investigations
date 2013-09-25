@@ -106,7 +106,6 @@ namespace EPMLiveCore.API
                         {"@webid", data.WebId},
                         {"@listid", data.ListId},
                         {"@itemid", data.ItemId},
-                        {"@fstring", data.FString},
                         {"@userid", data.UserId},
                         {"@icon", data.Icon},
                         {"@title", data.Title},

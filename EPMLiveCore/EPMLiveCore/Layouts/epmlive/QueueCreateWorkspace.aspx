@@ -23,7 +23,6 @@
         var compLvls = '<%=_compLevels%>';
         var workEngineSvcUrl = '<%=_workEngineSvcUrl%>';
         var workspaceTitle = '<%=_workspaceTitle%>';
-        var tempGalWebId = '<%=_tempGalWebId%>';
         var listGuid = '<%=_lstGuid%>';
         var listName = '<%=_listName%>';
         var itemId = '<%=_itemId%>';

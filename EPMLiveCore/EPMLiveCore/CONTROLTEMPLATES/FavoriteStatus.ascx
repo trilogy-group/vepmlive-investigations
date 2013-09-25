@@ -40,3 +40,13 @@
         <input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked');" class="ms-ButtonHeightWidth" target="_self" />
       </div>
 </div>
+
+<div id="favItem_Add_DivTemp" style="display:none">
+        <div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;
+        <input id="Text1" name="favTitle" type="text" value="<%=defaultFavTitle %>" />
+        <br />
+        <div style="clear:both;height:10px;"></div>
+        <input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self" />
+        <input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked');" class="ms-ButtonHeightWidth" target="_self" />
+      </div>
+</div>

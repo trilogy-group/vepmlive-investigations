@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using EPMLiveCore.Infrastructure;
@@ -95,9 +96,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListIconClass = string.Empty;
             try
             {
-                ListIconClass = (ItemId != "-1" && CurrentFileIsNull == "True")
-                    ? new GridGanttSettings(SPContext.Current.List).ListIcon
-                    : "icon-file-5";
+                ListIconClass = new GridGanttSettings(SPContext.Current.List).ListIcon;
             }catch{}
 
             CurrentUserId = "-1";

@@ -22,6 +22,7 @@ namespace EPMLiveCore
         {
             if (!string.IsNullOrEmpty(xml))
             {
+                xml = xml.Replace("&", "&amp;");
                 dataXml = XDocument.Parse(xml);
             }
         }

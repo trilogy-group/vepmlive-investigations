@@ -26,7 +26,6 @@ namespace EPMLiveCore.Layouts.epmlive
         protected string _reqListName = string.Empty;
         protected string _doNotDelRequest = string.Empty;
         protected string _tempGalRedirect = string.Empty;
-        protected string _tempGalWebId = string.Empty;
         protected string _curWebUrl = string.Empty;
         protected string _requestProjectName = string.Empty;
         protected string _uniquePermission = "false";
@@ -199,19 +198,15 @@ namespace EPMLiveCore.Layouts.epmlive
                 {
                     case "{Site}":
                         tempResUrl = SPContext.Current.Web.ServerRelativeUrl;
-                        _tempGalWebId = SPContext.Current.Web.ID.ToString();
                         break;
                     case "{site}":
                         tempResUrl = SPContext.Current.Web.ServerRelativeUrl;
-                        _tempGalWebId = SPContext.Current.Web.ID.ToString();
                         break;
                     case "{Root}":
                         tempResUrl = CoreFunctions.getConfigSetting(lockedWeb, "EPMLiveTemplateGalleryURL", true, true);
-                        _tempGalWebId = lockedWeb.ID.ToString();
                         break;
                     case "{root}":
                         tempResUrl = CoreFunctions.getConfigSetting(lockedWeb, "EPMLiveTemplateGalleryURL", true, true);
-                        _tempGalWebId = lockedWeb.ID.ToString();
                         break;
                 }
             }

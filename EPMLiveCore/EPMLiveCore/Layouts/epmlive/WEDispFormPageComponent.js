@@ -57,6 +57,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPMLivePlanner');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.TaskPlanner');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.CreateWorkspace');
+        Array.add($arr, 'Ribbon.ListForm.Display.Actions.Favorite');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.GoToWorkspace');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.BuildTeam');
         Array.add($arr, 'Ribbon.ListForm.Display.Manage.EPKCost');
@@ -86,6 +87,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
             case "Ribbon.ListForm.Display.Manage.EPMLivePlanner":
             case "Ribbon.ListForm.Display.Manage.TaskPlanner":
             case "Ribbon.ListForm.Display.Manage.CreateWorkspace":
+            case "Ribbon.ListForm.Display.Actions.Favorite":
             case "Ribbon.ListForm.Display.Manage.GoToWorkspace":
             case "Ribbon.ListForm.Display.Manage.BuildTeam":
             case "Ribbon.ListForm.Display.Manage.EPKCost":
@@ -158,6 +160,28 @@ WEDispFormPageComponent.PageComponent.prototype = {
                 }
             };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+        }
+        else if (commandId === 'Ribbon.ListForm.Display.Actions.Favorite') {
+            if (!($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png')) {
+                var viewDiv = document.createElement('div');
+                viewDiv.innerHTML = document.getElementById('fav_Add_DivTemp').innerHTML;
+
+                var options = {
+                    html: viewDiv,
+                    height: 110,
+                    width: 265,
+                    title: "Add Favorite Item",
+                    dialogReturnValueCallback: function (diagResult, retVal) {
+                        if (diagResult === 1) {
+                            window.Analytics.addItemFav(retVal);
+                        }
+                    }
+                };
+
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+            } else {
+                window.Analytics.removeItemFav();
+            }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.GoToWorkspace') {
             if (parent) {

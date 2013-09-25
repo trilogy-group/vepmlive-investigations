@@ -2,7 +2,7 @@
     (function (a, $$, $) {
 
         //====== FAVORITES ========================
-        var favoritesData =
+        a.favoritesData =
             "<Data>" +
                 "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
                 "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
@@ -20,7 +20,7 @@
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                data: "{ Function: 'LoadFavoriteStatus', Dataxml: '" + favoritesData + "' }",
+                data: "{ Function: 'LoadFavoriteStatus', Dataxml: '" + a.favoritesData + "' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 success: function (response) {
@@ -28,13 +28,31 @@
                         var resp = $$.parseJson(response.d);
                         var result = resp.Result;
                         if ($$.responseIsSuccess(result) && result['#text'] === 'false') {
-                            $('#favoritesStar').fadeIn(1000);
+                            // is item
+                            if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
+                                // do nothing
+                            // is page or non item
+                            } else {
+                                $('#favoritesStar').fadeIn(1000);
+                            }
                         } else if ($$.responseIsSuccess(result) && result['#text'] === 'true') {
-                            $('#favoritesStar').addClass('icon-star-active');
-                            $('#favoritesStar').fadeIn(1000);
+                            // is item
+                            if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
+                                // load different src
+                                $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
+                                    $(this).load(function () { $(this).fadeIn(); });
+                                    $(this).attr("src", "_layouts/epmlive/images/star-filled32.png");
+                                });
+                            // is page or non item
+                            } else {
+                                $('#favoritesStar').addClass('icon-star-active');
+                                $('#favoritesStar').fadeIn(1000);
+                            }
                         }
 
-
+                        // register event for favorite star 
+                        // on a non-item page
+                        // code for ribbon button is in WEDispFormPageComponent.js
                         $("#favoritesStar").click(function () {
                             if (!$(this).hasClass('icon-star-active')) {
                                 var viewDiv = document.createElement('div');
@@ -47,65 +65,15 @@
                                     title: "Add Favorite",
                                     dialogReturnValueCallback: function (diagResult, retVal) {
                                         if (diagResult === 1) {
-                                            add(retVal);
+                                            a.addPageFav(retVal);
                                         }
                                     }
                                 };
 
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             } else {
-                                $.ajax({
-                                    type: 'POST',
-                                    url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                                    data: "{ Function: 'RemoveFavorites', Dataxml: '" + favoritesData + "' }",
-                                    contentType: 'application/json; charset=utf-8',
-                                    dataType: 'json',
-                                    success: function (response) {
-                                        if (response.d) {
-                                            var resp = epmLive.parseJson(response.d);
-                                            var result = resp.Result;
-
-                                            if (epmLive.responseIsSuccess(result) && result['#text']) {
-                                                $('#favoritesStar').removeClass('icon-star-active');
-                                               
-                                                toastr.options = {
-                                                    "closeButton": false,
-                                                    "debug": false,
-                                                    "positionClass": "toast-top-right",
-                                                    "onclick": null,
-                                                    "showDuration": "300",
-                                                    "hideDuration": "1000",
-                                                    "timeOut": "5000",
-                                                    "extendedTimeOut": "1000",
-                                                    "showEasing": "swing",
-                                                    "hideEasing": "linear",
-                                                    "showMethod": "fadeIn",
-                                                    "hideMethod": "fadeOut"
-                                                };
-
-                                                toastr.success("An existing item has been removed from your favorites list.");
-
-                                                var sa = result['#text'].split(',');
-                                                // asynchronously update nav
-                                                window.epmLiveNavigation.removeLink({
-                                                    kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
-                                                    id: sa[0],
-                                                    //webId: use webid for type 3 removal,
-                                                });
-
-                                            } else {
-                                                //onError(response);
-                                            }
-                                        } else {
-                                            //onError(response);
-                                        }
-                                    },
-                                    error: function (response) {
-                                        //onError(response);
-                                    }
-                                });
+                                a.removePageFav();
                             }
-
                         });
                     }
                 },
@@ -114,7 +82,8 @@
                 }
             });
         }
-        function add(title) {
+
+        a.addPageFav = function(title) {
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
@@ -124,7 +93,7 @@
                     "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
                     "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
                     "<Param key=\"ListViewUrl\">" + $$.currentListViewUrl + "</Param>" +
-                    "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
+                    "<Param key=\"ListIconClass\">icon-file-5</Param>" +
                     "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
                     "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
                     "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
@@ -141,7 +110,7 @@
                         if (epmLive.responseIsSuccess(result) && result['#text']) {
                             //onSuccess(result);
                             $('#favoritesStar').addClass('icon-star-active');
-                            
+
                             toastr.options = {
                                 "closeButton": false,
                                 "debug": false,
@@ -158,14 +127,14 @@
                             };
 
                             toastr.success("A new item has been added to your favorites list.");
-                            
+
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
                             // 0 is page, 1 is item
                             var favKindInt = 0;
-                            if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
-                                favKindInt = 1;
-                            }
+                            //if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
+                            //    favKindInt = 1;
+                            //}
                             window.epmLiveNavigation.registerLink({
                                 kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
                                 id: sa[0],
@@ -176,7 +145,7 @@
                                 webId: sa[2],
                                 listId: sa[3],
                                 itemId: sa[4],
-                                external: false 
+                                external: false
                             });
                         } else {
                             //onError(response);
@@ -189,10 +158,336 @@
                     //onError(response);
                 }
             });
-        }
+        };
+
+        a.addItemFav = function(title) {
+            $.ajax({
+                type: 'POST',
+                url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                data: "{ Function: 'AddFavorites', Dataxml: '" +
+                    "<Data>" +
+                    "<Param key=\"SiteId\">" + epmLive.currentSiteId + "</Param>" +
+                    "<Param key=\"WebId\">" + epmLive.currentWebId + "</Param>" +
+                    "<Param key=\"ListId\">" + epmLive.currentListId + "</Param>" +
+                    "<Param key=\"ListViewUrl\">" + epmLive.currentListViewUrl + "</Param>" +
+                    "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
+                    "<Param key=\"ItemId\">" + epmLive.currentItemID + "</Param>" +
+                    "<Param key=\"FString\">" + epmLive.currentUrl + "</Param>" +
+                    "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
+                    "<Param key=\"Title\">" + title + "</Param>" +
+                    "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
+                    "</Data>' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.d) {
+                        var resp = epmLive.parseJson(response.d);
+                        var result = resp.Result;
+
+                        if (epmLive.responseIsSuccess(result) && result['#text']) {
+                            //onSuccess(result);
+                            if ($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star32.png') {
+                                $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function() {
+                                    $(this).load(function() { $(this).fadeIn(); });
+                                    $(this).attr("src", "_layouts/epmlive/images/star-filled32.png");
+                                });
+                            }
+
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "positionClass": "toast-top-right",
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            };
+
+                            toastr.success("A new item has been added to your favorites list.");
+
+                            var sa = result['#text'].split(',');
+                            // asynchronously update nav
+                            // 0 is page, 1 is item
+                            var favKindInt = 1;
+                           
+                            window.epmLiveNavigation.registerLink({
+                                kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                id: sa[0],
+                                title: sa[6],
+                                url: sa[9],
+                                cssClass: sa[7],
+                                siteId: sa[1],
+                                webId: sa[2],
+                                listId: sa[3],
+                                itemId: sa[4],
+                                external: false
+                            });
+                        } else {
+                            //onError(response);
+                        }
+                    } else {
+                        //onError(response);
+                    }
+                },
+                error: function(response) {
+                    //onError(response);
+                }
+            });
+        };
+
+        a.addItemFavFromGrid = function (title, id) {
+            $.ajax({
+                type: 'POST',
+                url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                data: "{ Function: 'AddFavorites', Dataxml: '" +
+                    "<Data>" +
+                    "<Param key=\"SiteId\">" + epmLive.currentSiteId + "</Param>" +
+                    "<Param key=\"WebId\">" + epmLive.currentWebId + "</Param>" +
+                    "<Param key=\"ListId\">" + epmLive.currentListId + "</Param>" +
+                    "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
+                    "<Param key=\"ItemId\">" + id + "</Param>" +
+                    "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
+                    "<Param key=\"Title\">" + title + "</Param>" +
+                    "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
+                    "</Data>' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d) {
+                        var resp = epmLive.parseJson(response.d);
+                        var result = resp.Result;
+
+                        if (epmLive.responseIsSuccess(result) && result['#text']) {
+                           
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "positionClass": "toast-top-right",
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            };
+
+                            toastr.success("A new item has been added to your favorites list.");
+
+                            var sa = result['#text'].split(',');
+                            // asynchronously update nav
+                            // 0 is page, 1 is item
+                            var favKindInt = 1;
+                          
+                            window.epmLiveNavigation.registerLink({
+                                kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                id: sa[0],
+                                title: sa[6],
+                                url: sa[9],
+                                cssClass: sa[7],
+                                siteId: sa[1],
+                                webId: sa[2],
+                                listId: sa[3],
+                                itemId: sa[4],
+                                external: false
+                            });
+                        } else {
+                            //onError(response);
+                        }
+                    } else {
+                        //onError(response);
+                    }
+                },
+                error: function (response) {
+                    //onError(response);
+                }
+            });
+        };
+
+        a.removePageFav = function () {
+            $.ajax({
+                type: 'POST',
+                url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                data: "{ Function: 'RemoveFavorites', Dataxml: '" + a.favoritesData + "' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d) {
+                        var resp = epmLive.parseJson(response.d);
+                        var result = resp.Result;
+
+                        if (epmLive.responseIsSuccess(result) && result['#text']) {
+                            $('#favoritesStar').removeClass('icon-star-active');
+
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "positionClass": "toast-top-right",
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            };
+
+                            toastr.success("An existing item has been removed from your favorites list.");
+
+                            var sa = result['#text'].split(',');
+                            // asynchronously update nav
+                            window.epmLiveNavigation.removeLink({
+                                kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                id: sa[0],
+                                //webId: use webid for type 3 removal,
+                            });
+
+                        } else {
+                            //onError(response);
+                        }
+                    } else {
+                        //onError(response);
+                    }
+                },
+                error: function (response) {
+                    //onError(response);
+                }
+            });
+        };
+
+        a.removeItemFav = function() {
+            $.ajax({
+                type: 'POST',
+                url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                data: "{ Function: 'RemoveFavorites', Dataxml: '" + a.favoritesData + "' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d) {
+                        var resp = epmLive.parseJson(response.d);
+                        var result = resp.Result;
+
+                        if (epmLive.responseIsSuccess(result) && result['#text']) {
+                            if ($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png') {
+                                $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
+                                    $(this).load(function () { $(this).fadeIn(); });
+                                    $(this).attr("src", "_layouts/epmlive/images/star32.png");
+                                });
+                            }
+
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "positionClass": "toast-top-right",
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            };
+
+                            toastr.success("An existing item has been removed from your favorites list.");
+
+                            var sa = result['#text'].split(',');
+                            // asynchronously update nav
+                            window.epmLiveNavigation.removeLink({
+                                kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                id: sa[0],
+                                //webId: use webid for type 3 removal,
+                            });
+
+                        } else {
+                            //onError(response);
+                        }
+                    } else {
+                        //onError(response);
+                    }
+                },
+                error: function (response) {
+                    //onError(response);
+                }
+            });
+        };
+        
+        a.removeItemFavFromGrid = function (id) {
+            // missing id from grid, add it explicitly
+            
+            $.ajax({
+                type: 'POST',
+                url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                data: "{ Function: 'RemoveFavorites', Dataxml: '" +
+                        "<Data>" +
+                        "<Param key=\"SiteId\">" + epmLive.currentSiteId + "</Param>" +
+                        "<Param key=\"WebId\">" + epmLive.currentWebId + "</Param>" +
+                        "<Param key=\"ListId\">" + epmLive.currentListId + "</Param>" +
+                        "<Param key=\"ListViewUrl\"></Param>" +
+                        "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
+                        "<Param key=\"ItemId\">" + id + "</Param>" +
+                        "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
+                        "<Param key=\"Title\">" + epmLive.currentListTitle + "</Param>" +
+                        "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
+                        "</Data>' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.d) {
+                        var resp = epmLive.parseJson(response.d);
+                        var result = resp.Result;
+
+                        if (epmLive.responseIsSuccess(result) && result['#text']) {
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "positionClass": "toast-top-right",
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            };
+
+                            toastr.success("An existing item has been removed from your favorites list.");
+
+                            var sa = result['#text'].split(',');
+                            // asynchronously update nav
+                            window.epmLiveNavigation.removeLink({
+                                kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                id: sa[0],
+                                //webId: use webid for type 3 removal,
+                            });
+
+                        } else {
+                            //onError(response);
+                        }
+                    } else {
+                        //onError(response);
+                    }
+                },
+                error: function (response) {
+                    //onError(response);
+                }
+            });
+        };
         loadFavoriteStatus();
         //====== FREQUENT ======================
-        var frequentData =
+        a.frequentData =
             "<Data>" +
                 "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
                 "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
@@ -220,7 +515,7 @@
                 $.ajax({
                     type: 'POST',
                     url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                    data: "{ Function: 'CreateFrequentApp', Dataxml: '" + frequentData + "' }",
+                    data: "{ Function: 'CreateFrequentApp', Dataxml: '" + a.frequentData + "' }",
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     success: function (response) {
@@ -252,7 +547,7 @@
             "</Data>";
 
         function countRecentItem() {
-            if (!$$.currentListViewUrl && $$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
+            if (!$$.currentListViewUrl && $$.currentItemID != '-1' && $$.currentFileIsNull == 'True' && $$.currentItemTitle.trim() != 'New Item') {
                 // add recent item
                 $.ajax({
                     type: 'POST',
@@ -299,6 +594,10 @@
 
         a.getAddFavDynamicValue = function(ele) {
             return $($(ele).parent().find('#favTitle').get(0)).val();
+        };
+        
+        a.getAddFavItemFromGridDynamicValue = function (ele) {
+            return $($(ele).parent().find('#favItemTitle').get(0)).val();
         };
         
         function removeSource(url) {

@@ -590,6 +590,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
     var webid = this.getUserData(this._curMenuRow.id, "webid");
     var listid = this.getUserData(this._curMenuRow.id, "listid");
     var itemid = this.getUserData(this._curMenuRow.id, "itemid");
+    var itemtitle = this.getUserData(this._curMenuRow.id, "title");
 
     if (this._useparent) {
         var parentid = this.getUserData(this._curMenuRow.id, "parentitemid");
@@ -615,7 +616,35 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
     if (taskplanner != "")
         weburl += "&planner=" + taskplanner;
 
-    if (action == "createworkspace" && this._hasTemplateList) {
+    if (action == "AddFavorite") {
+        var viewDiv = document.createElement('div');
+        viewDiv.innerHTML = 
+            '<div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;' +
+                '<input id="favItemTitle" name="favItemTitle" type="text" value="' + itemtitle + '" />' +
+                '<br />' +
+                '<div style="clear:both;height:10px;"></div>' +
+                '<input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavItemFromGridDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self" />' +
+                '<input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, \'Cancel clicked\');" class="ms-ButtonHeightWidth" target="_self" />' +
+            '</div>';
+        
+        var options = {
+            html: viewDiv,
+            height: 110,
+            width: 265,
+            title: "Add Favorite Item",
+            dialogReturnValueCallback: function (diagResult, retVal) {
+                if (diagResult === 1) {
+                    window.Analytics.addItemFavFromGrid(retVal, itemid);
+                }
+            }
+        };
+
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+    }
+    else if (action == "RemoveFavorite") {
+        window.Analytics.removeItemFavFromGrid(itemid);
+    }
+    else if (action == "createworkspace" && this._hasTemplateList) {
         CreateEPMLiveWorkspace(listid, itemid);
     }
     else if (actiontype == "99") {

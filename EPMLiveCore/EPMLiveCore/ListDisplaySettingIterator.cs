@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using EPMLiveCore.API;
+using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web;
@@ -327,7 +331,7 @@ namespace EPMLiveCore
 
                 RedirectUrl = String.Concat(sUrl, "/", List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl);
 
-                ProcessNewItemRecent();
+                ProcessNewItemRecent(ListItem);
             }
         }
 
@@ -335,13 +339,61 @@ namespace EPMLiveCore
         {
             if (SaveButton.SaveItem(SPContext.Current, false, ""))
             {
-                ProcessNewItemRecent();
+                ProcessNewItemRecent(SPContext.Current.ListItem);
             }
         }
 
-        protected void ProcessNewItemRecent()
+        protected void ProcessNewItemRecent(SPListItem i)
         {
-            //YOURCODEHERE
+            try
+            {
+                var queryCreateRecentItem =
+                    @"INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Date])
+                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " +
+                    Convert.ToInt32(AnalyticsType.Recent) + @", GETDATE())
+                    SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" +
+                    Convert.ToInt32(AnalyticsType.Recent) + @"
+
+                    IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 2) > 20)
+                    BEGIN
+	                    DELETE FROM FRF 
+	                    WHERE [Type] = 2 
+	                    AND [F_Date] NOT IN (SELECT TOP 20 [F_Date] FROM FRF WHERE [Type] = 2 ORDER BY [F_Date] DESC)
+                    END
+                    ";
+
+                var qParams = new Dictionary<string, object>
+                {
+                    {"@siteid", i.ParentList.ParentWeb.Site.ID},
+                    {"@webid", i.ParentList.ParentWeb.ID},
+                    {"@listid", i.ParentList.ID},
+                    {"@itemid", i.ID},
+                    {"@userid", i.ParentList.ParentWeb.CurrentUser.ID},
+                    {"@icon", new GridGanttSettings(i.ParentList).ListIcon},
+                    {"@title", i.Title},
+                };
+
+                var exec = new QueryExecutor(SPContext.Current.Web);
+                exec.ExecuteEpmLiveQuery(queryCreateRecentItem, qParams);
+                ClearCache();
+            }
+            catch{}
+        }
+
+        private static void ClearCache()
+        {
+            try
+            {
+                try
+                {
+                    new WorkspaceLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
+                }
+                catch
+                {
+                    CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                }
+            }
+            catch { }
         }
 
         protected override void OnInit(EventArgs e)

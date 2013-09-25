@@ -65,7 +65,6 @@ function registerCreateWorkspace2Script() {
             self.compLvls = ko.observable(w.compLvls);
             self.currentWebFullUrl = ko.observable(w.epmLive.currentWebFullUrl);
             self.currentWebId = ko.observable(w.epmLive.currentWebId);
-            self.tempGalWebId = ko.observable(w.tempGalWebId);
             self.currentSiteId = ko.observable(w.epmLive.currentSiteId);
             
 
@@ -105,7 +104,6 @@ function registerCreateWorkspace2Script() {
                             "<Param key=\"AttachedItemListGuid\">" + self.listGuid() + "</Param>" +
                             "<Param key=\"WebUrl\">" + self.currentWebFullUrl() + "</Param>" +
                             "<Param key=\"WebId\">" + self.currentWebId() + "</Param>" +
-                            "<Param key=\"TempGalWebId\">" + self.tempGalWebId() + "</Param>" +
                             "<Param key=\"SiteId\">" + self.currentSiteId() + "</Param>" +
                             "<Param key=\"CreatorId\">" + w.creatorId + "</Param>" +
                             "<Param key=\"CreateFromLiveTemp\">" + self.createFromLiveTemp() + "</Param>" +

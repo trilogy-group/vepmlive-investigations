@@ -288,8 +288,8 @@ namespace EPMLiveCore.Layouts.epmlive
                     ddlParentSiteLookup.SelectedValue = gSettings.WorkspaceParentSiteLookup;
 
                     //load list icon
-                    spnListIcon.CssClass = gSettings.ListIcon;
-                    hdnListIcon.Value = gSettings.ListIcon;
+                    spnListIcon.CssClass = string.IsNullOrEmpty(gSettings.ListIcon) ? "icon-square" : gSettings.ListIcon;
+                    hdnListIcon.Value = string.IsNullOrEmpty(gSettings.ListIcon) ? "icon-square" : gSettings.ListIcon;
 
                     chkWorkListFeat.Checked = gSettings.EnableWorkList;
                     chkEmails.Checked = gSettings.SendEmails;
