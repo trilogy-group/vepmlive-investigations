@@ -23,7 +23,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Fields 
 
-        #region Properties (9) 
+        #region Properties (11) 
 
         public IEnumerable<NavNode> AllNodes
         {
@@ -31,7 +31,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             {
                 List<NavNode> nodes = TopNodes.ToList();
                 nodes.AddRange(BottomNodes);
-
+                
                 return nodes;
             }
         }
@@ -39,6 +39,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         public IEnumerable<NavNode> BottomNodes { get; set; }
 
         public bool Pinned { get; private set; }
+
+        public string SelectedNode { get; private set; }
 
         public string SelectedTlNode
         {
@@ -64,7 +66,20 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             get { return SPContext.Current.Web.ServerRelativeUrl; }
         }
 
-        public string SelectedNode { get; private set; }
+        public bool WorkspaceCreationEnabled
+        {
+            get
+            {
+                try
+                {
+                    string flag = CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLiveDisableMyWorkspaces");
+                    return string.IsNullOrEmpty(flag) || !bool.Parse(flag);
+                }
+                catch { }
+
+                return true;
+            }
+        }
 
         #endregion Properties 
 
@@ -100,6 +115,21 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             }
 
             LoadSelectedNodeLinks();
+
+            if (WorkspaceCreationEnabled) return;
+
+            NavNode wsNode = null;
+            foreach (NavNode node in TopNodes.Where(n => !string.IsNullOrEmpty(n.Id) && n.Id.Equals("workspaces")))
+            {
+                wsNode = node;
+            }
+
+            if (wsNode == null) return;
+
+            List<NavNode> nodes = TopNodes.ToList();
+            nodes.Remove(wsNode);
+
+            TopNodes = nodes;
         }
 
         protected void OnTreeViewPreRender(object sender, EventArgs e)
@@ -123,7 +153,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
-        
         // Private Methods (2) 
 
         private void CalculatePinState()

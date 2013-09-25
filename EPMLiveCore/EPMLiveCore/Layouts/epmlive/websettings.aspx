@@ -197,14 +197,14 @@
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
         </wssuc:InputFormSection>
-        <wssuc:InputFormSection Title="Disable masterpage components" Description="" runat="server">
+        <wssuc:InputFormSection Title="Disable Components" Description="" runat="server">
             <template_description>
-	                    Check box to disable components.
+	                    Check the boxes to disable components.
 	                </template_description>
             <template_inputformcontrols>
 		                <wssuc:InputFormControl ID="InputFormControl1" LabelText="" runat="server">
 			                 <Template_Control>
-			                    <asp:CheckBox ID="cbDisableMyWorkspaces" runat="server" Text="Disable My Workspaces"/><br /><br />
+			                    <asp:CheckBox ID="cbDisableMyWorkspaces" runat="server" Text="Disable Workspaces Menu"/><br /><br />
                                 <asp:CheckBox ID="cbDisableCommonActions" runat="server" Text="Disable Common Actions"/><br /><br />
                                 <asp:CheckBox ID="cbDisableCreateNew" runat="server" Text="Disable Create New"/>
 			                 </Template_Control>
