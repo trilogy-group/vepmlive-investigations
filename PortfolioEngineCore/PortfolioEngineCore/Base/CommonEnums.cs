@@ -508,6 +508,7 @@ namespace PortfolioEngineCore
     qjcRefreshRoles = 200,
     qjcCalcAvailability = 111,
     qjcCalcDefaultFTEs = 112,
+    qjcPostCostValues = 113,
     qjcTest = 100001
     }
 }
