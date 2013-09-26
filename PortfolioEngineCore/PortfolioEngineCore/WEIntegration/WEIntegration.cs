@@ -418,6 +418,24 @@ namespace PortfolioEngineCore.WEIntegration
             return true;
         }
 
+        public bool GetAutoPosts(string datatype, ref int[,] autoposts)
+        {
+            //if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+            //_sqlConnection.Open();
+
+            //bool bRet = dbaCostValues.GetAutoPosts(_dba, datatype, ref autoposts);
+            //_sqlConnection.Close();
+            //return bRet;
+
+            if (_PFECN.State != ConnectionState.Open)
+                _PFECN.Open();
+
+            bool bRet = dbaCostValues.GetAutoPosts(_dba, datatype, ref autoposts);
+            _PFECN.Close();
+            return bRet;
+        }
+
+
         public DataTable GetPfeFields(int type)
         {
             if(_PFECN.State != ConnectionState.Open)
