@@ -54,8 +54,31 @@
 		this.ExitConfirmed = false;
 	}
 
+	ResPlanAnalyzer.prototype.OnResizeInternal = function (event) {
+	    try {
+	        var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
+	        var xy = jsf_findAbsolutePosition(divLayout);
+	        var body = document.body;
+	        //            if (this.params.IsDlg == "1") {
+	        //                this.Width = body.offsetWidth;
+	        //                this.Height = body.offsetHeight - 5;
+	        //            } else {
+	        //                this.Width = body.offsetWidth - 4;
+	        //                this.Height = body.offsetHeight - 195;
+	        //            }
+	        this.Width = body.offsetWidth;
+	        this.Height = body.offsetHeight - xy[1] - 5;
+	        this.OnResize();
+	    }
+	    catch (e) {
+	        this.HandleException("OnResizeInternal", e);
+	    }
+	};
+
 
 	ResPlanAnalyzer.prototype.OnResize = function (event) {
+
+
 	    if (this.initialized == true) {
 	        //var toolbarDataObjectDiv = document.getElementById("toolbarDataObjectDiv");
 
@@ -133,7 +156,7 @@
 
 		this.Width = nWidth;
 		this.Height = nHeight;
-		this.OnResize();
+		this.OnResizeInternal();
 	}
 
 	ResPlanAnalyzer.prototype.xmlStringToJson = function (xmlstring) {
@@ -2879,7 +2902,7 @@
 
 	        this.DetGrid = TreeGrid(sb.toString(), "gridDiv_1", "g_1");
 	        this.initialized = true;
-	        this.OnResize();
+	        this.OnResizeInternal();
 	        this.ShowWorkingPopup("divLoading");
 
 	    }
@@ -3267,7 +3290,7 @@
 	                this.TotGrid = TreeGrid(sb.toString(), "gridDiv_Totals", "bottomg_1");
 
 	                this.initialized = true;
-	                this.OnResize();
+	                this.OnResizeInternal();
 
 
 	            }
@@ -7021,7 +7044,7 @@
 
 
 	    grid.Render();
-	    this.OnResize();
+	    this.OnResizeInternal();
 	}
 
 	 ResPlanAnalyzer.prototype.hideFilters = function (grid, bfromtoolbar) {

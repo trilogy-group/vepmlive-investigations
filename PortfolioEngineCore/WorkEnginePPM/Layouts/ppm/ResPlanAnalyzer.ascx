@@ -16,8 +16,8 @@
 </asp:ScriptManagerProxy>
 
 <link rel="stylesheet" type="text/css" href="Styles/Dialog.css" />
-
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/dhtmlxlayout.css" />
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/skins/dhtmlxlayout_dhx_skyblue.css" />
 <script src="/_layouts/epmlive/dhtml/xlayout/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xlayout/dhtmlxlayout.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xlayout/dhtmlxcontainer.js" type="text/javascript"></script>
@@ -45,6 +45,7 @@
 <script src="/_layouts/ppm/ResPlanAnalyzer.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css" />
+<script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
 
 <script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
 
