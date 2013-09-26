@@ -185,6 +185,12 @@ namespace WorkEnginePPM.WebServices.Core
                 {
                     if (sResult.Length > 0)
                     {
+                        // we're saying the Post worked so have to check for AutoPost
+                        int[,] autoposts = new int[10, 2];
+                        bool bRet = adminCore.GetAutoPosts("Timesheets", ref autoposts);
+                        // if we have any autoposts then need to call Post Cost Values - best to use Job Server - can Job Server Post Cost Totals to WE? Needs to and not just for this
+                        // if use Job Server then should be done in the fn above (w/different name)
+
                         //var dataElement = new XElement("Data");
                         //var resultElement = new XElement("Result");
                         //resultElement.Add(new XAttribute("Message", sResult));
