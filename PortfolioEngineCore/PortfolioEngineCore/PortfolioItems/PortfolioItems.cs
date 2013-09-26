@@ -24,7 +24,7 @@ namespace PortfolioEngineCore.PortfolioItems
         public int FA_USEFULLNAME;
 
     }
-    
+
     internal class EPKItem
     {
         public int ID;
@@ -47,16 +47,16 @@ namespace PortfolioEngineCore.PortfolioItems
     public class PortfolioItems : PFEBase
     {
 
-		#region Fields (1) 
+        #region Fields (1)
 
         private readonly SqlConnection _sqlConnection;
 
-		#endregion Fields 
+        #endregion Fields
 
-		#region Constructors (1) 
+        #region Constructors (1)
 
         public PortfolioItems(string basepath, string username, string pid, string company, string dbcnstring, bool bDebug = false)
-            : base(basepath, username, pid, company, dbcnstring, SecurityLevels.EditPortfolioItems , bDebug)
+            : base(basepath, username, pid, company, dbcnstring, SecurityLevels.EditPortfolioItems, bDebug)
         {
             debug.AddMessage("Loading PortfolioItems Class");
             _sqlConnection = _PFECN;
@@ -65,6 +65,153 @@ namespace PortfolioEngineCore.PortfolioItems
         #endregion Constructors
 
         private const int CONST_PI_MANAGER_SURROGATE_CONTEXT = 4;
+
+        public void ObtainManagedPortfolioItems(out string sExtIDList, out string sPIDList, out string sXML)
+        {
+
+            if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+            _sqlConnection.Open();
+
+
+            bool bSuperPIM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperPIM);
+            bool bSuperRM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperRM);
+
+            sExtIDList = "";
+            sPIDList = "";
+            sXML = "";
+
+            string sProjectIDs = "";
+            string sProjectEXTIDs = "";
+            string sPIName;
+
+            CStruct xRoot = new CStruct();
+            xRoot.Initialize("PIS");
+            CStruct xPI;
+
+
+            string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '' ORDER BY PROJECT_NAME";
+            int iPid;
+            string sExtID;
+
+            SqlCommand oCommand = new SqlCommand(sCommand, _sqlConnection);
+            SqlDataReader reader = null;
+            reader = oCommand.ExecuteReader();
+
+            while (reader.Read())
+            {
+                iPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                sExtID = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                sPIName = DBAccess.ReadStringValue(reader["PROJECT_NAME"]);
+
+                xPI = xRoot.CreateSubStruct("PI");
+                xPI.CreateIntAttr("ID", iPid);
+                xPI.CreateStringAttr("EXTID", sExtID);
+                xPI.CreateStringAttr("NAME", sPIName);
+
+
+
+                if (sProjectIDs == "")
+                    sProjectIDs = iPid.ToString();
+                else
+                    sProjectIDs += "," + iPid.ToString();
+
+
+                if (sProjectEXTIDs == "")
+                    sProjectEXTIDs = sExtID;
+                else
+                    sProjectEXTIDs += "," + sExtID;
+
+            }
+
+            reader.Close();
+            reader = null;
+
+            if (sProjectIDs == "")
+                return;
+
+            if (bSuperPIM)
+            {
+                sPIDList = sProjectIDs;
+                sExtIDList = sProjectEXTIDs;
+                sXML = xRoot.XML();
+                return;
+            }
+
+            xRoot = new CStruct();
+            xRoot.Initialize("PIS");
+
+            sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS" +
+           " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID" +
+           " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = " + _userWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + _userWResID.ToString("0") + ")" +
+           " AND PROJECT_ID in (" + sProjectIDs + ")  ORDER BY PROJECT_NAME";
+
+            oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+            reader = oCommand.ExecuteReader();
+            while (reader.Read())
+            {
+                iPid = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                sExtID = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                sPIName = DBAccess.ReadStringValue(reader["PROJECT_NAME"]);
+
+                xPI = xRoot.CreateSubStruct("PI");
+                xPI.CreateIntAttr("ID", iPid);
+                xPI.CreateStringAttr("EXTID", sExtID);
+                xPI.CreateStringAttr("NAME", sPIName);
+
+                if (sProjectIDs == "")
+                    sPIDList = iPid.ToString();
+                else
+                    sPIDList += "," + iPid.ToString();
+
+
+                if (sExtIDList == "")
+                    sExtIDList = sExtID;
+                else
+                    sExtIDList += "," + sExtID;
+
+            }
+            reader.Close();
+
+            sXML = xRoot.XML();
+        }
+
+        public string GeneratePortfolioItemTicket(string sDataIn)
+        {
+
+            try
+            {
+
+                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                _sqlConnection.Open();
+
+                Guid newticket = Guid.NewGuid();
+
+
+                string cmdText = "INSERT INTO EPG_DATA_CACHE ( DC_TICKET, DC_TIMESTAMP, DC_DATA) " +
+                                      " VALUES(@pticket,@ptimest,@pdta)";
+                SqlCommand oCommand = new SqlCommand(cmdText, _sqlConnection);
+
+                SqlParameter pTicketID = oCommand.Parameters.Add("@pticket", SqlDbType.UniqueIdentifier);
+                SqlParameter pTimestampID = oCommand.Parameters.Add("@ptimest", SqlDbType.DateTime);
+                SqlParameter pDataID = oCommand.Parameters.Add("@pdta", SqlDbType.NText);
+
+
+                pTicketID.Value = newticket;
+                pTimestampID.Value = DateTime.Now;
+                pDataID.Value = sDataIn;
+
+                int lRowsAffected = oCommand.ExecuteNonQuery();
+
+
+
+                return newticket.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+        }
 
         public string UpdatePortfolioItems(string xml)
         {
@@ -139,14 +286,14 @@ namespace PortfolioEngineCore.PortfolioItems
                 {
                     string sGuid = xPI.GetStringAttr("EXTID", "");
                     string sListID = xPI.GetStringAttr("ListID", "");
- 
+
                     sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_MARKED_DELETION = 0 WHERE PROJECT_EXT_UID = @extid";
 
                     // When a PI is to be updated, then if it does not exists - create in.  If it has been closed, then unclose it.
                     // So basically if always set Marked for Deletion to 0 (i.e. not closed) then if no rows were affected -  need to create the PI
 
                     oCommand = new SqlCommand(sCommand, _sqlConnection);
-                    oCommand.Parameters.AddWithValue("@extid",sGuid);
+                    oCommand.Parameters.AddWithValue("@extid", sGuid);
                     int lRowsAffected = oCommand.ExecuteNonQuery();
                     int iPI = 0;
 
@@ -195,7 +342,7 @@ namespace PortfolioEngineCore.PortfolioItems
 
                     try
                     {
-                        
+
 
                         if (iPI != 0 && sListID != "")
                         {
@@ -214,14 +361,14 @@ namespace PortfolioEngineCore.PortfolioItems
                     catch (Exception ex)
                     {
                         _dba.WriteImmTrace("PortfolioItems", "UpdatePortfolioItems", "ErrorSetListID", "ListID: " + sListID + " Error: " + ex.Message);
-                       
+
                     }
 
                     // so by here we have an unclosed PI that "matches " the item - unless iPI is zero - inwhich case something nasty must have happened - as there was no match!
 
                     if (iPI == 0)
                     {
-                         CStruct xItem = xEPKUpdate.CreateSubStruct("Item");
+                        CStruct xItem = xEPKUpdate.CreateSubStruct("Item");
                         xItem.CreateStringAttr("ItemId", sGuid);
                         xItem.CreateIntAttr("Error", 100);
                         xItem.CreateStringAttr("ErrorText", statusText);
@@ -258,7 +405,7 @@ namespace PortfolioEngineCore.PortfolioItems
                             xItem.CreateStringAttr("ErrorText", statusText);
                             if (iRes != 2)
                             {
-                                 if (latchStatusText == "")
+                                if (latchStatusText == "")
                                     latchStatusText = statusText;
                             }
                         }
@@ -282,21 +429,21 @@ namespace PortfolioEngineCore.PortfolioItems
 
                 eStatus = ExportPIInfo(_dba, sPIDList, xEPKUpdate);
 
-                
+
                 if (eStatus != StatusEnum.rsSuccess)
                 {
 
                     // an item was noyt updated and have to insert this code here to be able to propergate the error plus the structure that gives each items status back to WE
-    //                CStruct xUpdateReplyRoot = new CStruct();
-    //                xUpdateReplyRoot.Initialize("Reply", xReply);
-    //                xUpdateReplyRoot.CreateInt("HRESULT", 0);
-    //                xUpdateReplyRoot.CreateInt("STATUS", 1);   // jason wants a failure to return a status of 1
-    //                xUpdateReplyRoot.CreateString("Error", latchStatusText);
-    //                xUpdateReplyRoot.CreateString("UserName", _username);
-    //                if (MissingResNames.Length != 0)
-    //                    xUpdateReplyRoot.CreateString("MissingResources", MissingResNames);
+                    //                CStruct xUpdateReplyRoot = new CStruct();
+                    //                xUpdateReplyRoot.Initialize("Reply", xReply);
+                    //                xUpdateReplyRoot.CreateInt("HRESULT", 0);
+                    //                xUpdateReplyRoot.CreateInt("STATUS", 1);   // jason wants a failure to return a status of 1
+                    //                xUpdateReplyRoot.CreateString("Error", latchStatusText);
+                    //                xUpdateReplyRoot.CreateString("UserName", _username);
+                    //                if (MissingResNames.Length != 0)
+                    //                    xUpdateReplyRoot.CreateString("MissingResources", MissingResNames);
 
-    //                xUpdateReplyRoot.AppendSubStruct(xEPKUpdate);
+                    //                xUpdateReplyRoot.AppendSubStruct(xEPKUpdate);
 
                     //                return xUpdateReplyRoot.XML();
 
@@ -312,7 +459,7 @@ namespace PortfolioEngineCore.PortfolioItems
 
                     _dba.WriteImmTrace("PortfolioItems", "UpdatePortfolioItems", "ErrReturn", xEPKUpdate.XML());
 
-                    _sqlConnection.Close();                     
+                    _sqlConnection.Close();
                     return xEPKUpdate.XML();
 
                 }
@@ -351,7 +498,7 @@ namespace PortfolioEngineCore.PortfolioItems
 
 
             xEPKUpdate.CreateInt("HRESULT", 0);
-            xEPKUpdate.CreateInt("STATUS", 0);  
+            xEPKUpdate.CreateInt("STATUS", 0);
             xEPKUpdate.CreateString("UserName", _username);
 
             _dba.WriteImmTrace("PortfolioItems", "UpdatePortfolioItems", "Return", xEPKUpdate.XML());
@@ -360,7 +507,7 @@ namespace PortfolioEngineCore.PortfolioItems
             _sqlConnection.Close();
             return xEPKUpdate.XML();
 
-   //          return "<UpdatePortfolioItems Status='0'></UpdatePortfolioItems>";
+            //          return "<UpdatePortfolioItems Status='0'></UpdatePortfolioItems>";
         }
 
         public string ClosePortfolioItems(string xml)
@@ -407,23 +554,23 @@ namespace PortfolioEngineCore.PortfolioItems
                 // this used to return <Reply Result=0><ClosePortfolioItems><Item ItemID=guid etc.....
                 // now returns "<ClosePortfolioItems Status='0'></ClosePortfolioItems>"
 
-    //          CStruct xUpdateReplyRoot = new CStruct();
-    //          xUpdateReplyRoot.Initialize("Reply", xReply);
-    //          xUpdateReplyRoot.CreateInt("HRESULT", 0);
-                xEPKUpdate.CreateInt("STATUS", 0);  
-    //          xUpdateReplyRoot.AppendSubStruct(xEPKUpdate);
-  
-    //          return xUpdateReplyRoot.XML();
+                //          CStruct xUpdateReplyRoot = new CStruct();
+                //          xUpdateReplyRoot.Initialize("Reply", xReply);
+                //          xUpdateReplyRoot.CreateInt("HRESULT", 0);
+                xEPKUpdate.CreateInt("STATUS", 0);
+                //          xUpdateReplyRoot.AppendSubStruct(xEPKUpdate);
+
+                //          return xUpdateReplyRoot.XML();
                 return xEPKUpdate.XML();
 
             }
             catch (Exception ex)
             {
-                return "<ClosePortfolioItems><STATUS>1</STATUS><Error>" + ex.Message  + "</Error></ClosePortfolioItems>";
+                return "<ClosePortfolioItems><STATUS>1</STATUS><Error>" + ex.Message + "</Error></ClosePortfolioItems>";
             }
 
 
-        //    return "<ClosePortfolioItems Status='0'></ClosePortfolioItems>";
+            //    return "<ClosePortfolioItems Status='0'></ClosePortfolioItems>";
         }
 
         public string CreateUpdateUpdatePortfolioItemsXML(string pids)
@@ -470,8 +617,8 @@ namespace PortfolioEngineCore.PortfolioItems
                 sTabList[1] = "EPGP_PROJECT_TEXT_VALUES";
                 sTabList[2] = "EPGP_PROJECT_NTEXT_VALUES";
                 sTabList[3] = "EPGP_PROJECT_DATE_VALUES";
-                sTabList[4] = "EPGP_PROJECT_DEC_VALUES"; 
-                
+                sTabList[4] = "EPGP_PROJECT_DEC_VALUES";
+
                 int lUseStage = 1;
 
                 string sCommand = "SELECT STAGE_ID FROM EPGP_STAGES Where (STAGE_SEQ = 1)";
@@ -585,11 +732,11 @@ namespace PortfolioEngineCore.PortfolioItems
             return "";
         }
 
-        private  int StripNum(ref string sin)
+        private int StripNum(ref string sin)
         {
             try
             {
-                if (  sin == "")      
+                if (sin == "")
                     return 0;
 
 
@@ -668,7 +815,7 @@ namespace PortfolioEngineCore.PortfolioItems
                 lRowsAffected = oCommand.ExecuteNonQuery();
 
                 oCommand = null;
-                
+
                 string[] sTabList;
                 sTabList = new string[6];
                 bool[] bTabTouched;
@@ -711,7 +858,7 @@ namespace PortfolioEngineCore.PortfolioItems
 
                         oCommand = new SqlCommand(sCommand, _sqlConnection);
                         lRowsAffected = oCommand.ExecuteNonQuery();
-                        
+
                         sCommand = "INSERT into EPGP_TEAMS (PROJECT_ID,WRES_ID, RES_IN_PLAN) " +
                         "VALUES(" + iPID.ToString() + ",@wresid,0)";
 
@@ -727,7 +874,7 @@ namespace PortfolioEngineCore.PortfolioItems
                             {
 
                                 pWRES_ID.Value = wid;
-                                lRowsAffected = oCommand.ExecuteNonQuery();                            
+                                lRowsAffected = oCommand.ExecuteNonQuery();
                             }
                         }
 
@@ -1283,17 +1430,17 @@ namespace PortfolioEngineCore.PortfolioItems
                                     "INSERT INTO EPG_DELEGATES (WRES_ID, SURR_ID, SURR_ASSN_DATE, SURR_WRES_ID, SURR_CONTEXT, SURR_CONTEXT_VALUE) " +
                                     "VALUES(" + latchedRId.ToString() + ", " + delegatecnt.ToString() + ", GetDate(), " +
                                     resId.ToString() + ", " + surrContext.ToString() + ", " + iPI.ToString() + ")";
-                                
+
                                 oCommand = new SqlCommand(sCommand, _sqlConnection);
                                 lRowsAffected = oCommand.ExecuteNonQuery();
 
                                 oCommand = null;
-                
+
                             }
                         }
 
                     }
-                 }
+                }
 
                 return latchedRId;
 
@@ -1429,7 +1576,7 @@ namespace PortfolioEngineCore.PortfolioItems
             {
                 reader = oCommand.ExecuteReader();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //eStatus = HandleStatusError(SeverityEnum.Exception, "ExecuteSQL", (StatusEnum)eStatusOnException, ex.Message.ToString());
                 eStatus = (StatusEnum)99871;
@@ -1440,7 +1587,7 @@ namespace PortfolioEngineCore.PortfolioItems
 
         private StatusEnum ExportPIInfo(DBAccess dba, string sProjectIDs, CStruct xEPKUpdate)
         {
-            StatusEnum eStatus = StatusEnum.rsSuccess; 
+            StatusEnum eStatus = StatusEnum.rsSuccess;
 
             SqlCommand oCommand;
             SqlDataReader reader;
@@ -1475,8 +1622,8 @@ namespace PortfolioEngineCore.PortfolioItems
             // We want these fields regardless so we'll just add them - they won't be mapped
             cmdText = "SELECT FIELD_ID,FIELD_NAME,FIELD_NAME_SQL,FIELD_TABLE_ID,FIELD_FORMAT FROM EPGT_FIELDS" +
                     " Where FIELD_ID In(9900,9903) ORDER BY FIELD_ID";
-          //  oCommand.CommandText = cmdText;
-         //   oCommand = new SqlCommand(cmdText, _sqlConnection);
+            //  oCommand.CommandText = cmdText;
+            //   oCommand = new SqlCommand(cmdText, _sqlConnection);
             oCommand = new SqlCommand(cmdText, _sqlConnection);
 
 
@@ -1775,7 +1922,7 @@ namespace PortfolioEngineCore.PortfolioItems
                             while (reader1.Read())
                             {
                                 string steammember = DBAccess.ReadIntValue(reader1["WRES_ID"]).ToString(); ;
-                                if (steamlist.Length == 0) steamlist = steammember; else steamlist += "," + steammember;                          
+                                if (steamlist.Length == 0) steamlist = steammember; else steamlist += "," + steammember;
                             }
                             reader1.Close();
                         }
@@ -1964,5 +2111,5 @@ namespace PortfolioEngineCore.PortfolioItems
             if (clnLookupValues.ContainsKey(lID)) sValue = clnLookupValues[lID];
             return sValue;
         }
-     }
+    }
 }
