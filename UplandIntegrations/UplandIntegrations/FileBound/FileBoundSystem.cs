@@ -143,6 +143,14 @@ namespace UplandIntegrations.FileBound
                     {
                         dr[dc.ColumnName] = c.fileId;
                     }
+                    else if (dc.ColumnName == "stepName")
+                    {
+                        WebClient wc2 = new WebClient();
+                        string resp2 = wc2.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routedItems?filter=relfileid_" + ItemID + ",routedobjecttype_6&fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+
+                        dynamic c2 = System.Web.Helpers.Json.Decode(resp2);
+
+                    }
                     else
                     {
                         int field = 0;
@@ -202,6 +210,26 @@ namespace UplandIntegrations.FileBound
                     if (dc.ColumnName == "ID")
                     {
                         dr[dc.ColumnName] = c[i].fileId;
+                    }
+                    else if (dc.ColumnName == "stepName")
+                    {
+                        WebClient wc2 = new WebClient();
+                        string resp2 = wc2.DownloadString(_webprops.Properties["APIUrl"].ToString() + "/files/" + c[i].id + "/documents?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+                        dynamic c2 = System.Web.Helpers.Json.Decode(resp2);
+
+
+                        if (c2.Length > 0)
+                        {
+                            string docid = c2[0].id.ToString();
+
+
+                            wc2 = new WebClient();
+                            resp2 = wc2.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routedItems?filter=routedobjectid_" + docid + ",routedobjecttype_6&fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+
+                            c2 = System.Web.Helpers.Json.Decode(resp2);
+                            if(c2.Length > 0)
+                                dr[dc.ColumnName] = c2[0].stepName;
+                        }
                     }
                     else
                     {
