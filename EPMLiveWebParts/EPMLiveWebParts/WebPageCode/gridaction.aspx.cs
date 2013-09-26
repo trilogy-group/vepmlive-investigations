@@ -67,7 +67,7 @@ namespace EPMLiveWebParts
 
                 if(list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
                 {
-                    if (!isFav)
+                    if (bUsePopup)
                         items.Add("View Item", getMenuItem(Request["grid"], "View Item", "/_layouts/images/blank.gif", "view", ""));
                     else
                         items.Add("View Item", getMenuItem(Request["grid"], "View Item", "/_layouts/images/blank.gif", "view", "1"));
