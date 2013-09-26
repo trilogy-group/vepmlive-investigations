@@ -436,6 +436,7 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\AddFavorite.aspx.cs">
       <DependentUpon>AddFavorite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\AddFavorite.aspx.designer.cs">
       <DependentUpon>AddFavorite.aspx.cs</DependentUpon>
@@ -841,7 +842,6 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\izendareporting.aspx.cs">
       <DependentUpon>izendareporting.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\izendareporting.aspx.designer.cs">
       <DependentUpon>izendareporting.aspx.cs</DependentUpon>
@@ -974,10 +974,51 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\Reporting.aspx.cs">
       <DependentUpon>Reporting.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\Reporting.aspx.designer.cs">
       <DependentUpon>Reporting.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\Add.aspx.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\Add.aspx.designer.cs">
+      <DependentUpon>Add.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\edit.aspx.cs">
+      <DependentUpon>edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\edit.aspx.designer.cs">
+      <DependentUpon>edit.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\Manage.aspx.cs">
+      <DependentUpon>Manage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\Manage.aspx.designer.cs">
+      <DependentUpon>Manage.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\redirect.aspx.cs">
+      <DependentUpon>redirect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\redirect.aspx.designer.cs">
+      <DependentUpon>redirect.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\Reporting.aspx.cs">
+      <DependentUpon>Reporting.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\izenda\Reporting.aspx.designer.cs">
+      <DependentUpon>Reporting.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\landing.aspx.cs">
+      <DependentUpon>landing.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\reporting\landing.aspx.designer.cs">
+      <DependentUpon>landing.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\requestworkspace.aspx.cs">
       <DependentUpon>requestworkspace.aspx</DependentUpon>
@@ -3370,6 +3411,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\ReportCheckActions.aspx" />
     <Content Include="Layouts\epmlive\ReportFilterViewCreator.aspx" />
     <Content Include="Layouts\epmlive\Reporting.aspx" />
+    <Content Include="Layouts\epmlive\reporting\izenda\Add.aspx" />
+    <Content Include="Layouts\epmlive\reporting\izenda\edit.aspx" />
+    <Content Include="Layouts\epmlive\reporting\izenda\Manage.aspx" />
+    <Content Include="Layouts\epmlive\reporting\izenda\redirect.aspx" />
+    <Content Include="Layouts\epmlive\reporting\izenda\Reporting.aspx" />
+    <Content Include="Layouts\epmlive\reporting\landing.aspx" />
     <Content Include="Layouts\epmlive\requestworkspace.aspx" />
     <Content Include="Layouts\epmlive\resourcecapacity.aspx" />
     <Content Include="Layouts\epmlive\resourcetools.js" />
