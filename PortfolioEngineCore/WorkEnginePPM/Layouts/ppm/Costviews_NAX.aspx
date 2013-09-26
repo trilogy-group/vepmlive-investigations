@@ -50,7 +50,7 @@ html, body {
         </tr>
         <tr>
             <td class="descriptioncell">
-                <label for="txtName">Field Name</label>
+                <label for="txtName">View Name</label>
             </td>
             <td class="controlcell">
                 <input type="text" id="txtName" style="width:350px;" />
@@ -58,7 +58,7 @@ html, body {
         </tr>
         <tr>
             <td class="descriptioncell">
-                Field Description
+                Description
             </td>
             <td class="controlcell">
                     <input type="text" id="txtDesc" style="Width:350px;"/>
