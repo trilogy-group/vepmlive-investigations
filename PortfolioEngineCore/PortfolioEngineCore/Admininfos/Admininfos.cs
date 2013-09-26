@@ -4582,20 +4582,18 @@ namespace PortfolioEngineCore
         /// Posts Cost Values for a CB/CT combination, optional list of PROJECT_IDs
         /// </summary>
         /// <param name="data">xml defn of CB and CT, optional one or more PI entries </param>
-        /// <returns></returns>
+        /// <returns>Result is status info, instruction is request to send data to WE</returns>
         public bool PostCostValues(string data, out string sResult, out string sPostInstruction)
         {
             // can be called from webservice or directly from 'outside' as well as within PfE code?
             if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
             _sqlConnection.Open();
 
-            string sCVResult="";
+            string sCVResult = "";
             bool bRet = dbaCostValues.PostCostValues(_dba, data, out sCVResult, out sPostInstruction);
             _sqlConnection.Close();
-            sResult=sCVResult;
-            //bool bRet = true;
+            sResult = sCVResult;
             return bRet;
         }
-
     }
 }
