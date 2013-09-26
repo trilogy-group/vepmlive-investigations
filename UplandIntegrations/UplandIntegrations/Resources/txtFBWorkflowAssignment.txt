@@ -64,18 +64,18 @@
             var currentRoutes;
 			var fileId = "#fileId#";
 			var projectId = "#projectId#";
-
+			var IntUrl = "#inturl#";
 
 			$.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
 				$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''").replace(/http:\/\//g, 'https://').replace(/:80/g, ''));
 
 				
-							$.get(WebAPIUrl + "routeditems/" + fileId + "?" + Param, function (routeobj) {
+							$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + fileId + ",routedobjecttype_6", function (routeobj) {
 
 								var routId = routeobj[0].routeId;
 
 									$.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
-										currentRoutes = routes;
+									currentRoutes = routes;
 
 										var xml = GetXML(routId);
 										if (routId > 0 && xml != "") {
@@ -257,6 +257,10 @@
                 var routeId = $("#ddlRoutes option:selected").val();
                 var xml = GetXML(routeId);
                 LoadVisualWorkflow(routeId, xml);
+
+				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + fileId, function (ret) {
+						alert(ret);
+				});
 
             }
 

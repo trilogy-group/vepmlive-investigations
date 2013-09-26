@@ -35,62 +35,95 @@ namespace UplandIntegrations.FileBound
             for (int i = 0; i < c.Length; i++)
             {
 
-                DataRow dr = Items.NewRow();
-
-                Items.Rows.Add(ProcessAssignmentRow(dr, c[i], Items.Columns));
+                ProcessAssignmentRow(c[i], Items.Columns, ref Items);
 
             }
         
             return Items;
         }
 
-        private DataRow ProcessAssignmentRow(DataRow dr, dynamic o, DataColumnCollection Columns)
+        private void ProcessAssignmentRow(dynamic o, DataColumnCollection Columns, ref DataTable Items)
         {
+
+            DataRow dr = null;
+            bool bNewRow = true;
+            try
+            {
+                dr = Items.Select("ID='" + o.routedObjectId + "'")[0];
+                bNewRow = false;
+            }
+            catch { }
+
+            if (bNewRow)
+                dr = Items.NewRow();
+
             foreach (DataColumn dc in Columns)
             {
-                if (dc.ColumnName == "ID")
-                {
-                    dr[dc.ColumnName] = o.routedItemId;
-                }
-                else if (dc.ColumnName == "relFileId")
-                {
-                    dr[dc.ColumnName] = o.relFileId;
-                }
-                else if (dc.ColumnName == "comment")
-                {
-                    dr[dc.ColumnName] = "You have a Workflow Task. Use the Worklow buttons to accept or reject your task.<br><br>Item: " + o.field[1];
-                }
-                else if (dc.ColumnName == "stepName")
-                {
-                    dr[dc.ColumnName] = o.stepName;
-                }
-                else if (dc.ColumnName == "userId")
-                {
 
-                    dr[dc.ColumnName] = o.userId;
-                    try
+                if (bNewRow)
+                {
+                    if (dc.ColumnName == "ID")
                     {
-                        WebClient wc = new WebClient();
-                        string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "users/" + o.userId + "?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+                        dr[dc.ColumnName] = o.routedObjectId;
+                    }
+                    else if (dc.ColumnName == "relFileId")
+                    {
+                        dr[dc.ColumnName] = o.relFileId;
+                    }
+                    else if (dc.ColumnName == "comment")
+                    {
+                        dr[dc.ColumnName] = "You have a Workflow Task. Use the Worklow buttons to accept or reject your task.<br><br>Item: " + o.field[1];
+                    }
+                    else if (dc.ColumnName == "stepName")
+                    {
+                        dr[dc.ColumnName] = o.stepName;
+                    }
+                    else if (dc.ColumnName == "userId")
+                    {
+                        try
+                        {
+                            WebClient wc = new WebClient();
+                            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "users/" + o.userId + "?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
 
-                        dynamic c = System.Web.Helpers.Json.Decode(resp);
+                            dynamic c = System.Web.Helpers.Json.Decode(resp);
 
+                            dr[dc.ColumnName] = c.email;
+                        }
+                        catch { }
 
                     }
-                    catch { }
+                    else if (dc.ColumnName == "dueDate")
+                    {
+                        dr[dc.ColumnName] = o.dueDate;
+                    }
+                    else if (dc.ColumnName.StartsWith("itemfield:"))
+                    {
+                        dr[dc.ColumnName] = o.field[int.Parse(dc.ColumnName.Substring(10))];
+                    }
+                }
+                else
+                {
+                    if (dc.ColumnName == "userId")
+                    {
 
-                }
-                else if (dc.ColumnName == "dueDate")
-                {
-                    dr[dc.ColumnName] = o.dueDate;
-                }
-                else if (dc.ColumnName.StartsWith("itemfield:"))
-                {
-                    dr[dc.ColumnName] = o.field[int.Parse(dc.ColumnName.Substring(10))];
+                        
+                        try
+                        {
+                            WebClient wc = new WebClient();
+                            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "users/" + o.userId + "?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+
+                            dynamic c = System.Web.Helpers.Json.Decode(resp);
+
+                            dr[dc.ColumnName] += "," + c.email;
+                        }
+                        catch { }
+
+                    }
                 }
             }
 
-            return dr;
+            if(bNewRow)
+                Items.Rows.Add(dr);
         }
 
         public DataTable GetItem(DataTable Items, string ItemID)
@@ -138,13 +171,17 @@ namespace UplandIntegrations.FileBound
         public DataTable GetAssignment(DataTable Items, string ItemID)
         {
             WebClient wc = new WebClient();
-            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routedItems/" + ItemID + "?fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+            string resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routedItems?filter=routedobjectid_" + ItemID + ",routedobjecttype_6&fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
 
             dynamic c = System.Web.Helpers.Json.Decode(resp);
-            
-            DataRow dr = Items.NewRow();
 
-            Items.Rows.Add(ProcessAssignmentRow(dr, c[0], Items.Columns));
+            for (int i = 0; i < c.Length; i++)
+            {
+
+                ProcessAssignmentRow(c[i], Items.Columns, ref Items);
+
+            }
+        
 
             return Items;
         }
@@ -326,7 +363,7 @@ namespace UplandIntegrations.FileBound
                         {
                             IntegrationAPI.Integration integ = new IntegrationAPI.Integration();
                             integ.Url = _webprops.IntegrationAPIUrl;
-                            integ.PostItemSimple(_webprops.Properties["RelatedAssign"].ToString(), c[0].userId);
+                            integ.PostItemSimple(_webprops.Properties["RelatedAssign"].ToString(), docId);
                         }
                     }
                 }

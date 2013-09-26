@@ -56,9 +56,26 @@ namespace UplandIntegrations.FileBound
                 {
                     case "WorkflowButtons":
                         if (WebProps.Properties["DataType"].ToString() == "Item")
-                            return Properties.Resources.txtFBWorkFlow.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+                        {
+                            string relass = "";
+                            try
+                            {
+                                relass = WebProps.Properties["RelatedAssign"].ToString();
+                            }catch{}
+                            string control = Properties.Resources.txtFBWorkFlow.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+                            control = control.Replace("#associatedkey#", relass);
+                            control = control.Replace("#inturl#", WebProps.IntegrationAPIUrl.Replace("/integration.asmx","/postitemsimple.aspx"));
+                            return control;
+                        }
                         else if (WebProps.Properties["DataType"].ToString() == "Assignment")
-                            return Properties.Resources.txtFBWorkflowAssignment.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+                        {
+                            string control = Properties.Resources.txtFBWorkflowAssignment.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+
+                            control = control.Replace("#associatedkey#", WebProps.IntegrationKey);
+                            control = control.Replace("#inturl#", WebProps.IntegrationAPIUrl.Replace("/integration.asmx", "/postitemsimple.aspx"));
+
+                            return control;
+                        }
                         break;
                 }
             }
