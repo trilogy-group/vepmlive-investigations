@@ -2011,7 +2011,7 @@
 							},
                             {
                                 items: [
-		{ type: "bigbutton", id: "ChangePeriodBtn", name: "Change Analyzer<br/>Periods", img: "formatmap32x32.png", style: "top: -384px; left: 0px;position:relative;", tooltip: "Change Calendar", onclick: "dialogEvent('AnalyzerTab_ChangeCalendar');" }
+		{ type: "bigbutton", id: "ChangePeriodBtn", name: "Change<br/>Calendar", img: "formatmap32x32.png", style: "top: -384px; left: 0px;position:relative;", tooltip: "Change Calendar", onclick: "dialogEvent('AnalyzerTab_ChangeCalendar');" }
 								]
                             },
                             {
@@ -2317,12 +2317,12 @@
 							},
 							{
 							    items: [
-									{ type: "mediumbutton", id: "idGraph", name: "Show<br/>Graph", img: "ps16x16.png", style: "top: -128px; left: -80px;position:relative;", tooltip: "Show Graph", onclick: "dialogEvent('AnalyzerTab_ShowGraph');" }
+									{ type: "mediumbutton", id: "idGraph", name: "Show<br/>Graph", img: "graph.png",  tooltip: "Show Graph", onclick: "dialogEvent('AnalyzerTab_ShowGraph');" }
 								]
 							},
 							{
 							    items: [
-									{ type: "mediumbutton", id: "idBTSDet", name: "Show<br/>Details", img: "ps16x16.png", style: "top: -128px; left: -192px;position:relative;", tooltip: "Show Details", onclick: "dialogEvent('AnalyzerTab_ShowBottomDetails');" }
+									{ type: "mediumbutton", id: "idBTSDet", name: "Show<br/>Details", img: "details.png",  tooltip: "Show Details", onclick: "dialogEvent('AnalyzerTab_ShowBottomDetails');" }
 								]
 							}
 						 ]
