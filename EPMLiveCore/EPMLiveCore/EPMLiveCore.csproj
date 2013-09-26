@@ -840,12 +840,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\Integration\Properties.aspx.designer.cs">
       <DependentUpon>Properties.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\epmlive\izendareporting.aspx.cs">
-      <DependentUpon>izendareporting.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\izendareporting.aspx.designer.cs">
-      <DependentUpon>izendareporting.aspx.cs</DependentUpon>
-    </Compile>
     <Compile Include="Layouts\epmlive\ListLookupConfig.aspx.cs">
       <DependentUpon>ListLookupConfig.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -971,12 +965,6 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\ReportFilterViewCreator.aspx.designer.cs">
       <DependentUpon>ReportFilterViewCreator.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Reporting.aspx.cs">
-      <DependentUpon>Reporting.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Reporting.aspx.designer.cs">
-      <DependentUpon>Reporting.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\reporting\izenda\Add.aspx.cs">
       <DependentUpon>Add.aspx</DependentUpon>
@@ -3330,7 +3318,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\Integration\Log.aspx" />
     <Content Include="Layouts\epmlive\Integration\OpenControl.aspx" />
     <Content Include="Layouts\epmlive\Integration\Properties.aspx" />
-    <Content Include="Layouts\epmlive\izendareporting.aspx" />
     <Content Include="Layouts\epmlive\javascripts\AddFavorite.js" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Analytics.js" />
@@ -3410,7 +3397,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\regionalsetng.aspx" />
     <Content Include="Layouts\epmlive\ReportCheckActions.aspx" />
     <Content Include="Layouts\epmlive\ReportFilterViewCreator.aspx" />
-    <Content Include="Layouts\epmlive\Reporting.aspx" />
     <Content Include="Layouts\epmlive\reporting\izenda\Add.aspx" />
     <Content Include="Layouts\epmlive\reporting\izenda\edit.aspx" />
     <Content Include="Layouts\epmlive\reporting\izenda\Manage.aspx" />
