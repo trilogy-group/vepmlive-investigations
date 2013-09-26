@@ -89,6 +89,18 @@
 		</div>
 	</div>
 </div>
+<div class="modalContent" id="idSelectPIDiv" style="display:none;">
+	<div class="modalText" style="margin-top:10px;padding-right:10px;">
+ 		<div>
+			<select multiple id="idSelPI" size="12">  
+            </select>
+		</div>       
+		<div class="button-container">
+				<a id="A1" href="javascript:dialogEvent('Select_PI');" class="button-new green" style="width:75px;">Display</a>
+				<a href="javascript:dialogEvent('Dont_Select_PI');" class="button-new silver" style="width:75px;">Cancel</a>
+		</div>
+	</div>
+</div>
 <div class="modalContent" id="idTotalsColsDlg" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">
 			<div style="display:relative;vertical-align:middle;padding-bottom:13px;">
