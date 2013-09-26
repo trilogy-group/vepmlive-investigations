@@ -80,6 +80,7 @@ namespace EPMLiveCore.Integrations.Jira
         {
             try
             {
+                apiUrl = apiUrl.ToLower().Replace("integration.asmx", "postitemsimple.aspx");
 
                 JiraType jiraType = (JiraType)Enum.Parse(typeof(JiraType), objectName);
                 switch (jiraType)
@@ -88,7 +89,7 @@ namespace EPMLiveCore.Integrations.Jira
 
                         Dictionary<string, object> payLoad = new Dictionary<string, object>();
                         payLoad.Add("name", integrationKey);
-                        payLoad.Add("url", string.Format("{0}?integrationkey={1}&issuekey=${2}", apiUrl, integrationKey, "{issue.key}"));
+                        payLoad.Add("url", string.Format("{0}?integrationkey={1}&id=${2}", apiUrl, integrationKey, "{issue.key}"));
                         payLoad.Add("events", new string[] { "jira:issue_created", "jira:issue_updated", "jira:issue_deleted" });
                         payLoad.Add("jqlFilter", "");
                         payLoad.Add("excludeIssueDetails", false);
