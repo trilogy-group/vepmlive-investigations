@@ -260,7 +260,7 @@ namespace EPMLiveCore.API.Integration
             {
 
                 OpenConnection();
-
+                    
                 if (dr["DIRECTION"].ToString() == "1")
                     ProcessItemOutgoing(dr);
                 else if (dr["DIRECTION"].ToString() == "2")
@@ -808,6 +808,8 @@ namespace EPMLiveCore.API.Integration
                                 hshUserMap = GetUserMap(drIntegration["INT_LIST_ID"].ToString(), true);
                             }
 
+                            Guid intlistid = new Guid(drIntegration["INT_LIST_ID"].ToString());
+
                             foreach (DataRow drItem in dtItem.Rows)
                             {
 
@@ -827,9 +829,12 @@ namespace EPMLiveCore.API.Integration
                                 }
                                 catch { bBuildTeamSec = false; }
 
-                                ProcessItemRow(drItem, list, dtCols, props, dr["COL_ID"].ToString(), new Guid(drIntegration["INT_LIST_ID"].ToString()), new Guid(drIntegration["MODULE_ID"].ToString()), bCanAdd, dtUserFields, hshUserMap, bBuildTeamSec);
+                                ProcessItemRow(drItem, list, dtCols, props, dr["COL_ID"].ToString(), intlistid, new Guid(drIntegration["MODULE_ID"].ToString()), bCanAdd, dtUserFields, hshUserMap, bBuildTeamSec);
                             }
                         }
+
+                        
+
                     }
                     else if (dr["TYPE"].ToString() == "2")//Delete
                     {
@@ -1084,8 +1089,12 @@ namespace EPMLiveCore.API.Integration
 
         internal void PostIntegration(DataTable dtItems, DataTable dtUserFields, DataTable dtColumns, SPList list)
         {
+            Guid intlistid = new Guid(dtColumns.TableName);
+
             try
             {
+
+                
                 string colidname = "";
                 try
                 {
@@ -1100,7 +1109,7 @@ namespace EPMLiveCore.API.Integration
 
                 ArrayList arrColsDel = new ArrayList();
 
-                Hashtable hshProps = GetProperties(new Guid(dtColumns.TableName));
+                Hashtable hshProps = GetProperties(intlistid);
 
                 foreach (DataColumn dc in dtItems.Columns)
                 {
@@ -1216,6 +1225,8 @@ namespace EPMLiveCore.API.Integration
                                 li["INTUIDSYS"] = "True";
                                 li.SystemUpdate();
                             }
+
+                            
                         }
                     }
                 }
@@ -1225,7 +1236,42 @@ namespace EPMLiveCore.API.Integration
                 LogMessage(dtColumns.TableName, list.ID.ToString(), "PostIntegration: " + ex.Message, 3);
             }
 
+            //PostCheckBit
+            foreach (DataRow dr in dtItems.Rows)
+            {
+                PostCheckBit(intlistid, dr["SPID"].ToString(), true);
+            }
 
+        }
+
+        private void PostCheckBit(Guid intlistid, string itemid, bool bCheck)
+        {
+
+            SqlCommand cmd = new SqlCommand("SELECT * FROM INT_CHECK WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid", cn);
+            cmd.Parameters.AddWithValue("@intlistid", intlistid);
+            cmd.Parameters.AddWithValue("@itemid", itemid);
+            SqlDataReader drRead = cmd.ExecuteReader();
+            bool bFound = false;
+            if (drRead.Read())
+                bFound = true;
+            drRead.Close();
+
+            if (bFound)
+            {
+                cmd = new SqlCommand("UPDATE INT_CHECK SET CHECKBIT=@check, CHECKTIME=GETDATE() WHERE INT_LIST_ID=@intlistid and ITEM_ID=@itemid", cn);
+                cmd.Parameters.AddWithValue("@intlistid", intlistid);
+                cmd.Parameters.AddWithValue("@itemid", itemid);
+                cmd.Parameters.AddWithValue("@check", bCheck);
+                cmd.ExecuteNonQuery();
+            }
+            else
+            {
+                cmd = new SqlCommand("INSERT INTO INT_CHECK (INT_LIST_ID, ITEM_ID, CHECKBIT, CHECKTIME) VALUES (@intlistid, @itemid, @check, GETDATE())", cn);
+                cmd.Parameters.AddWithValue("@intlistid", intlistid);
+                cmd.Parameters.AddWithValue("@itemid", itemid);
+                cmd.Parameters.AddWithValue("@check", bCheck);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         private void PostIntegrationDeleteToExternal(DataTable dtItems, Guid intlistid, Guid listid)
@@ -1728,40 +1774,91 @@ namespace EPMLiveCore.API.Integration
         internal void SubmitListEvent(SPListItem li, int eventType, SPItemEventDataCollection AfterProperties)
         {
 
-
-            string sys = "";
             try
             {
-                sys = AfterProperties["INTUIDSYS"].ToString();
-            }
-            catch { }
-
-            if (sys == "")
-            {
-                OpenConnection();
-
-                string colid = "";
-
-                SqlCommand cmd = new SqlCommand("SELECT INT_COLID FROM INT_LISTS where LIST_ID=@listid", cn);
-                cmd.Parameters.AddWithValue("@listid", li.ParentList.ID);
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
+                string sys = "";
+                try
                 {
-                    if (AfterProperties["INTUID" + dr.GetInt32(0).ToString()] != null && !string.IsNullOrEmpty(AfterProperties["INTUID" + dr.GetInt32(0).ToString()].ToString()))
-                        colid = dr.GetInt32(0).ToString();
+                    sys = AfterProperties["INTUIDSYS"].ToString();
                 }
-                dr.Close();
+                catch { }
 
+                if (sys == "")
+                {
+                    OpenConnection();
 
-                cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, ITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @itemid, @colid, 0, 1, @type)", cn);
-                cmd.Parameters.AddWithValue("@listid", li.ParentList.ID);
-                cmd.Parameters.AddWithValue("@itemid", li.ID);
-                cmd.Parameters.AddWithValue("@colid", colid);
-                cmd.Parameters.AddWithValue("@type", eventType);
-                cmd.ExecuteNonQuery();
+                    string colid = "";
+                    Guid intlistid = Guid.Empty;
 
-                CloseConnection(true);
+                    SqlCommand cmd = new SqlCommand("SELECT INT_COLID, INT_LIST_ID FROM INT_LISTS where LIST_ID=@listid", cn);
+                    cmd.Parameters.AddWithValue("@listid", li.ParentList.ID);
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        if (AfterProperties["INTUID" + dr.GetInt32(0).ToString()] != null && !string.IsNullOrEmpty(AfterProperties["INTUID" + dr.GetInt32(0).ToString()].ToString()))
+                        {
+                            intlistid = dr.GetGuid(1);
+                            colid = dr.GetInt32(0).ToString();
+                            break;
+                        }
+                    }
+                    dr.Close();
+
+                    if (colid == "" || bCheckBit(intlistid, li.ID, colid))
+                    {
+                        cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, ITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @itemid, @colid, 0, 1, @type)", cn);
+                        cmd.Parameters.AddWithValue("@listid", li.ParentList.ID);
+                        cmd.Parameters.AddWithValue("@itemid", li.ID);
+                        cmd.Parameters.AddWithValue("@colid", colid);
+                        cmd.Parameters.AddWithValue("@type", eventType);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    if (intlistid != Guid.Empty)
+                    {
+                        PostCheckBit(intlistid, li.ID.ToString(), false);
+                    }
+
+                    CloseConnection(true);
+                }
             }
+            catch (Exception ex)
+            {
+                LogMessage("", li.ParentList.ID.ToString(), "SubmitListEvent: " + ex.Message, 3);
+            }
+        }
+
+        private bool bCheckBit(Guid intlistid, int itemid, string colid)
+        {
+
+            bool bCheck = false;
+            SqlCommand cmd = new SqlCommand("SELECT CHECKBIT,CHECKTIME FROM dbo.INT_LISTS INNER JOIN dbo.INT_CHECK ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CHECK.INT_LIST_ID WHERE INT_CHECK.INT_LIST_ID=@intlistid and ITEM_ID=@itemid and INT_COLID=@colid", cn);
+            cmd.Parameters.AddWithValue("@intlistid", intlistid);
+            cmd.Parameters.AddWithValue("@colid", colid);
+            cmd.Parameters.AddWithValue("@itemid", itemid);
+            SqlDataReader drRead = cmd.ExecuteReader();
+
+            if (drRead.Read())
+            {
+                if (drRead.GetBoolean(0) == false)
+                {
+                    bCheck = true;
+                }
+                else
+                {
+                    TimeSpan ts = DateTime.Now - drRead.GetDateTime(1);
+                    if (ts.TotalMinutes > 5)
+                        bCheck = true;
+                }
+            }
+            else
+                bCheck = true;
+
+            drRead.Close();
+
+            return bCheck;
+
+
         }
 
         private void AddField(SPField field, DataTable dtU, DataRow drIntegrationModule, ref DataTable dt)
@@ -1833,7 +1930,7 @@ namespace EPMLiveCore.API.Integration
 
             SqlCommand cmd;
 
-            if (eventfromid != "")
+            /*if (eventfromid != "")
             {
                 cmd = new SqlCommand("SELECT PRIORITY FROM INT_LISTS where LIST_ID=@listid and INT_COLID=@colid", cn);
                 cmd.Parameters.AddWithValue("@listid", list.ID);
@@ -1842,7 +1939,7 @@ namespace EPMLiveCore.API.Integration
                 if (drPri.Read())
                     priority = drPri.GetInt32(0);
                 drPri.Close();
-            }
+            }*/
 
             if (intlistid == Guid.Empty)
             {
