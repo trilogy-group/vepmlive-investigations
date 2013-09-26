@@ -1463,13 +1463,14 @@ namespace EPMLiveCore.API.Integration
 
             OpenConnection();
 
-            SqlCommand cmd = new SqlCommand("SELECT     LIST_ID from INT_LISTS where INT_LIST_ID=@intlistid", cn);
+            SqlCommand cmd = new SqlCommand("SELECT     LIST_ID,INT_KEY from INT_LISTS where INT_LIST_ID=@intlistid", cn);
             cmd.Parameters.AddWithValue("@intlistid", intlistid);
             SqlDataReader dr = cmd.ExecuteReader();
             Guid listid = Guid.Empty;
             if (dr.Read())
             {
                 listid = dr.GetGuid(0);
+                props.IntegrationKey = dr.GetString(1);
             }
             dr.Close();
             CloseConnection(false);
