@@ -65,7 +65,7 @@ namespace UplandIntegrations.Tenrox.Managers
             }
         }
 
-        public override IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, string integrationKey)
+        public override IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, Guid integrationId)
         {
             using (var projectsClient = new ProjectsClient(Binding, EndpointAddress))
             {
@@ -83,7 +83,7 @@ namespace UplandIntegrations.Tenrox.Managers
                     try
                     {
                         Project p = projectsClient.Save(_token, proj);
-                        UpdateBinding(p.UniqueId, 2, integrationKey);
+                        UpdateBinding(p.UniqueId, 2, integrationId);
 
                         return new TenroxUpsertResult(p.UniqueId, TransactionType.INSERT);
                     }
@@ -125,7 +125,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
                 try
                 {
-                    project = projectsClient.QueryByUniqueId(_token, (int) row["ID"]);
+                    project = projectsClient.QueryByUniqueId(_token, int.Parse(row["ID"].ToString()));
                 }
                 catch { }
 
@@ -133,8 +133,24 @@ namespace UplandIntegrations.Tenrox.Managers
                 {
                     try
                     {
+                        DateTime now = DateTime.Now;
+
                         project = projectsClient.CreateNew(_token);
                         project.Id = row["SPID"].ToString();
+                        project.AccessType = 0;
+                        project.IsBillable = 0;
+                        project.IsCapitalized = 0;
+                        project.IsCosted = 0;
+                        project.IsFunded = 0;
+                        project.IsPlaceholder = 0;
+                        project.IsRandD = 0;
+                        project.ManagerId = -1;
+                        project.OverrideBillable = 0;
+                        project.ParentId = 3;
+                        project.PortfolioId = 2;
+                        project.ProjectWorkflowMapId = 112;
+                        project.StartDate = now.Date;
+                        project.ReleaseAlias = string.Format(@"UPL-INT-{0}-{1:yyMMddHHmmss}", project.Id, now);
                     }
                     catch { }
                 }

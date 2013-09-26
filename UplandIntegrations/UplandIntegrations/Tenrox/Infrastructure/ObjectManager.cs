@@ -15,11 +15,12 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 {
     internal abstract class ObjectManager : IObjectManager
     {
-        #region Fields (8) 
+        #region Fields (9) 
 
         protected readonly Binding Binding;
         protected readonly EndpointAddress EndpointAddress;
         protected readonly object Token;
+        private readonly UserToken _authToken;
         private readonly string _endpointAddress;
         private readonly Dictionary<string, Type> _objectFields;
         private readonly Type _objectType;
@@ -36,12 +37,13 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             MappingDict = new Dictionary<string, string>();
             DisplayNameDict = new Dictionary<string, string>();
 
+            _authToken = token;
             _endpointAddress = endpointAddress;
             _objectType = objectType;
             _objectFields = new Dictionary<string, Type>();
 
             Binding = binding;
-            Token = TranslateToken(token, tokenType);
+            Token = TranslateToken(_authToken, tokenType);
             EndpointAddress = new EndpointAddress(_endpointAddress + "sdk/" + svcUrl);
         }
 
@@ -67,15 +69,16 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
             List<ColumnProperty> columns = (from pair in _objectFields
                 let field = pair.Key
-                let valid = !(field.EndsWith("Id") && _objectFields.ContainsKey(field.Substring(0, field.Length - 2)))
+                let dn = field.Equals("UniqueId")
+                    ? "ID"
+                    : Regex.Replace(field, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ")
+                let displayName = dn.EndsWith(" Id") ? dn.Replace(" Id", string.Empty) : dn
+                let valid = !_objectFields.ContainsKey(field + "Id")
                 where valid
                 select new ColumnProperty
                 {
                     ColumnName = field,
-                    DiplayName =
-                        field.Equals("UniqueId")
-                            ? "ID"
-                            : Regex.Replace(field, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 "),
+                    DiplayName = displayName,
                     type = pair.Value
                 }).ToList();
 
@@ -111,20 +114,25 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         public abstract IEnumerable<TenroxObject> GetItems(int[] itemIds);
 
-        public void UpdateBinding(int itemId, int objectType, string integrationKey)
+        public void UpdateBinding(int itemId, int objectType, Guid integrationId)
         {
             var endpointAddress = new EndpointAddress(_endpointAddress + "sdk/integrations.svc");
 
             using (var integrationsClient = new IntegrationsClient(Binding, endpointAddress))
             {
-                var integration = new Integration {ObjectId = itemId, ObjectType = objectType, ID24 = integrationKey};
+                var integration = new Integration
+                {
+                    ObjectId = itemId,
+                    ObjectType = objectType,
+                    ID24 = integrationId.ToString()
+                };
 
-                object token = TranslateToken((UserToken) Token, typeof (TenroxIntegrationService.UserToken));
+                object token = TranslateToken(_authToken, typeof (TenroxIntegrationService.UserToken));
                 integrationsClient.Save((TenroxIntegrationService.UserToken) token, integration);
             }
         }
 
-        public abstract IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, string integrationKey);
+        public abstract IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, Guid integrationId);
         
         // Protected Methods (1) 
 
