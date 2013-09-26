@@ -69,8 +69,8 @@
 <HR style="COLOR: #cccccc">
 <%=sbOutput.ToString()%>
 <br />
-<a class="btn btn-success btn-large" href="javascript:void(0);" id="installbutton2" onclick="GoToApp();" style="color:#FFFFFF !important;">Go To Community</a>&nbsp;
-    <a class="btn btn-success btn-large" href="javascript:void(0);" id="A1" onclick="GoToStore();" style="color:#FFFFFF !important;">Go To Marketplace</a>
+<a class="btn btn-success btn-large" href="javascript:void(0);" id="installbutton2" onclick="GoToApp();" style="color:#FFFFFF !important;">Close</a>&nbsp;
+    <a class="btn btn-success btn-large" href="javascript:void(0);" id="A1" onclick="GoToStore();" style="color:#FFFFFF !important;">Install Another App</a>
 <br /><br />
     <a href="#" onclick="Javascript:expand()">Show Details</a><br /><br />
     <div id="detaildiv" style="display:none">
