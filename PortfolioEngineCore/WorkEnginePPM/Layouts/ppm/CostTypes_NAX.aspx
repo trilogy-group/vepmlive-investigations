@@ -188,8 +188,8 @@ html, body {
 					</select>
                 </td>
                 <td>
-                    <input type="button" value=" &gt; " onclick="javascript:postOptionsDlg_event('include');" /><br /><br />
-                    <input type="button" value=" &lt; " onclick="javascript:postOptionsDlg_event('exclude');"/>
+                    <input type="button" class="epmliveSmallButton"  value="&gt; " onclick="javascript:postOptionsDlg_event('include');" /><br /><br />
+                    <input type="button" class="epmliveSmallButton" value="&lt; " onclick="javascript:postOptionsDlg_event('exclude');"/>
                 </td>
                 <td class="descriptioncell">
                     Selected:<br />

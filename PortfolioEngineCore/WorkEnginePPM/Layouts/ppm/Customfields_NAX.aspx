@@ -90,7 +90,7 @@ html, body {
 			</tr>
 			<tr>
 				<td class="ms-propertysheet" nowrap="nowrap">
-					<textarea  class="ms-formula" name="Formula" style="height: 95px !important; width: 200px; padding: 3px;" rows="5" cols="24" id="idFormula" dir="ltr"></textarea>
+					<textarea  class="epmliveFormula" name="Formula" style="height: 102px !important; width: 200px; padding: 3px;" rows="5" cols="24" id="idFormula" dir="ltr"></textarea>
 				</td>
 				<td>
 					<select name="FrmFields" size="7" id="idFrmFields" style="width: 200px; padding: 3px;" ondblclick="javascript:AddColumnToFormula();" >
@@ -99,10 +99,10 @@ html, body {
 			</tr>
 			<tr>
 				<td class="ms-propertysheet" nowrap="nowrap">
-			        <input id="idValidate" type="button" class="epmliveButton" value="Validate" onclick="customfieldDlg_event('validate');" style="height: 25px !important"/>
+			        <input id="idValidate" type="button" class="epmliveButton" value="Validate" onclick="customfieldDlg_event('validate');" />
 				</td>
 				<td>
-			        <input id="idInsertField" type="button" class="epmliveButton" value="Insert Field" onclick="customfieldDlg_event('insertField');" style="height: 25px !important""/>
+			        <input id="idInsertField" type="button" class="epmliveButton" value="Insert Field" onclick="customfieldDlg_event('insertField');" />
 				</td>
 			</tr>
         </table>

@@ -80,8 +80,8 @@ html, body {
 					</select>
                 </td>
                 <td>
-                    <input type="button" value=" &gt; " onclick="javascript:resourcesDlg_event('include');" /><br /><br />
-                    <input type="button" value=" &lt; " onclick="javascript:resourcesDlg_event('exclude');"/>
+                    <input type="button" class="epmliveSmallButton"  value="&gt; " onclick="javascript:resourcesDlg_event('include');" /><br /><br />
+                    <input type="button" class="epmliveSmallButton" value="&lt; " onclick="javascript:resourcesDlg_event('exclude');"/>
                 </td>
                 <td class="descriptioncell">
                     Resources with this rate:<br />
@@ -233,6 +233,8 @@ html, body {
             case "btnAdd":
                 var newrow = tgrid1.grid.AddRow(null, null, true);
                 tgrid1.SetCellValue(newrow, "RT_NAME", "New Rate");
+                tgrid1.grid.SetAttribute(newrow, null, "wres_ids", "", 1, 0);
+                tgrid1.grid.SetAttribute(newrow, null, "rates", "", 1, 0);
                 break;
             case "btnSave":
                 var sData = BuildSaveRatesInfo();
@@ -278,7 +280,7 @@ html, body {
             case "btnEdit":
                 if (tgrid1_selectedRow != null) {
                     var grid = tgrid1.grid;
-                    var wresids = "," + grid.GetAttribute(tgrid1_selectedRow, "wres_ids", null).toString() + ",";
+                    //var wresids = "," + grid.GetAttribute(tgrid1_selectedRow, "wres_ids", null).toString() + ",";
                     var ratePairsArr = grid.GetAttribute(tgrid1_selectedRow, "rates", null).split(",");
                     tgridRates.Initialize(null); // reset grid data
                     var txtBaseRate = document.getElementById('txtBaseRate');

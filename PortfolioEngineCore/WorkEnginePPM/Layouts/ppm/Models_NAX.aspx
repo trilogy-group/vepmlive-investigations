@@ -96,8 +96,8 @@ html, body {
 					</select>
                 </td>
                 <td>
-                    <input type="button" value=" &gt; " onclick="javascript:modelDlg_event('include');" /><br /><br />
-                    <input type="button" value=" &lt; " onclick="javascript:modelDlg_event('exclude');"/>
+                    <input type="button" class="epmliveSmallButton" value="&gt; " onclick="javascript:modelDlg_event('include');" /><br /><br />
+                    <input type="button" class="epmliveSmallButton" value="&lt; " onclick="javascript:modelDlg_event('exclude');"/>
                 </td>
                 <td class="descriptioncell">
                     Selected:<br />
@@ -105,8 +105,8 @@ html, body {
 					</select>
                 </td>
                 <td>
-                    <input type="button" value="up" onclick="javascript:modelDlg_event('moveup');" /><br /><br />
-                    <input type="button" value="dn" onclick="javascript:modelDlg_event('movedown');"/>
+                    <input type="button" class="epmliveSmallButton" value="up" onclick="javascript:modelDlg_event('moveup');" /><br /><br />
+                    <input type="button" class="epmliveSmallButton" value="dn" onclick="javascript:modelDlg_event('movedown');"/>
                 </td>
             </tr>
              <tr>

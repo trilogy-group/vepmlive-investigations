@@ -64,11 +64,11 @@
                             </td>
                         </tr>
                         <tr>
-                            <td width="450" class="controlcell">
+<%--                            <td width="450" class="controlcell">
                                 <b>Status</b><br />
                                 &nbsp;&nbsp;<a href="SPTimerStatus.aspx">Refresh</a>
                         
-                            </td>
+                            </td>--%>
                             <td class="controlcell">
                                 Status:<br />
                                     &nbsp;&nbsp;<asp:Label ID="lblStatus" runat="server" ></asp:Label><br />
