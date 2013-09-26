@@ -37,16 +37,181 @@
 
 			Grids.OnUpdated = GridsOnUpdatedDelegate;
 
-
 			WorkEnginePPM.ResPlanAnalyzer.set_path(this.params.Webservice);
 
-
-			WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
-		}
-		catch (e) {
-			alert("Resource Analyzer OnLoad Exception");
-		}
+			if (this.params.TicketVal == undefined || this.params.TicketVal == "")
+			    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetPortfolioItemList", "", GetPortfolioItemListCompleteDelegate);
+			else
+			    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
+        }
+	    catch (e) {
+	        alert("Resource Analyzer OnLoad Exception");
+	    }
 	}
+
+    ResPlanAnalyzer.prototype.GetPortfolioItemListComplete = function (jsonString) {
+
+        try {
+
+            if (jsonString != null) {
+
+                var jsonObject = JSON_ConvertString(jsonString);
+                if (JSON_ValidateServerResult(jsonObject)) {
+                    this.PIInfo = jsonObject.Result.IDLists;
+
+                    if (this.PIInfo.IDLIST == "") {
+
+                        alert("You do not have the Permissions to access any Portfolio Items!");
+
+                        if (parent.SP.UI.DialogResult)
+                            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                        else
+                            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+
+                        return;
+                    }
+
+                    this.PIList = JSON_GetArray(this.PIInfo.PIS, "PI");
+                }
+
+
+                if (this.selectPIList == null) {
+                    this.selectPIList = new dhtmlXWindows();
+                    this.selectPIList.setSkin("dhx_web");
+                    this.selectPIList.enableAutoViewport(false);
+                    this.selectPIList.attachViewportTo(this.params.ClientID + "mainDiv");   // ("layoutDiv");
+                    this.selectPIList.setImagePath("/_layouts/ppm/images/");
+                    //                   this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 175);
+                    this.selectPIList.createWindow("winSELPIDlg", 20, 30, 410, 270);
+                    this.selectPIList.window("winSELPIDlg").setIcon("logo.ico", "logo.ico");
+                    this.selectPIList.window("winSELPIDlg").allowMove();
+                    this.selectPIList.window("winSELPIDlg").denyResize();
+                    this.selectPIList.window("winSELPIDlg").setModal(true);
+                    this.selectPIList.window("winSELPIDlg").center();
+                    this.selectPIList.window("winSELPIDlg").setText("Select Portfolio Items");
+                    this.selectPIList.window("winSELPIDlg").attachObject("idSelectPIDiv");
+                    this.selectPIList.window("winSELPIDlg").button("close").disable();
+                    this.selectPIList.window("winSELPIDlg").button("park").hide();
+                    //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
+
+
+
+                    var idpilist = document.getElementById('idSelPI');
+                    idpilist.options.length = 0;
+
+                    for (var i = 0; i < this.PIList.length; i++) {
+                        var pid = this.PIList[i].ID;
+                        var pname = this.PIList[i].NAME;
+
+                        idpilist.options[i] = new Option(pname, pid, true, true);
+
+
+                    }
+
+
+
+                }
+                else
+                    this.selectPIList.window("winSELPIDlg").show();
+
+
+
+
+            }
+
+        }
+
+        catch (e) {
+            alert("Resource Analyzer GetPortfolioItemListComplete Exception");
+
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+            else
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+        }
+
+
+
+    }
+
+
+    ResPlanAnalyzer.prototype.GrabSelectedPIs = function () {
+
+        var retval = false;
+        var sExtPIs = "";
+
+        var idpilist = document.getElementById('idSelPI');
+
+        for (var i = 0; i < this.PIList.length; i++) {
+
+            var pextid = this.PIList[i].EXTID;
+
+            if (idpilist.options[i].selected) {
+                retval = true;
+
+                if (sExtPIs == "")
+                    sExtPIs = pextid;
+                else
+                    sExtPIs = sExtPIs + "," + pextid;
+            }
+
+        }
+
+        if (retval == true)
+            WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetGeneratedPortfolioItemTicket", sExtPIs, GetGeneratedPortfolioItemTicketCompleteDelegate);
+
+
+        return retval;
+
+    }
+
+    ResPlanAnalyzer.prototype.GetGeneratedPortfolioItemTicketComplete = function (jsonString) {
+        try {
+
+            if (jsonString != null) {
+
+                var jsonObject = JSON_ConvertString(jsonString);
+                if (JSON_ValidateServerResult(jsonObject)) {
+                    var xticket = jsonObject.Result.Ticket.Value;
+
+                    if (xticket == "" || xticket == undefined) {
+
+                        if (parent.SP.UI.DialogResult)
+                            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                        else
+                            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+
+                        return;
+                    }
+
+                    this.params.TicketVal = xticket;
+
+                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
+
+
+                }
+
+
+
+
+            }
+
+        }
+
+        catch (e) {
+            alert("Resource Analyzer GetGeneratedPortfolioItemTicketComplete Exception");
+
+            if (parent.SP.UI.DialogResult)
+                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+            else
+                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+        }
+
+    }
 
 	ResPlanAnalyzer.prototype.OnUnload = function (event) {
 		if (this.Dirty && this.ExitConfirmed == false)
@@ -935,7 +1100,11 @@
 
 
 	function SetInitialDisplayFocus() {
-	    document.getElementById("idDisplayPress").focus();
+
+	    try {
+	        document.getElementById("idDisplayPress").focus();
+	    }
+        catch(e) {}
 	}
 
 
@@ -5566,6 +5735,38 @@
 
 	        switch (event) {
 
+	            case "Dont_Select_PI":
+
+	                this.selectPIList.window("winSELPIDlg").setModal(false);
+	                this.selectPIList.window("winSELPIDlg").hide();
+	                this.selectPIList.window("winSELPIDlg").detachObject()
+	                this.selectPIList = null;
+
+	                if (parent.SP.UI.DialogResult)
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	                else
+	                    parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+	                break;
+
+	            case "Select_PI":
+
+	                this.selectPIList.window("winSELPIDlg").setModal(false);
+	                this.selectPIList.window("winSELPIDlg").hide();
+	                this.selectPIList.window("winSELPIDlg").detachObject()
+	                this.selectPIList = null;
+
+	                if (this.GrabSelectedPIs() == false) {
+	                    if (parent.SP.UI.DialogResult)
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	                    else
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	                }
+
+	                //                   WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
+
+	                break;
+
 	            case "SelectRole_Change":
 	                if (this.TotalsLoading == true)
 	                    return;
@@ -6265,30 +6466,33 @@
 	                break;
 
 	            case "AnalyzerTab_ShowBottomDetails":
- 	                try {
-   
-   			            this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+	                try {
+
 	                    if (this.showingTotDet == false) {
 
-	                         this.totTab.setButtonStateOn("idBTSDet");
-	                         this.showingTotDet = true;
-                             WorkEnginePPM.ResPlanAnalyzer.Execute("SetBottomDetailsDisplay", "1" , RefreshBottomGrid);
+	                        this.TotGrid.ShowCol("PortfolioItem");
 
-                        }
+	                        this.totTab.setButtonStateOn("idBTSDet");
+	                        this.showingTotDet = true;
+	                        this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+
+	                        WorkEnginePPM.ResPlanAnalyzer.Execute("SetBottomDetailsDisplay", "1", RefreshBottomGrid);
+
+	                    }
 	                    else {
 	                        this.showingTotDet = false;
-                            
-                             
+
+	                        this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+
 	                        this.totTab.setButtonStateOff("idBTSDet");
-                             WorkEnginePPM.ResPlanAnalyzer.Execute("SetBottomDetailsDisplay", "0" , RefreshBottomGrid);
+	                        WorkEnginePPM.ResPlanAnalyzer.Execute("SetBottomDetailsDisplay", "0", RefreshBottomGrid);
 	                    }
 
-                        
+
 	                }
 	                catch (e) { }
 
 	                break;
-                       
      
 
 	            case "AnalyzerTab_ShowGraph":
@@ -7928,6 +8132,7 @@ ResPlanAnalyzer.prototype.InitVars = function () {
     this.ChartRawData = null;
 
     this.showingTotDet = false;
+    this.selectPIList = null;
 }
 
 	try {
@@ -7953,6 +8158,9 @@ ResPlanAnalyzer.prototype.InitVars = function () {
 	    this.deferedExternalEventDelegate = MakeDelegate(this, this.deferedExternalEvent);
 	    this.deferedsetFocusDelegate = MakeDelegate(this, this.deferedsetFocus);
 
+
+	    var GetPortfolioItemListCompleteDelegate = MakeDelegate(this, this.GetPortfolioItemListComplete);
+	    var GetGeneratedPortfolioItemTicketCompleteDelegate = MakeDelegate(this, this.GetGeneratedPortfolioItemTicketComplete);
 
 	    var GetCalendarInfoCompleteDelegate = MakeDelegate(this, this.GetCalendarInfoComplete);
 	    var LoadResPlanDataCompleteDelegate = MakeDelegate(this, this.LoadResPlanDataComplete);

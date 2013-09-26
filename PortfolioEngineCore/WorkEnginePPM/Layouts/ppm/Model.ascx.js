@@ -19,7 +19,7 @@
 	Model.prototype.OnLoad = function (event) {
 	    WorkEnginePPM.Model.set_path(this.Webservice);
 	    Grids.OnAfterValueChanged = GridsOnAfterValueChangedDelegate;
-//	    Grids.OnRenderStart = GridsOnRenderStartDelegate;
+	    //	    Grids.OnRenderStart = GridsOnRenderStartDelegate;
 	    Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
 	    Grids.OnGanttChanged = GridsOnGanttChangedDelegate;
 	    Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
@@ -30,19 +30,200 @@
 
 	    //		Grids.OnGetColor = GridsOnGetDefaultColorDelegate;
 
-//	    this.ViewID = "11"; 
-	    
+	    //	    this.ViewID = "11"; 
+
 	    if (this.ViewID == "" && this.ViewName == "") {
 	        this.IsModeller = true;
 
-	        this.GetModelAndVersions();
 	    }
 	    else {
 	        this.IsModeller = false;
-	        WorkEnginePPM.Model.GetCostViews(GetCostViewsCompleteDelegate);
+	    }
+
+	    if (this.params.TicketVal == undefined || this.params.TicketVal == "")
+	        WorkEnginePPM.Model.ExecuteJSON("","GetPortfolioItemList", "", GetPortfolioItemListCompleteDelegate);
+	    else {
+	        //	        WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
+
+	        if (this.ViewID == "" && this.ViewName == "") {
+	            this.GetModelAndVersions();
+	        }
+	        else {
+	            WorkEnginePPM.Model.GetCostViews(GetCostViewsCompleteDelegate);
+	        }
 	    }
 
 	}
+
+	Model.prototype.GetPortfolioItemListComplete = function (jsonString) {
+
+	    try {
+
+	        if (jsonString != null) {
+
+	            var jsonObject = JSON_ConvertString(jsonString);
+	            if (JSON_ValidateServerResult(jsonObject)) {
+	                this.PIInfo = jsonObject.Result.IDLists;
+
+	                if (this.PIInfo.IDLIST == "") {
+
+	                    alert("You do not have the Permissions to access any Portfolio Items!");
+
+	                    if (parent.SP.UI.DialogResult)
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	                    else
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+
+	                    return;
+	                }
+
+	                this.PIList = JSON_GetArray(this.PIInfo.PIS, "PI");
+	            }
+
+
+	            if (this.selectPIList == null) {
+	                this.selectPIList = new dhtmlXWindows();
+	                this.selectPIList.setSkin("dhx_web");
+	                this.selectPIList.enableAutoViewport(false);
+	                this.selectPIList.attachViewportTo(this.params.ClientID + "mainDiv");   // ("layoutDiv");
+	                this.selectPIList.setImagePath("/_layouts/ppm/images/");
+	                //                   this.selectCalendarAndPeriods.createWindow("winFCandPerDlg", 20, 30, 410, 175);
+	                this.selectPIList.createWindow("winSELPIDlg", 20, 30, 410, 270);
+	                this.selectPIList.window("winSELPIDlg").setIcon("logo.ico", "logo.ico");
+	                this.selectPIList.window("winSELPIDlg").allowMove();
+	                this.selectPIList.window("winSELPIDlg").denyResize();
+	                this.selectPIList.window("winSELPIDlg").setModal(true);
+	                this.selectPIList.window("winSELPIDlg").center();
+	                this.selectPIList.window("winSELPIDlg").setText("Select Portfolio Items");
+	                this.selectPIList.window("winSELPIDlg").attachObject("idSelectPIDiv");
+	                this.selectPIList.window("winSELPIDlg").button("close").disable();
+	                this.selectPIList.window("winSELPIDlg").button("park").hide();
+	                //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
+
+
+
+	                var idpilist = document.getElementById('idSelPI');
+	                idpilist.options.length = 0;
+
+	                for (var i = 0; i < this.PIList.length; i++) {
+	                    var pid = this.PIList[i].ID;
+	                    var pname = this.PIList[i].NAME;
+
+	                    idpilist.options[i] = new Option(pname, pid, true, true);
+
+
+	                }
+
+
+
+	            }
+	            else
+	                this.selectPIList.window("winSELPIDlg").show();
+
+
+
+
+	        }
+
+	    }
+
+	    catch (e) {
+	        alert("Model GetPortfolioItemListComplete Exception");
+
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	        else
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+	    }
+
+
+
+	}
+
+
+	Model.prototype.GrabSelectedPIs = function () {
+
+	    var retval = false;
+	    var sExtPIs = "";
+
+	    var idpilist = document.getElementById('idSelPI');
+
+	    for (var i = 0; i < this.PIList.length; i++) {
+
+	        var pextid = this.PIList[i].EXTID;
+
+	        if (idpilist.options[i].selected) {
+	            retval = true;
+
+	            if (sExtPIs == "")
+	                sExtPIs = pextid;
+	            else
+	                sExtPIs = sExtPIs + "," + pextid;
+	        }
+
+	    }
+
+	    if (retval == true)
+	        WorkEnginePPM.Model.ExecuteJSON("","GetGeneratedPortfolioItemTicket", sExtPIs, GetGeneratedPortfolioItemTicketCompleteDelegate);
+
+
+	    return retval;
+
+	}
+
+	Model.prototype.GetGeneratedPortfolioItemTicketComplete = function (jsonString) {
+	    try {
+
+	        if (jsonString != null) {
+
+	            var jsonObject = JSON_ConvertString(jsonString);
+	            if (JSON_ValidateServerResult(jsonObject)) {
+	                var xticket = jsonObject.Result.Ticket.Value;
+
+	                if (xticket == "" || xticket == undefined) {
+
+	                    if (parent.SP.UI.DialogResult)
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	                    else
+	                        parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+
+	                    return;
+	                }
+
+	                this.params.TicketVal = xticket;
+
+	                if (this.IsModeller == true) 
+	                        this.GetModelAndVersions();
+	                else 
+	                        WorkEnginePPM.Model.GetCostViews(GetCostViewsCompleteDelegate);
+	                   
+
+
+
+	            }
+
+
+
+
+	        }
+
+	    }
+
+	    catch (e) {
+	        alert("Model GetGeneratedPortfolioItemTicketComplete Exception");
+
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	        else
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+	    }
+
+	}
+
 
 	Model.prototype.GetModelAndVersions = function () {
 
@@ -2540,6 +2721,39 @@
 
 	Model.prototype.toolbarOnClick = function (id, data) {
 
+	    if (id == "Dont_Select_PI") {
+
+	        this.selectPIList.window("winSELPIDlg").setModal(false);
+	        this.selectPIList.window("winSELPIDlg").hide();
+	        this.selectPIList.window("winSELPIDlg").detachObject()
+	        this.selectPIList = null;
+
+	        if (parent.SP.UI.DialogResult)
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	        else
+	            parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+
+	        return;
+	    }
+
+	    if (id == "Select_PI") {
+
+	        this.selectPIList.window("winSELPIDlg").setModal(false);
+	        this.selectPIList.window("winSELPIDlg").hide();
+	        this.selectPIList.window("winSELPIDlg").detachObject()
+	        this.selectPIList = null;
+
+	        if (this.GrabSelectedPIs() == false) {
+	            if (parent.SP.UI.DialogResult)
+	                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+	            else
+	                parent.SP.UI.ModalDialog.commonModalDialogClose(0, '');
+	        }
+
+	        //                   WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
+
+	        return;
+	    }
 
 	    if (id == "Ribbon_Toggle") {
 	        if (this.ribbonBar.isCollapsed() == true) {
@@ -2724,7 +2938,7 @@
 
 	        document.getElementById("id_SaveView_Personal").checked = true;
 	        document.getElementById("id_SaveView_Default").checked = false;
-	        
+
 	        var selectView = document.getElementById("idUserViews");
 	        if (selectView != null && selectView.selectedIndex >= 0) {
 
@@ -2962,18 +3176,18 @@
 
 	        this.DetGrid.ChangeZoom(id);
 	        this.ZoomString = id;
-	        
-               var selectZoom = document.getElementById("idGanttZoom");
 
-	           selectZoom.selectedIndex = id.substr(4, 1) - 1;
-               this.viewBar.refreshSelect("idGanttZoom");
+	        var selectZoom = document.getElementById("idGanttZoom");
 
-	
+	        selectZoom.selectedIndex = id.substr(4, 1) - 1;
+	        this.viewBar.refreshSelect("idGanttZoom");
+
+
 	        if (this.firstdate != null)
 	            this.DetGrid.ScrollToDate(this.firstdate);
 
 	        this.LastSelZoomTo = id;
-	        
+
 	    }
 
 	    else if (id == "EnGrpBtn") {
@@ -5522,6 +5736,8 @@
 		this.totalsArea = "c";
 
 
+		this.selectPIList = null;
+
 		this.totalsRibbonArea = "a";
 		this.totalsGridArea = "b";
               
@@ -5609,6 +5825,9 @@
 		var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
 
 
+		var GetPortfolioItemListCompleteDelegate = MakeDelegate(this, this.GetPortfolioItemListComplete);
+		var GetGeneratedPortfolioItemTicketCompleteDelegate = MakeDelegate(this, this.GetGeneratedPortfolioItemTicketComplete);
+        
 		var GetSearchCompleteDelegate = MakeDelegate(this, this.GetSearchComplete);
 
 		var LoadColumnOrderData = MakeDelegate(this, this.DoLoadColumnOrderData);
