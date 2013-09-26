@@ -304,7 +304,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     chkResTools.Checked = gSettings.EnableResourcePlan;
                     chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
 
-                    if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 10701)
+                    //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 10701)
                     {
                         SectionEmail.Visible = true;
                         //try
@@ -1008,7 +1008,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.EnableContentReporting = chkContentReporting.Checked;
             gSettings.SaveSettings(list);
 
-            if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)
+            //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10701 || (uint)list.BaseTemplate == 10702)
             {
                 if (chkEmails.Checked)
                     API.APIEmail.InstallAssignedToEvent(list);
