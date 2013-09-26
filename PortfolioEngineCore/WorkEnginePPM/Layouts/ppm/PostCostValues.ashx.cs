@@ -142,7 +142,7 @@ namespace WorkEnginePPM
             int nCTId = xData.GetIntAttr("CT_ID");
             int nCBId = xData.GetIntAttr("CB_ID");
 
-            int lMethod = 1;
+            int lMethod = 0;
             if (lMethod == 0)
             {
                 // add job to Queue for immediate execution
@@ -195,6 +195,22 @@ namespace WorkEnginePPM
             else if (lMethod == 2)
             {
                 // add job to Queue for immediate execution - NAX version
+                CStruct xQueue = new CStruct();
+                xQueue.Initialize("Queue");
+                xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcPostCostValues);
+                xQueue.CreateString("Context", "Post Cost Values");
+                xQueue.CreateString("Comment", "from Admin Page");
+
+                CStruct xRequest = new CStruct();
+                xRequest.Initialize("Data");
+                CStruct xCB = xRequest.CreateSubStruct("CB");
+                xCB.CreateIntAttr("Id", nCBId);
+                CStruct xCT = xRequest.CreateSubStruct("CT");
+                xCT.CreateIntAttr("Id", nCTId);
+
+                xQueue.CreateString("Data", xRequest.XML());
+                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
+
             }
 
             return sReply;
