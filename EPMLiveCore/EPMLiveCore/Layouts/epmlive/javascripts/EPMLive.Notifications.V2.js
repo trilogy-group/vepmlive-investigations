@@ -262,6 +262,10 @@
                             epmLiveNotifications.totalNewNotifications(parseInt(epmLiveNotifications.totalNewNotifications()) + 1);
                             if (!epmLiveNotifications.firstTimeLoad) {
                                 doFlash();
+                                
+                                if (notification.type() === 6) {
+                                    window.epmLiveNavigation.registerLink({ kind: 3 });
+                                }
                             }
                         }
                     } else {

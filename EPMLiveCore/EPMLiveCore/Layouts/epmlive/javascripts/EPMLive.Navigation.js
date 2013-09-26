@@ -1058,7 +1058,10 @@
                 }
 
                 function registerProviderLinks(response) {
-                    var buildLink = function (link, page) {
+                    window.epmLiveNavigation.buildLink = function (link) {
+                        var webUrl = $$.currentWebUrl();
+                        var page = webUrl + window.location.href.split(webUrl)[1];
+                        
                         return {
                             id: link['@Id'],
                             title: link['@Title'],
@@ -1077,8 +1080,6 @@
                         };
                     };
 
-                    var webUrl = $$.currentWebUrl();
-                    var pg = webUrl + window.location.href.split(webUrl)[1];
                     var workspacesTitleRegistered = false;
 
                     for (var providerName in response.Nodes) {
@@ -1096,7 +1097,7 @@
 
                                 if (tlNode.provider === providerName) {
                                     if (providerName !== 'Workspaces') {
-                                        tlNode.registerLink(buildLink(lnk, pg));
+                                        tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
                                     } else {
                                         var workspaceTree = window.epmLiveNavigation.workspaceTree();
 
@@ -1105,9 +1106,9 @@
                                         var title = lnk['@Title'];
 
                                         if (workspacesTitleRegistered) {
-                                            tlNode.registerWorkspace(buildLink(lnk, pg), workspaceTree);
+                                            tlNode.registerWorkspace(window.epmLiveNavigation.buildLink(lnk), workspaceTree);
                                         } else {
-                                            tlNode.registerLink(buildLink(lnk, pg));
+                                            tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
 
                                             if (title === 'All Workspaces') {
                                                 workspacesTitleRegistered = true;
@@ -1163,17 +1164,17 @@
                                 wsTree.commitChanges();
                             };
 
-                            var wsTree = window.epmLiveNavigation.workspaceTree();
+                            var wTree = window.epmLiveNavigation.workspaceTree();
 
                             $('a.rtIn').each(function () {
                                 var $a = $(this);
 
                                 var $parent = $a.parent();
-
-                                $parent.append('<div id="' + wsTree.findNodeByText($a.text()).get_value() + '" class="epm-nav-ws-node"></div>');
+                                var text = $a.text();
+                                
+                                $parent.append('<div id="' + wTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
                                 $a.remove();
 
-                                var text = $a.text();
                                 $a.text('');
                                 $a.append('<span>' + text + '</span>');
                                 $parent.find('.epm-nav-ws-node').append($a);
@@ -1261,38 +1262,36 @@
                         }
 
                         if (providerName) {
-                            for (var j = 0; j < tlNodes.length; j++) {
-                                var tlNode = tlNodes[j];
+                            if (link.kind !== 3) {
+                                for (var j = 0; j < tlNodes.length; j++) {
+                                    var tlNode = tlNodes[j];
 
-                                if (tlNode.provider === providerName) {
+                                    if (tlNode.provider === providerName) {
 
-                                    if (link.kind !== 3) {
                                         link.cssClass = 'epm-nav-sortable ' + link.cssClass;
-                                    }
 
-                                    tlNode.registerLink(link);
+                                        tlNode.registerLink(link);
 
-                                    var $li = $sn.find('#' + link.id);
+                                        var $li = $sn.find('#' + link.id);
 
-                                    if (link.kind > -1 && link.kind < 3) {
                                         var $menu = $('#epm-nav-sub-' + providerName.toLowerCase() + '-static-links');
-                                        
-                                        $menu.find('.epm-nav-sub-placeholder').each(function() {
+
+                                        $menu.find('.epm-nav-sub-placeholder').each(function () {
                                             var $ph = $(this);
                                             var remove = false;
                                             var text = $ph.text();
-                                            
+
                                             if (link.kind === 0 && text === 'No pages') {
                                                 remove = true;
                                             } else if (link.kind === 1 && text === 'No items') {
                                                 remove = true;
                                             }
-                                            
+
                                             if (remove) {
                                                 $ph.remove();
                                             }
                                         });
-                                        
+
                                         if (link.kind < 2) {
                                             $li.find('a').attr('style', 'width:115px !important;');
                                         }
@@ -1300,7 +1299,7 @@
                                         if (link.kind === 0 || link.kind === 2) {
                                             try {
                                                 $li.remove().insertBefore($($menu.find('.epm-nav-sub-header').get(1)));
-                                            } catch(e) {
+                                            } catch (e) {
                                             }
                                         }
 
@@ -1309,18 +1308,88 @@
                                         } else {
                                             window.epmLiveNavigation.addFavoriteWSMenu($li);
                                         }
-                                    }
 
-                                    if (link.kind !== 3) {
                                         $li.addClass('epm-nav-sortable');
 
                                         window.epmLiveNavigation.addDragger($li);
+
+                                        $li.fadeIn(300);
+
+                                        break;
                                     }
-
-                                    $li.fadeIn(300);
-
-                                    break;
                                 }
+                            } else {
+                                epmLiveService.execute('GetNavigationLinks', providerName, function (response) {
+                                    var registeredLinks = [];
+                                    var links = response.Nodes.Workspaces.NavLink;
+                                    
+                                    for (var l in links) {
+                                        var lnk = links[l];
+                                        
+                                        if ($sn.find('#' + lnk['@Id']).length === 0) {
+                                            var title = lnk['@Title'];
+
+                                            if (title !== 'Workspaces' && title !== 'New Workspace' && title !== 'Favorite Workspaces' && title !== 'All Workspaces') {
+                                                var nl = window.epmLiveNavigation.buildLink(lnk);
+                                                var registered = false;
+
+                                                for (var i = 0; i < registeredLinks.length; i++) {
+                                                    if (registeredLinks[i] === nl.title) {
+                                                        registered = true;
+                                                        break;
+                                                    }
+                                                }
+
+                                                if (!registered) {
+                                                    nl.kind = 2;
+
+                                                    window.epmLiveNavigation.registerLink(nl);
+                                                    registeredLinks.push(nl.title);
+                                                } else {
+                                                    for (var n = 0; n < tlNodes.length; n++) {
+                                                        var nde = tlNodes[n];
+
+                                                        if (nde.provider === providerName) {
+                                                            var workspaceTree = window.epmLiveNavigation.workspaceTree();
+                                                            workspaceTree.trackChanges();
+                                                            
+                                                            nde.registerWorkspace(nl, workspaceTree);
+                                                            
+                                                            workspaceTree.commitChanges();
+                                                            
+                                                            $('a.rtIn').each(function () {
+                                                                var $a = $(this);
+                                                                var text = $a.text();
+
+                                                                if (text === nl.title) {
+                                                                    var $parent = $a.parent();
+
+                                                                    $parent.append('<div id="' + workspaceTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
+                                                                    $a.remove();
+
+                                                                    $a.text('');
+                                                                    $a.append('<span>' + text + '</span>');
+                                                                    $parent.find('.epm-nav-ws-node').append($a);
+                                                                    
+                                                                    var $p = $a.parent();
+
+                                                                    $p.addClass('epm-nav-sortable');
+                                                                    $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
+
+                                                                    window.epmLiveNavigation.addFavoriteWSMenu($p);
+                                                                }
+                                                            });
+
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }, function (response) {
+                                    console.log(response);
+                                });
                             }
                         }
                     }
@@ -1710,7 +1779,7 @@
                             menuManager.setupMenu($li, commands);
                         });
                     };
-                    
+
                     var _resetOrder = function ($list) {
                         var orders = [];
 
