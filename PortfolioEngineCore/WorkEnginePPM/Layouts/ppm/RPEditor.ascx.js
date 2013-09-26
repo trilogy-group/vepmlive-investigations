@@ -31,17 +31,49 @@
             //Grids.OnGroup = GridsOnGroupDelegate;
             //Grids.OnGroupFinish = GridsOnGroupFinishDelegate;
 
-            var sbDataxml = new StringBuilder();
-            sbDataxml.append('<Execute Function="GetMetaData">');
-            sbDataxml.append('<Wepid>' + this.params.WEPID + '</Wepid>');
-            sbDataxml.append('<TicketVal>' + this.params.TicketVal + '</TicketVal>');
-            sbDataxml.append('<IsResource>' + this.params.IsResource + '</IsResource>');
-            sbDataxml.append('</Execute>');
-            this.ExecuteJSON(sbDataxml.toString());
+            if ((this.params.TicketVal == "" && this.params.WEPID == ""))
+            {
+                var sbDataxml = new StringBuilder();
+                sbDataxml.append('<Execute Function="GetPIList">');
+                sbDataxml.append('</Execute>');
+                this.ExecuteJSON(sbDataxml.toString());
+            }
+            else {
+                var sbDataxml = new StringBuilder();
+                sbDataxml.append('<Execute Function="GetMetaData">');
+                sbDataxml.append('<Wepid>' + this.params.WEPID + '</Wepid>');
+                sbDataxml.append('<TicketVal>' + this.params.TicketVal + '</TicketVal>');
+                sbDataxml.append('<IsResource>' + this.params.IsResource + '</IsResource>');
+                sbDataxml.append('</Execute>');
+                this.ExecuteJSON(sbDataxml.toString());
+            }
         }
         catch (e) {
             this.HandleException("OnLoad", e);
         }
+    };
+    RPEditor.prototype.SelectPIsOK = function () {
+        var select = document.getElementById("idPIList");
+        var arrPIs = select.options;
+        var spis = "";
+        for (var i = 0; i < arrPIs.length; i++) {
+            var option = arrPIs[i];
+            if (option != null && option.selected == true) {
+                if (spis == "")
+                    spis = option.value;
+                else
+                    spis += "," + option.value;
+            }
+        }
+        if (spis == "") {
+            alert("Please select one or more Portfolio Items to continue");
+            return;
+        }
+        var sb = new StringBuilder();
+        sb.append('<Execute Function="CreateTicket" Context="ResourcePlanner">');
+        sb.append('<Data>' + spis + '</Data>');
+        sb.append('</Execute>');
+        this.ExecuteJSON(sb.toString(), "GeneralFunctions");
     };
     RPEditor.prototype.GridsOnDataSend = function (grid, source, data, Func) {
         if (grid.id != "g_RPE")
@@ -103,6 +135,16 @@
             }
             var func = result.Function;
             switch (func) {
+                case "GetPIList":
+                    var pis = result.PIs;
+                    var select = document.getElementById("idPIList");
+                    select.options.length = 0;
+                    var arrPIs = pis.PI;
+                    for (var i = 0; i < arrPIs.length; i++) {
+                        select.options[select.options.length] = new Option(arrPIs[i].name, arrPIs[i].wepid);
+                    }
+                    this.DisplayDialog(20, 30, 260, 220, "Select Portfolio Item(s)", "winSelectPIsDlg", "idSelectPIsDlgDiv", true, false);
+                    break;
                 case "GetMetaData":
                     this.NegotiationMode = (result.NegotiationMode != 0);
                     this.costCategoryRoles = result.CostCategoryRoles;
@@ -189,10 +231,25 @@
                     this.ApplyCostValues(result.CostValues);
                     break;
                 case "CreateTicket":
-                    var docurl = document.location.pathname.replace("rpeditor", "rpanalyzer");
-                    var weburl = docurl + "?dataid=" + result.Ticket + "&IsDlg=1&rpemode=1";
-                    var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: dialogCallbackDelegate };
-                    parent.SP.UI.ModalDialog.showModalDialog(options);
+                    switch (result.Context) {
+                        case "ResourceAnalyzer":
+                            var docurl = document.location.pathname.replace("rpeditor", "rpanalyzer");
+                            var weburl = docurl + "?dataid=" + result.Ticket + "&IsDlg=1&rpemode=1";
+                            var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: dialogCallbackDelegate };
+                            parent.SP.UI.ModalDialog.showModalDialog(options);
+                            break;
+                        case "ResourcePlanner":
+                            this.dhxWins_CloseDialog("winSelectPIsDlg");
+                            this.params.TicketVal = result.Ticket;
+                            var sbDataxml = new StringBuilder();
+                            sbDataxml.append('<Execute Function="GetMetaData">');
+                            sbDataxml.append('<Wepid>' + this.params.WEPID + '</Wepid>');
+                            sbDataxml.append('<TicketVal>' + this.params.TicketVal + '</TicketVal>');
+                            sbDataxml.append('<IsResource>' + this.params.IsResource + '</IsResource>');
+                            sbDataxml.append('</Execute>');
+                            this.ExecuteJSON(sbDataxml.toString());
+                            break;
+                    }
                     break;
                 default:
                     alert("ExecuteComplete unknown reply - " + jsonString);
@@ -2221,15 +2278,13 @@
             var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
             var xy = jsf_findAbsolutePosition(divLayout);
             var body = document.body;
-//            if (this.params.IsDlg == "1") {
-//                this.Width = body.offsetWidth;
-//                this.Height = body.offsetHeight - 5;
-//            } else {
-//                this.Width = body.offsetWidth - 4;
-//                this.Height = body.offsetHeight - 195;
-//            }
-            this.Width = body.offsetWidth;
-            this.Height = body.offsetHeight - xy[1] - 5;
+            if (this.params.IsDlg == "1") {
+                this.Width = body.offsetWidth - xy[0];
+                this.Height = body.offsetHeight - xy[1] - 5;
+            } else {
+                this.Width = body.offsetWidth - xy[0] - 20;
+                this.Height = body.offsetHeight - xy[1] - 20;
+            }
             this.OnResize();
             if (this.initialized == true)
                 this.GridsOnSectionResize(this.plangrid, 2, 0);
@@ -2416,6 +2471,9 @@
     RPEditor.prototype.externalEvent = function (event) {
         try {
             switch (event) {
+                case "SelectPIs_OK":
+                    this.SelectPIsOK();
+                    break;
                 case "PlanRibbon_Toggle":
                     if (this.editorTab.isCollapsed() == true) {
                         this.layout_plan.cells(const_PlanRibbonCell).fixSize(false, false);
@@ -2541,7 +2599,7 @@
                         if (this.plangrid != null && this.planrow != null) {
                             var dlg = this.wins.window("winSpreadDlg");
                             if (dlg == null) {
-                                this.DisplayDialog(20, 30, 275, 245, "Allocate Hours", "winSpreadDlg", "idSpreadDlgObj", false, false);
+                                this.DisplayDialog(20, 30, 275, 265, "Allocate Hours", "winSpreadDlg", "idSpreadDlgObj", false, false);
                                 this.spreadDlg_LoadData(this.plangrid, this.planrow, true);
                                 document.getElementById("idSpreadAmount").select();
                             }

@@ -15,7 +15,7 @@
     </Services>
 </asp:ScriptManagerProxy>
 
-<link rel="stylesheet" type="text/css" href="Styles/Dialog.css" />
+<link rel="stylesheet" type="text/css" href="Styles/DialogNew.css" />
 
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/dhtmlxlayout.css" />
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/skins/dhtmlxlayout_dhx_skyblue.css" />
@@ -32,7 +32,8 @@
 <script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxtoolbar.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.css" />
-<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_epm.css" />
+<%--<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_epm.css" />--%>
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_admin.css" />
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
@@ -81,29 +82,15 @@
 
 <div id="idEditorTabDiv"></div>
 
-<div id="idPIAndViewDlgObj" style="display:none;">
-    <table width="100%" cellspacing="0">
-        <tr>
-            <td width="150" class="controlcell">
-                Select the Portfolio Item :
-            </td>
-            <td class="controlcell">
-                <select id="idPIList" name="D1">
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td width="150" class="controlcell">
-                Select the View :
-            </td>
-            <td class="controlcell">
-                <select id="idViewList" name="D1">
-                </select>
-            </td>
-        </tr>
-    </table>
-    <div class="buttoncell" style="vertical-align:bottom; text-align:right">
-        <input id="Button2" type="button" value="OK" onclick="SelectPIDlg_OKOnClick();" style="width:3em;" />
+<div class="modalContent" id="idPIAndViewDlgObj" style="display:none;">
+	<div style="margin-top:10px;padding-right:10px;">
+        <select id="idPIList" size="8" style="width:226px;"></select>
+        <select id="idViewList" name="D1"style="display:none;"></select>
+	    <div style="float:right;">
+		    <div class="button-container" >
+			    <input type="button" class="epmliveButton" value="OK" onclick="SelectPIDlg_OKOnClick();"/>
+		    </div>
+	    </div>
     </div>
 </div>
 <div class="modalContent" id="idCategoriesDlgObj" style="display:none;">

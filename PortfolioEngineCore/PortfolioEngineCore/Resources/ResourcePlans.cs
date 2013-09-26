@@ -61,6 +61,8 @@ namespace PortfolioEngineCore
                             return GetImportCostPlanHours(sRequest, out sReply);
                         case "GetImportWorkHours":
                             return GetImportWorkHours(sRequest, out sReply);
+                        case "GetPIList":
+                            return GetPIList(sRequest, out sReply);
                         case "GetMetaData":
                             return GetMetaData(sRequest, out sReply);
                         //case "GetCostCategoryRoles":
@@ -102,6 +104,94 @@ namespace PortfolioEngineCore
             }
             finally { _dba.Close(); }
             return (_dba.Status == StatusEnum.rsSuccess);
+        }
+
+        private bool GetPIList(string sRequest, out string sReply)
+        {
+            sReply = "";
+            try
+            {
+                int nStatus = 0;
+                string sStatus = "";
+                CStruct xExecute = new CStruct();
+                CStruct xPIs = new CStruct();
+                xPIs.Initialize("PIs");
+                if (xExecute.LoadXML(sRequest) == true)
+                {
+                    string sProjectIDs = "";
+                    bool bSuperPIM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperPIM);
+                    bool bSuperRM = Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpSuperRM);
+
+                    string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '' ORDER BY PROJECT_NAME";
+                    SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection);
+                    SqlDataReader reader = null;
+                    reader = oCommand.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        CStruct xPI = xPIs.CreateSubStruct("PI");
+                        int lUID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                        if (sProjectIDs == "")
+                            sProjectIDs = lUID.ToString();
+                        else
+                            sProjectIDs += "," + lUID.ToString();
+                        string wepid = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                        xPI.CreateIntAttr("id", lUID);
+                        xPI.CreateStringAttr("wepid", wepid);
+                        xPI.CreateStringAttr("name", DBAccess.ReadStringValue(reader["PROJECT_NAME"]));
+                    }
+                    reader.Close();
+                    reader = null;
+
+                    if (bSuperPIM == false)
+                    {
+                        xPIs = new CStruct();
+                        xPIs.Initialize("PIs");
+
+                        sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS" +
+                       " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID" +
+                       " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = " + _userWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + _userWResID.ToString("0") + ")" +
+                       " AND PROJECT_ID in (" + sProjectIDs + ")  ORDER BY PROJECT_NAME";
+
+                        oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                        reader = oCommand.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            CStruct xPI = xPIs.CreateSubStruct("PI");
+                            int lUID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                            string wepid = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                            xPI.CreateIntAttr("id", lUID);
+                            xPI.CreateStringAttr("wepid", wepid);
+                            xPI.CreateStringAttr("name", DBAccess.ReadStringValue(reader["PROJECT_NAME"]));
+                        }
+                        reader.Close();
+                    }
+                    //{
+                    //    PortfolioItems.PortfolioItems pis = new PortfolioItems.PortfolioItems(_basepath, _username, _pid, _company, _dbcnstring, _debug);
+                    //    string sExtIDList;
+                    //    string sPIDList;
+                    //    string sXML;
+                    //    pis.ObtainManagedPortfolioItems(out sExtIDList, out sPIDList, out sXML);
+                    //}
+                }
+
+                CStruct xResult = BuildResultStruct("GetPIList", nStatus, sStatus);
+                if (nStatus == 0)
+                {
+                    xResult.AppendSubStruct(xPIs);
+                }
+                sReply = xResult.XML();
+            }
+            catch (Exception ex)
+            {
+                sReply = HandleException("GetPIList", 99999, ex);
+            }
+
+            bool bResult = (_dba.Status == StatusEnum.rsSuccess);
+            if (bResult == false)
+            {
+                sReply = HandleError("GetPIList", Status, FormatErrorText());
+            }
+            return bResult;
         }
 
         private bool GetMetaData(string sRequest, out string sReply)
