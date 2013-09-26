@@ -59,7 +59,7 @@
             var WebAPIUrl = "#APIUrl#";
             var FBSiteURL = "#SiteUrl#";
             var Param = "guid=#FBGUID#&fbsite=" + FBSiteURL;
-            var getTabs = true;
+            var getTabs = false;
             var getTaskButtons = true;
             var currentRoutes;
 			var fileId = "#fileId#";
@@ -249,7 +249,7 @@
                 return "";
             }
 
-            function TaskButtonCallback(action, url) {
+            function TaskButtonCallback(action, url, routedItemId) {
                 // for anything other than "set due date" (action -9999),
                 // load the next routed item into view:
                 //                    if (action != "-9999") {
@@ -264,6 +264,8 @@
                 var routeId = $("#ddlRoutes option:selected").val();
                 var xml = GetXML(routeId);
                 LoadVisualWorkflow(routeId, xml);
+
+
 
             }
 

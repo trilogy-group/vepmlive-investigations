@@ -66,6 +66,8 @@ namespace UplandIntegrations.FileBound
                 }
                 else if (dc.ColumnName == "userId")
                 {
+
+                    dr[dc.ColumnName] = o.userId;
                     try
                     {
                         WebClient wc = new WebClient();
@@ -116,7 +118,7 @@ namespace UplandIntegrations.FileBound
                         {
                             try
                             {
-                                dr[dc.ColumnName] = c.field[field];
+                                dr[dc.ColumnName] = c.field[field - 1];
                             }
                             catch { }
                         }
@@ -310,15 +312,23 @@ namespace UplandIntegrations.FileBound
                 r = streamReader.ReadToEnd();
             }
 
-            c = System.Web.Helpers.Json.Decode(r);
+            resp = wc.DownloadString(_webprops.Properties["APIUrl"].ToString() + "routeditems?projectid=" + _webprops.Properties["Folder"].ToString() + "&userid=0&routedobjecttype=6&filter=routedobjectid_" + docId + "&fbsite=" + _webprops.Properties["SiteUrl"].ToString() + "&guid=" + cn.FBGUID);
+
+            c = System.Web.Helpers.Json.Decode(resp);
 
             if (_webprops.IntegrationAPIUrl != "")
             {
                 try
                 {
-                    IntegrationAPI.Integration i = new IntegrationAPI.Integration();
-                    i.Url = _webprops.IntegrationAPIUrl;
-                    i.PostItemSimple(_webprops.Properties["RelatedAssign"].ToString(), c.id);
+                    for (int i = 0; i < c.Length; i++)
+                    {
+                        if (c[0].userId.ToString() != "0")
+                        {
+                            IntegrationAPI.Integration integ = new IntegrationAPI.Integration();
+                            integ.Url = _webprops.IntegrationAPIUrl;
+                            integ.PostItemSimple(_webprops.Properties["RelatedAssign"].ToString(), c[0].userId);
+                        }
+                    }
                 }
                 catch { }
             }

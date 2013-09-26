@@ -59,7 +59,7 @@
             var WebAPIUrl = "#APIUrl#";
             var FBSiteURL = "#SiteUrl#";
             var Param = "guid=#FBGUID#&fbsite=" + FBSiteURL;
-            var getTabs = true;
+            var getTabs = false;
             var getTaskButtons = true;
             var currentRoutes;
 			var fileId = "#fileId#";
