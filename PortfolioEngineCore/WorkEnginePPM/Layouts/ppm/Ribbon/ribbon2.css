@@ -1034,7 +1034,7 @@ a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hov
     border-color: #B1BAC4 !important;
 }
 .ms-cui-ctl-on, .ms-cui-ctl-dark-highlight, .ms-cui-ctl-a2.ms-cui-ctl-dark-highlight:hover, .ms-cui-ctl-a1.ms-cui-ctl-dark-highlight:hover, .ms-cui-mrusb-selecteditem a:hover, .ms-cui-ctl-hoveredOver {
-    background-color: #FFD86C;
+    background-color: #FFD86C !important;
     border-color: #C2821B !important;
 }
 .ms-cui-ctl-dark-highlight:hover {
