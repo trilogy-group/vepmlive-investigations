@@ -11,7 +11,7 @@ namespace PortfolioEngineCore
         {
             try
             {
-                //dba.WriteImmTrace("PfECore", "PostCostValues", "Input", data);
+                dba.WriteImmTrace("PfECore", "PostCostValues", "Input", data);
 
                 sResult = "";
                 string sErrorReply = "";
@@ -1449,6 +1449,7 @@ namespace PortfolioEngineCore
 
             return bTotalUpdated;
         }
+        
         private static bool UpdateCostTotal(DBAccess dba, int ProjectID, int nCB_ID, int nCT_ID, int nField_ID)
         {
             SqlCommand oCommand;
@@ -1549,6 +1550,36 @@ namespace PortfolioEngineCore
             }
             return true;
         }
+
+        public static bool GetAutoPosts(DBAccess dba, string datatype, ref int[,] autoposts)
+        {
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            string cmdText;
+
+            int larrayindex = 0;
+            int lmainkey = -1;
+            if (datatype.ToUpper() == "TIMESHEETS") {lmainkey=31;}
+            else if (datatype.ToUpper() == "RESOURCEPLANS") { lmainkey = 1; }
+
+            cmdText = "SELECT CT_ID,CB_ID From EPGP_COST_VALUES_TOSET Where TOSET_MAINKEY=@mainkey";
+            oCommand = new SqlCommand(cmdText, dba.Connection);
+            oCommand.Parameters.AddWithValue("@mainkey", lmainkey);
+            reader = oCommand.ExecuteReader();
+            if (reader.Read())
+            {
+                if (autoposts.GetUpperBound(0) >= larrayindex)
+                {
+                    autoposts[larrayindex, 0] = DBAccess.ReadIntValue(reader["CT_ID"]);
+                    autoposts[larrayindex, 1] = DBAccess.ReadIntValue(reader["CB_ID"]);
+                }
+                larrayindex ++;
+            }
+            reader.Close();
+
+            return true;
+        }
+
 
         private static string FormatError(DBAccess dba, int nCB_ID, int nCT_ID, string sMessage)
         {

@@ -118,6 +118,8 @@ namespace PortfolioEngineCore
                     string[] sLevelName = new string[nMaxLevel+1];
                     int l = 0;
                     string sParentName = "";
+                    // used to check for duplicate siblings
+                    Dictionary<string, string> dicFullnames = new Dictionary<string, string>();
 
                     foreach (KeyValuePair<int, PFELookupItem> oItemLookup in dicValues)
                     {
@@ -130,6 +132,17 @@ namespace PortfolioEngineCore
                             else sParentName = sParentName + "." + sLevelName[l];
                         }
                         oItemLookup.Value.fullname = sParentName + oItemLookup.Value.name;
+
+                        // need to check for duplicate siblings so stuff full name into dic, any error will be dup
+                        if (dicFullnames.ContainsKey(oItemLookup.Value.fullname))
+                        {
+                            sReply = DBAccess.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Can't save Lookup.\nDuplicate value not allowed: " + oItemLookup.Value.fullname);
+                            return StatusEnum.rsRequestCannotBeCompleted;
+                        }
+                        else
+                        {
+                            dicFullnames.Add(oItemLookup.Value.fullname, oItemLookup.Value.fullname);
+                        }
                     }
 
                     // update existing then insert new values
