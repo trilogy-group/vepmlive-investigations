@@ -311,7 +311,32 @@ namespace PortfolioEngineCore
             if (lCostView == 0)
                 return 1;
 
+            if (lCostView == -1)
+            {
 
+                bool bfnd = false;
+                sCommand = "SELECT * FROM EPGT_COSTVIEW_DISPLAY";
+                oCommand = new SqlCommand(sCommand, oDataAccess);
+                reader = oCommand.ExecuteReader();
+
+
+                while (reader.Read())
+                {
+                    if (bfnd == false)
+                    {
+                        bfnd = true;
+                        lCostView = DBAccess.ReadIntValue(reader["VIEW_UID"]);
+                        sCostView = lCostView.ToString();
+                    }
+
+                }
+                reader.Close();
+                reader = null;
+
+                if (bfnd == false)
+                    return 1;
+
+            }
 
             sCommand = "SELECT * FROM EPGT_COSTVIEW_DISPLAY WHERE VIEW_UID = " + sCostView;
             oCommand = new SqlCommand(sCommand, oDataAccess);
