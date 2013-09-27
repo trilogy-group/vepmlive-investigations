@@ -60,8 +60,8 @@
 
                                 var options = {
                                     html: viewDiv,
-                                    height: 110,
-                                    width: 265,
+                                    height: 90,
+                                    width: 250,
                                     title: "Add Favorite",
                                     dialogReturnValueCallback: function (diagResult, retVal) {
                                         if (diagResult === 1) {
@@ -71,6 +71,18 @@
                                 };
 
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                                
+                                var myVar = setInterval(function () { setFocus(); }, 200);
+                                function setFocus() {
+                                    if ($('.ms-dlgFrameContainer').find('#favTitle').length > 0 && !$('.ms-dlgFrameContainer').find('#favTitle').is(':focus')) {
+                                        if ($$.currentListTitle && $$.currentListViewTitle) {
+                                            $('.ms-dlgFrameContainer').find('#favTitle').focus().val($$.currentListTitle + '-' + $$.currentListViewTitle);
+                                        } else {
+                                            $('.ms-dlgFrameContainer').find('#favTitle').focus().val($$.currentFileTitle);
+                                        }
+                                        clearInterval(myVar);
+                                    }
+                                }
                             } else {
                                 a.removePageFav();
                             }
@@ -593,11 +605,11 @@
         };
 
         a.getAddFavDynamicValue = function(ele) {
-            return $($(ele).parent().find('#favTitle').get(0)).val();
+            return $($(ele).parent().parent().find('#favTitle').get(0)).val();
         };
         
         a.getAddFavItemFromGridDynamicValue = function (ele) {
-            return $($(ele).parent().find('#favItemTitle').get(0)).val();
+            return $($(ele).parent().parent().find('#favItemTitle').get(0)).val();
         };
         
         function removeSource(url) {

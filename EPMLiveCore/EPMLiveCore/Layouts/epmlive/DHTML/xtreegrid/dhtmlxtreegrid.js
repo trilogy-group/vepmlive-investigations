@@ -618,19 +618,23 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
 
     if (action == "AddFavorite") {
         var viewDiv = document.createElement('div');
-        viewDiv.innerHTML = 
-            '<div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;' +
-                '<input id="favItemTitle" name="favItemTitle" type="text" value="' + itemtitle + '" />' +
-                '<br />' +
-                '<div style="clear:both;height:10px;"></div>' +
-                '<input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavItemFromGridDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self" />' +
-                '<input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, \'Cancel clicked\');" class="ms-ButtonHeightWidth" target="_self" />' +
+        viewDiv.innerHTML =            
+            '<div>' +
+                '<div style="width: 250px; padding: 5px;"> Title:&nbsp;' +
+                    '<input type="text" value="" name="favItemTitle" id="favItemTitle" style="width:200px;">' +
+                    '<br>' +
+                    '<div style="clear: both; height: 20px;"></div>' +
+                    '<div style="margin-left: 45px;">' +
+                        '<input type="button" style="float: left; margin-right: 5px; width: 90px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(1, document.getElementById(\'favItemTitle\').value);" class="ms-ButtonHeightWidth" target="_self">' +
+                        '<input type="button" style="float:left;width:90px;" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(0, \'Cancel clicked\');" class="ms-ButtonHeightWidth" target="_self">' +
+                    '</div>' +
+                '</div>' +
             '</div>';
-        
+
         var options = {
             html: viewDiv,
-            height: 110,
-            width: 265,
+            height: 90,
+            width: 250,
             title: "Add Favorite Item",
             dialogReturnValueCallback: function (diagResult, retVal) {
                 if (diagResult === 1) {
@@ -640,6 +644,14 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
         };
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+        
+        var myVar = setInterval(function () { setFocus(); }, 200);
+        function setFocus() {
+            if ($('.ms-dlgFrameContainer').find('#favItemTitle').length > 0 && !$('.ms-dlgFrameContainer').find('#favItemTitle').is(':focus')) {
+                $('.ms-dlgFrameContainer').find('#favItemTitle').focus().val(itemtitle);
+                clearInterval(myVar);
+            }
+        }
     }
     else if (action == "RemoveFavorite") {
         window.Analytics.removeItemFavFromGrid(itemid);

@@ -69,5 +69,16 @@
   ControlAssembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5"
   ControlClass="EPMLiveCore.DispForm"
 		/>
+
+  <CustomAction
+  Id="DispFormEPMLive"
+  Location="EditFormToolbar"
+   RegistrationType="ContentType"
+  RegistrationId="0x01"
+  Sequence="102"
+  Title="Manage"
+  ControlAssembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5"
+  ControlClass="EPMLiveCore.DispForm"
+		/>
   
 </Elements>

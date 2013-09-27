@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web;
 using System.Web.UI;
 using EPMLiveCore.Infrastructure;
@@ -26,7 +27,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected string CurrentUrl;
         protected string ListIconClass;
         protected string ListViewUrl;
+        protected string ListViewTitle;
         protected string CurrentFileIsNull;
+        protected string CurrentFileTitle;
         private SPWeb _spWeb;
 
         #endregion Fields 
@@ -84,6 +87,10 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListViewUrl = string.Empty;
             try{ListViewUrl = SPContext.Current.ViewContext.View.Url;}catch{}
 
+            ListViewTitle = string.Empty;
+            try { ListViewTitle = SPContext.Current.ViewContext.View.Title; }
+            catch { }
+
             ItemId = "-1";
             try{ItemId = (SPContext.Current.Item != null) ? SPContext.Current.ItemId.ToString() : "-1";}catch{}
 
@@ -92,6 +99,10 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
             CurrentFileIsNull = "True";
             try { CurrentFileIsNull = (SPContext.Current.File == null).ToString(); }catch { }
+
+            CurrentFileTitle = string.Empty;
+            try { CurrentFileTitle = Path.GetFileName(Request.FilePath); }
+            catch { }
 
             ListIconClass = string.Empty;
             try

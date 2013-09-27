@@ -164,12 +164,12 @@ WEDispFormPageComponent.PageComponent.prototype = {
         else if (commandId === 'Ribbon.ListForm.Display.Actions.Favorite') {
             if (!($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png')) {
                 var viewDiv = document.createElement('div');
-                viewDiv.innerHTML = document.getElementById('fav_Add_DivTemp').innerHTML;
+                viewDiv.innerHTML = document.getElementById('favItem_Add_DivTemp').innerHTML;
 
                 var options = {
                     html: viewDiv,
-                    height: 110,
-                    width: 265,
+                    height: 90,
+                    width: 250,
                     title: "Add Favorite Item",
                     dialogReturnValueCallback: function (diagResult, retVal) {
                         if (diagResult === 1) {
@@ -179,6 +179,14 @@ WEDispFormPageComponent.PageComponent.prototype = {
                 };
 
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                
+                var myVar = setInterval(function () { setFocus(); }, 200);
+                function setFocus() {
+                    if ($('.ms-dlgFrameContainer').find('#favItemTitle').length > 0 && !$('.ms-dlgFrameContainer').find('#favItemTitle').is(':focus')) {
+                        $('.ms-dlgFrameContainer').find('#favItemTitle').focus().val(epmLive.currentItemTitle);
+                        clearInterval(myVar);
+                    }
+                }
             } else {
                 window.Analytics.removeItemFav();
             }

@@ -2,7 +2,7 @@
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="FavoriteStatus.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.FavoriteStatus" %>
@@ -30,23 +30,30 @@
     <span style="display: none;color:#D1D1D1;font-size:18px;" class="icon-star icon-star-disabled" id="favoritesStar" ></span>
 </div>
 
-
-<div id="fav_Add_DivTemp" style="display:none">
-        <div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;
-        <input id="favTitle" name="favTitle" type="text" value="<%=defaultFavTitle %>" />
-        <br />
-        <div style="clear:both;height:10px;"></div>
-        <input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self" />
-        <input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked');" class="ms-ButtonHeightWidth" target="_self" />
-      </div>
+<div id="fav_Add_DivTemp" style="display:none" style="width: 265px;">
+    <div>
+        <div style="width: 250px; padding: 5px;"> Title:&nbsp;
+            <input type="text" value="" name="favTitle" id="favTitle" style="width:200px;">
+            <br>
+            <div style="clear: both; height: 20px;"></div>
+            <div style="margin-left: 45px;">
+                <input type="button" style="float: left; margin-right: 5px; width: 90px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self">
+                <input type="button" style="float:left;width:90px;" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked');" class="ms-ButtonHeightWidth" target="_self">
+            </div>
+        </div>
+    </div>
 </div>
 
-<div id="favItem_Add_DivTemp" style="display:none">
-        <div style="width:250px;height:95px;padding:10px;"> Title:&nbsp;
-        <input id="Text1" name="favTitle" type="text" value="<%=defaultFavTitle %>" />
-        <br />
-        <div style="clear:both;height:10px;"></div>
-        <input type="button" style="float:left;width:90px;margin-right:5px;" value="OK" onClick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self" />
-        <input type="button" style="float:left;width:90px;" value="Cancel" onClick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked');" class="ms-ButtonHeightWidth" target="_self" />
-      </div>
+<div id="favItem_Add_DivTemp" style="display:none" style="width: 265px;">
+    <div>
+        <div style="width: 250px; padding: 5px;"> Title:&nbsp;
+            <input type="text" value="" name="favItemTitle" id="favItemTitle" style="width:200px;">
+            <br>
+            <div style="clear: both; height: 20px;"></div>
+            <div style="margin-left: 45px;">
+                <input type="button" style="float: left; margin-right: 5px; width: 90px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavItemFromGridDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self">
+                <input type="button" style="float:left;width:90px;" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(0, 'Cancel clicked');" class="ms-ButtonHeightWidth" target="_self">
+            </div>
+        </div>
+    </div>
 </div>

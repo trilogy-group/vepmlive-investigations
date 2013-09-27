@@ -296,13 +296,13 @@
 				 </Template_Control>
 			</wssuc:InputFormControl>
 
-            <wssuc:InputFormControl LabelText="" runat="server">
+            <wssuc:InputFormControl LabelText="" runat="server" visible="False">
 				 <Template_Control>
                     <asp:CheckBox ID="chkDeleteRequest" runat="server" Text="Do Not Delete Items" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
 
-            <wssuc:InputFormControl LabelText="Item List" runat="server">
+            <wssuc:InputFormControl LabelText="Item List" runat="server" visible="False">
 				 <Template_Control>
                     <asp:TextBox ID="txtRequestList" runat="server" />
 				 </Template_Control>
