@@ -5,11 +5,11 @@
 	<Cfg PrintCols='1'/>
 	<Cfg ExportCols='1'/>
 	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' />
-	<Cfg StaticCursor='1' Dragging='0' SelectingCells='1' ShowDeleted='0' SelectClass='0'/>
+	<Cfg StaticCursor='1' Dragging='0' SelectingCells='1' ShowDeleted='0' SelectClass='0' Hover='0'/>
 
 	<Toolbar Visible='0'></Toolbar>
 
-	<Panel Visible='1' Delete='0' Move='0' NoFormatEscape='1' CanHide='0'/>
+	<Panel Visible='1' Delete='0' Move='0' NoFormatEscape='1' CanHide='0' SelectWidth="30"/>
 
 	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2'/>
 	
@@ -26,7 +26,7 @@
 		
 	</RightCols>
 	<Def>
-		<D Name="R" Calculated='0' HoverCell='Color' HoverRow='Color'/>
+		<D Name="R" Calculated='0'/>
 		<D Name="Group" CanSelect='0'/>
 	</Def>
 	<Solid>

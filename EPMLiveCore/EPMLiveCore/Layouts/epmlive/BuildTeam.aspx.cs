@@ -205,7 +205,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     sResGrid = @"TreeGrid(   { 
                     Layout:{ Url:""../../_vti_bin/WorkEngine.asmx"", Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""GetResourceGridLayout"",Dataxml:""" + sLayoutParam + @""" } } ,
                     Data:{ Url:""../../_vti_bin/WorkEngine.asmx"", Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""GetResourceGridData"",Dataxml:""" + sLayoutParam + @""" } }, 
-                    Debug:""""
+                    Debug:"""",SuppressMessage:""3""
                     }, 
 	                ""divResPool"" );";
                 }

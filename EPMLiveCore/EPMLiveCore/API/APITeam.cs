@@ -924,7 +924,7 @@ namespace EPMLiveCore.API
                         if (listid != Guid.Empty)
                         {
                             SPList list = web.Lists[listid];
-                            GridGanttSettings gSettings = new GridGanttSettings(list);
+                            GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
                             bUseTeam = gSettings.BuildTeam;
                         }
 

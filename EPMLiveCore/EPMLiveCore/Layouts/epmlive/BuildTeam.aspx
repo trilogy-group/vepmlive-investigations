@@ -38,6 +38,17 @@
          background-color: #FFFFFF !important
      }
      #s4-ribbonrow{ height:140px !important}
+     
+
+a, .ms-link:visited {
+    color: #555555;
+    text-decoration: none;
+}
+
+
+
+
+
     </style>
 
     <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
@@ -63,7 +74,7 @@
                     </ul>
 		        </div>
                 <div id="divTeam">
-                    
+                    Loading...
                 </div>
             </td>
             <%=sResPool%>
@@ -158,7 +169,7 @@
 
             setHeight();
 
-            setTimeout("sm('dlgLoading', 130, 50);", 100);
+            //setTimeout("sm('dlgLoading', 130, 50);", 100);
            
             setTimeout("loadGrids()", 1000);
             
@@ -171,7 +182,7 @@
 	        TreeGrid(   { 
                 Layout:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridLayout",Dataxml:"<%=sLayoutParam %>" } } ,
                 Data:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridData",Dataxml:"<%=sLayoutParam %>" } }, 
-                Debug:""
+	            Debug:"",SuppressMessage:"3"
                 }, 
 	        "divTeam" );
         }
@@ -212,6 +223,9 @@
 
             if (renderCount == Grids.length) {
                 setTimeout("gridsloaded()", 200);
+
+                $(".GMHeadLeft").find("th:nth-child(2)" ).css("width","25px");
+                $(".GMBodyLeft").find("th:nth-child(2)" ).css("width","25px");
             }
             else if (renderCount > Grids.length)
             {

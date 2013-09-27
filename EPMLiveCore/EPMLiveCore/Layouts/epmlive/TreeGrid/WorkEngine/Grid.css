@@ -4,6 +4,7 @@
 /* ------------- Base tags ------------- */
 
 
+
 .GMImage { padding-bottom:256px; }
 .GMNone { display:none; }
 .GMSection,.GMSectionFF3 { table-layout:fixed; width:1px; font-size:1px; }
@@ -53,7 +54,7 @@
 .GMCell,.GMCellPanel,.GMCellFilter,.GMCellFilterPanel,.GMCellHeader,.GMCellHeaderPanel,.GMCellFilterPanel,
 .GMHeaderDrag,.GMHeaderGroup,.GMCellUser,.GMCellEmpty,.GMCellHeaderEmpty { 
 	border-top:0px solid #ffffff; border-bottom:1px solid #B1B5BA; border-left:0px solid #ffffff; border-right:0px solid #B1B5BA;
-	vertical-align:top; white-space:nowrap; overflow:hidden; overflow:auto!IE; height:auto;
+	vertical-align:middle; white-space:nowrap; overflow:hidden; overflow:auto!IE; height:auto; background-color:#FFFFFF
 	}
 .GMCellHeaderPanel { padding-top:2px; }
 
@@ -72,8 +73,9 @@
 .GMCellSpaceBelow { border-bottom:1px solid #e0e0ff; }
 
 .GMCellFilterPanel { background-color:#F0F0E0; text-align:center; padding-top:0px; }
-.GMCellHeader,.GMCellHeaderEmpty { padding-top:1px; background-color:#DFE3E8; border-top:0px solid #ffffff; }
-.GMCellPanel,.GMCellHeaderPanel { background-color:#DFE3E8; }
+.GMCellHeader,.GMCellHeaderEmpty { padding-top:1px; background-color:#FFFFFF; border-top:0px solid #ffffff; height: 30px; font-family: "Open Sans Regular", Verdana, 
+Arial; font-size: 14px }
+.GMCellPanel,.GMCellHeaderPanel { background-color:#FFFFFF; }
 .GMCellFilterPanel { padding-left:1px; }
 .GMCellUser { background-color:#F0F0E0; }
 .GMCellEmpty { background:#F0F0E0; border:0px none; }
@@ -99,12 +101,12 @@
 /* ------------- Inside cell ------------- */
 
 .GMHtml,.GMText,.GMLines,.GMPass,.GMInt,.GMFloat,.GMDate,.GMLink,.GMImg,.GMRadio,.GMRadioText,.GMList,.GMEnum,.GMDropCols,.GMAbs,.GMPagerEdit,.GMUser,.GMGantt {
-   font-size:11px; font-family:"Microsoft Sans Serif",Verdana,Arial; white-space:nowrap;
-   padding-left:3px; padding-right:3px; padding-top:2px; padding-bottom:2px;
+   font-size:14px; font-family:Open Sans Regular,Verdana,Arial; white-space:nowrap;
+   padding-left:3px; padding-right:3px; padding-top:3px; padding-bottom:3px;
    }
 .GMInt,.GMFloat,.GMDate { text-align:right; }
 .GMLines,.GMRadio,.GMHtml,.GMList { white-space:normal; }	
-.GMImg,.GMHtml { padding-top:0px; padding-bottom:0px; }
+.GMImg,.GMHtml { padding-top:3px; padding-bottom:3px; }
 .GMGantt { padding:5px; }
 .GMPass { font-size:15px; padding:0px; padding-left:3px; }
 .GMRadio,.GMRadioText { padding:0px; }
@@ -112,7 +114,7 @@
 .GMIcon { background-repeat:no-repeat; }
 .GMHidden { }
 .GMHiddenSpace { display:none; }
-.GMHeaderText { font:11px "Microsoft Sans Serif", Verdana, Arial; padding-left:3px; padding-right:3px; padding-bottom:1px; }
+.GMHeaderText { font-family: "Open Sans Regular", Verdana, Arial; font-size: 14px; padding-left:3px; padding-right:3px; padding-bottom:1px; }
 .GMAbs { padding:0px; }
 .GMUser { padding:0px; }
 .GMPagerEdit {
@@ -173,7 +175,8 @@
 .GMGantt10In { background:url(taskgantt.gif); height: 10px; border-right: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid #1F5BA9 }
 .GMGantt10InErr { background:url(taskgantt.gif); height: 10px; border-right: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid #1F5BA9 }
 .GMGantt10InCrit { background:url(critgantt.gif); height: 10px; border-right: 1px solid #801010; border-top: 1px solid #801010; border-bottom: 1px solid #801010 }
-.GMGantt90In,.GMGantt90InErr { background:url(taskganttpct.gif); height: 10px; border-left: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid #1F5BA9 }
+.GMGantt90In,.GMGantt90InErr { background:url(taskganttpct.gif); height: 10px; border-left: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid 
+#1F5BA9 }
 .GMGantt90InCrit { background:url(critganttpct.gif); height: 10px; border-left: 1px solid #801010; border-top: 1px solid #801010; border-bottom: 1px solid #801010 }
 .GMGantt100In,.GMGantt100InErr { background:url(taskganttpct.gif); height: 10px; border: 1px solid #1F5BA9; }
 .GMGantt100InCrit { background:url(critganttpct.gif); height: 10px; border: 1px solid #801010; }
@@ -186,7 +189,8 @@
 .GMGanttG10In { background: url(summarygantt.gif); height:4px;  border-right: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black}
 .GMGanttG10InCrit { background:#FC6; }
 .GMGanttG10InErr { background:#FAA; }
-.GMGanttG90In,.GMGanttG90InErr,.GMGanttG90InCrit { background: url(summaryganttpct.gif); height:4px; border-left: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black }
+.GMGanttG90In,.GMGanttG90InErr,.GMGanttG90InCrit { background: url(summaryganttpct.gif); height:4px; border-left: 1px solid black; border-top: 1px solid black; 
+border-bottom: 1px solid black }
 .GMGanttG100In,.GMGanttG100InErr,.GMGanttG100InCrit { background: url(summaryganttpct.gif); height:4px; border: 1px solid black }
 .GMGanttGNullIn { background: url(summarygantt.gif); height:4px; border: 1px solid black }
 .GMGanttGNullInErr { background: url(summarygantt.gif); height:4px; border: 1px solid black }
@@ -237,8 +241,10 @@
 .GMGanttRunBoxIn { background:#F0F0E0; }
 .GMGanttRunSolidOut { }
 .GMGanttRunSolidIn { background:#FFFF00; }
-.GMGanttRunFixedOut,.GMGanttRunLeftOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-left-style:solid!important; border-left-width:3px!important; border-left-color:blue; margin-left:0px;}
-.GMGanttRunFixedOut,.GMGanttRunRightOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-right-style:solid!important; border-right-width:3px!important; border-right-color:blue; }
+.GMGanttRunFixedOut,.GMGanttRunLeftOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-left-style:solid!important; border-left-width:3px!important; border-left-
+color:blue; margin-left:0px;}
+.GMGanttRunFixedOut,.GMGanttRunRightOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-right-style:solid!important; border-right-width:3px!important; border-
+right-color:blue; }
 .GMGanttRunFixedIn,.GMGanttRunLeftIn,.GMGanttRunRightIn { background:#C0C0C0; }
 .GMGanttRunBoundOut,.GMGanttRunBoundStartOut,.GMGanttRunEndOut,.GMGanttRunEndStartOut { color:white; }
 .GMGanttRunBoundIn,.GMGanttRunEndIn { background:#b04080; }
@@ -384,7 +390,8 @@
 .GMGanttExclude,.GMGanttExcludeHidden { height:500px; overflow:hidden; background:#F0F0E0; margin-left:auto; margin-right:auto; }
 .GMGanttExcludeHidden { }
 
-.GMGanttBase,.GMGanttBaseAuto,.GMGanttFinish,.GMGanttFinishAuto { height:500px; overflow:hidden; border-left:2px solid #FF9E0C; width:2px; margin-left:auto; margin-right:auto; }
+.GMGanttBase,.GMGanttBaseAuto,.GMGanttFinish,.GMGanttFinishAuto { height:500px; overflow:hidden; border-left:2px solid #FF9E0C; width:2px; margin-left:auto; margin-
+right:auto; }
 .GMGanttFinishAuto,.GMGanttBaseAuto { border-left:1px solid #FF9E0C; }
 
 .GMGanttHeader { margin-left:-4px; margin-right:-4px; margin-top:-2px; }
@@ -478,14 +485,15 @@ u.GMNL { padding-left:21px; }
 
 /* ------------- Panel img ------------- */
 
-.GMPanelImage,.GMPanelMove,.GMPanelMoveOff,.GMPanelSelect,.GMPanelSelectOn,.GMPanelSelectOff,.GMPanelDelete,.GMPanelDeleteOff,.GMPanelCopy,.GMPanelCopyOff,.GMPanelEmpty {
-   font-size:10px; padding-left:13px; background-image:url(Panel.gif); background-repeat:no-repeat;
+.GMPanelImage,.GMPanelMove,.GMPanelMoveOff,.GMPanelSelect,.GMPanelSelectOn,.GMPanelSelectOff,.GMPanelDelete,.GMPanelDeleteOff,.GMPanelCopy,.GMPanelCopyOff,.GMPanelEmpt
+y {
+   font-size:10px; padding-left:22px; background-image:url(grid-check.png); background-repeat:no-repeat; width:30px; padding-top:5px
    }
 .GMPanelEmpty { background:none; }   
 .GMPanelMove { background-position: 0px 0px; }
 .GMPanelMoveOff { background-position: -50px 0px; }
-.GMPanelSelect { background-position: -100px 0px; }
-.GMPanelSelectOn { background-position: -150px 0px; }
+.GMPanelSelect { background-position: 2px 2px; }
+.GMPanelSelectOn { background-position: -31px 2px; }
 .GMPanelSelectOff { background-position: -200px 0px; }
 .GMPanelDelete { background-position: -250px 0px; }
 .GMPanelDeleteOff { background-position: -300px 0px; }
@@ -503,7 +511,7 @@ u.GMNL { padding-left:21px; }
 .GMPx11x,.GMPx21x,.GMPx01x,.GMPx10x,.GMPx20x,.GMPx00x,
 .GMPxx11,.GMPxx10,.GMPxx01,.GMPxx00, 
 .GMPxxx1,.GMPxxx0,.GMPxx1x,.GMPxx0x,.GMPx2xx,.GMPx1xx,.GMPx0xx,.GMP1xxx,.GMP0xxx {
-   font-size:10px; background-image:url(FastPanel1.gif); background-repeat:no-repeat;
+   font-size:10px; background-image:url(grid-check.png); background-repeat:no-repeat; width:20px
    }
 .GMP1111,.GMP111x,.GMP11xx,.GMP1xxx { background-position:0px 0px; }
 .GMP1211,.GMP121x,.GMP12xx { background-position:-80px 0px; }
@@ -530,8 +538,8 @@ u.GMNL { padding-left:21px; }
 .GMP0200 { background-position:-1760px 0px; }
 .GMP0000 { background-position:-1840px 0px; }
 
-.GMPx111,.GMPx11x,.GMPx1xx { background-position:-13px 0px; }
-.GMPx211,.GMPx21x,.GMPx2xx { background-position:-93px 0px; }
+.GMPx111,.GMPx11x,.GMPx1xx { background-position:2px 2px; }
+.GMPx211,.GMPx21x,.GMPx2xx { background-position:-31px 2px; }
 .GMPx011,.GMPx01x,.GMPx0xx { background-position:-173px 0px; }
 .GMPx101,.GMPx10x { background-position:-253px 0px; }
 .GMPx201,.GMPx20x { background-position:-333px 0px; }
@@ -706,7 +714,7 @@ u.GMPSpace4 { padding-left:49px; background-position-x:18px; }
 .GMBoolXSpace,.GMBoolXSpaceRO,.GMBool0Space,.GMBool1Space,.GMBool0SpaceRO,.GMBool1SpaceRO,
 .GMBoolX,.GMBoolXRO,.GMBool0,.GMBool1,.GMBool0RO,.GMBool1RO,.GMBool2,.GMBool3,.GMBool2RO,.GMBool3RO,
 .GMFilter0,.GMFilter1,.GMGroup0,.GMGroup1,.GMSearch0,.GMSearch1 {
-   font-size:11px; background-image:url(Button.gif); background-repeat:no-repeat; }
+   font-size:14px; background-image:url(Button.gif); background-repeat:no-repeat; }
 .GMDateLeft,.GMDefaultsLeft,.GMDefaultsSpaceLeft { padding-left:20px; }
 .GMDateRight,.GMDefaultsRight,.GMDefaultsSpaceRight { padding-right:20px; }
 u.GMDateRight,u.GMDefaultsRight,u.GMDefaultsSpaceRight { padding-right:0px; padding-left:17px; }
@@ -772,17 +780,22 @@ u.GMFilter0,u.GMFilter1 { padding-left:13px; }
 .GMPopupNone { padding-right:14px; }
 
 /* ------------- Filter images ------------- */
-.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.GMFilter11Left,.GMFilter12Left,
-.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilter10Right,.GMFilter11Right,.GMFilter12Right {
+.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.
+GMFilter11Left,.GMFilter12Left,
+.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilt
+er10Right,.GMFilter11Right,.GMFilter12Right {
    font-size:11px; background-image:url(Filter.gif); background-repeat:no-repeat;
    }
-.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.GMFilter11Left,.GMFilter12Left {
+.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.
+GMFilter11Left,.GMFilter12Left {
    padding-left:17px;
    }
-.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilter10Right,.GMFilter11Right,.GMFilter12Right {
+.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilt
+er10Right,.GMFilter11Right,.GMFilter12Right {
    padding-right:17px;
    }
-u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4Right,u.GMFilter5Right,u.GMFilter6Right,u.GMFilter7Right,u.GMFilter8Right,u.GMFilter9Right,u.GMFilter10Right,u.GMFilter11Right,u.GMFilter12Right {  
+u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4Right,u.GMFilter5Right,u.GMFilter6Right,u.GMFilter7Right,u.GMFilter8Right,u.GMFilter9Rig
+ht,u.GMFilter10Right,u.GMFilter11Right,u.GMFilter12Right {  
    padding-right:0px; padding-left:17px;
    }
 .GMFilter0Left,.GMFilter0Menu { background-position:left 0px; }   
@@ -812,7 +825,8 @@ u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4R
 .GMFilter11Right { background-position:right -1650px; }
 .GMFilter12Right { background-position:right -1800px; }
 
-.GMFilter0Menu,.GMFilter1Menu,.GMFilter2Menu,.GMFilter3Menu,.GMFilter4Menu,.GMFilter5Menu,.GMFilter6Menu,.GMFilter7Menu,.GMFilter8Menu,.GMFilter9Menu,.GMFilter10Menu,.GMFilter11Menu,.GMFilter12Menu {
+.GMFilter0Menu,.GMFilter1Menu,.GMFilter2Menu,.GMFilter3Menu,.GMFilter4Menu,.GMFilter5Menu,.GMFilter6Menu,.GMFilter7Menu,.GMFilter8Menu,.GMFilter9Menu,.GMFilter10Menu,.
+GMFilter11Menu,.GMFilter12Menu {
    width:17px; height:17px; overflow:hidden; background-image:url(Filter.gif); background-repeat:no-repeat; margin-left:-1px;
    }
 .GMFilterMenuHeader { padding-left:2px; border-bottom:0px none!important; }   
@@ -877,8 +891,8 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 
 .GMColorAlternate { background-color:#EBFFFF; }
 
-.GMColorSelected { background-color:#9AC2E5; }
-.GMClassSelected { color:black; }
+.GMColorSelected { background-color:#FFFFFF; }
+.GMClassSelected { }
 
 .GMColorError { background-color:#FF6969; }
 .GMColorDeleted { background-color:#FFFFFF; }
@@ -900,34 +914,34 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMColorFound2 { background-color:#FFC387; }
 .GMColorFound3 { background-color:#87FF87; }
 
-.GMColorHovered { background-color:#F1F5FA; }
-.GMColorHoveredCell { background-color:#F1F5FA; }
-.GMColorHoveredCellReadOnly { background-color:#F1F5FA; }
-.GMColorHoveredCellNoFocus { background-color:#F8F8F8; }
-.GMClassHoveredCellHeader { background-position:0px -250px; }
-.GMClassHoveredCellPanel { background-position:0px -1751px; background-repeat:repeat-x; }
-.GMColorHoveredCellFastPanel { }
+.GMColorHovered { background-color:#FFFFFF; }
+.GMColorHoveredCell { background-color:#FFFFFF; }
+.GMColorHoveredCellReadOnly { background-color:#FFFFFF; }
+.GMColorHoveredCellNoFocus { background-color:#FFFFFFF; }
+.GMClassHoveredCellHeader { background-color:#FFFFFF }
+.GMClassHoveredCellPanel { background-color:#FFFFFF }
+.GMColorHoveredCellFastPanel { background-color:#FFFFFF}
 .GMColorHoveredCellSpace { background-color:#FFFFFF; }
-.GMColorHoveredCellSpaceEdit { background-color:#C0C0FF; }
+.GMColorHoveredCellSpaceEdit { background-color:#FFFFFF; }
 .GMColorHoveredCellSpaceBool { background-color:#FFFFFF; }
-.GMColorHoveredCellButton { background-color:#FFFFFE; }
+.GMColorHoveredCellButton { background-color:#FFFFFF; }
 .GMClassHoveredCellButton { color:green; }
-.GMColorHoveredCellButton1 { background-color:#FFFFFE; }
+.GMColorHoveredCellButton1 { background-color:#FFFFFF; }
 .GMClassHoveredCellButton1 { color:red; }
-.GMColorHoveredCellTab { background-color:#FFFFFE; }
+.GMColorHoveredCellTab { background-color:#FFFFFF; }
 .GMClassHoveredCellTab { background-position:0px -1751px; color:green; }
 .GMColorHoveredCellTab1 { background-color:#99bbcc; }
 .GMClassHoveredCellTab1 { background-image:none; }
 
-.GMColorFocused { background-color:#9AC2E5; }
-.GMColorFocusedCell { background-color:#9AC2E5; }
-.GMColorFocusedCellSafari { background-color:#9AC2E5; }
-.GMColorFocusedCellSpace { background-color:#E6E6E6; }
+.GMColorFocused { background-color:#FFFFFF; }
+.GMColorFocusedCell { background-color:#FFFFFF; }
+.GMColorFocusedCellSafari { background-color:#FFFFFF; }
+.GMColorFocusedCellSpace { background-color:#FFFFFF; }
 .GMColorFocusedCellButton { background-color:#FFFFFE; }
 .GMColorFocusedCellHeader { background-color:#FFFFFE; }
 .GMColorFocusedCellPanel { background-color:#FFFFFE; }
-.GMColorEditedCell { background-color:#9AC2E5; }
-.GMColorViewedCell { background-color:#9AC2E5; }
+.GMColorEditedCell { background-color:#FFFFFF; }
+.GMColorViewedCell { background-color:#FFFFFF; }
 
 /* --------------- Hover, focus, edit cursors ----------------- */
 .GMHoverPanelBackground { }
@@ -1043,7 +1057,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuOuter { overflow:hidden; border:1px solid black; padding:1px; background:white; }
 .GMMenuHeader {
    overflow:hidden; position:absolute; z-index:258;
-   border:1px solid #b0b0c0; background:white; cursor:pointer; _cursor:hand;
+   border:1px solid #b0b0c0; background:white; cursor:pointer; _cursor:hand; vertical-align:middle;
    }
 .GMMenuHead {
    background:#183873 url(Backgrounds.gif) repeat-x 0px -2px;
@@ -1077,7 +1091,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuNextIcon { background:url(Menu.gif) no-repeat right -300px; padding-right:10px; }
 .GMMenuNextIconRtl { background:url(Menu.gif) no-repeat left -900px; padding-left:10px; }
 
-.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font:11px "Microsoft Sans Serif",Arial; white-space:nowrap; }
+.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font: 11px "Open Sans Regular",Arial;    padding: 4px; }
 .GMMenuItemDisabled { opacity:0.50; filter:alpha(opacity=30); overflow:hidden; }
 .GMMenuLevel { color:blue; text-align:center; }  
 .GMMenuEnumParent,.GMMenuEditParent { padding-left:5px; padding-right:2px;}
@@ -1106,17 +1120,13 @@ overflow:hidden; width:0px; height:0px; }
 
 .GMMenuItem { padding-top:2px; padding-bottom:2px; padding-left:2px; padding-right:2px; background:white; }   
 .GMMenuItemHover {
-   margin-left:1px; margin-right:1px; padding-top:1px; padding-bottom:1px; 
-   background:#ffeeaa; border:1px solid #aaaadd;
+   margin-left:2px; margin-right:2px; padding-top:2px; padding-bottom:2px;background:#F1F5FA
    }
 .GMMenuFocus {
-   margin-left:1px; margin-right:1px; padding-top:1px; padding-bottom:1px;
-   border:1px solid #aaaadd;
-   background:#CAE1F3 url(Backgrounds.gif) repeat-x 0px -1250px;
+   margin-left:2px; margin-right:2px; padding-top:2px; padding-bottom:2px;
    }
 .GMMenuFocusHover {
-   margin-left:1px; margin-right:1px; padding-top:1px; padding-bottom:1px;
-   background:#CAE1F3; border:1px solid black;
+   margin-left:2px; margin-right:2px; padding-top:2px; padding-bottom:2px;background:#F1F5FA
    }
 .GMMenuSeparator {
    margin-top:1px; margin-right:3px; margin-left:3px; height:1px;   
@@ -1126,12 +1136,12 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuVSeparator { border-right:1px solid #DDD; }
 .GMMenuSection  { }
 
-.GMMenuFoot { border-top:none; text-align:center; background:url(Backgrounds.gif) repeat-x 0px -1367px; }  
+.GMMenuFoot { border-top:none; text-align:right;padding-right:10px }  
 .GMMenuButton {
    font-size:11px;background:#dcecf8; text-align:center; border:1px solid #8a8fb5; 
    width:48px; margin:2px; margin-top:5px; margin-bottom:4px; white-space:nowrap; padding-left:0px; padding-right:0px;
    }
-.GMMenuButton:hover { background:#ffeeaa; border:1px solid #aaaadd; }
+.GMMenuButton:hover { border:1px solid #aaaadd; }
 
 /*--------------- Grid configuration menus ----------------- */
 
@@ -1266,8 +1276,8 @@ overflow:hidden; width:0px; height:0px; }
 .GMEditParent { position:absolute; z-index:258; overflow:hidden; }
 
 .GMEnumHeaderLeft,.GMEnumHeaderRight,.GMEnumHeaderNone {
-   background:white; font:11px "Microsoft Sans Serif",Arial; cursor:pointer; _cursor:hand;
-   padding-left:2px; padding-right:4px; padding-top:2px; padding-bottom:2px;
+   background:white; font-size: 14px; font-family: "Open Sans Regular", Verdana, Arial; cursor:pointer; _cursor:hand;
+   padding-left:2px; padding-right:4px; padding-top:2px; padding-bottom:2px; vertical-align: middle;
    }
 .GMEnumHeaderLeft { background:white url(Menu.gif) no-repeat 1px -798px; padding-left:17px; }
 .GMEnumHeaderRight { background:white url(Menu.gif) no-repeat right -798px; padding-right:17px;}
@@ -1353,7 +1363,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMouseOrig { background:yellow!important; opacity:0.5; filter:alpha(opacity=50); }
 .GMMouseDragObject { position:absolute; z-index:260; background:#888; opacity:0.5; filter:alpha(opacity=50); }
 
-.GMFocus { border:1px solid #AAF; border-top:1px solid #00F; border-left:1px solid #00F; background-color:#EEE; } 
+.GMFocus { border:1px solid #AAF; border-top:1px solid #00F; border-left:1px solid #00F; background-color:#FFFFFF; } 
 
 .GMFocus { border:1px solid blue; background-color:white; }    
 
