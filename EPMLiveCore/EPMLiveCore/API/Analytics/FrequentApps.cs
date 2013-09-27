@@ -46,7 +46,7 @@ namespace EPMLiveCore.API
                     {
                         using (SPWeb spWeb = spSite.OpenWeb(data.WebId))
                         {
-                            new WorkspaceLinkProvider(data.SiteId, data.WebId, spWeb.Users.GetByID(data.UserId).LoginName).ClearCache();
+                            new RecentItemsLinkProvider(data.SiteId, data.WebId, spWeb.Users.GetByID(data.UserId).LoginName).ClearCache();
                         }
                     }
                 }
