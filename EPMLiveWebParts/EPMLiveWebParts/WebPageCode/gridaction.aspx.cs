@@ -57,14 +57,7 @@ namespace EPMLiveWebParts
 
                 bool isFav = IsFav(list, li, web, gSettings);
 
-                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
-                {
-                    if (!isFav)
-                        items.Add("Add Favorite", getMenuItem(Request["grid"], "Add Favorite", "/_layouts/images/blank.gif", "AddFavorite", ""));
-                    else
-                        items.Add("Remove Favorite", getMenuItem(Request["grid"], "Remove Favorite", "/_layouts/images/blank.gif", "RemoveFavorite", ""));
-                }
-
+               
                 if(list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
                 {
                     if (bUsePopup)
@@ -103,6 +96,14 @@ namespace EPMLiveWebParts
                     items.Add("Delete Item", getMenuItem(Request["grid"], "Delete Item", "/_layouts/images/delitem.gif", "delete", "99"));
 
                 items.Add("SEP" + (counter++).ToString(), "");
+
+                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
+                {
+                    if (!isFav)
+                        items.Add("Add Favorite", getMenuItem(Request["grid"], "Add Favorite", "/_layouts/images/blank.gif", "AddFavorite", ""));
+                    else
+                        items.Add("Remove Favorite", getMenuItem(Request["grid"], "Remove Favorite", "/_layouts/images/blank.gif", "RemoveFavorite", ""));
+                }
 
                 Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(web, null);
 
