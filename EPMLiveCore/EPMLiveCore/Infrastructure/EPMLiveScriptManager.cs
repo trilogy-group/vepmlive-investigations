@@ -72,8 +72,8 @@ namespace EPMLiveCore.Infrastructure
                 where !script.Equals("@/")
                 select script)
             {
-                SPPageContentManager.RegisterScriptFile(page, GetScript(script, debugMode), localizable, true,
-                    "javascript", null);
+                bool defer = !script.Equals("libraries/jquery.min");
+                SPPageContentManager.RegisterScriptFile(page, GetScript(script, debugMode), localizable, defer, "javascript", null);
             }
         }
 

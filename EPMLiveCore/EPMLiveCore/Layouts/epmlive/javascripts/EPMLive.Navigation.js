@@ -1099,24 +1099,27 @@
                                     if (providerName !== 'Workspaces') {
                                         tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
                                     } else {
-                                        var workspaceTree = window.epmLiveNavigation.workspaceTree();
+                                        try {
+                                            var workspaceTree = window.epmLiveNavigation.workspaceTree();
 
-                                        workspaceTree.trackChanges();
+                                            workspaceTree.trackChanges();
 
-                                        var title = lnk['@Title'];
+                                            var title = lnk['@Title'];
 
-                                        if (workspacesTitleRegistered) {
-                                            tlNode.registerWorkspace(window.epmLiveNavigation.buildLink(lnk), workspaceTree);
-                                        } else {
-                                            tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
+                                            if (workspacesTitleRegistered) {
+                                                tlNode.registerWorkspace(window.epmLiveNavigation.buildLink(lnk), workspaceTree);
+                                            } else {
+                                                tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
 
-                                            if (title === 'All Workspaces') {
-                                                workspacesTitleRegistered = true;
-                                                $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#EPMNavWorkspacesTree');
+                                                if (title === 'All Workspaces') {
+                                                    workspacesTitleRegistered = true;
+                                                    $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#EPMNavWorkspacesTree');
+                                                }
                                             }
-                                        }
 
-                                        workspaceTree.commitChanges();
+                                            workspaceTree.commitChanges();
+                                        } catch(e) {
+                                        } 
                                     }
                                 }
                             }
@@ -1124,44 +1127,47 @@
 
                         if (providerName === 'Workspaces') {
                             window.epmLiveNavigation.resetWorkspaceTree = function () {
-                                var wsTree = window.epmLiveNavigation.workspaceTree();
+                                try {
+                                    var wsTree = window.epmLiveNavigation.workspaceTree();
 
-                                wsTree.trackChanges();
+                                    wsTree.trackChanges();
 
-                                var nodes = wsTree.get_allNodes();
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].set_expanded(false);
-                                }
+                                    var nodes = wsTree.get_allNodes();
+                                    for (var i = 0; i < nodes.length; i++) {
+                                        nodes[i].set_expanded(false);
+                                    }
 
-                                var expandNode = function (webId) {
-                                    var node = wsTree.findNodeByValue(webId);
+                                    var expandNode = function (webId) {
+                                        var node = wsTree.findNodeByValue(webId);
 
-                                    if (node && node != wsTree) {
-                                        var parent = node.get_parent();
+                                        if (node && node != wsTree) {
+                                            var parent = node.get_parent();
 
-                                        if (parent !== wsTree && !parent.get_expanded()) {
-                                            parent.set_expanded(true);
+                                            if (parent !== wsTree && !parent.get_expanded()) {
+                                                parent.set_expanded(true);
 
-                                            expandNode(parent.get_value());
+                                                expandNode(parent.get_value());
+                                            }
                                         }
+                                    };
+
+                                    var wId = window.epmLiveNavigation.currentWebId;
+
+                                    var cNode = wsTree.findNodeByValue(wId);
+
+                                    if (cNode) {
+                                        if (cNode.get_parent() !== wsTree) {
+                                            expandNode(wId);
+                                        } else {
+                                            cNode.set_expanded(true);
+                                        }
+
+                                        cNode.set_selected(true);
                                     }
-                                };
 
-                                var wId = window.epmLiveNavigation.currentWebId;
-
-                                var cNode = wsTree.findNodeByValue(wId);
-
-                                if (cNode) {
-                                    if (cNode.get_parent() !== wsTree) {
-                                        expandNode(wId);
-                                    } else {
-                                        cNode.set_expanded(true);
-                                    }
-
-                                    cNode.set_selected(true);
-                                }
-
-                                wsTree.commitChanges();
+                                    wsTree.commitChanges();
+                                } catch(ex) {
+                                } 
                             };
 
                             var wTree = window.epmLiveNavigation.workspaceTree();
