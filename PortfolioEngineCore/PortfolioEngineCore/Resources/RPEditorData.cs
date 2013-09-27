@@ -351,6 +351,7 @@ namespace PortfolioEngineCore
             CStruct xCalendar = xPlanData.GetSubStruct("Calendar");
             CStruct xPeriods = xCalendar.GetSubStruct("Periods");
 
+            DateTime dtNow = DateTime.Now;
             List<CStruct> listPeriods = xPeriods.GetList("Period");
             foreach (CStruct xPeriod in listPeriods)
             {
@@ -369,6 +370,11 @@ namespace PortfolioEngineCore
                 xC.CreateIntAttr("MinWidth", 45);
                 xC.CreateIntAttr("Width", 65);
                 xC.CreateStringAttr("Align", "Center");
+
+                DateTime dtStart = xPeriod.GetDateAttr("Start");
+                DateTime dtFinish = xPeriod.GetDateAttr("Finish");
+                if (dtStart <= dtNow && dtFinish >= dtNow)
+                    xC.CreateBooleanAttr("Current", true);
             }
 
             // ******************************************* DATA *****************************************

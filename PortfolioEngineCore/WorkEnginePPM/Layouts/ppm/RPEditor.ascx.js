@@ -669,6 +669,14 @@
                     this.ResourcesSelectMode = resourcesSelectMode;
                     this.resourcesTab.selectByValue("idResourcesTab_Select", this.ResourcesSelectMode);
                 }
+                if (view.Settings.UseCurrentPeriod != null) {
+                    var UseCurrentPeriod = parseInt(view.Settings.UseCurrentPeriod);
+                    if (UseCurrentPeriod == 1) {
+                        this.startPeriod = this.currentPeriod;
+                        var from = document.getElementById('idViewTab_FromPeriod');
+                        from.options.selectedIndex = 0;
+                    }
+                }
             }
 
             if (bRender)
@@ -1317,6 +1325,7 @@
                 this.ShowHidePeriods(grid);
                 this.ShowSelectedResourceGroup();
                 this.RefreshResourcePeriods();
+                this.viewTab.refreshSelect("idViewTab_FromPeriod");
                 window.setTimeout(thisID + ".HandleAction('OnStart')", 100);
                 window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(gridRPE.GetFirst(null, 0), "ItemName"); }, 10);
             }
@@ -2940,6 +2949,8 @@
                 case "ViewTab_ToPeriod_Changed":
                     var from = document.getElementById('idViewTab_FromPeriod');
                     var sp = parseInt(from.options[from.selectedIndex].value);
+                    if (sp == 0 && this.currentPeriod != null)
+                        sp = this.currentPeriod;
                     var to = document.getElementById('idViewTab_ToPeriod');
                     var fp = parseInt(to.options[to.selectedIndex].value);
 
@@ -3724,6 +3735,9 @@
         sb.append(" displayMode='" + this.displayMode.toString() + "'");
         sb.append(" ResourceDisplayMode='" + this.ResourceDisplayMode + "'");
         sb.append(" ResourcesSelectMode='" + this.ResourcesSelectMode.toString() + "'");
+        var from = document.getElementById('idViewTab_FromPeriod');
+        if (from.options.selectedIndex == 0)
+            sb.append(" UseCurrentPeriod='1'");
         sb.append(" >");
         sb.append("</Settings>");
         return sb.toString();
@@ -4149,33 +4163,34 @@
         var from = document.getElementById('idViewTab_FromPeriod');
         from.options.length = 0;
         from.options.selectedIndex = -1;
+        from.options[from.options.length] = new Option("Current", 0);
         var to = document.getElementById('idViewTab_ToPeriod');
         to.options.length = 0;
         to.options.selectedIndex = -1;
-        var n = 0;
         for (var c = 0; c < grid.ColNames[2].length; c++) {
             var col = grid.ColNames[2][c];
             var sType = col.substring(0, 1);
             if (sType == "Q") {
                 var sPeriod = grid.GetCaption(col);
                 var periodid = parseInt(col.substring(1));
-                from.options[n] = new Option(sPeriod, periodid);
+                if (grid.GetAttribute(null, col, "Current") == true)
+                    this.currentPeriod = periodid;
+                from.options[from.options.length] = new Option(sPeriod, periodid);
                 if (this.startPeriod == null) {
                     this.startPeriod = periodid;
-                    from.options.selectedIndex = n;
+                    from.options.selectedIndex = from.options.length - 1;
                 }
                 else if (periodid == this.startPeriod)
-                    from.options.selectedIndex = n;
+                    from.options.selectedIndex = from.options.length - 1;
 
-                to.options[n] = new Option(sPeriod, periodid);
+                to.options[to.options.length] = new Option(sPeriod, periodid);
                 if (this.finishPeriod == null && c == grid.ColNames[2].length - 1) {
                     this.finishPeriod = periodid;
-                    to.options.selectedIndex = n;
+                    to.options.selectedIndex = to.options.length - 1;
                 }
                 else if (periodid == this.finishPeriod)
-                    to.options.selectedIndex = n;
+                    to.options.selectedIndex = to.options.length - 1;
             }
-            n++;
         }
         if (from.options.selectedIndex == -1) from.options.selectedIndex = 0;
         if (to.options.selectedIndex == -1) to.options.selectedIndex = to.options.length - 1;
@@ -5338,6 +5353,7 @@
         this.wins.setSkin("dhx_web");
         this.startPeriod = null;
         this.finishPeriod = null;
+        this.currentPeriod = null;
         this.projectuids = "";
         this.showHeatmap = false;
         this.savingPlan = false;
