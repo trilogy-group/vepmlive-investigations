@@ -4,8 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel.Channels;
-using System.Threading.Tasks;
-using EPMLiveIntegration;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxProjectService;
 
@@ -22,7 +20,8 @@ namespace UplandIntegrations.Tenrox.Managers
         #region Constructors (1) 
 
         public ProjectManager(Binding binding, string endpointAddress, TenroxAuthService.UserToken token)
-            : base(binding, endpointAddress, "projects.svc", token, typeof (Project), typeof (UserToken))
+            : base(binding, endpointAddress, "projects.svc", token,
+                typeof (Project), typeof (UserToken), typeof (ProjectsClient))
         {
             MappingDict = new Dictionary<string, string>
             {
@@ -36,89 +35,15 @@ namespace UplandIntegrations.Tenrox.Managers
 
         #endregion Constructors 
 
-        #region Methods (3) 
+        #region Methods (1) 
 
-        // Public Methods (2) 
+        // Protected Methods (1) 
 
-        public override IEnumerable<TenroxObject> GetItems(int[] itemIds)
+        protected override void BuildObjects(DataTable items, object client, List<string> columns,
+            List<object> newObjects, List<object> existingObjects)
         {
-            var tasks = new List<Task<TenroxObject>>();
+            var projectsClient = (ProjectsClient) client;
 
-            using (var projectsClient = new ProjectsClient(Binding, EndpointAddress))
-            {
-                tasks.AddRange(itemIds.Select(id => Task<TenroxObject>.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        return new TenroxObject(id, projectsClient.QueryByUniqueId(_token, id));
-                    }
-                    catch (Exception exception)
-                    {
-                        return new TenroxObject(id, exception);
-                    }
-                })));
-
-                foreach (var task in tasks)
-                {
-                    yield return task.Result;
-                }
-            }
-        }
-
-        public override IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, Guid integrationId)
-        {
-            using (var projectsClient = new ProjectsClient(Binding, EndpointAddress))
-            {
-                List<string> columns = (from DataColumn column in items.Columns select column.ColumnName).ToList();
-
-                var newProjects = new List<Project>();
-                var existingProjects = new List<Project>();
-
-                BuildProjects(items, projectsClient, columns, existingProjects, newProjects);
-
-                var tasks = new List<Task<TenroxUpsertResult>>();
-
-                tasks.AddRange(newProjects.Select(proj => Task<TenroxUpsertResult>.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        Project p = projectsClient.Save(_token, proj);
-                        UpdateBinding(p.UniqueId, 2, integrationId);
-
-                        return new TenroxUpsertResult(p.UniqueId, TransactionType.INSERT);
-                    }
-                    catch (Exception exception)
-                    {
-                        return new TenroxUpsertResult(proj.UniqueId, TransactionType.INSERT, exception.Message);
-                    }
-                })));
-
-                tasks.AddRange(existingProjects.Select(proj => Task<TenroxUpsertResult>.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        Project p = projectsClient.Save(_token, proj);
-                        return new TenroxUpsertResult(p.UniqueId, TransactionType.UPDATE);
-                    }
-                    catch (Exception exception)
-                    {
-                        return new TenroxUpsertResult(proj.UniqueId, TransactionType.UPDATE, exception.Message);
-                    }
-                })));
-
-                foreach (var task in tasks)
-                {
-                    yield return task.Result;
-                }
-            }
-        }
-
-        // Private Methods (1) 
-
-        private void BuildProjects(DataTable items, ProjectsClient projectsClient, List<string> columns,
-            List<Project> existingProjects,
-            List<Project> newProjects)
-        {
             foreach (DataRow row in items.Rows)
             {
                 Project project = null;
@@ -177,11 +102,11 @@ namespace UplandIntegrations.Tenrox.Managers
 
                 if (project.UniqueId > 0)
                 {
-                    existingProjects.Add(project);
+                    existingObjects.Add(project);
                 }
                 else
                 {
-                    newProjects.Add(project);
+                    newObjects.Add(project);
                 }
             }
         }
