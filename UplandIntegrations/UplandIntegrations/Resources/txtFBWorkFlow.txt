@@ -69,6 +69,12 @@
 			$.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
 				$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''").replace(/http:\/\//g, 'https://').replace(/:80/g, ''));
 
+				var cssURL = WebAPIUrl + 'visualworkflow/css?' + Param;
+                    if (!$("link[href='" + cssURL + "']").length) {
+                        $("head").append('<link rel="stylesheet" type="text/css" href="' + cssURL + '" />');
+                    }
+
+
 				$.get(WebAPIUrl + "files/" + fileId + "/documents?" + Param, function (docs) {
 								var p = eval(docs);
 								if(p.length > 0)

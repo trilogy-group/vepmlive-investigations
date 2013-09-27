@@ -385,17 +385,17 @@ namespace UplandIntegrations.FileBound
             {
                 try
                 {
-                    for (int i = 0; i < c.Length; i++)
+                    IntegrationAPI.Integration integ = new IntegrationAPI.Integration();
+                    integ.Url = _webprops.IntegrationAPIUrl;
+                    string ret = integ.PostItemSimple(_webprops.Properties["RelatedAssign"].ToString(), docId);
+                    if (ret.ToLower() != "<success/>")
                     {
-                        if (c[0].userId.ToString() != "0")
-                        {
-                            IntegrationAPI.Integration integ = new IntegrationAPI.Integration();
-                            integ.Url = _webprops.IntegrationAPIUrl;
-                            integ.PostItemSimple(_webprops.Properties["RelatedAssign"].ToString(), docId);
-                        }
+                        _log.LogMessage("Error Posting Assignment: " + ret, IntegrationLogType.Warning);
                     }
                 }
-                catch { }
+                catch(Exception ex) {
+                    _log.LogMessage("Exception Posting Assignment: " + ex.Message, IntegrationLogType.Warning);
+                }
             }
         }
 
