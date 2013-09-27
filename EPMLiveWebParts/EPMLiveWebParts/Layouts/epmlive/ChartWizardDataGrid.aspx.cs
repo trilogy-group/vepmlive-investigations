@@ -41,6 +41,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         protected override void OnPreRender(EventArgs e)
         {
+            base.OnPreRender(e);
             RegisterScripts();
         }
 
@@ -53,7 +54,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {
+        {   
             WebUrl = SPContext.Current.Web.Url;
         }
 
