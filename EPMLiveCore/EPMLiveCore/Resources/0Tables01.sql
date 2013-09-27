@@ -628,6 +628,33 @@ begin
 
 end
 
+-------------------------INT_PROPS-----------------------
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'INT_CHECK')
+	begin
+		
+		print 'Creating Table INT_CHECK'
+
+		CREATE TABLE [dbo].[INT_CHECK](
+			[INT_ITEM_CHECK] [uniqueidentifier] NULL DEFAULT (newid()),
+			[INT_LIST_ID] [uniqueidentifier] NULL,
+			[ITEM_ID] [int] NULL,
+			[CHECKBIT] [bit] NULL,
+			[CHECKTIME] [datetime] NULL
+		) ON [PRIMARY]
+
+
+end
+else
+begin
+
+	print 'Updating Table INT_CHECK'
+
+
+end
+
+
+
+
 
 -------------------------PLANNERLINK-----------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'PLANNERLINK')

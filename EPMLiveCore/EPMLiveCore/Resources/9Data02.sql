@@ -214,12 +214,9 @@ else
 begin
     UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.CreateWorkspaceJob', [Title]='Create Workspace', Priority=9 where jobtype_id=100
 end
-
-
-
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc499')
 begin
-    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc499','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.SQL','SQL','This provides access to data located in Microsoft SQL Server','sql.png','<Properties>
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc499','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.SQL','SQL','This provides access to data located in Microsoft SQL Server','sql.png','<Properties>
 	<Connection>
 		<Input Type="Text" Property="Server" Title="Server Name">Enter the full name of the sql server</Input>
 		<Input Type="Text" Property="Database" Title="Database Name"/>
@@ -229,7 +226,7 @@ begin
 		<Input Type="Text" Property="Where" Title="Enter Where Clause"/>
 		<Input Type="Select" Property="UserMapType" Title="Select User Mapping Type"/>
 	</General>
-</Properties>','False')
+</Properties>','False','7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
 end
 else
 begin
@@ -243,27 +240,27 @@ begin
 		<Input Type="Text" Property="Where" Title="Enter Where Clause"/>
 		<Input Type="Select" Property="UserMapType" Title="Select User Mapping Type"/>
 	</General>
-</Properties>',AvailableOnline='False' where module_id='a0950b9b-3525-40b8-a456-6403156dc499'
+</Properties>', AvailableOnline='False',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='a0950b9b-3525-40b8-a456-6403156dc499'
 end
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc49a')
 begin
-    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49a','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Integrations.Salesforce.Integrator','SalesForce','This connector allows data synchronization to and from salesforce','salesforce.png','<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</Input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>','True')
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49a','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Integrations.Salesforce.Integrator','SalesForce','This connector allows data synchronization to and from salesforce','salesforce.png','<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</Input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>','True','7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
 end
 else
 begin
-    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Integrations.Salesforce.Integrator', [Title]='SalesForce', Description='This connector allows data synchronization to and from salesforce', Icon='salesforce.png', CustomProps='<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</Input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>',AvailableOnline='True' where module_id='a0950b9b-3525-40b8-a456-6403156dc49a'
+    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Integrations.Salesforce.Integrator', [Title]='SalesForce', Description='This connector allows data synchronization to and from salesforce', Icon='salesforce.png', CustomProps='<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</Input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>', AvailableOnline='True',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='a0950b9b-3525-40b8-a456-6403156dc49a'
 end
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc49b')
 begin
-    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49b','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Integrations.Office365.Integrator','Office 365','This provides access to list data located on an Office 365 SharePoint site.','office365.png','<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="Office 365 Site URL">Your Office 365 Site URL. For example, https://company.sharepoint.com/sites/it</Input><Input Type="Text" Property="Username" Title="Username">Your Office 365 username. For example, user@company.onmicrosoft.com</Input><Input Type="Password" Property="Password" Title="Password"/></Connection><General><Input Type="Select" Property="List" Title="Select a list to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>','True')
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49b','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Integrations.Office365.Integrator','Office 365','This provides access to list data located on an Office 365 SharePoint site.','office365.png','<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="Office 365 Site URL">Your Office 365 Site URL. For example, https://company.sharepoint.com/sites/it</Input><Input Type="Text" Property="Username" Title="Username">Your Office 365 username. For example, user@company.onmicrosoft.com</Input><Input Type="Password" Property="Password" Title="Password"/></Connection><General><Input Type="Select" Property="List" Title="Select a list to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>','True','7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
 end
 else
 begin
-    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Integrations.Office365.Integrator', [Title]='Office 365', Description='This provides access to list data located on an Office 365 SharePoint site.', Icon='office365.png', CustomProps='<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="Office 365 Site URL">Your Office 365 Site URL. For example, https://company.sharepoint.com/sites/it</Input><Input Type="Text" Property="Username" Title="Username">Your Office 365 username. For example, user@company.onmicrosoft.com</Input><Input Type="Password" Property="Password" Title="Password"/></Connection><General><Input Type="Select" Property="List" Title="Select a list to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>',AvailableOnline='True' where module_id='a0950b9b-3525-40b8-a456-6403156dc49b'
+    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Integrations.Office365.Integrator', [Title]='Office 365', Description='This provides access to list data located on an Office 365 SharePoint site.', Icon='office365.png', CustomProps='<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="Office 365 Site URL">Your Office 365 Site URL. For example, https://company.sharepoint.com/sites/it</Input><Input Type="Text" Property="Username" Title="Username">Your Office 365 username. For example, user@company.onmicrosoft.com</Input><Input Type="Password" Property="Password" Title="Password"/></Connection><General><Input Type="Select" Property="List" Title="Select a list to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>', AvailableOnline='True',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='a0950b9b-3525-40b8-a456-6403156dc49b'
 end
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc49c')
 begin
-    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49c','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.Generic','Generic','This integration provides a web service that can be called from any 3rd party application','','<Properties>
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49c','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.Generic','Generic SOAP','This integration provides a web service that can be called from any 3rd party application using SOAP web services','','<Properties>
 	<Connection>
 		<Input Type="Text" Property="Name" Title="Integration Name">Enter the name of the 3rd party application. This can be anything and does not affect the integration.</Input>
 		<Input Type="Text" Property="WSDL" Title="Web Service URL">Enter the URL for your outgoing webservice</Input>
@@ -276,11 +273,11 @@ begin
 		<Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/>
 		<Input Type="Checkbox" Property="LogInfo" Title="Log informational messages."> This can be used to troubleshoot issues.</Input>
 	</General>
-</Properties>','True')
+</Properties>','True','960be444-30f5-4a97-8721-5a210b286dad')
 end
 else
 begin
-    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.API.Integration.Generic', [Title]='Generic', Description='This integration provides a web service that can be called from any 3rd party application', Icon='', CustomProps='<Properties>
+    UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.API.Integration.Generic', [Title]='Generic SOAP', Description='This integration provides a web service that can be called from any 3rd party application using SOAP web services', Icon='', CustomProps='<Properties>
 	<Connection>
 		<Input Type="Text" Property="Name" Title="Integration Name">Enter the name of the 3rd party application. This can be anything and does not affect the integration.</Input>
 		<Input Type="Text" Property="WSDL" Title="Web Service URL">Enter the URL for your outgoing webservice</Input>
@@ -293,5 +290,53 @@ begin
 		<Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/>
 		<Input Type="Checkbox" Property="LogInfo" Title="Log informational messages."> This can be used to troubleshoot issues.</Input>
 	</General>
-</Properties>',AvailableOnline='True' where module_id='a0950b9b-3525-40b8-a456-6403156dc49c'
+</Properties>', AvailableOnline='True',INT_CAT_ID='960be444-30f5-4a97-8721-5a210b286dad' where MODULE_ID='a0950b9b-3525-40b8-a456-6403156dc49c'
+end
+if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-7403156dc490')
+begin
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-7403156dc490','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.FileBound.Integrator','FileBound','','fb.png','<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="FileBound Site URL" /><Input Type="Text" Property="APIUrl" Title="FileBound API URL" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Folder" Title="Select a folder" /><Input Type="Select" Property="DataType" Title="Select data type" /><Input Type="Password" Property="RelatedAssign" Title="Assignment Integration Key" >When selecting the Item data type, enter the integration key here for the associated assignments list integration.</Input><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>','True','599c89b2-6330-4e54-aea5-00185f20cce0')
+end
+else
+begin
+    UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.FileBound.Integrator', [Title]='FileBound', Description='', Icon='fb.png', CustomProps='<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="FileBound Site URL" /><Input Type="Text" Property="APIUrl" Title="FileBound API URL" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Folder" Title="Select a folder" /><Input Type="Select" Property="DataType" Title="Select data type" /><Input Type="Password" Property="RelatedAssign" Title="Assignment Integration Key" >When selecting the Item data type, enter the integration key here for the associated assignments list integration.</Input><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>', AvailableOnline='True',INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0' where MODULE_ID='a0950b9b-3525-40b8-a456-7403156dc490'
+end
+if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-7403156dc491')
+begin
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-7403156dc491','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.PS.Integrator','PowerSteering','','ps.png','<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="FileBound Site URL" /><Input Type="Text" Property="APIUrl" Title="FileBound API URL" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Folder" Title="Select a folder" /><Input Type="Select" Property="DataType" Title="Select data type" /><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>','True','599c89b2-6330-4e54-aea5-00185f20cce0')
+end
+else
+begin
+    UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.PS.Integrator', [Title]='PowerSteering', Description='', Icon='ps.png', CustomProps='<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="FileBound Site URL" /><Input Type="Text" Property="APIUrl" Title="FileBound API URL" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Folder" Title="Select a folder" /><Input Type="Select" Property="DataType" Title="Select data type" /><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>', AvailableOnline='True',INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0' where MODULE_ID='a0950b9b-3525-40b8-a456-7403156dc491'
+end
+if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-7403156dc492')
+begin
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-7403156dc492','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.Tenrox.Integrator','Tenrox','','tenrox.png','<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="FileBound Site URL" /><Input Type="Text" Property="APIUrl" Title="FileBound API URL" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Folder" Title="Select a folder" /><Input Type="Select" Property="DataType" Title="Select data type" /><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>','True','599c89b2-6330-4e54-aea5-00185f20cce0')
+end
+else
+begin
+    UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.Tenrox.Integrator', [Title]='Tenrox', Description='', Icon='tenrox.png', CustomProps='<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="FileBound Site URL" /><Input Type="Text" Property="APIUrl" Title="FileBound API URL" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Folder" Title="Select a folder" /><Input Type="Select" Property="DataType" Title="Select data type" /><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>', AvailableOnline='True',INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0' where MODULE_ID='a0950b9b-3525-40b8-a456-7403156dc492'
+end
+if not exists (select INT_CAT_ID from INT_CATEGORY where INT_CAT_ID = '599c89b2-6330-4e54-aea5-00185f20cce0')
+begin
+    INSERT INTO INT_CATEGORY (INT_CAT_ID,CATEGORY,ICON,ORDERBY) VALUES ('599c89b2-6330-4e54-aea5-00185f20cce0','Upland','upland.png','1')
+end
+else
+begin
+    UPDATE INT_CATEGORY SET CATEGORY='Upland', ICON='upland.png', ORDERBY='1' where INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0'
+end
+if not exists (select INT_CAT_ID from INT_CATEGORY where INT_CAT_ID = '7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
+begin
+    INSERT INTO INT_CATEGORY (INT_CAT_ID,CATEGORY,ICON,ORDERBY) VALUES ('7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60','3rd Party','','2')
+end
+else
+begin
+    UPDATE INT_CATEGORY SET CATEGORY='3rd Party', ICON='', ORDERBY='2' where INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60'
+end
+if not exists (select INT_CAT_ID from INT_CATEGORY where INT_CAT_ID = '960be444-30f5-4a97-8721-5a210b286dad')
+begin
+    INSERT INTO INT_CATEGORY (INT_CAT_ID,CATEGORY,ICON,ORDERBY) VALUES ('960be444-30f5-4a97-8721-5a210b286dad','Generic','','3')
+end
+else
+begin
+    UPDATE INT_CATEGORY SET CATEGORY='Generic', ICON='', ORDERBY='3' where INT_CAT_ID='960be444-30f5-4a97-8721-5a210b286dad'
 end
