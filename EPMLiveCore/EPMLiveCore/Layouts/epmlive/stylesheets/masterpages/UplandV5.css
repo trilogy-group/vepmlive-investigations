@@ -183,24 +183,39 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     background-color: #FFF !important;
 }
 
+
+/* modification to 2013 toolbar styles */
 #fA0Main {
     position: relative;
     top: -3px;
 }
 
-.ms-menubuttonactivehover, .ms-menuactivehover {
-    border: 1px solid #ffffff;
-    color: #299EF2 !important;
+ #fA0Main {
+    top: -2px\9;
 }
 
-.ms-buttonactivehover, .ms-activehover {
-    border: 1px solid #ffffff;
-    color: #299EF2 !important;
-}
+@media screen and (min-width:0\0) {  
+ #fA0Main {
+    top: -2px;
+}   
+}  
 
+.ms-menubuttonactivehover, .ms-menuactivehover
+{
+border:1px solid #ffffff;
+color:#299EF2 !important;
+
+}
+.ms-buttonactivehover, .ms-activehover
+{
+border:1px solid #ffffff;
+color:#299EF2 !important;
+}
 .ms-splitbuttonhover {
-    background-color: #ffffff;
+background-color:#ffffff;
 }
+
+/* end modification to 2013 toolbar styles */
 
 /*
  * Toastr
