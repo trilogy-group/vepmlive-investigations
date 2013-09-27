@@ -2,11 +2,11 @@
 
 namespace UplandIntegrations.Tenrox.Infrastructure
 {
-    internal class TenroxUpsertResult
+    internal class TenroxTransactionResult
     {
         #region Constructors (1) 
 
-        public TenroxUpsertResult(int id, TransactionType transactionType, string error = null)
+        public TenroxTransactionResult(int id, TransactionType transactionType, string error = null)
         {
             Error = error;
             TransactionType = transactionType;

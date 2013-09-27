@@ -41,9 +41,14 @@ namespace UplandIntegrations.Tenrox.Services
 
         #endregion Constructors 
 
-        #region Methods (6) 
+        #region Methods (7) 
 
-        // Public Methods (3) 
+        // Public Methods (4) 
+
+        public IEnumerable<TenroxTransactionResult> DeleteItems(string objectName, int[] itemIds, Guid integrationId)
+        {
+            return GetManager(objectName).DeleteItems(itemIds, integrationId);
+        }
 
         public List<ColumnProperty> GetObjectFields(string objectName)
         {
@@ -89,7 +94,7 @@ namespace UplandIntegrations.Tenrox.Services
             }
         }
 
-        public IEnumerable<TenroxUpsertResult> UpsertItems(string objectName, DataTable items, Guid integrationId)
+        public IEnumerable<TenroxTransactionResult> UpsertItems(string objectName, DataTable items, Guid integrationId)
         {
             return GetManager(objectName).UpsertItems(items, integrationId);
         }

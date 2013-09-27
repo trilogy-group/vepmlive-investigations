@@ -18,9 +18,197 @@ namespace UplandIntegrations.Tenrox
 
         #endregion Fields 
 
-        #region Methods (3) 
+        #region Methods (17) 
 
-        // Private Methods (3) 
+        // Public Methods (13) 
+
+        public TransactionTable DeleteItems(WebProperties webProps, DataTable items, IntegrationLog log)
+        {
+            var transactionTable = new TransactionTable();
+
+            try
+            {
+                TenroxService txService = GetTenroxService(webProps);
+
+                List<string> ids;
+                Dictionary<string, string> idMap = BuildIdMap(items, out ids);
+
+                var itemIds = new List<int>();
+                foreach (string id in ids)
+                {
+                    try
+                    {
+                        itemIds.Add(int.Parse(id));
+                    }
+                    catch { }
+                }
+
+                IEnumerable<TenroxTransactionResult> results = txService.DeleteItems((string) webProps.Properties["Object"],
+                    itemIds.ToArray(), webProps.IntegrationId);
+
+                ProcessResults(items, log, results, idMap, transactionTable);
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message, IntegrationLogType.Error);
+            }
+
+            return transactionTable;
+        }
+
+        public List<ColumnProperty> GetColumns(WebProperties webProps, IntegrationLog log, string listName)
+        {
+            try
+            {
+                string objectName = null;
+
+                try
+                {
+                    objectName = webProps.Properties["Object"] as string;
+                }
+                catch { }
+
+                if (string.IsNullOrEmpty(objectName)) throw new Exception("Please provide an object.");
+
+                return GetTenroxService(webProps).GetObjectFields(objectName);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, IntegrationLogType.Error);
+            }
+
+            return null;
+        }
+
+        public Dictionary<string, string> GetDropDownValues(WebProperties webProps, IntegrationLog log, string property,
+            string parentpropertyValue)
+        {
+            try
+            {
+                if (property.Equals("Object"))
+                {
+                    return new Dictionary<string, string>
+                    {
+                        {"Client", "Client"},
+                        {"Project", "Project"},
+                        {"Task", "Task"}
+                    };
+                }
+
+                if (property.Equals("UserMapType"))
+                {
+                    return new Dictionary<string, string> {{"Email", "Email"}};
+                }
+
+                throw new Exception("Invalid property.");
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, IntegrationLogType.Error);
+            }
+
+            return null;
+        }
+
+        public DataTable GetItem(WebProperties webProps, IntegrationLog log, string itemId, DataTable items)
+        {
+            try
+            {
+                TenroxService txService = GetTenroxService(webProps);
+                txService.GetObjectItemsById((string) webProps.Properties["Object"], itemId, items);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, e.Message.StartsWith("No records found")
+                    ? IntegrationLogType.Warning
+                    : IntegrationLogType.Error);
+            }
+
+            return items;
+        }
+
+        public bool InstallIntegration(WebProperties webProps, IntegrationLog log, out string message,
+            string integrationKey,
+            string apiUrl)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynchDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RemoveIntegration(WebProperties webProps, IntegrationLog log, out string message,
+            string integrationKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TestConnection(WebProperties webProps, IntegrationLog log, out string message)
+        {
+            message = null;
+
+            try
+            {
+                GetTenroxService(webProps);
+            }
+            catch (Exception e)
+            {
+                message = e.Message;
+                log.LogMessage(message, IntegrationLogType.Error);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public TransactionTable UpdateItems(WebProperties webProps, DataTable items, IntegrationLog log)
+        {
+            var transactionTable = new TransactionTable();
+
+            try
+            {
+                TenroxService txService = GetTenroxService(webProps);
+
+                List<string> ids;
+                Dictionary<string, string> idMap = BuildIdMap(items, out ids);
+
+                IEnumerable<TenroxTransactionResult> results = txService.UpsertItems((string) webProps.Properties["Object"],
+                    items, webProps.IntegrationId);
+
+                ProcessResults(items, log, results, idMap, transactionTable);
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message, IntegrationLogType.Error);
+            }
+
+            return transactionTable;
+        }
+
+        public string GetControlCode(WebProperties webProps, IntegrationLog log, string itemId, string control)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<string> GetLocalControls(WebProperties webProps, IntegrationLog log)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<IntegrationControl> GetRemoteControls(WebProperties webProps, IntegrationLog log)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetURL(WebProperties webProps, IntegrationLog log, string control, string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        // Private Methods (4) 
 
         private static Dictionary<string, string> BuildIdMap(DataTable items, out List<string> ids)
         {
@@ -105,200 +293,41 @@ namespace UplandIntegrations.Tenrox
             return new TenroxService(orgUrl, orgName, username, password);
         }
 
-        #endregion Methods 
-
-        #region Implementation of IIntegrator
-
-        public TransactionTable UpdateItems(WebProperties webProps, DataTable items, IntegrationLog log)
+        private static void ProcessResults(DataTable items, IntegrationLog log, IEnumerable<TenroxTransactionResult> results,
+            Dictionary<string, string> idMap,
+            TransactionTable transactionTable)
         {
-            var transactionTable = new TransactionTable();
+            int index = 0;
 
-            try
+            foreach (TenroxTransactionResult result in results)
             {
-                TenroxService txService = GetTenroxService(webProps);
-
-                List<string> ids;
-                Dictionary<string, string> idMap = BuildIdMap(items, out ids);
-
-                int index = 0;
-
-                IEnumerable<TenroxUpsertResult> results = txService.UpsertItems((string) webProps.Properties["Object"],
-                    items, webProps.IntegrationId);
-
-                foreach (TenroxUpsertResult result in results)
-                {
-                    string txId = result.Id.ToString(CultureInfo.InvariantCulture);
-                    string spId;
-
-                    try
-                    {
-                        spId = idMap[txId];
-                    }
-                    catch
-                    {
-                        spId = items.Rows[index]["SPID"].ToString();
-                    }
-
-                    if (result.Success)
-                    {
-                        transactionTable.AddRow(spId, txId, result.TransactionType);
-                    }
-                    else
-                    {
-                        transactionTable.AddRow(spId, txId, TransactionType.FAILED);
-                        log.LogMessage(string.Format(UPSERT_ERROR_MESSAGE, txId, spId, result.Error),
-                            IntegrationLogType.Warning);
-                    }
-
-                    index++;
-                }
-            }
-            catch (Exception exception)
-            {
-                log.LogMessage(exception.Message, IntegrationLogType.Error);
-            }
-
-            return transactionTable;
-        }
-
-        public TransactionTable DeleteItems(WebProperties webProps, DataTable items, IntegrationLog log)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<ColumnProperty> GetColumns(WebProperties webProps, IntegrationLog log, string listName)
-        {
-            try
-            {
-                string objectName = null;
+                string txId = result.Id.ToString(CultureInfo.InvariantCulture);
+                string spId;
 
                 try
                 {
-                    objectName = webProps.Properties["Object"] as string;
+                    spId = idMap[txId];
                 }
-                catch { }
-
-                if (string.IsNullOrEmpty(objectName)) throw new Exception("Please provide an object.");
-
-                return GetTenroxService(webProps).GetObjectFields(objectName);
-            }
-            catch (Exception e)
-            {
-                log.LogMessage(e.Message, IntegrationLogType.Error);
-            }
-
-            return null;
-        }
-
-        public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynchDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetItem(WebProperties webProps, IntegrationLog log, string itemId, DataTable items)
-        {
-            try
-            {
-                TenroxService txService = GetTenroxService(webProps);
-                txService.GetObjectItemsById((string) webProps.Properties["Object"], itemId, items);
-            }
-            catch (Exception e)
-            {
-                log.LogMessage(e.Message, e.Message.StartsWith("No records found")
-                    ? IntegrationLogType.Warning
-                    : IntegrationLogType.Error);
-            }
-
-            return items;
-        }
-
-        public Dictionary<string, string> GetDropDownValues(WebProperties webProps, IntegrationLog log, string property,
-            string parentpropertyValue)
-        {
-            try
-            {
-                if (property.Equals("Object"))
+                catch
                 {
-                    return new Dictionary<string, string>
-                    {
-                        {"Client", "Client"},
-                        {"Project", "Project"},
-                        {"Task", "Task"}
-                    };
+                    spId = items.Rows[index]["SPID"].ToString();
                 }
 
-                if (property.Equals("UserMapType"))
+                if (result.Success)
                 {
-                    return new Dictionary<string, string> {{"Email", "Email"}};
+                    transactionTable.AddRow(spId, txId, result.TransactionType);
+                }
+                else
+                {
+                    transactionTable.AddRow(spId, txId, TransactionType.FAILED);
+                    log.LogMessage(string.Format(UPSERT_ERROR_MESSAGE, txId, spId, result.Error),
+                        IntegrationLogType.Warning);
                 }
 
-                throw new Exception("Invalid property.");
+                index++;
             }
-            catch (Exception e)
-            {
-                log.LogMessage(e.Message, IntegrationLogType.Error);
-            }
-
-            return null;
         }
 
-        public bool TestConnection(WebProperties webProps, IntegrationLog log, out string message)
-        {
-            message = null;
-
-            try
-            {
-                GetTenroxService(webProps);
-            }
-            catch (Exception e)
-            {
-                message = e.Message;
-                log.LogMessage(message, IntegrationLogType.Error);
-
-                return false;
-            }
-
-            return true;
-        }
-
-
-        public bool InstallIntegration(WebProperties webProps, IntegrationLog log, out string message,
-            string integrationKey,
-            string apiUrl)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool RemoveIntegration(WebProperties webProps, IntegrationLog log, out string message,
-            string integrationKey)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region Implementation of IIntegratorControls
-
-        public List<string> GetLocalControls(WebProperties webProps, IntegrationLog log)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<IntegrationControl> GetRemoteControls(WebProperties webProps, IntegrationLog log)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetURL(WebProperties webProps, IntegrationLog log, string control, string url)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetControlCode(WebProperties webProps, IntegrationLog log, string itemId, string control)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        #endregion Methods 
     }
 }

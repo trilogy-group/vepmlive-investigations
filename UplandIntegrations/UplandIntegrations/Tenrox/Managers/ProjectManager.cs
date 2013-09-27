@@ -31,6 +31,8 @@ namespace UplandIntegrations.Tenrox.Managers
                 {"ClientId", "Account"}
             };
 
+            ObjectId = 2;
+
             _token = (UserToken) Token;
         }
 

@@ -9,13 +9,13 @@ namespace UplandIntegrations.Tenrox.Infrastructure
     {
         #region Operations (4) 
 
+        IEnumerable<TenroxTransactionResult> DeleteItems(int[] itemIds, Guid integrationId);
+
         List<ColumnProperty> GetColumns();
 
         IEnumerable<TenroxObject> GetItems(int[] itemIds);
 
-        void UpdateBinding(int itemId, int objectType, Guid integrationId);
-
-        IEnumerable<TenroxUpsertResult> UpsertItems(DataTable items, Guid integrationId);
+        IEnumerable<TenroxTransactionResult> UpsertItems(DataTable items, Guid integrationId);
 
         #endregion Operations 
     }
