@@ -315,7 +315,7 @@ namespace WorkEnginePPM
             //xCfg.CreateIntAttr("CaseSensitiveId", 0);
             xCfg.CreateIntAttr("SelectingCells", 1);
             xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "RPEditor");
+            xCfg.CreateStringAttr("CSS", "TGrid");
             xCfg.CreateIntAttr("Sorting", 0);
             xCfg.CreateIntAttr("FastColumns", 1);
             xCfg.CreateBooleanAttr("NoTreeLines", true);

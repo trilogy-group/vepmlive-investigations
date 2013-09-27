@@ -398,7 +398,7 @@ var LookupDlg_event = function (event) {
                                 return false;
                         }
                         if (action == "btnAdd") {
-                            sRowId = json.reply.Lookup.VIEW_UID;
+                            sRowId = json.reply.Lookup.LOOKUP_UID;
                             dgrid1.addRow(sRowId);
                         }
                         dgrid1.SetCellValue(sRowId, "LOOKUP_UID", json.reply.Lookup.LOOKUP_UID);

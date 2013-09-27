@@ -102,8 +102,8 @@ html, body {
 					</select>
                 </td>
                 <td>
-                    <input type="button" value=" &gt; " onclick="javascript:CostviewDlg_event('include');" /><br /><br />
-                    <input type="button" value=" &lt; " onclick="javascript:CostviewDlg_event('exclude');"/>
+                    <input type="button" class="epmliveSmallButton" value="&gt; " onclick="javascript:CostviewDlg_event('include');" /><br /><br />
+                    <input type="button" class="epmliveSmallButton" value="&lt; " onclick="javascript:CostviewDlg_event('exclude');"/>
                 </td>
                 <td class="descriptioncell">
                     Selected Cost Types:<br />
@@ -111,8 +111,8 @@ html, body {
 					</select>
                 </td>
                 <td>
-                    <input type="button" value="up" onclick="javascript:CostviewDlg_event('moveup');" /><br /><br />
-                    <input type="button" value="dn" onclick="javascript:CostviewDlg_event('movedown');"/>
+                    <input type="button" class="epmliveSmallButton" value="up" onclick="javascript:CostviewDlg_event('moveup');" /><br /><br />
+                    <input type="button" class="epmliveSmallButton" value="dn" onclick="javascript:CostviewDlg_event('movedown');"/>
                 </td>
             </tr>
         </table>
