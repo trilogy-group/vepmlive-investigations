@@ -109,7 +109,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     ? "ID"
                     : Regex.Replace(field, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ")
                 let displayName = dn.EndsWith(" Id") ? dn.Replace(" Id", string.Empty) : dn
-                let valid = !_objectFields.ContainsKey(field + "Id")
+                let valid = !_objectFields.ContainsKey(field + "Id") && !field.Equals("Id") && !field.Equals("UniqueId")
                 where valid
                 select new ColumnProperty
                 {

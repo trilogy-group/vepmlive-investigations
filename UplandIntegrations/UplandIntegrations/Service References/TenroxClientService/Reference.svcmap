@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="945d85c3-d78f-4cc4-aca7-5e797105d8a6" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?wsdl" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="Clients.xsd" MetadataType="Schema" ID="1d86f421-2178-42f7-981c-1fffd4b11baa" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd6" />
+    <MetadataFile FileName="Clients1.xsd" MetadataType="Schema" ID="63a085ec-ddcf-46b8-b69f-4e8aa098660e" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd4" />
+    <MetadataFile FileName="Clients2.xsd" MetadataType="Schema" ID="7a6490e5-5d1a-4d66-886a-0603fe2d7d56" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd5" />
+    <MetadataFile FileName="Clients3.xsd" MetadataType="Schema" ID="e65eb2a0-9c59-47aa-b5ac-94213a4b36b6" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd1" />
+    <MetadataFile FileName="Clients4.xsd" MetadataType="Schema" ID="88c60748-c18c-4577-9290-60ee8845c47d" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd7" />
+    <MetadataFile FileName="Clients.wsdl" MetadataType="Wsdl" ID="d2133135-c995-494c-810e-03253d25addd" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?wsdl" />
+    <MetadataFile FileName="Clients1.wsdl" MetadataType="Wsdl" ID="50c9bf4a-ac15-4a5f-ba9b-0dd19985048f" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="Clients5.xsd" MetadataType="Schema" ID="9c608359-bbfa-4e91-a633-4fb68d2ed9d4" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd0" />
+    <MetadataFile FileName="Clients6.xsd" MetadataType="Schema" ID="86816f2f-8643-47d6-a2cb-1f69164fc089" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd3" />
+    <MetadataFile FileName="Clients7.xsd" MetadataType="Schema" ID="73be6b27-5e48-4814-af76-e241fc5defe9" SourceId="1" SourceUrl="http://srv-dev-epm.federation.com/TWebService/sdk/Clients.svc?xsd=xsd2" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

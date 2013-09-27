@@ -210,7 +210,7 @@ namespace UplandIntegrations.Tenrox
 
         // Private Methods (4) 
 
-        private static Dictionary<string, string> BuildIdMap(DataTable items, out List<string> ids)
+        private Dictionary<string, string> BuildIdMap(DataTable items, out List<string> ids)
         {
             var idMap = new Dictionary<string, string>();
             ids = new List<string>();
@@ -293,9 +293,8 @@ namespace UplandIntegrations.Tenrox
             return new TenroxService(orgUrl, orgName, username, password);
         }
 
-        private static void ProcessResults(DataTable items, IntegrationLog log, IEnumerable<TenroxTransactionResult> results,
-            Dictionary<string, string> idMap,
-            TransactionTable transactionTable)
+        private void ProcessResults(DataTable items, IntegrationLog log, IEnumerable<TenroxTransactionResult> results,
+            Dictionary<string, string> idMap, TransactionTable transactionTable)
         {
             int index = 0;
 
