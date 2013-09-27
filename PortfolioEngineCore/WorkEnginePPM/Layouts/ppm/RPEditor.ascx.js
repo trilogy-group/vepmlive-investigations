@@ -53,16 +53,15 @@
         }
     };
     RPEditor.prototype.SelectPIsOK = function () {
-        var select = document.getElementById("idPIList");
-        var arrPIs = select.options;
+        var arrPIs = this.arrPIs;
         var spis = "";
         for (var i = 0; i < arrPIs.length; i++) {
-            var option = arrPIs[i];
-            if (option != null && option.selected == true) {
+            var pi = document.getElementById("idPIListItem_" + i);
+            if (pi.checked == true) {
                 if (spis == "")
-                    spis = option.value;
+                    spis = this.arrPIs[i].wepid;
                 else
-                    spis += "," + option.value;
+                    spis += "," + this.arrPIs[i].wepid;
             }
         }
         if (spis == "") {
@@ -137,12 +136,13 @@
             switch (func) {
                 case "GetPIList":
                     var pis = result.PIs;
-                    var select = document.getElementById("idPIList");
-                    select.options.length = 0;
-                    var arrPIs = pis.PI;
-                    for (var i = 0; i < arrPIs.length; i++) {
-                        select.options[select.options.length] = new Option(arrPIs[i].name, arrPIs[i].wepid);
+                    var idPIListDiv = document.getElementById('idPIListDiv');
+                    var shtml = "";
+                    this.arrPIs = pis.PI;
+                    for (var i = 0; i < this.arrPIs.length; i++) {
+                        shtml += '<input id="idPIListItem_' + i + '" type="checkbox" />' + this.arrPIs[i].name + '<br />';
                     }
+                    idPIListDiv.innerHTML = shtml;
                     this.DisplayDialog(20, 30, 260, 220, "Select Portfolio Item(s)", "winSelectPIsDlg", "idSelectPIsDlgDiv", true, false);
                     break;
                 case "GetMetaData":
@@ -5341,6 +5341,7 @@
         this.projectuids = "";
         this.showHeatmap = false;
         this.savingPlan = false;
+        this.arrPIs = null;
 
         var const_HoursFormat = "0.##";
         var const_FTEFormat = "0.####";

@@ -78,7 +78,7 @@
 
 <div class="modalContent" id="idSelectPIsDlgDiv" style="display:none;">
 	<div style="margin-top:20px"">
-        <select id="idPIList" size="8" style="width:226px;" multiple="multiple"></select>
+ 	    <div id="idPIListDiv" style="border:1px solid #ccc; width:226px; height:100px; overflow-y:scroll; overflow-x:hidden;"></div>         
 	    <div style="float:right;">
 		    <div class="button-container" >
 			    <input type="button" class="epmliveButton" value="OK" onclick="dialogEvent('SelectPIs_OK');"/>
