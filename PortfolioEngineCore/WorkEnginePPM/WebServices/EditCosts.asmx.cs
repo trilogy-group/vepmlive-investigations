@@ -80,15 +80,24 @@ namespace WorkEnginePPM
                 DataAccess da = new DataAccess(sBaseInfo);
                 DBAccess dba = da.dba;
                 if (dba.Open() != StatusEnum.rsSuccess) goto Status_Error;
-                DataTable dt;
-                if (dbaEditCosts.SelectPIs(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
+                //DataTable dt;
+                //if (dbaEditCosts.SelectPIs(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
 
-                foreach (DataRow row in dt.Rows)
+                string sPIs;
+                if (dbaGeneral.GetPIList(dba, out sPIs) == true)
                 {
-                    PI pi = new PI();
-                    pi.Id = DBAccess.ReadIntValue(row["PROJECT_ID"]);
-                    pi.Name = DBAccess.ReadStringValue(row["PROJECT_NAME"]);
-                    pis.Add(pi);
+                    CStruct xPIs = new CStruct();
+                    if (xPIs.LoadXML(sPIs) == true)
+                    {
+                        List<CStruct> lstPIs = xPIs.GetList("PI");
+                        foreach (CStruct xPI in lstPIs)
+                        {
+                            PI pi = new PI();
+                            pi.Id = xPI.GetIntAttr("id");
+                            pi.Name = xPI.GetStringAttr("name");
+                            pis.Add(pi);
+                        }
+                    }
                 }
 Status_Error:
                 dba.Close();

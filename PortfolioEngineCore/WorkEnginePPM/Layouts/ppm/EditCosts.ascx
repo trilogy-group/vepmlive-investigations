@@ -84,8 +84,10 @@
 
 <div class="modalContent" id="idPIAndViewDlgObj" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
-        <select id="idPIList" size="8" style="width:226px;"></select>
-        <select id="idViewList" name="D1"style="display:none;"></select>
+        Portfolio Items:<br />
+        <select id="idPIList" size="8" style="width:226px;"></select><br />
+        Views:<br />
+        <select id="idViewList" style="width:226px;"></select>
 	    <div style="float:right;">
 		    <div class="button-container" >
 			    <input type="button" class="epmliveButton" value="OK" onclick="SelectPIDlg_OKOnClick();"/>

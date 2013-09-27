@@ -69,6 +69,71 @@ namespace PortfolioEngineCore
                 return "";
             }
         }
+        public static bool GetPIList(DBAccess dba, out string sReply)
+        {
+            sReply = "";
+            int nStatus = 0;
+            string sStatus = "";
+            CStruct xPIs = new CStruct();
+            xPIs.Initialize("PIs");
+            string sProjectIDs = "";
+            bool bSuperPIM = Security.CheckUserGlobalPermission(dba, dba.UserWResID, GlobalPermissionsEnum.gpSuperPIM);
+            bool bSuperRM = Security.CheckUserGlobalPermission(dba, dba.UserWResID, GlobalPermissionsEnum.gpSuperRM);
+
+            string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID IS NOT NULL OR PROJECT_EXT_UID <> '' ORDER BY PROJECT_NAME";
+            SqlCommand oCommand = new SqlCommand(sCommand, dba.Connection);
+            SqlDataReader reader = null;
+            reader = oCommand.ExecuteReader();
+            while (reader.Read())
+            {
+                CStruct xPI = xPIs.CreateSubStruct("PI");
+                int lUID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                if (sProjectIDs == "")
+                    sProjectIDs = lUID.ToString();
+                else
+                    sProjectIDs += "," + lUID.ToString();
+                string wepid = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                xPI.CreateIntAttr("id", lUID);
+                xPI.CreateStringAttr("wepid", wepid);
+                xPI.CreateStringAttr("name", DBAccess.ReadStringValue(reader["PROJECT_NAME"]));
+            }
+            reader.Close();
+            reader = null;
+
+            if (bSuperPIM == false)
+            {
+                xPIs = new CStruct();
+                xPIs.Initialize("PIs");
+
+                sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS" +
+                " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID" +
+                " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = " + dba.UserWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + dba.UserWResID.ToString("0") + ")" +
+                " AND PROJECT_ID in (" + sProjectIDs + ")  ORDER BY PROJECT_NAME";
+
+                oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
+                reader = oCommand.ExecuteReader();
+                while (reader.Read())
+                {
+                    CStruct xPI = xPIs.CreateSubStruct("PI");
+                    int lUID = DBAccess.ReadIntValue(reader["PROJECT_ID"]);
+                    string wepid = DBAccess.ReadStringValue(reader["PROJECT_EXT_UID"]);
+                    xPI.CreateIntAttr("id", lUID);
+                    xPI.CreateStringAttr("wepid", wepid);
+                    xPI.CreateStringAttr("name", DBAccess.ReadStringValue(reader["PROJECT_NAME"]));
+                }
+                reader.Close();
+            }
+            //{
+            //    PortfolioItems.PortfolioItems pis = new PortfolioItems.PortfolioItems(_basepath, _username, _pid, _company, _dbcnstring, _debug);
+            //    string sExtIDList;
+            //    string sPIDList;
+            //    string sXML;
+            //    pis.ObtainManagedPortfolioItems(out sExtIDList, out sPIDList, out sXML);
+            //}
+            sReply = xPIs.XML();
+            bool bResult = (dba.Status == StatusEnum.rsSuccess);
+            return bResult;
+        }
     }
 }
 

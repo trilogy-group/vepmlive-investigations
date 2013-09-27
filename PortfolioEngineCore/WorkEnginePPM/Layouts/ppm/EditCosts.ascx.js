@@ -102,13 +102,13 @@
             this.selectPIAndViewDlg.attachViewportTo(this.params.ClientID + "layoutDiv");
             this.selectPIAndViewDlg.setImagePath("/_layouts/ppm/images/");
             this.selectPIAndViewDlg.setSkin("dhx_web");
-            this.selectPIAndViewDlg.createWindow("winPIAndViewDlg", 20, 30, 260, 220);
+            this.selectPIAndViewDlg.createWindow("winPIAndViewDlg", 20, 30, 290, 270);
             this.selectPIAndViewDlg.window("winPIAndViewDlg").setIcon("logo.ico", "logo.ico");
             //this.selectPIAndViewDlg.window("winPIAndViewDlg").denyMove();
             this.selectPIAndViewDlg.window("winPIAndViewDlg").denyResize();
             this.selectPIAndViewDlg.window("winPIAndViewDlg").setModal(true);
             this.selectPIAndViewDlg.window("winPIAndViewDlg").center();
-            this.selectPIAndViewDlg.window("winPIAndViewDlg").setText("Select a Portfolio Item");
+            this.selectPIAndViewDlg.window("winPIAndViewDlg").setText("Select a Portfolio Item and a View");
             this.selectPIAndViewDlg.window("winPIAndViewDlg").attachObject("idPIAndViewDlgObj");
             this.selectPIAndViewDlg.window("winPIAndViewDlg").button("close").hide();
             this.selectPIAndViewDlg.window("winPIAndViewDlg").button("park").hide();
