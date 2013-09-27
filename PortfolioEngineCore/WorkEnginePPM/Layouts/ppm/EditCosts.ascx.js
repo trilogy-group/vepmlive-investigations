@@ -1800,6 +1800,8 @@
         this.lookupId = -1;
         this.ExitConfirmed = false;
         this.wins = new dhtmlXWindows();
+        this.wins.enableAutoViewport(false);
+        this.wins.attachViewportTo(this.params.ClientID + "layoutDiv");
         this.wins.setImagePath("/_layouts/ppm/images/");
         this.wins.setSkin("dhx_web");
         this.showArray = null;

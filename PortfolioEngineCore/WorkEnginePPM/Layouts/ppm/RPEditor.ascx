@@ -87,7 +87,7 @@
     </div>
 </div>
 <div class="modalContent" id="idNoteButtonsDiv" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
 		<div style="width:300px;float:right;">
 			<div class="button-container" style="width:305px">
         		<a id="idNoteDialog_Save" onclick="javascript:NotesDialogEvent('SaveNewNote');" class="epmliveButton" style="width:75px;">Save</a>
@@ -99,7 +99,7 @@
 </div>
 
 <div class="modalContent" id="idRowNoteDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
 		<div id="idRowNoteEditor" style="width: 100%; height: 300px; border: #909090 1px solid;"></div>
 		<div style="width:200px;float:right;">
 			<div class="button-container" style="float:none;margin-top:19px;">
@@ -111,7 +111,7 @@
 </div>
 
 <div class="modalContent" id="idRowNotificationDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
 		<div id="idRowNotificationLayout" style="position: relative; top: 0px; left: 0px; width:100%; height: 350px;"></div>
 		<div style="width:100px;float:right;">
 			<div class="button-container" style="float:none;margin-top:19px;">
@@ -123,30 +123,32 @@
 <div id='idDivRowEventsHtml' style='width:100%;height:100%;overflow:scroll;display:none;'></div>
 <div id="gridDiv_Notes" style="width:100%;height:100%;overflow:auto;display:none;"></div>
 <div class="modalContent" id="idSaveViewDlg" style="display:none;">
-	<div style="display:none;">
-    <input id="id_SaveView_Guid" type="hidden" />
-    <input id="id_SaveView_Action" type="hidden" />
+	<div style="margin-top:10px;padding-right:10px;">
+	    <div style="display:none;">
+        <input id="id_SaveView_Guid" type="hidden" />
+        <input id="id_SaveView_Action" type="hidden" />
+        </div>
+	    <div>
+		    View Name:<br />
+		    <input id="id_SaveView_Name" type="text" value="view 1" style="width:10em; text-align:left;margin-bottom:13px;" />
+	    </div>
+	    <div>
+		    <input id="id_SaveView_Default" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Default View</font>
+	    </div>
+	    <div style="display: none;">
+		    <input id="id_SaveView_Personal" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Personal View</font>
+	    </div>
+	    <div style="float:right;">
+		    <div class="button-container" >
+			    <input type="button" class="epmliveButton" value="OK" onclick="javascript: dialogEvent('SaveView_OK');"/>
+        	    <input type="button" class="epmliveButton" value="Cancel" onclick="javascript:dialogEvent('SaveView_Cancel');"/>
+		    </div>
+	    </div>
     </div>
-	<div>
-		View Name:<br />
-		<input id="id_SaveView_Name" type="text" value="view 1" style="width:10em; text-align:left;margin-bottom:13px;" />
-	</div>
-	<div>
-		<input id="id_SaveView_Default" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Default View</font>
-	</div>
-	<div style="display: none;">
-		<input id="id_SaveView_Personal" type="checkbox" />&nbsp;&nbsp;<font style="vertical-align:middle">Personal View</font>
-	</div>
-	<div style="float:right;">
-		<div class="button-container" >
-			<input type="button" class="epmliveButton" value="OK" onclick="javascript: dialogEvent('SaveView_OK');"/>
-        	<input type="button" class="epmliveButton" value="Cancel" onclick="javascript:dialogEvent('SaveView_Cancel');"/>
-		</div>
-	</div>
 </div>
 
 <div class="modalContent" id="idDeleteViewDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
 		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
 			Are you sure you want to delete this view?
 		</div>
@@ -163,7 +165,7 @@
 </div>
 
 <div class="modalContent" id="idSelectCostValuesDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
 		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
 			Select the cost values to be imported:
 		</div>
@@ -181,7 +183,7 @@
 </div>
 
 <div class="modalContent" id="idSpreadDlgObj" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
 	    <div>
             <div>
                 <table>
@@ -227,7 +229,7 @@
     </div>
 </div>
 <div class="modalContent" id="idSplitDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
  		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
             <div>Do you want to split the selected plan row or replace the existing resource?</div>
             <div style="padding-top:15px;">Please select the required action:</div>
@@ -242,7 +244,7 @@
     </div>
 </div>
 <div class="modalContent" id="idPrivateRowsDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
  		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
             <div>Some plan rows are marked as private.</div>
             <div style="padding-top:15px;">Would you like to make them public?</div>
@@ -257,7 +259,7 @@
     </div>
 </div>
 <div class="modalContent" id="idFulfillDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
  		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
             <div>Do you want to fulfill the plan requirement row or replace with the selected resources?</div>
             <div style="padding-top:15px;">Please select the required action:</div>
@@ -272,7 +274,7 @@
     </div>
 </div>
 <div class="modalContent" id="idPostDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
 		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
 			Select required options:
 		</div>
@@ -291,7 +293,7 @@
 	</div>
 </div>
 <div class="modalContent" id="idInvalidResDeptsDlg" style="display:none;">
-	<div>
+	<div style="margin-top:10px;padding-right:10px;">
  		<div style="display:relative;vertical-align:middle;padding-bottom:3px;">
             The following resources are not in the same department as the plan rows to which they are allocated. The plan rows for these resources should be assigned new resources. Alternatively, the plan rows for resources selected below can be transfered to the resource's current department.
 		</div>

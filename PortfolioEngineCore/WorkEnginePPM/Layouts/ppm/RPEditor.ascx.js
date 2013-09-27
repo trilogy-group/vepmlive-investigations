@@ -5332,6 +5332,8 @@
         this.noteEditor = null;
         this.pendingNotification = [];
         this.wins = new dhtmlXWindows();
+        this.wins.enableAutoViewport(false);
+        this.wins.attachViewportTo(this.params.ClientID + "layoutDiv");
         this.wins.setImagePath("/_layouts/ppm/images/");
         this.wins.setSkin("dhx_web");
         this.startPeriod = null;

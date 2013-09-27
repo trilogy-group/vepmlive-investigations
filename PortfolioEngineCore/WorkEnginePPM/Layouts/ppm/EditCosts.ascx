@@ -54,6 +54,9 @@
     .GMClassAdded { font-weight:normal !important; }
 
     .dhx_tabbar_row { background-color:#eeeeee !important;}
+    .modalContent {
+        margin-top: 0px !important;
+    }
 </style>
 
 <!--[if IE 8]>
@@ -85,9 +88,9 @@
 <div class="modalContent" id="idPIAndViewDlgObj" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
         Portfolio Items:<br />
-        <select id="idPIList" size="8" style="width:226px;"></select><br />
+        <select id="idPIList" size="8" style="width:246px;"></select><br />
         Views:<br />
-        <select id="idViewList" style="width:226px;"></select>
+        <select id="idViewList" style="width:246px;"></select>
 	    <div style="float:right;">
 		    <div class="button-container" >
 			    <input type="button" class="epmliveButton" value="OK" onclick="SelectPIDlg_OKOnClick();"/>
@@ -127,7 +130,7 @@
    </div>
 </div>
 <div class="modalContent" id="idToolsDlgObj" style="display:none;">
-	<div class="modalText" style="margin-top:10px;padding-right:10px;">
+	<div style="margin-top:10px;padding-right:10px;">
         <div>
             <table>
                 <tr>
@@ -170,12 +173,12 @@
                 </tr>
             </table>
         </div>
-		<div style="width:200px;position:absolute;bottom:5px;right:0px;">
-			<div class="button-container">
-        			<a onclick="javascript:toolsDlg_ApplyOnClick();" class="button-new green" style="width:75px;">Apply</a>
-        			<a onclick="javascript:toolsDlg_CloseOnClick();" class="button-new silver" style="width:75px;">Close</a>
-			</div>
-		</div>
+	    <div style="float:right;">
+		    <div class="button-container" >
+			    <input type="button" class="epmliveButton" value="Apply" onclick="javascript: toolsDlg_ApplyOnClick();"/>
+        		<input type="button" class="epmliveButton" value="Close" onclick="javascript: toolsDlg_CloseOnClick();"/>
+		    </div>
+	    </div>
    </div>
 </div>
 <div id="divLoading" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
