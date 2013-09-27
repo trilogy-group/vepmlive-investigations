@@ -117,6 +117,17 @@
                 <WebPartPages:SPWebPartManager runat="Server"/>
             </SharePoint:AjaxDelta>
             <asp:ScriptManager id="ScriptManager" runat="server" EnablePageMethods="false" EnablePartialRendering="true" EnableScriptGlobalization="false" EnableScriptLocalization="true" />
+            <div style="display: none !important;">
+        	    <SharePoint:AjaxDelta id="DeltaPlaceHolderLeftNavBar" role="navigation" runat="server">
+        		    <SharePoint:DelegateControl runat="server" ControlId="QuickLaunchDataSource" Id="topNavigationDelegate1" />
+                    <asp:ContentPlaceHolder id="PlaceHolderLeftNavBar" runat="server" />
+				    <asp:ContentPlaceHolder id="PlaceHolderLeftNavBarTop" runat="server" />
+                    <asp:ContentPlaceHolder id="PlaceHolderQuickLaunchTop" runat="server" />
+                    <asp:ContentPlaceHolder id="PlaceHolderLeftNavBarDataSource" runat="server" />
+                    <asp:ContentPlaceHolder id="PlaceHolderCalendarNavigator" runat="server" />
+                    <asp:ContentPlaceHolder id="PlaceHolderLeftActions" runat="server" />
+                </SharePoint:AjaxDelta>
+            </div>
             <SharePoint:AjaxDelta id="DeltaDelegateControls" runat="server">
                 <SharePoint:DelegateControl runat="server" ControlId="GlobalNavigation" />
                 <SharePoint:DelegateControl ControlId="GlobalSiteLink3" Scope="Farm" runat="server" Visible="false" />
@@ -511,16 +522,5 @@
             var g_Workspace = "s4-workspace";
         </SharePoint:ScriptBlock>   
         <span style="display: none;" id="walkMe2013"></span>
-        <div style="display: none !important;">
-        	<SharePoint:AjaxDelta id="DeltaPlaceHolderLeftNavBar" role="navigation" runat="server">
-        		<SharePoint:DelegateControl runat="server" ControlId="QuickLaunchDataSource" Id="topNavigationDelegate1" />
-                <asp:ContentPlaceHolder id="PlaceHolderLeftNavBar" runat="server" />
-				<asp:ContentPlaceHolder id="PlaceHolderLeftNavBarTop" runat="server" />
-                <asp:ContentPlaceHolder id="PlaceHolderQuickLaunchTop" runat="server" />
-                <asp:ContentPlaceHolder id="PlaceHolderLeftNavBarDataSource" runat="server" />
-                <asp:ContentPlaceHolder id="PlaceHolderCalendarNavigator" runat="server" />
-                <asp:ContentPlaceHolder id="PlaceHolderLeftActions" runat="server" />
-            </SharePoint:AjaxDelta>
-        </div>
     </body>
 </SharePoint:SPHtmlTag>
