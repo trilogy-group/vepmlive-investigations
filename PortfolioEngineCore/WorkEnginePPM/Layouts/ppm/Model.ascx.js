@@ -355,7 +355,7 @@
 	            this.selectModelAndVersion.enableAutoViewport(false);
 	            this.selectModelAndVersion.attachViewportTo(this.clientID + "mainDiv");
 	            this.selectModelAndVersion.setImagePath(this.imagePath);
-	            this.selectModelAndVersion.createWindow("winModelAndVersionsDlg", 20, 30, 450, 175);
+	            this.selectModelAndVersion.createWindow("winModelAndVersionsDlg", 20, 30, 450, 185);
 	            this.selectModelAndVersion.window("winModelAndVersionsDlg").setIcon("logo.ico", "logo.ico");
 	            this.selectModelAndVersion.window("winModelAndVersionsDlg").allowMove();
 	            this.selectModelAndVersion.window("winModelAndVersionsDlg").denyResize();
@@ -1165,7 +1165,7 @@
 	    		this.selectFiltering.enableAutoViewport(false);
 				this.selectFiltering.attachViewportTo(this.clientID + "mainDiv");
 				this.selectFiltering.setImagePath(this.imagePath);
-				this.selectFiltering.createWindow("winFilterDlg", 20, 30, 550, 440);
+				this.selectFiltering.createWindow("winFilterDlg", 20, 30, 550, 450);
 				this.selectFiltering.window("winFilterDlg").setIcon("logo.ico", "logo.ico");
 				this.selectFiltering.window("winFilterDlg").allowMove();
 				this.selectFiltering.window("winFilterDlg").denyResize();
@@ -1248,7 +1248,7 @@
 				this.selectCostTypeCmp.enableAutoViewport(false);
 				this.selectCostTypeCmp.attachViewportTo(this.clientID + "mainDiv");
 				this.selectCostTypeCmp.setImagePath(this.imagePath);
-				this.selectCostTypeCmp.createWindow("winCTCmpDlg", 20, 30, 550, 300);
+				this.selectCostTypeCmp.createWindow("winCTCmpDlg", 20, 30, 550, 310);
 				this.selectCostTypeCmp.window("winCTCmpDlg").setIcon("logo.ico", "logo.ico");
 				this.selectCostTypeCmp.window("winCTCmpDlg").allowMove();
 				this.selectCostTypeCmp.window("winCTCmpDlg").denyResize();
@@ -1330,7 +1330,7 @@
 				this.selectTotals.enableAutoViewport(false);
 				this.selectTotals.attachViewportTo(this.clientID + "mainDiv");
 				this.selectTotals.setImagePath(this.imagePath);
-				this.selectTotals.createWindow("winTotalDlg", 20, 30, 550, 390);
+				this.selectTotals.createWindow("winTotalDlg", 20, 30, 550, 400);
 				this.selectTotals.window("winTotalDlg").setIcon("logo.ico", "logo.ico");
 				this.selectTotals.window("winTotalDlg").allowMove();
 				this.selectTotals.window("winTotalDlg").denyResize();
@@ -1417,7 +1417,7 @@
                 this.selectSnG.enableAutoViewport(false);
 				this.selectSnG.attachViewportTo(this.clientID + "mainDiv");
 				this.selectSnG.setImagePath(this.imagePath);
-				this.selectSnG.createWindow("winSnGDlg", 20, 30, 550, 230);
+				this.selectSnG.createWindow("winSnGDlg", 20, 30, 550, 240);
 				this.selectSnG.window("winSnGDlg").setIcon("logo.ico", "logo.ico");
 				this.selectSnG.window("winSnGDlg").allowMove();
 				this.selectSnG.window("winSnGDlg").denyResize();
@@ -1793,7 +1793,7 @@
 			    this.selectCols.enableAutoViewport(false);
 				this.selectCols.attachViewportTo(this.clientID + "mainDiv");
 				this.selectCols.setImagePath(this.imagePath);
-				this.selectCols.createWindow("winColsDlg", 20, 30, 600, 390);
+				this.selectCols.createWindow("winColsDlg", 20, 30, 600, 410);
 				this.selectCols.window("winColsDlg").setIcon("logo.ico", "logo.ico");
 				this.selectCols.window("winColsDlg").allowMove();
 				this.selectCols.window("winColsDlg").denyResize();
@@ -2009,7 +2009,7 @@
 			    this.selectCopy.enableAutoViewport(false);
 				this.selectCopy.attachViewportTo(this.clientID + "mainDiv");
 				this.selectCopy.setImagePath(this.imagePath);
-				this.selectCopy.createWindow("winCVDlg", 20, 30, 600, 200);
+				this.selectCopy.createWindow("winCVDlg", 20, 30, 600, 210);
 				this.selectCopy.window("winCVDlg").setIcon("logo.ico", "logo.ico");
 				this.selectCopy.window("winCVDlg").allowMove();
 				this.selectCopy.window("winCVDlg").denyResize();
@@ -2179,11 +2179,11 @@
 
 	            if (this.DoingCopy == false) {
 	                idCopyNameDiv.style.display = "none";
-	                this.saveOrApply.createWindow("winSoADlg", 20, 30, 250, 125);
+	                this.saveOrApply.createWindow("winSoADlg", 20, 30, 250, 135);
 	            }
 	            else {
 	                idCopyNameDiv.style.display = "block";
-	                this.saveOrApply.createWindow("winSoADlg", 20, 30, 550, 190);
+	                this.saveOrApply.createWindow("winSoADlg", 20, 30, 550, 200);
 	            }
 
 	            this.saveOrApply.window("winSoADlg").setIcon("logo.ico", "logo.ico");
@@ -2240,7 +2240,7 @@
 			    this.saveOrApply.enableAutoViewport(false);
 				this.saveOrApply.attachViewportTo(this.clientID + "mainDiv");
 				this.saveOrApply.setImagePath(this.imagePath);
-				this.saveOrApply.createWindow("winSoADlg", 20, 30, 230, 135);
+				this.saveOrApply.createWindow("winSoADlg", 20, 30, 230, 145);
 				this.saveOrApply.window("winSoADlg").setIcon("logo.ico", "logo.ico");
 				this.saveOrApply.window("winSoADlg").allowMove();
 				this.saveOrApply.window("winSoADlg").denyResize();
@@ -2433,7 +2433,7 @@
 			     this.selectPoD.enableAutoViewport(false);
 				this.selectPoD.attachViewportTo(this.clientID + "mainDiv");
 				this.selectPoD.setImagePath(this.imagePath);
-				this.selectPoD.createWindow("winPoDDlg", 20, 30, 500, 220);
+				this.selectPoD.createWindow("winPoDDlg", 20, 30, 500, 230);
 				this.selectPoD.window("winPoDDlg").setIcon("logo.ico", "logo.ico");
 				this.selectPoD.window("winPoDDlg").allowMove();
 				this.selectPoD.window("winPoDDlg").denyResize();
@@ -2588,7 +2588,7 @@
 		    this.UserViewsObj.enableAutoViewport(false);
 			this.UserViewsObj.attachViewportTo(this.clientID + "mainDiv");
 			this.UserViewsObj.setImagePath(this.imagePath);
-			this.UserViewsObj.createWindow("winUserVDlg", 20, 30, 300, 175);
+			this.UserViewsObj.createWindow("winUserVDlg", 20, 30, 300, 185);
 			this.UserViewsObj.window("winUserVDlg").setIcon("logo.ico", "logo.ico");
 			this.UserViewsObj.window("winUserVDlg").allowMove();
 			this.UserViewsObj.window("winUserVDlg").denyResize();
@@ -2942,7 +2942,7 @@
 	            this.ModelViewDlg.enableAutoViewport(false);
 	            this.ModelViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 	            this.ModelViewDlg.setImagePath("/_layouts/ppm/images/");
-	            this.ModelViewDlg.createWindow("winModelViewDlg", 20, 30, 280, 192);
+	            this.ModelViewDlg.createWindow("winModelViewDlg", 20, 30, 280, 202);
 	            this.ModelViewDlg.window("winModelViewDlg").setIcon("logo.ico", "logo.ico");
 	            this.ModelViewDlg.window("winModelViewDlg").denyResize();
 	            this.ModelViewDlg.window("winModelViewDlg").button("park").hide();
@@ -2991,7 +2991,7 @@
 	            this.ModelViewDlg.enableAutoViewport(false);
 	            this.ModelViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 	            this.ModelViewDlg.setImagePath("/_layouts/ppm/images/");
-	            this.ModelViewDlg.createWindow("winModelViewDlg", 20, 30, 280, 192);
+	            this.ModelViewDlg.createWindow("winModelViewDlg", 20, 30, 280, 202);
 	            this.ModelViewDlg.window("winModelViewDlg").setIcon("logo.ico", "logo.ico");
 	            this.ModelViewDlg.window("winModelViewDlg").denyResize();
 	            this.ModelViewDlg.window("winModelViewDlg").button("park").hide();
@@ -3037,7 +3037,7 @@
 	            this.ModelerDeleteViewDlg.enableAutoViewport(false);
 	            this.ModelerDeleteViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 	            this.ModelerDeleteViewDlg.setImagePath("/_layouts/ppm/images/");
-	            this.ModelerDeleteViewDlg.createWindow("winModelerDeleteViewDlg", 20, 30, 280, 157);
+	            this.ModelerDeleteViewDlg.createWindow("winModelerDeleteViewDlg", 20, 30, 280, 167);
 	            this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").setIcon("logo.ico", "logo.ico");
 	            this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").denyResize();
 
@@ -3463,7 +3463,7 @@
 			    this.SearchDlg.enableAutoViewport(false);
 				this.SearchDlg.attachViewportTo(this.clientID + "mainDiv");
 				this.SearchDlg.setImagePath(this.imagePath);
-				this.SearchDlg.createWindow("winSearchsDlg", 20, 30, 510, 210);
+				this.SearchDlg.createWindow("winSearchsDlg", 20, 30, 510, 220);
 				this.SearchDlg.window("winSearchsDlg").setIcon("logo.ico", "logo.ico");
 				this.SearchDlg.window("winSearchsDlg").allowMove();
 				this.SearchDlg.window("winSearchsDlg").denyResize();
@@ -4364,7 +4364,7 @@
 				this.dlgCreateTarget.attachViewportTo(this.clientID + "mainDiv");
 				this.dlgCreateTarget.setImagePath(this.imagePath);
 
-				this.dlgCreateTarget.createWindow("winCreateTargetDlg", 20, 30, 550, 145);
+				this.dlgCreateTarget.createWindow("winCreateTargetDlg", 20, 30, 550, 155);
 
 				this.dlgCreateTarget.window("winCreateTargetDlg").setIcon("logo.ico", "logo.ico");
 				this.dlgCreateTarget.window("winCreateTargetDlg").allowMove();
@@ -4689,7 +4689,7 @@
 			this.dlgShowLegend.enableAutoViewport(false);
 			this.dlgShowLegend.attachViewportTo(this.clientID + "mainDiv");
 			this.dlgShowLegend.setImagePath(this.imagePath);
-			this.dlgShowLegend.createWindow("winShowLegDlg", 20, 30, 405, 315);
+			this.dlgShowLegend.createWindow("winShowLegDlg", 20, 30, 405, 325);
 			this.dlgShowLegend.window("winShowLegDlg").setIcon("logo.ico", "logo.ico");
 			this.dlgShowLegend.window("winShowLegDlg").allowMove();
 			this.dlgShowLegend.window("winShowLegDlg").denyResize();
@@ -4740,7 +4740,7 @@
 		    this.dlgTargetGroup.enableAutoViewport(false);
 			this.dlgTargetGroup.attachViewportTo(this.clientID + "mainDiv");
 			this.dlgTargetGroup.setImagePath(this.imagePath);
-			this.dlgTargetGroup.createWindow("winTarGrpDlg", 20, 30, 210, 125);
+			this.dlgTargetGroup.createWindow("winTarGrpDlg", 20, 30, 210, 135);
 			this.dlgTargetGroup.window("winTarGrpDlg").setIcon("logo.ico", "logo.ico");
 			this.dlgTargetGroup.window("winTarGrpDlg").allowMove();
 			this.dlgTargetGroup.window("winTarGrpDlg").denyResize();
@@ -5154,7 +5154,7 @@
 			this.saveOrApply.enableAutoViewport(false);
 			this.saveOrApply.attachViewportTo(this.clientID + "mainDiv");
 			this.saveOrApply.setImagePath(this.imagePath);
-			this.saveOrApply.createWindow("winSoADlg", 20, 30, 210, 125);
+			this.saveOrApply.createWindow("winSoADlg", 20, 30, 210, 135);
 			this.saveOrApply.window("winSoADlg").setIcon("logo.ico", "logo.ico");
 			this.saveOrApply.window("winSoADlg").allowMove();
 			this.saveOrApply.window("winSoADlg").denyResize();
