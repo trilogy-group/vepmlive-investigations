@@ -15,7 +15,7 @@
 	</Services>
 </asp:ScriptManagerProxy>
 
-<link rel="stylesheet" type="text/css" href="Styles/Dialog.css" />
+<link rel="stylesheet" type="text/css" href="Styles/DialogNew.css" />
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/dhtmlxlayout.css" />
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/skins/dhtmlxlayout_dhx_skyblue.css" />
 <script src="/_layouts/epmlive/dhtml/xlayout/dhtmlxcommon.js" type="text/javascript"></script>
@@ -31,7 +31,9 @@
 <script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxtoolbar.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.css" />
-<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_epm.css" />
+<%--<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_epm.css" />--%>
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_admin.css" />
+
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
@@ -48,6 +50,19 @@
 <script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
 
 <script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
+
+<style type="text/css">
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        overflow: hidden;
+    }
+    .modalContent {
+        margin-top: 0px !important;
+    }
+</style>
+
 
 <div id="idAnalyzerTabDiv"></div>    
 <div id="idViewTabDiv"></div>
@@ -84,20 +99,18 @@
 				<select id="idPerToList" name="idPerToList" style="vertical-align:middle;padding:0px;margin:0px;"></select>
 		</div>
 		<div class="button-container">
-				<a id="idDisplayPress" href="javascript:dialogEvent('Display_RPA');" class="button-new green" style="width:75px;">Display</a>
-				<a href="javascript:dialogEvent('Cancel_RPA');" class="button-new silver" style="width:75px;">Cancel</a>
+                <input id="idDisplayPress" type="button" onclick="javascript: dialogEvent('Display_RPA');" class="epmliveButton" value="Display"/>
+                <input type="button" onclick="javascript: dialogEvent('Cancel_RPA');" class="epmliveButton" value="Cancel"/>
 		</div>
 	</div>
 </div>
 <div class="modalContent" id="idSelectPIDiv" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">
- 		<div>
-			<select multiple id="idSelPI" size="12">  
-            </select>
-		</div>       
+ 		<div id="idSelPIDiv" style="border:2px solid #ccc; width:300px; height: 150px; overflow-y: scroll; overflow-x:hidden;">
+		</div>         
 		<div class="button-container">
-				<a id="A1" href="javascript:dialogEvent('Select_PI');" class="button-new green" style="width:75px;">Display</a>
-				<a href="javascript:dialogEvent('Dont_Select_PI');" class="button-new silver" style="width:75px;">Cancel</a>
+            	<input id="A1" type="button" onclick="javascript: dialogEvent('Select_PI');" class="epmliveButton" value="Display"/>
+            	<input type="button" onclick="javascript: dialogEvent('Dont_Select_PI');" class="epmliveButton" value="Cancel"/>
 		</div>
 	</div>
 </div>
@@ -141,17 +154,16 @@
 						<table>
 							<tr>
 								<td>
-									<div class="button-containerVert">
-										<a href="javascript:dialogEvent('TotalAddCol_Click');" class="button-new silver" style="width:75px;" id="idTotButtonAdd">Add ></a>
-					
+									<div class="button-container">
+                                        <input type="button" onclick="javascript: dialogEvent('TotalAddCol_Click');" id="idTotButtonAdd" class="epmliveButton" value="Add >"/>
 									</div>
 								</td>
 							</tr>
 							
 						   <tr>
 								<td>
-									<div class="button-containerVert">
-										<a href="javascript:dialogEvent('TotalRemoveCol_Click');" class="button-new silver" style="width:75px;" id="idTotButtonRemove">< Remove</a>
+									<div class="button-container">
+                                        <input type="button" onclick="javascript: dialogEvent('TotalRemoveCol_Click');" id="idTotButtonRemove" class="epmliveButton" value="< Remove"/>
 									</div>
 								</td>
 							</tr>
@@ -201,8 +213,8 @@
 	 
    <div style="width:200px;float:right;margin-top:17px;">
 	<div class="button-container">
-			<a href="javascript:dialogEvent('TotalColOK_Click');" class="button-new green" style="width:75px;">OK</a>
-			<a href="javascript:dialogEvent('TotalColCancel_Click');" class="button-new silver" style="width:75px;">Cancel</a>
+        <input type="button" onclick="javascript: dialogEvent('TotalColOK_Click');" class="epmliveButton" value="OK"/>
+        <input type="button" onclick="javascript: dialogEvent('TotalColCancel_Click');" class="epmliveButton" value="Cancel"/>
 	</div>
    </div>
  </div>
@@ -235,8 +247,8 @@
       </div>
         <div style="width:200px;float:right">
 	        <div class="button-container">
-					<a href="javascript:dialogEvent('SaveCS_OK');" class="button-new green" style="width:75px;">OK</a>
-					<a href="javascript:dialogEvent('SaveCS_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('SaveCS_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SaveCS_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
@@ -257,8 +269,8 @@
 		</div>
 		<div style="width:200px;float:right;">
 			<div class="button-container">
-					<a href="javascript:dialogEvent('SaveView_OK');" class="button-new green" style="width:75px;">OK</a>
-					<a href="javascript:dialogEvent('SaveView_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+					<input type="button" onclick="javascript:dialogEvent('SaveView_OK');" class="epmliveButton" value="OK"/>
+					<input type="button" onclick="javascript:dialogEvent('SaveView_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
@@ -273,8 +285,8 @@
 		</div>
 		<div style="width:200px;float:right;">
 			<div class="button-container">
-					<a href="javascript:dialogEvent('RenameView_OK');" class="button-new green" style="width:75px;">OK</a>
-					<a href="javascript:dialogEvent('RenameView_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                	<input type="button" onclick="javascript: dialogEvent('RenameView_OK');" class="epmliveButton" value="OK"/>
+					<input type="button" onclick="javascript: dialogEvent('RenameView_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
@@ -289,32 +301,32 @@
 		</div>
 		<div style="width:200px;float:right;">
 			<div class="button-container">
-					<a href="javascript:dialogEvent('DeleteView_OK');" class="button-new green" style="width:75px;">Delete</a>
-					<a href="javascript:dialogEvent('DeleteView_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+					<input type="button" onclick="javascript: dialogEvent('DeleteView_OK');" class="epmliveButton" value="Delete"/>
+                    <input type="button" onclick="javascript: dialogEvent('DeleteView_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
 </div>
 <div class="modalContent" id="idCapScenDlg" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">
-		<div style="display:inline;float:left;">
-			<select size="10" id="idSelectCapScen" name="idSelectCapScen" onchange="dialogEvent('CapScenSel');" style="padding:0px;margin-right:20px;width:185px;height:145px;border:1px solid #CCCCCC;"></select>
-		</div>
-		<div>
-			
-			<div class="button-containerVert"><a href="javascript:dialogEvent('CapScenNew_Click');" class="button-new silver" style="width:70px;" id="idCapScenNew">New</a></div>
-			<div style="height:6px;"></div>
-			<div class="button-containerVert"><a href="javascript:dialogEvent('CapScenCopy_Click');" class="button-new silver" style="width:70px;" id="idCapScenCopy">Copy</a></div>
-			<div style="height:6px;"></div>
-			<div class="button-containerVert"><a href="javascript:dialogEvent('CapScenEdit_Click');" class="button-new silver" style="width:70px;" id="idCapScenEdit">Edit</a></div>
-			<div style="height:6px;"></div>
-			<div class="button-containerVert"><a href="javascript:dialogEvent('CapScenRemove_Click');" class="button-new silver" style="width:70px;" id="idCapScenDel">Delete</a></div>
-		</div>
-		<div style="float:right;">
-			<div class="button-container">
-					<a href="javascript:dialogEvent('CapScenDone_Click');" class="button-new green" style="width:75px;">OK</a>
-				<a href="javascript:dialogEvent('CapScenDone_Click');" class="button-new silver" style="width:75px;">Cancel</a>
-			</div>
+        <table><tr><td>
+			<select size="10" id="idSelectCapScen" name="idSelectCapScen" onchange="dialogEvent('CapScenSel');" style="padding:0px;margin-right:20px;width:185px;height:175px;border:1px solid #CCCCCC;"></select>
+            </td>
+            <td>
+               <div class="button-container">
+               <table>
+                   <tr><td><input type="button" onclick="javascript: dialogEvent('CapScenNew_Click');" id="idCapScenNew" class="epmliveButton" value="New"/></td></tr>
+			       <tr><td><input type="button" onclick="javascript: dialogEvent('CapScenCopy_Click');" id="idCapScenCopy" class="epmliveButton" value="Copy"/></td></tr>
+			        <tr><td><input type="button" onclick="javascript: dialogEvent('CapScenEdit_Click');" id="idCapScenEdit" class="epmliveButton" value="Edit"/></td></tr>
+			        <tr><td><input type="button" onclick="javascript: dialogEvent('CapScenRemove_Click');" id="idCapScenDel" class="epmliveButton" value="Delete"/></td></tr>
+		     </table>
+                   </div>
+             </td></tr></table>
+	</div>
+	<div style="width:200px;float:right;">
+		<div class="button-container">
+				<input type="button" onclick="javascript: dialogEvent('CapScenDone_Click');" class="epmliveButton" value="OK"/>
+                <input type="button" onclick="javascript: dialogEvent('CapScenDone_Click');" class="epmliveButton" value="Cancel"/>
 		</div>
 	</div>
 </div>
@@ -332,8 +344,8 @@
 		</div>
 		<div style="float:right;">
 			<div class="button-container">
-					<a href="javascript:dialogEvent('SaveScenOK_Click');" class="button-new green" style="width:75px;">OK</a>
-				<a href="javascript:dialogEvent('SaveScenCan_Click');" class="button-new silver" style="width:75px;">Cancel</a>
+					<input type="button" onclick="javascript: dialogEvent('SaveScenOK_Click');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SaveScenCan_Click');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
@@ -379,8 +391,8 @@
 	</div>
 	<div style="width:200px;float:right;">
 		<div class="button-container">
-			<a onclick="javascript:dialogEvent('spreadDlg_Apply');" class="button-new green" style="width:75px;">Apply</a>
-			<a onclick="javascript:dialogEvent('spreadDlg_Close');" class="button-new silver" style="width:75px;">Close</a>
+            <input type="button" onclick="javascript: dialogEvent('spreadDlg_Apply');" class="epmliveButton" value="Apply"/>
+            <input type="button" onclick="javascript: dialogEvent('spreadDlg_Close');" class="epmliveButton" value="Close"/>
 		</div>
 	</div>
 </div>
@@ -389,7 +401,7 @@
 		<div id="idTarLegDiv"></div>
 		<div style="float:right;padding-right:5px;margin-top:15px;">
 			<div>
-					<a href="javascript:dialogEvent('TargetLegend_OKOnClick');" class="button-new green" style="width:75px;">OK</a>
+		        <input type="button" onclick="javascript: dialogEvent('TargetLegend_OKOnClick');" class="epmliveButton" value="OK"/>
 			</div>
 		</div>
 	</div>
@@ -443,7 +455,7 @@
 	   </div>
 		<div style="float:right;padding-right:5px;margin-top:15px;">
 			<div>
-					<a href="javascript:dialogEvent('GridExplain_OKOnClick');" class="button-new green" style="width:75px;">Close</a>
+                    <input type="button" onclick="javascript: dialogEvent('GridExplain_OKOnClick');" class="epmliveButton" value="Close"/>
 			</div>
 		</div>
 	</div>

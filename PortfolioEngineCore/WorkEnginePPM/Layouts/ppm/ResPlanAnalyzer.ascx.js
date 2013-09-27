@@ -33,8 +33,6 @@
 			Grids.OnRenderStart = GridsOnRenderStartDelegate;
 			Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
 
-
-
 			Grids.OnUpdated = GridsOnUpdatedDelegate;
 
 			WorkEnginePPM.ResPlanAnalyzer.set_path(this.params.Webservice);
@@ -97,19 +95,22 @@
 
 
 
-                    var idpilist = document.getElementById('idSelPI');
-                    idpilist.options.length = 0;
+
+
+                    var idpilist = document.getElementById('idSelPIDiv');
+                    //idpilist.options.length = 0;
+
+                    var shtml = "";
 
                     for (var i = 0; i < this.PIList.length; i++) {
                         var pid = this.PIList[i].ID;
                         var pname = this.PIList[i].NAME;
 
-                        idpilist.options[i] = new Option(pname, pid, true, true);
-
+                        shtml += '<input id="idSelPIChk' + i + '" type="checkbox" CHECKED />' + pname + '<br />';
 
                     }
 
-
+                    idpilist.innerHTML = shtml;
 
                 }
                 else
@@ -142,13 +143,13 @@
         var retval = false;
         var sExtPIs = "";
 
-        var idpilist = document.getElementById('idSelPI');
+
 
         for (var i = 0; i < this.PIList.length; i++) {
-
+            var idpilist = document.getElementById('idSelPIChk' + i);
             var pextid = this.PIList[i].EXTID;
 
-            if (idpilist.options[i].selected) {
+            if (idpilist.checked == true) {
                 retval = true;
 
                 if (sExtPIs == "")
@@ -158,10 +159,10 @@
             }
 
         }
-
         if (retval == true)
             WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetGeneratedPortfolioItemTicket", sExtPIs, GetGeneratedPortfolioItemTicketCompleteDelegate);
-
+        else
+            alert("No Portfolio Items were selected");
 
         return retval;
 
@@ -4705,7 +4706,7 @@
 				this.CapScenDlg.enableAutoViewport(false);
 				this.CapScenDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 				this.CapScenDlg.setImagePath("/_layouts/ppm/images/");
-				this.CapScenDlg.createWindow("winCapScenDlg", 20, 30, 330, 247);
+				this.CapScenDlg.createWindow("winCapScenDlg", 20, 30, 330, 317);
 				this.CapScenDlg.window("winCapScenDlg").setIcon("logo.ico", "logo.ico");
 				this.CapScenDlg.window("winCapScenDlg").denyResize();
 				this.CapScenDlg.window("winCapScenDlg").button("park").hide();
@@ -5692,12 +5693,16 @@
 		var btn = document.getElementById(idButton);
 
 		if (btn == null)
-			return;
+		    return;
+
+		btn.disabled = bstate;
+
+		return;
 		
-		if (bstate == true)
-			btn.className = "button-new disabledSilver";
-		else 
-		   btn.className = "button-new silver";
+		//if (bstate == true)
+		//	btn.className = "button-new disabledSilver";
+		//else 
+		//   btn.className = "button-new silver";
 			 
 	}
 
@@ -7371,9 +7376,9 @@
 			this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
 
             if (this.allowcsmode == "0")
-                this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
+                this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 285, 195);
             else
-			    this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 215);
+			    this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 285, 215);
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
@@ -7407,7 +7412,7 @@
 	        this.AnalyzerViewDlg.enableAutoViewport(false);
 	        this.AnalyzerViewDlg.attachViewportTo(this.params.ClientID + "mainDiv");
 	        this.AnalyzerViewDlg.setImagePath("/_layouts/ppm/images/");
-	        this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 265, 195);
+	        this.AnalyzerViewDlg.createWindow("winAnalyzerViewDlg", 20, 30, 295, 195);
 	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setIcon("logo.ico", "logo.ico");
 	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 	        //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
