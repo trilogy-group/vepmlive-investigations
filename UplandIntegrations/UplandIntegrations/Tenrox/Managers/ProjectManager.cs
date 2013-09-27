@@ -28,6 +28,7 @@ namespace UplandIntegrations.Tenrox.Managers
                 {"Name", "Title"},
                 {"StartDate", "Start"},
                 {"EndDate", "End"},
+                {"ClientId", "Account"}
             };
 
             _token = (UserToken) Token;

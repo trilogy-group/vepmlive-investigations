@@ -36,18 +36,18 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         protected ObjectManager(Binding binding, string endpointAddress, string svcUrl, UserToken token, Type objectType,
             Type tokenType, Type clientType)
         {
-            MappingDict = new Dictionary<string, string>();
             DisplayNameDict = new Dictionary<string, string>();
+            MappingDict = new Dictionary<string, string>();
 
             _authToken = token;
-            _endpointAddress = endpointAddress;
-            _objectType = objectType;
             _clientType = clientType;
             _objectFields = new Dictionary<string, Type>();
+            _objectType = objectType;
+            _endpointAddress = endpointAddress;
 
             Binding = binding;
-            Token = TranslateToken(_authToken, tokenType);
             EndpointAddress = new EndpointAddress(_endpointAddress + "sdk/" + svcUrl);
+            Token = TranslateToken(_authToken, tokenType);
         }
 
         #endregion Constructors 
