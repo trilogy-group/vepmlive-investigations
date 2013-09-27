@@ -399,15 +399,15 @@ namespace EPMLiveCore.Properties {
         /// <summary>
         ///   Looks up a localized string similar to &lt;td width=&quot;50&quot; valign=&quot;top&quot; style=&quot;padding:10px;&quot;&gt;
         ///&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
-        ///	&lt;input type=&quot;button&quot; class=&quot;btn btn-small&quot; value=&quot;&amp;lt; Add&quot; onClick=&quot;AddResource()&quot; style=&quot;width:100px&quot;&gt;&lt;br&gt;&lt;br&gt;
-        ///	&lt;input type=&quot;button&quot; class=&quot;btn btn-small&quot; value=&quot;Remove &amp;gt;&quot; onClick=&quot;RemoveResource()&quot; style=&quot;width:100px&quot;&gt;
+        ///	&lt;input type=&quot;button&quot; class=&quot;ms-ButtonHeightWidth&quot; value=&quot;&amp;lt; Add&quot; onClick=&quot;AddResource()&quot; style=&quot;width:100px&quot;&gt;&lt;br&gt;&lt;br&gt;
+        ///	&lt;input type=&quot;button&quot; class=&quot;ms-ButtonHeightWidth&quot; value=&quot;Remove &amp;gt;&quot; onClick=&quot;RemoveResource()&quot; style=&quot;width:100px&quot;&gt;
         ///&lt;/td&gt;
         ///&lt;td width=&quot;50%&quot; id=&quot;tdResPool&quot; valign=&quot;top&quot;&gt;
         ///	&lt;div class=&quot;gridHeader&quot;&gt;Resource Pool&lt;/div&gt;
         ///	&lt;div class=&quot;toolbar&quot;&gt;
         ///		&lt;ul&gt;
         /// 		    &lt;li&gt;
-        ///			    &lt;a href=&quot;javascript:void(0);&quot; onclick=&quot;AddResourceP [rest of string was truncated]&quot;;.
+        ///			    &lt;a href=&quot;javascript:void(0);&quot; onclick [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtBuildTeamResPool {
             get {
@@ -521,11 +521,11 @@ namespace EPMLiveCore.Properties {
         ///	&lt;Cfg PrintCols=&apos;1&apos;/&gt;
         ///	&lt;Cfg ExportCols=&apos;1&apos;/&gt;
         ///	&lt;Cfg NumberId=&apos;1&apos; FullId=&apos;0&apos; IdChars=&apos;1234567890&apos; AddFocusCol=&apos;Title&apos; /&gt;
-        ///	&lt;Cfg StaticCursor=&apos;1&apos; Dragging=&apos;0&apos; SelectingCells=&apos;1&apos; ShowDeleted=&apos;0&apos; SelectClass=&apos;0&apos;/&gt;
+        ///	&lt;Cfg StaticCursor=&apos;1&apos; Dragging=&apos;0&apos; SelectingCells=&apos;1&apos; ShowDeleted=&apos;0&apos; SelectClass=&apos;0&apos; Hover=&apos;0&apos;/&gt;
         ///
         ///	&lt;Toolbar Visible=&apos;0&apos;&gt;&lt;/Toolbar&gt;
         ///
-        ///	&lt;Panel Visible=&apos; [rest of string was truncated]&quot;;.
+        ///	&lt;Panel [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTeamGridLayout {
             get {
