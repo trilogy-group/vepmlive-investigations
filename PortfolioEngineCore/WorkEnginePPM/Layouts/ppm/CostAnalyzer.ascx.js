@@ -108,19 +108,21 @@
 
 
 
-                    var idpilist = document.getElementById('idSelPI');
-                    idpilist.options.length = 0;
+
+                    var idpilist = document.getElementById('idSelPIDiv');
+                    //idpilist.options.length = 0;
+
+                    var shtml = "";
 
                     for (var i = 0; i < this.PIList.length; i++) {
                         var pid = this.PIList[i].ID;
                         var pname = this.PIList[i].NAME;
 
-                        idpilist.options[i] = new Option(pname, pid, true, true);
-
+                        shtml += '<input id="idSelPIChk' + i + '" type="checkbox" CHECKED />' + pname + '<br />';
 
                     }
 
-
+                    idpilist.innerHTML = shtml;
 
                 }
                 else
@@ -153,13 +155,13 @@
         var retval = false;
         var sExtPIs = "";
 
-        var idpilist = document.getElementById('idSelPI');
+
 
         for (var i = 0; i < this.PIList.length; i++) {
-
+            var idpilist = document.getElementById('idSelPIChk' + i);
             var pextid = this.PIList[i].EXTID;
 
-            if (idpilist.options[i].selected) {
+            if (idpilist.checked == true) {
                 retval = true;
 
                 if (sExtPIs == "")
@@ -172,6 +174,9 @@
 
         if (retval == true)
             WorkEnginePPM.CostAnalyzer.ExecuteJSON("GetGeneratedPortfolioItemTicket", sExtPIs, GetGeneratedPortfolioItemTicketCompleteDelegate);
+        else
+            alert("No Portfolio Items were selected");
+
 
 
         return retval;
@@ -199,6 +204,8 @@
                     }
 
                     this.params.TicketVal = xticket;
+                    if (this.params.ViewID == undefined || this.params.ViewID == "")
+                        this.params.ViewID = -1;
 
                     var s = this.BuildLoadInf(this.params.TicketVal, this.params.ViewID);
 
@@ -5779,7 +5786,7 @@
                 this.SelectEditDlg.attachViewportTo(this.clientID + "mainDiv");
                 this.SelectEditDlg.setImagePath(this.imagePath);
 
-                this.SelectEditDlg.createWindow("winEditTarDlg", 20, 30, 250, 125);
+                this.SelectEditDlg.createWindow("winEditTarDlg", 20, 30, 300, 125);
 
                 this.SelectEditDlg.window("winEditTarDlg").setIcon("logo.ico", "logo.ico");
                 this.SelectEditDlg.window("winEditTarDlg").allowMove();
@@ -5851,7 +5858,7 @@
                 this.SelectDelDlg.attachViewportTo(this.clientID + "mainDiv");
                 this.SelectDelDlg.setImagePath(this.imagePath);
 
-                this.SelectDelDlg.createWindow("winDelTarDlg", 20, 30, 250, 125);
+                this.SelectDelDlg.createWindow("winDelTarDlg", 20, 30, 300, 125);
 
                 this.SelectDelDlg.window("winDelTarDlg").setIcon("logo.ico", "logo.ico");
                 this.SelectDelDlg.window("winDelTarDlg").allowMove();
@@ -5942,7 +5949,7 @@
                 this.SelectCopyDlg.attachViewportTo(this.clientID + "mainDiv");
                 this.SelectCopyDlg.setImagePath(this.imagePath);
 
-                this.SelectCopyDlg.createWindow("winCopyTarDlg", 20, 30, 250, 125);
+                this.SelectCopyDlg.createWindow("winCopyTarDlg", 20, 30, 300, 125);
 
                 this.SelectCopyDlg.window("winCopyTarDlg").setIcon("logo.ico", "logo.ico");
                 this.SelectCopyDlg.window("winCopyTarDlg").allowMove();

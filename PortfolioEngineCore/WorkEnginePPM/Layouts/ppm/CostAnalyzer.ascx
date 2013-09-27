@@ -9,256 +9,13 @@
 
 <%@ Register Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"
     Namespace="System.Web.UI" TagPrefix="asp" %>
-<style type="text/css">
- 
- 
-   
-.style1
-{
-height: 20px;
-}
 
-.dhtmlx_wins_title 
-{
-top:-1px;
-left:-1px;
-}
-
-div.dhtmlx_window_active 
-{
-box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.dhtmlx_wins_body_outer {
-    border: none !important;
-}
-
-.dhtmlx_wins_body_inner {
-margin-top:5px !important;
-margin-left:10px !important;
-}
-
-select
-{
-font-family:Verdana;
-font-size:12px;
-color:#535353;
-}
-
-input
-{
-font-family:Verdana;
-font-size:12px;
-color:#535353;
-}
-
-
-.button-container 
-{
-overflow: hidden;
-width:205px;
-float:right;
-margin-top:17px;
-}
-
-.button-containerVert
-{
-overflow: hidden;
-}
-
-.button-new.save 
-{
-float: left;
-}
-
-.button-new.cancel 
-{
-float: right;
-}
-
-.button-new 
-{
-font-size: 12px;
--moz-border-radius: 5px;
--webkit-border-radius: 5px;
--o-border-radius: 5px;
--ms-border-radius: 5px;
--khtml-border-radius: 5px;
-border-radius: 5px;
-display: inline-block;
-line-height: 24px;
-margin-bottom: 4px;
-font-weight: normal;
-text-shadow: none;
-padding: 1px 10px 1px 10px;
-white-space: nowrap;
-cursor: pointer;
-font-family: arial, sans-serif;
-text-decoration:none !important;
-text-align:center;
-
-}
-
-.button-new.green 
-{
-/*background: #6ABD3D;*/
-background: #6CC325 1px;
-background: -webkit-linear-gradient(top, #9FD870 1px, #98DB62 1px, #6ABD3C 100%);
-background: -o-linear-gradient(top, #9FD870 1px, #6CC325 1px, #6ABD3C 100%);
-background: -ms-linear-gradient(top, #9FD870 1px, #6CC325 1px, #6ABD3C 100%);
-background: -moz-linear-gradient(top, #9FD870 1px, #98DB62 1px, #6ABD3C 100%);
-border: 1px solid #6ABD3D;
-color: white;
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9FD870', endColorstr='#6CC325',GradientType=0 );
-}
-
-.button-new.silver 
-{
-background: #EAEAEA;
-background: whiteSmoke 1px;
-background: -webkit-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-background: -o-linear-gradient(top, white 1px,#FFFFFF 1px, #F0F0F0 100%);
-background: -ms-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-background: -moz-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#F0F0F0',GradientType=0 );
-border: 1px solid gainsboro;
-color: #535353;
-}
-
-.button-new.green:hover
-{
-background: #71BF31;
-border: 1px solid #60BA16;
-filter: none;
-}
-
-.button-new.silver:hover
-{
-background: #F0F0F0;
-border: 1px solid #D8D8D8;
-filter: none;
-}
-
-.disabledGreen
-{
-opacity:.5;
--ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
-filter: alpha(opacity=50);					
-cursor:default;
-background: #6CC325 1px;
-background: -webkit-linear-gradient(top, #9FD870 1px, #98DB62 1px, #6ABD3C 100%);
-background: -o-linear-gradient(top, #9FD870 1px, #6CC325 1px, #6ABD3C 100%);
-background: -ms-linear-gradient(top, #9FD870 1px, #6CC325 1px, #6ABD3C 100%);
-background: -moz-linear-gradient(top, #9FD870 1px, #98DB62 1px, #6ABD3C 100%);
-border: 1px solid #6ABD3D;
-color: white;
-color: #FFFFFF !important;
-}
-
-.disabledGreen:hover
-{
-opacity:.5;
--ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
-filter: alpha(opacity=50);					
-cursor:default;
-background: #6CC325 1px;
-background: -webkit-linear-gradient(top, #9FD870 1px, #98DB62 1px, #6ABD3C 100%);
-background: -o-linear-gradient(top, #9FD870 1px, #6CC325 1px, #6ABD3C 100%);
-background: -ms-linear-gradient(top, #9FD870 1px, #6CC325 1px, #6ABD3C 100%);
-background: -moz-linear-gradient(top, #9FD870 1px, #98DB62 1px, #6ABD3C 100%);
-border: 1px solid #6ABD3D;
-color: white;
-color: #FFFFFF !important;
-}
-
-.disabledSilver
-{
-opacity:.5;
--ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
-filter: alpha(opacity=50);					
-cursor:default;
-background: #EAEAEA;
-background: whiteSmoke 1px;
-background: -webkit-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-background: -o-linear-gradient(top, white 1px,#FFFFFF 1px, #F0F0F0 100%);
-background: -ms-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-background: -moz-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-border: 1px solid gainsboro;
-color: #535353 !important;
-
-}
-
-.disabledSilver:hover
-{
-opacity:.5;
--ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
-filter: alpha(opacity=50);
-cursor:default;
-background: #EAEAEA;
-background: whiteSmoke 1px;
-background: -webkit-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-background: -o-linear-gradient(top, white 1px,#FFFFFF 1px, #F0F0F0 100%);
-background: -ms-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-background: -moz-linear-gradient(top, white 1px, #FFFFFF 1px, #F0F0F0 100%);
-border: 1px solid gainsboro;
-color: #535353 !important;
-}
-
-div.dhtmlx_window_active 
-{
-border:1px solid #CCCCCC;
-}
-
-
-.modalContent
-{
-font-family:Verdana;
-font-size:12px;
-padding-bottom:5px;
-width:100%;
-height: 100%;
-padding-left:5px;
-padding-right:5px;
-color:#535353;
-}
-
-#veil {
-display:none;
-position:absolute;
-left:0px;
-top:0px;
-width:100%;
-height:100%;
-filter:alpha(opacity=30);
-opacity:0.3;
--moz-opacity:0.3;
--khtml-opacity:0.3;
-z-index:997;
-background:gray;
-
-}
-
-</style>
-
-
-<!--[if gt IE 8]>
-
-<style type="text/css">
-
-.button-new 
-{
-border-radius: 0px;
-}
-
-
-</style>
-
-<![endif]-->
 
 <asp:ScriptManagerProxy ID="sm1" runat="server">
     <Services>
     </Services>
 </asp:ScriptManagerProxy>
+<link rel="stylesheet" type="text/css" href="Styles/DialogNew.css" />
 
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/dhtmlxlayout.css" />
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/skins/dhtmlxlayout_dhx_skyblue.css" />
@@ -270,11 +27,14 @@ border-radius: 0px;
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxtabbar.js" type="text/javascript"></script>
 
+
 <script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxtoolbar.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.css" />
-<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_epm.css" />
+<%--<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_epm.css" />--%>
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_admin.css" />
+
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
@@ -282,12 +42,26 @@ border-radius: 0px;
 <script src="/_layouts/epmlive/TreeGrid/GridE.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/ribbon/ribbon2.css" />
-
 <script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
 
 <script src="/_layouts/ppm/CostAnalyzer.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css" />
+
+
+<style type="text/css">
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        overflow: hidden;
+    }
+    .modalContent {
+        margin-top: 0px !important;
+    }
+</style>
+
+
 <div id="idAnalyzerTabDiv"></div>    
 <div id="idViewTabDiv"></div>
 <div id="idBottomTabDiv"></div>
@@ -305,35 +79,12 @@ border-radius: 0px;
 </div>
 <div class="modalContent" id="idSelectPIDiv" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">
- 		<div>
-			<select multiple id="idSelPI" size="12">  
-            </select>
-		</div>       
+ 		<div id="idSelPIDiv" style="border:2px solid #ccc; width:300px; height: 150px; overflow-y: scroll; overflow-x:hidden;">
+		</div>      
 		<div class="button-container">
-				<a id="A1" href="javascript:dialogEvent('Select_PI');" class="button-new green" style="width:75px;">Display</a>
-				<a href="javascript:dialogEvent('Dont_Select_PI');" class="button-new silver" style="width:75px;">Cancel</a>
-		</div>
-	</div>
-</div>
-<div class="modalContent" id="idFCandPerDlgObj" style="display:none;">
-	<div class="modalText" style="margin-top:10px;padding-right:10px;">
-			<div style="display:inline;vertical-align:middle;padding-bottom:3px;">
-				Choose a Fiscal Calendar:&nbsp;
-			</div>
-		<div style="display:inline;">
-			<select id="idCalList" name="idCalList" onchange="dialogEvent('SelectCalendar_Change');" style="vertical-align:middle;padding:0px;margin:0px;"></select>
-		</div>
-        <div style="display:none;" >
-		    <div style="padding-top:10px;padding-bottom:13px;">Choose a period range:</div>
-		    <div style="padding-bottom:3px;display:inline;">From Period:&nbsp;</div>
-			    <select id="idPerFromList" name="idPerFromList" style="vertical-align:middle;padding:0px;margin:0px;"></select>
-		    <div style="padding-bottom:3px;display:inline;">&nbsp;&nbsp;&nbsp;&nbsp;To Period:&nbsp;</div>
-			    <select id="idPerToList" name="idPerToList" style="vertical-align:middle;padding:0px;margin:0px;"></select>
-		</div>
-		<div class="button-container">
-        		<a href="javascript:dialogEvent('Display_RPA');" class="button-new green" style="width:75px;">Display</a>
-        		<a href="javascript:dialogEvent('Cancel_RPA');" class="button-new silver" style="width:75px;">Cancel</a>
-		</div>
+            	<input id="A1" type="button" onclick="javascript: dialogEvent('Select_PI');" class="epmliveButton" value="Display"/>
+            	<input type="button" onclick="javascript: dialogEvent('Dont_Select_PI');" class="epmliveButton" value="Cancel"/>
+        </div>
 	</div>
 </div>
 <div id="idCreateNewCapScen" class="modalContent" style="display:none;">
@@ -344,8 +95,8 @@ border-radius: 0px;
 		<div><input id="idTxtCapScenName" type="text" value=" " style="width:210px;text-align:left;padding:0px;margin:0px;height:20px;" /></div>
 		<div style="width:200px;margin-left:10px;margin-top:3px;">
 			<div style="padding-top:10px;">
-        			<a href="javascript:dialogEvent('SaveCS_OK');" class="button-new green" style="width:75px;">OK</a>
-        			<a href="javascript:dialogEvent('SaveCS_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('SaveCS_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SaveCS_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
    		</div>
     </div>
@@ -366,8 +117,8 @@ border-radius: 0px;
 		</div>
 		<div style="width:200px;float:right;">
 			<div class="button-container">
-        			<a href="javascript:dialogEvent('SaveView_OK');" class="button-new green" style="width:75px;">OK</a>
-        			<a href="javascript:dialogEvent('SaveView_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                     <input type="button" onclick="javascript: dialogEvent('SaveView_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SaveView_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
@@ -382,8 +133,8 @@ border-radius: 0px;
 		</div>
 		<div style="width:200px;float:right;">
 			<div class="button-container">
-        			<a href="javascript:dialogEvent('RenameView_OK');" class="button-new green" style="width:75px;">OK</a>
-        			<a href="javascript:dialogEvent('RenameView_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('RenameView_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('RenameView_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
@@ -398,31 +149,8 @@ border-radius: 0px;
 		</div>
 		<div style="width:200px;float:right;">
 			<div class="button-container">
-        			<a href="javascript:dialogEvent('DeleteView_OK');" class="button-new green" style="width:75px;">Delete</a>
-        			<a href="javascript:dialogEvent('DeleteView_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="modalContent" id="idCapScenDlg" style="display:none;">
-	<div class="modalText" style="margin-top:10px;padding-right:10px;">
-		<div style="display:inline;float:left;">
-			<select size="10" id="idSelectCapScen" name="idSelectCapScen" onchange="dialogEvent('CapScenSel');" style="padding:0px;margin-right:20px;width:185px;height:145px;border:1px solid #CCCCCC;"></select>
-		</div>
-		<div>
-			
-	        <div class="button-containerVert"><a href="javascript:dialogEvent('CapScenNew_Click');" class="button-new silver" style="width:70px;" id="idCapScenNew">New</a></div>
-		    <div style="height:6px;"></div>
-            <div class="button-containerVert"><a href="javascript:dialogEvent('CapScenCopy_Click');" class="button-new silver" style="width:70px;" id="idCapScenCopy">Copy</a></div>
-		    <div style="height:6px;"></div>
-            <div class="button-containerVert"><a href="javascript:dialogEvent('CapScenEdit_Click');" class="button-new silver" style="width:70px;" id="idCapScenEdit">Edit</a></div>
-		    <div style="height:6px;"></div>
-            <div class="button-containerVert"><a href="javascript:dialogEvent('CapScenRemove_Click');" class="button-new silver" style="width:70px;" id="idCapScenDel">Delete</a></div>
-		</div>
-		<div style="float:right;">
-			<div class="button-container">
-        			<a href="javascript:dialogEvent('CapScenDone_Click');" class="button-new green" style="width:75px;">OK</a>
-				<a href="javascript:dialogEvent('CapScenDone_Click');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('DeleteView_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('DeleteView_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
 		</div>
 	</div>
@@ -468,8 +196,8 @@ border-radius: 0px;
     </div>
 	<div style="width:200px;float:right;">
 		<div class="button-container">
-        	<a onclick="javascript:editTargetEvent('spreadDlg_Apply');" class="button-new green" style="width:75px;">Apply</a>
-        	<a onclick="javascript:editTargetEvent('spreadDlg_Close');" class="button-new silver" style="width:75px;">Close</a>
+                    <input type="button" onclick="javascript: dialogEvent('spreadDlg_Apply');" class="epmliveButton" value="Apply"/>
+                    <input type="button" onclick="javascript: dialogEvent('spreadDlg_Close');" class="epmliveButton" value="Close"/>
 		</div>
 	</div>
 </div>
@@ -478,7 +206,7 @@ border-radius: 0px;
 		<div id="idTarLegDiv"></div>
 		<div style="float:right;padding-right:5px;margin-top:15px;">
 			<div>
-        			<a href="javascript:dialogEvent('TargetLegend_OKOnClick');" class="button-new green" style="width:75px;">OK</a>
+                    <input type="button" onclick="javascript: dialogEvent('TargetLegend_OKOnClick');" class="epmliveButton" value="OK"/>
 			</div>
 		</div>
 	</div>
@@ -530,7 +258,7 @@ border-radius: 0px;
        </div>
 		<div style="float:right;padding-right:5px;margin-top:15px;">
 			<div>
-        			<a href="javascript:dialogEvent('GridExplain_OKOnClick');" class="button-new green" style="width:75px;">Close</a>
+                <input type="button" onclick="javascript: dialogEvent('GridExplain_OKOnClick');" class="epmliveButton" value="Close"/>
 			</div>
 		</div>
 	</div>
@@ -594,8 +322,7 @@ border-radius: 0px;
                             <tr>
                                 <td>
                                     <div class="button-containerVert">
-        				                <a href="javascript:dialogEvent('TotalAddCol_Click');" class="button-new silver" style="width:75px;" id="idTotButtonAdd">Add ></a>
-        			
+                                        <input type="button" onclick="javascript: dialogEvent('TotalAddCol_Click');" class="epmliveButton" value="Add >"/>
 				                    </div>
                                 </td>
                             </tr>
@@ -603,7 +330,7 @@ border-radius: 0px;
                            <tr>
                                 <td>
 				                    <div class="button-containerVert">
-        				                <a href="javascript:dialogEvent('TotalRemoveCol_Click');" class="button-new silver" style="width:75px;" id="idTotButtonRemove">< Remove</a>
+                                        <input type="button" onclick="javascript: dialogEvent('TotalRemoveCol_Click');" class="epmliveButton" value="< Remove"/>
 				                    </div>
                                 </td>
                             </tr>
@@ -650,11 +377,12 @@ border-radius: 0px;
              </table>
      </div>
      <div class="button-container">
-         <a href="javascript:dialogEvent('SelectTotals_OK');" class="button-new green" style="width:75px;">OK</a>
-         <a href="javascript:dialogEvent('SelectTotals_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('SelectTotals_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SelectTotals_Cancel');" class="epmliveButton" value="Cancel"/>
      </div>
 </div>
 <div id="idEditTargetDlgObj" class="modalContent" style="display:none;">
+    <br />
     <table id="EditTarTable" width="100%"  cellspacing="0">
          <tr>
              <td  >
@@ -662,41 +390,40 @@ border-radius: 0px;
                 </select>
            </td>
         </tr>
-        <tr><td><br /></td></tr>
      </table>
      <div class="button-container">
-         <a href="javascript:dialogEvent('SelectEditTarget_OK');" class="button-new green" style="width:75px;">OK</a>
-         <a href="javascript:dialogEvent('SelectEditTarget_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('SelectEditTarget_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SelectEditTarget_Cancel');" class="epmliveButton" value="Cancel"/>
      </div>
 </div>
 <div id="idDeleteTargetDlgObj" class="modalContent" style="display:none;">
-    <table id="DelTarTable" width="100%"  cellspacing="0">
+<br />
+        <table id="DelTarTable" width="100%"  cellspacing="0">
          <tr>
              <td  >
                 <select id="idSelDelTarget">
                 </select>
            </td>
         </tr>
-        <tr><td><br /></td></tr>
      </table>
      <div class="button-container">
-         <a href="javascript:dialogEvent('SelectDeleteTarget_OK');" class="button-new green" style="width:75px;">OK</a>
-         <a href="javascript:dialogEvent('SelectDeleteTarget_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('SelectDeleteTarget_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SelectDeleteTarget_Cancel');" class="epmliveButton" value="Cancel"/>
      </div>
 </div>
 <div id="idCopyTargetDlgObj" class="modalContent" style="display:none;">
-    <table id="CopyTarTable" width="100%"  cellspacing="0">
+ <br />
+       <table id="CopyTarTable" width="100%"  cellspacing="0">
          <tr>
              <td  >
                 <select id="idSelCopyTarget">
                 </select>
            </td>
         </tr>
-        <tr><td><br /></td></tr>
      </table>
      <div class="button-container">
-         <a href="javascript:dialogEvent('SelectCopyTarget_OK');" class="button-new green" style="width:75px;">OK</a>
-         <a href="javascript:dialogEvent('SelectCopyTarget_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: dialogEvent('SelectCopyTarget_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: dialogEvent('SelectCopyTarget_Cancel');" class="epmliveButton" value="Cancel"/>
      </div>
 </div>
 <div id="idEditTargetDlg" class="modalContent" style="display:none;">
@@ -711,11 +438,12 @@ border-radius: 0px;
 		<div><input id="txtCostTargetName" type="text" value=" " style="width:210px;text-align:left;padding:0px;margin:0px;height:20px;" /></div>
 		<div style="width:200px;margin-left:10px;margin-top:3px;">
 			<div style="padding-top:10px;">
-        			<a href="javascript:editTargetEvent('etSaveAs_OK');" class="button-new green" style="width:75px;">OK</a>
-        			<a href="javascript:editTargetEvent('etSaveAs_Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
+                    <input type="button" onclick="javascript: editTargetEvent('etSaveAs_OK');" class="epmliveButton" value="OK"/>
+                    <input type="button" onclick="javascript: editTargetEvent('etSaveAs_Cancel');" class="epmliveButton" value="Cancel"/>
 			</div>
    		</div>
     </div>
+</div>
 <div id="gridDiv_1" style="width:100%;height:100%;overflow:auto;"></div>
 <div id="gridDiv_Totals" style="width:100%;overflow:auto;"></div>
 <div id="toolbarDataObjectDiv"></div>

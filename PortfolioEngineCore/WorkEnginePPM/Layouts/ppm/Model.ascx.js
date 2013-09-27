@@ -103,19 +103,22 @@
 
 
 
-	                var idpilist = document.getElementById('idSelPI');
-	                idpilist.options.length = 0;
+
+
+	                var idpilist = document.getElementById('idSelPIDiv');
+	                //idpilist.options.length = 0;
+
+	                var shtml = "";
 
 	                for (var i = 0; i < this.PIList.length; i++) {
 	                    var pid = this.PIList[i].ID;
 	                    var pname = this.PIList[i].NAME;
 
-	                    idpilist.options[i] = new Option(pname, pid, true, true);
-
+	                    shtml += '<input id="idSelPIChk' + i + '" type="checkbox" CHECKED />' + pname + '<br />';
 
 	                }
 
-
+	                idpilist.innerHTML = shtml;
 
 	            }
 	            else
@@ -148,13 +151,13 @@
 	    var retval = false;
 	    var sExtPIs = "";
 
-	    var idpilist = document.getElementById('idSelPI');
+
 
 	    for (var i = 0; i < this.PIList.length; i++) {
-
+	        var idpilist = document.getElementById('idSelPIChk' + i);
 	        var pextid = this.PIList[i].EXTID;
 
-	        if (idpilist.options[i].selected) {
+	        if (idpilist.checked == true) {
 	            retval = true;
 
 	            if (sExtPIs == "")
@@ -164,9 +167,11 @@
 	        }
 
 	    }
-
 	    if (retval == true)
 	        WorkEnginePPM.Model.ExecuteJSON("","GetGeneratedPortfolioItemTicket", sExtPIs, GetGeneratedPortfolioItemTicketCompleteDelegate);
+	    else
+	        alert("No Portfolio Items were selected");
+
 
 
 	    return retval;
@@ -194,11 +199,16 @@
 	                }
 
 	                this.params.TicketVal = xticket;
+	                this.TicketVal = xticket;
 
 	                if (this.IsModeller == true) 
 	                        this.GetModelAndVersions();
-	                else 
-	                        WorkEnginePPM.Model.GetCostViews(GetCostViewsCompleteDelegate);
+	                else {
+
+
+	                    WorkEnginePPM.Model.GetCostViews(GetCostViewsCompleteDelegate);
+	                }
+
 	                   
 
 
@@ -235,12 +245,29 @@
 
    Model.prototype.GetCostViewsComplete = function (result) {
 	   
-		var bFound = false;
+       var bFound = false;
+       var bnoview = false;
+
+       if (this.ViewName == undefined)
+           this.ViewName = "";
+
+       if (this.ViewID == undefined)
+           this.ViewID = "";
+
+       if (this.ViewName == "" && this.ViewID == "")
+           bnoview = true;
 
 		for (var n = 0; n < result.length; n++) {
 			var Id = result[n].Id;
 			var Name = result[n].Name;
 
+			if (bnoview) {
+			    this.ViewName = "";
+			    this.ViewID = Id;
+			    bFound = true;
+			    break;
+
+			}
 
 			if (Name == this.ViewName)
 			{
