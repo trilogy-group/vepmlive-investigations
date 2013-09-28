@@ -250,6 +250,13 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\getreportfiltertitles.aspx.designer.cs">
       <DependentUpon>getreportfiltertitles.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\MyWork.aspx.cs">
+      <DependentUpon>MyWork.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\MyWork.aspx.designer.cs">
+      <DependentUpon>MyWork.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\MyWorkGridAction.aspx.cs">
       <DependentUpon>MyWorkGridAction.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -491,6 +498,9 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="Layouts\epmlive\epmlivegantt.lpk" />
     <None Include="Layouts\epmlive\epmlivegantt_OLD.lpk" />
+    <None Include="Layouts\epmlive\MyWorkWebPart.min.js.map">
+      <DependentUpon>MyWorkWebPart.js</DependentUpon>
+    </None>
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{05dece48-3f8d-4fcc-a082-3bccd21012ef}</SharePointProjectItemId>
     </None>
@@ -1288,11 +1298,18 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\jquery.multiselect.css" />
     <Content Include="Layouts\epmlive\listedititem.aspx" />
     <Content Include="Layouts\epmlive\MD5.js" />
+    <Content Include="Layouts\epmlive\MyWork.aspx" />
     <Content Include="Layouts\epmlive\MyWorkContextualTabPageComponent.js" />
     <Content Include="Layouts\epmlive\MyWorkGridAction.aspx" />
     <Content Include="Layouts\epmlive\MyWorkRichTextEditor.aspx" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.css" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.js" />
+    <Content Include="Layouts\epmlive\MyWorkWebPart.min.css">
+      <DependentUpon>MyWorkWebPart.css</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\MyWorkWebPart.min.js">
+      <DependentUpon>MyWorkWebPart.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\RedirectionProxy.aspx" />
     <Content Include="Layouts\epmlive\ReportingFilterWebPart.css" />
     <Content Include="Layouts\epmlive\ReportViewWebpart.js" />

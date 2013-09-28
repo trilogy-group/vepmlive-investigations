@@ -28,8 +28,8 @@
 	</div>
 </div>
 
-<script type="text/javascript">
-	(function () {
+<SharePoint:ScriptBlock runat="server">
+    (function () {
 		window.allWorkGridId = '<%= MyWorkParams.WebPartId %>';
 		
 //		var initialize = function () {
@@ -39,4 +39,4 @@
 
 //		ExecuteOrDelayUntilScriptLoaded(initialize, 'EPMLive.WorkCenter.js');
 	})();
-</script>
+</SharePoint:ScriptBlock>

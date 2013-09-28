@@ -54,45 +54,6 @@ Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
         if (window.myWorkLoader) {
             window.myWorkLoader.close();
-            window.setTimeout(function () {
-                window.epmLive.utils.fireEvent(document.getElementById('MSOZoneCell_WebPart' + myWorkWebPartQualifier), 'mouseup');
-                window.setTimeout(function () {
-                    try {
-                        window.SelectRibbonTab('Ribbon.MyWorkTab', true);
-                        
-                        window.setTimeout(function () {
-                            try {
-                                var setTabStyle = function () {
-                                    var tabs = [$(document.getElementById('Ribbon.MyWorkTab-title')), $(document.getElementById('Ribbon.MyWorkViewsTab-title'))];
-
-                                    for (var tab in tabs) {
-                                        if (tabs.hasOwnProperty(tab)) {
-                                            var t = tabs[tab];
-
-                                            t.attr('style', 'border-top: 1px solid #E1E1E1 !important; height: 33px !important; margin-top: -4px !important');
-                                            t.find('a').attr('style', 'padding-top: 4px !important;');
-
-                                            if (t.attr('aria-selected') === 'false') {
-                                                t.attr('style', 'height: 33px !important; margin-top: -3px !important');
-                                            }
-
-                                            t.click(function () {
-                                                window.setTimeout(function () {
-                                                    setTabStyle();
-                                                }, 100);
-                                            });
-                                        }
-                                    }
-                                };
-
-                                setTabStyle();
-                            } catch (ex) {
-                            }
-                        }, 2000);
-                    } catch (e) {
-                    }
-                }, 500);
-            }, 500);
         } else {
             document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
         }
@@ -363,6 +324,7 @@ Grids.OnLoaded = function (grid) {
         });
 
         MyWorkGrid.resetNoDataRow();
+        window.setTimeout(function () { MyWorkGrid.loadRibbon(); }, 1500);
     }
 };
 
@@ -2982,9 +2944,42 @@ var MyWorkGrid = {
     loadRibbon: function () {
         SP.SOD.executeOrDelayUntilScriptLoaded(function () {
             var selectTab = function (tabId) {
-                window._ribbonStartInit(tabId, false, null);
-                window.SelectRibbonTab(tabId, true);
-                window.RefreshCommandUI();
+                window._ribbonStartInit(tabId, true, null);
+
+                $('#s4-ribbonrow').height(35);
+
+                window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 50);
+                window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 100);
+                
+                window.setTimeout(function () {
+                    try {
+                        var setTabStyle = function () {
+                            var tabs = [$(document.getElementById('Ribbon.MyWorkTab-title')), $(document.getElementById('Ribbon.MyWorkViewsTab-title'))];
+
+                            for (var tab in tabs) {
+                                if (tabs.hasOwnProperty(tab)) {
+                                    var t = tabs[tab];
+
+                                    t.attr('style', 'border-top: 1px solid #E1E1E1 !important; height: 33px !important; margin-top: -4px !important');
+                                    t.find('a').attr('style', 'padding-top: 4px !important;');
+
+                                    if (t.attr('aria-selected') === 'false') {
+                                        t.attr('style', 'height: 33px !important; margin-top: -3px !important');
+                                    }
+
+                                    t.click(function () {
+                                        window.setTimeout(function () {
+                                            setTabStyle();
+                                        }, 100);
+                                    });
+                                }
+                            }
+                        };
+
+                        setTabStyle();
+                    } catch (ex) {
+                    }
+                }, 2000);
             };
 
             var pm = SP.Ribbon.PageManager.get_instance();
@@ -2997,7 +2992,7 @@ var MyWorkGrid = {
             }
 
             if (!ribbon) {
-                if (typeof(window._ribbonStartInit) === 'function') {
+                if (typeof (window._ribbonStartInit) === 'function') {
                     selectTab('Ribbon.MyWorkTab');
                 }
             } else {

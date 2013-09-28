@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.UI;
 using System.Xml.Linq;
 using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
@@ -432,31 +433,21 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 
         private void RegisterScripts()
         {
-            string version = string.Empty;
-
-            string temp;
-            if (!IsInDebugMode(out temp))
+            foreach (string style in new[] {"MyWorkWebPart.min"})
             {
-                string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-
-                if (string.IsNullOrEmpty(fileVersion) || fileVersion.Equals("1.0.0.0"))
-                {
-                    fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-                }
-
-                version = "?v=" + fileVersion;
+                SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + style + ".css");
             }
 
-            CssRegistration.Register("/_layouts/epmlive/MyWorkWebPart.css");
-
-            ScriptLink.Register(Page, "/_layouts/epmlive/treegrid/GridE.js", false);
-            ScriptLink.Register(Page, "/_layouts/epmlive/xml2json.js", false);
-            ScriptLink.Register(Page, "/_layouts/epmlive/MD5.js", false);
-            ScriptLink.Register(Page, "/_layouts/epmlive/MyWorkWebPart.js" + version, false);
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "libraries/jquery.min", "/treegrid/GridE", "/xml2json", "/MD5", "@/MyWorkWebPart"
+            });
 
             ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
         }
 
         #endregion Methods 
+
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
     }
 }

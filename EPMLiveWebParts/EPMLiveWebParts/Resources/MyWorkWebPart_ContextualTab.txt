@@ -37,8 +37,8 @@
 				  Description="Add a new item"
 				  LabelText="New Item"
 				  TemplateAlias="ONERWFIXED"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/newitem-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/newitem-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/newitem-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/newitem-16.png" />
 		</Controls>
 	  </Group>
 	  <Group Id="Ribbon.MyWorkTab.MyWorkGroupManage"
@@ -54,24 +54,24 @@
 				  LabelText="View Item"
 				  TemplateAlias="ONERWFIXED"
 				  Sequence="5"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/viewitem-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/viewitem-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/viewitem-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/viewitem-16.png" />
 		  <Button Id="Ribbon.MyWork.Manage.EditItem"
 				  Command="MyWork.Cmd.EditItem"
 				  Description="Edit this item"
 				  LabelText="Edit Item"
 				  TemplateAlias="ONERWFIXED"
 				  Sequence="10"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/edititem-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/edititem-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/edititem-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/edititem-16.png" />
 		  <Button Id="Ribbon.MyWork.Manage.Comments"
 				  Command="MyWork.Cmd.Comments"
 				  Description="Comments"
 				  LabelText="Comments"
 				  TemplateAlias="ONERWFIXED"
 				  Sequence="30"
-				  Image32by32="/_layouts/epmlive/images/comments32.png"
-				  Image16by16="/_layouts/epmlive/images/comments16.gif" />
+				  Image32by32="/_layouts/15/epmlive/images/comments32.png"
+				  Image16by16="/_layouts/15/epmlive/images/comments16.gif" />
 		</Controls>
 	  </Group>
 	  <Group Id="Ribbon.MyWorkTab.MyWorkGroupViews"
@@ -107,8 +107,8 @@
 				  Description="Alert Me"
 				  LabelText="Alert Me"
 				  TemplateAlias="ONERWFIXED"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/alertme-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/alertme-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/alertme-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/alertme-16.png" />
 		</Controls>
 	  </Group>
 	  <Group Id="Ribbon.MyWorkTab.MyWorkGroupWorkFilter"
@@ -174,22 +174,22 @@
 				  Description="Save View"
 				  LabelText="Save View"
 				  TemplateAlias="THRRW"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/saveview-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/saveview-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/saveview-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/saveview-16.png" />
 		  <Button Id="Ribbon.MyWork.Views.RenameView"
 				  Command="MyWork.Cmd.RenameView"
 				  Description="Rename View"
 				  LabelText="Rename View"
 				  TemplateAlias="THRRW"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/renameview-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/renameview-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/renameview-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/renameview-16.png" />
 		  <Button Id="Ribbon.MyWork.Views.DeleteView"
 				  Command="MyWork.Cmd.DeleteView"
 				  Description="Delete View"
 				  LabelText="Delete View"
 				  TemplateAlias="THRRW"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/deleteview-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/deleteview-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/deleteview-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/deleteview-16.png" />
 		  <Button Id="Ribbon.MyWork.Actions.SelectColoumns"
 				  Command="MyWork.Cmd.SelectColoumns"
 				  Description="Select Columns"
@@ -219,24 +219,24 @@
 				  Description="Show/Hide Filters"
 				  LabelText="Show Filters"
 				  TemplateAlias="THRRW"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/showhidefilters-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/showhidefilters-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/showhidefilters-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/showhidefilters-16.png" />
 		  <ToggleButton Id="Ribbon.MyWork.Views.ShowHideGrouping"
 				  Command="MyWork.Cmd.ShowHideGrouping"
 				  QueryCommand="MyWork.Cmd.ShowHideGrouping.Query"
 				  Description="Show/Hide Grouping"
 				  LabelText="Show Grouping"
 				  TemplateAlias="THRRW"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/showhidegrouping-32.png"
-				  Image16by16="_layouts/epmlive/images/grouping.gif" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/showhidegrouping-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/grouping.gif" />
 		  <Button Id="Ribbon.MyWork.Views.ClearSort"
 				  Command="MyWork.Cmd.ClearSort"
 				  Description="Removes Sorting"
 				  LabelText="Remove Sorting"
 				  TemplateAlias="THRRW"
 				  Sequence="30"
-				  Image32by32="_layouts/epmlive/images/mywork/ribbon/sort-32.png"
-				  Image16by16="_layouts/epmlive/images/mywork/ribbon/sort-16.png" />
+				  Image32by32="/_layouts/15/epmlive/images/mywork/ribbon/sort-32.png"
+				  Image16by16="/_layouts/15/epmlive/images/mywork/ribbon/sort-16.png" />
 		</Controls>
 	  </Group>
 	  <Group Id="Ribbon.MyWorkViewsTab.MyWorkGroupActions"

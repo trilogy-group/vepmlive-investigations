@@ -8,34 +8,6 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MyWorkControl.ascx.cs" Inherits="EPMLiveWebParts.CONTROLTEMPLATES.MyWork.MyWorkControl" %>
 
 <div id="EPMAllWork">
-
-    <SharePoint:StyleBlock runat="server">
-        .EPMLiveMyWorkGroup {
-            border-bottom: 1px solid #ABABAB;
-        }
-        
-        .EPMLiveMyWorkGroupTitle {
-            padding-top: 14px;
-            font-weight: bold;
-            font-weight: bold;
-            height: 22px;
-            padding-bottom: 3px;
-        }
-        
-        .EPMLiveMyWorkGroupTitle > a {
-            color: #444444 !important;
-            text-decoration: none !important;
-        }
-        
-        .EPMLiveMyWorkGroupPrefix {
-            color: #777777;
-        }
-        
-        .EPMLiveMyWorkGroupPostfix {
-            font-weight: normal;
-        }
-    </SharePoint:StyleBlock>
-
     <div id="MWG_Loader_<%= WebPartId %>" class="epmlive-loader">  
     </div>
 
