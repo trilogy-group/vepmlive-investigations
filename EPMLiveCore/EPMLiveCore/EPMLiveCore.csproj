@@ -1619,7 +1619,9 @@ net start "WETimer"</PostDeploymentCommand>
       <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
     </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map">
+      <DependentUpon>EPMLive.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Navigation.min.js.map">
       <DependentUpon>EPMLive.Navigation.js</DependentUpon>
     </None>
@@ -3685,6 +3687,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\FastPanel2.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Filter.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\grid-check.png" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Grid.css" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\HScroll.png" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Menu.gif" />

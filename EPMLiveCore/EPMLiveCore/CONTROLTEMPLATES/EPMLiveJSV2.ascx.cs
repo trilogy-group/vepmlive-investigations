@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
+using System.Globalization;
 using System.Web;
 using System.Web.UI;
 using EPMLiveCore.Infrastructure;
@@ -10,8 +9,17 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 {
     public partial class EPMLiveJSV2 : UserControl
     {
-        #region Fields (8) 
+        #region Fields (17) 
 
+        protected string CurrentFileIsNull;
+        protected string CurrentUrl;
+        protected string CurrentUserId;
+        protected string ItemId;
+        protected string ItemTitle;
+        protected string ListIconClass;
+        protected string ListId;
+        protected string ListTitle;
+        protected string ListViewUrl;
         protected string Scheme;
         protected string SiteId;
         protected string SiteUrl;
@@ -19,17 +27,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected string WebFullUrl;
         protected string WebId;
         protected string WebUrl;
-        protected string ListId;
-        protected string ListTitle;
-        protected string ItemId;
-        protected string ItemTitle;
-        protected string CurrentUserId;
-        protected string CurrentUrl;
-        protected string ListIconClass;
-        protected string ListViewUrl;
-        protected string ListViewTitle;
-        protected string CurrentFileIsNull;
-        protected string CurrentFileTitle;
         private SPWeb _spWeb;
 
         #endregion Fields 
@@ -50,8 +47,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/jquery-ui.min", "@libraries/jquery.cookie", "/xml2json", "/MD5",
-                "jquery.multiselect.min", "@EPMLive.Analytics"
+                "libraries/jquery.min", "libraries/jquery-ui.min", "libraries/jquery.tmpl.min",
+                "@libraries/jquery.cookie", "/xml2json", "/MD5", "jquery.multiselect.min", "@EPMLive.Analytics"
             });
 
             EPMFileVersion = EPMLiveScriptManager.FileVersion;
@@ -71,54 +68,85 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            _spWeb = SPContext.Current.Web;
+            SPContext spContext = SPContext.Current;
+
+            _spWeb = spContext.Web;
+
             SiteId = _spWeb.Site.ID.ToString();
             SiteUrl = _spWeb.Site.Url;
             WebFullUrl = _spWeb.Url;
             WebId = _spWeb.ID.ToString();
             WebUrl = _spWeb.SafeServerRelativeUrl();
-            
+
             ListTitle = string.Empty;
-            try{ListTitle = SPContext.Current.List.Title;}catch{}
-            
+            try
+            {
+                ListTitle = spContext.List.Title;
+            }
+            catch { }
+
             ListId = Guid.Empty.ToString();
-            try{ListId = SPContext.Current.ListId.ToString();}catch{}
+            try
+            {
+                ListId = spContext.ListId.ToString();
+            }
+            catch { }
 
             ListViewUrl = string.Empty;
-            try{ListViewUrl = SPContext.Current.ViewContext.View.Url;}catch{}
-
-            ListViewTitle = string.Empty;
-            try { ListViewTitle = SPContext.Current.ViewContext.View.Title; }
+            try
+            {
+                ListViewUrl = spContext.ViewContext.View.Url;
+            }
             catch { }
 
             ItemId = "-1";
-            try{ItemId = (SPContext.Current.Item != null) ? SPContext.Current.ItemId.ToString() : "-1";}catch{}
+            try
+            {
+                ItemId = (spContext.Item != null) ? spContext.ItemId.ToString(CultureInfo.InvariantCulture) : "-1";
+            }
+            catch { }
 
             ItemTitle = string.Empty;
-            try { ItemTitle = (SPContext.Current.Item != null) ? SPContext.Current.ListItemDisplayName : string.Empty; }catch { }
+            try
+            {
+                ItemTitle = (spContext.Item != null) ? spContext.ListItemDisplayName : string.Empty;
+            }
+            catch { }
 
             CurrentFileIsNull = "True";
-            try { CurrentFileIsNull = (SPContext.Current.File == null).ToString(); }catch { }
-
-            CurrentFileTitle = string.Empty;
-            try { CurrentFileTitle = Path.GetFileName(Request.FilePath); }
+            try
+            {
+                CurrentFileIsNull = (spContext.File == null).ToString();
+            }
             catch { }
 
             ListIconClass = string.Empty;
             try
             {
-                ListIconClass = new GridGanttSettings(SPContext.Current.List).ListIcon;
-            }catch{}
-
-            CurrentUserId = "-1";
-            try{CurrentUserId = SPContext.Current.Web.CurrentUser.ID.ToString();}catch{}
-
-            CurrentUrl = string.Empty;
-            try { CurrentUrl = new Uri(new Uri(SPContext.Current.Web.Url), HttpContext.Current.Request.RawUrl).AbsoluteUri; }
+                ListIconClass = new GridGanttSettings(spContext.List).ListIcon;
+            }
             catch { }
 
-            try{WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");}catch { }
-           
+            CurrentUserId = "-1";
+            try
+            {
+                CurrentUserId = _spWeb.CurrentUser.ID.ToString(CultureInfo.InvariantCulture);
+            }
+            catch { }
+
+            CurrentUrl = string.Empty;
+            try
+            {
+                CurrentUrl = new Uri(new Uri(_spWeb.Url), HttpContext.Current.Request.RawUrl).AbsoluteUri;
+            }
+            catch { }
+
+            try
+            {
+                WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
+            }
+            catch { }
+
 
             Scheme = Request.Url.Scheme;
         }

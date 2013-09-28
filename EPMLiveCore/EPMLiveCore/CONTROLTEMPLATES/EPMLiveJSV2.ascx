@@ -7,9 +7,8 @@
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveJSV2.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.EPMLiveJSV2" %>
 
-<script type="text/javascript">
+<SharePoint:ScriptBlock runat="server">
     (function () {
-
         function onJqueryLoaded() {
             $.getScript = function (url, callback, cache) {
                 $.ajax({
@@ -21,32 +20,28 @@
                 });
             };
 
-            $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/libraries/jquery.tmpl.min.js?v=<%= EPMFileVersion %>', function () {
-                $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js?v=<%= EPMFileVersion %>', function () {
-                    $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/epmlive<%= DebugMode ? ".min" : string.Empty %>.js?v=<%= EPMFileVersion %>', function () {
-                        epmLive.currentSiteId = '<%= SiteId %>';
-                        epmLive.currentSiteUrl = '<%= SiteUrl %>';
-                        epmLive.currentWebId = '<%= WebId %>';
-                        epmLive.currentWebUrl = '<%= WebUrl %>';
-                        epmLive.currentWebFullUrl = '<%= WebFullUrl %>';
-                        epmLive.currentListId = '<%= ListId %>';
-                        epmLive.currentListIcon = '<%= ListIconClass %>';
-                        epmLive.currentListTitle = '<%= ListTitle %>';
-                        epmLive.currentListViewUrl = '<%= ListViewUrl %>';
-                        epmLive.currentListViewTitle = '<%= ListViewTitle %>';
-                        epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
-                        epmLive.currentItemID = '<%= ItemId %>';
-                        epmLive.currentItemTitle = '<%= ItemTitle %>';
-                        epmLive.currentFileTitle = '<%= CurrentFileTitle %>';
-                        epmLive.currentUserId = '<%= CurrentUserId %>';
-                        epmLive.currentUrl = '<%= CurrentUrl %>';
-                        epmLive.fileVersion = '<%= EPMFileVersion %>';
-                        epmLive.debugMode = <%= DebugMode.ToString().ToLower() %>;
-                        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
-                    }, true);
+            $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js?v=<%= EPMFileVersion %>', function() {
+                $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/epmlive<%= DebugMode ? ".min" : string.Empty %>.js?v=<%= EPMFileVersion %>', function() {
+                    epmLive.currentSiteId = '<%= SiteId %>';
+                    epmLive.currentSiteUrl = '<%= SiteUrl %>';
+                    epmLive.currentWebId = '<%= WebId %>';
+                    epmLive.currentWebUrl = '<%= WebUrl %>';
+                    epmLive.currentWebFullUrl = '<%= WebFullUrl %>';
+                    epmLive.currentListId = '<%= ListId %>';
+                    epmLive.currentListIcon = '<%= ListIconClass %>';
+                    epmLive.currentListTitle = '<%= ListTitle %>';
+                    epmLive.currentListViewUrl = '<%= ListViewUrl %>';
+                    epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
+                    epmLive.currentItemID = '<%= ItemId %>';
+                    epmLive.currentItemTitle = '<%= ItemTitle %>';
+                    epmLive.currentUserId = '<%= CurrentUserId %>';
+                    epmLive.currentUrl = '<%= CurrentUrl %>';
+                    epmLive.fileVersion = '<%= EPMFileVersion %>';
+                    epmLive.debugMode = <%= DebugMode.ToString().ToLower() %>;
+                    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
                 }, true);
             }, true);
-
+            
             $(function () {
                 var walkme = document.createElement('script');
                 walkme.type = 'text/javascript';
@@ -59,4 +54,4 @@
 
         ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
     })();
-</script>
+</SharePoint:ScriptBlock>
