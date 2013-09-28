@@ -120,7 +120,7 @@
                var currentNode = "epm-nav-top-" + node.Id;
                if (Pinned && SelectedTlNode.Equals(currentNode))
                {
-                   attr = @"style=""display:block;""";
+                   attr = @" style=""display:block;""";
                }
         %>
             <div id="epm-nav-sub-<%= node.Id %>" class="epm-nav-sub" data-role="sub-nav-node"<%= attr %>>
