@@ -40,7 +40,7 @@ html, body {
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-	<div style="margin-top:5px;margin-bottom:5px;padding-left:3px;padding-right:3px;">
+	<div id="idselectdiv" runat="server" style="margin-top:5px;margin-bottom:5px;padding-left:3px;padding-right:3px;" visible="false">
 		<div style="padding-bottom:3px;">
             <table cellspacing="0">
                 <tr>
@@ -82,9 +82,9 @@ html, body {
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Test Page for Resource and Cost Planners and Analyzers
+<%=pageTitle%>
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Test Page for Resource and Cost Planners and Analyzers
+<%=pageTitle%>
 </asp:Content>
