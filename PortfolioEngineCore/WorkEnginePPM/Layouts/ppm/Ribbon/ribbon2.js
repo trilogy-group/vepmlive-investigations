@@ -663,6 +663,7 @@
             })();
         });
         constructor.prototype = $.widget.extend(basePrototype, {
+
             // TODO: remove support for widgetEventPrefix
             // always use the name + a colon as the prefix, e.g., draggable:start
             // don't prefix for widgets that aren't DOM-based
@@ -678,7 +679,8 @@
         // are inheriting from it and redefine all of them so that they inherit from
         // the new version of this widget. We're essentially trying to replace one
         // level in the prototype chain.
-        if (existingConstructor) {
+        try {
+            if (existingConstructor) {
             $.each(existingConstructor._childConstructors, function (i, child) {
                 var childPrototype = child.prototype;
 
@@ -694,6 +696,8 @@
         }
 
         $.widget.bridge(name, constructor);
+        }
+        catch (e) { }
     };
 
     $.widget.extend = function (target) {
@@ -1083,6 +1087,7 @@
 
 (function ($, undefined) {
 
+
     var multiselectID = 0;
 
     $.widget("ech.multiselect", {
@@ -1106,63 +1111,67 @@
         },
 
         _create: function () {
-            var el = this.element.hide(),
-			o = this.options;
+            try {
+                var el = this.element.hide(),
+                o = this.options;
 
-            this.speed = $.fx.speeds._default; // default speed for effects
-            this._isOpen = false; // assume no
+                this.speed = $.fx.speeds._default; // default speed for effects
+                this._isOpen = false; // assume no
 
-            var 
-			button = (this.button = $('<button type="button"><span class="ui-icon ui-icon-triangle-2-n-s"></span></button>'))
-				.addClass('ui-multiselect ui-widget ui-state-default ui-corner-all')
-				.addClass(o.classes)
-				.attr({ 'title': el.attr('title'), 'aria-haspopup': true, 'tabIndex': el.attr('tabIndex') })
-				.insertAfter(el),
+                var
+                button = (this.button = $('<button type="button"><span class="ui-icon ui-icon-triangle-2-n-s"></span></button>'))
+                    .addClass('ui-multiselect ui-widget ui-state-default ui-corner-all')
+                    .addClass(o.classes)
+                    .attr({ 'title': el.attr('title'), 'aria-haspopup': true, 'tabIndex': el.attr('tabIndex') })
+                    .insertAfter(el),
 
-			buttonlabel = (this.buttonlabel = $('<span />'))
-				.html(o.noneSelectedText)
-				.appendTo(button),
+                buttonlabel = (this.buttonlabel = $('<span />'))
+                    .html(o.noneSelectedText)
+                    .appendTo(button),
 
-			menu = (this.menu = $('<div />'))
-				.addClass('ui-multiselect-menu ui-widget ui-widget-content ui-corner-all')
-				.addClass(o.classes)
-				.appendTo(document.body),
+                menu = (this.menu = $('<div />'))
+                    .addClass('ui-multiselect-menu ui-widget ui-widget-content ui-corner-all')
+                    .addClass(o.classes)
+                    .appendTo(document.body),
 
-			header = (this.header = $('<div />'))
-				.addClass('ui-widget-header ui-corner-all ui-multiselect-header ui-helper-clearfix')
-				.appendTo(menu),
+                header = (this.header = $('<div />'))
+                    .addClass('ui-widget-header ui-corner-all ui-multiselect-header ui-helper-clearfix')
+                    .appendTo(menu),
 
-			headerLinkContainer = (this.headerLinkContainer = $('<ul />'))
-				.addClass('ui-helper-reset')
-				.html(function () {
-				    if (o.header === true) {
-				        return '<li><a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-check"></span><span>' + o.checkAllText + '</span></a></li><li><a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-closethick"></span><span>' + o.uncheckAllText + '</span></a></li>';
-				    } else if (typeof o.header === "string") {
-				        return '<li>' + o.header + '</li>';
-				    } else {
-				        return '';
-				    }
-				})
-				.append('<li class="ui-multiselect-close"><a href="#" class="ui-multiselect-close"><span class="ui-icon ui-icon-circle-close"></span></a></li>')
-				.appendTo(header),
+                headerLinkContainer = (this.headerLinkContainer = $('<ul />'))
+                    .addClass('ui-helper-reset')
+                    .html(function () {
+                        if (o.header === true) {
+                            return '<li><a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-check"></span><span>' + o.checkAllText + '</span></a></li><li><a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-closethick"></span><span>' + o.uncheckAllText + '</span></a></li>';
+                        } else if (typeof o.header === "string") {
+                            return '<li>' + o.header + '</li>';
+                        } else {
+                            return '';
+                        }
+                    })
+                    .append('<li class="ui-multiselect-close"><a href="#" class="ui-multiselect-close"><span class="ui-icon ui-icon-circle-close"></span></a></li>')
+                    .appendTo(header),
 
-			checkboxContainer = (this.checkboxContainer = $('<ul />'))
-				.addClass('ui-multiselect-checkboxes ui-helper-reset')
-				.appendTo(menu);
+                checkboxContainer = (this.checkboxContainer = $('<ul />'))
+                    .addClass('ui-multiselect-checkboxes ui-helper-reset')
+                    .appendTo(menu);
 
-            // perform event bindings
-            this._bindEvents();
+                // perform event bindings
+                this._bindEvents();
 
-            // build menu
-            this.refresh(true);
+                // build menu
+                this.refresh(true);
 
-            // some addl. logic for single selects
-            if (!o.multiple) {
-                menu.addClass('ui-multiselect-single');
+                // some addl. logic for single selects
+                if (!o.multiple) {
+                    menu.addClass('ui-multiselect-single');
+                }
             }
+            catch (e) { }
         },
 
         _init: function () {
+            try {
             if (this.options.header === false) {
                 this.header.hide();
             }
@@ -1175,9 +1184,12 @@
             if (this.element.is(':disabled')) {
                 this.disable();
             }
+            }
+            catch (e) { }
         },
 
         refresh: function (init) {
+            try {
             var el = this.element,
 			o = this.options,
 			menu = this.menu,
@@ -1261,10 +1273,13 @@
             if (!init) {
                 this._trigger('refresh');
             }
+            }
+            catch (e) { }
         },
 
         // updates the button text. call refresh() to rebuild
         update: function () {
+            try {
             var o = this.options,
 			$inputs = this.inputs,
 			$checked = $inputs.filter(':checked'),
@@ -1285,10 +1300,13 @@
 
             this.buttonlabel.html(value);
             return value;
+            }
+            catch (e) { }
         },
 
         // binds events
         _bindEvents: function () {
+            try {
             var self = this, button = this.button;
 
             function clickHandler() {
@@ -1461,10 +1479,13 @@
             $(this.element[0].form).bind('reset.multiselect', function () {
                 setTimeout($.proxy(self.refresh, self), 10);
             });
+            }
+            catch (e) { }
         },
 
         // set button width
         _setButtonWidth: function () {
+            try {
             var width = this.element.outerWidth(),
 			o = this.options;
 
@@ -1474,41 +1495,49 @@
 
             // set widths
             this.button.width(width);
+            }
+            catch (e) { }
         },
 
         // set menu width
         _setMenuWidth: function () {
-            var m = this.menu,
-			width = this.button.outerWidth() -
-				parseInt(m.css('padding-left'), 10) -
-				parseInt(m.css('padding-right'), 10) -
-				parseInt(m.css('border-right-width'), 10) -
-				parseInt(m.css('border-left-width'), 10);
+            try {
+                var m = this.menu,
+                width = this.button.outerWidth() -
+                    parseInt(m.css('padding-left'), 10) -
+                    parseInt(m.css('padding-right'), 10) -
+                    parseInt(m.css('border-right-width'), 10) -
+                    parseInt(m.css('border-left-width'), 10);
 
-            m.width(width || this.button.outerWidth());
+                m.width(width || this.button.outerWidth());
+            }
+            catch (e) { }
         },
 
         // move up or down within the menu
         _traverse: function (which, start) {
-            var $start = $(start),
-			moveToLast = which === 38 || which === 37,
+            try {
+                var $start = $(start),
+                moveToLast = which === 38 || which === 37,
 
-            // select the first li that isn't an optgroup label / disabled
-			$next = $start.parent()[moveToLast ? 'prevAll' : 'nextAll']('li:not(.ui-multiselect-disabled, .ui-multiselect-optgroup-label)')[moveToLast ? 'last' : 'first']();
+                // select the first li that isn't an optgroup label / disabled
+                $next = $start.parent()[moveToLast ? 'prevAll' : 'nextAll']('li:not(.ui-multiselect-disabled, .ui-multiselect-optgroup-label)')[moveToLast ? 'last' : 'first']();
 
-            // if at the first/last element
-            if (!$next.length) {
-                var $container = this.menu.find('ul').last();
+                // if at the first/last element
+                if (!$next.length) {
+                    var $container = this.menu.find('ul').last();
 
-                // move to the first/last
-                this.menu.find('label')[moveToLast ? 'last' : 'first']().trigger('mouseover');
+                    // move to the first/last
+                    this.menu.find('label')[moveToLast ? 'last' : 'first']().trigger('mouseover');
 
-                // set scroll position
-                $container.scrollTop(moveToLast ? $container.height() : 0);
+                    // set scroll position
+                    $container.scrollTop(moveToLast ? $container.height() : 0);
 
-            } else {
-                $next.find('label').trigger('mouseover');
+                } else {
+                    $next.find('label').trigger('mouseover');
+                }
             }
+            catch (e) { }
         },
 
         // This is an internal function to toggle the checked property and
@@ -1590,6 +1619,7 @@
 
         // open the menu
         open: function (e) {
+            try {
             var self = this,
 			button = this.button,
 			menu = this.menu,
@@ -1649,10 +1679,13 @@
             button.addClass('ui-state-active');
             this._isOpen = true;
             this._trigger('open');
+            }
+            catch (e) { }
         },
 
         // close the menu
         close: function () {
+            try {
             if (this._trigger('beforeclose') === false) {
                 return;
             }
@@ -1676,6 +1709,8 @@
             this.button.removeClass('ui-state-active').trigger('blur').trigger('mouseleave');
             this._isOpen = false;
             this._trigger('close');
+            }
+            catch (e) { }
         },
 
         enable: function () {
@@ -1701,6 +1736,7 @@
         },
 
         destroy: function () {
+            try {
             // remove classes + data
             $.Widget.prototype.destroy.call(this);
 
@@ -1709,6 +1745,8 @@
             this.element.show();
 
             return this;
+            }
+            catch (e) { }
         },
 
         isOpen: function () {
@@ -1725,6 +1763,7 @@
 
         // react to option changes after initialization
         _setOption: function (key, value) {
+            try {
             var menu = this.menu;
 
             switch (key) {
@@ -1762,8 +1801,10 @@
             }
 
             $.Widget.prototype._setOption.apply(this, arguments);
-        }
-    });
+            }
+       
+            catch (e) { }
+     }});
 
 })(jQuery);
 
