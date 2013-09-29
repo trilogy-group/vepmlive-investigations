@@ -459,10 +459,18 @@
 
                 window.epmLiveNavigation.togglePinned = function(remember) {
                     if ($sn.data('pinstate') === 'pinned') {
-                        changePinState('unpinned', remember);
+                        window.epmLiveNavigation.pin(remember);
                     } else {
-                        changePinState('pinned', remember);
+                        window.epmLiveNavigation.unpin(remember);
                     }
+                };
+                
+                window.epmLiveNavigation.pin = function (remember) {
+                    changePinState('pinned', remember);
+                };
+                
+                window.epmLiveNavigation.unpin = function (remember) {
+                    changePinState('unpinned', remember);
                 };
 
                 function getSelectedSubLevelNode() {
