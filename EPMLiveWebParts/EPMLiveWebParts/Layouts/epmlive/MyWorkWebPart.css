@@ -291,41 +291,17 @@ li.mwg-smi {
 .EPMLiveMyWorkTitle > div, .MWG_CompletedLineThrough > div, .HideCol0Title > div { display: inline; }
 
 .epmlive-toggle-switch {
-    border: 2px solid #C0C0C0;
-    color: #ffffff;
+    color: #0090CA;
     cursor: pointer;
-    font-family: Segoe UI, Segoe, Helvetica;
-    font-size: 14px;
-    font-weight: bold;
-    height: 20px;
-    line-height: 20px;
-    padding: 0;
-    padding-left: 3px;
-    padding-right: 3px;
-    position: relative;
-    width: 25px;
-    _cursor: hand;
+    font-size: 13px;
+    text-align: center;
 }
 
 .epmlive-toggle-switch > span {
+    font-family: segoe ui;
+    margin-left: 3px;
     position: relative;
     top: -1px;
-}
-
-.epmlive-toggle-switch-on { background-color: #4B89B2; }
-
-.epmlive-toggle-switch-off {
-    background-color: #E8E8E8;
-    color: #A0A0A0;
-    text-align: right;
-}
-
-.epmlive-toggle-switch-slider {
-    background-color: #C0C0C0;
-    height: 28px;
-    position: absolute;
-    top: -4px;
-    width: 15px;
 }
 
 .EPMLiveMyWorkGroup { border-bottom: 1px solid #ABABAB; }

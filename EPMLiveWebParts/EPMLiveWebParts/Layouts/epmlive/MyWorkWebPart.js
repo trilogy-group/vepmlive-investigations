@@ -242,9 +242,9 @@ Grids.OnGetHtmlValue = function (grid, row, col, val) {
                         break;
                     case 'WorkingOn':
                         if (val === 0) {
-                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch epmlive-toggle-switch-off" data-state="0" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }" style="margin-left:20px;"><span>NO</span><div class="epmlive-toggle-switch-slider" style="left: -16px;"></div></div>';
+                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch fui-radio-unchecked" data-state="0" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }" style="margin-left:20px;"><span>NO</span></div>';
                         } else {
-                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch epmlive-toggle-switch-on" data-state="1" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }" style="margin-left:20px;"><span>YES</span><div class="epmlive-toggle-switch-slider" style="left: 32px;"></div></div>';
+                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch fui-radio-checked" data-state="1" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }" style="margin-left:20px;"><span>YES</span></div>';
                         }
 
                         break;
@@ -2222,23 +2222,18 @@ var MyWorkGrid = {
         var row = Grids[MyWorkGrid.gridId].GetRowById(rowId);
         var ele = $('#epmtgs_' + rowId);
 
-        var slider = $(ele.find('.epmlive-toggle-switch-slider')[0]);
         var label = $(ele.find('span')[0]);
-
-        var width = ele.width() + slider.width() + 7;
 
         if (ele.data('state')) {
             ele.data('state', 0);
-            ele.removeClass('epmlive-toggle-switch-on');
-            ele.addClass('epmlive-toggle-switch-off');
-            slider.animate({ left: '-=' + width }, 300);
+            ele.removeClass('fui-radio-checked');
+            ele.addClass('fui-radio-unchecked');
             label.text('NO');
             row['WorkingOn'] = 0;
         } else {
             ele.data('state', 1);
-            ele.removeClass('epmlive-toggle-switch-off');
-            ele.addClass('epmlive-toggle-switch-on');
-            slider.animate({ left: '+=' + width }, 300);
+            ele.removeClass('fui-radio-unchecked');
+            ele.addClass('fui-radio-checked');
             label.text('YES');
             row['WorkingOn'] = 1;
         }
