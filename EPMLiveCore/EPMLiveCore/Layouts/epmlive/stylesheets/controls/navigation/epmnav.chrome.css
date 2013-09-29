@@ -16,5 +16,14 @@
   top: 0;
 }
 .epm-nav-sub .epm-nav-icon {
-  top: 1px;
+  top: 0px;
+}
+.epm-nav-sub .epm-menu-btn {
+  margin-top: 2px;
+}
+.epm-nav-sub li.epm-nav-node.epm-nav-trans a {
+  top: 0px;
+}
+.epm-nav-sub .epm-nav-dragger {
+  top: .5px;
 }
