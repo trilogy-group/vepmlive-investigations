@@ -28,7 +28,7 @@ a.ms-core-menu-root { padding: 0 !important; }
     padding-top: 4px;
     padding-bottom: 4px;
     margin-left: 10px;
-    margin-right: 45px;
+    margin-right: 70px;
 }
 
 .left-block { display: inline-block; }
@@ -36,8 +36,8 @@ a.ms-core-menu-root { padding: 0 !important; }
 .table-cell-div { display: inline-block; }
 
 #site-title, #page-title {
-    height: 39px;
-    line-height: 39px;
+    height: 49px;
+    line-height: 49px;
 }
 
 #site-title:after { content: '-'; }
