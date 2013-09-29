@@ -813,7 +813,7 @@ namespace EPMLiveCore.API
                         "1"),
                     AT("--SEP--", null, null, true),
                     AT("Permissions", "perms", "/_layouts/images/permissions16.png",
-                        LP(list, SPBasePermissions.ManagePermissions), "1"),
+                        LP(list, SPBasePermissions.ManagePermissions), "0"),
                     AT("Delete Item", "delete", "/_layouts/images/delitem.gif",
                         LP(list, SPBasePermissions.DeleteListItems),
                         "99"),
