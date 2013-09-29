@@ -321,9 +321,18 @@
                                     $(this).parent().removeClass(selectedClass);
                                 });
 
-                                $parent.addClass(selectedClass);
+                                var url = '';
+                                var aId = '';
+                                
+                                var id = $parent.parent().get(0).id;
 
-                                $.cookie(selectedLinkCookie, JSON.stringify({ id: $a.get(0).id, url: $a.attr('href') }), cookieOptions);
+                                if (id !== 'epm-nav-sub-favorites-static-links' && id !== 'epm-nav-sub-recent-static-links' && id !== 'epm-nav-sub-new-static-links') {
+                                    $parent.addClass(selectedClass);
+                                    url = $a.attr('href');
+                                    aId = $a.get(0).id;
+                                }
+                                
+                                $.cookie(selectedLinkCookie, JSON.stringify({ id: aId, url: url }), cookieOptions);
                             }
                         });
                     };
@@ -485,7 +494,16 @@
                     var link = $.parseJSON($.cookie(selectedLinkCookie));
                     if (link) {
                         if (link.id) {
-                            $($sn.find('#' + link.id).get(0)).parent().addClass(selectedClass);
+                            var $a = $($sn.find('#' + link.id).get(0));
+                            if ($a.length > 0) {
+                                var $parent = $a.parent();
+
+                                var id = $parent.parent().get(0).id;
+
+                                if (id !== 'epm-nav-sub-favorites-static-links' && id !== 'epm-nav-sub-recent-static-links' && id !== 'epm-nav-sub-new-static-links') {
+                                    $parent.addClass(selectedClass);
+                                }
+                            }
                         } else {
                             var index = link.index;
                             var uri = link.uri;
