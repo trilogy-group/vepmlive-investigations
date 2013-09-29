@@ -230,15 +230,15 @@
                             </div>
 
                             <div id="search-container" class="epm-global-button-right">
-                                <a href="javascript:toggleSearch();"><span class="fui-search"></span></a>
+                                <a href="javascript:toggleSearch();" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Search"><span class="fui-search"></span></a>
                             </div>
 
                             <div id="walkme-container" class="epm-global-button-right">
-                                <a id="epm-support-link" href="http://support.epmlive.com/" target="_blank"><span class="fui-question"></span></a>
+                                <a id="epm-support-link" href="http://support.epmlive.com/" target="_blank" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Support Community"><span class="fui-question"></span></a>
                             </div>
                             
                             <div id="uv-container" class="epm-global-button-right">
-                                <a id="epm-uv-link" href="javascript:window.showUserVoicePopup();"><span class="fui-ext-megaphone"></span></a>
+                                <a id="epm-uv-link" href="javascript:window.showUserVoicePopup();" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom"  data-delay="100"><span class="fui-ext-megaphone"></span></a>
                             </div>
 
                             <!-- Notification Counter -->
