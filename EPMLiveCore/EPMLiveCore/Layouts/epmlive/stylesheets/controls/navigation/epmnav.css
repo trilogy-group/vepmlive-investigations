@@ -213,6 +213,7 @@
   padding-top: 10px !important;
   width: 155px !important;
 }
+.epm-nav-sub div.epm-nav-sub-placeholder,
 .epm-nav-sub li.epm-nav-sub-placeholder {
   color: #CCCCCC;
   margin-bottom: 30px !important;
@@ -221,6 +222,7 @@
   position: relative;
   left: -5px;
 }
+.epm-nav-sub div.epm-nav-sub-placeholder:hover,
 .epm-nav-sub li.epm-nav-sub-placeholder:hover {
   color: #CCCCCC !important;
   background: #eeeeee !important;

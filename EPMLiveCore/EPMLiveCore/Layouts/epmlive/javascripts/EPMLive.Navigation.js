@@ -1926,6 +1926,8 @@
                     var filterTree = function (term) {
                         var nodes = window.epmLiveNavigation.workspaceTree().get_allNodes();
 
+                        var found = false;
+
                         for (var i = 0; i < nodes.length; i++) {
                             var node = nodes[i];
                             var nodeText = node.get_text().trim();
@@ -1933,9 +1935,19 @@
                             if (nodeText && nodeText.toLowerCase().indexOf(term) !== -1) {
                                 setParentNodesVisible(node);
                                 node.set_visible(true);
+                                found = true;
+
+                                var $ph = $('#EPMNavWorkspacesTree').find('div.epm-nav-sub-placeholder');
+                                if ($ph.length > 0) {
+                                    $($ph.get(0)).remove();
+                                }
                             } else {
                                 node.set_visible(false);
                             }
+                        }
+                        
+                        if (!found) {
+                            $('#EPMNavWorkspacesTree').append($('<div class="epm-nav-sub-placeholder">No search results</div>').hide().fadeIn(200));
                         }
                     };
 
