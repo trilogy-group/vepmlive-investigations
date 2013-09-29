@@ -324,7 +324,11 @@ Grids.OnLoaded = function (grid) {
         });
 
         MyWorkGrid.resetNoDataRow();
-        window.setTimeout(function () { MyWorkGrid.loadRibbon(); }, 1500);
+
+        var url = (window.location.href + '').toLowerCase();
+        if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
+            window.setTimeout(function () { MyWorkGrid.loadRibbon(); }, 1500);
+        }
     }
 };
 
@@ -2950,6 +2954,7 @@ var MyWorkGrid = {
 
                 window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 50);
                 window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 100);
+                window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 500);
                 
                 window.setTimeout(function () {
                     try {

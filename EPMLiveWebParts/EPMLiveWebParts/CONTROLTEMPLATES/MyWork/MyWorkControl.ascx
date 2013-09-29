@@ -14,7 +14,8 @@
     <SharePoint:ScriptBlock runat="server">
         function initializeEPMLoader() {
             $(function() {
-                if (document.location.href.toLowerCase().indexOf('my%20work.aspx') !== -1) {
+                var url = (document.location.href + '').toLowerCase();
+                if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
                     function showLoading() {
                         window.myWorkLoader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
                     }
@@ -27,7 +28,7 @@
                     loader.css('top', (div.height() - loader.height()) / 2);
                     loader.css('left', (div.width() - loader.width()) / 2);
 
-                    loader.show();   
+                    loader.show();
                 }
             });
         }
