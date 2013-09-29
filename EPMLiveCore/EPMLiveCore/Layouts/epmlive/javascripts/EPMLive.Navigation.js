@@ -1744,6 +1744,8 @@
                     var _addMenu = function ($li, rIndex) {
                         if ($li.index() < rIndex) {
                             addNewItemMenu($li);
+                        } else {
+                            addCtxMenu($li);
                         }
                     };
 
@@ -1755,6 +1757,15 @@
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
                             var $a = $($li.find('a').get(0));
                             window.epmLiveNavigation.handleContextualCommand(null, $a.data('webid'), $a.data('listid'), null, 'nav:add', 0);
+                        });
+                    };
+
+                    var addCtxMenu = function ($li) {
+                        $($li.find('a').get(0)).attr('style', 'width: 115px !important;');
+                        $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
+
+                        $($li.find('.epm-menu-btn').get(0)).click(function () {
+                            menuManager.setupMenu($li, []);
                         });
                     };
 
