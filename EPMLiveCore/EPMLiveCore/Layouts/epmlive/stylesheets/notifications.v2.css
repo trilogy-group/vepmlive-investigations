@@ -195,6 +195,12 @@
 #EPMLiveNotificationCounterProfilePic > img {
     height: 38px;
     width: 38px;
-}body
-{
+}
+
+#EPMLiveNotificationsWrap:after,
+#EPMLiveNotifications:after {
+    content: "";
+    font-size: 1px;
+    display: inline;
+    overflow: hidden;
 }
