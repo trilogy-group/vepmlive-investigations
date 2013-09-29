@@ -538,8 +538,8 @@ function registerEpmLiveResourceGridScript() {
 
                 var isMSIE = $.browser.msie;
 
-                var height = isMSIE ? 120 : 115;
-                var width = isMSIE ? 220 : 215;
+                var height = isMSIE ? 140 : 135;
+                var width = isMSIE ? 230 : 225;
 
                 var options = window.SP.UI.$create_DialogOptions();
 
@@ -1092,7 +1092,7 @@ function registerEpmLiveResourceGridScript() {
 
                 var isMSIE = $.browser.msie;
 
-                var height = isMSIE ? 95 : 100;
+                var height = isMSIE ? 135 : 140;
                 var width = isMSIE ? 235 : 240;
 
                 var options = window.SP.UI.$create_DialogOptions();
@@ -1122,10 +1122,15 @@ function registerEpmLiveResourceGridScript() {
 
                         $('#s4-ribbonrow').height(35);
 
-                        window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 50);
-                        window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 100);
+                        var intervalId = window.setInterval(function () {
+                            if (!document.getElementById('Ribbon.ResourceGridTab')) {
+                                window.SelectRibbonTab(tabId, true);
+                            }
+                        }, 1);
 
                         window.setTimeout(function () {
+                            window.clearInterval(intervalId);
+                            
                             try {
                                 var setTabStyle = function() {
                                     var tabs = [$(document.getElementById('Ribbon.ResourceGridTab-title')), $(document.getElementById('Ribbon.ResourceGridViewTab-title'))];
@@ -1817,7 +1822,7 @@ function registerEpmLiveResourceGridScript() {
             var maxHeight = webPartHeight;
 
             if (!webPartHeight) {
-                maxHeight = $('#s4-workspace').height() - ($('#s4-titlerow').height() + $('#EPMLiveStatusbar').height() + $('#EPMLiveStatusbarTemplate').height() + $('#EPMLiveStatuTemplate').height() + $('#s4-statusbarcontainer').height() + offset);
+                maxHeight = $('#s4-workspace').height() - ($('#s4-titlerow').height() + $('#EPMLiveStatusbar').height() + $('#EPMLiveStatusbarTemplate').height() + $('#EPMLiveStatuTemplate').height() + $('#s4-statusbarcontainer').height() + offset) - 100;
             }
 
             grid.MaxVScroll = maxHeight;
