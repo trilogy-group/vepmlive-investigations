@@ -77,14 +77,14 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             WebFullUrl = _spWeb.Url;
             WebId = _spWeb.ID.ToString();
             WebUrl = _spWeb.SafeServerRelativeUrl();
-
+            
             ListTitle = string.Empty;
             try
             {
                 ListTitle = spContext.List.Title;
             }
             catch { }
-
+            
             ListId = Guid.Empty.ToString();
             try
             {
@@ -123,9 +123,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListIconClass = string.Empty;
             try
             {
-                ListIconClass = new GridGanttSettings(spContext.List).ListIcon;
-            }
-            catch { }
+                var sIcon = new GridGanttSettings(SPContext.Current.List).ListIcon;
+                ListIconClass = !string.IsNullOrEmpty(sIcon) ? sIcon : "icon-square";
+            }catch{}
 
             CurrentUserId = "-1";
             try
@@ -146,7 +146,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
             }
             catch { }
-
+           
 
             Scheme = Request.Url.Scheme;
         }
