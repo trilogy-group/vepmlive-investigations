@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Web;
 using System.Web.UI;
 using EPMLiveCore.Infrastructure;
@@ -20,6 +21,8 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected string ListId;
         protected string ListTitle;
         protected string ListViewUrl;
+        protected string ListViewTitle;
+        protected string CurrentFileTitle;
         protected string Scheme;
         protected string SiteId;
         protected string SiteUrl;
@@ -99,6 +102,13 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             }
             catch { }
 
+            ListViewTitle = string.Empty;
+            try
+            {
+                ListViewUrl = spContext.ViewContext.View.Title;
+            }
+            catch { }
+
             ItemId = "-1";
             try
             {
@@ -119,6 +129,18 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 CurrentFileIsNull = (spContext.File == null).ToString();
             }
             catch { }
+
+            CurrentFileTitle = string.Empty;
+            try
+            {
+                CurrentFileTitle = Path.GetFileName(Request.FilePath);
+                if (!string.IsNullOrEmpty(CurrentFileTitle))
+                {
+                    CurrentFileTitle = CurrentFileTitle.Replace(".aspx", "");
+                }    
+            }
+            catch
+            {}
 
             ListIconClass = string.Empty;
             try
