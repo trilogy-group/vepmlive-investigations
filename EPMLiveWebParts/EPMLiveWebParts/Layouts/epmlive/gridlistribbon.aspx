@@ -332,7 +332,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 else
                 {
                     var webid = this.$Grid.getUserData(rowId,"webid").trim();
-
+                    if(webid == "")
+                        return false;
                     if(webid.toLowerCase() != this.$Grid._webid.toLowerCase())
                         return true;
                     else
