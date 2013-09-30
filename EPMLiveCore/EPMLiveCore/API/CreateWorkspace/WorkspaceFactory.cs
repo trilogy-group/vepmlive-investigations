@@ -999,53 +999,6 @@ namespace EPMLiveCore.API
                             evt.Delete();
                         }
                         w.EventReceivers.Add(SPEventReceiverType.WebDeleted, assemblyName, className);
-
-
-                        // add creator to team by default
-                        var listRes = s.RootWeb.Lists.TryGetList("Resources");
-                        var listTeam = w.Lists.TryGetList("Team");
-                        if ((listRes != null) &&
-                            (listRes.Items.Count > 0) &&
-                            (listTeam != null))
-                        {
-                            var sQuery = @"<Where><Eq><FieldRef Name=""SharePointAccount"" LookupId=""True"" /><Value Type=""Int"">" + CreatorId + @"</Value></Eq></Where>";
-                            var sViewFields = @"<FieldRef Name=""Title"" />";
-
-                            var oQuery = new SPQuery();
-                            oQuery.Query = sQuery;
-                            oQuery.ViewFields = sViewFields;
-                            var collListItems = listRes.GetItems(oQuery);
-                            if (collListItems.Count == 0)
-                            {
-                                w.Update();
-                                return;
-                            }
-
-                            var item = collListItems[0];
-                            SPField userValueFld = null;
-
-                            try
-                            {
-                                userValueFld = item.Fields[item.Fields.GetFieldByInternalName("SharePointAccount").Id];
-                            }
-                            catch { }
-
-                            if ((userValueFld != null) && (item[listRes.Fields.GetFieldByInternalName("SharePointAccount").Id] != null))
-                            {   
-                                var q = new SPQuery();
-                                q.Query = "<Where><Eq><FieldRef Name=\"ResID\" /><Value Type=\"Number\">" + CreatorId + "</Value></Eq></Where>";
-                                var tListItems = listTeam.GetItems(q);
-
-                                if (tListItems.Count.Equals(0))
-                                {
-                                    var newTeamItem = listTeam.Items.Add();
-                                    newTeamItem[listTeam.Fields.GetFieldByInternalName("Title").Id] = item["Title"];
-                                    newTeamItem[listTeam.Fields.GetFieldByInternalName("ResID").Id] = item.ID;
-                                    newTeamItem.Update();
-                                    listTeam.Update();
-                                }
-                            }
-                        }
                         w.Update();
                     }
                 }
@@ -1064,6 +1017,63 @@ namespace EPMLiveCore.API
                         {
                             w.Features.Add(new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01"));
                         }
+
+                        // add creator to team by default
+                        var listRes = s.RootWeb.Lists.TryGetList("Resources");
+                        var listTeam = w.Lists.TryGetList("Team");
+                        w.Site.CatchAccessDeniedException = false;
+                        if (listTeam == null)
+                        {
+                            w.AllowUnsafeUpdates = true;
+                            w.Lists.Add("Team", "Use this list to manage your project team", SPListTemplateType.GenericList);
+                            listTeam = w.Lists.TryGetList("Team");
+                            try
+                            {
+                                listTeam.Fields.Add("ResID", SPFieldType.Number, false);
+                                listTeam.Update();
+                            }
+                            catch { }
+                        }
+
+                        listTeam = w.Lists.TryGetList("Team");
+                        if ((listRes != null) &&
+                            (listRes.Items.Count > 0) &&
+                            (listTeam != null))
+                        {
+                            var sQuery = @"<Where><Eq><FieldRef Name=""SharePointAccount"" LookupId=""True"" /><Value Type=""Int"">" + CreatorId + @"</Value></Eq></Where>";
+                            var sViewFields = @"<FieldRef Name=""Title"" />";
+
+                            var oQuery = new SPQuery();
+                            oQuery.Query = sQuery;
+                            oQuery.ViewFields = sViewFields;
+                            var collListItems = listRes.GetItems(oQuery);
+                            if (collListItems.Count == 0)
+                            {
+                                w.Update();
+                                return;
+                            }
+
+                            SPListItem item = null;
+                            try{item = collListItems[0];}catch { }
+
+                            if (item != null)
+                            {
+                                var q = new SPQuery();
+                                q.Query = "<Where><Eq><FieldRef Name=\"ResID\" /><Value Type=\"Number\">" + CreatorId + "</Value></Eq></Where>";
+                                var tListItems = listTeam.GetItems(q);
+
+                                if (tListItems.Count.Equals(0))
+                                {
+                                    var newTeamItem = listTeam.Items.Add();
+                                    newTeamItem[listTeam.Fields.GetFieldByInternalName("Title").Id] = item["Title"];
+                                    newTeamItem[listTeam.Fields.GetFieldByInternalName("ResID").Id] = item.ID;
+                                    newTeamItem.Update();
+                                    listTeam.Update();
+                                }
+                            }
+                        }
+
+                        w.Update();
                     }
                 }
             }
