@@ -351,7 +351,7 @@ namespace PortfolioEngineCore
             CStruct xCalendar = xPlanData.GetSubStruct("Calendar");
             CStruct xPeriods = xCalendar.GetSubStruct("Periods");
 
-            DateTime dtNow = DateTime.Now;
+            DateTime dtNow = DateTime.Now.Date;
             List<CStruct> listPeriods = xPeriods.GetList("Period");
             foreach (CStruct xPeriod in listPeriods)
             {

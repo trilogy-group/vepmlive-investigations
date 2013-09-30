@@ -359,27 +359,26 @@ Exit_Function:
 
                 dbaEditCosts.CheckCostTypeSecurity(dba, costType.Id, ref costType.EditMode);
 
-                DateTime dtStatusDate;
-                {
-                    // read in the statusdate - convert it to a periodID
-                    DataTable dt;
-                    if (dbaGeneral.SelectAdmin(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
+                //DateTime dtStatusDate;
+                //{
+                //    // read in the statusdate - convert it to a periodID
+                //    DataTable dt;
+                //    if (dbaGeneral.SelectAdmin(dba, out dt) != StatusEnum.rsSuccess) goto Status_Error;
 
-                    if (dt.Rows.Count != 1)
-                    {
-                        dba.Status = (StatusEnum)99999;
-                        dba.StatusText = "Invalid Admin row count : " + dt.Rows.Count.ToString("0");
-                        goto Status_Error;
-                    }
+                //    if (dt.Rows.Count != 1)
+                //    {
+                //        dba.Status = (StatusEnum)99999;
+                //        dba.StatusText = "Invalid Admin row count : " + dt.Rows.Count.ToString("0");
+                //        goto Status_Error;
+                //    }
 
-                    dtStatusDate = DBAccess.ReadDateValue(dt.Rows[0]["ADM_STATUS_DATE"]);
-                }
+                //    dtStatusDate = DBAccess.ReadDateValue(dt.Rows[0]["ADM_STATUS_DATE"]);
+                //}
 
                 int nCalendarID;
                 int nFirstPeriod;
                 int nLastPeriod;
                 if (dbaEditCosts.SelectViewCalendarInfo(dba, nViewUID, out nCalendarID, out nFirstPeriod, out nLastPeriod) != StatusEnum.rsSuccess) goto Status_Error;
-
 
                 List<InternalPeriod> periods = new List<InternalPeriod>();
                 if (nCalendarID >= 0)
@@ -388,6 +387,7 @@ Exit_Function:
                     if (dbaEditCosts.SelectCalendarPeriods(dba, nCalendarID, out dt) != StatusEnum.rsSuccess) goto Status_Error;
 
                     InternalPeriod period = null;
+                    DateTime dtNow = DateTime.Now.Date;
                     foreach (DataRow row in dt.Rows)
                     {
                         bool bIsNull;
@@ -399,11 +399,14 @@ Exit_Function:
 
                         if (nFirstPeriod == Int32.MinValue)
                             nFirstPeriod = period.Id;
+                        // NB: Using old Status period flag for current period marker
+                        if (period.StartDate <= dtNow && period.FinishDate >= dtNow)
+                            period.IsStatusPeriod = true;
 
                         if (period.Id >= nFirstPeriod && period.Id <= nLastPeriod)
                         {
-                            if (dtStatusDate >= period.StartDate && dtStatusDate <= period.FinishDate)
-                                period.IsStatusPeriod = true;
+                            //if (dtStatusDate >= period.StartDate && dtStatusDate <= period.FinishDate)
+                            //    period.IsStatusPeriod = true;
                             periods.Add(period);
                         }
                     }
@@ -2159,15 +2162,10 @@ Exit_Function:
                 //xC.CreateIntAttr("CanResize", 0);
                 xC.CreateIntAttr("MinWidth", 25);
                 xC.CreateIntAttr("Width", 40);
+                //if (period.IsStatusPeriod)
+                //    xC.CreateBooleanAttr("IsStatusPeriod", true);
                 if (period.IsStatusPeriod)
-                    xC.CreateBooleanAttr("IsStatusPeriod", true);
-
-
-                //xC.CreateDateAttr("Start", period.StartDate);
-                //if (m_nFTEMode == 0)
-                //    xC.CreateIntAttr("Visible", 1);
-                //else
-                //    xC.CreateIntAttr("Visible", 0);
+                    xC.CreateBooleanAttr("Current", true);
 
                 xC = m_xPeriodCols.CreateSubStruct("C");
                 xC.CreateStringAttr("Name", "F" + sId);
@@ -2177,10 +2175,6 @@ Exit_Function:
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("MinWidth", 25);
                 xC.CreateIntAttr("Width", 45);
-                //if (m_nFTEMode == 0)
-                //    xC.CreateIntAttr("Visible", 0);
-                //else
-                //    xC.CreateIntAttr("Visible", 1);
 
                 xC = m_xPeriodCols.CreateSubStruct("C");
                 xC.CreateStringAttr("Name", "C" + sId);
@@ -2191,19 +2185,6 @@ Exit_Function:
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("MinWidth", 50);
                 xC.CreateIntAttr("Width", 70);
-
-                //xC = m_xPeriodCols.CreateSubStruct("C");
-                //xC.CreateStringAttr("Name", "E" + sId);
-                //xC.CreateStringAttr("Type", "Float");
-                //xC.CreateStringAttr("Format", ",#.##");
-
-                //xC = m_xPeriodCols.CreateSubStruct("C");
-                //xC.CreateStringAttr("Name", "R" + sId);
-                //xC.CreateStringAttr("Type", "Float");
-                //xC.CreateStringAttr("Format", ",#.##");
-
-                //m_xDSummaryRow.CreateStringAttr("C" + sId + "Formula", "sum()");
-                //m_xDSummaryRow.CreateStringAttr("Q" + sId + "Formula", "sum()");
             }
 
             public void FinalizeGridLayout()

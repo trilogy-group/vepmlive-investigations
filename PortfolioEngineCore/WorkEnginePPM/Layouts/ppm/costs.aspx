@@ -39,9 +39,9 @@
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Cost Planner - <%=sProjectName %>
+<%=sTitle%>
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Cost Planner - <%=sProjectName %>
+<%=sTitle%>
 </asp:Content>

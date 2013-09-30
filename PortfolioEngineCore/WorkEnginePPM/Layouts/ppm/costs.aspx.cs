@@ -8,7 +8,7 @@ namespace WorkEnginePPM
     public partial class costs : LayoutsPageBase
     {
         protected string strOutput = "";
-        protected string sProjectName = "";
+        protected string sTitle = "";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -23,49 +23,61 @@ namespace WorkEnginePPM
                 return;
             }
 
-            sProjectName = HelperFunctions.getProjectNameFromUID(Request["itemid"]);
-            int i;
-
             string sListId = "";
             if(!string.IsNullOrEmpty(Request["listid"]))
             {
                 sListId = Request["listid"];
             }
-            else
+            else if (!string.IsNullOrEmpty(Request["itemid"]))
             {
                 sListId = Request["itemid"].Split('.')[1];
             }
 
-            SPList list = Web.Lists[new Guid(sListId)];
-
-            if (HelperFunctions.UseNonActiveXControl("costs", list) == false)
+            if (sListId == "")
             {
-                if (int.TryParse(Request["view"], out i))
-                {
-                    strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRCost.LMR_WE_Costs", "<Params WEPID=\\\"" + Request["itemid"] + "\\\" ViewID=\\\"" + Request["view"] + "\\\"/>", "true", Page);
-                }
-                else
-                {
-                    strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRCost.LMR_WE_Costs", "<Params WEPID=\\\"" + Request["itemid"] + "\\\" ViewName=\\\"" + Request["view"] + "\\\"/>", "true", Page);
-                }
-                LiteralControl lit = new LiteralControl(strOutput.ToString());
-                PlaceHolder1.Controls.Add(lit);
+                sTitle = "Cost Planner";
+                WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl)LoadControl("/_layouts/ppm/EditCosts.ascx");
+                ctl.ViewUID = 0;
+                ctl.WEPID = "";
+                PlaceHolder1.Controls.Add(ctl);
             }
             else
             {
-                WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl)LoadControl("/_layouts/ppm/EditCosts.ascx");
-                ctl.ViewUID = 0;
-                string sView = Request["view"].ToString();
+                sTitle = "Cost Planner - " + HelperFunctions.getProjectNameFromUID(Request["itemid"]);
 
-                if(sView == "")
-                    sView = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_costview");
+                SPList list = Web.Lists[new Guid(sListId)];
 
-                if (int.TryParse(sView, out i))
+                int i;
+
+                if (HelperFunctions.UseNonActiveXControl("costs", list) == false)
                 {
-                    ctl.ViewUID = i;
+                    if (int.TryParse(Request["view"], out i))
+                    {
+                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRCost.LMR_WE_Costs", "<Params WEPID=\\\"" + Request["itemid"] + "\\\" ViewID=\\\"" + Request["view"] + "\\\"/>", "true", Page);
+                    }
+                    else
+                    {
+                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRCost.LMR_WE_Costs", "<Params WEPID=\\\"" + Request["itemid"] + "\\\" ViewName=\\\"" + Request["view"] + "\\\"/>", "true", Page);
+                    }
+                    LiteralControl lit = new LiteralControl(strOutput.ToString());
+                    PlaceHolder1.Controls.Add(lit);
                 }
-                ctl.WEPID = Request["itemid"];
-                PlaceHolder1.Controls.Add(ctl);
+                else
+                {
+                    WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl)LoadControl("/_layouts/ppm/EditCosts.ascx");
+                    ctl.ViewUID = 0;
+                    string sView = Request["view"].ToString();
+
+                    if (sView == "")
+                        sView = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_costview");
+
+                    if (int.TryParse(sView, out i))
+                    {
+                        ctl.ViewUID = i;
+                    }
+                    ctl.WEPID = Request["itemid"];
+                    PlaceHolder1.Controls.Add(ctl);
+                }
             }
         }
 

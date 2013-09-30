@@ -538,18 +538,18 @@
         if (this.CostTypes.length > 0) {
             this.tabbar.setTabActive("tab_" + this.CostTypes[0].Id);
         }
-        
         var from = document.getElementById('idViewTab_FromPeriod');
         from.options.length = 0;
         from.options.selectedIndex = -1;
+        from.options[from.options.length] = new Option("Current", 0);
         var to = document.getElementById('idViewTab_ToPeriod');
         to.options.length = 0;
         to.options.selectedIndex = -1;
         for (var n = 0; n < this.Periods.length; n++) {
             var periodid = parseInt(this.Periods[n].Id);
             var sPeriod = this.Periods[n].Name;
-            from.options[n] = new Option(sPeriod, periodid);
-            to.options[n] = new Option(sPeriod, periodid);
+            from.options[from.options.length] = new Option(sPeriod, periodid);
+            to.options[to.options.length] = new Option(sPeriod, periodid);
         }
     };
     EditCosts.prototype.tabbarOnSelect = function (id, data) {
@@ -873,6 +873,8 @@
                 var sp = parseInt(from.options[from.selectedIndex].value);
                 var to = document.getElementById('idViewTab_ToPeriod');
                 var fp = parseInt(to.options[to.selectedIndex].value);
+                if (sp == 0 && this.currentPeriod != null)
+                    sp = this.currentPeriod;
 
                 if (sp > fp) {
                     alert("The 'From' period cannot be after the 'To' Period");
@@ -971,6 +973,8 @@
                 var col = g.ColNames[1][c];
                 var sType = col.substring(0, 1);
                 var periodId = parseInt(col.substring(1));
+                if (grid.GetAttribute(null, col, "Current") == true)
+                    this.currentPeriod = periodId;
                 var bHide = false;
                 if (periodId < this.startPeriod || periodId > this.finishPeriod)
                     this.hideArray[this.hideArray.length] = col;
@@ -1792,6 +1796,7 @@
         this.Periods = null;
         this.startPeriod = null;
         this.finishPeriod = null;
+        this.currentPeriod = null;
         this.selectPIAndViewDlg = null;
         this.imagePath = "/_layouts/ppm/images/";
         this.FTEMode = 0;

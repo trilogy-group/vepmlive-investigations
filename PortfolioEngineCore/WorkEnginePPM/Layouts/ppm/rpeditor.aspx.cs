@@ -56,7 +56,7 @@ namespace WorkEnginePPM
             string dataid = Request["dataid"];
             if (string.IsNullOrEmpty(dataid) == false)
             {
-                WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl) LoadControl("/_layouts/ppm/RPEditor.ascx");
+                WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl)LoadControl("/_layouts/ppm/RPEditor.ascx");
                 ctl.WEPID = Request["itemid"];
                 ctl.TicketVal = Request["dataid"];
                 ctl.IsResource = Request["isresource"];
@@ -70,45 +70,57 @@ namespace WorkEnginePPM
             }
 
             string sListId = "";
-            if(!string.IsNullOrEmpty(Request["listid"]))
+            if (!string.IsNullOrEmpty(Request["listid"]))
             {
                 sListId = Request["listid"];
             }
-            else if(!string.IsNullOrEmpty(Request["itemid"]))
+            else if (!string.IsNullOrEmpty(Request["itemid"]))
             {
                 sListId = Request["itemid"].Split('.')[1];
             }
-            SPList list = Web.Lists[new Guid(sListId)];
-
-            if (HelperFunctions.UseNonActiveXControl("resplan", list) == false)
+            if (sListId == "")
             {
-                RPETitle = "Resource Planner - " + HelperFunctions.getProjectNameFromUID(Request["itemid"]);
-                int i;
-                if (int.TryParse(Request["view"], out i))
-                    strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_Central.PICommitmentsEditor",
-                                                                    "<Params WEPID=\\\"" + Request["itemid"] +
-                                                                    "\\\" ViewID=\\\"" + Request["view"] + "\\\"/>",
-                                                                    "true", Page);
-                else
-                    strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_Central.PICommitmentsEditor",
-                                                                    "<Params WEPID=\\\"" + Request["itemid"] +
-                                                                    "\\\" ViewName=\\\"" + Request["view"] + "\\\"/>",
-                                                                    "true", Page);
-                LiteralControl lit = new LiteralControl(strOutput.ToString());
-                PlaceHolder1.Controls.Add(lit);
+                WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl)LoadControl("/_layouts/ppm/RPEditor.ascx");
+                ctl.IsResource = "0";
+                //ctl.IsDlg = Request["IsDlg"];
+                ctl.IsDlg = "0";
+                RPETitle = "Resource Planner";
+                PlaceHolder1.Controls.Add(ctl);
             }
             else
             {
-                WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl)LoadControl("/_layouts/ppm/RPEditor.ascx");
-                ctl.WEPID = Request["itemid"];
-                ctl.TicketVal = Request["dataid"];
-                ctl.IsResource = Request["isresource"];
-                ctl.IsDlg = Request["IsDlg"];
-                if (string.IsNullOrEmpty(Request["isresource"]) == true || Request["isresource"] == "0")
-                    RPETitle = "Resource Planner - Project Mode";
+                SPList list = Web.Lists[new Guid(sListId)];
+
+                if (HelperFunctions.UseNonActiveXControl("resplan", list) == false)
+                {
+                    RPETitle = "Resource Planner - " + HelperFunctions.getProjectNameFromUID(Request["itemid"]);
+                    int i;
+                    if (int.TryParse(Request["view"], out i))
+                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_Central.PICommitmentsEditor",
+                                                                        "<Params WEPID=\\\"" + Request["itemid"] +
+                                                                        "\\\" ViewID=\\\"" + Request["view"] + "\\\"/>",
+                                                                        "true", Page);
+                    else
+                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_Central.PICommitmentsEditor",
+                                                                        "<Params WEPID=\\\"" + Request["itemid"] +
+                                                                        "\\\" ViewName=\\\"" + Request["view"] + "\\\"/>",
+                                                                        "true", Page);
+                    LiteralControl lit = new LiteralControl(strOutput.ToString());
+                    PlaceHolder1.Controls.Add(lit);
+                }
                 else
-                    RPETitle = "Resource Planner - Department Mode";
-                PlaceHolder1.Controls.Add(ctl);
+                {
+                    WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl)LoadControl("/_layouts/ppm/RPEditor.ascx");
+                    ctl.WEPID = Request["itemid"];
+                    ctl.TicketVal = Request["dataid"];
+                    ctl.IsResource = Request["isresource"];
+                    ctl.IsDlg = Request["IsDlg"];
+                    if (string.IsNullOrEmpty(Request["isresource"]) == true || Request["isresource"] == "0")
+                        RPETitle = "Resource Planner - Project Mode";
+                    else
+                        RPETitle = "Resource Planner - Department Mode";
+                    PlaceHolder1.Controls.Add(ctl);
+                }
             }
         }
     }
