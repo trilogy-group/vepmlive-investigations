@@ -162,7 +162,7 @@ opacity:.9;
 		<span class="icon-pie-5"></span>
 		</div>
             </li></a>
-            <a href="../../../sitepages/report.aspx" id="classic"><li class="orange-crush">
+            <a href="../../../../sitepages/report.aspx" id="classic"><li class="orange-crush">
 		<div style="float:left;">
                 <h2>Classic Reporting</h2>
                 <p>Access classic reporting.</p>
@@ -180,9 +180,9 @@ opacity:.9;
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Application Page
+Reporting
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-My Application Page
+Reporting
 </asp:Content>
