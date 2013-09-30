@@ -7,6 +7,8 @@ using System.ServiceModel;
 using EPMLiveIntegration;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxAuthService;
+using UplandIntegrations.TenroxProjectService;
+using UserToken = UplandIntegrations.TenroxAuthService.UserToken;
 
 namespace UplandIntegrations.Tenrox.Services
 {
@@ -59,7 +61,8 @@ namespace UplandIntegrations.Tenrox.Services
         {
             List<string> columns = (from DataColumn column in items.Columns select column.ColumnName).ToList();
 
-            foreach (TenroxObject txObject in GetManager(objectName).GetItems(GetIds(itemId).ToArray()))
+            IObjectManager objectManager = GetManager(objectName);
+            foreach (TenroxObject txObject in objectManager.GetItems(GetIds(itemId).ToArray()))
             {
                 object item = txObject.Item;
                 if (item == null) continue;
@@ -88,6 +91,20 @@ namespace UplandIntegrations.Tenrox.Services
                         row[column] = value;
                     }
                     catch { }
+                }
+
+                if (objectName.Trim().ToLower().Equals("project"))
+                {
+                    int managerId = ((Project) txObject.Item).ManagerId;
+
+                    if (managerId == 0)
+                    {
+                        row["ManagerId"] = string.Empty;
+                    }
+                    else
+                    {
+                        row["ManagerId"] = objectManager.TranslateIdToUserEmail(managerId);
+                    }
                 }
 
                 items.Rows.Add(row);

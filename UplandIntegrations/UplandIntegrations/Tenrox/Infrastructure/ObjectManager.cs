@@ -61,7 +61,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (14) 
+        #region Methods (15) 
 
         // Public Methods (5) 
 
@@ -177,6 +177,22 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
         }
 
+        public string TranslateIdToUserEmail(int userId)
+        {
+            if (userId == 0) return string.Empty;
+
+            using (var usersClient = new UsersClient(Binding, EndpointAddress))
+            {
+                User user = usersClient.QueryByUniqueId(_userToken, userId);
+                if (user != null)
+                {
+                    return user.Email;
+                }
+            }
+
+            return string.Empty;
+        }
+
         public virtual IEnumerable<TenroxTransactionResult> UpsertItems(DataTable items, Guid integrationId)
         {
             using (IDisposable client = GetClient())
@@ -228,30 +244,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
         }
 
-        public void UpdateBinding(int itemId, Guid integrationId)
-        {
-            var endpointAddress = new EndpointAddress(_endpointAddress + "sdk/integrations.svc");
-
-            using (var integrationsClient = new IntegrationsClient(Binding, endpointAddress))
-            {
-                var token =
-                    (TenroxIntegrationService.UserToken)
-                        TranslateToken(_authToken, typeof (TenroxIntegrationService.UserToken));
-
-                Integration integration = integrationsClient.QueryByAll(token)
-                    .FirstOrDefault(i => i.ID24.Equals(integrationId.ToString()) && i.ObjectType.Equals(ObjectId)) ??
-                                          new Integration
-                                          {
-                                              ObjectId = itemId,
-                                              ObjectType = ObjectId,
-                                              ID24 = integrationId.ToString()
-                                          };
-
-                integrationsClient.Save(token, integration);
-            }
-        }
-
-        // Protected Methods (4) 
+        // Protected Methods (5) 
 
         protected abstract void BuildObjects(DataTable items, object client, List<string> columns,
             List<object> newObjects, List<object> existingObjects);
@@ -351,6 +344,29 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
 
             return 0;
+        }
+
+        protected void UpdateBinding(int itemId, Guid integrationId)
+        {
+            var endpointAddress = new EndpointAddress(_endpointAddress + "sdk/integrations.svc");
+
+            using (var integrationsClient = new IntegrationsClient(Binding, endpointAddress))
+            {
+                var token =
+                    (TenroxIntegrationService.UserToken)
+                        TranslateToken(_authToken, typeof (TenroxIntegrationService.UserToken));
+
+                Integration integration = integrationsClient.QueryByAll(token)
+                    .FirstOrDefault(i => i.ID24.Equals(integrationId.ToString()) && i.ObjectType.Equals(ObjectId)) ??
+                                          new Integration
+                                          {
+                                              ObjectId = itemId,
+                                              ObjectType = ObjectId,
+                                              ID24 = integrationId.ToString()
+                                          };
+
+                integrationsClient.Save(token, integration);
+            }
         }
 
         // Private Methods (5) 

@@ -87,7 +87,7 @@ namespace UplandIntegrations.Tenrox.Managers
                 string email = null;
                 try
                 {
-                    email = row["ManagerId"].ToString();
+                    email = row["ManagerId"].ToString().Split(',')[0].Trim();
                 }
                 catch { }
 
