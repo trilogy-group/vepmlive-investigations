@@ -74,6 +74,14 @@ namespace EPMLiveWebParts
                         items.Add("Edit Item", getMenuItem(Request["grid"], "Edit Item", "/_layouts/images/edititem.gif", "edit", "1"));
                 }
 
+                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
+                {
+                    if (!isFav)
+                        items.Add("Add Favorite", getMenuItem(Request["grid"], "Add Favorite", "/_layouts/images/blank.gif", "AddFavorite", ""));
+                    else
+                        items.Add("Remove Favorite", getMenuItem(Request["grid"], "Remove Favorite", "/_layouts/images/blank.gif", "RemoveFavorite", ""));
+                }
+
                 items.Add("SEP" + (counter++).ToString(), "");
                 
                 if(list.EnableVersioning)
@@ -97,13 +105,7 @@ namespace EPMLiveWebParts
 
                 items.Add("SEP" + (counter++).ToString(), "");
 
-                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
-                {
-                    if (!isFav)
-                        items.Add("Add Favorite", getMenuItem(Request["grid"], "Add Favorite", "/_layouts/images/blank.gif", "AddFavorite", ""));
-                    else
-                        items.Add("Remove Favorite", getMenuItem(Request["grid"], "Remove Favorite", "/_layouts/images/blank.gif", "RemoveFavorite", ""));
-                }
+                
 
                 Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(web, null);
 
