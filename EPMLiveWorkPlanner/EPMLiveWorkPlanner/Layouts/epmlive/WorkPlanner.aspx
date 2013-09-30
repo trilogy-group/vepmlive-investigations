@@ -323,7 +323,7 @@
 
             var surl =  "<%=sWebUrl %>/_layouts/epmlive/workplannerwizard.aspx?Planner=<%=sPlannerID %>&ID=<%=sItemID %>&PType=<%=sProjectType %>&listid=<%=sProjectListId %>&tasklistid=<%=sTaskListId%>&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
 
-            var options = { url: surl, width: 400, title: "Planner", dialogReturnValueCallback: showPlannerPopClose };
+            var options = { url: surl, width: 450, title: "Planner", dialogReturnValueCallback: showPlannerPopClose };
 
             SP.UI.ModalDialog.showModalDialog(options);
         }
@@ -773,9 +773,16 @@
         
 
         setTimeout("CreateTrees()", 100);
+        
 
         
     }
+        ExecuteOrDelayUntilScriptLoaded(UnpinNav, 'EPMLive.Navigation.js');
+        function UnpinNav()
+        {
+            window.epmLiveNavigation.unpin();
+
+        }
 
     function CreateTrees()
     {

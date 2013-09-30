@@ -1293,6 +1293,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
                 AddTabEvents();
             }
+
+            
         }
 
         private void AddRibbonTab()
