@@ -2017,10 +2017,9 @@
             ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
             ExecuteOrDelayUntilScriptLoaded(manageWorkspaces, 'EPMLiveNavigation_Workspaces');
             ExecuteOrDelayUntilScriptLoaded(manageRecentItems, 'EPMLiveNavigation_RecentItems');
+            
             window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
         });
-
-        
     }
 
     function onJqueryLoaded() {
@@ -2028,8 +2027,6 @@
     }
 
     ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
-
-    
 })();
 
 
