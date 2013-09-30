@@ -205,8 +205,9 @@
 		                <wssuc:InputFormControl ID="InputFormControl1" LabelText="" runat="server">
 			                 <Template_Control>
 			                    <asp:CheckBox ID="cbDisableMyWorkspaces" runat="server" Text="Disable Workspaces Menu"/><br /><br />
-                                <asp:CheckBox ID="cbDisableCommonActions" runat="server" Text="Disable Common Actions"/><br /><br />
                                 <asp:CheckBox ID="cbDisableCreateNew" runat="server" Text="Disable Create New"/>
+                                <asp:CheckBox ID="cbDisableCommonActions" runat="server" Text="Disable Common Actions" Visible="False"/>
+                                
 			                 </Template_Control>
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
