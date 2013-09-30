@@ -8,6 +8,73 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="landing.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.reportslanding" DynamicMasterPageFile="~masterurl/default.master" %>
 
 
+<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+
+<style>
+
+#s4-workspace {
+background-color:#fbfbfc !important;
+}
+
+
+#bi-wrapper {
+     font-family:Open Sans Regular;
+    background-color:#fbfbfc;
+    margin:0px;
+    height:100%;
+    width:100%;
+}
+#bi-wrapper h1 {
+    font-size:30px;
+    font-family:Open Sans Regular;
+    text-align:center;
+    margin:0px auto;
+    width:400px;
+    color:#555555;
+}
+#bi-desc {
+    margin:0px auto;
+    width:600px;
+    margin-bottom:60px;
+    color:#555555;
+    font-size:16px;
+}
+#bi-main {
+    margin:0px auto;
+    width:500px;
+}
+#bi-main ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+#bi-main li {
+margin: 0;
+padding: 10px;
+    padding-left:15px;
+overflow: hidden;
+height:100px;
+margin-bottom:30px;    
+}
+
+#bi-wrapper a {
+
+text-decoration:none !important;
+
+}
+
+#bi-main li:hover {
+
+cursor: pointer;
+}
+#bi-main p {
+margin-top:5px;
+font-weight:400;    
+}
+#bi-main h2
+{
+    font-size:20px;
+    font-weight:600;
     text-align:left;
     margin:0px;
 }
@@ -86,7 +153,7 @@ opacity:.9;
     </div>
     <div id="bi-main">
         <ul>
-            <a href="./reporting.aspx" id="advanced"><li class="skyblue">
+            <a href="izenda/reporting.aspx" id="advanced"><li class="skyblue">
 		<div style="float:left;">
                 <h2>Advanced Reporting</h2>
                 <p>Access advanced reporting.</p>
@@ -113,9 +180,9 @@ opacity:.9;
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Reporting
+Application Page
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Reporting
+My Application Page
 </asp:Content>
