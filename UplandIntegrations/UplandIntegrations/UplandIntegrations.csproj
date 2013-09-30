@@ -97,7 +97,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Tenrox\Adapter.cs" />
+    <Compile Include="Tenrox\Integrator.cs" />
     <Compile Include="Tenrox\Managers\ClientManager.cs" />
     <Compile Include="Tenrox\Infrastructure\IObjectManager.cs" />
     <Compile Include="Tenrox\Infrastructure\ObjectManager.cs" />
@@ -474,12 +474,11 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\UplandIntegrations\UplandIntegrations\bin\Debug\UplandIntegrations.dll" /f
+iisreset</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "UplandIntegrations.dll" /f</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

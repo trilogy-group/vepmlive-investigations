@@ -9,12 +9,12 @@ using UplandIntegrations.Tenrox.Services;
 
 namespace UplandIntegrations.Tenrox
 {
-    public class Adapter : IIntegrator, IIntegratorControls
+    public class Integrator : IIntegrator, IIntegratorControls
     {
         #region Fields (1) 
 
         private const string UPSERT_ERROR_MESSAGE =
-            @"Could not upsert record. Tenrox ID: {0}.EPMLive ID: {1}. Reason: {2}";
+            @"Could not upsert record. Tenrox ID: {0}. EPMLive ID: {1}. Reason: {2}";
 
         #endregion Fields 
 
