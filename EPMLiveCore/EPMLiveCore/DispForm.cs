@@ -18,10 +18,27 @@ namespace EPMLiveCore
         protected override void Render(HtmlTextWriter writer)
         {
             base.Render(writer);
+
+            SPWeb web = SPContext.Current.Web;
+
+            string editURL = SPContext.Current.List.Forms[PAGETYPE.PAGE_EDITFORM].Url;
+            editURL = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/" + editURL;
+            string extraParams = "";
+
+            GridGanttSettings gSettings = API.ListCommands.GetGridGanttSettings(SPContext.Current.List);
+
             writer.WriteLine("<script>");
             writer.WriteLine("WEWebId = '" + SPContext.Current.Web.ID + "';");
             writer.WriteLine("WEListId = '" + SPContext.Current.List.ID + "';");
-            writer.WriteLine("WEItemId = '" + SPContext.Current.Item.ID + "';");
+            writer.WriteLine("WEItemId = '" + SPContext.Current.ListItem.ID + "';");
+            writer.WriteLine("WETitle = \"" + SPContext.Current.ListItem.Title.Replace("\"", "&quot;") + "\";");
+            writer.WriteLine("WEWebUrl = '" + ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "';");
+            writer.WriteLine("WEWebId = '" + web.ID + "';");
+            writer.WriteLine("WEEditForm = '" + editURL + "';");
+            writer.WriteLine("WEExtraParams = '" + extraParams.Trim('&') + "';");
+            writer.WriteLine("WESource = '" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()) + "';");
+            writer.WriteLine("WEUseTeam = " + gSettings.BuildTeam.ToString().ToLower() + ";");
+            writer.WriteLine("WEDLG = '" + Page.Request["IsDlg"] + "';");
             writer.WriteLine("</script>");
         }
 
