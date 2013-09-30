@@ -52,6 +52,14 @@
 				text-align:center;
 				padding: 3px;
 			}
+			.vwf-tab-container
+			{
+				display:none !important;
+			}
+			#vwf-workflow-container
+			{
+				display:none !important;
+			}
         </style>
 
         <script type="text/javascript" language="javascript">
@@ -167,7 +175,7 @@
 
                             $("#vr-content").append(html);
 							
-							document.getElementById("vwf-tab-main-container").style.display="none";
+							
 
                             $.get(WebAPIUrl + "routeditems/" + vwfData.routedItemId + "?localtreeonly=true&lookupIdCode=true&visualWorkflow=true&" + Param, function (routedItems) {
 
@@ -185,8 +193,8 @@
 										document.getElementById("vr-view").style.display = "";
 										document.getElementById("vr-load").style.display = "none";
                                 });
-
-								
+								document.getElementById("vwf-workflow-container").style.display="none";
+								$("#vwf-main").css("height","80px");
                             });
 
                         });
@@ -268,14 +276,16 @@
 
 			function ViewWorkflow()
 			{
+				if(!bSet)
+				{
+					wfc = document.getElementById("vwf-workflow-container");
+					wfc.style.display = "";
+					bSet = true;
+				}
 
-				document.getElementById("vwf-tab-main-container").style.display = "";
-
-				var options = { html: document.getElementById("vwf-tab-main-container"), showMaximized: true, title: "Workflow" };
+				var options = { html: wfc, showMaximized: true, title: "Workflow" };
 
 				SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
-
-				
 			}
 
 
