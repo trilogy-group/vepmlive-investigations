@@ -1,29 +1,104 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Reflection;
 using System.ServiceModel.Channels;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxTaskService;
-using UserToken = UplandIntegrations.TenroxAuthService.UserToken;
 
 namespace UplandIntegrations.Tenrox.Managers
 {
     internal class TaskManager : ObjectManager
     {
+        #region Fields (1) 
+
+        private readonly UserToken _token;
+
+        #endregion Fields 
+
         #region Constructors (1) 
 
-        public TaskManager(Binding binding, string endpointAddress, UserToken token)
+        public TaskManager(Binding binding, string endpointAddress, TenroxAuthService.UserToken token)
             : base(binding, endpointAddress, "tasks.svc", token,
-                typeof (Task), typeof (TenroxTaskService.UserToken), typeof (TasksClient)) { }
+                typeof (Task), typeof (TenroxAuthService.UserToken), typeof (TasksClient))
+        {
+            MappingDict = new Dictionary<string, string>
+            {
+                {"Name", "Title"},
+                {"StartDate", "Start"},
+                {"EndDate", "Finish"}
+            };
+
+            ObjectId = 10;
+
+            _token = (UserToken) Token;
+        }
 
         #endregion Constructors 
 
         #region Overrides of ObjectManager
 
         protected override void BuildObjects(DataTable items, object client, List<string> columns,
-            List<object> newObjects, List<object> existingObjects)
+            List<object> newTasks, List<object> existingTasks)
         {
-            throw new NotImplementedException();
+            var tasksClient = (TasksClient) client;
+
+            foreach (DataRow row in items.Rows)
+            {
+                Task task = null;
+
+                try
+                {
+                    task = tasksClient.QueryByUniqueId(_token, int.Parse(row["ID"].ToString()));
+                }
+                catch { }
+
+                if (task == null)
+                {
+                    try
+                    {
+                        task = tasksClient.CreateNew(_token);
+                        task.AccessType = 1;
+                        task.Capitalized = 0;
+                        task.IsBillable = 0;
+                        task.IsCosted = 0;
+                        task.IsFunded = 0;
+                        task.IsRandD = 0;
+                        task.StartDate = DateTime.Now;
+                    }
+                    catch { }
+                }
+
+                if (task == null) continue;
+
+                Type type = task.GetType();
+
+                foreach (
+                    string column in
+                        from column in columns
+                        let col = column.ToLower()
+                        where !col.Equals("id") && !col.Equals("spid")
+                        select column)
+                {
+                    try
+                    {
+                        PropertyInfo property = type.GetProperty(column);
+                        property.SetValue(task, GetValue(row[column], property));
+                    }
+                    catch { }
+                }
+
+
+                if (task.UniqueId > 0)
+                {
+                    existingTasks.Add(task);
+                }
+                else
+                {
+                    newTasks.Add(task);
+                }
+            }
         }
 
         #endregion

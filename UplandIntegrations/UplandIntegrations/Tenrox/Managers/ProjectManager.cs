@@ -43,7 +43,7 @@ namespace UplandIntegrations.Tenrox.Managers
         // Protected Methods (1) 
 
         protected override void BuildObjects(DataTable items, object client, List<string> columns,
-            List<object> newObjects, List<object> existingObjects)
+            List<object> newProjects, List<object> existingProjects)
         {
             var projectsClient = (ProjectsClient) client;
 
@@ -105,11 +105,11 @@ namespace UplandIntegrations.Tenrox.Managers
 
                 if (project.UniqueId > 0)
                 {
-                    existingObjects.Add(project);
+                    existingProjects.Add(project);
                 }
                 else
                 {
-                    newObjects.Add(project);
+                    newProjects.Add(project);
                 }
             }
         }
