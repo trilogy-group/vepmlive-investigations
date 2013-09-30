@@ -5617,7 +5617,7 @@
 			}
 
             
-			if (this.AnalyzerHideDetailschecked == true) {
+			if (this.showingTotDet == true) {
 				this.totTab.setButtonStateOn("idBTSDet");
 			} else {
 				this.totTab.setButtonStateOff("idBTSDet");
