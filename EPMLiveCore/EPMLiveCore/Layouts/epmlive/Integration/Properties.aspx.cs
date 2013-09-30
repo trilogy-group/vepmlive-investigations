@@ -76,9 +76,10 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                      lblURL.Text = intcore.GetAPIUrl(Web.Site.WebApplication.Id);
                  }
                  catch { }
-                 Dictionary<string,string> sASO = intcore.GetDropDownProperties(intadmin.ModuleID, intadmin.intlistid, new Guid(Request["LIST"]) , "AvailableSynchOptions","");
+                 Dictionary<string,string> sASO = intcore.GetDropDownProperties(intadmin.ModuleID, intadmin.intlistid, new Guid(Request["LIST"]) , "AvailableSynchOptions","") ??
+                                                  new Dictionary<string, string>();
 
-                 if (sASO == null || sASO.Count == 0)
+                 if (sASO.Count == 0)
                  {
                      sASO.Add("LI", "LI");
                      sASO.Add("LO", "LO");
