@@ -10,13 +10,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using EPMLiveIntegration;
 using UplandIntegrations.TenroxIntegrationService;
+using UplandIntegrations.TenroxUserService;
 using UserToken = UplandIntegrations.TenroxAuthService.UserToken;
 
 namespace UplandIntegrations.Tenrox.Infrastructure
 {
     internal abstract class ObjectManager : IObjectManager
     {
-        #region Fields (10) 
+        #region Fields (11) 
 
         protected readonly Binding Binding;
         protected readonly EndpointAddress EndpointAddress;
@@ -26,6 +27,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         private readonly string _endpointAddress;
         private readonly Dictionary<string, Type> _objectFields;
         private readonly Type _objectType;
+        private readonly TenroxUserService.UserToken _userToken;
         protected Dictionary<string, string> DisplayNameDict;
         protected Dictionary<string, string> MappingDict;
 
@@ -44,6 +46,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             _objectFields = new Dictionary<string, Type>();
             _objectType = objectType;
             _endpointAddress = endpointAddress;
+            _userToken = (TenroxUserService.UserToken) TranslateToken(_authToken, typeof (TenroxUserService.UserToken));
 
             Binding = binding;
             EndpointAddress = new EndpointAddress(_endpointAddress + "sdk/" + svcUrl);
@@ -58,7 +61,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (13) 
+        #region Methods (14) 
 
         // Public Methods (5) 
 
@@ -248,7 +251,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
         }
 
-        // Protected Methods (3) 
+        // Protected Methods (4) 
 
         protected abstract void BuildObjects(DataTable items, object client, List<string> columns,
             List<object> newObjects, List<object> existingObjects);
@@ -332,6 +335,22 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             catch { }
 
             return value;
+        }
+
+        protected int TranslateEmailToUserId(string email)
+        {
+            if (string.IsNullOrEmpty(email)) return 0;
+
+            using (var usersClient = new UsersClient(Binding, EndpointAddress))
+            {
+                User user = usersClient.QueryByEmail(_userToken, email);
+                if (user != null)
+                {
+                    return user.UniqueId;
+                }
+            }
+
+            return 0;
         }
 
         // Private Methods (5) 

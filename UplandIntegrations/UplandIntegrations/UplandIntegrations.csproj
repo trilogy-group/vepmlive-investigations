@@ -92,6 +92,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Service References\TenroxUserService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Tenrox\Adapter.cs" />
     <Compile Include="Tenrox\Managers\ClientManager.cs" />
     <Compile Include="Tenrox\Infrastructure\IObjectManager.cs" />
@@ -337,6 +342,77 @@
     <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.Task.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.BulkDeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.BulkDeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DXSelectedUser.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.FindSimpleUsersByEmailResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.FindSimpleUsersByNameResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.GetAllSimpleUsersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByAllSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByNameSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByUniqueIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.Skill.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.User.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.UserSimple.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\Users.wsdl" />
+    <None Include="Service References\TenroxUserService\Users.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users1.wsdl" />
+    <None Include="Service References\TenroxUserService\Users1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users7.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Web References\IntegrationAPI\integration.wsdl" />
     <None Include="Web References\IntegrationAPI\Reference.map" />
   </ItemGroup>
@@ -352,6 +428,12 @@
     <None Include="Service References\TenroxClientService\configuration91.svcinfo" />
     <None Include="Service References\TenroxClientService\configuration.svcinfo" />
     <None Include="Service References\TenroxClientService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TenroxUserService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxUserService\configuration.svcinfo" />
+    <None Include="Service References\TenroxUserService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
@@ -387,6 +469,7 @@
     <WCFMetadataStorage Include="Service References\TenroxIntegrationService\" />
     <WCFMetadataStorage Include="Service References\TenroxProjectService\" />
     <WCFMetadataStorage Include="Service References\TenroxTaskService\" />
+    <WCFMetadataStorage Include="Service References\TenroxUserService\" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

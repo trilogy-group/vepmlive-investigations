@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="Tenrox.Application.SDK" elementFormDefault="qualified" targetNamespace="Tenrox.Application.SDK" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Users.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" />
+  <xs:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Users.svc?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" />
+  <xs:element name="QueryByAll">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q1:UserToken" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByAllResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByAllResult" nillable="true" type="q2:ArrayOfUser" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByUniqueId">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q3:UserToken" />
+        <xs:element minOccurs="0" name="p_intUniqueId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByUniqueIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByUniqueIdResult" nillable="true" type="q4:User" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByAllSimple">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q5:UserToken" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByAllSimpleResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByAllSimpleResult" nillable="true" type="q6:ArrayOfUserSimple" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByAllActiveSimple">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q7:UserToken" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByAllActiveSimpleResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByAllActiveSimpleResult" nillable="true" type="q8:ArrayOfUserSimple" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FindSimpleUsersByName">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q9:UserToken" />
+        <xs:element minOccurs="0" name="usernameToMatch" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="pageIndex" type="xs:int" />
+        <xs:element minOccurs="0" name="pageSize" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FindSimpleUsersByNameResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="FindSimpleUsersByNameResult" nillable="true" type="q10:ArrayOfUserSimple" />
+        <xs:element minOccurs="0" name="totalRecords" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FindSimpleUsersByEmail">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q11:UserToken" />
+        <xs:element minOccurs="0" name="emailToMatch" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="pageIndex" type="xs:int" />
+        <xs:element minOccurs="0" name="pageSize" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FindSimpleUsersByEmailResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="FindSimpleUsersByEmailResult" nillable="true" type="q12:ArrayOfUserSimple" />
+        <xs:element minOccurs="0" name="totalRecords" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAllSimpleUsers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q13:UserToken" />
+        <xs:element minOccurs="0" name="pageIndex" type="xs:int" />
+        <xs:element minOccurs="0" name="pageSize" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAllSimpleUsersResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="GetAllSimpleUsersResult" nillable="true" type="q14:ArrayOfUserSimple" />
+        <xs:element minOccurs="0" name="totalRecords" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSimpleUserByLogonName">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q15:UserToken" />
+        <xs:element minOccurs="0" name="LogonName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSimpleUserByLogonNameResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="GetSimpleUserByLogonNameResult" nillable="true" type="q16:ArrayOfUserSimple" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSimpleUserByUniqueId">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q17:UserToken" />
+        <xs:element minOccurs="0" name="UserUID" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSimpleUserByUniqueIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="GetSimpleUserByUniqueIdResult" nillable="true" type="q18:ArrayOfUserSimple" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QuerySkillsByUserID">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q19:UserToken" />
+        <xs:element minOccurs="0" name="Userid" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QuerySkillsByUserIDResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QuerySkillsByUserIDResult" nillable="true" type="q20:ArrayOfSkill" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QuerySkills">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q21:UserToken" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QuerySkillsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QuerySkillsResult" nillable="true" type="q22:ArrayOfSkill" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Save">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q23="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="userToken" nillable="true" type="q23:UserToken" />
+        <xs:element xmlns:q24="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="p_toSave" nillable="true" type="q24:User" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q25="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="SaveResult" nillable="true" type="q25:User" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveAll">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q26="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="userToken" nillable="true" type="q26:UserToken" />
+        <xs:element xmlns:q27="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="p_toSave" nillable="true" type="q27:ArrayOfUser" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveAllResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q28="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="SaveAllResult" nillable="true" type="q28:ArrayOfUser" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryById">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q29="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="token" nillable="true" type="q29:UserToken" />
+        <xs:element minOccurs="0" name="p_strId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q30="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByIdResult" nillable="true" type="q30:ArrayOfUser" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByName">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q31="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="token" nillable="true" type="q31:UserToken" />
+        <xs:element minOccurs="0" name="p_strName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByNameResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q32="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByNameResult" nillable="true" type="q32:ArrayOfUser" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByEmail">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q33="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="token" nillable="true" type="q33:UserToken" />
+        <xs:element minOccurs="0" name="p_strEmail" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByEmailResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q34="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByEmailResult" nillable="true" type="q34:User" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByDXUsers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q35="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q35:UserToken" />
+        <xs:element minOccurs="0" name="p_selectedUserId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryByDXUsersResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q36="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="QueryByDXUsersResult" nillable="true" type="q36:ArrayOfDXSelectedUser" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignSkill">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q37="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q37:UserToken" />
+        <xs:element minOccurs="0" name="p_intUserId" type="xs:int" />
+        <xs:element minOccurs="0" name="p_intSkillId" type="xs:int" />
+        <xs:element minOccurs="0" name="p_dtStartDate" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="p_dtEndState" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="p_intProficiencyId" type="xs:int" />
+        <xs:element minOccurs="0" name="p_intExperience" type="xs:int" />
+        <xs:element minOccurs="0" name="p_intInterestkey" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignSkillResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignSkillSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q38="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q38:UserToken" />
+        <xs:element minOccurs="0" name="p_intUserId" type="xs:int" />
+        <xs:element minOccurs="0" name="p_intSkillSetId" type="xs:int" />
+        <xs:element minOccurs="0" name="p_dtStartDate" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="p_dtEndState" type="xs:dateTime" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignSkillSetResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignRateRule">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q39="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_userToken" nillable="true" type="q39:UserToken" />
+        <xs:element minOccurs="0" name="p_intRuleType" type="xs:int" />
+        <xs:element minOccurs="0" name="p_strName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="p_strUserId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="p_strProjectId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="p_strRateType" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="p_dblRate" type="xs:double" />
+        <xs:element minOccurs="0" name="p_dblOvertimeRate" type="xs:double" />
+        <xs:element minOccurs="0" name="p_dblDoubleRate" type="xs:double" />
+        <xs:element minOccurs="0" name="p_intCurrencyId" type="xs:int" />
+        <xs:element minOccurs="0" name="p_dtRateStartDate" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="p_dtRateEndDate" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="p_dtRateEffectiveOnDate" type="xs:dateTime" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignRateRuleResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateNew">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q40="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="token" nillable="true" type="q40:UserToken" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateNewResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q41="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="CreateNewResult" nillable="true" type="q41:User" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OptomisticSave">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q42="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" minOccurs="0" name="p_strToken" nillable="true" type="q42:UserToken" />
+        <xs:element xmlns:q43="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" minOccurs="0" name="p_toSave" nillable="true" type="q43:ArrayOfUser" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OptomisticSaveResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="OptomisticSaveResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

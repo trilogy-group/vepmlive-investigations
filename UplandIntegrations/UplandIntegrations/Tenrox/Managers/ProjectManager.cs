@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.ServiceModel.Channels;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxProjectService;
@@ -82,6 +83,18 @@ namespace UplandIntegrations.Tenrox.Managers
                 }
 
                 if (project == null) continue;
+
+                string email = null;
+                try
+                {
+                    email = row["ManagerId"].ToString();
+                }
+                catch { }
+
+                if (!string.IsNullOrEmpty(email))
+                {
+                    row["ManagerId"] = TranslateEmailToUserId(email).ToString(CultureInfo.InvariantCulture);
+                }
 
                 FillObjects(columns, newProjects, existingProjects, project, row);
             }
