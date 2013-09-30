@@ -105,7 +105,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListViewTitle = string.Empty;
             try
             {
-                ListViewUrl = spContext.ViewContext.View.Title;
+                ListViewTitle = spContext.ViewContext.View.Title;
             }
             catch { }
 
