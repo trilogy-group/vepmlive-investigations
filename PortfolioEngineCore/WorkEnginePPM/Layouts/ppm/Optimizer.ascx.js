@@ -1552,12 +1552,15 @@
 		var btn = document.getElementById(idButton);
 
 		if (btn == null)
-			return;
+		    return;
+		btn.disabled = bstate;
+
+		return;
 		
-		if (bstate == true)
-			btn.className = "button-new disabledSilver";
-		else 
-		   btn.className = "button-new silver";
+		//if (bstate == true)
+		//	btn.className = "button-new disabledSilver";
+		//else 
+		//   btn.className = "button-new silver";
 
     }
 

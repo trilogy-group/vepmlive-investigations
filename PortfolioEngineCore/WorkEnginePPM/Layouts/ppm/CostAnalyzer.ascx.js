@@ -4539,11 +4539,14 @@
 
         if (btn == null)
             return;
+        btn.disabled = bstate;
 
-        if (bstate == true)
-            btn.className = "button-new disabledSilver";
-        else
-            btn.className = "button-new silver";
+        return;
+
+        //if (bstate == true)
+        //    btn.className = "button-new disabledSilver";
+        //else
+        //    btn.className = "button-new silver";
 
     }
 

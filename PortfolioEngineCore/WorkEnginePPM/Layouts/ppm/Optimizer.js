@@ -1857,10 +1857,14 @@
         if (btn == null)
             return;
 
-        if (bstate == true)
-            btn.className = "button-new disabledSilver";
-        else
-            btn.className = "button-new silver";
+        btn.disabled = bstate;
+
+        return;
+
+        //if (bstate == true)
+        //    btn.className = "button-new disabledSilver";
+        //else
+        //    btn.className = "button-new silver";
 
     }
     OptimizerRibbon.prototype.FinishOptConf = function () {
@@ -2147,7 +2151,7 @@
         sInject.append('                    <tr>');
         sInject.append('                        <td>');
         sInject.append('                            <div class="button-containerVert">');
-        sInject.append('				                <a href="javascript:OptimizerEvent(\'OptConfAddCol_Click\');" class="button-new silver" style="width:75px;" id="idOptConfAdd">Add ></a>');
+        sInject.append('				               <input id="idOptConfAdd" type="button" onclick="javascript: OptimizerEvent(\'OptConfAddCol_Click\');" class="epmliveButton" value="Add >"/>');
         sInject.append('			');
         sInject.append('		                    </div>');
         sInject.append('                        </td>');
@@ -2156,7 +2160,7 @@
         sInject.append('                   <tr>');
         sInject.append('                        <td>');
         sInject.append('		                    <div class="button-containerVert">');
-        sInject.append('				                <a href="javascript:OptimizerEvent(\'OptConfRemoveCol_Click\');" class="button-new silver" style="width:75px;" id="idOptConfRemove">< Remove</a>');
+        sInject.append('				                <input id="idOptConfRemove" type="button" onclick="javascript: OptimizerEvent(\'OptConfRemoveCol_Click\');" class="epmliveButton" value="< Remove"/>');
         sInject.append('		                    </div>');
         sInject.append('                        </td>');
         sInject.append('                    </tr>');
@@ -2188,8 +2192,8 @@
         sInject.append('    <br />');
         sInject.append('    <div style="width:200px;float:right;margin-top:17px;">');
         sInject.append('	    <div class="button-container">');
-        sInject.append('			<a href="javascript:OptimizerEvent(\'OptConfOK_Click\');" class="button-new green" style="width:75px;">OK</a>');
-        sInject.append('			<a href="javascript:OptimizerEvent(\'OptConfCancel_Click\');" class="button-new silver" style="width:75px;">Cancel</a>');
+        sInject.append('		    <input type="button" onclick="javascript: OptimizerEvent(\'OptConfOK_Click\');" class="epmliveButton" value="OK"/>');
+        sInject.append('		    <input type="button" onclick="javascript: OptimizerEvent(\'OptConfCancel_Click\');" class="epmliveButton" value="Cancel"/>');
         sInject.append('	    </div>');
         sInject.append('    </div>');
         sInject.append('</div>');
