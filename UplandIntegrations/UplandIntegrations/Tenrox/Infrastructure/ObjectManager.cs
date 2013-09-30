@@ -58,7 +58,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (12) 
+        #region Methods (13) 
 
         // Public Methods (5) 
 
@@ -248,10 +248,43 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
         }
 
-        // Protected Methods (2) 
+        // Protected Methods (3) 
 
         protected abstract void BuildObjects(DataTable items, object client, List<string> columns,
             List<object> newObjects, List<object> existingObjects);
+
+        protected void FillObjects(IEnumerable<string> columns, List<object> newObjects, List<object> existingObjects,
+            object obj, DataRow row)
+        {
+            Type type = obj.GetType();
+
+            foreach (
+                string column in
+                    from column in columns
+                    let col = column.ToLower()
+                    where !col.Equals("id") && !col.Equals("spid")
+                    select column)
+            {
+                try
+                {
+                    PropertyInfo property = type.GetProperty(column);
+                    property.SetValue(obj, GetValue(row[column], property));
+                }
+                catch { }
+            }
+
+            int uniqueId;
+            int.TryParse((type.GetProperty("UniqueId").GetValue(obj) ?? string.Empty).ToString(), out uniqueId);
+
+            if (uniqueId > 0)
+            {
+                existingObjects.Add(obj);
+            }
+            else
+            {
+                newObjects.Add(obj);
+            }
+        }
 
         protected object GetValue(object value, PropertyInfo property)
         {

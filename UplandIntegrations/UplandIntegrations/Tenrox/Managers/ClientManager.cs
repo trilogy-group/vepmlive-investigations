@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Reflection;
 using System.ServiceModel.Channels;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxClientService;
@@ -66,32 +63,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
                 if (c == null) continue;
 
-                Type type = c.GetType();
-
-                foreach (
-                    string column in
-                        from column in columns
-                        let col = column.ToLower()
-                        where !col.Equals("id") && !col.Equals("spid")
-                        select column)
-                {
-                    try
-                    {
-                        PropertyInfo property = type.GetProperty(column);
-                        property.SetValue(c, GetValue(row[column], property));
-                    }
-                    catch { }
-                }
-
-
-                if (c.UniqueId > 0)
-                {
-                    existingClients.Add(c);
-                }
-                else
-                {
-                    newClients.Add(c);
-                }
+                FillObjects(columns, newClients, existingClients, c, row);
             }
         }
 

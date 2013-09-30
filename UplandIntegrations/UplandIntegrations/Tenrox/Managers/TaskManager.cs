@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Reflection;
 using System.ServiceModel.Channels;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxTaskService;
@@ -72,32 +70,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
                 if (task == null) continue;
 
-                Type type = task.GetType();
-
-                foreach (
-                    string column in
-                        from column in columns
-                        let col = column.ToLower()
-                        where !col.Equals("id") && !col.Equals("spid")
-                        select column)
-                {
-                    try
-                    {
-                        PropertyInfo property = type.GetProperty(column);
-                        property.SetValue(task, GetValue(row[column], property));
-                    }
-                    catch { }
-                }
-
-
-                if (task.UniqueId > 0)
-                {
-                    existingTasks.Add(task);
-                }
-                else
-                {
-                    newTasks.Add(task);
-                }
+                FillObjects(columns, newTasks, existingTasks, task, row);
             }
         }
 

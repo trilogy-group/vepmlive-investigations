@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Reflection;
 using System.ServiceModel.Channels;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxProjectService;
@@ -85,32 +83,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
                 if (project == null) continue;
 
-                Type type = project.GetType();
-
-                foreach (
-                    string column in
-                        from column in columns
-                        let col = column.ToLower()
-                        where !col.Equals("id") && !col.Equals("spid")
-                        select column)
-                {
-                    try
-                    {
-                        PropertyInfo property = type.GetProperty(column);
-                        property.SetValue(project, GetValue(row[column], property));
-                    }
-                    catch { }
-                }
-
-
-                if (project.UniqueId > 0)
-                {
-                    existingProjects.Add(project);
-                }
-                else
-                {
-                    newProjects.Add(project);
-                }
+                FillObjects(columns, newProjects, existingProjects, project, row);
             }
         }
 
