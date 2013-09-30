@@ -78,7 +78,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                  catch { }
                  Dictionary<string,string> sASO = intcore.GetDropDownProperties(intadmin.ModuleID, intadmin.intlistid, new Guid(Request["LIST"]) , "AvailableSynchOptions","");
 
-                 if(sASO.Count == 0)
+                 if (sASO == null || sASO.Count == 0)
                  {
                      sASO.Add("LI", "LI");
                      sASO.Add("LO", "LO");
