@@ -146,20 +146,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
             } catch (e) { }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.CreateWorkspace') {
-            var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/QueueCreateWorkspace.aspx?listid=' + WEListId + '&itemid=' + WEItemId);
-            var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
-            var tUrl = urlBuilder.get_url();
-            var options = {
-                url: tUrl,
-                title: 'Create Workspace',
-                allowMaximize: false,
-                dialogReturnValueCallback: function (dialogResult, returnVal) {
-                    if (dialogResult == '1') {
-                        window.location.href = value;
-                    }
-                }
-            };
-            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+            CreateEPMLiveWorkspace(WEListId, WEItemId);
         }
         else if (commandId === 'Ribbon.ListForm.Display.Actions.Favorite') {
             if (!($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png')) {
