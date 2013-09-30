@@ -40,7 +40,7 @@ namespace PortfolioEngineCore
             sReply = "";
             if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
             _sqlConnection.Open();
-            DateTime dtnow = DateTime.Now;
+            DateTime dtnow = DateTime.Today;
 
             CStruct xRPA = new CStruct();
             xRPA.Initialize("ResourceAnalyzerCalendars");
@@ -121,7 +121,7 @@ namespace PortfolioEngineCore
                         DateTime pers = DBAccess.ReadDateValue(reader["PRD_START_DATE"]);
                         DateTime perf = DBAccess.ReadDateValue(reader["PRD_FINISH_DATE"]);
 
-     
+                        perf = perf.AddMinutes(1439);
 
                         if (cal_id == first_cal_id)
                         {
