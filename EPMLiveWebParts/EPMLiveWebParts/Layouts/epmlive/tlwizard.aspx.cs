@@ -438,6 +438,20 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 roll.AddGroup(web.SiteGroups["Visitors"]);
             }
             catch { }
+            try
+            {
+                web.SiteGroups.Add("Report Writers", newOwner, user, "");
+                roll = web.Roles["Read"];
+                roll.AddGroup(web.SiteGroups["Report Writers"]);
+            }
+            catch { }
+            try
+            {
+                web.SiteGroups.Add("Report Viewers", newOwner, user, "");
+                roll = web.Roles["Read"];
+                roll.AddGroup(web.SiteGroups["Report Viewers"]);
+            }
+            catch { }
 
             roll = web.Roles["Contribute2"]; 
             
