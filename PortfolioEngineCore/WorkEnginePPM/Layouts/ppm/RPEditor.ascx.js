@@ -2580,10 +2580,15 @@
                                     if (b) {
                                         var row = plangrid.FRow;
                                         var reqrow = this.GetParentRequirement(row);
+                                        var wresId = plangrid.GetAttribute(row, null, "Res_UID");
+                                        var resrow = this.FindResourceRow(wresId);
                                         plangrid.DeleteRow(row, 2); // 1=okmsg+del; 2=del; 3=undel
                                         if (reqrow != null) {
                                             this.UpdatePlanRowCalculatedValues(reqrow, 0);
                                             this.RefreshPlanRowPeriods(plangrid, reqrow, true);
+                                        }
+                                        if (wresId != null && resrow != null) {
+                                            this.CalculateResourceRowCommitted(wresId, resrow);
                                         }
                                     }
                                     break;
@@ -4548,7 +4553,14 @@
             if (planresuid == null) planresuid = plangrid.GetAttribute(row, null, "Res_UID");
             if (resuid == planresuid) {
                 var origH = plangrid.GetAttribute(row, null, "H" + periodid + "Orig");
-                if (origH != null)
+                var deleted = plangrid.GetAttribute(row, null, "Deleted");
+                if (deleted == 1 && origH == null) {
+                    deltaC -= this.GetPeriodHours(plangrid, row, "H" + periodid);
+                }
+                else if (deleted == 1 && origH != null) {
+                    deltaC -= origH;
+                }
+                else if (origH != null)
                     deltaC += this.GetPeriodHours(plangrid, row, "H" + periodid) - origH;
             }
             row = plangrid.GetNext(row);
