@@ -500,7 +500,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         var options = {
             url: tUrl,
             title: 'Integration',
-
+            width: 600,
             dialogReturnValueCallback: function (dialogResult, returnValue) {
 
             }
