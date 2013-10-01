@@ -467,27 +467,50 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
     var t = controlFull.indexOf(".");
     var control = controlFull.substr(0, t);
-    var windowtype = controlFull.substr(t);
+    var windowtype = controlFull.substr(t + 1);
 
     alert(control);
     alert(windowtype);
 
-
+    FullWindow = 1, FullDialog, SmallDialog, IFrame
 
     var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/integration/gotoremote.aspx?control=' + control + '&listid=' + listid + '&itemid=' + itemid);
 
     var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
     var tUrl = urlBuilder.get_url();
 
-    var options = {
-        url: tUrl,
-        showMaximized: true,
-        title: 'Integration',
 
-        dialogReturnValueCallback: function (dialogResult, returnValue) {
-            
-        }
-    };
+    if (windowtype == 1) {
+        window.open(tUrl, '', config = 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0,toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=yes');
+    }
+    else if (windowtype == 2) {
+        var options = {
+            url: tUrl,
+            showMaximized: true,
+            title: 'Integration',
 
-    SP.UI.ModalDialog.showModalDialog(options);
+            dialogReturnValueCallback: function (dialogResult, returnValue) {
+
+            }
+        };
+
+        SP.UI.ModalDialog.showModalDialog(options);
+    }
+    else if (windowtype == 3) {
+        var options = {
+            url: tUrl,
+            title: 'Integration',
+
+            dialogReturnValueCallback: function (dialogResult, returnValue) {
+
+            }
+        };
+
+        SP.UI.ModalDialog.showModalDialog(options);
+    }
+    else if (windowtype == 4) {
+        location.href = tUrl;
+    }
+
+   
 }

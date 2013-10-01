@@ -13,6 +13,64 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
        <%=error %>
+
+        <script language="javascript">
+            function setHeight() {
+                var frmremote = document.getElementById("frmRemote");
+                if(frmremote)
+                    frmremote.style.height = (getHeight() - getTop(frmremote) - 40) + "px";
+            }
+
+            function getHeight() {
+                var scnHei;
+                if (self.innerHeight) // all except Explorer
+                {
+                    //scnWid = self.innerWidth;
+                    scnHei = self.innerHeight;
+                }
+                else if (document.documentElement && document.documentElement.clientHeight) {
+                    //scnWid = document.documentElement.clientWidth;
+                    scnHei = document.documentElement.clientHeight;
+                }
+                else if (document.body) // other Explorers
+                {
+                    //scnWid = document.body.clientWidth;
+                    scnHei = document.body.clientHeight;
+                }
+                return scnHei;
+            }
+
+            function getWidth() {
+                var scnWid;
+                if (self.innerHeight) // all except Explorer
+                {
+                    scnWid = self.innerWidth;
+                    //scnHei = self.innerHeight;
+                }
+                else if (document.documentElement && document.documentElement.clientHeight) {
+                    scnWid = document.documentElement.clientWidth;
+                    //scnHei = document.documentElement.clientHeight;
+                }
+                else if (document.body) // other Explorers
+                {
+                    scnWid = document.body.clientWidth;
+                    //scnHei = document.body.clientHeight;
+                }
+                return scnWid;
+            }
+            function getTop(obj) {
+                var posY = obj.offsetTop;
+
+                while (obj.offsetParent) {
+                    posY = posY + obj.offsetParent.offsetTop;
+                    if (obj == document.getElementsByTagName('body')[0]) { break }
+                    else { obj = obj.offsetParent; }
+                }
+
+                return posY;
+            }
+            _spBodyOnLoadFunctionNames.push("setHeight");
+            </script>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

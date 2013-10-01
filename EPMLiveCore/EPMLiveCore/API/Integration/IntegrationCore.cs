@@ -50,7 +50,7 @@ namespace EPMLiveCore.API.Integration
 
             OpenConnection();
 
-            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_LISTS.INT_LIST_ID, dbo.INT_LISTS.INT_COLID FROM         dbo.INT_CONTROLS INNER JOIN dbo.INT_LISTS ON dbo.INT_CONTROLS.INT_LIST_ID = dbo.INT_LISTS.INT_LIST_ID where LIST_ID=@listid and control=@control", cn);
+            SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_LISTS.INT_LIST_ID, dbo.INT_LISTS.INT_COLID, WINDOWSTYLE FROM         dbo.INT_CONTROLS INNER JOIN dbo.INT_LISTS ON dbo.INT_CONTROLS.INT_LIST_ID = dbo.INT_LISTS.INT_LIST_ID where LIST_ID=@listid and control=@control", cn);
             cmd.Parameters.AddWithValue("@listid", ListId);
             cmd.Parameters.AddWithValue("@control", control);
             SqlDataAdapter da = new SqlDataAdapter(cmd);

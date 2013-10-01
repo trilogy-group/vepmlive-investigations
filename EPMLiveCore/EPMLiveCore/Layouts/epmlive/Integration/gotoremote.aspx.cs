@@ -13,6 +13,8 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
         {
             string url = "";
 
+            bool bIframe = false;
+
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 Guid listId = new Guid(Request["listid"]);
@@ -34,6 +36,11 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     if (intid != "")
                     {
                         url = core.GetControlURL(new Guid(dr["INT_LIST_ID"].ToString()), listId, Request["Control"], intid);
+
+                        if (dr["WINDOWSTYLE"].ToString() == "4")
+                        {
+                            bIframe = true;
+                        }
                     }
                     else
                     {
@@ -50,7 +57,14 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
             if (url != "")
             {
-                Response.Redirect(url);
+                if (bIframe)
+                {
+                    error = "<iframe src=\"" + url + "\" id=\"frmRemote\">";
+                }
+                else
+                {
+                    Response.Redirect(url);
+                }
             }
             else
             {
