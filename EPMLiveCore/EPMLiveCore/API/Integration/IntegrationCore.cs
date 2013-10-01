@@ -107,8 +107,8 @@ namespace EPMLiveCore.API.Integration
 
                     if (controls != null)
                     {
-                        List<IntegrationControl> ctls = controls.GetRemoteControls(webprops, log);
-                        List<string> lctls = controls.GetLocalControls(webprops, log);
+                        List<IntegrationControl> ctls = controls.GetPageButtons(webprops, log, false);
+                        List<string> lctls = controls.GetEmbeddedItemControls(webprops, log);
 
                         DataTable dtResInfo = new DataTable();
                         dtResInfo.Columns.Add("INT_CONTROL_ID", typeof(Guid));
@@ -117,17 +117,17 @@ namespace EPMLiveCore.API.Integration
                         dtResInfo.Columns.Add("LOCAL");
                         dtResInfo.Columns.Add("TITLE");
                         dtResInfo.Columns.Add("IMAGE");
-                        dtResInfo.Columns.Add("BITEM");
+                        dtResInfo.Columns.Add("GLOBAL");
                         dtResInfo.Columns.Add("WINDOWSTYLE");
 
                         foreach (IntegrationControl ictl in ctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image, ictl.BItemLevel, (int)ictl.Window });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image, false, (int)ictl.Window });
                         }
 
                         foreach (string ictl in lctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "", false, false, 0 });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "", false, 0 });
                         }
 
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
@@ -1309,7 +1309,7 @@ namespace EPMLiveCore.API.Integration
             return "";
         }
 
-        public List<IntegrationControl> GetRemoteControls(Guid listid, SPListItem li, out string Errors)
+        public List<IntegrationControl> GetItemButtons(Guid listid, SPListItem li, out string Errors)
         {
             List<IntegrationControl> ics = new List<IntegrationControl>();
             Errors = "";
@@ -1321,7 +1321,50 @@ namespace EPMLiveCore.API.Integration
 
                     DataSet ds = new DataSet();
 
-                    SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0", cn);
+                    SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE,  dbo.INT_CONTROLS.WINDOWSTYLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0", cn);
+                    cmd.Parameters.AddWithValue("@listid", listid);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(ds);
+
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    {
+                        try
+                        {
+                            IntegrationControl i = new IntegrationControl();
+                            i.Control = dr["CONTROL"].ToString();
+                            i.Image = dr["IMAGE"].ToString();
+                            i.Title = dr["TITLE"].ToString();
+                            i.Window = (EPMLiveIntegration.IntegrationControlWindowStyle)int.Parse(dr["WINDOWSTYLE"].ToString());
+                            ics.Add(i);
+                        }
+                        catch { }
+                    }
+
+                    CloseConnection(false);
+                });
+
+            }
+            catch (Exception ex)
+            {
+                Errors += ex.Message;
+            }
+            return ics;
+        }
+
+
+        public List<IntegrationControl> GetGlobalButtons(Guid listid, SPListItem li, out string Errors)
+        {
+            List<IntegrationControl> ics = new List<IntegrationControl>();
+            Errors = "";
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    OpenConnection();
+
+                    DataSet ds = new DataSet();
+
+                    SqlCommand cmd = new SqlCommand("SELECT     dbo.INT_CONTROLS.CONTROL, dbo.INT_CONTROLS.IMAGE, dbo.INT_CONTROLS.TITLE FROM         dbo.INT_LISTS INNER JOIN dbo.INT_CONTROLS ON dbo.INT_LISTS.INT_LIST_ID = dbo.INT_CONTROLS.INT_LIST_ID WHERE LIST_ID=@listid and LOCAL=0 and GLOBAL=0", cn);
                     cmd.Parameters.AddWithValue("@listid", listid);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(ds);
@@ -1347,7 +1390,7 @@ namespace EPMLiveCore.API.Integration
             return ics;
         }
 
-        public List<IntegrationControlDef> GetLocalControls(Guid listid, SPListItem li, out string Errors)
+        public List<IntegrationControlDef> GetEmbbededControls(Guid listid, SPListItem li, out string Errors)
         {
             List<IntegrationControlDef> icds = new List<IntegrationControlDef>();
             Errors = "";
@@ -1380,7 +1423,7 @@ namespace EPMLiveCore.API.Integration
                         {
                             try
                             {
-                                List<string> conts = ((IIntegratorControls)integrator.iIntegrator).GetLocalControls(webprops, log);
+                                List<string> conts = ((IIntegratorControls)integrator.iIntegrator).GetEmbeddedItemControls(webprops, log);
 
                                 foreach (string cont in conts)
                                 {

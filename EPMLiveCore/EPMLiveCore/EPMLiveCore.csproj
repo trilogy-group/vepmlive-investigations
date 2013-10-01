@@ -12,8 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>SP 2013 Deploy</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -27,9 +27,11 @@ net start "WETimer"</PostDeploymentCommand>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
 "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>0</FileUpgradeFlags>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
-    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\Backup1\</UpgradeBackupLocation>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <IncludeAssemblyInPackage>True</IncludeAssemblyInPackage>
     <PublishUrl>publish\</PublishUrl>
@@ -3263,6 +3265,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\navigation\collapse.png" />
     <Content Include="Layouts\epmlive\images\navigation\expand.png" />
     <Content Include="Layouts\epmlive\images\navigation\notch.png" />
+    <Content Include="Layouts\epmlive\images\navigation\search-white.png" />
     <Content Include="Layouts\epmlive\images\navtipwhite.png" />
     <Content Include="Layouts\epmlive\images\notavailable.png" />
     <Content Include="Layouts\epmlive\images\notification-icons\assigned-to.png" />
@@ -3304,6 +3307,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\settings\Timesheet.png" />
     <Content Include="Layouts\epmlive\images\settings\UserMgmt.png" />
     <Content Include="Layouts\epmlive\images\settings\Users.png" />
+    <Content Include="Layouts\epmlive\images\star-filled16.png" />
+    <Content Include="Layouts\epmlive\images\star-filled32.png" />
+    <Content Include="Layouts\epmlive\images\star16.png" />
+    <Content Include="Layouts\epmlive\images\star32.png" />
     <Content Include="Layouts\epmlive\images\unlink.GIF" />
     <Content Include="Layouts\epmlive\images\up.gif" />
     <Content Include="Layouts\epmlive\images\warning.png" />
@@ -3947,18 +3954,7 @@ net start "WETimer"</PostDeploymentCommand>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
-        <DeploymentConfigurations>
-          <DeploymentConfiguration Name="SP 2013 Deploy">
-            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
-            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
-          </DeploymentConfiguration>
-        </DeploymentConfigurations>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
+  <ProjectExtensions />
   <PropertyGroup>
     <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
 del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
