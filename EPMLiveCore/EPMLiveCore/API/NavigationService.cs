@@ -42,7 +42,7 @@ namespace EPMLiveCore.API
                     IEnumerable<Type> types = AssemblyManager.Current.GetTypes();
                     Parallel.ForEach(providers, provider => LoadProvider(provider, types));
                 });
-
+                 
                 tasks.Add(t1);
 
                 Task t2 = Task.Factory.StartNew(() =>
