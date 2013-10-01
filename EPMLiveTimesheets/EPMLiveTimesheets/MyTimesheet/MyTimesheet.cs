@@ -432,7 +432,7 @@ namespace TimeSheets
                             ");
             
 
-            output.WriteLine(@"<div align=""center"" id=""TSLoader" + sFullGridId + @""" width=""100%""><img style=""vertical-align:middle;"" src=""_layouts/images/gears_anv4.gif""/>&nbsp;Loading Items...</div>");
+            output.WriteLine(@"<div align=""center"" id=""TSLoader" + sFullGridId + @""" width=""100%""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;Loading Items...</div>");
             
             output.WriteLine("<div style=\"width:100%\">");
             output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
@@ -459,8 +459,9 @@ namespace TimeSheets
             output.WriteLine("initmb();");
             
             output.WriteLine("function clickTab(){");
-            output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
-            output.WriteLine("fireEvent(wp, 'mouseup');");
+            output.WriteLine("SelectRibbonTab('Ribbon.MyTimesheetTab', true);");
+            //output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
+            //output.WriteLine("fireEvent(wp, 'mouseup');");
             output.WriteLine("}");
 
             output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"MyTimesheetContextualTabPageComponent.js\");");

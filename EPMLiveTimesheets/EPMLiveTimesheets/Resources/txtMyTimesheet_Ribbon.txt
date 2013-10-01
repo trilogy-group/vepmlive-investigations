@@ -71,7 +71,7 @@
 		                Command="Ribbon.MyTimesheet.AddWork" 
 		                Sequence="10" 
 		                LabelText="Add Work"
-						Image32by32="_layouts/epmlive/images/mytsadditem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsadditem.png" 
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -79,7 +79,7 @@
 		                Command="Ribbon.MyTimesheet.AddNonWork" 
 		                Sequence="11" 
 		                LabelText="Add Non-Work"
-						Image32by32="_layouts/epmlive/images/mytsadditem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsadditem.png" 
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -87,7 +87,7 @@
 		                Command="Ribbon.MyTimesheet.AutoWork" 
 		                Sequence="12" 
 		                LabelText="Auto-Add Work"
-						Image32by32="_layouts/epmlive/images/mytsadditem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsadditem.png" 
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -95,7 +95,7 @@
 		                Command="Ribbon.MyTimesheet.RemoveWork" 
 		                Sequence="13" 
 		                LabelText="Remove Item"
-						Image32by32="_layouts/epmlive/images/mytsremoveitem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsremoveitem.png" 
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -103,7 +103,7 @@
 		                Command="Ribbon.MyTimesheet.Comments" 
 		                Sequence="14" 
 		                LabelText="Comments"
-						Image32by32="_layouts/epmlive/images/comments32.png" 
+						Image32by32="/_layouts/epmlive/images/comments32.png" 
 		                TemplateAlias="oL"/>
 
 				</Controls>
@@ -217,32 +217,32 @@
 							  Description="Save View"
 							  LabelText="Save View"
 							  TemplateAlias="oM"
-							  Image32by32="_layouts/epmlive/images/mywork/ribbon/saveview-32.png"
-							  Image16by16="_layouts/epmlive/images/mywork/ribbon/saveview-16.png" />
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/saveview-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/saveview-16.png" />
 
 					  <Button Id="Ribbon.MyTimesheetViews.RenameView"
 							  Command="Ribbon.MyTimesheet.RenameView"
 							  Description="Rename View"
 							  LabelText="Rename View"
 							  TemplateAlias="oM"
-							  Image32by32="_layouts/epmlive/images/mywork/ribbon/renameview-32.png"
-							  Image16by16="_layouts/epmlive/images/mywork/ribbon/renameview-16.png" />
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/renameview-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/renameview-16.png" />
 
 					  <Button Id="Ribbon.MyTimesheetViews.DeleteView"
 							  Command="Ribbon.MyTimesheet.DeleteView"
 							  Description="Delete View"
 							  LabelText="Delete View"
 							  TemplateAlias="oM"
-							  Image32by32="_layouts/epmlive/images/mywork/ribbon/deleteview-32.png"
-							  Image16by16="_layouts/epmlive/images/mywork/ribbon/deleteview-16.png" />
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/deleteview-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/deleteview-16.png" />
 
 					  <Button Id="Ribbon.MyTimesheetViews.SelectColumns"
 							  Command="Ribbon.MyTimesheet.SelectColumns"
 							  Description="Select Columns"
 							  LabelText="Select Columns"
 							  TemplateAlias="oM"
-							  Image32by32="_layouts/epmlive/images/mywork/ribbon/selectcoloumns-32.png"
-							  Image16by16="_layouts/epmlive/images/mywork/ribbon/selectcoloumns-16.png" />
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/selectcoloumns-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/selectcoloumns-16.png" />
 
 					  <ToggleButton Id="Ribbon.MyTimesheetViews.ShowHideFilters"
 							  Command="Ribbon.MyTimesheet.ShowHideFilters"
@@ -250,8 +250,8 @@
 							  Description="Show Filters"
 							  LabelText="Show Filters"
 							  TemplateAlias="oM"
-							  Image32by32="_layouts/epmlive/images/mywork/ribbon/showhidefilters-32.png"
-							  Image16by16="_layouts/epmlive/images/mywork/ribbon/showhidefilters-16.png" />
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/showhidefilters-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/showhidefilters-16.png" />
 
 					  <ToggleButton Id="Ribbon.MyTimesheetViews.ShowHideGrouping"
 							  Command="Ribbon.MyTimesheet.ShowHideGrouping"
@@ -259,8 +259,8 @@
 							  Description="Show Grouping"
 							  LabelText="Show Grouping"
 							  TemplateAlias="oM"
-							  Image32by32="_layouts/epmlive/images/mywork/ribbon/showhidegrouping-32.png"
-							  Image16by16="_layouts/epmlive/images/grouping.gif" />
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/showhidegrouping-32.png"
+							  Image16by16="/_layouts/epmlive/images/grouping.gif" />
 
 					  <Button Id="Ribbon.MyTimesheetViews.ClearSort"
 							  Command="Ribbon.MyTimesheet.ClearSort"
@@ -268,8 +268,8 @@
 							  LabelText="Remove Sorting"
 							  TemplateAlias="oM"
 							  Sequence="30"
-							  Image32by32="_layouts/epmlive/images/mywork/ribbon/sort-32.png"
-							  Image16by16="_layouts/epmlive/images/mywork/ribbon/sort-16.png" />
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/sort-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/sort-16.png" />
 
 					<Label Id="Ribbon.MyTimesheetViews.CurrentViewLabel"
 							 LabelText="Current View:"

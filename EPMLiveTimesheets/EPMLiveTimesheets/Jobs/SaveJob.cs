@@ -555,9 +555,11 @@ namespace TimeSheets
                             cmd.Parameters.AddWithValue("@uid", drDelItem["TS_ITEM_UID"].ToString());
                             cmd.ExecuteNonQuery();
                         }
-
+                        
                         if (liveHours)
                             sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
+
+                        SharedFunctions.processResources(cn, TSUID.ToString(), site.RootWeb, user.LoginName);
                     }
                 }
                 else
