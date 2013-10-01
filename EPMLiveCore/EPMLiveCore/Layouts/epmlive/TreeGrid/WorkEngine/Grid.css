@@ -4,14 +4,13 @@
 /* ------------- Base tags ------------- */
 
 
-
 .GMImage { padding-bottom:256px; }
 .GMNone { display:none; }
 .GMSection,.GMSectionFF3 { table-layout:fixed; width:1px; font-size:1px; }
 .GMSectionFF3 { border-collapse:collapse; }
 
 /* -------------- Sections ------------------ */
-.GMMainTable { border:1px solid #d0d0d0; border-collapse:separate; text-align:left; }
+.GMMainTable { border:1px solid #ffffff; border-collapse:separate; text-align:left; }
 .GMBodyLeft, .GMBodyMid, .GMBodyRight, .GMHeadLeft, .GMHeadMid, .GMHeadRight, .GMFootLeft, .GMFootMid, .GMFootRight { }
 .GMBodyLeft, .GMBodyMid, .GMBodyRight { }
 .GMHeadLeft, .GMHeadMid, .GMHeadRight { }
@@ -53,7 +52,7 @@
 
 .GMCell,.GMCellPanel,.GMCellFilter,.GMCellFilterPanel,.GMCellHeader,.GMCellHeaderPanel,.GMCellFilterPanel,
 .GMHeaderDrag,.GMHeaderGroup,.GMCellUser,.GMCellEmpty,.GMCellHeaderEmpty { 
-	border-top:0px solid #ffffff; border-bottom:1px solid #B1B5BA; border-left:0px solid #ffffff; border-right:0px solid #B1B5BA;
+	border-top:0px solid #ffffff; border-bottom:1px solid #DDDDDD; border-left:0px solid #ffffff; border-right:0px solid #DDDDDD;
 	vertical-align:middle; white-space:nowrap; overflow:hidden; overflow:auto!IE; height:auto; background-color:#FFFFFF
 	}
 .GMCellHeaderPanel { padding-top:2px; }
@@ -73,7 +72,8 @@
 .GMCellSpaceBelow { border-bottom:1px solid #e0e0ff; }
 
 .GMCellFilterPanel { background-color:#F0F0E0; text-align:center; padding-top:0px; }
-.GMCellHeader,.GMCellHeaderEmpty { padding-top:1px; background-color:#FFFFFF; border-top:0px solid #ffffff; height: 30px; font-family: "Open Sans Regular", Verdana, 
+.GMCellHeader,.GMCellHeaderEmpty { padding-top:1px; background-color:#FFFFFF; border-top:0px solid #ffffff; height: 30px; font-family: "Open Sans Regular", Verdana, 
+
 Arial; font-size: 14px }
 .GMCellPanel,.GMCellHeaderPanel { background-color:#FFFFFF; }
 .GMCellFilterPanel { padding-left:1px; }
@@ -175,7 +175,8 @@ Arial; font-size: 14px }
 .GMGantt10In { background:url(taskgantt.gif); height: 10px; border-right: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid #1F5BA9 }
 .GMGantt10InErr { background:url(taskgantt.gif); height: 10px; border-right: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid #1F5BA9 }
 .GMGantt10InCrit { background:url(critgantt.gif); height: 10px; border-right: 1px solid #801010; border-top: 1px solid #801010; border-bottom: 1px solid #801010 }
-.GMGantt90In,.GMGantt90InErr { background:url(taskganttpct.gif); height: 10px; border-left: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid 
+.GMGantt90In,.GMGantt90InErr { background:url(taskganttpct.gif); height: 10px; border-left: 1px solid #1F5BA9; border-top: 1px solid #1F5BA9; border-bottom: 1px solid 
+
 #1F5BA9 }
 .GMGantt90InCrit { background:url(critganttpct.gif); height: 10px; border-left: 1px solid #801010; border-top: 1px solid #801010; border-bottom: 1px solid #801010 }
 .GMGantt100In,.GMGantt100InErr { background:url(taskganttpct.gif); height: 10px; border: 1px solid #1F5BA9; }
@@ -189,7 +190,8 @@ Arial; font-size: 14px }
 .GMGanttG10In { background: url(summarygantt.gif); height:4px;  border-right: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black}
 .GMGanttG10InCrit { background:#FC6; }
 .GMGanttG10InErr { background:#FAA; }
-.GMGanttG90In,.GMGanttG90InErr,.GMGanttG90InCrit { background: url(summaryganttpct.gif); height:4px; border-left: 1px solid black; border-top: 1px solid black; 
+.GMGanttG90In,.GMGanttG90InErr,.GMGanttG90InCrit { background: url(summaryganttpct.gif); height:4px; border-left: 1px solid black; border-top: 1px solid black; 
+
 border-bottom: 1px solid black }
 .GMGanttG100In,.GMGanttG100InErr,.GMGanttG100InCrit { background: url(summaryganttpct.gif); height:4px; border: 1px solid black }
 .GMGanttGNullIn { background: url(summarygantt.gif); height:4px; border: 1px solid black }
@@ -241,9 +243,11 @@ border-bottom: 1px solid black }
 .GMGanttRunBoxIn { background:#F0F0E0; }
 .GMGanttRunSolidOut { }
 .GMGanttRunSolidIn { background:#FFFF00; }
-.GMGanttRunFixedOut,.GMGanttRunLeftOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-left-style:solid!important; border-left-width:3px!important; border-left-
+.GMGanttRunFixedOut,.GMGanttRunLeftOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-left-style:solid!important; border-left-width:3px!important; border-left-
+
 color:blue; margin-left:0px;}
-.GMGanttRunFixedOut,.GMGanttRunRightOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-right-style:solid!important; border-right-width:3px!important; border-
+.GMGanttRunFixedOut,.GMGanttRunRightOut,.GMGanttRunBoundOut,.GMGanttRunBoundStartOut { border-right-style:solid!important; border-right-width:3px!important; border-
+
 right-color:blue; }
 .GMGanttRunFixedIn,.GMGanttRunLeftIn,.GMGanttRunRightIn { background:#C0C0C0; }
 .GMGanttRunBoundOut,.GMGanttRunBoundStartOut,.GMGanttRunEndOut,.GMGanttRunEndStartOut { color:white; }
@@ -390,7 +394,8 @@ right-color:blue; }
 .GMGanttExclude,.GMGanttExcludeHidden { height:500px; overflow:hidden; background:#F0F0E0; margin-left:auto; margin-right:auto; }
 .GMGanttExcludeHidden { }
 
-.GMGanttBase,.GMGanttBaseAuto,.GMGanttFinish,.GMGanttFinishAuto { height:500px; overflow:hidden; border-left:2px solid #FF9E0C; width:2px; margin-left:auto; margin-
+.GMGanttBase,.GMGanttBaseAuto,.GMGanttFinish,.GMGanttFinishAuto { height:500px; overflow:hidden; border-left:2px solid #FF9E0C; width:2px; margin-left:auto; margin-
+
 right:auto; }
 .GMGanttFinishAuto,.GMGanttBaseAuto { border-left:1px solid #FF9E0C; }
 
@@ -485,7 +490,8 @@ u.GMNL { padding-left:21px; }
 
 /* ------------- Panel img ------------- */
 
-.GMPanelImage,.GMPanelMove,.GMPanelMoveOff,.GMPanelSelect,.GMPanelSelectOn,.GMPanelSelectOff,.GMPanelDelete,.GMPanelDeleteOff,.GMPanelCopy,.GMPanelCopyOff,.GMPanelEmpt
+.GMPanelImage,.GMPanelMove,.GMPanelMoveOff,.GMPanelSelect,.GMPanelSelectOn,.GMPanelSelectOff,.GMPanelDelete,.GMPanelDeleteOff,.GMPanelCopy,.GMPanelCopyOff,.GMPanelEmpt
+
 y {
    font-size:10px; padding-left:22px; background-image:url(grid-check.png); background-repeat:no-repeat; width:30px; padding-top:5px
    }
@@ -780,21 +786,26 @@ u.GMFilter0,u.GMFilter1 { padding-left:13px; }
 .GMPopupNone { padding-right:14px; }
 
 /* ------------- Filter images ------------- */
-.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.
+.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.
+
 GMFilter11Left,.GMFilter12Left,
-.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilt
+.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilt
+
 er10Right,.GMFilter11Right,.GMFilter12Right {
    font-size:11px; background-image:url(Filter.gif); background-repeat:no-repeat;
    }
-.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.
+.GMFilter0Left,.GMFilter1Left,.GMFilter2Left,.GMFilter3Left,.GMFilter4Left,.GMFilter5Left,.GMFilter6Left,.GMFilter7Left,.GMFilter8Left,.GMFilter9Left,.GMFilter10Left,.
+
 GMFilter11Left,.GMFilter12Left {
    padding-left:17px;
    }
-.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilt
+.GMFilter0Right,.GMFilter1Right,.GMFilter2Right,.GMFilter3Right,.GMFilter4Right,.GMFilter5Right,.GMFilter6Right,.GMFilter7Right,.GMFilter8Right,.GMFilter9Right,.GMFilt
+
 er10Right,.GMFilter11Right,.GMFilter12Right {
    padding-right:17px;
    }
-u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4Right,u.GMFilter5Right,u.GMFilter6Right,u.GMFilter7Right,u.GMFilter8Right,u.GMFilter9Rig
+u.GMFilter0Right,u.GMFilter1Right,u.GMFilter2Right,u.GMFilter3Right,u.GMFilter4Right,u.GMFilter5Right,u.GMFilter6Right,u.GMFilter7Right,u.GMFilter8Right,u.GMFilter9Rig
+
 ht,u.GMFilter10Right,u.GMFilter11Right,u.GMFilter12Right {  
    padding-right:0px; padding-left:17px;
    }
@@ -825,7 +836,8 @@ ht,u.GMFilter10Right,u.GMFilter11Right,u.GMFilter12Right {
 .GMFilter11Right { background-position:right -1650px; }
 .GMFilter12Right { background-position:right -1800px; }
 
-.GMFilter0Menu,.GMFilter1Menu,.GMFilter2Menu,.GMFilter3Menu,.GMFilter4Menu,.GMFilter5Menu,.GMFilter6Menu,.GMFilter7Menu,.GMFilter8Menu,.GMFilter9Menu,.GMFilter10Menu,.
+.GMFilter0Menu,.GMFilter1Menu,.GMFilter2Menu,.GMFilter3Menu,.GMFilter4Menu,.GMFilter5Menu,.GMFilter6Menu,.GMFilter7Menu,.GMFilter8Menu,.GMFilter9Menu,.GMFilter10Menu,.
+
 GMFilter11Menu,.GMFilter12Menu {
    width:17px; height:17px; overflow:hidden; background-image:url(Filter.gif); background-repeat:no-repeat; margin-left:-1px;
    }
@@ -1054,7 +1066,7 @@ overflow:hidden; width:0px; height:0px; }
 
 .GMMenuMain { position:absolute; left:0px; top:0px; z-index:258; }
 .GMMenuStatic { }
-.GMMenuOuter { overflow:hidden; border:1px solid black; padding:1px; background:white; }
+.GMMenuOuter { overflow:hidden; border:1px solid #cccccc; padding:1px; background:white; }
 .GMMenuHeader {
    overflow:hidden; position:absolute; z-index:258;
    border:1px solid #b0b0c0; background:white; cursor:pointer; _cursor:hand; vertical-align:middle;
@@ -1072,12 +1084,13 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuShadow {
    position:absolute; margin-left:3px; margin-top:3px; z-index:257;
    background:#888; opacity:0.5; filter:alpha(opacity=50);
+   display:none;
    }
 
 .GMMenuCheckedIconLeft { background:url(Menu.gif) no-repeat -2px -51px; padding-left:17px; }
-.GMMenuCheckedIconRight { background:url(Menu.gif) no-repeat right -51px; padding-right:17px; }
+.GMMenuCheckedIconRight { background: url("checked-basic.png") no-repeat right 4px !important; }
 .GMMenuUncheckedIconLeft { background:url(Menu.gif) no-repeat -2px -1px; padding-left:17px; }
-.GMMenuUncheckedIconRight { background:url(Menu.gif) no-repeat right -1px; padding-right:17px; }
+.GMMenuUncheckedIconRight { background: url("unchecked-basic.png") no-repeat right 4px !important; }
 .GMMenuCheckedRadioLeft { background:url(Menu.gif) no-repeat -2px -751px; padding-left:17px; }
 .GMMenuCheckedRadioRight { background:url(Menu.gif) no-repeat right -751px; padding-right:17px; }
 .GMMenuUncheckedRadioLeft { background:url(Menu.gif) no-repeat -2px -701px; padding-left:17px; }
@@ -1136,7 +1149,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuVSeparator { border-right:1px solid #DDD; }
 .GMMenuSection  { }
 
-.GMMenuFoot { border-top:none; text-align:right;padding-right:10px }  
+.GMMenuFoot { border-top:none; text-align:right;padding-right:3px }  
 .GMMenuButton {
    font-size:11px;background:#dcecf8; text-align:center; border:1px solid #8a8fb5; 
    width:48px; margin:2px; margin-top:5px; margin-bottom:4px; white-space:nowrap; padding-left:0px; padding-right:0px;
@@ -1341,8 +1354,8 @@ overflow:hidden; width:0px; height:0px; }
    }*/
 
 .GMHintMain { position:absolute; margin-left:-1px; margin-top:-1px; left:0px; top:0px; z-index:260; background:white; cursor:default; }
-.GMHintOuter { overflow:hidden; border:1px solid black; background:white!important; color:black; text-align:left; }
-.GMHintHeaderOuter { background:url(Backgrounds.gif) repeat-x 0px 0px!important; color:white; border: 1px solid white; }
+.GMHintOuter { overflow:hidden; border:1px solid black; background:white!important; color:black; text-align:left;display:none; }
+.GMHintHeaderOuter { background:url(Backgrounds.gif) repeat-x 0px 0px!important; color:white; border: 1px solid white;display:none; }
 .GMHintShadow {
    position:absolute; margin-left:2px; margin-top:2px; z-index:259;
    background:#888; opacity:0.3; filter:alpha(opacity=30);
