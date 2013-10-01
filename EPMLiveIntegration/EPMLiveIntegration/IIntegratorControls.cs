@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EPMLiveIntegration
 {
-    public enum IntegrationControlWindowStyle { FullWindow = 1, FullDialog, SmallDialog }
+    public enum IntegrationControlWindowStyle { FullWindow = 1, FullDialog, SmallDialog, IFrame }
 
     public class IntegrationControl
     {
