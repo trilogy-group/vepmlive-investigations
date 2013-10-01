@@ -440,7 +440,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "/treegrid/GridE", "/xml2json", "/MD5", "@/MyWorkWebPart"
+                "libraries/jquery.min","@EPM", "/treegrid/GridE", "/xml2json", "/MD5", "@/MyWorkWebPart"
             });
 
             ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };

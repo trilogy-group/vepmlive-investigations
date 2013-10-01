@@ -179,6 +179,8 @@ div#MWG_PivotMenu, .mwg-submenu {
     background-color: #FFFFFF;
     border: 1px solid #D1D1D1;
     border-collapse: separate;
+    -webkit-box-shadow: 0 0 7px 0 rgba(0, 0, 0, 0.47);
+    -ms-box-shadow: 0 0 7px 0 rgba(0, 0, 0, 0.47);
     box-shadow: 0 0 7px 0 rgba(0, 0, 0, 0.47);
     left: -25px;
     overflow: visible;
@@ -248,6 +250,8 @@ li.mwg-smi {
 }
 
 .mwg-submenu {
+    -webkit-box-shadow: 2px 0 7px 0 rgba(0, 0, 0, 0.47);
+    -ms-box-shadow: 2px 0 7px 0 rgba(0, 0, 0, 0.47);
     box-shadow: 2px 0 7px 0 rgba(0, 0, 0, 0.47);
     left: 35px;
     top: -7px;

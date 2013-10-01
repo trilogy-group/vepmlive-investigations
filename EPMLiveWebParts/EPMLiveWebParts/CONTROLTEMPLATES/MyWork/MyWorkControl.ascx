@@ -8,32 +8,23 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MyWorkControl.ascx.cs" Inherits="EPMLiveWebParts.CONTROLTEMPLATES.MyWork.MyWorkControl" %>
 
 <div id="EPMAllWork">
-    <div id="MWG_Loader_<%= WebPartId %>" class="epmlive-loader">  
-    </div>
-
     <SharePoint:ScriptBlock runat="server">
         function initializeEPMLoader() {
             $(function() {
                 var url = (document.location.href + '').toLowerCase();
                 if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
                     function showLoading() {
-                        window.myWorkLoader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
+                        EPM.UI.Loader.current().startLoading({id: 'WebPart<%= Qualifier %>', page: true});
                     }
 
-                    SP.SOD.executeOrDelayUntilScriptLoaded(showLoading, "sp.js");
+                    SP.SOD.executeOrDelayUntilScriptLoaded(showLoading, 'EPM.UI');
                 } else {
-                    var loader = $('#MWG_Loader_<%= WebPartId %>');
-                    var div = $('#WebPart<%= Qualifier %>');
-
-                    loader.css('top', (div.height() - loader.height()) / 2);
-                    loader.css('left', (div.width() - loader.width()) / 2);
-
-                    loader.show();
+                    EPM.UI.Loader.current().startLoading({id: 'WebPart<%= Qualifier %>'});
                 }
             });
         }
 
-        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, "jquery.min.js");
+        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, 'jquery.min.js');
     </SharePoint:ScriptBlock>
     
     <div id="MWG_Header" style="display: <%= ShowToolbar ? "block" : "none" %>">

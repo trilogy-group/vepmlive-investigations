@@ -52,11 +52,7 @@ Grids.OnGetSortValue = function(grid, row, col, val) {
 
 Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
-        if (window.myWorkLoader) {
-            window.myWorkLoader.close();
-        } else {
-            document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
-        }
+        window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
 
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
 
