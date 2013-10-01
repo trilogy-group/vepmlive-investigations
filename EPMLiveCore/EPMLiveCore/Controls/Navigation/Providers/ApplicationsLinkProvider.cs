@@ -93,7 +93,17 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             tasks.Add(t2);
 
-            Task.WaitAll(tasks.ToArray());
+            try
+            {
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch (AggregateException exception)
+            {
+                exception.Handle(e =>
+                {
+                    throw e;
+                });
+            }
 
             links.Add(new NavLink {Title = "Apps", Url = "Header"});
 

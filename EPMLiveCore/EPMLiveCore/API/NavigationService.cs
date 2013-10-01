@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using EPMLiveCore.Controls.Navigation.Providers;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
-using Telerik.Web.UI;
 
 namespace EPMLiveCore.API
 {
@@ -58,11 +58,31 @@ namespace EPMLiveCore.API
 
                 tasks.Add(t2);
 
-                Task.WaitAll(tasks.ToArray());
+                try
+                {
+                    Task.WaitAll(tasks.ToArray());
+                }
+                catch (AggregateException exception)
+                {
+                    exception.Handle(e =>
+                    {
+                        var loadException = e as ReflectionTypeLoadException;
+                        if (loadException != null)
+                        {
+                            if (loadException.LoaderExceptions.Any())
+                            {
+                                throw loadException.LoaderExceptions.First();
+                            }
+                        }
+
+                        throw e;
+                    });
+                }
             }
             catch (Exception exception)
             {
-                throw new APIException(20000, "[NavigationService] " + exception.Message);
+                throw new APIException(20000,
+                    "[NavigationService] Type: " + exception.GetType() + ". Message: " + exception.Message);
             }
         }
 
@@ -75,7 +95,7 @@ namespace EPMLiveCore.API
 
         #endregion Constructors 
 
-        #region Methods (12) 
+        #region Methods (13) 
 
         // Public Methods (5) 
 
@@ -88,12 +108,10 @@ namespace EPMLiveCore.API
                 Guid listId;
                 int itemId;
                 int userId;
-                bool rollups;
-                bool requestList;
-                bool usePopup;
                 bool debugMode;
 
-                GetContextualMenuItems_ParseRequest(data, out siteId, out webId, out listId, out itemId, out userId, out debugMode);
+                GetContextualMenuItems_ParseRequest(data, out siteId, out webId, out listId, out itemId, out userId,
+                    out debugMode);
 
                 var items = new XElement("Items");
 
@@ -152,19 +170,18 @@ namespace EPMLiveCore.API
 
                     try
                     {
-                        foreach (NavLink link in linkProvider.GetLinks())
-                        {
-                            int order = link.Order;
-
-                            if (order == 0)
-                            {
-                                order = links.Count == 0 ? 1 : links.Keys.Max() + 1;
-                            }
-
-                            links.Add(order, link);
-                        }
+                        GetNavigationLinks(linkProvider, links);
                     }
-                    catch { }
+                    catch
+                    {
+                        try
+                        {
+                            Thread.Sleep(1000);
+                            ((NavLinkProvider) linkProvider).ClearCache();
+                            GetNavigationLinks(linkProvider, links);
+                        }
+                        catch { }
+                    }
 
                     if (links.Count == 0) continue;
 
@@ -209,7 +226,8 @@ namespace EPMLiveCore.API
             }
         }
 
-        public DataTable GetMenuItems(Guid siteId, Guid webId, Guid listId, int itemId, int userId, out Dictionary<string, string> diagnosticInfo)
+        public DataTable GetMenuItems(Guid siteId, Guid webId, Guid listId, int itemId, int userId,
+            out Dictionary<string, string> diagnosticInfo)
         {
             var info = new Dictionary<string, string>();
 
@@ -247,7 +265,8 @@ namespace EPMLiveCore.API
                                     using (SPWeb spWeb = spSite.OpenWeb(webId))
                                     {
                                         SPList list = spWeb.Lists.GetList(listId, true);
-                                        result = GetGeneralActions(ListCommands.GetGridGanttSettings(list).UsePopup, list, out di);
+                                        result = GetGeneralActions(ListCommands.GetGridGanttSettings(list).UsePopup,
+                                            list, out di);
                                     }
                                 }
                             }
@@ -470,7 +489,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        // Private Methods (7) 
+        // Private Methods (8) 
 
         private static Tuple<string, string, string, string, bool> AT(string title, string command, string imgUrl,
             bool allowed, string kind = "")
@@ -498,7 +517,8 @@ namespace EPMLiveCore.API
             return linkId;
         }
 
-        private static void GetContextualMenuItems_ParseRequest(string data, out Guid siteId, out Guid webId, out Guid listId, out int itemId, out int userId, out bool debugMode)
+        private static void GetContextualMenuItems_ParseRequest(string data, out Guid siteId, out Guid webId,
+            out Guid listId, out int itemId, out int userId, out bool debugMode)
         {
             debugMode = false;
 
@@ -604,6 +624,21 @@ namespace EPMLiveCore.API
         private static string GetLinkId(NavLink navLink, string providerName)
         {
             return navLink.Id ?? CalculateLinkId(navLink, providerName);
+        }
+
+        private static void GetNavigationLinks(INavLinkProvider linkProvider, SortedDictionary<int, NavLink> links)
+        {
+            foreach (NavLink link in linkProvider.GetLinks())
+            {
+                int order = link.Order;
+
+                if (order == 0)
+                {
+                    order = links.Count == 0 ? 1 : links.Keys.Max() + 1;
+                }
+
+                links.Add(order, link);
+            }
         }
 
         private static bool LIP(SPListItem listItem, SPBasePermissions spBasePermissions)
@@ -744,7 +779,8 @@ namespace EPMLiveCore.API
             return actions;
         }
 
-        private Tuple<string, string, string, string, bool>[] GetWorkspaceActions(SPListItem li, out Dictionary<string, string> di)
+        private Tuple<string, string, string, string, bool>[] GetWorkspaceActions(SPListItem li,
+            out Dictionary<string, string> di)
         {
             bool success = true;
             di = new Dictionary<string, string> {{"Workspace Actions", true.ToString()}};
@@ -761,7 +797,8 @@ namespace EPMLiveCore.API
                 }
                 catch { }
 
-                actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif", !string.IsNullOrEmpty(url), "1"));
+                actions.Add(AT("Go To Workspace", "workspace", "/_layouts/images/STSICON.gif",
+                    !string.IsNullOrEmpty(url), "1"));
 
                 string childitem = string.Empty;
 

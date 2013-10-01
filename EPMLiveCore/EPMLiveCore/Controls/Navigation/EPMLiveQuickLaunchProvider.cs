@@ -101,40 +101,47 @@ namespace EPMLiveCore.Controls.Navigation
 
                                     var locker = new Object();
 
-                                    Task.WaitAll((from SPListItem c in communities
-                                        select Task.Factory.StartNew(() =>
-                                        {
-                                            var communityName = (string) (c["Title"] ?? string.Empty);
-                                            if (string.IsNullOrEmpty(communityName)) return;
-
-                                            var ql = (string) (c["QuickLaunch"] ?? string.Empty);
-                                            if (string.IsNullOrEmpty(ql)) return;
-
-                                            foreach (string linkId in ql.Split(','))
+                                    try
+                                    {
+                                        Task.WaitAll((from SPListItem c in communities
+                                            select Task.Factory.StartNew(() =>
                                             {
-                                                string id = linkId.Split(':')[0];
+                                                var communityName = (string) (c["Title"] ?? string.Empty);
+                                                if (string.IsNullOrEmpty(communityName)) return;
 
-                                                if (!communityLinks.ContainsKey(communityName))
+                                                var ql = (string) (c["QuickLaunch"] ?? string.Empty);
+                                                if (string.IsNullOrEmpty(ql)) return;
+
+                                                foreach (string linkId in ql.Split(','))
                                                 {
+                                                    string id = linkId.Split(':')[0];
+
+                                                    if (!communityLinks.ContainsKey(communityName))
+                                                    {
+                                                        lock (locker)
+                                                        {
+                                                            communityLinks.Add(communityName, new List<string>());
+                                                        }
+                                                    }
+
                                                     lock (locker)
                                                     {
-                                                        communityLinks.Add(communityName, new List<string>());
+                                                        communityLinks[communityName].Add(id);
+                                                    }
+
+                                                    if (linkNodes.ContainsKey(id)) continue;
+
+                                                    lock (locker)
+                                                    {
+                                                        linkNodes.Add(id, null);
                                                     }
                                                 }
-
-                                                lock (locker)
-                                                {
-                                                    communityLinks[communityName].Add(id);
-                                                }
-
-                                                if (linkNodes.ContainsKey(id)) continue;
-
-                                                lock (locker)
-                                                {
-                                                    linkNodes.Add(id, null);
-                                                }
-                                            }
-                                        })).ToArray());
+                                            })).ToArray());
+                                    }
+                                    catch (AggregateException exception)
+                                    {
+                                        exception.Handle(e => { throw e; });
+                                    }
 
                                     string[] links = linkNodes.Keys.ToArray();
                                     foreach (string nodeKey in links)
