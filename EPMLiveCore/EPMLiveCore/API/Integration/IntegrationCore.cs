@@ -117,16 +117,17 @@ namespace EPMLiveCore.API.Integration
                         dtResInfo.Columns.Add("LOCAL");
                         dtResInfo.Columns.Add("TITLE");
                         dtResInfo.Columns.Add("IMAGE");
-                        dtResInfo.Columns.Add("WINDOW");
+                        dtResInfo.Columns.Add("BITEM");
+                        dtResInfo.Columns.Add("WINDOWSTYLE");
 
                         foreach (IntegrationControl ictl in ctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image, ictl.Window });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image, ictl.BItemLevel, (int)ictl.Window });
                         }
 
                         foreach (string ictl in lctls)
                         {
-                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "", false });
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "", false, false, 0 });
                         }
 
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
