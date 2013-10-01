@@ -50,7 +50,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/jquery-ui.min", "libraries/jquery.tmpl.min",
+                "libraries/jquery.min", "@EPM", "libraries/jquery-ui.min", "libraries/jquery.tmpl.min",
                 "@libraries/jquery.cookie", "/xml2json", "/MD5", "jquery.multiselect.min", "@EPMLive.Analytics"
             });
 

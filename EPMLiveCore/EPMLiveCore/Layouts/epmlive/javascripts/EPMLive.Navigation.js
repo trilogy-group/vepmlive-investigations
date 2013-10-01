@@ -468,9 +468,9 @@
 
                 window.epmLiveNavigation.togglePinned = function(remember) {
                     if ($sn.data('pinstate') === 'pinned') {
-                        window.epmLiveNavigation.pin(remember);
-                    } else {
                         window.epmLiveNavigation.unpin(remember);
+                    } else {
+                        window.epmLiveNavigation.pin(remember);
                     }
                 };
                 
