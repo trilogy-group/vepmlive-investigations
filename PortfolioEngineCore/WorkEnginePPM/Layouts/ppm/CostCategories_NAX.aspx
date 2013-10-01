@@ -456,7 +456,7 @@ html, body {
                             return false;
                     }
                     var txtBaseRate = document.getElementById('txtBaseRate');
-                    txtBaseRate.value = json.reply.costcategory.baserate;
+                    txtBaseRate.value = NumberToString(parseFloat(json.reply.costcategory.baserate), "0.00");
                     tgridRates.Initialize(json.reply.costcategory.tgridRates);
                     tgridRates.SetWidth(390);
                     tgridRates.SetHeight(150);

@@ -290,12 +290,12 @@ html, body {
                         if (dateAndRateArr.length == 2) {
                             if (dateAndRateArr[0] == "1899.12.30") {
                                 tgridRates.grid.SetAttribute(row, null, "BC_EFFECTIVE_DATE", "", 1, 0);
-                                txtBaseRate.value = StringToNumber(dateAndRateArr[1], "0.00####");
+                                txtBaseRate.value = NumberToString(parseFloat(dateAndRateArr[1]), "0.00");
                             } else {
                                 var row = tgridRates.AddRow();
                                 var dt = StringToDate(dateAndRateArr[0], "yyyy.MM.dd");
                                 tgridRates.grid.SetAttribute(row, null, "BC_EFFECTIVE_DATE", dt, 1, 0);
-                                tgridRates.grid.SetAttribute(row, null, "BC_RATE", StringToNumber(dateAndRateArr[1], "0.00####") , 1, 0);
+                                tgridRates.grid.SetAttribute(row, null, "BC_RATE", NumberToString(parseFloat(dateAndRateArr[1]), "0.00") , 1, 0);
                             }
                        }
                     }
