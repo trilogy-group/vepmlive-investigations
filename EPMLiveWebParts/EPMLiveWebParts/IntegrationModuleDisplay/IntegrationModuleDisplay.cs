@@ -32,7 +32,7 @@ namespace EPMLiveWebParts
                 int itemid = SPContext.Current.Item.ID;
                 string Errors = "";
                 EPMLiveCore.API.Integration.IntegrationCore c = new EPMLiveCore.API.Integration.IntegrationCore(SPContext.Current.Site.ID, SPContext.Current.Web.ID);
-                List<EPMLiveCore.API.Integration.IntegrationCore.IntegrationControlDef> cs = c.GetLocalControls(SPContext.Current.ListId, SPContext.Current.ListItem, out Errors);
+                List<EPMLiveCore.API.Integration.IntegrationCore.IntegrationControlDef> cs = c.GetEmbbededControls(SPContext.Current.ListId, SPContext.Current.ListItem, out Errors);
 
                 foreach (EPMLiveCore.API.Integration.IntegrationCore.IntegrationControlDef def in cs)
                 {
