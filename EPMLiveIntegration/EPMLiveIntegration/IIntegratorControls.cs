@@ -18,8 +18,8 @@ namespace EPMLiveIntegration
 
     public interface IIntegratorControls
     {
-        List<string> GetLocalControls(WebProperties WebProps, IntegrationLog Log);
-        List<IntegrationControl> GetRemoteControls(WebProperties WebProps, IntegrationLog Log);
+        List<string> GetEmbeddedItemControls(WebProperties WebProps, IntegrationLog Log);
+        List<IntegrationControl> GetPageButtons(WebProperties WebProps, IntegrationLog Log, bool GlobalButtons);
         string GetURL(WebProperties WebProps, IntegrationLog Log, string control, string ItemID);
         string GetControlCode(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control);
     }
