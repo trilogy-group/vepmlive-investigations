@@ -463,7 +463,16 @@ function CreateEPMLiveWorkspace(listid, itemid) {
 }
 
 
-function OpenIntegrationPage(control, listid, itemid) {
+function OpenIntegrationPage(controlFull, listid, itemid) {
+
+    var t = controlFull.indexOf(".");
+    var control = controlFull.substr(0, t);
+    var windowtype = controlFull.substr(t);
+
+    alert(control);
+    alert(windowtype);
+
+
 
     var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/integration/gotoremote.aspx?control=' + control + '&listid=' + listid + '&itemid=' + itemid);
 
