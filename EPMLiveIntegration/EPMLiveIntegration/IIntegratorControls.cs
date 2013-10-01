@@ -5,12 +5,15 @@ using System.Text;
 
 namespace EPMLiveIntegration
 {
+    public enum IntegrationControlWindowStyle { FullWindow = 1, FullDialog, SmallDialog }
+
     public class IntegrationControl
     {
         public string Control;
         public string Image;
         public string Title;
-        public bool Window;
+        public IntegrationControlWindowStyle Window;
+        public bool BItemLevel;
     }
 
     public interface IIntegratorControls
