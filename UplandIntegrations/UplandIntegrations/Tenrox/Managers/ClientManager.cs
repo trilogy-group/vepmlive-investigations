@@ -22,7 +22,13 @@ namespace UplandIntegrations.Tenrox.Managers
         {
             MappingDict = new Dictionary<string, string>
             {
-                {"Name", "Title"}
+                {"Name", "Title"},
+                {"AccountExecutiveId", "Account_x0020_Executive"},
+                {"AddressLine1", "Street"},
+                {"AddressLine2", "Street2"},
+                {"EmailAddress", "Email"},
+                {"PostalCode", "ZipCode"},
+                {"TelephoneNumber", "Phone"}
             };
 
             ObjectId = 9;

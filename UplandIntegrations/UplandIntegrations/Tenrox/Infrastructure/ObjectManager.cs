@@ -108,9 +108,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
             List<ColumnProperty> columns = (from pair in _objectFields
                 let field = pair.Key
-                let dn = field.Equals("UniqueId")
-                    ? "ID"
-                    : Regex.Replace(field, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ")
+                let dn = Regex.Replace(field, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ")
                 let displayName = dn.EndsWith(" Id") ? dn.Replace(" Id", string.Empty) : dn
                 let valid = !_objectFields.ContainsKey(field + "Id") && !field.Equals("Id") && !field.Equals("UniqueId")
                 where valid
@@ -125,10 +123,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             {
                 string name = column.ColumnName;
 
-                if (MappingDict.ContainsKey(name))
-                {
-                    column.DefaultListColumn = MappingDict[name];
-                }
+                column.DefaultListColumn = MappingDict.ContainsKey(name) ? MappingDict[name] : name;
 
                 if (DisplayNameDict.ContainsKey(name))
                 {
@@ -145,7 +140,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             columns.Insert(0, new ColumnProperty
             {
                 ColumnName = "UniqueId",
-                DiplayName = "ID"
+                DiplayName = "Unique ID"
             });
 
             return columns;
@@ -181,7 +176,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         {
             if (userId == 0) return string.Empty;
 
-            using (var usersClient = new UsersClient(Binding, EndpointAddress))
+            var endpointAddress = new EndpointAddress(_endpointAddress + "sdk/users.svc");
+            using (var usersClient = new UsersClient(Binding, endpointAddress))
             {
                 User user = usersClient.QueryByUniqueId(_userToken, userId);
                 if (user != null)
@@ -334,7 +330,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         {
             if (string.IsNullOrEmpty(email)) return 0;
 
-            using (var usersClient = new UsersClient(Binding, EndpointAddress))
+            var endpointAddress = new EndpointAddress(_endpointAddress + "sdk/users.svc");
+            using (var usersClient = new UsersClient(Binding, endpointAddress))
             {
                 User user = usersClient.QueryByEmail(_userToken, email);
                 if (user != null)

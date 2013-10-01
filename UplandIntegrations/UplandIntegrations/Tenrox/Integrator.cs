@@ -11,16 +11,24 @@ namespace UplandIntegrations.Tenrox
 {
     public class Integrator : IIntegrator, IIntegratorControls
     {
-        #region Fields (1) 
+        #region Fields (4) 
+
+        private const string EXPENSES_URL =
+            @"{0}/TEnterprise/core/base/logon.aspx?Linktype=9999&LiveLink=1&LinkUID=-1&OrgName={1}";
+
+        private const string PROJECT_INFO_URL =
+            @"{0}/TEnterprise/core/base/logon.aspx?HideCloseButton=1&Linktype=2&LiveLink=1&LinkUID={1}&OrgName={2}";
+
+        private const string TIMESHEET_URL = @"{0}/TEnterprise/core/base/logon.aspx?Linktype=12&LiveLink=1&OrgName={1}";
 
         private const string UPSERT_ERROR_MESSAGE =
             @"Could not upsert record. Tenrox ID: {0}. EPMLive ID: {1}. Reason: {2}";
 
         #endregion Fields 
 
-        #region Methods (17) 
+        #region Methods (13) 
 
-        // Public Methods (13) 
+        // Public Methods (9) 
 
         public TransactionTable DeleteItems(WebProperties webProps, DataTable items, IntegrationLog log)
         {
@@ -43,8 +51,9 @@ namespace UplandIntegrations.Tenrox
                     catch { }
                 }
 
-                IEnumerable<TenroxTransactionResult> results = txService.DeleteItems((string) webProps.Properties["Object"],
-                    itemIds.ToArray(), webProps.IntegrationId);
+                IEnumerable<TenroxTransactionResult> results =
+                    txService.DeleteItems((string) webProps.Properties["Object"],
+                        itemIds.ToArray(), webProps.IntegrationId);
 
                 ProcessResults(items, log, results, idMap, transactionTable);
             }
@@ -131,7 +140,8 @@ namespace UplandIntegrations.Tenrox
             string integrationKey,
             string apiUrl)
         {
-            throw new NotImplementedException();
+            message = null;
+            return true;
         }
 
         public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynchDate)
@@ -142,7 +152,8 @@ namespace UplandIntegrations.Tenrox
         public bool RemoveIntegration(WebProperties webProps, IntegrationLog log, out string message,
             string integrationKey)
         {
-            throw new NotImplementedException();
+            message = null;
+            return true;
         }
 
         public bool TestConnection(WebProperties webProps, IntegrationLog log, out string message)
@@ -175,8 +186,9 @@ namespace UplandIntegrations.Tenrox
                 List<string> ids;
                 Dictionary<string, string> idMap = BuildIdMap(items, out ids);
 
-                IEnumerable<TenroxTransactionResult> results = txService.UpsertItems((string) webProps.Properties["Object"],
-                    items, webProps.IntegrationId);
+                IEnumerable<TenroxTransactionResult> results =
+                    txService.UpsertItems((string) webProps.Properties["Object"],
+                        items, webProps.IntegrationId);
 
                 ProcessResults(items, log, results, idMap, transactionTable);
             }
@@ -186,26 +198,6 @@ namespace UplandIntegrations.Tenrox
             }
 
             return transactionTable;
-        }
-
-        public string GetControlCode(WebProperties webProps, IntegrationLog log, string itemId, string control)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<string> GetLocalControls(WebProperties webProps, IntegrationLog log)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<IntegrationControl> GetRemoteControls(WebProperties webProps, IntegrationLog log)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetURL(WebProperties webProps, IntegrationLog log, string control, string url)
-        {
-            throw new NotImplementedException();
         }
 
         // Private Methods (4) 
@@ -328,5 +320,83 @@ namespace UplandIntegrations.Tenrox
         }
 
         #endregion Methods 
+
+        #region Implementation of IIntegratorControls
+
+        public List<string> GetEmbeddedItemControls(WebProperties webProps, IntegrationLog log)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<IntegrationControl> GetPageButtons(WebProperties webProps, IntegrationLog log, bool globalButtons)
+        {
+            return new List<IntegrationControl>
+            {
+                new IntegrationControl
+                {
+                    Control = "TX_Timesheet",
+                    Title = "Timesheet",
+                    Image = "tx_timesheet.png",
+                    Window = IntegrationControlWindowStyle.IFrame
+                },
+                new IntegrationControl
+                {
+                    Control = "TX_Expenses",
+                    Title = "Expenses",
+                    Image = "tx_expenses.png",
+                    Window = IntegrationControlWindowStyle.IFrame
+                },
+                new IntegrationControl
+                {
+                    Control = "TX_ProjectInfo",
+                    Title = "Project Info",
+                    Image = "tx_projectinfo.png",
+                    Window = IntegrationControlWindowStyle.FullDialog
+                }
+            };
+        }
+
+        public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
+        {
+            try
+            {
+                string orgUrl;
+                string orgName;
+                string username;
+                SecureString password;
+
+                GetAuthInfo(webProps, out orgUrl, out orgName, out username, out password);
+
+                if (orgUrl.EndsWith("/"))
+                {
+                    orgUrl = orgUrl.Substring(0, orgUrl.Length - 1);
+                }
+
+                switch (control)
+                {
+                    case "TX_Timesheet":
+                        return string.Format(TIMESHEET_URL, orgUrl, orgName);
+                    case "TX_Expenses":
+                        return string.Format(EXPENSES_URL, orgUrl, orgName);
+                    case "TX_ProjectInfo":
+                        return string.Format(PROJECT_INFO_URL, orgUrl, itemId, orgName);
+                }
+
+                throw new Exception(control + " is not a valid Tenrox control.");
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message, IntegrationLogType.Error);
+            }
+
+            return null;
+        }
+
+        public string GetControlCode(WebProperties webProps, IntegrationLog log, string itemId, string control)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

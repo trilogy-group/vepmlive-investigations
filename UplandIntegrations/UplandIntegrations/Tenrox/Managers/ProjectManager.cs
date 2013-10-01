@@ -27,7 +27,8 @@ namespace UplandIntegrations.Tenrox.Managers
                 {"Name", "Title"},
                 {"StartDate", "Start"},
                 {"EndDate", "End"},
-                {"ClientId", "Account"}
+                {"ClientId", "Account"},
+                {"ManagerId", "AssignedTo"}
             };
 
             ObjectId = 2;
