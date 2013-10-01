@@ -32,7 +32,8 @@ namespace UplandIntegrations.FileBound
             i.Control = "Docs";
             i.Image = "workflows.png";
             i.Title = "View FB Documents";
-            i.Window = true;
+            i.Window = IntegrationControlWindowStyle.FullWindow;
+            i.BItemLevel = true;
             l.Add(i);
 
             return l;

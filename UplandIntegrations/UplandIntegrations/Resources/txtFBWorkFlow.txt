@@ -273,7 +273,7 @@
                 LoadVisualWorkflow(routeId, xml);
 
 				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + routedItemId, function (ret) {
-						alert(ret);
+						
 				});
 
             }

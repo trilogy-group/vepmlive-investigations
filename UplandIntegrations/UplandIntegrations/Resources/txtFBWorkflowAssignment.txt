@@ -267,7 +267,7 @@
                 LoadVisualWorkflow(routeId, xml);
 
 				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + fileId, function (ret) {
-						alert(ret);
+						
 				});
 
             }
