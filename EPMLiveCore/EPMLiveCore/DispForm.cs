@@ -283,13 +283,13 @@ namespace EPMLiveCore
             
             var commands = new List<IRibbonCommand>();
 
-            List<EPMLiveIntegration.IntegrationControl> ics = core.GetRemoteControls(ListItem.ParentList.ID, ListItem, out Errors);
+            List<EPMLiveIntegration.IntegrationControl> ics = core.GetItemButtons(ListItem.ParentList.ID, ListItem, out Errors);
             foreach (EPMLiveIntegration.IntegrationControl ic in ics)
             {
 
                 ribbonExtensions = new XmlDocument();
                 ribbonExtensions.LoadXml(@"<Button
-                        Id=""EPMINT." + ic.Control + @"""
+                        Id=""EPMINT." + ic.Control + @"." + (int)ic.Window + @"""
                         Sequence=""" + (seq++).ToString() + @"""
                         Command=""Ribbon.ListForm.Display.Manage.EPMINT""
                         Image32by32=""/_layouts/15/images/" + ic.Image + @"""
