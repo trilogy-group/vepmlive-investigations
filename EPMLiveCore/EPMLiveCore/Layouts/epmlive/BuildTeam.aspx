@@ -224,8 +224,8 @@ a, .ms-link:visited {
             if (renderCount == Grids.length) {
                 setTimeout("gridsloaded()", 200);
 
-                $(".GMHeadLeft").find("th:nth-child(2)" ).css("width","25px");
-                $(".GMBodyLeft").find("th:nth-child(2)" ).css("width","25px");
+                //$(".GMHeadLeft").find("th:nth-child(2)" ).css("width","25px");
+                //$(".GMBodyLeft").find("th:nth-child(2)" ).css("width","25px");
             }
             else if (renderCount > Grids.length)
             {
