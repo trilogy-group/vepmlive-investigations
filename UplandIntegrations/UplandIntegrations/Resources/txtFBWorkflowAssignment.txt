@@ -66,38 +66,45 @@
 		var tabmain;
             var WebAPIUrl = "#APIUrl#";
             var FBSiteURL = "#SiteUrl#";
-            var Param = "guid=#FBGUID#&fbsite=" + FBSiteURL;
+            var Param = 
             var getTabs = false;
             var getTaskButtons = true;
             var currentRoutes;
 			var fileId = "#fileId#";
 			var projectId = "#projectId#";
 			var IntUrl = "#inturl#";
-
-			$.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
-				$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''").replace(/http:\/\//g, 'https://').replace(/:80/g, ''));
-
+			
+			$.get("#proxyurl#", function (fbguid) {
 				
-							$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + fileId + ",routedobjecttype_6", function (routeobj) {
+				Param = "guid=" + fbguid + "&fbsite=" + FBSiteURL;
 
-								var routId = routeobj[0].routeId;
+				$.get(WebAPIUrl + "visualworkflow/scripts?" + Param, function (scripts) {
+					$("head").append(scripts.replace("$.url('/Content/pie.htc')", "''").replace(/http:\/\//g, 'https://').replace(/:80/g, ''));
 
-									$.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
-									currentRoutes = routes;
+						var cssURL = WebAPIUrl + 'visualworkflow/css?' + Param;
+						if (!$("link[href='" + escape(cssURL) + "']").length) {
+							$("head").append('<link rel="stylesheet" type="text/css" href="' + cssURL + '" />');
+						}
+						$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + fileId + ",routedobjecttype_6", function (routeobj) {
 
-										var xml = GetXML(routId);
-										if (routId > 0 && xml != "") {
-											LoadVisualWorkflow(routId, xml);
-										}
+							var routId = routeobj[0].routeId;
 
-									});
+								$.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
+								currentRoutes = routes;
+
+									var xml = GetXML(routId);
+									if (routId > 0 && xml != "") {
+										LoadVisualWorkflow(routId, xml);
+									}
+
+								});
 										
 
-							});
+						});
 
-				}
-            );
-
+					}
+				);
+			});
             $(function () {
 
                 // open process designer to the current route when button is clicked:

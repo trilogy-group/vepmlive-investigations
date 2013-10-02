@@ -16,6 +16,23 @@ namespace UplandIntegrations.FileBound
     public class Integrator : IIntegrator, IIntegratorControls
     {
 
+        public string GetProxyResult(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control, string Property)
+        {
+
+            if (Control == "WorkflowButtons")
+            {
+                if(Property == "FBGUID")
+                {
+                    FBConnection cn = new FBConnection(WebProps, Log);
+
+                    return cn.FBGUID;
+                }
+                return "Invalid Property";
+            }
+            else
+                return "Invalid Control";
+        }
+
         public List<string> GetEmbeddedItemControls(WebProperties WebProps, IntegrationLog Log)
         {
             List<string> l = new List<string>();
@@ -56,8 +73,7 @@ namespace UplandIntegrations.FileBound
         {
             try
             {
-                FBConnection cn = new FBConnection(WebProps, Log);
-
+                
                 switch (Control)
                 {
                     case "WorkflowButtons":
@@ -68,17 +84,19 @@ namespace UplandIntegrations.FileBound
                             {
                                 relass = WebProps.Properties["RelatedAssign"].ToString();
                             }catch{}
-                            string control = Properties.Resources.txtFBWorkFlow.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+                            string control = Properties.Resources.txtFBWorkFlow.Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
                             control = control.Replace("#associatedkey#", relass);
                             control = control.Replace("#inturl#", WebProps.IntegrationAPIUrl.Replace("/integration.asmx","/postitemsimple.aspx"));
+                            control = control.Replace("#proxyurl#", WebProps.FullURL + "/_layouts/15/epmlive/integration/proxy.aspx?IntegrationId=" + WebProps.IntegrationId + "&Control=" + Control + "&Property=FBGUID");
                             return control;
                         }
                         else if (WebProps.Properties["DataType"].ToString() == "Assignment")
                         {
-                            string control = Properties.Resources.txtFBWorkflowAssignment.Replace("#FBGUID#", cn.FBGUID).Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
+                            string control = Properties.Resources.txtFBWorkflowAssignment.Replace("#APIUrl#", WebProps.Properties["APIUrl"].ToString()).Replace("#SiteUrl#", WebProps.Properties["SiteUrl"].ToString()).Replace("#fileId#", ItemID).Replace("#projectId#", WebProps.Properties["Folder"].ToString());
 
                             control = control.Replace("#associatedkey#", WebProps.IntegrationKey);
                             control = control.Replace("#inturl#", WebProps.IntegrationAPIUrl.Replace("/integration.asmx", "/postitemsimple.aspx"));
+                            control = control.Replace("#proxyurl#", WebProps.FullURL + "/_layouts/15/epmlive/integration/proxy.aspx?IntegrationId=" + WebProps.IntegrationId + "&Control=" + Control + "&Property=FBGUID");
 
                             return control;
                         }
