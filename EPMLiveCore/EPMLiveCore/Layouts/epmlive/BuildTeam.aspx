@@ -1,4 +1,4 @@
-﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
+﻿<%@ Assembly Name="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
@@ -63,13 +63,13 @@ a, .ms-link:visited {
 		        <div class="toolbar">
                     <ul>
  		                 <li>
-			                <a href="javascript:void(0);" onclick="AddTeamColumns()" rel="tooltiptop" title="Select Columns"><img border="0" src="/_layouts/epmlive/images/selectcolumn.gif" style="vertical-align: middle;"></a> 
+			                <a href="javascript:void(0);" onclick="AddTeamColumns(this)" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Select Columns"><span class="icon-table"></span></a> 
                         </li>
                         <li>
-                            <a href="javascript:void(0);" onclick="TeamFilters()" rel="tooltiptop" title="Show/Hide Filters"><img border="0" src="/_layouts/epmlive/images/filter.png" style="vertical-align: middle;"></a>
+                            <a href="javascript:void(0);" onclick="TeamFilters(this)" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Show/Hide Filters"><span class="icon-filter-2"></span></a>
                         </li>
 			            <li>
-                            <a href="javascript:void(0);" onclick="TeamGroups()" rel="tooltiptop" title="Show/Hide Grouping"><img border="0" src="/_layouts/epmlive/images/grouping.gif" style="vertical-align: middle;"></a>
+                            <a href="javascript:void(0);" onclick="TeamGroups(this)" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Show/Hide Grouping"><span class="icon-indent-increase-2"></span></a>
                         </li>
                     </ul>
 		        </div>
@@ -179,11 +179,11 @@ a, .ms-link:visited {
         {
 	        <%=sResGrid%>
 
-	        TreeGrid(   { 
+            TreeGrid(   { 
                 Layout:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridLayout",Dataxml:"<%=sLayoutParam %>" } } ,
-                Data:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridData",Dataxml:"<%=sLayoutParam %>" } }, 
+	            Data:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridData",Dataxml:"<%=sLayoutParam %>" } }, 
 	            Debug:"",SuppressMessage:"3"
-                }, 
+	        }, 
 	        "divTeam" );
         }
 
@@ -196,10 +196,10 @@ a, .ms-link:visited {
         var renderCount = 0;
 
 
-	    function gridsloaded()
-	    {
+        function gridsloaded()
+        {
 
-		    try {
+            try {
                 RemoveResources();
             } catch (e) { }
             try {
@@ -215,7 +215,7 @@ a, .ms-link:visited {
             hm("dlgLoading");
             RefreshCommandUI();	
 
-	    }
+        }
 
 
         Grids.OnRenderFinish = function (grid) {
@@ -332,7 +332,7 @@ a, .ms-link:visited {
         initmb();
 
         //_spBodyOnLoadFunctionNames.push("doLoad");
-	ExecuteOrDelayUntilScriptLoaded(doLoad, 'sp.ui.dialog.js');
+        ExecuteOrDelayUntilScriptLoaded(doLoad, 'sp.ui.dialog.js');
 
         <%=sDisable %>
 
