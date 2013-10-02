@@ -325,35 +325,49 @@ namespace UplandIntegrations.Tenrox
 
         public List<string> GetEmbeddedItemControls(WebProperties webProps, IntegrationLog log)
         {
-            throw new NotImplementedException();
+            List<string> lstControls = new List<string>();
+
+
+
+            return lstControls;
         }
 
         public List<IntegrationControl> GetPageButtons(WebProperties webProps, IntegrationLog log, bool globalButtons)
         {
-            return new List<IntegrationControl>
+            if (globalButtons)
             {
-                new IntegrationControl
+                return new List<IntegrationControl>
                 {
-                    Control = "TX_Timesheet",
-                    Title = "Timesheet",
-                    Image = "tx_timesheet.png",
-                    Window = IntegrationControlWindowStyle.IFrame
-                },
-                new IntegrationControl
+                
+                    new IntegrationControl
+                    {
+                        Control = "TX_Timesheet",
+                        Title = "Timesheet",
+                        Image = "tx_timesheet.png",
+                        Window = IntegrationControlWindowStyle.IFrame
+                    },
+                    new IntegrationControl
+                    {
+                        Control = "TX_Expenses",
+                        Title = "Expenses",
+                        Image = "tx_expenses.png",
+                        Window = IntegrationControlWindowStyle.IFrame
+                    }
+                };
+            }
+            else
+            {
+                return new List<IntegrationControl>
                 {
-                    Control = "TX_Expenses",
-                    Title = "Expenses",
-                    Image = "tx_expenses.png",
-                    Window = IntegrationControlWindowStyle.IFrame
-                },
-                new IntegrationControl
-                {
-                    Control = "TX_ProjectInfo",
-                    Title = "Project Info",
-                    Image = "tx_projectinfo.png",
-                    Window = IntegrationControlWindowStyle.FullDialog
-                }
-            };
+                    new IntegrationControl
+                    {
+                        Control = "TX_ProjectInfo",
+                        Title = "Project Info",
+                        Image = "tx_projectinfo.png",
+                        Window = IntegrationControlWindowStyle.FullDialog
+                    }
+                };
+            }
         }
 
         public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
