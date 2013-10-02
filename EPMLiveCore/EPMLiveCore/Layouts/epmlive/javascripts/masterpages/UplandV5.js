@@ -103,15 +103,39 @@
             }
         });
 
-        var addUpdateProfilePicLink = function() {
-            var $menuitems = $('#welcomeMenuBox').find('ie\\:menuitem');
+        var addUpdateProfilePicLink = function () {
+            if (window.isIE8) {
 
-            if ($menuitems.length > 0) {
-                $('<ie:menuitem menugroupid="100" description="Update your profile photo." text="Update Profile Photo" onmenuclick="javascript:window.updateProfilePic();" type="option" id="epm-update-profile-pic" enabled="true" checked="false" onmenuclick_original="javascript:window.updateProfilePic();" text_original="Update Profile Photo" description_original="Update your profile photo." valorig=""></ie:menuitem>').insertAfter('#' + $('#welcomeMenuBox').find('ie\\:menuitem').get(0).id);
+                var insertAfter = function(referenceNode, newNode) {
+                    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling.nextSibling);
+                };
+
+                var $menuBox = $('#welcomeMenuBox');
+                
+                if ($menuBox.length > 0) {
+                    var $menuItems = $($('#welcomeMenuBox').get(0).getElementsByTagName('ie:menuitem'));
+                    if ($menuItems.length > 0) {
+                        insertAfter($menuItems.get(0), $('<ie:menuitem menugroupid="100" description="Update your profile photo." text="Update Profile Photo" onmenuclick="javascript:window.updateProfilePic();" type="option" id="epm-update-profile-pic" enabled="true" checked="false" onmenuclick_original="javascript:window.updateProfilePic();" text_original="Update Profile Photo" description_original="Update your profile photo." valorig=""></ie:menuitem>').get(0));
+                    } else {
+                        window.setTimeout(function() {
+                            addUpdateProfilePicLink();
+                        }, 1);
+                    }
+                } else {
+                    window.setTimeout(function () {
+                        addUpdateProfilePicLink();
+                    }, 1);
+                }
             } else {
-                window.setTimeout(function() {
-                    addUpdateProfilePicLink();
-                }, 1);
+                var $menuitems = $('#welcomeMenuBox').find('ie\\:menuitem');
+
+                if ($menuitems.length > 0) {
+                    $('<ie:menuitem menugroupid="100" description="Update your profile photo." text="Update Profile Photo" onmenuclick="javascript:window.updateProfilePic();" type="option" id="epm-update-profile-pic" enabled="true" checked="false" onmenuclick_original="javascript:window.updateProfilePic();" text_original="Update Profile Photo" description_original="Update your profile photo." valorig=""></ie:menuitem>').insertAfter('#' + $menuitems.get(0).id);
+                } else {
+                    window.setTimeout(function () {
+                        addUpdateProfilePicLink();
+                    }, 1);
+                }
             }
         };
 
