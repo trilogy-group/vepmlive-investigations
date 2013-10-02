@@ -30,12 +30,15 @@ function selectRow#gridid#(id, ind)
 
 	RefreshCommandUI();
 
-	if(curGrid.getRowById(id)._locked)
+	if(curGrid.canribbon)
 	{
-		SelectRibbonTab("Ribbon.ListItem", true);
-		//var wp2 = document.getElementById('Ribbon.ListItem-title');
-		//if(wp2)
-		//	fireEvent(wp2.firstChild, 'click');
+		if(curGrid.getRowById(id)._locked)
+		{
+			SelectRibbonTab("Ribbon.ListItem", true);
+			//var wp2 = document.getElementById('Ribbon.ListItem-title');
+			//if(wp2)
+			//	fireEvent(wp2.firstChild, 'click');
+		}
 	}
 }
 

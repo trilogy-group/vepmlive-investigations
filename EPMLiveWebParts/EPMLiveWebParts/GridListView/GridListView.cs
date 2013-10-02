@@ -1716,7 +1716,7 @@ namespace EPMLiveWebParts
 
         protected override void OnPreRender(EventArgs e)
         {
-            if (view.RowLimit > 0)
+            if (view != null && view.RowLimit > 0)
             {
                 EPMLiveCore.Infrastructure.EPMLiveScriptManager.RegisterScript(Page, new[]
                 {
@@ -1726,11 +1726,13 @@ namespace EPMLiveWebParts
             }
 
             tb.AddTimer();
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            if (view != null)
             {
-                buildParams();
-            });
-
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    buildParams();
+                });
+            }
             if (newGridMode.ToLower() == "gantt")
             {
                 ScriptLink.Register(Page, "/_layouts/epmlive/treegrid/GridE.js", false);
@@ -3922,7 +3924,12 @@ namespace EPMLiveWebParts
             output.WriteLine("mygrid" + sFullGridId + "._curPlanner = '" + PlannerV2CurPlanner.Trim() + "';");
             output.WriteLine("mygrid" + sFullGridId + "._epkurl = '" + EPKURL + "';");
             output.WriteLine("mygrid" + sFullGridId + "._epkcostview = '" + EPKCostView + "';");
+
+            output.WriteLine("mygrid" + sFullGridId + ".canribbon = "  + (SPContext.Current.ViewContext.View != null).ToString().ToLower() + ";" );
+
             output.WriteLine("mygrid" + sFullGridId + ".addFocusedCommands = function($arr){");
+            
+            
             //foreach (SPUserCustomAction ca in list.UserCustomActions)
             //{
             //    XmlDocument doc = new XmlDocument();
@@ -4301,7 +4308,7 @@ namespace EPMLiveWebParts
                 LookupFilterValue = litem.ToString();
             }
 
-
+            
             bAssociatedItems = gSettings.AssociatedItems;
 
             if (PropUseDefaults.Value)
