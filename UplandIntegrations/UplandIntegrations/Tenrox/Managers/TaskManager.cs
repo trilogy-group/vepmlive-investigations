@@ -19,7 +19,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
         public TaskManager(Binding binding, string endpointAddress, TenroxAuthService.UserToken token)
             : base(binding, endpointAddress, "tasks.svc", token,
-                typeof (Task), typeof (TenroxAuthService.UserToken), typeof (TasksClient))
+                typeof (Task), typeof (UserToken), typeof (TasksClient))
         {
             MappingDict = new Dictionary<string, string>
             {

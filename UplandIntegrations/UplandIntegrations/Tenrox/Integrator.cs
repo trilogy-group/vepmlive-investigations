@@ -144,7 +144,7 @@ namespace UplandIntegrations.Tenrox
 
         public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynchDate)
         {
-            throw new NotImplementedException();
+            return items;
         }
 
         public bool RemoveIntegration(WebProperties webProps, IntegrationLog log, out string message,
@@ -399,7 +399,7 @@ namespace UplandIntegrations.Tenrox
 
         public string GetControlCode(WebProperties webProps, IntegrationLog log, string itemId, string control)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
 
         public string GetProxyResult(WebProperties webProps, IntegrationLog log, string itemId, string control,
