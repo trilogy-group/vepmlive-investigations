@@ -476,14 +476,14 @@ u.GMT,u.GMTL,u.GMC,u.GMCL,u.GME,u.GMEL,u.GMD0,u.GMD1,u.GMD2,u.GMD3,u.GMD0L,u.GMD
 
 /* ------------- Tree Img without lines ------------- */
 
-.GMND0,.GMND1,.GMND2,.GMND3,.GMNC,.GMNE,.GMNCR,.GMNER { font-size:10px; background-image:url(TreeN.gif); background-repeat:no-repeat; vertical-align:top; }
+.GMND0,.GMND1,.GMND2,.GMND3,.GMNC,.GMNE,.GMNCR,.GMNER { font-size:10px; background-image:url('expand-collapse-sprite.png') !important; background-repeat:no-repeat; vertical-align:top; }
 u.GMND0,u.GMND1,u.GMND2,u.GMND3,u.GMNC,u.GMNE,u.GMNCR,u.GMNER { padding-left:26px; }
 .GMND0 { background-position: 0px 0px; }
 .GMND1 { background-position: -50px 0px; }
 .GMND2 { background-position: -100px 0px; }
 .GMND3 { background-position: -150px 0px; }
-.GMNC { background-position:right -50px;}
-.GMNE { background-position:right -2000px;}
+.GMNC { background-position:-14px 5px;}
+.GMNE { background-position: 10px 5px;}
 .GMNCR { background-position:-205px -50px;}
 .GMNER { background-position:-205px -2000px;}
 u.GMNL { padding-left:21px; }
@@ -606,7 +606,7 @@ y {
 .GMP0xx1 { background-position:-1760px 0px; }
 .GMP0xx0 { background-position:-1840px 0px; }
 
-.GMPSpace1 { padding-left:12px; }
+.GMPSpace1 { padding-left:15px; }
 .GMPSpace2 { padding-left:25px; }
 .GMPSpace3 { padding-left:38px; }
 .GMPSpace4 { padding-left:51px; }
@@ -720,7 +720,7 @@ u.GMPSpace4 { padding-left:49px; background-position-x:18px; }
 .GMBoolXSpace,.GMBoolXSpaceRO,.GMBool0Space,.GMBool1Space,.GMBool0SpaceRO,.GMBool1SpaceRO,
 .GMBoolX,.GMBoolXRO,.GMBool0,.GMBool1,.GMBool0RO,.GMBool1RO,.GMBool2,.GMBool3,.GMBool2RO,.GMBool3RO,
 .GMFilter0,.GMFilter1,.GMGroup0,.GMGroup1,.GMSearch0,.GMSearch1 {
-   font-size:14px; background-image:url(Button.gif); background-repeat:no-repeat; }
+   font-size:14px; background-image:url('basic-checkbox-sprite.png'); background-repeat:no-repeat; }
 .GMDateLeft,.GMDefaultsLeft,.GMDefaultsSpaceLeft { padding-left:20px; }
 .GMDateRight,.GMDefaultsRight,.GMDefaultsSpaceRight { padding-right:20px; }
 u.GMDateRight,u.GMDefaultsRight,u.GMDefaultsSpaceRight { padding-right:0px; padding-left:17px; }
@@ -765,8 +765,8 @@ u.GMFilter0,u.GMFilter1 { padding-left:13px; }
 .GMBool3,.GMBool3RO { background-position:center -1500px; }
 .GMFilter0 { background-position:center -750px; }
 .GMFilter1 { background-position:center -1000px; }
-.GMGroup0 { background-position:center -750px; }
-.GMGroup1 { background-position:center -1000px; }
+.GMGroup0 { background-position: 0px 1px; }
+.GMGroup1 { background-position: -24px 1px; }
 .GMSearch0 { background-position:center -750px; }
 .GMSearch1 { background-position:center -1000px; }
 .GMBoolInput { margin-top:0px; margin-bottom:0px; padding:0px; margin-top:-4px!IE;margin-bottom:-4px!IE; }
@@ -914,7 +914,7 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMColorMoved1 { background-color:#FFFFFF; }
 .GMColorMoved2 { background-color:#FFFFFF; }
 .GMColorChanged { background-color:#FFFFFF; }
-.GMColorChangedCell { background-color:#E1E1FF; }
+.GMColorChangedCell { background-color:#FFFFFF; }
 .GMClassChangedCell { }
 
 .GMColorMaxChildren { background-color:#FFFFF0; }
@@ -1072,8 +1072,8 @@ overflow:hidden; width:0px; height:0px; }
    border:1px solid #b0b0c0; background:white; cursor:pointer; _cursor:hand; vertical-align:middle;
    }
 .GMMenuHead {
-   background:#183873 url(Backgrounds.gif) repeat-x 0px -2px;
-   font:10px Verdana,Arial; color:white; cursor:default;
+   background:none;
+   font:10px Verdana,Arial; color:#666666; cursor:default;
    text-align:center; padding-top:5px; padding-bottom:4px;
    }
 .GMMenuClose {
@@ -1158,7 +1158,7 @@ overflow:hidden; width:0px; height:0px; }
 
 /*--------------- Grid configuration menus ----------------- */
 
-.GMCfgMenuOuter,.GMColumnsMenuOuter { border:1px solid black; }
+.GMCfgMenuOuter,.GMColumnsMenuOuter { border:1px solid #BBBBBB; }
 .GMCfgMenuHead,.GMColumnsMenuHead { padding-left:3px; }
 .GMCfgMenuBody,.GMColumnsMenuBody { padding-left:4px; padding-right:4px; }
 .GMCfgMenuFoot,.GMColumnsMenuFoot { padding-right:3px; padding-left:3px; }
@@ -1167,7 +1167,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMColumnsMenuItemText { white-space:nowrap; }
 .GMCfgMenuItem,.GMColumnsMenuItem { padding-top:3px; padding-bottom:3px; }
 .GMCfgMenuItemHover,.GMCfgMenuFocus,.GMCfgMenuFocusHover,
-.GMColumnsMenuItemHover,.GMColumnsMenuFocus,.GMColumnsMenuFocusHover { padding-top:2px; padding-bottom:2px; }
+.GMColumnsMenuItemHover,.GMColumnsMenuFocus,.GMColumnsMenuFocusHover { padding-top:3px; padding-bottom:3px; }
 
 /* ------------------- Calendar, TGLib ------------------- */
 
