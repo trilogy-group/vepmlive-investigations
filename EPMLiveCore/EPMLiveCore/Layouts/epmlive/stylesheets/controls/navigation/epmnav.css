@@ -497,6 +497,7 @@
   -moz-border-radius: 15px;
   -webkit-border-radius: 15px;
   border-radius: 15px;
+  outline-style:none;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView {
   margin-left: 10px;
