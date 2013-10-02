@@ -411,6 +411,11 @@ namespace UplandIntegrations.Tenrox
             throw new NotImplementedException();
         }
 
+        public string GetProxyResult(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control, string Property)
+        {
+            return "";
+        }
+
         #endregion
     }
 }
