@@ -27,6 +27,7 @@ using System.Net;
 using EPMLiveReportsAdmin;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -139,7 +140,15 @@ namespace EPMLiveCore.Layouts.epmlive
 
             Button1.Focus();
         }
+        protected override void OnPreLoad(EventArgs e)
+        {
+            base.OnPreLoad(e);
 
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "GridGanttSettings"
+            });
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)

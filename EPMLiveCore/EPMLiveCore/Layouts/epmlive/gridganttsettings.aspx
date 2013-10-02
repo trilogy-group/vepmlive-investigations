@@ -22,7 +22,31 @@
 <asp:Content ID="Content2" ContentPlaceHolderId="PlaceHolderPageDescription" runat="server">Use this page to determine the Grid/Gantt field settings for this List.  These settings are only relevant when using this List in conjunction with EPM Live Web Parts such as the Grid Web Part.</asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderId="PlaceHolderMain" runat="server">
 
-<script language="javascript">
+<SharePoint:StyleBlock runat="server">
+    .icon-button {
+        line-height:50px;
+        border:1px solid #CCCCCC;
+        float:left;
+        height:50px;
+        width:50px;
+        text-align:center;
+        border-radius:5px;
+        background: -moz-linear-gradient(bottom, #cccccc, #fafafa);
+        background-image: -ms-linear-gradient(bottom, #cccccc,#fafafa);
+        background-image: -webkit-linear-gradient(bottom, #cccccc,#fafafa);
+        background-image: linear-gradient(to top, #cccccc,#fafafa);
+        
+    }
+    .icon-button-text {
+        float: right; 
+        position: relative; 
+        margin-top: 15px; 
+        left: -20px;
+    }
+
+</SharePoint:StyleBlock>
+
+<SharePoint:ScriptBlock runat="server">
 
     function CheckTimesheet() {
 
@@ -61,10 +85,9 @@
 
 
     
-</script>
+</SharePoint:ScriptBlock>
 
-<script type="text/javascript" src="/_layouts/epmlive/GridGanttSettings.js"></script>
-<script type="text/javascript">
+<SharePoint:ScriptBlock runat="server">
     var listid = "<%=strListId%>";
     var reportActionUrl = "<%=strReportActionUrl%>";
     var cbEnableReport = "<%=cbEnableReporting.ClientID%>";
@@ -502,12 +525,13 @@
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
-				     <div style="line-height: 20px;">
-				         <span class="box1" style="float:left;">
+				     <div class="icon-button">
+				         <span class="box1" style="">
 				             <asp:Label id="spnListIcon" runat="server" style="cursor:pointer;font-size:18px;" onclick="OpenIconSelect();return false;" ></asp:Label>
                              <asp:HiddenField runat="server" ID="hdnListIcon"/>
 	                    </span>
 				     </div>
+                     <div class="icon-button-text">Click the button to select an icon for this List.</div>
 				 </Template_Control>
 			</wssuc:InputFormControl>
 		</Template_InputFormControls>
