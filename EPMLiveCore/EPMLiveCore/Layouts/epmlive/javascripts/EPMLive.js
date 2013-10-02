@@ -469,11 +469,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
     var control = controlFull.substr(0, t);
     var windowtype = controlFull.substr(t + 1);
 
-    alert(control);
-    alert(windowtype);
-
-    FullWindow = 1, FullDialog, SmallDialog, IFrame
-
     var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/integration/gotoremote.aspx?control=' + control + '&listid=' + listid + '&itemid=' + itemid);
 
     var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
