@@ -3,7 +3,7 @@
 	<input type="button" class="ms-ButtonHeightWidth" value="&lt; Add" onClick="AddResource()" style="width:100px"><br><br>
 	<input type="button" class="ms-ButtonHeightWidth" value="Remove &gt;" onClick="RemoveResource()" style="width:100px">
 </td>
-<td width="50%" id="tdResPool" valign="top">
+<td id="tdRes" valign="top">
 	<div class="gridHeader">Resource Pool</div>
 	<div class="toolbar">
 		<ul>

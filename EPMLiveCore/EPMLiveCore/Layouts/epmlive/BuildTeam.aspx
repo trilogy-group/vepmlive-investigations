@@ -58,7 +58,7 @@ a, .ms-link:visited {
 
     <table style="width:100%; height:100%" id="parentId">
         <tr>
-            <td width="50%" valign="top">
+            <td width="50%" valign="top" id="tdTeam">
                 <div class="gridHeader">Current Team</div>
 		        <div class="toolbar">
                     <ul>

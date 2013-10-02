@@ -285,10 +285,25 @@ function setHeight() {
         document.getElementById("divResPool").style.height = h2;
     } catch (e) { }
 
-    /*document.getElementById("divTeam").style.height = tbl.style.height;
-    try {
-    document.getElementById("divRes").style.height = tbl.style.height;
-    } catch (e) { }*/
+
+
+    var hWidth = (getWidth() - 50) / 2;
+
+    tbl.style.width = getWidth() + "px";
+
+    var res = document.getElementById("tdRes");
+    if (res) {
+        res.style.width = hWidth + "px";
+
+        var team = document.getElementById("tdTeam");
+        team.style.width = hWidth + "px";
+
+    }
+    else {
+        var team = document.getElementById("tdTeam");
+        team.style.width = tbl.style.width;
+    }
+    document.getElementById("divTeam").style.width = team.style.width;
 }
 
 function SaveAndClose() {
