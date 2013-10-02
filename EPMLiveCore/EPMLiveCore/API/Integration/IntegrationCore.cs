@@ -1487,6 +1487,19 @@ namespace EPMLiveCore.API.Integration
             return integrator.iIntegrator.GetItem(webprops, log, itemid, dtItems);
         }
 
+        internal string GetProxyResult(Guid intlistid, string ItemId, string Control, string Property)
+        {
+            IntegratorDef integrator = GetIntegrator(intlistid);
+
+            IntegrationLog log = new IntegrationLog(cn, intlistid, integrator.ListId, integrator.Title);
+
+            Hashtable hshProps = GetProperties(intlistid);
+
+            WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
+
+            return ((IIntegratorControls)integrator.iIntegrator).GetProxyResult(webprops, log, ItemId, Control, Property);
+        }
+
         private WebProperties GetWebProps(Hashtable Props, Guid intlistid)
         {
             WebProperties props = new WebProperties();
