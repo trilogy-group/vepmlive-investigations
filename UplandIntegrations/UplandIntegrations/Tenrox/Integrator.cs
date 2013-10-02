@@ -108,15 +108,13 @@ namespace UplandIntegrations.Tenrox
                 {
                     return new Dictionary<string, string> {{"Email", "Email"}};
                 }
-
-                throw new Exception("Invalid property.");
             }
             catch (Exception e)
             {
                 log.LogMessage(e.Message, IntegrationLogType.Error);
             }
 
-            return null;
+            return new Dictionary<string, string>();
         }
 
         public DataTable GetItem(WebProperties webProps, IntegrationLog log, string itemId, DataTable items)
@@ -325,11 +323,7 @@ namespace UplandIntegrations.Tenrox
 
         public List<string> GetEmbeddedItemControls(WebProperties webProps, IntegrationLog log)
         {
-            List<string> lstControls = new List<string>();
-
-
-
-            return lstControls;
+            return new List<string>();
         }
 
         public List<IntegrationControl> GetPageButtons(WebProperties webProps, IntegrationLog log, bool globalButtons)
@@ -338,7 +332,6 @@ namespace UplandIntegrations.Tenrox
             {
                 return new List<IntegrationControl>
                 {
-                
                     new IntegrationControl
                     {
                         Control = "TX_Timesheet",
@@ -355,19 +348,17 @@ namespace UplandIntegrations.Tenrox
                     }
                 };
             }
-            else
+
+            return new List<IntegrationControl>
             {
-                return new List<IntegrationControl>
+                new IntegrationControl
                 {
-                    new IntegrationControl
-                    {
-                        Control = "TX_ProjectInfo",
-                        Title = "Project Info",
-                        Image = "tx_projectinfo.png",
-                        Window = IntegrationControlWindowStyle.FullDialog
-                    }
-                };
-            }
+                    Control = "TX_ProjectInfo",
+                    Title = "Project Info",
+                    Image = "tx_projectinfo.png",
+                    Window = IntegrationControlWindowStyle.FullDialog
+                }
+            };
         }
 
         public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
@@ -411,9 +402,10 @@ namespace UplandIntegrations.Tenrox
             throw new NotImplementedException();
         }
 
-        public string GetProxyResult(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control, string Property)
+        public string GetProxyResult(WebProperties webProps, IntegrationLog log, string itemId, string control,
+            string property)
         {
-            return "";
+            return string.Empty;
         }
 
         #endregion
