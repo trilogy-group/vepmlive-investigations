@@ -1261,7 +1261,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 }
             }
 
-            Infrastructure.CacheStore.Current.RemoveCategory("GGS-" + list.ID);
+            Infrastructure.CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
         }
