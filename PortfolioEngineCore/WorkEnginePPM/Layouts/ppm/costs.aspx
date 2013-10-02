@@ -14,6 +14,9 @@
     .ms-dialog .ms-bodyareacell {
     padding: 0 !important;
 }
+    #s4-bodyContainer {
+        padding-bottom: 0 !important;
+    }
 </style>
 
 </asp:Content>
@@ -21,20 +24,6 @@
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
 <asp:PlaceHolder runat="server" ID="PlaceHolder1" />
-<script type="text/javascript">
-    function Page_OnResize() {
-        if (typeof(editcosts) != "undefined") {
-            editcosts.SetSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
-        }
-    }
-
-    if (document.addEventListener != null) { // e.g. Firefox
-        window.addEventListener("resize", Page_OnResize, true);
-    }
-    else { // e.g. IE
-        window.attachEvent("onresize", Page_OnResize);
-    }
-</script>
 
 </asp:Content>
 

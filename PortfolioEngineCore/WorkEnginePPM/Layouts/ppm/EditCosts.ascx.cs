@@ -59,6 +59,13 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             set { m_nViewUID = value; }
         }
 
+        private string m_sIsDlg = "";
+        public string IsDlg
+        {
+            get { return m_sIsDlg; }
+            set { m_sIsDlg = value; }
+        }
+
         public string Webservice
         {
             get

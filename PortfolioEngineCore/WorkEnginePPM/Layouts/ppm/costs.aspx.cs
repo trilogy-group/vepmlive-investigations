@@ -39,6 +39,7 @@ namespace WorkEnginePPM
                 WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl)LoadControl("/_layouts/ppm/EditCosts.ascx");
                 ctl.ViewUID = 0;
                 ctl.WEPID = "";
+                ctl.IsDlg = Request["IsDlg"];
                 PlaceHolder1.Controls.Add(ctl);
             }
             else
@@ -76,6 +77,7 @@ namespace WorkEnginePPM
                         ctl.ViewUID = i;
                     }
                     ctl.WEPID = Request["itemid"];
+                    ctl.IsDlg = Request["IsDlg"];
                     PlaceHolder1.Controls.Add(ctl);
                 }
             }

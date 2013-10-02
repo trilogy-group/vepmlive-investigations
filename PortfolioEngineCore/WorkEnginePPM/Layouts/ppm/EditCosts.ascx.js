@@ -150,29 +150,56 @@
             WorkEnginePPM.EditCosts.GetCostTypes(this.params.ViewUID, getCostTypesCompleteDelegate);
         }
     };
+    EditCosts.prototype.OnResizeInternal = function (event) {
+        try {
+            //this.OnResize();
+            window.setTimeout(thisID + ".OnResize();", 1);
+        }
+        catch (e) {
+            this.HandleException("OnResizeInternal", e);
+        }
+    };
+    EditCosts.prototype.HandleException = function (name, e) {
+        alert("Exception thrown in function " + name + "\n\n" + e.toString());
+    };
     EditCosts.prototype.OnResize = function (event) {
-        if (this.initialized == true) {
+        try {
+            var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
+            var xy = jsf_findAbsolutePosition(divLayout);
+            var body = document.body;
+            if (this.params.IsDlg == "1") {
+                this.Width = body.offsetWidth - xy[0];
+                this.Height = body.offsetHeight - xy[1] - 5;
+            } else {
+                this.Width = body.offsetWidth - xy[0] - 20;
+                this.Height = body.offsetHeight - xy[1] - 20;
+            }
             var lHeight = this.Height;
             var divLayout = document.getElementById(this.params.ClientID + "layoutDiv");
             if (lHeight > 300) {
-                divLayout.style.height = (lHeight - 12) + "px";
+                divLayout.style.height = lHeight + "px";
             }
             var lWidth = this.Width;
             if (lWidth > 300) {
                 divLayout.style.width = lWidth + "px";
             }
 
-            this.layout.cont.obj._offsetTop = 0;
-            this.layout.cont.obj._offsetHeight = 0;
-            this.layout.cont.obj._offsetLeft = 0;
-            this.layout.cont.obj._offsetWidth = 0;
-            this.layout.setSizes();
+            if (this.layout != null) {
+                this.layout.cont.obj._offsetTop = 0;
+                this.layout.cont.obj._offsetHeight = 0;
+                this.layout.cont.obj._offsetLeft = 0;
+                this.layout.cont.obj._offsetWidth = 0;
+                this.layout.setSizes();
+            }
+        }
+        catch (e) {
+            this.HandleException("OnResize", e);
         }
     };
     EditCosts.prototype.SetSize = function (nWidth, nHeight) {
-        this.Width = nWidth;
-        this.Height = nHeight;
-        this.OnResize();
+        //this.Width = nWidth;
+        //this.Height = nHeight;
+        //this.OnResize();
     };
     EditCosts.prototype.ChildEvent = function (json) {
         switch (json.event) {
@@ -1366,7 +1393,8 @@
                                 if (calccosts == true) {
                                     if (r > 0) {
                                         var v = q * r;
-                                        if ((row["C" + sId] - v) > 0.01)
+                                        var cv = row["C" + sId];
+                                        if ((cv - v) > 0.01 || (cv - v) < 0.01)
                                             grid.SetValue(row, "C" + sId, v, 0);
                                         else
                                             row["C" + sId] = v;
@@ -1814,6 +1842,7 @@
         this.hideAllArray = null;
 
         var loadDelegate = MakeDelegate(this, this.OnLoad);
+        var resizeDelegate = MakeDelegate(this, this.OnResizeInternal);
         var CheckStatusCompleteDelegate = MakeDelegate(this, this.OnCheckStatusComplete);
         var unloadDelegate = MakeDelegate(this, this.OnUnload);
         var GetPIListCompleteDelegate = MakeDelegate(this, this.GetPIListComplete);
@@ -1838,11 +1867,13 @@
             window.addEventListener("load", loadDelegate, true);
             window.addEventListener("beforeunload", unloadDelegate, true);
             window.addEventListener("unload", unloadDelegate, true);
+            window.addEventListener("resize", resizeDelegate, true);
         }
         else { // e.g. IE
             window.attachEvent("onload", loadDelegate);
             window.attachEvent("onbeforeunload", unloadDelegate);
             window.attachEvent("onunload", unloadDelegate);
+            window.attachEvent("onresize", resizeDelegate);
         }
     }
     catch (ex) {

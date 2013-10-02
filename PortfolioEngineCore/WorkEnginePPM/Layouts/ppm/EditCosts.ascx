@@ -43,12 +43,13 @@
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/EditCosts.ascx.css" />
 <script src="/_layouts/ppm/editcosts.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
+<script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/ribbon/ribbon2.css" />
 <script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
 
 <style type="text/css">
-    IFRAME.dhtmlx_wins_ie6_cover_fix { height: 0px !important; }
+    /*IFRAME.dhtmlx_wins_ie6_cover_fix { height: 0px !important; }*/
 
     .GMColorDefault { background-color:#E7EAF0 !important;}
     .GMClassAdded { font-weight:normal !important; }
@@ -191,7 +192,7 @@
 </div>
 <div id="<%=ClientID%>mainDiv">
     <div id="veil" style="display:none;"></div>
-    <div id="<%=ClientID%>layoutDiv" style="position: relative; width: 100%; height: 500px;"></div>
+    <div id="<%=ClientID%>layoutDiv" style="position: relative; width: 100%; height: 650px; top: 0px; left: 0px; display:block"></div>
 </div>
 <script type="text/javascript">
     function SelectPIDlg_OKOnClick() { editcosts.SelectPIDlg_OKOnClick(); }
@@ -207,5 +208,6 @@
     params.ViewUID = '<%=ViewUID%>';
     params.URL = '<%=URL%>';
     params.Webservice = '<%=Webservice%>';
+    params.IsDlg = "<%=IsDlg%>";
     editcosts = new EditCosts('editcosts', params);
 </script>
