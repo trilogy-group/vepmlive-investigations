@@ -178,14 +178,14 @@ namespace EPMLiveCore.Jobs
                 }
             }
 
-            ProcessSecurity(site, list, li);
+            ProcessSecurity(site, list, li, userid);
 
             // we wait until all groups have been created to createworkspace
             // only if there isn't a current process creating ws 
             WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
         }
      
-        private void ProcessSecurity(SPSite site, SPList list, SPListItem li)
+        private void ProcessSecurity(SPSite site, SPList list, SPListItem li, int userid)
         {
 
             ReportData _dao = new ReportData(site.ID);
@@ -215,6 +215,26 @@ namespace EPMLiveCore.Jobs
                         cmd.Parameters.AddWithValue("@groupid", ra.Member.ID);
                         cmd.Parameters.AddWithValue("@sectype", type);
                         cmd.ExecuteNonQuery();
+
+                        cmd = new SqlCommand("SELECT * FROM RPTGROUPUSER where SITEID=@siteid and GROUPID=@groupid and USERID=@userid", cn);
+                        cmd.Parameters.AddWithValue("@siteid", site.ID);
+                        cmd.Parameters.AddWithValue("@groupid", ra.Member.ID);
+                        cmd.Parameters.AddWithValue("@userid", userid);
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        bool found = false;
+                        if (dr.Read())
+                        {
+                            found = true;
+                        }
+                        dr.Close();
+                        if (!found)
+                        {
+                            cmd = new SqlCommand("INSERT INTO RPTGROUPUSER (SITEID, GROUPID, USERID) VALUES (@siteid, @groupid, @userid)", cn);
+                            cmd.Parameters.AddWithValue("@siteid", site.ID);
+                            cmd.Parameters.AddWithValue("@groupid", ra.Member.ID);
+                            cmd.Parameters.AddWithValue("@userid", userid);
+                            cmd.ExecuteNonQuery();
+                        }
                     }
                 }
 
