@@ -23,72 +23,96 @@ namespace WorkEnginePPM
                 return;
             }
 
-            int i;
 
-            SPList list = Web.Lists[new Guid(Request["listid"])];
-
-            bool useneewone = false;
-            
-            ArrayList arrMenus = new ArrayList();
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            string sListId = "";
+            if (!string.IsNullOrEmpty(Request["listid"]))
             {
-                try
-                {
-                    string sListName = list.Title;
-
-                    using (SPSite site = new SPSite(Web.Site.ID))
-                    {
-                        SPWeb rootWeb = site.RootWeb;
-
-                        string menus = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "epk" + sListName.Replace(" ", "") + "_menus");
-
-                        arrMenus = new ArrayList(menus.Split('|'));
-
-                        if (arrMenus.Contains("costanalyzerv2"))
-                            useneewone = true;
-                    }
-                }
-                catch { }
-            });
-
-
-            if (!arrMenus.Contains("costanalyzerv2") && HelperFunctions.UseNonActiveXControl("costanalyzer", list) == false)
+                sListId = Request["listid"];
+            }
+            string sDataId = "";
+            if (!string.IsNullOrEmpty(Request["dataid"]))
             {
+                sDataId = Request["listid"];
+            }
+
+            if (sListId == "" && sDataId == "")
+            {
+                WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl)LoadControl("/_layouts/ppm/CostAnalyzer.ascx");
+                int i;
                 if (int.TryParse(Request["view"], out i))
-                    strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRModeler.LMR_WE_Model", "<Params Ticket=\\\"" + Request["dataid"] + "\\\"  ViewID=\\\"" + Request["view"] + "\\\"/>", "true", Page);
+                    ctl.ViewIDVal = Request["view"];
                 else
-                    strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRModeler.LMR_WE_Model", "<Params Ticket=\\\"" + Request["dataid"] + "\\\"  ViewName=\\\"" + Request["view"] + "\\\"/>", "true", Page);
-                LiteralControl lit = new LiteralControl(strOutput.ToString());
-                PlaceHolder1.Controls.Add(lit);
+                    ctl.ViewNameVal = Request["view"];
+                PlaceHolder1.Controls.Add(ctl);
             }
             else
             {
-                
-                if (useneewone)
+                SPList list = Web.Lists[new Guid(sListId)];
+
+                bool useneewone = false;
+
+                ArrayList arrMenus = new ArrayList();
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl)LoadControl("/_layouts/ppm/CostAnalyzer.ascx");
-                    ctl.TicketVal = Request["dataid"];
+                    try
+                    {
+                        string sListName = list.Title;
 
+                        using (SPSite site = new SPSite(Web.Site.ID))
+                        {
+                            SPWeb rootWeb = site.RootWeb;
+
+                            string menus = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "epk" + sListName.Replace(" ", "") + "_menus");
+
+                            arrMenus = new ArrayList(menus.Split('|'));
+
+                            if (arrMenus.Contains("costanalyzerv2"))
+                                useneewone = true;
+                        }
+                    }
+                    catch { }
+                });
+
+                int i;
+
+                if (!arrMenus.Contains("costanalyzerv2") && HelperFunctions.UseNonActiveXControl("costanalyzer", list) == false)
+                {
                     if (int.TryParse(Request["view"], out i))
-                        ctl.ViewIDVal = Request["view"];
+                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRModeler.LMR_WE_Model", "<Params Ticket=\\\"" + Request["dataid"] + "\\\"  ViewID=\\\"" + Request["view"] + "\\\"/>", "true", Page);
                     else
-                        ctl.ViewNameVal = Request["view"];
-
-                    PlaceHolder1.Controls.Add(ctl);
+                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRModeler.LMR_WE_Model", "<Params Ticket=\\\"" + Request["dataid"] + "\\\"  ViewName=\\\"" + Request["view"] + "\\\"/>", "true", Page);
+                    LiteralControl lit = new LiteralControl(strOutput.ToString());
+                    PlaceHolder1.Controls.Add(lit);
                 }
                 else
                 {
-                    WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl)LoadControl("/_layouts/ppm/Model.ascx");
 
-                    ctl.TicketVal = Request["dataid"];
+                    if (useneewone)
+                    {
+                        WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.CostAnalyzerControl)LoadControl("/_layouts/ppm/CostAnalyzer.ascx");
+                        ctl.TicketVal = Request["dataid"];
 
-                    if (int.TryParse(Request["view"], out i))
-                        ctl.ViewIDVal = Request["view"];
+                        if (int.TryParse(Request["view"], out i))
+                            ctl.ViewIDVal = Request["view"];
+                        else
+                            ctl.ViewNameVal = Request["view"];
+
+                        PlaceHolder1.Controls.Add(ctl);
+                    }
                     else
-                        ctl.ViewNameVal = Request["view"];
+                    {
+                        WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl)LoadControl("/_layouts/ppm/Model.ascx");
 
-                    PlaceHolder1.Controls.Add(ctl);
+                        ctl.TicketVal = Request["dataid"];
+
+                        if (int.TryParse(Request["view"], out i))
+                            ctl.ViewIDVal = Request["view"];
+                        else
+                            ctl.ViewNameVal = Request["view"];
+
+                        PlaceHolder1.Controls.Add(ctl);
+                    }
                 }
             }
         }

@@ -22,24 +22,35 @@ namespace WorkEnginePPM
                 return;
             }
 
-            SPList list = Web.Lists[new Guid(Request["listid"])];
-
-            if (HelperFunctions.UseNonActiveXControl("modeler", list) == false)
+            string sListId = "";
+            if (!string.IsNullOrEmpty(Request["listid"]))
             {
-                strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRModeler.LMR_WE_Model", "<Params Ticket=\\\"" + Request["dataid"] + "\\\"/>", "true", Page);
-                LiteralControl lit = new LiteralControl(strOutput.ToString());
-                PlaceHolder1.Controls.Add(lit);
+                sListId = Request["listid"];
+            }
+
+            if (sListId == "")
+            {
+                WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl)LoadControl("/_layouts/ppm/Model.ascx");
+                PlaceHolder1.Controls.Add(ctl);
             }
             else
             {
-                WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl)LoadControl("/_layouts/ppm/Model.ascx");
+                SPList list = Web.Lists[new Guid(sListId)];
+                if (HelperFunctions.UseNonActiveXControl("modeler", list) == false)
+                {
+                    strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_LMRModeler.LMR_WE_Model", "<Params Ticket=\\\"" + Request["dataid"] + "\\\"/>", "true", Page);
+                    LiteralControl lit = new LiteralControl(strOutput.ToString());
+                    PlaceHolder1.Controls.Add(lit);
+                }
+                else
+                {
+                    WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.ModelControl)LoadControl("/_layouts/ppm/Model.ascx");
 
-                ctl.TicketVal = Request["dataid"];
-                
-                PlaceHolder1.Controls.Add(ctl);
+                    ctl.TicketVal = Request["dataid"];
+
+                    PlaceHolder1.Controls.Add(ctl);
+                }
             }
-
-
         }
     }
 }
