@@ -7,6 +7,8 @@ module EPM {
             width?: number;
             bgColor?: string;
             duration?: number;
+            loader?: JQuery;
+            el?: JQuery;
         }
 
         export class Loader {
@@ -64,6 +66,9 @@ module EPM {
 
                     $("body").append($loader.fadeIn(300));
 
+                    element.loader = $loader;
+                    element.el = $el;
+
                     setTimeout(() => {
                         this.showLoading(element);
                     }, 2000);
@@ -77,15 +82,20 @@ module EPM {
                     var index = -1;
 
                     for (var i = 0; i < this._elements.length; i++) {
-                        if (element.id === this._elements[i].id) {
+                        var el = this._elements[i];
+
+                        if (element.id === el.id) {
                             index = i;
+                            element.loader = el.loader;
+                            element.el = el.el;
+
                             break;
                         }
                     }
 
                     if (index !== -1) {
-                        $("#" + element.id + "_epm_loader").fadeOut(300).remove();
-                        $("#" + element.id).css("visibility", "visible").hide().fadeIn(2000);
+                        element.loader.fadeOut(300).remove();
+                        element.el.css("visibility", "visible").hide().fadeIn(2000);
                         this._elements.splice(index, 1);
                     }
                 }
@@ -109,9 +119,9 @@ module EPM {
             private showLoading(element: IElement): void {
                 if (this.elementIsRegistered(element)) {
                     var $div = $("<div>Loading...</div>");
-                    $div.offset({ top: ($("#" + element.id + "_epm_loader").height() - 20) / 2 });
+                    $div.offset({ top: (element.loader.height() - 20) / 2 });
 
-                    $("#" + element.id + "_epm_loader").append($div);
+                    element.loader.append($div);
                 }
             }
         }
