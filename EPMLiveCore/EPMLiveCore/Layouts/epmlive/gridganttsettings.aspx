@@ -82,9 +82,13 @@
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         return false;
     }
-
-
     
+    $(function(){
+        $('.icon-button').click(function(){
+            OpenIconSelect();
+            return false;
+        }); 
+    });
 </SharePoint:ScriptBlock>
 
 <SharePoint:ScriptBlock runat="server">
@@ -525,9 +529,9 @@
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="" runat="server">
 				 <Template_Control>
-				     <div class="icon-button">
+				     <div class="icon-button" style="cursor:pointer;">
 				         <span class="box1" style="">
-				             <asp:Label id="spnListIcon" runat="server" style="cursor:pointer;font-size:18px;" onclick="OpenIconSelect();return false;" ></asp:Label>
+				             <asp:Label id="spnListIcon" runat="server" style="cursor:pointer;font-size:18px;" ></asp:Label>
                              <asp:HiddenField runat="server" ID="hdnListIcon"/>
 	                    </span>
 				     </div>
