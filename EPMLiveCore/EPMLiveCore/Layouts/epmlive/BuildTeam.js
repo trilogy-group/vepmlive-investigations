@@ -8,7 +8,7 @@ function Assignments() {
 
     var sRows = rGrid.GetSelRows();
 
-    
+
 
     for (var r in sRows) {
         var oSRow = sRows[r];
@@ -49,12 +49,11 @@ function RemoveResources() {
                 if (oRow.Kind == "Data")
                     rGrid.HideRow(oRow);
             }
-        }catch(e){}
+        } catch (e) { }
     }
 }
 
-function AddResource() 
-{
+function AddResource() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
 
@@ -69,7 +68,7 @@ function AddResource()
         tGrid.SetValue(oTRow, "Generic", rGrid.GetValue(oSRow, "Generic"), 1, 0);
 
         for (var c in rGrid.Cols) {
-            if(c != "Title")
+            if (c != "Title")
                 tGrid.SetValue(oTRow, c, rGrid.GetValue(oSRow, c), 1, 0);
         }
 
@@ -100,7 +99,7 @@ function AddResource()
         }
 
 
-        if(tGrid.GetValue(oTRow, "Generic") != "1")
+        if (tGrid.GetValue(oTRow, "Generic") != "1")
             tGrid.SetValue(oTRow, "Permissions", perms.join(';'), 1, 0);
 
         tGrid.SetValue(oTRow, "Title", rGrid.GetValue(oSRow, "Title"), 1, 0);
@@ -111,8 +110,7 @@ function AddResource()
     RefreshCommandUI();
 }
 
-function RemoveResource() 
-{
+function RemoveResource() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
 
@@ -136,7 +134,7 @@ function AddResourcePool() {
 function onAddResourcePool(dialogResult, returnValue) {
 
     ShowTDialog("Refreshing...");
-    
+
     setTimeout("reloadres()", 2000);
 
 }
@@ -154,35 +152,48 @@ function AddTeamColumns() {
     Grids.TeamGrid.ActionShowColumns();
 }
 
-function TeamFilters() {
+function TeamFilters(o) {
     var grid = Grids.TeamGrid;
     var row = grid.GetRowById("Filter");
     try {
-        if (row.Visible)
+        if (row.Visible) {
             grid.HideRow(row);
-        else
+            $(o).find("span").css("color", "#777777");
+        }
+        else {
             grid.ShowRow(row);
+            $(o).find("span").css("color", "#000000");
+        }
+
     } catch (e) { }
 }
 
-function TeamGroups() {
+function TeamGroups(o) {
     var grid = Grids.TeamGrid;
     var row = grid.GetRowById("GroupRow");
-    if (row.Visible)
+    if (row.Visible) {
         grid.HideRow(row);
-    else
+        $(o).find("span").css("color", "#777777");
+    }
+    else {
         grid.ShowRow(row);
+        $(o).find("span").css("color", "#000000");
+    }
 }
 
 
-function ResFilters() {
+function ResFilters(o) {
     var grid = Grids.ResourceGrid;
     var row = grid.GetRowById("Filter");
     try {
-        if (row.Visible)
+        if (row.Visible) {
             grid.HideRow(row);
-        else
+            $(o).find("span").css("color", "#777777");
+        }
+        else {
             grid.ShowRow(row);
+            $(o).find("span").css("color", "#777777");
+        }
     } catch (e) { }
 }
 
@@ -210,7 +221,7 @@ function CanAddResource() {
 
 function ShowPool() {
 
-    
+
     RefreshCommandUI();
 }
 
@@ -231,8 +242,7 @@ function CheckAddRemoveButtons() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
 
-    try
-    {
+    try {
         if (tGrid.GetSelRows().length == 0)
             document.getElementById("btnRemove").disabled = true;
         else
@@ -242,7 +252,7 @@ function CheckAddRemoveButtons() {
             document.getElementById("btnAdd").disabled = true;
         else
             document.getElementById("btnAdd").disabled = false;
-    }catch(e){}
+    } catch (e) { }
 
 }
 
