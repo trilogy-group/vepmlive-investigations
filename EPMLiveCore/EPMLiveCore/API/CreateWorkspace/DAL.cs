@@ -118,10 +118,20 @@ namespace EPMLiveCore.API
                         var cmd = new SqlCommand
                         {
                             CommandText =
-                                @"INSERT INTO FRF ([SITE_ID], [WEB_ID], [USER_ID], [Title], [F_String], [Type], [F_Date], [F_Int])
+                            @"IF((SELECT COUNT(*) FROM FRF WHERE [Type]=4) = 0)
+                            BEGIN
+	                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [USER_ID], [Title], [F_String], [Type], [F_Date], [F_Int])
                                 VALUES ('" + siteId + @"', '" + createdWebId + @"', '" + userId + @"', '" + siteTitle +
                                 @"', '" + createdWebUrl + @"', " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) +
-                                @", GETDATE(), (SELECT MAX([F_Int]) FROM FRF WHERE [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @") + 1)",
+                                @", GETDATE(), 1)
+                            END
+                            ELSE
+                            BEGIN
+	                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [USER_ID], [Title], [F_String], [Type], [F_Date], [F_Int])
+                                VALUES ('" + siteId + @"', '" + createdWebId + @"', '" + userId + @"', '" + siteTitle +
+                                @"', '" + createdWebUrl + @"', " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) +
+                                @", GETDATE(), (SELECT MAX([F_Int]) FROM FRF WHERE [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @") + 1)
+                            END",
                             Connection = con
                         };
 
