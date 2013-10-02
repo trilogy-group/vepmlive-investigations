@@ -479,7 +479,9 @@ iisreset</PostDeploymentCommand>
     </None>
     <None Include="Layouts\epmlive\epmlivegantt.lpk" />
     <None Include="Layouts\epmlive\epmlivegantt_OLD.lpk" />
-    <None Include="Layouts\epmlive\MyWorkWebPart.min.js.map" />
+    <None Include="Layouts\epmlive\MyWorkWebPart.min.js.map">
+      <DependentUpon>MyWorkWebPart.js</DependentUpon>
+    </None>
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{05dece48-3f8d-4fcc-a082-3bccd21012ef}</SharePointProjectItemId>
     </None>

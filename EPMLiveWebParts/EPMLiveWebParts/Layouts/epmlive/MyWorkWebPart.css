@@ -299,13 +299,7 @@ li.mwg-smi {
     cursor: pointer;
     font-size: 13px;
     text-align: center;
-}
-
-.epmlive-toggle-switch > span {
-    font-family: segoe ui;
-    margin-left: 3px;
-    position: relative;
-    top: -1px;
+    width: 100%;
 }
 
 .EPMLiveMyWorkGroup { border-bottom: 1px solid #ABABAB; }

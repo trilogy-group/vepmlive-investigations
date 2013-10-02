@@ -238,9 +238,9 @@ Grids.OnGetHtmlValue = function (grid, row, col, val) {
                         break;
                     case 'WorkingOn':
                         if (val === 0) {
-                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch fui-radio-unchecked" data-state="0" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }" style="margin-left:20px;"><span>NO</span></div>';
+                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch fui-radio-unchecked" data-state="0" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }"><span>&nbsp;</span></div>';
                         } else {
-                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch fui-radio-checked" data-state="1" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }" style="margin-left:20px;"><span>YES</span></div>';
+                            value = '<div id="epmtgs_' + row.id + '" class="epmlive-toggle-switch fui-radio-checked" data-state="1" onclick="MyWorkGrid.updateWorkingOn(\'' + row.id + '\');try { window.event.cancelBubble = true; } catch(e) { }"><span>&nbsp;</span></div>';
                         }
 
                         break;
@@ -2224,13 +2224,13 @@ var MyWorkGrid = {
             ele.data('state', 0);
             ele.removeClass('fui-radio-checked');
             ele.addClass('fui-radio-unchecked');
-            label.text('NO');
+            label.html('&nbsp;');
             row['WorkingOn'] = 0;
         } else {
             ele.data('state', 1);
             ele.removeClass('fui-radio-unchecked');
             ele.addClass('fui-radio-checked');
-            label.text('YES');
+            label.html('&nbsp;');
             row['WorkingOn'] = 1;
         }
 
