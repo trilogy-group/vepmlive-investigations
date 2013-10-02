@@ -32,6 +32,7 @@
                     epmLive.currentListTitle = '<%= ListTitle %>';
                     epmLive.currentListViewUrl = '<%= ListViewUrl %>';
                     epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
+                    epmLive.currentFileTitle = '<%=CurrentFileTitle %>';
                     epmLive.currentItemID = '<%= ItemId %>';
                     epmLive.currentItemTitle = '<%= ItemTitle %>';
                     epmLive.currentUserId = '<%= CurrentUserId %>';
