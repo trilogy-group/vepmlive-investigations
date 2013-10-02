@@ -29,7 +29,7 @@
                     epmLive.currentWebFullUrl = '<%= WebFullUrl %>';
                     epmLive.currentListId = '<%= ListId %>';
                     epmLive.currentListIcon = '<%= ListIconClass %>';
-                    epmLive.currentListTitle = '<%= ListTitle %>';
+                    epmLive.currentListViewTitle = '<%= ListViewTitle %>';
                     epmLive.currentListViewUrl = '<%= ListViewUrl %>';
                     epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
                     epmLive.currentFileTitle = '<%=CurrentFileTitle %>';
