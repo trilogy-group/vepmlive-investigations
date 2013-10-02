@@ -22,6 +22,7 @@ namespace EPMLiveIntegration
         List<IntegrationControl> GetPageButtons(WebProperties WebProps, IntegrationLog Log, bool GlobalButtons);
         string GetURL(WebProperties WebProps, IntegrationLog Log, string control, string ItemID);
         string GetControlCode(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control);
+        string GetProxyResult(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control, string Property);
     }
 }
 
