@@ -37,6 +37,12 @@
         background-image: linear-gradient(to top, #cccccc,#fafafa);
         
     }
+    .icon-button:hover {
+        background: -moz-linear-gradient(bottom, #E8E8E8, #fafafa);
+        background-image: -ms-linear-gradient(bottom, #E8E8E8,#fafafa);
+        background-image: -webkit-linear-gradient(bottom, #E8E8E8,#fafafa);
+        background-image: linear-gradient(to top, #E8E8E8,#fafafa);
+    }
     .icon-button-text {
         float: right; 
         position: relative; 
