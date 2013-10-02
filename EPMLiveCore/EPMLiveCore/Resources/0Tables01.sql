@@ -757,12 +757,13 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 
 		CREATE TABLE [dbo].[INT_CONTROLS](
 			[INT_CONTROL_ID] [uniqueidentifier] NULL DEFAULT (newid()),
-			[INT_LIST_ID] [uniqueidentifier] NULL,
-			[CONTROL] [varchar](255) NULL,
-			[LOCAL] [bit] NULL,
-			[TITLE] [varchar](255) NULL,
-			[IMAGE] [varchar](255) NULL,
-			[WINDOW] [bit] NULL
+				[INT_LIST_ID] [uniqueidentifier] NULL,
+				[CONTROL] [varchar](255) NULL,
+				[LOCAL] [bit] NULL,
+				[TITLE] [varchar](255) NULL,
+				[IMAGE] [varchar](255) NULL,
+				[GLOBAL] [bit] NULL,
+				[WINDOWSTYLE] [int] NULL
 		) ON [PRIMARY]
 end
 else
