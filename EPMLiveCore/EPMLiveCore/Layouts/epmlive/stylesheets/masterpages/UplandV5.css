@@ -1,6 +1,6 @@
 ﻿#suiteBar { height: 50px !important; }
 
-#suiteBarLeft, #suiteBarRight { background-color: #0090CA; }
+#suiteBarLeft, #suiteBarRight { background-color: #0090CA !important; }
 
 #DeltaSuiteBarRight { line-height: 50px; }
 
@@ -159,14 +159,14 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 }
 
 .epm-loader {
-    z-index: 50;
-    position: absolute;
     background: #ffffff;
+    position: absolute;
+    z-index: 50;
 }
 
 .epm-loader > div {
-    font-size: 20px;
     color: #BBBBBB;
+    font-size: 20px;
     text-align: center;
 }
 
@@ -217,6 +217,14 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 }
 
 .ms-splitbuttonhover { background-color: #ffffff; }
+
+.ms-core-needIEFilter .ms-core-overlay { filter: none !important }
+
+.ms-core-needIEFilter #suiteBarRight { filter: none !important }
+
+.ms-core-needIEFilter #suiteBarLeft { filter: none !important }
+
+.ms-core-needIEFilter#globalNavBox { filter: none !important }
 
 /* end modification to 2013 toolbar styles */
 
