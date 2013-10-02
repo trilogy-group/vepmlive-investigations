@@ -1,6 +1,6 @@
 .gridHeader
 {
-font-family:Segoe UI Light,Segoe,Verdana;
+font-family:Open Sans Light,Segoe,Verdana;
 font-size:24px;
 margin-top:-10px;
 }
@@ -48,14 +48,13 @@ border:1px solid #eeeeee;
 
 
 
-.toolbar ul li:hover
-{
-background-color:#FDEEB3;
-border:1px solid #F1C43F;
+
+
+.toolbar ul li span {
+color:#777777;
+font-size:18px;
+padding-top:2px;
 }
 
-.toolbarSelected
-{
-background-color:#FDEEB3;
-border:1px solid #F1C43F !important;
-}
+
+
