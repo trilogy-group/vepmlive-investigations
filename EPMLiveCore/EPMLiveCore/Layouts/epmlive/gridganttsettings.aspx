@@ -94,7 +94,7 @@
     var cbEnableWSCreation = "<%=chkEnableRequests.ClientID%>";
     var ddlAutoCreateTemplateId = "<%=ddlAutoCreateTemplate.ClientID%>";
     var cbAutoCreateId = "<%=chkAutoCreate.ClientID%>";
-</script>
+</SharePoint:ScriptBlock>
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <wssuc:InputFormSection Title="Field Settings"
