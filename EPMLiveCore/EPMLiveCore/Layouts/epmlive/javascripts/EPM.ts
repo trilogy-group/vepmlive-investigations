@@ -64,10 +64,9 @@ module EPM {
 
                     $("body").append($loader.fadeIn(300));
 
-                    var self = this;
-                    setTimeout(function () {
-                        self.showLoading(element);
-                    }, element.duration || 2000);
+                    setTimeout(() => {
+                        this.showLoading(element);
+                    }, 2000);
                 }
             }
 

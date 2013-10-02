@@ -19,6 +19,7 @@ var EPM;
             };
 
             Loader.prototype.startLoading = function (element) {
+                var _this = this;
                 if (!this.elementIsRegistered(element)) {
                     this._elements.push(element);
                     $("#" + element.id).css("visibility", "hidden");
@@ -52,10 +53,9 @@ var EPM;
 
                     $("body").append($loader.fadeIn(300));
 
-                    var self = this;
                     setTimeout(function () {
-                        self.showLoading(element);
-                    }, element.duration || 2000);
+                        _this.showLoading(element);
+                    }, 2000);
                 }
             };
 
