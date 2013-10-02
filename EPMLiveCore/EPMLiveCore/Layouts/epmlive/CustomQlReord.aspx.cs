@@ -26,10 +26,12 @@ namespace EPMLiveCore
         private SPWeb _eWeb;
         protected List<SPNavigationNode> _spNavCollQuickLaunch;
         protected int _appId = -1;
+
         protected string _nodeType = string.Empty;
         protected string _actionMoveNode = "movenode";
         protected string _async_nav_actions_url = ASYNC_NAV_ACTIONS_URL;
         private AppSettingsHelper appHelper;
+        protected int _origUserId = -1;
 
         #endregion
 
@@ -55,6 +57,7 @@ namespace EPMLiveCore
 
             //_spNavCollQuickLaunch = _web.Navigation.QuickLaunch;
             _spNavCollQuickLaunch = appHelper.TryGetQuickLaunchNodeCollectionById(_appId);
+            _origUserId = SPContext.Current.Web.CurrentUser.ID;
         }
 
         private void RedirectToQuikLnch()

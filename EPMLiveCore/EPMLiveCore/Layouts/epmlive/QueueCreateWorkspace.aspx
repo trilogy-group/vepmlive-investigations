@@ -46,7 +46,7 @@
 	            <label style="font-family:Open Sans Regular;font-size:15px;padding-right:10px;">
                     What is the title of this Workspace?
 	            </label>  
-	            <input type="textbox" class="titleInput" data-bind="value: workspaceTitle, valueUpdate: 'afterkeydown'" />
+	            <input type="textbox" class="titleInput" data-bind="value: workspaceTitle, valueUpdate: 'afterkeydown', event: { keydown: PreventNonAlphaNumeric }" />
 	            <br><br>
 	            <label style="font-family:Open Sans Regular;font-size:15px;">
                     Permissions

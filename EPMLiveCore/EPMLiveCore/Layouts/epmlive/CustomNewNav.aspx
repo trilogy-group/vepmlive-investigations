@@ -105,6 +105,7 @@ function DeleteNodeConfirmation()
         var tbUrlClientId = '<%=txtUrl.ClientID %>';
         var appId = '<%=_appId %>';
         var ddlNavigationHeadingsClientId = '<%=ddlNavigationHeadings.ClientID %>';
+        var origUserId = '<%=_origUserId %>';
 
         function AsyncAddHeading() {
             var title = $('#' + tbTextClientId).val();
@@ -115,12 +116,14 @@ function DeleteNodeConfirmation()
                 title = url;
             }
 
-            var postData = { action: action,
+            var postData = {
+                action: action,
                 title: title,
                 url: url,
                 nodetype: nodeType,
                 headingnodeid: headingNodeId,
-                appid: appId
+                appid: appId,
+                origUserId: origUserId
             };
 
             $.post(webUrl + asyncNavActionsUrl, postData, function (data) {

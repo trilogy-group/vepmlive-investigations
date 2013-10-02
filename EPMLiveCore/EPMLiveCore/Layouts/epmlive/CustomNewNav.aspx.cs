@@ -36,6 +36,7 @@ namespace EPMLiveCore
         protected string _createAction = string.Empty;
         protected string _nodeType = string.Empty;
         protected SPNavigationNode _parentNode;
+        protected int _origUserId = -1;
 
         #endregion
 
@@ -94,6 +95,8 @@ namespace EPMLiveCore
             }
 
             int.TryParse(GetParameter("appid"), out _appId);
+
+            _origUserId = SPContext.Current.Web.CurrentUser.ID;
         }
 
         private string GetParameter(string key)
@@ -123,6 +126,7 @@ namespace EPMLiveCore
 
         private void CreateNodes()
         {
+            SPUser origUser = SPContext.Current.Web.CurrentUser;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 using (SPSite es = new SPSite(_web.Url))
@@ -134,7 +138,7 @@ namespace EPMLiveCore
                             int headingNodeId = int.Parse(ddlNavigationHeadings.SelectedValue);
                             string title = !string.IsNullOrEmpty(txtTitle.Text) ? txtTitle.Text : txtUrl.Text;
                             string url = txtUrl.Text;
-                            appHelper.CreateChildNode(_appId, _nodeType, title, url, headingNodeId, !appHelper.IsUrlInternal(url));
+                            appHelper.CreateChildNode(_appId, _nodeType, title, url, headingNodeId, !appHelper.IsUrlInternal(url), origUser);
                             API.Applications.CreateQuickLaunchXML(_appId, ew);
                             API.Applications.CreateTopNavXML(_appId, ew);
                         }
@@ -142,7 +146,7 @@ namespace EPMLiveCore
                         {   
                             string title = !string.IsNullOrEmpty(txtTitle.Text) ? txtTitle.Text : txtUrl.Text;
                             string url = txtUrl.Text;
-                            appHelper.CreateParentNode(_appId, _nodeType, title, url, !appHelper.IsUrlInternal(url));
+                            appHelper.CreateParentNode(_appId, _nodeType, title, url, !appHelper.IsUrlInternal(url), origUser);
                             API.Applications.CreateQuickLaunchXML(_appId, ew);
                             API.Applications.CreateTopNavXML(_appId, ew);
                         }

@@ -97,7 +97,7 @@ function registerCreateWorkspace2Script() {
                             "<Param key=\"TemplateSource\">" + self.templateSource() + "</Param>" +
                             "<Param key=\"TemplateItemId\">" + self.templateItemId() + "</Param>" +
                             "<Param key=\"IncludeContent\">True</Param>" +
-                            "<Param key=\"SiteTitle\">" + self.workspaceTitle() + "</Param>" +
+                            "<Param key=\"SiteTitle\">" + self.workspaceTitle().replace(/[^a-zA-Z 0-9]+/g, '') + "</Param>" +
                             "<Param key=\"SolutionName\">" + self.solutionName() + "</Param>" +
                             "<Param key=\"UniquePermission\">" + self.uniquePermission() + "</Param>" +
                             "<Param key=\"AttachedItemId\">" + self.itemId() + "</Param>" +
@@ -275,6 +275,35 @@ function registerCreateWorkspace2Script() {
                 }
                 
                 self.hasTempSelected(true);
+            };
+
+            self.PreventNonAlphaNumeric = function (data, event) {
+                var isValid = false;
+                
+                if (event.keyCode <= 13) isValid = true;
+                
+                if (event.keyCode >= 65 && event.keyCode <= 90) {
+                    isValid = true;
+                }
+                else if (event.keyCode != 16 && event.keyCode != 17 && !event.shiftKey &&
+                         event.keyCode >= 96 && event.keyCode <= 105) {
+                    isValid = true;
+                }
+                else if (event.keyCode != 16 && event.keyCode != 17 && !event.shiftKey &&
+                         event.keyCode >= 48 && event.keyCode <= 57) {
+                    isValid = true;
+                }
+                else if (event.keyCode == 32) {
+                    isValid = true;
+                }
+                else if (event.keyCode == 8) {
+                    isValid = true;
+                }
+                else if (event.keyCode == 189 && event.shiftKey) {
+                    isValid = true;
+                }
+
+                return isValid;
             };
 
             self.AutosizeDialog = function() {

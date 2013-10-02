@@ -625,7 +625,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
                     '<br>' +
                     '<div style="clear: both; height: 20px;"></div>' +
                     '<div style="margin-left: 45px;">' +
-                        '<input type="button" style="float: left; margin-right: 5px; width: 90px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(1, document.getElementById(\'favItemTitle\').value);" class="ms-ButtonHeightWidth" target="_self">' +
+                        '<input type="button" style="float: left; margin-right: 5px; width: 90px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavItemFromGridDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self">' +
                         '<input type="button" style="float:left;width:90px;" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(0, \'Cancel clicked\');" class="ms-ButtonHeightWidth" target="_self">' +
                     '</div>' +
                 '</div>' +

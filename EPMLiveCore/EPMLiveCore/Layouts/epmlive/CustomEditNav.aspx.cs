@@ -152,7 +152,7 @@ namespace EPMLiveCore
             string url = txtUrl.Text;
             string title = !string.IsNullOrEmpty(txtTitle.Text) ? txtTitle.Text : url;
 
-            appHelper.EditNodeById(newParentNodeID, _iId, title, url, _appId, _nodeType);
+            appHelper.EditNodeById(newParentNodeID, _iId, title, url, _appId, _nodeType, SPContext.Current.Web.CurrentUser);
 
             API.Applications.CreateQuickLaunchXML(_appId, Web);
             API.Applications.CreateTopNavXML(_appId, Web);

@@ -28,6 +28,8 @@ namespace EPMLiveCore
         protected string _actionMoveNode = "movenode";
         protected string _async_nav_actions_url = ASYNC_NAV_ACTIONS_URL;
         private AppSettingsHelper appHelper;
+        protected int _origUserId = -1;
+
         #endregion
 
         #region helper methods
@@ -54,6 +56,7 @@ namespace EPMLiveCore
             appHelper = new AppSettingsHelper();
             //_spNavCollTopNav = _web.Navigation.TopNavigationBar;
             _spNavCollTopNav = appHelper.TryGetTopNavNodeCollectionById(_appId);
+            _origUserId = SPContext.Current.Web.CurrentUser.ID;
         }
 
         private void RedirectToTopNavPage()

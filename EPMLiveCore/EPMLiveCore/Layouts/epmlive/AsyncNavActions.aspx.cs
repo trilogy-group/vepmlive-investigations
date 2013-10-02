@@ -9,6 +9,7 @@ namespace EPMLiveCore
     {
         private string _action = string.Empty;
         private int _appId = -1;
+        private int _origUserId = -1;
         private string _title = string.Empty;
         private string _url = string.Empty;
         private string _nodeType = string.Empty;
@@ -24,6 +25,7 @@ namespace EPMLiveCore
         {
             _action = Request["action"];
             int.TryParse(Request["appid"], out _appId);
+            int.TryParse(Request["origuserid"], out _origUserId);
             _title = Request["title"];
             _url = Request["url"];
             _nodeType = Request["nodetype"];
@@ -50,7 +52,7 @@ namespace EPMLiveCore
                 case "createparentnode":
                     try
                     {
-                        appHelper.CreateParentNode(_appId, _nodeType, _title, _url, !appHelper.IsUrlInternal(_url));
+                        appHelper.CreateParentNode(_appId, _nodeType, _title, _url, !appHelper.IsUrlInternal(_url), SPContext.Current.Web.AllUsers.GetByID(_origUserId));
 
                         API.Applications.CreateQuickLaunchXML(_appId, SPContext.Current.Web);
                         API.Applications.CreateTopNavXML(_appId, SPContext.Current.Web);
@@ -64,7 +66,7 @@ namespace EPMLiveCore
                 case "createchildnode":
                     try
                     {
-                        appHelper.CreateChildNode(_appId, _nodeType, _title, _url, _headingNodeId, !appHelper.IsUrlInternal(_url));
+                        appHelper.CreateChildNode(_appId, _nodeType, _title, _url, _headingNodeId, !appHelper.IsUrlInternal(_url), SPContext.Current.Web.AllUsers.GetByID(_origUserId));
                         API.Applications.CreateQuickLaunchXML(_appId, SPContext.Current.Web);
                         API.Applications.CreateTopNavXML(_appId, SPContext.Current.Web);
                     }
@@ -77,7 +79,7 @@ namespace EPMLiveCore
                 case "deletenode":
                     try
                     {
-                        appHelper.DeleteNode(_appId, _nodeId, _nodeType);
+                        appHelper.DeleteNode(_appId, _nodeId, _nodeType, SPContext.Current.Web.AllUsers.GetByID(_origUserId));
                         API.Applications.CreateQuickLaunchXML(_appId, SPContext.Current.Web);
                         API.Applications.CreateTopNavXML(_appId, SPContext.Current.Web);
                     }
@@ -90,7 +92,7 @@ namespace EPMLiveCore
                 case "editnode":
                     try
                     {
-                        appHelper.EditNodeById(_parentNodeId, _nodeId, _title, _url, _appId, _nodeType);
+                        appHelper.EditNodeById(_parentNodeId, _nodeId, _title, _url, _appId, _nodeType, SPContext.Current.Web.AllUsers.GetByID(_origUserId));
                         API.Applications.CreateQuickLaunchXML(_appId, SPContext.Current.Web);
                         API.Applications.CreateTopNavXML(_appId, SPContext.Current.Web);
                     }
@@ -101,7 +103,7 @@ namespace EPMLiveCore
                     break;
                 case "movenode":
                     try{
-                        appHelper.UpdateNodeOrder(_appId, _nodeType, _moveInfos);
+                        appHelper.UpdateNodeOrder(_appId, _nodeType, _moveInfos, SPContext.Current.Web.AllUsers.GetByID(_origUserId));
                         API.Applications.CreateQuickLaunchXML(_appId, SPContext.Current.Web);
                         API.Applications.CreateTopNavXML(_appId, SPContext.Current.Web);
                     }

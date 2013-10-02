@@ -223,6 +223,7 @@
         var actionMoveNode = '<%=_actionMoveNode %>';
         var nodeType = '<%=_nodeType %>';
         var appId = '<%=_appId %>';
+        var origUserId = '<%=_origUserId %>';
 
         function AsyncMoveNode() {
             var moveInfos = document.getElementById("MovedItems").value;
@@ -231,7 +232,8 @@
                 action: actionMoveNode,
                 nodetype: nodeType,
                 appid: appId,
-                moveinfos: moveInfos
+                moveinfos: moveInfos,
+                origUserId: origUserId
             };
 
             $.post(epmLive.currentWebFullUrl + asyncNavActionsUrl, postData, function (data) {
