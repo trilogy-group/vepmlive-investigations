@@ -12,8 +12,11 @@
 
 <style type="text/css">
     .ms-dialog .ms-bodyareacell {
-    padding: 0 !important;
-}
+        padding: 0 !important;
+    }
+    #s4-bodyContainer {
+        padding-bottom: 0 !important;
+    }
 </style>
 
 </asp:Content>
