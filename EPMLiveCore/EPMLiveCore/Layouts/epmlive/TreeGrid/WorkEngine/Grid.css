@@ -835,6 +835,7 @@ ht,u.GMFilter10Right,u.GMFilter11Right,u.GMFilter12Right {
 .GMFilter10Right { background-position:right -1500px; }
 .GMFilter11Right { background-position:right -1650px; }
 .GMFilter12Right { background-position:right -1800px; }
+.GMFilterRow { height:25px !important;}
 
 .GMFilter0Menu,.GMFilter1Menu,.GMFilter2Menu,.GMFilter3Menu,.GMFilter4Menu,.GMFilter5Menu,.GMFilter6Menu,.GMFilter7Menu,.GMFilter8Menu,.GMFilter9Menu,.GMFilter10Menu,.
 
