@@ -1637,6 +1637,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="ISAPI\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
     </None>
+    <None Include="Layouts\epmlive\javascripts\EPM.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPM.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPM.ts" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map">
       <DependentUpon>EPMLive.js</DependentUpon>
@@ -3350,6 +3353,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\Integration\Proxy.aspx" />
     <Content Include="Layouts\epmlive\javascripts\AddFavorite.js" />
     <Content Include="Layouts\epmlive\javascripts\BtnChangeApp.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPM.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPM.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Analytics.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.js" />
@@ -3708,9 +3713,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\TreeGrid\Text.xml" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Backgrounds.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\BackgroundsOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\basic-checkbox-sprite.png" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\checked-basic.png" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\critgantt.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\critganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\expand-collapse-sprite.png" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\FastPanel1.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\FastPanel2.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Filter.gif" />
@@ -3729,6 +3737,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Toolbar.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\Tree.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\unchecked-basic.png" />
     <Content Include="Layouts\epmlive\TreeGrid\WorkEngine\VScroll.gif" />
     <Content Include="Layouts\epmlive\unsealfields.aspx" />
     <Content Include="Layouts\epmlive\Upgrade.aspx" />

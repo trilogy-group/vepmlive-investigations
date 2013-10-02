@@ -192,19 +192,25 @@ function ResFilters(o) {
         }
         else {
             grid.ShowRow(row);
-            $(o).find("span").css("color", "#777777");
+            $(o).find("span").css("color", "#000000");
         }
     } catch (e) { }
 }
 
 
-function ResGroups() {
+function ResGroups(o) {
     var grid = Grids.ResourceGrid;
     var row = grid.GetRowById("GroupRow");
     if (row.Visible)
+    {
         grid.HideRow(row);
+        $(o).find("span").css("color", "#777777");
+    }
     else
+    {
         grid.ShowRow(row);
+        $(o).find("span").css("color", "#000000");
+    }
 }
 
 function CanViewResPool() {
