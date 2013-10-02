@@ -175,7 +175,7 @@ namespace EPMLiveWebParts
 
                 EPMLiveScriptManager.RegisterScript(Page, new[]
                 {
-                    "libraries/jquery.min", "/treegrid/GridE", "@EPMLive.ResourceGrid"
+                    "libraries/jquery.min", "@EPM", "/treegrid/GridE", "@EPMLive.ResourceGrid"
                 });
 
                 ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };

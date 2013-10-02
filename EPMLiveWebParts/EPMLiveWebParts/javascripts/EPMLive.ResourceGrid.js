@@ -1832,12 +1832,7 @@ function registerEpmLiveResourceGridScript() {
                 $('#WebPart' + $$.webpartQualifier).height(maxHeight);
             }
 
-            if ($$.loader) {
-                $$$.utils.fireEvent(document.getElementById('MSOZoneCell_WebPart' + $$.webpartQualifier), 'mouseup');
-                $$.loader.close();
-            } else {
-                $('#ResourceGridLoader').hide();
-            }
+            window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
 
             var win = $(window);
 

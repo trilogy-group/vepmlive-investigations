@@ -12,24 +12,21 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>SP 2013 Deploy</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PreDeploymentCommand>
-    </PreDeploymentCommand>
-    <PostDeploymentCommand>
-    </PostDeploymentCommand>
-    <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
+    <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
+    <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
+iisreset</PostDeploymentCommand>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\Backup2\</UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ProjectMode>SharePointCustomization</ProjectMode>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -54,7 +51,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -72,12 +68,8 @@
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\Open XML SDK\V2.0\lib\DocumentFormat.OpenXml.dll</HintPath>
-    </Reference>
-    <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="EPM Live Core">
       <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveReportsAdmin">
@@ -122,9 +114,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs">
-      <Link>CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="ActionBar\ActionBar.cs" />
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
@@ -213,7 +202,6 @@
     <Compile Include="GridListView\GridDelegates.cs" />
     <Compile Include="GridListView\GridListView.cs" />
     <Compile Include="GridListView\GridListViewToolpart.cs" />
-    <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplay.cs" />
     <Compile Include="IReportID.cs" />
     <Compile Include="Layouts\epmlive\AssignmentPlanner.aspx.cs">
       <DependentUpon>AssignmentPlanner.aspx</DependentUpon>
@@ -252,7 +240,6 @@
     </Compile>
     <Compile Include="Layouts\epmlive\MyWork.aspx.cs">
       <DependentUpon>MyWork.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\MyWork.aspx.designer.cs">
       <DependentUpon>MyWork.aspx.cs</DependentUpon>
@@ -456,7 +443,7 @@
     </None>
     <None Include="ContentView\ContentView.dwp" />
     <None Include="ContentView\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{0df1f62d-fcc9-4ea3-a76f-d94b4213f8e2}</SharePointProjectItemId>
+      <SharePointProjectItemId>{a5aa9ffc-c47c-42d5-adc1-a36c03620f99}</SharePointProjectItemId>
     </None>
     <None Include="ContextualHelpSlideOut\ContextualSlideOut.dwp" />
     <None Include="ContextualHelpSlideOut\SharePointProjectItem.spdata">
@@ -486,10 +473,7 @@
     <None Include="Images\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{15464df9-e42e-48f3-b1e6-a85162b36a70}</SharePointProjectItemId>
     </None>
-    <None Include="IntegrationModuleDisplay\IntegrationModuleDisplay.dwp" />
-    <None Include="IntegrationModuleDisplay\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{c42b6a2b-e82a-4636-bd60-7909bd27b3b6}</SharePointProjectItemId>
-    </None>
+    <None Include="javascripts\EPMLive.ResourceGrid.min.js.map" />
     <None Include="javascripts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b4edbe17-7726-46f6-b2e7-0bb1cf6b3477}</SharePointProjectItemId>
     </None>
@@ -802,12 +786,12 @@
     <Content Include="Images\3people.gif" />
     <Content Include="Images\ganttzoomin.gif" />
     <Content Include="Images\ganttzoomout.gif" />
-    <Content Include="IntegrationModuleDisplay\Elements.xml" />
     <Content Include="javascripts\ChartWizard.js" />
     <Content Include="javascripts\EPMLive.AssignmentPlanner.ContextualTabPageComponent.js" />
     <Content Include="javascripts\EPMLive.AssignmentPlanner.js" />
     <Content Include="javascripts\EPMLive.ResourceGrid.ContextualTabPageComponent.js" />
     <Content Include="javascripts\EPMLive.ResourceGrid.js" />
+    <Content Include="javascripts\EPMLive.ResourceGrid.min.js" />
     <Content Include="javascripts\EPMLive.WorkCenter.js" />
     <Content Include="javascripts\GridGantt.js" />
     <Content Include="javascripts\jquery.multiselect.min.js" />
@@ -1172,6 +1156,10 @@
     <Content Include="javascripts\libraries\Kendo\cultures\kendo.culture.zu-ZA.min.js" />
     <Content Include="javascripts\libraries\Kendo\cultures\kendo.culture.zu.min.js" />
     <Content Include="Layouts\epmlive\addmenu.css" />
+    <Content Include="Layouts\epmlive\MyWork.aspx" />
+    <Content Include="Layouts\epmlive\MyWorkWebPart.min.css" />
+    <Content Include="Layouts\epmlive\MyWorkWebPart.min.js" />
+    <Content Include="Layouts\epmlive\Stylesheets\addmenu.css" />
     <Content Include="Layouts\epmlive\ajaxpost.aspx" />
     <Content Include="Layouts\epmlive\AssignmentPlanner.aspx" />
     <Content Include="Layouts\epmlive\Calendar.aspx" />
@@ -1208,6 +1196,21 @@
     <Content Include="Layouts\epmlive\images\BubbleChart\YAxisIcon.png" />
     <Content Include="Layouts\epmlive\images\BubbleChart\ZAxisColorIcon.png" />
     <Content Include="Layouts\epmlive\images\BubbleChart\ZAxisIcon.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\Area.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\AreaClustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\Bar.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\Bar100.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\BarClustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\BarStacked.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\bubble.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\column.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\column100.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\columnclustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\columnstacked.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\donut.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\line.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\lineclustered.png" />
+    <Content Include="Layouts\epmlive\images\ChartWizard\pie.png" />
     <Content Include="Layouts\epmlive\images\costanalyzer.png" />
     <Content Include="Layouts\epmlive\images\costanalyzer16.png" />
     <Content Include="Layouts\epmlive\images\DisplayProfilePicture\DefaultProfilePic.png" />
@@ -1290,14 +1293,11 @@
     <Content Include="Layouts\epmlive\jquery.multiselect.css" />
     <Content Include="Layouts\epmlive\listedititem.aspx" />
     <Content Include="Layouts\epmlive\MD5.js" />
-    <Content Include="Layouts\epmlive\MyWork.aspx" />
     <Content Include="Layouts\epmlive\MyWorkContextualTabPageComponent.js" />
     <Content Include="Layouts\epmlive\MyWorkGridAction.aspx" />
     <Content Include="Layouts\epmlive\MyWorkRichTextEditor.aspx" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.css" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.js" />
-    <Content Include="Layouts\epmlive\MyWorkWebPart.min.css" />
-    <Content Include="Layouts\epmlive\MyWorkWebPart.min.js" />
     <Content Include="Layouts\epmlive\RedirectionProxy.aspx" />
     <Content Include="Layouts\epmlive\ReportingFilterWebPart.css" />
     <Content Include="Layouts\epmlive\ReportViewWebpart.js" />
@@ -1311,9 +1311,7 @@
     <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\border-h.gif" />
     <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\border-v.gif" />
     <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\imgareaselect-default.css" />
-    <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\imgareaselect-default.min.css">
-      <DependentUpon>imgareaselect-default.css</DependentUpon>
-    </Content>
+    <Content Include="Layouts\epmlive\Stylesheets\Vendors\ImageAreaSelect\imgareaselect-default.min.css" />
     <Content Include="Layouts\epmlive\styles\ChartWizard\ChartWizardStyle.css" />
     <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-fileupload.css" />
     <Content Include="Layouts\epmlive\styles\libraries\bootstrap\bootstrap-fileupload.min.css" />
@@ -1561,5 +1559,20 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ProjectExtensions />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
+        <DeploymentConfigurations>
+          <DeploymentConfiguration Name="SP 2013 Deploy">
+            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
+            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
+          </DeploymentConfiguration>
+        </DeploymentConfigurations>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\dkuo_epmlive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll" /f
+iisreset</PostBuildEvent>
+  </PropertyGroup>
 </Project>
