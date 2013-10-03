@@ -79,12 +79,16 @@ namespace EPMLiveCore.Integrations.Jira
         }
         public Dictionary<string, string> GetDropDownValues(WebProperties WebProps, IntegrationLog log, string Property, string ParentPropertyValue)
         {
+            
             Dictionary<string, string> props = new Dictionary<string, string>();
-            props.Add(JiraType.Users.ToString(), JiraType.Users.ToString());
-            props.Add(JiraType.Projects.ToString(), JiraType.Projects.ToString());
-            props.Add(JiraType.Components.ToString(), JiraType.Components.ToString());
-            props.Add(JiraType.Versions.ToString(), JiraType.Versions.ToString());
-            props.Add(JiraType.Issues.ToString(), JiraType.Issues.ToString());
+            if (Property == "Object")
+            {
+                props.Add(JiraType.Users.ToString(), JiraType.Users.ToString());
+                props.Add(JiraType.Projects.ToString(), JiraType.Projects.ToString());
+                props.Add(JiraType.Components.ToString(), JiraType.Components.ToString());
+                props.Add(JiraType.Versions.ToString(), JiraType.Versions.ToString());
+                props.Add(JiraType.Issues.ToString(), JiraType.Issues.ToString());
+            }
             return props;
         }
         public bool TestConnection(WebProperties WebProps, IntegrationLog Log, out string Message)
