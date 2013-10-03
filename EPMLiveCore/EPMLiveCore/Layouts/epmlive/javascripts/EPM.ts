@@ -126,6 +126,20 @@ module EPM {
             }
         }
 
+        (function () {
+            var browser = $.browser;
+
+            if (browser.msie && parseInt(browser.version) === 8) {
+                $.fn.fadeIn = function () {
+                    return $.fn.show.apply(this);
+                };
+
+                $.fn.fadeOut = function () {
+                    return $.fn.hide.apply(this);
+                };
+            }
+        })();
+
         SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPM.UI');
     }
 }

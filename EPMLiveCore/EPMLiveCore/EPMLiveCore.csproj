@@ -1643,9 +1643,13 @@ net start "WETimer"</PostDeploymentCommand>
       <SharePointProjectItemId>{e1d70971-aab5-42b4-b6ae-344cea954899}</SharePointProjectItemId>
     </None>
     <None Include="Layouts\epmlive\javascripts\EPM.js.map" />
-    <None Include="Layouts\epmlive\javascripts\EPM.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPM.min.js.map">
+      <DependentUpon>EPM.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\EPM.ts" />
-    <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Analytics.min.js.map">
+      <DependentUpon>EPMLive.Analytics.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.min.js.map">
       <DependentUpon>EPMLive.js</DependentUpon>
     </None>

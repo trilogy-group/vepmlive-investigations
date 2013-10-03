@@ -4,17 +4,6 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveHead.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.EPMLiveHead" %>
 
 <!--[if lt IE 9]>
-    <SharePoint:StyleBlock runat="server">
-        * {
-            opacity: inherit !important;
-            filter: inherit !important;
-        }
-            
-        .ms-core-needIEFilter .ms-dlgOverlay {
-            filter: alpha(opacity=50) !important;
-        }
-    </SharePoint:StyleBlock>
-
     <SharePoint:ScriptBlock runat="server">
         WebFontConfig = {
             custom: {
@@ -48,9 +37,9 @@
 <![endif]-->
         
 <!--[if !IE]><!-->
-<link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-<link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-<link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
+    <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
+    <link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
+    <link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
 <!--<![endif]-->
 
 <Sharepoint:StyleBlock runat="server">

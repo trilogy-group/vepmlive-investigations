@@ -1,7 +1,8 @@
 var EPM;
-(function (EPM) {
-    (function (UI) {
-        var Loader = (function () {
+(function(EPM) {
+    (function(UI) {
+        var Loader = (function() {
+
             function Loader() {
                 if (!Loader._instance) {
                     this._elements = [];
@@ -10,7 +11,8 @@ var EPM;
                     throw new Error("Error: Instantiation failed: Use EPM.UI.Loader.current() instead of new.");
                 }
             }
-            Loader.current = function () {
+
+            Loader.current = function() {
                 if (!Loader._instance) {
                     Loader._instance = new Loader();
                 }
@@ -18,7 +20,7 @@ var EPM;
                 return Loader._instance;
             };
 
-            Loader.prototype.startLoading = function (element) {
+            Loader.prototype.startLoading = function(element) {
                 var _this = this;
                 if (!this.elementIsRegistered(element)) {
                     this._elements.push(element);
@@ -56,13 +58,13 @@ var EPM;
                     element.loader = $loader;
                     element.el = $el;
 
-                    setTimeout(function () {
+                    setTimeout(function() {
                         _this.showLoading(element);
                     }, 2000);
                 }
             };
 
-            Loader.prototype.stopLoading = function (elementId) {
+            Loader.prototype.stopLoading = function(elementId) {
                 var element = { id: elementId };
 
                 if (this.elementIsRegistered(element)) {
@@ -88,7 +90,7 @@ var EPM;
                 }
             };
 
-            Loader.prototype.elementIsRegistered = function (element) {
+            Loader.prototype.elementIsRegistered = function(element) {
                 var found = false;
 
                 this._elements = this._elements || [];
@@ -103,7 +105,7 @@ var EPM;
                 return found;
             };
 
-            Loader.prototype.showLoading = function (element) {
+            Loader.prototype.showLoading = function(element) {
                 if (this.elementIsRegistered(element)) {
                     var $div = $("<div>Loading...</div>");
                     $div.offset({ top: (element.loader.height() - 20) / 2 });
@@ -115,8 +117,21 @@ var EPM;
         })();
         UI.Loader = Loader;
 
+        (function() {
+            var browser = $.browser;
+
+            if (browser.msie && parseInt(browser.version) === 8) {
+                $.fn.fadeIn = function() {
+                    return $.fn.show.apply(this);
+                };
+
+                $.fn.fadeOut = function() {
+                    return $.fn.hide.apply(this);
+                };
+            }
+        })();
+
         SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPM.UI');
     })(EPM.UI || (EPM.UI = {}));
     var UI = EPM.UI;
 })(EPM || (EPM = {}));
-//# sourceMappingURL=EPM.js.map
