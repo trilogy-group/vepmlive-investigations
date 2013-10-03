@@ -85,8 +85,14 @@ html, body {
                         idCalendar.options.length = 0;
                         var item = json.reply.calendars.item;
                         idCalendar.options[idCalendar.options.length] = new Option("", "-1");
-                        for (var i = 0; i < item.length; i++) {
-                            idCalendar.options[idCalendar.options.length] = new Option(item[i].name, item[i].id);
+                        if (item != null) {
+                            if (item.length == null) {
+                                idCalendar.options[idCalendar.options.length] = new Option(item.name, item.id);
+                            } else {
+                                for (var i = 0; i < item.length; i++) {
+                                    idCalendar.options[idCalendar.options.length] = new Option(item[i].name, item[i].id);
+                                }
+                            }
                         }
                     }
                 }
