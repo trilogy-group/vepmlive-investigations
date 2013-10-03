@@ -192,30 +192,6 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 
 .ms-core-overlay { background-color: #FFF !important; }
 
-
-/* modification to 2013 toolbar styles */
-
-#fA0Main {
-    position: relative;
-    top: -3px;
-}
-
-#fA0Main { top: -2px\9; }
-
-@media screen and (min-width: 0\0) {
-    #fA0Main { top: -2px; }
-}
-
-.ms-menubuttonactivehover, .ms-menuactivehover {
-    border: 1px solid #ffffff;
-    color: #299EF2 !important;
-}
-
-.ms-buttonactivehover, .ms-activehover {
-    border: 1px solid #ffffff;
-    color: #299EF2 !important;
-}
-
 .ms-splitbuttonhover { background-color: #ffffff; }
 
 .ms-core-needIEFilter .ms-core-overlay { filter: none !important }
@@ -225,6 +201,26 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 .ms-core-needIEFilter #suiteBarLeft { filter: none !important }
 
 .ms-core-needIEFilter#globalNavBox { filter: none !important }
+
+.ms-browseTab { display: none; }
+
+/* modification to 2013 toolbar styles */
+
+#fA0Main {
+    position: relative;
+    top: -3px;
+    top: -2px\9;
+}
+
+@media screen and (min-width: 0\0) {
+    #fA0Main { top: -2px; }
+}
+
+.ms-buttonactivehover, .ms-activehover,
+.ms-menubuttonactivehover, .ms-menuactivehover {
+    border: 1px solid #ffffff;
+    color: #299EF2 !important;
+}
 
 /* end modification to 2013 toolbar styles */
 
