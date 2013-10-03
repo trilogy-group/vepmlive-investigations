@@ -348,17 +348,22 @@ namespace UplandIntegrations.Tenrox
                     }
                 };
             }
-
-            return new List<IntegrationControl>
+            else
             {
-                new IntegrationControl
+
+                return new List<IntegrationControl>
                 {
-                    Control = "TX_ProjectInfo",
-                    Title = "Project Info",
-                    Image = "tx_projectinfo.png",
-                    Window = IntegrationControlWindowStyle.FullDialog
-                }
-            };
+                    
+                    new IntegrationControl
+                    {
+                        Control = "TX_ProjectInfo",
+                        Title = "Project Info",
+                        Image = "tx_projectinfo.png",
+                        Window = IntegrationControlWindowStyle.FullDialog
+                    }
+                    
+                };
+            }
         }
 
         public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
