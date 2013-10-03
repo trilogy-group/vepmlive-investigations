@@ -13,7 +13,7 @@ namespace EPMLiveCore.Integrations.Jira
             try
             {
                 Message = "";
-                CheckWebProps(WebProps);
+                CheckWebProps(WebProps, true);
                 using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
                 {
                     jiraService.InstallWebhook((string)WebProps.Properties["Object"], IntegrationKey, APIUrl);
@@ -32,7 +32,7 @@ namespace EPMLiveCore.Integrations.Jira
             try
             {
                 Message = "";
-                CheckWebProps(WebProps);
+                CheckWebProps(WebProps, true);
                 using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
                 {
                     jiraService.RemoveWebhook((string)WebProps.Properties["Object"], Convert.ToString(WebProps.Properties["ServerUrl"]), IntegrationKey);
@@ -57,7 +57,7 @@ namespace EPMLiveCore.Integrations.Jira
         }
         public List<ColumnProperty> GetColumns(WebProperties WebProps, IntegrationLog Log, string ListName)
         {
-            CheckWebProps(WebProps);
+            CheckWebProps(WebProps, true);
             List<ColumnProperty> columnPropertyList = new List<ColumnProperty>();
             using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
             {
@@ -92,7 +92,7 @@ namespace EPMLiveCore.Integrations.Jira
             try
             {
                 Message = "";
-                CheckWebProps(WebProps);
+                CheckWebProps(WebProps, false);
                 using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
                 {
                 }
@@ -108,7 +108,7 @@ namespace EPMLiveCore.Integrations.Jira
 
         public TransactionTable DeleteItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
         {
-            CheckWebProps(WebProps);
+            CheckWebProps(WebProps, true);
             TransactionTable transactionTable = new TransactionTable();
             using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
             {
@@ -132,7 +132,7 @@ namespace EPMLiveCore.Integrations.Jira
         }
         public TransactionTable UpdateItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
         {
-            CheckWebProps(WebProps);
+            CheckWebProps(WebProps, true);
             TransactionTable transactionTable = new TransactionTable();
             using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
             {
@@ -177,7 +177,7 @@ namespace EPMLiveCore.Integrations.Jira
         {
             try
             {
-                CheckWebProps(WebProps);
+                CheckWebProps(WebProps, true);
                 using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
                 {
                     jiraService.GetObjectItem((string)WebProps.Properties["Object"], Items, ItemID, false);
@@ -193,7 +193,7 @@ namespace EPMLiveCore.Integrations.Jira
         {
             try
             {
-                CheckWebProps(WebProps);
+                CheckWebProps(WebProps, true);
                 using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
                 {
                     jiraService.GetObjectItems((string)WebProps.Properties["Object"], Items, LastSynchDate, false);
@@ -209,12 +209,16 @@ namespace EPMLiveCore.Integrations.Jira
 
         #region Private Methods
 
-        private void CheckWebProps(WebProperties WebProps)
+        private void CheckWebProps(WebProperties WebProps, Boolean checkOtherWebProperties)
         {
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["ServerUrl"]))) throw new Exception("Please provide the serverurl.");
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Username"]))) throw new Exception("Please provide the username.");
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Password"]))) throw new Exception("Please provide the password.");
-            if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Object"]))) throw new Exception("Please provide the object.");
+
+            if (checkOtherWebProperties)
+            {
+                if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Object"]))) throw new Exception("Please provide the object.");
+            }
         }
         private string GetDefaultColumn(string objectName, string columnName)
         {
