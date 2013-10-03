@@ -28,6 +28,13 @@
         }
     </SharePoint:ScriptBlock>
     <script src="/_layouts/15/epmlive/javascripts/masterpages/webfont.js?v=<%= EPMLiveVersion %>"> </script>
+    <SharePoint:StyleBlock runat="server">
+        #s4-ribbonrow {
+            overflow: hidden !important;
+            height: 90px;
+            display: block;
+        }
+    </SharePoint:StyleBlock>
 <![endif]-->
 
 <!--[if IE 9]>
