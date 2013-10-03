@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using EPMLiveCore.Controls.Navigation;
+using EPMLiveCore.Controls.Navigation.Providers;
 using Microsoft.SharePoint;
 using System.Data.SqlClient;
 using EPMLiveCore.GlobalResources;
@@ -1398,7 +1400,7 @@ namespace EPMLiveCore
             return result;
         }
 
-        public void CreateChildNode(int appId, string nodeType, string title, string url, int headingNodeId, bool isExternal)
+        public void CreateChildNode(int appId, string nodeType, string title, string url, int headingNodeId, bool isExternal, SPUser origUser)
         {
             url = GetCleanUrl(url);
 
@@ -1461,6 +1463,8 @@ namespace EPMLiveCore
                                     break;
                             }
 
+                            // clear EPM cache
+                            new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
                         }
 
                         ew.Update();
@@ -1472,7 +1476,7 @@ namespace EPMLiveCore
 
         }
 
-        public void CreateParentNode(int appId, string nodeType, string title, string url, bool isExternal)
+        public void CreateParentNode(int appId, string nodeType, string title, string url, bool isExternal, SPUser origUser)
         {
             url = GetCleanUrl(url);
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -1581,6 +1585,9 @@ namespace EPMLiveCore
                                     }
                                     break;
                             }
+
+                            // clear EPM cache
+                            new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
                         }
 
                         ew.Update();
@@ -1590,7 +1597,7 @@ namespace EPMLiveCore
             });
         }
 
-        public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType)
+        public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType, SPUser origUser)
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
@@ -1705,6 +1712,9 @@ namespace EPMLiveCore
                             }
                         }
 
+                        // clear EPM cache
+                        new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
+
                         ew.Update();
                         ew.AllowUnsafeUpdates = false;
                     }
@@ -1712,7 +1722,7 @@ namespace EPMLiveCore
             });
         }
 
-        public void DeleteNode(int appId, int nodeId, string nodeType)
+        public void DeleteNode(int appId, int nodeId, string nodeType, SPUser origUser)
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
@@ -1738,6 +1748,9 @@ namespace EPMLiveCore
                                     break;
                             }
                             eNode.Delete();
+
+                            // clear EPM cache
+                            new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
                         }
                     }
                 }
@@ -1746,7 +1759,7 @@ namespace EPMLiveCore
 
         }
 
-        public void UpdateNodeOrder(int appId, string nodeType, string moveInfos)
+        public void UpdateNodeOrder(int appId, string nodeType, string moveInfos, SPUser origUser)
         {
             // Get the moving record from html control called "MovedItems".
             // It a long string value that contains a ; separated set of integers. 
@@ -1766,6 +1779,9 @@ namespace EPMLiveCore
                 // do the actual re-ordering
                 MoveNode(appId, nodeType, movementInfo);
             }
+
+            // clear EPM cache
+            new GenericLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, origUser.LoginName).ClearCache();
         }
 
         private void MoveNode(int appId, string nodeType, string[] movementInfo)
@@ -1819,6 +1835,7 @@ namespace EPMLiveCore
                                 }
                             }
                         }
+
 
                         // note: 
                         // when performing SPNavigationNode.(Move/MoveToFirst/MoveToLast) 
