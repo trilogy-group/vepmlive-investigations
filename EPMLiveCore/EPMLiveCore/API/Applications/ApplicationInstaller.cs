@@ -2735,88 +2735,118 @@ namespace EPMLiveCore.API
 
                 try
                 {
+                    bool bSkipReports = false;
 
-                    if (sType == "1")
+                    if (sFileName == "Report Library" && oWeb.ID != oWeb.Site.RootWeb.ID)
                     {
-                        SPFolder oFolder = oWeb.GetFolder(sFullFile);
-
-                        int iId = ParentMessageId;
-                        bool bProcessFolder = false;
-
-                        if (!oFolder.Exists)
-                        {
-                            if (sFullFile.Contains("/"))
-                            {
-                                if (!bVerifyOnly)
-                                {
-                                    oWeb.Folders.Add(sFullFile);
-                                    oFolder = oWeb.GetFolder(sFullFile);
-                                }
-                                bProcessFolder = true;
-                                iId = addMessage(ErrorLevels.NoError, "Folder: " + sFileName, "", ParentMessageId);
-                            }
-                            else
-                            {
-                                XmlNode ndList = null;
-                                try
-                                {
-                                    ndList = ndLists.SelectSingleNode("List[@Name='" + sFileName + "']");
-                                }
-                                catch { }
-
-                                if (ndList == null)
-                                {
-                                    iId = addMessage(ErrorLevels.Error, "Folder: " + sFileName, "Document Library or Folder does not exist.", ParentMessageId);
-                                }
-                                else
-                                {
-                                    iId = addMessage(ErrorLevels.NoError, "Folder: " + sFileName, "", ParentMessageId);
-                                    bProcessFolder = true;
-                                }
-                            }
-
-                        }
-                        else
-                        {
-                            XmlAttribute attrNoDelete = ndChild.Attributes["NoDelete"];
-                            if (attrNoDelete == null)
-                            {
-                                attrNoDelete = ndChild.OwnerDocument.CreateAttribute("NoDelete");
-                                attrNoDelete.Value = "True";
-                                ndChild.Attributes.Append(attrNoDelete);
-                            }
-                            else
-                            {
-                                attrNoDelete.Value = "True";
-                            }
-
-                            bProcessFolder = true;
-                            iId = addMessage(ErrorLevels.NoError, "Folder: " + sFileName, "", ParentMessageId);
-                        }
-
-                        bool bOverwriteFolder = bOverwrite;
-                        try
-                        {
-                            bOverwriteFolder = bool.Parse(getAttribute(ndChild, "Overwrite"));
-                        }
-                        catch { }
-
-                        if (bProcessFolder)
-                            iInstallFilesProcessFolder(iId, counter, ndChild, max, copy, bOverwriteFolder);
+                        bSkipReports = true;
+                    }
+                    if (bSkipReports)
+                    {
+                        addMessage(ErrorLevels.NoError, "Folder: Report Library", "Report Library will not be processed at web level", ParentMessageId);
                     }
                     else
                     {
-                        bool bOverwriteFile = false;
-                        try
+                        if (sType == "1")
                         {
-                            bOverwriteFile = bool.Parse(getAttribute(ndChild, "Overwrite"));
-                        }
-                        catch { }
+                            SPFolder oFolder = oWeb.GetFolder(sFullFile);
 
-                        SPFile oFile = oWeb.GetFile(getAttribute(ndChild, "FullFile"));
-                        if (oFile.Exists)
+                            int iId = ParentMessageId;
+                            bool bProcessFolder = false;
+
+                            if (!oFolder.Exists)
+                            {
+                                if (sFullFile.Contains("/"))
+                                {
+                                    if (!bVerifyOnly)
+                                    {
+                                        oWeb.Folders.Add(sFullFile);
+                                        oFolder = oWeb.GetFolder(sFullFile);
+                                    }
+                                    bProcessFolder = true;
+                                    iId = addMessage(ErrorLevels.NoError, "Folder: " + sFileName, "", ParentMessageId);
+                                }
+                                else
+                                {
+                                    XmlNode ndList = null;
+                                    try
+                                    {
+                                        ndList = ndLists.SelectSingleNode("List[@Name='" + sFileName + "']");
+                                    }
+                                    catch { }
+
+                                    if (ndList == null)
+                                    {
+                                        iId = addMessage(ErrorLevels.Error, "Folder: " + sFileName, "Document Library or Folder does not exist.", ParentMessageId);
+                                    }
+                                    else
+                                    {
+                                        iId = addMessage(ErrorLevels.NoError, "Folder: " + sFileName, "", ParentMessageId);
+                                        bProcessFolder = true;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                XmlAttribute attrNoDelete = ndChild.Attributes["NoDelete"];
+                                if (attrNoDelete == null)
+                                {
+                                    attrNoDelete = ndChild.OwnerDocument.CreateAttribute("NoDelete");
+                                    attrNoDelete.Value = "True";
+                                    ndChild.Attributes.Append(attrNoDelete);
+                                }
+                                else
+                                {
+                                    attrNoDelete.Value = "True";
+                                }
+
+                                bProcessFolder = true;
+                                iId = addMessage(ErrorLevels.NoError, "Folder: " + sFileName, "", ParentMessageId);
+                            }
+
+                            bool bOverwriteFolder = bOverwrite;
+                            try
+                            {
+                                bOverwriteFolder = bool.Parse(getAttribute(ndChild, "Overwrite"));
+                            }
+                            catch { }
+
+                            if (bProcessFolder)
+                                iInstallFilesProcessFolder(iId, counter, ndChild, max, copy, bOverwriteFolder);
+                        }
+                        else
                         {
-                            if (bOverwrite || bOverwriteFile)
+                            bool bOverwriteFile = false;
+                            try
+                            {
+                                bOverwriteFile = bool.Parse(getAttribute(ndChild, "Overwrite"));
+                            }
+                            catch { }
+
+                            SPFile oFile = oWeb.GetFile(getAttribute(ndChild, "FullFile"));
+                            if (oFile.Exists)
+                            {
+                                if (bOverwrite || bOverwriteFile)
+                                {
+                                    try
+                                    {
+                                        if (!bVerifyOnly)
+                                            iInstallFile(sFileName, sParentFolder, sFullFile, copy);
+
+                                        addMessage(ErrorLevels.NoError, "File: " + sFileName, "", ParentMessageId);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        addMessage(ErrorLevels.Error, "File: " + sFileName, "Error: " + ex.Message, ParentMessageId);
+                                    }
+                                }
+                                else
+                                {
+                                    addMessage(ErrorLevels.Warning, "File: " + sFileName, "File exists and can't overwrite", ParentMessageId);
+                                }
+                            }
+                            else
                             {
                                 try
                                 {
@@ -2829,24 +2859,6 @@ namespace EPMLiveCore.API
                                 {
                                     addMessage(ErrorLevels.Error, "File: " + sFileName, "Error: " + ex.Message, ParentMessageId);
                                 }
-                            }
-                            else
-                            {
-                                addMessage(ErrorLevels.Warning, "File: " + sFileName, "File exists and can't overwrite", ParentMessageId);
-                            }
-                        }
-                        else
-                        {
-                            try
-                            {
-                                if (!bVerifyOnly)
-                                    iInstallFile(sFileName, sParentFolder, sFullFile, copy);
-
-                                addMessage(ErrorLevels.NoError, "File: " + sFileName, "", ParentMessageId);
-                            }
-                            catch (Exception ex)
-                            {
-                                addMessage(ErrorLevels.Error, "File: " + sFileName, "Error: " + ex.Message, ParentMessageId);
                             }
                         }
                     }
@@ -2954,6 +2966,7 @@ namespace EPMLiveCore.API
                                     string sFileName = System.IO.Path.GetFileName(sFullFile);
                                     string sParentFolder = System.IO.Path.GetDirectoryName(sFullFile).Replace("\\", "/");
 
+
                                     bool bOverwrite = false;
 
                                     if (System.IO.Path.GetExtension(sFileName) == ".txt")
@@ -3008,7 +3021,6 @@ namespace EPMLiveCore.API
                                         docFiles.FirstChild.AppendChild(ndNew);
                                     else
                                         ndParent.AppendChild(ndNew);
-
                                 }
                             }
                         }
