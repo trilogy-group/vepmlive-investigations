@@ -120,7 +120,7 @@ var EPM;
         (function() {
             var browser = $.browser;
 
-            if (browser.msie && parseInt(browser.version) === 8) {
+            if (browser.msie && parseInt(browser.version) < 9) {
                 $.fn.fadeIn = function() {
                     return $.fn.show.apply(this);
                 };
