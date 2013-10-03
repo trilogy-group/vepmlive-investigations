@@ -475,6 +475,171 @@ function GEInit() {
             }
             return data;
         }
+        
+        function BuildAllItemsDropDown(cachedata, controlProps) {
+
+            if (controlProps.ControlType == '1') {
+                $('#' + controlProps.ControlInfo.DropDownClientId).prop('disabled', false);
+            }
+            else if (controlProps.ControlType == '2') {
+                $('#' + controlProps.ControlInfo.GenericEntityDivId).prop('disabled', false);
+            }
+
+            if (controlProps.ControlType == '1') {
+                if (cachedata) {
+                    if (controlProps.ControlInfo.IsMultiSelect != true) {
+                        $('#' + controlProps.ControlInfo.DropDownClientId).empty();
+                        var items = cachedata.split(';#');
+                        var itemIndex = 0;
+                        // get the values that begins with the search text
+                        // don't return options that has been selected already
+                        for (var i in items) {
+                            if (items[i].indexOf('^') != -1) {
+                                var itemPair = items[i].split('^^');
+                                var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
+                                $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
+                                $('#' + controlProps.ControlInfo.DropDownClientId).val(itemPair[0]);
+                            }
+                        }
+                    }
+                        // if control is a multi-select control
+                    else {
+                        if (cachedata && cachedata.indexOf(';#') != -1) {
+                            $('#' + controlProps.ControlInfo.SelectCandidateId).empty();
+                            var items = cachedata.split(';#');
+                            // get the values that begins with the search text
+                            // don't return options that has been selected already
+                            for (var i in items) {
+                                var itemPair = items[i].split('^^');
+                                if (itemPair[1] != undefined) {
+                                    hasMatch = true;
+                                    var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
+                                    $('#' + controlProps.ControlInfo.SelectCandidateId).append(opt);
+                                    itemIndex++;
+                                }
+                            }
+
+                            $('#' + controlProps.ControlInfo.SelectCandidateId).prop('disabled', false);
+                            $('#' + controlProps.ControlInfo.AddButtonId).prop('disabled', false);
+                            $('#' + controlProps.ControlInfo.RemoveButtonId).prop('disabled', false);
+                            $('#' + controlProps.ControlInfo.SelectResultId).prop('disabled', false);
+                        }
+                    }
+                }
+            }
+            else if (controlProps.ControlType == '2') {
+                controlProps.ControlInfo.CandidateIndex = -1;
+                var pickerSelections = new Array();
+                var hasMatch = false;
+                if (cachedata) {
+
+                    RemoveTypeAheadChoiceCandidate(controlProps);
+
+                    var containerDiv = $(document.createElement('div'))
+                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).outerWidth() - 2)
+                           .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
+                           .addClass('autocomplete')
+                           .css('background-color', 'white');
+
+                    containerDiv.css('top', GetFullTop($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+                    containerDiv.css('left', GetFullLeft($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).after(containerDiv);
+                    RegisterClickOutsideEvent(controlProps);
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).blur(function () {
+                        $(this).css('display', '');
+                    });
+
+                    // get the list of options
+                    var htmlHolder = $('#' + controlProps.ControlInfo.GenericEntityDivId).html();
+                    htmlHolder = htmlHolder.split('&nbsp').join('').split(';').join('');
+                    var parent = null;
+                    try {
+                        parent = $('<div>' + htmlHolder + '</div>');
+                    }
+                    catch (e) {
+                    }
+
+                    if (parent != null && htmlHolder.length > 0) {
+                        parent.find('SPAN').each(function () {
+                            pickerSelections.push($(this).text().trim());
+                        });
+                    }
+
+                    var items = cachedata.split(';#');
+                    var itemIndex = 0;
+
+                    // get the values that contains the search text
+                    // don't return options that has been selected already
+                    for (var i in items) {
+                        var itemPair = items[i].split('^^');
+                        if (itemPair[1] != undefined &&
+                !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
+                            hasMatch = true;
+                            $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_" + itemIndex + "' value='" + itemPair[0] + "'>" + itemPair[1] + "</div>");
+                            itemIndex++;
+                        }
+                    }
+
+                    RegisterHoverStyle();
+
+                    $('.autoText').click(function () {
+                        if ($(this).attr('id') === 'autoText_noValue') {
+                            return;
+                        }
+
+                        if ($('#' + controlProps.FieldName + '_errorText').length > 0) {
+                            $('#' + controlProps.FieldName + '_errorText').remove();
+                        }
+                        if (!controlProps.ControlInfo.IsMultiSelect) {
+                            var newText = $(this).html();
+                            controlProps.ControlInfo.SingleSelectDisplayVal = newText;
+                            controlProps.ControlInfo.SingleSelectLookupVal = $(this).attr('value');
+                            //UpdateSingleSelectPickerValue(controlProps);
+                            var index = $(this).attr('value');
+                            UpdateSingleSelectPickerValueWOValidation(controlProps, index);
+                        }
+                        else {
+                            var newText = $(this).html();
+                            var index = $(this).attr('value');
+                            //UpdateMultiSelectPickerValue(controlProps, newText);
+                            UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
+                        }
+                    });
+
+
+                }
+                    // without cache
+                else {
+                    RemoveTypeAheadChoiceCandidate(controlProps);
+
+                    var containerDiv = $(document.createElement('div'))
+                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).outerWidth() - 2)
+                           .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
+                           .addClass('autocomplete')
+                           .css('background-color', 'white');
+
+                    containerDiv.css('top', GetFullTop($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+                    containerDiv.css('left', GetFullLeft($('#' + controlProps.ControlInfo.GenericEntityDivId)));
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).after(containerDiv);
+                    RegisterClickOutsideEvent(controlProps);
+
+                    $('#' + controlProps.ControlInfo.GenericEntityDivId).blur(function () {
+                        $(this).css('display', '');
+                    });
+
+                    //$('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_noValue'>No Values To Select</div>");
+                    hasMatch = false;
+                }
+
+                if (!hasMatch) {
+                    $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_noValue'>No Values To Select</div>");
+                    //RemoveTypeAheadChoiceCandidate(controlProps);
+                }
+            }
+        }
 
         function BuildDropDownWithCache(cachedata, controlProps) {
 
@@ -538,7 +703,7 @@ function GEInit() {
                     RemoveTypeAheadChoiceCandidate(controlProps);
 
                     var containerDiv = $(document.createElement('div'))
-                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).width())
+                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).outerWidth() - 2)
                            .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
                            .addClass('autocomplete')
                            .css('background-color', 'white');
@@ -637,7 +802,7 @@ function GEInit() {
                     RemoveTypeAheadChoiceCandidate(controlProps);
 
                     var containerDiv = $(document.createElement('div'))
-                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).width())
+                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).outerWidth() - 2)
                            .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
                            .addClass('autocomplete')
                            .css('background-color', 'white');
@@ -663,170 +828,7 @@ function GEInit() {
             }
         }
 
-        function BuildAllItemsDropDown(cachedata, controlProps) {
-
-            if (controlProps.ControlType == '1') {
-                $('#' + controlProps.ControlInfo.DropDownClientId).prop('disabled', false);
-            }
-            else if (controlProps.ControlType == '2') {
-                $('#' + controlProps.ControlInfo.GenericEntityDivId).prop('disabled', false);
-            }
-
-            if (controlProps.ControlType == '1') {
-                if (cachedata) {
-                    if (controlProps.ControlInfo.IsMultiSelect != true) {
-                        $('#' + controlProps.ControlInfo.DropDownClientId).empty();
-                        var items = cachedata.split(';#');
-                        var itemIndex = 0;
-                        // get the values that begins with the search text
-                        // don't return options that has been selected already
-                        for (var i in items) {
-                            if (items[i].indexOf('^') != -1) {
-                                var itemPair = items[i].split('^^');
-                                var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
-                                $('#' + controlProps.ControlInfo.DropDownClientId).append(opt);
-                                $('#' + controlProps.ControlInfo.DropDownClientId).val(itemPair[0]);
-                            }
-                        }
-                    }
-                        // if control is a multi-select control
-                    else {
-                        if (cachedata && cachedata.indexOf(';#') != -1) {
-                            $('#' + controlProps.ControlInfo.SelectCandidateId).empty();
-                            var items = cachedata.split(';#');
-                            // get the values that begins with the search text
-                            // don't return options that has been selected already
-                            for (var i in items) {
-                                var itemPair = items[i].split('^^');
-                                if (itemPair[1] != undefined) {
-                                    hasMatch = true;
-                                    var opt = "<option value='" + itemPair[0] + "'>" + itemPair[1] + "</option>";
-                                    $('#' + controlProps.ControlInfo.SelectCandidateId).append(opt);
-                                    itemIndex++;
-                                }
-                            }
-
-                            $('#' + controlProps.ControlInfo.SelectCandidateId).prop('disabled', false);
-                            $('#' + controlProps.ControlInfo.AddButtonId).prop('disabled', false);
-                            $('#' + controlProps.ControlInfo.RemoveButtonId).prop('disabled', false);
-                            $('#' + controlProps.ControlInfo.SelectResultId).prop('disabled', false);
-                        }
-                    }
-                }
-            }
-            else if (controlProps.ControlType == '2') {
-                controlProps.ControlInfo.CandidateIndex = -1;
-                var pickerSelections = new Array();
-                var hasMatch = false;
-                if (cachedata) {
-
-                    RemoveTypeAheadChoiceCandidate(controlProps);
-
-                    var containerDiv = $(document.createElement('div'))
-                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).width())
-                           .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
-                           .addClass('autocomplete')
-                           .css('background-color', 'white');
-
-                    containerDiv.css('top', GetFullTop($('#' + controlProps.ControlInfo.GenericEntityDivId)));
-                    containerDiv.css('left', GetFullLeft($('#' + controlProps.ControlInfo.GenericEntityDivId)));
-
-                    $('#' + controlProps.ControlInfo.GenericEntityDivId).after(containerDiv);
-                    RegisterClickOutsideEvent(controlProps);
-
-                    $('#' + controlProps.ControlInfo.GenericEntityDivId).blur(function () {
-                        $(this).css('display', '');
-                    });
-
-                    // get the list of options
-                    var htmlHolder = $('#' + controlProps.ControlInfo.GenericEntityDivId).html();
-                    htmlHolder = htmlHolder.split('&nbsp').join('').split(';').join('');
-                    var parent = null;
-                    try {
-                        parent = $('<div>' + htmlHolder + '</div>');
-                    }
-                    catch (e) {
-                    }
-
-                    if (parent != null && htmlHolder.length > 0) {
-                        parent.find('SPAN').each(function () {
-                            pickerSelections.push($(this).text().trim());
-                        });
-                    }
-
-                    var items = cachedata.split(';#');
-                    var itemIndex = 0;
-
-                    // get the values that contains the search text
-                    // don't return options that has been selected already
-                    for (var i in items) {
-                        var itemPair = items[i].split('^^');
-                        if (itemPair[1] != undefined &&
-                !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
-                            hasMatch = true;
-                            $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_" + itemIndex + "' value='" + itemPair[0] + "'>" + itemPair[1] + "</div>");
-                            itemIndex++;
-                        }
-                    }
-
-                    RegisterHoverStyle();
-
-                    $('.autoText').click(function () {
-                        if ($(this).attr('id') === 'autoText_noValue') {
-                            return;
-                        }
-
-                        if ($('#' + controlProps.FieldName + '_errorText').length > 0) {
-                            $('#' + controlProps.FieldName + '_errorText').remove();
-                        }
-                        if (!controlProps.ControlInfo.IsMultiSelect) {
-                            var newText = $(this).html();
-                            controlProps.ControlInfo.SingleSelectDisplayVal = newText;
-                            controlProps.ControlInfo.SingleSelectLookupVal = $(this).attr('value');
-                            //UpdateSingleSelectPickerValue(controlProps);
-                            var index = $(this).attr('value');
-                            UpdateSingleSelectPickerValueWOValidation(controlProps, index);
-                        }
-                        else {
-                            var newText = $(this).html();
-                            var index = $(this).attr('value');
-                            //UpdateMultiSelectPickerValue(controlProps, newText);
-                            UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
-                        }
-                    });
-
-
-                }
-                    // without cache
-                else {
-                    RemoveTypeAheadChoiceCandidate(controlProps);
-
-                    var containerDiv = $(document.createElement('div'))
-                           .width($('#' + controlProps.ControlInfo.GenericEntityDivId).width())
-                           .attr('id', controlProps.ControlInfo.AutoCompleteDivId)
-                           .addClass('autocomplete')
-                           .css('background-color', 'white');
-
-                    containerDiv.css('top', GetFullTop($('#' + controlProps.ControlInfo.GenericEntityDivId)));
-                    containerDiv.css('left', GetFullLeft($('#' + controlProps.ControlInfo.GenericEntityDivId)));
-
-                    $('#' + controlProps.ControlInfo.GenericEntityDivId).after(containerDiv);
-                    RegisterClickOutsideEvent(controlProps);
-
-                    $('#' + controlProps.ControlInfo.GenericEntityDivId).blur(function () {
-                        $(this).css('display', '');
-                    });
-
-                    //$('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_noValue'>No Values To Select</div>");
-                    hasMatch = false;
-                }
-
-                if (!hasMatch) {
-                    $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_noValue'>No Values To Select</div>");
-                    //RemoveTypeAheadChoiceCandidate(controlProps);
-                }
-            }
-        }
+        
 
         function RegisterHoverStyle() {
             if ($('.autoText').length > 0) {
@@ -1398,7 +1400,7 @@ function GEInit() {
             }
             return posY;
         }
-
+       
         function GetFullLeft(obj) {
             var posX = obj.offsetLeft;
             while (obj.offsetParent) {
@@ -1408,11 +1410,11 @@ function GEInit() {
             }
             return posX;
         }
-
+        
         function clickedOutsideElement(elemId, event) {
             var theElem = null;
             try {
-                theElem = (window.event) ? getEventTarget(window.event) : event.target;
+                theElem = (window.event) ? GetEventTarget(window.event) : event.target;
             }
             catch (e)
             { }
