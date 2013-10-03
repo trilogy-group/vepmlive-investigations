@@ -1551,7 +1551,7 @@ namespace PortfolioEngineCore
             return true;
         }
 
-        public static bool GetAutoPosts(DBAccess dba, string datatype, ref int[,] autoposts)
+        private static bool GetAutoPosts(DBAccess dba, string datatype, ref int[,] autoposts)
         {
             SqlCommand oCommand;
             SqlDataReader reader;
