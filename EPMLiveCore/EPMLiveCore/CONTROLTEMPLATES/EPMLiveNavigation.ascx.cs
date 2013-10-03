@@ -91,10 +91,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             base.OnPreRender(e);
 
-            foreach (string style in new[]
-            {
-                "masterpages/glyphs.min", "masterpages/icomoon.min", "controls/navigation/epmnav.min"
-            })
+            foreach (string style in new[] {"controls/navigation/epmnav.min"})
             {
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
             }

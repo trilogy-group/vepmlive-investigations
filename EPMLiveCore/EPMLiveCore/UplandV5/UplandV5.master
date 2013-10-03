@@ -47,15 +47,18 @@
         <SharePoint:CssRegistration Name="Themable/corev15.css" runat="server" />
     </head>
     <body>
-        <!-- IMPORTANT: The head tag cannot have following in order to make MDS work
-            - Meta tag with referesh
-            - link tag for stylesheets (text/css)
-            - script tag
-            - title tag
-            - base tag
-            ** source: http://steve.thelineberrys.com/gotchas-using-custom-web-parts-and-the-minimal-download-strategy/ -->
-        
         <!--[if lt IE 9]>
+            <SharePoint:StyleBlock runat="server">
+                * {
+                    opacity: inherit !important;
+                    filter: inherit !important;
+                }
+            
+                .ms-core-needIEFilter .ms-dlgOverlay {
+                    filter: alpha(opacity=50) !important;
+                }
+            </SharePoint:StyleBlock>
+
             <SharePoint:ScriptBlock runat="server">
                 WebFontConfig = {
                     custom: {
@@ -63,16 +66,35 @@
                         urls: ['/_layouts/15/epmlive/stylesheets/masterpages/opensans.ie.min.css']
                     }
                 };
+            
+                if ((window.location.href + '').toLowerCase().indexOf('isdlg') === -1) {
+                    var head = document.getElementsByTagName('head')[0];
+                    var styles = ['glyphs', 'icomoon'];
+                
+                    for (var i = 0; i < styles.length; i++) {
+                        var style = document.createElement('link');
+
+                        style.type = 'text/css';
+                        style.rel = 'stylesheet';
+                        style.href = '/_layouts/15/epmlive/stylesheets/masterpages/' + styles[i] + '.min.css';
+                    
+                        head.appendChild(style);
+                    }
+                }
             </SharePoint:ScriptBlock>
             <script src="/_layouts/15/epmlive/javascripts/masterpages/webfont.js"></script>
         <![endif]-->
-        
+
         <!--[if IE 9]>
             <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css' rel='stylesheet' type='text/css'>
+            <link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css' rel='stylesheet' type='text/css'>
+            <link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css' rel='stylesheet' type='text/css'>
         <![endif]-->
         
         <!--[if !IE]><!-->
 	        <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css' rel='stylesheet' type='text/css'>
+            <link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css' rel='stylesheet' type='text/css'>
+            <link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css' rel='stylesheet' type='text/css'>
         <!--<![endif]-->
         
         <SharePoint:ScriptBlock runat="server">
