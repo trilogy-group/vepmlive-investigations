@@ -6,6 +6,7 @@
 <%@ Register TagPrefix="epm" Namespace="EPMLiveCore" Assembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Register TagPrefix="epm" Namespace="EPMLiveCore.Controls.Navigation" Assembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Register TagPrefix="epm" Namespace="EPMLiveCore.Infrastructure.Navigation" Assembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
+<%@ Register TagPrefix="epm" TagName="EPMLiveHead" src="~/_controltemplates/EPMLiveHead.ascx" %>
 <%@ Register TagPrefix="epm" TagName="EPMLiveJSV2" src="~/_controltemplates/EPMLiveJSV2.ascx" %>
 <%@ Register TagPrefix="epm" TagName="EPMLiveNotificationsV2" src="~/_controltemplates/EPMLiveNotificationsV2.ascx" %>
 <%@ Register TagPrefix="epm" TagName="TemplateVersoning" src="~/_controltemplates/TemplateVersoning.ascx" %>
@@ -47,81 +48,17 @@
         <SharePoint:CssRegistration Name="Themable/corev15.css" runat="server" />
     </head>
     <body>
-        <!--[if lt IE 9]>
-            <SharePoint:StyleBlock runat="server">
-                * {
-                    opacity: inherit !important;
-                    filter: inherit !important;
-                }
-            
-                .ms-core-needIEFilter .ms-dlgOverlay {
-                    filter: alpha(opacity=50) !important;
-                }
-            </SharePoint:StyleBlock>
-
-            <SharePoint:ScriptBlock runat="server">
-                WebFontConfig = {
-                    custom: {
-                        families: ['Open Sans Light', 'Open Sans Regular', 'Open Sans Semi Bold'],
-                        urls: ['/_layouts/15/epmlive/stylesheets/masterpages/opensans.ie.min.css']
-                    }
-                };
-            
-                if ((window.location.href + '').toLowerCase().indexOf('isdlg') === -1) {
-                    var head = document.getElementsByTagName('head')[0];
-                    var styles = ['glyphs', 'icomoon'];
-                
-                    for (var i = 0; i < styles.length; i++) {
-                        var style = document.createElement('link');
-
-                        style.type = 'text/css';
-                        style.rel = 'stylesheet';
-                        style.href = '/_layouts/15/epmlive/stylesheets/masterpages/' + styles[i] + '.min.css';
-                    
-                        head.appendChild(style);
-                    }
-                }
-            </SharePoint:ScriptBlock>
-            <script src="/_layouts/15/epmlive/javascripts/masterpages/webfont.js"></script>
-        <![endif]-->
-
-        <!--[if IE 9]>
-            <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css' rel='stylesheet' type='text/css'>
-            <link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css' rel='stylesheet' type='text/css'>
-            <link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css' rel='stylesheet' type='text/css'>
-        <![endif]-->
-        
-        <!--[if !IE]><!-->
-	        <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css' rel='stylesheet' type='text/css'>
-            <link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css' rel='stylesheet' type='text/css'>
-            <link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css' rel='stylesheet' type='text/css'>
-        <!--<![endif]-->
-        
+        <!-- EPMLive Head -->
+            <epm:EPMLiveHead runat="server"></epm:EPMLiveHead>
+        <!-- // EPMLive Head -->
         <SharePoint:ScriptBlock runat="server">
             window.isIE8 = false;
         </SharePoint:ScriptBlock>
-    
         <!--[if IE 8]>
             <Sharepoint:ScriptBlock runat="server">
                 window.isIE8 = true;
             </Sharepoint:ScriptBlock>
         <![endif]-->
-
-        <Sharepoint:StyleBlock runat="server">
-            span.ms-welcome-root > span.ms-core-menu-arrow:before,
-            span.ms-welcome-hover > span.ms-core-menu-arrow:before {
-                content: "\e005";
-            }
-        </Sharepoint:StyleBlock>
-        
-        <link href="/_layouts/15/epmlive/stylesheets/masterpages/UplandV5.min.css" rel="stylesheet" type="text/css" />
-        <script src="/_layouts/15/epmlive/javascripts/masterpages/UplandV5.min.js" type="text/javascript"> </script>
-        
-        <link href="/_layouts/15/epmlive/stylesheets/tooltip.min.css" rel="stylesheet" type="text/css" />
-        <script src="/_layouts/15/epmlive/javascripts/libraries/tooltip.min.js" type="text/javascript"> </script>
-        
-        <link href="/_layouts/15/epmlive/stylesheets/libraries/jquery-ui.css" rel="stylesheet" type="text/css" />
-
         <SharePoint:ImageLink runat="server"/>
         <SharePoint:SPNoScript runat="server"/>
         <SharePoint:SPClientIDGenerator runat="server" ServerControlID="DeltaPlaceHolderMain;DeltaPlaceHolderPageTitleInTitleArea;DeltaPlaceHolderUtilityContent" />
@@ -250,27 +187,20 @@
                                     </asp:ContentPlaceHolder>
                                 </SharePoint:AjaxDelta>
                             </div>
-
                             <div id="search-container" class="epm-global-button-right">
                                 <a href="javascript:toggleSearch();" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Search"><span class="fui-search"></span></a>
                             </div>
-
                             <div id="walkme-container" class="epm-global-button-right">
                                 <a id="epm-support-link" href="http://support.epmlive.com/" target="_blank" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Support Community"><span class="fui-question"></span></a>
                             </div>
-                            
                             <div id="uv-container" class="epm-global-button-right">
                                 <a id="epm-uv-link" href="javascript:window.showUserVoicePopup();" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom"  data-delay="100"><span class="fui-ext-megaphone"></span></a>
                             </div>
-
                             <!-- Notification Counter -->
-
                             <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
                                 <epm:NotificationCounterV2 runat="server"></epm:NotificationCounterV2>
                             </div>
-                            
                             <!-- // Notification Counter -->
-                            
                             <div id="welcomeMenuBox" class="ms-tableCell ms-verticalAlignMiddle"> 	
                                 <wssuc:Welcome id="IdWelcome" runat="server" EnableViewState="false" />
                             </div>
@@ -279,9 +209,7 @@
                 </div>
             </div>
             <div id="ms-hcTest"></div>
-            
             <!-- ++ EPM Live Navigation -->
-            
             <SharePoint:AjaxDelta runat="server" id="EPMLiveNavigation" BlockElement="True">
                 <epm:EPMLiveNavigation runat="server">
                     <TopNodes>
@@ -298,9 +226,7 @@
                     </BottomNodes>
                 </epm:EPMLiveNavigation>
             </SharePoint:AjaxDelta>
-
             <!-- EPM Live Navigation xx -->
-
             <div id="s4-ribbonrow">
                 <div id="globalNavBox" class="noindex">
                     <div id="ribbonBox">

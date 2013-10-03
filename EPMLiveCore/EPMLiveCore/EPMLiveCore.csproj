@@ -27,7 +27,7 @@ net start "WETimer"</PostDeploymentCommand>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
 "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <FileUpgradeFlags>0</FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\Backup1\</UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -236,6 +236,13 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx.designer.cs">
       <DependentUpon>DaysHoursBreakdownFieldSettings.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveHead.ascx.cs">
+      <DependentUpon>EPMLiveHead.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\EPMLiveHead.ascx.designer.cs">
+      <DependentUpon>EPMLiveHead.ascx.cs</DependentUpon>
     </Compile>
     <Compile Include="CONTROLTEMPLATES\EPMLiveJS.ascx.cs">
       <DependentUpon>EPMLiveJS.ascx</DependentUpon>
@@ -2046,6 +2053,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldControl.ascx" />
     <Content Include="CONTROLTEMPLATES\DaysHoursBreakdownFieldSettings.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveControlTemplates.ascx" />
+    <Content Include="CONTROLTEMPLATES\EPMLiveHead.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveJS.ascx" />
     <Content Include="CONTROLTEMPLATES\EPMLiveJSV2.ascx" />
     <Content Include="CONTROLTEMPLATES\epmlivelisttemplates.ascx" />
