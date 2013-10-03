@@ -80,7 +80,7 @@
         }
     </script>
 
-    <div style="width:100%; text-align:center; height:100%">
+    <div style="width:100%; text-align:center; height:200px">
         <%=ApplicationName %><br /><br />
 
         PreCheck Running (<span id="spnPercent">0</span>%)<br /><br />

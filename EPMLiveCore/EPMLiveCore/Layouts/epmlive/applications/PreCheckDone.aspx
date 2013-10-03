@@ -70,7 +70,7 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-
+        <div style="height:250px">
 <div style="height:10px;"></div>
  
 <h3 class="wizHeader">Installation Check Results: <span style="color:#376594;"><%=ApplicationName %></span></h3>
@@ -125,7 +125,7 @@
         <HeaderStyle Font-Bold="True" ForeColor="#333333" HorizontalAlign="Left" Font-Size="13px"  CssClass="itemidborder" Font-Names="Helvetica Neue, Helvetica, Arial, sans-serif"/>
     </asp:GridView>
     </div>
-        
+        </div>
     
 </asp:Content>
 
