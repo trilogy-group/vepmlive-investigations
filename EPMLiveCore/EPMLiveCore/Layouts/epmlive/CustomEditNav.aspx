@@ -147,14 +147,16 @@ function DeleteNodeConfirmation()
         var nodeId = '<%=_iId %>';
         var txtTitleId = '<%=txtTitle.ClientID %>';
         var txtUrlId = '<%=txtUrl.ClientID %>';
-
+        var origUserId = '<%=_origUserId %>';
+        
         function AsyncDeleteNode() {
 
             var postData = {
                 action: actionDelete,
                 nodetype: nodeType,
                 appid: appId, 
-                nodeId: nodeId
+                nodeId: nodeId,
+                origUserId: origUserId
             };
 
             $.post(webUrl + asyncNavActionsUrl, postData, function (data) {
@@ -189,7 +191,8 @@ function DeleteNodeConfirmation()
                 title: title,
                 url: url,
                 appId: appId,
-                nodetype: nodeType
+                nodetype: nodeType,
+                origUserId: origUserId
             };
 
             $.post(webUrl + asyncNavActionsUrl, postData, function (data) {

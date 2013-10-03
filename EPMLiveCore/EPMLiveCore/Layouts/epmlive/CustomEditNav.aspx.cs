@@ -40,6 +40,7 @@ namespace EPMLiveCore
         protected string _asyncEditAction = "editnode";
         protected string _async_nav_actions_url = ASYNC_NAV_ACTIONS_URL;
         protected string _webUrl = string.Empty;
+        protected int _origUserId = -1;
         
 
         #endregion
@@ -191,6 +192,8 @@ namespace EPMLiveCore
             {
                 _isEditingHeading = false;
             }
+
+            _origUserId = SPContext.Current.Web.CurrentUser.ID;
         }
 
         private string GetParameter(string key)
