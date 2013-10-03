@@ -130,11 +130,23 @@ module EPM {
             var browser = $.browser;
 
             if (browser.msie && parseInt(browser.version) < 9) {
-                $.fn.fadeIn = function () {
+                $.fn.fadeIn = function (duration, callback) {
+                    if (callback) {
+                        setTimeout(function () {
+                            callback();
+                        }, 5);
+                    }
+
                     return $.fn.show.apply(this);
                 };
 
-                $.fn.fadeOut = function () {
+                $.fn.fadeOut = function (duration, callback) {
+                    if (callback) {
+                        setTimeout(function () {
+                            callback();
+                        }, 5);
+                    }
+
                     return $.fn.hide.apply(this);
                 };
             }
