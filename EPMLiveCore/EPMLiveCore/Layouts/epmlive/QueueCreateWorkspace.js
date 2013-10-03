@@ -416,16 +416,16 @@ function registerCreateWorkspace2Script() {
                     $('#divProgress').show();
                 }
 
-                $('.titleInput').focus();
+                w.setTimeout(function() { $('.titleInput').focus(); }, 10);
             };
 
             self.pageInit();
         }
 
-
-
+       
         // apply bindings
         k.applyBindings(new CreateWorkspaceViewModel(), document.getElementById('OuterContainer'));
+       
 
     })(window.CreateWS2 = window.CreateWS2 || {}, window.epmLive, window.jQuery, window.ko, window);
 
