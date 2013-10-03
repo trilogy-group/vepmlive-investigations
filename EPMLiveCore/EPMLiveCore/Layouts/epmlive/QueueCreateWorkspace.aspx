@@ -46,7 +46,7 @@
 	            <label style="font-family:Open Sans Regular;font-size:15px;padding-right:10px;">
                     What is the title of this Workspace?
 	            </label>  
-	            <input type="textbox" class="titleInput" data-bind="value: workspaceTitle, valueUpdate: 'afterkeydown', event: { keydown: PreventNonAlphaNumeric }" />
+	            <input type="textbox" id="tbWsName" name="tbWsName" class="titleInput" data-bind="value: workspaceTitle, valueUpdate: 'afterkeydown', event: { keydown: PreventNonAlphaNumeric }" />
 	            <br><br>
 	            <label style="font-family:Open Sans Regular;font-size:15px;">
                     Permissions
@@ -70,7 +70,7 @@
 	                    <%--<div class="workspace-loading"  id="marketLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 250px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
+	                    <div style="height: 50px; vertical-align: middle;margin-left: 320px; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
                             <div style="">There are no online templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (marketApps().length > 0)">
@@ -101,7 +101,7 @@
 	                    <%--<div class="workspace-loading" id="localLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle; margin-left: auto; margin-right: auto; margin-top: 100px; width: 250px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
+	                    <div style="height: 50px; vertical-align: middle; margin-left: 320px; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
                             <div style="">There are no local templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (downloadedApps().length > 0)">
