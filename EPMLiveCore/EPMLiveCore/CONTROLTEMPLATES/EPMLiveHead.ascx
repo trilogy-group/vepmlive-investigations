@@ -8,7 +8,7 @@
         WebFontConfig = {
             custom: {
                 families: ['Open Sans Light', 'Open Sans Regular', 'Open Sans Semi Bold'],
-                urls: ['/_layouts/15/epmlive/stylesheets/masterpages/opensans.ie.min.css?v=<%= EPMLiveVersion %>']
+                urls: ['/_layouts/15/epmlive/stylesheets/masterpages/opensans.ie.min.css']
             }
         };
             
@@ -27,7 +27,7 @@
             }
         }
     </SharePoint:ScriptBlock>
-    <script src="/_layouts/15/epmlive/javascripts/masterpages/webfont.js?v=<%= EPMLiveVersion %>"> </script>
+    <script src="/_layouts/15/epmlive/javascripts/masterpages/webfont.js"> </script>
     <SharePoint:StyleBlock runat="server">
         #s4-ribbonrow {
             overflow: hidden !important;
