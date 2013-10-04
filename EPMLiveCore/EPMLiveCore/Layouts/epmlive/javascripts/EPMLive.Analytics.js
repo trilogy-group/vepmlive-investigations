@@ -2,6 +2,7 @@
     (function (a, $$, $) {
 
         //====== FAVORITES ========================
+        var isItem = ($$.currentItemID && !$$.currentListViewUrl && $$.currentFileIsNull === "True") ? "True" : "False";
         a.favoritesData =
             "<Data>" +
                 "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
@@ -15,6 +16,7 @@
                 "<Param key=\"Type\">1</Param>" +
                 "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
                 "<Param key=\"PageTitle\">" + $$.pageName + "</Param>" +
+                "<Param key=\"IsItem\">" + isItem + "</Param>" +
                 "</Data>";
         function loadFavoriteStatus() {
             $.ajax({
@@ -111,6 +113,7 @@
                     "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
                     "<Param key=\"Title\">" + title + "</Param>" +
                     "<Param key=\"FileIsNull\">" + $$.currentFileIsNull + "</Param>" +
+                    "<Param key=\"IsItem\">False</Param>" +
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
@@ -188,6 +191,7 @@
                     "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
                     "<Param key=\"Title\">" + title + "</Param>" +
                     "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
+                    "<Param key=\"IsItem\">True</Param>" +
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
@@ -252,20 +256,21 @@
             });
         };
 
-        a.addItemFavFromGrid = function (title, id) {
+        a.addItemFavFromGrid = function (title, webid, listid, id) {
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
                 data: "{ Function: 'AddFavorites', Dataxml: '" +
                     "<Data>" +
                     "<Param key=\"SiteId\">" + epmLive.currentSiteId + "</Param>" +
-                    "<Param key=\"WebId\">" + epmLive.currentWebId + "</Param>" +
-                    "<Param key=\"ListId\">" + epmLive.currentListId + "</Param>" +
+                    "<Param key=\"WebId\">" + webid + "</Param>" +
+                    "<Param key=\"ListId\">" + listid + "</Param>" +
                     "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
                     "<Param key=\"ItemId\">" + id + "</Param>" +
                     "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
                     "<Param key=\"Title\">" + title + "</Param>" +
                     "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
+                    "<Param key=\"IsItem\">True</Param>" +
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
@@ -327,7 +332,21 @@
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                data: "{ Function: 'RemoveFavorites', Dataxml: '" + a.favoritesData + "' }",
+                data: "{ Function: 'RemoveFavorites', Dataxml: '" +
+                    "<Data>" +
+                        "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
+                        "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
+                        "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
+                        "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
+                        "<Param key=\"ListView\">" + $$.currentListViewUrl + "</Param>" +
+                        "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
+                        "<Param key=\"FileIsNull\">" + $$.currentFileIsNull + "</Param>" +
+                        "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
+                        "<Param key=\"Type\">1</Param>" +
+                        "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
+                        "<Param key=\"PageTitle\">" + $$.pageName + "</Param>" +
+                        "<Param key=\"IsItem\">False</Param>" +
+                    "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 success: function (response) {
@@ -380,7 +399,21 @@
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                data: "{ Function: 'RemoveFavorites', Dataxml: '" + a.favoritesData + "' }",
+                data: "{ Function: 'RemoveFavorites', Dataxml: '" +
+                    "<Data>" +
+                        "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
+                        "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
+                        "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
+                        "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
+                        "<Param key=\"ListView\">" + $$.currentListViewUrl + "</Param>" +
+                        "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
+                        "<Param key=\"FileIsNull\">" + $$.currentFileIsNull + "</Param>" +
+                        "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
+                        "<Param key=\"Type\">1</Param>" +
+                        "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
+                        "<Param key=\"PageTitle\">" + $$.pageName + "</Param>" +
+                        "<Param key=\"IsItem\">True</Param>" +
+                    "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 success: function (response) {
@@ -434,7 +467,7 @@
             });
         };
         
-        a.removeItemFavFromGrid = function (id) {
+        a.removeItemFavFromGrid = function (webid, listid, itemid) {
             // missing id from grid, add it explicitly
             
             $.ajax({
@@ -443,14 +476,15 @@
                 data: "{ Function: 'RemoveFavorites', Dataxml: '" +
                         "<Data>" +
                         "<Param key=\"SiteId\">" + epmLive.currentSiteId + "</Param>" +
-                        "<Param key=\"WebId\">" + epmLive.currentWebId + "</Param>" +
-                        "<Param key=\"ListId\">" + epmLive.currentListId + "</Param>" +
+                        "<Param key=\"WebId\">" + webid + "</Param>" +
+                        "<Param key=\"ListId\">" + listid + "</Param>" +
                         "<Param key=\"ListViewUrl\"></Param>" +
                         "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
-                        "<Param key=\"ItemId\">" + id + "</Param>" +
+                        "<Param key=\"ItemId\">" + itemid + "</Param>" +
                         "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
                         "<Param key=\"Title\">" + epmLive.currentListTitle + "</Param>" +
                         "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
+                        "<Param key=\"IsItem\">True</Param>" +
                         "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
