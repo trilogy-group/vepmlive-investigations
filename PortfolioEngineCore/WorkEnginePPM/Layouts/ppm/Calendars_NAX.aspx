@@ -175,7 +175,7 @@ html, body {
                     return false;
                 }
            case "btnAdd2":
-                var newrow;
+               var newrow;
                 if (event == "btnInsert2") {
                     newrow = tgrid1.grid.AddRow(null, tgrid1_selectedRow, true);
                 }
@@ -344,9 +344,11 @@ html, body {
                         dgrid1_OnRowSelect(null);
                       break;
                 }
+                GridsOnClickCell(tgrid1.grid, null, null)
                 CloseDialog('winCalendarDlg');
                 break;
             case "cancel":
+                GridsOnClickCell(tgrid1.grid, null, null)
                 CloseDialog('winCalendarDlg');
                 break;
         }
