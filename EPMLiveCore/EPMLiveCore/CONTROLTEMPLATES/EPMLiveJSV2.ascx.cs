@@ -84,7 +84,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListTitle = string.Empty;
             try
             {
-                ListTitle = spContext.List.Title;
+                ListTitle = HttpUtility.JavaScriptStringEncode(spContext.List.Title);
             }
             catch { }
             
@@ -105,7 +105,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListViewTitle = string.Empty;
             try
             {
-                ListViewTitle = spContext.ViewContext.View.Title;
+                ListViewTitle = HttpUtility.JavaScriptStringEncode(spContext.ViewContext.View.Title);
             }
             catch { }
 
@@ -119,7 +119,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ItemTitle = string.Empty;
             try
             {
-                ItemTitle = (spContext.Item != null) ? spContext.ListItemDisplayName : string.Empty;
+                ItemTitle = (spContext.Item != null) ? HttpUtility.JavaScriptStringEncode(spContext.ListItemDisplayName) : string.Empty;
             }
             catch { }
 
