@@ -402,12 +402,12 @@ namespace EPMLiveCore.Properties {
         ///	&lt;input type=&quot;button&quot; class=&quot;ms-ButtonHeightWidth&quot; value=&quot;&amp;lt; Add&quot; onClick=&quot;AddResource()&quot; style=&quot;width:100px&quot;&gt;&lt;br&gt;&lt;br&gt;
         ///	&lt;input type=&quot;button&quot; class=&quot;ms-ButtonHeightWidth&quot; value=&quot;Remove &amp;gt;&quot; onClick=&quot;RemoveResource()&quot; style=&quot;width:100px&quot;&gt;
         ///&lt;/td&gt;
-        ///&lt;td width=&quot;50%&quot; id=&quot;tdResPool&quot; valign=&quot;top&quot;&gt;
+        ///&lt;td id=&quot;tdRes&quot; valign=&quot;top&quot;&gt;
         ///	&lt;div class=&quot;gridHeader&quot;&gt;Resource Pool&lt;/div&gt;
         ///	&lt;div class=&quot;toolbar&quot;&gt;
         ///		&lt;ul&gt;
         /// 		    &lt;li&gt;
-        ///			    &lt;a href=&quot;javascript:void(0);&quot; onclick [rest of string was truncated]&quot;;.
+        ///			    &lt;a href=&quot;javascript:void(0);&quot; onclick=&quot;AddResourcePoo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtBuildTeamResPool {
             get {

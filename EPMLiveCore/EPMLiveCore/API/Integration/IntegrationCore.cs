@@ -85,7 +85,7 @@ namespace EPMLiveCore.API.Integration
                 IntegratorDef integrator = GetIntegrator(intlistid);
 
                 IntegrationLog log = new IntegrationLog(cn, intlistid, listid, integrator.Title);
-
+                
                 Hashtable hshProps = GetProperties(intlistid);
 
                 WebProperties webprops = GetWebProps(hshProps, integrator.intlistid);
@@ -272,7 +272,7 @@ namespace EPMLiveCore.API.Integration
             }
             catch (Exception ex)
             {
-                LogMessage("", dr["LIST_ID"].ToString(), "ExecuteEvent: " + ex.Message, 3);
+                LogMessage("", dr["LIST_ID"].ToString(), "ExecuteEvent: " + ex.Message, (int)IntegrationLogType.Error);
             }
         }
 
@@ -692,7 +692,7 @@ namespace EPMLiveCore.API.Integration
             }
             catch (Exception ex)
             {
-                LogMessage(intlistid.ToString(), list.ID.ToString(), "Error Updating Item From Incoming: " + ex.Message, 3);
+                LogMessage(intlistid.ToString(), list.ID.ToString(), "Error Updating Item From Incoming: " + ex.Message, (int)IntegrationLogType.Error);
             }
         }
 
@@ -726,6 +726,7 @@ namespace EPMLiveCore.API.Integration
 
                         if (drIntegration["LIVEINCOMING"].ToString().ToLower() == "true")
                         {
+                            LogMessage(drIntegration["INT_LIST_ID"].ToString(), list.ID.ToString(), "Update Event on ID: " + dr["INTITEM_ID"].ToString() + " Accepted.", (int)IntegrationLogType.Event);
 
                             parms.Add("intlistid", drIntegration["INT_LIST_ID"].ToString());
                             DataSet dsColumns = GetDataSet("SELECT * FROM INT_COLUMNS where INT_LIST_ID=@intlistid", parms);
@@ -833,7 +834,10 @@ namespace EPMLiveCore.API.Integration
                                 ProcessItemRow(drItem, list, dtCols, props, dr["COL_ID"].ToString(), intlistid, new Guid(drIntegration["MODULE_ID"].ToString()), bCanAdd, dtUserFields, hshUserMap, bBuildTeamSec);
                             }
                         }
-
+                        else
+                        {
+                            LogMessage(drIntegration["INT_LIST_ID"].ToString(), list.ID.ToString(), "Update Event on ID: " + dr["INTITEM_ID"].ToString() + " Ignored (live incoming off)." ,(int)IntegrationLogType.Event);
+                        }
                         
 
                     }
@@ -857,7 +861,7 @@ namespace EPMLiveCore.API.Integration
             }
             catch (Exception ex)
             {
-                LogMessage("", dr["LIST_ID"].ToString(), "ProcessItemIncoming: " + ex.Message, 3);
+                LogMessage("", dr["LIST_ID"].ToString(), "ProcessItemIncoming: " + ex.Message, (int)IntegrationLogType.Error);
             }
         }
 
@@ -959,7 +963,7 @@ namespace EPMLiveCore.API.Integration
             }
             catch (Exception ex)
             {
-                LogMessage("", dr["LIST_ID"].ToString(), "ProcessItemOutgoing: " + ex.Message, 3);
+                LogMessage("", dr["LIST_ID"].ToString(), "ProcessItemOutgoing: " + ex.Message, (int)IntegrationLogType.Error);
             }
         }
 
@@ -1234,7 +1238,7 @@ namespace EPMLiveCore.API.Integration
             }
             catch (Exception ex)
             {
-                LogMessage(dtColumns.TableName, list.ID.ToString(), "PostIntegration: " + ex.Message, 3);
+                LogMessage(dtColumns.TableName, list.ID.ToString(), "PostIntegration: " + ex.Message, (int)IntegrationLogType.Error);
             }
 
             //PostCheckBit
@@ -1882,7 +1886,7 @@ namespace EPMLiveCore.API.Integration
             }
             catch (Exception ex)
             {
-                LogMessage("", li.ParentList.ID.ToString(), "SubmitListEvent: " + ex.Message, 3);
+                LogMessage("", li.ParentList.ID.ToString(), "SubmitListEvent: " + ex.Message, (int)IntegrationLogType.Error);
             }
         }
 

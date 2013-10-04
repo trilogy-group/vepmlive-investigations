@@ -27,10 +27,12 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 <div style="padding: 10px">
-    View Level: <asp:DropDownList ID="ddlLevel" runat="server" AutoPostBack="true">
+    Lowest Log Level: <asp:DropDownList ID="ddlLevel" runat="server" AutoPostBack="true">
+    
     <asp:ListItem Value="1" Text="View All"></asp:ListItem>
-    <asp:ListItem Value="2" Text="Warnings and Errors"></asp:ListItem>
-    <asp:ListItem Value="3" Text="Errors Only" Selected="True"></asp:ListItem>
+    <asp:ListItem Value="2" Text="Events"></asp:ListItem>
+    <asp:ListItem Value="10" Text="Warnings"></asp:ListItem>
+    <asp:ListItem Value="20" Text="Errors" Selected="True"></asp:ListItem>
     </asp:DropDownList> &nbsp;<a href="IntegrationList.aspx?LIST=<%=Request["LIST"] %>">Back To Integrations</a>
     <br /><br />
     <asp:GridView ID="gvLog" runat="server" AutoGenerateColumns="false" HeaderStyle-HorizontalAlign="Left" RowStyle-BorderStyle="None" RowStyle-CssClass="logrow" BorderStyle="None">
