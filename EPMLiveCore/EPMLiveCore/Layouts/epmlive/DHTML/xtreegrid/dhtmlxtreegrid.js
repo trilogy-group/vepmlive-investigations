@@ -618,7 +618,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
 
     if (action == "AddFavorite") {
         var viewDiv = document.createElement('div');
-        viewDiv.innerHTML =            
+        viewDiv.innerHTML =
             '<div>' +
                 '<div style="width: 250px; padding: 5px;"> Title:&nbsp;' +
                     '<input type="text" value="" name="favItemTitle" id="favItemTitle" style="width:200px;">' +
@@ -644,7 +644,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
         };
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
-        
+
         var myVar = setInterval(function () { setFocus(); }, 200);
         function setFocus() {
             if ($('.ms-dlgFrameContainer').find('#favItemTitle').length > 0 && !$('.ms-dlgFrameContainer').find('#favItemTitle').is(':focus')) {
@@ -846,14 +846,14 @@ eXcell_tree.prototype.setValue = function (valAr) {
         if (this.grid._enableCMenus && itemid != "") {
             _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; position: relative; nowrap; height:" + (_isIE ? 20 : 18) + "px;' onmouseout=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenuout(this);\" onmouseover=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenu(this);\" id='" + this.cell.parentNode.idd + "'>";
             //_tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;'><SPAN>&nbsp;</SPAN><A id='menuA' onfocus='return false;' title='Open Menu' onclick='return false;' href='javascript:;'><IMG id='menuImg' class='ms-ellipsis-icon' style='visibility: hidden' alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23' width=7 height=4 border=0></A><SPAN>&nbsp;</SPAN></DIV>";
-            _tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;' class='ms-list-itemLink'><A style='top: -5px;' href='javascript:void(0);' class='ms-lstItmLinkAnchor ms-ellipsis-a'><IMG class=ms-ellipsis-icon alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23'></A></DIV>";
+            _tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;' class='ms-list-itemLink'><A style='top: -5px;' href='javascript:void(0);' class='ms-lstItmLinkAnchor ms-ellipsis-a'><IMG class=ms-ellipsis-icon alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23'></A></DIV>";
         }
         else {
             _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; white-space : nowrap; height:" + (_isIE ? 20 : 18) + "px;'>";
             _tgc.menu = "";
         }
 
-        _tgc.itemim = "' align='absmiddle' " + (this.grid._img_height ? (" height=\"" + this.grid._img_height + "\"") : "") + (this.grid._img_width ? (" width=\"" + this.grid._img_width + "\"") : "") + " ><span " + (_isFF ? "style='position:relative; top:2px';z-index=-1" : "z-index=-1") + "id='nodeval'>";
+        _tgc.itemim = "' align='absmiddle' " + (this.grid._img_height ? (" height=\"" + this.grid._img_height + "\"") : "") + (this.grid._img_width ? (" width=\"" + this.grid._img_width + "\"") : "") + " ><span " + (_isFF ? "style='position:relative; top:2px;z-index=-1;overflow:hidden'" : "style='z-index=-1;overflow:hidden'") + " id='nodeval'>";
 
 
 
@@ -878,9 +878,14 @@ eXcell_tree.prototype.setValue = function (valAr) {
     row.label = valAr;
 
     var html = [_tgc.start];
+    html.push(_tgc.menu);
+
+    html.push("<div style='overflow:hidden'>");
 
     for (var i = 0; i < row.level; i++)
         html.push(_tgc.spacer);
+
+
 
     //if has children
     if (row.has_kids) {
@@ -896,8 +901,7 @@ eXcell_tree.prototype.setValue = function (valAr) {
     html.push(row.label);
 
     html.push(_tgc.close);
-
-    html.push(_tgc.menu);
+    html.push("</div>");
 
 
     html.push(_tgc.closeClose);
