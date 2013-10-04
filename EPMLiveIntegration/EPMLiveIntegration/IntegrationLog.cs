@@ -7,7 +7,7 @@ using System.IO;
 
 namespace EPMLiveIntegration
 {
-    public enum IntegrationLogType { Information = 1, Warning, Error };
+    public enum IntegrationLogType { Information = 1, Warning, Error, Event };
 
     public class IntegrationLog
     {
