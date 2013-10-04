@@ -22,7 +22,7 @@
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
     <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
 iisreset</PostDeploymentCommand>
-    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <FileUpgradeFlags>0</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\Backup2\</UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -240,6 +240,7 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\MyWork.aspx.cs">
       <DependentUpon>MyWork.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\MyWork.aspx.designer.cs">
       <DependentUpon>MyWork.aspx.cs</DependentUpon>
