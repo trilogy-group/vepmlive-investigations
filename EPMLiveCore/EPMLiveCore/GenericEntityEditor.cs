@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint;
 using System.Web.UI;
@@ -25,11 +26,11 @@ namespace EPMLiveCore
             this.PickerDialogType = typeof(GenericPickerDialog);
             propBag = new GenericEntityPickerPropertyBag(this.CustomProperty);
         }
-                
+
         protected override void CreateChildControls()
-        {   
+        {
             base.CreateChildControls();
-            
+
             Control browseControl = FindBrowseLink(this);
             if (browseControl != null)
             {
@@ -56,7 +57,7 @@ namespace EPMLiveCore
                 //{
                 //    HtmlGenericControl divClear = new HtmlGenericControl("div");
                 //    divClear.Attributes.Add("style", "clear:both");
-                    
+
                 //    HtmlGenericControl errorText = new HtmlGenericControl("textarea");
                 //    errorText.ID = propBag.Field + "_errorText";
                 //    errorText.Attributes.Add("class", "ms-inputuserfield");
@@ -67,7 +68,7 @@ namespace EPMLiveCore
                 //}
             }
         }
-        
+
 
         private SPList GetListFromPropBag()
         {
@@ -234,7 +235,15 @@ namespace EPMLiveCore
                 fileVersion = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
             }
 
-            ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/GenericEntityEditor.js?v=" + fileVersion, false);
+            if (HttpContext.Current.Request.Browser.Type.ToUpper().Contains("IE") && HttpContext.Current.Request.Browser.MajorVersion < 9)
+            {
+                ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/GenericEntityEditor-ie8.js?v=" + fileVersion, false);
+            }
+            else
+            {
+                ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/GenericEntityEditor.js?v=" + fileVersion, false);
+            }
+
             //this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityEditorJS_", "<script src='/_layouts/epmlive/javascripts/GenericEntityEditor.js'></script>", false);
             this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "_GenericEntityPickerStyle_", "<link href=\"/_layouts/epmlive/GenericEntityPickerStyle.css\" rel=\"stylesheet\" type=\"text/css\" />", false);
 
