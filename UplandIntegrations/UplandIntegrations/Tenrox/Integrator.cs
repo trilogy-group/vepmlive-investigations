@@ -301,7 +301,7 @@ namespace UplandIntegrations.Tenrox
                 {
                     spId = items.Rows[index]["SPID"].ToString();
                 }
-
+                
                 if (result.Success)
                 {
                     transactionTable.AddRow(spId, txId, result.TransactionType);
