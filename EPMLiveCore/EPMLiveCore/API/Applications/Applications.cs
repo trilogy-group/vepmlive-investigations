@@ -1248,7 +1248,7 @@ namespace EPMLiveCore.API
                         {
                             ArrayList arrNav = new ArrayList();
 
-                            SPNavigationNode newnav = new SPNavigationNode("Home", "SitePages/" + cleanTitle + ".aspx");
+                            SPNavigationNode newnav = new SPNavigationNode("Dashboard", "SitePages/" + cleanTitle + ".aspx");
                             web.Navigation.QuickLaunch.AddAsFirst(newnav);
 
                             arrNav.Add(newnav.Id.ToString());
