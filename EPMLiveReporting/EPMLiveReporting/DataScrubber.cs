@@ -11,7 +11,7 @@ namespace EPMLiveReportsAdmin
     {
         public static void CleanTables(SPSite site, EPMData epmdata)
         {
-            #region WIPE DATA FROM ReportListIds AND RPTWeb TABLE
+            #region WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS TABLE
 
             SqlCommand cmd;
             cmd = new SqlCommand("DELETE FROM ReportListIds", epmdata.GetClientReportingConnection);
@@ -20,15 +20,17 @@ namespace EPMLiveReportsAdmin
             cmd = new SqlCommand("DELETE FROM RPTWeb", epmdata.GetClientReportingConnection);
             cmd.ExecuteNonQuery();
 
+            cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
+            cmd.ExecuteNonQuery();
+
             #endregion
 
-            #region CLEAN ReportListIds, RPTWeb, RPTWEBGROUPS, AND FRF-Recent TABLES
+            #region REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, AND FRF-Recent TABLES
 
             var listNames = new DataTable();
+
             var listIds = new DataTable();
             listIds.Columns.Add(new DataColumn("Id", typeof (Guid)));
-            var listIdsTest = new DataTable();
-            var rptWebTest = new DataTable();
 
             var rptWeb = new DataTable();
             rptWeb.Columns.Add(new DataColumn("SiteId", typeof (Guid)));
@@ -39,6 +41,9 @@ namespace EPMLiveReportsAdmin
             rptWeb.Columns.Add(new DataColumn("WebId", typeof (Guid)));
             rptWeb.Columns.Add(new DataColumn("WebUrl", typeof (string)));
             rptWeb.Columns.Add(new DataColumn("WebTitle", typeof (string)));
+
+            var listIdsTest = new DataTable();
+            var rptWebTest = new DataTable();
 
             string errMsg = string.Empty;
             bool hasError = false;
@@ -95,6 +100,54 @@ namespace EPMLiveReportsAdmin
                         }
                         #endregion
 
+                        #region  POPULATE RPTWEBGROUPS
+
+                        try
+                        {
+                            var dt = new DataTable();
+                            var dc = new DataColumn("RPTWEBGROUPS") { DataType = System.Type.GetType("System.Guid") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("SITEID") { DataType = System.Type.GetType("System.Guid") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("WEBID") { DataType = System.Type.GetType("System.Guid") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("GROUPID") { DataType = System.Type.GetType("System.Int32") };
+                            dt.Columns.Add(dc);
+                            dc = new DataColumn("SECTYPE") { DataType = System.Type.GetType("System.Int32") };
+                            dt.Columns.Add(dc);
+
+                            foreach (SPRoleAssignment ra in w.RoleAssignments)
+                            {
+                                var type = 0;
+                                if (ra.Member is SPGroup)
+                                {
+                                    type = 1;
+                                }
+                                var found = ra.RoleDefinitionBindings.Cast<SPRoleDefinition>().Any(def => (def.BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems);
+                                if (found)
+                                {
+                                    dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, ra.Member.ID, type });
+                                }
+                            }
+
+                            dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, 999999, 1 });
+
+                            using (var bulkCopy = new SqlBulkCopy(epmdata.GetClientReportingConnection))
+                            {
+                                bulkCopy.DestinationTableName =
+                                    "dbo.RPTWEBGROUPS";
+
+                                bulkCopy.WriteToServer(dt);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            hasError = true;
+                            errMsg += e.Message;
+                        }
+
+                        #endregion
+
                         #region GATHER VALID LISTS
                         // IGNORE SPDispose 130, Web is being disposed
                         try
@@ -129,13 +182,9 @@ namespace EPMLiveReportsAdmin
                         {
                             hasError = true;
                             errMsg += e1.Message;
-
-                            if (w != null)
-                            {
-                                w.Dispose();
-                            }
                         }
                         #endregion
+
                         if (w != null)
                         {
                             w.Dispose();
@@ -268,25 +317,6 @@ namespace EPMLiveReportsAdmin
                         "Data cleaning in Refresh process.",
                         "Cleaning has been cancelled.",
                         "Error: " + errMsg,
-                        0, 1, "");
-                }
-
-                #endregion
-
-                #region  CLEAN RPTWEBGROUPS - DELETE ENTRIES WITH NONEXISTENT LISTIDS
-
-                try
-                {
-                    cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS WHERE WEBID NOT IN (SELECT r.WebId FROM RPTWeb r)");
-                    cmd.Connection = epmdata.GetClientReportingConnection;
-                    cmd.ExecuteNonQuery();
-                }
-                catch (Exception e)
-                {
-                    epmdata.LogStatus("",
-                        "Data cleaning in Refresh process.",
-                        "Error cleaning RPTWEBGROUPS table. Error: " + e.Message,
-                        errMsg,
                         0, 1, "");
                 }
 
