@@ -37,7 +37,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             if (url.Contains("_layouts"))
             {
                 string[] parts = url.Split(new[] {"_layouts"}, StringSplitOptions.None);
-                url = RelativeUrl + "_layouts" + string.Join(string.Empty, parts.Skip(1));
+                url = RelativeUrl + "/_layouts" + string.Join(string.Empty, parts.Skip(1));
             }
             else
             {
@@ -68,7 +68,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     {
                         try
                         {
-                            bool isRootWeb = spWeb.IsRootWeb;
+                            bool isRootWeb = spWeb.ID == WebId;
                             SPNavigation spNavigation = spWeb.Navigation;
 
                             wpLinks.AddRange(from nodeId in GetNodes(spWeb)
