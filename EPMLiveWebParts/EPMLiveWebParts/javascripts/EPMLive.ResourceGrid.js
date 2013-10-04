@@ -1850,6 +1850,8 @@ function registerEpmLiveResourceGridScript() {
                     newHeight = height - winHeight;
                 }
 
+                newHeight += 100;
+
                 if (newHeight !== 0) {
                     grid.MaxVScroll += newHeight;
                     $$.winHeight = height;
