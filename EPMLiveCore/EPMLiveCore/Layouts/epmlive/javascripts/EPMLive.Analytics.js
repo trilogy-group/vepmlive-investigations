@@ -15,7 +15,7 @@
                 "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
                 "<Param key=\"Type\">1</Param>" +
                 "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
-                "<Param key=\"PageTitle\">" + $$.pageName + "</Param>" +
+                "<Param key=\"PageTitle\">" + escape($$.pageName) + "</Param>" +
                 "<Param key=\"IsItem\">" + isItem + "</Param>" +
                 "</Data>";
         function loadFavoriteStatus() {
@@ -131,7 +131,7 @@
                     "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
                     "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
                     "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
-                    "<Param key=\"Title\">" + title + "</Param>" +
+                    "<Param key=\"Title\">" + escape(title) + "</Param>" +
                     "<Param key=\"FileIsNull\">" + $$.currentFileIsNull + "</Param>" +
                     "<Param key=\"IsItem\">False</Param>" +
                     "</Data>' }",
@@ -209,7 +209,7 @@
                     "<Param key=\"ItemId\">" + epmLive.currentItemID + "</Param>" +
                     "<Param key=\"FString\">" + epmLive.currentUrl + "</Param>" +
                     "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
-                    "<Param key=\"Title\">" + title + "</Param>" +
+                    "<Param key=\"Title\">" + escape(title) + "</Param>" +
                     "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
                     "<Param key=\"IsItem\">True</Param>" +
                     "</Data>' }",
@@ -288,7 +288,7 @@
                     "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
                     "<Param key=\"ItemId\">" + id + "</Param>" +
                     "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
-                    "<Param key=\"Title\">" + title + "</Param>" +
+                    "<Param key=\"Title\">" + escape(title) + "</Param>" +
                     "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
                     "<Param key=\"IsItem\">True</Param>" +
                     "</Data>' }",
@@ -364,7 +364,7 @@
                         "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
                         "<Param key=\"Type\">1</Param>" +
                         "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
-                        "<Param key=\"PageTitle\">" + $$.pageName + "</Param>" +
+                        "<Param key=\"PageTitle\">" + escape($$.pageName) + "</Param>" +
                         "<Param key=\"IsItem\">False</Param>" +
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
@@ -431,7 +431,7 @@
                         "<Param key=\"FString\">" + $$.currentUrl + "</Param>" +
                         "<Param key=\"Type\">1</Param>" +
                         "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
-                        "<Param key=\"PageTitle\">" + $$.pageName + "</Param>" +
+                        "<Param key=\"PageTitle\">" + escape($$.pageName) + "</Param>" +
                         "<Param key=\"IsItem\">True</Param>" +
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
@@ -502,7 +502,7 @@
                         "<Param key=\"ListIconClass\">" + epmLive.currentListIcon + "</Param>" +
                         "<Param key=\"ItemId\">" + itemid + "</Param>" +
                         "<Param key=\"UserId\">" + epmLive.currentUserId + "</Param>" +
-                        "<Param key=\"Title\">" + epmLive.currentListTitle + "</Param>" +
+                        "<Param key=\"Title\">" + escape(epmLive.currentListTitle) + "</Param>" +
                         "<Param key=\"FileIsNull\">" + epmLive.currentFileIsNull + "</Param>" +
                         "<Param key=\"IsItem\">True</Param>" +
                         "</Data>' }",
@@ -559,7 +559,7 @@
                 "<Param key=\"WebId\">" + $$.currentWebId + "</Param>" +
                 "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
                 "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
-                "<Param key=\"Title\">" + $$.currentListTitle + "</Param>" +
+                "<Param key=\"Title\">" + escape($$.currentListTitle) + "</Param>" +
                 "<Param key=\"Type\">3</Param>" +
                 "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
             "</Data>";
@@ -607,7 +607,7 @@
                 "<Param key=\"ListId\">" + $$.currentListId + "</Param>" +
                 "<Param key=\"ItemId\">" + $$.currentItemID + "</Param>" +
                 "<Param key=\"ListIconClass\">" + $$.currentListIcon + "</Param>" +
-                "<Param key=\"Title\">" + $$.currentItemTitle + "</Param>" +
+                "<Param key=\"Title\">" + escape($$.currentItemTitle) + "</Param>" +
                 "<Param key=\"Type\">2</Param>" +
                 "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
             "</Data>";

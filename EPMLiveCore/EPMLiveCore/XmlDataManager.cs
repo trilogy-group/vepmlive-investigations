@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 
 namespace EPMLiveCore
@@ -22,7 +23,9 @@ namespace EPMLiveCore
         {
             if (!string.IsNullOrEmpty(xml))
             {
+                xml = HttpUtility.UrlDecode(xml);
                 xml = xml.Replace("&", "&amp;");
+
                 dataXml = XDocument.Parse(xml);
             }
         }
