@@ -229,6 +229,7 @@ html, body {
     function toolbar_event(event) {
         if (toolbar.isItemDisabled(event) == true)
             return;
+        tgrid1.EndEdit();
         switch (event) {
             case "btnAdd":
                 var newrow = tgrid1.grid.AddRow(null, null, true);
