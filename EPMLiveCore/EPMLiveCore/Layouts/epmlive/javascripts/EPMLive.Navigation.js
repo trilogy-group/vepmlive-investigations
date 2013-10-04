@@ -631,12 +631,26 @@
                         $('li.epm-nav-node').find('a').each(function () {
                             var $a = $(this);
 
-                            if (!$a.attr('alt')) {
+                            if (!$a.attr('title')) {
                                 var $span = $a.find('span');
+
                                 if ($span) {
-                                    if ($a.width() < $span.width()) {
-                                        $a.attr('alt', $span.text());
-                                        $a.attr('title', $span.text());
+                                    if (!$.browser.msie) {
+                                        if ($a.width() < $span.width()) {
+                                            $a.attr('title', $span.text());
+                                        }
+                                    } else {
+                                        var $el = $a.clone().css({
+                                            display: 'inline',
+                                            width: 'auto',
+                                            visibility: 'hidden'
+                                        }).appendTo('body');
+
+                                        if (($el.width() + $span.offset().left + 15) > $a.width()) {
+                                            $a.attr('title', $span.text());
+                                        }
+
+                                        $el.remove();
                                     }
                                 }
                             }
