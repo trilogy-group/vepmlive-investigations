@@ -236,7 +236,7 @@ html, body {
         dgrid1.SetWidth(newWidth);
     };
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
-        var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, false, bResize);
+        var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
 //        ResizeDialog(idWindow, idAttachObj);
 //        window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
