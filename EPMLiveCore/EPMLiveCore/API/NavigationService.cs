@@ -808,7 +808,8 @@ namespace EPMLiveCore.API
                 }
                 catch { }
 
-                bool allowed = string.IsNullOrEmpty(url) && (li.ModerationInformation == null ||
+                bool allowed = ListCommands.GetGridGanttSettings(li.ParentList).EnableRequests &&
+                               string.IsNullOrEmpty(url) && (li.ModerationInformation == null ||
                                                              li.ModerationInformation.Status ==
                                                              SPModerationStatusType.Approved)
                                && li.Web.ID == _spWeb.ID && string.IsNullOrEmpty(childitem);

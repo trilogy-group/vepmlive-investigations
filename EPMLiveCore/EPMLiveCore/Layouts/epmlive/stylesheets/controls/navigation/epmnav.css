@@ -116,10 +116,10 @@
 }
 .epm-nav-sub .epm-nav-home {
   color: #969696 !important;
-  float: right;
   font-size: 18px;
-  line-height: 30px;
-  margin-right: 12px;
+  margin-left: 10px;
+  position: relative;
+  top: 2px;
 }
 .epm-nav-sub .epm-nav-icon {
   margin-left: 5px;
