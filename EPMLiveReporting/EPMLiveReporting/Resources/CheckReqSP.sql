@@ -20,13 +20,15 @@ BEGIN
       SET NOCOUNT ON;
 
     -- Insert statements for procedure here
+      CREATE TABLE #Groups (GroupId INT)
+	  INSERT INTO #Groups (GroupId) SELECT GROUPID FROM dbo.RPTGROUPUSER WHERE (USERID = @UserId) AND (SITEID = @SiteId)
+    
       SELECT DISTINCT SiteId, ItemWebId, ItemListId, ItemId, ParentWebId, WebId, WebUrl, WebTitle,
             CASE 
                   WHEN @UserId = 1073741823 THEN 1 
-                  WHEN (SELECT COUNT(*) FROM dbo.RPTWeb 
-                              INNER JOIN dbo.RPTWEBGROUPS ON dbo.RPTWeb.SiteId = dbo.RPTWEBGROUPS.SITEID AND dbo.RPTWeb.WebId = dbo.RPTWEBGROUPS.WEBID 
-                              LEFT OUTER JOIN dbo.RPTGROUPUSER ON dbo.RPTWEBGROUPS.SITEID = dbo.RPTGROUPUSER.SITEID AND dbo.RPTWEBGROUPS.GROUPID = dbo.RPTGROUPUSER.GROUPID
-                              WHERE ((SECTYPE = 0) AND (dbo.RPTWEBGROUPS.GROUPID = @UserId)) OR ((SECTYPE = 1) AND (USERID = @UserId))) > 0 THEN 1
+                  WHEN (WebId IN (SELECT WEBID FROM dbo.RPTWEBGROUPS 
+                        WHERE (SECTYPE = 1) AND (GROUPID IN (SELECT GroupId FROM #Groups)) 
+                        OR (SECTYPE = 0) AND (GROUPID = @UserId))) THEN 1
                   ELSE 0 
             END AS HasAccess
       FROM RPTWeb WHERE SiteId = @SiteId
