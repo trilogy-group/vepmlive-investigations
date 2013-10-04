@@ -108,7 +108,7 @@
                             y1: y1,
                             y2: y2,
                             onSelectEnd: function (img, selection) {
-                                $('#ResizeInfoField').val(w + '|' + h + '|' + selection.width + '|' + selection.height + '|' + selection.x1 + '|' + selection.y1 + '|' + selection.x2 + '|' + selection.y2);
+                                $('#ResizeInfoField').val(img.width + '|' + img.height + '|' + selection.width + '|' + selection.height + '|' + selection.x1 + '|' + selection.y1 + '|' + selection.x2 + '|' + selection.y2);
                             }
                         });
                     });
@@ -127,9 +127,15 @@
                     if (ready) {
                         prepareImage($pic);
                     } else {
+                        var timeout = 1;
+
+                        if(window.isIE8) {
+                            timeout = 500;
+                        }
+
                         window.setTimeout(function () {
                             tryLoadingImage();
-                        }, 1);
+                        }, timeout);
                     }
                 }
 
