@@ -48,15 +48,14 @@ namespace EPMLiveIntegrationService
                                 SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webapp.Id));
                                 cn.Open();
 
-                                SqlCommand cmd = new SqlCommand(@"SELECT     dbo.INT_CONTROLS.URL, INT_LISTS_1.INT_COLID, dbo.INT_LISTS.LIST_ID, dbo.INT_LISTS.INT_COLID AS Expr1, dbo.INT_LISTS.SITE_ID, dbo.INT_LISTS.WEB_ID, INT_LISTS_1.INT_LIST_ID
-                                                                    
-                                                                    FROM         dbo.INT_CONTROLS INNER JOIN
-                                                                    dbo.INT_LISTS AS INT_LISTS_1 ON dbo.INT_CONTROLS.INT_LIST_ID = INT_LISTS_1.INT_LIST_ID RIGHT OUTER JOIN
-                                                                    dbo.INT_LISTS ON INT_LISTS_1.LIST_ID = dbo.INT_LISTS.LIST_ID WHERE     (dbo.INT_LISTS.INT_LIST_ID = @integrationid) and Control=@control", cn);
+                                SqlCommand cmd = new SqlCommand(@"SELECT     INT_LISTS_1.INT_COLID, dbo.INT_LISTS.LIST_ID, dbo.INT_LISTS.INT_COLID AS Expr1, dbo.INT_LISTS.SITE_ID, dbo.INT_LISTS.WEB_ID, 
+                                                                      INT_LISTS_1.INT_LIST_ID
+                                                                        FROM         dbo.INT_CONTROLS INNER JOIN
+                                                                      dbo.INT_LISTS AS INT_LISTS_1 ON dbo.INT_CONTROLS.INT_LIST_ID = INT_LISTS_1.INT_LIST_ID RIGHT OUTER JOIN
+                                                                      dbo.INT_LISTS ON INT_LISTS_1.LIST_ID = dbo.INT_LISTS.LIST_ID WHERE     (dbo.INT_LISTS.INT_LIST_ID = @integrationid) and Control=@control", cn);
                                 cmd.Parameters.AddWithValue("@integrationid", IntegrationId);
                                 cmd.Parameters.AddWithValue("@control", Control);
 
-                                string url = "";
                                 int destcolid = 0;
                                 int srccolid = 0;
                                 Guid listid = Guid.Empty;
@@ -68,127 +67,122 @@ namespace EPMLiveIntegrationService
                                 if(dr.Read())
                                 {
                                     if(!dr.IsDBNull(0))
-                                        url = dr.GetString(0);
+                                        destcolid = dr.GetInt32(0);
 
-                                    if(!dr.IsDBNull(1))
-                                        destcolid = dr.GetInt32(1);
+                                    listid = dr.GetGuid(1);
+                                    srccolid = dr.GetInt32(2);
+                                    siteid = dr.GetGuid(3);
+                                    webid = dr.GetGuid(4);
 
-                                    listid = dr.GetGuid(2);
-                                    srccolid = dr.GetInt32(3);
-                                    siteid = dr.GetGuid(4);
-                                    webid = dr.GetGuid(5);
-
-                                    if(!dr.IsDBNull(6))
-                                        intlistuid = dr.GetGuid(6);
+                                    if(!dr.IsDBNull(5))
+                                        intlistuid = dr.GetGuid(5);
 
                                 }
 
                                 dr.Close();
-
-                                if(url != "")
+                                
+                                string url = "";
+                                if (webid != Guid.Empty)
                                 {
-                                    SPSecurity.RunWithElevatedPrivileges(delegate(){
-                                        using(SPSite site = new SPSite(siteid))
+                                    if (Control.ToLower().StartsWith("epmlive-"))
+                                    {
+                                        cmd = new SqlCommand("SELECT site_id, web_id, list_id, int_colid from INT_LISTS where INT_LIST_ID=@integrationid", cn);
+                                        cmd.Parameters.AddWithValue("@integrationid", IntegrationId);
+
+                                        dr = cmd.ExecuteReader();
+                                        if (dr.Read())
                                         {
-                                            using(SPWeb web = site.OpenWeb(webid))
+                                            siteid = dr.GetGuid(0);
+                                            webid = dr.GetGuid(1);
+                                            listid = dr.GetGuid(2);
+                                            srccolid = dr.GetInt32(3);
+                                        }
+
+                                        dr.Close();
+
+                                        Control = Control.Substring(8);
+
+                                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                                        {
+                                            using (SPSite site = new SPSite(siteid))
                                             {
-
-                                                SPList list = web.Lists[listid];
-
-                                                if(url.Contains("{ID}"))
+                                                using (SPWeb web = site.OpenWeb(webid))
                                                 {
-                                                    SPQuery query = new SPQuery();
-                                                    query.Query = "<Where><Eq><FieldRef Name='INTUID" + srccolid + "'/><Value Type='Text'>" + ID + "</Value></Eq></Where>";
+                                                    //SPList list = web.Lists[listid];
 
-                                                    SPListItemCollection lic = list.GetItems(query);
+                                                    //SPQuery query = new SPQuery();
+                                                    //query.Query = "<Where><Eq><FieldRef Name='INTUID" + srccolid + "'/><Value Type='Text'>" + ID + "</Value></Eq></Where>";
 
-                                                    if(lic.Count > 0)
-                                                    {
-                                                        string newid = "";
-                                                        try
-                                                        {
-                                                            newid = lic[0]["INTUID" + destcolid].ToString();
-                                                        }
-                                                        catch { }
-                                                        if(newid != "")
-                                                        {
-                                                            url = url.Replace("{ID}", newid);
-                                                        }
-                                                        else
-                                                        {
-                                                            url = "";
-                                                            lblMessage.Text = "Unable to find related item id with id: " + ID;
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        url = "";
-                                                        lblMessage.Text = "Unable to find item with id: " + ID;
+                                                    //SPListItemCollection lic = list.GetItems(query);
 
-                                                    }
+                                                    //if(lic.Count > 0)
+                                                    //{
+                                                    //    url = web.Url + "/_layouts/epmlive/integration/opencontrol.aspx?control=" + Control + "&id=" + lic[0].ID +"&intid=" + IntegrationId;
+                                                    //}
+                                                    url = web.Url + "/_layouts/epmlive/integration/opencontrol.aspx?control=" + Control + "&id=" + ID + "&intid=" + IntegrationId;
+
                                                 }
 
-                                                url = url.Replace("{INTID}", intlistuid.ToString());
-
-                                                EPMLiveCore.API.Integration.IntegrationCore core = new EPMLiveCore.API.Integration.IntegrationCore(siteid, webid);
-                                                //url = core.GetControlURL(intlistuid, listid, Control, url);
                                             }
-                                        }
 
-                                    });
 
-                                    if(url != "")
-                                        lblMessage.Text = url;
-                                        //Response.Redirect(url);
-                                }
-                                else if(Control.ToLower().StartsWith("epmlive-"))
-                                {
-                                    cmd = new SqlCommand("SELECT site_id, web_id, list_id, int_colid from INT_LISTS where INT_LIST_ID=@integrationid", cn);
-                                    cmd.Parameters.AddWithValue("@integrationid", IntegrationId);
-                                    
-                                    dr = cmd.ExecuteReader();
-                                    if(dr.Read())
-                                    {
-                                        siteid = dr.GetGuid(0);
-                                        webid = dr.GetGuid(1);
-                                        listid = dr.GetGuid(2);
-                                        srccolid = dr.GetInt32(3);
+                                        });
+
+                                        if (url != "")
+                                            lblMessage.Text = url;
+
+
                                     }
-
-                                    dr.Close();
-
-                                    Control = Control.Substring(8);
-
-                                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                                    else
                                     {
-                                        using(SPSite site = new SPSite(siteid))
+
+                                        EPMLiveCore.API.Integration.IntegrationCore core = new EPMLiveCore.API.Integration.IntegrationCore(siteid, webid);
+                                        string ItemId = "";
+                                        if (ID != "")
                                         {
-                                            using(SPWeb web = site.OpenWeb(webid))
+                                            SPSecurity.RunWithElevatedPrivileges(delegate()
                                             {
-                                                //SPList list = web.Lists[listid];
+                                                using (SPSite site = new SPSite(siteid))
+                                                {
+                                                    using (SPWeb web = site.OpenWeb(webid))
+                                                    {
+                                                        SPList list = web.Lists[listid];
 
-                                                //SPQuery query = new SPQuery();
-                                                //query.Query = "<Where><Eq><FieldRef Name='INTUID" + srccolid + "'/><Value Type='Text'>" + ID + "</Value></Eq></Where>";
+                                                        try
+                                                        {
+                                                            SPQuery query = new SPQuery();
+                                                            query.Query = "<Where><Eq><FieldRef Name='INTUID" + srccolid + "'/><Value Type='Text'>" + ID + "</Value></Eq></Where>";
 
-                                                //SPListItemCollection lic = list.GetItems(query);
+                                                            SPListItemCollection lic = list.GetItems(query);
 
-                                                //if(lic.Count > 0)
-                                                //{
-                                                //    url = web.Url + "/_layouts/epmlive/integration/opencontrol.aspx?control=" + Control + "&id=" + lic[0].ID +"&intid=" + IntegrationId;
-                                                //}
-                                                url = web.Url + "/_layouts/epmlive/integration/opencontrol.aspx?control=" + Control + "&id=" + ID + "&intid=" + IntegrationId;
-                                                
+                                                            if (lic.Count > 0)
+                                                            {
+                                                                ItemId = lic[0]["INTUID" + destcolid].ToString();
+                                                            }
+                                                        }
+                                                        catch
+                                                        {
+                                                        }
+                                                    }
+
+                                                }
+
+                                            });
+
+                                            if (ItemId != "")
+                                            {
+                                                url = core.GetControlURL(intlistuid, listid, Control, ItemId);
                                             }
-                                            
+                                            else
+                                            {
+                                                lblMessage.Text = "Couldn't find matching ID";
+                                            }
                                         }
-
-
-                                    });
-
-                                    if(url != "")
-                                        lblMessage.Text = url;
-
-
+                                        else
+                                        {
+                                            url = core.GetControlURL(intlistuid, listid, Control, "");
+                                        }
+                                    }
                                 }
                                 else
                                 {
