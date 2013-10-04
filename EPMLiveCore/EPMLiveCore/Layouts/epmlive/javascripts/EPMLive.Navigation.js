@@ -712,7 +712,7 @@
                             var lId = '';
                             var iId = '';
 
-                            if (itemId === 'undefined') {
+                            if (itemId !== 'undefined') {
                                 try {
                                     var info = window.epmLiveNavigation.wsTeamDict[webId].split('.');
                                     if (info[2] !== '-1') {
@@ -1835,6 +1835,8 @@
 
                             var commands = [];
 
+                            var webId = null;
+
                             if ($li.hasClass('epm-nav-ws-node')) {
                                 var found = false;
 
@@ -1849,11 +1851,16 @@
                                 } else {
                                     commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
                                 }
+
+                                webId = liId;
                             } else {
                                 commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
+                                webId = $($li.find('a').get(0)).data('webid');
                             }
-
-                            commands.push({ title: 'Manage team', command: 'nav:team', kind: 6 });
+                            
+                            if (window.epmLiveNavigation.wsTeamDict[webId] !== 'X') {
+                                commands.push({ title: 'Edit team', command: 'nav:team', kind: 6 });
+                            }
 
                             menuManager.setupMenu($li, commands);
                         });

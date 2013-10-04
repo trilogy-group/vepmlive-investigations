@@ -203,7 +203,12 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 
 .ms-core-needIEFilter#globalNavBox { filter: none !important }
 
-.ms-browseTab { display: none; }
+.ms-browseTab a:hover,
+.ms-browseTab a:active {
+    border: 1px solid #F0F0F0 !important;
+    background: #F0F0F0 !important;
+    cursor: pointer;
+}
 
 /* modification to 2013 toolbar styles */
 

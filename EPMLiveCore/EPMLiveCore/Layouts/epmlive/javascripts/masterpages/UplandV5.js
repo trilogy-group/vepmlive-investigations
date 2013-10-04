@@ -191,7 +191,7 @@
 
         configureSearchBox();
         addUpdateProfilePicLink();
-        configureTooltips();   
+        configureTooltips();
     };
 
     ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
