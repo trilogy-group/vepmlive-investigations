@@ -77,7 +77,7 @@
 <div id="idNoteTabDiv" style="display:none;"></div>
 
 <div class="modalContent" id="idSelectPIsDlgDiv" style="display:none;">
-	<div style="margin-top:20px"">
+	<div style="margin-top:20px">
  	    <div id="idPIListDiv" style="border:1px solid #ccc; width:226px; height:100px; overflow-y:scroll; overflow-x:hidden;"></div>         
 	    <div style="float:right;">
 		    <div class="button-container" >
