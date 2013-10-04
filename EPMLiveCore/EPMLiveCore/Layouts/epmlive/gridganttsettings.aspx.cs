@@ -404,14 +404,19 @@ namespace EPMLiveCore.Layouts.epmlive
             SPQuery getAllItemsQuery = new SPQuery();
             getAllItemsQuery.Query = "<Where><Eq><FieldRef Name='Active' /><Value Type='Bool'>True</Value></Eq></Where><OrderBy><FieldRef Name=\"Title0\" Ascending=\"True\" /></OrderBy>";
             SPList tmpGalList = SPContext.Current.Web.Lists.TryGetList("Template Gallery");
-            SPListItemCollection templates = tmpGalList.GetItems(getAllItemsQuery);
-            foreach (SPListItem template in templates)
+            if (tmpGalList != null)
             {
-                // the templatetype is not matching, skip this template
-                if (template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id] != null &&
-                    template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id].ToString().Trim().Equals("workspace", StringComparison.CurrentCultureIgnoreCase))
+                SPListItemCollection templates = tmpGalList.GetItems(getAllItemsQuery);
+                foreach (SPListItem template in templates)
                 {
-                    result.Add(template["Description"].ToString(), template.ID);
+                    // the templatetype is not matching, skip this template
+                    if (template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id] != null &&
+                        template[tmpGalList.Fields.GetFieldByInternalName("TemplateType").Id].ToString()
+                            .Trim()
+                            .Equals("workspace", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        result.Add(template["Description"].ToString(), template.ID);
+                    }
                 }
             }
 
