@@ -1438,6 +1438,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="AppsListEvents\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{a0b8e287-cd4e-45c4-b77c-6ec4dfe05a4a}</SharePointProjectItemId>
     </None>
+    <None Include="BrowseTab\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{2e4786ae-6776-4f81-834b-6638e6804a51}</SharePointProjectItemId>
+    </None>
     <None Include="BuildTeam\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9cf05ac6-0692-49fb-8c37-2ec1acb6a29c}</SharePointProjectItemId>
     </None>
@@ -2044,6 +2047,8 @@ net start "WETimer"</PostDeploymentCommand>
       <Link>EPMLiveIntegration.dll</Link>
     </Content>
     <Content Include="AppsListEvents\Elements.xml" />
+    <Content Include="BrowseTab\Elements.xml" />
+    <Content Include="BrowseTab\Sample.txt" />
     <Content Include="BuildTeam\Elements.xml" />
     <Content Include="CONFIG\webconfig.EPMLIVE.xml" />
     <Content Include="Controls\Navigation\EPMLiveNavigationDataSource\Elements.xml" />
@@ -2281,6 +2286,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Images\spgraphic.gif" />
     <Content Include="Images\Sr_Overdue.gif" />
     <Content Include="Images\Star.GIF" />
+    <Content Include="Images\tx_projectinfo.png" />
     <Content Include="Images\Urgent.GIF" />
     <Content Include="Images\waiting.png" />
     <Content Include="Images\WESite.png" />

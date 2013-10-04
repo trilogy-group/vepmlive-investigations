@@ -189,6 +189,23 @@
             }
         };
 
+        window.fixGridMenus = function() {
+            window.setTimeout(function() {
+                $('.js-callout-mainElement').each(function() {
+                    var $menu = $(this);
+                    
+                    if ($menu.is(':visible')) {
+                        var menuOffset = $menu.offset();
+                        var leftOffset = $('#s4-workspace').offset().left;
+                        
+                        if (menuOffset.left < leftOffset) {
+                            $menu.offset({ top: menuOffset.top, left: leftOffset + 12 });
+                        }
+                    }
+                });
+            }, 0);
+        };
+
         configureSearchBox();
         addUpdateProfilePicLink();
         configureTooltips();
