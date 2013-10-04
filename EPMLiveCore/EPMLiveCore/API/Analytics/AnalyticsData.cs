@@ -139,15 +139,29 @@ namespace EPMLiveCore.API
         {
             get
             {
-                string sIcon;
-                if (!string.IsNullOrEmpty(mgr.GetPropVal("ListIconClass")))
+                var sIcon = string.Empty;
+                try
                 {
-                    sIcon = mgr.GetPropVal("ListIconClass");
+                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    {
+                        using (var s = new SPSite(SiteId))
+                        {
+                            using (var w = s.OpenWeb(WebId))
+                            {
+                                var list = w.Lists[ListId];
+                                var settings = new GridGanttSettings(list);
+                                sIcon = settings.ListIcon;
+                            }
+                        }
+                    });
                 }
-                else
+                catch { }
+
+                if (string.IsNullOrEmpty(sIcon))
                 {
-                    sIcon = IsPage ? DEFAULT_PAGE_ICON : DEFAULT_LIST_ICON;
-                }
+                    sIcon = !IsItem ? DEFAULT_PAGE_ICON : DEFAULT_LIST_ICON;
+                }   
+                
                 return sIcon;
             }
         }
@@ -196,10 +210,13 @@ namespace EPMLiveCore.API
         {
             get
             {
-                bool isItem = (string.IsNullOrEmpty(ListViewUrl)
-                                && ListId != Guid.Empty
-                                && ItemId != -1
-                                && FileIsNull);
+                bool isItem = false;
+                var s = mgr.GetPropVal("IsItem");
+                if (!string.IsNullOrEmpty(s))
+                {
+                    isItem = bool.Parse(s);
+                }
+
                 return isItem;
             }
         }
@@ -210,14 +227,6 @@ namespace EPMLiveCore.API
             {
                 bool isListView = !string.IsNullOrEmpty(ListViewUrl) && ListId != Guid.Empty;
                 return isListView;
-            }
-        }
-
-        public bool IsPage
-        {
-            get
-            {
-                return (!IsItem && !IsListView);
             }
         }
     }

@@ -638,7 +638,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
             title: "Add Favorite Item",
             dialogReturnValueCallback: function (diagResult, retVal) {
                 if (diagResult === 1) {
-                    window.Analytics.addItemFavFromGrid(retVal, itemid);
+                    window.Analytics.addItemFavFromGrid(retVal, webid, listid, itemid);
                 }
             }
         };
@@ -654,7 +654,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
         }
     }
     else if (action == "RemoveFavorite") {
-        window.Analytics.removeItemFavFromGrid(itemid);
+        window.Analytics.removeItemFavFromGrid(webid, listid, itemid);
     }
     else if (action == "createworkspace" && this._hasTemplateList) {
         CreateEPMLiveWorkspace(listid, itemid);

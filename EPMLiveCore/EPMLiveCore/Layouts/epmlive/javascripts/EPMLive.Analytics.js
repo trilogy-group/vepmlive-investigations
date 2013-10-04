@@ -33,9 +33,20 @@
                             // is item
                             if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
                                 // do nothing
-                            // is page or non item
+                                // is page or non item
                             } else {
-                                $('#favoritesStar').fadeIn(1000);
+                                window.setTimeout(function () {
+                                    if (!$('#favoritesStar').hasClass('icon-star')) {
+                                        $('#favoritesStar').addClass('icon-star');
+                                    }
+
+                                    if (!$('#favoritesStar').hasClass('icon-star-disabled')) {
+                                        $('#favoritesStar').addClass('icon-star-disabled');
+                                    }
+
+                                    $('#favoritesStar').fadeIn(1000);
+                                }, 100);
+
                             }
                         } else if ($$.responseIsSuccess(result) && result['#text'] === 'true') {
                             // is item
@@ -45,10 +56,19 @@
                                     $(this).load(function () { $(this).fadeIn(); });
                                     $(this).attr("src", "_layouts/epmlive/images/star-filled32.png");
                                 });
-                            // is page or non item
+                                // is page or non item
                             } else {
-                                $('#favoritesStar').addClass('icon-star-active');
-                                $('#favoritesStar').fadeIn(1000);
+                                window.setTimeout(function () {
+                                    if (!$('#favoritesStar').hasClass('icon-star')) {
+                                        $('#favoritesStar').addClass('icon-star');
+                                    }
+
+                                    if (!$('#favoritesStar').hasClass('icon-star-active')) {
+                                        $('#favoritesStar').addClass('icon-star-active');
+                                    }
+
+                                    $('#favoritesStar').fadeIn(1000);
+                                }, 100);
                             }
                         }
 
@@ -73,7 +93,7 @@
                                 };
 
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
-                                
+
                                 var myVar = setInterval(function () { setFocus(); }, 200);
                                 function setFocus() {
                                     if ($('.ms-dlgFrameContainer').find('#favTitle').length > 0 && !$('.ms-dlgFrameContainer').find('#favTitle').is(':focus')) {
@@ -97,7 +117,7 @@
             });
         }
 
-        a.addPageFav = function(title) {
+        a.addPageFav = function (title) {
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
@@ -117,7 +137,7 @@
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.d) {
                         var resp = epmLive.parseJson(response.d);
                         var result = resp.Result;
@@ -169,13 +189,13 @@
                         //onError(response);
                     }
                 },
-                error: function(response) {
+                error: function (response) {
                     //onError(response);
                 }
             });
         };
 
-        a.addItemFav = function(title) {
+        a.addItemFav = function (title) {
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
@@ -195,7 +215,7 @@
                     "</Data>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.d) {
                         var resp = epmLive.parseJson(response.d);
                         var result = resp.Result;
@@ -203,8 +223,8 @@
                         if (epmLive.responseIsSuccess(result) && result['#text']) {
                             //onSuccess(result);
                             if ($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star32.png') {
-                                $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function() {
-                                    $(this).load(function() { $(this).fadeIn(); });
+                                $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
+                                    $(this).load(function () { $(this).fadeIn(); });
                                     $(this).attr("src", "_layouts/epmlive/images/star-filled32.png");
                                 });
                             }
@@ -230,7 +250,7 @@
                             // asynchronously update nav
                             // 0 is page, 1 is item
                             var favKindInt = 1;
-                           
+
                             window.epmLiveNavigation.registerLink({
                                 kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
                                 id: sa[0],
@@ -250,7 +270,7 @@
                         //onError(response);
                     }
                 },
-                error: function(response) {
+                error: function (response) {
                     //onError(response);
                 }
             });
@@ -280,7 +300,7 @@
                         var result = resp.Result;
 
                         if (epmLive.responseIsSuccess(result) && result['#text']) {
-                           
+
                             toastr.options = {
                                 "closeButton": false,
                                 "debug": false,
@@ -302,7 +322,7 @@
                             // asynchronously update nav
                             // 0 is page, 1 is item
                             var favKindInt = 1;
-                          
+
                             window.epmLiveNavigation.registerLink({
                                 kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
                                 id: sa[0],
@@ -395,7 +415,7 @@
             });
         };
 
-        a.removeItemFav = function() {
+        a.removeItemFav = function () {
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
@@ -466,10 +486,10 @@
                 }
             });
         };
-        
+
         a.removeItemFavFromGrid = function (webid, listid, itemid) {
             // missing id from grid, add it explicitly
-            
+
             $.ajax({
                 type: 'POST',
                 url: epmLive.currentWebFullUrl + '/_vti_bin/WorkEngine.asmx/Execute',
@@ -543,9 +563,9 @@
                 "<Param key=\"Type\">3</Param>" +
                 "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
             "</Data>";
-        
+
         function countFrequentApps() {
-            
+
             var sPrevList = '';
             if ($.cookie('FrequentApp_CurrentList')) {
                 sPrevList = $.cookie('FrequentApp_CurrentList');
@@ -566,7 +586,7 @@
                     dataType: 'json',
                     success: function (response) {
                         if (response.d) {
-                            
+
                         }
                     },
                     error: function (response) {
@@ -574,11 +594,11 @@
                     }
                 });
             }
-            
+
         }
-        
+
         countFrequentApps();
-        
+
         //====== RECENT ========================
         var RecentData =
             "<Data>" +
@@ -618,7 +638,7 @@
 
         //====== HELPER FUNCTIONS =============
 
-        a.turnOnFav = function() {
+        a.turnOnFav = function () {
             if (!$('#favoritesStar').hasClass('icon-star-active')) {
                 $('#favoritesStar').addClass('icon-star-active');
             }
@@ -634,18 +654,18 @@
                 }
                 // an item
             } else {
-                
+
             }
         };
 
-        a.getAddFavDynamicValue = function(ele) {
+        a.getAddFavDynamicValue = function (ele) {
             return $($(ele).parent().parent().find('#favTitle').get(0)).val();
         };
-        
+
         a.getAddFavItemFromGridDynamicValue = function (ele) {
             return $($(ele).parent().parent().find('#favItemTitle').get(0)).val();
         };
-        
+
         function removeSource(url) {
             var retVal = url;
             if (url.indexOf('Source') != -1) {
@@ -656,9 +676,9 @@
                     if (sa2[i].split('=')[0].toLowerCase() === "source") {
                         sRemove = sa2;
                         break;
-                    } 
+                    }
                 }
-                
+
                 if (sRemove) {
                     retVal = retVal.replace(sRemove, '');
                 }

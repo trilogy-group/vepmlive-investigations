@@ -70,8 +70,8 @@
 	                    <%--<div class="workspace-loading"  id="marketLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle;margin-left: 320px; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
-                            <div style="">There are no online templates available</div>
+	                    <div style="height: 50px; vertical-align: middle;margin-right:auto;margin-left: auto; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
+                            <div style="text-align: center">There are no online templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (marketApps().length > 0)">
 		                    <ol data-bind="foreach: marketApps">
@@ -101,8 +101,8 @@
 	                    <%--<div class="workspace-loading" id="localLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle; margin-left: 320px; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
-                            <div style="">There are no local templates available</div>
+	                    <div style="height: 50px; vertical-align: middle; margin-right:auto;margin-left: auto; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
+                            <div style="text-align: center">There are no local templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (downloadedApps().length > 0)">
 		                    <ol data-bind="foreach: downloadedApps">

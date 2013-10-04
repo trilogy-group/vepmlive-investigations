@@ -1496,27 +1496,32 @@ function GEInit() {
         }
 
         function HideSPControls(controlProps) {
-            if (controlProps.ControlInfo.GenericEntityDivIdRoot != '') {
+
+            //if (controlProps.ControlInfo.GenericEntityDivIdRoot != '') {
+            //    // hide SP Control
+            //    $('#' + controlProps.ControlInfo.GenericEntityDivIdRoot).siblings().css('height', '0px');
+            //}
+            //if (controlProps.ControlInfo.GenericEntityCheckNameId != '') {
+            //    // hide validation button
+            //    $('#' + controlProps.ControlInfo.GenericEntityCheckNameId).css('height', '0px');
+            //}
+
+            //if (controlProps.ControlInfo.DropDownClientId != '') {
+            //    $('#' + controlProps.ControlInfo.DropDownClientId).parent().siblings().css('height', '0px');
+            //}
+
+            //if (controlProps.ControlInfo.TextBoxClientId != '') {
+            //    $('#' + controlProps.ControlInfo.TextBoxClientId).parent().siblings().css('height', '0px');
+            //}
+
+            //if (controlProps.ControlInfo.DropImageClientId != '') {
+            //    $('#' + controlProps.ControlInfo.DropImageClientId).parent().siblings().css('height', '0px');
+            //}
+
+            if (controlProps.ControlInfo.GenericEntityDivIdRoot !== undefined) {
                 // hide SP Control
-                $('#' + controlProps.ControlInfo.GenericEntityDivIdRoot).siblings().css('display', 'none');
+                $('#' + controlProps.ControlInfo.GenericEntityDivIdRoot).siblings().wrap("<div style='height: 0px; overflow: hidden;'></div>");
             }
-            if (controlProps.ControlInfo.GenericEntityCheckNameId != '') {
-                // hide validation button
-                $('#' + controlProps.ControlInfo.GenericEntityCheckNameId).css('display', 'none');
-            }
-
-            if (controlProps.ControlInfo.DropDownClientId != '') {
-                $('#' + controlProps.ControlInfo.DropDownClientId).parent().siblings().css('display', 'none');
-            }
-
-            if (controlProps.ControlInfo.TextBoxClientId != '') {
-                $('#' + controlProps.ControlInfo.TextBoxClientId).parent().siblings().css('display', 'none');
-            }
-
-            if (controlProps.ControlInfo.DropImageClientId != '') {
-                $('#' + controlProps.ControlInfo.DropImageClientId).parent().siblings().css('display', 'none');
-            }
-
         }
 
         function SetProperOuterTableCssClass(GenericEntityDivIdRoot) {
@@ -1555,6 +1560,6 @@ function GEInit() {
     }(window.epmLiveGenericEntityEditor = window.epmLiveGenericEntityEditor || {}, jQuery, window));
 
 }
-ExecuteOrDelayUntilScriptLoaded(GEInit, "EPMLive.js");
+ExecuteOrDelayUntilScriptLoaded(GEInit, "clientforms.js");
 
 
