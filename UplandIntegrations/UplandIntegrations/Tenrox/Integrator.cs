@@ -359,7 +359,7 @@ namespace UplandIntegrations.Tenrox
                         Control = "TX_ProjectInfo",
                         Title = "Project Info",
                         Image = "tx_projectinfo.png",
-                        Window = IntegrationControlWindowStyle.FullDialog
+                        Window = IntegrationControlWindowStyle.SmallDialog
                     }
                     
                 };
