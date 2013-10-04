@@ -131,9 +131,25 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 string cWebId = S(childWeb["WebId"]);
 
                 string itemId = string.Empty;
-                if(!S(childWeb["ItemId"]).Equals("-1"))
+
+                string cItemId = S(childWeb["ItemId"]);
+                if (!string.IsNullOrEmpty(cItemId) && !cItemId.Equals("-1"))
                 {
-                    itemId = S(childWeb["ItemWebId"]) + "." + S(childWeb["ItemListId"]) + "." + S(childWeb["ItemId"]);
+                    itemId = S(childWeb["ItemWebId"]) + "." + S(childWeb["ItemListId"]) + "." + cItemId;
+                }
+
+                if (string.IsNullOrEmpty(itemId))
+                {
+                    using (var spSite = new SPSite(SiteId))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
+                        {
+                            if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                            {
+                                itemId = "X";
+                            }
+                        }
+                    }
                 }
 
                 yield return new SPNavLink

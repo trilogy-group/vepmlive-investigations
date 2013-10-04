@@ -131,6 +131,12 @@ module EPM {
 
             if (browser.msie && parseInt(browser.version) < 9) {
                 $.fn.fadeIn = function (duration, callback) {
+                    if (!callback) {
+                        if (typeof (duration) === "function") {
+                            callback = duration;
+                        }
+                    }
+
                     if (callback) {
                         setTimeout(function () {
                             callback();
@@ -141,6 +147,12 @@ module EPM {
                 };
 
                 $.fn.fadeOut = function (duration, callback) {
+                    if (!callback) {
+                        if (typeof (duration) === "function") {
+                            callback = duration;
+                        }
+                    }
+
                     if (callback) {
                         setTimeout(function () {
                             callback();
