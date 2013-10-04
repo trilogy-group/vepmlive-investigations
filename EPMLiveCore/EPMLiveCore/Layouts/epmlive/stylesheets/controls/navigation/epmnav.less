@@ -16,6 +16,7 @@
 @link-hover:#3376A4;
 @menu-color: #999999;
 @link-color:#666666;
+@header-color: #969696;
 @icon-font:2.2em;
 @header-font:12px;
 @link-font:12px;
@@ -178,6 +179,16 @@
     display: none;
     position: relative;
 
+    .epm-nav-home {
+        padding-left: 10px;
+        top: 3px;
+        position: relative;
+        font-size: 18px;
+        line-height: 18px;
+        float: right;
+        color: @header-color !important;
+    }
+
     .epm-nav-icon {
         margin-left: 5px;
         position: relative;
@@ -230,7 +241,7 @@
     li.epm-nav-sub-header-bottom,
     li.epm-nav-section-header {
         border-bottom: 1px solid #D6D6D6;
-        color: #969696;
+        color: @header-color;
         font-family: Open Sans Regular;
         font-size: 12.75px;
         font-size: 12px\9;
@@ -593,7 +604,7 @@
             -moz-border-radius: 15px;
             -webkit-border-radius: 15px;
             border-radius: 15px;
-			outline-style:none;
+            outline-style: none;
         }
 
         .RadTreeView {

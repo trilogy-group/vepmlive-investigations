@@ -114,6 +114,15 @@
   display: none;
   position: relative;
 }
+.epm-nav-sub .epm-nav-home {
+  padding-left: 10px;
+  top: 3px;
+  position: relative;
+  font-size: 18px;
+  line-height: 18px;
+  float: right;
+  color: #969696 !important;
+}
 .epm-nav-sub .epm-nav-icon {
   margin-left: 5px;
   position: relative;
