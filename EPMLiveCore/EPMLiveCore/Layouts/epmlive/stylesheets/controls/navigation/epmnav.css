@@ -117,6 +117,13 @@
   display: none;
   position: relative;
 }
+.epm-nav-sub a.epm-nav-ws-disabled {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+}
 .epm-nav-sub div.epm-nav-home {
   color: #969696 !important;
   margin-left: 6px;

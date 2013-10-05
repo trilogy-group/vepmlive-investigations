@@ -227,7 +227,8 @@
                         window.epmLiveNavigation.wsInfoDict[link.webId] = {
                             siteId: link.siteId,
                             listId: listId,
-                            itemId: itemId
+                            itemId: itemId,
+                            hasAccess: link.active
                         };
 
                         parent.get_nodes().add(node);
@@ -1249,11 +1250,18 @@
                                 var $parent = $a.parent();
                                 var text = $a.text();
                                 
-                                $parent.append('<div id="' + wTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
+                                var webId = wTree.findNodeByText(text).get_value();
+                                
+                                $parent.append('<div id="' + webId + '" class="epm-nav-ws-node"></div>');
                                 $a.remove();
 
                                 $a.text('');
                                 $a.append('<span>' + text + '</span>');
+                                
+                                if (!window.epmLiveNavigation.wsInfoDict[webId].hasAccess) {
+                                    $a.addClass('epm-nav-ws-disabled');
+                                }
+
                                 $parent.find('.epm-nav-ws-node').append($a);
                             });
 
@@ -1882,32 +1890,40 @@
 
                             var webId = null;
 
+                            var proceed = true;
+
                             if ($li.hasClass('epm-nav-ws-node')) {
-                                var found = false;
+                                if (window.epmLiveNavigation.wsInfoDict[liId].hasAccess) {
+                                    var found = false;
 
-                                $('#epm-nav-sub-workspaces-static-links').find('a').each(function () {
-                                    if ($(this).data('webid') === liId) {
-                                        found = true;
+                                    $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
+                                        if ($(this).data('webid') === liId) {
+                                            found = true;
+                                        }
+                                    });
+
+                                    if (found) {
+                                        commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
+                                    } else {
+                                        commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
                                     }
-                                });
 
-                                if (found) {
-                                    commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
+                                    webId = liId;
                                 } else {
-                                    commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
+                                    proceed = false;
                                 }
-
-                                webId = liId;
                             } else {
                                 commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
                                 webId = $($li.find('a').get(0)).data('webid');
                             }
                             
-                            if (window.epmLiveNavigation.wsTeamDict[webId] !== 'X') {
-                                commands.push({ title: 'Edit team', command: 'nav:team', kind: 6 });
-                            }
+                            if (proceed) {
+                                if (window.epmLiveNavigation.wsTeamDict[webId] !== 'X') {
+                                    commands.push({ title: 'Edit team', command: 'nav:team', kind: 6 });
+                                }
 
-                            menuManager.setupMenu($li, commands);
+                                menuManager.setupMenu($li, commands);
+                            }
                         });
                     };
 
@@ -1938,7 +1954,9 @@
                     };
 
                     var _addMenu = function ($li) {
-                        window.epmLiveNavigation.addFavoriteWSMenu($li);
+                        if (window.epmLiveNavigation.wsInfoDict[$li.get(0).id].hasAccess) {
+                            window.epmLiveNavigation.addFavoriteWSMenu($li);
+                        }
                     };
 
                     var _configNodeWidth = function () {
