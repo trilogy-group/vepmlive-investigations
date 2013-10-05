@@ -7,7 +7,7 @@
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="FavoriteStatus.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.FavoriteStatus" %>
 
-<div id="EPMLiveFavoriteStatus" style="display: block !important; vertical-align: middle;">
+<div id="EPMLiveFavoriteStatus" style="width:30px; display:inline-block !important;vertical-align: middle;">
     
     <Sharepoint:StyleBlock runat="server">
         body {
