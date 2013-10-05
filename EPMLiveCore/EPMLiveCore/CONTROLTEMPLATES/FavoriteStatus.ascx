@@ -7,7 +7,7 @@
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="FavoriteStatus.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.FavoriteStatus" %>
 
-<div id="EPMLiveFavoriteStatus" style="width: 100px; width: 30px; display: inline-block; vertical-align: middle;">
+<div id="EPMLiveFavoriteStatus" style="display: block !important; vertical-align: middle;">
     
     <Sharepoint:StyleBlock runat="server">
         body {
@@ -25,9 +25,24 @@
             color: #0072C6 !important;
             cursor: pointer;
         }
+        
+        <!--[if IE 8]>
+        .ms-cui-tt-a{
+            width: auto !important;
+        }
+        
+        .ms-cui-tt-span{
+            display: block !important;
+            padding: 8px 10px !important;
+            text-align: center !important;
+        }
+        <![endif]-->
+
     </Sharepoint:StyleBlock>
    
-    <span style="display: none;color:#D1D1D1;font-size:18px;" class="icon-star icon-star-disabled" id="favoritesStar" ></span>
+    <div>
+        <span id="favoritesStar" style="font-size:18px;" ></span>
+    </div>
 </div>
 
 <div id="fav_Add_DivTemp" style="display:none" style="width: 265px;">
