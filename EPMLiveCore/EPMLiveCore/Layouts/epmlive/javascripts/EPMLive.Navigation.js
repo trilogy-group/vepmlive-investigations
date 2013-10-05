@@ -1954,7 +1954,12 @@
                     };
 
                     var _addMenu = function ($li) {
-                        if (window.epmLiveNavigation.wsInfoDict[$li.get(0).id].hasAccess) {
+                        var wsInfoDict = window.epmLiveNavigation.wsInfoDict[$li.get(0).id];
+                        if (wsInfoDict) {
+                            if (wsInfoDict.hasAccess) {
+                                window.epmLiveNavigation.addFavoriteWSMenu($li);
+                            }
+                        } else {
                             window.epmLiveNavigation.addFavoriteWSMenu($li);
                         }
                     };
