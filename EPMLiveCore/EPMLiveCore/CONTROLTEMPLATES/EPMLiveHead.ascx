@@ -17,7 +17,7 @@
 
             var url = (window.location.href + '').toLowerCase();
             if (url.indexOf('isdlg') === -1) {
-                styles.push('masterpages/upland.icons.min');
+                styles.push('masterpages/upland.icons');
                 styles.push('libraries/jquery-ui');
             } else {
                 if (url.indexOf('/ppm/') === -1) {
@@ -32,7 +32,7 @@
 
                 style.type = 'text/css';
                 style.rel = 'stylesheet';
-                style.href = '/_layouts/15/epmlive/stylesheets/' + styles[i] + '.css?v=<%= EPMLiveVersion %>';
+                style.href = '/_layouts/15/epmlive/stylesheets/' + styles[i] + '.min.css?v=<%= EPMLiveVersion %>';
 
                 head.appendChild(style);
             }
