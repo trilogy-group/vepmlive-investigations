@@ -1972,21 +1972,27 @@
                     };
 
                     var _initSearch = function () {
-                        var $sb = $('#EPMNavWSTSearch');
+                        if ($.fn.bindWithDelay) {
+                            var $sb = $('#EPMNavWSTSearch');
 
-                        $sb.val('');
-                        $sb.bindWithDelay('keyup', function () {
-                            var term = $(this).val().trim();
-                            if (term) {
-                                if (term.length > 1) {
-                                    filterTree(term.toLowerCase());
+                            $sb.val('');
+                            $sb.bindWithDelay('keyup', function() {
+                                var term = $(this).val().trim();
+                                if (term) {
+                                    if (term.length > 1) {
+                                        filterTree(term.toLowerCase());
+                                    } else {
+                                        showAllNodes();
+                                    }
                                 } else {
                                     showAllNodes();
                                 }
-                            } else {
-                                showAllNodes();
-                            }
-                        }, 200);
+                            }, 200);
+                        } else {
+                            window.setTimeout(function() {
+                                _initSearch();
+                            }, 100);
+                        }
                     };
 
                     var filterTree = function (term) {
