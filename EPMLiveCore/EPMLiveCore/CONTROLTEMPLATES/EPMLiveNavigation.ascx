@@ -164,6 +164,7 @@
                 <% } %> 
             </div>       
         <% } %>
+        <div id="epm-nav-sub-bottom-ph">&nbsp;</div>
     </div>
 </div>
 

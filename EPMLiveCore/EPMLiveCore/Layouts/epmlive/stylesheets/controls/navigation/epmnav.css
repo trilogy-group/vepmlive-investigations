@@ -110,6 +110,9 @@
   -moz-transition: All 0.2s ease;
   transition: All 0.2s ease;
 }
+#epm-nav-sub-bottom-ph {
+  height: 75px;
+}
 .epm-nav-sub {
   display: none;
   position: relative;
