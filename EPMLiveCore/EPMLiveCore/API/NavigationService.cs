@@ -403,6 +403,8 @@ namespace EPMLiveCore.API
                             }
                         }
 
+                        if (!actions.Any()) return;
+
                         string lastTitle = string.Empty;
 
                         Tuple<string, string, string, string, bool> lastAction = actions.Last();

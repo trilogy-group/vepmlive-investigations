@@ -1655,16 +1655,18 @@
                         epmLiveService.execute('GetContextualMenuItems', data, function (response) {
                             var commands = [];
 
-                            var items = response.ContextualMenus.Items.Item;
+                            if (response.ContextualMenus.Items) {
+                                var items = response.ContextualMenus.Items.Item;
 
-                            if (items) {
-                                if (!items.length) {
-                                    items = [items];
-                                }
+                                if (items) {
+                                    if (!items.length) {
+                                        items = [items];
+                                    }
 
-                                for (var i = 0; i < items.length; i++) {
-                                    var item = items[i];
-                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                    for (var i = 0; i < items.length; i++) {
+                                        var item = items[i];
+                                        commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                    }
                                 }
                             }
 
