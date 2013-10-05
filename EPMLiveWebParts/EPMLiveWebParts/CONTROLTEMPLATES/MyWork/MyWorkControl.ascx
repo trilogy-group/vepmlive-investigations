@@ -27,7 +27,7 @@
         SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, 'jquery.min.js');
     </SharePoint:ScriptBlock>
     
-    <div id="MWG_Header" style="display: <%= ShowToolbar ? "block" : "none" %>">
+    <div id="MWG_Header" style="overflow:hidden; display: <%= ShowToolbar ? "block" : "none" %>">
         <div id="MWG_Pivot">
             <div id="MWG_Pivot_Active" class="mwg-menuitem selected" data-filter="active">Active</div>
             <div id="MWG_Pivot_Completed" class="mwg-menuitem" data-filter="completed">Completed</div>
