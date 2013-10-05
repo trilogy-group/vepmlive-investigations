@@ -1789,33 +1789,47 @@
 
                 try {
                     var $favMenu = $('#epm-nav-sub-favorites');
-                    var offset = $($favMenu.find('.epm-nav-sub-header').get(1)).offset();
-                    
+
                     $ul.sortable({
                         items: 'li.epm-nav-sortable',
                         placeholder: 'epm-nav-drag-placeholder',
-                        update: function (event, ui) {
-                            var valid = true;
-                            
+                        start: function(event, ui) {
                             if ($favMenu.is(':visible')) {
-                                if (ui.originalPosition.top > offset.top) {
-                                    if (ui.position.top < offset.top) {
+                                var index = ui.item.index();
+                                var kind = 'page';
+
+                                if (index > $($favMenu.find('.epm-nav-sub-header').get(1)).index()) {
+                                    kind = 'item';
+                                }
+
+                                ui.item.data('kind', kind);
+                            }
+                        },
+                        stop: function(event, ui) {
+                            if ($favMenu.is(':visible')) {
+                                var valid = true;
+
+                                var kind = ui.item.data('kind');
+                                var index = ui.item.index();
+                                var iIndex = $($favMenu.find('.epm-nav-sub-header').get(1)).index();
+
+                                if (kind === 'page') {
+                                    if (index > iIndex) {
                                         valid = false;
                                     }
                                 } else {
-                                    if (ui.position.top > offset.top) {
+                                    if (index < iIndex) {
                                         valid = false;
                                     }
                                 }
+
+                                if (!valid) {
+                                    $($(ui.item).parent()).sortable('cancel');
+                                }
                             }
-                            
-                            if (valid) {
-                                favoritesManager.resetOrder($ul);
-                            } else {
-                                $($(ui.item).parent()).sortable('cancel');
-                            }
-                            
-                            offset = $($favMenu.find('.epm-nav-sub-header').get(1)).offset();
+                        },
+                        update: function() {
+                            favoritesManager.resetOrder($ul);
                         }
                     });
 
