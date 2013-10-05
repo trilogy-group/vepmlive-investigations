@@ -135,7 +135,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
                 catch { }
 
-                string webId = S(WebId);
+                string webId = S(row["WebId"]);
                 string listId = S(row["ListId"]);
 
                 string url =
