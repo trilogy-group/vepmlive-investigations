@@ -157,10 +157,15 @@ namespace EPMLiveCore.API
                 }
                 catch { }
 
-                if (string.IsNullOrEmpty(sIcon))
+                if (IsItem && string.IsNullOrEmpty(sIcon))
                 {
-                    sIcon = !IsItem ? DEFAULT_PAGE_ICON : DEFAULT_LIST_ICON;
-                }   
+                    sIcon = DEFAULT_LIST_ICON;
+                }
+
+                if (!IsItem)
+                {
+                    sIcon = DEFAULT_PAGE_ICON;
+                }
                 
                 return sIcon;
             }
