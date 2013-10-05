@@ -13,3 +13,12 @@
         <span id="EPMLiveNotificationCount" data-bind="text: epmLiveNotifications.totalNewNotifications() > 99 ? '99+' : epmLiveNotifications.totalNewNotifications()">&nbsp;</span>
     </div>
 </div>
+
+<SharePoint:ScriptBlock runat="server">
+    (function() {
+        var img = document.getElementById('EPMLiveProfilePic');
+        img.onerror = function() {
+            this.style.display = "none";
+        };
+    })();
+</SharePoint:ScriptBlock>
