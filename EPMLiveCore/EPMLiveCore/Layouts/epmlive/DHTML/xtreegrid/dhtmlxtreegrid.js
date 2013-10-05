@@ -28,7 +28,7 @@ dhtmlXGridObject.prototype.doExpand = function (obj) {
     else
         if ((r.state == "minus") && (!r._closeable))
             this.collapseKids(row)
-}
+} 
 
 
 function dhtmlxHierarchy() {
