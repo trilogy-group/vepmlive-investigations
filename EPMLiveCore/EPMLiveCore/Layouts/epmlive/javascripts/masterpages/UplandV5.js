@@ -76,7 +76,7 @@
 
     window.profilePicUpdated = function(status, picUrl) {
         if (status === 1) {
-            $('#EPMLiveProfilePic').attr('src', picUrl + '?v' + new Date().getTime());
+            $('#EPMLiveProfilePic').attr('src', picUrl + '?v' + new Date().getTime()).show();
         }
     };
 
