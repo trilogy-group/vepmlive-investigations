@@ -114,12 +114,25 @@
   display: none;
   position: relative;
 }
-.epm-nav-sub .epm-nav-home {
+.epm-nav-sub div.epm-nav-home {
   color: #969696 !important;
-  font-size: 18px;
-  margin-left: 10px;
+  margin-left: 6px;
+  margin-top: 10px;
+}
+.epm-nav-sub div.epm-nav-home span {
+  font-size: 14px;
+  margin-right: 4px;
+}
+.epm-nav-sub div.epm-nav-home a {
+  color: #666666;
+  font-size: 1em;
   position: relative;
-  top: 2px;
+  top: -2px;
+}
+.epm-nav-sub div.epm-nav-home a:active,
+.epm-nav-sub div.epm-nav-home a:hover {
+  color: #666666 !important;
+  text-decoration: none;
 }
 .epm-nav-sub .epm-nav-icon {
   margin-left: 5px;

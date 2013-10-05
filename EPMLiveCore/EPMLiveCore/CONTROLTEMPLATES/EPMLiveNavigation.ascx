@@ -126,8 +126,9 @@
             <div id="epm-nav-sub-<%= node.Id %>" class="epm-nav-sub" data-role="sub-nav-node"<%= attr %>>
                 <% if (node.Id.ToLower().Equals("ql"))
                    { %>
-                    <div class="epm-nav-sub-header">Navigation<a href="<%= WebUrl %>" class="epm-nav-home"><span class="fui-home"></span></a></div>
+                    <div class="epm-nav-sub-header">Navigation</div>
                     <div class="epm-nav-sub-header-bottom"></div>
+                    <div class="epm-nav-home"><span class="fui-home"></span><a class="epm-nav-node" href="<%= WebUrl %>">Home</a></div>
                     <SharePoint:SPTreeView
                         ID="EPMLiveNav"
                         runat="server"
