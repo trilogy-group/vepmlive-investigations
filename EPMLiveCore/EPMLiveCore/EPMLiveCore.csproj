@@ -3513,6 +3513,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\upland.icons.css" />
+    <Content Include="Layouts\epmlive\stylesheets\masterpages\upland.icons.min.css">
+      <DependentUpon>upland.icons.css</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />

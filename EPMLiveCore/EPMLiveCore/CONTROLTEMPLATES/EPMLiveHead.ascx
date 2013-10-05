@@ -14,7 +14,7 @@
             
         if ((window.location.href + '').toLowerCase().indexOf('isdlg') === -1) {
             var head = document.getElementsByTagName('head')[0];
-            var styles = ['glyphs', 'icomoon'];
+            var styles = ['upland.icons'];
                 
             for (var i = 0; i < styles.length; i++) {
                 var style = document.createElement('link');
@@ -39,14 +39,12 @@
 
 <!--[if IE 9]>
     <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
+    <link href='/_layouts/15/epmlive/stylesheets/masterpages/upland.icons.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
 <![endif]-->
         
 <!--[if !IE]><!-->
     <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/glyphs.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/icomoon.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
+    <link href='/_layouts/15/epmlive/stylesheets/masterpages/upland.icons.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
 <!--<![endif]-->
 
 <Sharepoint:StyleBlock runat="server">
