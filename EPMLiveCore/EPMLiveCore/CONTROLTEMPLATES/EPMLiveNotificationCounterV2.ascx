@@ -18,7 +18,7 @@
     (function() {
         var img = document.getElementById('EPMLiveProfilePic');
         img.onerror = function() {
-            this.style.display = "none";
+            this.style.display = 'none';
         };
     })();
 </SharePoint:ScriptBlock>
