@@ -207,6 +207,29 @@
                         window.epmLiveNavigation.wsTeamDict = window.epmLiveNavigation.wsTeamDict || {};
                         window.epmLiveNavigation.wsTeamDict[link.webId] = link.itemId;
 
+                        var info = link.itemId.split('.');
+
+                        var listId = '';
+                        
+                        try {
+                            listId = info[1];
+                        } catch (e) {
+                        }
+
+                        var itemId = '';
+
+                        try {
+                            itemId = info[2];
+                        } catch(e) {
+                        }
+
+                        window.epmLiveNavigation.wsInfoDict = window.epmLiveNavigation.wsInfoDict || {};
+                        window.epmLiveNavigation.wsInfoDict[link.webId] = {
+                            siteId: link.siteId,
+                            listId: listId,
+                            itemId: itemId
+                        };
+
                         parent.get_nodes().add(node);
                     };
 
@@ -1606,8 +1629,28 @@
                         showMenu();
                         
                         var $a = $($li.find('a').get(0));
+                        
+                        var siteId = $a.data('siteid');
+                        var webId = $a.data('webid');
+                        var listId = $a.data('listid');
+                        var itemId = $a.data('itemid');
+                        
+                        if (!siteId) {
+                            webId = $li.get(0).id;
+                            
+                            var wsInfoDict = window.epmLiveNavigation.wsInfoDict[webId];
+                            
+                            siteId = wsInfoDict.siteId;
+                            listId = wsInfoDict.listId;
+                            itemId = wsInfoDict.itemId;
 
-                        var data = '<Request><Params><SiteId>' + $a.data('siteid') + '</SiteId><WebId>' + $a.data('webid') + '</WebId><ListId>' + $a.data('listid') + '</ListId><ItemId>' + $a.data('itemid') + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
+                            $a.data('siteid', siteId);
+                            $a.data('webid', webId);
+                            $a.data('listid', listId);
+                            $a.data('itemid', itemId);
+                        }
+                        
+                        var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
 
                         epmLiveService.execute('GetContextualMenuItems', data, function (response) {
                             var commands = [];

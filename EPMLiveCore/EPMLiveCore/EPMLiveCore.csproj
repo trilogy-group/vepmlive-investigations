@@ -239,6 +239,7 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="CONTROLTEMPLATES\EPMLiveHead.ascx.cs">
       <DependentUpon>EPMLiveHead.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="CONTROLTEMPLATES\EPMLiveHead.ascx.designer.cs">
       <DependentUpon>EPMLiveHead.ascx.cs</DependentUpon>
