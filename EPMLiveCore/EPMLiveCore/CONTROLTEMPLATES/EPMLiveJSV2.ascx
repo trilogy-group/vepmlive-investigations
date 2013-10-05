@@ -41,8 +41,8 @@
                     epmLive.fileVersion = '<%= EPMFileVersion %>';
                     epmLive.debugMode = <%= DebugMode.ToString().ToLower() %>;
                     window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
-                }, true);
-            }, true);
+                }, !window.isIE8);
+            }, !window.isIE8);
             
             $(function () {
                 var walkme = document.createElement('script');

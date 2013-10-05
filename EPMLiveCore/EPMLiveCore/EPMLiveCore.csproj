@@ -1670,7 +1670,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map">
       <DependentUpon>UplandV5.js</DependentUpon>
     </None>
-    <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map">
+      <DependentUpon>Notifications.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\Project1.mpp" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.less" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.less" />

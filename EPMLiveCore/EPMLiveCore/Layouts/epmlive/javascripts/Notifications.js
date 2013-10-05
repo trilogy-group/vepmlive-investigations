@@ -1,10 +1,4 @@
-﻿/// <version>4.3.2.172013</version>
-/// <reference path="EPMLive.Notifications.js" />
-/// <reference path="libraries/knockout-1.2.1.debug.js" />
-/// <reference path="libraries/jquery.endless-scroll.js" />
-/// <reference path="EPMLive.js" />
-
-function initializeEPMLiveNotifications() {
+﻿function initializeEPMLiveNotifications() {
     $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.timeago.js', function() {
         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function() {
             $.getScript('/_layouts/epmlive/javascripts/libraries/slimScroll.js', function() {
@@ -191,7 +185,7 @@ function initializeEPMLiveNotifications() {
                                 contentType: 'application/json; charset=utf-8',
                                 dataType: 'json',
 
-                                success: function(response) {
+                                success: function (response) {
                                     if (response.d) {
                                         var responseJson = $$.parseJson(response.d);
 
@@ -212,7 +206,7 @@ function initializeEPMLiveNotifications() {
                                     }
                                 },
 
-                                error: function(error) {
+                                error: function (error) {
                                     $$.log(error);
                                 }
                             });
@@ -236,9 +230,9 @@ function initializeEPMLiveNotifications() {
                         $$.log(e);
                     }
                 }());
-            }, true);
-        }, true);
-    }, true);
+            }, !window.isIE8);
+        }, !window.isIE8);
+    }, !window.isIE8);
 }
 
 ExecuteOrDelayUntilScriptLoaded(initializeEPMLiveNotifications, 'EPMLive.js');
