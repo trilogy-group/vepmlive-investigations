@@ -26,6 +26,7 @@ namespace EPMLiveCore.API
                     queryParams = GetRecentItemQueryParams(data);
                     break;
                 case AnalyticsType.FavoriteWorkspace:
+                    queryParams = GetFavWorkspaceQueryParams(data);
                     break;
 
             }
@@ -88,6 +89,22 @@ namespace EPMLiveCore.API
                     queryParams = GetCreateRecentItemQueryParams(data);
                     break;
 
+            }
+
+            return queryParams;
+        }
+
+        private static Dictionary<string, object> GetFavWorkspaceQueryParams(AnalyticsData data)
+        {
+            var queryParams = new Dictionary<string, object>();
+            switch (data.Action)
+            {
+                case AnalyticsAction.Create:
+                    queryParams = GetCreateFavWorkspaceQueryParams(data);
+                    break;
+                case AnalyticsAction.Delete:
+                    queryParams = GetRemoveFavWorkspaceQueryParams(data);
+                    break;
             }
 
             return queryParams;
@@ -297,6 +314,50 @@ namespace EPMLiveCore.API
                             {"@icon", data.Icon},
                             {"@title", data.Title},
                         };
+        }
+
+        #endregion
+
+        #region Favorite Workspace
+
+        private static Dictionary<string, object> GetCreateFavWorkspaceQueryParams(AnalyticsData data)
+        {
+            return new Dictionary<string, object>
+                        {
+                            {"@siteid", data.SiteId},
+                            {"@webid", data.WebId},
+                            {"@listid", data.ListId},
+                            {"@itemid", data.ItemId},
+                            {"@userid", data.UserId},
+                            {"@icon", data.Icon},
+                            {"@title", data.Title},
+                        };
+        }
+
+        private static Dictionary<string, object> GetRemoveFavWorkspaceQueryParams(AnalyticsData data)
+        {
+            return data.IsItem ?
+                new Dictionary<string, object>
+                    {
+                        {"@siteid", data.SiteId},
+                        {"@webid", data.WebId},
+                        {"@listid", data.ListId},
+                        {"@itemid", data.ItemId},
+                        {"@fstring", data.FString},
+                        {"@userid", data.UserId},
+                        {"@title", data.Title},
+                    }
+            :
+                new Dictionary<string, object>
+                    {
+                        {"@siteid", data.SiteId},
+                        {"@webid", data.WebId},
+                        {"@listid", data.ListId},
+                        {"@fstring", data.FString},
+                        {"@userid", data.UserId},
+                        {"@title", data.Title},
+                    }
+            ;
         }
 
         #endregion
