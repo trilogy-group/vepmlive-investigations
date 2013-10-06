@@ -211,7 +211,7 @@
         configureTooltips();
 
         window.onload = function() {
-            if ($('#DeltaPlaceHolderPageTitleInTitleArea').find('.ms-hidden').length > 0) {
+            if ($('#site-title').text().trim() === $('#DeltaPlaceHolderPageTitleInTitleArea').text().trim()) {
                 $('#site-title').addClass('epm-no-page-title');
             }
         };
