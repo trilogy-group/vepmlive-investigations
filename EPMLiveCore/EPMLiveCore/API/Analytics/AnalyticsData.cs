@@ -174,7 +174,7 @@ namespace EPMLiveCore.API
 
                 if (Type == AnalyticsType.FavoriteWorkspace)
                 {
-                    sIcon = "icon-square";
+                    sIcon = "";
                 }
                 
                 return sIcon;
