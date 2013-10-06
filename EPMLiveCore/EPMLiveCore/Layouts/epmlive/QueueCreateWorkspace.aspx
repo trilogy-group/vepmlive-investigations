@@ -70,7 +70,7 @@
 	                    <%--<div class="workspace-loading"  id="marketLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle;margin-right:auto;margin-left: auto; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
+	                    <div style="height: 50px; vertical-align: middle;margin-right:auto;margin-left: auto; margin-top: 100px; width: 240px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
                             <div style="text-align: center">There are no online templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (marketApps().length > 0)">
@@ -101,7 +101,7 @@
 	                    <%--<div class="workspace-loading" id="localLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle; margin-right:auto;margin-left: auto; margin-top: 100px; width: 223px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
+	                    <div style="height: 50px; vertical-align: middle; margin-right:auto;margin-left: auto; margin-top: 100px; width: 230px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
                             <div style="text-align: center">There are no local templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (downloadedApps().length > 0)">
