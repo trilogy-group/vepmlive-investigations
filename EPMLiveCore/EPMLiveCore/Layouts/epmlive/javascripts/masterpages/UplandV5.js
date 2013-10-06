@@ -209,6 +209,12 @@
         configureSearchBox();
         addUpdateProfilePicLink();
         configureTooltips();
+
+        window.onload = function() {
+            if ($('#DeltaPlaceHolderPageTitleInTitleArea').find('.ms-hidden').length > 0) {
+                $('#site-title').addClass('epm-no-page-title');
+            }
+        };
     };
 
     ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
