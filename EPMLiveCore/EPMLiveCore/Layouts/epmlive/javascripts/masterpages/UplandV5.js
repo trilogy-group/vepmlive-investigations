@@ -101,7 +101,17 @@
         }
     };
 
-    var epmLiveTweaks = function() {
+    var epmLiveTweaks = function () {
+        $(function() {
+            var $siteTitle = $('#site-title');
+            var $pageTitle = $('#DeltaPlaceHolderPageTitleInTitleArea');
+
+            if ($siteTitle.text().trim() === $pageTitle.text().trim()) {
+                $siteTitle.addClass('epm-no-page-title');
+                $pageTitle.hide();
+            }
+        });
+        
         $(document).click(function(e) {
             if ($('#search-box-container').is(':visible')) {
                 if ($(e.target).parents('#search-box-container').length === 0 && $(e.target).parents('#search-container').length === 0) {
@@ -209,16 +219,6 @@
         configureSearchBox();
         addUpdateProfilePicLink();
         configureTooltips();
-
-        window.onload = function() {
-            var $siteTitle = $('#site-title');
-            var $pageTitle = $('#DeltaPlaceHolderPageTitleInTitleArea');
-            
-            if ($siteTitle.text().trim() === $pageTitle.text().trim()) {
-                $siteTitle.addClass('epm-no-page-title');
-                $pageTitle.hide();
-            }
-        };
     };
 
     ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
