@@ -34,10 +34,14 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         {
             if (isRootWeb) return url;
 
-            if (url.Contains("_layouts"))
+            if (url.ToLower().Contains("_layouts"))
             {
                 string[] parts = url.Split(new[] {"_layouts"}, StringSplitOptions.None);
                 url = RelativeUrl + "/_layouts" + string.Join(string.Empty, parts.Skip(1));
+            }
+            else if (url.ToLower().Contains("sitepages"))
+            {
+                url = string.Format(@"javascript:SP.UI.ModalDialog.showModalDialog({{url: '{0}', showMaximized: true}});", url);
             }
             else
             {

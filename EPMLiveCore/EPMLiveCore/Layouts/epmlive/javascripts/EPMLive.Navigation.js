@@ -825,7 +825,7 @@
 
                                 var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass"></Param><Param key="ItemId">' + itemId + '</Param><Param key="FString">' + webUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param></Data>';
 
-                                epmLiveService.execute('AddFavorites', data, function(response) {
+                                epmLiveService.execute('AddFavoritesWs', data, function (response) {
                                 }, function (response) {
                                     window.epmLiveNavigation.registerLink({
                                         id: webId,

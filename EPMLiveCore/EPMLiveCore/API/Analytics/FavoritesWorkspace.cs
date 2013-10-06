@@ -50,7 +50,7 @@ namespace EPMLiveCore.API
                     FRFQueryFactory.GetQuery(data),
                     FRFQueryParamFactory.GetParam(data));
                 ClearCache(data);
-                if (dt.Rows.Count > 0)
+                if (dt.Rows != null && dt.Rows.Count > 0)
                 {
                     result = string.Join(",", dt.Rows[0].ItemArray);
                 }
