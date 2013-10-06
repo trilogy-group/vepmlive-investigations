@@ -1898,9 +1898,12 @@ var MyWorkGrid = {
         MyWorkGrid.isDirty = true;
 
         MyWorkGrid.changeToolbarSelection('Completed');
+        
+        $('#MWG_Pivot_Selector').show();
 
         try {
             $('.GSNoDataRow').find('div').html('You do not have any completed work items.');
+            $('#MWG_Pivot_Selector').hide();
         } catch (e) {
         }
     },
@@ -1921,8 +1924,11 @@ var MyWorkGrid = {
 
         MyWorkGrid.changeToolbarSelection('Active');
 
+        $('#MWG_Pivot_Selector').show();
+
         try {
             $('.GSNoDataRow').find('div').html('There are no active work items assigned to you.');
+            $('#MWG_Pivot_Selector').hide();
         } catch (e) {
         }
     },
@@ -2202,6 +2208,8 @@ var MyWorkGrid = {
                 cell.innerHTML = message;
 
                 MyWorkGrid.noDataResetCompleted = true;
+
+                $('#MWG_Pivot_Selector').hide();
             }
         }
     },
