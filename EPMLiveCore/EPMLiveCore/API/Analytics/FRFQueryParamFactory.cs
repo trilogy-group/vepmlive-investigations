@@ -322,7 +322,8 @@ namespace EPMLiveCore.API
 
         private static Dictionary<string, object> GetCreateFavWorkspaceQueryParams(AnalyticsData data)
         {
-            return new Dictionary<string, object>
+            return data.IsItem ?
+                new Dictionary<string, object>
                         {
                             {"@siteid", data.SiteId},
                             {"@webid", data.WebId},
@@ -331,6 +332,18 @@ namespace EPMLiveCore.API
                             {"@userid", data.UserId},
                             {"@icon", data.Icon},
                             {"@title", data.Title},
+                            {"@fstring", data.FString}
+                        }
+                :
+                new Dictionary<string, object>
+                        {
+                            {"@siteid", data.SiteId},
+                            {"@webid", data.WebId},
+                            {"@listid", data.ListId},
+                            {"@userid", data.UserId},
+                            {"@icon", data.Icon},
+                            {"@title", data.Title},
+                            {"@fstring", data.FString}
                         };
         }
 

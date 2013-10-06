@@ -141,6 +141,45 @@ namespace EPMLiveCore.API
             });
         }
 
+        public static void AddToFRF(Guid siteId, Guid createdWebId, string siteTitle, string createdWebUrl, int userId, int type, Guid listId, int itemId)
+        {
+            // type legend
+            // 1 = favorites
+            // 2 = recent
+            // 3 = frequent apps
+            // 4 = workspace
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                using (var eSite = new SPSite(siteId))
+                {
+                    using (var con = new SqlConnection(CoreFunctions.getConnectionString(eSite.WebApplication.Id)))
+                    {
+                        con.Open();
+                        var cmd = new SqlCommand
+                        {
+                            CommandText =
+                            @"IF((SELECT COUNT(*) FROM FRF WHERE [Type]=4) = 0)
+                            BEGIN
+	                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [F_String], [Type], [F_Date], [F_Int])
+                                VALUES ('" + siteId + @"', '" + createdWebId + @"', '" + listId + @"', " + itemId + @", " + userId + @", '" + siteTitle +
+                                @"', '" + createdWebUrl + @"', " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) +
+                                @", GETDATE(), 1)
+                            END
+                            ELSE
+                            BEGIN
+	                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [F_String], [Type], [F_Date], [F_Int])
+                                VALUES ('" + siteId + @"', '" + createdWebId + @"', '" + listId + @"', " + itemId + @", " + userId + @", '" + siteTitle +
+                                @"', '" + createdWebUrl + @"', " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) +
+                                @", GETDATE(), (SELECT MAX([F_Int]) FROM FRF WHERE [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @") + 1)
+                            END",
+                            Connection = con
+                        };
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            });
+        }
         public static void AddWsPermission(Guid siteId, Guid createdWebId)
         {
                 string script = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +

@@ -171,6 +171,11 @@ namespace EPMLiveCore.API
                 {
                     sIcon = DEFAULT_PAGE_ICON;
                 }
+
+                if (Type == AnalyticsType.FavoriteWorkspace)
+                {
+                    sIcon = "icon-square";
+                }
                 
                 return sIcon;
             }

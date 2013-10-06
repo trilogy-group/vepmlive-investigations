@@ -952,8 +952,15 @@ namespace EPMLiveCore.API
 
         public void AddToFavorites()
         {
-            // TODO: add ws info to favorites table in db
-            WorkspaceData.AddToFRF(SiteId, _createdWebId, _createdWebTitle, _createdWebUrl, CreatorId, 4);
+            if (_isStandAlone)
+            {
+                // TODO: add ws info to favorites table in db
+                WorkspaceData.AddToFRF(SiteId, _createdWebId, _createdWebTitle, _createdWebUrl, CreatorId, 4);
+            }
+            else
+            {
+                WorkspaceData.AddToFRF(SiteId, _createdWebId, _createdWebTitle, _createdWebUrl, CreatorId, 4, AttachedItemListId, AttachedItemId);
+            }
         }
 
         public void AddPermission()
@@ -1054,7 +1061,8 @@ namespace EPMLiveCore.API
                             }
 
                             SPListItem item = null;
-                            try{item = collListItems[0];}catch { }
+                            try { item = collListItems[0]; }
+                            catch { }
 
                             if (item != null)
                             {
