@@ -237,25 +237,25 @@ namespace EPMLiveCore.API
                     END";
 
         private static string queryCreateFavWS_Item =
-                   @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
+                   @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
                         BEGIN
-	                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @", 1)
+	                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int], [F_String])
+                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @", 1, @fstring)
                             SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @"
                         END
                         ELSE
                         BEGIN
-                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @", (SELECT MAX([F_Int]) FROM FRF WHERE [Type] = 1) + 1)
+                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int], [F_String])
+                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @", (SELECT MAX([F_Int]) FROM FRF WHERE [Type] = 1) + 1, @fstring)
                             SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @"
                         END
                     END
                     SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @"    
                     ";
         private static string queryCreateFavWS_NonItem =
-                   @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
+                   @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [USER_ID]=@userid AND [F_String]=@fstring AND [Type]=" + Convert.ToInt32(AnalyticsType.FavoriteWorkspace) + @")
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
                         BEGIN
