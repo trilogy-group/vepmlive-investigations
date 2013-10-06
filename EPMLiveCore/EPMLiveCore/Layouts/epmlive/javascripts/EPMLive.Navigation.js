@@ -813,16 +813,38 @@
                                     }
                                 }
                             } else {
-                                //var title = $($('#' + id).find('a').get(0)).text();
-
-                                //var _$$ = window.epmLive;
-
-                                //var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + _$$.currentWebId + '</Param><Param key="ListId">' + _$$.currentListId + '</Param><Param key="ListViewUrl">' + _$$.currentListViewUrl + '</Param><Param key="ListIconClass">' + _$$.currentListIcon + '</Param><Param key="ItemId">' + _$$.currentItemID + '</Param><Param key="FString">' + _$$.currentUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull">' + _$$.currentFileIsNull + '</Param></Data>';
+                                var $link = $($('#' + id).find('a').get(0));
                                 
-                                //epmLiveService.execute('AddFavorites', data, function (response) {
-                                //    var i = 0;
-                                //}, function (response) {
-                                //});
+                                var title = $link.text();
+                                var webUrl = $link.attr('href');
+
+                                var _$$ = window.epmLive;
+
+                                listId = listId === 'undefined' ? null : listId;
+                                itemId = itemId === 'undefined' ? null : itemId;
+
+                                var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass"></Param><Param key="ItemId">' + itemId + '</Param><Param key="FString">' + webUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param></Data>';
+
+                                epmLiveService.execute('AddFavorites', data, function(response) {
+                                }, function (response) {
+                                    window.epmLiveNavigation.registerLink({
+                                        id: webId,
+                                        title: title,
+                                        url: webUrl,
+                                        category: null,
+                                        cssClass: null,
+                                        order: null,
+                                        siteId: _$$.currentSiteId,
+                                        webId: webId,
+                                        listId: listId,
+                                        itemId: itemId,
+                                        external: false,
+                                        visible: true,
+                                        active: true,
+                                        seprator: false,
+                                        kind: 3
+                                    });
+                                });
                             }
                             break;
                         case '99':
