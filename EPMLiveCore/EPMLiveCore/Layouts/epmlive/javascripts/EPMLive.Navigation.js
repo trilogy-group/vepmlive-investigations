@@ -822,11 +822,28 @@
 
                                 listId = listId === 'undefined' ? null : listId;
                                 itemId = itemId === 'undefined' ? null : itemId;
-                                var isItem = itemId === null ? "False" : "True";
+                                var isItem = itemId === null ? 'False' : 'True';
                                 
                                 var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass"></Param><Param key="ItemId">' + itemId + '</Param><Param key="FString">' + webUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">' + isItem + '</Param></Data>';
 
                                 epmLiveService.execute('AddFavoritesWs', data, function (response) {
+                                    window.epmLiveNavigation.registerLink({
+                                        id: webId,
+                                        title: title,
+                                        url: webUrl,
+                                        category: null,
+                                        cssClass: null,
+                                        order: null,
+                                        siteId: _$$.currentSiteId,
+                                        webId: webId,
+                                        listId: listId,
+                                        itemId: itemId,
+                                        external: false,
+                                        visible: true,
+                                        active: true,
+                                        seprator: false,
+                                        kind: 3
+                                    });
                                 }, function (response) {
                                     window.epmLiveNavigation.registerLink({
                                         id: webId,
