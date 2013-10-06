@@ -89,10 +89,10 @@
 <div class="modalContent" id="idNoteButtonsDiv" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
 		<div style="width:300px;float:right;">
-			<div class="button-container" style="width:305px">
-        		<a id="idNoteDialog_Save" onclick="javascript:NotesDialogEvent('SaveNewNote');" class="epmliveButton" style="width:75px;">Save</a>
-        		<a id="idNoteDialog_Cancel" onclick="javascript:NotesDialogEvent('CancelNote');" class="epmliveButton" style="width:75px;">Cancel</a>
-        		<a id="idNoteDialog_Close" onclick="javascript:NotesDialogEvent('CloseNote');" class="epmliveButton" style="width:75px;">Close</a>
+			<div class="button-container">
+			    <input id="idNoteDialog_Save" type="button" class="epmliveButton" value="Save" onclick="javascript: NotesDialogEvent('SaveNewNote');"/>
+        		<input id="idNoteDialog_Cancel" type="button" class="epmliveButton" value="Cancel" onclick="javascript: NotesDialogEvent('CancelNote');"/>
+        		<input id="idNoteDialog_Close" type="button" class="epmliveButton" value="Close" onclick="javascript: NotesDialogEvent('CloseNote');"/>
 			</div>
 		</div>
 	</div>
@@ -102,9 +102,9 @@
 	<div style="margin-top:10px;padding-right:10px;">
 		<div id="idRowNoteEditor" style="width: 100%; height: 300px; border: #909090 1px solid;"></div>
 		<div style="width:200px;float:right;">
-			<div class="button-container" style="float:none;margin-top:19px;">
-        			<a id="idRowNoteDialog_Save" onclick="javascript:NotesDialogEvent('SaveRowNote');" class="epmliveButton" style="width:75px;">Save</a>
-        			<a onclick="javascript:NotesDialogEvent('CancelRowNote');" class="epmliveButton" style="width:75px;">Cancel</a>
+			<div class="button-container">
+			    <input id="idRowNoteDialog_Save" type="button" class="epmliveButton" value="Save" onclick="javascript: NotesDialogEvent('SaveRowNote');"/>
+        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: NotesDialogEvent('CancelRowNote');"/>
 			</div>
 		</div>
 	</div>
@@ -114,8 +114,8 @@
 	<div style="margin-top:10px;padding-right:10px;">
 		<div id="idRowNotificationLayout" style="position: relative; top: 0px; left: 0px; width:100%; height: 350px;"></div>
 		<div style="width:100px;float:right;">
-			<div class="button-container" style="float:none;margin-top:19px;">
-        			<a onclick="javascript:NotesDialogEvent('CloseRowNotificationDialog');" class="epmliveButton" style="width:75px;">Close</a>
+			<div class="button-container" >
+        		<input type="button" class="epmliveButton" value="Close" onclick="javascript:NotesDialogEvent('CloseRowNotificationDialog');"/>
 			</div>
 		</div>
 	</div>
@@ -174,9 +174,9 @@
             </select>
 		</div>
 		<div style="width:200px;float:right;">
-			<div class="button-container" style="float:none;margin-top:19px;">
-        			<a onclick="javascript:dialogEvent('Costtype_Import');" class="epmliveButton" style="width:75px;">Import</a>
-        			<a onclick="javascript:dialogEvent('Costtype_Cancel');" class="epmliveButton" style="width:75px;">Cancel</a>
+			<div class="button-container" >
+        		<input type="button" class="epmliveButton" value="Import" onclick="javascript: dialogEvent('Costtype_Import');"/>
+        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('Costtype_Cancel');"/>
 			</div>
 		</div>
 	</div>
@@ -235,10 +235,10 @@
             <div style="padding-top:15px;">Please select the required action:</div>
 		</div>
 		<div style="width:300px;float:right;">
-			<div class="button-container" style="width:305px;margin-left:3px;margin-top:12px;float:none;">
-        		<a onclick="javascript:dialogEvent('splitDlg_Split');" class="epmliveButton" style="width:75px;">Split</a>
-        		<a onclick="javascript:dialogEvent('splitDlg_Replace');" class="epmliveButton" style="width:75px;">Replace</a>
-        		<a onclick="javascript:dialogEvent('splitDlg_Cancel');" class="epmliveButton" style="width:75px;">Cancel</a>
+			<div class="button-container">
+			    <input type="button" class="epmliveButton" value="Split" onclick="javascript: dialogEvent('splitDlg_Split');"/>
+        		<input type="button" class="epmliveButton" value="Replace" onclick="javascript: dialogEvent('splitDlg_Replace');"/>
+        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('splitDlg_Cancel');"/>
 			</div>
 		</div>
     </div>
@@ -249,11 +249,11 @@
             <div>Some plan rows are marked as private.</div>
             <div style="padding-top:15px;">Would you like to make them public?</div>
 		</div>
-		<div style="width:300px;float:right;">
-			<div class="button-container" style="width:305px;margin-left:3px;margin-top:12px;float:none;">
-        		<a onclick="javascript:dialogEvent('privateRowsDlg_Yes');" class="epmliveButton" style="width:75px;">Yes</a>
-        		<a onclick="javascript:dialogEvent('privateRowsDlg_No');" class="epmliveButton" style="width:75px;">No</a>
-        		<a onclick="javascript:dialogEvent('privateRowsDlg_Cancel');" class="epmliveButton" style="width:75px;">Cancel</a>
+		<div style="float:right;">
+			<div class="button-container" style="margin-left:3px;">
+			    <input type="button" class="epmliveButton" value="Yes" onclick="javascript: dialogEvent('privateRowsDlg_Yes');"/>
+        		<input type="button" class="epmliveButton" value="No" onclick="javascript: dialogEvent('privateRowsDlg_No');"/>
+        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('privateRowsDlg_Cancel');"/>
 			</div>
 		</div>
     </div>
@@ -265,10 +265,10 @@
             <div style="padding-top:15px;">Please select the required action:</div>
 		</div>
 		<div style="width:300px;float:right;">
-			<div class="button-container" style="width:305px;margin-left:3px;margin-top:12px;float:none;">
-        		<a onclick="javascript:dialogEvent('fulfillDlg_Fulfill');" class="epmliveButton" style="width:75px;">Fulfill</a>
-        		<a onclick="javascript:dialogEvent('fulfillDlg_Replace');" class="epmliveButton" style="width:75px;">Replace</a>
-        		<a onclick="javascript:dialogEvent('fulfillDlg_Cancel');" class="epmliveButton" style="width:75px;">Cancel</a>
+			<div class="button-container">
+			    <input type="button" class="epmliveButton" value="Fulfill" onclick="javascript: dialogEvent('fulfillDlg_Fulfill');"/>
+        		<input type="button" class="epmliveButton" value="Replace" onclick="javascript: dialogEvent('fulfillDlg_Replace');"/>
+        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('fulfillDlg_Cancel');"/>
 			</div>
 		</div>
     </div>
@@ -285,9 +285,9 @@
            <input id="idPostBaselineCheck" type="checkbox" />&nbsp;Post Baseline
 		</div>
 		<div style="width:200px;float:right;">
-			<div class="button-container" style="float:none;margin-left:3px;">
-        			<a onclick="javascript:dialogEvent('postDlg_OK');" class="epmliveButton" style="width:75px;">OK</a>
-        			<a onclick="javascript:dialogEvent('postDlg_Cancel');" class="epmliveButton" style="width:75px;">Cancel</a>
+			<div class="button-container">
+			    <input type="button" class="epmliveButton" value="OK" onclick="javascript: dialogEvent('postDlg_OK');"/>
+        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('postDlg_Cancel');"/>
 			</div>
 		</div>
 	</div>
@@ -301,9 +301,9 @@
             <select id="idSelectPlanResources" style="width:100%;" size="10" multiple></select>
  		</div>
 		<div style="width:200px;float:right;">
-			<div class="button-container" style="float:none;margin-left:3px;">
-        			<a onclick="javascript:dialogEvent('invalidResDeptsDlg_Forward');" class="epmliveButton" style="width:75px;">Forward</a>
-        			<a onclick="javascript:dialogEvent('invalidResDeptsDlg_Cancel');" class="epmliveButton" style="width:75px;">Close</a>
+			<div class="button-container">
+			    <input type="button" class="epmliveButton" value="Forward" onclick="javascript: dialogEvent('invalidResDeptsDlg_Forward');"/>
+        		<input type="button" class="epmliveButton" value="Close" onclick="javascript: dialogEvent('invalidResDeptsDlg_Cancel');"/>
 			</div>
 		</div>
     </div>

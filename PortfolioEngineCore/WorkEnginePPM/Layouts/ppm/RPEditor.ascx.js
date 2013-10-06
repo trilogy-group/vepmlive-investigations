@@ -3433,8 +3433,8 @@
             //var dhxLayout = new dhtmlXLayoutObject("idRowNotificationLayout", "2E", "dhx_skyblue");
             var dhxLayout = new dhtmlXLayoutObject("idRowNotificationLayout", "1C", "dhx_skyblue");
             dhxLayout.cells("a").hideHeader();
-            dhxLayout.cells("a").setHeight(200);
-            dhxLayout.cells("a").setText("Row Notification History");
+            //dhxLayout.cells("a").setHeight(200);
+            //dhxLayout.cells("a").setText("Row Notification History");
             //dhxLayout.cells("a").fixSize(false, true);
             //dhxLayout.cells("a").collapse();
             //dhxLayout.cells("a").attachHTMLString(html);
@@ -3453,7 +3453,7 @@
             //            this.noteEditor.setContent(html);
             //            this.noteEditor.init();
             dlg.show();
-            window.setTimeout("var el=document.getElementById('idDivRowEventsHtml'); el.scrollTop = el.scrollHeight;", 200);
+            //window.setTimeout("var el=document.getElementById('idDivRowEventsHtml'); el.scrollTop = el.scrollHeight;", 200);
         }
         catch (e) {
             this.HandleException("DisplayNotificationDialog", e);
@@ -5234,12 +5234,12 @@
             var dlg = wins.createWindow(idWindow, left, top, width, height);
             if (dlg != null) {
                 dlg.clearIcon();
+                    dlg.button("minmax1").hide();
                 if (bResize == false) {
                     dlg.denyResize();
-                    dlg.button("minmax1").hide();
                 } else {
                     dlg.allowResize();
-                    dlg.button("minmax1").show();
+                    //dlg.button("minmax1").show();
                 }
                 dlg.button("park").hide();
                 dlg.button("close").hide();
@@ -5361,7 +5361,7 @@
         this.wins = new dhtmlXWindows();
         this.wins.enableAutoViewport(false);
         this.wins.attachViewportTo(this.params.ClientID + "layoutDiv");
-        this.wins.setImagePath("/_layouts/ppm/images/");
+        this.wins.setImagePath("../epmlive/dhtml/windows/imgs/");
         this.wins.setSkin("dhx_web");
         this.startPeriod = null;
         this.finishPeriod = null;

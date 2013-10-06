@@ -100,10 +100,10 @@
             this.selectPIAndViewDlg = new dhtmlXWindows();
             this.selectPIAndViewDlg.enableAutoViewport(false);
             this.selectPIAndViewDlg.attachViewportTo(this.params.ClientID + "layoutDiv");
-            this.selectPIAndViewDlg.setImagePath("/_layouts/ppm/images/");
+            this.selectPIAndViewDlg.setImagePath("../epmlive/dhtml/windows/imgs/");
             this.selectPIAndViewDlg.setSkin("dhx_web");
             this.selectPIAndViewDlg.createWindow("winPIAndViewDlg", 20, 30, 290, 270);
-            this.selectPIAndViewDlg.window("winPIAndViewDlg").setIcon("logo.ico", "logo.ico");
+            //this.selectPIAndViewDlg.window("winPIAndViewDlg").setIcon("logo.ico", "logo.ico");
             //this.selectPIAndViewDlg.window("winPIAndViewDlg").denyMove();
             this.selectPIAndViewDlg.window("winPIAndViewDlg").denyResize();
             this.selectPIAndViewDlg.window("winPIAndViewDlg").setModal(true);
@@ -1835,7 +1835,7 @@
         this.wins = new dhtmlXWindows();
         this.wins.enableAutoViewport(false);
         this.wins.attachViewportTo(this.params.ClientID + "layoutDiv");
-        this.wins.setImagePath("/_layouts/ppm/images/");
+        this.wins.setImagePath("../epmlive/dhtml/windows/imgs/");
         this.wins.setSkin("dhx_web");
         this.showArray = null;
         this.hideArray = null;
