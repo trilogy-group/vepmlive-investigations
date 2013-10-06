@@ -53,7 +53,8 @@ namespace EPMLiveCore.API
                 ClearCache(data);
                 if (dt.Rows.Count > 0)
                 {
-                    result = string.Join(",", dt.Rows[0].ItemArray);
+
+                    result = string.Join(",", CleanItemArray(dt.Rows[0].ItemArray));
                 }
                 else
                 {
@@ -82,7 +83,7 @@ namespace EPMLiveCore.API
                 ClearCache(data);
                 if (dt.Rows.Count > 0)
                 {
-                    result = string.Join(",", dt.Rows[0].ItemArray);
+                    result = string.Join(",", CleanItemArray(dt.Rows[0].ItemArray));
                 }
                 else
                 {
@@ -117,6 +118,24 @@ namespace EPMLiveCore.API
                 }
             }
             catch { }
+        }
+
+        private static object[] CleanItemArray(object [] r)
+        {
+            var result = r;
+            var resultObjA = new object[r.Count()];
+            for (var i = 0; i < r.Count(); i++)
+            {
+                if (r[i] is string)
+                {
+                    resultObjA[i] = r[i].ToString().Replace("&", "&amp;");
+                    continue;
+                }
+
+                resultObjA[i] = r[i];
+            }
+
+            return resultObjA;
         }
         
     }

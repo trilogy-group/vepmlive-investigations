@@ -140,22 +140,27 @@ namespace EPMLiveCore.API
             get
             {
                 var sIcon = string.Empty;
-                try
+                if (SiteId != Guid.Empty && WebId != Guid.Empty && ListId != Guid.Empty)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    try
                     {
-                        using (var s = new SPSite(SiteId))
+                        SPSecurity.RunWithElevatedPrivileges(() =>
                         {
-                            using (var w = s.OpenWeb(WebId))
+                            using (var s = new SPSite(SiteId))
                             {
-                                var list = w.Lists[ListId];
-                                var settings = new GridGanttSettings(list);
-                                sIcon = settings.ListIcon;
+                                using (var w = s.OpenWeb(WebId))
+                                {
+                                    var list = w.Lists[ListId];
+                                    var settings = new GridGanttSettings(list);
+                                    sIcon = settings.ListIcon;
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                    catch
+                    {
+                    }
                 }
-                catch { }
 
                 if ((IsItem || IsListView) && string.IsNullOrEmpty(sIcon))
                 {

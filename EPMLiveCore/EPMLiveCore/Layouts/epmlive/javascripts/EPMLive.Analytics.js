@@ -2,7 +2,7 @@
     (function (a, $$, $) {
 
         //====== FAVORITES ========================
-        var isItem = ($$.currentItemID && !$$.currentListViewUrl && $$.currentFileIsNull === "True") ? "True" : "False";
+        var isItem = ($$.currentItemID !== "-1" && !$$.currentListViewUrl && $$.currentFileIsNull === "True") ? "True" : "False";
         a.favoritesData =
             "<Data>" +
                 "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
