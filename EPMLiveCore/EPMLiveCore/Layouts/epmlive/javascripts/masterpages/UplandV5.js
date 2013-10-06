@@ -211,8 +211,12 @@
         configureTooltips();
 
         window.onload = function() {
-            if ($('#site-title').text().trim() === $('#DeltaPlaceHolderPageTitleInTitleArea').text().trim()) {
-                $('#site-title').addClass('epm-no-page-title');
+            var $siteTitle = $('#site-title');
+            var $pageTitle = $('#DeltaPlaceHolderPageTitleInTitleArea');
+            
+            if ($siteTitle.text().trim() === $pageTitle.text().trim()) {
+                $siteTitle.addClass('epm-no-page-title');
+                $pageTitle.hide();
             }
         };
     };
