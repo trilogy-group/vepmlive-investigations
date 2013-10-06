@@ -38,7 +38,6 @@
             }
         })();
     </SharePoint:ScriptBlock>
-    <!--<script src="/_layouts/15/epmlive/javascripts/masterpages/webfont.js"> </script>-->
     <SharePoint:StyleBlock runat="server">
         #s4-ribbonrow {
             overflow: hidden !important;
