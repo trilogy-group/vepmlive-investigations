@@ -348,11 +348,18 @@ namespace EPMLiveCore
             try
             {
                 var queryCreateRecentItem =
-                    @"INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Date])
-                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " +
-                    Convert.ToInt32(AnalyticsType.Recent) + @", GETDATE())
-                    SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" +
-                    Convert.ToInt32(AnalyticsType.Recent) + @"
+                    @"IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Recent) + @")
+                    BEGIN
+                        UPDATE FRF SET [F_Date] = GETDATE() 
+                        WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Recent) + @" 
+                        SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Recent) + @"
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Date])
+                        VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, " + Convert.ToInt32(AnalyticsType.Recent) + @", GETDATE())
+                        SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Recent) + @"
+                    END
 
                     IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 2) > 20)
                     BEGIN
@@ -370,7 +377,7 @@ namespace EPMLiveCore
                     {"@itemid", i.ID},
                     {"@userid", i.ParentList.ParentWeb.CurrentUser.ID},
                     {"@icon", new GridGanttSettings(i.ParentList).ListIcon},
-                    {"@title", i.Title},
+                    {"@title", i.ParentList.Title.Contains("Template Gallery") ? new SPFieldUrlValue(i["URL"].ToString()).Description : i.Title},
                 };
 
                 var exec = new QueryExecutor(SPContext.Current.Web);
