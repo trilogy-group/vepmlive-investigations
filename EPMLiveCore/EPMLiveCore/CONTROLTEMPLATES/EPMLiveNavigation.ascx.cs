@@ -23,7 +23,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Fields 
 
-        #region Properties (11) 
+        #region Properties (12) 
 
         public IEnumerable<NavNode> AllNodes
         {
@@ -31,12 +31,17 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             {
                 List<NavNode> nodes = TopNodes.ToList();
                 nodes.AddRange(BottomNodes);
-                
+
                 return nodes;
             }
         }
 
         public IEnumerable<NavNode> BottomNodes { get; set; }
+
+        public bool IsRootWeb
+        {
+            get { return SPContext.Current.Web.IsRootWeb; }
+        }
 
         public bool Pinned { get; private set; }
 

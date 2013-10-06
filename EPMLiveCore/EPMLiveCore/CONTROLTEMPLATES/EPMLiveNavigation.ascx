@@ -25,13 +25,13 @@
     <Sharepoint:StyleBlock runat="server">
         #s4-ribbonrow,
         #s4-workspace {
-            margin-left: 230px;
+        margin-left: 230px;
         }
 
         .ms-dialog .epm-nav-pinned,
         .ms-dialog #s4-ribbonrow,
         .ms-dialog #s4-workspace {
-            margin-left: 0;
+        margin-left: 0;
         }
     </Sharepoint:StyleBlock>
 <%
@@ -41,13 +41,13 @@
     <Sharepoint:StyleBlock runat="server">
         #s4-ribbonrow,
         #s4-workspace {
-            margin-left: 50px;
+        margin-left: 50px;
         }
         
         .ms-dialog .epm-nav-unpinned,
         .ms-dialog #s4-ribbonrow,
         .ms-dialog #s4-workspace {
-            margin-left: 0;
+        margin-left: 0;
         }
     </Sharepoint:StyleBlock>
 <% } %>
@@ -128,7 +128,13 @@
                    { %>
                     <div class="epm-nav-sub-header">Navigation</div>
                     <div class="epm-nav-sub-header-bottom"></div>
-                    <div class="epm-nav-home"><span class="fui-home"></span><a class="epm-nav-node" href="<%= WebUrl %>">Home</a></div>
+                
+                    <% if (IsRootWeb)
+                       { %>
+                        <div class="epm-nav-home"><span class="fui-home"></span><a class="epm-nav-node" href="<%= WebUrl %>">Home</a></div>
+                    <%
+                       } %>
+
                     <SharePoint:SPTreeView
                         ID="EPMLiveNav"
                         runat="server"
@@ -170,17 +176,17 @@
 
 <SharePoint:ScriptBlock runat="server">
     (function() {
-        window.epmLiveNavigation = {
-            currentWebId: '<%= WebId %>',
-            currentWebUrl: '<%= WebUrl %>',
-            currentUserId: <%= UserId %>,
-            staticProvider: '<%= StaticProviderLinks %>',
-            selectedNode: '<%= SelectedNode %>',
-            workspaceTree: function() {
-                return window.$find('<%= WorkspacesNavTree.ClientID %>');
-            }
-        };
+    window.epmLiveNavigation = {
+    currentWebId: '<%= WebId %>',
+    currentWebUrl: '<%= WebUrl %>',
+    currentUserId: <%= UserId %>,
+    staticProvider: '<%= StaticProviderLinks %>',
+    selectedNode: '<%= SelectedNode %>',
+    workspaceTree: function() {
+    return window.$find('<%= WorkspacesNavTree.ClientID %>');
+    }
+    };
 
-        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
+    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
     })();
 </SharePoint:ScriptBlock>
