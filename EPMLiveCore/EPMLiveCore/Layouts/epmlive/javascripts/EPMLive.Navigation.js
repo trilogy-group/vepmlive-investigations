@@ -1422,6 +1422,8 @@
                                                 remove = true;
                                             } else if (link.kind === 1 && text === 'No items') {
                                                 remove = true;
+                                            } else if (link.id === 2 && text === 'No favorite workspace') {
+                                                remove = true;
                                             }
 
                                             if (remove) {
