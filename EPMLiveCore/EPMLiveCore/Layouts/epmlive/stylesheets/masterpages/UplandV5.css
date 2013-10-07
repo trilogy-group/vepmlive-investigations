@@ -212,6 +212,10 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     cursor: pointer;
 }
 
+.dhtmlx_window_active {
+    z-index: 500 !important;
+}
+
 /* modification to 2013 toolbar styles */
 
 #fA0Main {
