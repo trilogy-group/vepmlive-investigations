@@ -24,12 +24,13 @@
         </tr>
         <tr>
             <td>Report XML:</td>
-            <td><asp:TextBox ID="txtXml" runat="server" TextMode="MultiLine" Columns="60" Rows="250"></asp:TextBox></td>
+            <td><asp:TextBox ID="txtXml" runat="server" TextMode="MultiLine" Columns="60" Rows="25"></asp:TextBox></td>
         </tr>
         <tr>
             <td></td>
-            <td><asp:Button ID="btnSave" Text="Save" OnClick="btnSave_Click" runat="server"/></td>
+            <td><asp:Button ID="btnSave" Text="Save" OnClick="btnSave_Click" runat="server"/> <asp:Button ID="btnCancel" Text="Save" OnClick="btnCancel_Click" runat="server"/></td>
         </tr>
+
     </table>
 
 </asp:Content>

@@ -56,5 +56,10 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/reporting/izenda/manage.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
 
         }
+
+        protected void btnCancel_Click(object sender, EventArgs e)
+        {
+            Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/reporting/izenda/manage.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+        }
     }
 }
