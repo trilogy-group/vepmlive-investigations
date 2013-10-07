@@ -1708,7 +1708,7 @@ function registerEpmLiveResourceGridScript() {
         };
 
         window.Grids.OnClick = function (grid, row, col, x, y, evt) {
-            $$.actions.loadRibbon();
+            window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
             $$.actions.hideEasyScroll(true);
 
             if (row.Kind === 'Data' && row.Def.Name === 'R') {
@@ -1863,7 +1863,13 @@ function registerEpmLiveResourceGridScript() {
             grid.Update();
             grid.Render();
 
-            window.setTimeout(function() { $$.actions.loadRibbon(); }, 1500);
+            if ((window.location.href + '').toLowerCase().indexOf('sitepages') !== -1) {
+                window.setTimeout(function () { $$.actions.loadRibbon(); }, 1500);
+
+                $('#s4-workspace').click(function() {
+                    window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
+                });
+            }
         };
 
         window.Grids.OnGetHtmlValue = function (grid, row, col, val) {
