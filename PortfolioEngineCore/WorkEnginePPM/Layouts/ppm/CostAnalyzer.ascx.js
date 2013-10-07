@@ -104,6 +104,7 @@
                     this.selectPIList.window("winSELPIDlg").attachObject("idSelectPIDiv");
                     this.selectPIList.window("winSELPIDlg").button("close").disable();
                     this.selectPIList.window("winSELPIDlg").button("park").hide();
+                    this.selectPIList.window("winSELPIDlg").button("minmax1").hide();
                     //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
 
 
@@ -972,6 +973,7 @@
                 this.SetTotals.window("winTotDlg").attachObject("idTotalsDlgObj");
                 this.SetTotals.window("winTotDlg").button("close").disable();
                 this.SetTotals.window("winTotDlg").button("park").hide();
+                this.SetTotals.window("winTotDlg").button("minmax1").hide();
 
                 //       document.getElementById("dhxMainCont").style.border = "none";
 
@@ -4850,6 +4852,7 @@
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Rename View");
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { AnalyzerViewDlg_OnCloseDelegate(); return true; });
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idRenameAnalyzerDlg");
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("minmax1").hide();
                     }
                     else {
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
@@ -4898,6 +4901,7 @@
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Save View");
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachEvent("onClose", function (win) { AnalyzerViewDlg_OnCloseDelegate(); return true; });
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").attachObject("idSaveAnalyzerDlg");
+                        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("minmax1").hide();
                     }
                     else {
                         this.AnalyzerViewDlg.window("winAnalyzerViewDlg").show();
@@ -4938,6 +4942,7 @@
                         this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setText("Delete View");
                         this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").attachEvent("onClose", function (win) { AnalyzerDeleteViewDlg_OnCloseDelegate(); return true; });
                         this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").attachObject("idDeleteAnalyzerDlg");
+                        this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").button("minmax1").hide();
                     }
                     else {
                         this.ViewDlg.window("winViewDlg").show();
@@ -5638,6 +5643,7 @@
             this.dlgShowLegend.window("winShowLegDlg").attachObject("idTargetLegendDlgObj");
             this.dlgShowLegend.window("winShowLegDlg").button("close").disable();
             this.dlgShowLegend.window("winShowLegDlg").button("park").hide();
+            this.dlgShowLegend.window("winShowLegDlg").button("minmax1").hide();
 
             var sbDataxml = new StringBuilder();
 
@@ -5803,6 +5809,7 @@
                 this.SelectEditDlg.window("winEditTarDlg").attachObject("idEditTargetDlgObj");
                 this.SelectEditDlg.window("winEditTarDlg").button("close").disable();
                 this.SelectEditDlg.window("winEditTarDlg").button("park").hide();
+                this.SelectEditDlg.window("winEditTarDlg").button("minmax1").hide();
 
                 var select = document.getElementById('idSelEditTarget');
 
@@ -5875,6 +5882,7 @@
                 this.SelectDelDlg.window("winDelTarDlg").attachObject("idDeleteTargetDlgObj");
                 this.SelectDelDlg.window("winDelTarDlg").button("close").disable();
                 this.SelectDelDlg.window("winDelTarDlg").button("park").hide();
+                this.SelectDelDlg.window("winDelTarDlg").button("minmax1").hide();
 
                 var select = document.getElementById('idSelDelTarget');
 
@@ -5966,6 +5974,7 @@
                 this.SelectCopyDlg.window("winCopyTarDlg").attachObject("idCopyTargetDlgObj");
                 this.SelectCopyDlg.window("winCopyTarDlg").button("close").disable();
                 this.SelectCopyDlg.window("winCopyTarDlg").button("park").hide();
+                this.SelectCopyDlg.window("winCopyTarDlg").button("minmax1").hide();
 
                 var select = document.getElementById('idSelCopyTarget');
 
@@ -6042,6 +6051,7 @@
                 this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditTargetDlg");
                 this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
                 this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
+                this.dlgEditTarget.window("winEditTargetDlg").button("minmax1").hide();
                 //               this.dlgEditTarget.window("winEditTargetDlg").attachEvent("onFocus", layoutOnResizeFinishDelegate);
 
                 this.EditTargetid = id;
@@ -6746,7 +6756,8 @@
                 this.dlgSaveTargetAs.window("winSaveAsTargetDlg").attachObject("idSaveTargetDlg");
                 this.dlgSaveTargetAs.window("winSaveAsTargetDlg").button("close").disable();
                 this.dlgSaveTargetAs.window("winSaveAsTargetDlg").button("park").hide();
-                //               this.dlgSaveTargetAs.window("winSaveAsTargetDlg").attachEvent("onFocus", layoutOnResizeFinishDelegate);
+                this.dlgSaveTargetAs.window("winSaveAsTargetDlg").button("minmax1").hide();
+                 //               this.dlgSaveTargetAs.window("winSaveAsTargetDlg").attachEvent("onFocus", layoutOnResizeFinishDelegate);
 
 
                 if (this.DoingCreate)
@@ -6797,6 +6808,7 @@
                 this.dlgSpreadDlg.window("winSpreadDlg").attachObject("idSpreadDlgObj");
                 this.dlgSpreadDlg.window("winSpreadDlg").button("close").disable();
                 this.dlgSpreadDlg.window("winSpreadDlg").button("park").hide();
+                this.dlgSpreadDlg.window("winSpreadDlg").button("minmax1").hide();
 
             }
             else

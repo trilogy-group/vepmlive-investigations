@@ -91,6 +91,7 @@
                     this.selectPIList.window("winSELPIDlg").attachObject("idSelectPIDiv");
                     this.selectPIList.window("winSELPIDlg").button("close").disable();
                     this.selectPIList.window("winSELPIDlg").button("park").hide();
+                    this.selectPIList.window("winSELPIDlg").button("minmax1").hide();
                     //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
 
 
@@ -1041,6 +1042,7 @@
 	                this.selectCalendarAndPeriods.window("winFCandPerDlg").attachObject("idFCandPerDlgObj");
 	                this.selectCalendarAndPeriods.window("winFCandPerDlg").button("close").disable();
 	                this.selectCalendarAndPeriods.window("winFCandPerDlg").button("park").hide();
+	                this.selectCalendarAndPeriods.window("winFCandPerDlg").button("minmax1").hide();
 	                //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
 
 	            }
@@ -1270,6 +1272,7 @@
 				this.SetTotals.window("winTotDlg").attachObject("idTotalsColsDlg");
 				this.SetTotals.window("winTotDlg").button("close").disable();
 				this.SetTotals.window("winTotDlg").button("park").hide();
+				this.SetTotals.window("winTotDlg").button("minmax1").hide();
 
 				//       document.getElementById("dhxMainCont").style.border = "none";
 
@@ -4710,6 +4713,7 @@
 				this.CapScenDlg.window("winCapScenDlg").setIcon("logo.ico", "logo.ico");
 				this.CapScenDlg.window("winCapScenDlg").denyResize();
 				this.CapScenDlg.window("winCapScenDlg").button("park").hide();
+				this.CapScenDlg.window("winCapScenDlg").button("minmax1").hide();
 				this.CapScenDlg.window("winCapScenDlg").setModal(true);
 				this.CapScenDlg.window("winCapScenDlg").center();
 				this.CapScenDlg.window("winCapScenDlg").setText("Capacity Scenarios");
@@ -4787,6 +4791,7 @@
 	            this.SaveScenDlg.window("winSaveScenDlg").setIcon("logo.ico", "logo.ico");
 	            this.SaveScenDlg.window("winSaveScenDlg").denyResize();
 	            this.SaveScenDlg.window("winSaveScenDlg").button("park").hide();
+	            this.SaveScenDlg.window("winSaveScenDlg").button("minmax1").hide();
 	            this.SaveScenDlg.window("winSaveScenDlg").setModal(true);
 	            this.SaveScenDlg.window("winSaveScenDlg").center();
 	            this.SaveScenDlg.window("winSaveScenDlg").setText("Save Scenario");
@@ -4903,6 +4908,7 @@
 	            this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditCapScenDlg");
 	            this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
 	            this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
+	            this.dlgEditTarget.window("winEditTargetDlg").button("minmax1").hide();
 
 	            this.EditCSid = this.EditCapScen;
 	            this.EditName = csname;
@@ -4954,6 +4960,7 @@
 	            this.dlgChart.window("winChartDlg").attachObject("idChartDlg");
 	            this.dlgChart.window("winChartDlg").button("close").disable();
 	            this.dlgChart.window("winChartDlg").button("park").hide();
+	            this.dlgChart.window("winChartDlg").button("minmax1").hide();
 
 	            var ChRibonData = {
 	                parent: "ribbonbarChartDiv",
@@ -5256,6 +5263,7 @@
 			this.dlgSpreadDlg.window("winSpreadDlg").attachObject("idSpreadDlgObj");
 			this.dlgSpreadDlg.window("winSpreadDlg").button("close").disable();
 			this.dlgSpreadDlg.window("winSpreadDlg").button("park").hide();
+			this.dlgSpreadDlg.window("winSpreadDlg").button("minmax1").hide();
 
 		}
 		else
@@ -6192,6 +6200,7 @@
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 	                    //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("minmax1").hide();
 	                    //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
@@ -6236,6 +6245,7 @@
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 	                    //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("minmax1").hide();
 	                    //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
 	                    this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
@@ -6269,6 +6279,7 @@
 	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").denyResize();
 	                    //this.ViewDlg.window("winViewDlg").button("close").disable();
 	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").button("park").hide();
+	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").button("minmax1").hide();
 	                    //this.ViewDlg.setSkin(this.params.DHTMLXSkin);
 	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").setModal(true);
 	                    this.AnalyzerDeleteViewDlg.window("winAnalyzerDeleteViewDlg").center();
@@ -7383,7 +7394,8 @@
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 			//this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
-			//this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
+			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("minmax1").hide();
+		    //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
 			this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setText("Create New Capacity Scenario");
@@ -7417,6 +7429,7 @@
 	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").denyResize();
 	        //this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("close").disable();
 	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("park").hide();
+	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").button("minmax1").hide();
 	        //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
 	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").setModal(true);
 	        this.AnalyzerViewDlg.window("winAnalyzerViewDlg").center();
@@ -7490,7 +7503,8 @@
 			this.dlgShowLegend.window("winShowLegDlg").attachObject("idTargetLegendDlgObj");
 			this.dlgShowLegend.window("winShowLegDlg").button("close").disable();
 			this.dlgShowLegend.window("winShowLegDlg").button("park").hide();
-			
+			this.dlgShowLegend.window("winShowLegDlg").button("minmax1").hide();
+
 			var sbDataxml = new StringBuilder();
 
 			sbDataxml = new StringBuilder();
@@ -7677,6 +7691,7 @@
 				this.dlgShowGridEx.window("winGridExDlg").attachObject("idGridExplainDlgObj");
 				this.dlgShowGridEx.window("winGridExDlg").button("close").disable();
 				this.dlgShowGridEx.window("winGridExDlg").button("park").hide();
+				this.dlgShowGridEx.window("winGridExDlg").button("minmax1").hide();
 
 			} else
 				this.dlgShowGridEx.window("winGridExDlg").show();

@@ -99,6 +99,7 @@
 	                this.selectPIList.window("winSELPIDlg").attachObject("idSelectPIDiv");
 	                this.selectPIList.window("winSELPIDlg").button("close").disable();
 	                this.selectPIList.window("winSELPIDlg").button("park").hide();
+	                this.selectPIList.window("winSELPIDlg").button("minmax1").hide();
 	                //      this.selectCalendarAndPeriods.window("winFCandPerDlg").hideHeader();
 
 
@@ -365,6 +366,7 @@
 	            this.selectModelAndVersion.window("winModelAndVersionsDlg").attachObject("idMVDlgObj");
 	            this.selectModelAndVersion.window("winModelAndVersionsDlg").button("close").disable();
 	            this.selectModelAndVersion.window("winModelAndVersionsDlg").button("park").hide();
+	            this.selectModelAndVersion.window("winModelAndVersionsDlg").button("minmax1").hide();
 
 
 
@@ -1175,6 +1177,7 @@
 				this.selectFiltering.window("winFilterDlg").attachObject("idFilterDlgObj");
 				this.selectFiltering.window("winFilterDlg").button("close").disable();
 				this.selectFiltering.window("winFilterDlg").button("park").hide();
+				this.selectFiltering.window("winFilterDlg").button("minmax1").hide();
 
 				var sHTML1 = "<treegrid debug='0' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetFilterGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetFilterGridData' data_namespace='WorkEnginePPM' data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
 				this.FilterGrid = TreeGrid(sHTML1, "FilterDiv", "f_1");
@@ -1258,6 +1261,7 @@
 				this.selectCostTypeCmp.window("winCTCmpDlg").attachObject("idCTCmpDlgObj");
 				this.selectCostTypeCmp.window("winCTCmpDlg").button("close").disable();
 				this.selectCostTypeCmp.window("winCTCmpDlg").button("park").hide();
+				this.selectCostTypeCmp.window("winCTCmpDlg").button("minmax1").hide();
 
 				var sHTML1 = "<treegrid debug='0' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetTotalGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetCostTypeCompareGridData' data_namespace='WorkEnginePPM' data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
 				this.CTCmpGrid = TreeGrid(sHTML1, "CTCmpDiv", "ctc_1");
@@ -1340,6 +1344,7 @@
 				this.selectTotals.window("winTotalDlg").attachObject("idTotalsDlgObj");
 				this.selectTotals.window("winTotalDlg").button("close").disable();
 				this.selectTotals.window("winTotalDlg").button("park").hide();
+				this.selectTotals.window("winTotalDlg").button("minmax1").hide();
 
 				var sHTML1 = "<treegrid debug='0' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetTotalGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetTotalGridData' data_namespace='WorkEnginePPM' data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
 				this.TotalGrid = TreeGrid(sHTML1, "TotalDiv", "t_1");
@@ -1427,6 +1432,7 @@
 				this.selectSnG.window("winSnGDlg").attachObject("idSortnGroupDlgObj");
 				this.selectSnG.window("winSnGDlg").button("close").disable();
 				this.selectSnG.window("winSnGDlg").button("park").hide();
+				this.selectSnG.window("winSnGDlg").button("minmax1").hide();
 				WorkEnginePPM.Model.GetSortAndGroup(this.TicketVal, GetSortAndGroupCompleteDelegate);
 
 				
@@ -1803,6 +1809,7 @@
 				this.selectCols.window("winColsDlg").attachObject("idColssDlgObj");
 				this.selectCols.window("winColsDlg").button("close").disable();
 				this.selectCols.window("winColsDlg").button("park").hide();
+				this.selectCols.window("winColsDlg").button("minmax1").hide();
 
 				this.ColsLoading = true;
 
@@ -2019,6 +2026,7 @@
 				this.selectCopy.window("winCVDlg").attachObject("idCopyVersionsDlgObj");
 				this.selectCopy.window("winCVDlg").button("close").disable();
 				this.selectCopy.window("winCVDlg").button("park").hide();
+				this.selectCopy.window("winCVDlg").button("minmax1").hide();
 
 				var FromList = document.getElementById('SelFromVersion');
 				var ToList = document.getElementById('SelToVersion');
@@ -2204,6 +2212,7 @@
 	            this.saveOrApply.window("winSoADlg").attachObject("idSaveVersionOrApplyTargetDlgObj");
 	            this.saveOrApply.window("winSoADlg").button("close").disable();
 	            this.saveOrApply.window("winSoADlg").button("park").hide();
+	            this.saveOrApply.window("winSoADlg").button("minmax1").hide();
 
 	            var SVoT = document.getElementById('idSaveorApply');
 	            SVoT.options.length = 0;
@@ -2255,6 +2264,7 @@
 				this.saveOrApply.window("winSoADlg").attachObject("idSaveVersionOrApplyTargetDlgObj");
 				this.saveOrApply.window("winSoADlg").button("close").disable();
 				this.saveOrApply.window("winSoADlg").button("park").hide();
+				this.saveOrApply.window("winSoADlg").button("minmax1").hide();
 
 				var SVoT = document.getElementById('idSaveorApply');
 				SVoT.options.length = 0;
@@ -2445,6 +2455,7 @@
 				this.selectPoD.window("winPoDDlg").attachObject("idPerDispOptsDlgObj");
 				this.selectPoD.window("winPoDDlg").button("close").disable();
 				this.selectPoD.window("winPoDDlg").button("park").hide();
+				this.selectPoD.window("winPoDDlg").button("minmax1").hide();
 
 
 			   var dispFrom = document.getElementById('idDispPerFrom');
@@ -2600,6 +2611,7 @@
 			this.UserViewsObj.window("winUserVDlg").attachObject("idUserViewsDlgObj");
 			this.UserViewsObj.window("winUserVDlg").button("close").disable();
 			this.UserViewsObj.window("winUserVDlg").button("park").hide();
+			this.UserViewsObj.window("winUserVDlg").button("minmax1").hide();
 
 			var SelView = document.getElementById('idSelectUserView');
 			var txtName = document.getElementById('idUserViewText');
@@ -2946,6 +2958,7 @@
 	            this.ModelViewDlg.window("winModelViewDlg").setIcon("logo.ico", "logo.ico");
 	            this.ModelViewDlg.window("winModelViewDlg").denyResize();
 	            this.ModelViewDlg.window("winModelViewDlg").button("park").hide();
+	            this.ModelViewDlg.window("winModelViewDlg").button("minmax1").hide();
 	            this.ModelViewDlg.window("winModelViewDlg").setModal(true);
 	            this.ModelViewDlg.window("winModelViewDlg").center();
 	            this.ModelViewDlg.window("winModelViewDlg").setText("Save View");
@@ -2995,6 +3008,7 @@
 	            this.ModelViewDlg.window("winModelViewDlg").setIcon("logo.ico", "logo.ico");
 	            this.ModelViewDlg.window("winModelViewDlg").denyResize();
 	            this.ModelViewDlg.window("winModelViewDlg").button("park").hide();
+	            this.ModelViewDlg.window("winModelViewDlg").button("minmax1").hide();
 	            this.ModelViewDlg.window("winModelViewDlg").setModal(true);
 	            this.ModelViewDlg.window("winModelViewDlg").center();
 	            this.ModelViewDlg.window("winModelViewDlg").setText("Save View");
@@ -3042,6 +3056,7 @@
 	            this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").denyResize();
 
 	            this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").button("park").hide();
+	            this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").button("minmax1").hide();
 	            //this.ViewDlg.setSkin(this.params.DHTMLXSkin);                this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").setModal(true);
 	            this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").center();
 	            this.ModelerDeleteViewDlg.window("winModelerDeleteViewDlg").setText("Delete View");
@@ -3473,6 +3488,7 @@
 				this.SearchDlg.window("winSearchsDlg").attachObject("idSearchDlgObj");
 				this.SearchDlg.window("winSearchsDlg").button("close").disable();
 				this.SearchDlg.window("winSearchsDlg").button("park").hide();
+				this.SearchDlg.window("winSearchsDlg").button("minmax1").hide();
 
 				WorkEnginePPM.Model.GetColumnOrderData(this.TicketVal, GetSearchCompleteDelegate);
 			   
@@ -4379,6 +4395,7 @@
 				this.dlgCreateTarget.window("winCreateTargetDlg").attachObject("idCreateTragetDlgObj");
 				this.dlgCreateTarget.window("winCreateTargetDlg").button("close").disable();
 				this.dlgCreateTarget.window("winCreateTargetDlg").button("park").hide();
+				this.dlgCreateTarget.window("winCreateTargetDlg").button("minmax1").hide();
 
 				document.getElementById('idTxtNewTargetName').value = "";
 				document.getElementById('idTxtNewTargetDesc').value = "";
@@ -4469,6 +4486,7 @@
 	            this.dlgEditTarget.window("winEditTargetDlg").attachObject("idEditTargetDlg");
 	            this.dlgEditTarget.window("winEditTargetDlg").button("close").disable();
 	            this.dlgEditTarget.window("winEditTargetDlg").button("park").hide();
+	            this.dlgEditTarget.window("winEditTargetDlg").button("minmax1").hide();
 	            //               this.dlgEditTarget.window("winEditTargetDlg").attachEvent("onFocus", layoutOnResizeFinishDelegate);
 
 	            this.EditTargetid = id;
@@ -4702,6 +4720,7 @@
 			this.dlgShowLegend.window("winShowLegDlg").attachObject("idTargetLegendDlgObj");
 			this.dlgShowLegend.window("winShowLegDlg").button("close").disable();
 			this.dlgShowLegend.window("winShowLegDlg").button("park").hide();
+			this.dlgShowLegend.window("winShowLegDlg").button("minmax1").hide();
 
 
 			var sHTML1 = "<treegrid debug='0' sync='0' layout_url='" + this.Webservice + "' layout_method='Soap' layout_function='GetLegendGridLayout' layout_namespace='WorkEnginePPM' layout_param_Ticket='" + this.TicketVal + "' data_url='" + this.Webservice + "' data_method='Soap' data_function='GetLegendGridData' data_namespace='WorkEnginePPM' data_param_Ticket='" + this.TicketVal + "' ></treegrid>";
@@ -4753,6 +4772,7 @@
 			this.dlgTargetGroup.window("winTarGrpDlg").attachObject("idGroupTargetBy");
 			this.dlgTargetGroup.window("winTarGrpDlg").button("close").disable();
 			this.dlgTargetGroup.window("winTarGrpDlg").button("park").hide();
+			this.dlgTargetGroup.window("winTarGrpDlg").button("minmax1").hide();
 
 			var SGT = document.getElementById('idSelectGroup');
 			SGT.options.length = 0;
@@ -5168,6 +5188,7 @@
 			this.saveOrApply.window("winSoADlg").attachObject("idSaveVersionOrApplyTargetDlgObj");
 			this.saveOrApply.window("winSoADlg").button("close").disable();
 			this.saveOrApply.window("winSoADlg").button("park").hide();
+			this.saveOrApply.window("winSoADlg").button("minmax1").hide();
 
 			var SVoT = document.getElementById('idSaveorApply');
 			SVoT.options.length = 0;

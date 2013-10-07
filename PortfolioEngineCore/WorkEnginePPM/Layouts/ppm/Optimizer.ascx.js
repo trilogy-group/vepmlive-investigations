@@ -1724,6 +1724,7 @@
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").denyResize();
 	                    //this.AnalyzerViewDlg.window("winOptimizerViewDlg").button("close").disable();
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").button("park").hide();
+	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").button("minmax1").hide();
 	                    //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").setModal(true);
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").center();
@@ -1773,6 +1774,7 @@
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").denyResize();
 	                    //this.AnalyzerViewDlg.window("winOptimizerViewDlg").button("close").disable();
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").button("park").hide();
+	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").button("minmax1").hide();
 	                    //this.AnalyzerViewDlg.setSkin(this.params.DHTMLXSkin);
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").setModal(true);
 	                    this.AnalyzerViewDlg.window("winOptimizerViewDlg").center();
@@ -1812,6 +1814,7 @@
 	                    this.AnalyzerDeleteViewDlg.window("winOptimizerDeleteViewDlg").denyResize();
 	                    //this.ViewDlg.window("winViewDlg").button("close").disable();
 	                    this.AnalyzerDeleteViewDlg.window("winOptimizerDeleteViewDlg").button("park").hide();
+	                    this.AnalyzerDeleteViewDlg.window("winOptimizerDeleteViewDlg").button("minmax1").hide();
 	                    //this.ViewDlg.setSkin(this.params.DHTMLXSkin);
 	                    this.AnalyzerDeleteViewDlg.window("winOptimizerDeleteViewDlg").setModal(true);
 	                    this.AnalyzerDeleteViewDlg.window("winOptimizerDeleteViewDlg").center();

@@ -93,6 +93,7 @@
   //                      this.EditRangeDlg.window("winEditRangeDlgDlg").setIcon("logo.ico", "logo.ico");
                         this.EditRangeDlg.window("winEditRangeDlgDlg").denyResize();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").button("park").hide();
+                        this.EditRangeDlg.window("winEditRangeDlgDlg").button("minmax1").hide();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setModal(true);
                         this.EditRangeDlg.window("winEditRangeDlgDlg").center();
                         this.EditRangeDlg.window("winEditRangeDlgDlg").setText(fld.FName);
@@ -409,6 +410,7 @@
   //                      this.DeleteStratDlg.window("winDeleteStratDlg").setIcon("logo.ico", "logo.ico");
                         this.DeleteStratDlg.window("winDeleteStratDlg").denyResize();
                         this.DeleteStratDlg.window("winDeleteStratDlg").button("park").hide();
+                        this.DeleteStratDlg.window("winDeleteStratDlg").button("minmax1").hide();
                         this.DeleteStratDlg.window("winDeleteStratDlg").setModal(true);
                         this.DeleteStratDlg.window("winDeleteStratDlg").center();
                         this.DeleteStratDlg.window("winDeleteStratDlg").setText("Delete Stratagy");
@@ -502,6 +504,7 @@
  //                       this.SaveStratDlg.window("winSaveStratDlg").setIcon("logo.ico", "logo.ico");
                         this.SaveStratDlg.window("winSaveStratDlg").denyResize();
                         this.SaveStratDlg.window("winSaveStratDlg").button("park").hide();
+                        this.SaveStratDlg.window("winSaveStratDlg").button("minmax1").hide();
                         this.SaveStratDlg.window("winSaveStratDlg").setModal(true);
                         this.SaveStratDlg.window("winSaveStratDlg").center();
                         this.SaveStratDlg.window("winSaveStratDlg").setText("Save Strategy");
@@ -585,6 +588,7 @@
  //                       this.RenameStratDlg.window("winRenameStratDlg").setIcon("logo.ico", "logo.ico");
                         this.RenameStratDlg.window("winRenameStratDlg").denyResize();
                         this.RenameStratDlg.window("winRenameStratDlg").button("park").hide();
+                        this.RenameStratDlg.window("winRenameStratDlg").button("minmax1").hide();
                         this.RenameStratDlg.window("winRenameStratDlg").setModal(true);
                         this.RenameStratDlg.window("winRenameStratDlg").center();
                         this.RenameStratDlg.window("winRenameStratDlg").setText("Rename Strategy");
@@ -1786,6 +1790,7 @@
                 this.OptDlg.window("winOptDlg").attachObject(idDiv);
                 this.OptDlg.window("winOptDlg").button("close").disable();
                 this.OptDlg.window("winOptDlg").button("park").hide();
+                this.OptDlg.window("winOptDlg").button("minmax1").hide();
 
                 //       document.getElementById("dhxMainCont").style.border = "none";
 
