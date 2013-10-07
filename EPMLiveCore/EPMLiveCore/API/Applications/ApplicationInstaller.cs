@@ -505,6 +505,10 @@ namespace EPMLiveCore.API
             {
                 return true;
             }
+            else if (url.Contains("_layouts/"))
+            {
+                return true;
+            }
             else
             {
                 if (bVerifyOnly)
