@@ -997,12 +997,25 @@
         if (g) {
             this.showArray = new Array();
             this.hideArray = new Array();
+            if (this.currentPeriod == null) {
+                for (var c = 0; c < g.ColNames[1].length; c++) {
+                    var col = g.ColNames[1][c];
+                    var sType = col.substring(0, 1);
+                    var periodId = parseInt(col.substring(1));
+                    if (grid.GetAttribute(null, col, "Current") == true) {
+                        this.currentPeriod = periodId;
+                        if (this.startPeriod <= this.currentPeriod) {
+                            this.startPeriod = this.currentPeriod;
+                            this.editorTab.selectByValue("idViewTab_FromPeriod", 0);
+                        }
+                        break;
+                    }
+                }
+            }
             for (var c = 0; c < g.ColNames[1].length; c++) {
                 var col = g.ColNames[1][c];
                 var sType = col.substring(0, 1);
                 var periodId = parseInt(col.substring(1));
-                if (grid.GetAttribute(null, col, "Current") == true)
-                    this.currentPeriod = periodId;
                 var bHide = false;
                 if (periodId < this.startPeriod || periodId > this.finishPeriod)
                     this.hideArray[this.hideArray.length] = col;
