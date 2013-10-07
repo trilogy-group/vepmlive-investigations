@@ -41,7 +41,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             }
             else if (url.ToLower().Contains("sitepages"))
             {
-                url = string.Format(@"javascript:SP.UI.ModalDialog.showModalDialog({{url: '{0}', showMaximized: true}});", url);
+                url = string.Format(@"javascript:SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {{ url: {0}, showMaximized: true }});", url);
             }
             else
             {
