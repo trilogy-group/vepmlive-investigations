@@ -28,7 +28,7 @@ dhtmlXGridObject.prototype.doExpand = function (obj) {
     else
         if ((r.state == "minus") && (!r._closeable))
             this.collapseKids(row)
-} 
+}
 
 
 function dhtmlxHierarchy() {
@@ -836,7 +836,7 @@ eXcell_tree.prototype.setValue = function (valAr) {
         _tgc.spacer = "<img src='" + this.grid.imgURL + "blank.gif'  align='absmiddle' class='space'>";
         _tgc.imst = "<img src='" + this.grid.imgURL;
         _tgc.imsti = "<img src='" + (this.grid.iconURL || this.grid.imgURL);
-        _tgc.imact = "' align='absmiddle'  onclick='this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.doExpand(this);event.cancelBubble=true;'>"
+        _tgc.imact = "' align='absmiddle'  onclick='this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.parentNode.grid.doExpand(this.parentNode);event.cancelBubble=true;'>"
         _tgc.plus = _tgc.imst + "plus.gif" + _tgc.imact;
         _tgc.minus = _tgc.imst + "minus.gif" + _tgc.imact;
         _tgc.blank = _tgc.imst + "blank.gif" + _tgc.imact;
@@ -909,8 +909,8 @@ eXcell_tree.prototype.setValue = function (valAr) {
 
 
     this.cell.innerHTML = html.join("");
-    this.cell.parentNode.imgTag = this.cell.childNodes[0].childNodes[row.level];
-    this.cell.parentNode.valTag = this.cell.childNodes[0].childNodes[row.level + 2];
+    this.cell.parentNode.imgTag = this.cell.childNodes[0].childNodes[0].childNodes[row.level];
+    this.cell.parentNode.valTag = this.cell.childNodes[0].childNodes[0].childNodes[row.level + 2];
     if (_isKHTML) this.cell.vAlign = "top";
     if (row.parent.id != 0 && row.parent.state == "plus") {
         this.grid._updateTGRState(row.parent, false);
