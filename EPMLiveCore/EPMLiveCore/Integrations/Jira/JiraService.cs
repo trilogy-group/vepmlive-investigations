@@ -62,10 +62,11 @@ namespace EPMLiveCore.Integrations.Jira
 
                 var response = restClient.Execute(restRequest);
 
-                if (response.ResponseStatus != ResponseStatus.Completed || response.ErrorException != null)
+                if (response.ResponseStatus != ResponseStatus.Completed || response.ErrorException != null || response.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3} {4}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content, response.ErrorMessage));
                 }
+               
             }
             catch (Exception ex)
             {
