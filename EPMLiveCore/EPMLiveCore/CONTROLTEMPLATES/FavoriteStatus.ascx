@@ -29,11 +29,11 @@
     
      <!--[if IE 8]>
          <SharePoint:StyleBlock runat="server">
-            .ms-cui-tt-a{
+            .ms-cui-tt-a {
                 width: auto !important;
             }
         
-            .ms-cui-tt-span{
+            .ms-cui-tt-span {
                 display: block !important;
                 padding: 8px 10px !important;
                 text-align: center !important;
