@@ -25,20 +25,21 @@
             color: #0072C6 !important;
             cursor: pointer;
         }
-        
-        <!--[if IE 8]>
-        .ms-cui-tt-a{
-            width: auto !important;
-        }
-        
-        .ms-cui-tt-span{
-            display: block !important;
-            padding: 8px 10px !important;
-            text-align: center !important;
-        }
-        <![endif]-->
-
     </Sharepoint:StyleBlock>
+    
+     <!--[if IE 8]>
+         <SharePoint:StyleBlock runat="server">
+            .ms-cui-tt-a{
+                width: auto !important;
+            }
+        
+            .ms-cui-tt-span{
+                display: block !important;
+                padding: 8px 10px !important;
+                text-align: center !important;
+            }
+         </SharePoint:StyleBlock>
+     <![endif]-->
    
     <div>
         <span id="favoritesStar" style="font-size:18px;" ></span>
