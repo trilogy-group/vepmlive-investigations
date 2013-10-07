@@ -38,6 +38,7 @@ namespace EPMLiveCore.Integrations.Jira
                 jsonSerializerSettings = new JsonSerializerSettings();
                 jsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 
+
                 restClient = new RestClient(serverUrl)
                 {
                     Authenticator = new HttpBasicAuthenticator(userName, password)
@@ -63,7 +64,7 @@ namespace EPMLiveCore.Integrations.Jira
 
                 if (response.ResponseStatus != ResponseStatus.Completed || response.ErrorException != null)
                 {
-                    throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content));
+                    throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3} {4}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content, response.ErrorMessage));
                 }
             }
             catch (Exception ex)
@@ -311,7 +312,6 @@ namespace EPMLiveCore.Integrations.Jira
                 throw ex;
             }
         }
-
         #endregion
 
         #region Private
@@ -529,20 +529,20 @@ namespace EPMLiveCore.Integrations.Jira
 
             if (response.ResponseStatus != ResponseStatus.Completed)
             {
-                throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content));
+                throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3} {4}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content, response.ErrorMessage));
             }
             switch (request.Method)
             {
                 case Method.DELETE:
                     if (response.StatusCode != HttpStatusCode.NoContent)
                     {
-                        throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content));
+                        throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3} {4}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content, response.ErrorMessage));
                     }
                     break;
                 case Method.POST:
                     if (response.StatusCode != HttpStatusCode.Created)
                     {
-                        throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content));
+                        throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3} {4}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content, response.ErrorMessage));
                     }
                     break;
                 case Method.PUT:
@@ -551,7 +551,7 @@ namespace EPMLiveCore.Integrations.Jira
                     }
                     else
                     {
-                        throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content));
+                        throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3} {4}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content, response.ErrorMessage));
                     }
                     break;
                 default:

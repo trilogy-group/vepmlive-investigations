@@ -5,7 +5,7 @@ using System.Data;
 
 namespace EPMLiveCore.Integrations.Jira
 {
-    public class JiraIntegrator : IIntegrator
+    public class JiraIntegrator : IIntegrator, IIntegratorControls
     {
         #region Interface Methods
         public bool InstallIntegration(WebProperties WebProps, IntegrationLog Log, out string Message, string IntegrationKey, string APIUrl)
@@ -51,10 +51,7 @@ namespace EPMLiveCore.Integrations.Jira
         {
             throw new NotImplementedException();
         }
-        public string GetURL(WebProperties WebProps, IntegrationLog Log, string control, string url)
-        {
-            throw new NotImplementedException();
-        }
+
         public List<ColumnProperty> GetColumns(WebProperties WebProps, IntegrationLog Log, string ListName)
         {
             CheckWebProps(WebProps, true);
@@ -79,7 +76,7 @@ namespace EPMLiveCore.Integrations.Jira
         }
         public Dictionary<string, string> GetDropDownValues(WebProperties WebProps, IntegrationLog log, string Property, string ParentPropertyValue)
         {
-            
+
             Dictionary<string, string> props = new Dictionary<string, string>();
             if (Property == "Object")
             {
@@ -274,5 +271,60 @@ namespace EPMLiveCore.Integrations.Jira
         }
 
         #endregion
+
+        public string GetControlCode(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<string> GetEmbeddedItemControls(WebProperties WebProps, IntegrationLog Log)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<IntegrationControl> GetPageButtons(WebProperties WebProps, IntegrationLog Log, bool GlobalButtons)
+        {
+            if (!GlobalButtons)
+            {
+                return new List<IntegrationControl>
+                {
+                    
+                    new IntegrationControl
+                    {
+                        Control = "JI_ViewIssue",
+                        Title = "View Issue",
+                        Image = "ji_viewissue.png",
+                        Window = IntegrationControlWindowStyle.FullWindow
+                    }
+                    
+                };
+            }
+            return null;
+        }
+
+        public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
+        {
+            try
+            {
+                CheckWebProps(webProps, true);
+                switch (control)
+                {
+                    case "JI_ViewIssue":
+                        return string.Format("{0}/{1}/{2}", webProps.Properties["ServerUrl"].ToString(), "browse", itemId);
+                }
+                throw new Exception(control + " is not a valid jira control.");
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message, IntegrationLogType.Error);
+            }
+
+            return null;
+        }
+
+        public string GetProxyResult(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control, string Property)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
