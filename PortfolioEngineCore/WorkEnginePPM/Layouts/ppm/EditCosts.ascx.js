@@ -112,6 +112,7 @@
             this.selectPIAndViewDlg.window("winPIAndViewDlg").attachObject("idPIAndViewDlgObj");
             this.selectPIAndViewDlg.window("winPIAndViewDlg").button("close").hide();
             this.selectPIAndViewDlg.window("winPIAndViewDlg").button("park").hide();
+            this.selectPIAndViewDlg.window("winPIAndViewDlg").button("minmax1").hide();
             WorkEnginePPM.EditCosts.GetPIList(GetPIListCompleteDelegate);
             WorkEnginePPM.EditCosts.GetViewList(GetViewListCompleteDelegate);
         }
@@ -1685,7 +1686,10 @@
         this.editorTab.disableItem("ToolsBtn");
     };
     EditCosts.prototype.HandleButtons = function () {
-        this.editorTab.enableItem("CloseBtn");
+        if (this.params.IsDlg == "1")
+            this.editorTab.enableItem("CloseBtn");
+        else
+            this.editorTab.disableItem("CloseBtn");
         var selectedgrid = this.GetSelectedTopGrid();
         // bit 0 = changed rows; bit 1 = selected rows - here I'm checking for changed rows 
         this.Dirty = false;
