@@ -393,7 +393,7 @@ namespace EPMLiveCore
             {
                 try
                 {
-                    new WorkspaceLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
+                    new RecentItemsLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
                 }
                 catch
                 {
