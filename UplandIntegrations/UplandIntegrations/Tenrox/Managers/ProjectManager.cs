@@ -47,13 +47,22 @@ namespace UplandIntegrations.Tenrox.Managers
         {
             var projectsClient = (ProjectsClient) client;
 
+            if (!items.Columns.Contains("ActualManagerId"))
+            {
+                items.Columns.Add("ActualManagerId", typeof (string));
+                columns.Add("ActualManagerId");
+            }
+
             foreach (DataRow row in items.Rows)
             {
+                string managerField = "ManagerId";
+
                 Project project = null;
 
                 try
                 {
                     project = projectsClient.QueryByUniqueId(_token, int.Parse(row["ID"].ToString()));
+                    managerField = "ActualManagerId";
                 }
                 catch { }
 
@@ -94,7 +103,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
                 if (!string.IsNullOrEmpty(email))
                 {
-                    row["ManagerId"] = TranslateEmailToUserId(email).ToString(CultureInfo.InvariantCulture);
+                    row[managerField] = TranslateEmailToUserId(email).ToString(CultureInfo.InvariantCulture);
                 }
 
                 FillObjects(columns, newProjects, existingProjects, project, row);
