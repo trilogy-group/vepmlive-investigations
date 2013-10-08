@@ -301,7 +301,7 @@ namespace UplandIntegrations.Tenrox
                 {
                     spId = items.Rows[index]["SPID"].ToString();
                 }
-                
+
                 if (result.Success)
                 {
                     transactionTable.AddRow(spId, txId, result.TransactionType);
@@ -348,12 +348,11 @@ namespace UplandIntegrations.Tenrox
                     }
                 };
             }
-            else
-            {
 
+            if (webProps.Properties["Object"].Equals("Project"))
+            {
                 return new List<IntegrationControl>
                 {
-                    
                     new IntegrationControl
                     {
                         Control = "TX_ProjectInfo",
@@ -361,9 +360,10 @@ namespace UplandIntegrations.Tenrox
                         Image = "tx_projectinfo.png",
                         Window = IntegrationControlWindowStyle.SmallDialog
                     }
-                    
                 };
             }
+
+            return new List<IntegrationControl>();
         }
 
         public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
