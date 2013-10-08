@@ -258,6 +258,8 @@ namespace PortfolioEngineCore
         public static StatusEnum InsertPeriods(DBAccess dba, int nCalendar, DataTable dt, out int lRowsAffected)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
+
+            SqlCommand oCommand;
             lRowsAffected = 0;
             try
             {
@@ -265,7 +267,7 @@ namespace PortfolioEngineCore
                 {
                     string cmdText = "INSERT INTO EPG_PERIODS (PRD_ID,CB_ID,PRD_NAME,PRD_START_DATE,PRD_FINISH_DATE,PRD_CLOSED_DATE,PRD_CLOSED_NAME,PRD_IS_CLOSED) VALUES(@PRD_ID,@CB_ID,@PRD_NAME,@PRD_START_DATE,@PRD_FINISH_DATE,@PRD_CLOSED_DATE,@PRD_CLOSED_NAME,@PRD_IS_CLOSED)";
 
-                    SqlCommand oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                    oCommand = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
 
                     SqlParameter pPRD_ID = oCommand.Parameters.Add("@PRD_ID", SqlDbType.Int);
                     SqlParameter pCB_ID = oCommand.Parameters.Add("@CB_ID", SqlDbType.Int);
@@ -291,6 +293,12 @@ namespace PortfolioEngineCore
                         lRowsAffected += oCommand.ExecuteNonQuery();
                     }
                 }
+
+                // need to make sure this insert set wasn't to replace deleted set with more periods which then left orphan BREAKDOWN_ATTRIBS
+                oCommand = new SqlCommand("EPG_SP_CleanCTAdmin", dba.Connection,dba.Transaction);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.ExecuteNonQuery();
+
             }
             catch (Exception ex)
             {
