@@ -288,19 +288,23 @@ namespace EPMLiveCore.Integrations.Jira
             {
                 CheckWebProps(WebProps, true);
                 JiraType jiraType = (JiraType)Enum.Parse(typeof(JiraType), Convert.ToString(WebProps.Properties["Object"]));
-                if (jiraType == JiraType.Issues)
+                switch (jiraType)
                 {
-                    return new List<IntegrationControl>
-                    {
-                        new IntegrationControl
+                    case JiraType.Issues:
+                        return new List<IntegrationControl>
                         {
-                            Control = "JI_ViewIssue",
-                            Title = "View Issue",
-                            Image = "ji_viewissue.png",
-                            Window = IntegrationControlWindowStyle.FullWindow
-                        }
+                            new IntegrationControl
+                            {
+                                Control = "JI_ViewIssue",
+                                Title = "View Issue",
+                                Image = "ji_viewissue.png",
+                                Window = IntegrationControlWindowStyle.FullWindow
+                            }
                     
-                    };
+                        };
+                        break;
+                    default:
+                        break;
                 }
             }
             return new List<IntegrationControl>();
@@ -315,6 +319,7 @@ namespace EPMLiveCore.Integrations.Jira
                 {
                     case "JI_ViewIssue":
                         return string.Format("{0}/{1}/{2}", webProps.Properties["ServerUrl"].ToString(), "browse", itemId);
+                        break;
                 }
                 throw new Exception(control + " is not a valid jira control.");
             }

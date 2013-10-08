@@ -597,6 +597,9 @@ namespace EPMLiveCore.Integrations.Jira
                     writer.WriteStartObject();
                     foreach (DataColumn column in dataColumns)
                     {
+                        if (column.ColumnName.Equals("SPID"))
+                            continue;
+
                         if (dataRow[column] != null && !string.IsNullOrEmpty(Convert.ToString(dataRow[column])))
                         {
                             writer.WritePropertyName(column.ColumnName);
@@ -616,6 +619,9 @@ namespace EPMLiveCore.Integrations.Jira
 
                     foreach (DataColumn column in dataColumnsList)
                     {
+                        if (column.ColumnName.Equals("SPID"))
+                            continue;
+
                         if (dataRow[column] != null && !string.IsNullOrEmpty(Convert.ToString(dataRow[column])))
                         {
                             if (column.ColumnName.Contains("|"))
