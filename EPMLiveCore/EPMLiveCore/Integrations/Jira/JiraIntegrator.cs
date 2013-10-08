@@ -274,32 +274,36 @@ namespace EPMLiveCore.Integrations.Jira
 
         public string GetControlCode(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
 
         public List<string> GetEmbeddedItemControls(WebProperties WebProps, IntegrationLog Log)
         {
-            throw new NotImplementedException();
+            return new List<string>();
         }
 
         public List<IntegrationControl> GetPageButtons(WebProperties WebProps, IntegrationLog Log, bool GlobalButtons)
         {
             if (!GlobalButtons)
             {
-                return new List<IntegrationControl>
+                CheckWebProps(WebProps, true);
+                JiraType jiraType = (JiraType)Enum.Parse(typeof(JiraType), Convert.ToString(WebProps.Properties["Object"]));
+                if (jiraType == JiraType.Issues)
                 {
-                    
-                    new IntegrationControl
+                    return new List<IntegrationControl>
                     {
-                        Control = "JI_ViewIssue",
-                        Title = "View Issue",
-                        Image = "ji_viewissue.png",
-                        Window = IntegrationControlWindowStyle.FullWindow
-                    }
+                        new IntegrationControl
+                        {
+                            Control = "JI_ViewIssue",
+                            Title = "View Issue",
+                            Image = "ji_viewissue.png",
+                            Window = IntegrationControlWindowStyle.FullWindow
+                        }
                     
-                };
+                    };
+                }
             }
-            return null;
+            return new List<IntegrationControl>();
         }
 
         public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
@@ -324,7 +328,7 @@ namespace EPMLiveCore.Integrations.Jira
 
         public string GetProxyResult(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control, string Property)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
     }
 }
