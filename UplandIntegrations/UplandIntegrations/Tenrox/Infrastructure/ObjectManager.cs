@@ -214,6 +214,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     }
                     catch (Exception exception)
                     {
+                        exception = exception.InnerException ?? exception;
                         return new TenroxTransactionResult(uniqueId, TransactionType.INSERT, exception.Message);
                     }
                 })));
@@ -229,6 +230,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     }
                     catch (Exception exception)
                     {
+                        exception = exception.InnerException ?? exception;
                         return new TenroxTransactionResult(uniqueId, TransactionType.UPDATE, exception.Message);
                     }
                 })));
