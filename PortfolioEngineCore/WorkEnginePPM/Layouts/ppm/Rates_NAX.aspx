@@ -76,7 +76,7 @@ html, body {
             <tr>
                 <td class="descriptioncell">
                     Available Resources:<br />
-					<select name="FrmFieldsOut" size="7" id="idResourcesOut" style="width: 150px; padding: 3px;" ondblclick="javascript:resourcesDlg_event('include');" >
+					<select name="FrmFieldsOut" size="7" id="idResourcesOut" style="width: 200px; padding: 3px;" ondblclick="javascript:resourcesDlg_event('include');" >
 					</select>
                 </td>
                 <td>
@@ -85,7 +85,7 @@ html, body {
                 </td>
                 <td class="descriptioncell">
                     Resources with this rate:<br />
-					<select name="FrmFieldsIn" size="7" id="idResourcesIn" style="width: 150px; padding: 3px;" ondblclick="javascript:resourcesDlg_event('exclude');" >
+					<select name="FrmFieldsIn" size="7" id="idResourcesIn" style="width: 200px; padding: 3px;" ondblclick="javascript:resourcesDlg_event('exclude');" >
 					</select>
                 </td>
             </tr>
@@ -136,7 +136,7 @@ html, body {
     var tgrid1_selectedRow = 0;
     var tgridRates_selectedRow = 0;
     var tgridFTEs_selectedRow = 0;
-    var tgrid1 = window.<%=tgrid1.UID%>;
+    var tgrid1 = window['<%=tgrid1.UID%>'];
     var tgridRates = window['<%=tgridRates.UID%>'];
     var bSaving = false;
  
@@ -331,7 +331,7 @@ html, body {
                         else
                             idResourcesOut.options[idResourcesOut.options.length] = option;
                     }
-                    DisplayDialog(420, 300, s, "winResourcesDlg", "idResourcesDlg", true, false);
+                    DisplayDialog(520, 300, s, "winResourcesDlg", "idResourcesDlg", true, false);
                 }
                 break;
         }
@@ -344,7 +344,8 @@ html, body {
             if (row.id != ignorethisrow.id) {
                 var wresids = "," + grid.GetAttribute(row, "wres_ids", null).toString() + ",";
                 if (wresids.indexOf("," + wresid + ",") > -1) {
-                    return resname + "(*)";
+                    var ratename = grid.GetAttribute(row, "RT_NAME", null);
+                    return resname + " (" + ratename + ")";
                 }
             }
             row = grid.GetNext(row);
@@ -412,7 +413,7 @@ html, body {
             case "include":
                 var selected = $("#idResourcesOut option:selected").get(0);
                 if (selected != null) {
-                    var nindex = selected.text.indexOf("(*)");
+                    var nindex = selected.text.indexOf(" (");
                     if (nindex > -1) {
                         var resname = selected.text.substr(0,nindex);
                         var srate = GetResourceRateName(selected.value);
@@ -430,7 +431,7 @@ html, body {
                 var idResourcesIn = document.getElementById('idResourcesIn');
                 for (var i = 0; i < idResourcesIn.options.length; i++) {
                     var resname = idResourcesIn.options[i].text;
-                    var nindex = resname.indexOf("(*)");
+                    var nindex = resname.indexOf(" (");
                     if (nindex > -1) {
                         resname = "," + resname.substr(0,nindex) + ",";
                         var wresid = "," + idResourcesIn.options[i].value + ",";
@@ -455,7 +456,7 @@ html, body {
                     if (resnames != "")
                         resnames += ",";
                     var resname = idResourcesIn.options[i].text;
-                    var nindex = resname.indexOf("(*)");
+                    var nindex = resname.indexOf(" (");
                     if (nindex > -1) {
                         resname = resname.substr(0,nindex);
                     }
