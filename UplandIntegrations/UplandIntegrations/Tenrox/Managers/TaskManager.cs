@@ -63,6 +63,7 @@ namespace UplandIntegrations.Tenrox.Managers
                         task.IsCosted = 0;
                         task.IsFunded = 0;
                         task.IsRandD = 0;
+                        task.WorktypeId = 71;
                         task.StartDate = DateTime.Now;
                     }
                     catch { }
