@@ -193,8 +193,8 @@ namespace PortfolioEngineCore
                         //  apply updates to dbs
                         if (bUpdates)
                         {
-                            cmdText = @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid" +
-                                " Where LV_UID=@LV_uid";
+                            cmdText = @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid," +
+                                " LV_INACTIVE=@LV_inactive Where LV_UID=@LV_uid";
                             oCommand = new SqlCommand(cmdText, dba.Connection);
                             oCommand.Transaction = transaction;
                             oCommand.CommandType = CommandType.Text;
@@ -205,6 +205,7 @@ namespace PortfolioEngineCore
                             SqlParameter pVALUE = oCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
                             SqlParameter pFULLVALUE = oCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
                             SqlParameter pEXTID = oCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
+                            SqlParameter pINACTIVE = oCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
 
                             foreach (DataRow row in dataTable.Rows)
                             {
@@ -216,6 +217,7 @@ namespace PortfolioEngineCore
                                     pVALUE.Value = row["LV_VALUE"];
                                     pFULLVALUE.Value = row["LV_FULLVALUE"];
                                     pEXTID.Value = row["LV_EXT_UID"];
+                                    pINACTIVE.Value = row["LV_INACTIVE"];
                                     oCommand.ExecuteNonQuery();
                                 }
                             }
@@ -246,8 +248,8 @@ namespace PortfolioEngineCore
                     if (bInserts)
                     {
                         cmdText = @"SET NOCOUNT ON;"
-                                   + "Insert Into EPGP_LOOKUP_VALUES (LOOKUP_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_EXT_UID)"
-                                   + " Values (@LV_lookupuid,@LV_value,@LV_fullvalue,@LV_id,@LV_level,@LV_extid);"
+                                   + "Insert Into EPGP_LOOKUP_VALUES (LOOKUP_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_EXT_UID,LV_INACTIVE)"
+                                   + " Values (@LV_lookupuid,@LV_value,@LV_fullvalue,@LV_id,@LV_level,@LV_extid,@LV_inactive);"
                                    + "Select @@IDENTITY as NewID";
                         oCommand = new SqlCommand(cmdText, dba.Connection);
                         oCommand.Transaction = transaction;
@@ -259,6 +261,7 @@ namespace PortfolioEngineCore
                         SqlParameter pVALUE = oCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
                         SqlParameter pFULLVALUE = oCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
                         SqlParameter pEXTID = oCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
+                        SqlParameter pINACTIVE = oCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
 
                         foreach (KeyValuePair<int, PFELookupItem> lookupitem in dicValues)
                         {
@@ -271,6 +274,7 @@ namespace PortfolioEngineCore
                                 pFULLVALUE.Value = lookupitem.Value.fullname;
                                 Guid g = Guid.NewGuid();
                                 pEXTID.Value = g.ToString();
+                                pINACTIVE.Value = lookupitem.Value.inactive;
 
                                 reader = oCommand.ExecuteReader();
                                 if (reader.Read())
