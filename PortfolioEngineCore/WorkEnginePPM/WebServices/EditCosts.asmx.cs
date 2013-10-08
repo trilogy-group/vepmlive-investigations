@@ -33,6 +33,7 @@ namespace WorkEnginePPM
             public int Uid;
             public string Name;
             public int Level;
+            public bool Inactive;
         }
 
         /// <summary>
@@ -644,14 +645,13 @@ Status_Error:
                             if (costCustomField.UseFullName == true)
                             {
                                 lookupItem.Name = DBAccess.ReadStringValue(row["LV_FULLVALUE"]);
-                                lookupItem.Level = DBAccess.ReadIntValue(row["LV_LEVEL"]);
-                                //lookupItem.Level = 1;
                             }
                             else
                             {
                                 lookupItem.Name = DBAccess.ReadStringValue(row["LV_VALUE"]);
-                                lookupItem.Level = DBAccess.ReadIntValue(row["LV_LEVEL"]);
                             }
+                            lookupItem.Level = DBAccess.ReadIntValue(row["LV_LEVEL"]);
+                            lookupItem.Inactive = DBAccess.ReadBoolValue(row["LV_INACTIVE"]);
                             lookupItems.Add(lookupItem);
                         }
 
@@ -701,12 +701,18 @@ Status_Error:
                 {
                     if (sJSON != "")
                         sJSON += ",";
-                    sJSON += "{Name:'" + lookupItems[i].Uid.ToString("0") + "',Text:'" + lookupItems[i].Name + "',Value:'" + lookupItems[i].Uid.ToString("0") + "_" + lookupItems[i].Name + "'}";
+                    string sDisabled = "";
+                    if (lookupItems[i].Inactive == true)
+                        sDisabled = ",Disabled:1";
+                    sJSON += "{Name:'" + lookupItems[i].Uid.ToString("0") + "',Text:'" + lookupItems[i].Name + "'" + sDisabled + ",Value:'" + lookupItems[i].Uid.ToString("0") + "_" + lookupItems[i].Name + "'}";
                     if (i + 1 < nItems)
                     {
                         if (lookupItems[i + 1].Level > lookupItems[i].Level)
                         {
-                            sJSON += ",{Name:'Level" + lookupItems[i].Uid.ToString("0") + "',Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1) + "]}";
+                            sDisabled = "";
+                            if (lookupItems[i].Inactive == true)
+                                sDisabled = ",Disabled:1";
+                            sJSON += ",{Name:'Level" + lookupItems[i].Uid.ToString("0") + "'" + sDisabled + ",Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1) + "]}";
                             //jsonLookup = "{Items:[{Name:'Name1',Text:'Text1',Value:'Value1'},{Name:'Level2',Expanded:-1,Level:1,Items:[{Name:'Name1.1',Text:'Text1.1',Value:'Value1.1'},{Name:'Name1.2',Text:'Text1.2',Value:'Value1.2'}]}]}";
                         }
                     }

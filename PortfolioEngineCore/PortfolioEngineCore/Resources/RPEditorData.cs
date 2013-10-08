@@ -859,12 +859,18 @@ namespace PortfolioEngineCore
                 {
                     if (sJSON != "")
                         sJSON += ",";
-                    sJSON += "{Name:'" + lookupItems[i].GetStringAttr("ID") + "',Text:'" + lookupItems[i].GetStringAttr("Name") + "',Value:'" + lookupItems[i].GetStringAttr("ID") + "_" + lookupItems[i].GetStringAttr("Name") + "'}";
+                    string sDisabled = "";
+                    if (lookupItems[i].GetBooleanAttr("Inactive", false) == true)
+                        sDisabled = ",Disabled:1";
+                    sJSON += "{Name:'" + lookupItems[i].GetStringAttr("ID") + "',Text:'" + lookupItems[i].GetStringAttr("Name") + "'" + sDisabled + ",Value:'" + lookupItems[i].GetStringAttr("ID") + "_" + lookupItems[i].GetStringAttr("Name") + "'}";
                     if (i + 1 < nItems)
                     {
                         if (lookupItems[i + 1].GetIntAttr("Level") > lookupItems[i].GetIntAttr("Level"))
                         {
-                            sJSON += ",{Name:'Level" + lookupItems[i].GetIntAttr("ID") + "',Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1) + "]}";
+                            sDisabled = "";
+                            if (lookupItems[i].GetBooleanAttr("Inactive", false) == true)
+                                sDisabled = ",Disabled:1";
+                            sJSON += ",{Name:'Level" + lookupItems[i].GetIntAttr("ID") + "'" + sDisabled + ",Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1) + "]}";
                         }
                     }
                 }
