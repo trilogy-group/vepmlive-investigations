@@ -207,6 +207,7 @@ html, body {
     var OnLoad = function (event) {
         Grids.OnFocus = GridsOnFocus;
         Grids.OnAfterValueChanged = GridsOnAfterValueChanged;
+        Grids.OnCanDrop = GridsOnCanDrop;
         tgrid1_selectedRow = 0;
         OnResize();
     };
@@ -254,6 +255,16 @@ html, body {
                     toolbarFTEs.disableItem("btnSaveFTEs");
                 break;
         }
+    };
+    function GridsOnCanDrop(grid, row, togrid, torow, type, copy) {
+        // types : 0 - cannot drop; 1 - above; 2 append as child of torow; 3 - add below torow
+        if (grid == null || togrid == null || row == null || torow == null || grid.id != tgrid1.id || grid.id != togrid.id)
+            return 0;
+        var toroleid = grid.GetAttribute(torow, "CA_ROLE", null);
+        if (toroleid != 0) {
+            return 0;
+        }
+        return type;
     };
     var OnResize = function (event) {
         var lefttop = tgrid1.GetLeftTopPositions();
@@ -318,7 +329,6 @@ html, body {
         sb.append(' majorcategoryid="' + sMCValue + '"');
         sb.append(' majorcategorydefault="' + sMCItemValue + '"');
         sb.append('>');
-        var tgrid1 = window.<%=tgrid1.UID%>;
         //if ((tgrid1.grid.HasChanges() & (1 << 0)) != 0) {
             sb.append('<![CDATA[' + tgrid1.GetXmlData() + ']]>');
         //}
