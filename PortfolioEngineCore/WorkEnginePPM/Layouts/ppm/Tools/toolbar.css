@@ -79,11 +79,11 @@ text-decoration: none;
 	overflow: hidden;
 }
 
-.toolbar-button-image-span{margin-top:1px; /*SP2013*/margin-right:3px;margin-bottom:4px;margin-left:0px;position:relative;overflow:hidden;text-align:left;z-index:10;height: 16px;
+.toolbar-button-image-span{margin-top:0px; /*SP2013*/margin-right:3px;margin-bottom:4px;margin-left:0px;position:relative;overflow:hidden;text-align:left;z-index:10;height: 16px;
 width: 16px;
 display:inline-block;
 }.toolbar-button-image-span img{position:absolute;z-index:5;}
-.toolbar-button-image-span-2{margin-top:3px; /*SP2013*/margin-right:2px;margin-bottom:0px;margin-left:0px;position:relative;overflow:hidden;display:inline-block;
+.toolbar-button-image-span-2{margin-top:1px; /*SP2013*/margin-right:2px;margin-bottom:0px;margin-left:0px;padding-left:2px;position:relative;overflow:hidden;display:inline-block;
 vertical-align: top;
 }
 input[type="button"], input[type="reset"], input[type="submit"], button {
