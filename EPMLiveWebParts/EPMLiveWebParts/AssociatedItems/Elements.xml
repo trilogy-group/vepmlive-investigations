@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
+  <Module Name="AssociatedItems" List="113" Url="_catalogs/wp">
+    <File Path="AssociatedItems\AssociatedItems.webpart" Url="AssociatedItems.webpart" Type="GhostableInLibrary" >
+      <Property Name="Group" Value="EPM Live" />
+    </File>
+  </Module>
+</Elements>
