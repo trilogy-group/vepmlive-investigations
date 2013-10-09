@@ -413,6 +413,41 @@ namespace PortfolioEngineCore
                         xI.CreateBooleanAttr("UserCanEdit", true);
                     xI.CreateStringAttr("HtmlPrefix", "<b>");
                     xI.CreateStringAttr("HtmlPostfix", "</b>");
+                    foreach (CStruct xField in listFields)
+                    {
+                        SpecialFieldIDsEnum eFieldID = (SpecialFieldIDsEnum)xField.GetIntAttr("ID");
+                        string sColIDName = "";
+                        switch (eFieldID)
+                        {
+                            case SpecialFieldIDsEnum.sfID:
+                            case SpecialFieldIDsEnum.sfProjectName:
+                            case SpecialFieldIDsEnum.sfRPEGroup:
+                            case SpecialFieldIDsEnum.sfMajorCategory:
+                            case SpecialFieldIDsEnum.sfCostCategoryRoleName:
+                            case SpecialFieldIDsEnum.sfRoleName:
+                            case SpecialFieldIDsEnum.sfRPDeptName:
+                            case SpecialFieldIDsEnum.sfResourceName:
+                            case SpecialFieldIDsEnum.sfResourceRate:
+                            case SpecialFieldIDsEnum.sfDescription:
+                            case SpecialFieldIDsEnum.sfTimestamp:
+                            case SpecialFieldIDsEnum.sfResourceGroups:
+                            case SpecialFieldIDsEnum.sfResourceType:
+                                break;
+
+                            default:
+                            {
+                                if (eFieldID >= SpecialFieldIDsEnum.sfRPCatText1 && eFieldID <= SpecialFieldIDsEnum.sfRPCatCode5)
+                                {
+                                    sColIDName = "X" + ((int)eFieldID).ToString("0000") + "_Name";
+                                    xI.CreateIntAttr(sColIDName + "CanEdit", 0);
+                                    CStruct xLookup = GetLookup(listRPCats, (int)eFieldID);
+                                    if (xLookup != null)
+                                        xI.CreateStringAttr(sColIDName + "Button", "");
+                                }
+                                break;
+                            }
+                        }
+                    }
                     listAddedProjects.Add(sProjectID, xI);
                 }
             }
