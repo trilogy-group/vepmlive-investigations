@@ -139,7 +139,7 @@
                     classname = item.className + classdisabled;
                     sb.append("<td class='toolbar-item-td' >");
                     sb.append("<a class='toolbar-button-link' >");
-                    sb.append("<button" + id + " type='button' title='" + itemtooltip + "' class='" + classname + "' " + onclick + ">");
+                    sb.append("<div" + id + " type='button' title='" + itemtooltip + "' class='" + classname + "' " + onclick + ">");
                     //sb.append("<span>");
                     sb.append("<span class='toolbar-button-image-span'>");
                     sb.append("<img alt='' src='" + this.toolbarData.imagePath + item.img + "' " + itemstyle + "/>");
@@ -150,7 +150,7 @@
 //                    sb.append("<img style='vertical-align: middle;' class='toolbar-button-image' alt='" + itemname + "' src='" + this.toolbarData.imagePath + item.img + "'/>");
                     sb.append("<span class='toolbar-button-image-span-2' >" + itemname + "</span>");
 
-                    sb.append("</button>");
+                    sb.append("</div>");
                     sb.append("</a>");
                     sb.append("</td>");
                     break;
