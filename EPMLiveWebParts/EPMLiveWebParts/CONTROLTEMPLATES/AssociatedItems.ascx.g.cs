@@ -40,6 +40,8 @@ namespace EPMLiveWebParts.AssociatedItems {
         
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl associatedItemsDiv;
         
+        protected global::System.Web.UI.WebControls.Label lblError;
+        
         public static implicit operator global::System.Web.UI.TemplateControl(AssociatedItems target) 
         {
             return target == null ? null : target.TemplateControl;
@@ -56,11 +58,27 @@ namespace EPMLiveWebParts.AssociatedItems {
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.WebControls.Label @__BuildControllblError() {
+            global::System.Web.UI.WebControls.Label @__ctrl;
+            @__ctrl = new global::System.Web.UI.WebControls.Label();
+            this.lblError = @__ctrl;
+            @__ctrl.ApplyStyleSheetSkin(this.Page);
+            @__ctrl.ID = "lblError";
+            @__ctrl.Text = "This page is not a display form page. Please add this webpart on a display form p" +
+                "age.";
+            @__ctrl.ForeColor = global::System.Drawing.Color.Red;
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void @__BuildControlTree(global::EPMLiveWebParts.AssociatedItems.AssociatedItems @__ctrl) {
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl1;
             @__ctrl1 = this.@__BuildControlassociatedItemsDiv();
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
             @__parser.AddParsedSubObject(@__ctrl1);
+            global::System.Web.UI.WebControls.Label @__ctrl2;
+            @__ctrl2 = this.@__BuildControllblError();
+            @__parser.AddParsedSubObject(@__ctrl2);
             @__ctrl.SetRenderMethodDelegate(new System.Web.UI.RenderMethod(this.@__Render__control1));
         }
         
@@ -88,7 +106,7 @@ namespace EPMLiveWebParts.AssociatedItems {
 
     .slidingDivHeader {
         float: left;
-        color: #0072C6;
+        color: black;
         font-size: large;
     }
 
@@ -101,58 +119,70 @@ namespace EPMLiveWebParts.AssociatedItems {
         padding: 5px;
         margin-right: 5px;
     }
+
     .pipeSeperator {
-        float:left;
-        font-size:large;
+        float: left;
+        font-size: large;
     }
 </style>
 
 <script type=""text/javascript"">
-    EPMLiveCore.WorkEngineAPI.Execute(""GetAssociatedItems"", dataXml, function (response) {
-        var divHTML = response.toString().replace(""<Result Status=\""0\"">"", """").replace(""</Result>"", """");
-        $(""#");
-    @__w.Write(associatedItemsDiv.ClientID);
 
-            @__w.Write("\").html(\"\");\r\n            $(\"#");
-        @__w.Write(associatedItemsDiv.ClientID);
+    $(function () {
+        fillWebPartData();
+    });
+
+    function fillWebPartData() {
+        if (dataXml != '') {
+            EPMLiveCore.WorkEngineAPI.Execute(""GetAssociatedItems"", dataXml, function (response) {
+                var divHTML = response.toString().replace(""<Result Status=\""0\"">"", """").replace(""</Result>"", """");
+                $(""#");
+            @__w.Write(associatedItemsDiv.ClientID);
+
+            @__w.Write("\").html(\"\");\r\n                $(\"#");
+            @__w.Write(associatedItemsDiv.ClientID);
 
             @__w.Write(@""").html(divHTML);
-        $("".slidingDiv"").hide();
+                $("".slidingDiv"").hide();
 
-        $("".listMainDiv"").mouseover(function () {
-            $("".slidingDiv"").hide();
-            $(this).find("".slidingDiv"").show();
-        });
-        $("".slidingDiv"").mouseover(function () {
-            $(this).show();
-        });
-        $(""#");
-    @__w.Write(associatedItemsDiv.ClientID);
+                $("".listMainDiv"").mouseover(function () {
+                    $("".slidingDiv"").hide();
+                    $(this).find("".slidingDiv"").show();
+                });
+                $("".slidingDiv"").mouseover(function () {
+                    $(this).show();
+                });
+                $(""#");
+            @__w.Write(associatedItemsDiv.ClientID);
 
-            @__w.Write("\").mouseout(function () {\r\n            $(\".slidingDiv\").hide();\r\n        });\r\n   " +
-                    " });\r\n\r\n    function showItemUrl(weburl) {\r\n        var options = { url: weburl," +
-                    " showMaximized: true };\r\n        SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalD" +
-                    "ialog.showModalDialog\', options);\r\n    }\r\n\r\n    function showItemPopup(siteurl, " +
-                    "webid, listid, itemid) {\r\n        showSharePointPopup(siteurl + \'/_layouts/epmli" +
-                    "ve/gridaction.aspx?action=getcontextmenus&webid=\' + webid +\r\n            \'&listi" +
-                    "d=\' + listid + \'&ID=\' + itemid, null, false, true, null, {\r\n                grid" +
-                    "Id: \"myDiv\",\r\n                rowId: \"myDiv\",\r\n                col: \"myDiv\"\r\n   " +
-                    "         }, 300, 400);\r\n    }\r\n\r\n    function emptyFunction() {\r\n    }\r\n\r\n    fu" +
-                    "nction showSharePointPopup(url, title, allowMaximize, showClose, func, funcParam" +
-                    "s, width, height) {\r\n        if (allowMaximize == null) allowMaximize = true;\r\n " +
-                    "       if (showClose == null) showClose = true;\r\n        if (func == null) func " +
-                    "= emptyFunction;\r\n\r\n        var options;\r\n\r\n        if (width !== undefined && h" +
-                    "eight !== undefined) {\r\n            options = {\r\n                title: title,\r\n" +
-                    "                allowMaximize: allowMaximize,\r\n                showClose: showCl" +
-                    "ose,\r\n                url: url,\r\n                dialogReturnValueCallback: Func" +
-                    "tion.createCallback(Function.createDelegate(null, func), funcParams),\r\n         " +
-                    "       width: width,\r\n                height: height\r\n            };\r\n        } " +
-                    "else {\r\n            options = { title: title, allowMaximize: allowMaximize, show" +
-                    "Close: showClose, url: url, dialogReturnValueCallback: Function.createCallback(F" +
-                    "unction.createDelegate(null, func), funcParams) };\r\n        }\r\n\r\n        SP.UI.M" +
-                    "odalDialog.showModalDialog(options);\r\n    }\r\n\r\n</script>\r\n\r\n");
+            @__w.Write("\").mouseout(function () {\r\n                    $(\".slidingDiv\").hide();\r\n        " +
+                    "        });\r\n            });\r\n        }\r\n    }\r\n\r\n    function showItemUrl(webur" +
+                    "l) {\r\n        var options = { url: weburl, showMaximized: true, dialogReturnValu" +
+                    "eCallback: function (dialogResult) { fillWebPartData(); } };\r\n        SP.SOD.exe" +
+                    "cute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n    }\r\n\r" +
+                    "\n    function showItemPopup(siteurl, webid, listid, itemid) {\r\n        showShare" +
+                    "PointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontextmenus&w" +
+                    "ebid=\' + webid +\r\n            \'&listid=\' + listid + \'&ID=\' + itemid, null, false" +
+                    ", true, null, {\r\n                gridId: \"myDiv\",\r\n                rowId: \"myDiv" +
+                    "\",\r\n                col: \"myDiv\"\r\n            }, 300, 400);\r\n    }\r\n\r\n    functi" +
+                    "on emptyFunction() {\r\n    }\r\n\r\n    function showSharePointPopup(url, title, allo" +
+                    "wMaximize, showClose, func, funcParams, width, height) {\r\n        if (allowMaxim" +
+                    "ize == null) allowMaximize = true;\r\n        if (showClose == null) showClose = t" +
+                    "rue;\r\n        if (func == null) func = emptyFunction;\r\n\r\n        var options;\r\n\r" +
+                    "\n        if (width !== undefined && height !== undefined) {\r\n            options" +
+                    " = {\r\n                title: title,\r\n                allowMaximize: allowMaximiz" +
+                    "e,\r\n                showClose: showClose,\r\n                url: url,\r\n          " +
+                    "      dialogReturnValueCallback: Function.createCallback(Function.createDelegate" +
+                    "(null, func), funcParams),\r\n                width: width,\r\n                heigh" +
+                    "t: height\r\n            };\r\n        } else {\r\n            options = { title: titl" +
+                    "e, allowMaximize: allowMaximize, showClose: showClose, url: url, dialogReturnVal" +
+                    "ueCallback: Function.createCallback(Function.createDelegate(null, func), funcPar" +
+                    "ams) };\r\n        }\r\n\r\n        SP.UI.ModalDialog.showModalDialog(options);\r\n    }" +
+                    "\r\n\r\n</script>\r\n\r\n");
             parameterContainer.Controls[0].RenderControl(@__w);
-            @__w.Write("\r\n\r\n");
+            @__w.Write("\r\n");
+            parameterContainer.Controls[1].RenderControl(@__w);
+            @__w.Write("\r\n");
         }
         
         private void InitializeControl() {

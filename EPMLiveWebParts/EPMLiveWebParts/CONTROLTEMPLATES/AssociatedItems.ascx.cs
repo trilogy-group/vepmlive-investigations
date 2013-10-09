@@ -72,7 +72,7 @@ namespace EPMLiveWebParts.AssociatedItems
             ArrayList arrAssociatedLists = EPMLiveCore.API.ListCommands.GetAssociatedLists(SPContext.Current.List);
             int rec = 0;
 
-            if (arrAssociatedLists != null && arrAssociatedLists.Count > 0)
+            if (arrAssociatedLists != null)
             {
                 foreach (AssociatedListInfo item in arrAssociatedLists)
                 {
@@ -103,7 +103,16 @@ namespace EPMLiveWebParts.AssociatedItems
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            PrepareAssociatedListsString();
+            if (HttpContext.Current.Request.Url.ToString().ToLower().Contains("dispform.aspx"))
+            {
+                lblError.Visible = false;
+                PrepareAssociatedListsString();
+            }
+            else
+            {
+                this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "dataXml", "<script type=\"text/javascript\">var dataXml='';</script>");
+                lblError.Visible = true;
+            }
         }
 
         #endregion

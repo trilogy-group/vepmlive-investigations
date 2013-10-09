@@ -1709,7 +1709,7 @@ namespace EPMLiveCore
 
                         arrAssociatedLists = EPMLiveCore.API.ListCommands.GetAssociatedLists(list);
 
-                        if (arrAssociatedLists != null && arrAssociatedLists.Count > 0)
+                        if (arrAssociatedLists != null)
                         {
                             #region Prepare DataTable for Associated Items
 
@@ -1761,11 +1761,14 @@ namespace EPMLiveCore
                                             SqlDataAdapter daListItemCount = new SqlDataAdapter(cmdQuery);
                                             daListItemCount.Fill(dsListItemCount);
 
+                                            int associatedItemsCount = 0;
                                             if (dsListItemCount != null && dsListItemCount.Tables[0].Rows.Count > 0)
                                             {
-                                                //Display ListName [ItemCount] on UI
-                                                sbListAssociatedItemsDiv.Append("<div id='div_" + rptListId + "' class='listMainDiv'>" + listName + " [" + Convert.ToString(dsListItemCount.Tables[0].Rows[0]["Count"]) + "]");
+                                                associatedItemsCount = Convert.ToInt32(dsListItemCount.Tables[0].Rows[0]["Count"]);
                                             }
+
+                                            //Display ListName [ItemCount] on UI
+                                            sbListAssociatedItemsDiv.Append("<div id='div_" + rptListId + "' class='listMainDiv'>" + listName + " [" + Convert.ToString(associatedItemsCount) + "]");
 
                                             #endregion
                                         }
@@ -1799,10 +1802,10 @@ namespace EPMLiveCore
 
                                         //Load Top-5 Items...
                                         SPList projectAssociatedList = spWeb.Lists[listName];
-                                        SPQuery qryTop5Items = new SPQuery();
-                                        qryTop5Items.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + projectID + "</Value></Eq></Where><QueryOptions></QueryOptions><OrderBy><FieldRef Name='Modified' Ascending='FALSE' /></OrderBy>";
-                                        qryTop5Items.RowLimit = 5;
-                                        SPListItemCollection top5AssociatedItems = projectAssociatedList.GetItems(qryTop5Items);
+                                        SPQuery qryAssociatedItems = new SPQuery();
+                                        qryAssociatedItems.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + projectID + "</Value></Eq></Where><QueryOptions></QueryOptions><OrderBy><FieldRef Name='Modified' Ascending='FALSE' /></OrderBy>";
+                                        qryAssociatedItems.RowLimit = 5;
+                                        SPListItemCollection top5AssociatedItems = projectAssociatedList.GetItems(qryAssociatedItems);
 
                                         sbListAssociatedItemsDiv.Append("<div id='div_items_" + rptListId + "' class='slidingDiv'>");
                                         sbListAssociatedItemsDiv.Append("<div class='slidingDivHeader'>" + listName + "</div>");
@@ -1824,8 +1827,15 @@ namespace EPMLiveCore
                                         sbListAssociatedItemsDiv.Append("<br/>");
                                         sbListAssociatedItemsDiv.Append("<br/>");
 
-                                        string viewAllItemsUrl = projectAssociatedList.DefaultViewUrl + "?filterfield1=" + projectLinkedField + "&filtervalue1=" + projectTitle + "&Source=" + sourceUrl;
-                                        sbListAssociatedItemsDiv.Append("<a href='#' onclick=\"javascript:showItemUrl('" + viewAllItemsUrl + "');return false;\">View All " + projectAssociatedList.Title + "</a>");
+                                        qryAssociatedItems = new SPQuery();
+                                        qryAssociatedItems.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + projectID + "</Value></Eq></Where><QueryOptions></QueryOptions><OrderBy><FieldRef Name='Modified' Ascending='FALSE' /></OrderBy>";
+                                        SPListItemCollection otherAssociatedItems = projectAssociatedList.GetItems(qryAssociatedItems);
+
+                                        if (otherAssociatedItems.Count > 5)
+                                        {
+                                            string viewAllItemsUrl = projectAssociatedList.DefaultViewUrl + "?filterfield1=" + projectLinkedField + "&filtervalue1=" + projectTitle + "&Source=" + sourceUrl;
+                                            sbListAssociatedItemsDiv.Append("<a href='#' onclick=\"javascript:showItemUrl('" + viewAllItemsUrl + "');return false;\">View All " + projectAssociatedList.Title + "</a>");
+                                        }
 
                                         sbListAssociatedItemsDiv.Append("</div>"); //div_items_listGuid - Div Ends..
                                         sbListAssociatedItemsDiv.Append("</div>"); //div_listGUID - Div Ends..

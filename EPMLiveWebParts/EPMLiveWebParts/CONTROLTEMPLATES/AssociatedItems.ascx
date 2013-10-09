@@ -27,7 +27,7 @@
 
     .slidingDivHeader {
         float: left;
-        color: #0072C6;
+        color: black;
         font-size: large;
     }
 
@@ -40,33 +40,43 @@
         padding: 5px;
         margin-right: 5px;
     }
+
     .pipeSeperator {
-        float:left;
-        font-size:large;
+        float: left;
+        font-size: large;
     }
 </style>
 
 <script type="text/javascript">
-    EPMLiveCore.WorkEngineAPI.Execute("GetAssociatedItems", dataXml, function (response) {
-        var divHTML = response.toString().replace("<Result Status=\"0\">", "").replace("</Result>", "");
-        $("#<%=associatedItemsDiv.ClientID%>").html("");
-            $("#<%=associatedItemsDiv.ClientID%>").html(divHTML);
-        $(".slidingDiv").hide();
 
-        $(".listMainDiv").mouseover(function () {
-            $(".slidingDiv").hide();
-            $(this).find(".slidingDiv").show();
-        });
-        $(".slidingDiv").mouseover(function () {
-            $(this).show();
-        });
-        $("#<%=associatedItemsDiv.ClientID%>").mouseout(function () {
-            $(".slidingDiv").hide();
-        });
+    $(function () {
+        fillWebPartData();
     });
 
+    function fillWebPartData() {
+        if (dataXml != '') {
+            EPMLiveCore.WorkEngineAPI.Execute("GetAssociatedItems", dataXml, function (response) {
+                var divHTML = response.toString().replace("<Result Status=\"0\">", "").replace("</Result>", "");
+                $("#<%=associatedItemsDiv.ClientID%>").html("");
+                $("#<%=associatedItemsDiv.ClientID%>").html(divHTML);
+                $(".slidingDiv").hide();
+
+                $(".listMainDiv").mouseover(function () {
+                    $(".slidingDiv").hide();
+                    $(this).find(".slidingDiv").show();
+                });
+                $(".slidingDiv").mouseover(function () {
+                    $(this).show();
+                });
+                $("#<%=associatedItemsDiv.ClientID%>").mouseout(function () {
+                    $(".slidingDiv").hide();
+                });
+            });
+        }
+    }
+
     function showItemUrl(weburl) {
-        var options = { url: weburl, showMaximized: true };
+        var options = { url: weburl, showMaximized: true, dialogReturnValueCallback: function (dialogResult) { fillWebPartData(); } };
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
 
@@ -109,4 +119,4 @@
 </script>
 
 <div id="associatedItemsDiv" runat="server" style="float: left;"></div>
-
+<asp:Label ID="lblError" runat="server" Text="This page is not a display form page. Please add this webpart on a display form page." ForeColor="Red"></asp:Label>
