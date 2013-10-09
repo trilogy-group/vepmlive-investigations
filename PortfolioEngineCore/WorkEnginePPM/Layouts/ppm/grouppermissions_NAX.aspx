@@ -36,6 +36,11 @@ html, body {
     margin: 0px;
     overflow: hidden;
 }
+
+.GMFocusRowBorder {
+    border: 0px !important;
+}
+
 </style>
 </asp:Content>
 
@@ -119,7 +124,7 @@ html, body {
     var treegridData;
     var toolbar = new Toolbar(toobarData);
     
-    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1 = window["<%=dgrid1.UID%>"];
     var dgrid1_selectedRow = 0;
     var OnLoad = function (event) {
         toolbar.Render();
@@ -212,7 +217,7 @@ html, body {
                 return false;
         }
 
-        var dgrid2 = window.<%=dgrid2.UID%>;
+        var dgrid2 = window["<%=dgrid2.UID%>"];
 
         var columnData = json.reply.groupMembers.columnData;
         var tableData = json.reply.groupMembers.tableData;

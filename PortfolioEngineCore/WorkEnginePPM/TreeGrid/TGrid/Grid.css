@@ -16,7 +16,7 @@ table.dhtmlxLayoutPolyContainer_dhx_skyblue td.dhtmlxLayoutPolySplitterHorInacti
 
 .GMFocusRowBorder
 {
-    border: 1px solid #91CDF2 !important;
+    border: 1px solid #91CDF2;
     z-index: 2 !important;
 }
 
