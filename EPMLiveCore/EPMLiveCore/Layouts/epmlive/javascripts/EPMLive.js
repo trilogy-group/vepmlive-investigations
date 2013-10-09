@@ -504,6 +504,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         SP.UI.ModalDialog.showModalDialog(options);
     }
     else if (windowtype == 4) {
+        var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('EPMLive/integration/gotoremoteframe.aspx?control=' + control + '&listid=' + listid + '&itemid=' + itemid);
+
+        var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
+        var tUrl = urlBuilder.get_url();
+
         location.href = tUrl;
     }
 
