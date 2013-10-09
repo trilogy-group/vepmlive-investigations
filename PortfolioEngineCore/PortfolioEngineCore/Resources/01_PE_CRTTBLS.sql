@@ -24,7 +24,7 @@ else
                 begin
                                 Print 'Updating Table EPG_SYSTEM'
                 end
-Insert into dbo.EPG_SYSTEM (SY_VERSION,SY_INSTALLED) VALUES(    4320000, GETDATE())
+Insert into dbo.EPG_SYSTEM (SY_VERSION,SY_INSTALLED) VALUES(    5500000, GETDATE())
                 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_SITEMAP')
                 begin
@@ -3126,7 +3126,7 @@ CREATE TABLE dbo.EPGP_CAPACITY_SETS
 else
                 begin
                                 Print 'Updating Table EPGP_CAPACITY_SETS'
-                                 if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_CAPACITY_SETS' and column_name = 'WRES_ID')
+                                if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_CAPACITY_SETS' and column_name = 'WRES_ID')
                                 begin
                                                 Print '     Add Column WRES_ID'
                                                 ALTER TABLE EPGP_CAPACITY_SETS ADD WRES_ID int NOT NULL Default 0
@@ -3135,8 +3135,9 @@ else
                                 begin
                                                 Print '     Add Column CS_ROLE_BASED'
                                                 ALTER TABLE EPGP_CAPACITY_SETS ADD CS_ROLE_BASED int NOT NULL Default 0
-                                end 
-			    end             
+                                end
+
+                end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_CAPACITY_VALUES')
                 begin
@@ -5374,7 +5375,7 @@ else
 --     print 'Drop Table EPGP_BURDEN_GROUPS'
 --     DROP TABLE dbo.EPGP_BURDEN_GROUPS
 --end
---GO
+--
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_BURDEN_GROUPS')
                 begin
                                 print 'Creating Table EPGP_BURDEN_GROUPS'
@@ -5687,5 +5688,23 @@ CREATE TABLE dbo.EPGP_PI_WORK2
 else
                 begin
                                 Print 'Updating Table EPGP_PI_WORK2'
+                end
+                                                            
+
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_DATASTASH')
+                begin
+                                print 'Creating Table EPG_DATASTASH'
+
+CREATE TABLE dbo.EPG_DATASTASH
+ (
+	DATASTASH_KEY nvarchar(255) NULL,
+	DATASTASH_DATA ntext NOT NULL,
+	DATASTASH_TIMESTAMP datetime NULL
+) 
+
+                end
+else
+                begin
+                                Print 'Updating Table EPG_DATASTASH'
                 end
                                                             
