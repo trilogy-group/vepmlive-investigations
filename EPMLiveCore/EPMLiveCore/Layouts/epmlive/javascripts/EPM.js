@@ -1,8 +1,7 @@
 var EPM;
-(function(EPM) {
-    (function(UI) {
-        var Loader = (function() {
-
+(function (EPM) {
+    (function (UI) {
+        var Loader = (function () {
             function Loader() {
                 if (!Loader._instance) {
                     this._elements = [];
@@ -11,8 +10,7 @@ var EPM;
                     throw new Error("Error: Instantiation failed: Use EPM.UI.Loader.current() instead of new.");
                 }
             }
-
-            Loader.current = function() {
+            Loader.current = function () {
                 if (!Loader._instance) {
                     Loader._instance = new Loader();
                 }
@@ -20,23 +18,28 @@ var EPM;
                 return Loader._instance;
             };
 
-            Loader.prototype.startLoading = function(element) {
+            Loader.prototype.startLoading = function (element) {
                 var _this = this;
                 if (!this.elementIsRegistered(element)) {
                     this._elements.push(element);
-                    $("#" + element.id).css("visibility", "hidden");
 
+                    var $content = $(document.getElementById("s4-workspace"));
                     var $el = $("#" + element.id);
+
+                    $el.css("visibility", "hidden");
+
                     var offset = $el.offset();
 
                     var height;
                     var width;
 
                     if (element.page) {
-                        var $content = $("#s4-workspace");
-
                         height = $content.height();
                         width = $content.width();
+
+                        if (element.coverRibbon) {
+                            offset = { top: 50, left: 230 };
+                        }
                     } else {
                         height = element.height || $el.height();
                         width = element.width || $el.width();
@@ -48,23 +51,40 @@ var EPM;
                         $loader.css("background", element.bgColor);
                     }
 
-                    $loader.height(height);
-                    $loader.width(width);
+                    if (!element.coverRibbon) {
+                        $loader.height(height);
+                        $loader.width(width);
+                    } else {
+                        $loader.css("height", "100%");
+                        $loader.css("width", "100%");
+                    }
+
                     $loader.hide();
                     $loader.offset({ top: offset.top, left: offset.left });
 
-                    $("body").append($loader.fadeIn(300));
+                    $("body").append($loader.show());
 
                     element.loader = $loader;
                     element.el = $el;
 
-                    setTimeout(function() {
+                    if ($.browser.msie) {
+                        if (element.coverRibbon) {
+                            $(document.getElementById("s4-ribbonrow")).css("visibility", "hidden");
+                            $content.css("visibility", "hidden");
+                        } else {
+                            $el.css("visibility", "hidden");
+                        }
+                    } else {
+                        $el.css("visibility", "visible");
+                    }
+
+                    setTimeout(function () {
                         _this.showLoading(element);
                     }, 2000);
                 }
             };
 
-            Loader.prototype.stopLoading = function(elementId) {
+            Loader.prototype.stopLoading = function (elementId) {
                 var element = { id: elementId };
 
                 if (this.elementIsRegistered(element)) {
@@ -77,20 +97,46 @@ var EPM;
                             index = i;
                             element.loader = el.loader;
                             element.el = el.el;
+                            element.coverRibbon = el.coverRibbon;
 
                             break;
                         }
                     }
 
                     if (index !== -1) {
-                        element.loader.fadeOut(300).remove();
-                        element.el.css("visibility", "visible").hide().fadeIn(2000);
+                        if (element.coverRibbon) {
+                            var $ribbon = $(document.getElementById("s4-ribbonrow"));
+                            var $content = $(document.getElementById("s4-workspace"));
+
+                            $ribbon.hide();
+                            $content.hide();
+                            element.loader.fadeOut(300).remove();
+
+                            if ($.browser.msie) {
+                                $ribbon.css("visibility", "visible").hide();
+                                $content.css("visibility", "visible").hide();
+                                element.el.css("visibility", "visible").hide();
+                            }
+
+                            $ribbon.fadeIn(2000);
+                            $content.fadeIn(2000);
+                            element.el.fadeIn(2000);
+                        } else {
+                            element.el.hide();
+                            element.loader.fadeOut(300).remove();
+
+                            if ($.browser.msie) {
+                                element.el.css("visibility", "visible").hide();
+                            }
+
+                            element.el.fadeIn(2000);
+                        }
                         this._elements.splice(index, 1);
                     }
                 }
             };
 
-            Loader.prototype.elementIsRegistered = function(element) {
+            Loader.prototype.elementIsRegistered = function (element) {
                 var found = false;
 
                 this._elements = this._elements || [];
@@ -105,31 +151,33 @@ var EPM;
                 return found;
             };
 
-            Loader.prototype.showLoading = function(element) {
+            Loader.prototype.showLoading = function (element) {
                 if (this.elementIsRegistered(element)) {
-                    var $div = $("<div>Loading...</div>");
-                    $div.offset({ top: (element.loader.height() - 20) / 2 });
+                    var $span = $("<span style=\"left: 50%\">Loading...</span>");
+                    element.loader.append($span.hide());
 
-                    element.loader.append($div);
+                    $span.css("margin-left", -($span.width() / 2) - 230);
+                    $span.css("margin-top", element.loader.height() / 3);
+                    $span.show();
                 }
             };
             return Loader;
         })();
         UI.Loader = Loader;
 
-        (function() {
+        (function () {
             var browser = $.browser;
 
             if (browser.msie && parseInt(browser.version) < 9) {
-                $.fn.fadeIn = function(duration, callback) {
+                $.fn.fadeIn = function (duration, callback) {
                     if (!callback) {
-                        if (typeof(duration) === "function") {
+                        if (typeof (duration) === "function") {
                             callback = duration;
                         }
                     }
 
                     if (callback) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             callback();
                         }, 5);
                     }
@@ -137,15 +185,15 @@ var EPM;
                     return $.fn.show.apply(this);
                 };
 
-                $.fn.fadeOut = function(duration, callback) {
+                $.fn.fadeOut = function (duration, callback) {
                     if (!callback) {
-                        if (typeof(duration) === "function") {
+                        if (typeof (duration) === "function") {
                             callback = duration;
                         }
                     }
 
                     if (callback) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             callback();
                         }, 5);
                     }

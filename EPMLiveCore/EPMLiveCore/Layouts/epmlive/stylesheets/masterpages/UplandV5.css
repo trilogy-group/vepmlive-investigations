@@ -168,10 +168,10 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 .epm-loader {
     background: #ffffff;
     position: absolute;
-    z-index: 50;
+    z-index: 10000;
 }
 
-.epm-loader > div {
+.epm-loader > span {
     color: #BBBBBB;
     font-size: 20px;
     text-align: center;
