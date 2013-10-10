@@ -130,6 +130,12 @@ namespace EPMLiveCore.API.Integration
                             dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "", false, 0 });
                         }
 
+                        List<IntegrationControl> gctls = controls.GetPageButtons(webprops, log, true);
+                        foreach (IntegrationControl ictl in gctls)
+                        {
+                            dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image, true, (int)ictl.Window });
+                        }
+
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                         {
                             sbc.DestinationTableName = "INT_CONTROLS";
