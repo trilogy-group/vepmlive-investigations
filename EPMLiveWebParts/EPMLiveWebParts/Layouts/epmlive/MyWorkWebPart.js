@@ -53,8 +53,12 @@ Grids.OnGetSortValue = function(grid, row, col, val) {
 Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
-        window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
         
+        var url = (document.location.href + '').toLowerCase();
+        if (url.indexOf('mywork.aspx') === -1 && url.indexOf('my%20work.aspx') === -1) {
+            window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+        }
+
         if (MyWorkGrid.showingCompletedItems) {
             for (var rowId in grid.Rows) {
                 var row = grid.Rows[rowId];
