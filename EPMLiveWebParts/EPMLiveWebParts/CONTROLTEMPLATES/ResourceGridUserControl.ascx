@@ -208,8 +208,9 @@
          <SharePoint:ScriptBlock runat="server">
              function initializeResourceGridWP() {
                 function showLoading() {
-                    if (document.location.href.toLowerCase().indexOf('resource.aspx') !== -1) {
-                        EPM.UI.Loader.current().startLoading({id: 'WebPart<%= WebPartQualifier %>', page: true});
+                    var url = document.location.href.toLowerCase();
+                    if (url.indexOf('resource%20pool.aspx') !== -1 || url.indexOf('_layouts') !== -1) {
+                        EPM.UI.Loader.current().startLoading({id: 'WebPart<%= WebPartQualifier %>', page: true, coverRibbon: true});
                     } else {
                         EPM.UI.Loader.current().startLoading({id: 'WebPart<%= WebPartQualifier %>'});
                     }

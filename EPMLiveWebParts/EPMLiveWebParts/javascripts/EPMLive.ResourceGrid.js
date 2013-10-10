@@ -1156,6 +1156,12 @@ function registerEpmLiveResourceGridScript() {
                                 };
 
                                 setTabStyle();
+                                
+                                if (!epmLiveResourceGrid.loaderStopped) {
+                                    $(document.getElementById("s4-ribbonrow")).height(126);
+                                    window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
+                                    epmLiveResourceGrid.loaderStopped = true;
+                                }
                             } catch (ex) {
                             }
                         }, 2000);
@@ -1831,8 +1837,6 @@ function registerEpmLiveResourceGridScript() {
                 $('#MSOZoneCell_WebPart' + $$.webpartQualifier).height(maxHeight);
                 $('#WebPart' + $$.webpartQualifier).height(maxHeight);
             }
-
-            window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
 
             var win = $(window);
 
