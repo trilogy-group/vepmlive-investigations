@@ -118,9 +118,9 @@ var EPM;
                                 element.el.css("visibility", "visible").hide();
                             }
 
-                            $ribbon.fadeIn(2000);
-                            $content.fadeIn(2000);
-                            element.el.fadeIn(2000);
+                            $ribbon.fadeIn(1500);
+                            $content.fadeIn(1500);
+                            element.el.fadeIn(1500);
                         } else {
                             element.el.hide();
                             element.loader.fadeOut(300).remove();
@@ -129,7 +129,7 @@ var EPM;
                                 element.el.css("visibility", "visible").hide();
                             }
 
-                            element.el.fadeIn(2000);
+                            element.el.fadeIn(1500);
                         }
                         this._elements.splice(index, 1);
                     }
