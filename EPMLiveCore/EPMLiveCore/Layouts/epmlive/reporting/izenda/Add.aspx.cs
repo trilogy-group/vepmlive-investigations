@@ -26,7 +26,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
 
 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid and name=@name", cn);
-                cmd.Parameters.AddWithValue("@siteid", Web.Site.ID);
+                cmd.Parameters.AddWithValue("@siteid", Web.ID);
                 cmd.Parameters.AddWithValue("@name", newname);
                 SqlDataReader dr = cmd.ExecuteReader();
 
@@ -40,7 +40,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 if (!bFound)
                 {
                     cmd = new SqlCommand("INSERT INTO IzendaAdHocReports (Name,TenantID,CreatedDate,ModifiedDate,Xml) VALUES (@name,@siteid,GETDATE(),GETDATE(),@xml)", cn);
-                    cmd.Parameters.AddWithValue("@siteid", Web.Site.ID);
+                    cmd.Parameters.AddWithValue("@siteid", Web.ID);
                     cmd.Parameters.AddWithValue("@name", newname);
                     cmd.Parameters.AddWithValue("@xml", txtXml.Text);
                     cmd.ExecuteNonQuery();

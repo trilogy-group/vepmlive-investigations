@@ -20,7 +20,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                     cn.Open();
 
                     SqlCommand cmd = new SqlCommand("SELECT Xml FROM IzendaAdHocReports where TenantID=@siteid and name=@name", cn);
-                    cmd.Parameters.AddWithValue("@siteid", Web.Site.ID);
+                    cmd.Parameters.AddWithValue("@siteid", Web.ID);
                     cmd.Parameters.AddWithValue("@name", hdnFullName.Value);
 
                     SqlDataReader dr = cmd.ExecuteReader();
@@ -56,7 +56,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                     newname = txtCategory.Text + "\\" + newname;
 
                 SqlCommand cmd = new SqlCommand("UPDATE IzendaAdHocReports set Name=@newname, xml=@xml where TenantID=@siteid and name=@name", cn);
-                cmd.Parameters.AddWithValue("@siteid", Web.Site.ID);
+                cmd.Parameters.AddWithValue("@siteid", Web.ID);
                 cmd.Parameters.AddWithValue("@name", hdnFullName.Value);
                 cmd.Parameters.AddWithValue("@xml", txtXml.Text);
                 cmd.Parameters.AddWithValue("@newname", newname);
