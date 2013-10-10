@@ -238,6 +238,10 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     color: #299EF2 !important;
 }
 
+.ms-dialog #s4-workspace {
+    margin-top: 10px;
+}
+
 /* end modification to 2013 toolbar styles */
 
 /*
