@@ -11,6 +11,7 @@ using EPMLiveIntegration;
 using System.Xml;
 using Microsoft.SharePoint.Administration;
 using System.Text.RegularExpressions;
+using EPMLiveCore.GlobalResources;
 
 namespace EPMLiveCore.API.Integration
 {
@@ -130,10 +131,33 @@ namespace EPMLiveCore.API.Integration
                             dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl, true, ictl, "", false, 0 });
                         }
 
+
+                        AppSettingsHelper appHelper = new AppSettingsHelper();
+
                         List<IntegrationControl> gctls = controls.GetPageButtons(webprops, log, true);
                         foreach (IntegrationControl ictl in gctls)
                         {
                             dtResInfo.Rows.Add(new object[] { Guid.NewGuid(), intlistid, ictl.Control, false, ictl.Title, ictl.Image, true, (int)ictl.Window });
+
+                            try
+                            {
+                                var url = _web.ServerRelativeUrl;
+
+                                if (url == "/")
+                                    url = "";
+
+                                SPList appList = _web.Lists.TryGetList(MultiAppNavigationResources.INSTALLED_APP_LIST_NAME);
+
+                                int _appId = appHelper.GetDefaultCommunity(appList).ID;
+
+                                appHelper.CreateParentNode(_appId, "quiklnch", ictl.Title, url + "/_layouts/epmlive/integration/gotoremote.aspx?integrationid=" + intlistid.ToString() + "&control=" + ictl.Control, false, null);
+                                API.Applications.CreateQuickLaunchXML(_appId, _web);
+                                API.Applications.CreateTopNavXML(_appId, _web);
+                            }
+                            catch (Exception ex)
+                            {
+                                log.LogMessage("Error Installing Control (" + ictl.Control + "): " + ex.Message, IntegrationLogType.Warning);
+                            }
                         }
 
                         using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
