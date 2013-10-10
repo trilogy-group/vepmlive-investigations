@@ -692,7 +692,7 @@ namespace EPMLiveCore.Integrations.Jira
                             }
                         }
                     }
-                    
+
                     if (subColumnArrayStart)
                     {
                         writer.WriteEndArray();
@@ -744,16 +744,19 @@ namespace EPMLiveCore.Integrations.Jira
                         {
                             int arrayCount = 0;
                             JArray propertyJArray = JArray.Parse(subProperty.Value.ToString());
-                            foreach (JObject propertyJObject in propertyJArray)
+                            if (propertyJArray != null && propertyJArray.Count > 0 && propertyJArray[0].GetType() == typeof(JObject))
                             {
-                                foreach (JProperty idProperty in propertyJObject.Properties())
+                                foreach (JObject propertyJObject in propertyJArray)
                                 {
-                                    if (idProperty.Name.Equals("id"))
+                                    foreach (JProperty idProperty in propertyJObject.Properties())
                                     {
-                                        if (items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                        if (idProperty.Name.Equals("id"))
                                         {
-                                            dataRow[string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())] = idProperty.Value;
-                                            arrayCount++;
+                                            if (items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                            {
+                                                dataRow[string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())] = idProperty.Value;
+                                                arrayCount++;
+                                            }
                                         }
                                     }
                                 }
@@ -807,16 +810,19 @@ namespace EPMLiveCore.Integrations.Jira
                         {
                             int arrayCount = 0;
                             JArray propertyJArray = JArray.Parse(subProperty.Value.ToString());
-                            foreach (JObject propertyJObject in propertyJArray)
+                            if (propertyJArray != null && propertyJArray.Count > 0 && propertyJArray[0].GetType() == typeof(JObject))
                             {
-                                foreach (JProperty idProperty in propertyJObject.Properties())
+                                foreach (JObject propertyJObject in propertyJArray)
                                 {
-                                    if (idProperty.Name.Equals("id"))
+                                    foreach (JProperty idProperty in propertyJObject.Properties())
                                     {
-                                        if (!items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                        if (idProperty.Name.Equals("id"))
                                         {
-                                            items.Columns.Add(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString()));
-                                            arrayCount++;
+                                            if (!items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                            {
+                                                items.Columns.Add(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString()));
+                                                arrayCount++;
+                                            }
                                         }
                                     }
                                 }
