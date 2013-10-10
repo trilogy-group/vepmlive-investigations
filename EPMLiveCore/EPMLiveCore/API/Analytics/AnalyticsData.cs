@@ -176,20 +176,21 @@ namespace EPMLiveCore.API
                 {
                     sIcon = "";
                 }
-                
+
                 return sIcon;
             }
         }
 
-        public string FString
+        public object FString
         {
             get
             {
+                object result = DBNull.Value;
                 var s = mgr.GetPropVal("FString");
                 var sRemove = string.Empty;
 
                 if (!string.IsNullOrEmpty(s))
-                {   
+                {
                     if (s.ToLower().Contains("source"))
                     {
                         if (s.Contains('?') && s.Contains('&'))
@@ -217,8 +218,40 @@ namespace EPMLiveCore.API
                     s = s.Replace(sRemove, "");
                 }
 
-                return Uri.UnescapeDataString(s);
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    using (var site = new SPSite(SiteId))
+                    {
+                        using (var web = site.OpenWeb(WebId))
+                        {
+                            SPList list = null;
+                            try
+                            {
+                                list = web.Lists[ListId];
+                            }catch{}
+
+
+                            if (list is SPDocumentLibrary)
+                            {
+                                var item = list.GetItemById(ItemId);
+                                if (item != null)
+                                {
+                                    s = web.Url + "/" + item.Url;
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (!string.IsNullOrEmpty(s))
+                {
+                    result = Uri.UnescapeDataString(s);
+                }
+
+                return result;
             }
+
+
         }
 
         public bool IsItem
@@ -246,5 +279,5 @@ namespace EPMLiveCore.API
         }
     }
 
-    
+
 }

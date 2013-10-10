@@ -2,7 +2,15 @@
     (function (a, $$, $) {
 
         //====== FAVORITES ========================
-        var isItem = ($$.currentItemID !== "-1" && !$$.currentListViewUrl && $$.currentFileIsNull === "True") ? "True" : "False";
+        a.isItem = function() {
+            var bItem = ($$.currentItemID !== "-1" &&
+                !$$.currentListViewUrl &&
+                ($$.currentUrl.indexOf('NewForm.aspx') !== -1 || $$.currentUrl.indexOf('EditForm.aspx') !== -1 || $$.currentUrl.indexOf('DispForm.aspx') !== -1))
+                ? true : false;
+
+            return bItem;
+        };
+       
         a.favoritesData =
             "<Data>" +
                 "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
@@ -16,7 +24,7 @@
                 "<Param key=\"Type\">1</Param>" +
                 "<Param key=\"UserId\">" + $$.currentUserId + "</Param>" +
                 "<Param key=\"PageTitle\">" + escape($$.pageName) + "</Param>" +
-                "<Param key=\"IsItem\">" + isItem + "</Param>" +
+                "<Param key=\"IsItem\">" + a.isItem().toString() + "</Param>" +
                 "</Data>";
         function loadFavoriteStatus() {
             $.ajax({
@@ -31,7 +39,7 @@
                         var result = resp.Result;
                         if ($$.responseIsSuccess(result) && result['#text'] === 'false') {
                             // is item
-                            if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
+                            if (a.isItem()) {
                                 // do nothing
                                 // is page or non item
                             } else {
@@ -50,7 +58,7 @@
                             }
                         } else if ($$.responseIsSuccess(result) && result['#text'] === 'true') {
                             // is item
-                            if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
+                            if (a.isItem()) {
                                 // load different src
                                 $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
                                     $(this).load(function () { $(this).fadeIn(); });

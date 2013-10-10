@@ -1,4 +1,4 @@
-﻿/// <reference path="/_layouts/epmlive/jQueryLibrary/jquery-1.5.1.min.js" />
+﻿
 $(function () {
     if (userHasPerm == 'True') {
         $('.newCommentInputBox').css('display', '');
@@ -8,6 +8,48 @@ $(function () {
         $('.newCommentInputBox').css('display', 'none');
         alert("You can't make comments because your permission level is lower than \"Contribute\".");
     }
+    
+    $("#tbCommentInput").bind('paste', function () {
+        var value = $(this).text();
+        if (value.length > 0) {
+            $('#postBtn').removeClass('epmliveButton-disabled');
+            $('#postBtn').addClass('epmliveButton-emphasize');
+        }
+        else {
+            $('#postBtn').removeClass('epmliveButton-emphasize');
+            $('#postBtn').addClass('epmliveButton-disabled');
+        }
+    });
+
+
+    $('#tbCommentInput').keyup(function () {
+        var value = $(this).text();
+        if (value.length > 0) {
+            $('#postBtn').removeClass('epmliveButton-disabled');
+            $('#postBtn').addClass('epmliveButton-emphasize');
+        }
+        else {
+            $('#postBtn').removeClass('epmliveButton-emphasize');
+            $('#postBtn').addClass('epmliveButton-disabled');
+        }
+
+        var commentDivHeight = $('#tbCommentInput').height();
+
+        var subDivHeight = $('.commentsContainer').height();
+        if (commentDivHeight > 72) {
+            var diff = (commentDivHeight - 72);
+            $('.commentsContainer').height(230 - diff);
+        }
+        else {
+            $('.commentsContainer').height(230);
+        }
+
+    });
+
+
+    $('#postBtn').click(function () {
+        if ($('#tbCommentInput').text().length > 0) { ajaxPost('CreateComment'); };
+    });
 });
 
 var loadingHtml = "<div id=\"divLoadingIcon\" style=\"width:100%; vertical-align: middle; white-space: nowrap; background-color: rgb(255, 255, 255);padding-top:10px;padding-bottom:20px;\">" +

@@ -150,14 +150,14 @@ namespace EPMLiveCore.API
                     BEGIN
                         IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 1) = 0)
                         BEGIN
-	                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", 1)
+	                        INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int], [F_String])
+                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", 1, @fstring)
                             SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @"
                         END
                         ELSE
                         BEGIN
-                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int])
-                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", (SELECT MAX([F_Int]) FROM FRF WHERE [Type] = 1) + 1)
+                            INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Title], [Icon], [Type], [F_Int], [F_String])
+                                    VALUES (@siteid, @webid, @listid, @itemid, @userid, @title, @icon, " + Convert.ToInt32(AnalyticsType.Favorite) + @", (SELECT MAX([F_Int]) FROM FRF WHERE [Type] = 1) + 1, @fstring)
                             SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=" + Convert.ToInt32(AnalyticsType.Favorite) + @"
                         END
                     END";
