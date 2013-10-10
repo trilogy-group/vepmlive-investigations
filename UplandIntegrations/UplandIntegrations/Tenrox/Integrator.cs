@@ -359,20 +359,6 @@ namespace UplandIntegrations.Tenrox
                         Title = "Project Info",
                         Image = "tx_projectinfo.png",
                         Window = IntegrationControlWindowStyle.SmallDialog
-                    },
-                    new IntegrationControl
-                    {
-                        Control = "TX_Timesheet",
-                        Title = "Timesheet",
-                        Image = "tx_timesheet.png",
-                        Window = IntegrationControlWindowStyle.IFrame
-                    },
-                    new IntegrationControl
-                    {
-                        Control = "TX_Expenses",
-                        Title = "Expenses",
-                        Image = "tx_expenses.png",
-                        Window = IntegrationControlWindowStyle.IFrame
                     }
                 };
             }
@@ -396,13 +382,13 @@ namespace UplandIntegrations.Tenrox
                     orgUrl = orgUrl.Substring(0, orgUrl.Length - 1);
                 }
 
-                switch (control)
+                switch (control.ToLower())
                 {
-                    case "TX_Timesheet":
+                    case "tx_timesheet":
                         return string.Format(TIMESHEET_URL, orgUrl, orgName);
-                    case "TX_Expenses":
+                    case "tx_expenses":
                         return string.Format(EXPENSES_URL, orgUrl, orgName);
-                    case "TX_ProjectInfo":
+                    case "txt_projectinfo":
                         return string.Format(PROJECT_INFO_URL, orgUrl, itemId, orgName);
                 }
 
