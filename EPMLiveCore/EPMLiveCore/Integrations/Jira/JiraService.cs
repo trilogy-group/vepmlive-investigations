@@ -66,7 +66,7 @@ namespace EPMLiveCore.Integrations.Jira
                 {
                     throw new Exception(string.Format("RestSharp response status: {0} - HTTP response: {1} - {2} {3} {4}", response.ResponseStatus, response.StatusCode, response.StatusDescription, response.Content, response.ErrorMessage));
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -616,6 +616,7 @@ namespace EPMLiveCore.Integrations.Jira
                                            select dc).OrderBy(c => c.ColumnName);
 
                     Boolean subColumnStart = false;
+                    Boolean subColumnArrayStart = false;
 
                     foreach (DataColumn column in dataColumnsList)
                     {
@@ -634,9 +635,29 @@ namespace EPMLiveCore.Integrations.Jira
                                     writer.WriteStartObject();
                                     subColumnStart = true;
                                 }
+
                                 if (subColumnsArray.Count() == 3)
                                 {
+                                    if (subColumnArrayStart)
+                                    {
+                                        writer.WriteEndArray();
+                                        subColumnArrayStart = false;
+                                    }
+
                                     writer.WritePropertyName(subColumnsArray[1]);
+                                    writer.WriteStartObject();
+                                    writer.WritePropertyName(subColumnsArray[2]);
+                                    json.Serialize(writer, dataRow[column]);
+                                    writer.WriteEndObject();
+                                }
+                                else if (subColumnsArray.Count() == 4)
+                                {
+                                    if (!subColumnArrayStart)
+                                    {
+                                        writer.WritePropertyName(subColumnsArray[1]);
+                                        writer.WriteStartArray();
+                                        subColumnArrayStart = true;
+                                    }
                                     writer.WriteStartObject();
                                     writer.WritePropertyName(subColumnsArray[2]);
                                     json.Serialize(writer, dataRow[column]);
@@ -644,12 +665,23 @@ namespace EPMLiveCore.Integrations.Jira
                                 }
                                 else
                                 {
+                                    if (subColumnArrayStart)
+                                    {
+                                        writer.WriteEndArray();
+                                        subColumnArrayStart = false;
+                                    }
+
                                     writer.WritePropertyName(subColumnsArray[1]);
                                     json.Serialize(writer, dataRow[column]);
                                 }
                             }
                             else
                             {
+                                if (subColumnArrayStart)
+                                {
+                                    writer.WriteEndArray();
+                                    subColumnArrayStart = false;
+                                }
                                 if (subColumnStart)
                                 {
                                     writer.WriteEndObject();
@@ -659,6 +691,12 @@ namespace EPMLiveCore.Integrations.Jira
                                 json.Serialize(writer, dataRow[column]);
                             }
                         }
+                    }
+                    
+                    if (subColumnArrayStart)
+                    {
+                        writer.WriteEndArray();
+                        subColumnArrayStart = false;
                     }
                     if (subColumnStart)
                     {
@@ -698,6 +736,25 @@ namespace EPMLiveCore.Integrations.Jira
                                     if (items.Columns.Contains(string.Format("{0}|{1}|{2}", property.Name, subProperty.Name, "id")))
                                     {
                                         dataRow[(string.Format("{0}|{1}|{2}", property.Name, subProperty.Name, "id"))] = idProperty.Value;
+                                    }
+                                }
+                            }
+                        }
+                        else if (subProperty.Value.GetType() == typeof(JArray))
+                        {
+                            int arrayCount = 0;
+                            JArray propertyJArray = JArray.Parse(subProperty.Value.ToString());
+                            foreach (JObject propertyJObject in propertyJArray)
+                            {
+                                foreach (JProperty idProperty in propertyJObject.Properties())
+                                {
+                                    if (idProperty.Name.Equals("id"))
+                                    {
+                                        if (items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                        {
+                                            dataRow[string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())] = idProperty.Value;
+                                            arrayCount++;
+                                        }
                                     }
                                 }
                             }
@@ -742,6 +799,25 @@ namespace EPMLiveCore.Integrations.Jira
                                     if (!items.Columns.Contains(string.Format("{0}|{1}|{2}", property.Name, subProperty.Name, "id")))
                                     {
                                         items.Columns.Add(string.Format("{0}|{1}|{2}", property.Name, subProperty.Name, "id"));
+                                    }
+                                }
+                            }
+                        }
+                        else if (subProperty.Value.GetType() == typeof(JArray))
+                        {
+                            int arrayCount = 0;
+                            JArray propertyJArray = JArray.Parse(subProperty.Value.ToString());
+                            foreach (JObject propertyJObject in propertyJArray)
+                            {
+                                foreach (JProperty idProperty in propertyJObject.Properties())
+                                {
+                                    if (idProperty.Name.Equals("id"))
+                                    {
+                                        if (!items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                        {
+                                            items.Columns.Add(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString()));
+                                            arrayCount++;
+                                        }
                                     }
                                 }
                             }
