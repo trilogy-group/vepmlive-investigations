@@ -95,7 +95,7 @@
 
 													var xml = GetXML(routId);
 													if (routId > 0 && xml != "") {
-														LoadVisualWorkflow(routId, xml);
+														LoadVisualWorkflow(routId, docid, xml);
 													}
 
 												});
@@ -166,7 +166,7 @@
 
             });
 
-            function LoadVisualWorkflow(routeId, xml) {
+            function LoadVisualWorkflow(routeId, docId, xml) {
 
                 // make sure vr-content is empty:
                 $("#vr-content").empty();
