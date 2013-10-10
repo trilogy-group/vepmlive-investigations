@@ -157,7 +157,7 @@ var EPM;
                     element.loader.append($span.hide());
 
                     $span.css("margin-left", -($span.width() / 2) - 230);
-                    $span.css("margin-top", element.loader.height() / 3);
+                    $span.css("margin-top", element.loader.height() / 4);
                     $span.show();
                 }
             };
