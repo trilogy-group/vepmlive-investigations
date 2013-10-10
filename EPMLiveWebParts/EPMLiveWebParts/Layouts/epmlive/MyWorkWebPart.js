@@ -52,8 +52,6 @@ Grids.OnGetSortValue = function(grid, row, col, val) {
 
 Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
-        window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
-
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
 
         if (MyWorkGrid.showingCompletedItems) {
@@ -2979,6 +2977,12 @@ var MyWorkGrid = {
                                 }
                             }
                         };
+
+                        if (!MyWorkGrid.loaderStopped) {
+                            $(document.getElementById("s4-ribbonrow")).height(126);
+                            window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+                            MyWorkGrid.loaderStopped = true;
+                        }
 
                         setTabStyle();
                     } catch (ex) {

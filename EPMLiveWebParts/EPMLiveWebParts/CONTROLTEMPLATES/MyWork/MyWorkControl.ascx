@@ -14,7 +14,7 @@
                 var url = (document.location.href + '').toLowerCase();
                 if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
                     function showLoading() {
-                        EPM.UI.Loader.current().startLoading({id: 'WebPart<%= Qualifier %>', page: true});
+                        EPM.UI.Loader.current().startLoading({id: 'WebPart<%= Qualifier %>', page: true, coverRibbon: true});
                     }
 
                     SP.SOD.executeOrDelayUntilScriptLoaded(showLoading, 'EPM.UI');
