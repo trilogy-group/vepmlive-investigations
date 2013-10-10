@@ -259,7 +259,13 @@ namespace EPMLiveWebParts
         {
             var control = (MyWorkShell) Page.LoadControl(@"~/_CONTROLTEMPLATES/MyWork/MyWorkShell.ascx");
 
-            int totalWebPartCount = WebPartManager.WebParts.Cast<object>().Count(webPart => !webPart.GetType().Name.Equals("ContextualHelpSlideOut"));
+            int totalWebPartCount = 0;
+
+            try
+            {
+                totalWebPartCount = WebPartManager.WebParts.Cast<object>().Count(webPart => !webPart.GetType().Name.Equals("ContextualHelpSlideOut"));
+            }
+            catch { }
 
             control.MyWorkParams = new MyWorkParams(_crossSiteUrls, _defaultGlobalView, DisplayTitle,
                                                     _myWorkSelectedLists, MyWorkSelectedLists, PerformanceMode,
@@ -316,6 +322,9 @@ namespace EPMLiveWebParts
 
             ribbonExtensions.LoadXml(_contextualTabTemplate);
             spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.Templates._children");
+
+            spRibbon.MakeTabAvailable(MANAGE_TAB_ID);
+            spRibbon.MakeTabAvailable(VIEWS_TAB_ID);
         }
 
         #endregion Methods 
