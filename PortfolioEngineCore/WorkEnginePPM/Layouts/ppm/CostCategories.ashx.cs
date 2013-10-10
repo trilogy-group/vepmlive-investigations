@@ -239,13 +239,21 @@ namespace WorkEnginePPM
                         else
                         {
                             // If we are  in version >= V43 then need to push updated cost categories to WE
-                            xQueue = new CStruct();
-                            xQueue.Initialize("Queue");
-                            xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcRefreshRoles);
-                            xQueue.CreateString("Context", "CostCategories");
-                            xQueue.CreateString("Comment", "Refresh Roles");
-                            xQueue.CreateString("Data", "No Context Data");
-                            AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
+                            
+                            // when Job Server moved out of Webservice.asmx.cs Job 200 was dropped as it couldn't work doing it that way
+                            //xQueue = new CStruct();
+                            //xQueue.Initialize("Queue");
+                            //xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcRefreshRoles);
+                            //xQueue.CreateString("Context", "CostCategories");
+                            //xQueue.CreateString("Comment", "Refresh Roles");
+                            //xQueue.CreateString("Data", "No Context Data");
+                            //AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
+
+                            // need to run Refresh Roles Synchronously - this is what the Job Server WAS doing for job 200 (qjcRefreshRoles)
+                            PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
+                            pFeAPI.Execute("RefreshRoles", "");
+                            pFeAPI.Dispose();
+
                         }
                     }
                 }
