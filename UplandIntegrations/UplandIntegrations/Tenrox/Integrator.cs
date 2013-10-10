@@ -359,6 +359,20 @@ namespace UplandIntegrations.Tenrox
                         Title = "Project Info",
                         Image = "tx_projectinfo.png",
                         Window = IntegrationControlWindowStyle.SmallDialog
+                    },
+                    new IntegrationControl
+                    {
+                        Control = "TX_Timesheet",
+                        Title = "Timesheet",
+                        Image = "tx_timesheet.png",
+                        Window = IntegrationControlWindowStyle.IFrame
+                    },
+                    new IntegrationControl
+                    {
+                        Control = "TX_Expenses",
+                        Title = "Expenses",
+                        Image = "tx_expenses.png",
+                        Window = IntegrationControlWindowStyle.IFrame
                     }
                 };
             }
