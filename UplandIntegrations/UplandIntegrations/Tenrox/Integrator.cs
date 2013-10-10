@@ -328,29 +328,29 @@ namespace UplandIntegrations.Tenrox
 
         public List<IntegrationControl> GetPageButtons(WebProperties webProps, IntegrationLog log, bool globalButtons)
         {
-            if (globalButtons)
-            {
-                return new List<IntegrationControl>
-                {
-                    new IntegrationControl
-                    {
-                        Control = "TX_Timesheet",
-                        Title = "Timesheet",
-                        Image = "tx_timesheet.png",
-                        Window = IntegrationControlWindowStyle.IFrame
-                    },
-                    new IntegrationControl
-                    {
-                        Control = "TX_Expenses",
-                        Title = "Expenses",
-                        Image = "tx_expenses.png",
-                        Window = IntegrationControlWindowStyle.IFrame
-                    }
-                };
-            }
-
             if (webProps.Properties["Object"].Equals("Project"))
             {
+                if (globalButtons)
+                {
+                    return new List<IntegrationControl>
+                    {
+                        new IntegrationControl
+                        {
+                            Control = "TX_Timesheet",
+                            Title = "Timesheet",
+                            Image = "tx_timesheet.png",
+                            Window = IntegrationControlWindowStyle.IFrame
+                        },
+                        new IntegrationControl
+                        {
+                            Control = "TX_Expenses",
+                            Title = "Expenses",
+                            Image = "tx_expenses.png",
+                            Window = IntegrationControlWindowStyle.IFrame
+                        }
+                    };
+                }
+
                 return new List<IntegrationControl>
                 {
                     new IntegrationControl
