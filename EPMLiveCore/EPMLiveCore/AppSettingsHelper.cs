@@ -136,28 +136,7 @@ namespace EPMLiveCore
 
                             if (defaultAppItem == null)
                             {
-                                SPQuery qDefaultVisibleComs = new SPQuery();
-                                qDefaultVisibleComs.Query = "<Where><And><IsNull><FieldRef Name=\"EXTID\" /></IsNull><And><Eq><FieldRef Name=\"Visible\" /><Value Type=\"Boolean\">1</Value></Eq><Eq><FieldRef Name=\"Default\" /><Value Type=\"Boolean\">1</Value></Eq></And></And></Where>";
-                                SPListItemCollection items = appList.GetItems(qDefaultVisibleComs);
-
-                                if (items.Count == 1)
-                                {
-                                    defaultAppItem = items[0];
-                                }
-                                else
-                                {
-                                    if (appList.Items.Count > 0)
-                                    {
-                                        SPQuery queryFirstCom = new SPQuery();
-                                        queryFirstCom.Query = "<Where><And><IsNull><FieldRef Name=\"EXTID\" /></IsNull><Eq><FieldRef Name=\"Visible\" /><Value Type=\"Boolean\">1</Value></Eq></And></Where>";
-                                        SPListItemCollection firstComs = appList.GetItems(queryFirstCom);
-                                        if (firstComs.Count > 0)
-                                        {
-                                            SPListItem tempItem = firstComs[0];
-                                            defaultAppItem = tempItem;
-                                        }
-                                    }
-                                }
+                                defaultAppItem = GetDefaultCommunity(appList);
                             }
 
                             if (defaultAppItem != null)
@@ -175,6 +154,35 @@ namespace EPMLiveCore
             });
 
             CurrentAppId = result;
+        }
+        public SPListItem GetDefaultCommunity(SPList appList)
+        {
+            SPListItem defaultAppItem = null;
+
+            SPQuery qDefaultVisibleComs = new SPQuery();
+            qDefaultVisibleComs.Query = "<Where><And><IsNull><FieldRef Name=\"EXTID\" /></IsNull><And><Eq><FieldRef Name=\"Visible\" /><Value Type=\"Boolean\">1</Value></Eq><Eq><FieldRef Name=\"Default\" /><Value Type=\"Boolean\">1</Value></Eq></And></And></Where>";
+            SPListItemCollection items = appList.GetItems(qDefaultVisibleComs);
+
+            if (items.Count == 1)
+            {
+                defaultAppItem = items[0];
+            }
+            else
+            {
+                if (appList.Items.Count > 0)
+                {
+                    SPQuery queryFirstCom = new SPQuery();
+                    queryFirstCom.Query = "<Where><And><IsNull><FieldRef Name=\"EXTID\" /></IsNull><Eq><FieldRef Name=\"Visible\" /><Value Type=\"Boolean\">1</Value></Eq></And></Where>";
+                    SPListItemCollection firstComs = appList.GetItems(queryFirstCom);
+                    if (firstComs.Count > 0)
+                    {
+                        SPListItem tempItem = firstComs[0];
+                        defaultAppItem = tempItem;
+                    }
+                }
+            }
+
+            return defaultAppItem;
         }
 
         /// <summary>
@@ -1587,7 +1595,14 @@ namespace EPMLiveCore
                             }
 
                             // clear EPM cache
-                            new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
+                            try
+                            {
+                                if (origUser != null)
+                                    new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
+                                else
+                                    EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(ew.Url, Infrastructure.CacheStoreCategory.Navigation);
+                            }
+                            catch { }
                         }
 
                         ew.Update();
