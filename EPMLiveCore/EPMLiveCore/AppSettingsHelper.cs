@@ -1597,10 +1597,7 @@ namespace EPMLiveCore
                             // clear EPM cache
                             try
                             {
-                                if (origUser != null)
-                                    new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
-                                else
-                                    EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(ew.Url, Infrastructure.CacheStoreCategory.Navigation);
+                                EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(ew.Url, Infrastructure.CacheStoreCategory.Navigation);
                             }
                             catch { }
                         }
