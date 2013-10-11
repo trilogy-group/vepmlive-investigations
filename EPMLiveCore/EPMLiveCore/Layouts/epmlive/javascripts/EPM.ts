@@ -167,6 +167,9 @@ module EPM {
 
             private showLoading(element: IElement): void {
                 if (this.elementIsRegistered(element)) {
+                    element.loader.height();
+                    element.loader.width();
+
                     var $span = $("<span style=\"left: 50%\">Loading...</span>");
                     element.loader.append($span.hide());
 

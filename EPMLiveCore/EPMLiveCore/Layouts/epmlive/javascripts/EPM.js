@@ -153,6 +153,9 @@ var EPM;
 
             Loader.prototype.showLoading = function (element) {
                 if (this.elementIsRegistered(element)) {
+                    element.loader.height();
+                    element.loader.width();
+
                     var $span = $("<span style=\"left: 50%\">Loading...</span>");
                     element.loader.append($span.hide());
 
