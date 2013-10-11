@@ -1401,7 +1401,7 @@ overflow:hidden; width:0px; height:0px; }
 /* ------------------- Calendar, TGLib ------------------- */
 
 .GMPickMain { position:absolute; left:0px; top:0px; z-index:258; }
-.GMPickOuter { overflow:hidden; background:white; padding:1px; border:1px solid #426b8c; }
+.GMPickOuter { overflow:hidden; background:white; padding:0; border:1px solid #ccc; }
 .GMPickHeader {
    overflow:hidden; position:absolute; z-index:258;
    border:1px solid black; background:white; cursor:pointer; _cursor:hand;
@@ -1428,8 +1428,8 @@ overflow:hidden; width:0px; height:0px; }
    background:url(Backgrounds.gif) repeat-x 0px -1367px;
    }
 .GMPickMY {
-   background:#183873 url(Backgrounds.gif) repeat-x 0px -2px;
-   font:10px Tahoma; color:white; cursor:default;
+   background:rgb(241,241,241);
+   font:13px "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif; color:#666; cursor:default;
    text-align:center; padding-top:2px; padding-bottom:4px;
    }   
 .GMPickMYDown { padding-right:13px; background:url(Menu.gif) no-repeat right -400px; cursor:pointer; _cursor:hand; }
@@ -1441,23 +1441,23 @@ overflow:hidden; width:0px; height:0px; }
 
 .GMPickTable { }
 .GMPickRow { background:white; }
-.GMPickRowW { background:url(Backgrounds.gif) repeat-x 0px -1350px; }
+.GMPickRowW { /*background:url(Backgrounds.gif) repeat-x 0px -1350px;*/ }
 .GMPickCell { padding-left:3px; padding-right:3px; padding-top:2px; padding-bottom:2px; width:16px; }
 .GMPickWDN {
-   background:transparent; color:#333333;
-   width:16px; padding:1px; font:10px Tahoma; text-align:center; cursor:default;
+   background:transparent; color:#777;
+   width:16px; padding:1px; font:13px "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif; text-align:center; cursor:default;
    }
 .GMPickHover,.GMPickSelHover,.GMPickWD, .GMPickSa, .GMPickSu, .GMPickSel, .GMPickNow, .GMPickWDNE, .GMPickSaNE, .GMPickSuNE, .GMPickSelNE, .GMPickNowNE, 
 
 .GMPickOM, .GMPickOMNE {
    text-align:center; width:16px; border:1px solid white;
-   font:10px Tahoma; cursor:pointer; _cursor:hand;
+   font:13px "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif; cursor:pointer; _cursor:hand;
    }
 .GMPickWDNE, .GMPickSaNE, .GMPickSuNE, .GMPickSelNE, .GMPickNowNE { cursor:default; }
 .GMPickWD { background-color:#ffffff;   }
 .GMPickSa { background-color:#ffffff;   }
 .GMPickSu { background-color:#ffffff;   }
-.GMPickSel { background-color:#fbea54; border:1px solid #dad1d1;}
+.GMPickSel { background-color:transparent; border:1px solid #2a8dd4;}
 .GMPickSelNE { background-color:#fbea54; border:1px solid #dad1d1;}
 .GMPickNow { background-color:#c0f3ff; border:1px solid #dad1d1;}
 .GMPickNowNE { background-color:#c0f3ff; border:1px solid #dad1d1;}
