@@ -323,6 +323,29 @@ html, body {
                     return false;
                 }
                 sRowId = dgrid1_selectedRow;
+                var isDeprecated = dgrid1.GetCellValue(dgrid1_selectedRow, "IsDeprecated");
+                if (isDeprecated == "1") {
+                    var b = window.confirm("This Custom Field Type is deprecated and should be deleted.\n\nDelete Now?");
+                    if (b) {
+                        var sb = new StringBuilder();
+                        sb.append('<request function="CustomfieldRequest" context="DeleteCustomfieldInfo">');
+                        sb.append('<data');
+                        sb.append(' FA_FIELD_ID="' + sRowId + '"');
+                        sb.append('/>');
+                        sb.append('</request>'); 
+                        var sRequest = sb.toString();
+                        var jsonString = SendRequest(sRequest);
+                        var json = JSON_ConvertString(jsonString);
+                        if (json.reply != null) {
+                            if (jsf_alertError(json.reply.error) == true)
+                                return false;
+                        }
+                        // if deleted  then remove row from grid
+                        dgrid1.deleteRow(sRowId);
+                        dgrid1_OnRowSelect(0);
+                    }
+                    return;
+                }
                 var sRequest = '<request function="CustomfieldRequest" context="ReadCustomfieldInfo"><data><![CDATA[' + sRowId + ']]></data></request>';
                 var jsonString = SendRequest(sRequest);
                 var json = JSON_ConvertString(jsonString);
