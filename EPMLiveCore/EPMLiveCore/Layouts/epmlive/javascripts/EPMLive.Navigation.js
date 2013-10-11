@@ -2096,21 +2096,26 @@
                                 node.set_visible(true);
                                 found = true;
 
-                                var $ph = $('#EPMNavWorkspacesTree').find('div.epm-nav-sub-placeholder');
-                                if ($ph.length > 0) {
-                                    $($ph.get(0)).remove();
-                                }
+                                removeSearchPlaceHolders();
                             } else {
                                 node.set_visible(false);
                             }
                         }
-                        
-                        if (!found) {
+
+                        if (!found && $('#EPMNavWorkspacesTree').find('.epm-nav-sub-placeholder').length === 0) {
                             $('#EPMNavWorkspacesTree').append($('<div class="epm-nav-sub-placeholder">No search results</div>').hide().fadeIn(200));
                         }
                     };
 
+                    var removeSearchPlaceHolders = function() {
+                        $('#EPMNavWorkspacesTree').find('.epm-nav-sub-placeholder').each(function() {
+                            $(this).remove();
+                        });
+                    };
+
                     var showAllNodes = function () {
+                        removeSearchPlaceHolders();
+                        
                         var nodes = window.epmLiveNavigation.workspaceTree().get_allNodes();
 
                         for (var i = 0; i < nodes.length; i++) {
