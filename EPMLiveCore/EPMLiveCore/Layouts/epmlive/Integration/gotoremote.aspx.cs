@@ -62,7 +62,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 else
                 {
                     API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(Web.Site.ID, Web.ID);
-                    DataTable dt = core.GetIntegrationControl(new Guid(Request["integrationid"]), Request["Control"]);
+                    DataTable dt = core.GetIntegrationControlByIntId(new Guid(Request["integrationid"]), Request["Control"]);
                     if (dt.Rows.Count > 0)
                     {
                         DataRow dr = dt.Rows[0];
