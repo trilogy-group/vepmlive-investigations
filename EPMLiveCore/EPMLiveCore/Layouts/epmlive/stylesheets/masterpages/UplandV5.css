@@ -4,7 +4,10 @@
 
 #suiteBar { height: 50px !important; }
 
-#suiteBarLeft, #suiteBarRight { background-color: #0090CA !important; }
+#suiteBarLeft, #suiteBarRight {
+    background-color: #0090CA !important;
+    white-space: nowrap;
+}
 
 #DeltaSuiteBarRight { line-height: 50px; }
 
