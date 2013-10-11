@@ -84,7 +84,7 @@ namespace EPMLiveReportsAdmin
                             r["ItemId"] = !string.IsNullOrEmpty(sItemId) ? int.Parse(sItemId) : -1;
                             r["ParentWebId"] = w.ParentWeb != null ? w.ParentWeb.ID : Guid.Empty;
                             r["WebId"] = w.ID;
-                            r["WebUrl"] = w.Url;
+                            r["WebUrl"] = w.ServerRelativeUrl;
                             r["WebTitle"] = w.Title;
                         }
                         else
@@ -95,7 +95,7 @@ namespace EPMLiveReportsAdmin
                             r["ItemId"] = -1;
                             r["ParentWebId"] = w.ParentWeb != null ? w.ParentWeb.ID : Guid.Empty;
                             r["WebId"] = w.ID;
-                            r["WebUrl"] = w.Url;
+                            r["WebUrl"] = w.ServerRelativeUrl;
                             r["WebTitle"] = w.Title;
                         }
                         #endregion
