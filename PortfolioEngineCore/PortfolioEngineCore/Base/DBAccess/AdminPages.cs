@@ -31,6 +31,26 @@ namespace PortfolioEngineCore
             int lRowsAffected;
             return dba.ExecuteNonQuery(s, (StatusEnum)99999, out lRowsAffected);
         }
+
+        public static int GetRPCalendar (DBAccess dba)
+        {
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            string cmdText;
+            int nCal=0;
+
+            cmdText = "SELECT ADM_PORT_COMMITMENTS_CB_ID FROM EPG_ADMIN";
+            oCommand = new SqlCommand(cmdText, dba.Connection);
+            reader = oCommand.ExecuteReader();
+            while (reader.Read())
+            {
+                nCal = DBAccess.ReadIntValue(reader["ADM_PORT_COMMITMENTS_CB_ID"]);
+            }
+            reader.Close();
+            reader = null;
+
+            return nCal;
+        }
     }
     public class dbaCustomFields
     {
