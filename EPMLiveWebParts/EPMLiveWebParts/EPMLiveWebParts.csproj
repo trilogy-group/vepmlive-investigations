@@ -21,7 +21,7 @@
     <SccProvider>SAK</SccProvider>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
     <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
-      iisreset</PostDeploymentCommand>
+iisreset</PostDeploymentCommand>
     <FileUpgradeFlags>0</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\Backup2\</UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
@@ -118,11 +118,7 @@
     <Compile Include="AssociatedItems\AssociatedItems.ascx.cs">
       <DependentUpon>AssociatedItems.ascx</DependentUpon>
     </Compile>
-    <Compile Include="AssociatedItems\AssociatedItems.ascx.g.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AssociatedItems.ascx</DependentUpon>
-    </Compile>
+    <Compile Include="AssociatedItems\AssociatedItems.ascx.g.cs" />
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
     <Compile Include="ChartControl\ChartControl.cs" />
@@ -210,6 +206,7 @@
     <Compile Include="GridListView\GridDelegates.cs" />
     <Compile Include="GridListView\GridListView.cs" />
     <Compile Include="GridListView\GridListViewToolpart.cs" />
+    <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplay.cs" />
     <Compile Include="IReportID.cs" />
     <Compile Include="Layouts\epmlive\AssignmentPlanner.aspx.cs">
       <DependentUpon>AssignmentPlanner.aspx</DependentUpon>
@@ -436,7 +433,7 @@
     </None>
     <None Include="AssociatedItems\AssociatedItems.webpart" />
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{d4be9b8d-5c4c-47f5-9e99-22167f86e782}</SharePointProjectItemId>
+      <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
     </None>
     <None Include="BackButton\BackButton.webpart" />
     <None Include="BackButton\SharePointProjectItem.spdata">
@@ -485,6 +482,10 @@
     </None>
     <None Include="Images\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{15464df9-e42e-48f3-b1e6-a85162b36a70}</SharePointProjectItemId>
+    </None>
+    <None Include="IntegrationModuleDisplay\IntegrationModuleDisplay.dwp" />
+    <None Include="IntegrationModuleDisplay\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9824766d-01ac-47de-9b99-c51ba1944751}</SharePointProjectItemId>
     </None>
     <None Include="javascripts\EPMLive.ResourceGrid.min.js.map">
       <DependentUpon>EPMLive.ResourceGrid.js</DependentUpon>
@@ -774,10 +775,7 @@
       <Link>Telerik.Web.UI.Skins.dll</Link>
     </Content>
     <Content Include="ActionBar\Elements.xml" />
-    <Content Include="AssociatedItems\AssociatedItems.ascx">
-      <Generator>SharePointWebPartCodeGenerator</Generator>
-      <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
-    </Content>
+    <Content Include="AssociatedItems\AssociatedItems.ascx" />
     <Content Include="AssociatedItems\Elements.xml" />
     <Content Include="BackButton\Elements.xml" />
     <Content Include="BuyNow\Elements.xml" />
@@ -808,6 +806,7 @@
     <Content Include="Images\3people.gif" />
     <Content Include="Images\ganttzoomin.gif" />
     <Content Include="Images\ganttzoomout.gif" />
+    <Content Include="IntegrationModuleDisplay\Elements.xml" />
     <Content Include="javascripts\ChartWizard.js" />
     <Content Include="javascripts\EPMLive.AssignmentPlanner.ContextualTabPageComponent.js" />
     <Content Include="javascripts\EPMLive.AssignmentPlanner.js" />
@@ -1595,6 +1594,6 @@
   </ProjectExtensions>
   <PropertyGroup>
     <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\dkuo_epmlive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll" /f
-      iisreset</PostBuildEvent>
+iisreset</PostBuildEvent>
   </PropertyGroup>
 </Project>

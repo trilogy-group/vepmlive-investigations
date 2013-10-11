@@ -357,12 +357,6 @@ function registerEpmLiveResourceGridScript() {
                                 grid.AddDataFromServer(responseJson.ResourcePoolDataGridChanges.Data['#cdata']);
                                 grid.RenderBody();
 
-                                window.setTimeout(function () {
-                                    var g = $$.grid.grids[$$.id()];
-                                    g.Update();
-                                    g.Render();
-                                }, 10);
-
                                 if (changeType === 'Added') {
                                     $$.actions.reIndexResources();
                                 }
