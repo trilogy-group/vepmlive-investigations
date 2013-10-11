@@ -62,13 +62,26 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 else
                 {
                     API.Integration.IntegrationCore core = new API.Integration.IntegrationCore(Web.Site.ID, Web.ID);
+                    DataTable dt = core.GetIntegrationControl(new Guid(Request["integrationid"]), Request["Control"]);
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow dr = dt.Rows[0];
 
-                    Hashtable hshParams  = new Hashtable();
-                    hshParams.Add("intlistuid", Request["intlistid"]);
+                        Hashtable hshParams = new Hashtable();
+                        hshParams.Add("intlistuid", Request["integrationid"]);
 
-                    DataSet ds = core.GetDataSet("Select list_id from INT_LISTS where INT_LIST_ID=@intlistuid", hshParams);
+                        url = core.GetControlURL(new Guid(Request["integrationid"]), new Guid(dr["LIST_ID"].ToString()), Request["Control"], "");
 
-                    url = core.GetControlURL(new Guid(Request["intlistid"]), new Guid(ds.Tables[0].Rows[0]["LIST_ID"].ToString()), Request["Control"], "");
+
+                        if (dr["WINDOWSTYLE"].ToString() == "4")
+                        {
+                            bIframe = true;
+                        }
+                    }
+                    else
+                    {
+                        error = "Could not find control";
+                    }
                 }
             });
 
