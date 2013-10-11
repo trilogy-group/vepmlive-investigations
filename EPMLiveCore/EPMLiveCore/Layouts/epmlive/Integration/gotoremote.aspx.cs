@@ -85,7 +85,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 }
             });
 
-            if (url != "")
+            if (!string.IsNullOrEmpty(url))
             {
                 if (bIframe)
                 {
@@ -95,10 +95,6 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 {
                     Response.Redirect(url);
                 }
-            }
-            else
-            {
-                error = "No Url Generated";
             }
         }
 
