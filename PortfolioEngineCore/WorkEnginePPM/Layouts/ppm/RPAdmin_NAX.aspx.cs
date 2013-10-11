@@ -130,6 +130,10 @@ Exit_Function:
             DataAccess da = new DataAccess(sBaseInfo);
             DBAccess dba = da.dba;
             dba.Open();
+
+            // need to recalculate availabilities if the RP Calendar has changed so grab the old one before update
+            int nOldRPCalendar = dbaRPAdmin.GetRPCalendar(dba);
+            
             int deptuid = Int32.Parse(ddlDepartments.SelectedValue);
             int roleuid =  Int32.Parse(this.ddlResourceRoles.SelectedValue);
             int caluid =  Int32.Parse(this.ddlCalendar.SelectedValue);
@@ -137,6 +141,18 @@ Exit_Function:
             int opmode = Int32.Parse(this.ddlOperationMode.SelectedValue); 
             int hoursuid = Int32.Parse(this.ddlTotalHours.SelectedValue);
             dbaRPAdmin.UpdateRPAdminInfo(dba, deptuid, roleuid, caluid, mode, opmode, hoursuid);
+
+            if (nOldRPCalendar != caluid)
+            {
+                CStruct xQueue;
+                xQueue = new CStruct();
+                xQueue.Initialize("Queue");
+                xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcCalcAvailability);
+                xQueue.CreateString("Context", "Edit Calendar");
+                xQueue.CreateString("Comment", "Calculate Availability");
+                xQueue.CreateString("Data", "No Context Data");
+                AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML());
+            }
             dba.Close();
         }
     }
