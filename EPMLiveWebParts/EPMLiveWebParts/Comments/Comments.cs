@@ -20,7 +20,7 @@ namespace EPMLiveWebParts.Comments
     {
         #region constant strings
 
-        const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" style=\"background:url('/_layouts/15/epmlive/images/progress_ring.gif') no-repeat scroll center center transparent;height:50px;width:100%\">" +
+        const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" class=\"commentLoader\">" +
                                     "</div>";
 
         //const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" style=\"display:none;width:100%; vertical-align: middle; white-space: nowrap; background-color: rgb(255, 255, 255); padding-top:10px; padding-bottom:10px;\" >" +
@@ -141,8 +141,6 @@ namespace EPMLiveWebParts.Comments
 
             SPWeb cWeb = SPContext.Current.Web;
             SPSite cSite = SPContext.Current.Site;
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsStyle.css\"/>");
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/SocialData.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/Comments.UI.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsWebPartStyle.css\"/>");
 

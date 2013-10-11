@@ -2,12 +2,12 @@
 
 function GetData() {
     (function ($$, $, undefined) {
-        var loadingDiv = "<div id=\"divWorkingNewComment\" style=\"width:100%; vertical-align: middle; white-space: nowrap; background-color: #eef4f9; padding-top:10px; padding-bottom:10px;\">" +
+        var loadingDiv = "<div class=\"workingNewComment\" id=\"divWorkingNewComment\">" +
                                     "<IMG style=\"VERTICAL-ALIGN: middle; margin-left:40%;\" title=\"Loading...\" alt=\"Loading...\" src=\"/_layouts/images/progress-circle-24.gif\">&nbsp;" +
                                     "<SPAN style=\"TEXT-ALIGN: center; WHITE-SPACE: nowrap; COLOR: black; VERTICAL-ALIGN: middle; OVERFLOW: hidden;font-family:Verdana;font-size:12px;color:#686868;\">Loading...</SPAN>" +
                                     "</div>";
         var loadedItemIds = '';
-        var commentDivider = '<div style="height:12px;border-bottom:solid 2px #ccc;"></div><div style="height:12px;"></div>';
+        var commentDivider = '<div class=\"commentDivider\"></div><div style="height:12px;"></div>';
         var CommentTemp =
              '<div id="divCommentItem##itemId##" style="">' +
                 '<table class="ms-socialCommentItem customCommentItem" id="commentItem_##itemId##">' +
@@ -47,7 +47,7 @@ function GetData() {
         //            '</div>';
 
         var SubCommentTemp =
-            '<div item=\"##listId##_##itemId##\" style="background-color:rgb(238, 244, 249);border-bottom:1px solid #c5d9e8;padding:3px;" isExtra=\"##isExtra##\">' +
+            '<div class=\"subitem\" item=\"##listId##_##itemId##\" isExtra=\"##isExtra##\">' +
                 '<table class="ms-socialCommentItem customCommentItem" id="commentItem_##itemId##">' +
                     '<tbody>' +
                         '<tr>' +
@@ -80,7 +80,7 @@ function GetData() {
             '<div style=\"clear:both\"></div>';
 
         var HiddenSubCommentTemp =
-            '<div class=\"subitem\" item=\"##listId##_##itemId##\" style="background-color:rgb(238, 244, 249);border-bottom:1px solid #c5d9e8;padding:3px;display:none;" isExtra=\"##isExtra##\">' +
+            '<div class=\"subitem\" item=\"##listId##_##itemId##\" style="display:none;" isExtra=\"##isExtra##\">' +
                 '<table class="ms-socialCommentItem customCommentItem" id="commentItem_##itemId##">' +
                     '<tbody>' +
                         '<tr>' +
