@@ -1734,6 +1734,14 @@
                 };
             })();
 
+            window.epmLiveNavigation.addContextualMenu = function($li, defaultCommands) {
+                $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
+
+                $($li.find('.epm-menu-btn').get(0)).click(function () {
+                    menuManager.setupMenu($li, defaultCommands);
+                });
+            };
+
             var manageSettings = function () {
                 var settingsManager = (function () {
                     var _collapseAll = function ($sl) {
