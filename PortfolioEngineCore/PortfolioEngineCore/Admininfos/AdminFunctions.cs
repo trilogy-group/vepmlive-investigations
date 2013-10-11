@@ -448,14 +448,17 @@ namespace PortfolioEngineCore
                 if (reslist.Length > 0)
                 {
                     sCommand = "Delete EPGP_CAPACITY_VALUES From EPGP_CAPACITY_VALUES" +
-                                " JOIN dbo.EPG_FN_ConvertListToTable(N'" + reslist + "') LT on EPGP_CAPACITY_VALUES.WRES_ID=LT.TokenVal Where CB_ID=@CalID";
+                                " JOIN dbo.EPG_FN_ConvertListToTable(N'" + reslist + "') LT on EPGP_CAPACITY_VALUES.WRES_ID=LT.TokenVal";
+                    // used to use calendar but this fails when RP Calendar changed I guess need to delete availabilities in RP Admin - for now though there can only be one calendar in EPM Live
+                    //  " JOIN dbo.EPG_FN_ConvertListToTable(N'" + reslist + "') LT on EPGP_CAPACITY_VALUES.WRES_ID=LT.TokenVal Where CB_ID=@CalID"; 
                 }
                 else
                 {
-                    sCommand = "Delete From EPGP_CAPACITY_VALUES Where CB_ID=@CalID";
+                    sCommand = "Delete From EPGP_CAPACITY_VALUES";
+                    //sCommand = "Delete From EPGP_CAPACITY_VALUES Where CB_ID=@CalID";
                 }
                 oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
-                oCommand.Parameters.AddWithValue("@CalID", calendar);
+                //oCommand.Parameters.AddWithValue("@CalID", calendar);
                 oCommand.CommandType = CommandType.Text;
                 oCommand.ExecuteNonQuery();
 
