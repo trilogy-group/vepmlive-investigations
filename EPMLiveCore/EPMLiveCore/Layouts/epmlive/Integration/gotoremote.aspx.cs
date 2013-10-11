@@ -89,7 +89,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             {
                 if (bIframe)
                 {
-                    error = "<iframe src=\"" + url + "\" id=\"frmRemote\" style=\"width:100%;height:100%\">";
+                    error = "<iframe src=\"" + url + "\" id=\"frmRemote\" style=\"width:100%;height:600px\">";
                 }
                 else
                 {
