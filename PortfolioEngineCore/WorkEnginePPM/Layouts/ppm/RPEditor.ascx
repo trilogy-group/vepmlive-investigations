@@ -15,8 +15,6 @@
     </Services>
 </asp:ScriptManagerProxy>
 
-<link rel="stylesheet" type="text/css" href="Styles/DialogNew.css" />
-
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/dhtmlxlayout.css" />
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xlayout/skins/dhtmlxlayout_dhx_skyblue.css" />
 <script src="/_layouts/epmlive/dhtml/xlayout/dhtmlxcommon.js" type="text/javascript"></script>
@@ -27,17 +25,7 @@
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xtab/dhtmlxtabbar.js" type="text/javascript"></script>
 
-<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xmenu/skins/dhtmlxmenu_dhx_skyblue.css"/>
-<script src="/_layouts/epmlive/dhtml/xmenu/dhtmlxcommon.js" type="text/javascript"></script>
-<script src="/_layouts/epmlive/dhtml/xmenu/dhtmlxmenu.js" type="text/javascript"></script>
-<script src="/_layouts/epmlive/dhtml/xmenu/ext/dhtmlxmenu_ext.js" type="text/javascript"></script>
-
-<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xtoolbar/skins/dhtmlxtoolbar_dhx_skyblue.css" />
-<script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxcommon.js" type="text/javascript"></script>
-<script src="/_layouts/epmlive/dhtml/xtoolbar/dhtmlxtoolbar.js" type="text/javascript"></script>
-
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.css" />
-<%--<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_epm.css" />--%>
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/windows/skins/dhtmlxwindows_dhx_admin.css" />
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
@@ -57,18 +45,6 @@
 <script src="/_layouts/ppm/rpeditor.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
-
-<style type="text/css">
-    html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0px;
-        overflow: hidden;
-    }
-    .modalContent {
-        margin-top: 0px !important;
-    }
-</style>
 
 <div id="idEditorTabDiv"></div>
 <div id="idViewTabDiv"></div>
