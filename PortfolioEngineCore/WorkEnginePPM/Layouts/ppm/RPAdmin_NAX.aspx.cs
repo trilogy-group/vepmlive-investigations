@@ -144,6 +144,10 @@ Exit_Function:
 
             if (nOldRPCalendar != caluid)
             {
+                // this is useful for test
+                //AdminFunctions.CalcRPAllAvailabilities(dba);
+                
+                // use Job Server
                 CStruct xQueue;
                 xQueue = new CStruct();
                 xQueue.Initialize("Queue");
