@@ -1824,7 +1824,7 @@ namespace EPMLiveCore
                                         foreach (SPListItem item in top5AssociatedItems)
                                         {
                                             sbListAssociatedItemsDiv.Append("<tr>");
-                                            sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:showItemUrl('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title + "</a></td>");
+                                            sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title + "</a></td>");
                                             //sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:showItemPopup('" + siteUrl + "','" + webID + "','" + projectAssociatedList.ID + "','" + item.ID + "');return false;\">...</a></td>");
                                             sbListAssociatedItemsDiv.Append("</tr>");
                                         }
