@@ -21,7 +21,7 @@
     <SccProvider>SAK</SccProvider>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
     <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
-iisreset</PostDeploymentCommand>
+      iisreset</PostDeploymentCommand>
     <FileUpgradeFlags>0</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\Backup2\</UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
@@ -115,6 +115,14 @@ iisreset</PostDeploymentCommand>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionBar\ActionBar.cs" />
+    <Compile Include="AssociatedItems\AssociatedItems.ascx.cs">
+      <DependentUpon>AssociatedItems.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="AssociatedItems\AssociatedItems.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssociatedItems.ascx</DependentUpon>
+    </Compile>
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
     <Compile Include="ChartControl\ChartControl.cs" />
@@ -425,6 +433,10 @@ iisreset</PostDeploymentCommand>
     <None Include="ActionBar\ActionBar.dwp" />
     <None Include="ActionBar\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9eee2ecb-d8a2-4111-8e7c-68a5b20d9a3a}</SharePointProjectItemId>
+    </None>
+    <None Include="AssociatedItems\AssociatedItems.webpart" />
+    <None Include="AssociatedItems\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{d4be9b8d-5c4c-47f5-9e99-22167f86e782}</SharePointProjectItemId>
     </None>
     <None Include="BackButton\BackButton.webpart" />
     <None Include="BackButton\SharePointProjectItem.spdata">
@@ -762,6 +774,11 @@ iisreset</PostDeploymentCommand>
       <Link>Telerik.Web.UI.Skins.dll</Link>
     </Content>
     <Content Include="ActionBar\Elements.xml" />
+    <Content Include="AssociatedItems\AssociatedItems.ascx">
+      <Generator>SharePointWebPartCodeGenerator</Generator>
+      <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
+    </Content>
+    <Content Include="AssociatedItems\Elements.xml" />
     <Content Include="BackButton\Elements.xml" />
     <Content Include="BuyNow\Elements.xml" />
     <Content Include="ChartControl\Elements.xml" />
@@ -1578,6 +1595,6 @@ iisreset</PostDeploymentCommand>
   </ProjectExtensions>
   <PropertyGroup>
     <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\dkuo_epmlive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll" /f
-iisreset</PostBuildEvent>
+      iisreset</PostBuildEvent>
   </PropertyGroup>
 </Project>
