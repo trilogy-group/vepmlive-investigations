@@ -216,38 +216,41 @@ namespace PortfolioEngineCore
                         //string Permissions = DBAccess.ReadStringValue(row["MODEL_VERSION_PERMISSIONS"]);
                         string FullPermissions = DBAccess.ReadStringValue(row["MODEL_VERSION_PERMISSIONS_HIDDEN"]);
 
-                        int version_uid = VERSION_UID;
-                        if (version_uid <= 0)
+                        if (Deleted==0)
                         {
-                            version_uid = nNewVersion_UID;
-                            nNewVersion_UID++;
-                        }
-                        pVERSION_UID.Value = version_uid;
-                        pName.Value = VERSION_NAME;
-                        pDesc.Value = VERSION_DESC;
-                        oCommand.ExecuteNonQuery();
-
-                        // we've written out VERSION record but need to stash the Group Permission info for writting next...
-                        string[] permissiongroups = FullPermissions.Split(',');
-                        foreach (string sentry in permissiongroups)
-                        {
-                            // group entry looks like this '1::Admins::1::1'   
-                            string[] groupentries = sentry.Split(':');
-                            int group_uid;
-                            int readpermission;
-                            int editpermission;
-                            int.TryParse(groupentries[0], out group_uid);
-                            if (group_uid > 0)
+                            int version_uid = VERSION_UID;
+                            if (version_uid <= 0)
                             {
-                                int.TryParse(groupentries[4], out readpermission);
-                                int.TryParse(groupentries[6], out editpermission);
-                                PfEModelVersionPermissionGroup pgroup = new PfEModelVersionPermissionGroup();
-                                pgroup.MODEL_UID = nMODEL_UID;
-                                pgroup.VERSION_UID = version_uid;
-                                pgroup.GROUP_UID = group_uid;
-                                pgroup.ReadPermission = readpermission;
-                                pgroup.EditPermission = editpermission;
-                                grouppermissions.Add(pgroup);
+                                version_uid = nNewVersion_UID;
+                                nNewVersion_UID++;
+                            }
+                            pVERSION_UID.Value = version_uid;
+                            pName.Value = VERSION_NAME;
+                            pDesc.Value = VERSION_DESC;
+                            oCommand.ExecuteNonQuery();
+
+                            // we've written out VERSION record but need to stash the Group Permission info for writting next...
+                            string[] permissiongroups = FullPermissions.Split(',');
+                            foreach (string sentry in permissiongroups)
+                            {
+                                // group entry looks like this '1::Admins::1::1'   
+                                string[] groupentries = sentry.Split(':');
+                                int group_uid;
+                                int readpermission;
+                                int editpermission;
+                                int.TryParse(groupentries[0], out group_uid);
+                                if (group_uid > 0)
+                                {
+                                    int.TryParse(groupentries[4], out readpermission);
+                                    int.TryParse(groupentries[6], out editpermission);
+                                    PfEModelVersionPermissionGroup pgroup = new PfEModelVersionPermissionGroup();
+                                    pgroup.MODEL_UID = nMODEL_UID;
+                                    pgroup.VERSION_UID = version_uid;
+                                    pgroup.GROUP_UID = group_uid;
+                                    pgroup.ReadPermission = readpermission;
+                                    pgroup.EditPermission = editpermission;
+                                    grouppermissions.Add(pgroup);
+                                }
                             }
                         }
                     }
@@ -288,92 +291,24 @@ namespace PortfolioEngineCore
             }
         }
 
-        //public static StatusEnum DeleteCostView(DBAccess dba, int nVIEW_UID, out string sReply)
-        //{
-        //    string cmdText;
-        //    SqlCommand oCommand;
-        //    sReply = "";
-        //    try
-        //    {
-        //        // check if Cost View can be deleted
-        //        string sdeletemessage;
-        //        if (CanDeleteCostView(dba, nVIEW_UID, out sdeletemessage) != StatusEnum.rsSuccess) return dba.Status;
-        //        if (sdeletemessage.Length > 0)
-        //        {
-        //            sReply = DBAccess.FormatAdminError("error", "CostViews.DeleteCostView", "This Cost View cannot be deleted, it is currently used as follows:" + "\n" + "\n" + sdeletemessage);
-        //            return StatusEnum.rsRequestCannotBeCompleted;
-        //        }
-
-        //        // get info for view to be deleted
-        //        {
-        //            cmdText = "SELECT VIEW_UID, VIEW_NAME FROM EPGT_COSTVIEW_DISPLAY Where VIEW_UID=@p1";
-        //            DataTable dt;
-        //            dba.SelectDataById(cmdText, nVIEW_UID, (StatusEnum)99999, out dt);
-        //            if (dt != null && dt.Rows.Count > 0)
-        //            {
-        //                DataRow row = dt.Rows[0];
-        //                int nCV = DBAccess.ReadIntValue(row["VIEW_UID"]);
-        //            }
-        //            else
-        //            {
-        //                sReply = DBAccess.FormatAdminError("error", "CostViews.DeleteCostView", "Can't delete Cost View, Cost View not found");
-        //                return StatusEnum.rsRequestCannotBeCompleted;
-        //            }
-        //        }
-
-        //        //   clear if used in Portfolio Views - won't happen while we disallow that
-        //        cmdText = "UPDATE EPGT_VIEW_DISPLAY SET COSTVIEW_UID = NULL WHERE COSTVIEW_UID = @pVIEW_UID";
-        //        oCommand = new SqlCommand(cmdText, dba.Connection);
-        //        oCommand.Parameters.AddWithValue("@pVIEW_UID", nVIEW_UID);
-        //        oCommand.ExecuteNonQuery();
-
-        //        //    clear any CT entries
-        //        cmdText = "DELETE FROM EPGT_COSTVIEW_COST_TYPES WHERE VIEW_UID = @pVIEW_UID";
-        //        oCommand = new SqlCommand(cmdText, dba.Connection);
-        //        oCommand.Parameters.AddWithValue("@pVIEW_UID", nVIEW_UID);
-        //        oCommand.ExecuteNonQuery();
-
-        //        // Delete the Cost View itself
-        //        cmdText = "DELETE FROM EPGT_COSTVIEW_DISPLAY WHERE VIEW_UID = @pVIEW_UID";
-        //        oCommand = new SqlCommand(cmdText, dba.Connection);
-        //        oCommand.Parameters.AddWithValue("@pVIEW_UID", nVIEW_UID);
-        //        oCommand.ExecuteNonQuery();
-
-        //        return dba.Status;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        sReply = DBAccess.FormatAdminError("exception", "CostViews.DeleteCostView", ex.Message);
-        //        return StatusEnum.rsRequestCannotBeCompleted;
-        //    }
-        //}
-
-        //public static StatusEnum CanDeleteCostView(DBAccess dba, int nVIEW_UID, out string sReply)
-        //{
-        //    SqlCommand oCommand;
-        //    SqlDataReader reader;
-        //    sReply = "";
-        //    try
-        //    {
-        //        // check if Cost View can be deleted
-        //        oCommand = new SqlCommand("EPG_SP_ReadUsedCostViews", dba.Connection);
-        //        oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-        //        oCommand.Parameters.AddWithValue("@UID", nVIEW_UID);
-        //        reader = oCommand.ExecuteReader();
-
-        //        while (reader.Read())
-        //        {
-        //            sReply += "Portfolio View: " + DBAccess.ReadStringValue(reader["VIEW_NAME"]) + "\n";
-        //        }
-        //        reader.Close();
-        //        return StatusEnum.rsSuccess;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        sReply = DBAccess.FormatAdminError("exception", "CostViews.CanDeleteCostView", ex.Message);
-        //        return StatusEnum.rsRequestCannotBeCompleted;
-        //    }
-        //}
+        public static StatusEnum DeleteModel(DBAccess dba, int nMODEL_UID, out string sReply)
+        {
+            SqlCommand oCommand;
+            sReply = "";
+            try
+            {
+                oCommand = new SqlCommand("EPG_SP_DeleteModel", dba.Connection);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.Parameters.AddWithValue("@ModelUID", nMODEL_UID);
+                oCommand.ExecuteNonQuery();
+                return dba.Status;
+            }
+            catch (Exception ex)
+            {
+                sReply = DBAccess.FormatAdminError("exception", "CostViews.DeleteModel", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
 
         private class PfEModelVersionPermissionGroup
         {
