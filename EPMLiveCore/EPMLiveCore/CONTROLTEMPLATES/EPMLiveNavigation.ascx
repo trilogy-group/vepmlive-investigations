@@ -128,12 +128,7 @@
                    { %>
                     <div class="epm-nav-sub-header">Navigation</div>
                     <div class="epm-nav-sub-header-bottom"></div>
-                
-                    <% if (IsRootWeb)
-                       { %>
-                        <div class="epm-nav-home"><span class="fui-home"></span><a class="epm-nav-node" href="<%= WebUrl %>">Home</a></div>
-                    <%
-                       } %>
+                    <div class="epm-nav-home"><span class="fui-home"></span><a class="epm-nav-node" href="<%= WebUrl %>">Home</a></div>
 
                     <SharePoint:SPTreeView
                         ID="EPMLiveNav"
