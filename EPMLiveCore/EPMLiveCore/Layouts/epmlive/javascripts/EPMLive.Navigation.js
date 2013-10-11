@@ -763,6 +763,10 @@
                         }
                     }
 
+                    if (redirectUrl) {
+                        redirectUrl = redirectUrl.split('#')[0];
+                    }
+
                     switch (kind) {
                         case '0':
                             OpenCreateWebPageDialog(redirectUrl);
@@ -1173,6 +1177,7 @@
                     window.epmLiveNavigation.buildLink = function (link) {
                         var webUrl = $$.currentWebUrl();
                         var page = webUrl + window.location.href.split(webUrl)[1];
+                        page = page.split('#')[0].split('?')[0];
                         
                         return {
                             id: link['@Id'],
