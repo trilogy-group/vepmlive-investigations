@@ -19,6 +19,11 @@ namespace EPMLiveCore.API
             var dt = new System.Data.DataTable();
             var data = new AnalyticsData(xml, AnalyticsType.Recent, AnalyticsAction.Create);
 
+            if (!IsValidList(data))
+            {
+                return result;
+            }
+
             try
             {
                 var exec = new QueryExecutor(SPContext.Current.Web);
@@ -38,6 +43,64 @@ namespace EPMLiveCore.API
                 result = "error: " + e.Message;
             }
             return result;
+        }
+
+        private static bool IsValidList(AnalyticsData data)
+        {
+            bool isValid = false;
+            var inValidLists = new List<string>
+            {
+                "Holiday Schedules",
+                "My Timesheet",
+                "Holidays",
+                "My Work",
+                "Roles",
+                "Departments",
+                "Non Work",
+                "Project Schedules",
+                "Site Assets",
+                "IzendaReports",
+                "Planner Templates",
+                "Report Library",
+                "Site Pages",
+                "User Profile Pictures",
+                "Excel Reports",
+                "Style Library",
+                "Work Hour"
+            };
+            try
+            {
+                try
+                {
+                    using (var spSite = new SPSite(data.SiteId))
+                    {
+                        using (var spWeb = spSite.OpenWeb(data.WebId))
+                        {
+                            SPList testList = null;
+                            try
+                            {
+                                testList = spWeb.Lists[data.ListId];
+
+                            }
+                            catch
+                            {
+                            }
+
+                            if (testList != null && !testList.Hidden && !inValidLists.Contains(testList.Title))
+                            {
+                                isValid = true;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                   
+                }
+            }
+            catch { }
+
+            return isValid;
         }
 
         private static void ClearCache(AnalyticsData data)
