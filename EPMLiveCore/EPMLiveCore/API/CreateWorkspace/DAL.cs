@@ -39,32 +39,7 @@ namespace EPMLiveCore.API
             return iRecs == 0;
         }
 
-        //public static void SendErrorSignalsToDB(string error, Guid siteId, Guid webId, Guid listId, int itemId)
-        //{
-        //    SPSecurity.RunWithElevatedPrivileges(() =>
-        //    {
-        //        using (SPSite eSite = new SPSite(siteId))
-        //        {
-        //            using (SqlConnection con = new SqlConnection(CoreFunctions.getReportingConnectionString(eSite.WebApplication.Id, eSite.ID)))
-        //            {
-        //                con.Open();
-        //                SqlCommand cmd = new SqlCommand("IF EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [ItemSiteId] = '" + siteId.ToString() + "' AND [ItemWebId] = '" + webId.ToString() + "' AND [ItemListId] = '" + listId.ToString() + "' AND [ItemId] = " + itemId.ToString() + ") " +
-        //                                                "BEGIN " +
-        //                                                    "UPDATE [dbo].[RPTWeb] SET [WorkspaceStatus] = 'ERROR: " + error + "' WHERE [ItemSiteId] = '" + siteId.ToString() + "' AND [ItemWebId] = '" + webId.ToString() + "' AND [ItemListId] = '" + listId.ToString() + "' AND [ItemId] = " + itemId.ToString() + " " +
-        //                                                "END " +
-        //                                                "ELSE " +
-        //                                                "BEGIN " +
-        //                                                    "INSERT INTO [dbo].[RPTWeb] ([ItemSiteId], [ItemWebId], [ItemListId], [ItemId], [WorkspaceStatus], [WebId]) VALUES ( '" + siteId.ToString() + "', '" + webId.ToString() + "', '" + listId.ToString() + "', '" + itemId.ToString() + "', 'ERROR: " + error + "', '" + Guid.Empty.ToString() + "') " + 
-        //                                                "END ");
-
-        //                cmd.Connection = con;
-        //                cmd.ExecuteNonQuery();
-        //            }
-        //        }
-        //    });
-        //}
-
-        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb itemWeb, SPWeb parentWeb, Guid listId, int itemId, Guid createdWebId, string createdWebUrl, string createdWebTitle)
+        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb itemWeb, SPWeb parentWeb, Guid listId, int itemId, Guid createdWebId, string createdWebServerRelativeUrl, string createdWebTitle)
         {
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -74,26 +49,63 @@ namespace EPMLiveCore.API
                     {
                         con.Open();
 
-                        SqlCommand cmd = new SqlCommand(@"IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWeb]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+                        var cmd = new SqlCommand(@"IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWeb]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+                                                    BEGIN 
+                                                        IF NOT EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + eSite.RootWeb.ID + @"')
                                                         BEGIN 
-                                                            IF NOT EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + eSite.RootWeb.ID + @"')
-                                                            BEGIN 
-                                                                INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eSite.RootWeb.ID + @"', '" + eSite.RootWeb.Url + @"', '" + eSite.RootWeb.Title + @"') 
-                                                            END 
-                                                            
-                                                            IF EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"')
-                                                            BEGIN                                                            
-                                                                DELETE FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"'  
-                                                            END 
-
-                                                            INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebUrl + @"', '" + createdWebTitle + @"') 
+                                                            INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eSite.RootWeb.ID + @"', '" + eSite.RootWeb.ServerRelativeUrl + @"', '" + eSite.RootWeb.Title + @"') 
                                                         END 
-                                                        ELSE 
+                                                            
+                                                        IF EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"')
+                                                        BEGIN                                                            
+                                                            DELETE FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"'  
+                                                        END 
+
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                    END 
+                                                    ELSE 
+                                                    BEGIN 
+                                                        CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max))
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eSite.RootWeb.ID + @"', '" + eSite.RootWeb.ServerRelativeUrl + @"', '" + eSite.RootWeb.Title + @"') 
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                    END");
+                        cmd.Connection = con;
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            });
+        }
+
+        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb parentWeb, Guid createdWebId, string createdWebServerRelativeUrl, string createdWebTitle)
+        {
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                using (SPSite eSite = new SPSite(siteId))
+                {
+                    using (SqlConnection con = new SqlConnection(CoreFunctions.getReportingConnectionString(eSite.WebApplication.Id, eSite.ID)))
+                    {
+                        con.Open();
+
+                        var cmd = new SqlCommand(@"IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWeb]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) 
+                                                    BEGIN 
+                                                        IF NOT EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + eSite.RootWeb.ID + @"')
                                                         BEGIN 
-                                                            CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max))
-                                                            INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eSite.RootWeb.ID + @"', '" + eSite.RootWeb.Url + @"', '" + eSite.RootWeb.Title + @"') 
-                                                            INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebUrl + @"', '" + createdWebTitle + @"') 
-                                                        END");
+                                                            INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eSite.RootWeb.ID + @"', '" + eSite.RootWeb.ServerRelativeUrl + @"', '" + eSite.RootWeb.Title + @"') 
+                                                        END 
+                                                            
+                                                        IF EXISTS (SELECT * FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"')
+                                                        BEGIN                                                            
+                                                            DELETE FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"'  
+                                                        END 
+
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                    END 
+                                                    ELSE 
+                                                    BEGIN 
+                                                        CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max))
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eSite.RootWeb.ID + @"', '" + eSite.RootWeb.ServerRelativeUrl + @"', '" + eSite.RootWeb.Title + @"') 
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                    END");
                         cmd.Connection = con;
                         cmd.ExecuteNonQuery();
                     }

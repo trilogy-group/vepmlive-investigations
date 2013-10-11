@@ -872,7 +872,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divEPMLiveTempFilters').css('display', 'block');
+                            $('.divEPMLiveTempFilters').css('display', 'none');
                             //$('#lnkOnlineTemps').trigger('click');
                         }
                         else if ($('#linkNewWorkspace').hasClass('selectedLink') &&
@@ -888,7 +888,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divFilterBy').css('display', 'block');
+                            $('.divFilterBy').css('display', 'none');
                             //$('#lnkInstalledTemps').trigger('click');
                         }
                         else if ($('#linkNewWorkspace').hasClass('selectedLink') &&
@@ -925,7 +925,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divEPMLiveTempFilters').css('display', 'block');
+                            $('.divEPMLiveTempFilters').css('display', 'none');
                             //$('#lnkNewTempFrmOnline').trigger('click');
                         }
                         else if ($('#lnkNewTempFrmLocal').hasClass('selectedLink')) {
@@ -940,7 +940,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divFilterBy').css('display', 'block');
+                            $('.divFilterBy').css('display', 'none');
 
                             //$('#lnkNewTempFrmLocal').trigger('click');
                         }
@@ -956,7 +956,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divSolGalFilters').css('display', 'block');
+                            $('.divSolGalFilters').css('display', 'none');
 
                             //$('#lnkNewTempFrmSolGal').trigger('click');
                         }
@@ -991,7 +991,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divEPMLiveTempFilters').css('display', 'block');
+                            $('.divEPMLiveTempFilters').css('display', 'none');
                             //$('#lnkOnlineTemps').trigger('click');
                         }
                         else if ($('#linkNewWorkspace').hasClass('selectedLink') &&
@@ -1007,7 +1007,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divFilterBy').css('display', 'block');
+                            $('.divFilterBy').css('display', 'none');
 
                             //$('#lnkInstalledTemps').trigger('click');
                         }
@@ -1045,7 +1045,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divEPMLiveTempFilters').css('display', 'block');
+                            $('.divEPMLiveTempFilters').css('display', 'none');
 
                             //$('#lnkOnlineTemps').trigger('click');
                         }
@@ -1062,7 +1062,7 @@
                             $('#divExistingWorkspaceContainer').css('display', 'none');
 
                             $('.divFilters').css('display', 'none');
-                            $('.divFilterBy').css('display', 'block');
+                            $('.divFilterBy').css('display', 'none');
 
                             //$('#lnkInstalledTemps').trigger('click');
                         }
@@ -2501,7 +2501,7 @@
         $('.divLeft').css('display', '');
         $('.divRight').css('display', '');
 
-        $('.divEPMLiveTempFilters').css('display', 'block');
+        $('.divEPMLiveTempFilters').css('display', 'none');
         //$('.categoryfilter').css('display', 'none');
         //$('.onlineCategoryfilter').css('display', 'none');
 
@@ -2838,7 +2838,7 @@
         $('.divCreateNewWorkspaceFrom').css('display', 'block');
 
         if (window.newItemNameLwrCs == "template") {
-            $('.divFilterBy').css('display', 'block');
+            $('.divFilterBy').css('display', 'none');
         }
 
         $('#hdnParentWebUrl').val(parentWebUrl);
@@ -2909,7 +2909,7 @@
 
         $('#btnMoreLessOpt').val("More Options");
 
-        $('.divEPMLiveTempFilters').css('display', 'block');
+        $('.divEPMLiveTempFilters').css('display', 'none');
         $('.divFilterBy').css('display', 'none');
         $('.divSolGalFilters').css('display', 'none');
 
@@ -2968,7 +2968,7 @@
 
         $('.divEPMLiveTempFilters').css('display', 'none');
         $('.divFilterBy').css('display', 'none');
-        $('.divSolGalFilters').css('display', 'block');
+        $('.divSolGalFilters').css('display', 'none');
 
         $$.ConfigureScrollbar($('#divSolGalTempsHolder'));
         $$.WireSolGalTempDivWithLogic();
@@ -3038,7 +3038,7 @@
             $('.divRight').css('display', 'none');
         }
         else {
-            $('.divFilterBy').css('display', 'block');
+            $('.divFilterBy').css('display', 'none');
             $('.divEPMLiveTempFilters').css('display', 'none');
             $('.divSolGalFilters').css('display', 'none');
             $('#hdnParentWebUrl').val(parentWebUrl);

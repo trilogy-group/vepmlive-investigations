@@ -286,7 +286,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         links.Add(new NavLink
                         {
                             Title = "New Workspace",
-                            Url = string.Format(CREATE_WORKSPACE_URL, RelativeUrl),
+                            Url = string.Format(CREATE_WORKSPACE_URL, (RelativeUrl == "/" ? "" : RelativeUrl)),
                             CssClass = "epm-nav-button"
                         });
                     }

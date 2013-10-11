@@ -68,14 +68,7 @@ function Init() {
                         if (!$('#' + controlProps.wePeopleEditorDivID).hasClass('ccBox')) {
                             $('#' + controlProps.wePeopleEditorDivID).addClass('ccBox');
                         }
-                        
-                        //$('#' + controlProps.wePeopleEditorDivID).css('padding-top', '5px');
-                        //$('#' + controlProps.wePeopleEditorDivID).css('padding-right', '5px');
-                        //$('#' + controlProps.wePeopleEditorDivID).css('padding-bottom', '10px');
-                        //$('#' + controlProps.wePeopleEditorDivID).css('padding-left', '5px');
-                        //$('#' + controlProps.wePeopleEditorDivID).css('margin-top', '5px');
-                        //$('#' + controlProps.wePeopleEditorDivID).css('height', 'auto');
-                        //$('#' + controlProps.wePeopleEditorDivID).css('max-height', '48px');
+                       
                         $('#' + checkNameId).css('display', 'none');
                         $('#' + browseId).css('display', 'none');
 
@@ -91,8 +84,8 @@ function Init() {
 
                             switch (e.keyCode) {
                                 case 8:
-                                    var text = $(this).text();
-                                    var lastChar = text.substr(text.length - 1, 1);
+                                    var text = $(this).text().trim();
+                                    var lastChar = text.trim().substr(text.trim().length - 1, 1);
                                     if (lastChar == ';') {
                                         var tester = $(this).html();
                                         var eleParent = null;
@@ -105,17 +98,18 @@ function Init() {
                                         if (eleParent != null) {
                                             if (eleParent.find('SPAN').length > 0) {
                                                 try {
-                                                    $(this).children('span:last-child').remove();
-                                                    $(this).html($(this).html().replace(/;$/, ''));
-                                                    //$(this).html($(this).html().replace(/(&nbsp;)$/, ''));
-                                                    //$(this).html($(this).html().replace(/(&nbsp;)$/, ''));
+                                                    $(this).children('span')[$(this).children('span').length -1].remove();
+                                                    if ($(this).children('span').length === 0) {
+                                                        $(this).focus();
+                                                        $(this).html('');
+                                                    }
                                                 }
                                                 catch (e) {
                                                 }
                                             }
                                         }
                                     }
-
+                                   
                                     break;
                             }
 
@@ -164,6 +158,7 @@ function Init() {
                                         else {
                                             // if data has been loaded, and user highlights something
                                             if (controlProps.candidateIndex != -1) {
+                                                $('#' + controlProps.wePeopleEditorDivID).focus();
                                                 var newText = $('#autoText_' + controlProps.candidateIndex).text();
                                                 var uid = $('#autoText_' + controlProps.candidateIndex).attr('userid');
                                                 //var newText = $(selectedDiv).html();
@@ -184,6 +179,7 @@ function Init() {
                                         else {
                                             // if data has been loaded, and user highlights something
                                             if (controlProps.candidateIndex != -1) {
+                                                $('#' + controlProps.wePeopleEditorDivID).focus();
                                                 var newText = $('#autoText_' + controlProps.candidateIndex).text();
                                                 var uid = $('#autoText_' + controlProps.candidateIndex).attr('userid');
                                                 //var newText = $(selectedDiv).html();
@@ -487,6 +483,8 @@ function Init() {
                 RegisterHoverStyle();
 
                 $('.autoText').click(function () {
+                    $('#' + controlProps.wePeopleEditorDivID).focus();
+                    
                     if (!controlProps.isMultiSelect) {
                         var newText = $(this).text();
                         var uid = $(this).attr('userid');
@@ -499,7 +497,7 @@ function Init() {
                         UpdateMultiSelectPickerValueWOValidation(controlProps, newText, uid);
                     }
 
-                    $('#' + controlProps.wePeopleEditorDivID).focus();
+                    
                 });
             }
 
@@ -560,7 +558,7 @@ function Init() {
 
         function UpdateSingleSelectPickerValueWOValidation(controlProps, newTextVal, index) {
 
-            $('#' + controlProps.wePeopleEditorDivID).focus();
+            
             $('#' + controlProps.wePeopleEditorDivID).empty();
             var spEntityStyle = '<span contenteditable="false" title="' + newTextVal + '" class="ms-entity-resolved" tabindex="-1" iscontenttype="true" id="span' + index + '" onmouseover="this.contentEditable=false;" onmouseout="this.contentEditable=true;">' +
 	                                '<div description="' + newTextVal + '" isresolved="True" displaytext="' + newTextVal + '" key="' + index + '" id="divEntityData" style="display:none;">' +
@@ -569,18 +567,20 @@ function Init() {
 	                                '<span contenteditable="" oncontextmenu="onContextMenuSpnRw(event,ctx);" onmousedown="onMouseDownRw(event);" tabindex="-1" id="content">' + newTextVal + '</span>' +
                                 '</span>';
 
+            
             $('#' + controlProps.wePeopleEditorDivID).append('&nbsp;');
             $('#' + controlProps.wePeopleEditorDivID).append(spEntityStyle);
             $('#' + controlProps.wePeopleEditorDivID).append('&nbsp;');
             $('#' + controlProps.wePeopleEditorDivID).append(';');
             $('#' + controlProps.wePeopleEditorDivID).append('&nbsp;');
 
+            $('#' + controlProps.wePeopleEditorDivID).focus();
+            setCursor(controlProps.wePeopleEditorDivID, $('#' + controlProps.wePeopleEditorDivID).val().length);
             RemoveTypeAheadChoiceCandidate(controlProps);
         }
 
         function UpdateMultiSelectPickerValueWOValidation(controlProps, newTextVal, index) {
             // updates the picker's values
-            $('#' + controlProps.wePeopleEditorDivID).focus();
             var clean = $('#' + controlProps.wePeopleEditorDivID).html();
             clean = clean.substring(0, clean.lastIndexOf(';') + 1);
             clean = clean.replace(/&nbsp;/, '');
@@ -599,12 +599,15 @@ function Init() {
 	                                '<span contenteditable="" oncontextmenu="onContextMenuSpnRw(event,ctx);" onmousedown="onMouseDownRw(event);" tabindex="-1" class="spnUserBlk" id="content">' + newTextVal + '</span>' +
                                 '</span>';
 
+            
             $('#' + controlProps.wePeopleEditorDivID).append('&nbsp;');
             $('#' + controlProps.wePeopleEditorDivID).append(spEntityStyle);
             $('#' + controlProps.wePeopleEditorDivID).append('&nbsp;');
             $('#' + controlProps.wePeopleEditorDivID).append(';');
             $('#' + controlProps.wePeopleEditorDivID).append('&nbsp;');
 
+            $('#' + controlProps.wePeopleEditorDivID).focus();
+            setCursor(controlProps.wePeopleEditorDivID, $('#' + controlProps.wePeopleEditorDivID).val().length);
             RemoveTypeAheadChoiceCandidate(controlProps);
         }
 
@@ -651,6 +654,25 @@ function Init() {
 
         // ===== HELPER FUNCTIONS =====
 
+        function setCursor(node, pos) {
+            var node = (typeof node == "string" ||
+            node instanceof String) ? document.getElementById(node) : node;
+            if (!node) {
+                return false;
+            } else if (node.createTextRange) {
+                var textRange = node.createTextRange();
+                textRange.collapse(true);
+                textRange.moveEnd(pos);
+                textRange.moveStart(pos);
+                textRange.select();
+                return true;
+            } else if (node.setSelectionRange) {
+                node.setSelectionRange(pos, pos);
+                return true;
+            }
+            return false;
+        }
+        
         function RemoveTypeAheadChoiceCandidate(controlProps) {
             if ($('#' + controlProps.autoCompleteDivID).length > 0) {
                 $('#' + controlProps.autoCompleteDivID).remove();
@@ -689,7 +711,7 @@ function Init() {
         function clickedOutsideElement(elemId, event) {
             var theElem = null;
             try {
-                theElem = (window.event) ? getEventTarget(window.event) : event.target;
+                theElem = (window.event) ? GetEventTarget(window.event) : event.target;
             }
             catch (e) { }
             while (theElem != null) {

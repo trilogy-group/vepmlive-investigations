@@ -72,7 +72,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <div class="ms-socialCommentInputBox ms-rtestate-write customCommentItem" id="socialCommentInputBox_Model" contenteditable="true">
+                        <div class="epmliveinput ms-rtestate-write customCommentItem" id="socialCommentInputBox_Model" contenteditable="true">
                             comment</div>
                     </td>
                 </tr>

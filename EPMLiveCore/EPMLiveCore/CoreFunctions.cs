@@ -1943,11 +1943,12 @@ namespace EPMLiveCore
             catch (Exception ex) { return ex.Message.ToString(); }
         }
 
-        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, SPWeb parentWeb, out Guid createdSiteId, out string createdSiteUrl, out string createdWebTitle)
+        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle)
         {
-            createdSiteId = Guid.Empty;
-            createdSiteUrl = string.Empty;
+            createdWebId = Guid.Empty;
+            createdWebUrl = string.Empty;
             createdWebTitle = string.Empty;
+            createdWebServerRelativeUrl = string.Empty;
             try
             {
                 string sUrl = "";
@@ -1962,8 +1963,9 @@ namespace EPMLiveCore
                 }
                 SPWeb web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
 
-                createdSiteId = web.ID;
-                createdSiteUrl = web.Url;
+                createdWebId = web.ID;
+                createdWebUrl = web.Url;
+                createdWebServerRelativeUrl = web.ServerRelativeUrl;
                 createdWebTitle = web.Title;
 
                 if (web.Navigation.TopNavigationBar != null)
@@ -2082,10 +2084,11 @@ namespace EPMLiveCore
         }
 
         public static string createSiteFromItem(string title, string url, string template, string user, bool unique, bool toplink,
-            SPWeb parentWeb, SPWeb itemWeb, Guid listId, int itemId, out Guid createdSiteId, out string createdSiteUrl, out string createdWebTitle)
+            SPWeb parentWeb, SPWeb itemWeb, Guid listId, int itemId, out Guid createdSiteId, out string createdWebUrl, out string createdWebRelativeUrl, out string createdWebTitle)
         {
             createdSiteId = Guid.Empty;
-            createdSiteUrl = string.Empty;
+            createdWebUrl = string.Empty;
+            createdWebRelativeUrl = string.Empty;
             createdWebTitle = string.Empty;
             try
             {
@@ -2104,7 +2107,8 @@ namespace EPMLiveCore
                     SPWeb web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
 
                     createdSiteId = web.ID;
-                    createdSiteUrl = web.Url;
+                    createdWebUrl = web.Url;
+                    createdWebRelativeUrl = web.ServerRelativeUrl;
                     createdWebTitle = web.Title;
 
                     if (web.Navigation.TopNavigationBar != null)

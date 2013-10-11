@@ -48,7 +48,7 @@ $(function () {
 
 
     $('#postBtn').click(function () {
-        if ($('#tbCommentInput').text().length > 0) { ajaxPost('CreateComment'); };
+        if ($('#tbCommentInput').text().trim().length > 0) { ajaxPost('CreateComment'); };
     });
 });
 
