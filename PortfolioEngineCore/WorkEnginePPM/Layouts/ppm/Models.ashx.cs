@@ -390,15 +390,15 @@ namespace WorkEnginePPM
             DBAccess dba = da.dba;
             if (dba.Open() == StatusEnum.rsSuccess)
             {
-                //int nMODEL_UID = xData.GetIntAttr(MODEL_UID");
-                //try
-                //{
-                //    dbaModels.DeleteModel(dba, nMODEL_UID, out sReply);
-                //}
-                //catch (Exception ex)
-                //{
-                //    sReply = WebAdmin.FormatError("exception", "Models.DeleteModelInfo", ex.Message);
-                //}
+                int nMODEL_UID = xData.GetIntAttr("MODEL_UID");
+                try
+                {
+                    dbaModels.DeleteModel(dba, nMODEL_UID, out sReply);
+                }
+                catch (Exception ex)
+                {
+                    sReply = WebAdmin.FormatError("exception", "Models.DeleteModelInfo", ex.Message);
+                }
                 dba.Close();
             }
             return sReply;
