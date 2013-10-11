@@ -277,14 +277,14 @@ namespace EPMLiveReportsAdmin.Jobs
 
         private void CheckSchema(SqlConnection cn)
         {
-            var cmd = new SqlCommand(Properties.Resources.CheckReqSP, cn);
+            var cmd = new SqlCommand(Properties.Resources.CheckSchema, cn);
             cmd.CommandType = CommandType.Text;
             cmd.ExecuteNonQuery();
         }
 
         private void CheckReqSP(SqlConnection cn)
         {
-            var cmd = new SqlCommand(Properties.Resources.CheckSchema, cn);
+            var cmd = new SqlCommand(Properties.Resources.CheckReqSP, cn);
             cmd.CommandType = CommandType.Text;
             cmd.ExecuteNonQuery();
         }
