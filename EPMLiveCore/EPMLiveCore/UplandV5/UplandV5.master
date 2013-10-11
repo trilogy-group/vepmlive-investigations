@@ -215,7 +215,7 @@
                 <epm:EPMLiveNavigation runat="server">
                     <TopNodes>
                         <epm:NavNode Id="ql" Title="Portal" CssClass="fui-list" />
-                        <epm:NavNode Id="new" Title="Add an app" CssClass="fui-plus" LinkProvider="Applications" />
+                        <epm:NavNode Id="new" Title="Create New" CssClass="fui-plus" LinkProvider="Applications" />
                         <epm:NavNode Separator="True" />
                         <epm:NavNode Id="workplace" Title="My Workplace" CssClass="fui-ext-checklist" LinkProvider="MyWorkplace" />
                         <epm:NavNode Id="favorites" Title="Favorites" CssClass="fui-star-2" LinkProvider="Favorites" />
