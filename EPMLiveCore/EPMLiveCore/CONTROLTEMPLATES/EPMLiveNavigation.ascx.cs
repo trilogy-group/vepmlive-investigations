@@ -150,7 +150,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 }
             }
 
-            spTreeView.Sort();
             spTreeView.ExpandAll();
         }
 
