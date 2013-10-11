@@ -160,6 +160,7 @@
                 }
                 break;
             default:
+                pagechanged = true;
                 break;
         }
     };
