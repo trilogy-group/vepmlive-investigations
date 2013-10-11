@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using System.Data;
 using System.Data.SqlClient;
@@ -271,6 +272,10 @@ namespace EPMLiveReportsAdmin.Jobs
                 bErrors = true;
                 sErrors += "<font color=\"red\">Error running schedule field update: " + ex.Message + "</font><br>";
             }
+
+            // clear cache
+
+            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
             finishJob();
         }
 
