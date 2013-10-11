@@ -1809,7 +1809,13 @@ namespace EPMLiveCore
 
                                         sbListAssociatedItemsDiv.Append("<div id='div_items_" + rptListId + "' class='slidingDiv'>");
                                         sbListAssociatedItemsDiv.Append("<div class='slidingDivHeader'>" + listName + "</div>");
-                                        sbListAssociatedItemsDiv.Append("<div class='slidingDivAdd'><a href='#' onclick=\"javascript:showItemUrl('" + projectAssociatedList.DefaultNewFormUrl + "');return false;\"><img title='Add new " + listName + "' alt='' src='/_layouts/epmlive/images/newitem5.png' class='ms-core-menu-buttonIcon'></img></a></div>");
+
+                                        if (!EPMLiveCore.API.ListCommands.GetGridGanttSettings(projectAssociatedList).HideNewButton)
+                                        {
+                                            string newFormUrl = projectAssociatedList.DefaultNewFormUrl + "?LookupField=" + projectLinkedField + "&LookupValue=" + projectID;
+                                            sbListAssociatedItemsDiv.Append("<div class='slidingDivAdd'><a href='#' onclick=\"javascript:showNewForm('" + newFormUrl + "');return false;\"><img title='Add new " + listName + "' alt='' src='/_layouts/epmlive/images/newitem5.png' class='ms-core-menu-buttonIcon'></img></a></div>");
+                                        }
+
                                         sbListAssociatedItemsDiv.Append("<br/>");
 
                                         sbListAssociatedItemsDiv.Append("<div style='clear:both;'></div>");
@@ -1833,7 +1839,7 @@ namespace EPMLiveCore
 
                                         if (otherAssociatedItems.Count > 5)
                                         {
-                                            string viewAllItemsUrl = projectAssociatedList.DefaultViewUrl + "?filterfield1=" + projectLinkedField + "&filtervalue1=" + projectTitle + "&Source=" + sourceUrl;
+                                            string viewAllItemsUrl = spWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + projectListID + "&lookups=" + projectTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + projectAssociatedList.ID.ToString();// +"&Source=" + sourceUrl;
                                             sbListAssociatedItemsDiv.Append("<a href='#' onclick=\"javascript:showItemUrl('" + viewAllItemsUrl + "');return false;\">View All " + projectAssociatedList.Title + "</a>");
                                         }
 

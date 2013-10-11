@@ -75,8 +75,28 @@
         }
     }
 
+
     function showItemUrl(weburl) {
-        var options = { url: weburl, showMaximized: true, dialogReturnValueCallback: function (dialogResult) { fillWebPartData(); } };
+        $.ajax({
+            type: "POST",
+            url: weburl,
+            success: function (ticket) {
+                if (ticket.indexOf("General Error") != 0) {
+                    var listInfo = ticket.split('|');
+
+                    var viewSiteContentUrl = listInfo[0] + "/_layouts/epmlive/gridaction.aspx?action=associateditems&list=" + listInfo[3] + "&field=" + listInfo[1] + "&LookupFieldList=" + listInfo[2] + "&Source=" + document.location.href;
+                    var options = { url: viewSiteContentUrl, showMaximized: true };
+                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                }
+                else {
+                    alert(ticket);
+                }
+            }
+        });
+    }
+
+    function showNewForm(weburl) {
+        var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { fillWebPartData(); } };
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
 

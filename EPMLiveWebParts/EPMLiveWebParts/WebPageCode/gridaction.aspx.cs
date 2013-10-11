@@ -370,6 +370,13 @@ namespace EPMLiveWebParts
                                 data = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "|" + Request["field"] + "|" + Request["listid"] + "|" + Request["LookupFieldList"];
                             }
                             break;
+                        case "associateditems":
+                            w = SPContext.Current.Web;
+                            {
+                                SPList list = w.Lists[new Guid(Request["list"])];
+                                url = list.DefaultViewUrl + "?lookupfield=" + Request["field"] + "&LookupFieldList=" + Request["LookupFieldList"];
+                            }
+                            break;
                         case "linkeditems":
                             w = SPContext.Current.Web;
                             {
