@@ -36,7 +36,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public void Remove(Guid linkId)
         {
-            using (var spSite = new SPSite(SiteId))
+            using (var spSite = new SPSite(SiteId, GetUserToken()))
             {
                 using (SPWeb spWeb = spSite.OpenWeb(WebId))
                 {

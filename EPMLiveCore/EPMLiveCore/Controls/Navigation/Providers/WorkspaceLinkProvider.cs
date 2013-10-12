@@ -140,16 +140,19 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                 if (string.IsNullOrEmpty(itemId))
                 {
-                    using (var spSite = new SPSite(SiteId))
+                    SPSecurity.RunWithElevatedPrivileges(() =>
                     {
-                        using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
+                        using (var spSite = new SPSite(SiteId))
                         {
-                            if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                            using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
                             {
-                                itemId = "X";
+                                if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                                {
+                                    itemId = "X";
+                                }
                             }
                         }
-                    }
+                    });
                 }
 
                 yield return new SPNavLink
@@ -277,7 +280,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
             };
 
-            using (var spSite = new SPSite(SiteId))
+            using (var spSite = new SPSite(SiteId, GetUserToken()))
             {
                 using (SPWeb spWeb = spSite.OpenWeb(WebId))
                 {
