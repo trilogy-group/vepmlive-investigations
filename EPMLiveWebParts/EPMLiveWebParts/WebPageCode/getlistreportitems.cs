@@ -393,12 +393,15 @@ namespace EPMLiveWebParts
                         try
                         {
                             var web = SPContext.Current.Web.Site.RootWeb;
-                            var urlim = getReportParameters(Microsoft.SharePoint.Utilities.SPUrlUtility.CombineUrl(web.Url, item.Url));
+                            //var urlim = getReportParameters(Microsoft.SharePoint.Utilities.SPUrlUtility.CombineUrl(web.Url, item.Url));
                             var sServerReelativeUrl = (web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl;
 
-                            tnAdd.NavigateUrl = sServerReelativeUrl +
-                                "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
-                               sServerReelativeUrl + "/" + item.Url + urlim + "&rv:HeaderArea=none";
+                            //tnAdd.NavigateUrl = sServerReelativeUrl +
+                            //    "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
+                            //   sServerReelativeUrl + "/" + item.Url + urlim + "&rv:HeaderArea=none";
+
+                            tnAdd.NavigateUrl = "/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(web.Url) +
+                                                "&itemurl=" + HttpUtility.UrlEncode(item.Url);
                         }
                         catch (Exception ex)
                         {
