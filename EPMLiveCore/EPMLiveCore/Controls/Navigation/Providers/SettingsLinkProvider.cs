@@ -51,8 +51,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 new Tuple<SPBasePermissions?, NavLink>(SPBasePermissions.ManageWeb, new NavLink
                 {
                     Title = "Add an app",
-                    Url = string.Format("http://market.epmlive.com/?source={0}", Url),
-                    External = true
+                    Url = string.Format("{0}/_layouts/15/addanapp.aspx", RelativeUrl)
                 }),
                 new Tuple<SPBasePermissions?, NavLink>(null, new NavLink
                 {
