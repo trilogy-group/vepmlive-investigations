@@ -3342,6 +3342,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\ReportFilterViewCreator\HeaderRightColumnBodyLayout.gif" />
     <Content Include="Layouts\epmlive\images\resources32.png" />
     <Content Include="Layouts\epmlive\images\right.GIF" />
+    <Content Include="Layouts\epmlive\images\screens.png" />
     <Content Include="Layouts\epmlive\images\scrollto.gif" />
     <Content Include="Layouts\epmlive\images\search.png" />
     <Content Include="Layouts\epmlive\images\settings\Advanced.png" />
