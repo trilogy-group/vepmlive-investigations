@@ -13,6 +13,7 @@ namespace WorkEnginePPM
     {
         private DataTable m_dt = null;
         private List<TCol> m_cols = new List<TCol>();
+        private List<CfgAttr> m_cfgAttrs = new List<CfgAttr>();
 
         private string m_sIDColName = "";
         public bool DragAndDrop = false;
@@ -33,7 +34,11 @@ namespace WorkEnginePPM
             date,
             combo
         }
-
+        public class CfgAttr
+        {
+            public string name;
+            public string value;
+        }
         public class TCol
         {
             public string title;
@@ -71,6 +76,13 @@ namespace WorkEnginePPM
             col.mainlevelcol = mainlevelcol;
             col.hidden = hidden;
             return col;
+        }
+        public void AddCfgAttr(string name, string value)
+        {
+            CfgAttr cfgAttr = new CfgAttr();
+            cfgAttr.name = name;
+            cfgAttr.value = value;
+            m_cfgAttrs.Add(cfgAttr);
         }
         public void SetDataTable(DataTable dt)
         {
@@ -212,7 +224,10 @@ namespace WorkEnginePPM
             xCfg.CreateIntAttr("Sorting", 0);
             xCfg.CreateIntAttr("FastColumns", 1);
             xCfg.CreateIntAttr("StaticCursor", 1);
-
+            foreach (CfgAttr cfgAttr in m_cfgAttrs)
+            {
+                xCfg.CreateStringAttr(cfgAttr.name, cfgAttr.value);
+            }
             //xCfg.CreateStringAttr("MainCol", "Permission");
 
             //CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
@@ -293,6 +308,7 @@ namespace WorkEnginePPM
                         case _TGrid.Type.date:
                             xC.CreateStringAttr("Type", "Date");
                             xC.CreateStringAttr("Format", "M/d/yyyy");
+                            //xC.CreateStringAttr("Button", "");
                             break;
                         case _TGrid.Type.combo:
                             xC.CreateStringAttr("Type", "Text");

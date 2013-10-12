@@ -127,6 +127,7 @@ namespace WorkEnginePPM
                 dbaCalendars.SelectCalendarPeriods(dba, nCalendarId, out dt);
 
                 _TGrid tg = new _TGrid();
+                tg.AddCfgAttr("AutoCalendar", "1");
                 InitializeColumns(tg);
                 tg.SetDataTable(dt);
                 string tgridData = "";
