@@ -1825,7 +1825,14 @@ namespace EPMLiveCore
                                         {
                                             sbListAssociatedItemsDiv.Append("<tr>");
                                             sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title + "</a></td>");
-                                            //sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:showItemPopup('" + siteUrl + "','" + webID + "','" + projectAssociatedList.ID + "','" + item.ID + "');return false;\">...</a></td>");
+
+                                            sbListAssociatedItemsDiv.Append("<td>");
+                                            sbListAssociatedItemsDiv.Append("<li class='associateditemscontextmenu'>");
+                                            sbListAssociatedItemsDiv.Append("<a data-itemid='" + item.ID + "' data-listid='" + projectAssociatedList.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'>");
+                                            sbListAssociatedItemsDiv.Append("</a>");
+                                            sbListAssociatedItemsDiv.Append("</li>");
+                                            sbListAssociatedItemsDiv.Append("</td>");
+
                                             sbListAssociatedItemsDiv.Append("</tr>");
                                         }
 

@@ -44,6 +44,12 @@
         float: left;
         font-size: large;
     }
+
+    .associateditemscontextmenu {
+        list-style: none;
+        cursor: pointer;
+        position: absolute;
+    }
 </style>
 
 <script type="text/javascript">
@@ -70,9 +76,18 @@
                 $("#<%=associatedItemsDiv.ClientID%>").mouseout(function () {
                     $(".slidingDiv").hide();
                 });
+
+                window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
+
+                $('.associateditemscontextmenu').each(function () {
+                    window.epmLiveNavigation.addContextualMenu($(this));
+                });
+
             });
         }
     }
+
+
 
 
     function showItemUrl(weburl) {
