@@ -616,7 +616,6 @@ namespace UplandIntegrations.Jira
                                            select dc).OrderBy(c => c.ColumnName);
 
                     Boolean subColumnStart = false;
-                    Boolean subColumnArrayStart = false;
 
                     foreach (DataColumn column in dataColumnsList)
                     {
@@ -638,12 +637,6 @@ namespace UplandIntegrations.Jira
 
                                 if (subColumnsArray.Count() == 3)
                                 {
-                                    if (subColumnArrayStart)
-                                    {
-                                        writer.WriteEndArray();
-                                        subColumnArrayStart = false;
-                                    }
-
                                     writer.WritePropertyName(subColumnsArray[1]);
                                     writer.WriteStartObject();
                                     writer.WritePropertyName(subColumnsArray[2]);
@@ -652,36 +645,30 @@ namespace UplandIntegrations.Jira
                                 }
                                 else if (subColumnsArray.Count() == 4)
                                 {
-                                    if (!subColumnArrayStart)
+                                    writer.WritePropertyName(subColumnsArray[1]);
+                                    writer.WriteStartArray();
+                                    string[] idValues = Convert.ToString(dataRow[column]).Split(',');
+                                    foreach (string idValue in idValues)
                                     {
-                                        writer.WritePropertyName(subColumnsArray[1]);
-                                        writer.WriteStartArray();
-                                        subColumnArrayStart = true;
+                                        if (!string.IsNullOrEmpty(idValue))
+                                        {
+                                            writer.WriteStartObject();
+                                            writer.WritePropertyName(subColumnsArray[2]);
+                                            json.Serialize(writer, idValue);
+                                            writer.WriteEndObject();
+                                        }
                                     }
-                                    writer.WriteStartObject();
-                                    writer.WritePropertyName(subColumnsArray[2]);
-                                    json.Serialize(writer, dataRow[column]);
-                                    writer.WriteEndObject();
+                                    writer.WriteEndArray();
+
                                 }
                                 else
                                 {
-                                    if (subColumnArrayStart)
-                                    {
-                                        writer.WriteEndArray();
-                                        subColumnArrayStart = false;
-                                    }
-
                                     writer.WritePropertyName(subColumnsArray[1]);
                                     json.Serialize(writer, dataRow[column]);
                                 }
                             }
                             else
                             {
-                                if (subColumnArrayStart)
-                                {
-                                    writer.WriteEndArray();
-                                    subColumnArrayStart = false;
-                                }
                                 if (subColumnStart)
                                 {
                                     writer.WriteEndObject();
@@ -691,12 +678,6 @@ namespace UplandIntegrations.Jira
                                 json.Serialize(writer, dataRow[column]);
                             }
                         }
-                    }
-
-                    if (subColumnArrayStart)
-                    {
-                        writer.WriteEndArray();
-                        subColumnArrayStart = false;
                     }
                     if (subColumnStart)
                     {
@@ -742,7 +723,6 @@ namespace UplandIntegrations.Jira
                         }
                         else if (subProperty.Value.GetType() == typeof(JArray))
                         {
-                            int arrayCount = 0;
                             JArray propertyJArray = JArray.Parse(subProperty.Value.ToString());
                             if (propertyJArray != null && propertyJArray.Count > 0 && propertyJArray[0].GetType() == typeof(JObject))
                             {
@@ -752,10 +732,17 @@ namespace UplandIntegrations.Jira
                                     {
                                         if (idProperty.Name.Equals("id"))
                                         {
-                                            if (items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                            if (items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", "0")))
                                             {
-                                                dataRow[string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())] = idProperty.Value;
-                                                arrayCount++;
+                                                string dataRowPreviousValue = Convert.ToString(dataRow[string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", "0")]);
+                                                if (string.IsNullOrEmpty(dataRowPreviousValue))
+                                                {
+                                                    dataRow[string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", "0")] = idProperty.Value;
+                                                }
+                                                else
+                                                {
+                                                    dataRow[string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", "0")] = string.Format("{0},{1}", dataRowPreviousValue, idProperty.Value);
+                                                }
                                             }
                                         }
                                     }
@@ -808,7 +795,6 @@ namespace UplandIntegrations.Jira
                         }
                         else if (subProperty.Value.GetType() == typeof(JArray))
                         {
-                            int arrayCount = 0;
                             JArray propertyJArray = JArray.Parse(subProperty.Value.ToString());
                             if (propertyJArray != null && propertyJArray.Count > 0 && propertyJArray[0].GetType() == typeof(JObject))
                             {
@@ -818,10 +804,9 @@ namespace UplandIntegrations.Jira
                                     {
                                         if (idProperty.Name.Equals("id"))
                                         {
-                                            if (!items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString())))
+                                            if (!items.Columns.Contains(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", "0")))
                                             {
-                                                items.Columns.Add(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", arrayCount.ToString()));
-                                                arrayCount++;
+                                                items.Columns.Add(string.Format("{0}|{1}|{2}|{3}", property.Name, subProperty.Name, "id", "0"));
                                             }
                                         }
                                     }
