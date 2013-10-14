@@ -274,32 +274,40 @@ namespace UplandIntegrations.Jira
 
         public string GetControlCode(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
 
         public List<string> GetEmbeddedItemControls(WebProperties WebProps, IntegrationLog Log)
         {
-            throw new NotImplementedException();
+            return new List<string>();
         }
 
         public List<IntegrationControl> GetPageButtons(WebProperties WebProps, IntegrationLog Log, bool GlobalButtons)
         {
             if (!GlobalButtons)
             {
-                return new List<IntegrationControl>
+                CheckWebProps(WebProps, true);
+                JiraType jiraType = (JiraType)Enum.Parse(typeof(JiraType), Convert.ToString(WebProps.Properties["Object"]));
+                switch (jiraType)
                 {
+                    case JiraType.Issues:
+                        return new List<IntegrationControl>
+                        {
+                            new IntegrationControl
+                            {
+                                Control = "JI_ViewIssue",
+                                Title = "View Issue",
+                                Image = "ji_viewissue.png",
+                                Window = IntegrationControlWindowStyle.FullWindow
+                            }
                     
-                    new IntegrationControl
-                    {
-                        Control = "JI_ViewIssue",
-                        Title = "View Issue",
-                        Image = "ji_viewissue.png",
-                        Window = IntegrationControlWindowStyle.FullWindow
-                    }
-                    
-                };
+                        };
+                        break;
+                    default:
+                        break;
+                }
             }
-            return null;
+            return new List<IntegrationControl>();
         }
 
         public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
@@ -311,6 +319,7 @@ namespace UplandIntegrations.Jira
                 {
                     case "JI_ViewIssue":
                         return string.Format("{0}/{1}/{2}", webProps.Properties["ServerUrl"].ToString(), "browse", itemId);
+                        break;
                 }
                 throw new Exception(control + " is not a valid jira control.");
             }
@@ -319,12 +328,12 @@ namespace UplandIntegrations.Jira
                 log.LogMessage(exception.Message, IntegrationLogType.Error);
             }
 
-            return null;
+            return string.Empty;
         }
 
         public string GetProxyResult(WebProperties WebProps, IntegrationLog Log, string ItemID, string Control, string Property)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
     }
 }
