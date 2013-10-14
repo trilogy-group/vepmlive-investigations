@@ -132,6 +132,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             new ApplicationsLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
             new SettingsLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
             new WorkplaceLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
+            new AssociatedItemsLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);
 
             ResetCache(safeRemove);
         }

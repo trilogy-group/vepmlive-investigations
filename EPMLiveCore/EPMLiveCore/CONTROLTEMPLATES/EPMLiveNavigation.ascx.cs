@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using EPMLiveCore.API;
+using EPMLiveCore.Controls.Navigation.Providers;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
@@ -88,7 +89,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Properties 
 
-        #region Methods (5) 
+        #region Methods (6) 
 
         // Protected Methods (3) 
 
@@ -138,7 +139,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             var spTreeView = ((SPTreeView) sender);
 
-            if (SPContext.Current.Web.IsRootWeb)
+            SPContext spContext = SPContext.Current;
+
+            if (spContext.Web.IsRootWeb)
             {
                 TreeNode wpNode =
                     spTreeView.Nodes.Cast<TreeNode>()
@@ -150,11 +153,14 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 }
             }
 
+            GetAssociatedItems(spContext, spTreeView);
+
             spTreeView.ExpandAll();
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
-        // Private Methods (2) 
+
+        // Private Methods (3) 
 
         private void CalculatePinState()
         {
@@ -173,6 +179,31 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             {
                 Pinned = pinStateCookie.Value.Equals("pinned");
             }
+        }
+
+        private static void GetAssociatedItems(SPContext spContext, SPTreeView spTreeView)
+        {
+            var linkProvider = new AssociatedItemsLinkProvider(
+                spContext.Site.ID,
+                spContext.Web.ID,
+                spContext.Web.CurrentUser.LoginName);
+
+            List<INavObject> links = linkProvider.GetLinks().ToList();
+
+            if (!links.Any()) return;
+
+            var rootNode = new TreeNode {Text = links.First().Title};
+
+            foreach (INavObject link in links.Skip(1))
+            {
+                rootNode.ChildNodes.Add(new TreeNode
+                {
+                    Text = link.Title,
+                    NavigateUrl = link.Url
+                });
+            }
+
+            spTreeView.Nodes.Add(rootNode);
         }
 
         private void LoadSelectedNodeLinks()
