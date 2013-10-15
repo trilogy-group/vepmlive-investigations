@@ -19,8 +19,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-<PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
-<PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
+    <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
+    <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
 iisreset</PostDeploymentCommand>
     <FileUpgradeFlags>0</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\Backup2\</UpgradeBackupLocation>
@@ -491,6 +491,9 @@ iisreset</PostDeploymentCommand>
     <None Include="IntegrationModuleDisplay\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{9824766d-01ac-47de-9b99-c51ba1944751}</SharePointProjectItemId>
     </None>
+    <None Include="javascripts\EPMLive.AssignmentPlanner.min.js.map">
+      <DependentUpon>EPMLive.AssignmentPlanner.js</DependentUpon>
+    </None>
     <None Include="javascripts\EPMLive.ResourceGrid.min.js.map">
       <DependentUpon>EPMLive.ResourceGrid.js</DependentUpon>
     </None>
@@ -817,6 +820,9 @@ iisreset</PostDeploymentCommand>
     <Content Include="javascripts\ChartWizard.js" />
     <Content Include="javascripts\EPMLive.AssignmentPlanner.ContextualTabPageComponent.js" />
     <Content Include="javascripts\EPMLive.AssignmentPlanner.js" />
+    <Content Include="javascripts\EPMLive.AssignmentPlanner.min.js">
+      <DependentUpon>EPMLive.AssignmentPlanner.js</DependentUpon>
+    </Content>
     <Content Include="javascripts\EPMLive.ResourceGrid.ContextualTabPageComponent.js" />
     <Content Include="javascripts\EPMLive.ResourceGrid.js" />
     <Content Include="javascripts\EPMLive.ResourceGrid.min.js" />
@@ -1587,7 +1593,7 @@ iisreset</PostDeploymentCommand>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-<ProjectExtensions>
+  <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
         <DeploymentConfigurations>

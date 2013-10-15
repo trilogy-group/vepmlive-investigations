@@ -7,6 +7,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
@@ -150,8 +151,10 @@ namespace EPMLiveWebParts.Layouts.epmlive
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnPreRender(EventArgs e)
         {
-            RegisterScripts();
+            base.OnPreRender(e);
+
             RegisterRibbon();
+            RegisterScripts();
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -250,12 +253,10 @@ namespace EPMLiveWebParts.Layouts.epmlive
         /// </summary>
         private void RegisterScripts()
         {
-            var javascripts = new[] {"treegrid/GridE.js", "javascripts/EPMLive.AssignmentPlanner.js"};
-
-            foreach (string javascript in javascripts)
+            EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                ScriptLink.Register(Page, string.Format("/_layouts/epmlive/{0}", javascript), false);
-            }
+                "libraries/jquery.min", "/treegrid/GridE", "@EPMLive.AssignmentPlanner"
+            });
 
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, errors) => true;
         }
