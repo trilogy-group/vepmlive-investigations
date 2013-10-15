@@ -382,10 +382,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Infrastructure\SessionManager.cs" />
     <Compile Include="Infrastructure\WEFeatures.cs" />
     <Compile Include="IntegrateEvents\IntegrateEvents.cs" />
-    <Compile Include="Integrations\Jira\CustomJsonConverter.cs" />
-    <Compile Include="Integrations\Jira\JiraIntegrator.cs" />
-    <Compile Include="Integrations\Jira\JiraService.cs" />
-    <Compile Include="Integrations\Jira\JiraType.cs" />
     <Compile Include="Integrations\Office365\Infrastructure\AESCryptographyService.cs" />
     <Compile Include="Integrations\Office365\Infrastructure\Extensions.cs" />
     <Compile Include="Integrations\Office365\Infrastructure\O365Result.cs" />
