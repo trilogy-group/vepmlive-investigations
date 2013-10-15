@@ -892,6 +892,20 @@
                     var unhoverNode = window.TreeView_UnhoverNode;
                     var toggleNode = window.TreeView_ToggleNode;
 
+                    var navLinkOffset = 0;
+                    $('td.epm-nav-node').find('a').each(function () {
+                        var $a = $(this);
+                        var offset = $a.offset().left;
+                        
+                        if (navLinkOffset === 0) {
+                            navLinkOffset = offset;
+                        } else {
+                            if (offset > navLinkOffset) {
+                                $a.width(112);
+                            }
+                        }
+                    });
+
                     window.TreeView_HoverNode = function (data, el) {
                         var node = $(el);
 
