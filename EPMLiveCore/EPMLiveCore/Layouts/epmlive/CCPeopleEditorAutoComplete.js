@@ -75,11 +75,33 @@ function Init() {
                         // remove SharePoint keydown event
                         $('#' + controlProps.wePeopleEditorDivID).removeAttr("onkeydown");
 
-                        $('#' + controlProps.wePeopleEditorDivID).keydown(function (e) {
+                        $('#' + controlProps.wePeopleEditorDivID).unbind('keydown').keydown(function (e) {
 
                             var index = $(this).attr('CtrlPropArrPos');
                             if (index != undefined && window._wePeopleEditorControlPropertyArray) {
                                 controlProps = window._wePeopleEditorControlPropertyArray[index];
+                            }
+                            
+                            // test if single lookup field already has a value
+                            if ((e.keyCode >= 65 && e.keyCode <= 90) ||
+                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 96 && e.keyCode <= 105) ||
+                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 48 && e.keyCode <= 57)) {
+                                var tester = $(this).html();
+
+                                var eleParent = null;
+                                try {
+                                    eleParent = $('<div>' + tester + '</div>');
+                                }
+                                catch (e) {
+                                }
+
+                                if (eleParent != null) {
+
+                                    if (!controlProps.isMultiSelect && eleParent.find('SPAN').length > 0) {
+                                        alert('Only one value is allowed for this lookup field.');
+                                        return false;
+                                    }
+                                }
                             }
 
                             switch (e.keyCode) {
@@ -111,42 +133,7 @@ function Init() {
                                     }
                                    
                                     break;
-                            }
-
-                            // test if single lookup field already has a value
-                            if ((e.keyCode >= 65 && e.keyCode <= 90) ||
-                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 96 && e.keyCode <= 105) ||
-                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 48 && e.keyCode <= 57)) {
-                                var tester = $(this).html();
-
-                                var eleParent = null;
-                                try {
-                                    eleParent = $('<div>' + tester + '</div>');
-                                }
-                                catch (e) {
-                                }
-
-                                if (eleParent != null) {
-
-                                    if (!controlProps.isMultiSelect && eleParent.find('SPAN').length > 0) {
-                                        alert('Only one value is allowed for this lookup field.');
-                                        return false;
-                                    }
-                                }
-                            }
-
-                        });
-
-                        // register keyup event with type ahead logic 
-                        $('#' + controlProps.wePeopleEditorDivID).keyup(function (e) {
-
-                            var index = $(this).attr('CtrlPropArrPos');
-                            if (index != undefined && window._wePeopleEditorControlPropertyArray) {
-                                controlProps = window._wePeopleEditorControlPropertyArray[index];
-                            }
-
-                            switch (e.keyCode) {
-
+                                    
                                 case 13:
                                     //alert('enter key pressed!');
                                     if (!controlProps.isMultiSelect) {
@@ -165,7 +152,7 @@ function Init() {
                                                 controlProps.singleSelectLookupVal = newText;
                                                 UpdateSingleSelectPickerValueWOValidation(controlProps, newText, uid);
                                             }
-                                            // user highlights nothing, just click validate
+                                                // user highlights nothing, just click validate
                                             else {
                                                 //$('#' + controlProps.wePeopleEdtiorCheckNameID).trigger('click');
                                             }
@@ -193,6 +180,18 @@ function Init() {
                                     }
                                     e.preventDefault();
                                     break;
+                            }
+                        });
+
+                        // register keyup event with type ahead logic 
+                        $('#' + controlProps.wePeopleEditorDivID).keyup(function (e) {
+
+                            var index = $(this).attr('CtrlPropArrPos');
+                            if (index != undefined && window._wePeopleEditorControlPropertyArray) {
+                                controlProps = window._wePeopleEditorControlPropertyArray[index];
+                            }
+
+                            switch (e.keyCode) {
                                 case 38: //up
                                     //alert('moved up!');
                                     $('.autoText').each(function () {

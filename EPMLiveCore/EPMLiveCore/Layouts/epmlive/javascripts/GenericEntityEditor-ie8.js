@@ -98,6 +98,26 @@ function GEInit() {
                         controlProps = window._LookupFieldsPropsArray[index];
                     }
 
+                    // test if single lookup field already has a value
+                    if ((e.keyCode >= 65 && e.keyCode <= 90) ||
+                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 96 && e.keyCode <= 105) ||
+                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 48 && e.keyCode <= 57)) {
+                        var tester = $(this).html();
+                        var eleParent = null;
+                        try {
+                            eleParent = $('<div>' + tester + '</div>');
+                        }
+                        catch (e) {
+                        }
+
+                        if (eleParent != null) {
+                            if (!controlProps.ControlInfo.IsMultiSelect && eleParent.find('SPAN').length > 0) {
+                                alert('Only one value is allowed for this lookup field.');
+                                return false;
+                            }
+                        }
+                    }
+                    
                     switch (e.keyCode) {
                         case 8:
                             var text = $(this).text();
@@ -126,27 +146,60 @@ function GEInit() {
                             }
 
                             break;
-                    }
-
-                    // test if single lookup field already has a value
-                    if ((e.keyCode >= 65 && e.keyCode <= 90) ||
-                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 96 && e.keyCode <= 105) ||
-                            (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey && e.keyCode >= 48 && e.keyCode <= 57)) {
-                        var tester = $(this).html();
-                        var eleParent = null;
-                        try {
-                            eleParent = $('<div>' + tester + '</div>');
-                        }
-                        catch (e) {
-                        }
-
-                        if (eleParent != null) {
-                            if (!controlProps.ControlInfo.IsMultiSelect && eleParent.find('SPAN').length > 0) {
-                                alert('Only one value is allowed for this lookup field.');
-                                return false;
+                        case 13:
+                            if ($('#' + controlProps.FieldName + '_errorText').length > 0) {
+                                $('#' + controlProps.FieldName + '_errorText').remove();
                             }
-                        }
+                            var selectedDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
+                            var ctrlId = $(selectedDiv).attr('id');
+                            if (ctrlId === 'autoText_noValue') {
+                                return;
+                            }
+                            //alert('enter key pressed!');  
+                            if (!controlProps.ControlInfo.IsMultiSelect) {
+                                if (CheckIfDataExists(controlProps) == -1) {
+                                    // if data hasn't been loaded, do nothing
+                                    return false;
+                                }
+                                else {
+                                    // if data has been loaded, and user highlights something
+                                    if (controlProps.ControlInfo.CandidateIndex != -1) {
+                                        var selectedDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
+                                        var newText = $(selectedDiv).html();
+                                        controlProps.ControlInfo.SingleSelectDisplayVal = newText;
+                                        controlProps.ControlInfo.SingleSelectLookupVal = $(selectedDiv).attr('value');
+                                        UpdateSingleSelectPickerValueWOValidation(controlProps, controlProps.ControlInfo.SingleSelectLookupVal);
+                                    }
+                                    else {
+                                        // data has been loaded, and user has not selected anything, just click validate
+                                        $('#' + controlProps.ControlInfo.GenericEntityCheckNameId).trigger('click');
+                                    }
+                                }
+                            }
+                            else {
+                                if (CheckIfDataExists(controlProps) == -1) {
+                                    // if data hasn't been loaded, do nothing
+                                    return false;
+                                }
+                                else {
+                                    // if data has been loaded, and user highlights something
+                                    if (controlProps.ControlInfo.CandidateIndex != -1) {
+                                        var selectedDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
+                                        var newText = $(selectedDiv).html();
+                                        var index = $(selectedDiv).attr('value');
+                                        UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
+                                    }
+                                    else {
+                                        // data has been loaded, and user has not selected anything, just click validate
+                                        $('#' + controlProps.ControlInfo.GenericEntityCheckNameId).trigger('click');
+                                    }
+                                }
+                            }
+                            e.preventDefault();
+                            break;
                     }
+
+                    
 
 
                 });
@@ -243,56 +296,7 @@ function GEInit() {
                                 RemoveTypeAheadChoiceCandidate(controlProps);
                             }
                             break;
-                        case 13:
-                            if ($('#' + controlProps.FieldName + '_errorText').length > 0) {
-                                $('#' + controlProps.FieldName + '_errorText').remove();
-                            }
-                            var selectedDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
-                            var ctrlId = $(selectedDiv).attr('id');
-                            if (ctrlId === 'autoText_noValue') {
-                                return;
-                            }
-                            //alert('enter key pressed!');  
-                            if (!controlProps.ControlInfo.IsMultiSelect) {
-                                if (CheckIfDataExists(controlProps) == -1) {
-                                    // if data hasn't been loaded, do nothing
-                                    return false;
-                                }
-                                else {
-                                    // if data has been loaded, and user highlights something
-                                    if (controlProps.ControlInfo.CandidateIndex != -1) {
-                                        var selectedDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
-                                        var newText = $(selectedDiv).html();
-                                        controlProps.ControlInfo.SingleSelectDisplayVal = newText;
-                                        controlProps.ControlInfo.SingleSelectLookupVal = $(selectedDiv).attr('value');
-                                        UpdateSingleSelectPickerValueWOValidation(controlProps, controlProps.ControlInfo.SingleSelectLookupVal);
-                                    }
-                                    else {
-                                        // data has been loaded, and user has not selected anything, just click validate
-                                        $('#' + controlProps.ControlInfo.GenericEntityCheckNameId).trigger('click');
-                                    }
-                                }
-                            }
-                            else {
-                                if (CheckIfDataExists(controlProps) == -1) {
-                                    // if data hasn't been loaded, do nothing
-                                    return false;
-                                }
-                                else {
-                                    // if data has been loaded, and user highlights something
-                                    if (controlProps.ControlInfo.CandidateIndex != -1) {
-                                        var selectedDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
-                                        var newText = $(selectedDiv).html();
-                                        var index = $(selectedDiv).attr('value');
-                                        UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
-                                    }
-                                    else {
-                                        // data has been loaded, and user has not selected anything, just click validate
-                                        $('#' + controlProps.ControlInfo.GenericEntityCheckNameId).trigger('click');
-                                    }
-                                }
-                            }
-                            break;
+                       
                         case 38: //up
                             //alert('moved up!');
                             $('.autoText').each(function () {
