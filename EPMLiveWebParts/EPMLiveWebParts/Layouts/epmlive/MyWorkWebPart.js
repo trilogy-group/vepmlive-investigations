@@ -301,9 +301,6 @@ Grids.OnLoaded = function (grid) {
             }
         });
 
-        grid.Update();
-        grid.Render();
-
         $('html').click(function () {
             var g = window.Grids[MyWorkGrid.gridId];
             
@@ -1454,9 +1451,6 @@ var MyWorkGrid = {
                 grid.SetWidth('Edit', 25);
             }
 
-            grid.Update();
-            grid.Render();
-
             grid.Cols['Title'].RelWidth = 1;
 
             MyWorkGrid.defaultViewId = viewId;
@@ -1478,10 +1472,6 @@ var MyWorkGrid = {
             RefreshCommandUI();
 
             window.setTimeout(function () {
-                var g = Grids[MyWorkGrid.gridId];
-                g.Update();
-                g.Render();
-
                 $('#EPMMyWorkGrid').css('overflow', 'visible');
                 $('.s4-wpTopTable').css('border', 'none');
             }, 10);
