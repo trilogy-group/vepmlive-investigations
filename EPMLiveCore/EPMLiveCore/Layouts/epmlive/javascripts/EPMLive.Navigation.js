@@ -1073,7 +1073,7 @@
                         var wsWidth = 0;
 
                         try {
-                            wsWidth = $wsTree.width();
+                            wsWidth = $wsTree.width() + 20;
                         } catch(ex) {
                         } 
                         
