@@ -498,6 +498,71 @@ namespace PortfolioEngineCore
             }
         }
 
+        public static StatusEnum DeleteLookup(DBAccess dba, int nLOOKUP_UID, out string sReply)
+        {
+            SqlCommand oCommand;
+            string cmdText;
+            sReply = "";
+            try
+            {
+                // check if Lookup can be deleted
+                string sdeletemessage;
+                if (CanDeleteLookup(dba, nLOOKUP_UID, out sdeletemessage) != StatusEnum.rsSuccess) return dba.Status;
+                if (sdeletemessage.Length > 0)
+                {
+                    sReply = DBAccess.FormatAdminError("error", "Lookups.DeleteLookup", "This Lookup cannot be deleted, it is currently used as follows:" + "\n" + "\n" + sdeletemessage);
+                    return StatusEnum.rsRequestCannotBeCompleted;
+                }
+
+                //    clear any VALUES entries
+                cmdText = "DELETE FROM EPGP_LOOKUP_VALUES Where LOOKUP_UID = @pLOOKUP_UID";
+                oCommand = new SqlCommand(cmdText, dba.Connection);
+                oCommand.Parameters.AddWithValue("@pLOOKUP_UID", nLOOKUP_UID);
+                oCommand.ExecuteNonQuery();
+
+                // Delete the TABLE entry
+                cmdText = "DELETE FROM EPGP_LOOKUP_TABLES Where LOOKUP_UID = @pLOOKUP_UID";
+                oCommand = new SqlCommand(cmdText, dba.Connection);
+                oCommand.Parameters.AddWithValue("@pLOOKUP_UID", nLOOKUP_UID);
+                oCommand.ExecuteNonQuery();
+
+                return dba.Status;
+            }
+            catch (Exception ex)
+            {
+                sReply = DBAccess.FormatAdminError("exception", "Lookups.DeleteLookup", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
+
+        public static StatusEnum CanDeleteLookup(DBAccess dba, int nLOOKUP_UID, out string sReply)
+        {
+            SqlCommand oCommand;
+            SqlDataReader reader;
+            sReply = "";
+            try
+            {
+                // check if LOOKUP can be deleted
+                oCommand = new SqlCommand("EPG_SP_ReadUsedLookups", dba.Connection);
+                oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                oCommand.Parameters.AddWithValue("@LookupUID", nLOOKUP_UID);
+                reader = oCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    sReply += DBAccess.ReadStringValue(reader["UsedMessage"]) + ":  " + DBAccess.ReadStringValue(reader["UsedData"]) + "\n";
+                }
+                reader.Close();
+                return StatusEnum.rsSuccess;
+            }
+            catch (Exception ex)
+            {
+                sReply = DBAccess.FormatAdminError("exception", "CostViews.CanDeleteCostView", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
+
+
         private class PFELookupItem
         {
             public int UID;
