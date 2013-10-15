@@ -959,6 +959,10 @@
                         handleContextualCommand(id, webId, listId, itemId, command, kind);
                     };
 
+                    $('.epm-app-btn').click(function() {
+                        document.location.href = $(this).data('url');
+                    });
+
                     $('td.epm-nav-node-root').click(function () {
                         var $td = $(this);
                         var id = $td.parent().find('a').get(0).id;

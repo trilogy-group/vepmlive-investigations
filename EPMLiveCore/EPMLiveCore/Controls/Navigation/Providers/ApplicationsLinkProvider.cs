@@ -57,6 +57,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             var lists = new Dictionary<int, string[]>();
             var libraries = new Dictionary<int, string[]>();
 
+            string appStoreLink = string.Empty;
+
             var tasks = new List<Task>();
 
             Task t1 = Task.Factory.StartNew(() =>
@@ -65,6 +67,14 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     using (SPWeb spWeb = spSite.OpenWeb(WebId))
                     {
+                        if (spWeb.DoesUserHavePermissions(SPBasePermissions.ManageWeb))
+                        {
+                            appStoreLink =
+                                string.Format(
+                                    "<span class='epm-app-btn' data-url='{0}'><span class='icon-plus-2'></span></span>",
+                                    string.Format("{0}/_layouts/15/addanapp.aspx", RelativeUrl));
+                        }
+
                         try
                         {
                             lists = CreateNewAjaxDataHost.GetCreatableLists(spWeb);
@@ -105,7 +115,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 });
             }
 
-            links.Add(new NavLink {Title = "Apps", Url = "Header"});
+            links.Add(new NavLink
+            {
+                Title = string.Format("Apps{0}", appStoreLink),
+                Url = "Header"
+            });
 
             if (lists.Count > 0)
             {
