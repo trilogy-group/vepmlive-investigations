@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.ReportingProxy;
@@ -29,9 +31,9 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         #endregion Constructors 
 
-        #region Methods (3) 
+        #region Methods (4) 
 
-        // Private Methods (3) 
+        // Private Methods (4) 
 
         private void GetAssociatedItems(List<NavLink> links)
         {
@@ -61,18 +63,35 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         }
                         catch { }
 
-                        if (spList != null)
-                        {
-                            NavLink navLink = GetLink(spList, parentItemId);
+                        if (spList == null) return;
 
-                            if (navLink != null)
-                            {
-                                links.Add(navLink);
-                            }
+                        NavLink navLink = GetLink(spList, parentItemId);
+
+                        if (navLink != null)
+                        {
+                            links.Add(navLink);
                         }
+
+                        links.AddRange(
+                            ListCommands.GetAssociatedLists(spList)
+                                .Cast<AssociatedListInfo>()
+                                .Select(listInfo => GetLink(listInfo, spList))
+                                .Where(link => link != null));
                     }
                 }
             }
+        }
+
+        private NavLink GetLink(AssociatedListInfo listInfo, SPList spList)
+        {
+            return new NavLink
+            {
+                Id = listInfo.ListId.ToString(),
+                Title = listInfo.Title,
+                Url = string.Format(
+                    @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/redirectionproxy.aspx?webid={1}&listid={2}&action=new');",
+                    RelativeUrl, spList.ParentWeb.ID, listInfo.ListId)
+            };
         }
 
         private NavLink GetLink(SPList spList, int itemId)
