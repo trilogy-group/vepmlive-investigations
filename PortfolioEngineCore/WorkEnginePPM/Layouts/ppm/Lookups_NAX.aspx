@@ -119,7 +119,7 @@ html, body {
     var toolbar = new Toolbar(toolbarData);
     var toolbarLV = new Toolbar(toolbarLVData);
     var tgridLV = window['<%=tgridLV.UID%>'];
-    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1 = window['<%=dgrid1.UID%>'];
     var dgrid1_selectedRow = 0;
     var OnLoad = function (event) {
         Grids.OnClick = GridsOnClick;
@@ -259,7 +259,7 @@ html, body {
                         return false;
                 }
                 toolbarLV.Render();
-                var fieldId = json.reply.Lookup.VIEW_UID;
+                var fieldId = json.reply.Lookup.LOOKUP_UID;
                 document.getElementById('txtId').value = fieldId;
                 document.getElementById('txtName').value = GetStringFromValue(json.reply.Lookup.LOOKUP_NAME);
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.Lookup.LOOKUP_DESC);
