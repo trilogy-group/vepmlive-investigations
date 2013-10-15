@@ -207,15 +207,15 @@ namespace WorkEnginePPM
             if (dba.Open() == StatusEnum.rsSuccess)
             {
                 int nLOOKUP_UID = xData.GetIntAttr("LOOKUP_UID");
-        //        try
-        //        {
-        //            dbaLookups.DeleteLookup(dba, nCTId, out sReply);
-        //        }
-        //        catch (Exception ex)
-        //        {
-                //            sReply = WebAdmin.FormatError("exception", "Lookups.DeleteLookupInfo", ex.Message);
-        //        }
-        //        dba.Close();
+                try
+                {
+                    dbaLookups.DeleteLookup(dba, nLOOKUP_UID, out sReply);
+                }
+                catch (Exception ex)
+                {
+                    sReply = WebAdmin.FormatError("exception", "Lookups.DeleteLookupInfo", ex.Message);
+                }
+                dba.Close();
             }
             return sReply;
         }
