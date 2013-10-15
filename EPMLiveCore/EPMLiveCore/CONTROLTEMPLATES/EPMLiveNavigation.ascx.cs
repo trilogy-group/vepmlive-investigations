@@ -11,6 +11,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using RestSharp.Extensions;
 
 namespace EPMLiveCore.CONTROLTEMPLATES
 {
@@ -192,7 +193,11 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
             if (!links.Any()) return;
 
-            var rootNode = new TreeNode {Text = links.First().Title};
+            var rootNode = new TreeNode
+            {
+                Text = links.First().Title,
+                SelectAction = TreeNodeSelectAction.None
+            };
 
             foreach (INavObject link in links.Skip(1))
             {
