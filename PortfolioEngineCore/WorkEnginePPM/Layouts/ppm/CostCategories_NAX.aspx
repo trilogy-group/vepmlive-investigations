@@ -405,6 +405,7 @@ html, body {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
                     tgrid1.grid.AcceptChanges();
+                    bChanged = false;
                 }
                 break;
             case "btnDelete":
