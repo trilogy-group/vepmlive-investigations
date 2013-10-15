@@ -192,6 +192,10 @@ namespace EPMLiveCore
             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
             ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Edit.Actions.Controls._children");
 
+            ribbonExtensions = new XmlDocument();
+            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
+            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.DocLibListForm.Edit.Actions.Controls._children");
+
             EPMLiveCore.API.RibbonProperties rp = (EPMLiveCore.API.RibbonProperties)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GR-" + Web.CurrentUser.ID, "GridSettings-" + List.ID, () =>
             {
                 return EPMLiveCore.API.ListCommands.GetRibbonProps(List);
