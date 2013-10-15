@@ -305,7 +305,7 @@ namespace PortfolioEngineCore
             }
             catch (Exception ex)
             {
-                sReply = DBAccess.FormatAdminError("exception", "CostViews.DeleteModel", ex.Message);
+                sReply = DBAccess.FormatAdminError("exception", "Models.DeleteModel", ex.Message);
                 return StatusEnum.rsRequestCannotBeCompleted;
             }
         }
