@@ -26,10 +26,12 @@ namespace EPMLiveCore.Controls.Navigation
         {
             var nodes = new SiteMapNodeCollection();
 
-            PopulateCommunityLinks();
+            //PopulateCommunityLinks();
 
             if (node.Title.Equals("Quick launch"))
             {
+                PopulateCommunityLinks(base.GetChildNodes(node));
+
                 foreach (var community in _communityLinks)
                 {
                     nodes.Add(new SiteMapNode(this, community.Key) {Title = community.Key});
@@ -52,7 +54,7 @@ namespace EPMLiveCore.Controls.Navigation
             return nodes;
         }
 
-        private void PopulateCommunityLinks()
+        private void PopulateCommunityLinks(SiteMapNodeCollection ChildNodes)
         {
             SPWeb currentWeb = SPContext.Current.Web;
             Guid siteId = currentWeb.Site.ID;
@@ -133,6 +135,7 @@ namespace EPMLiveCore.Controls.Navigation
 
                                                     lock (locker)
                                                     {
+                                                        
                                                         linkNodes.Add(id, null);
                                                     }
                                                 }
@@ -148,7 +151,9 @@ namespace EPMLiveCore.Controls.Navigation
                                     {
                                         try
                                         {
-                                            linkNodes[nodeKey] = FindSiteMapNodeFromKey(nodeKey);
+                                            SiteMapNode oNode = FindSiteMapNodeFromKey(nodeKey);
+                                            if(ChildNodes.Contains(oNode))
+                                                linkNodes[nodeKey] = oNode;
                                         }
                                         catch { }
                                     }
