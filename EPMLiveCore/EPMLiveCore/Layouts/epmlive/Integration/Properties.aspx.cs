@@ -201,7 +201,10 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
         {
             get
             {
-                return "integrationlist.aspx?LIST=" + Request["List"];
+                if (Request["ret"] == "Manage")
+                    return "manage.aspx";
+                else
+                    return "integrationlist.aspx?LIST=" + Request["List"];
             }
         }
 
@@ -271,12 +274,14 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
                      if(Request["wizard"] == "1")
                      {
-                         SPUtility.Redirect("epmlive/integration/columns.aspx?intlistid=" + intadmin.intlistid + "&LIST=" + Request["List"] + "&wizard=1", SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                         SPUtility.Redirect("epmlive/integration/columns.aspx?intlistid=" + intadmin.intlistid + "&LIST=" + Request["List"] + "&wizard=1&ret=" + Request["ret"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                      }
                      else
                      {
-
-                         SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                         if (Request["ret"] == "Manage")
+                            SPUtility.Redirect("epmlive/integration/manage.aspx", SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                         else
+                            SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                      }
 
                  }

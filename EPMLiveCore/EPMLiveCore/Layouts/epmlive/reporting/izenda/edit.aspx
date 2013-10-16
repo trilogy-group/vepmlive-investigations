@@ -28,7 +28,7 @@
         </tr>
         <tr>
             <td></td>
-            <td><asp:Button ID="btnSave" Text="Save" OnClick="btnSave_Click" runat="server"/> <asp:Button ID="btnCancel" Text="Save" OnClick="btnCancel_Click" runat="server"/></td>
+            <td><asp:Button ID="btnSave" Text="Save" OnClick="btnSave_Click" runat="server"/> <asp:Button ID="btnCancel" Text="Cancel" OnClick="btnCancel_Click" runat="server"/></td>
         </tr>
 
     </table>

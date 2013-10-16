@@ -65,7 +65,10 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
         {
             get
             {
-                return "integrationlist.aspx?LIST=" + Request["List"];
+                if (Request["ret"] == "Manage")
+                    return "manage.aspx";
+                else
+                    return "integrationlist.aspx?LIST=" + Request["List"];
             }
         }
 
@@ -107,7 +110,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     {
                         intadmin.CreateIntegration(Web.Site.ID, Web.ID, new Guid(Request["List"]), Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"), false, false, false, false);
                         intadmin.SaveProperties(hshProps);
-                        SPUtility.Redirect("epmlive/integration/properties.aspx?intlistid=" + intadmin.intlistid + "&LIST=" + Request["List"] + "&wizard=1", SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                        SPUtility.Redirect("epmlive/integration/properties.aspx?intlistid=" + intadmin.intlistid + "&LIST=" + Request["List"] + "&wizard=1&ret=" + Request["ret"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                     }
                     else
                     {
@@ -115,7 +118,10 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                         //intadmin.UpdateIntegration(intlistid, lblKey.Text, chkLout.Checked, chkLin.Checked, chkTout.Checked, chkTin.Checked);
                         intadmin.SaveProperties(hshProps);
                         intadmin.InstallEventHandlers(list);
-                        SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                        if (Request["ret"] == "Manage")
+                            SPUtility.Redirect("epmlive/integration/manage.aspx", SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                        else
+                            SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                     }
 
                 }

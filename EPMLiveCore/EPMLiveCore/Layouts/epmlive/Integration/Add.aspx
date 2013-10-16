@@ -13,7 +13,7 @@
     <script language="javascript">
 
         function AddIntegration(module) {
-            location.href = 'Connection.aspx?List=<%=Request["LIST"] %>&wizard=1&Module=' + module;
+            location.href = 'Connection.aspx?List=<%=Request["LIST"] %>&wizard=1&Module=' + module + "&ret=<%=Request["ret"]%>";
         }
     </script>
 
@@ -30,7 +30,11 @@
             <TABLE width="100%">
             <TBODY>
                 <TR>
+                    <%if(Request["ret"] == "Manage"){ %>
+                    <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><A id=A2 class=ms-addnew href="manage.aspx">Cancel</A> </TD>
+                    <%}else{ %>
                     <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><A id=A1 class=ms-addnew href="integrationlist.aspx?LIST=<%=Request["LIST"] %>">Cancel</A> </TD>
+                    <%} %>
                 </TR>
             </TBODY>
         </TABLE>

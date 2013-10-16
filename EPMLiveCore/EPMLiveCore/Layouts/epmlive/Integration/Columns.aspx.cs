@@ -213,6 +213,17 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             });
         }
 
+        public override string PageToRedirectOnCancel
+        {
+            get
+            {
+                if (Request["ret"] == "Manage")
+                    return "manage.aspx";
+                else
+                    return "integrationlist.aspx?LIST=" + Request["List"];
+            }
+        }
+
         protected void Button1_Click(object sender, EventArgs e)
         {
             bool success = true;
@@ -272,7 +283,10 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                  intcore.CloseConnection(true);
             });
             if(success)
-                SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                if(Request["ret"] == "Manage")
+                    SPUtility.Redirect("epmlive/integration/manage.aspx", SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                else
+                    SPUtility.Redirect("epmlive/integration/integrationlist.aspx?LIST=" + Request["List"], SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
         }
     }
 }

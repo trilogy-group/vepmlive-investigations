@@ -40,7 +40,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 if (!bFound)
                 {
                     cmd = new SqlCommand("INSERT INTO IzendaAdHocReports (Name,TenantID,CreatedDate,ModifiedDate,Xml) VALUES (@name,@siteid,GETDATE(),GETDATE(),@xml)", cn);
-                    cmd.Parameters.AddWithValue("@siteid", Web.ID);
+                    cmd.Parameters.AddWithValue("@siteid", Web.ID.ToString().ToLower());
                     cmd.Parameters.AddWithValue("@name", newname);
                     cmd.Parameters.AddWithValue("@xml", txtXml.Text);
                     cmd.ExecuteNonQuery();
