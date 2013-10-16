@@ -221,7 +221,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     catch (Exception exception)
                     {
                         exception = exception.InnerException ?? exception;
-                        return new TenroxTransactionResult(uniqueId, spId, null, TransactionType.INSERT, exception.Message);
+                        return new TenroxTransactionResult(uniqueId, spId, null, TransactionType.INSERT,
+                            exception.Message);
                     }
                 })));
 
@@ -240,7 +241,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     catch (Exception exception)
                     {
                         exception = exception.InnerException ?? exception;
-                        return new TenroxTransactionResult(uniqueId, spId, null, TransactionType.UPDATE, exception.Message);
+                        return new TenroxTransactionResult(uniqueId, spId, null, TransactionType.UPDATE,
+                            exception.Message);
                     }
                 })));
 
@@ -251,7 +253,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
         }
 
-        // Protected Methods (5) 
+        // Protected Methods (6) 
 
         protected abstract void BuildObjects(DataTable items, object client, List<string> columns,
             List<object> newObjects, List<object> existingObjects);
@@ -354,6 +356,23 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             return 0;
         }
 
+        protected object TranslateToken(UserToken token, Type tokenType)
+        {
+            object newToken = Activator.CreateInstance(tokenType);
+
+            foreach (PropertyInfo property in typeof (UserToken).GetProperties())
+            {
+                newToken.GetType().GetProperty(property.Name).SetValue(newToken, property.GetValue(token));
+            }
+
+            foreach (FieldInfo field in typeof (UserToken).GetFields())
+            {
+                newToken.GetType().GetField(field.Name).SetValue(newToken, field.GetValue(token));
+            }
+
+            return newToken;
+        }
+
         protected void UpdateBinding(int itemId, Guid integrationId)
         {
             if (ObjectId == -1) return;
@@ -379,7 +398,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             }
         }
 
-        // Private Methods (5) 
+        // Private Methods (4) 
 
         private void DeleteBinding(int itemId, Guid integrationId)
         {
@@ -414,27 +433,9 @@ namespace UplandIntegrations.Tenrox.Infrastructure
             return propertyType;
         }
 
-
         private object SaveObject(IDisposable client, object obj)
         {
             return _clientType.GetMethod("Save").Invoke(client, new[] {Token, obj});
-        }
-
-        protected object TranslateToken(UserToken token, Type tokenType)
-        {
-            object newToken = Activator.CreateInstance(tokenType);
-
-            foreach (PropertyInfo property in typeof (UserToken).GetProperties())
-            {
-                newToken.GetType().GetProperty(property.Name).SetValue(newToken, property.GetValue(token));
-            }
-
-            foreach (FieldInfo field in typeof (UserToken).GetFields())
-            {
-                newToken.GetType().GetField(field.Name).SetValue(newToken, field.GetValue(token));
-            }
-
-            return newToken;
         }
 
         #endregion Methods 

@@ -48,6 +48,58 @@ namespace UplandIntegrations.Tenrox.Managers
 
         #endregion Constructors 
 
+        #region Methods (1) 
+
+        // Private Methods (1) 
+
+        private void AddTaskAssignments(IEnumerable<TenroxTransactionResult> upsertItems,
+            EnumerableRowCollection<DataRow> rows)
+        {
+            using (var client = new AssignmentsClient(_binding,
+                new EndpointAddress(_endpointAddress + "sdk/assignments.svc")))
+            {
+                var token = (TenroxAssignmentService.UserToken) TranslateToken(_authToken,
+                    typeof (TenroxAssignmentService.UserToken));
+
+                foreach (TenroxTransactionResult result in upsertItems.Where(result => result.Success))
+                {
+                    TenroxTransactionResult upsertResult = result;
+
+                    DataRow row = (from r in rows
+                        where r["SPID"].ToString().Equals(upsertResult.SpId.ToString(CultureInfo.InvariantCulture))
+                        select r).FirstOrDefault();
+
+                    if (row == null) continue;
+
+                    foreach (Assignment assignment in client.QueryBy(token, "taskid = @0", new object[] {result.Id}))
+                    {
+                        try
+                        {
+                            client.Delete(token, assignment.UniqueId);
+                        }
+                        catch { }
+                    }
+
+                    var task = (Task) result.TxObject;
+
+                    foreach (int userId in row["Assignment"].ToString().Split(',')
+                        .Select(TranslateEmailToUserId).Where(userId => userId != 0))
+                    {
+                        Assignment assignment = client.CreateNew(token);
+
+                        assignment.TaskId = result.Id;
+                        assignment.UserId = userId;
+                        if (task.StartDate != null) assignment.StartDate = task.StartDate.Value;
+                        if (task.EndDate != null) assignment.EndDate = task.EndDate.Value;
+
+                        client.Save(token, assignment);
+                    }
+                }
+            }
+        }
+
+        #endregion Methods 
+
         #region Overrides of ObjectManager
 
         protected override void BuildObjects(DataTable items, object client, List<string> columns,
@@ -109,50 +161,5 @@ namespace UplandIntegrations.Tenrox.Managers
         }
 
         #endregion
-
-        private void AddTaskAssignments(IEnumerable<TenroxTransactionResult> upsertItems, EnumerableRowCollection<DataRow> rows)
-        {
-            using (var client = new AssignmentsClient(_binding,
-                    new EndpointAddress(_endpointAddress + "sdk/assignments.svc")))
-            {
-                var token = (TenroxAssignmentService.UserToken) TranslateToken(_authToken,
-                    typeof(TenroxAssignmentService.UserToken));
-
-                foreach (TenroxTransactionResult result in upsertItems.Where(result => result.Success))
-                {
-                    TenroxTransactionResult upsertResult = result;
-
-                    DataRow row = (from r in rows
-                                   where r["SPID"].ToString().Equals(upsertResult.SpId.ToString(CultureInfo.InvariantCulture))
-                                   select r).FirstOrDefault();
-
-                    if (row == null) continue;
-
-                    foreach (Assignment assignment in client.QueryBy(token, "taskid = @0", new object[] { result.Id }))
-                    {
-                        try
-                        {
-                            client.Delete(token, assignment.UniqueId);
-                        }
-                        catch { }
-                    }
-
-                    var task = (Task) result.TxObject;
-
-                    foreach (int userId in row["Assignment"].ToString().Split(',')
-                        .Select(TranslateEmailToUserId).Where(userId => userId != 0))
-                    {
-                        Assignment assignment = client.CreateNew(token);
-
-                        assignment.TaskId = result.Id;
-                        assignment.UserId = userId;
-                        if (task.StartDate != null) assignment.StartDate = task.StartDate.Value;
-                        if (task.EndDate != null) assignment.EndDate = task.EndDate.Value;
-
-                        client.Save(token, assignment);
-                    }
-                }
-            }
-        }
     }
 }

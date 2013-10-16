@@ -18,11 +18,13 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         #endregion Constructors 
 
-        #region Properties (4) 
+        #region Properties (6) 
 
         public string Error { get; private set; }
 
         public int Id { get; private set; }
+
+        public int SpId { get; private set; }
 
         public bool Success
         {
@@ -30,7 +32,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         }
 
         public TransactionType TransactionType { get; private set; }
-        public int SpId { get; private set; }
+
         public object TxObject { get; private set; }
 
         #endregion Properties 
