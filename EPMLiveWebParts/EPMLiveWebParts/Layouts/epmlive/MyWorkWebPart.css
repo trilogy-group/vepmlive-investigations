@@ -170,7 +170,8 @@ input#Ribbon_MyWork_Actions_Search, input#MWG_Search, .MWG_SearchClose, .MWG_Sea
 #MWG_PivotMenu_wrap {
     display: none;
     padding: 0 !important;
-    position: relative;
+    position: absolute;
+    z-index: 500;
 }
 
 #MWG_PivotMenu_wrap:hover { color: #666666; }

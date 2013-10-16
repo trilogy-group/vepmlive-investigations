@@ -2511,6 +2511,16 @@ var MyWorkGrid = {
                     } else {
                         $('.mwg-mi-clear').hide();
                     }
+                    
+                    var offset = $('#MWG_Pivot_Selector').offset().left;
+
+                    if ($('#epm-nav-sub').is(':visible')) {
+                        offset -= 230;
+                    } else {
+                        offset -= 50;
+                    }
+
+                    menu.css('left', offset);
 
                     menu.show();
                 };
