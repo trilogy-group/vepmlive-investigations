@@ -30,6 +30,12 @@ var EPM;
 
                     var offset = $el.offset();
 
+                    var leftOffset = 50;
+
+                    if ($('#epm-nav-sub').is(':visible')) {
+                        leftOffset = 230;
+                    }
+
                     var height;
                     var width;
 
@@ -38,7 +44,7 @@ var EPM;
                         width = $content.width();
 
                         if (element.coverRibbon) {
-                            offset = { top: 50, left: 230 };
+                            offset = { top: 50, left: leftOffset };
                         }
                     } else {
                         height = element.height || $el.height();
@@ -56,7 +62,7 @@ var EPM;
                         $loader.width(width);
                     } else {
                         $loader.css("height", $(window).height() - 50);
-                        $loader.css("width", $(window).width() - 230);
+                        $loader.css("width", $(window).width() - leftOffset);
                     }
 
                     $loader.hide();
@@ -80,7 +86,7 @@ var EPM;
 
                     setTimeout(function () {
                         _this.showLoading(element);
-                    }, 2000);
+                    }, 1500);
                 }
             };
 
@@ -118,9 +124,9 @@ var EPM;
                                 element.el.css("visibility", "visible").hide();
                             }
 
-                            $ribbon.fadeIn(1000);
-                            $content.fadeIn(1000);
-                            element.el.fadeIn(1000);
+                            $ribbon.fadeIn(500);
+                            $content.fadeIn(500);
+                            element.el.fadeIn(500);
                         } else {
                             element.el.hide();
                             element.loader.fadeOut(300).remove();
@@ -129,7 +135,7 @@ var EPM;
                                 element.el.css("visibility", "visible").hide();
                             }
 
-                            element.el.fadeIn(1000);
+                            element.el.fadeIn(500);
                         }
                         this._elements.splice(index, 1);
                     }
@@ -153,7 +159,8 @@ var EPM;
 
             Loader.prototype.showLoading = function (element) {
                 if (this.elementIsRegistered(element)) {
-                    element.loader.find('td').text('Loding...');
+                    var offset = element.loader.height() / -4;
+                    element.loader.find('td').append($('<span style="position:relative;top:' + offset + 'px">Loading...</span>'));
                 }
             };
             return Loader;
