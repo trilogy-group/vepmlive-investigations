@@ -698,6 +698,8 @@ namespace EPMLiveCore.API
             bool uniquePermission = bool.Parse(_xmlDataMgr.GetPropVal("UniquePermission"));
             bool inheritTopLink = false;
 
+            
+
             string err = string.Empty;
             if (parentWeb.DoesUserHavePermissions(siteOwnerName, SPBasePermissions.ManageSubwebs))
             {
@@ -712,8 +714,7 @@ namespace EPMLiveCore.API
                     if (uniquePermission)
                     {
                         if (!isStandAlone)
-                        {
-                            //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
+                        {   
                             err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true,
                                 inheritTopLink,
                                 cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
@@ -784,7 +785,7 @@ namespace EPMLiveCore.API
             }
             else
             {
-                throw new Exception("You do have have permission to create subsite on the parent web selected.");
+                err = "1:You do not have have permission to create subsite on the parent web selected.";
             }
 
             // try to recreate if error says we need to activate features
@@ -902,7 +903,8 @@ namespace EPMLiveCore.API
                 {
                     // err is in this 1:string format
                     // that's why we substring(2)
-                    throw new Exception(err.Substring(2));
+                    //throw new Exception(err.Substring(2));
+                    NotifyWsGeneralError(web, err.Substring(2));
                 }
             }
             else
@@ -951,6 +953,14 @@ namespace EPMLiveCore.API
             }
         }
 
+        public void NotifyWsGeneralError(SPWeb cWeb, string error)
+        {
+            SPUser originalUser = cWeb.AllUsers.GetByID(CreatorId);
+            APIEmail.QueueItemMessage(7, true, BuildErrorEmailData(_createdWebTitle, error),
+                new[] { originalUser.ID.ToString() }, null, false, true, cWeb, originalUser, true);
+
+        }
+
         public void AddToFavorites()
         {
             if (_isStandAlone)
@@ -977,6 +987,16 @@ namespace EPMLiveCore.API
             var result = new Hashtable();
             result.Add("ItemUrl", url);
             result.Add("Workspace_Name", wsName);
+            return result;
+        }
+
+        private Hashtable BuildErrorEmailData(string wsName, string error)
+        {
+            //{ItemUrl}
+            //{Workspace_Name}
+            var result = new Hashtable();
+            result.Add("Workspace_Name", wsName);
+            result.Add("CreateWorkspace_Error", error);
             return result;
         }
 
@@ -1170,7 +1190,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw e;
+                NotifyWsGeneralError(web, e.Message);
             }
 
             return new OnlineWorkspaceInfo(_xmlResult.ToString());
@@ -1280,7 +1300,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw e;
+                NotifyWsGeneralError(web, e.Message);
             }
 
             return new DownloadedWorkspaceInfo(_xmlResult.ToString());

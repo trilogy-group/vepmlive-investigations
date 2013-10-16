@@ -218,31 +218,6 @@ namespace EPMLiveCore.API
                     s = s.Replace(sRemove, "");
                 }
 
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                {
-                    using (var site = new SPSite(SiteId))
-                    {
-                        using (var web = site.OpenWeb(WebId))
-                        {
-                            SPList list = null;
-                            try
-                            {
-                                list = web.Lists[ListId];
-                            }catch{}
-
-
-                            if (list is SPDocumentLibrary)
-                            {
-                                var item = list.GetItemById(ItemId);
-                                if (item != null)
-                                {
-                                    s = web.Url + "/" + item.Url;
-                                }
-                            }
-                        }
-                    }
-                });
-
                 if (!string.IsNullOrEmpty(s))
                 {
                     result = Uri.UnescapeDataString(s);
