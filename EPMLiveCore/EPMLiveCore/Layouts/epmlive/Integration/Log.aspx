@@ -33,7 +33,12 @@
     <asp:ListItem Value="2" Text="Events"></asp:ListItem>
     <asp:ListItem Value="10" Text="Warnings"></asp:ListItem>
     <asp:ListItem Value="20" Text="Errors" Selected="True"></asp:ListItem>
-    </asp:DropDownList> &nbsp;<a href="IntegrationList.aspx?LIST=<%=Request["LIST"] %>">Back To Integrations</a>
+    </asp:DropDownList> &nbsp;
+    <%if(Request["ret"] == "Manage"){ %>
+    <a href="Manage.aspx">Back To Integrations</a>
+    <%}else{ %>
+    <a href="IntegrationList.aspx?LIST=<%=Request["LIST"] %>">Back To Integrations</a>
+    <%} %>
     <br /><br />
     <asp:GridView ID="gvLog" runat="server" AutoGenerateColumns="false" HeaderStyle-HorizontalAlign="Left" RowStyle-BorderStyle="None" RowStyle-CssClass="logrow" BorderStyle="None">
         <Columns>
