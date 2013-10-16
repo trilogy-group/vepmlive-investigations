@@ -130,52 +130,49 @@ namespace UplandIntegrations.Tenrox.Services
         {
             try
             {
-                if (objectName.Trim().ToLower().Equals("task"))
+                if (!objectName.Trim().ToLower().Equals("task")) return;
+                if (!columns.Contains("TimesheetHours") && !columns.Contains("TimesheetBillableHours")) return;
+
+                using (var client = new ExecuteStoredProcedureClient(_binding,
+                    new EndpointAddress(_svcUrl + "/sdk/executestoredprocedure.svc")))
                 {
-                    if (columns.Contains("TimesheetHours") || columns.Contains("TimesheetBillableHours"))
+                    var token =
+                        (TenroxDataService.UserToken)
+                            TranslateToken(_token, typeof (TenroxDataService.UserToken));
+
+                    DataTable dataTable = client.RunStoredProcedure(token, "TIMEQBYTASKFORUPDTS", null);
+
+                    EnumerableRowCollection<DataRow> rows = dataTable.AsEnumerable();
+
+                    decimal tsHours = -1;
+                    decimal tsBillableHours = -1;
+
+                    foreach (
+                        DataRow dataRow in from r in rows where r["TASKUID"].ToString().Equals(itemId) select r)
                     {
-                        using (var client = new ExecuteStoredProcedureClient(_binding,
-                            new EndpointAddress(_svcUrl + "/sdk/executestoredprocedure.svc")))
+                        decimal tsTime;
+                        if (decimal.TryParse(dataRow["TOTALTIME"].ToString(), out tsTime))
                         {
-                            var token =
-                                (TenroxDataService.UserToken)
-                                    TranslateToken(_token, typeof (TenroxDataService.UserToken));
-
-                            DataTable dataTable = client.RunStoredProcedure(token, "TIMEQBYTASKFORUPDTS", null);
-
-                            EnumerableRowCollection<DataRow> rows = dataTable.AsEnumerable();
-
-                            decimal tsHours = -1;
-                            decimal tsBillableHours = -1;
-
-                            foreach (
-                                DataRow dataRow in from r in rows where r["TASKUID"].ToString().Equals(itemId) select r)
-                            {
-                                decimal tsTime;
-                                if (decimal.TryParse(dataRow["TOTALTIME"].ToString(), out tsTime))
-                                {
-                                    if (tsHours == -1) tsHours = 0;
-                                    tsHours += tsTime;
-                                }
-
-                                decimal tsBillableTime;
-                                if (decimal.TryParse(dataRow["BILLABLETIME"].ToString(), out tsBillableTime))
-                                {
-                                    if (tsBillableHours == -1) tsBillableHours = 0;
-                                    tsBillableHours += tsBillableTime;
-                                }
-                            }
-
-                            if (tsHours > -1)
-                            {
-                                row["TimesheetHours"] = tsHours;
-                            }
-
-                            if (tsBillableHours > -1)
-                            {
-                                row["TimesheetBillableHours"] = tsBillableHours;
-                            }
+                            if (tsHours == -1) tsHours = 0;
+                            tsHours += tsTime;
                         }
+
+                        decimal tsBillableTime;
+                        if (decimal.TryParse(dataRow["BILLABLETIME"].ToString(), out tsBillableTime))
+                        {
+                            if (tsBillableHours == -1) tsBillableHours = 0;
+                            tsBillableHours += tsBillableTime;
+                        }
+                    }
+
+                    if (tsHours > -1)
+                    {
+                        row["TimesheetHours"] = tsHours;
+                    }
+
+                    if (tsBillableHours > -1)
+                    {
+                        row["TimesheetBillableHours"] = tsBillableHours;
                     }
                 }
             }
