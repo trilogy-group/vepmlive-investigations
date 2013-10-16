@@ -444,3 +444,33 @@ begin
 </table>  
 ' where emailid=6
 end
+if not exists (select emailid from EMAILTEMPLATES where emailid = 7)
+begin
+    INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (7,'Workspace Creation Failure','There was an issue creating workspace: {Workspace_Name}','<table width="100%" cellspacing="0" cellpadding="0">  
+            <tbody><tr>  
+                <td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">There was an issue creating workspace "{Workspace_Name}". The following errors occurred:
+                </td>  
+            </tr>  
+            <tr>  
+                <td style="font-size:14px;color:#666666;font-family:Segoe UI,Helvetica,Arial;padding-top:10px;">
+                    {CreateWorkspace_Error}
+                </td>  
+            </tr>                                   
+</tbody></table>
+')
+end
+else
+begin
+    UPDATE EMAILTEMPLATES SET subject='There was an issue creating workspace: {Workspace_Name}', body='<table width="100%" cellspacing="0" cellpadding="0">  
+            <tbody><tr>  
+                <td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">There was an issue creating workspace "{Workspace_Name}". The following errors occurred:
+                </td>  
+            </tr>  
+            <tr>  
+                <td style="font-size:14px;color:#666666;font-family:Segoe UI,Helvetica,Arial;padding-top:10px;">
+                    {CreateWorkspace_Error}
+                </td>  
+            </tr>                                   
+</tbody></table>
+' where emailid=7
+end
