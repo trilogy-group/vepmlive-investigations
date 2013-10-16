@@ -196,7 +196,7 @@ html, body {
     };
     var toolbar = new Toolbar(toobarData);
     var toolbarVersions = new Toolbar(toolbarVersionsData);
-    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1 = window["<%=dgrid1.UID%>"];
     var dgrid1_selectedRow = 0;
     var dgridVersions_selectedRow = 0;
     var versionid = 0;
@@ -238,28 +238,28 @@ html, body {
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
-//        ResizeDialog(idWindow, idAttachObj);
-//        window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
+        ResizeDialog(idWindow, idAttachObj);
+        window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
         return dlg;
     };
-//    function ResizeDialog(idWindow, idAttachObj) {
-//        var obj = document.getElementById(idAttachObj);
-//        var width = GetMaxWidth(obj) + 20;
-//        var height = obj.offsetHeight;
-//        var win = thiswins.window(idWindow);
-//        win.setDimension(width + 13, height + 110);
-//    };
-//    function GetMaxWidth(obj) {
-//        var width = 0;
-//        var childDivs = obj.childNodes;
-//        for( i=0; i< childDivs.length; i++ )
-//        {
-//            var childDiv = childDivs[i];
-//            if (childDiv.offsetWidth > width)
-//                width = childDiv.offsetWidth;
-//        }
-//        return width;
-//    };
+    function ResizeDialog(idWindow, idAttachObj) {
+        var obj = document.getElementById(idAttachObj);
+        var width = GetMaxWidth(obj);
+        var height = obj.offsetHeight;
+        var win = thiswins.window(idWindow);
+        win.setDimension(width + 50, height + 110);
+    };
+    function GetMaxWidth(obj) {
+        var width = 0;
+        var childDivs = obj.childNodes;
+        for( i=0; i< childDivs.length; i++ )
+        {
+            var childDiv = childDivs[i];
+            if (childDiv.offsetWidth > width)
+                width = childDiv.offsetWidth;
+        }
+        return width;
+    };
     function CloseDialog (idWindow) {
         switch (idWindow) {
             case 'winModelDlg':
