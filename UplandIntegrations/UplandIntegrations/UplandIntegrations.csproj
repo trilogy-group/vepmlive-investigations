@@ -95,6 +95,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Service References\TenroxDataService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Service References\TenroxIntegrationService\Reference.cs" />
     <Compile Include="Web References\IntegrationAPI\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -256,6 +261,29 @@
     </None>
     <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByUniqueIdSerializedResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxDataService\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\service.wsdl" />
+    <None Include="Service References\TenroxDataService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\System.Data.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\Tenrox.Application.SDK.wsdl" />
+    <None Include="Service References\TenroxDataService\Tenrox.Application.SDK.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\Tenrox.Server.Framework.WebServices.FaultContracts.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\Tenrox.Shared.Utilities.xsd">
+      <SubType>Designer</SubType>
     </None>
     <None Include="Service References\TenroxIntegrationService\Integrations.wsdl" />
     <None Include="Service References\TenroxIntegrationService\Integrations.xsd">
@@ -708,6 +736,12 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Service References\TenroxDataService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxDataService\configuration.svcinfo" />
+    <None Include="Service References\TenroxDataService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="Web References\IntegrationAPI\integration.disco" />
     <None Include="Service References\TenroxAuthService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
@@ -738,6 +772,7 @@
     <WCFMetadataStorage Include="Service References\TenroxAssignmentService\" />
     <WCFMetadataStorage Include="Service References\TenroxAuthService\" />
     <WCFMetadataStorage Include="Service References\TenroxClientService\" />
+    <WCFMetadataStorage Include="Service References\TenroxDataService\" />
     <WCFMetadataStorage Include="Service References\TenroxIntegrationService\" />
     <WCFMetadataStorage Include="Service References\TenroxProjectService\" />
     <WCFMetadataStorage Include="Service References\TenroxTaskService\" />

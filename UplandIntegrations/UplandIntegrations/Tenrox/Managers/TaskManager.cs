@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.ServiceModel;
+using EPMLiveIntegration;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxAssignmentService;
 using UplandIntegrations.TenroxTaskService;
@@ -101,6 +102,28 @@ namespace UplandIntegrations.Tenrox.Managers
         #endregion Methods 
 
         #region Overrides of ObjectManager
+
+        public override List<ColumnProperty> GetColumns()
+        {
+            List<ColumnProperty> columnProperties = base.GetColumns();
+
+            columnProperties.Add(new ColumnProperty
+            {
+                ColumnName = "TimesheetHours",
+                DefaultListColumn = "TimesheetHours",
+                DiplayName = "Timesheet Hours",
+                type = typeof (decimal)
+            });
+
+            columnProperties.Add(new ColumnProperty
+            {
+                ColumnName = "TimesheetBillableHours",
+                DiplayName = "Timesheet Billable Hours",
+                type = typeof (decimal)
+            });
+
+            return columnProperties;
+        }
 
         protected override void BuildObjects(DataTable items, object client, List<string> columns,
             List<object> newTasks, List<object> existingTasks)

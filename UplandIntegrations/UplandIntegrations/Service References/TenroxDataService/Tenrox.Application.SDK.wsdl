@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="Tenrox.Application.SDK" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="Tenrox.Application.SDK" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="Tenrox.Application.SDK/Imports">
+      <xsd:import namespace="Tenrox.Application.SDK" />
+      <xsd:import namespace="http://Tenrox.Server.Framework.WebServices.FaultContracts" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/System.Data" />
+      <xsd:import />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedure_InputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedure" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedure_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedure_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q1:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureExecute_InputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureExecute" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureExecute_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureExecuteResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureExecute_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q2="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q2:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureNonQuery_InputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureNonQuery" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureNonQuery_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureNonQueryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureNonQuery_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q3:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureScalar_InputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureScalar" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureScalar_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureScalarResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureScalar_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q4:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureDataSet_InputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureDataSet" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureDataSet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureDataSetResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureDataSet_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q5="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q5:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureSerialized_InputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureSerialized" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureSerialized_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RunStoredProcedureSerializedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_RunStoredProcedureSerialized_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q6="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q6:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_ProcessErrorMessages_InputMessage">
+    <wsdl:part name="parameters" element="tns:ProcessErrorMessages" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_ProcessErrorMessages_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ProcessErrorMessagesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExecuteStoredProcedure_ProcessErrorMessages_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q7:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:portType name="IExecuteStoredProcedure">
+    <wsdl:operation name="RunStoredProcedure">
+      <wsdl:input wsaw:Action="RunStoredProcedure" message="tns:IExecuteStoredProcedure_RunStoredProcedure_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureResponse" message="tns:IExecuteStoredProcedure_RunStoredProcedure_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IExecuteStoredProcedure_RunStoredProcedure_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RunStoredProcedureExecute">
+      <wsdl:input wsaw:Action="RunStoredProcedureExecute" message="tns:IExecuteStoredProcedure_RunStoredProcedureExecute_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureExecuteResponse" message="tns:IExecuteStoredProcedure_RunStoredProcedureExecute_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureExecuteTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IExecuteStoredProcedure_RunStoredProcedureExecute_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RunStoredProcedureNonQuery">
+      <wsdl:input wsaw:Action="RunStoredProcedureNonQuery" message="tns:IExecuteStoredProcedure_RunStoredProcedureNonQuery_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureNonQueryResponse" message="tns:IExecuteStoredProcedure_RunStoredProcedureNonQuery_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureNonQueryTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IExecuteStoredProcedure_RunStoredProcedureNonQuery_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RunStoredProcedureScalar">
+      <wsdl:input wsaw:Action="RunStoredProcedureScalar" message="tns:IExecuteStoredProcedure_RunStoredProcedureScalar_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureScalarResponse" message="tns:IExecuteStoredProcedure_RunStoredProcedureScalar_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureScalarTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IExecuteStoredProcedure_RunStoredProcedureScalar_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RunStoredProcedureDataSet">
+      <wsdl:input wsaw:Action="RunStoredProcedureDataSet" message="tns:IExecuteStoredProcedure_RunStoredProcedureDataSet_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureDataSetResponse" message="tns:IExecuteStoredProcedure_RunStoredProcedureDataSet_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureDataSetTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IExecuteStoredProcedure_RunStoredProcedureDataSet_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RunStoredProcedureSerialized">
+      <wsdl:input wsaw:Action="RunStoredProcedureSerialized" message="tns:IExecuteStoredProcedure_RunStoredProcedureSerialized_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureSerializedResponse" message="tns:IExecuteStoredProcedure_RunStoredProcedureSerialized_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/RunStoredProcedureSerializedTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IExecuteStoredProcedure_RunStoredProcedureSerialized_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ProcessErrorMessages">
+      <wsdl:input wsaw:Action="ProcessErrorMessages" message="tns:IExecuteStoredProcedure_ProcessErrorMessages_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/ProcessErrorMessagesResponse" message="tns:IExecuteStoredProcedure_ProcessErrorMessages_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IExecuteStoredProcedure/ProcessErrorMessagesTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IExecuteStoredProcedure_ProcessErrorMessages_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

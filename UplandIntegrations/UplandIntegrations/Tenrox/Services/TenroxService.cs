@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Security;
 using System.ServiceModel;
 using EPMLiveIntegration;
 using UplandIntegrations.Tenrox.Infrastructure;
 using UplandIntegrations.TenroxAuthService;
+using UplandIntegrations.TenroxDataService;
 using UplandIntegrations.TenroxProjectService;
 using UserToken = UplandIntegrations.TenroxAuthService.UserToken;
 
@@ -43,7 +45,7 @@ namespace UplandIntegrations.Tenrox.Services
 
         #endregion Constructors 
 
-        #region Methods (7) 
+        #region Methods (10) 
 
         // Public Methods (4) 
 
@@ -93,23 +95,8 @@ namespace UplandIntegrations.Tenrox.Services
                     catch { }
                 }
 
-                try
-                {
-                    if (objectName.Trim().ToLower().Equals("project"))
-                    {
-                        int managerId = ((Project) txObject.Item).ManagerId;
-
-                        if (managerId == 0)
-                        {
-                            row["ManagerId"] = string.Empty;
-                        }
-                        else
-                        {
-                            row["ManagerId"] = objectManager.TranslateIdToUserEmail(managerId);
-                        }
-                    }
-                }
-                catch { }
+                PopulateUserFields(objectName, txObject, row, objectManager);
+                GetTimesheetHours(objectName, itemId, columns, row);
 
                 items.Rows.Add(row);
             }
@@ -120,7 +107,7 @@ namespace UplandIntegrations.Tenrox.Services
             return GetManager(objectName).UpsertItems(items, integrationId);
         }
 
-        // Private Methods (3) 
+        // Private Methods (6) 
 
         private static IEnumerable<int> GetIds(string itemId)
         {
@@ -139,9 +126,111 @@ namespace UplandIntegrations.Tenrox.Services
             return ObjectManagerFactory.GetManager(objectName, _binding, _svcUrl, _token);
         }
 
+        private void GetTimesheetHours(string objectName, string itemId, List<string> columns, DataRow row)
+        {
+            try
+            {
+                if (objectName.Trim().ToLower().Equals("task"))
+                {
+                    if (columns.Contains("TimesheetHours") || columns.Contains("TimesheetBillableHours"))
+                    {
+                        using (var client = new ExecuteStoredProcedureClient(_binding,
+                            new EndpointAddress(_svcUrl + "/sdk/executestoredprocedure.svc")))
+                        {
+                            var token =
+                                (TenroxDataService.UserToken)
+                                    TranslateToken(_token, typeof (TenroxDataService.UserToken));
+
+                            DataTable dataTable = client.RunStoredProcedure(token, "TIMEQBYTASKFORUPDTS", null);
+
+                            EnumerableRowCollection<DataRow> rows = dataTable.AsEnumerable();
+
+                            decimal tsHours = -1;
+                            decimal tsBillableHours = -1;
+
+                            foreach (
+                                DataRow dataRow in from r in rows where r["TASKUID"].ToString().Equals(itemId) select r)
+                            {
+                                decimal tsTime;
+                                if (decimal.TryParse(dataRow["TOTALTIME"].ToString(), out tsTime))
+                                {
+                                    if (tsHours == -1) tsHours = 0;
+                                    tsHours += tsTime;
+                                }
+
+                                decimal tsBillableTime;
+                                if (decimal.TryParse(dataRow["BILLABLETIME"].ToString(), out tsBillableTime))
+                                {
+                                    if (tsBillableHours == -1) tsBillableHours = 0;
+                                    tsBillableHours += tsBillableTime;
+                                }
+                            }
+
+                            if (tsHours > -1)
+                            {
+                                row["TimesheetHours"] = tsHours;
+                            }
+
+                            if (tsBillableHours > -1)
+                            {
+                                row["TimesheetBillableHours"] = tsBillableHours;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
         private static object GetValue(object item, string property)
         {
             return item.GetType().GetProperty(property).GetValue(item);
+        }
+
+        private static void PopulateUserFields(string objectName, TenroxObject txObject, DataRow row,
+            IObjectManager objectManager)
+        {
+            try
+            {
+                if (!objectName.Trim().ToLower().Equals("project")) return;
+
+                int managerId = ((Project) txObject.Item).ManagerId;
+
+                if (managerId == 0)
+                {
+                    row["ManagerId"] = string.Empty;
+                }
+                else
+                {
+                    row["ManagerId"] = objectManager.TranslateIdToUserEmail(managerId);
+                }
+            }
+            catch { }
+        }
+
+        private object TranslateToken(UserToken token, Type tokenType)
+        {
+            object newToken = Activator.CreateInstance(tokenType);
+
+            foreach (PropertyInfo property in typeof (UserToken).GetProperties())
+            {
+                try
+                {
+                    newToken.GetType().GetProperty(property.Name).SetValue(newToken, property.GetValue(token));
+                }
+                catch { }
+            }
+
+            foreach (FieldInfo field in typeof (UserToken).GetFields())
+            {
+                try
+                {
+                    newToken.GetType().GetField(field.Name).SetValue(newToken, field.GetValue(token));
+                }
+                catch { }
+            }
+
+            return newToken;
         }
 
         #endregion Methods 
