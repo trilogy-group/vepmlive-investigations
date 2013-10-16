@@ -2982,7 +2982,7 @@ var MyWorkGrid = {
                         setTabStyle();
                     } catch (ex) {
                     }
-                }, 2000);
+                }, 750);
             };
 
             var pm = SP.Ribbon.PageManager.get_instance();
