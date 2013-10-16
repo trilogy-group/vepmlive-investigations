@@ -45,12 +45,15 @@
             }, !window.isIE8);
             
             $(function () {
-                var walkme = document.createElement('script');
-                walkme.type = 'text/javascript';
-                walkme.async = true;
-                walkme.src = '<%= Scheme %>://d3b3ehuo35wzeh.cloudfront.net/users/<%= WalkMeId %>/walkme_<%= WalkMeId %>_https.js';
-                var s = document.getElementsByTagName('script')[0];
-                s.parentNode.insertBefore(walkme, s);
+                var walkmeId = '<%= WalkMeId %>';
+                if (walkmeId){
+                    var walkme = document.createElement('script');
+                    walkme.type = 'text/javascript';
+                    walkme.async = true;
+                    walkme.src = '<%= Scheme %>://d3b3ehuo35wzeh.cloudfront.net/users/<%= WalkMeId %>/walkme_<%= WalkMeId %>_https.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(walkme, s);
+                };
             });
         }
 
