@@ -21,7 +21,7 @@
     <EPMLive:MyWorkWebPart runat="server" __MarkupType="xmlmarkup" WebPart="true" __WebPartId="{B130AD40-A4E8-408D-B59F-E1FB30A36044}" >
         <WebPart xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/WebPart/v2">
             <Title>My Work</Title>
-            <FrameType>Default</FrameType>
+            <FrameType>None</FrameType>
             <Description />
             <IsIncluded>true</IsIncluded>
             <ZoneID>Header</ZoneID>
@@ -58,7 +58,7 @@
             <PerformanceMode xmlns="MyWork">false</PerformanceMode>
             <SelectedFields xmlns="MyWork" />
             <SelectedLists xmlns="MyWork" />
-            <ShowToolbar xmlns="MyWork">false</ShowToolbar>
+            <ShowToolbar xmlns="MyWork">true</ShowToolbar>
             <UseCentralizedSettings xmlns="MyWork">true</UseCentralizedSettings>
         </WebPart>
     </EPMLive:MyWorkWebPart>
