@@ -93,19 +93,23 @@ namespace UplandIntegrations.Tenrox.Services
                     catch { }
                 }
 
-                if (objectName.Trim().ToLower().Equals("project"))
+                try
                 {
-                    int managerId = ((Project) txObject.Item).ManagerId;
+                    if (objectName.Trim().ToLower().Equals("project"))
+                    {
+                        int managerId = ((Project) txObject.Item).ManagerId;
 
-                    if (managerId == 0)
-                    {
-                        row["ManagerId"] = string.Empty;
-                    }
-                    else
-                    {
-                        row["ManagerId"] = objectManager.TranslateIdToUserEmail(managerId);
+                        if (managerId == 0)
+                        {
+                            row["ManagerId"] = string.Empty;
+                        }
+                        else
+                        {
+                            row["ManagerId"] = objectManager.TranslateIdToUserEmail(managerId);
+                        }
                     }
                 }
+                catch { }
 
                 items.Rows.Add(row);
             }
