@@ -477,7 +477,58 @@
                 });
             }
 
+            var fixed = true;
+            var path = window.location.pathname;
+
+            if (path.indexOf("Resource Pool.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("MyWork.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("workplanner.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("MyTimesheet.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("IsDlg")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("NewForm.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("DispForm.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("EditForm.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("Resource%20Pool.aspx")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("My%20Timesheet.aspx")> -1) {
+	            fixed = false;
+            }
+
+
+            if(fixed == true) {
+       
+                // This function extends the original from INIT.JS
+                var FixRibbonAndWorkspaceDimensions = (function () {
+                  var original = FixRibbonAndWorkspaceDimensions;
+                  return function () {
+                    
+                    // Call the original function
+                    original();
+                    
+                    // Remove the inline style attribute for the workspace div
+                    $("#s4-ribbonrow").css("height","35px");
+                    
+                  };
+                })();
+            }
+
         </SharePoint:ScriptBlock>   
-        <span style="display: none;" id="walkMe2013"></span>
     </body>
 </SharePoint:SPHtmlTag>
