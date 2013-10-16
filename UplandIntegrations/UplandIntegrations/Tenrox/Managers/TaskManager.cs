@@ -1,36 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.ServiceModel.Channels;
+using System.Globalization;
+using System.Linq;
+using System.ServiceModel;
 using UplandIntegrations.Tenrox.Infrastructure;
+using UplandIntegrations.TenroxAssignmentService;
 using UplandIntegrations.TenroxTaskService;
+using Assignment = UplandIntegrations.TenroxAssignmentService.Assignment;
+using Task = UplandIntegrations.TenroxTaskService.Task;
+using UserToken = UplandIntegrations.TenroxAuthService.UserToken;
 
 namespace UplandIntegrations.Tenrox.Managers
 {
     internal class TaskManager : ObjectManager
     {
-        #region Fields (1) 
+        #region Fields (4) 
 
-        private readonly UserToken _token;
+        private readonly UserToken _authToken;
+        private readonly BasicHttpBinding _binding;
+        private readonly string _endpointAddress;
+        private readonly TenroxTaskService.UserToken _token;
 
         #endregion Fields 
 
         #region Constructors (1) 
 
-        public TaskManager(Binding binding, string endpointAddress, TenroxAuthService.UserToken token)
+        public TaskManager(BasicHttpBinding binding, string endpointAddress, UserToken token)
             : base(binding, endpointAddress, "tasks.svc", token,
-                typeof (Task), typeof (UserToken), typeof (TasksClient))
+                typeof (Task), typeof (TenroxTaskService.UserToken), typeof (TasksClient))
         {
+            _binding = binding;
+            _endpointAddress = endpointAddress;
+            _authToken = token;
+
             MappingDict = new Dictionary<string, string>
             {
                 {"Name", "Title"},
                 {"StartDate", "Start"},
-                {"EndDate", "Finish"}
+                {"DueDate", "Finish"}
             };
 
             ObjectId = 10;
 
-            _token = (UserToken) Token;
+            _token = (TenroxTaskService.UserToken) Token;
         }
 
         #endregion Constructors 
@@ -65,6 +78,7 @@ namespace UplandIntegrations.Tenrox.Managers
                         task.IsRandD = 0;
                         task.WorktypeId = 71;
                         task.StartDate = DateTime.Now;
+                        task.Id = row["SPID"].ToString();
                     }
                     catch { }
                 }
@@ -75,6 +89,70 @@ namespace UplandIntegrations.Tenrox.Managers
             }
         }
 
+        public override IEnumerable<TenroxTransactionResult> UpsertItems(DataTable items, Guid integrationId)
+        {
+            IEnumerable<TenroxTransactionResult> results = base.UpsertItems(items, integrationId);
+            TenroxTransactionResult[] upsertItems = results as TenroxTransactionResult[] ?? results.ToArray();
+
+            EnumerableRowCollection<DataRow> rows = items.AsEnumerable();
+
+            try
+            {
+                AddTaskAssignments(upsertItems, rows);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception("Could not process an assignment. Error: " + exception.Message);
+            }
+
+            return upsertItems;
+        }
+
         #endregion
+
+        private void AddTaskAssignments(IEnumerable<TenroxTransactionResult> upsertItems, EnumerableRowCollection<DataRow> rows)
+        {
+            using (var client = new AssignmentsClient(_binding,
+                    new EndpointAddress(_endpointAddress + "sdk/assignments.svc")))
+            {
+                var token = (TenroxAssignmentService.UserToken) TranslateToken(_authToken,
+                    typeof(TenroxAssignmentService.UserToken));
+
+                foreach (TenroxTransactionResult result in upsertItems.Where(result => result.Success))
+                {
+                    TenroxTransactionResult upsertResult = result;
+
+                    DataRow row = (from r in rows
+                                   where r["SPID"].ToString().Equals(upsertResult.SpId.ToString(CultureInfo.InvariantCulture))
+                                   select r).FirstOrDefault();
+
+                    if (row == null) continue;
+
+                    foreach (Assignment assignment in client.QueryBy(token, "taskid = @0", new object[] { result.Id }))
+                    {
+                        try
+                        {
+                            client.Delete(token, assignment.UniqueId);
+                        }
+                        catch { }
+                    }
+
+                    var task = (Task) result.TxObject;
+
+                    foreach (int userId in row["Assignment"].ToString().Split(',')
+                        .Select(TranslateEmailToUserId).Where(userId => userId != 0))
+                    {
+                        Assignment assignment = client.CreateNew(token);
+
+                        assignment.TaskId = result.Id;
+                        assignment.UserId = userId;
+                        if (task.StartDate != null) assignment.StartDate = task.StartDate.Value;
+                        if (task.EndDate != null) assignment.EndDate = task.EndDate.Value;
+
+                        client.Save(token, assignment);
+                    }
+                }
+            }
+        }
     }
 }

@@ -63,6 +63,7 @@ namespace UplandIntegrations.Tenrox.Managers
                         c.AccessType = 1;
                         c.IsPlaceholder = 0;
                         c.ParentId = 12;
+                        c.Id = row["SPID"].ToString();
                     }
                     catch { }
                 }

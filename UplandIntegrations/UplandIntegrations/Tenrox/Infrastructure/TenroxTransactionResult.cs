@@ -6,8 +6,11 @@ namespace UplandIntegrations.Tenrox.Infrastructure
     {
         #region Constructors (1) 
 
-        public TenroxTransactionResult(int id, TransactionType transactionType, string error = null)
+        public TenroxTransactionResult(int id, int spId, object txObject, TransactionType transactionType,
+            string error = null)
         {
+            TxObject = txObject;
+            SpId = spId;
             Error = error;
             TransactionType = transactionType;
             Id = id;
@@ -27,6 +30,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
         }
 
         public TransactionType TransactionType { get; private set; }
+        public int SpId { get; private set; }
+        public object TxObject { get; private set; }
 
         #endregion Properties 
     }
