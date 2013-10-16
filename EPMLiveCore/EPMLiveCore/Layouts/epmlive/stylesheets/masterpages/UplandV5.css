@@ -170,16 +170,14 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 
 .epm-loader {
     background: #ffffff;
-    position: absolute;
+    position: absolute !important;
     z-index: 10000;
 }
 
-.epm-loader > span {
+.epm-loader td {
     color: #BBBBBB;
     font-size: 20px;
     text-align: center;
-    position: relative;
-    display: inline-block;
 }
 
 .ms-dlgLoadingTextDiv .ms-core-pageTitle {

@@ -45,7 +45,7 @@ var EPM;
                         width = element.width || $el.width();
                     }
 
-                    var $loader = $("<div id=\"" + element.id + "_epm_loader\" class=\"epm-loader\">&nbsp;</div>");
+                    var $loader = $("<table id=\"" + element.id + "_epm_loader\" class=\"epm-loader\"><tr><td></td></tr></table>");
 
                     if (element.bgColor) {
                         $loader.css("background", element.bgColor);
@@ -55,8 +55,8 @@ var EPM;
                         $loader.height(height);
                         $loader.width(width);
                     } else {
-                        $loader.css("height", "100%");
-                        $loader.css("width", "100%");
+                        $loader.css("height", $(window).height() - 50);
+                        $loader.css("width", $(window).width() - 230);
                     }
 
                     $loader.hide();
@@ -153,15 +153,7 @@ var EPM;
 
             Loader.prototype.showLoading = function (element) {
                 if (this.elementIsRegistered(element)) {
-                    element.loader.height();
-                    element.loader.width();
-
-                    var $span = $("<span style=\"left: 50%\">Loading...</span>");
-                    element.loader.append($span.hide());
-
-                    $span.css("margin-left", -($span.width() / 2) - 230);
-                    $span.css("margin-top", element.loader.height() / 4);
-                    $span.show();
+                    element.loader.find('td').text('Loding...');
                 }
             };
             return Loader;
