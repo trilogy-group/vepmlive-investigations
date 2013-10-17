@@ -164,7 +164,7 @@ namespace UplandIntegrations.Tenrox
             }
             catch (Exception e)
             {
-                message = e.Message;
+                message = e.Message + e.InnerException.Message;
                 log.LogMessage(message, IntegrationLogType.Error);
 
                 return false;
@@ -388,7 +388,7 @@ namespace UplandIntegrations.Tenrox
                         return string.Format(TIMESHEET_URL, orgUrl, orgName);
                     case "tx_expenses":
                         return string.Format(EXPENSES_URL, orgUrl, orgName);
-                    case "txt_projectinfo":
+                    case "tx_projectinfo":
                         return string.Format(PROJECT_INFO_URL, orgUrl, itemId, orgName);
                 }
 
