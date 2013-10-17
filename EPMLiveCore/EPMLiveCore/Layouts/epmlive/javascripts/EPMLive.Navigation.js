@@ -1550,6 +1550,15 @@
                                             }
                                         }
                                     }
+
+                                    try {
+                                        if ($('#epm-nav-sub-workspaces a').length < 3) {
+                                            window.setTimeout(function() {
+                                                window.epmLiveNavigation.registerLink({ kind: 3 });
+                                            }, 200);
+                                        }
+                                    } catch(ex) {
+                                    }
                                 }, function (response) {
                                     console.log(response);
                                 });
