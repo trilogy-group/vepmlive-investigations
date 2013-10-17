@@ -77,7 +77,7 @@
 		<I Kind='Filter'  Visible='0'/>
 	</Head>
 	<Foot>
-		<I Kind='Data' CanEdit='1' id='NewTask2' Background="#FFFFFF" Title='New Item' Visible='1' Def="NewTaskBack" Class='NewRowBack' NoColor='1' NoUpload='1' NoColorState='1' LeftHtml="&lt;input type='text' style='width:100%' class='newclassinput' onkeypress='newtaskkeypress(this, event, false); CancelBubbling(this, event);' onkeydown='CancelBubbling(this, event);' onkeyup='CancelBubbling(this, event);' onclick='CancelBubbling(this, event);' value='New Task' onfocus='newtaskfocus(this)' onblur='newtaskblur(this);' id='txtNewTask'&gt;" MidHtml="" RightHtml=""   CanMove="0" CanDrag="0" CanSelect="0" CanExport="0"/>
+		<I Kind='Data' CanEdit='1' id='NewTask2' Background="#FFFFFF" Title='New Item' Visible='1' Def="NewTaskBack" Class='NewRowBack' NoColor='1' NoUpload='1' NoColorState='1' LeftHtml="&lt;input type='text' style='width:100%' class='newclassinput' onkeypress='CancelBubbling(this, event);' onkeydown='newtaskkeypress(this, event, false); CancelBubbling(this, event);' onkeyup='CancelBubbling(this, event);' onclick='CancelBubbling(this, event);' value='New Task' onfocus='newtaskfocus(this)' onblur='newtaskblur(this);' id='txtNewTask'&gt;" MidHtml="" RightHtml=""   CanMove="0" CanDrag="0" CanSelect="0" CanExport="0"/>
 
 		<!--<I Kind='Data' CanEdit='1' id='NewTask' Title='New Item' Visible='1' Class='NewTask' NoColor='1' NoUpload='1' NoColorState='1' Def="Task" CanMove="0" CanDrag="0" CanSelect="0" CanExport="0" DefaultDate="2/2/2012"/>-->
 	</Foot>

@@ -3983,6 +3983,7 @@ function SetBaseline()
 }
 
 function CancelBubbling(obj, evt) {
+    evt.Handled = true;
     var e = (evt) ? evt : window.event;
     if (window.event) {
         e.cancelBubble = true;
@@ -4018,6 +4019,8 @@ function newtaskkeypress(textfield, event, agilegrid) {
                 textfield.value = "";
             }
         }
+        event.preventDefault();
+        return false;
     }
 
 }
