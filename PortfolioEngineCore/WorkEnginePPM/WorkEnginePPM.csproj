@@ -13,7 +13,7 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <ActiveDeploymentConfiguration>SP 13 Deploy</ActiveDeploymentConfiguration>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -21,8 +21,13 @@
     <SandboxedSolution>False</SandboxedSolution>
     <ProjectMode>SharePointCustomization</ProjectMode>
     <FileUpgradeFlags>0</FileUpgradeFlags>
-    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\PortfolioEngineCore\Backup1\</UpgradeBackupLocation>
+    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\PortfolioEngineCore\Backup\WorkEnginePPM\</UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s WorkEnginePPM
+"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "WorkEnginePPM" /f</PreDeploymentCommand>
+    <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s WorkEnginePPM -p "C:\Workspace\Upland\EPM Live\EPMLive2013\PortfolioEngineCore\WorkEnginePPM\bin\Debug\"
+iisreset</PostDeploymentCommand>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -35,7 +40,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -255,12 +259,22 @@
     <Compile Include="Layouts\ppm\CostTypes_NAX.aspx.designer.cs">
       <DependentUpon>CostTypes_NAX.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\Costviews.ashx.cs">
+      <DependentUpon>Costviews.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Costviews.aspx.cs">
       <DependentUpon>Costviews.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Costviews.aspx.designer.cs">
       <DependentUpon>Costviews.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Costviews_NAX.aspx.cs">
+      <DependentUpon>Costviews_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Costviews_NAX.aspx.designer.cs">
+      <DependentUpon>Costviews_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\CustomFieldForm.aspx.cs">
       <DependentUpon>CustomFieldForm.aspx</DependentUpon>
@@ -286,6 +300,16 @@
     <Compile Include="Layouts\ppm\Customfields_NAX.aspx.designer.cs">
       <DependentUpon>Customfields_NAX.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\CVAdmin.aspx.cs">
+      <DependentUpon>CVAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\CVAdmin.aspx.designer.cs">
+      <DependentUpon>CVAdmin.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBAdmin.ashx.cs">
+      <DependentUpon>DBAdmin.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\DBAdmin.aspx.cs">
       <DependentUpon>DBAdmin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -293,8 +317,43 @@
     <Compile Include="Layouts\ppm\DBAdmin.aspx.designer.cs">
       <DependentUpon>DBAdmin.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\DBAdmin_NAX.aspx.cs">
+      <DependentUpon>DBAdmin_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBAdmin_NAX.aspx.designer.cs">
+      <DependentUpon>DBAdmin_NAX.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBALog.aspx.cs">
+      <DependentUpon>DBALog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBALog.aspx.designer.cs">
+      <DependentUpon>DBALog.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBAPIs.aspx.cs">
+      <DependentUpon>DBAPIs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBAPIs.aspx.designer.cs">
+      <DependentUpon>DBAPIs.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\DBARequest.ashx.cs">
       <DependentUpon>DBARequest.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBAResources.aspx.cs">
+      <DependentUpon>DBAResources.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBAResources.aspx.designer.cs">
+      <DependentUpon>DBAResources.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBATables.aspx.cs">
+      <DependentUpon>DBATables.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\DBATables.aspx.designer.cs">
+      <DependentUpon>DBATables.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\details.aspx.cs">
       <DependentUpon>details.aspx</DependentUpon>
@@ -368,12 +427,22 @@
     <Compile Include="Layouts\ppm\grouppermissions_NAX.aspx.designer.cs">
       <DependentUpon>grouppermissions_NAX.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\Lookups.ashx.cs">
+      <DependentUpon>Lookups.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Lookups.aspx.cs">
       <DependentUpon>Lookups.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Lookups.aspx.designer.cs">
       <DependentUpon>Lookups.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Lookups_NAX.aspx.cs">
+      <DependentUpon>Lookups_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Lookups_NAX.aspx.designer.cs">
+      <DependentUpon>Lookups_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\ManageLists.aspx.cs">
       <DependentUpon>ManageLists.aspx</DependentUpon>
@@ -403,12 +472,22 @@
     <Compile Include="Layouts\ppm\Modelgrouping.aspx.designer.cs">
       <DependentUpon>Modelgrouping.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\Models.ashx.cs">
+      <DependentUpon>Models.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Models.aspx.cs">
       <DependentUpon>Models.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Models.aspx.designer.cs">
       <DependentUpon>Models.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Models_NAX.aspx.cs">
+      <DependentUpon>Models_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Models_NAX.aspx.designer.cs">
+      <DependentUpon>Models_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\NoPerm.aspx.cs">
       <DependentUpon>NoPerm.aspx</DependentUpon>
@@ -496,6 +575,16 @@
     <Compile Include="Layouts\ppm\Ratelist.aspx.designer.cs">
       <DependentUpon>Ratelist.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\Rates.ashx.cs">
+      <DependentUpon>Rates.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\Rates_NAX.aspx.cs">
+      <DependentUpon>Rates_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\Rates_NAX.aspx.designer.cs">
+      <DependentUpon>Rates_NAX.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\Resourcerates.aspx.cs">
       <DependentUpon>Resourcerates.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -562,6 +651,13 @@
     <Compile Include="Layouts\ppm\rpeditor.aspx.designer.cs">
       <DependentUpon>rpeditor.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\RPTestData.aspx.cs">
+      <DependentUpon>RPTestData.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\RPTestData.aspx.designer.cs">
+      <DependentUpon>RPTestData.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\ppm\RPView.aspx.cs">
       <DependentUpon>RPView.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -617,6 +713,13 @@
     </Compile>
     <Compile Include="Layouts\ppm\SPViewLog.aspx.designer.cs">
       <DependentUpon>SPViewLog.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\TestPage.aspx.cs">
+      <DependentUpon>TestPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\TestPage.aspx.designer.cs">
+      <DependentUpon>TestPage.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\TestSingleSite.aspx.cs">
       <DependentUpon>TestSingleSite.aspx</DependentUpon>
@@ -792,14 +895,25 @@
     <None Include="Layouts\ppm\CostCategories.ashx" />
     <None Include="Layouts\ppm\CostTypeCustomFields.ashx" />
     <None Include="Layouts\ppm\CostTypes.ashx" />
+    <None Include="Layouts\ppm\Costviews.ashx" />
     <None Include="Layouts\ppm\Customfields.ashx" />
+    <None Include="Layouts\ppm\DBAdmin.ashx" />
     <None Include="Layouts\ppm\DBARequest.ashx" />
     <None Include="Layouts\ppm\EPKCSRequest.ashx" />
     <None Include="Layouts\ppm\EPKRequest.ashx" />
     <None Include="Layouts\ppm\GroupPermissions.ashx" />
+    <None Include="Layouts\ppm\Lookups.ashx">
+      <SubType>Code</SubType>
+    </None>
+    <None Include="Layouts\ppm\Models.ashx">
+      <SubType>Code</SubType>
+    </None>
     <None Include="Layouts\ppm\PageRequest.ashx" />
     <None Include="Layouts\ppm\PostCostValues.ashx" />
     <None Include="Layouts\ppm\QueueManager.ashx" />
+    <None Include="Layouts\ppm\Rates.ashx">
+      <SubType>Code</SubType>
+    </None>
     <None Include="Layouts\ppm\RPCustomFields.ashx" />
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{baef277f-bfda-4978-ac17-78e4cab7f183}</SharePointProjectItemId>
@@ -931,10 +1045,17 @@
     <Content Include="Layouts\ppm\Costtypes.aspx" />
     <Content Include="Layouts\ppm\CostTypes_NAX.aspx" />
     <Content Include="Layouts\ppm\Costviews.aspx" />
+    <Content Include="Layouts\ppm\Costviews_NAX.aspx" />
     <Content Include="Layouts\ppm\CustomFieldForm.aspx" />
     <Content Include="Layouts\ppm\Customfields.aspx" />
     <Content Include="Layouts\ppm\Customfields_NAX.aspx" />
+    <Content Include="Layouts\ppm\CVAdmin.aspx" />
     <Content Include="Layouts\ppm\DBAdmin.aspx" />
+    <Content Include="Layouts\ppm\DBAdmin_NAX.aspx" />
+    <Content Include="Layouts\ppm\DBALog.aspx" />
+    <Content Include="Layouts\ppm\DBAPIs.aspx" />
+    <Content Include="Layouts\ppm\DBAResources.aspx" />
+    <Content Include="Layouts\ppm\DBATables.aspx" />
     <Content Include="Layouts\ppm\details.aspx" />
     <Content Include="Layouts\ppm\EditCalendar.ascx" />
     <Content Include="Layouts\ppm\EditCalendar.ascx.css" />
@@ -968,8 +1089,7 @@
     <Content Include="Layouts\ppm\Images\Commitment.gif" />
     <Content Include="Layouts\ppm\Images\CommitmentCancelled.gif" />
     <Content Include="Layouts\ppm\Images\configure.jpg" />
-    <Content Include="Layouts\ppm\Images\Copy of formatmap16x16.png" />
-    <Content Include="Layouts\ppm\Images\Copy of formatmap32x32.png" />
+    <Content Include="Layouts\ppm\Images\configure.png" />
     <Content Include="Layouts\ppm\Images\CopyCostValues.gif" />
     <Content Include="Layouts\ppm\Images\CopyRow.gif" />
     <Content Include="Layouts\ppm\Images\createview.gif" />
@@ -978,17 +1098,21 @@
     <Content Include="Layouts\ppm\Images\delete32.png" />
     <Content Include="Layouts\ppm\Images\deleteview.gif" />
     <Content Include="Layouts\ppm\Images\detail.png" />
+    <Content Include="Layouts\ppm\Images\details.png" />
     <Content Include="Layouts\ppm\Images\editview.gif" />
     <Content Include="Layouts\ppm\Images\epmlive-master.png" />
     <Content Include="Layouts\ppm\Images\epmlive-sprite.png" />
     <Content Include="Layouts\ppm\Images\Excel.GIF" />
     <Content Include="Layouts\ppm\Images\ExpandAll.gif" />
     <Content Include="Layouts\ppm\Images\exportexcel20x20.png" />
+    <Content Include="Layouts\ppm\Images\filter.png" />
     <Content Include="Layouts\ppm\Images\formatmap16x16.png" />
+    <Content Include="Layouts\ppm\Images\formatmap16x16_2.png" />
     <Content Include="Layouts\ppm\Images\formatmap32x32.png" />
     <Content Include="Layouts\ppm\Images\Forward.gif" />
     <Content Include="Layouts\ppm\Images\Generic.gif" />
     <Content Include="Layouts\ppm\Images\GoTo.gif" />
+    <Content Include="Layouts\ppm\Images\graph.png" />
     <Content Include="Layouts\ppm\Images\Green.gif" />
     <Content Include="Layouts\ppm\Images\GridDet.gif" />
     <Content Include="Layouts\ppm\Images\grouping.gif" />
@@ -1022,9 +1146,11 @@
     <Content Include="Layouts\ppm\Images\PSHours.gif" />
     <Content Include="Layouts\ppm\Images\Publish.gif" />
     <Content Include="Layouts\ppm\Images\Publish.png" />
+    <Content Include="Layouts\ppm\Images\rates.png" />
     <Content Include="Layouts\ppm\Images\Red.gif" />
     <Content Include="Layouts\ppm\Images\reference.png" />
     <Content Include="Layouts\ppm\Images\Refresh.gif" />
+    <Content Include="Layouts\ppm\Images\refresh.png" />
     <Content Include="Layouts\ppm\Images\Reject.gif" />
     <Content Include="Layouts\ppm\Images\Renegotiate.gif" />
     <Content Include="Layouts\ppm\Images\Request.gif" />
@@ -1033,6 +1159,7 @@
     <Content Include="Layouts\ppm\Images\ResPlan.gif" />
     <Content Include="Layouts\ppm\Images\Revenue.gif" />
     <Content Include="Layouts\ppm\Images\Revert.gif" />
+    <Content Include="Layouts\ppm\Images\ribbondnarrow.png" />
     <Content Include="Layouts\ppm\Images\RMApproved.gif" />
     <Content Include="Layouts\ppm\Images\RMRejected.gif" />
     <Content Include="Layouts\ppm\Images\Save.gif" />
@@ -1059,7 +1186,9 @@
     <Content Include="Layouts\ppm\Images\ViewDefault.gif" />
     <Content Include="Layouts\ppm\Images\WIHours.gif" />
     <Content Include="Layouts\ppm\Images\Yellow.gif" />
+    <Content Include="Layouts\ppm\Kendo\kendo.dataviz.min.js" />
     <Content Include="Layouts\ppm\Lookups.aspx" />
+    <Content Include="Layouts\ppm\Lookups_NAX.aspx" />
     <Content Include="Layouts\ppm\ManageLists.aspx" />
     <Content Include="Layouts\ppm\Model.ascx" />
     <Content Include="Layouts\ppm\Model.ascx.css" />
@@ -1068,6 +1197,7 @@
     <Content Include="Layouts\ppm\ModelExportExcel.aspx" />
     <Content Include="Layouts\ppm\Modelgrouping.aspx" />
     <Content Include="Layouts\ppm\Models.aspx" />
+    <Content Include="Layouts\ppm\Models_NAX.aspx" />
     <Content Include="Layouts\ppm\NoPerm.aspx" />
     <Content Include="Layouts\ppm\Optimizer.ascx" />
     <Content Include="Layouts\ppm\Optimizer.ascx.css" />
@@ -1082,6 +1212,7 @@
     <Content Include="Layouts\ppm\Queuemanager.aspx" />
     <Content Include="Layouts\ppm\Queuemanager_NAX.aspx" />
     <Content Include="Layouts\ppm\Ratelist.aspx" />
+    <Content Include="Layouts\ppm\Rates_NAX.aspx" />
     <Content Include="Layouts\ppm\Resourcerates.aspx" />
     <Content Include="Layouts\ppm\ResPlanAnalyzer.ascx" />
     <Content Include="Layouts\ppm\ResPlanAnalyzer.ascx.css" />
@@ -1107,6 +1238,7 @@
     <Content Include="Layouts\ppm\RPEditor.ascx.css" />
     <Content Include="Layouts\ppm\RPEditor.ascx.js" />
     <Content Include="Layouts\ppm\rpeditor.aspx" />
+    <Content Include="Layouts\ppm\RPTestData.aspx" />
     <Content Include="Layouts\ppm\RPView.aspx" />
     <Content Include="Layouts\ppm\savesession.aspx" />
     <Content Include="Layouts\ppm\settings.aspx" />
@@ -1123,6 +1255,7 @@
     <Content Include="Layouts\ppm\Styles\jqueryui.css" />
     <Content Include="Layouts\ppm\Styles\overload.dhtmlx.css" />
     <Content Include="Layouts\ppm\Styles\Page.css" />
+    <Content Include="Layouts\ppm\TestPage.aspx" />
     <Content Include="Layouts\ppm\TestSingleSite.aspx" />
     <Content Include="Layouts\ppm\Tools\Buttonbar.ascx" />
     <Content Include="Layouts\ppm\Tools\Buttonbar.css" />
@@ -1248,6 +1381,33 @@
     <Content Include="TreeGrid\RPEditor\TreeN.gif" />
     <Content Include="TreeGrid\RPEditor\unchecked.png" />
     <Content Include="TreeGrid\RPEditor\VScroll.gif" />
+    <Content Include="TreeGrid\TGrid\Backgrounds.gif" />
+    <Content Include="TreeGrid\TGrid\BackgroundsOLD.gif" />
+    <Content Include="TreeGrid\TGrid\Button.gif" />
+    <Content Include="TreeGrid\TGrid\checked.png" />
+    <Content Include="TreeGrid\TGrid\critgantt.gif" />
+    <Content Include="TreeGrid\TGrid\critganttpct.gif" />
+    <Content Include="TreeGrid\TGrid\FastPanel1.gif" />
+    <Content Include="TreeGrid\TGrid\FastPanel2.gif" />
+    <Content Include="TreeGrid\TGrid\Filter.gif" />
+    <Content Include="TreeGrid\TGrid\Gantt.gif" />
+    <Content Include="TreeGrid\TGrid\Grid.css" />
+    <Content Include="TreeGrid\TGrid\HScroll.png" />
+    <Content Include="TreeGrid\TGrid\Menu.gif" />
+    <Content Include="TreeGrid\TGrid\MenuOLD.gif" />
+    <Content Include="TreeGrid\TGrid\minus.gif" />
+    <Content Include="TreeGrid\TGrid\Panel.gif" />
+    <Content Include="TreeGrid\TGrid\plus.gif" />
+    <Content Include="TreeGrid\TGrid\Sort.gif" />
+    <Content Include="TreeGrid\TGrid\summarygantt.gif" />
+    <Content Include="TreeGrid\TGrid\summaryganttpct.gif" />
+    <Content Include="TreeGrid\TGrid\taskgantt.gif" />
+    <Content Include="TreeGrid\TGrid\taskganttpct.gif" />
+    <Content Include="TreeGrid\TGrid\Toolbar.gif" />
+    <Content Include="TreeGrid\TGrid\Tree.gif" />
+    <Content Include="TreeGrid\TGrid\TreeN.gif" />
+    <Content Include="TreeGrid\TGrid\unchecked.png" />
+    <Content Include="TreeGrid\TGrid\VScroll.gif" />
     <Content Include="WebServices\ClientPrioritization.asmx" />
     <Content Include="WebServices\clientprioritizationdisco.aspx" />
     <Content Include="WebServices\clientprioritizationwsdl.aspx" />
@@ -1314,4 +1474,16 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
+        <DeploymentConfigurations>
+          <DeploymentConfiguration Name="SP 13 Deploy">
+            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
+            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
+          </DeploymentConfiguration>
+        </DeploymentConfigurations>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

@@ -286,7 +286,7 @@ namespace WorkEnginePPM.Events.DataSync
             if (saturday == null) throw new Exception("Please provide work hours for Saturday.");
             saturday = decimal.Parse((string) saturday);
 
-            isDefault = properties.AfterProperties["IsDefault"] ?? false;
+            isDefault = bool.Parse((properties.AfterProperties["IsDefault"] ?? (properties.ListItem["IsDefault"] ?? false)).ToString());
         }
 
         /// <summary>
