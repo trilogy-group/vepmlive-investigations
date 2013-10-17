@@ -510,6 +510,9 @@
             else if (path.indexOf("My%20Timesheet.aspx")> -1) {
 	            fixed = false;
             }
+             else if (path.indexOf("_catalogs")> -1) {
+	            fixed = false;
+            }
 
 
             if(fixed == true) {
