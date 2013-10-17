@@ -3488,8 +3488,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\buttons.css" />
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.css" />
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.min.css" />
-    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.css" />
-    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.css">
+      <DependentUpon>epmnav.less</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css">
+      <DependentUpon>epmnav.less</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />

@@ -71,7 +71,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         {
                             appStoreLink =
                                 string.Format(
-                                    "<span class='epm-app-btn' data-url='{0}'><span class='icon-plus-2'></span></span>",
+                                    "<span class='epm-app-btn' data-url='{0}'><span class='fui-plus'></span></span>",
                                     string.Format("{0}/_layouts/15/addanapp.aspx", RelativeUrl));
                         }
 
@@ -98,7 +98,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                             foreach (var library in libraries)
                             {
-                                var libInfo = library.Value;
+                                string[] libInfo = library.Value;
 
                                 if (!libInfo[1].ToLower().Trim().Equals("site pages")) continue;
                                 library.Value[4] = libInfo[4].Replace("SitePages/Forms/Upload.aspx?source=",
@@ -120,10 +120,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             }
             catch (AggregateException exception)
             {
-                exception.Handle(e =>
-                {
-                    throw e;
-                });
+                exception.Handle(e => { throw e; });
             }
 
             links.Add(new NavLink
@@ -149,7 +146,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 });
             }
 
-            links.Add(new NavLink {Title = "Library Apps", Url = "Header"});
+            links.Add(new NavLink
+            {
+                Title = string.Format("Library Apps{0}", appStoreLink),
+                Url = "Header"
+            });
 
             if (libraries.Count > 0)
             {
