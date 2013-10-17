@@ -206,6 +206,25 @@ html, body {
 		</div>
 	</div>
 </div>
+<div class="modalContent" id="idPostCostValuesDlg" style="display:none;">
+    <div style="width:310px; display:block; padding-top: 0px; padding-bottom: 10px;">
+        <table cellspacing="0">
+            <tr>
+                <td class="descriptioncell" style="width:100px;">Select&nbsp;Calendar</td>
+                <td class="controlcell" style="width:200px;">
+                    <select id="idPCVCalendar" size="7" style="width:200px;" >
+                    </select>
+                </td>
+            </tr>
+        </table>
+	</div>
+	<div style="float:right;">
+		<div class="button-container" >
+			<input type="button" class="epmliveButton" value="Post" onclick="postCostValuesDlg_event('post');"/>
+			<input type="button" class="epmliveButton" value="Close" onclick="postCostValuesDlg_event('close');"/>
+		</div>
+	</div>
+</div>
 <div style="display: block;" >
     <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
     <div id="idToolbarDiv"></div>
@@ -224,13 +243,14 @@ html, body {
             { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
             { type: "button", id: "btnCostTotals", name: "COST TOTALS", img: "formatmap16x16_2.png", style: "top: -90px; left: -289px;", tooltip: "Cost Totals",  onclick: "toolbar_event('btnCostTotals');", disabled: true },
             { type: "button", id: "btnSecurity", name: "SECURITY", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Security", onclick: "toolbar_event('btnSecurity');", disabled: true },
-            { type: "button", id: "btnPostOptions", name: "POST OPTIONS", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Post Cost Options", onclick: "toolbar_event('btnPostOptions');", disabled: true }
-        ]
+            { type: "button", id: "btnPostOptions", name: "POST OPTIONS", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Post Cost Options", onclick: "toolbar_event('btnPostOptions');", disabled: true },
+            { type: "button", id: "btnPostCostValues", name: "POST", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Post Cost Values", onclick: "toolbar_event('btnPostCostValues');", disabled: true }
+    ]
     };
 
     var toolbar = new Toolbar(toobarData);
     toolbar.Render();
-    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1 = window['<%=dgrid1.UID%>'];
     var dgrid1_selectedRow = 0;
     var tgrid1 = window['<%=tgrid1.UID%>'];
     var tgrid2 = window['<%=tgrid2.UID%>'];
@@ -251,6 +271,7 @@ html, body {
             toolbar.enableItem("btnCostTotals");
             toolbar.enableItem("btnSecurity");
             toolbar.enableItem("btnPostOptions");
+            toolbar.enableItem("btnPostCostValues");
         }
         else {
             toolbar.disableItem("btnModify");
@@ -258,6 +279,7 @@ html, body {
             toolbar.disableItem("btnCostTotals");
             toolbar.disableItem("btnSecurity");
             toolbar.disableItem("btnPostOptions");
+            toolbar.disableItem("btnPostCostValues");
         }
     };
 //    function GridsOnFocus(grid, row, col, orow, ocol, pagepos) {
@@ -325,6 +347,7 @@ html, body {
             case 'winCostTotalsDlg':
             case 'winSecurityDlg':
             case 'winPostOptionsDlg':
+            case 'winPostCostValuesDlg':
                 dgrid1.grid.selectRowById(dgrid1_selectedRow);
                 break;
         }
@@ -407,6 +430,36 @@ html, body {
                 }
                 dgrid1.grid.clearSelection();
                 DisplayDialog(350, 270, "Post Options for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winPostOptionsDlg", "idPostOptionsDlg", true, false);
+                break;
+            case "btnPostCostValues":
+                if (toolbar.isItemDisabled("btnPostCostValues") == true) {
+                    alert("Select a row to enable the Post Cost Values button");
+                    return false;
+                }
+                sRowId = dgrid1_selectedRow;
+                var sRequest = '<request function="CostTypesRequest" context="ReadCalendarsForCostType"><data><![CDATA[' + sRowId + ']]></data></request>';
+                var jsonString = SendRequest(sRequest);
+                var json = JSON_ConvertString(jsonString);
+                if (json.reply != null) {
+                    if (jsf_alertError(json.reply.error) == true)
+                        return false;
+                    var item = json.reply.calendars.item;
+                    var idCalendar = document.getElementById('idPCVCalendar');
+                    idCalendar.options.length = 0;
+                    if (item != null) {
+                        if (item.length == null) {
+                            idCalendar.options[idCalendar.options.length] = new Option(item.name, item.id);
+                        } else {
+                            for (var i = 0; i < item.length; i++) {
+                                idCalendar.options[idCalendar.options.length] = new Option(item[i].name, item[i].id);
+                            }
+                        }
+                    }
+                    if (idCalendar.options.length > 0)
+                        idCalendar.selectedIndex = 0;
+                }
+                dgrid1.grid.clearSelection();
+                DisplayDialog(400, 200, "Post Cost Values for " + dgrid1.GetCellValue(dgrid1_selectedRow, "CT_NAME"), "winPostCostValuesDlg", "idPostCostValuesDlg", true, false);
                 break;
             case "btnModify":
                 if (toolbar.isItemDisabled("btnModify") == true) {
@@ -797,6 +850,39 @@ html, body {
                 break;
         }
         return false;
+    };
+    var postCostValuesDlg_event = function (event) {
+        switch (event) {
+            case "post":
+                var idCalendar = document.getElementById('idPCVCalendar');
+                if (idCalendar.selectedIndex == -1) {
+                    alert("Please select a calendar");
+                    return false;
+                }
+                var sCTId = dgrid1_selectedRow;
+                var sCBId = idCalendar.options[idCalendar.selectedIndex].value;
+                if (sCTId != null && sCTId != "0" && sCBId != null && sCBId != "-1") {
+                    var sb = new StringBuilder();
+                    sb.append('<request function="CostTypesRequest" context="PostCostValues">');
+                    sb.append('<data');
+                    sb.append(' CT_ID="' + sCTId + '"');
+                    sb.append(' CB_ID="' + sCBId + '"');
+                    sb.append('/>');
+                    sb.append('</request>');
+                    var sRequest = sb.toString();
+                    var jsonString = SendRequest(sRequest);
+                    var json = JSON_ConvertString(jsonString);
+                    if (json.reply != null) {
+                        if (jsf_alertError(json.reply.error) == true)
+                            return false;
+                    }
+                    alert("Post to Job Queue Complete");
+                }
+                break;
+            case "close":
+                CloseDialog('winPostCostValuesDlg');
+                break;
+        }
     };
 
     var thiswins = new dhtmlXWindows();
