@@ -67,7 +67,7 @@
         </ZoneTemplate>
     </WebPartPages:WebPartZone>
     
-    <script>
+    <SharePoint:ScriptBlock runat="server">
         (function() {
             var $zone = $('.ms-webpart-zone');
             var $webpart = $zone.find('div.ms-webpartzone-cell');
@@ -76,7 +76,7 @@
             $zone.height(height);
             $webpart.height(height);
         })();
-    </script>
+    </SharePoint:ScriptBlock>
 
 </asp:Content>
 

@@ -1007,7 +1007,7 @@
 
                     try {
                         $sn.slimScroll({
-                            height: $sn.height(),
+                            height: $sn.height() - 60,
                             width: $sn.width()
                         });
                     } catch (e) {
