@@ -543,19 +543,16 @@
   color: #666666;
   font-family: 'Open Sans Regular', sans-serif;
 }
-.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.epm-nav-ws-node {
-  height: 23px;
-}
-.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtHover,
-.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected {
-  height: 23px;
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.epm-nav-ws-node a {
+  border: 1px solid #EEEEEE;
+  padding: 3px;
 }
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtHover a,
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI div.rtSelected a {
   background: none repeat scroll 0 0 transparent !important;
-  border: medium none;
+  border: 1px solid #EEEEEE;
   color: #666666;
-  padding: 4px 3px;
+  padding: 3px;
   margin-left: 1px;
   position: static;
 }
