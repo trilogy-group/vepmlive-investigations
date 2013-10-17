@@ -262,7 +262,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         ProcessIzenda(web);
 
 
-                        ClearNavigationCache(w);
+                        ClearNavigationCache();
 
                         if(rdoYes.Checked)
                         {
@@ -542,7 +542,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //hideWizard(web);
             Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">SP.UI.ModalDialog.commonModalDialogClose(0, '');</script>");
 
-            ClearNavigationCache(web);
+            ClearNavigationCache();
         }
 
         private void ProcessTimerJob(SPWeb web)
@@ -870,7 +870,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
         }
 
-        private void ClearNavigationCache(SPWeb web)
+        private void ClearNavigationCache()
         {
             CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
         }
