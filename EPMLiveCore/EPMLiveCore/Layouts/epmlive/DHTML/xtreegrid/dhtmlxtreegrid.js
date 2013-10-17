@@ -762,8 +762,9 @@ dhtmlXGridObject.prototype.hovermenushow = function (dd, cell) {
             itemid = newids[2];
         }
     }
-
-    var weburl = siteurl + "/_layouts/epmlive/gridaction.aspx?action=GetContextMenus&grid=" + this._gridid + "&webid=" + webid + "&listid=" + listid + "&id=" + itemid + "&rollups=" + this._brollups + "&requestlist=" + this._requestList + "&popups=" + this._usepopup;
+    var d = new Date();
+    var n = d.getTime();
+    var weburl = siteurl + "/_layouts/epmlive/gridaction.aspx?action=GetContextMenus&grid=" + this._gridid + "&webid=" + webid + "&listid=" + listid + "&id=" + itemid + "&rollups=" + this._brollups + "&requestlist=" + this._requestList + "&popups=" + this._usepopup + "&ticks=" + n;
 
     var data = dhtmlxAjax.getSync(weburl);
     var sData = data.xmlDoc.responseText.trim();
