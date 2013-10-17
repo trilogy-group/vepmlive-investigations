@@ -167,8 +167,8 @@ html, body {
             { type: "button", id: "btnAdd", name: "ADD", img: "formatmap16x16_2.png", style: "top: -90px; left: -216px;", tooltip: "Add", onclick: "toolbar_event('btnAdd');" },
             { type: "button", id: "btnAddRole", name: "ADD ROLE", img: "addresource.gif", tooltip: "Add role", width: "80px", onclick: "toolbar_event('btnAddRole');" },
             { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
-            { type: "button", id: "btnFTEs", name: "FTEs", img: "delete.png", tooltip: "FTEs", width: "80px", onclick: "return toolbar_event('btnFTEs');", disabled: false },
-            { type: "button", id: "btnRates", name: "RATES", img: "delete.png", tooltip: "Rates", width: "80px", onclick: "return toolbar_event('btnRates');", disabled: true }
+            { type: "button", id: "btnFTEs", name: "FTEs", img: "formatmap16x16_2.png", style: "top: -217px; left: -289px;", tooltip: "FTEs", width: "80px", onclick: "return toolbar_event('btnFTEs');", disabled: false },
+            { type: "button", id: "btnRates", name: "RATES", img: "rates.png", tooltip: "Rates", width: "80px", onclick: "return toolbar_event('btnRates');", disabled: true }
         ]
     };
     var toolbarRatesData = {
