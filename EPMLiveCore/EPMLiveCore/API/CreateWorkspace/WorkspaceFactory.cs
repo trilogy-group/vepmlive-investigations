@@ -327,7 +327,7 @@ namespace EPMLiveCore.API
                 var delSols = new List<SPUserSolution>();
 
                 delSols = (from s in es.Solutions.OfType<SPUserSolution>()
-                           where _lstSolutionsToBeRemoved.Contains(s.SolutionId.ToString("N"))
+                           where _lstSolutionsToBeRemoved.Contains(s.Name.Replace(".wsp", ""))
                            select s).ToList<SPUserSolution>();
 
                 if (delSols.Count > 0)
