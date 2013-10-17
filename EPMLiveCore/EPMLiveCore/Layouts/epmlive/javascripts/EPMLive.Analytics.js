@@ -178,18 +178,33 @@
                             //if ($$.currentItemID != '-1' && $$.currentFileIsNull == 'True') {
                             //    favKindInt = 1;
                             //}
-                            window.epmLiveNavigation.registerLink({
-                                kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
-                                id: sa[0],
-                                title: sa[6],
-                                url: sa[9],
-                                cssClass: sa[7],
-                                siteId: sa[1],
-                                webId: sa[2],
-                                listId: sa[3],
-                                itemId: sa[4],
-                                external: false
-                            });
+                            if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
+                                window.parent.epmLiveNavigation.registerLink({
+                                    kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    title: sa[6],
+                                    url: sa[9],
+                                    cssClass: sa[7],
+                                    siteId: sa[1],
+                                    webId: sa[2],
+                                    listId: sa[3],
+                                    itemId: sa[4],
+                                    external: false
+                                });
+                            } else {
+                                window.epmLiveNavigation.registerLink({
+                                    kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    title: sa[6],
+                                    url: sa[9],
+                                    cssClass: sa[7],
+                                    siteId: sa[1],
+                                    webId: sa[2],
+                                    listId: sa[3],
+                                    itemId: sa[4],
+                                    external: false
+                                });
+                            }
                         } else {
                             //onError(response);
                         }
@@ -259,18 +274,35 @@
                             // 0 is page, 1 is item
                             var favKindInt = 1;
 
-                            window.epmLiveNavigation.registerLink({
-                                kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
-                                id: sa[0],
-                                title: sa[6],
-                                url: sa[9],
-                                cssClass: sa[7],
-                                siteId: sa[1],
-                                webId: sa[2],
-                                listId: sa[3],
-                                itemId: sa[4],
-                                external: false
-                            });
+                            if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
+                                window.parent.epmLiveNavigation.registerLink({
+                                    kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    title: sa[6],
+                                    url: sa[9],
+                                    cssClass: sa[7],
+                                    siteId: sa[1],
+                                    webId: sa[2],
+                                    listId: sa[3],
+                                    itemId: sa[4],
+                                    external: false
+                                });
+                            } else {
+                                window.epmLiveNavigation.registerLink({
+                                    kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    title: sa[6],
+                                    url: sa[9],
+                                    cssClass: sa[7],
+                                    siteId: sa[1],
+                                    webId: sa[2],
+                                    listId: sa[3],
+                                    itemId: sa[4],
+                                    external: false
+                                });
+                            }
+
+                            
                         } else {
                             //onError(response);
                         }
@@ -330,19 +362,34 @@
                             // asynchronously update nav
                             // 0 is page, 1 is item
                             var favKindInt = 1;
-
-                            window.epmLiveNavigation.registerLink({
-                                kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
-                                id: sa[0],
-                                title: sa[6],
-                                url: sa[9],
-                                cssClass: sa[7],
-                                siteId: sa[1],
-                                webId: sa[2],
-                                listId: sa[3],
-                                itemId: sa[4],
-                                external: false
-                            });
+                            if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
+                                window.parent.epmLiveNavigation.registerLink({
+                                    kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    title: sa[6],
+                                    url: sa[9],
+                                    cssClass: sa[7],
+                                    siteId: sa[1],
+                                    webId: sa[2],
+                                    listId: sa[3],
+                                    itemId: sa[4],
+                                    external: false
+                                });
+                            } else {
+                                window.epmLiveNavigation.registerLink({
+                                    kind: favKindInt, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    title: sa[6],
+                                    url: sa[9],
+                                    cssClass: sa[7],
+                                    siteId: sa[1],
+                                    webId: sa[2],
+                                    listId: sa[3],
+                                    itemId: sa[4],
+                                    external: false
+                                });
+                            }
+                          
                         } else {
                             //onError(response);
                         }
@@ -404,11 +451,20 @@
 
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
-                            window.epmLiveNavigation.removeLink({
-                                kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
-                                id: sa[0],
-                                //webId: use webid for type 3 removal,
-                            });
+                            if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
+                                window.parent.epmLiveNavigation.removeLink({
+                                    kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    //webId: use webid for type 3 removal,
+                                });
+                            } else {
+                                window.epmLiveNavigation.removeLink({
+                                    kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    //webId: use webid for type 3 removal,
+                                });
+                            }
+                           
 
                         } else {
                             //onError(response);
@@ -475,12 +531,22 @@
                             toastr.success("An existing item has been removed from your favorites list.");
 
                             var sa = result['#text'].split(',');
-                            // asynchronously update nav
-                            window.epmLiveNavigation.removeLink({
-                                kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
-                                id: sa[0],
-                                //webId: use webid for type 3 removal,
-                            });
+                            if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
+                                // asynchronously update nav
+                                window.parent.epmLiveNavigation.removeLink({
+                                    kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    //webId: use webid for type 3 removal,
+                                });
+                            } else {
+                                // asynchronously update nav
+                                window.epmLiveNavigation.removeLink({
+                                    kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    //webId: use webid for type 3 removal,
+                                });
+                            }
+                           
 
                         } else {
                             //onError(response);
@@ -540,12 +606,21 @@
                             toastr.success("An existing item has been removed from your favorites list.");
 
                             var sa = result['#text'].split(',');
-                            // asynchronously update nav
-                            window.epmLiveNavigation.removeLink({
-                                kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
-                                id: sa[0],
-                                //webId: use webid for type 3 removal,
-                            });
+                            if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
+                                // asynchronously update nav
+                                window.parent.epmLiveNavigation.removeLink({
+                                    kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    //webId: use webid for type 3 removal,
+                                });
+                            } else {
+                                // asynchronously update nav
+                                window.epmLiveNavigation.removeLink({
+                                    kind: 0, // 0 - FA, 1 - RI, 2 - FW, 3 - WS
+                                    id: sa[0],
+                                    //webId: use webid for type 3 removal,
+                                });
+                            }
 
                         } else {
                             //onError(response);
