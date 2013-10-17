@@ -18,50 +18,66 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <EPMLive:MyWorkWebPart runat="server" __MarkupType="xmlmarkup" WebPart="true" __WebPartId="{B130AD40-A4E8-408D-B59F-E1FB30A36044}" >
-        <WebPart xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/WebPart/v2">
-            <Title>My Work</Title>
-            <FrameType>None</FrameType>
-            <Description />
-            <IsIncluded>true</IsIncluded>
-            <ZoneID>Header</ZoneID>
-            <PartOrder>2</PartOrder>
-            <FrameState>Normal</FrameState>
-            <Height />
-            <Width />
-            <AllowRemove>true</AllowRemove>
-            <AllowZoneChange>true</AllowZoneChange>
-            <AllowMinimize>true</AllowMinimize>
-            <AllowConnect>true</AllowConnect>
-            <AllowEdit>true</AllowEdit>
-            <AllowHide>true</AllowHide>
-            <IsVisible>true</IsVisible>
-            <DetailLink />
-            <HelpLink />
-            <HelpMode>Modeless</HelpMode>
-            <Dir>Default</Dir>
-            <PartImageSmall />
-            <MissingAssembly>Cannot import this Web Part.</MissingAssembly>
-            <PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
-            <IsIncludedFilter />
-            <ExportControlledProperties>true</ExportControlledProperties>
-            <ConnectionID>00000000-0000-0000-0000-000000000000</ConnectionID>
-            <ID>g_790ccaa2_6ae3_4990_84cc_f85160655fd7</ID>
-            <AllowEditToggle xmlns="MyWork">false</AllowEditToggle>
-            <CrossSiteUrls xmlns="MyWork" />
-            <DefaultGlobalView xmlns="MyWork" />
-            <DefaultToEditMode xmlns="MyWork">false</DefaultToEditMode>
-            <DueDayFilter xmlns="MyWork" />
-            <HideNewButton xmlns="MyWork">false</HideNewButton>
-            <MyWorkSelectedLists xmlns="MyWork" />
-            <NewItemIndicator xmlns="MyWork" />
-            <PerformanceMode xmlns="MyWork">false</PerformanceMode>
-            <SelectedFields xmlns="MyWork" />
-            <SelectedLists xmlns="MyWork" />
-            <ShowToolbar xmlns="MyWork">true</ShowToolbar>
-            <UseCentralizedSettings xmlns="MyWork">true</UseCentralizedSettings>
-        </WebPart>
-    </EPMLive:MyWorkWebPart>
+    <WebPartPages:WebPartZone runat="server" Title="loc:Header" ID="Header" FrameType="None">
+        <ZoneTemplate>
+            <EPMLive:MyWorkWebPart runat="server" __MarkupType="xmlmarkup" WebPart="true" __WebPartId="{B130AD40-A4E8-408D-B59F-E1FB30A36044}" >
+                <WebPart xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/WebPart/v2">
+                    <Title>My Work</Title>
+                    <FrameType>None</FrameType>
+                    <Description />
+                    <IsIncluded>true</IsIncluded>
+                    <ZoneID>Header</ZoneID>
+                    <PartOrder>2</PartOrder>
+                    <FrameState>Normal</FrameState>
+                    <Height />
+                    <Width />
+                    <AllowRemove>true</AllowRemove>
+                    <AllowZoneChange>true</AllowZoneChange>
+                    <AllowMinimize>true</AllowMinimize>
+                    <AllowConnect>true</AllowConnect>
+                    <AllowEdit>true</AllowEdit>
+                    <AllowHide>true</AllowHide>
+                    <IsVisible>true</IsVisible>
+                    <DetailLink />
+                    <HelpLink />
+                    <HelpMode>Modeless</HelpMode>
+                    <Dir>Default</Dir>
+                    <PartImageSmall />
+                    <MissingAssembly>Cannot import this Web Part.</MissingAssembly>
+                    <PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
+                    <IsIncludedFilter />
+                    <ExportControlledProperties>true</ExportControlledProperties>
+                    <ConnectionID>00000000-0000-0000-0000-000000000000</ConnectionID>
+                    <ID>g_790ccaa2_6ae3_4990_84cc_f85160655fd7</ID>
+                    <AllowEditToggle xmlns="MyWork">false</AllowEditToggle>
+                    <CrossSiteUrls xmlns="MyWork" />
+                    <DefaultGlobalView xmlns="MyWork" />
+                    <DefaultToEditMode xmlns="MyWork">false</DefaultToEditMode>
+                    <DueDayFilter xmlns="MyWork" />
+                    <HideNewButton xmlns="MyWork">false</HideNewButton>
+                    <MyWorkSelectedLists xmlns="MyWork" />
+                    <NewItemIndicator xmlns="MyWork" />
+                    <PerformanceMode xmlns="MyWork">false</PerformanceMode>
+                    <SelectedFields xmlns="MyWork" />
+                    <SelectedLists xmlns="MyWork" />
+                    <ShowToolbar xmlns="MyWork">true</ShowToolbar>
+                    <UseCentralizedSettings xmlns="MyWork">true</UseCentralizedSettings>
+                </WebPart>
+            </EPMLive:MyWorkWebPart>
+        </ZoneTemplate>
+    </WebPartPages:WebPartZone>
+    
+    <script>
+        (function() {
+            var $zone = $('.ms-webpart-zone');
+            var $webpart = $zone.find('div.ms-webpartzone-cell');
+            var height = $(window).height() - $zone.offset().top - 126 - 20;
+            
+            $zone.height(height);
+            $webpart.height(height);
+        })();
+    </script>
+
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
