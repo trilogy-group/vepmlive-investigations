@@ -492,7 +492,7 @@
             else if (path.indexOf("MyTimesheet.aspx")> -1) {
 	            fixed = false;
             }
-            else if (path.indexOf("IsDlg")> -1) {
+            else if (window.location.href.indexOf("IsDlg")> -1) {
 	            fixed = false;
             }
             else if (path.indexOf("NewForm.aspx")> -1) {
