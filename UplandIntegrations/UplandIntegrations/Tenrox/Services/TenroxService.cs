@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Security;
 using System.ServiceModel;
@@ -28,6 +29,8 @@ namespace UplandIntegrations.Tenrox.Services
 
         public TenroxService(string orgUrl, string orgName, string username, SecureString password)
         {
+            ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
+
             try
             {
                 _svcUrl = string.Format(@"{0}{1}twebservice/", orgUrl, orgUrl.EndsWith("/") ? string.Empty : "/");
