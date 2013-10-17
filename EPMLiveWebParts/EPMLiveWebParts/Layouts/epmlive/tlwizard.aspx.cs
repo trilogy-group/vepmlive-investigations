@@ -1,5 +1,6 @@
 ﻿using System;
 using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Data.SqlClient;
@@ -871,7 +872,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private void ClearNavigationCache(SPWeb web)
         {
-            new GenericLinkProvider(web.Site.ID, web.ID, web.CurrentUser.LoginName).ClearCache();
+            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
         }
     }
 }
