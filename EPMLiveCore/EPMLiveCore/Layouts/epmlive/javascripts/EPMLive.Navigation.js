@@ -905,10 +905,6 @@
                             }
                         }
                     });
-                    
-                    $('.epm-app-btn').click(function () {
-                        document.location.href = $(this).data('url');
-                    });
 
                     window.TreeView_HoverNode = function (data, el) {
                         var node = $(el);
@@ -1344,6 +1340,10 @@
                             expandNodes(providerName);
                         }
                     }
+                    
+                    $('.epm-app-btn').click(function () {
+                        document.location.href = $(this).data('url');
+                    });
                 }
 
                 function loadLinks() {
