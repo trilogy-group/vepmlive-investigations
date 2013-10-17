@@ -23,7 +23,7 @@ namespace EPMLiveCore.API
                     foreach (SPListItem li in list.Items)
                     {
 
-                        iAddIzendaReport(li.Title, li["Xml"].ToString(), cn, list.ParentWeb.Site.ID.ToString().ToLower());
+                        iAddIzendaReport(li.Title, li["Xml"].ToString(), cn, list.ParentWeb.ID.ToString().ToLower());
 
                     }
                     
@@ -49,7 +49,7 @@ namespace EPMLiveCore.API
                 cn.Open();
                 try
                 {
-                    iAddIzendaReport(title, xml, cn, web.Site.ID.ToString().ToLower());
+                    iAddIzendaReport(title, xml, cn, web.ID.ToString().ToLower());
                 }
                 catch (Exception ex)
                 {
