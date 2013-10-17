@@ -905,6 +905,10 @@
                             }
                         }
                     });
+                    
+                    $('.epm-app-btn').click(function () {
+                        document.location.href = $(this).data('url');
+                    });
 
                     window.TreeView_HoverNode = function (data, el) {
                         var node = $(el);
@@ -972,10 +976,6 @@
                     window.epmLiveNavigation.handleContextualCommand = function (id, webId, listId, itemId, command, kind) {
                         handleContextualCommand(id, webId, listId, itemId, command, kind);
                     };
-
-                    $('.epm-app-btn').click(function() {
-                        document.location.href = $(this).data('url');
-                    });
 
                     $('td.epm-nav-node-root').click(function () {
                         var $td = $(this);
