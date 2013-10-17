@@ -454,19 +454,19 @@
 					</asp:ContentPlaceHolder>
             	</SharePoint:AjaxDelta>
             </div>
+            <SharePoint:AjaxDelta id="DeltaPlaceHolderUtilityContent" runat="server">
+                <!-- EPMLive JS -->
+                <epm:EPMLiveJSV2 runat="server"></epm:EPMLiveJSV2>
+                <!-- // EPMLive JS -->
+                <!-- EPMLiveNotifications -->
+                <epm:EPMLiveNotificationsV2 runat="server"></epm:EPMLiveNotificationsV2>
+                <!-- // EPMLiveNotifications -->		    
+                <!-- Template Versoning -->
+                <epm:TemplateVersoning runat="server"></epm:TemplateVersoning>
+                <!-- // Template Versoning -->
+                <asp:ContentPlaceHolder id="PlaceHolderUtilityContent" runat="server" />
+            </SharePoint:AjaxDelta>
         </SharePoint:SharePointForm>
-        <SharePoint:AjaxDelta id="DeltaPlaceHolderUtilityContent" runat="server">
-            <!-- EPMLive JS -->
-            <epm:EPMLiveJSV2 runat="server"></epm:EPMLiveJSV2>
-            <!-- // EPMLive JS -->
-            <!-- EPMLiveNotifications -->
-            <epm:EPMLiveNotificationsV2 runat="server"></epm:EPMLiveNotificationsV2>
-            <!-- // EPMLiveNotifications -->		    
-            <!-- Template Versoning -->
-            <epm:TemplateVersoning runat="server"></epm:TemplateVersoning>
-            <!-- // Template Versoning -->
-            <asp:ContentPlaceHolder id="PlaceHolderUtilityContent" runat="server" />
-        </SharePoint:AjaxDelta>
         <SharePoint:ScriptBlock runat="server">
             var g_Workspace = "s4-workspace";
 

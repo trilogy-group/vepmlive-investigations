@@ -79,7 +79,7 @@
 }
 #epm-nav-top ul.bottom {
   position: absolute;
-  bottom: 75px;
+  bottom: 50px;
   width: 100%;
 }
 #epm-nav-sub {
@@ -111,7 +111,7 @@
   transition: All 0.2s ease;
 }
 #epm-nav-sub-bottom-ph {
-  height: 75px;
+  height: 17px;
 }
 .epm-nav-sub {
   display: none;

@@ -171,17 +171,27 @@
 
 <SharePoint:ScriptBlock runat="server">
     (function() {
-    window.epmLiveNavigation = {
-    currentWebId: '<%= WebId %>',
-    currentWebUrl: '<%= WebUrl %>',
-    currentUserId: <%= UserId %>,
-    staticProvider: '<%= StaticProviderLinks %>',
-    selectedNode: '<%= SelectedNode %>',
-    workspaceTree: function() {
-    return window.$find('<%= WorkspacesNavTree.ClientID %>');
-    }
-    };
+        window.epmLiveNavigation = {
+            currentWebId: '<%= WebId %>',
+            currentWebUrl: '<%= WebUrl %>',
+            currentUserId: <%= UserId %>,
+            staticProvider: '<%= StaticProviderLinks %>',
+            selectedNode: '<%= SelectedNode %>',
+            workspaceTree: function() {
+                return window.$find('<%= WorkspacesNavTree.ClientID %>');
+            }
+        };
 
-    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
+        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
     })();
 </SharePoint:ScriptBlock>
+
+<script>
+    var height = $(window).height() - 50;
+    $('#epm-nav-top').height(height);
+
+    $(window).resize(function() {
+        var height = $(window).height() - 50;
+        $('#epm-nav-top').height(height);
+    });
+</script>
