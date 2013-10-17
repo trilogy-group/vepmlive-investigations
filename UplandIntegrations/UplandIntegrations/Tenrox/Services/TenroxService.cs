@@ -28,18 +28,36 @@ namespace UplandIntegrations.Tenrox.Services
 
         public TenroxService(string orgUrl, string orgName, string username, SecureString password)
         {
-            _svcUrl = string.Format(@"{0}{1}twebservice/", orgUrl, orgUrl.EndsWith("/") ? string.Empty : "/");
-
-            BasicHttpSecurityMode mode = orgUrl.StartsWith("https", StringComparison.InvariantCultureIgnoreCase)
-                ? BasicHttpSecurityMode.Transport
-                : BasicHttpSecurityMode.None;
-
-            _binding = new BasicHttpBinding(mode) {MaxBufferSize = int.MaxValue, MaxReceivedMessageSize = int.MaxValue};
-
-            var authEndpoint = new EndpointAddress(_svcUrl + "logonas.svc");
-            using (var authService = new LogonAsClient(_binding, authEndpoint))
+            try
             {
-                _token = authService.Authenticate(orgName, username, password.ToUnsecureString(), null, true);
+                _svcUrl = string.Format(@"{0}{1}twebservice/", orgUrl, orgUrl.EndsWith("/") ? string.Empty : "/");
+
+                BasicHttpSecurityMode mode = orgUrl.StartsWith("https", StringComparison.InvariantCultureIgnoreCase)
+                    ? BasicHttpSecurityMode.Transport
+                    : BasicHttpSecurityMode.None;
+
+                _binding = new BasicHttpBinding(mode)
+                {
+                    MaxBufferSize = int.MaxValue,
+                    MaxReceivedMessageSize = int.MaxValue
+                };
+
+                var authEndpoint = new EndpointAddress(_svcUrl + "logonas.svc");
+                using (var authService = new LogonAsClient(_binding, authEndpoint))
+                {
+                    _token = authService.Authenticate(orgName, username, password.ToUnsecureString(), null, true);
+                }
+            }
+            catch (Exception exception)
+            {
+                var ex = exception;
+
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
+
+                throw ex;
             }
         }
 
