@@ -323,7 +323,7 @@
 
             var surl =  "<%=sWebUrl %>/_layouts/epmlive/workplannerwizard.aspx?Planner=<%=sPlannerID %>&ID=<%=sItemID %>&PType=<%=sProjectType %>&listid=<%=sProjectListId %>&tasklistid=<%=sTaskListId%>&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
 
-            var options = { url: surl, width: 450, title: "Planner", dialogReturnValueCallback: showPlannerPopClose };
+            var options = { url: surl, width: 450, title: "Select Planner", dialogReturnValueCallback: showPlannerPopClose };
 
             SP.UI.ModalDialog.showModalDialog(options);
         }
@@ -822,7 +822,7 @@
     function setHeight(a, b, c) {
         //dhxLayout.cells("b").setHeight((getHeight() - getTop(document.getElementById("parentId"))));
         document.getElementById("parentId").style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
-        document.getElementById("parentId").style.width = (getWidth() - 20) + "px";
+        document.getElementById("parentId").style.width = (getWidth() - 100) + "px";
         
         dhxLayout.setSizes();
 

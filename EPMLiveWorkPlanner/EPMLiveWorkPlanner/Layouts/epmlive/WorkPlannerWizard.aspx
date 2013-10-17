@@ -36,11 +36,48 @@
 	{
 		vertical-align:top;
 		padding-right:5px;
+		text-align:left;
 	}
     .btn
     {
         height: 100% !important;
     }
+
+
+input[type=checkbox] {
+display:none;
+}
+ 
+input[type=checkbox] + label
+{
+background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAQCAYAAABk1z2tAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3QoREw0jycifHAAAAOlJREFUSMfN1a1KRFEUxfHfDAMjFpOa/QKDYBCLeLfJR7Dqc5gsBoMP4wtYzoVJgoapWm2CRYui5SDDBLmOMOfstg9nL/4s2HtRefXatv2aZbBpml6Xf//V79fu4GDejvxVf9BlKKW0iEtcF3PwF7gFjLCLrXkD9qdghlP9EsYZ7hFnxQBTSjsYp5RWc7+Me2zgDnsR8VLSwQtsYpRS2s7OreEBRxHxWmKLJwFPs2PrGWoFNziIiLdSZ+YHMCLesY8nDHGLk/yuOGCG/MQhznEcER/VHOoJyGdcVZcksyZE15pVv/osrr6+AaojSGl/czSzAAAAAElFTkSuQmCC);
+background-position:-24px 0px;
+height: 16px;
+width: 16px;
+display:inline-block;
+padding: 0 0 0 0px;
+cursor:pointer;
+}
+
+
+input[type=checkbox]:checked + label
+{
+background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAQCAYAAABk1z2tAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3QoREw0jycifHAAAAOlJREFUSMfN1a1KRFEUxfHfDAMjFpOa/QKDYBCLeLfJR7Dqc5gsBoMP4wtYzoVJgoapWm2CRYui5SDDBLmOMOfstg9nL/4s2HtRefXatv2aZbBpml6Xf//V79fu4GDejvxVf9BlKKW0iEtcF3PwF7gFjLCLrXkD9qdghlP9EsYZ7hFnxQBTSjsYp5RWc7+Me2zgDnsR8VLSwQtsYpRS2s7OreEBRxHxWmKLJwFPs2PrGWoFNziIiLdSZ+YHMCLesY8nDHGLk/yuOGCG/MQhznEcER/VHOoJyGdcVZcksyZE15pVv/osrr6+AaojSGl/czSzAAAAAElFTkSuQmCC);
+background-position:0px 0px;
+height: 16px;
+width: 16px;
+display:inline-block;
+padding: 0 0 0 0px;
+cursor:pointer;
+}
+
+
+body {
+font-family: Open Sans Regular, Helvetica;
+}
+
+
+
         
     </style>
 
@@ -69,16 +106,15 @@
 
         }
 
-        function SelectPlanner(planner) 
-        {
+        function SelectPlanner(planner) {
 
             var sPlannerInfo = planner.split('|');
 
             sPlannerID = sPlannerInfo[0];
             sProjectType = sPlannerInfo[1];
-            
+
             var chkDefault = document.getElementById("chkDefault");
-            if(chkDefault)
+            if (chkDefault)
                 sSetDefault = chkDefault.checked
 
             Redirect();
@@ -92,19 +128,17 @@
         }
 
         function SelectItemDD(item) {
-            
+
             sItemID = item;
 
             Redirect();
         }
 
         function ApplyTemplate(t) {
-            if(t == "-101")
-            {
-                location.href = "workplannerwizard.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Planner=" +sPlannerID + "&PType=" + sProjectType + "&tasklistid=" + sTaskListId + "&SetDefault=" + sSetDefault + "&PCSelected=1&isdlg=1&Upload=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"])%>";
+            if (t == "-101") {
+                location.href = "workplannerwizard.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Planner=" + sPlannerID + "&PType=" + sProjectType + "&tasklistid=" + sTaskListId + "&SetDefault=" + sSetDefault + "&PCSelected=1&isdlg=1&Upload=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"])%>";
             }
-            else
-            {
+            else {
                 sm("dlgTemplate", 150, 50);
                 dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ApplyTemplate&ID=" + sItemID + "&Planner=" + sPlannerID + "&Template=" + t + "&PType=" + sProjectType + "&ProjectName=" + sProjectName, ApplyTemplateClose);
             }
@@ -124,27 +158,23 @@
             }
         }
 
-        function Redirect() 
-        {
+        function Redirect() {
 
-            location.href = "workplannerwizard.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Planner=" +sPlannerID + "&PType=" + sProjectType + "&tasklistid=" + sTaskListId + "&SetDefault=" + sSetDefault + "&PCSelected=1&isdlg=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"])%>";
+            location.href = "workplannerwizard.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Planner=" + sPlannerID + "&PType=" + sProjectType + "&tasklistid=" + sTaskListId + "&SetDefault=" + sSetDefault + "&PCSelected=1&isdlg=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"])%>";
 
         }
 
         function GoToPlanner() {
-            if(sPlannerID == "MPP")
-            {
+            if (sPlannerID == "MPP") {
                 location.href = "getproject.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
             }
-            else if (sProjectType == "Online")
-            {
+            else if (sProjectType == "Online") {
                 parent.location.href = "workplanner.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Planner=" + sPlannerID + "&PType=" + sProjectType + "&tasklistid=" + sTaskListId + "&SetDefault=" + sSetDefault + "&PCSelected=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
             }
-            else
-            {
+            else {
                 location.href = "openmpp.aspx?Planner=" + sPlannerID + "&ProjectName=" + sProjectName + "&listid=" + sProjectListId + "&isdlg=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
             }
-        }
+    }
 
     </script>
 </asp:Content>
@@ -187,11 +217,12 @@
 
     <asp:Panel ID="pnlPlanner" runat="server" Visible="false">
 
-        <h4>Select Planner</h4><br />
-        <div style="width:380px;height:22px;overflow:auto;padding-left:5px;">
-            <input type="checkbox" value="setdefault" id="chkDefault" name="chkDefault" /> Use as default planner
+        <!--<h4>Select Planner</h4><br />-->
+        <div style="height:22px;overflow:auto;text-align:center;">
+            <input type="checkbox" value="setdefault" id="chkDefault" name="chkDefault" /><label for="chkDefault"></label>
+	    <font style="position:relative;top:-1px;color:#666666;">Use as default planner</font>
         </div><br />
-        <div style="width:390px;max-height:400px;overflow:auto" class="wizardBoxes">
+        <div style="text-align:center;max-height:400px;overflow:auto" class="wizardBoxes">
             <%=sOutputHtml %>
         </div>
         
