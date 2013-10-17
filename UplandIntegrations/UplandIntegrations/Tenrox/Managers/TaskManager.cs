@@ -19,7 +19,7 @@ namespace UplandIntegrations.Tenrox.Managers
         #region Fields (4) 
 
         private readonly UserToken _authToken;
-        private readonly BasicHttpBinding _binding;
+        private readonly HttpBindingBase _binding;
         private readonly string _endpointAddress;
         private readonly TenroxTaskService.UserToken _token;
 
@@ -27,7 +27,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
         #region Constructors (1) 
 
-        public TaskManager(BasicHttpBinding binding, string endpointAddress, UserToken token)
+        public TaskManager(HttpBindingBase binding, string endpointAddress, UserToken token)
             : base(binding, endpointAddress, "tasks.svc", token,
                 typeof (Task), typeof (TenroxTaskService.UserToken), typeof (TasksClient))
         {

@@ -11,7 +11,7 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         // Public Methods (1) 
 
-        public static IObjectManager GetManager(string objectName, BasicHttpBinding binding, string endpointAddress,
+        public static IObjectManager GetManager(string objectName, HttpBindingBase binding, string endpointAddress,
             UserToken token)
         {
             switch (objectName.Trim().ToLower())

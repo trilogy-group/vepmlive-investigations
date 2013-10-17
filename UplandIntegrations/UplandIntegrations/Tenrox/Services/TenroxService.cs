@@ -18,7 +18,7 @@ namespace UplandIntegrations.Tenrox.Services
     {
         #region Fields (3) 
 
-        private readonly BasicHttpBinding _binding;
+        private readonly HttpBindingBase _binding;
         private readonly string _svcUrl;
         private readonly UserToken _token;
 
@@ -36,11 +36,22 @@ namespace UplandIntegrations.Tenrox.Services
                     ? BasicHttpSecurityMode.Transport
                     : BasicHttpSecurityMode.None;
 
-                _binding = new BasicHttpBinding(mode)
+                if (mode == BasicHttpSecurityMode.Transport)
                 {
-                    MaxBufferSize = int.MaxValue,
-                    MaxReceivedMessageSize = int.MaxValue
-                };
+                    _binding = new BasicHttpsBinding(BasicHttpsSecurityMode.Transport)
+                    {
+                        MaxBufferSize = int.MaxValue,
+                        MaxReceivedMessageSize = int.MaxValue
+                    };
+                }
+                else
+                {
+                    _binding = new BasicHttpBinding(mode)
+                    {
+                        MaxBufferSize = int.MaxValue,
+                        MaxReceivedMessageSize = int.MaxValue
+                    };
+                }
 
                 var authEndpoint = new EndpointAddress(_svcUrl + "logonas.svc");
                 using (var authService = new LogonAsClient(_binding, authEndpoint))
@@ -50,7 +61,7 @@ namespace UplandIntegrations.Tenrox.Services
             }
             catch (Exception exception)
             {
-                var ex = exception;
+                Exception ex = exception;
 
                 while (ex.InnerException != null)
                 {
