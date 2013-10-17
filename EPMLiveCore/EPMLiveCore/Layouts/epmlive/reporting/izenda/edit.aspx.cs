@@ -55,7 +55,7 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 if (txtCategory.Text != "")
                     newname = txtCategory.Text + "\\" + newname;
 
-                SqlCommand cmd = new SqlCommand("UPDATE IzendaAdHocReports set Name=@newname, xml=@xml where TenantID=@siteid and name=@name", cn);
+                SqlCommand cmd = new SqlCommand("UPDATE IzendaAdHocReports set Name=@newname, xml=@xml,ModifiedDate=GETDATE() where TenantID=@siteid and name=@name", cn);
                 cmd.Parameters.AddWithValue("@siteid", Web.ID);
                 cmd.Parameters.AddWithValue("@name", hdnFullName.Value);
                 cmd.Parameters.AddWithValue("@xml", txtXml.Text);
