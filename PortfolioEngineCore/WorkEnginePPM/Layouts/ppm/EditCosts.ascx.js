@@ -1397,7 +1397,6 @@
                         var sType = col.substring(0, 1);
                         var sId = col.substring(1);
                         if (sType == "Q") {
-                            var r = this.GetRate(grid, row, col);
                             var FTEconv = 1;
                             var e = grid.GetAttribute(row, null, "E" + sId);
                             if (isNaN(e) == false)
@@ -1405,16 +1404,20 @@
                             var q = row[col];
                             if (isNaN(q) == false) {
                                 if (calccosts == true) {
-                                    if (r > 0) {
-                                        var v = q * r;
-                                        var cv = row["C" + sId];
-                                        if ((cv - v) > 0.01 || (cv - v) < 0.01)
-                                            grid.SetValue(row, "C" + sId, v, 0);
-                                        else
-                                            row["C" + sId] = v;
+                                    if (row["uom"] != "") {
+                                        var r = this.GetRate(grid, row, col);
+                                        if (r > 0) {
+                                            var v = q * r;
+                                            var cv = row["C" + sId];
+                                            var diff = (cv - v);
+                                            if (diff > 0.01 || diff < -0.01)
+                                                grid.SetValue(row, "C" + sId, v, 0);
+                                            else
+                                                row["C" + sId] = v;
+                                        }
+                                        else if (q != 0)
+                                            row["C" + sId] = "";
                                     }
-                                    else if (q != 0)
-                                        row["C" + sId] = "";
                                 }
                                 if (FTEconv > 0)
                                     row["F" + sId] = q / FTEconv;
