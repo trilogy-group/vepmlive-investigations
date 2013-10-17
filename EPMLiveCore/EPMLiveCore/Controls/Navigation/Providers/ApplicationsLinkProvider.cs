@@ -95,6 +95,17 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         try
                         {
                             libraries = CreateNewAjaxDataHost.GetCreatableLibraries(spWeb);
+
+                            foreach (var library in libraries)
+                            {
+                                var libInfo = library.Value;
+
+                                if (!libInfo[1].ToLower().Trim().Equals("site pages")) continue;
+                                library.Value[4] = libInfo[4].Replace("SitePages/Forms/Upload.aspx?source=",
+                                    "_layouts/15/createwebpage.aspx");
+
+                                break;
+                            }
                         }
                         catch { }
                     }
@@ -117,7 +128,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             links.Add(new NavLink
             {
-                Title = string.Format("Apps{0}", appStoreLink),
+                Title = string.Format("List Apps{0}", appStoreLink),
                 Url = "Header"
             });
 
@@ -133,12 +144,12 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             {
                 links.Add(new NavLink
                 {
-                    Title = "No apps",
+                    Title = "No list apps",
                     Url = "PlaceHolder"
                 });
             }
 
-            links.Add(new NavLink {Title = "Libraries", Url = "Header"});
+            links.Add(new NavLink {Title = "Library Apps", Url = "Header"});
 
             if (libraries.Count > 0)
             {
@@ -152,7 +163,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             {
                 links.Add(new NavLink
                 {
-                    Title = "No libraries",
+                    Title = "No library apps",
                     Url = "PlaceHolder"
                 });
             }
