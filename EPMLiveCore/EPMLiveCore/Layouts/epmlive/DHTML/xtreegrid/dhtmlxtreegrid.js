@@ -910,7 +910,9 @@ eXcell_tree.prototype.setValue = function (valAr) {
 
     this.cell.innerHTML = html.join("");
     this.cell.parentNode.imgTag = this.cell.childNodes[0].childNodes[0].childNodes[row.level];
-    this.cell.parentNode.valTag = this.cell.childNodes[0].childNodes[0].childNodes[row.level + 2];
+    //    this.cell.parentNode.valTag = this.cell.childNodes[0].childNodes[1].childNodes[row.level + 2];
+    if (this.cell.childNodes[0].childNodes[1])
+        this.cell.parentNode.valTag = this.cell.childNodes[0].childNodes[1].childNodes[row.level + 2];
     if (_isKHTML) this.cell.vAlign = "top";
     if (row.parent.id != 0 && row.parent.state == "plus") {
         this.grid._updateTGRState(row.parent, false);
