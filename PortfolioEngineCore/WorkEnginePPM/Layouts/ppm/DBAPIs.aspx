@@ -38,15 +38,15 @@
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", id: "btnClose", name: "CLOSE", img: "formatmap16x16_2.png", style: "top: -90px; left: -216px;", tooltip: "Close", onclick: "toolbar_event('btnClose');", disabled: true },
-            { type: "button", id: "btnReOpen", name: "RE-OPEN", img: "formatmap16x16_2.png", style: "top: -90px; left: -216px;", tooltip: "Re-open", onclick: "toolbar_event('btnReopen');", disabled: true },
-            { type: "button", id: "btnCheckIn", name: "CHECK-IN", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "CheckIn",  onclick: "return toolbar_event('btnCheckin');", disabled: true },
+            { type: "button", id: "btnClose", name: "CLOSE", img: "formatmap16x16_2.png", style: "top: -200px; left: -289px;", tooltip: "Close", onclick: "toolbar_event('btnClose');", disabled: true },
+            { type: "button", id: "btnReOpen", name: "RE-OPEN", img: "formatmap16x16_2.png", style: "top: -180px; left: -289px;", tooltip: "Re-open", onclick: "toolbar_event('btnReopen');", disabled: true },
+            { type: "button", id: "btnCheckIn", name: "CHECK-IN", img: "formatmap16x16_2.png", style: "top: -18px; left: -214px;", tooltip: "CheckIn",  onclick: "return toolbar_event('btnCheckin');", disabled: true },
             { type: "button", id: "btnDelete", name: "DELETE ITEM", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
             { type: "button", id: "btnRefresh", name: "REFRESH", img: "refresh.png", tooltip: "Refresh", onclick: "return toolbar_event('btnRefresh');" }
         ]
     };
     var toolbar = new Toolbar(toobarData);
-    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1 = window["<%=dgrid1.UID%>"];
     var dgrid1_selectedRow = 0;
 
     function dgrid1_OnRowSelect(rowid, cellindex) {
