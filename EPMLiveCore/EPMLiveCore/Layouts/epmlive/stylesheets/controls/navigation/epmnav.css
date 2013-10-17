@@ -29,9 +29,9 @@
   -webkit-box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
   box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
   background-color: #E2E2E2;
-  height: 100%;
   position: absolute;
   top: 50px;
+  bottom: 0;
   width: 50px;
 }
 #epm-nav-top ul {
@@ -89,7 +89,8 @@
   box-shadow: -1px 0 1px rgba(0, 0, 0, 0.2) inset;
   display: none;
   float: left;
-  height: 100%;
+  top: 50px;
+  bottom: 0;
   left: 50px;
   position: absolute;
   width: 180px;
@@ -111,7 +112,7 @@
   transition: All 0.2s ease;
 }
 #epm-nav-sub-bottom-ph {
-  height: 17px;
+  height: 15px;
 }
 .epm-nav-sub {
   display: none;

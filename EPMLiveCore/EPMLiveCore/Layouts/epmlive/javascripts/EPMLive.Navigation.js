@@ -1007,7 +1007,7 @@
 
                     try {
                         $sn.slimScroll({
-                            height: $sn.height() - 60,
+                            height: $sn.height(),
                             width: $sn.width()
                         });
                     } catch (e) {
@@ -1019,6 +1019,7 @@
                     $ss.css('position', 'absolute');
                     $ss.css('left', '50px');
                     $sn.css('left', '0');
+                    $sn.css('top', '0');
                     $sb.css('z-index', 1001);
 
                     $(window).resize(function () {

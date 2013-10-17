@@ -88,9 +88,9 @@
 #epm-nav-top {
     .box-shadow(@x: -1px, @color: @shadow-color);
     background-color: #E2E2E2;
-    height: 100%;
     position: absolute;
     top: @top-nav-width;
+    bottom: 0;
     width: @top-nav-width;
 
     ul {
@@ -156,7 +156,8 @@
     .box-shadow(@x: -1px, @color: @shadow-color);
     display: none;
     float: left;
-    height: 100%;
+    top: 50px;
+    bottom: 0;
     left: 50px;
     position: absolute;
     width: @sub-nav-width;
@@ -176,7 +177,7 @@
 }
 
 #epm-nav-sub-bottom-ph {
-    height: 17px;
+    height: 15px;
 }
 
 .epm-nav-sub {
