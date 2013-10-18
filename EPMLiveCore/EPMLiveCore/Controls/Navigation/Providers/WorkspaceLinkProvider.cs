@@ -105,10 +105,21 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 SPNavLink rootWebLink = GetRootWebLink(rows);
                 yield return rootWebLink;
 
-                foreach (SPNavLink navLink in GetChildWebs(rows, rootWebLink.WebId))
+                SPSite spSite = null;
+
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    spSite = new SPSite(SiteId);
+                });
+
+                if (spSite == null) yield break;
+
+                foreach (SPNavLink navLink in GetChildWebs(rows, rootWebLink.WebId, spSite))
                 {
                     yield return navLink;
                 }
+
+                spSite.Dispose();
             }
             else
             {
@@ -120,7 +131,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             }
         }
 
-        private IEnumerable<SPNavLink> GetChildWebs(EnumerableRowCollection<DataRow> rows, string webId)
+        private IEnumerable<SPNavLink> GetChildWebs(EnumerableRowCollection<DataRow> rows, string webId, SPSite spSite)
         {
             EnumerableRowCollection<DataRow> childWebs = from r in rows
                 where S(r["ParentWebId"]).Equals(S(webId))
@@ -128,7 +139,20 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             foreach (DataRow childWeb in childWebs)
             {
+                var proceed = true;
+
                 string cWebId = S(childWeb["WebId"]);
+                var hasAccess = S(childWeb["HasAccess"]);
+
+                if (!hasAccess.Equals("1"))
+                {
+                    if (!(from r in rows where S(r["ParentWebId"]).Equals(cWebId) select r).Any())
+                    {
+                        proceed = false;
+                    }
+                }
+
+                if (!proceed) continue;
 
                 string itemId = string.Empty;
 
@@ -138,33 +162,24 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     itemId = S(childWeb["ItemWebId"]) + "." + S(childWeb["ItemListId"]) + "." + cItemId;
                 }
 
-                var proceed = true;
-
-                try
+                if (hasAccess.Equals("1"))
                 {
-                    if (string.IsNullOrEmpty(itemId))
+                    try
                     {
-                        SPSecurity.RunWithElevatedPrivileges(() =>
+                        if (string.IsNullOrEmpty(itemId))
                         {
-                            using (var spSite = new SPSite(SiteId))
+                            using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
                             {
-                                using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
+                                if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
                                 {
-                                    if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
-                                    {
-                                        itemId = "X";
-                                    }
+                                    itemId = "X";
                                 }
                             }
-                        });
-                    }
-                }
-                catch
-                {
-                    proceed = false;
-                }
 
-                if (!proceed) continue;
+                        }
+                    }
+                    catch { }
+                }
 
                 yield return new SPNavLink
                 {
@@ -173,12 +188,12 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     Url = S(childWeb["WebUrl"]),
                     SiteId = S(SiteId),
                     WebId = cWebId,
-                    Active = S(childWeb["HasAccess"]).Equals("1"),
+                    Active = hasAccess.Equals("1"),
                     Category = S(webId),
                     ItemId = itemId
                 };
 
-                foreach (SPNavLink navLink in GetChildWebs(rows, cWebId))
+                foreach (SPNavLink navLink in GetChildWebs(rows, cWebId, spSite))
                 {
                     yield return navLink;
                 }
