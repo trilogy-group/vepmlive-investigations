@@ -564,7 +564,7 @@ namespace EPMLiveWebParts
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
                                 SPListItem li = list.GetItemById(int.Parse(Request["ID"]));
-                                url = li["WorkspaceUrl"].ToString();
+                                url = li["WorkspaceUrl"].ToString().Split(',')[0]; ;
                             }
                             catch { }
                             
@@ -723,7 +723,7 @@ namespace EPMLiveWebParts
             {
                 data = "General Error: " + ex.Message;
             }
-            url = url.Replace("//", "/");
+            url = url.Substring(0, 10) + url.Substring(10).Replace("//", "/");
 
             if (url != "")
             {
