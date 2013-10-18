@@ -513,7 +513,13 @@
              else if (path.indexOf("_catalogs")> -1) {
 	            fixed = false;
             }
-
+            else if (path.indexOf("_layouts")> -1) {
+	            fixed = false;
+            }
+            else if (path.indexOf("fd_Item_")> -1) {
+	            fixed = false;
+            }
+            
 
             if(fixed == true) {
        
