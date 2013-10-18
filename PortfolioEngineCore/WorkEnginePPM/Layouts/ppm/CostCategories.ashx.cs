@@ -183,7 +183,16 @@ namespace WorkEnginePPM
                     DataTable dt = tg.SetXmlData(stgridRates);
                     if (dbaCostCategories.UpdateCostCategoryRates(dba, nCA_UID, baserate, dt, out sReply) != StatusEnum.rsSuccess)
                     {
-                        if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "CostTypes.UpdateCostTypesInfo2", dba.StatusText);
+                        if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "CostCategorys.SaveCostCategoryRatesInfo", dba.StatusText);
+                    }
+                    else
+                    {
+                        // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
+                        // this is done now after changing any rate as well as if press save on the main Cost Categories page
+                        if (!AdminFunctions.CalcCategoryRates(dba, out sReply))
+                        {
+                            sReply = DBAccess.FormatAdminError("error", "CostCategories.SaveCostCategoryRatesInfo", sReply);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -234,7 +243,7 @@ namespace WorkEnginePPM
                         // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
                         if (!AdminFunctions.CalcCategoryRates(dba, out sReply))
                         {
-                            sReply = DBAccess.FormatAdminError("error", "CostCategories.SaveCpstCategoryInfo", sReply);
+                            sReply = DBAccess.FormatAdminError("error", "CostCategories.SaveCostCategoryInfo", sReply);
                         }
                         else
                         {
