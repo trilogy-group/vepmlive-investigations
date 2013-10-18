@@ -38,10 +38,10 @@
         style: "display:none;",
         imagePath: "images/",
         items: [
-            { type: "button", id: "btnClose", name: "CLOSE", img: "formatmap16x16_2.png", style: "top: -200px; left: -289px;", tooltip: "Close", onclick: "toolbar_event('btnClose');", disabled: true },
-            { type: "button", id: "btnReOpen", name: "RE-OPEN", img: "formatmap16x16_2.png", style: "top: -180px; left: -289px;", tooltip: "Re-open", onclick: "toolbar_event('btnReopen');", disabled: true },
-            { type: "button", id: "btnCheckIn", name: "CHECK-IN", img: "formatmap16x16_2.png", style: "top: -18px; left: -214px;", tooltip: "CheckIn",  onclick: "return toolbar_event('btnCheckin');", disabled: true },
-            { type: "button", id: "btnDelete", name: "DELETE ITEM", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
+            { type: "button", id: "btnClose", name: "CLOSE", img: "formatmap16x16_2.png", style: "top: -180px; left: -289px;", tooltip: "Close", onclick: "toolbar_event('btnClose');", disabled: true },
+            { type: "button", id: "btnReOpen", name: "RE-OPEN", img: "formatmap16x16_2.png", style: "top: -200px; left: -289px;", tooltip: "Re-open", onclick: "toolbar_event('btnReOpen');", disabled: true },
+            { type: "button", id: "btnCheckIn", name: "CHECK-IN", img: "formatmap16x16_2.png", style: "top: -18px; left: -214px;", tooltip: "CheckIn", onclick: "toolbar_event('btnCheckIn');", disabled: true },
+            { type: "button", id: "btnDelete", name: "DELETE ITEM", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "toolbar_event('btnDelete');", disabled: true },
             { type: "button", id: "btnRefresh", name: "REFRESH", img: "refresh.png", tooltip: "Refresh", onclick: "return toolbar_event('btnRefresh');" }
         ]
     };
@@ -114,11 +114,12 @@
                 if (json.reply != null) {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
+                    dgrid1.SetCellValue(sRowId, "PROJECT_MARKED_DELETION", json.reply.PI.PROJECT_MARKED_DELETION);
                 }
                 dgrid1.reapplySort();
                 dgrid1.selectRow(sRowId);
                 break;
-            case "btnReopen":
+            case "btnReOpen":
                 var sb = new StringBuilder();
                 sb.append('<request function="DBAdminRequest" context="OpenPI">');
                 sb.append('<data');
@@ -131,11 +132,12 @@
                 if (json.reply != null) {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
+                    dgrid1.SetCellValue(sRowId, "PROJECT_MARKED_DELETION", json.reply.PI.PROJECT_MARKED_DELETION);
                 }
                 dgrid1.reapplySort();
                 dgrid1.selectRow(sRowId);
                 break;
-            case "btnCheckin":
+            case "btnCheckIn":
                 var sb = new StringBuilder();
                 sb.append('<request function="DBAdminRequest" context="CheckInPI">');
                 sb.append('<data');
@@ -148,6 +150,7 @@
                 if (json.reply != null) {
                     if (jsf_alertError(json.reply.error) == true)
                         return false;
+                    dgrid1.SetCellValue(sRowId, "PROJECT_CHECKEDOUT", json.reply.PI.PROJECT_CHECKEDOUT);
                 }
                 dgrid1.reapplySort();
                 dgrid1.selectRow(sRowId);
@@ -168,11 +171,10 @@
                     if (json.reply != null) {
                         if (jsf_alertError(json.reply.error) == true)
                             return false;
+                        // no errors so remove row from grid
+                        dgrid1.deleteRow(sRowId);
+                        dgrid1_OnRowSelect(null);
                     }
-                    // if deleted  then remove row from grid
-                    var sRowId = dgrid1_selectedRow;
-                    dgrid1.deleteRow(sRowId);
-                    dgrid1_OnRowSelect(null);
                 }
                 break;
             case "btnRefresh":

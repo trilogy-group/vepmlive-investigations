@@ -6,6 +6,7 @@ using System.Data;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using PortfolioEngineCore;
+using WorkEnginePPM.ControlTemplates.WorkEnginePPM;
 
 namespace WorkEnginePPM
 {
@@ -88,13 +89,7 @@ namespace WorkEnginePPM
                                 }
                                 else
                                 {
-                                    ////  needed to update list after SAVE
-                                    //CStruct xCostviews = new CStruct();
-                                    //xCostviews.Initialize("Costview");
-                                    //xCostviews.CreateIntAttr("VIEW_UID", nVIEW_UID);
-                                    //xCostviews.CreateStringAttr("VIEW_NAME", sVIEW_NAME);
-                                    //xCostviews.CreateStringAttr("VIEW_DESC", sVIEW_DESC);
-                                    //sReply = xCostviews.XML();
+                                    sReply = GetPIXML(dba, nPROJECT_ID);
                                 }
                             }
                             catch (Exception ex)
@@ -121,13 +116,7 @@ namespace WorkEnginePPM
                                 }
                                 else
                                 {
-                                    ////  needed to update list after SAVE
-                                    //CStruct xCostviews = new CStruct();
-                                    //xCostviews.Initialize("Costview");
-                                    //xCostviews.CreateIntAttr("VIEW_UID", nVIEW_UID);
-                                    //xCostviews.CreateStringAttr("VIEW_NAME", sVIEW_NAME);
-                                    //xCostviews.CreateStringAttr("VIEW_DESC", sVIEW_DESC);
-                                    //sReply = xCostviews.XML();
+                                    sReply = GetPIXML(dba, nPROJECT_ID);
                                 }
                             }
                             catch (Exception ex)
@@ -154,13 +143,7 @@ namespace WorkEnginePPM
                                 }
                                 else
                                 {
-                                    ////  needed to update list after SAVE
-                                    //CStruct xCostviews = new CStruct();
-                                    //xCostviews.Initialize("Costview");
-                                    //xCostviews.CreateIntAttr("VIEW_UID", nVIEW_UID);
-                                    //xCostviews.CreateStringAttr("VIEW_NAME", sVIEW_NAME);
-                                    //xCostviews.CreateStringAttr("VIEW_DESC", sVIEW_DESC);
-                                    //sReply = xCostviews.XML();
+                                    sReply = GetPIXML(dba, nPROJECT_ID);
                                 }
                             }
                             catch (Exception ex)
@@ -184,16 +167,6 @@ namespace WorkEnginePPM
                                 if (dbaDBAdmin.DeletePI(dba, nPROJECT_ID, out sReply) != StatusEnum.rsSuccess)
                                 {
                                     if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "DBAdmin.DeletePI", dba.StatusText);
-                                }
-                                else
-                                {
-                                    ////  needed to update list after SAVE
-                                    //CStruct xCostviews = new CStruct();
-                                    //xCostviews.Initialize("Costview");
-                                    //xCostviews.CreateIntAttr("VIEW_UID", nVIEW_UID);
-                                    //xCostviews.CreateStringAttr("VIEW_NAME", sVIEW_NAME);
-                                    //xCostviews.CreateStringAttr("VIEW_DESC", sVIEW_DESC);
-                                    //sReply = xCostviews.XML();
                                 }
                             }
                             catch (Exception ex)
@@ -295,6 +268,57 @@ namespace WorkEnginePPM
             }
 
             return sReply;
+        }
+        protected static string GetPIXML(DBAccess dba, int nPROJECT_ID)
+        {
+            string sXML = "";
+            try
+            {
+                DataTable dt;
+                string cmdText = "SELECT PROJECT_ID,PROJECT_NAME,PROJECT_MARKED_DELETION,PROJECT_SECURITY,PROJECT_CREATED,PROJECT_CHECKEDOUT,RES_NAME,PROJECT_CHECKEDOUT_DATE,PROJECT_EXT_UID"
+                                + " FROM EPGP_PROJECTS"
+                                + " LEFT JOIN EPG_RESOURCES ON PROJECT_CHECKEDOUT_BY = WRES_ID"
+                                + " WHERE PROJECT_ID = @p1";
+                if (dba.SelectDataById(cmdText, nPROJECT_ID, (StatusEnum)99998, out dt) != StatusEnum.rsSuccess)
+                {
+                    //lblGeneralError.Text = "SelectData Error : " + dba.Status.ToString() + " - " + dba.StatusText;
+                    //lblGeneralError.Visible = true;
+                }
+                else
+                {
+                    if (dt.Rows.Count == 1)
+                    {
+                        DataRow row = dt.Rows[0];
+                        CStruct xPI = new CStruct();
+                        xPI.Initialize("PI");
+                        xPI.CreateIntAttr("PROJECT_ID", DBAccess.ReadIntValue(row["PROJECT_ID"]));
+                        xPI.CreateStringAttr("PROJECT_NAME", DBAccess.ReadStringValue(row["PROJECT_NAME"]));
+                        xPI.CreateIntAttr("PROJECT_MARKED_DELETION", DBAccess.ReadIntValue(row["PROJECT_MARKED_DELETION"]));
+                        xPI.CreateIntAttr("PROJECT_CHECKEDOUT", DBAccess.ReadIntValue(row["PROJECT_CHECKEDOUT"]));
+                        xPI.CreateStringAttr("RES_NAME", DBAccess.ReadStringValue(row["RES_NAME"]));
+                        xPI.CreateDateAttr("PROJECT_CHECKEDOUT_DATE", DBAccess.ReadDateValue(row["PROJECT_CHECKEDOUT_DATE"]));
+                        sXML = xPI.XML();
+                    }
+                }
+            }
+            catch (PFEException pex)
+            {
+                //if (pex.ExceptionNumber == 9999)
+                //    Response.Redirect(this.Site.Url + "/_layouts/ppm/NoPerm.aspx?requesturl='" + Request.RawUrl + "'");
+                //lblGeneralError.Text = "PFE Exception : " + pex.ExceptionNumber.ToString() + " - " + pex.Message;
+                //lblGeneralError.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                //lblGeneralError.Text = ex.Message;
+                //lblGeneralError.Visible = true;
+            }
+            finally
+            {
+                if (dba != null)
+                    dba.Close();
+            }
+            return sXML;
         }
         #endregion
     }

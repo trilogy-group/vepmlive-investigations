@@ -116,11 +116,10 @@
                     if (json.reply != null) {
                         if (jsf_alertError(json.reply.error) == true)
                             return false;
+                        // no errors so remove row from grid
+                        dgrid1.deleteRow(sRowId);
+                        dgrid1_OnRowSelect(null);
                     }
-                    // if deleted  then remove row from grid
-                    var sRowId = dgrid1_selectedRow;
-                    dgrid1.deleteRow(sRowId);
-                    dgrid1_OnRowSelect(null);
                 }
                 break;
             case "btnRefresh":
