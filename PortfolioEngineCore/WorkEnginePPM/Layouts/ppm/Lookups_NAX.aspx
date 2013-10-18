@@ -242,6 +242,8 @@ html, body {
                 tgridLV.Initialize(json.reply.Lookup.tgridLVData);
                 tgridLV.SetWidth(440);
                 tgridLV.SetHeight(120);
+                document.getElementById('idDeleteWarning').style.display = "none";
+                document.getElementById('idOKButton').value = "OK";
                 dgrid1.grid.clearSelection();
                 DisplayDialog(645, 550, dlgTitle, "winLookupDlg", "idLookupDlg", true, false);
                 break;
