@@ -262,7 +262,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         ProcessIzenda(web);
 
 
-                        ClearNavigationCache();
+                        ClearNavigationCache(web);
 
                         if(rdoYes.Checked)
                         {
@@ -542,7 +542,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //hideWizard(web);
             Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">SP.UI.ModalDialog.commonModalDialogClose(0, '');</script>");
 
-            ClearNavigationCache();
+            ClearNavigationCache(web);
         }
 
         private void ProcessTimerJob(SPWeb web)
@@ -779,14 +779,14 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 SSRS.CookieContainer.Add(oC);
                 */
 
-
-                var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
-
-                var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
-                SSRS.CookieContainer =
-
-                new CookieContainer();
-                SSRS.CookieContainer.Add(fedAuth);
+                try
+                {
+                    var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
+                    var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
+                    SSRS.CookieContainer = new CookieContainer();
+                    SSRS.CookieContainer.Add(fedAuth);
+                }
+                catch { }
 
                 SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
 
@@ -870,9 +870,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
         }
 
-        private void ClearNavigationCache()
+        private void ClearNavigationCache(SPWeb web)
         {
-            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+            CacheStore.Current.RemoveSafely(web.Url, CacheStoreCategory.Navigation);
         }
     }
 }
