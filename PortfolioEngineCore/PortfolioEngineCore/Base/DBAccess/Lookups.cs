@@ -128,8 +128,11 @@ namespace PortfolioEngineCore
                         sParentName = "";
                         for (l = 1; l <= lLevel - 1; l++)
                         {
-                            if (l == 1) sParentName = sLevelName[l] + ".";
-                            else sParentName = sParentName + "." + sLevelName[l];
+                            if (l == 1)
+                                sParentName = sLevelName[l];
+                            else
+                                sParentName = sParentName + sLevelName[l];
+                            sParentName += ".";
                         }
                         oItemLookup.Value.fullname = sParentName + oItemLookup.Value.name;
 
