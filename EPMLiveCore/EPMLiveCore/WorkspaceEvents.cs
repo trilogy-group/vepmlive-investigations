@@ -34,7 +34,7 @@ namespace EPMLiveCore
                     "<Param key=\"IsItem\">" + isitem + "</Param></Data>";
 
                 var data = new AnalyticsData(xml, AnalyticsType.FavoriteWorkspace, AnalyticsAction.Delete);
-                var qExec = new QueryExecutor(SPContext.Current.Web);
+                var qExec = new QueryExecutor(properties.Web);
                 qExec.ExecuteEpmLiveQuery(
                     FRFQueryFactory.GetQuery(data),
                     FRFQueryParamFactory.GetParam(data));
