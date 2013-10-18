@@ -1191,8 +1191,17 @@
                 function registerProviderLinks(response) {
                     window.epmLiveNavigation.buildLink = function (link) {
                         var webUrl = $$.currentWebUrl();
-                        var page = webUrl + window.location.href.split(webUrl)[1];
-                        page = page.split('#')[0].split('?')[0];
+                        var url = window.location.href;
+
+                        var urlParts = url.split('?');
+
+                        var page = (webUrl + urlParts[0].split(webUrl)[1]);
+
+                        if (urlParts.length > 1) {
+                            page = page + '?' + urlParts[1];
+                        }
+
+                        page = escape(page);
                         
                         return {
                             id: link['@Id'],
