@@ -138,22 +138,33 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     itemId = S(childWeb["ItemWebId"]) + "." + S(childWeb["ItemListId"]) + "." + cItemId;
                 }
 
-                if (string.IsNullOrEmpty(itemId))
+                var proceed = true;
+
+                try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    if (string.IsNullOrEmpty(itemId))
                     {
-                        using (var spSite = new SPSite(SiteId))
+                        SPSecurity.RunWithElevatedPrivileges(() =>
                         {
-                            using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
+                            using (var spSite = new SPSite(SiteId))
                             {
-                                if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                                using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
                                 {
-                                    itemId = "X";
+                                    if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                                    {
+                                        itemId = "X";
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
+                catch
+                {
+                    proceed = false;
+                }
+
+                if (!proceed) continue;
 
                 yield return new SPNavLink
                 {
