@@ -688,7 +688,7 @@ dhtmlXGridObject.prototype.menuaction = function (obj, action, actiontype) {
     else {
         curRow = this._curMenuRow.id;
         curGrid = this;
-        var options = { url: weburl, width: 700, dialogReturnValueCallback: this.gridactioncallback };
+        var options = { url: weburl, width: 600, dialogReturnValueCallback: this.gridactioncallback };
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
     this._curHover = false;
