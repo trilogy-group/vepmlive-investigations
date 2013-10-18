@@ -84,7 +84,7 @@ function viewItem#gridid#(link, action)
 		}
 	}
 
-	var options = { url: wurl, width: 700, dialogReturnValueCallback:myCallback };
+	var options = { url: wurl, width: 600, dialogReturnValueCallback:myCallback };
 
 	SP.UI.ModalDialog.showModalDialog(options);
 }
@@ -119,7 +119,7 @@ function newItem#gridid#(usepopup)
 	{
 		function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
 
-		var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
+		var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 
 		SP.UI.ModalDialog.showModalDialog(options);
 	}

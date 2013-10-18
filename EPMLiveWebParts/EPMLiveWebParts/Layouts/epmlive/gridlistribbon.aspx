@@ -784,11 +784,11 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if(commandId === 'ViewProperties')
         {
-            this.epmlive_gridaction("view", 650, this.$Grid.getSelectedRowId());
+            this.epmlive_gridaction("view", 600, this.$Grid.getSelectedRowId());
         }
         else if(commandId === 'EditProperties')
         {
-            this.epmlive_gridaction("edit", 700, this.$Grid.getSelectedRowId());
+            this.epmlive_gridaction("edit", 600, this.$Grid.getSelectedRowId());
 
 
 
@@ -917,7 +917,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
 
-        	var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
+        	var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 
         	SP.UI.ModalDialog.showModalDialog(options);
         }
@@ -929,7 +929,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
                 function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
 
-            	var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
+            	var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 
             	SP.UI.ModalDialog.showModalDialog(options);
             }
@@ -957,7 +957,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             {
                 function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
 
-        	    var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
+        	    var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 
         	    SP.UI.ModalDialog.showModalDialog(options);
             }
