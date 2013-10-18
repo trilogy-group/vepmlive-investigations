@@ -472,22 +472,24 @@ namespace TimeSheets
 
         protected override void OnPreRender(EventArgs e)
         {
-            AddContextualTab();
+            if (bHasPeriods)
+            {
+                AddContextualTab();
 
-            ClientScriptManager clientScriptManager = Page.ClientScript;
-            clientScriptManager.RegisterClientScriptBlock(GetType(), "MyTimesheet", DelayScript.Replace("{webPartPageComponentId}",SPRibbon.GetWebPartPageComponentId(this)).Replace("{TSOBJECT}", "TSObject" + sFullGridId) );
+                ClientScriptManager clientScriptManager = Page.ClientScript;
+                clientScriptManager.RegisterClientScriptBlock(GetType(), "MyTimesheet", DelayScript.Replace("{webPartPageComponentId}", SPRibbon.GetWebPartPageComponentId(this)).Replace("{TSOBJECT}", "TSObject" + sFullGridId));
 
-            CssRegistration.Register("/_layouts/epmlive/MyTimesheet.css");
-            CssRegistration.Register("/_layouts/epmlive/modal/modal.css");
+                CssRegistration.Register("/_layouts/epmlive/MyTimesheet.css");
+                CssRegistration.Register("/_layouts/epmlive/modal/modal.css");
 
-            ScriptLink.Register(Page, "/_layouts/epmlive/treegrid/GridE.js", false);
-            ScriptLink.Register(Page, "/_layouts/epmlive/modal/modal.js", false);
-            ScriptLink.Register(Page, "/_layouts/epmlive/dhtml/xgrid/dhtmlxcommon.js", false);
+                ScriptLink.Register(Page, "/_layouts/epmlive/treegrid/GridE.js", false);
+                ScriptLink.Register(Page, "/_layouts/epmlive/modal/modal.js", false);
+                ScriptLink.Register(Page, "/_layouts/epmlive/dhtml/xgrid/dhtmlxcommon.js", false);
 
-            ScriptLink.Register(Page, "/_layouts/epmlive/MyTimesheet.js", false);
+                ScriptLink.Register(Page, "/_layouts/epmlive/MyTimesheet.js", false);
 
-            ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
-
+                ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
+            }
             base.OnPreRender(e);
         }
 
