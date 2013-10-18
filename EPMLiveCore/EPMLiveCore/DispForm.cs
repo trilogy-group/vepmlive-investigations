@@ -177,7 +177,7 @@ namespace EPMLiveCore
                 if ((ListItem.ModerationInformation == null || ListItem.ModerationInformation.Status == SPModerationStatusType.Approved) && childitem == "")
                 {
                     ribbonExtensions = new XmlDocument();
-                    ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.CreateWorkspace\" Sequence=\"50\" Command=\"Ribbon.ListForm.Display.Manage.CreateWorkspace\" LabelText=\"Create Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>");
+                    ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.CreateWorkspace\" Sequence=\"50\" Command=\"Ribbon.ListForm.Display.Manage.CreateWorkspace\" LabelText=\"Create Workspace\" TemplateAlias=\"o2\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>");
                     ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
                 }
             }
