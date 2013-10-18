@@ -212,10 +212,15 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 
 .ms-core-needIEFilter#globalNavBox { filter: none !important }
 
+.ms-browseTab span {
+    padding-bottom: 7px !important;
+}
+
 .ms-browseTab a:hover,
 .ms-browseTab a:active {
     background: #F0F0F0 !important;
     border: 1px solid #F0F0F0 !important;
+    border-bottom: none !important;
     cursor: pointer;
 }
 
