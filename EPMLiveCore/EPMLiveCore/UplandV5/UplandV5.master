@@ -519,6 +519,10 @@
             else if (path.indexOf("fd_Item_")> -1) {
 	            fixed = false;
             }
+            else if (window.location.href.indexOf("VisibilityContext=WSSWebPartPage")> -1) {
+	            fixed = false;
+            }
+
             
 
             if(fixed == true) {
