@@ -80,6 +80,13 @@
 <![endif]-->
         
 <!--[if !IE]><!-->
+
+    <SharePoint:StyleBlock runat="server">
+        .epm-nav-icon {
+            top: 4px;
+        }
+    </SharePoint:StyleBlock>
+
     <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
     <link href='/_layouts/15/epmlive/stylesheets/masterpages/upland.icons.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
     <link href="/_layouts/15/epmlive/stylesheets/libraries/jquery-ui.css?v=<%= EPMLiveVersion %>" rel="stylesheet" type="text/css" />
