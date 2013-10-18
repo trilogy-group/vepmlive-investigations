@@ -2940,7 +2940,7 @@
 			select.options[0] = new Option("Hours", 1, true, true);
 			select.options[1] = new Option("FTE", 2, false, false);
 			select.options[2] = new Option("FTE Percent", 3, false, false);
-			select.options[3] = new Option("FTE Conversion", 4, false, false);
+			//select.options[3] = new Option("FTE Conversion", 4, false, false);
 
 
 			var selectedItem = select.options[select.selectedIndex];
