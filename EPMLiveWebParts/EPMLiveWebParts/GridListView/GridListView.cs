@@ -3494,7 +3494,9 @@ namespace EPMLiveWebParts
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",clearLoader);");
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",switchFilterLoad" + sFullGridId + ");");
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",enablesearcher" + sFullGridId + ");");
-
+            if(SPContext.Current.ViewContext.View != null)
+                output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",clickTab());");
+            
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onRowSelect\",selectRow" + sFullGridId + ");");
 
             try
@@ -3730,7 +3732,7 @@ namespace EPMLiveWebParts
                     output.WriteLine("try{");
                     output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
                     output.WriteLine("fireEvent(wp, 'mouseup');");
-                    output.WriteLine("setTimeout(\"clickbrowse()\",100);");
+                    //output.WriteLine("setTimeout(\"clickbrowse()\",100);");
                     output.WriteLine("}catch(e){}");
                     output.WriteLine("}");
 
@@ -3747,7 +3749,7 @@ namespace EPMLiveWebParts
                     output.WriteLine("try{");
                     output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
                     output.WriteLine("fireEvent(wp, 'mouseup');");
-                    output.WriteLine("setTimeout(\"clickbrowse()\",1000);");
+                    //output.WriteLine("setTimeout(\"clickbrowse()\",1000);");
                     output.WriteLine("}catch(e){}");
                     output.WriteLine("}");
 
