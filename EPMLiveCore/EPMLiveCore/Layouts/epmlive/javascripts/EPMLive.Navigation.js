@@ -1375,7 +1375,7 @@
                         links = window.epmLiveNavigation.staticProvider;
                     }
 
-                    if (links) {
+                    if (links !== null) {
                         var linkXml = $$.parseJson(base64Service.decode(links));
 
                         if (!linkXml.Nodes.Workspaces) {
@@ -1384,13 +1384,13 @@
                             if (window.epmLiveNavigation.workspaceTree()) {
                                 registerProviderLinks(linkXml);
                             } else {
-                                window.setTimeout(function () {
+                                window.setTimeout(function() {
                                     registerStaticProviderLinks();
                                 }, 1);
                             }
                         }
                     } else {
-                        window.setTimeout(function () {
+                        window.setTimeout(function() {
                             registerStaticProviderLinks();
                         }, 1);
                     }
