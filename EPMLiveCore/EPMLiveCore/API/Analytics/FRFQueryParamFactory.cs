@@ -365,7 +365,6 @@ namespace EPMLiveCore.API
                     {
                         {"@siteid", data.SiteId},
                         {"@webid", data.WebId},
-                        {"@listid", data.ListId},
                         {"@fstring", data.FString},
                         {"@userid", data.UserId},
                         {"@title", data.Title},
