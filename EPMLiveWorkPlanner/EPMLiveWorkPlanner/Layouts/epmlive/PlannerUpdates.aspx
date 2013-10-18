@@ -321,8 +321,8 @@
 
         function setHeight() {
             var h = getHeight();
-            document.getElementById("divMain").style.height = (h - 25) + "px";
-            document.getElementById("divTree").style.height = (h - 75) + "px";
+            document.getElementById("divMain").style.height = (h - 40) + "px";
+            document.getElementById("divTree").style.height = (h - 90) + "px";
 
             if(!divDetail)
                 divDetail = document.getElementById("divDetail");
@@ -380,7 +380,7 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     
-    <div id="divMain" style="width:100%; height:500px">
+    <div id="divMain" style="width:100%; height:400px">
         <div id="div1" style="width:100%; height:20px">
             Double click to view task details.<br />
         </div>
