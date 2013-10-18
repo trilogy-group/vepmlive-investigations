@@ -2385,6 +2385,11 @@ namespace EPMLiveWebParts
 
 
                 }
+
+                if (SPContext.Current.ViewContext.View != null)
+                {
+                    output.Write("<script language=\"javascript\">fixedRibbon = true;</script>");
+                }
             }
             catch (Exception ex)
             {
