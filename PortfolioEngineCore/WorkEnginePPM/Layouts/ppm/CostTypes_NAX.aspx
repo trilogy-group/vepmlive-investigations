@@ -243,8 +243,8 @@ html, body {
             { type: "button", id: "btnDelete", name: "DELETE", img: "formatmap16x16_2.png", style: "top: -270px; left: -270px;", tooltip: "Delete",  onclick: "return toolbar_event('btnDelete');", disabled: true },
             { type: "button", id: "btnCostTotals", name: "COST TOTALS", img: "formatmap16x16_2.png", style: "top: -90px; left: -289px;", tooltip: "Cost Totals",  onclick: "toolbar_event('btnCostTotals');", disabled: true },
             { type: "button", id: "btnSecurity", name: "SECURITY", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Security", onclick: "toolbar_event('btnSecurity');", disabled: true },
-            { type: "button", id: "btnPostOptions", name: "POST OPTIONS", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Post Cost Options", onclick: "toolbar_event('btnPostOptions');", disabled: true },
-            { type: "button", id: "btnPostCostValues", name: "POST", img: "formatmap16x16_2.png", style: "top: -145px; left: -72px;", tooltip: "Post Cost Values", onclick: "toolbar_event('btnPostCostValues');", disabled: true }
+            { type: "button", id: "btnPostOptions", name: "POST OPTIONS", img: "formatmap16x16_2.png", style: "top: -252px; left: -91px;", tooltip: "Post Cost Options", onclick: "toolbar_event('btnPostOptions');", disabled: true },
+            { type: "button", id: "btnPostCostValues", name: "POST", img: "formatmap16x16_2.png", style: "top: -252px; left: -71px;", tooltip: "Post Cost Values", onclick: "toolbar_event('btnPostCostValues');", disabled: true }
     ]
     };
 
