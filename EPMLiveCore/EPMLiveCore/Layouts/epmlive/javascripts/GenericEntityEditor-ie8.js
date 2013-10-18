@@ -1564,6 +1564,6 @@ function GEInit() {
     }(window.epmLiveGenericEntityEditor = window.epmLiveGenericEntityEditor || {}, jQuery, window));
 
 }
-ExecuteOrDelayUntilScriptLoaded(GEInit, "clientforms.js");
+ExecuteOrDelayUntilScriptLoaded(GEInit, "EPMLive.js");
 
 
