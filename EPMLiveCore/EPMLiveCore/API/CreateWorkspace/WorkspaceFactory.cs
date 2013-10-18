@@ -698,7 +698,7 @@ namespace EPMLiveCore.API
             bool uniquePermission = bool.Parse(_xmlDataMgr.GetPropVal("UniquePermission"));
             bool inheritTopLink = false;
 
-            
+
 
             string err = string.Empty;
             if (parentWeb.DoesUserHavePermissions(siteOwnerName, SPBasePermissions.ManageSubwebs))
@@ -714,7 +714,7 @@ namespace EPMLiveCore.API
                     if (uniquePermission)
                     {
                         if (!isStandAlone)
-                        {   
+                        {
                             err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true,
                                 inheritTopLink,
                                 cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
@@ -768,7 +768,7 @@ namespace EPMLiveCore.API
                         {
                             if (!_isStandAlone)
                             {
-                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName,false, inheritTopLink,
+                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
                                     eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                     out _createdWebUrl, out _createdWebTitle);
                             }
@@ -818,13 +818,13 @@ namespace EPMLiveCore.API
                                     if (!isStandAlone)
                                     {
                                         //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,siteOwnerName, true, inheritTopLink,
+                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
                                             cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                             out _createdWebUrl, out _createdWebTitle);
                                     }
                                     else
                                     {
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,siteOwnerName, true, inheritTopLink,
+                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
                                             cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                             out _createdWebUrl, out _createdWebTitle);
                                     }
@@ -833,7 +833,7 @@ namespace EPMLiveCore.API
                                 {
                                     if (!isStandAlone)
                                     {
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,siteOwnerName, false, inheritTopLink,
+                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
                                             cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                             out _createdWebUrl, out _createdWebTitle);
                                     }
@@ -858,7 +858,7 @@ namespace EPMLiveCore.API
                                         if (!isStandAlone)
                                         {
                                             //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,siteOwnerName, true, inheritTopLink,
+                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
                                                 eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                                 out _createdWebUrl, out _createdWebTitle);
                                         }
@@ -873,7 +873,7 @@ namespace EPMLiveCore.API
                                     {
                                         if (!_isStandAlone)
                                         {
-                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName,siteOwnerName, false, inheritTopLink,
+                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
                                                 eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                                 out _createdWebUrl, out _createdWebTitle);
                                         }
@@ -1021,12 +1021,12 @@ namespace EPMLiveCore.API
                             "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
                         var className = "EPMLiveCore.WorkspaceEvents";
                         var evts = CoreFunctions.GetWebEvents(w, assemblyName, className,
-                            new List<SPEventReceiverType> { SPEventReceiverType.WebDeleted });
+                            new List<SPEventReceiverType> { SPEventReceiverType.WebDeleting });
                         foreach (SPEventReceiverDefinition evt in evts)
                         {
                             evt.Delete();
                         }
-                        w.EventReceivers.Add(SPEventReceiverType.WebDeleted, assemblyName, className);
+                        w.EventReceivers.Add(SPEventReceiverType.WebDeleting, assemblyName, className);
                         w.Update();
                     }
                 }
@@ -1164,13 +1164,14 @@ namespace EPMLiveCore.API
             var site = new SPSite(SiteId);
             SPWeb web = site.OpenWeb(WebId);
 
-            try
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                SPSecurity.RunWithElevatedPrivileges(() =>
+                using (var eSite = new SPSite(SiteId))
                 {
-                    using (var eSite = new SPSite(SiteId))
+                    using (SPWeb eWeb = eSite.OpenWeb(WebId))
                     {
-                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                        try
                         {
                             GrabOnlineFiles(eSite, eWeb);
                             BaseProvision(site, web, eSite, eWeb);
@@ -1181,17 +1182,20 @@ namespace EPMLiveCore.API
                             AddPermission();
                             ModifyNewWSProperty();
                             ActivateFeature();
+                            //RemoveSolutionFromGallery(eSite, eWeb);
+                        }
+                        catch (Exception e)
+                        {
+                            NotifyWsGeneralError(web, e.Message);
+                        }
+                        finally
+                        {
                             RemoveSolutionFromGallery(eSite, eWeb);
+                            ClearCache();
                         }
                     }
-                });
-
-                ClearCache();
-            }
-            catch (Exception e)
-            {
-                NotifyWsGeneralError(web, e.Message);
-            }
+                }
+            });
 
             return new OnlineWorkspaceInfo(_xmlResult.ToString());
         }
@@ -1233,10 +1237,17 @@ namespace EPMLiveCore.API
 
             string originalSolName = tempName.Replace(".wsp", "");
             string SolNameWOSpace = originalSolName.Replace(" ", "");
-            string sTempName = (from t in cEWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
-                                where t.Name.EndsWith(originalSolName, StringComparison.CurrentCultureIgnoreCase) ||
-                                      t.Name.EndsWith(SolNameWOSpace, StringComparison.CurrentCultureIgnoreCase)
-                                select t).ToList<SPWebTemplate>()[0].Name;
+            string sTempName = string.Empty;
+            var lstTemps = (from t in cEWeb.GetAvailableWebTemplates(1033).OfType<SPWebTemplate>()
+                            where t.Name.EndsWith(originalSolName, StringComparison.CurrentCultureIgnoreCase) ||
+                                  t.Name.EndsWith(SolNameWOSpace, StringComparison.CurrentCultureIgnoreCase)
+                            select t).ToList<SPWebTemplate>();
+
+            if (lstTemps.Count > 0)
+            {
+                sTempName = lstTemps[0].Name;
+            }
+
             _xmlDataMgr.EditProp("TemplateName", sTempName);
 
             if (string.IsNullOrEmpty(_xmlDataMgr.GetPropVal("TemplateName")))
@@ -1274,13 +1285,13 @@ namespace EPMLiveCore.API
             var site = new SPSite(SiteId);
             SPWeb web = site.OpenWeb(WebId);
 
-            try
+            SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                SPSecurity.RunWithElevatedPrivileges(() =>
+                using (var eSite = new SPSite(SiteId))
                 {
-                    using (var eSite = new SPSite(SiteId))
+                    using (SPWeb eWeb = eSite.OpenWeb(WebId))
                     {
-                        using (SPWeb eWeb = eSite.OpenWeb(WebId))
+                        try
                         {
                             GetTempName(eSite, TempGalWebId);
                             BaseProvision(site, web, eSite, eWeb);
@@ -1291,17 +1302,20 @@ namespace EPMLiveCore.API
                             AddPermission();
                             ModifyNewWSProperty();
                             ActivateFeature();
+                            //RemoveSolutionFromGallery(eSite, eWeb);
+                        }
+                        catch (Exception e)
+                        {
+                            NotifyWsGeneralError(web, e.Message);
+                        }
+                        finally
+                        {
                             RemoveSolutionFromGallery(eSite, eWeb);
+                            ClearCache();
                         }
                     }
-                });
-
-                ClearCache();
-            }
-            catch (Exception e)
-            {
-                NotifyWsGeneralError(web, e.Message);
-            }
+                }
+            });
 
             return new DownloadedWorkspaceInfo(_xmlResult.ToString());
         }
