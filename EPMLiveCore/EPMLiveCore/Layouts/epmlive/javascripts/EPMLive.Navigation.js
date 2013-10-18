@@ -1615,6 +1615,18 @@
                                     return 'icon-user-plus-3';
                                 case 'workspace':
                                     return 'icon-tree-2';
+                                case 'epkcommand:rpeditor':
+                                    return 'icon-users-5';
+                                case 'perms':
+                                    return 'icon-key';
+                                case 'createworkspace':
+                                    return 'icon-tree-2';
+                                case 'epkcommand:costs':
+                                    return 'icon-coins';
+                                case 'workflows':
+                                    return 'icon-loop-3';
+                                case 'gotoplanner':
+                                    return 'fui-ext-project';
                                 default:
                                     return 'epm-nav-cm-blank';
                             }
