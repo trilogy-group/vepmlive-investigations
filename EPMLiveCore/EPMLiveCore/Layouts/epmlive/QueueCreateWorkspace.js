@@ -414,6 +414,8 @@ function registerCreateWorkspace2Script() {
               
                 if (self.showInProgress() === 'true') {
                     $('#divProgress').show();
+                    $('#divProgress').siblings().hide();
+                    $('.modal-footer').hide();
                 }
 
                 w.setTimeout(function() { $('.titleInput').focus(); }, 10);
