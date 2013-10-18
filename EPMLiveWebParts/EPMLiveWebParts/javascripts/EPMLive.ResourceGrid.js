@@ -1863,13 +1863,11 @@ function registerEpmLiveResourceGridScript() {
             grid.Update();
             grid.Render();
 
-            if ((window.location.href + '').toLowerCase().indexOf('sitepages') !== -1) {
-                window.setTimeout(function () { $$.actions.loadRibbon(); }, 1500);
+            window.setTimeout(function () { $$.actions.loadRibbon(); }, 1500);
 
-                $('#s4-workspace').click(function() {
-                    window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
-                });
-            }
+            $('#s4-workspace').click(function () {
+                window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
+            });
         };
 
         window.Grids.OnGetHtmlValue = function (grid, row, col, val) {
