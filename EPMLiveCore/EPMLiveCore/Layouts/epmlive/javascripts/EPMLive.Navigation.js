@@ -1084,7 +1084,7 @@
                         var wsWidth = 0;
 
                         try {
-                            wsWidth = $wsTree.width() + 20;
+                            wsWidth = $wsTree.width() + 40;
                         } catch(ex) {
                         } 
                         

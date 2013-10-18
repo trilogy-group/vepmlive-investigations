@@ -644,6 +644,24 @@
             white-space: nowrap;
             display: inline-block;
 
+            span.rtPlus,
+            span.rtMinus {
+                background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAQCAYAAABk1z2tAAAAiUlEQVRIx9XVUQrAIAgGYGF39oK9eqeNYA2xzaxt7V/gS4h8WBYR+koprSMxrT4qkJkphy5AwRgFdtWvgFeFo/stYCQ3g2CApWMesCogIsubwNKVHXIAzf75kEQu9F1gZDDcDsIDZ9xBe8T6eHX+Z0A1DLhAPcUa1wV84l1r5VucC0T86v4BRF8bSWOCDyiuVXEAAAAASUVORK5CYII=') !important;
+                *background-image: url(../../../images/navigation/expand-collapse-sprite.png) !important; /* For IE 6 and 7 */
+                height: 15px !important;
+                width: 15px !important;
+                margin-left: -18px;
+                margin-right: 3px !important;
+            }
+
+            span.rtPlus {
+                background-position: 0 -1px !important;
+            }
+
+            span.rtMinus {
+                background-position: -24px -1px !important;
+            }
+
             a {
                 color: @link-color;
                 font-family: 'Open Sans Regular',sans-serif;

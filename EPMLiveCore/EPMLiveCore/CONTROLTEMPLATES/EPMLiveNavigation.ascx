@@ -160,7 +160,7 @@
                    { %>
                     <div id="EPMNavWorkspacesTree">
                         <input placeholder="Search..." type="text" id="EPMNavWSTSearch"/>
-                        <telerik:RadTreeView ID="WorkspacesNavTree" runat="server" EnableTheming="False" EnableViewState="False" />
+                        <telerik:RadTreeView ID="WorkspacesNavTree" ShowLineImages="False" runat="server" EnableTheming="False" EnableViewState="False" />
                     </div>
                 <% } %> 
             </div>       
@@ -171,17 +171,17 @@
 
 <SharePoint:ScriptBlock runat="server">
     (function() {
-    window.epmLiveNavigation = {
-    currentWebId: '<%= WebId %>',
-    currentWebUrl: '<%= WebUrl %>',
-    currentUserId: <%= UserId %>,
-    staticProvider: '<%= StaticProviderLinks %>',
-    selectedNode: '<%= SelectedNode %>',
-    workspaceTree: function() {
-    return window.$find('<%= WorkspacesNavTree.ClientID %>');
-    }
-    };
+        window.epmLiveNavigation = {
+            currentWebId: '<%= WebId %>',
+            currentWebUrl: '<%= WebUrl %>',
+            currentUserId: <%= UserId %>,
+            staticProvider: '<%= StaticProviderLinks %>',
+            selectedNode: '<%= SelectedNode %>',
+            workspaceTree: function() {
+                return window.$find('<%= WorkspacesNavTree.ClientID %>');
+            }
+        };
 
-    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
+        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation');
     })();
 </SharePoint:ScriptBlock>
