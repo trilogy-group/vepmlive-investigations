@@ -723,10 +723,12 @@ namespace EPMLiveWebParts
             {
                 data = "General Error: " + ex.Message;
             }
-            url = url.Substring(0, 10) + url.Substring(10).Replace("//", "/");
+            
 
             if (url != "")
             {
+                url = url.Substring(0, 10) + url.Substring(10).Replace("//", "/");
+
                 string source = System.Web.HttpUtility.UrlEncode(Request["source"]);
                 if (source != null && source != "")
                 {
