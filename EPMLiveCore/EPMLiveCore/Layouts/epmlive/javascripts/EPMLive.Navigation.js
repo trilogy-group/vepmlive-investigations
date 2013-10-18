@@ -1376,17 +1376,19 @@
                     }
 
                     if (links !== null) {
-                        var linkXml = $$.parseJson(base64Service.decode(links));
+                        if (links) {
+                            var linkXml = $$.parseJson(base64Service.decode(links));
 
-                        if (!linkXml.Nodes.Workspaces) {
-                            registerProviderLinks(linkXml);
-                        } else {
-                            if (window.epmLiveNavigation.workspaceTree()) {
+                            if (!linkXml.Nodes.Workspaces) {
                                 registerProviderLinks(linkXml);
                             } else {
-                                window.setTimeout(function() {
-                                    registerStaticProviderLinks();
-                                }, 1);
+                                if (window.epmLiveNavigation.workspaceTree()) {
+                                    registerProviderLinks(linkXml);
+                                } else {
+                                    window.setTimeout(function () {
+                                        registerStaticProviderLinks();
+                                    }, 1);
+                                }
                             }
                         }
                     } else {
