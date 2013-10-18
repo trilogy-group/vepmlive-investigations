@@ -1495,60 +1495,70 @@
                                             var title = lnk['@Title'];
 
                                             if (title !== 'Workspaces' && title !== 'New Workspace' && title !== 'Favorite Workspaces' && title !== 'All Workspaces') {
-                                                var nl = window.epmLiveNavigation.buildLink(lnk);
-                                                var registered = false;
+                                                var registerWS = function() {
+                                                    if (window.epmLiveNavigation.buildLink) {
+                                                        var nl = window.epmLiveNavigation.buildLink(lnk);
+                                                        var registered = false;
 
-                                                for (var i = 0; i < registeredLinks.length; i++) {
-                                                    if (registeredLinks[i] === nl.title) {
-                                                        registered = true;
-                                                        break;
-                                                    }
-                                                }
-
-                                                if (!registered) {
-                                                    nl.kind = 2;
-
-                                                    window.epmLiveNavigation.registerLink(nl);
-                                                    registeredLinks.push(nl.title);
-                                                } else {
-                                                    for (var n = 0; n < tlNodes.length; n++) {
-                                                        var nde = tlNodes[n];
-
-                                                        if (nde.provider === providerName) {
-                                                            var workspaceTree = window.epmLiveNavigation.workspaceTree();
-                                                            workspaceTree.trackChanges();
-                                                            
-                                                            nde.registerWorkspace(nl, workspaceTree);
-                                                            
-                                                            workspaceTree.commitChanges();
-                                                            
-                                                            $('a.rtIn').each(function () {
-                                                                var $a = $(this);
-                                                                var text = $a.text();
-
-                                                                if (text === nl.title) {
-                                                                    var $parent = $a.parent();
-
-                                                                    $parent.append('<div id="' + workspaceTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
-                                                                    $a.remove();
-
-                                                                    $a.text('');
-                                                                    $a.append('<span>' + text + '</span>');
-                                                                    $parent.find('.epm-nav-ws-node').append($a);
-                                                                    
-                                                                    var $p = $a.parent();
-
-                                                                    $p.addClass('epm-nav-sortable');
-                                                                    $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
-
-                                                                    window.epmLiveNavigation.addFavoriteWSMenu($p);
-                                                                }
-                                                            });
-
-                                                            break;
+                                                        for (var i = 0; i < registeredLinks.length; i++) {
+                                                            if (registeredLinks[i] === nl.title) {
+                                                                registered = true;
+                                                                break;
+                                                            }
                                                         }
+
+                                                        if (!registered) {
+                                                            nl.kind = 2;
+
+                                                            window.epmLiveNavigation.registerLink(nl);
+                                                            registeredLinks.push(nl.title);
+                                                        } else {
+                                                            for (var n = 0; n < tlNodes.length; n++) {
+                                                                var nde = tlNodes[n];
+
+                                                                if (nde.provider === providerName) {
+                                                                    var workspaceTree = window.epmLiveNavigation.workspaceTree();
+                                                                    workspaceTree.trackChanges();
+
+                                                                    nde.registerWorkspace(nl, workspaceTree);
+
+                                                                    workspaceTree.commitChanges();
+
+                                                                    $('a.rtIn').each(function () {
+                                                                        var $a = $(this);
+                                                                        var text = $a.text();
+
+                                                                        if (text === nl.title) {
+                                                                            var $parent = $a.parent();
+
+                                                                            $parent.append('<div id="' + workspaceTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
+                                                                            $a.remove();
+
+                                                                            $a.text('');
+                                                                            $a.append('<span>' + text + '</span>');
+                                                                            $parent.find('.epm-nav-ws-node').append($a);
+
+                                                                            var $p = $a.parent();
+
+                                                                            $p.addClass('epm-nav-sortable');
+                                                                            $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
+
+                                                                            window.epmLiveNavigation.addFavoriteWSMenu($p);
+                                                                        }
+                                                                    });
+
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    } else {
+                                                        window.setTimeout(function () {
+                                                            registerWS();
+                                                        }, 1);
                                                     }
-                                                }
+                                                };
+
+                                                registerWS();
                                             }
                                         }
                                     }
