@@ -46,6 +46,9 @@
             <asp:ContentPlaceHolder id="PlaceHolderBodyAreaClass" runat="server" />
         </SharePoint:AjaxDelta>
         <SharePoint:CssRegistration Name="Themable/corev15.css" runat="server" />
+        <SharePoint:ScriptBlock runat="server">
+            var fixedRibbon = false;
+        </SharePoint:ScriptBlock>
     </head>
     <body>
         <!-- EPMLive Head -->
@@ -476,56 +479,8 @@
                     $("#idStorefrontHeader").append('<a href="https://epmlive.myshopify.com?Source=' + weburl + '" target="_blank"><div style="background-color:#0090CA;width:736px;height:300px;margin-bottom:20px;border:1px solid #007CC9;border-radius:3px;"><div style="float:left;width:300px;"><div style="margin-left:15px;margin-bottom:20px;text-align:center;color:#ffffff;font-family:Open Sans Light;font-size:30px;margin-top:20px;width:100%;">Install an EPM Live custom App</div><div style="margin-left:15px;text-align:center;width:100%;"><p style="font-size:18px;font-family:Open Sans Regular;color:#fff;">- OR -</p></div><div style="margin-left:15px;text-align:center;width:100%;"><p style="font-size:18px;font-family:Open Sans Regular;color:#fff;padding:15px;">browse from the list of SharePoint Apps below.</p></div></div><div style="float:right;padding:15px;margin-top:25px;"><img style="width:400px;" src="/_layouts/15/epmlive/images/screens.png"/></div></div></a>');
                 });
             }
-
-            var fixed = true;
-            var path = window.location.pathname;
-
-            if (path.indexOf("Resource Pool.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("MyWork.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("workplanner.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("MyTimesheet.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (window.location.href.indexOf("IsDlg")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("NewForm.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("DispForm.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("EditForm.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("Resource%20Pool.aspx")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("My%20Timesheet.aspx")> -1) {
-	            fixed = false;
-            }
-             else if (path.indexOf("_catalogs")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("_layouts")> -1) {
-	            fixed = false;
-            }
-            else if (path.indexOf("fd_Item_")> -1) {
-	            fixed = false;
-            }
-            else if (window.location.href.indexOf("VisibilityContext=WSSWebPartPage")> -1) {
-	            fixed = false;
-            }
-
-            
-
-            if(fixed == true) {
+  
+            if(fixedRibbon) {
        
                 // This function extends the original from INIT.JS
                 var FixRibbonAndWorkspaceDimensions = (function () {
