@@ -116,6 +116,7 @@
     function toolbar_event(event) {
         switch (event) {
             case 'btnSave':
+                pagechanged = false;
                 <%= Page.ClientScript.GetPostBackEventReference(btnSave, String.Empty) %>;
                 break;
             default:
