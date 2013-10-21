@@ -1194,7 +1194,6 @@
                         var url = window.location.href;
 
                         var urlParts = url.split('?');
-
                         var page = (webUrl + urlParts[0].split(webUrl)[1]);
 
                         if (urlParts.length > 1) {
