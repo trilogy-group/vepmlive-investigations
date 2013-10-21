@@ -19,7 +19,7 @@ namespace UplandIntegrations.Tenrox
         private const string PROJECT_INFO_URL =
             @"{0}/TEnterprise/core/base/logon.aspx?HideCloseButton=1&Linktype=2&LiveLink=1&LinkUID={1}&OrgName={2}";
 
-        private const string TIMESHEET_URL = @"{0}/TEnterprise/core/base/logon.aspx?Linktype=12&LiveLink=1&OrgName={1}";
+        private const string TIMESHEET_URL = @"{0}/TEnterprise/core/base/logon.aspx?Linktype=12&LiveLink=1&OrgName={1}&extapplication=mscrm";
 
         private const string UPSERT_ERROR_MESSAGE =
             @"Could not upsert record. Tenrox ID: {0}. EPMLive ID: {1}. Reason: {2}";
@@ -164,7 +164,7 @@ namespace UplandIntegrations.Tenrox
             }
             catch (Exception e)
             {
-                message = e.Message + e.InnerException.Message;
+                message = e.Message;
                 log.LogMessage(message, IntegrationLogType.Error);
 
                 return false;

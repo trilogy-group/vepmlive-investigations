@@ -95,7 +95,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Service References\TenroxDataService\Reference.cs">
+    <Compile Include="Service References\TenroxDataService\Reference.cs" />
+    <Compile Include="Service References\TenroxDataService\Reference1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -736,12 +737,12 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Service References\TenroxDataService\configuration91.svcinfo" />
-    <None Include="Service References\TenroxDataService\configuration.svcinfo" />
-    <None Include="Service References\TenroxDataService\Reference.svcmap">
+    <Content Include="Service References\TenroxDataService\configuration.svcinfo" />
+    <Content Include="Service References\TenroxDataService\configuration91.svcinfo" />
+    <Content Include="Service References\TenroxDataService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
+      <LastGenOutput>Reference1.cs</LastGenOutput>
+    </Content>
     <Content Include="Web References\IntegrationAPI\integration.disco" />
     <None Include="Service References\TenroxAuthService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
@@ -772,7 +773,6 @@
     <WCFMetadataStorage Include="Service References\TenroxAssignmentService\" />
     <WCFMetadataStorage Include="Service References\TenroxAuthService\" />
     <WCFMetadataStorage Include="Service References\TenroxClientService\" />
-    <WCFMetadataStorage Include="Service References\TenroxDataService\" />
     <WCFMetadataStorage Include="Service References\TenroxIntegrationService\" />
     <WCFMetadataStorage Include="Service References\TenroxProjectService\" />
     <WCFMetadataStorage Include="Service References\TenroxTaskService\" />

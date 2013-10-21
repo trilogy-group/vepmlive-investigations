@@ -89,15 +89,12 @@
 
 							var routId = routeobj[0].routeId;
 
-								$.get(WebAPIUrl + "routes/" + projectId + "?xml=true&" + Param, function (routes) {
-								currentRoutes = routes;
+								$.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
 
-									var xml = GetXML(routId);
-									if (routId > 0 && xml != "") {
-										LoadVisualWorkflow(routId, xml);
-									}
+														LoadVisualWorkflow(routId, docid, xml);
+													}
 
-								});
+												});
 										
 
 						});
