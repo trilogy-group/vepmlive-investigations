@@ -239,6 +239,8 @@ html, body {
                 document.getElementById('txtId').value = fieldId;
                 document.getElementById('txtName').value = GetStringFromValue(json.reply.Lookup.LOOKUP_NAME);
                 document.getElementById('txtDesc').value = GetStringFromValue(json.reply.Lookup.LOOKUP_DESC);
+                document.getElementById('txtName').disabled = false;
+                document.getElementById('txtDesc').disabled = false;
                 tgridLV.Initialize(json.reply.Lookup.tgridLVData);
                 tgridLV.SetWidth(440);
                 tgridLV.SetHeight(120);
