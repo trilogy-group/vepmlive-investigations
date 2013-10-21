@@ -1,4 +1,5 @@
 ﻿using System;
+using EPMLiveCore;
 using EPMLiveCore.Controls.Navigation.Providers;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
@@ -228,65 +229,75 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 {
                     using(SPWeb web = site.OpenWeb())
                     {
-                        site.AllowUnsafeUpdates = true;
-                        web.AllowUnsafeUpdates = true;
                         try
                         {
-                            string loc = EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmlivewizardredirect");
-                            if(loc != "")
+                            site.AllowUnsafeUpdates = true;
+                            web.AllowUnsafeUpdates = true;
+                            try
                             {
-                                url = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + loc;
-                            }
-                            else
-                            {
-                                SPList list = web.Lists["Configuration Tasks"];
-                                url = list.DefaultView.ServerRelativeUrl;
-                            }
-                        }
-                        catch { }
-
-                        processQuickLaunch(web);
-                        hideWizard(web);
-                        if(ssrsurl != "")
-                        {
-                            processReports(web);
-                        }
-
-                        ProcessNotifications(web);
-                        ProcessTimerJob(web);
-                        ProcessReportingRefreshJob(web);
-                        ProcessBackEndLists(web);
-                        ProcessGroups(web, w.CurrentUser);
-                        ProcessExcel(web);
-                        ProcessLists(web);
-                        ProcessIzenda(web);
-
-
-                        ClearNavigationCache(web);
-
-                        if(rdoYes.Checked)
-                        {
-                            if(url != "")
-                            {
-                                if(Request["isdlg"] == "1")
-                                    Page.ClientScript.RegisterStartupScript(this.GetType(), "redirect", "<script language=\"javascript\">window.parent.location.href='" + url + "';</script>");
+                                string loc = CoreFunctions.getConfigSetting(web, "epmlivewizardredirect");
+                                if (loc != "")
+                                {
+                                    url = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + loc;
+                                }
                                 else
-                                    Response.Redirect(url);
+                                {
+                                    SPList list = web.Lists["Configuration Tasks"];
+                                    url = list.DefaultView.ServerRelativeUrl;
+                                }
+                            }
+                            catch { }
+
+                            processQuickLaunch(web);
+                            hideWizard(web);
+                            if (ssrsurl != "")
+                            {
+                                processReports(web);
+                            }
+
+                            ProcessNotifications(web);
+                            ProcessTimerJob(web);
+                            ProcessReportingRefreshJob(web);
+                            ProcessBackEndLists(web);
+                            ProcessGroups(web, w.CurrentUser);
+                            ProcessExcel(web);
+                            ProcessLists(web);
+                            ProcessIzenda(web);
+
+                            ClearNavigationCache();
+
+                            if (rdoYes.Checked)
+                            {
+                                if (url != "")
+                                {
+                                    if (Request["isdlg"] == "1")
+                                        Page.ClientScript.RegisterStartupScript(this.GetType(), "redirect",
+                                            "<script language=\"javascript\">window.parent.location.href='" + url +
+                                            "';</script>");
+                                    else
+                                        Response.Redirect(url);
+                                }
+                                else
+                                {
+                                    if (Request["isdlg"] == "1")
+                                        Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
+                                            "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
+                                    else
+                                        Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
+                                }
                             }
                             else
                             {
-                                if(Request["isdlg"] == "1")
-                                    Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
+                                if (Request["isdlg"] == "1")
+                                    Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
+                                        "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
                                 else
                                     Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
                             }
                         }
-                        else
+                        finally
                         {
-                            if(Request["isdlg"] == "1")
-                                Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
-                            else
-                                Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
+                            ClearNavigationCache();
                         }
                     }
                 }
@@ -533,16 +544,21 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         protected void btnCancel_Click(object sender, EventArgs e)
         {
-            pnlDone.Visible = false;
-            pnl1.Visible = false;
-            pnl2.Visible = false;
+            try
+            {
+                pnlDone.Visible = false;
+                pnl1.Visible = false;
+                pnl2.Visible = false;
 
-            SPWeb web = SPContext.Current.Web;
-            processQuickLaunch(web);
-            //hideWizard(web);
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">SP.UI.ModalDialog.commonModalDialogClose(0, '');</script>");
-
-            ClearNavigationCache(web);
+                SPWeb web = SPContext.Current.Web;
+                processQuickLaunch(web);
+                //hideWizard(web);
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">SP.UI.ModalDialog.commonModalDialogClose(0, '');</script>");
+            }
+            finally
+            {
+                ClearNavigationCache();
+            }
         }
 
         private void ProcessTimerJob(SPWeb web)
@@ -870,9 +886,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
         }
 
-        private void ClearNavigationCache(SPWeb web)
+        private void ClearNavigationCache()
         {
-            CacheStore.Current.RemoveSafely(web.Url, CacheStoreCategory.Navigation);
+            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
         }
     }
 }

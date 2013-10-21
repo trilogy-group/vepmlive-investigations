@@ -272,6 +272,13 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\RedirectionProxy.aspx.designer.cs">
       <DependentUpon>RedirectionProxy.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\SSRSReportRedirect.aspx.cs">
+      <DependentUpon>SSRSReportRedirect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SSRSReportRedirect.aspx.designer.cs">
+      <DependentUpon>SSRSReportRedirect.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\tlwizard.aspx.cs">
       <DependentUpon>tlwizard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1193,6 +1200,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\MyWork.aspx" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.min.css" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.min.js" />
+    <Content Include="Layouts\epmlive\SSRSReportRedirect.aspx" />
     <Content Include="Layouts\epmlive\Stylesheets\addmenu.css" />
     <Content Include="Layouts\epmlive\ajaxpost.aspx" />
     <Content Include="Layouts\epmlive\AssignmentPlanner.aspx" />
