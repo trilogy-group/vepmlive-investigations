@@ -1231,6 +1231,15 @@ namespace PortfolioEngineCore
                     }
                     else
                     {
+                        if (bDefault)
+                        {
+                            // clear other view default flags
+                            sCommand = "UPDATE EPG_VIEWS SET VIEW_DEFAULT=0 WHERE VIEW_CONTEXT=30000 AND VIEW_GUID<>@VIEW_GUID";
+                            cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                            cmd.Parameters.AddWithValue("@VIEW_GUID", guidView);
+                            nRowsAffected = cmd.ExecuteNonQuery();
+                        }
+
                         CStruct xResult = BuildResultStruct("SaveResourcePlanView");
                         xResult.AppendSubStruct(xView);
                         sReply = xResult.XML();
