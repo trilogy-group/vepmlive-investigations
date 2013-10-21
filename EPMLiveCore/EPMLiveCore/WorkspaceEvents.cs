@@ -39,6 +39,14 @@ namespace EPMLiveCore
                     FRFQueryFactory.GetQuery(data),
                     FRFQueryParamFactory.GetParam(data));
 
+                qExec.ExecuteReportingDBNonQuery(
+                    "DELETE FROM RPTWeb WHERE [WebId]=@webid", 
+                    new Dictionary<string, object>()
+                    {
+                        {"@webid", properties.WebId}
+                    });
+
+
                 CacheStore.Current.RemoveSafely(properties.Web.Url, CacheStoreCategory.Navigation);
             }
             catch
