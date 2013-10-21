@@ -24,7 +24,9 @@ function jsf_isEmpty(value) {
 };
 function jsf_displayDialog(wins, left, top, width, height, title, idWindow, idAttachObj, bModal, bResize, bAttachURL) {
     if (wins != null) {
-        var dlg = wins.createWindow(idWindow, left, top, width, height);
+        var dlg = wins.window(idWindow);
+        if (dlg == null)
+            dlg = wins.createWindow(idWindow, left, top, width, height);
         if (dlg != null) {
             dlg.clearIcon();
             if (bResize == false) {
@@ -46,7 +48,7 @@ function jsf_displayDialog(wins, left, top, width, height, title, idWindow, idAt
                     dlg.attachObject(idAttachObj);
             }
             dlg.allowMove();
-
+            dlg.show();
         }
         return dlg;
     }
