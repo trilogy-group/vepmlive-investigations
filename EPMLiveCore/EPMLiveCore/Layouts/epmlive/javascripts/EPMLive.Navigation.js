@@ -1192,17 +1192,29 @@
                     window.epmLiveNavigation.buildLink = function (link) {
                         var webUrl = $$.currentWebUrl();
                         var url = window.location.href;
-
-                        var urlParts = url.split('?');
-
-                        var page = (webUrl + urlParts[0].split(webUrl)[1]);
-
-                        page = escape(page);
+                        var rawUrl = (link['#cdata'] || '');
                         
+                        if ((rawUrl + '').toLowerCase().indexOf('/lists/') !== -1) {
+                            url = rawUrl.replace(/Source={page}&BackTo={page}/g, '');
+                            var parts = url.split('?');
+                            
+                            if (parts.length > 1) {
+                                if (!parts[1]) {
+                                    url = parts[0];
+                                }
+                            }
+                        } else {
+                            var urlParts = url.split('?');
+                            var page = (webUrl + urlParts[0].split(webUrl)[1]);
+                            page = escape(page);
+                            
+                            url = rawUrl.replace(/{page}/g, page);
+                        }
+
                         return {
                             id: link['@Id'],
                             title: link['@Title'],
-                            url: (link['#cdata'] || '').replace(/{page}/g, page),
+                            url: url,
                             category: link['@Category'],
                             cssClass: link['@CssClass'],
                             order: parseInt(link['@Order']),
