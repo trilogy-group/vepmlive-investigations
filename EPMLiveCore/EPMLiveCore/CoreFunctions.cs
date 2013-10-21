@@ -1951,17 +1951,21 @@ namespace EPMLiveCore
             createdWebServerRelativeUrl = string.Empty;
             try
             {
-                string sUrl = "";
+                var sUrl = "";
 
-                string finalTitle = title;
-                bool exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
-                int i = 1;
+                var finalTitle = title;
+                var exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
+
+                var prefix = title;
+                var suffix = 1;
+
                 while (exists)
                 {
-                    finalTitle = finalTitle + i++;
+                    finalTitle = prefix + suffix++;
                     exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
                 }
-                SPWeb web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
+
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
 
                 createdWebId = web.ID;
                 createdWebUrl = web.Url;
@@ -1994,22 +1998,22 @@ namespace EPMLiveCore
                                 List<string> listsToBeMapped = new List<string>();
                                 string EPMLiveReportingAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
                                 foreach (SPList l in w.Lists)
-                                {   
+                                {
                                     string sClass = "EPMLiveReportsAdmin.ListEvents";
 
-                                     evts = CoreFunctions.GetListEvents(l,
-                                                                        EPMLiveReportingAssembly,
-                                                                        sClass,
-                                                                        new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
+                                    evts = CoreFunctions.GetListEvents(l,
+                                                                       EPMLiveReportingAssembly,
+                                                                       sClass,
+                                                                       new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
                                                                                     SPEventReceiverType.ItemUpdated,
                                                                                     SPEventReceiverType.ItemDeleting});
 
-                                     if (evts.Count > 0 &&
-                                         !listsToBeMapped.Contains(l.Title))
-                                     {
-                                         listsToBeMapped.Add(l.Title);
-                                         continue;
-                                     }
+                                    if (evts.Count > 0 &&
+                                        !listsToBeMapped.Contains(l.Title))
+                                    {
+                                        listsToBeMapped.Add(l.Title);
+                                        continue;
+                                    }
                                 }
 
                                 if (listsToBeMapped.Count > 0)
@@ -2028,9 +2032,9 @@ namespace EPMLiveCore
                                     }
                                     catch { }
 
-                                    if (m != null && 
-                                        assemblyInstance != null && 
-                                        thisClass != null && 
+                                    if (m != null &&
+                                        assemblyInstance != null &&
+                                        thisClass != null &&
                                         apiClass != null)
                                     {
                                         m.Invoke(apiClass, new object[] { string.Join(",", listsToBeMapped) });
@@ -2078,7 +2082,7 @@ namespace EPMLiveCore
             }
             catch
             {
-                
+
             }
             return exists;
         }
@@ -2092,212 +2096,214 @@ namespace EPMLiveCore
             createdWebTitle = string.Empty;
             try
             {
-                string sUrl = "";
-               
+                var sUrl = "";
+
+                var finalTitle = title;
+                var exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
+
+                var prefix = title;
+                var suffix = 1;
+
+                while (exists)
                 {
-                    string finalTitle = title;
-                    bool exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
-                    int i = 1;
-                    while (exists)
+                    finalTitle = prefix + suffix++;
+                    exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
+                }
+
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
+
+                createdSiteId = web.ID;
+                createdWebUrl = web.Url;
+                createdWebRelativeUrl = web.ServerRelativeUrl;
+                createdWebTitle = web.Title;
+
+                if (web.Navigation.TopNavigationBar != null)
+                {
+                    web.Navigation.TopNavigationBar.Navigation.UseShared = toplink;
+                }
+
+                web.AllowUnsafeUpdates = true;
+
+                web.Update();
+
+                API.Applications.GenerateQuickLaunchFromApp(web);
+
+                if (unique)
+                {
+                    int iowner = 0;
+                    int imember = 0;
+                    int ivisitor = 0;
+
+                    string strEPMLiveGroupsPermAssignments = "";
+
+
+                    List<int> owners = new List<int>();
+                    List<int> members = new List<int>();
+                    List<int> visitors = new List<int>();
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        finalTitle = finalTitle + i++;
-                        exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
-                    }
+                        using (SPSite es = new SPSite(itemWeb.Site.ID))
+                        {
+                            using (SPWeb ew = es.OpenWeb(itemWeb.ID))
+                            {
+                                SPList itemList = ew.Lists[listId];
+                                SPListItem item = itemList.GetItemById(itemId);
 
-                    SPWeb web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
-
-                    createdSiteId = web.ID;
-                    createdWebUrl = web.Url;
-                    createdWebRelativeUrl = web.ServerRelativeUrl;
-                    createdWebTitle = web.Title;
-
-                    if (web.Navigation.TopNavigationBar != null)
-                    {
-                        web.Navigation.TopNavigationBar.Navigation.UseShared = toplink;
-                    }
-
-                    web.AllowUnsafeUpdates = true;
+                                SPRoleAssignmentCollection raColl = item.RoleAssignments;
+                                iowner = (from SPRoleAssignment owner in raColl
+                                          where owner.Member.Name.Contains(title + " Owner")
+                                          select owner.Member.ID).FirstOrDefault<int>();
+                                owners = (from SPRoleAssignment owner in raColl
+                                          where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Administrator))
+                                          select owner.Member.ID).ToList<int>();
+                                imember = (from SPRoleAssignment owner in raColl
+                                           where owner.Member.Name.Contains(title + " Member")
+                                           select owner.Member.ID).ToList<int>()[0];
+                                members = (from SPRoleAssignment owner in raColl
+                                           where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Contributor))
+                                           select owner.Member.ID).ToList<int>();
+                                ivisitor = (from SPRoleAssignment owner in raColl
+                                            where owner.Member.Name.Contains(title + " Visitor")
+                                            select owner.Member.ID).ToList<int>()[0];
+                                visitors = (from SPRoleAssignment owner in raColl
+                                            where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Reader))
+                                            select owner.Member.ID).ToList<int>();
+                            }
+                        }
+                    });
+                    SPUser ownerByCreation = web.AllUsers[user];
 
                     web.Update();
-
-                    API.Applications.GenerateQuickLaunchFromApp(web);
-
-                    if (unique)
+                    SPMember newOwner = null;
+                    //=========Owner Group========================
+                    SPRole roll = web.Roles["Full Control"];
+                    if (iowner != 0)
                     {
-                        int iowner = 0;
-                        int imember = 0;
-                        int ivisitor = 0;
-
-                        string strEPMLiveGroupsPermAssignments = "";
-
-
-                        List<int> owners = new List<int>();
-                        List<int> members = new List<int>();
-                        List<int> visitors = new List<int>();
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        try
                         {
-                            using (SPSite es = new SPSite(itemWeb.Site.ID))
-                            {
-                                using (SPWeb ew = es.OpenWeb(itemWeb.ID))
-                                {
-                                    SPList itemList = ew.Lists[listId];
-                                    SPListItem item = itemList.GetItemById(itemId);
-
-                                    SPRoleAssignmentCollection raColl = item.RoleAssignments;
-                                    iowner = (from SPRoleAssignment owner in raColl
-                                              where owner.Member.Name.Contains(title + " Owner")
-                                              select owner.Member.ID).FirstOrDefault<int>();
-                                    owners = (from SPRoleAssignment owner in raColl
-                                              where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Administrator))
-                                              select owner.Member.ID).ToList<int>();
-                                    imember = (from SPRoleAssignment owner in raColl
-                                               where owner.Member.Name.Contains(title + " Member")
-                                               select owner.Member.ID).ToList<int>()[0];
-                                    members = (from SPRoleAssignment owner in raColl
-                                               where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Contributor))
-                                               select owner.Member.ID).ToList<int>();
-                                    ivisitor = (from SPRoleAssignment owner in raColl
-                                                where owner.Member.Name.Contains(title + " Visitor")
-                                                select owner.Member.ID).ToList<int>()[0];
-                                    visitors = (from SPRoleAssignment owner in raColl
-                                                where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Reader))
-                                                select owner.Member.ID).ToList<int>();
-                                }
-                            }
-                        });
-                        SPUser ownerByCreation = web.AllUsers[user];
-
-                        web.Update();
-                        SPMember newOwner = null;
-                        //=========Owner Group========================
-                        SPRole roll = web.Roles["Full Control"];
-                        if (iowner != 0)
-                        {
-                            try
-                            {
-                                web.AssociatedOwnerGroup = web.SiteGroups.GetByID(iowner);
-                                roll.AddGroup(web.SiteGroups.GetByID(iowner));
-                                newOwner = web.SiteGroups.GetByID(iowner);
-                            }
-                            catch { }
+                            web.AssociatedOwnerGroup = web.SiteGroups.GetByID(iowner);
+                            roll.AddGroup(web.SiteGroups.GetByID(iowner));
+                            newOwner = web.SiteGroups.GetByID(iowner);
                         }
-                        else
-                        {
-                            string finalGroupName = string.Empty;
-                            try
-                            {
-                                if (newOwner == null)
-                                    newOwner = ownerByCreation;
-
-                                finalGroupName = AddGroup(web, title, "Administrators", newOwner, ownerByCreation, "");
-                            }
-                            catch (Exception) { }
-                            web.Update();
-                            web.AssociatedOwnerGroup = GetSiteGroup(web, finalGroupName);
-                            roll.AddGroup(web.SiteGroups[finalGroupName]);
-                            newOwner = web.SiteGroups[finalGroupName];
-                        }
-                        if (newOwner == null)
-                            newOwner = ownerByCreation;
-
-                        if (owners.Count() > 0)
-                        {
-                            foreach (int id in owners)
-                            {
-                                roll.AddGroup(web.SiteGroups.GetByID(id));
-                            }
-                            web.Update();
-                        }
-                        //=========Member Group========================
-                        if (imember != 0)
-                        {
-                            try
-                            {
-                                web.AssociatedMemberGroup = web.SiteGroups.GetByID(imember);
-                                roll = web.Roles["Contribute"];
-                                roll.AddGroup(web.SiteGroups.GetByID(imember));
-                            }
-                            catch { }
-                        }
-                        else
-                        {
-                            string finalGroupName = string.Empty;
-                            try
-                            {
-                                finalGroupName = AddGroup(web, title, "Members", newOwner, ownerByCreation, "");
-                            }
-                            catch (Exception) { }
-                            web.Update();
-                            web.AssociatedMemberGroup = GetSiteGroup(web, finalGroupName);
-                            roll = web.Roles["Contribute"];
-                            roll.AddGroup(web.SiteGroups[finalGroupName]);
-                        }
-
-                        if (members.Count() > 0)
-                        {
-                            foreach (int id in members)
-                            {
-                                roll.AddGroup(web.SiteGroups.GetByID(id));
-                            }
-                            web.Update();
-                        }
-                        //=========Visitor Group========================
-                        if (ivisitor != 0)
-                        {
-                            try
-                            {
-                                web.AssociatedVisitorGroup = web.SiteGroups.GetByID(ivisitor);
-                                roll = web.Roles["Read"];
-                                roll.AddGroup(web.SiteGroups.GetByID(ivisitor));
-                            }
-                            catch { }
-                        }
-                        else
-                        {
-                            string finalGroupName = string.Empty;
-                            try
-                            {
-                                finalGroupName = AddGroup(web, title, "Visitors", newOwner, ownerByCreation, "");
-                            }
-                            catch (Exception) { }
-                            web.Update();
-                            web.AssociatedVisitorGroup = GetSiteGroup(web, finalGroupName);
-                            roll = web.Roles["Read"];
-                            roll.AddGroup(web.SiteGroups[finalGroupName]);
-                        }
-
-                        if (visitors.Count() > 0)
-                        {
-                            foreach (int id in visitors)
-                            {
-                                roll.AddGroup(web.SiteGroups.GetByID(id));
-                            }
-                        }
-                        web.Update();
-
-                        if (strEPMLiveGroupsPermAssignments.Length > 1)
-                        {
-                            string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
-                            foreach (string strInner in strOuter)
-                            {
-                                string[] strInnerMost = strInner.Split('~');
-                                SPGroup spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
-
-                                //Persist groups & permissions to the database
-                                if (spGroup != null)
-                                {
-                                    SPRoleAssignment spRA = new SPRoleAssignment(spGroup);
-                                    spRA.RoleDefinitionBindings.Add(web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
-                                    web.RoleAssignments.Add(spRA);
-                                }
-                            }
-                        }
-                        web.Update();
-
+                        catch { }
                     }
-                    sUrl = web.Url;
-                    web.Close();
+                    else
+                    {
+                        string finalGroupName = string.Empty;
+                        try
+                        {
+                            if (newOwner == null)
+                                newOwner = ownerByCreation;
+
+                            finalGroupName = AddGroup(web, title, "Administrators", newOwner, ownerByCreation, "");
+                        }
+                        catch (Exception) { }
+                        web.Update();
+                        web.AssociatedOwnerGroup = GetSiteGroup(web, finalGroupName);
+                        roll.AddGroup(web.SiteGroups[finalGroupName]);
+                        newOwner = web.SiteGroups[finalGroupName];
+                    }
+                    if (newOwner == null)
+                        newOwner = ownerByCreation;
+
+                    if (owners.Count() > 0)
+                    {
+                        foreach (int id in owners)
+                        {
+                            roll.AddGroup(web.SiteGroups.GetByID(id));
+                        }
+                        web.Update();
+                    }
+                    //=========Member Group========================
+                    if (imember != 0)
+                    {
+                        try
+                        {
+                            web.AssociatedMemberGroup = web.SiteGroups.GetByID(imember);
+                            roll = web.Roles["Contribute"];
+                            roll.AddGroup(web.SiteGroups.GetByID(imember));
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        string finalGroupName = string.Empty;
+                        try
+                        {
+                            finalGroupName = AddGroup(web, title, "Members", newOwner, ownerByCreation, "");
+                        }
+                        catch (Exception) { }
+                        web.Update();
+                        web.AssociatedMemberGroup = GetSiteGroup(web, finalGroupName);
+                        roll = web.Roles["Contribute"];
+                        roll.AddGroup(web.SiteGroups[finalGroupName]);
+                    }
+
+                    if (members.Count() > 0)
+                    {
+                        foreach (int id in members)
+                        {
+                            roll.AddGroup(web.SiteGroups.GetByID(id));
+                        }
+                        web.Update();
+                    }
+                    //=========Visitor Group========================
+                    if (ivisitor != 0)
+                    {
+                        try
+                        {
+                            web.AssociatedVisitorGroup = web.SiteGroups.GetByID(ivisitor);
+                            roll = web.Roles["Read"];
+                            roll.AddGroup(web.SiteGroups.GetByID(ivisitor));
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        string finalGroupName = string.Empty;
+                        try
+                        {
+                            finalGroupName = AddGroup(web, title, "Visitors", newOwner, ownerByCreation, "");
+                        }
+                        catch (Exception) { }
+                        web.Update();
+                        web.AssociatedVisitorGroup = GetSiteGroup(web, finalGroupName);
+                        roll = web.Roles["Read"];
+                        roll.AddGroup(web.SiteGroups[finalGroupName]);
+                    }
+
+                    if (visitors.Count() > 0)
+                    {
+                        foreach (int id in visitors)
+                        {
+                            roll.AddGroup(web.SiteGroups.GetByID(id));
+                        }
+                    }
+                    web.Update();
+
+                    if (strEPMLiveGroupsPermAssignments.Length > 1)
+                    {
+                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
+                        foreach (string strInner in strOuter)
+                        {
+                            string[] strInnerMost = strInner.Split('~');
+                            SPGroup spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
+
+                            //Persist groups & permissions to the database
+                            if (spGroup != null)
+                            {
+                                SPRoleAssignment spRA = new SPRoleAssignment(spGroup);
+                                spRA.RoleDefinitionBindings.Add(web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
+                                web.RoleAssignments.Add(spRA);
+                            }
+                        }
+                    }
+                    web.Update();
+
                 }
+                sUrl = web.Url;
+                web.Close();
+
 
                 return "0:" + sUrl;
             }
