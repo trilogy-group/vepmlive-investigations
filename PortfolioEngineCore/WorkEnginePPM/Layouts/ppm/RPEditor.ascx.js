@@ -3022,6 +3022,7 @@
             else
                 resgrid.RenderBody();
         }
+        this.SetPaddingWidth();
         this.HideUnusedGroupRowsAsync();
     };
     RPEditor.prototype.GridsOnRowFilter = function (grid, row, show) {
