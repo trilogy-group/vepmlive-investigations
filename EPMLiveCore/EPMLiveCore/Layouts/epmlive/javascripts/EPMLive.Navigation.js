@@ -1004,7 +1004,8 @@
                     try {
                         $sn.slimScroll({
                             height: $sn.height(),
-                            width: $sn.width()
+                            width: $sn.width(),
+                            alwaysVisible: true
                         });
                     } catch (e) {
                     }
@@ -1012,11 +1013,31 @@
                     var $ss = $('#epm-nav').find('.slimScrollDiv');
                     var $sb = $ss.find('.slimScrollBar');
 
+                    $sb.hide();
                     $ss.css('position', 'absolute');
                     $ss.css('left', '50px');
                     $sn.css('left', '0');
                     $sn.css('top', '0');
                     $sb.css('z-index', 1001);
+
+                    $ss.hover(function () {
+                        var show = false;
+                        
+                        $('.epm-nav-sub').each(function() {
+                            var $menu = $(this);
+                            if ($menu.is(':visible')) {
+                                if ($menu.height() >= $ss.height()) {
+                                    show = true;
+                                }
+                            }
+                        });
+                        
+                        if (show) {
+                            $sb.fadeIn(300);
+                        }
+                    }, function() {
+                        $sb.fadeOut(300);
+                    });
 
                     $(window).resize(function () {
                         var height = $('#epm-nav-top').height();
