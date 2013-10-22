@@ -146,7 +146,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                 if (!hasAccess.Equals("1"))
                 {
-                    if (!(from r in rows where S(r["ParentWebId"]).Equals(cWebId) select r).Any())
+                    if (!(from r in rows where S(r["ParentWebId"]).Equals(cWebId) && S(r["HasAccess"]).Equals("1") select r).Any())
                     {
                         proceed = false;
                     }
