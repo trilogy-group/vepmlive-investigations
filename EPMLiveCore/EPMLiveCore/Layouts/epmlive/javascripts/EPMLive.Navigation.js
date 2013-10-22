@@ -1567,6 +1567,9 @@
                                                                     break;
                                                                 }
                                                             }
+
+                                                            $('#epm-nav-nows-ph').remove();
+                                                            $('#EPMNavWorkspacesTree').fadeIn(300);
                                                         }
                                                     } else {
                                                         window.setTimeout(function () {
@@ -2017,6 +2020,8 @@
             };
 
             var manageWorkspaces = function () {
+                var $wsTree = $('#EPMNavWorkspacesTree');
+                
                 var workspacesManager = (function () {
                     window.epmLiveNavigation.addFavoriteWSMenu = function($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
@@ -2176,13 +2181,13 @@
                             }
                         }
 
-                        if (!found && $('#EPMNavWorkspacesTree').find('.epm-nav-sub-placeholder').length === 0) {
-                            $('#EPMNavWorkspacesTree').append($('<div class="epm-nav-sub-placeholder">No search results</div>').hide().fadeIn(200));
+                        if (!found && $wsTree.find('.epm-nav-sub-placeholder').length === 0) {
+                            $wsTree.append($('<div class="epm-nav-sub-placeholder">No search results</div>').hide().fadeIn(200));
                         }
                     };
 
                     var removeSearchPlaceHolders = function() {
-                        $('#EPMNavWorkspacesTree').find('.epm-nav-sub-placeholder').each(function() {
+                        $wsTree.find('.epm-nav-sub-placeholder').each(function() {
                             $(this).remove();
                         });
                     };
@@ -2246,9 +2251,15 @@
                 workspacesManager.configureNodeWidth();
                 workspacesManager.initializeSearch();
 
-                $('#EPMNavWorkspacesTree').find('a').each(function () {
+                $wsTree.find('a').each(function () {
                     workspacesManager.addMenu($(this).parent());
                 });
+                
+                if ($wsTree.find('a').length === 1) {
+                    $wsTree.hide();
+
+                    $('#epm-nav-sub-workspaces-static-links').get(0).innerHTML += '<li id="epm-nav-nows-ph" class="epm-nav-sub-placeholder">No workspaces</li>';
+                }
             };
 
             ExecuteOrDelayUntilScriptLoaded(manageSettings, 'EPMLiveNavigation_Settings');

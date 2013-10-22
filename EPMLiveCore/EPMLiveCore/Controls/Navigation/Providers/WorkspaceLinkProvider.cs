@@ -228,6 +228,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
             }
 
+            var wsFound = false;
+
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
                 foreach (DataRow row in dataTable.Rows)
@@ -236,22 +238,24 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
                     SPNavLink navLink = allWorkspaces.FirstOrDefault(w => (w.WebId ?? string.Empty).Equals(webId));
 
-                    if (navLink != null)
+                    if (navLink == null) continue;
+
+                    wsFound = true;
+
+                    yield return new SPNavLink
                     {
-                        yield return new SPNavLink
-                        {
-                            Id = S(row["LinkId"]),
-                            Title = S(row["Title"]),
-                            Url = S(row["Url"]),
-                            CssClass = "epm-nav-sortable " + S(row["CssClass"]),
-                            SiteId = S(row["SiteId"]),
-                            WebId = webId,
-                            ItemId = navLink.ItemId
-                        };
-                    }
+                        Id = S(row["LinkId"]),
+                        Title = S(row["Title"]),
+                        Url = S(row["Url"]),
+                        CssClass = "epm-nav-sortable " + S(row["CssClass"]),
+                        SiteId = S(row["SiteId"]),
+                        WebId = webId,
+                        ItemId = navLink.ItemId
+                    };
                 }
             }
-            else
+
+            if (!wsFound)
             {
                 yield return new NavLink
                 {
