@@ -13,7 +13,10 @@ namespace EPMLiveCore.Controls.Navigation.Providers
     [NavLinkProviderInfo(Name = "AssociatedItems")]
     public class AssociatedItemsLinkProvider : NavLinkProvider
     {
-        #region Fields (2) 
+        #region Fields (3) 
+
+        private const string LIST_URL =
+            @"javascript:SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {{ url: '{0}?lookupfield={1}&LookupFieldList={2}', showMaximized: true }});";
 
         private const string PARENT_WEB_LIST_ITEM_QUERY =
             @"SELECT TOP(1) ParentWebId, ItemListId AS ParentListId, ItemId AS ParentItemId FROM RPTWeb WHERE WebId = @WebId";
@@ -43,55 +46,65 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             ParentWebListItemId(ref parentWebId, ref parentListId, ref parentItemId);
 
-            if (parentWebId != Guid.Empty && parentListId != Guid.Empty && parentItemId > 0)
+            if (parentWebId == Guid.Empty || parentListId == Guid.Empty || parentItemId <= 0) return;
+
+            links.Add(new NavLink
             {
-                links.Add(new NavLink
-                {
-                    Title = "Associated Items",
-                    Url = "Header"
-                });
+                Title = "Associated Items",
+                Url = "Header"
+            });
 
-                using (var spSite = new SPSite(SiteId, GetUserToken()))
+            using (var spSite = new SPSite(SiteId, GetUserToken()))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(parentWebId))
                 {
-                    using (SPWeb spWeb = spSite.OpenWeb(parentWebId))
+                    SPList spList = null;
+
+                    try
                     {
-                        SPList spList = null;
-
-                        try
-                        {
-                            spList = spWeb.Lists.GetList(parentListId, false);
-                        }
-                        catch { }
-
-                        if (spList == null) return;
-
-                        NavLink navLink = GetLink(spList, parentItemId);
-
-                        if (navLink != null)
-                        {
-                            links.Add(navLink);
-                        }
-
-                        links.AddRange(
-                            ListCommands.GetAssociatedLists(spList)
-                                .Cast<AssociatedListInfo>()
-                                .Select(listInfo => GetLink(listInfo, spList))
-                                .Where(link => link != null));
+                        spList = spWeb.Lists.GetList(parentListId, false);
                     }
+                    catch { }
+
+                    if (spList == null) return;
+
+                    NavLink navLink = GetLink(spList, parentItemId);
+
+                    if (navLink != null)
+                    {
+                        links.Add(navLink);
+                    }
+
+                    links.AddRange(from object associatedList in ListCommands.GetAssociatedLists(spList)
+                        where associatedList != null
+                        select (AssociatedListInfo) associatedList
+                        into listInfo
+                        select GetLink(listInfo, spList)
+                        into link
+                        where link != null
+                        select link);
                 }
             }
         }
 
         private NavLink GetLink(AssociatedListInfo listInfo, SPList spList)
         {
-            return new NavLink
+            SPList list = null;
+
+            try
             {
-                Id = listInfo.ListId.ToString(),
-                Title = listInfo.Title,
-                Url = string.Format(
-                    @"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/redirectionproxy.aspx?webid={1}&listid={2}&action=new');",
-                    RelativeUrl, spList.ParentWeb.ID, listInfo.ListId)
-            };
+                list = spList.ParentWeb.Lists.GetList(listInfo.ListId, false);
+            }
+            catch { }
+
+            return list == null
+                ? null
+                : new NavLink
+                {
+                    Id = listInfo.ListId.ToString(),
+                    Title = listInfo.Title,
+                    Url = string.Format(LIST_URL, list.DefaultViewUrl, listInfo.LinkedField, spList.ID)
+                };
         }
 
         private NavLink GetLink(SPList spList, int itemId)
