@@ -16,6 +16,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             string url = "";
 
             bool bIframe = false;
+            string windowStyle = "";
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
@@ -38,6 +39,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                             intid = li["INTUID" + dr["INT_COLID"].ToString()].ToString();
                         }
                         catch { }
+                        windowStyle = dr["WINDOWSTYLE"].ToString();
                         if (intid != "")
                         {
                             url = core.GetControlURL(new Guid(dr["INT_LIST_ID"].ToString()), listId, Request["Control"], intid);
@@ -87,13 +89,56 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
             if (!string.IsNullOrEmpty(url))
             {
+                
                 if (bIframe)
                 {
-                    error = "<iframe src=\"" + url + "\" id=\"frmRemote\" style=\"width:100%;height:600px\">";
+                    error += "<script language=\"javascript\">\r\n";
+                    error += "function LoadInt2(){\r\n";
+                    error += "OpenIntegrationPage('" + Request["Control"] + ".1','','');\r\n";
+                    if (Request["isdlg"] == "1")
+                    {
+                        error += "SP.SOD.execute('SP.UI.dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 0, '');";
+                    }
+                    else
+                    {
+                        if (!System.IO.Path.GetFileName(Request.UrlReferrer.ToString()).StartsWith("gotoremote.aspx"))
+                            error += "location.href='" + Request.UrlReferrer.ToString() + "';\r\n";
+                    }
+                    error += "}\r\n";
+                    error += "function LoadInt(){\r\n";
+                    error += "var sandboxSupported = \"sandbox\" in document.createElement(\"iframe\");\r\n";
+                    error += "if(sandboxSupported){\r\n";
+                    error += "ifrm = document.createElement(\"IFRAME\"); \r\n";
+                    error += "ifrm.setAttribute(\"src\", \"" + url + "\");\r\n"; 
+                    error += "ifrm.style.width = \"100%\"; \r\n";
+                    error += "ifrm.style.height = 600 + \"px\"; \r\n";
+                    error += "document.getElementById(\"DeltaPlaceHolderMain\").appendChild(ifrm); \r\n";
+                    error += "}else{\r\n";
+                    error += "ExecuteOrDelayUntilScriptLoaded(LoadInt2, 'EPMLive.js');\r\n";
+                    error += "}}\r\n";
+                    error += "SP.SOD.executeFunc(\"sp.js\", null, LoadInt);\r\n";
+                    error += "</script>";
+                        
+                        //<iframe src=\"" + url + "\" id=\"frmRemote\" style=\"width:100%;height:600px\" sandbox=\"allow-forms allow-scripts\">";
                 }
                 else
                 {
-                    Response.Redirect(url);
+                    if (Request.UrlReferrer == null)
+                        Response.Redirect(url);
+                    else if(error == "")
+                    {
+                        error = "<script language=\"javascript\">\r\n";
+                        error += "function LoadInt1(){\r\n";
+                        error += "ExecuteOrDelayUntilScriptLoaded(LoadInt2, 'EPMLive.js');\r\n";
+                        error += "}\r\n";
+                        error += "function LoadInt2(){\r\n";
+                        error += "OpenIntegrationPage('" + Request["Control"] + "." + windowStyle + "','','');\r\n";
+                        if(!System.IO.Path.GetFileName(Request.UrlReferrer.ToString()).StartsWith("gotoremote.aspx"))
+                            error += "location.href='" + Request.UrlReferrer.ToString() + "';\r\n";
+                        error += "}\r\n";
+                        error += "SP.SOD.executeFunc(\"sp.js\", null, LoadInt1);\r\n";
+                        error += "</script>";
+                    }
                 }
             }
         }

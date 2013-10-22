@@ -11,7 +11,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Infrastructure.Navigation;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using RestSharp.Extensions;
+//using RestSharp.Extensions;
 
 namespace EPMLiveCore.CONTROLTEMPLATES
 {
