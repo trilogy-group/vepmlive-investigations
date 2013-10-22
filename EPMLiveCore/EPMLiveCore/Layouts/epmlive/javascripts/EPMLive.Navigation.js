@@ -1701,6 +1701,16 @@
                             }
                         }
 
+                        $menu.find('a').click(function() {
+                            var $at = $(this);
+                            if ($at.parent().find('.icon-star-6').length) {
+                                $menu.hover(function() {
+                                }, function() {
+                                    $menu.remove();
+                                });
+                            }
+                        });
+
                         $menu.hover(function () {
                             window.epmNavHoveredNode = liId;
                         });
