@@ -124,6 +124,7 @@
   -moz-opacity: 0.5;
   -khtml-opacity: 0.5;
   opacity: 0.5;
+  cursor: default !important;
 }
 .epm-nav-sub div.epm-nav-home {
   color: #969696 !important;
