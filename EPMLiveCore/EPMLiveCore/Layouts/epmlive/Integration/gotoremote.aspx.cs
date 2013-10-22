@@ -112,6 +112,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     error += "ifrm.setAttribute(\"src\", \"" + url + "\");\r\n"; 
                     error += "ifrm.style.width = \"100%\"; \r\n";
                     error += "ifrm.style.height = 600 + \"px\"; \r\n";
+                    error += "ifrm.setAttribute(\"sandbox\", \"allow-script allow allow-forms\");\r\n"; 
                     error += "document.getElementById(\"DeltaPlaceHolderMain\").appendChild(ifrm); \r\n";
                     error += "}else{\r\n";
                     error += "ExecuteOrDelayUntilScriptLoaded(LoadInt2, 'EPMLive.js');\r\n";
