@@ -412,23 +412,29 @@ namespace PortfolioEngineCore
                 if (lLookupID > 0)
                 {
                     // Read field from LOOKUP_VALUES and get its list id
-                    SqlCommand oCommand = new SqlCommand("EPG_SP_ReadListItems", dba.Connection);
-                    oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    oCommand.Parameters.Add("LookupUID", SqlDbType.Int).Value = lLookupID;
-                    SqlDataReader reader = oCommand.ExecuteReader();
+                    DataTable dt;
+                    if (dbaEditCosts.SelectLookup(dba, lLookupID, out dt) != StatusEnum.rsSuccess)
+                        return dba.Status;
+                    //SqlCommand oCommand = new SqlCommand("EPG_SP_ReadListItems", dba.Connection);
+                    //oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    //oCommand.Parameters.Add("LookupUID", SqlDbType.Int).Value = lLookupID;
+                    //SqlDataReader reader = oCommand.ExecuteReader();
 
                     bool bInactive = false;
-                    while (reader.Read())
+                    //while (reader.Read())
+                    //{
+                    foreach (DataRow row in dt.Rows)
                     {
                         oLookupListItem = oLookupListItems.CreateSubStruct("Item");
-                        oLookupListItem.CreateIntAttr("ID", DBAccess.ReadIntValue(reader["LV_UID"]));
-                        oLookupListItem.CreateIntAttr("Level", DBAccess.ReadIntValue(reader["LV_LEVEL"]));
-                        oLookupListItem.CreateStringAttr("Name", DBAccess.ReadStringValue(reader["LV_VALUE"]));
-                        bInactive = DBAccess.ReadBoolValue(reader["LV_INACTIVE"]);
+                        oLookupListItem.CreateIntAttr("ID", DBAccess.ReadIntValue(row["LV_UID"]));
+                        oLookupListItem.CreateIntAttr("Level", DBAccess.ReadIntValue(row["LV_LEVEL"]));
+                        oLookupListItem.CreateStringAttr("Name", DBAccess.ReadStringValue(row["LV_VALUE"]));
+                        oLookupListItem.CreateStringAttr("FullName", DBAccess.ReadStringValue(row["LV_FULLVALUE"]));
+                        bInactive = DBAccess.ReadBoolValue(row["LV_INACTIVE"]);
                         if (bInactive)
                             oLookupListItem.CreateBooleanAttr("Inactive", bInactive);
                     }
-                    reader.Close();
+                    //reader.Close();
                 }
                 xReply = oLookupList;
             }

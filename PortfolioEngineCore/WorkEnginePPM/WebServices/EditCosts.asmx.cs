@@ -593,7 +593,7 @@ Status_Error:
 
             // add in lookup info in json format
             LookupItem[] arrNamedRateItems = namedRateItems.ToArray();
-            jsonRateLookup = "{Items:[" + BuildJSONLookup(arrNamedRateItems, 0) + "]}";
+            jsonRateLookup = "{Items:[" + BuildJSONLookup(arrNamedRateItems, 0, false) + "]}";
             return dba.Status;
         }
 
@@ -657,7 +657,7 @@ Status_Error:
 
                         // add in lookup info in json format
                         LookupItem[] arrLookupItems = lookupItems.ToArray();
-                        costCustomField.jsonLookup = "{Items:[" + BuildJSONLookup(arrLookupItems, 0) + "]}";
+                        costCustomField.jsonLookup = "{Items:[" + BuildJSONLookup(arrLookupItems, 0, costCustomField.LeafOnly) + "]}";
                     }
                 }
             }
@@ -691,7 +691,7 @@ Status_Error:
             return dba.Status;
         }
 
-        private string BuildJSONLookup(LookupItem[] lookupItems, int nIndex)
+        private string BuildJSONLookup(LookupItem[] lookupItems, int nIndex, bool bCatLeafOnly)
         {
             string sJSON = "";
             int nItems = lookupItems.Length;
@@ -704,16 +704,15 @@ Status_Error:
                     string sDisabled = "";
                     if (lookupItems[i].Inactive == true)
                         sDisabled = ",Disabled:1";
+                    else if (i + 1 < nItems && lookupItems[i + 1].Level > lookupItems[i].Level && bCatLeafOnly == true)
+                        sDisabled = ",Disabled:1";
+                    
                     sJSON += "{Name:'" + lookupItems[i].Uid.ToString("0") + "',Text:'" + lookupItems[i].Name + "'" + sDisabled + ",Value:'" + lookupItems[i].Uid.ToString("0") + "_" + lookupItems[i].Name + "'}";
                     if (i + 1 < nItems)
                     {
                         if (lookupItems[i + 1].Level > lookupItems[i].Level)
                         {
-                            sDisabled = "";
-                            if (lookupItems[i].Inactive == true)
-                                sDisabled = ",Disabled:1";
-                            sJSON += ",{Name:'Level" + lookupItems[i].Uid.ToString("0") + "'" + sDisabled + ",Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1) + "]}";
-                            //jsonLookup = "{Items:[{Name:'Name1',Text:'Text1',Value:'Value1'},{Name:'Level2',Expanded:-1,Level:1,Items:[{Name:'Name1.1',Text:'Text1.1',Value:'Value1.1'},{Name:'Name1.2',Text:'Text1.2',Value:'Value1.2'}]}]}";
+                            sJSON += ",{Name:'Level" + lookupItems[i].Uid.ToString("0") + "',Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1, bCatLeafOnly) + "]}";
                         }
                     }
                 }
@@ -922,6 +921,7 @@ Status_Error:
                         string si = (i + 1).ToString("0");
                         costCategory.CustomCodeValues[i] = DBAccess.ReadIntValue(row["OC_0" + si]);
                         costCategory.CustomCodeTextValues[i] = DBAccess.ReadStringValue(row["LV_0" + si]);
+                        costCategory.CustomCodeTextFullValues[i] = DBAccess.ReadStringValue(row["LVF_0" + si]);
                         costCategory.CustomTextValues[i] = DBAccess.ReadStringValue(row["TEXT_0" + si]);
                     }
 
@@ -2253,6 +2253,7 @@ Exit_Function:
             public string NamedRateName;
             public int[] CustomCodeValues = new int[5];
             public string[] CustomCodeTextValues = new string[5];
+            public string[] CustomCodeTextFullValues = new string[5];
             public string[] CustomTextValues = new string[5];
 
             public CostCategory Parent = null;
@@ -2348,7 +2349,11 @@ Exit_Function:
                                 case 11805:
                                     int nCode = costCategory.CustomCodeValues[costCustomField.FieldId - 11801];
                                     xI.CreateIntAttr("Y" + costCustomField.Id.ToString("0"), nCode);
-                                    string sCodeText = costCategory.CustomCodeTextValues[costCustomField.FieldId - 11801];
+                                    string sCodeText = "";
+                                    if (costCustomField.UseFullName)
+                                        sCodeText = costCategory.CustomCodeTextFullValues[costCustomField.FieldId - 11801];
+                                    else 
+                                        sCodeText = costCategory.CustomCodeTextValues[costCustomField.FieldId - 11801];
                                     if (string.IsNullOrEmpty(sCodeText) == false)
                                         xI.CreateStringAttr("Z" + costCustomField.Id.ToString("0"), sCodeText);
                                     break;

@@ -321,8 +321,9 @@ namespace PortfolioEngineCore
                         CStruct xLookupList = xLookup.GetSubStruct("LookupList");
                         CStruct xItems = xLookupList.GetSubStruct("Items");
                         List<CStruct> listItems = xItems.GetList("Item");
-
-                        xC.CreateStringAttr("Defaults", "{Items:[" + BuildJSONLookup(listItems.ToArray(), 0) + "]}");
+                        bool bCatLeafOnly = xField.GetBooleanAttr("CatLeafOnly");
+                        bool bUseFullName = xField.GetBooleanAttr("UseFullName");
+                        xC.CreateStringAttr("Defaults", "{Items:[" + BuildJSONLookup(listItems.ToArray(), 0, bCatLeafOnly, bUseFullName) + "]}");
                         xC.CreateStringAttr("Button", "Defaults");
                         xC.CreateIntAttr("MinWidth", 30);
                         // setting WidthPad to 0 make dropdown button disappear
@@ -729,7 +730,10 @@ namespace PortfolioEngineCore
                                                     CStruct xItem;
                                                     if (listItems.TryGetValue(sValue, out xItem))
                                                     {
-                                                        sValue = xItem.GetStringAttr("Name");
+                                                        if (xField.GetBooleanAttr("UseFullName"))
+                                                            sValue = xItem.GetStringAttr("FullName");
+                                                        else
+                                                            sValue = xItem.GetStringAttr("Name");
                                                     }
                                                 }
                                             }
@@ -884,7 +888,7 @@ namespace PortfolioEngineCore
         }
 
 
-        private static string BuildJSONLookup(CStruct[] lookupItems, int nIndex)
+        private static string BuildJSONLookup(CStruct[] lookupItems, int nIndex, bool bCatLeafOnly, bool bUseFullName)
         {
             string sJSON = "";
             int nItems = lookupItems.Length;
@@ -897,15 +901,19 @@ namespace PortfolioEngineCore
                     string sDisabled = "";
                     if (lookupItems[i].GetBooleanAttr("Inactive", false) == true)
                         sDisabled = ",Disabled:1";
-                    sJSON += "{Name:'" + lookupItems[i].GetStringAttr("ID") + "',Text:'" + lookupItems[i].GetStringAttr("Name") + "'" + sDisabled + ",Value:'" + lookupItems[i].GetStringAttr("ID") + "_" + lookupItems[i].GetStringAttr("Name") + "'}";
+                    else if (i + 1 < nItems && lookupItems[i + 1].GetIntAttr("Level") > lookupItems[i].GetIntAttr("Level") && bCatLeafOnly == true)
+                        sDisabled = ",Disabled:1";
+                    string sName = "";
+                    if (bUseFullName)
+                        sName = lookupItems[i].GetStringAttr("FullName");
+                    else
+                        sName = lookupItems[i].GetStringAttr("Name");
+                    sJSON += "{Name:'" + lookupItems[i].GetStringAttr("ID") + "',Text:'" + sName + "'" + sDisabled + ",Value:'" + lookupItems[i].GetStringAttr("ID") + "_" + sName + "'}";
                     if (i + 1 < nItems)
                     {
                         if (lookupItems[i + 1].GetIntAttr("Level") > lookupItems[i].GetIntAttr("Level"))
                         {
-                            sDisabled = "";
-                            if (lookupItems[i].GetBooleanAttr("Inactive", false) == true)
-                                sDisabled = ",Disabled:1";
-                            sJSON += ",{Name:'Level" + lookupItems[i].GetIntAttr("ID") + "'" + sDisabled + ",Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1) + "]}";
+                            sJSON += ",{Name:'Level" + lookupItems[i].GetIntAttr("ID") + "',Expanded:-1,Level:1,Items:[" + BuildJSONLookup(lookupItems, i + 1, bCatLeafOnly, bUseFullName) + "]}";
                         }
                     }
                 }
