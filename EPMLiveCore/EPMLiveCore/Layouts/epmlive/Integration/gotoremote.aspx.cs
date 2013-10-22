@@ -124,7 +124,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 }
                 else
                 {
-                    if (Request.UrlReferrer == null)
+                    if (Request.UrlReferrer == null || Request["isdlg"] == "1")
                         Response.Redirect(url);
                     else if(error == "")
                     {
