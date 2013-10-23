@@ -122,10 +122,12 @@ html, body {
        </table>
     </div>
     <div id="idDeleteWarning" style="width:300px; color:red; display:none;"><a>Are you sure, all data will be cleared?</a></div>
-	<div class="button-container" >
-		<input id="idOKButton" type="button" class="epmliveButton" value="OK" onclick="modelDlg_event('ok');"/>
-		<input type="button" class="epmliveButton" value="Cancel" onclick="modelDlg_event('cancel');"/>
-	</div>
+	<div style="float:right;">
+	    <div class="button-container" >
+		    <input id="idOKButton" type="button" class="epmliveButton" value="OK" onclick="modelDlg_event('ok');"/>
+		    <input type="button" class="epmliveButton" value="Cancel" onclick="modelDlg_event('cancel');"/>
+	    </div>
+    </div>
 </div>
 <div class="modalContent" id="idVersionDlg" style="display:none;">
     <input id="idVersionDlgMode" type="hidden" value="" />
@@ -147,7 +149,7 @@ html, body {
                 <label for="txtName">Name</label>
             </td>
             <td class="controlcell">
-                <input type="text" id="txtNameVer" style="width:200px;" />
+                <input type="text" id="txtNameVer" style="width:250px;" />
             </td>
         </tr>
         <tr>
@@ -155,18 +157,20 @@ html, body {
                 Description
             </td>
             <td class="controlcell">
-                    <input type="text" id="txtDescVer" style="Width:200px;"/>
+                    <input type="text" id="txtDescVer" style="Width:250px;"/>
             </td>
         </tr>
     </table>
-	<div style="margin-top:10px;padding-right:10px;">
-        <div style="display:block;"><tg1:TGridUserControl id="tgridSecurity" runat="server" /></div>
+	<div style="margin-top:10px;padding-right:10px;width:360px;">
+        <tg1:TGridUserControl id="tgridSecurity" runat="server" />
 	</div>
     <div id="idDeleteWarningVer" style="width:250px; color:red; display:none;"><a>Are you sure, all data will be cleared?</a></div>
-	<div class="button-container" >
-		<input id="idOKButtonVer" type="button" class="epmliveButton" value="OK" onclick="versionDlg_event('ok');"/>
-		<input type="button" class="epmliveButton" value="Cancel" onclick="versionDlg_event('cancel');"/>
-	</div>
+	<div style="float:right;">
+	    <div class="button-container" >
+		    <input id="idOKButtonVer" type="button" class="epmliveButton" value="OK" onclick="versionDlg_event('ok');"/>
+		    <input type="button" class="epmliveButton" value="Cancel" onclick="versionDlg_event('cancel');"/>
+	    </div>
+    </div>
 </div>
 <div style="display: block;" >
 <asp:Label ID="lblGeneralError" runat="server" Text="" Visible="false" ForeColor="Red"></asp:Label>
@@ -238,28 +242,28 @@ html, body {
     function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
-        ResizeDialog(idWindow, idAttachObj);
-        window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 10);
+        //ResizeDialog(idWindow, idAttachObj);
+        //window.setTimeout('ResizeDialog("' + idWindow + '", "' + idAttachObj + '");', 1);
         return dlg;
     };
-    function ResizeDialog(idWindow, idAttachObj) {
-        var obj = document.getElementById(idAttachObj);
-        var width = GetMaxWidth(obj);
-        var height = obj.offsetHeight;
-        var win = thiswins.window(idWindow);
-        win.setDimension(width + 50, height + 110);
-    };
-    function GetMaxWidth(obj) {
-        var width = 0;
-        var childDivs = obj.childNodes;
-        for( i=0; i< childDivs.length; i++ )
-        {
-            var childDiv = childDivs[i];
-            if (childDiv.offsetWidth > width)
-                width = childDiv.offsetWidth;
-        }
-        return width;
-    };
+    //function ResizeDialog(idWindow, idAttachObj) {
+    //    var obj = document.getElementById(idAttachObj);
+    //    var width = GetMaxWidth(obj);
+    //    var height = obj.offsetHeight;
+    //    var win = thiswins.window(idWindow);
+    //    win.setDimension(width + 50, height + 110);
+    //};
+    //function GetMaxWidth(obj) {
+    //    var width = 0;
+    //    var childDivs = obj.childNodes;
+    //    for( i=0; i< childDivs.length; i++ )
+    //    {
+    //        var childDiv = childDivs[i];
+    //        if (childDiv.offsetWidth > width)
+    //            width = childDiv.offsetWidth;
+    //    }
+    //    return width;
+    //};
     function CloseDialog (idWindow) {
         switch (idWindow) {
             case 'winModelDlg':
@@ -358,7 +362,7 @@ html, body {
                 document.getElementById('idDeleteWarning').style.display = "none";
                 document.getElementById('idOKButton').value = "OK";
                 dgrid1.grid.clearSelection();
-                DisplayDialog(600, 650, dlgTitle, "winModelDlg", "idModelDlg", true, false);
+                DisplayDialog(592, 664, dlgTitle, "winModelDlg", "idModelDlg", true, false);
                 break;
             case "btnDelete":
                 if (toolbar.isItemDisabled("btnDelete") == true) {
@@ -427,7 +431,7 @@ html, body {
                 toolbarVersions.disable();
                 document.getElementById('idDeleteWarning').style.display = "block";
                 document.getElementById('idOKButton').value = "Delete";
-                DisplayDialog(600, 670, "Delete Model ", "winModelDlg", "idModelDlg", true, false);
+                DisplayDialog(592, 684, "Delete Model ", "winModelDlg", "idModelDlg", true, false);
                 break;
         }
         return false;
@@ -486,7 +490,7 @@ html, body {
                 }
                 var tgridSecurity = window['<%=tgridSecurity.UID%>'];
                 tgridSecurity.Initialize(tgridSecurityTemplate);
-                tgridSecurity.SetWidth(310);
+                //tgridSecurity.SetWidth(310);
                 tgridSecurity.SetHeight(180);
                 var sPerms = "";
                 if (event == "btnModify2") {
@@ -517,7 +521,7 @@ html, body {
                     bFirst = false;
                 }
                 thiswins.window('winModelDlg').setModal(false);
-                DisplayDialog(350, 380, sTitle, "winVersionDlg", "idVersionDlg", true, false);
+                DisplayDialog(393, 368, sTitle, "winVersionDlg", "idVersionDlg", true, false);
                 break;
             case "btnDelete2":
                 if (toolbarVersions.isItemDisabled("btnDelete2") == true) {
@@ -649,29 +653,11 @@ html, body {
                             dgridVersions.addRow(dgridVersions_selectedRow);
                             dgridVersions_OnRowSelect(dgridVersions_selectedRow);
                         }
-
                         dgridVersions.SetCellValue(dgridVersions_selectedRow, "MODEL_VERSION_UID", document.getElementById('txtIdVer').value);
                         dgridVersions.SetCellValue(dgridVersions_selectedRow, "MODEL_VERSION_NAME", document.getElementById('txtNameVer').value);
                         dgridVersions.SetCellValue(dgridVersions_selectedRow, "MODEL_VERSION_DESC", document.getElementById('txtDescVer').value);
                         dgridVersions.SetCellValue(dgridVersions_selectedRow, "MODEL_VERSION_PERMISSIONS", sPerms);
                         dgridVersions.SetCellValue(dgridVersions_selectedRow, "MODEL_VERSION_PERMISSIONS_HIDDEN", sPermsHidden);
-
-//                dg.AddColumn(title: "ID", width: 50, name: "MODEL_VERSION_UID", isId: true, hidden: true);
-//                dg.AddColumn(title: "Name", width: 150, name: "MODEL_VERSION_NAME", editable: true);
-//                dg.AddColumn(title: "Description", width: 150, name: "MODEL_VERSION_DESC", editable: true);
-//                dg.AddColumn(title: "Permissions", width: 250, name: "MODEL_VERSION_PERMISSIONS", editable: false);
-//                dg.AddColumn(title: "PermissionsHidden", width: 180, name: "MODEL_VERSION_PERMISSIONS_HIDDEN", editable: false);
-//                        dgrid1.SetCellValue(sRowId, "VIEW_UID", json.reply.Model.VIEW_UID);
-//            tg.AddColumn(title: "ID", width: 50, name: "GROUP_ID", isId: true, hidden: true);
-//            tg.AddColumn(title: "Permission Group", width: 170, name: "GROUP_NAME", maincol: true, editable: false);
-//            tg.AddColumn(title: "Read", width: 50, name: "DS_READ", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
-//            tg.AddColumn(title: "Edit", width: 50, name: "DS_EDIT", align: _TGrid.Align.center, type: _TGrid.Type.checkbox, editable: true);
-//            var sArr = select.options[select.selectedIndex].value.split(",");
-//            var ctId = sArr[0];
-//            var cbId = sArr[1];
-
-
-
                         break;
                     case "btnDelete2":
                         break;
