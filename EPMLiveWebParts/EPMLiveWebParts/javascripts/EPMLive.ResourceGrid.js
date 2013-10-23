@@ -47,7 +47,7 @@ function registerEpmLiveResourceGridScript() {
                         if (reportId !== 'workvscapacity') {
                             loaded = true;
                             var report = collection[reportId];
-                            sb.append("<Button Id='Ribbon.ResourceGrid.Reports.{0}' Command='ResourceGrid.Cmd.ReportsDropDown.Select' LabelText='{1}' CommandValueId='{0}'/>".format(reportId, report.name));
+                            sb.append("<Button Id='Ribbon.ResourceGrid.Reports.{0}' Command='ResourceGrid.Cmd.ReportsDropDown.Select' LabelText=\"{1}\" CommandValueId='{0}'/>".format(reportId, report.name));
                         }
                     }
                 }
@@ -448,7 +448,7 @@ function registerEpmLiveResourceGridScript() {
             },
 
             getXml: function (view) {
-                var viewXml = '<View Id="{0}" Name="{1}" IsDefault="{2}" IsPersonal="{3}"><Cols>'.format(view.id, view.name, view.isdefault, view.ispersonal);
+                var viewXml = '<View Id="{0}" Name="{1}" IsDefault="{2}" IsPersonal="{3}"><Cols>'.format(view.id, escape(view.name), view.isdefault, view.ispersonal);
 
                 for (var i = 0; i < view.cols.length; i++) {
                     var col = view.cols[i];
@@ -814,6 +814,10 @@ function registerEpmLiveResourceGridScript() {
                             if (theView.hasOwnProperty(v)) {
                                 var key = v.replace(/@/, '').toLowerCase();
                                 var value = theView[v];
+                                
+                                if (key.toLowerCase() === 'name') {
+                                    value = unescape(value);
+                                }
 
                                 if (key === 'cols') {
                                     value = value.Col;
@@ -952,7 +956,7 @@ function registerEpmLiveResourceGridScript() {
                                         continue;
                                     }
 
-                                    sb.append("<Button Id='Ribbon.ResourceGrid.views.{0}' Command='ResourceGrid.Cmd.CurrentViewDropDown.Select' LabelText='{1}' CommandValueId='{0}'/>".format(view.id, view.name));
+                                    sb.append("<Button Id='Ribbon.ResourceGrid.views.{0}' Command='ResourceGrid.Cmd.CurrentViewDropDown.Select' LabelText=\"{1}\" CommandValueId='{0}'/>".format(view.id, view.name));
                                 }
                             }
                         }
@@ -968,7 +972,7 @@ function registerEpmLiveResourceGridScript() {
 
                 sb.append("<MenuSection DisplayMode='Menu' Id='Ribbon.ResourceGrid.Views.Dropdown.Menu.Default' Title='Current View'>");
                 sb.append("<Controls Id='Ribbon.ResourceGrid.Views.Dropdown.Menu.Default.Controls'>");
-                sb.append("<Button Id='Ribbon.ResourceGrid.views.{0}' Command='ResourceGrid.Cmd.CurrentViewDropDown.Select' LabelText='{1}' CommandValueId='{0}'/>".format(currentView.id, currentView.name));
+                sb.append("<Button Id='Ribbon.ResourceGrid.views.{0}' Command='ResourceGrid.Cmd.CurrentViewDropDown.Select' LabelText=\"{1}\" CommandValueId='{0}'/>".format(currentView.id, currentView.name));
                 sb.append('</Controls>');
                 sb.append('</MenuSection>');
 
