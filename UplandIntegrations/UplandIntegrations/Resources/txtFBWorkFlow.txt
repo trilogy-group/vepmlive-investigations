@@ -93,7 +93,6 @@
 											 $.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
 
 														LoadVisualWorkflow(routId, docid, xml);
-													}
 
 												});
 										
