@@ -413,7 +413,7 @@ namespace PortfolioEngineCore
             xTrace.CreateStringAttr("Text", sText);
             xTrace.CreateStringAttr("Details", sDetails);
 
-            if (bImmediate)
+            //if (bImmediate)
             {
                 WriteTrace();
             }
