@@ -59,15 +59,15 @@
         var $sicon = $('#search-container a');
         var $sinput = $($sbox.find('input').get(0));
 
-        $sinput.focus();
-
         if ($sbox.is(':visible')) {
             $sicon.css('color', '#00668E');
         } else {
             $sicon.css('color', '#FFFFFF');
         }
 
-        $sbox.toggle('fast');
+        $sbox.toggle('fast',function() {
+            $sinput.focus();
+        });
     };
 
     window.updateProfilePic = function() {
