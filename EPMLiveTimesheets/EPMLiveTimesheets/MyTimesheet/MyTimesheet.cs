@@ -424,6 +424,7 @@ namespace TimeSheets
                                     TSCols = " + TSCols + @";
                                     TSDCols = " + TSDCols + @";
                                     siteUrl = '" + url + @"';
+                                    siteColUrl = '" + SPContext.Current.Site.ServerRelativeUrl + @"';
 
                                     curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss", culture) + @"')).getTime();
 

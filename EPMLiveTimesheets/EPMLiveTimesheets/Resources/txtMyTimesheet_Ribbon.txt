@@ -13,6 +13,9 @@
 			<MaxSize Id="Ribbon.MyTimesheet.WorkGroup.MaxSize" GroupId="Ribbon.MyTimesheet.WorkGroup" Size="LargeMediumSmall"/>
 			<Scale Id="Ribbon.MyTimesheet.WorkGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.WorkGroup" Size="LargeMediumSmall" />
 
+			<MaxSize Id="Ribbon.MyTimesheet.Approvals.MaxSize" GroupId="Ribbon.MyTimesheet.Approvals" Size="LargeMediumSmall"/>
+			<Scale Id="Ribbon.MyTimesheet.Approvals.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.Approvals" Size="LargeMediumSmall" />
+
 		</Scaling>
 		<Groups Id="Ribbon.MyTimesheet.Groups">
 			<Group Id="Ribbon.MyTimesheet.ActionsGroup" Title="Actions" Sequence="10" Template="Ribbon.Templates.MyTimesheetTemplate">
@@ -200,6 +203,26 @@
 
 				</Controls>
 			</Group>
+
+			<Group Id="Ribbon.MyTimesheet.Approvals" Title="Approvals" Sequence="20" Template="Ribbon.Templates.MyTimesheetTemplate">
+				<Controls Id="Ribbon.MyTimesheet.Approvals.Controls">
+
+					<Button 
+						Id="Ribbon.MyTimesheet.Approvals.PM" 
+						Command="Ribbon.MyTimesheet.ApprovalsPM" 
+						Sequence="11" 
+						LabelText="Project Manager"
+						TemplateAlias="oM"/>
+
+					<Button 
+						Id="Ribbon.MyTimesheet.Approvals.TM" 
+						Command="Ribbon.MyTimesheet.ApprovalsTM" 
+						Sequence="11" 
+						LabelText="Timesheet Manager"
+						TemplateAlias="oM"/>
+
+				</Controls>
+			</Group>
 		</Groups>
 	</Tab>
 
@@ -287,6 +310,8 @@
 
 				</Controls>
 			</Group>
+
+
 		</Groups>
 	</Tab>
 </ContextualGroup>

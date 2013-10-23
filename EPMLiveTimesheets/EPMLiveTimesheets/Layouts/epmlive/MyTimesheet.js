@@ -9,6 +9,7 @@ var curPop = false;
 var StopWatchRow = null;
 var StopWatchGrid = null;
 var siteUrl;
+var siteColUrl;
 var sApplyDates = "";
 var curStoppingRow;
 var curStoppingGrid;

@@ -55,7 +55,10 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         'Ribbon.MyTimesheet.ShowHideGrouping',
         'Ribbon.MyTimesheet.ClearSort',
         'Ribbon.MyTimesheet.ChangeView',
-        'Ribbon.MyTimesheet.AutoWork'];
+        'Ribbon.MyTimesheet.AutoWork',
+
+        'Ribbon.MyTimesheet.ApprovalsPM',
+        'Ribbon.MyTimesheet.ApprovalsTM'];
     },
 
     getGlobalCommands: function ContextualTabWebPart_CustomPageComponent$getGlobalCommands() {
@@ -69,7 +72,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         'Ribbon.MyTimesheet.PopulateViewDropDown',
         'Ribbon.MyTimesheet.QueryCurrentView',
         'Ribbon.MyTimesheet.ShowHideFilters.Query',
-        'Ribbon.MyTimesheet.ShowHideGrouping.Query'];
+        'Ribbon.MyTimesheet.ShowHideGrouping.Query',
+        'Ribbon.MyTimesheet.Approvals'];
     },
 
     isFocusable: function ContextualTabWebPart_CustomPageComponent$isFocusable() {
@@ -104,6 +108,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'Ribbon.MyTimesheet.ChangeView':
             case 'Ribbon.MyTimesheet.QueryCurrentView':
             case 'Ribbon.MyTimesheet.ShowHideFilters.Query':
+            case 'Ribbon.MyTimesheet.Approvals':
+            case 'Ribbon.MyTimesheet.ApprovalsPM':
+            case 'Ribbon.MyTimesheet.ApprovalsTM':
                 return true;
             case 'Ribbon.MyTimesheet.Comments':
                 if (curRow != null && curRow["ItemId"] != null)
@@ -423,6 +430,29 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             SP.UI.ModalDialog.showModalDialog(options);
 
         }
+        else if (commandId === 'Ribbon.MyTimesheet.ApprovalsPM') {
+            var grid = Grids["TS" + this.tsObject.id];
+
+            curGrid = grid;
+
+            var surl = siteColUrl + "/Lists/My%20Timesheet/Project%20Manager%20Approval.aspx";
+
+            var options = { url: surl, showMaximized: true, title: "Approvals", autoSize: false };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+        }
+        else if (commandId === 'Ribbon.MyTimesheet.ApprovalsTM') {
+            var grid = Grids["TS" + this.tsObject.id];
+
+            curGrid = grid;
+
+            var surl = siteColUrl + "/Lists/My%20Timesheet/Timesheet%20Managers%20Approval.aspx";
+
+            var options = { url: surl, showMaximized: true, title: "Approvals", autoSize: false };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+        }
+
         return true;
     },
 
