@@ -87,7 +87,7 @@ namespace EPMLiveCore.API
         private const string COMMENT_COUNT_FIELD = "CommentCount";
         private const string COMMENTERS_FIELD = "Commenters";
         private const string COMMENTERS_READ_FIELD = "CommentersRead";
-        private const string COMPLETE_COL_WIDTH = "20";
+        private const string COMPLETE_COL_WIDTH = "25";
         private const string COMPLETED_FIELD = "Complete";
         private const string CREATED_BY_FIELD = "Author";
         private const string CREATED_FIELD = "Created";
