@@ -598,6 +598,9 @@
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu li .epm-nav-cm-icon {
   top: -6px;
 }
+.epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu a {
+  border: none !important;
+}
 .epm-nav-sub #EPMNavWorkspacesTree .RadTreeView li.rtLI ul.epm-nav-contextual-menu a:hover {
   text-decoration: none;
 }
