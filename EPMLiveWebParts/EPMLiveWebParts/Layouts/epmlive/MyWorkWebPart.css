@@ -61,7 +61,7 @@ span.MWG_CommentCounter {
 
 .MWG_OverDue_Completed {
     background-image: url('/_layouts/epmlive/treegrid/mywork13/common.png');
-    background-position: 5px -303px;
+    background-position: 5px -305px;
     background-repeat: no-repeat;
     height: 20px;
     line-height: 20px;
@@ -69,19 +69,19 @@ span.MWG_CommentCounter {
 
 .MWG_UnCompletedRow_Normal {
     background-image: url('/_layouts/epmlive/treegrid/mywork13/common.png');
-    background-position: 5px -203px;
+    background-position: 5px -205px;
     background-repeat: no-repeat;
 }
 
 .MWG_CompletedRow_OverDue {
     background-image: url('/_layouts/epmlive/treegrid/mywork13/common.png');
-    background-position: 5px -353px;
+    background-position: 5px -355px;
     background-repeat: no-repeat;
 }
 
 .MWG_CompletedRow_Normal {
     background-image: url('/_layouts/epmlive/treegrid/mywork13/common.png');
-    background-position: 5px -253px;
+    background-position: 5px -255px;
     background-repeat: no-repeat;
 }
 
