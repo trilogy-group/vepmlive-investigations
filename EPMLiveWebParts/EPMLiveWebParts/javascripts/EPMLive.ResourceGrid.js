@@ -750,24 +750,26 @@ function registerEpmLiveResourceGridScript() {
 
                     $('.EPMLiveResourceGridGroup').click(function (event) {
                         try {
-                            var row = $(this).parent();
-                            if (row) {
-                                row = row[0];
-
+                            if ($(event.currentTarget).attr('class').indexOf('Panel') === -1) {
+                                var row = $(this).parent();
                                 if (row) {
-                                    var attributes = row.attributes;
-                                    for (var a in attributes) {
-                                        if (attributes.hasOwnProperty(a)) {
-                                            var attr = attributes[a];
-                                            if (attr.name === 'onmousemove') {
-                                                row = g.Rows[attr.value.split('"')[1]];
-                                                if (row.Expanded === 1) {
-                                                    g.Collapse(row);
-                                                } else {
-                                                    g.Expand(row);
-                                                }
+                                    row = row[0];
 
-                                                event.stopPropagation();
+                                    if (row) {
+                                        var attributes = row.attributes;
+                                        for (var a in attributes) {
+                                            if (attributes.hasOwnProperty(a)) {
+                                                var attr = attributes[a];
+                                                if (attr.name === 'onmousemove') {
+                                                    row = g.Rows[attr.value.split('"')[1]];
+                                                    if (row.Expanded === 1) {
+                                                        g.Collapse(row);
+                                                    } else {
+                                                        g.Expand(row);
+                                                    }
+
+                                                    event.stopPropagation();
+                                                }
                                             }
                                         }
                                     }
