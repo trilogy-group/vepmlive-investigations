@@ -290,7 +290,7 @@ function AddResource() {
                 select.options[select.options.length] = new Option(enums[oR], enumkeys[oR]);
         }
 
-        var options = { html: addResourceDiv, width: 300, height: 210, title: "Select Resources", dialogReturnValueCallback: AddResourceClose };
+        var options = { html: addResourceDiv, width: 300, height: 280, title: "Select Resources", dialogReturnValueCallback: AddResourceClose };
 
         SP.UI.ModalDialog.showModalDialog(options);
     }

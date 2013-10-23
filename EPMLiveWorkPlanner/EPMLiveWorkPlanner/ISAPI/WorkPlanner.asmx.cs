@@ -4162,6 +4162,10 @@ namespace EPMLiveWorkPlanner
 
             DataSet dsResources = GetResourceTable(p, oListProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);
 
+            EPMLiveCore.GridGanttSettings gSettings = EPMLiveCore.API.ListCommands.GetGridGanttSettings(oListProjectCenter);
+
+            Dictionary<string, Dictionary<string, string>> fieldProperties = EPMLiveCore.ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+
             foreach (SPField oField in oListProjectCenter.Fields)
             {
                 if (!oField.Hidden && oField.Type != SPFieldType.Computed && isValidField(oField.InternalName, true))
@@ -4200,6 +4204,12 @@ namespace EPMLiveWorkPlanner
 
                     if (oField.InternalName == "Start")
                         canEdit = "0";
+
+                    if (canEdit == "1")
+                    {
+                        if (!EPMLiveCore.EditableFieldDisplay.isEditable(liProject, oField, fieldProperties))
+                            canEdit = "0";
+                    }
 
                     attr = docOut.CreateAttribute("CanEdit");
                     attr.Value = canEdit;

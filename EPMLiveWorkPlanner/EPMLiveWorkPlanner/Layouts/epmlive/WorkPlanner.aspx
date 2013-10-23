@@ -1596,6 +1596,8 @@ Name:&nbsp;&nbsp;<%=sProjectName %></div>
 
     <script>
         initmb();
+
+        document.getElementsByTagName("html")[0].className = "ms-dialog";document.getElementsByTagName("html")[0].className = "ms-dialog";
     </script>
 
 
