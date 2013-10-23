@@ -15,6 +15,7 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<WebPartPages:AllowFraming ID="AllowFraming1" runat="server" />
 <SharePoint:SPHtmlTag dir="<%$Resources:wss,multipages_direction_dir_value%>" ID="SPHtmlTag" runat="server" >
     <head id="Head1" runat="server">
         <meta name="GENERATOR" content="Microsoft SharePoint" />
