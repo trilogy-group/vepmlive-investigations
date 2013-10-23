@@ -358,7 +358,7 @@ namespace TimeSheets
             string url = SPContext.Current.Web.Url;
             if(url == "/") url = "";
 
-            string curUrl = Page.Request.Url.ToString();
+            string curUrl = Page.Request.RawUrl.ToString();
 
             if(curUrl.Contains("?"))
                 curUrl = curUrl.Substring(0, curUrl.IndexOf("?") + 1);
@@ -442,7 +442,7 @@ namespace TimeSheets
             output.WriteLine("</div>");
 
 
-            output.WriteLine(@"<div align=""center"" id=""divMessage" + sFullGridId + @""" width=""100%"" class=""dialog""><img style=""vertical-align:middle;"" src=""_layouts/images/gears_anv4.gif""/>&nbsp;<span id=""spnMessage" + sFullGridId + @""">Saving Timesheet...</span></div>");
+            output.WriteLine(@"<div align=""center"" id=""divMessage" + sFullGridId + @""" width=""100%"" class=""dialog""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;<span id=""spnMessage" + sFullGridId + @""">Saving Timesheet...</span></div>");
             
             output.WriteLine(@"<div id=""viewNameDiv"" style=""display:none;width:200;padding:10px"">
 

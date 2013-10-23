@@ -387,7 +387,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             curGrid = grid;
 
-            var options = { html: viewNameDiv, width: 250, height: 135, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
+            var options = { html: viewNameDiv, width: 300, height: 150, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
             SP.UI.ModalDialog.showModalDialog(options);
         }
         else if (commandId === 'Ribbon.MyTimesheet.ChangeView') {

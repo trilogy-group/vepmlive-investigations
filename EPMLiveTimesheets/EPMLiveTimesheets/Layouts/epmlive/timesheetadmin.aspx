@@ -34,9 +34,7 @@
 
     <link rel="STYLESHEET" type="text/css" href="dhtml/xgrid/dhtmlxgrid.css"/>
     <link rel="STYLESHEET" type="text/css" href="dhtml/xgrid/dhtmlxgrid_skins.css"/>
-    <link rel="STYLESHEET" type="text/css" href="dhtml/calendar/dhtmlxcalendar.css"/>
-    <link rel="STYLESHEET" type="text/css" href="dhtml/xmenu/dhtmlxmenu.css">
-	<link rel="STYLESHEET" type="text/css" href="dhtml/xmenu/context.css">
+    <link rel="STYLESHEET" type="text/css" href="dhtml/calendar/dhtmlxcalendar.css"/
 	<script type="text/javascript" language="javascript" src="/_layouts/1033/form.js"></script>
 	<script>	    _css_prefix = "DHTML/xgrid/"; _js_prefix = "DHTML/xgrid/"; </script>
 	
@@ -60,10 +58,6 @@
     <script src="DHTML/xtreegrid/dhtmlxtreegrid.js"></script>    
     
     <script src="DHTML/xdataproc/dhtmlxdataprocessor.js"></script>
-    
-    <script language="JavaScript" src="dhtml/xmenu/dhtmlxprotobar.js"></script>
-	<script language="JavaScript" src="dhtml/xmenu/dhtmlxmenubar.js"></script>
-	<script language="JavaScript" src="dhtml/xmenu/dhtmlxmenubar_cp.js"></script>
 
 <div id="dlgAddPeriod" class="dialog">
             <table width="100%">

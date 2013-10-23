@@ -1458,17 +1458,18 @@ function leavePage() {
     var message = "";
 
     if (curGrid.HasChanges()) {
-        if (!e) e = window.event;
+        //if (!e) e = window.event;
         message = 'You have unsaved changes.';
-        e.returnValue = message;
+        //e.returnValue = message;
 
-        if (e.stopPropagation) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
+        //if (e.stopPropagation) {
+        //    e.stopPropagation();
+        //    e.preventDefault();
+        //}
     }
 
-    return message;
+    if(message != "")
+        return message;
 }
 
 window.onbeforeunload = leavePage;
