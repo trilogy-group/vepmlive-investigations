@@ -50,7 +50,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             links.Add(new NavLink
             {
-                Title = "Associated Items",
+                Title = @"Associated Items<span class=""icon-info-2"" style=""padding-left: 8px;"" title=""Since this Workspace was created from an Item in the parent site, you have access to these associated parent Lists and Libraries.""></span>",
                 Url = "Header"
             });
 
