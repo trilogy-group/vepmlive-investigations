@@ -457,6 +457,7 @@ button.toast-close-button {
     position: fixed;
     visibility: visible;
     z-index: 1030;
+    white-space: normal !important;
 }
 
 .tooltip.in {
