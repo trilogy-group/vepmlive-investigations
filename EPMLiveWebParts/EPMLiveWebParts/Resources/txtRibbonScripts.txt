@@ -30,7 +30,7 @@ function epmlive_delete(grid, rowid)
 	}
 }
 
-function epmlive_doDelete(id, weburl, grid)
+function epmlive_doDelete(id, weburl, grid, curRowId)
 {
 
 	var loader = dhtmlxAjax.postSync(weburl, "Items=" + grid.getCheckedIds());
@@ -41,10 +41,17 @@ function epmlive_doDelete(id, weburl, grid)
 	}
 	else
 	{
-		var oRows = grid.getCheckedRowIds().split(',');
-		for(var oRow in oRows)
+		if(curRowId)
 		{
-			grid.setRowHidden(oRows[oRow], true);
+			grid.setRowHidden(grid.GetRowById(curRowId), true);
+		}
+		if(grid.getCheckedRowIds())
+		{
+			var oRows = grid.getCheckedRowIds().split(',');
+			for(var oRow in oRows)
+			{
+				grid.setRowHidden(oRows[oRow], true);
+			}
 		}
 		
 	}
