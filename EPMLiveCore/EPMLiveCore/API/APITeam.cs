@@ -29,11 +29,20 @@ namespace EPMLiveCore.API
             {
                 if (arrColumns != null)
                 {
-                    foreach (SPField f in list.Fields)
+                    if (arrColumns.Contains("SimpleColumns"))
                     {
-                        if (arrColumns.Contains(f.InternalName))
+                        dt.Columns.Remove("Groups");
+                        dt.Columns.Remove("Photo");
+                        dt.Columns.Add("Title");
+                    }
+                    else
+                    {
+                        foreach (SPField f in list.Fields)
                         {
-                            dt.Columns.Add(f.InternalName);
+                            if (arrColumns.Contains(f.InternalName))
+                            {
+                                dt.Columns.Add(f.InternalName);
+                            }
                         }
                     }
                 }
