@@ -15,7 +15,7 @@
 
 <asp:HiddenField ID="hiddenTableData" runat="server"></asp:HiddenField>
 <div style="margin-left:4px; margin-right:4px;" id="<%=ClientID%>_tgrid_div" >
-<div id="<%=ClientID%>_treegrid_div" style="overflow:hidden;"></div>
+<div id="<%=ClientID%>_treegrid_div" style="height:300px;overflow:hidden;"></div>
 </div>
 <script type="text/javascript">
     try {
