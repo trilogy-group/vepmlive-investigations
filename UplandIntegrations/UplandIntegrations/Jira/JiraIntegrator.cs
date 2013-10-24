@@ -14,6 +14,11 @@ namespace UplandIntegrations.Jira
             {
                 Message = "";
                 CheckWebProps(WebProps, true);
+                if (string.IsNullOrEmpty(APIUrl))
+                {
+                    Message = "APIUrl is required for integration. Please contact administrator.";
+                    return false;
+                }
                 using (JiraService jiraService = new JiraService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
                 {
                     jiraService.InstallWebhook((string)WebProps.Properties["Object"], IntegrationKey, APIUrl);
