@@ -180,7 +180,12 @@ namespace EPMLiveWebParts
                     }
                     catch { }
 
-                    if((li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved) && web.ID == SPContext.Current.Web.ID && childitem == "" && wsurl == "")
+                    if((li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved) 
+                        && web.ID == SPContext.Current.Web.ID 
+                        && childitem == "" 
+                        && wsurl == ""
+                        && li.DoesUserHavePermissions(web.CurrentUser, SPBasePermissions.EditListItems)
+                        && web.DoesUserHavePermissions(web.CurrentUser.LoginName, SPBasePermissions.ManageSubwebs))
                     {
                         items.Add("Create Workspace", getMenuItem(Request["grid"], "Create Workspace", "/_layouts/images/STSICON.gif", "createworkspace", "1"));
                     }
