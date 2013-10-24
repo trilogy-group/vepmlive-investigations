@@ -287,6 +287,11 @@
 	            this.dlgEditTarget.window("winEditTargetDlg").setDimension(this.Width, this.Height);
 	        if (this.dlgChart != null)
 	            this.dlgChart.window("winChartDlg").setDimension(this.Width, this.Height);
+
+
+	        if (this.showingGraph == true) {
+	            this.createChart();
+	        }
 	    }
 	}
 
@@ -8170,6 +8175,7 @@ ResPlanAnalyzer.prototype.InitVars = function () {
 	    this.CmtCal = 0;
 
 	    var loadDelegate = MakeDelegate(this, this.OnLoad);
+	    var resizeDelegate = MakeDelegate(this, this.OnResizeInternal);
 	    //        var unloadDelegate = MakeDelegate(this, this.OnUnload);
 	    var HandlePingSessionData = MakeDelegate(this, this.HandlePingSession);
 	    var HandlePopulateUI = MakeDelegate(this, this.PopulateUI);
@@ -8261,17 +8267,18 @@ ResPlanAnalyzer.prototype.InitVars = function () {
 
 //	    });
 
-
- 
-
-		if (document.addEventListener != null) { // e.g. Firefox
-			window.addEventListener("load", loadDelegate, true);
-//            window.addEventListener("beforeunload", unloadDelegate, true);
-		}
-		else { // e.g. IE
-			window.attachEvent("onload", loadDelegate);
-//            window.attachEvent("onbeforeunload", unloadDelegate);
-		}
+        if (document.addEventListener != null) { // e.g. Firefox
+            window.addEventListener("load", loadDelegate, true);
+            //window.addEventListener("beforeunload", beforeUnloadDelegate, true);
+            //window.addEventListener("unload", unloadDelegate, true);
+            window.addEventListener("resize", resizeDelegate, true);
+        }
+        else { // e.g. IE
+            window.attachEvent("onload", loadDelegate);
+            //window.attachEvent("onbeforeunload", beforeUnloadDelegate);
+            //window.attachEvent("onunload", unloadDelegate);
+            window.attachEvent("onresize", resizeDelegate);
+        }
 	}
 	catch (e) {
 		alert("Resource Plan Analyzer Initialization error");
