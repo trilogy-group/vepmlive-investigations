@@ -389,7 +389,7 @@ html, body {
                         DisplayDialog(400, 280, "Add roles to " + grid.GetAttribute(parentrow, "CA_NAME", null), "winRolesDlg", "idRolesDlg", true, false);
                     }
                     else
-                        alert("all available roles have already been added to this cost type");
+                        alert("All available roles have already been added to this summary row.");
                 }
                 break;
             case "btnSave":
@@ -439,10 +439,10 @@ html, body {
                 if (childrow != null) {
                     sb.appendLine("WARNING!");
                     sb.appendLine("");
-                    sb.appendLine("All child rows of the selected cost category will also be deleted");
+                    sb.appendLine("All child rows of the selected cost category will also be deleted.");
                     sb.appendLine("");
                 }
-                sb.appendLine("Press 'OK' to continue. The rows will be deleted on Save");
+                sb.appendLine("Press 'OK' to continue. The rows will be deleted on Save.");
                 var s = sb.toString();
                 var r = confirm (s);
                 if (r == true) {
@@ -480,7 +480,7 @@ html, body {
             case "btnFTEs":
                 var hasChanges = tgrid1.grid.HasChanges();
                 if ((hasChanges & (1 << 0)) != 0) {
-                     window.alert("You have unsaved changes to cost categories.\n\nYou must save or abandon these changes before editing FTEs");
+                     window.alert("You have unsaved changes to cost categories.\n\nYou must save or abandon these changes before editing FTEs.");
                      return;
                 }
                 var sRequest = '<request function="CostCategoriesRequest" context="ReadCalendarFTEsInfo"><data><![CDATA[' + -1 + ']]></data></request>';
