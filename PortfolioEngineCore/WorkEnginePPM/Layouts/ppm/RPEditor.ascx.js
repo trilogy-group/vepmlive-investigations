@@ -2698,7 +2698,7 @@
                         this.ApplyGridView("g_RPE", selectedView, true);
                         this.ApplyGridView("g_Res", selectedView, true);
                         this.ShowSelectedResourceGroup();
-                        this.UpdatePlanCalculatedValues();
+                        //this.UpdatePlanCalculatedValues();
                         this.RefreshPlanPeriods(false);
                         var grid = Grids["g_RPE"];
                         this.RefreshGrid(grid);
