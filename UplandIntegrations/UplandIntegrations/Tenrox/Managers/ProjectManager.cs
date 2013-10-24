@@ -87,7 +87,7 @@ namespace UplandIntegrations.Tenrox.Managers
                         project.PortfolioId = 2;
                         project.ProjectWorkflowMapId = 112;
                         project.StartDate = now.Date;
-                        project.ReleaseAlias = string.Format(@"UPL-INT-{0}-{1:yyMMddHHmmss}", project.Id, now);
+                        project.ReleaseAlias = string.Format(@"UPL-INT-P-{0}", project.Id);
                     }
                     catch { }
                 }

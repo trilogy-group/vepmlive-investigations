@@ -90,6 +90,7 @@ namespace UplandIntegrations.Tenrox.Managers
 
                         assignment.TaskId = result.Id;
                         assignment.UserId = userId;
+                        assignment.Name = row["Name"].ToString();
                         if (task.StartDate != null) assignment.StartDate = task.StartDate.Value;
                         if (task.EndDate != null) assignment.EndDate = task.EndDate.Value;
 
@@ -154,6 +155,8 @@ namespace UplandIntegrations.Tenrox.Managers
                         task.WorktypeId = 71;
                         task.StartDate = DateTime.Now;
                         task.Id = row["SPID"].ToString();
+
+                        row["Name"] = string.Format(@"[UPL-INT-T-{0}-{1}] {2}", row["SPID"], row["ProjectId"], row["Name"]);
                     }
                     catch { }
                 }
