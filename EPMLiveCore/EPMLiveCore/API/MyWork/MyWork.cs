@@ -74,7 +74,6 @@ using EPMLiveCore.Properties;
 using EPMLiveCore.ReportingProxy;
 using EPMLiveReportsAdmin;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore.API
 {
@@ -203,7 +202,7 @@ namespace EPMLiveCore.API
                         var xmlSerializer = new XmlSerializer(typeof (List<MyWorkGridView>));
                         return
                             (IEnumerable<MyWorkGridView>)
-                            xmlSerializer.Deserialize(new StringReader(serializedGlobalViews));
+                                xmlSerializer.Deserialize(new StringReader(serializedGlobalViews));
                     }
                 }
 
@@ -227,8 +226,8 @@ namespace EPMLiveCore.API
         /// <param name="spWeb">The sp web.</param>
         /// <returns></returns>
         public static IOrderedEnumerable<KeyValuePair<string, string>> GetListFieldsAndTypesFromDb(Guid listId,
-                                                                                                   Guid webId,
-                                                                                                   SPWeb spWeb)
+            Guid webId,
+            SPWeb spWeb)
         {
             try
             {
@@ -250,15 +249,15 @@ namespace EPMLiveCore.API
                         string fields = ((byte[]) sqlCommand.ExecuteScalar()).SpDecompress();
 
                         XDocument xDocument = XDocument.Parse(string.Format("<Fields>{0}</Fields>",
-                                                                            fields.Remove(0, fields.IndexOf("<"))));
+                            fields.Remove(0, fields.IndexOf("<"))));
 
                         foreach (XElement xElement in xDocument.Element("Fields").Elements()
-                                                               .Where(
-                                                                   xElement => xElement.Name.LocalName.Equals("Field"))
-                                                               .Where(
-                                                                   xElement =>
-                                                                   xElement.Attribute("Name") != null &&
-                                                                   xElement.Attribute("Type") != null)
+                            .Where(
+                                xElement => xElement.Name.LocalName.Equals("Field"))
+                            .Where(
+                                xElement =>
+                                    xElement.Attribute("Name") != null &&
+                                    xElement.Attribute("Type") != null)
                             )
                         {
                             listFieldsAndTypes.Add(xElement.Attribute("Name").Value, xElement.Attribute("Type").Value);
@@ -303,9 +302,9 @@ namespace EPMLiveCore.API
                     webUrl = webUrl.Equals("/") ? string.Empty : webUrl.Substring(1);
 
                     string archivedWebString = string.Join(",",
-                                                           archivedWebs.Select(
-                                                               archivedWeb => string.Format("'{0}'", archivedWeb)).
-                                                                        ToArray());
+                        archivedWebs.Select(
+                            archivedWeb => string.Format("'{0}'", archivedWeb)).
+                            ToArray());
 
                     string queryString =
                         string.Format(
@@ -317,9 +316,9 @@ namespace EPMLiveCore.API
                             selectedList);
 
                     queryString += string.IsNullOrEmpty(webUrl)
-                                       ? string.Format(@"(dbo.Webs.SiteId = '{0}')", spWeb.Site.ID)
-                                       : string.Format(
-                                           @"(dbo.Webs.FullUrl LIKE '{0}/%' OR dbo.Webs.FullUrl = '{0}')", webUrl);
+                        ? string.Format(@"(dbo.Webs.SiteId = '{0}')", spWeb.Site.ID)
+                        : string.Format(
+                            @"(dbo.Webs.FullUrl LIKE '{0}/%' OR dbo.Webs.FullUrl = '{0}')", webUrl);
 
                     if (archivedWebs.Count > 0)
                         queryString += string.Format(@" AND (dbo.AllLists.tp_WebId NOT IN ({0}))", archivedWebString);
@@ -413,11 +412,11 @@ namespace EPMLiveCore.API
             {
                 SqlConnection sqlConnection = null;
                 SPSecurity.RunWithElevatedPrivileges(() =>
-                    {
-                        string databaseConnectionString =
-                            spWeb.Site.ContentDatabase.DatabaseConnectionString;
-                        sqlConnection = new SqlConnection(databaseConnectionString);
-                    });
+                {
+                    string databaseConnectionString =
+                        spWeb.Site.ContentDatabase.DatabaseConnectionString;
+                    sqlConnection = new SqlConnection(databaseConnectionString);
+                });
                 return sqlConnection;
             }
             catch (APIException)
@@ -544,7 +543,7 @@ namespace EPMLiveCore.API
         /// <param name="myWorkFields">My work fields.</param>
         /// <returns></returns>
         private static Dictionary<string, int> GenerateColDictionary(DataTable myWorkDataTable,
-                                                                     IEnumerable<string> myWorkFields)
+            IEnumerable<string> myWorkFields)
         {
             var colDict = new Dictionary<string, int>();
 
@@ -578,14 +577,14 @@ namespace EPMLiveCore.API
         /// <param name="selectedFields">The selected fields.</param>
         /// <param name="selectedLists">The selected lists.</param>
         private static void GetDataFromLists(XDocument result, Dictionary<string, SPField> fieldTypes, string query,
-                                             SPSite spSite, SPWeb spWeb,
-                                             List<string> selectedFields, List<string> selectedLists)
+            SPSite spSite, SPWeb spWeb,
+            List<string> selectedFields, List<string> selectedLists)
         {
             foreach (Guid theWebId in from webId in spWeb.ToTreeList()
-                                      let archivedWebs = GetArchivedWebs(spSite.ID)
-                                      let theWebId = webId
-                                      where !archivedWebs.Exists(wId => wId == theWebId)
-                                      select theWebId)
+                let archivedWebs = GetArchivedWebs(spSite.ID)
+                let theWebId = webId
+                where !archivedWebs.Exists(wId => wId == theWebId)
+                select theWebId)
             {
                 using (SPWeb web = spSite.OpenWeb(theWebId))
                 {
@@ -618,19 +617,19 @@ namespace EPMLiveCore.API
                         //WriteToDebugWindow("List: " + spList.Title);
 
                         var spQuery = new SPQuery
-                            {QueryThrottleMode = SPQueryThrottleOption.Override};
+                        {QueryThrottleMode = SPQueryThrottleOption.Override};
 
                         foreach (string selectedField in selectedFields)
                         {
                             spQuery.ViewFields +=
                                 string.Format(@"<FieldRef Name='{0}' Nullable='TRUE'/>",
-                                              selectedField);
+                                    selectedField);
                         }
 
                         if (!selectedFields.Exists(f => f.Equals(COMPLETED_FIELD)))
                             spQuery.ViewFields +=
                                 string.Format("<FieldRef Name='{0}' Nullable='TRUE'/>",
-                                              COMPLETED_FIELD);
+                                    COMPLETED_FIELD);
 
                         spQuery.Query = query;
 
@@ -642,8 +641,8 @@ namespace EPMLiveCore.API
                         if (!spListItemCollection.HasItems()) continue;
 
                         bool listContainsField = selectedFields.Any(selectedField =>
-                                                                    spListItemCollection.Fields.
-                                                                                         ContainsField(selectedField));
+                            spListItemCollection.Fields.
+                                ContainsField(selectedField));
 
                         if (!listContainsField) continue;
 
@@ -660,7 +659,7 @@ namespace EPMLiveCore.API
 
                             foreach (string selectedField in selectedFields.Where(
                                 selectedField =>
-                                theListItem.Fields.ContainsFieldWithInternalName(selectedField)))
+                                    theListItem.Fields.ContainsFieldWithInternalName(selectedField)))
                             {
                                 string value =
                                     (theListItem[selectedField] ?? string.Empty).ToString();
@@ -682,7 +681,7 @@ namespace EPMLiveCore.API
 
                             var itemElement = new XElement("Item");
                             itemElement.Add(new XAttribute("ID",
-                                                           spListItem["ID"].ToString().ToUpper()));
+                                spListItem["ID"].ToString().ToUpper()));
 
                             itemElement.Add(new XAttribute("ListID", listId));
                             itemElement.Add(new XAttribute("WebID", theWebId.ToString().ToUpper()));
@@ -725,9 +724,9 @@ namespace EPMLiveCore.API
         /// <param name="data">The data.</param>
         /// <returns></returns>
         private static IEnumerable<DataTable> GetDataFromReportingDB(Dictionary<string, string> workTypes,
-                                                                     IEnumerable<string> selectedFields,
-                                                                     List<Guid> archivedWebs, SPWeb spWeb,
-                                                                     List<string> selectedLists, string data)
+            IEnumerable<string> selectedFields,
+            List<Guid> archivedWebs, SPWeb spWeb,
+            List<string> selectedLists, string data)
         {
             const string dateFormat = "yyyy-MM-dd HH:mm:ss";
 
@@ -791,26 +790,25 @@ namespace EPMLiveCore.API
                 if (archivedWebs.Any())
                 {
                     string @join = string.Join(",",
-                                               archivedWebs.Distinct().Select(
-                                                   w => string.Format(@"N'{0}'", w)).
-                                                            ToArray());
+                        archivedWebs.Distinct().Select(
+                            w => string.Format(@"N'{0}'", w)).
+                            ToArray());
                     archivedWebIds = string.Format(@"AND (WebId NOT IN ({0}))", @join);
                 }
 
                 string queryLists = string.Join(",",
-                                                selectedLists.Select(
-                                                    l => string.Format(@"N'{0}'", l)).
-                                                              ToArray());
+                    selectedLists.Select(
+                        l => string.Format(@"N'{0}'", l)).
+                        ToArray());
 
                 SPUser currentUser = spWeb.CurrentUser;
 
                 string sql = string.Format(
                     @"SELECT DISTINCT * FROM dbo.LSTMyWork WHERE ([AssignedToID] = {0})  AND ([Complete] {1} 1 OR [Complete] IS NULL)
-                                AND ([WebUrl] LIKE N'{2}%' OR [WebUrl] = N'{2}' OR [WebUrl] = N'/' AND [SiteId] = N'{3}')
-                                AND ([DueDate] IS NULL OR ([DueDate] >= '{4}' AND [DueDate] <= '{5}'))
-                                AND ([WorkType] IN ({6})) {7}",
-                    currentUser.ID, getCompletedItems ? "=" : "<>",
-                    spWeb.SafeServerRelativeUrl(), siteId,
+                                AND [SiteId] = N'{2}'
+                                AND ([DueDate] IS NULL OR ([DueDate] >= '{3}' AND [DueDate] <= '{4}'))
+                                AND ([WorkType] IN ({5})) {6}",
+                    currentUser.ID, getCompletedItems ? "=" : "<>", siteId,
                     ((DateTime) from).ToString("MM/dd/yyyy HH:mm:ss"),
                     ((DateTime) to).ToString("MM/dd/yyyy HH:mm:ss"),
                     queryLists, archivedWebIds);
@@ -851,14 +849,14 @@ namespace EPMLiveCore.API
                 if (myWorkDataTable.Rows.Count == 0) return tables;
 
                 IEnumerable<string> columns = from DataColumn dataColumn in myWorkDataTable.Columns
-                                              select string.Format(@"N'{0}'", dataColumn.ColumnName);
+                    select string.Format(@"N'{0}'", dataColumn.ColumnName);
 
                 var lists = new List<string>
-                    {
-                        string.Format(@"N'{0}'", myWorkListId.ToString()
-                                                             .Replace("{", string.Empty)
-                                                             .Replace("}", string.Empty))
-                    };
+                {
+                    string.Format(@"N'{0}'", myWorkListId.ToString()
+                        .Replace("{", string.Empty)
+                        .Replace("}", string.Empty))
+                };
 
                 foreach (DataRow r in myWorkDataTable.Rows)
                 {
@@ -940,8 +938,8 @@ namespace EPMLiveCore.API
 
                 string sl = selectedList;
                 EnumerableRowCollection<DataRow> dataRows = from r in myWorkDtRows
-                                                            where r.Field<string>("WorkType").Equals(sl)
-                                                            select r;
+                    where r.Field<string>("WorkType").Equals(sl)
+                    select r;
 
                 foreach (DataRow dataRow in dataRows)
                 {
@@ -950,7 +948,7 @@ namespace EPMLiveCore.API
                     foreach (string selectedField in myWorkFields)
                     {
                         row[selectedField] = GetMyWorkFieldValue(selectedField, dataRow, colDict, fieldsTableRows,
-                                                                 flagsTable);
+                            flagsTable);
                     }
 
                     bool workingOn = false;
@@ -990,8 +988,8 @@ namespace EPMLiveCore.API
         /// <param name="selectedLists">The selected lists.</param>
         /// <returns></returns>
         private static IEnumerable<DataTable> GetDataFromSP(List<string> selectedListIds, SPSiteDataQuery dataQuery,
-                                                            SPWeb spWeb, SPSite spSite,
-                                                            List<Guid> archivedWebs, IEnumerable<string> selectedLists)
+            SPWeb spWeb, SPSite spSite,
+            List<Guid> archivedWebs, IEnumerable<string> selectedLists)
         {
             var locker = new object();
             var eventWaitHandles = new List<EventWaitHandle>();
@@ -1015,46 +1013,46 @@ namespace EPMLiveCore.API
                 if (string.IsNullOrEmpty(listIds)) continue;
 
                 dataQuery.Lists = string.Format("<Lists MaxListLimit='0'>{0}</Lists>",
-                                                listIds);
+                    listIds);
 
                 var url = (string) spSite.Url.Clone();
                 var id = new Guid(spWeb.ID.ToString());
                 SPUserToken spUserToken = spWeb.CurrentUser.UserToken;
 
                 var spSiteDataQuery = new SPSiteDataQuery
-                    {
-                        Webs = dataQuery.Webs,
-                        Query = dataQuery.Query,
-                        QueryThrottleMode =
-                            dataQuery.QueryThrottleMode,
-                        ViewFields = dataQuery.ViewFields,
-                        Lists = dataQuery.Lists
-                    };
+                {
+                    Webs = dataQuery.Webs,
+                    Query = dataQuery.Query,
+                    QueryThrottleMode =
+                        dataQuery.QueryThrottleMode,
+                    ViewFields = dataQuery.ViewFields,
+                    Lists = dataQuery.Lists
+                };
 
                 var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
                 eventWaitHandles.Add(eventWaitHandle);
 
                 string list = selectedList;
                 var thread = new Thread(() =>
+                {
+                    try
                     {
-                        try
-                        {
-                            DataTable dataTable = QueryMyWorkData(spSiteDataQuery, url, id,
-                                                                  spUserToken);
-                            dataTable.TableName = list;
+                        DataTable dataTable = QueryMyWorkData(spSiteDataQuery, url, id,
+                            spUserToken);
+                        dataTable.TableName = list;
 
-                            lock (locker)
-                            {
-                                dataTables.Add(dataTable);
-                            }
-                        }
-                        catch (SPException ex)
+                        lock (locker)
                         {
-                            spExceptionOccured = true;
+                            dataTables.Add(dataTable);
                         }
+                    }
+                    catch (SPException ex)
+                    {
+                        spExceptionOccured = true;
+                    }
 
-                        eventWaitHandle.Set();
-                    }) {Name = theSelectedList, IsBackground = true};
+                    eventWaitHandle.Set();
+                }) {Name = theSelectedList, IsBackground = true};
 
                 thread.Start();
             }
@@ -1150,9 +1148,9 @@ namespace EPMLiveCore.API
 
             if (name.Equals(COMMENT_COUNT_FIELD))
                 value = !string.IsNullOrEmpty(value)
-                            ? decimal.Truncate(Convert.ToDecimal(value, new CultureInfo("")))
-                                     .ToString(CultureInfo.InvariantCulture)
-                            : string.Empty;
+                    ? decimal.Truncate(Convert.ToDecimal(value, new CultureInfo("")))
+                        .ToString(CultureInfo.InvariantCulture)
+                    : string.Empty;
 
             if (name.Equals("Priority"))
             {
@@ -1170,15 +1168,13 @@ namespace EPMLiveCore.API
                         {
                             SPWeb spWeb = SPContext.Current.Web;
                             value = Decimal.Parse(value,
-                                                  new CultureInfo(
-                                                      (int)
-                                                      (spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings).
-                                                          LocaleId))
-                                           .ToString(CultureInfo.InvariantCulture);
+                                new CultureInfo(
+                                    (int)
+                                        (spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings).
+                                            LocaleId))
+                                .ToString(CultureInfo.InvariantCulture);
                         }
-                        catch
-                        {
-                        }
+                        catch { }
                     }
                 }
                 else if (type.Contains("Date"))
@@ -1189,9 +1185,7 @@ namespace EPMLiveCore.API
                         {
                             value = DateTime.Parse(value).ToString("yyyy-M-d HH:mm:ss");
                         }
-                        catch
-                        {
-                        }
+                        catch { }
                     }
                 }
             }
@@ -1259,8 +1253,8 @@ namespace EPMLiveCore.API
         /// <param name="flagsTable">The flags table.</param>
         /// <returns></returns>
         private static object GetMyWorkFieldValue(string myWorkField, DataRow myWorkDataRow,
-                                                  Dictionary<string, int> colDict,
-                                                  EnumerableRowCollection<DataRow> fieldsTableRows, DataTable flagsTable)
+            Dictionary<string, int> colDict,
+            EnumerableRowCollection<DataRow> fieldsTableRows, DataTable flagsTable)
         {
             object value = null;
 
@@ -1280,10 +1274,10 @@ namespace EPMLiveCore.API
                     string sf = myWorkField;
 
                     DataRow field = (from r in fieldsTableRows
-                                     where
-                                         r.Field<Guid>("ListId") == lstId &&
-                                         r.Field<string>("InternalName").Equals(sf)
-                                     select r).FirstOrDefault();
+                        where
+                            r.Field<Guid>("ListId") == lstId &&
+                            r.Field<string>("InternalName").Equals(sf)
+                        select r).FirstOrDefault();
 
                     if (field != null)
                     {
@@ -1313,9 +1307,7 @@ namespace EPMLiveCore.API
                                         list.Add(ids[i]);
                                         list.Add(values[i]);
                                     }
-                                    catch
-                                    {
-                                    }
+                                    catch { }
                                 }
 
                                 value = string.Join(";#", list.ToArray());
@@ -1358,30 +1350,30 @@ namespace EPMLiveCore.API
             foreach (
                 string attribute in
                     new[]
-                        {
-                            "ID", "Name", "Default", "Personal", "LeftCols", "Cols", "RightCols", "Filters", "Grouping",
-                            "Sorting"
-                        }
+                    {
+                        "ID", "Name", "Default", "Personal", "LeftCols", "Cols", "RightCols", "Filters", "Grouping",
+                        "Sorting"
+                    }
                         .Where(
                             attribute =>
-                            !viewElement.Attributes().ToList().Exists(a => a.Name.LocalName.Equals(attribute))))
+                                !viewElement.Attributes().ToList().Exists(a => a.Name.LocalName.Equals(attribute))))
             {
                 throw new Exception("Cannot find attribute " + attribute);
             }
 
             return new MyWorkGridView
-                {
-                    Id = viewElement.Attribute("ID").Value,
-                    Name = viewElement.Attribute("Name").Value,
-                    Default = Convert.ToBoolean(viewElement.Attribute("Default").Value),
-                    Personal = Convert.ToBoolean(viewElement.Attribute("Personal").Value),
-                    LeftCols = viewElement.Attribute("LeftCols").Value,
-                    Cols = viewElement.Attribute("Cols").Value,
-                    RightCols = viewElement.Attribute("RightCols").Value,
-                    Filters = viewElement.Attribute("Filters").Value,
-                    Grouping = viewElement.Attribute("Grouping").Value,
-                    Sorting = viewElement.Attribute("Sorting").Value
-                };
+            {
+                Id = viewElement.Attribute("ID").Value,
+                Name = viewElement.Attribute("Name").Value,
+                Default = Convert.ToBoolean(viewElement.Attribute("Default").Value),
+                Personal = Convert.ToBoolean(viewElement.Attribute("Personal").Value),
+                LeftCols = viewElement.Attribute("LeftCols").Value,
+                Cols = viewElement.Attribute("Cols").Value,
+                RightCols = viewElement.Attribute("RightCols").Value,
+                Filters = viewElement.Attribute("Filters").Value,
+                Grouping = viewElement.Attribute("Grouping").Value,
+                Sorting = viewElement.Attribute("Sorting").Value
+            };
         }
 
         /// <summary>
@@ -1409,7 +1401,7 @@ namespace EPMLiveCore.API
         /// <param name="selectedListIds">The selected list ids.</param>
         /// <returns></returns>
         private static IEnumerable<Guid> GetMyWorkListIdsFromDb(SPWeb spWeb, List<Guid> archivedWebs,
-                                                                List<string> selectedListIds)
+            List<string> selectedListIds)
         {
             try
             {
@@ -1421,13 +1413,13 @@ namespace EPMLiveCore.API
                     webUrl = webUrl.Equals("/") ? string.Empty : webUrl.Substring(1);
 
                     string archivedWebString = string.Join(",",
-                                                           archivedWebs.Select(
-                                                               archivedWeb => string.Format("'{0}'", archivedWeb)).
-                                                                        ToArray());
+                        archivedWebs.Select(
+                            archivedWeb => string.Format("'{0}'", archivedWeb)).
+                            ToArray());
                     string selectedListString = string.Join(",",
-                                                            selectedListIds.Select(
-                                                                selectedList => string.Format("'{0}'", selectedList)).
-                                                                            ToArray());
+                        selectedListIds.Select(
+                            selectedList => string.Format("'{0}'", selectedList)).
+                            ToArray());
 
                     string queryString =
                         @"
@@ -1437,9 +1429,9 @@ namespace EPMLiveCore.API
                             WHERE ";
 
                     queryString += string.IsNullOrEmpty(webUrl)
-                                       ? string.Format(@"(dbo.Webs.SiteId = '{0}')", spWeb.Site.ID)
-                                       : string.Format(
-                                           @"(dbo.Webs.FullUrl LIKE '{0}/%' OR dbo.Webs.FullUrl = '{0}')", webUrl);
+                        ? string.Format(@"(dbo.Webs.SiteId = '{0}')", spWeb.Site.ID)
+                        : string.Format(
+                            @"(dbo.Webs.FullUrl LIKE '{0}/%' OR dbo.Webs.FullUrl = '{0}')", webUrl);
 
                     if (archivedWebs.Count > 0)
                         queryString += string.Format(@" AND (dbo.AllLists.tp_WebId NOT IN ({0}))", archivedWebString);
@@ -1447,7 +1439,7 @@ namespace EPMLiveCore.API
                         queryString += string.Format(@" AND (dbo.AllLists.tp_ID NOT IN ({0}))", selectedListString);
 
                     queryString += string.Format(@" AND (dbo.AllLists.tp_ServerTemplate = {0})",
-                                                 MY_WORK_LIST_SERVER_TEMPLATE_ID);
+                        MY_WORK_LIST_SERVER_TEMPLATE_ID);
 
                     using (var sqlCommand = new SqlCommand(queryString, sqlConnection))
                     {
@@ -1514,7 +1506,7 @@ namespace EPMLiveCore.API
                                     var xmlSerializer = new XmlSerializer(typeof (List<MyWorkGridView>));
                                     return
                                         (IEnumerable<MyWorkGridView>)
-                                        xmlSerializer.Deserialize(new StringReader(serializedPersonalViews));
+                                            xmlSerializer.Deserialize(new StringReader(serializedPersonalViews));
                                 }
                             }
                             catch (SqlException sqlException)
@@ -1559,8 +1551,8 @@ namespace EPMLiveCore.API
                             xDocument.Element("MyWork").Element("Query").Descendants().ToList().Exists(
                                 e => e.Name.LocalName.Equals("Where")))
                             return xDocument.Element("MyWork").Element("Query").Element("Where").ToString()
-                                            .Replace("<Where>", string.Empty).Replace("</Where>", string.Empty)
-                                            .Replace("<Where/>", string.Empty).Replace("<Where />", string.Empty);
+                                .Replace("<Where>", string.Empty).Replace("</Where>", string.Empty)
+                                .Replace("<Where/>", string.Empty).Replace("<Where />", string.Empty);
                     }
                 }
             }
@@ -1581,7 +1573,7 @@ namespace EPMLiveCore.API
         ///     if set to <c>true</c> [no lists selected].
         /// </param>
         private static void GetSettings(string data, ref List<string> selectedFields, ref List<string> selectedLists,
-                                        ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected)
+            ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected)
         {
             try
             {
@@ -1601,7 +1593,7 @@ namespace EPMLiveCore.API
                                 e => e.Name.LocalName.Equals("Lists")))
                         {
                             selectedLists.AddRange(xDocument.Element("MyWork").Element("Lists").Value.Split(new[] {','})
-                                                            .Where(list => !string.IsNullOrEmpty(list)));
+                                .Where(list => !string.IsNullOrEmpty(list)));
 
                             listsSupplied = true;
                         }
@@ -1612,7 +1604,7 @@ namespace EPMLiveCore.API
                         {
                             selectedLists.AddRange(xDocument.Element("MyWork").Element("MyWorkLists").Value.Split(
                                 new[] {','})
-                                                            .Where(list => !string.IsNullOrEmpty(list)));
+                                .Where(list => !string.IsNullOrEmpty(list)));
 
                             myWorkListsSupplied = true;
                         }
@@ -1622,8 +1614,8 @@ namespace EPMLiveCore.API
                                 e => e.Name.LocalName.Equals("Fields")))
                         {
                             selectedFields.AddRange(xDocument.Element("MyWork").Element("Fields").Value.Split(new[]
-                                {','})
-                                                             .Where(field => !string.IsNullOrEmpty(field)));
+                            {','})
+                                .Where(field => !string.IsNullOrEmpty(field)));
 
                             fieldsSupplied = true;
                         }
@@ -1636,7 +1628,7 @@ namespace EPMLiveCore.API
                             {
                                 siteUrls.AddRange(xDocument.Element("MyWork").Element("CrossSiteUrls").Value.Split(
                                     new[] {','})
-                                                           .Where(crossSite => !string.IsNullOrEmpty(crossSite)));
+                                    .Where(crossSite => !string.IsNullOrEmpty(crossSite)));
 
                                 siteUrlsSupplied = true;
                             }
@@ -1659,33 +1651,33 @@ namespace EPMLiveCore.API
                     if (!listsSupplied)
                         selectedLists.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_LISTS)
-                                         .Split(new[] {','}));
+                                .Split(new[] {','}));
 
                     if (!myWorkListsSupplied)
                         selectedLists.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_MY_WORK_LISTS)
-                                         .Split(new[] {','}));
+                                .Split(new[] {','}));
 
                     if (!fieldsSupplied)
                         selectedFields.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_FIELDS).Split(new[]
-                                {','}));
+                            {','}));
 
                     if (!siteUrlsSupplied)
                     {
                         if (
                             !string.IsNullOrEmpty(CoreFunctions.getConfigSetting(configWeb,
-                                                                                 GENERAL_SETTINGS_CROSS_SITE_URLS)))
+                                GENERAL_SETTINGS_CROSS_SITE_URLS)))
                         {
                             siteUrls.AddRange(CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_CROSS_SITE_URLS)
-                                                           .Split(new[] {'|'}));
+                                .Split(new[] {'|'}));
                         }
                         else siteUrls.Add(SPContext.Current.Web.Url);
                     }
 
                     if (!performanceModeSupplied)
                         performanceMode = CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_PERFORMANCE_MODE)
-                                                       .Equals("on");
+                            .Equals("on");
                 }
 
                 selectedLists.RemoveAll(string.IsNullOrEmpty);
@@ -1700,13 +1692,13 @@ namespace EPMLiveCore.API
                 }
 
                 var fixedFields = new[]
-                    {
-                        COMPLETED_FIELD, COMMENT_COUNT_FIELD, PRIORITY_FIELD, FLAG_FIELD, TITLE_FIELD,
-                        DUE_DATE_FIELD,
-                        CREATED_FIELD, CREATED_BY_FIELD, MODIFIED_FIELD, MODIFIED_BY_FIELD,
-                        COMMENTERS_FIELD,
-                        COMMENTERS_READ_FIELD
-                    };
+                {
+                    COMPLETED_FIELD, COMMENT_COUNT_FIELD, PRIORITY_FIELD, FLAG_FIELD, TITLE_FIELD,
+                    DUE_DATE_FIELD,
+                    CREATED_FIELD, CREATED_BY_FIELD, MODIFIED_FIELD, MODIFIED_BY_FIELD,
+                    COMMENTERS_FIELD,
+                    COMMENTERS_READ_FIELD
+                };
 
                 foreach (string fixedField in fixedFields)
                 {
@@ -1732,7 +1724,7 @@ namespace EPMLiveCore.API
         /// <param name="type">The type.</param>
         /// <param name="format">The format.</param>
         private static void GetTypeAndFormat(Dictionary<string, SPField> fieldTypes, string selectedField,
-                                             out string type, out string format)
+            out string type, out string format)
         {
             type = string.Empty;
             format = string.Empty;
@@ -1759,11 +1751,11 @@ namespace EPMLiveCore.API
             var queryExecutor = new QueryExecutor(spWeb);
 
             return queryExecutor.ExecuteEpmLiveQuery(sql,
-                                                     new Dictionary<string, object>
-                                                         {
-                                                             {"@ResourceId", spWeb.CurrentUser.ID},
-                                                             {"@SiteId", spWeb.Site.ID}
-                                                         });
+                new Dictionary<string, object>
+                {
+                    {"@ResourceId", spWeb.CurrentUser.ID},
+                    {"@SiteId", spWeb.Site.ID}
+                });
         }
 
         /// <summary>
@@ -1862,10 +1854,10 @@ namespace EPMLiveCore.API
                         try
                         {
                             var columnDefs = new List<ColumnDef>
-                                {
-                                    new ColumnDef("Complete", "Complete", "Complete",
-                                                  SPFieldType.Boolean, SqlDbType.Bit)
-                                };
+                            {
+                                new ColumnDef("Complete", "Complete", "Complete",
+                                    SPFieldType.Boolean, SqlDbType.Bit)
+                            };
 
                             myWorkReportData.InsertListColumns((Guid) listId, columnDefs);
                             myWorkReportData.AddColumns("LSTMyWork", columnDefs);
@@ -1873,7 +1865,7 @@ namespace EPMLiveCore.API
                         catch
                         {
                             throw new APIException(2014,
-                                                   "Unable to map MyWork 'Complete' column to the Reporting Database.");
+                                "Unable to map MyWork 'Complete' column to the Reporting Database.");
                         }
                     }
 
@@ -1894,9 +1886,9 @@ namespace EPMLiveCore.API
         /// <param name="workspaces">The workspaces.</param>
         /// <param name="result">The result.</param>
         private static void ProcessMyWork(DataTable dataTable, SPSite spSite, SPWeb spWeb,
-                                          IEnumerable<string> selectedFields, Dictionary<string, SPField> fieldTypes,
-                                          Dictionary<string, string> workTypes, Dictionary<string, string> workspaces,
-                                          ref XDocument result)
+            IEnumerable<string> selectedFields, Dictionary<string, SPField> fieldTypes,
+            Dictionary<string, string> workTypes, Dictionary<string, string> workspaces,
+            ref XDocument result)
         {
             try
             {
@@ -1915,8 +1907,8 @@ namespace EPMLiveCore.API
                     foreach (string selectedField in selectedFields)
                     {
                         string value = row[selectedField] == null || row[selectedField] == DBNull.Value
-                                           ? string.Empty
-                                           : row[selectedField].ToString();
+                            ? string.Empty
+                            : row[selectedField].ToString();
 
                         if (selectedField.Equals("Author"))
                         {
@@ -1991,7 +1983,7 @@ namespace EPMLiveCore.API
         /// <param name="userToken">The user token.</param>
         /// <returns></returns>
         private static DataTable QueryMyWorkData(SPSiteDataQuery dataQuery, string siteUrl, Guid webId,
-                                                 SPUserToken userToken)
+            SPUserToken userToken)
         {
             DataTable dataTable = null;
             using (var spSite = new SPSite(siteUrl, userToken))
@@ -2013,7 +2005,7 @@ namespace EPMLiveCore.API
         /// <param name="globalViews">The global views.</param>
         /// <param name="configWeb">The config web.</param>
         private static void RenameGlobalView(string viewId, string viewName, IEnumerable<MyWorkGridView> globalViews,
-                                             SPWeb configWeb)
+            SPWeb configWeb)
         {
             List<MyWorkGridView> myWorkGridViews = globalViews.ToList();
             foreach (
@@ -2034,7 +2026,7 @@ namespace EPMLiveCore.API
         /// <param name="personalViews">The personal views.</param>
         /// <param name="configWeb">The config web.</param>
         private static void RenamePersonalView(string viewId, string viewName, IEnumerable<MyWorkGridView> personalViews,
-                                               SPWeb configWeb)
+            SPWeb configWeb)
         {
             List<MyWorkGridView> myWorkGridViews = personalViews.ToList();
             foreach (
@@ -2062,13 +2054,13 @@ namespace EPMLiveCore.API
                 stringWriter.Close();
 
                 SPSecurity.RunWithElevatedPrivileges(() =>
-                    {
-                        configWeb.AllowUnsafeUpdates = true;
-                        CoreFunctions.setConfigSetting(configWeb,
-                                                       MY_WORK_GRID_GLOBAL_VIEWS,
-                                                       stringWriter.ToString());
-                        configWeb.AllowUnsafeUpdates = false;
-                    });
+                {
+                    configWeb.AllowUnsafeUpdates = true;
+                    CoreFunctions.setConfigSetting(configWeb,
+                        MY_WORK_GRID_GLOBAL_VIEWS,
+                        stringWriter.ToString());
+                    configWeb.AllowUnsafeUpdates = false;
+                });
             }
             catch (APIException)
             {
@@ -2218,7 +2210,7 @@ namespace EPMLiveCore.API
                     using (SPWeb spWeb = spSite.OpenWeb(webId))
                     {
                         hasPermissions = spWeb.Lists[listId].DoesUserHavePermissions(SPContext.Current.Web.CurrentUser,
-                                                                                     SPBasePermissions.EditListItems);
+                            SPBasePermissions.EditListItems);
                     }
                 }
 
@@ -2300,12 +2292,12 @@ namespace EPMLiveCore.API
 
                 string theQuery = GetQuery(data);
                 string query = !string.IsNullOrEmpty(theQuery)
-                                   ? string.Format(
-                                       @"<Where><And>{0}<Eq><FieldRef Name='{1}'/><Value Type='Integer'><UserID/></Value></Eq></And></Where>",
-                                       theQuery, ASSIGNED_TO_FIELD)
-                                   : string.Format(
-                                       @"<Where><Eq><FieldRef Name='{0}'/><Value Type='Integer'><UserID/></Value></Eq></Where>",
-                                       ASSIGNED_TO_FIELD);
+                    ? string.Format(
+                        @"<Where><And>{0}<Eq><FieldRef Name='{1}'/><Value Type='Integer'><UserID/></Value></Eq></And></Where>",
+                        theQuery, ASSIGNED_TO_FIELD)
+                    : string.Format(
+                        @"<Where><Eq><FieldRef Name='{0}'/><Value Type='Integer'><UserID/></Value></Eq></Where>",
+                        ASSIGNED_TO_FIELD);
 
                 var selectedLists = new List<string>();
                 var selectedFields = new List<string>();
@@ -2314,7 +2306,7 @@ namespace EPMLiveCore.API
                 bool noListsSelected = true;
 
                 GetSettings(data, ref selectedFields, ref selectedLists, ref siteUrls, ref performanceMode,
-                            ref noListsSelected);
+                    ref noListsSelected);
 
                 bool processFlag = false;
 
@@ -2334,24 +2326,24 @@ namespace EPMLiveCore.API
                             if (!performanceMode)
                             {
                                 GetDataFromLists(result, fieldTypes, query, spSite, spWeb, selectedFields,
-                                                 selectedLists);
+                                    selectedLists);
                             }
                             else
                             {
                                 if (ShouldUseReportingDb(spWeb))
                                 {
                                     IEnumerable<DataTable> dataTables = GetDataFromReportingDB(workTypes,
-                                                                                               selectedFields,
-                                                                                               archivedWebs,
-                                                                                               spWeb, selectedLists,
-                                                                                               data);
+                                        selectedFields,
+                                        archivedWebs,
+                                        spWeb, selectedLists,
+                                        data);
 
                                     if (dataTables != null)
                                     {
                                         foreach (DataTable dataTable in dataTables)
                                         {
                                             ProcessMyWork(dataTable, spSite, spWeb, selectedFields, fieldTypes,
-                                                          workTypes, workSpaces, ref result);
+                                                workTypes, workSpaces, ref result);
                                         }
                                     }
                                 }
@@ -2360,11 +2352,11 @@ namespace EPMLiveCore.API
                                     try
                                     {
                                         var dataQuery = new SPSiteDataQuery
-                                            {
-                                                Webs = @"<Webs Scope='Recursive'>",
-                                                Query = query,
-                                                QueryThrottleMode = SPQueryThrottleOption.Override
-                                            };
+                                        {
+                                            Webs = @"<Webs Scope='Recursive'>",
+                                            Query = query,
+                                            QueryThrottleMode = SPQueryThrottleOption.Override
+                                        };
 
                                         foreach (string selectedField in selectedFields)
                                         {
@@ -2385,18 +2377,18 @@ namespace EPMLiveCore.API
                                         {
                                             processFlag = true;
                                             IEnumerable<DataTable> dataTables = GetDataFromSP(selectedListIds,
-                                                                                              dataQuery,
-                                                                                              spWeb, spSite,
-                                                                                              archivedWebs,
-                                                                                              selectedLists);
+                                                dataQuery,
+                                                spWeb, spSite,
+                                                archivedWebs,
+                                                selectedLists);
 
                                             if (dataTables != null)
                                             {
                                                 foreach (DataTable dataTable in dataTables)
                                                 {
                                                     ProcessMyWork(dataTable, spSite, spWeb, selectedFields,
-                                                                  fieldTypes,
-                                                                  workTypes, workSpaces, ref result);
+                                                        fieldTypes,
+                                                        workTypes, workSpaces, ref result);
                                                 }
                                             }
                                         }
@@ -2408,7 +2400,7 @@ namespace EPMLiveCore.API
                                     catch (Exception e)
                                     {
                                         throw new APIException(2014,
-                                                               "Unable to retrieve My Work data from My Work lists.");
+                                            "Unable to retrieve My Work data from My Work lists.");
                                     }
                                 }
                             }
@@ -2438,7 +2430,7 @@ namespace EPMLiveCore.API
         /// <param name="format">The format.</param>
         /// <returns></returns>
         internal static string GetMyWorkFieldType(MyWorkField myWorkField, Dictionary<string, SPField> fieldTypes,
-                                                  out string format)
+            out string format)
         {
             string type = "Html";
             format = string.Empty;
@@ -2502,8 +2494,8 @@ namespace EPMLiveCore.API
                             var element = new XElement("Field");
                             element.Add(new XAttribute("Name", theField));
                             element.Add(new XAttribute("Type",
-                                                       Utils.GetRelatedGridType(
-                                                           spListItem.Fields.GetFieldByInternalName(theField))));
+                                Utils.GetRelatedGridType(
+                                    spListItem.Fields.GetFieldByInternalName(theField))));
 
                             xElement.Add(element);
                         }
@@ -2540,7 +2532,7 @@ namespace EPMLiveCore.API
                 catch (APIException apiException)
                 {
                     return string.Format(@"<Grid><IO Result=""-{0}"" Message=""{1}"" /></Grid>",
-                                         apiException.ExceptionNumber, apiException.Message);
+                        apiException.ExceptionNumber, apiException.Message);
                 }
 
                 var result = new XDocument();
@@ -2556,7 +2548,7 @@ namespace EPMLiveCore.API
                 bool noListSelected = true;
 
                 GetSettings(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), ref selectedFields, ref selectedLists,
-                            ref siteUrls, ref performanceMode, ref noListSelected);
+                    ref siteUrls, ref performanceMode, ref noListSelected);
 
                 grid.Add(new XElement("Body"));
                 grid.Element("Body").Add(new XElement("B"));
@@ -2626,11 +2618,11 @@ namespace EPMLiveCore.API
                         {
                             flag =
                                 (xDocument.Element("MyPersonalization").Element("Personalizations").Elements().ToList()
-                                          .Where(e => e.Attribute("Key").Value.Equals(FLAG_FIELD))).FirstOrDefault()
-                                                                                                   .Attribute
+                                    .Where(e => e.Attribute("Key").Value.Equals(FLAG_FIELD))).FirstOrDefault()
+                                    .Attribute
                                     (
                                         "Value")
-                                                                                                   .Value;
+                                    .Value;
                         }
 
                         if (i.Attribute(FLAG_FIELD) != null) i.Attribute(FLAG_FIELD).Remove();
@@ -2768,7 +2760,7 @@ namespace EPMLiveCore.API
                 data = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data));
 
                 GetSettings(data, ref selectedFields, ref selectedLists, ref siteUrls, ref performanceMode,
-                            ref noListSelected);
+                    ref noListSelected);
 
                 var fields = new List<MyWorkField>();
 
@@ -2784,11 +2776,11 @@ namespace EPMLiveCore.API
                 var cfgElement = new XElement("Cfg");
 
                 cfgElement.Add(new XAttribute("id",
-                                              XDocument.Parse(data).Element("MyWork").Element("WebPart").Attribute("ID")
-                                                       .Value));
+                    XDocument.Parse(data).Element("MyWork").Element("WebPart").Attribute("ID")
+                        .Value));
                 cfgElement.Add(new XAttribute("CSS",
-                                              string.Format("{0}/_layouts/epmlive/treegrid/mywork13/grid.css",
-                                                            SPContext.Current.Web.Url)));
+                    string.Format("{0}/_layouts/epmlive/treegrid/mywork13/grid.css",
+                        SPContext.Current.Web.Url)));
 
                 grid.Add(cfgElement);
 
@@ -2804,9 +2796,9 @@ namespace EPMLiveCore.API
 
                 XElement cols = grid.Element("Cols");
                 foreach (MyWorkField myWorkField in fields.OrderBy(f => f.DisplayName)
-                                                          .Where(myWorkField => !leftCols.Contains(myWorkField.Name))
-                                                          .Where(myWorkField => !centerCols.Contains(myWorkField.Name))
-                                                          .Where(myWorkField => !rightCols.Contains(myWorkField.Name)))
+                    .Where(myWorkField => !leftCols.Contains(myWorkField.Name))
+                    .Where(myWorkField => !centerCols.Contains(myWorkField.Name))
+                    .Where(myWorkField => !rightCols.Contains(myWorkField.Name)))
                 {
                     string internalName = myWorkField.Name;
 
@@ -2834,7 +2826,7 @@ namespace EPMLiveCore.API
 
                     if (internalName.Equals(DUE_DATE_FIELD))
                         c.Add(new XAttribute("ClassFormula",
-                                             string.Format("calculateDueColor('{0}',Row)", DUE_DATE_FIELD)));
+                            string.Format("calculateDueColor('{0}',Row)", DUE_DATE_FIELD)));
 
                     cols.Add(c);
                 }
@@ -2854,9 +2846,9 @@ namespace EPMLiveCore.API
                 XElement header = grid.Element("Header");
 
                 foreach (MyWorkField myWorkField in fields.OrderBy(f => f.DisplayName)
-                                                          .Where(myWorkField => !leftCols.Contains(myWorkField.Name))
-                                                          .Where(
-                                                              myWorkField => !rightCols.Contains(myWorkField.Name)))
+                    .Where(myWorkField => !leftCols.Contains(myWorkField.Name))
+                    .Where(
+                        myWorkField => !rightCols.Contains(myWorkField.Name)))
                 {
                     string name = Utils.ToGridSafeFieldName(myWorkField.Name);
                     string value = myWorkField.DisplayName;
@@ -2889,8 +2881,8 @@ namespace EPMLiveCore.API
                     if (!bool.Parse(xDocument.Element("MyWork").Element("CompleteItemsQuery").Value))
                     {
                         result.Element("Grid").Element("LeftCols").Elements("C")
-                              .FirstOrDefault(e => e.Attribute("Name").Value.Equals("Complete"))
-                              .Add(new XAttribute("Tip", "Mark Complete"));
+                            .FirstOrDefault(e => e.Attribute("Name").Value.Equals("Complete"))
+                            .Add(new XAttribute("Tip", "Mark Complete"));
                     }
                 }
 
@@ -2898,13 +2890,13 @@ namespace EPMLiveCore.API
                 {
                     XElement workingOnElement =
                         (from e in result.Descendants("C")
-                         where e.Attribute("Name").Value.Equals(WORKING_ON_FIELD)
-                         select e).FirstOrDefault();
+                            where e.Attribute("Name").Value.Equals(WORKING_ON_FIELD)
+                            select e).FirstOrDefault();
 
                     if (workingOnElement != null)
                     {
                         workingOnElement.Add(new XAttribute("CanFilter", 0), new XAttribute("CanGroup", 0),
-                                             new XAttribute("CanHide", 0));
+                            new XAttribute("CanHide", 0));
                     }
                 }
 
@@ -2942,25 +2934,25 @@ namespace EPMLiveCore.API
                 if (!myWorkGridViews.ToList().Exists(v => v.Id.Equals("dv")))
                 {
                     string cols = string.Format("Flag:{0},DueDate:{1},DueDay:{2}", FLAG_COL_WIDTH, DUE_DATE_COL_WIDTH,
-                                                DUE_DAY_COL_WIDTH);
+                        DUE_DAY_COL_WIDTH);
 
                     var myWorkGridView = new MyWorkGridView
-                        {
-                            Id = "dv",
-                            Name = "Default View",
-                            Default = true,
-                            Personal = false,
-                            LeftCols =
-                                string.Format(
-                                    "Complete:{0},CommentCount:{1},Priority:{2}Title:{3}",
-                                    COMPLETE_COL_WIDTH, COMMENT_COL_WIDTH,
-                                    PRIORITY_COL_WIDTH, TITLE_COL_WIDTH),
-                            Cols = cols,
-                            RightCols = string.Empty,
-                            Filters = "0|",
-                            Grouping = "0|",
-                            Sorting = "DueDate"
-                        };
+                    {
+                        Id = "dv",
+                        Name = "Default View",
+                        Default = true,
+                        Personal = false,
+                        LeftCols =
+                            string.Format(
+                                "Complete:{0},CommentCount:{1},Priority:{2}Title:{3}",
+                                COMPLETE_COL_WIDTH, COMMENT_COL_WIDTH,
+                                PRIORITY_COL_WIDTH, TITLE_COL_WIDTH),
+                        Cols = cols,
+                        RightCols = string.Empty,
+                        Filters = "0|",
+                        Grouping = "0|",
+                        Sorting = "DueDate"
+                    };
 
                     SaveGlobalViews(myWorkGridView, Utils.GetConfigWeb());
 
@@ -3030,9 +3022,9 @@ namespace EPMLiveCore.API
                 XElement myWorkElement = result.Element("MyWork");
 
                 XDocument xDocument = XDocument.Parse(ListItem.GetListItem(data.Replace("<MyWork>", "<ListItem>")
-                                                                               .Replace("</MyWork>", "</ListItem>").
-                                                                                Replace("<MyWork/>", "<ListItem/>")
-                                                                               .Replace("<MyWork />", "<ListItem />")));
+                    .Replace("</MyWork>", "</ListItem>").
+                    Replace("<MyWork/>", "<ListItem/>")
+                    .Replace("<MyWork />", "<ListItem />")));
 
                 XElement xElement = xDocument.Element("ListItem");
 
@@ -3058,7 +3050,7 @@ namespace EPMLiveCore.API
 
                 foreach (XElement field in xElement.Element("Fields").Elements("Field"))
                 {
-                    var value = GetGridSafeValue(field);
+                    string value = GetGridSafeValue(field);
 
                     if (field.Attribute("Type").Value.Contains("Date"))
                     {
@@ -3133,7 +3125,7 @@ namespace EPMLiveCore.API
                         return currencyFormatDictionary[numberFormatInfo.CurrencyPositivePattern]
                             .Replace("$", numberFormatInfo.CurrencySymbol)
                             .Replace("n",
-                                     string.Format("##,#.{0}", new string('0', numberFormatInfo.CurrencyDecimalDigits)));
+                                string.Format("##,#.{0}", new string('0', numberFormatInfo.CurrencyDecimalDigits)));
                     }
 
                     return string.Empty;
@@ -3171,8 +3163,8 @@ namespace EPMLiveCore.API
                             string field = dataColumn.ColumnName;
 
                             string value = dataRow[field] == null || dataRow[field] == DBNull.Value
-                                               ? string.Empty
-                                               : dataRow[field].ToString();
+                                ? string.Empty
+                                : dataRow[field].ToString();
 
                             value = GetGridSafeValue(BuildFieldElement(fieldTypes, value, field));
 
@@ -3219,8 +3211,8 @@ namespace EPMLiveCore.API
 
                 cfgElement.Add(new XAttribute("id", XDocument.Parse(data).Root.Element("Params").Element("GridId").Value));
                 cfgElement.Add(new XAttribute("CSS",
-                                              string.Format("{0}/_layouts/epmlive/treegrid/workingon/grid.css",
-                                                            SPContext.Current.Web.Url)));
+                    string.Format("{0}/_layouts/epmlive/treegrid/workingon/grid.css",
+                        SPContext.Current.Web.Url)));
 
                 grid.Add(cfgElement);
 
@@ -3364,14 +3356,14 @@ namespace EPMLiveCore.API
                 string siteUrl;
 
                 Utils.GetItemListWebSite(data, GetMyWorkItemElement(data), out itemId, out listId, out webId, out siteId,
-                                         out siteUrl);
+                    out siteUrl);
 
                 Dictionary<string, string> fieldValues =
                     Utils.GetFieldValues(XDocument.Parse(data).Element("MyWorkItem"));
 
                 Dictionary<string, string> originalFieldValues =
                     fieldValues.ToDictionary(fieldValue => Utils.ToOriginalFieldName(fieldValue.Key),
-                                             fieldValue => fieldValue.Value);
+                        fieldValue => fieldValue.Value);
 
                 var listItemDocument = new XDocument();
                 listItemDocument.Add(new XElement("ListItems"));
