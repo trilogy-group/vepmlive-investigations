@@ -409,8 +409,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                 var token =
                     (TenroxIntegrationService.UserToken)
                         TranslateToken(_authToken, typeof (TenroxIntegrationService.UserToken));
-                foreach (Integration integration in integrationsClient.QueryByAll(token)
-                    .Where(i => i.ID24.Equals(integrationId.ToString()) && i.ObjectId == itemId))
+
+                foreach (Integration integration in integrationsClient.QueryByObjectTypeObjectID(token, ObjectId, itemId))
                 {
                     integrationsClient.Delete(token, integration.UniqueId);
                     break;
