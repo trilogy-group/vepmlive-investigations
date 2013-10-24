@@ -482,7 +482,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         var options = {
             url: tUrl,
             showMaximized: true,
-            title: 'Integration',
+            title: '',
 
             dialogReturnValueCallback: function (dialogResult, returnValue) {
 
@@ -494,7 +494,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
     else if (windowtype == 3) {
         var options = {
             url: tUrl,
-            title: 'Integration',
+            title: '',
             width: 600,
             dialogReturnValueCallback: function (dialogResult, returnValue) {
 
