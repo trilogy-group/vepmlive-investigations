@@ -236,13 +236,20 @@ function registerCreateWorkspace2Script() {
                     url: self.workEngineSvcUrl,
                     data: "{Function: 'AddAndQueueCreateWorkspaceJob', Dataxml: '" + self.createWSParams() + "' }",
                     contentType: 'application/json; charset=utf-8',
+                    context: this,
                     dataType: 'json',
                     success: function (result) {
                         //var r = result;
-                        parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
+                        //parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, 'success');
+                        try {
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success');
+                        } catch (e) {}
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
-                        parent.SP.UI.ModalDialog.commonModalDialogClose(-1, errorThrown);
+                        //parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.invalid, errorThrown);
+                        try {
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, errorThrown);
+                        } catch(e) {}
                     }
                 });
             };
