@@ -1,4 +1,5 @@
-﻿using Microsoft.SharePoint;
+﻿using System.Reflection;
+using Microsoft.SharePoint;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -194,43 +195,42 @@ namespace EPMLiveCore.API
         }
         public static void AddWsPermission(Guid siteId, Guid createdWebId)
         {
-                string script = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +
-                                  "BEGIN " +
-                                    "CREATE TABLE [dbo].[RPTWEBGROUPS]( " +
-                                            "[RPTWEBGROUPID] [uniqueidentifier] NOT NULL, " +
-                                            "[SITEID] [uniqueidentifier] NULL, " +
-                                            "[WEBID] [uniqueidentifier] NULL, " +
-                                            "[GROUPID] [int] NULL, " +
-                                            "[SECTYPE] [int] NULL, " +
-                                    "CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
-                                    "( " +
-                                            "[RPTWEBGROUPID] ASC " +
-                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
-                                    ") ON [PRIMARY] " +
+                const string ensureRptWebScript = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +
+                                                  "BEGIN " +
+                                                  "CREATE TABLE [dbo].[RPTWEBGROUPS]( " +
+                                                  "[RPTWEBGROUPID] [uniqueidentifier] NOT NULL, " +
+                                                  "[SITEID] [uniqueidentifier] NULL, " +
+                                                  "[WEBID] [uniqueidentifier] NULL, " +
+                                                  "[GROUPID] [int] NULL, " +
+                                                  "[SECTYPE] [int] NULL, " +
+                                                  "CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
+                                                  "( " +
+                                                  "[RPTWEBGROUPID] ASC " +
+                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                                  ") ON [PRIMARY] " +
                                     
-                                    "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [DF_RPTWEBGROUPS_RPTWEBGROUPID]  DEFAULT (newid()) FOR [RPTWEBGROUPID] " +
+                                                  "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [DF_RPTWEBGROUPS_RPTWEBGROUPID]  DEFAULT (newid()) FOR [RPTWEBGROUPID] " +
                                 
-                                    "IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[RPTWEBGROUPS]') AND name = N'PK_RPTWEBGROUPS') " +
-                                    "ALTER TABLE [dbo].[RPTWEBGROUPS] DROP CONSTRAINT [PK_RPTWEBGROUPS] " +
+                                                  "IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[RPTWEBGROUPS]') AND name = N'PK_RPTWEBGROUPS') " +
+                                                  "ALTER TABLE [dbo].[RPTWEBGROUPS] DROP CONSTRAINT [PK_RPTWEBGROUPS] " +
                                 
-                                    "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
-                                    "( " +
-                                            "[RPTWEBGROUPID] ASC " +
-                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                                  "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
+                                                  "( " +
+                                                  "[RPTWEBGROUPID] ASC " +
+                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
                                     
-                                    "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID_SECTYPE] ON [dbo].[RPTWEBGROUPS]  " +
-                                    "( " +
-                                            "[GROUPID] ASC, " +
-                                            "[SECTYPE] ASC " +
-                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                                  "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID_SECTYPE] ON [dbo].[RPTWEBGROUPS]  " +
+                                                  "( " +
+                                                  "[GROUPID] ASC, " +
+                                                  "[SECTYPE] ASC " +
+                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
                                     
-                                    "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID] ON [dbo].[RPTWEBGROUPS]  " +
-                                    "( " +
-                                            "[GROUPID] ASC " +
-                                    ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
+                                                  "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID] ON [dbo].[RPTWEBGROUPS]  " +
+                                                  "( " +
+                                                  "[GROUPID] ASC " +
+                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
                                     
-                                "END ";     
-                                
+                                                  "END ";
 
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -241,7 +241,7 @@ namespace EPMLiveCore.API
                         using (var con = new SqlConnection(CoreFunctions.getReportingConnectionString(s.WebApplication.Id, s.ID)))
                         {
                             con.Open();
-                            var cmd = new SqlCommand(script) { Connection = con };
+                            var cmd = new SqlCommand(ensureRptWebScript) { Connection = con };
                             cmd.ExecuteNonQuery();
 
                            
@@ -279,6 +279,47 @@ namespace EPMLiveCore.API
                                     "dbo.RPTWEBGROUPS";
 
                                 bulkCopy.WriteToServer(dt);
+                            }
+
+                            try
+                            {
+                                const string epmLiveReportingAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+                                MethodInfo m = null;
+                                Assembly assemblyInstance = null;
+                                Type thisClass = null;
+                                object apiClass = null;
+                                // use reflection to map list
+                                try
+                                {
+                                    assemblyInstance = Assembly.Load(epmLiveReportingAssembly);
+                                    thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ProcessSecurity", true, true);
+                                    m = thisClass.GetMethod("ProcessSecurityGroups",
+                                        BindingFlags.Public | BindingFlags.Static);
+                                }
+                                catch
+                                {
+                                }
+
+                                if (m != null && assemblyInstance != null && thisClass != null )
+                                {
+                                    using (
+                                        var conn =
+                                            new SqlConnection(
+                                                CoreFunctions.getReportingConnectionString(s.WebApplication.Id, s.ID)))
+                                    {
+                                        conn.Open();
+                                        m.Invoke(null, new object[]
+                                            {
+                                                s,
+                                                conn,
+                                                ""
+                                            });
+                                    }
+                                    
+                                }
+                            }
+                            catch
+                            {
                             }
                         }
                     }

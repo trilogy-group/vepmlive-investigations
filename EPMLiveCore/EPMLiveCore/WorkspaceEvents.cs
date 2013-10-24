@@ -14,8 +14,7 @@ namespace EPMLiveCore
     public class WorkspaceEvents : SPWebEventReceiver
     {
         public override void WebDeleting(SPWebEventProperties properties)
-        {
-            // will implement later
+        {   
             try
             {
                 var sParentItem = properties.Web.AllProperties["ParentItem"];
@@ -23,7 +22,9 @@ namespace EPMLiveCore
                 var webid = sColl[0];
                 var listid = sColl[1];
                 var itemid = sColl[2];
-                var isitem = (new Guid(listid) == Guid.Empty) ? "false" : "true";
+                var sIsItem = (new Guid(listid) != Guid.Empty) ? "true" : "false";
+                var bIsItem = (new Guid(listid) != Guid.Empty);
+
                 var xml = 
                     "<Data><Param key=\"SiteId\">" + properties.SiteId + "</Param>" + 
                     "<Param key=\"WebId\">" + properties.Web.ID + "</Param>" +
@@ -31,7 +32,7 @@ namespace EPMLiveCore
                     "<Param key=\"FString\">" + properties.Web.ServerRelativeUrl + "</Param>" +
                     "<Param key=\"Type\">4</Param>" +
                     "<Param key=\"UserId\">" + properties.Web.CurrentUser.ID + "</Param>" +
-                    "<Param key=\"IsItem\">" + isitem + "</Param></Data>";
+                    "<Param key=\"IsItem\">" + sIsItem + "</Param></Data>";
 
                 var data = new AnalyticsData(xml, AnalyticsType.FavoriteWorkspace, AnalyticsAction.Delete);
                 var qExec = new QueryExecutor(properties.Web);
@@ -46,6 +47,58 @@ namespace EPMLiveCore
                         {"@webid", properties.WebId}
                     });
 
+                qExec.ExecuteReportingDBNonQuery(
+                    "DELETE FROM [RPTWEBGROUPS] WHERE [WEBID] NOT IN (SELECT [WebId] FROM [RPTWeb])",
+                    new Dictionary<string, object>());
+
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate
+                    {
+                        using (var s = new SPSite(properties.SiteId))
+                        {
+                            using (var w = s.OpenWeb(properties.WebId))
+                            {
+                                if (w.Lists.Cast<SPList>().Any())
+                                {
+                                    var slistIds = w.Lists.Cast<SPList>().Aggregate("(", (current, l) => current + ("'" + l.ID.ToString() + "',"));
+                                    slistIds = (slistIds.TrimEnd(',') + ")");
+
+                                    qExec.ExecuteReportingDBNonQuery(
+                                        "DELETE FROM [RPTITEMGROUPS] WHERE [LISTID] NOT IN " + slistIds,
+                                        new Dictionary<string, object>());
+                                }
+                            }
+                        }
+                    });
+                }
+                catch { }
+
+                if (bIsItem)
+                {
+                    // remove the parent item's workspaceurl field value
+                    // so the workspace icon doesn't show up in grid
+                    try
+                    {
+                        SPSecurity.RunWithElevatedPrivileges(delegate
+                        {
+                            using (var s = new SPSite(properties.SiteId))
+                            {
+                                using (var w = s.OpenWeb(new Guid(webid)))
+                                {
+                                    w.AllowUnsafeUpdates = true;
+
+                                    var l = w.Lists[new Guid(listid)];
+                                    var i = l.GetItemById(int.Parse(itemid));
+
+                                    i["WorkspaceUrl"] = string.Empty;
+                                    i.SystemUpdate();
+                                }
+                            }
+                        });
+                    }
+                    catch { }
+                }
 
                 CacheStore.Current.RemoveSafely(properties.Web.Url, CacheStoreCategory.Navigation);
             }

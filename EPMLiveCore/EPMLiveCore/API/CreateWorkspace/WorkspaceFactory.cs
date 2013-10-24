@@ -698,8 +698,6 @@ namespace EPMLiveCore.API
             bool uniquePermission = bool.Parse(_xmlDataMgr.GetPropVal("UniquePermission"));
             bool inheritTopLink = false;
 
-
-
             string err = string.Empty;
             if (parentWeb.DoesUserHavePermissions(siteOwnerName, SPBasePermissions.ManageSubwebs))
             {
@@ -715,7 +713,7 @@ namespace EPMLiveCore.API
                     {
                         if (!isStandAlone)
                         {
-                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true,
+                            err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true,
                                 inheritTopLink,
                                 cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
                                 out _createdWebTitle);
@@ -730,7 +728,7 @@ namespace EPMLiveCore.API
                     {
                         if (!isStandAlone)
                         {
-                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName,
+                            err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName,
                                 false, inheritTopLink,
                                 cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebUrl, out _createdWebServerRelativeUrl,
                                 out _createdWebTitle);
@@ -754,7 +752,7 @@ namespace EPMLiveCore.API
                             if (!isStandAlone)
                             {
                                 //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
+                                err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
                                     eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                     out _createdWebUrl, out _createdWebTitle);
                             }
@@ -768,7 +766,7 @@ namespace EPMLiveCore.API
                         {
                             if (!_isStandAlone)
                             {
-                                err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
+                                err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
                                     eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                     out _createdWebUrl, out _createdWebTitle);
                             }
@@ -818,13 +816,13 @@ namespace EPMLiveCore.API
                                     if (!isStandAlone)
                                     {
                                         //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
+                                        err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
                                             cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                             out _createdWebUrl, out _createdWebTitle);
                                     }
                                     else
                                     {
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
+                                        err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
                                             cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                             out _createdWebUrl, out _createdWebTitle);
                                     }
@@ -833,7 +831,7 @@ namespace EPMLiveCore.API
                                 {
                                     if (!isStandAlone)
                                     {
-                                        err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
+                                        err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
                                             cEWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                             out _createdWebUrl, out _createdWebTitle);
                                     }
@@ -858,7 +856,7 @@ namespace EPMLiveCore.API
                                         if (!isStandAlone)
                                         {
                                             //WorkspaceData.SendStartSignalsToDB(SiteId, WebId, AttachedItemListId, AttachedItemId);
-                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
+                                            err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, true, inheritTopLink,
                                                 eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                                 out _createdWebUrl, out _createdWebTitle);
                                         }
@@ -873,7 +871,7 @@ namespace EPMLiveCore.API
                                     {
                                         if (!_isStandAlone)
                                         {
-                                            err = CoreFunctions.createSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
+                                            err = CoreFunctions.CreateSiteFromItem(siteTitle, siteUrl, templateName, siteOwnerName, false, inheritTopLink,
                                                 eParentWeb, web, AttachedItemListId, AttachedItemId, out _createdWebId, out _createdWebServerRelativeUrl,
                                                 out _createdWebUrl, out _createdWebTitle);
                                         }

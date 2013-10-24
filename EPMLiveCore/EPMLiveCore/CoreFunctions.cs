@@ -1943,7 +1943,8 @@ namespace EPMLiveCore
             catch (Exception ex) { return ex.Message.ToString(); }
         }
 
-        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle)
+        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, 
+            SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle)
         {
             createdWebId = Guid.Empty;
             createdWebUrl = string.Empty;
@@ -1965,7 +1966,11 @@ namespace EPMLiveCore
                     exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
                 }
 
-                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
+                // In EPM 5.5, we decided to make all workspaces 
+                // unique. "OPEN" workspaces are different
+                // in that they have a owner (the workspace creator)
+                // and a "Everyone" group with contribute permission
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, true, false);
 
                 createdWebId = web.ID;
                 createdWebUrl = web.Url;
@@ -1992,21 +1997,27 @@ namespace EPMLiveCore
                         {
                             using (SPWeb w = s.OpenWeb())
                             {
-                                Dictionary<string, SPRoleType> groups = Security.AddBasicSecurityToWorkspace(w, w.Title, w.AllUsers[user]);
-                                strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(w, "EPMLiveGroupsPermAssignments");
+                                Dictionary<string, SPRoleType> groups = Security.AddBasicSecurityToWorkspace(w, w.Title,
+                                    w.AllUsers[user]);
+                                strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(w,
+                                    "EPMLiveGroupsPermAssignments");
                                 List<SPEventReceiverDefinition> evts = null;
                                 List<string> listsToBeMapped = new List<string>();
-                                string EPMLiveReportingAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+                                string EPMLiveReportingAssembly =
+                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
                                 foreach (SPList l in w.Lists)
                                 {
                                     string sClass = "EPMLiveReportsAdmin.ListEvents";
 
                                     evts = CoreFunctions.GetListEvents(l,
-                                                                       EPMLiveReportingAssembly,
-                                                                       sClass,
-                                                                       new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
-                                                                                    SPEventReceiverType.ItemUpdated,
-                                                                                    SPEventReceiverType.ItemDeleting});
+                                        EPMLiveReportingAssembly,
+                                        sClass,
+                                        new List<SPEventReceiverType>
+                                        {
+                                            SPEventReceiverType.ItemAdded,
+                                            SPEventReceiverType.ItemUpdated,
+                                            SPEventReceiverType.ItemDeleting
+                                        });
 
                                     if (evts.Count > 0 &&
                                         !listsToBeMapped.Contains(l.Title))
@@ -2027,17 +2038,21 @@ namespace EPMLiveCore
                                     {
                                         assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
                                         thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                        m = thisClass.GetMethod("MapDefaultList", BindingFlags.Public | BindingFlags.Instance);
-                                        apiClass = Activator.CreateInstance(thisClass, new object[] { SPContext.Current.Site.ID });
+                                        m = thisClass.GetMethod("MapDefaultList",
+                                            BindingFlags.Public | BindingFlags.Instance);
+                                        apiClass = Activator.CreateInstance(thisClass,
+                                            new object[] {SPContext.Current.Site.ID});
                                     }
-                                    catch { }
+                                    catch
+                                    {
+                                    }
 
                                     if (m != null &&
                                         assemblyInstance != null &&
                                         thisClass != null &&
                                         apiClass != null)
                                     {
-                                        m.Invoke(apiClass, new object[] { string.Join(",", listsToBeMapped) });
+                                        m.Invoke(apiClass, new object[] {string.Join(",", listsToBeMapped)});
                                     }
                                 }
                             }
@@ -2047,7 +2062,8 @@ namespace EPMLiveCore
                     if (strEPMLiveGroupsPermAssignments.Length > 1)
                     {
 
-                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
+                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] {"|~|"},
+                            StringSplitOptions.None);
                         foreach (string strInner in strOuter)
                         {
                             string[] strInnerMost = strInner.Split('~');
@@ -2057,14 +2073,59 @@ namespace EPMLiveCore
                             if (spGroup != null)
                             {
                                 SPRoleAssignment spRA = new SPRoleAssignment(spGroup);
-                                spRA.RoleDefinitionBindings.Add(web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
+                                spRA.RoleDefinitionBindings.Add(
+                                    web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
                                 web.RoleAssignments.Add(spRA);
                             }
                         }
                     }
-
                     web.Update();
+                }
+                else
+                {
+                    var ownerByCreation = web.AllUsers[user];
 
+                    SPSecurity.RunWithElevatedPrivileges(delegate
+                    {
+                        using (var es = new SPSite(web.Url))
+                        {
+                            using (var ew = es.OpenWeb())
+                            {
+                                ew.AllowUnsafeUpdates = true;
+
+                                // add creator with full control
+                                var raAdmin = new SPRoleAssignment(ownerByCreation);
+                                raAdmin.RoleDefinitionBindings.Add(ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
+                                ew.RoleAssignments.Add(raAdmin);
+
+                                // add administrator group with full control, add rest with contribute
+                                foreach (var @group in from SPGroup @group in es.RootWeb.Groups
+                                                       let eGroup = es.RootWeb.Groups[@group.Name] 
+                                                       let c = eGroup.Roles 
+                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights) 134287360) 
+                                                       where @group.CanCurrentUserEditMembership && canUse 
+                                                       select @group)
+                                {
+                                    if (@group.Name.Contains("Administrators"))
+                                    {
+                                        var raAdministrators = new SPRoleAssignment(@group);
+                                        raAdministrators.RoleDefinitionBindings.Add(
+                                            ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
+                                        ew.RoleAssignments.Add(raAdministrators);
+                                    }
+                                    else
+                                    {
+                                        var raContribute = new SPRoleAssignment(@group);
+                                        raContribute.RoleDefinitionBindings.Add(
+                                            ew.RoleDefinitions.GetByType(SPRoleType.Contributor));
+                                        ew.RoleAssignments.Add(raContribute);
+                                    }
+                                }
+
+                                ew.Update();
+                            }
+                        }
+                    });
                 }
                 sUrl = web.Url;
                 web.Close();
@@ -2087,7 +2148,7 @@ namespace EPMLiveCore
             return exists;
         }
 
-        public static string createSiteFromItem(string title, string url, string template, string user, bool unique, bool toplink,
+        public static string CreateSiteFromItem(string title, string url, string template, string user, bool unique, bool toplink,
             SPWeb parentWeb, SPWeb itemWeb, Guid listId, int itemId, out Guid createdSiteId, out string createdWebUrl, out string createdWebRelativeUrl, out string createdWebTitle)
         {
             createdSiteId = Guid.Empty;
@@ -2110,7 +2171,12 @@ namespace EPMLiveCore
                     exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
                 }
 
-                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, unique, false);
+                // In EPM 5.5, we decided to make all workspaces 
+                // unique. "OPEN" workspaces are different
+                // in that they have a owner (the workspace creator)
+                // and a "Everyone" group with contribute permission
+
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, true, false);
 
                 createdSiteId = web.ID;
                 createdWebUrl = web.Url;
@@ -2128,50 +2194,55 @@ namespace EPMLiveCore
 
                 API.Applications.GenerateQuickLaunchFromApp(web);
 
+                #region Modify Unique Workspace
+
                 if (unique)
                 {
-                    int iowner = 0;
-                    int imember = 0;
-                    int ivisitor = 0;
+                    var iowner = 0;
+                    var imember = 0;
+                    var ivisitor = 0;
 
-                    string strEPMLiveGroupsPermAssignments = "";
-
-
-                    List<int> owners = new List<int>();
-                    List<int> members = new List<int>();
-                    List<int> visitors = new List<int>();
+                    var owners = new List<int>();
+                    var members = new List<int>();
+                    var visitors = new List<int>();
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        using (SPSite es = new SPSite(itemWeb.Site.ID))
+                        using (var es = new SPSite(itemWeb.Site.ID))
                         {
-                            using (SPWeb ew = es.OpenWeb(itemWeb.ID))
+                            using (var ew = es.OpenWeb(itemWeb.ID))
                             {
-                                SPList itemList = ew.Lists[listId];
-                                SPListItem item = itemList.GetItemById(itemId);
+                                var itemList = ew.Lists[listId];
+                                var item = itemList.GetItemById(itemId);
 
-                                SPRoleAssignmentCollection raColl = item.RoleAssignments;
+                                var raColl = item.RoleAssignments;
                                 iowner = (from SPRoleAssignment owner in raColl
-                                          where owner.Member.Name.Contains(title + " Owner")
-                                          select owner.Member.ID).FirstOrDefault<int>();
+                                    where owner.Member.Name.Contains(title + " Owner")
+                                    select owner.Member.ID).FirstOrDefault<int>();
                                 owners = (from SPRoleAssignment owner in raColl
-                                          where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Administrator))
-                                          select owner.Member.ID).ToList<int>();
+                                    where
+                                        owner.RoleDefinitionBindings.Contains(
+                                            ew.RoleDefinitions.GetByType(SPRoleType.Administrator))
+                                    select owner.Member.ID).ToList<int>();
                                 imember = (from SPRoleAssignment owner in raColl
-                                           where owner.Member.Name.Contains(title + " Member")
-                                           select owner.Member.ID).ToList<int>()[0];
+                                    where owner.Member.Name.Contains(title + " Member")
+                                    select owner.Member.ID).ToList<int>()[0];
                                 members = (from SPRoleAssignment owner in raColl
-                                           where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Contributor))
-                                           select owner.Member.ID).ToList<int>();
+                                    where
+                                        owner.RoleDefinitionBindings.Contains(
+                                            ew.RoleDefinitions.GetByType(SPRoleType.Contributor))
+                                    select owner.Member.ID).ToList<int>();
                                 ivisitor = (from SPRoleAssignment owner in raColl
-                                            where owner.Member.Name.Contains(title + " Visitor")
-                                            select owner.Member.ID).ToList<int>()[0];
+                                    where owner.Member.Name.Contains(title + " Visitor")
+                                    select owner.Member.ID).ToList<int>()[0];
                                 visitors = (from SPRoleAssignment owner in raColl
-                                            where owner.RoleDefinitionBindings.Contains(ew.RoleDefinitions.GetByType(SPRoleType.Reader))
-                                            select owner.Member.ID).ToList<int>();
+                                    where
+                                        owner.RoleDefinitionBindings.Contains(
+                                            ew.RoleDefinitions.GetByType(SPRoleType.Reader))
+                                    select owner.Member.ID).ToList<int>();
                             }
                         }
                     });
-                    SPUser ownerByCreation = web.AllUsers[user];
+                    var ownerByCreation = web.AllUsers[user];
 
                     web.Update();
                     SPMember newOwner = null;
@@ -2185,19 +2256,21 @@ namespace EPMLiveCore
                             roll.AddGroup(web.SiteGroups.GetByID(iowner));
                             newOwner = web.SiteGroups.GetByID(iowner);
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
                     else
                     {
                         string finalGroupName = string.Empty;
                         try
-                        {
-                            if (newOwner == null)
-                                newOwner = ownerByCreation;
-
+                        {  
+                            newOwner = ownerByCreation;
                             finalGroupName = AddGroup(web, title, "Administrators", newOwner, ownerByCreation, "");
                         }
-                        catch (Exception) { }
+                        catch (Exception)
+                        {
+                        }
                         web.Update();
                         web.AssociatedOwnerGroup = GetSiteGroup(web, finalGroupName);
                         roll.AddGroup(web.SiteGroups[finalGroupName]);
@@ -2206,7 +2279,7 @@ namespace EPMLiveCore
                     if (newOwner == null)
                         newOwner = ownerByCreation;
 
-                    if (owners.Count() > 0)
+                    if (owners.Any())
                     {
                         foreach (int id in owners)
                         {
@@ -2223,7 +2296,9 @@ namespace EPMLiveCore
                             roll = web.Roles["Contribute"];
                             roll.AddGroup(web.SiteGroups.GetByID(imember));
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
                     else
                     {
@@ -2232,16 +2307,18 @@ namespace EPMLiveCore
                         {
                             finalGroupName = AddGroup(web, title, "Members", newOwner, ownerByCreation, "");
                         }
-                        catch (Exception) { }
+                        catch (Exception)
+                        {
+                        }
                         web.Update();
                         web.AssociatedMemberGroup = GetSiteGroup(web, finalGroupName);
                         roll = web.Roles["Contribute"];
                         roll.AddGroup(web.SiteGroups[finalGroupName]);
                     }
 
-                    if (members.Count() > 0)
+                    if (members.Any())
                     {
-                        foreach (int id in members)
+                        foreach (var id in members)
                         {
                             roll.AddGroup(web.SiteGroups.GetByID(id));
                         }
@@ -2256,7 +2333,9 @@ namespace EPMLiveCore
                             roll = web.Roles["Read"];
                             roll.AddGroup(web.SiteGroups.GetByID(ivisitor));
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
                     else
                     {
@@ -2265,14 +2344,16 @@ namespace EPMLiveCore
                         {
                             finalGroupName = AddGroup(web, title, "Visitors", newOwner, ownerByCreation, "");
                         }
-                        catch (Exception) { }
+                        catch (Exception)
+                        {
+                        }
                         web.Update();
                         web.AssociatedVisitorGroup = GetSiteGroup(web, finalGroupName);
                         roll = web.Roles["Read"];
                         roll.AddGroup(web.SiteGroups[finalGroupName]);
                     }
 
-                    if (visitors.Count() > 0)
+                    if (visitors.Any())
                     {
                         foreach (int id in visitors)
                         {
@@ -2280,27 +2361,55 @@ namespace EPMLiveCore
                         }
                     }
                     web.Update();
+                }
+                #endregion
+                #region Modify Open Workspace
+                else
+                {   
+                    var ownerByCreation = web.AllUsers[user];
 
-                    if (strEPMLiveGroupsPermAssignments.Length > 1)
+                    SPSecurity.RunWithElevatedPrivileges(delegate
                     {
-                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
-                        foreach (string strInner in strOuter)
+                        using (var es = new SPSite(itemWeb.Site.ID))
                         {
-                            string[] strInnerMost = strInner.Split('~');
-                            SPGroup spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
-
-                            //Persist groups & permissions to the database
-                            if (spGroup != null)
+                            using (var ew = es.OpenWeb(itemWeb.ID))
                             {
-                                SPRoleAssignment spRA = new SPRoleAssignment(spGroup);
-                                spRA.RoleDefinitionBindings.Add(web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
-                                web.RoleAssignments.Add(spRA);
+                                ew.AllowUnsafeUpdates = true;
+                                // Add creator with full control perm
+                                var raAdmin = new SPRoleAssignment(ownerByCreation);
+                                raAdmin.RoleDefinitionBindings.Add(ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
+                                ew.RoleAssignments.Add(raAdmin);
+
+                                // administrator group full control, add rest at contribute
+                                foreach (var @group in from SPGroup @group in es.RootWeb.Groups
+                                                       let eGroup = es.RootWeb.Groups[@group.Name] 
+                                                       let c = eGroup.Roles 
+                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights) 134287360) 
+                                                       where @group.CanCurrentUserEditMembership && canUse 
+                                                       select @group)
+                                {
+                                    if (@group.Name.Contains("Administrators"))
+                                    {
+                                        var raAdministrators = new SPRoleAssignment(@group);
+                                        raAdministrators.RoleDefinitionBindings.Add(
+                                            ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
+                                        ew.RoleAssignments.Add(raAdministrators);
+                                    }
+                                    else
+                                    {
+                                        var raContribute = new SPRoleAssignment(@group);
+                                        raContribute.RoleDefinitionBindings.Add(
+                                            ew.RoleDefinitions.GetByType(SPRoleType.Contributor));
+                                        ew.RoleAssignments.Add(raContribute);
+                                    }
+                                }
+
+                                ew.Update();
                             }
                         }
-                    }
-                    web.Update();
-
+                    });
                 }
+                #endregion
                 sUrl = web.Url;
                 web.Close();
 
@@ -2345,12 +2454,27 @@ namespace EPMLiveCore
             return finalGroupName;
         }
 
+        //public static string EnsureEveryoneGroup(SPWeb web)
+        //{   
+        //    SPGroup testGrp = null;
+        //    try
+        //    {
+        //        testGrp = web.SiteGroups["Everyone"];
+        //    }
+        //    catch { }
+
+        //    if (testGrp == null)
+        //    {
+        //        web.Site.RootWeb.SiteGroups.Add("Everyone", web.SiteAdministrators[0], web.SiteAdministrators[0], "");
+        //        web.Site.RootWeb.SiteGroups["Everyone"].AddUser(web.Site.RootWeb.AllUsers["c:0(.s|true"]);
+        //    }
+
+        //    return "Everyone";
+        //}
+
         public static SPGroup GetSiteGroup(SPWeb web, string name)
         {
-            foreach (SPGroup group in web.SiteGroups)
-                if (group.Name.ToLower() == name.ToLower())
-                    return group;
-            return null;
+            return web.SiteGroups.Cast<SPGroup>().FirstOrDefault(@group => String.Equals(@group.Name, name, StringComparison.CurrentCultureIgnoreCase));
         }
 
         public static void setConfigSetting(SPWeb web, string setting, string value)
