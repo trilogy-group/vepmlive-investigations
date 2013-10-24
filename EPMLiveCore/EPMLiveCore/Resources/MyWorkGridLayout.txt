@@ -10,6 +10,7 @@
 	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
 	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="20" MaxRowHeight="20" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
 	<Cfg Paging="2" AllPages="1" PageLength="10" MaxPages="20" NoPager="1" ChildParts="2" />
+	<Cfg BorderCursors="1" />
 	<Def>
 		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" />
 		<D Name="R" TitleHtmlPrefixFormula="'&lt;img id=&quot;MWG_Processing_'+Row.id+'&quot; class=&quot;MWG_Processing&quot; src=&quot;/_layouts/epmlive/images/mywork/loading16.gif&quot;>&lt;/img>'"/>
