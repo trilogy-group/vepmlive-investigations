@@ -28,7 +28,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected string _tempGalRedirect = string.Empty;
         protected string _curWebUrl = string.Empty;
         protected string _requestProjectName = string.Empty;
-        protected string _uniquePermission = "false";
+        protected string _uniquePermission = "true";
         protected string _defaultCreateNewOpt = string.Empty;
         protected string _currentUserId = string.Empty;
         protected string _showInProgress = "false";
@@ -166,7 +166,7 @@ namespace EPMLiveCore.Layouts.epmlive
             try
             {
                 _uniquePermission = bool.Parse(_isStandAlone)
-                    ? "false": SPContext.Current.Web.Lists[new Guid(_lstGuid)].GetItemById(int.Parse(_itemId)).HasUniqueRoleAssignments.ToString();
+                    ? "true": SPContext.Current.Web.Lists[new Guid(_lstGuid)].GetItemById(int.Parse(_itemId)).HasUniqueRoleAssignments.ToString();
             }
             catch { }
 

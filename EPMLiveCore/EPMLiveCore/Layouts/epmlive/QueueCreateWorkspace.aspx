@@ -51,10 +51,10 @@
 	            <label style="font-family:Open Sans Regular;font-size:15px;">
                     Permissions
 	            </label> 
-	            <br> 
-	            <input id="permsOpen" name="rPermGrp" type="radio" value="false" data-bind="checked: uniquePermission" /> Open - Accessible and open to anyone who has permission to the parent site
-	            <br>
+	            <br/> 
 	            <input id="permsPrivate" name="rPermGrp" type="radio" value="true" data-bind="checked: uniquePermission"/> Private - Invite only
+	            <br/>
+                <input id="permsOpen" name="rPermGrp" type="radio" value="false" data-bind="checked: uniquePermission" /> Open - Accessible and open to anyone who has permission to the parent site
 	        </div>
             <%--bottom section--%>
 	        <div style="border-top:1px solid #ffffff;width:860px;height:285px;overflow: hidden">
