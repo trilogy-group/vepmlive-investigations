@@ -57,9 +57,12 @@ namespace TimeSheets
         bool bHasPeriods = false;
         bool bCanEditViews = false;
 
+
+        private EPMLiveCore.TimeDebug tb;
+
         protected override void CreateChildControls()
         {
-
+            tb.AddTimer();
             act = new EPMLiveCore.Act(SPContext.Current.Web);
             activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.Timesheets);
 
@@ -278,7 +281,7 @@ namespace TimeSheets
             ///
 
 
-            DataTable dtTsDelegates = EPMLiveCore.API.APITeam.GetResourcePool("<Resources FilterField=\"TimesheetDelegates\" FilterFieldValue=\"" + web.CurrentUser.Name + "\" Columns=\"\"/>", web);
+            DataTable dtTsDelegates = EPMLiveCore.API.APITeam.GetResourcePool("<Resources FilterField=\"TimesheetDelegates\" FilterFieldValue=\"" + web.CurrentUser.Name + "\" ><Columns>SimpleColumns</Columns></Resources>", web);
 
             foreach(DataRow dr in dtTsDelegates.Rows)
             {
@@ -307,9 +310,15 @@ namespace TimeSheets
 
             views = TimesheetAPI.GetViews(web);
 
-
+            tb.StopTimer();
 
         }
+
+        protected override void OnInit(EventArgs e)
+        {
+            tb = new EPMLiveCore.TimeDebug("Timesheet", Page.Request["debug"]);
+        }
+
 
         protected override void OnLoad(EventArgs e)
         {
@@ -318,6 +327,7 @@ namespace TimeSheets
 
         protected override void RenderWebPart(HtmlTextWriter output)
         {
+            tb.AddTimer();
             if (SPContext.Current.ViewContext.View != null)
             {
                 foreach (System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
@@ -468,11 +478,14 @@ namespace TimeSheets
             output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"MyTimesheetContextualTabPageComponent.js\");");
             output.WriteLine(@"var viewNameDiv = document.getElementById(""viewNameDiv"");");
             output.WriteLine("</script>");
-           
+
+            tb.StopTimer();
+            tb.WriteTimers(output);
         }
 
         protected override void OnPreRender(EventArgs e)
         {
+            tb.AddTimer();
             if (bHasPeriods)
             {
                 AddContextualTab();
@@ -492,6 +505,7 @@ namespace TimeSheets
                 ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
             }
             base.OnPreRender(e);
+            tb.StopTimer();
         }
 
         private void AddContextualTab()
