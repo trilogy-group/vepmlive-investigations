@@ -2998,20 +2998,16 @@ function Ribbon(ribbonData) {
         return s;
     };
     Ribbon_showPopup = function (idPopup, idSelect, idParent) {
-
-
         var item = document.getElementById(idSelect);
         if (item.disabled == true)
                 return;
-        
-
         var popup = document.getElementById(idPopup);
         var tbselect = document.getElementById(idSelect + "_textbox");
         var parent = document.getElementById(idParent);
         var offsetParent = parent.offsetParent;
         var xy = Ribbon_findAbsolutePosition(tbselect, parent);
         if (popup.style.display == "block") {
-            if (popup.style.top == (xy[1] + 17).toString() + "px" && popup.style.left == (xy[0] - 8).toString() + "px") {
+            if (popup.style.top == (xy[1] + 17).toString() + "px" && popup.style.left == (xy[0] - 6).toString() + "px") {
                 popup.style.display = "none";
                 return;
             }
@@ -3052,7 +3048,7 @@ function Ribbon(ribbonData) {
         sb.append("</div>");
         var s = sb.toString();
         popup.className = "ms-cui-menu";
-        popup.style.cssText = "direction: ltr; visibility: visible; position: absolute; top: " + (xy[1] + 17).toString() + "px; left: " + (xy[0] - 8).toString() + "px; z-index: 1001; min-width: " + (tbselect.parentNode.offsetWidth - 1).toString() + "px; max-height:" + maxheight + "px;overflow:auto; display:none;";
+        popup.style.cssText = "direction: ltr; visibility: visible; position: absolute; top: " + (xy[1] + 17).toString() + "px; left: " + (xy[0] - 6).toString() + "px; z-index: 1001; min-width: " + (tbselect.parentNode.offsetWidth - 3).toString() + "px; max-height:" + maxheight + "px;overflow:auto; display:none;";
         popup.innerHTML = s;
         popup.style.display = "block";
         popup.focus();
@@ -3085,23 +3081,10 @@ function Ribbon(ribbonData) {
         }
     };
     Ribbon_findAbsolutePosition = function (obj, objParent) {
-        var pcurleftx = 0;
-        var pcurtopy = 0;
-        if (objParent.offsetParent) {
-            do {
-                pcurleftx += objParent.offsetLeft;
-                pcurtopy += objParent.offsetTop;
-            } while (objParent = objParent.offsetParent);
-        }
-        var curleftx = 0;
-        var curtopy = 0;
-        if (obj.offsetParent) {
-            do {
-                curleftx += obj.offsetLeft;
-                curtopy += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-        }
-        return [curleftx - pcurleftx, curtopy - pcurtopy];
+        var xytextbox = jsf_findAbsolutePosition(obj)
+        var xygrandparent = jsf_findAbsolutePosition(objParent.offsetParent)
+        var xy = [xytextbox[0] - xygrandparent[0], xytextbox[1] - xygrandparent[1]];
+        return xy;
     };
     Ribbon_HandleException = function (name, e) {
         alert("Exception thrown in function " + name + "\n\n" + e.toString());
