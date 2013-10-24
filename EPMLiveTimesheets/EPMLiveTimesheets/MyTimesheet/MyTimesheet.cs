@@ -319,7 +319,6 @@ namespace TimeSheets
             tb = new EPMLiveCore.TimeDebug("Timesheet", Page.Request["debug"]);
         }
 
-
         protected override void OnLoad(EventArgs e)
         {
             sFullGridId = this.ZoneIndex + this.ZoneID;
