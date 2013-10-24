@@ -134,42 +134,43 @@ namespace EPMLiveReportsAdmin.Jobs
                 sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
             }
 
-            foreach (SPWeb w in site.AllWebs)
-            {
-                // IGNORE SPDispose 130 error, web is being disposed
-                try
-                {
-                    List<string> allLists = new List<string>(data.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
-                    List<SPList> allSpLists = new List<SPList>();
-                    foreach (string l in allLists)
-                    {
-                        SPList list = w.Lists.TryGetList(l);
-                        if (list == null ||
-                            list.Title == "Work Hours" ||
-                            list.Title == "Resources")
-                        {
-                            continue;
-                        }
+            // TODO: We need to make sure this doesn't break anything!!!!
+            //foreach (SPWeb w in site.AllWebs)
+            //{
+            //    // IGNORE SPDispose 130 error, web is being disposed
+            //    try
+            //    {
+            //        List<string> allLists = new List<string>(data.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+            //        List<SPList> allSpLists = new List<SPList>();
+            //        foreach (string l in allLists)
+            //        {
+            //            SPList list = w.Lists.TryGetList(l);
+            //            if (list == null ||
+            //                list.Title == "Work Hours" ||
+            //                list.Title == "Resources")
+            //            {
+            //                continue;
+            //            }
 
-                        if (list != null)
-                        {
-                            allSpLists.Add(list);
-                        }
-                    }
-                    ProcessSecurity.ProcessSecurityOnRefreshAll(w, allSpLists, epmdata.GetClientReportingConnection);
-                    if (w != null)
-                    {
-                        w.Dispose();
-                    }
-                }
-                catch
-                {
-                    if (w != null)
-                    {
-                        w.Dispose();
-                    }
-                }
-            }
+            //            if (list != null)
+            //            {
+            //                allSpLists.Add(list);
+            //            }
+            //        }
+            //        ProcessSecurity.ProcessSecurityOnRefreshAll(w, allSpLists, epmdata.GetClientReportingConnection);
+            //        if (w != null)
+            //        {
+            //            w.Dispose();
+            //        }
+            //    }
+            //    catch
+            //    {
+            //        if (w != null)
+            //        {
+            //            w.Dispose();
+            //        }
+            //    }
+            //}
 
             #endregion
 
