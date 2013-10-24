@@ -93,38 +93,40 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 if (bIframe)
                 {
                     error += "<script language=\"javascript\">\r\n";
-                    error += "function LoadInt2(){\r\n";
-                    error += "OpenIntegrationPage('" + Request["Control"] + ".1','','');\r\n";
-                    if (Request["isdlg"] == "1")
-                    {
-                            error += "SP.SOD.execute('SP.UI.dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 0, '');";
-                    }
-                    else
-                    {
-                        if (!System.IO.Path.GetFileName(Request.UrlReferrer.ToString()).StartsWith("gotoremote.aspx"))
-                            error += "location.href='" + Request.UrlReferrer.ToString() + "';\r\n";
-                    }
-                    error += "}\r\n";
-                    error += "function LoadInt(){\r\n";
-                    error += "var sandboxSupported = \"sandbox\" in document.createElement(\"iframe\");\r\n";
-                    error += "if(sandboxSupported){\r\n";
+                    //error += "function LoadInt2(){\r\n";
+                    //error += "OpenIntegrationPage('" + Request["Control"] + ".1','','');\r\n";
+                    //if (Request["isdlg"] == "1")
+                    //{
+                    //        error += "SP.SOD.execute('SP.UI.dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 0, '');";
+                    //}
+                    //else
+                    //{
+                    //    if (!System.IO.Path.GetFileName(Request.UrlReferrer.ToString()).StartsWith("gotoremote.aspx"))
+                    //        error += "location.href='" + Request.UrlReferrer.ToString() + "';\r\n";
+                    //}
+                    //error += "}\r\n";
+                    //error += "function LoadInt(){\r\n";
+                    //error += "var sandboxSupported = \"sandbox\" in document.createElement(\"iframe\");\r\n";
+                    //error += "if(sandboxSupported){\r\n";
                     error += "ifrm = document.createElement(\"IFRAME\"); \r\n";
-                    error += "ifrm.setAttribute(\"src\", \"" + url + "\");\r\n"; 
+                    error += "ifrm.setAttribute(\"src\", \"" + url + "\");\r\n";
+                    error += "ifrm.setAttribute(\"id\", \"frmRemote\");\r\n"; 
                     error += "ifrm.style.width = \"100%\"; \r\n";
                     error += "ifrm.style.height = 600 + \"px\"; \r\n";
-                    error += "ifrm.setAttribute(\"sandbox\", \"allow-scripts allow-forms allow-same-origin allow-popups\");\r\n"; 
+                    //error += "ifrm.setAttribute(\"sandbox\", \"allow-scripts allow-forms allow-same-origin allow-popups\");\r\n"; 
                     error += "document.getElementById(\"DeltaPlaceHolderMain\").appendChild(ifrm); \r\n";
-                    error += "}else{\r\n";
-                    error += "ExecuteOrDelayUntilScriptLoaded(LoadInt2, 'EPMLive.js');\r\n";
-                    error += "}}\r\n";
-                    error += "SP.SOD.executeFunc(\"sp.js\", null, LoadInt);\r\n";
+                    //error += "}else{\r\n";
+                    //error += "ExecuteOrDelayUntilScriptLoaded(LoadInt2, 'EPMLive.js');\r\n";
+                    //error += "}}\r\n";
+                    //error += "SP.SOD.executeFunc(\"sp.js\", null, LoadInt);\r\n";
                     error += "</script>";
                         
                         //<iframe src=\"" + url + "\" id=\"frmRemote\" style=\"width:100%;height:600px\" sandbox=\"allow-forms allow-scripts\">";
                 }
                 else
                 {
-                    if (Request["isdlg"] == "1")
+                    Response.Redirect(url);
+                    /*if (Request["isdlg"] == "1")
                     {
                         error += "<script language=\"javascript\">\r\n";
                         error += "function LoadInt(){\r\n";
@@ -159,7 +161,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                         error += "}\r\n";
                         error += "SP.SOD.executeFunc(\"sp.js\", null, LoadInt1);\r\n";
                         error += "</script>";
-                    }
+                    }*/
                 }
             }
         }
