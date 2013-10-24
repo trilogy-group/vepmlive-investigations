@@ -385,14 +385,14 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     (TenroxIntegrationService.UserToken)
                         TranslateToken(_authToken, typeof (TenroxIntegrationService.UserToken));
 
-                Integration integration = integrationsClient.QueryByAll(token)
-                    .FirstOrDefault(i => i.ID24.Equals(integrationId.ToString()) && i.ObjectType.Equals(ObjectId)) ??
-                                          new Integration
-                                          {
-                                              ObjectId = itemId,
-                                              ObjectType = ObjectId,
-                                              ID24 = integrationId.ToString()
-                                          };
+                Integration integration =
+                    integrationsClient.QueryByObjectTypeObjectID(token, ObjectId, itemId).FirstOrDefault() ??
+                    new Integration
+                    {
+                        ObjectId = itemId,
+                        ObjectType = ObjectId,
+                        ID24 = integrationId.ToString()
+                    };
 
                 integrationsClient.Save(token, integration);
             }
