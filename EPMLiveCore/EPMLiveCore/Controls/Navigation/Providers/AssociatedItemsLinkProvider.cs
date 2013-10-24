@@ -16,7 +16,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
         #region Fields (3) 
 
         private const string LIST_URL =
-            @"javascript:SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {{ url: '{0}?lookupfield={1}&LookupFieldList={2}', showMaximized: true }});";
+            @"javascript:window.epmLiveNavigation.showAssociatedItems({{ url: '{0}?lookupfield={1}&LookupFieldList={2}', listId: '{2}', listName: '{3}', field: '{1}', lookup: '{4}' }});";
 
         private const string PARENT_WEB_LIST_ITEM_QUERY =
             @"SELECT TOP(1) ParentWebId, ItemListId AS ParentListId, ItemId AS ParentItemId FROM RPTWeb WHERE WebId = @WebId";
@@ -73,21 +73,21 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                     if (navLink != null)
                     {
                         links.Add(navLink);
-                    }
 
-                    links.AddRange(from object associatedList in ListCommands.GetAssociatedLists(spList)
-                        where associatedList != null
-                        select (AssociatedListInfo) associatedList
-                        into listInfo
-                        select GetLink(listInfo, spList)
-                        into link
-                        where link != null
-                        select link);
+                        links.AddRange(from object associatedList in ListCommands.GetAssociatedLists(spList)
+                            where associatedList != null
+                            select (AssociatedListInfo) associatedList
+                            into listInfo
+                            select GetLink(listInfo, spList, navLink.Title)
+                            into link
+                            where link != null
+                            select link);
+                    }
                 }
             }
         }
 
-        private NavLink GetLink(AssociatedListInfo listInfo, SPList spList)
+        private NavLink GetLink(AssociatedListInfo listInfo, SPList spList, string title)
         {
             SPList list = null;
 
@@ -103,7 +103,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 {
                     Id = listInfo.ListId.ToString(),
                     Title = listInfo.Title,
-                    Url = string.Format(LIST_URL, list.DefaultViewUrl, listInfo.LinkedField, spList.ID)
+                    Url = string.Format(LIST_URL, list.DefaultViewUrl, listInfo.LinkedField, spList.ID, listInfo.Title, title)
                 };
         }
 

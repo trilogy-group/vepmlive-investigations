@@ -1620,6 +1620,37 @@
                     }
                 };
 
+                window.epmLiveNavigation.showAssociatedItems = function (itemInfo) {
+                    var displayPopup = function(url) {
+                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: url, showMaximized: true });
+                    };
+                    
+                    var showItems = function (info) {
+                        var webUrl = $$.currentWebUrl();
+
+                        if (webUrl) {
+                            $.ajax({
+                                type: 'POST',
+                                url: (webUrl + '/_layouts/15/epmlive/gridaction.aspx?action=linkeditemspost&listid='+ info.listId +'&lookups='+ info.lookup +'&field='+ info.field +'&LookupFieldList='+info.listName).replace(/\/\//g, '/'),
+                                contentType: 'application/json; charset=utf-8',
+                                dataType: 'json',
+                                success: function(response) {
+                                    displayPopup(info.url);
+                                },
+                                error: function(response) {
+                                    displayPopup(info.url);
+                                }
+                            });
+                        } else {
+                            window.setTimeout(function() {
+                                showItems(info);
+                            }, 1);
+                        }
+                    };
+
+                    showItems(itemInfo);
+                };
+
                 var _init = function () {
                     registerTopLevelNodes();
                     registerStaticProviderLinks();
