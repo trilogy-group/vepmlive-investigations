@@ -22,6 +22,7 @@
 
             $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js?v=<%= EPMFileVersion %>', function() {
                 $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/epmlive<%= DebugMode ? ".min" : string.Empty %>.js?v=<%= EPMFileVersion %>', function() {
+                    epmLive.rootWebId = '<%= RootWebId %>';
                     epmLive.currentSiteId = '<%= SiteId %>';
                     epmLive.currentSiteUrl = '<%= SiteUrl %>';
                     epmLive.currentWebId = '<%= WebId %>';

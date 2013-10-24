@@ -2123,7 +2123,7 @@
                             }
                             
                             if (proceed) {
-                                if (window.epmLiveNavigation.wsTeamDict[webId] !== 'X') {
+                                if (window.epmLiveNavigation.wsTeamDict[webId] !== 'X' && liId !== window.epmLive.rootWebId) {
                                     commands.push({ title: 'Edit team', command: 'nav:team', kind: 6 });
                                 }
 

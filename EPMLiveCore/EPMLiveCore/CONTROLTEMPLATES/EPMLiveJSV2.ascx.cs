@@ -34,11 +34,19 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         #endregion Fields 
 
-        #region Properties (2) 
+        #region Properties (3) 
 
         public bool DebugMode { get; private set; }
 
         public string EPMFileVersion { get; private set; }
+
+        public string RootWebId
+        {
+            get
+            {
+                return SPContext.Current.Site.RootWeb.ID.ToString().ToLower();
+            }
+        }
 
         #endregion Properties 
 
