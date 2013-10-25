@@ -1870,71 +1870,71 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         /// <param name="sListNames"></param>
         /// <returns></returns>
-        public string UpdateListNames(string sListNames)
-        {
-            string sSQL = string.Empty;
-            char[] splitter = ",".ToCharArray();
-            string listNamesOUT = null;
-            string[] listNamesIN = null;
-            string sListName = string.Empty;
-            Guid RPTListID = Guid.Empty;
+        //public string UpdateListNames(string sListNames)
+        //{
+        //    string sSQL = string.Empty;
+        //    char[] splitter = ",".ToCharArray();
+        //    string listNamesOUT = null;
+        //    string[] listNamesIN = null;
+        //    string sListName = string.Empty;
+        //    Guid RPTListID = Guid.Empty;
 
-            try
-            {
-                //ListNames IN -- START
-                if (sListNames.Contains(","))
-                {
-                    listNamesIN = sListNames.Split(splitter[0]);
-                }
-                else
-                {
-                    listNamesIN = new string[1];
-                    listNamesIN[0] = sListNames;
-                }
-                // -- END
+        //    try
+        //    {
+        //        //ListNames IN -- START
+        //        if (sListNames.Contains(","))
+        //        {
+        //            listNamesIN = sListNames.Split(splitter[0]);
+        //        }
+        //        else
+        //        {
+        //            listNamesIN = new string[1];
+        //            listNamesIN[0] = sListNames;
+        //        }
+        //        // -- END
 
-                //listNamesOUT = new string[listNamesIN.Length];
-                int iListCounter = 0;
-                using (SPSite site = new SPSite(_siteID))
-                {
-                    using (SPWeb web = site.OpenWeb())
-                    {
-                        while (iListCounter < listNamesIN.Length)
-                        {
-                            RPTListID = GetListId(listNamesIN[iListCounter]);
-                            sListName = web.Lists[RPTListID].Title;
+        //        //listNamesOUT = new string[listNamesIN.Length];
+        //        int iListCounter = 0;
+        //        using (SPSite site = new SPSite(_siteID))
+        //        {
+        //            using (SPWeb web = site.OpenWeb())
+        //            {
+        //                while (iListCounter < listNamesIN.Length)
+        //                {
+        //                    RPTListID = GetListId(listNamesIN[iListCounter]);
+        //                    sListName = web.Lists[RPTListID].Title;
 
-                            if (sListName.Trim().ToLower() != listNamesIN[iListCounter].Trim().ToLower())
-                            {
-                                if (UpdateListName(RPTListID, sListName))
-                                {
-                                    listNamesOUT = listNamesOUT + "," + sListName;
-                                }
-                                else
-                                {
-                                    LogStatus(string.Empty, sListNames, "Error updating listname. For list:" + listNamesIN[iListCounter].Replace("'", ""), _sqlError, 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                                }
-                            }
-                            else
-                            {
-                                listNamesOUT = listNamesOUT + "," + listNamesIN[iListCounter];
-                            }
-                            iListCounter++;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogStatus(string.Empty, sListNames, "Error processing UpdateListNames() -- " + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            }
+        //                    if (sListName.Trim().ToLower() != listNamesIN[iListCounter].Trim().ToLower())
+        //                    {
+        //                        if (UpdateListName(RPTListID, sListName))
+        //                        {
+        //                            listNamesOUT = listNamesOUT + "," + sListName;
+        //                        }
+        //                        else
+        //                        {
+        //                            LogStatus(string.Empty, sListNames, "Error updating listname. For list:" + listNamesIN[iListCounter].Replace("'", ""), _sqlError, 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        listNamesOUT = listNamesOUT + "," + listNamesIN[iListCounter];
+        //                    }
+        //                    iListCounter++;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogStatus(string.Empty, sListNames, "Error processing UpdateListNames() -- " + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+        //    }
 
-            if (listNamesOUT.IndexOf(",") == 0)
-            {
-                listNamesOUT = listNamesOUT.Remove(0, 1);
-            }
-            return listNamesOUT;
-        }
+        //    if (listNamesOUT.IndexOf(",") == 0)
+        //    {
+        //        listNamesOUT = listNamesOUT.Remove(0, 1);
+        //    }
+        //    return listNamesOUT;
+        //}
 
         /// <summary>
         /// 

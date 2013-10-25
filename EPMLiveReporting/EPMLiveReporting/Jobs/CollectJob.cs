@@ -110,7 +110,7 @@ namespace EPMLiveReportsAdmin.Jobs
                 sErrors += "<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " + ex.Message + "</font><br>";
             }
 
-            if (data == null || data == "")
+            if (string.IsNullOrEmpty(data))
             {
                 data = epmdata.GetListNames();
                 try
@@ -124,15 +124,15 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
             }
 
-            try
-            {
-                data = epmdata.UpdateListNames(data);
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
-                sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
-            }
+            //try
+            //{
+            //    data = epmdata.UpdateListNames(data);
+            //}
+            //catch (Exception ex)
+            //{
+            //    bErrors = true;
+            //    sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
+            //}
 
             // TODO: We need to make sure this doesn't break anything!!!!
             //foreach (SPWeb w in site.AllWebs)

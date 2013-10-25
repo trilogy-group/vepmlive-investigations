@@ -87,15 +87,15 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
             }
 
-            try
-            {
-                data = epmdata.UpdateListNames(data);
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
-                sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
-            }
+            //try
+            //{
+            //    data = epmdata.UpdateListNames(data);
+            //}
+            //catch (Exception ex)
+            //{
+            //    bErrors = true;
+            //    sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
+            //}
 
             try
             {
