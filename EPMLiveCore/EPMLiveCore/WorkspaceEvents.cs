@@ -51,29 +51,6 @@ namespace EPMLiveCore
                     "DELETE FROM [RPTWEBGROUPS] WHERE [WEBID] NOT IN (SELECT [WebId] FROM [RPTWeb])",
                     new Dictionary<string, object>());
 
-                try
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate
-                    {
-                        using (var s = new SPSite(properties.SiteId))
-                        {
-                            using (var w = s.OpenWeb(properties.WebId))
-                            {
-                                if (w.Lists.Cast<SPList>().Any())
-                                {
-                                    var slistIds = w.Lists.Cast<SPList>().Aggregate("(", (current, l) => current + ("'" + l.ID.ToString() + "',"));
-                                    slistIds = (slistIds.TrimEnd(',') + ")");
-
-                                    qExec.ExecuteReportingDBNonQuery(
-                                        "DELETE FROM [RPTITEMGROUPS] WHERE [LISTID] NOT IN " + slistIds,
-                                        new Dictionary<string, object>());
-                                }
-                            }
-                        }
-                    });
-                }
-                catch { }
-
                 if (bIsItem)
                 {
                     // remove the parent item's workspaceurl field value
