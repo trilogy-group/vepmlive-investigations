@@ -1,7 +1,5 @@
 /* EPM */
 
-
-
 table.dhtmlxLayoutPolyContainer_dhx_skyblue td.dhtmlxLayoutPolySplitterHorInactive {
     -moz-user-select: none;
     background-color: #EBEBEB;
@@ -12,53 +10,6 @@ table.dhtmlxLayoutPolyContainer_dhx_skyblue td.dhtmlxLayoutPolySplitterHorInacti
     vertical-align: top;
 
 }
-
-
-.GMFocusRowBorder
-{
-    border: 1px solid #91CDF2;
-    z-index: 2 !important;
-}
-
-.GMColorFocusedCell 
-{ 
-background-color:#FFFFFF;
-}
-
-.GMClassFocusedCell 
-{ 
-background-color:#FFFFFF;
-}
-
-/*.GMFocusRowBackground 
-{ 
-opacity:0.1;
-filter:alpha(opacity=10);
-background:#A5E1FF; 
-}*/
-
-/*.GMFocusRowBackground
-{
-opacity:0.1;
-background-color:#A5E1FF;
-filter:alpha(opacity=10);
-}
-*/
-.GMColorDefault { background-color:#FFFFFF; }
-
-
-/*.GMColorSelected { background-color:#A5E1FF; !important; }*/
-/*.GMColorFocused { background-color:#A5E1FF; !important; }*/
-/*.GMColorFocusedCell { background-color:#91CDF2; !important; }*/
-/*.GMColorFocusedCellSafari { background-color:#A5E1FF; !important; }*/
-/*.GMColorEditedCell { background-color:#A5E1FF; !important; }
-.GMColorViewedCell { background-color:#A5E1FF; !important; }
-.GMFocusCellBorder,.GMEditCellBorder { z-index:4; border:0px solid #6666FF !important; background: #CCEBFF !important; }*/
-
-
-.GMColorHovered { background-color:#FFFFFF; }
-.GMColorHoveredCell { background-color:#FFFFFF; }
-.GMColorHoveredCellReadOnly { background-color:#FFFFFF; }
 
 .GMCellHeader
 {
@@ -200,14 +151,6 @@ font-weight:400;
 font-family:Tahoma !important;*/
 vertical-align: middle !important;
 }
-
-.GMColorSelected { 
-
-background-color:#CCEBFF !important;
-/*background-color: rgb(254, 276, 280);*/
-
-}
-
 
 .GMCell,.GMCellPanel,.GMCellFilter,.GMCellFilterPanel,.GMCellHeader,.GMCellHeaderPanel,.GMCellFilterPanel,
 .GMHeaderDrag,.GMHeaderGroup,.GMCellUser,.GMCellEmpty,.GMCellHeaderEmpty { 
@@ -1122,26 +1065,26 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 /* -------------- State classes ------------- */
 /* The colors must be set by numbers not by names */
 
-/*.GMColorDefault { background-color:#E7EAF0; }*/
+.GMColorDefault { background-color:#FFFFFF; }
 .GMColorNoFocus { background-color:#F6F6E6; }
 .GMColorReadOnly { background-color:#FFFFFF;}
 .GMColorPreview { background-color:#FFFFFF; }
 
 .GMColorAlternate { background-color:#EBFFFF; }
 
-.GMColorSelected { background-color:#9AC2E5; }
+.GMColorSelected { background-color:#CDE6F7 !important; }
 .GMClassSelected { color:black; }
 
 .GMColorError { background-color:#FF6969; }
 .GMColorDeleted { background-color:#FFFFFF; }
 .GMClassDeleted { font-style:italic; }
 .GMColorAdded { background-color:#FFFFFF; }
-.GMClassAdded { font-weight:bold; }
+.GMClassAdded {  }
 .GMColorMoved1 { background-color:#FFFFFF; }
 .GMColorMoved2 { background-color:#FFFFFF; }
 .GMColorChanged { background-color:#FFFFFF; }
 .GMColorChangedCell { background-color:#E1E1FF; }
-.GMClassChangedCell { }
+.GMClassChangedCell {  }
 
 .GMColorMaxChildren { background-color:#FFFFF0; }
 
@@ -1152,13 +1095,12 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMColorFound2 { background-color:#FFC387; }
 .GMColorFound3 { background-color:#87FF87; }
 
-/*.GMColorHovered { background-color:#F1F5FA; }*/
-.GMColorHoveredCell { background-color:#F1F5FA; }
-/*.GMColorHoveredCellReadOnly { background-color:#F1F5FA; }*/
-.GMColorHoveredCellNoFocus { background-color:#F8F8F8; }
-.GMClassHoveredCellHeader { background-position:0px -250px; }
-.GMClassHoveredCellPanel { background-position:0px -1751px; background-repeat:repeat-x; }
-.GMColorHoveredCellFastPanel { }
+.GMColorHovered { background-color:#E6F2FB; }
+.GMColorHoveredCell { background-color:#E6F2FB; }
+.GMColorHoveredCellReadOnly { background-color:#E6F2FB; }
+.GMColorHoveredCellNoFocus { background-color:#E6F2FB; }
+/* HEADER CELL HOVER */
+.GMClassHoveredCellHeader { background-color: rgba(205, 230, 247, 0.5); }
 .GMColorHoveredCellSpace { background-color:#FFFFFF; }
 .GMColorHoveredCellSpaceEdit { background-color:#C0C0FF; }
 .GMColorHoveredCellSpaceBool { background-color:#FFFFFF; }
@@ -1168,45 +1110,45 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMClassHoveredCellButton1 { color:red; }
 .GMColorHoveredCellTab { background-color:#FFFFFE; }
 .GMClassHoveredCellTab { background-position:0px -1751px; color:green; }
-.GMColorHoveredCellTab1 { background-color:#99bbcc; }
+.GMColorHoveredCellTab1 { background-color:#CCCCCC; }
 .GMClassHoveredCellTab1 { background-image:none; }
 
-/*.GMColorFocused { background-color:#9AC2E5; }  EPM Live Edit */
-/*.GMColorFocusedCell { background-color:#9AC2E5; } EPM Live Edit */
-/*.GMColorFocusedCellSafari { background-color:#9AC2E5; } EPM Live Edit */
-.GMColorFocusedCellSpace { background-color:#E6E6E6; }
+.GMColorFocused { background-color:#CDE6F7 !important; }
+.GMColorFocusedCell { background-color:#CDE6F7 !important; }
+.GMColorFocusedCellSafari { background-color:#A0A0FF; }
+.GMColorFocusedCellSpace { background-color:#FFFFFE; }
 .GMColorFocusedCellButton { background-color:#FFFFFE; }
 .GMColorFocusedCellHeader { background-color:#FFFFFE; }
 .GMColorFocusedCellPanel { background-color:#FFFFFE; }
-.GMColorEditedCell { background-color:#9AC2E5; }
-.GMColorViewedCell { background-color:#9AC2E5; }
+.GMColorEditedCell { background-color:#FFFFFF; }
+.GMColorViewedCell { background-color:#FFFFFF; }
 
 /* --------------- Hover, focus, edit cursors ----------------- */
-.GMHoverPanelBackground { }
-/*.GMHoverRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#00F; } */
-/*.GMHoverRowBorder { z-index:1; border-top:1px solid #BBF; border-bottom:1px solid #BBF; cursor:default; } */
-/*.GMHoverCellBorder { z-index:3; padding:1px; border:1px solid #A0A0F0; background:white; }*/
+.GMHoverPanelBackground {
+    z-index: -4 !important;
+    background-color:#E6F2FB;
+    background-image: url(blackcheck.png);
+    background-position: center center;
+}
+.GMHoverRowBackground {
+    background-color: #E6F2FB;
+    z-index: -4 !important;
+}
+.GMHoverRowBorder { z-index:1; cursor:default; }
+.GMHoverCellBorder { }
 .GMFocusPanelBackground { }
-/*.GMFocusRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#0000; } EPM Live Edit */
-/*.GMFocusRowBorder { z-index:2; border:0px solid black; } EPM Live Edit */
-/*.GMFocusCellBorder,.GMEditCellBorder { z-index:4; border:0px solid #6666FF; background: #9AC2E5 }*/
-/*.GMFocusCellSpaceBorder,.GMEditCellSpaceBorder { z-index:4; }*/
-.GMEditCellBorder { border-color:#FF6666; }
+.GMFocusRowBackground {  }
+.GMFocusRowBorder {  }
+.GMFocusCellBorder,.GMEditCellBorder,.GMFocusCellSpaceBorder,.GMEditCellSpaceBorder { z-index:4; border:2px solid #000000; }
+.GMEditCellBorder,.GMEditCellSpaceBorder { border-color:#000000; }
 .GMEditCellInput { position:relative; border:1px solid #BBB; overflow:hidden; z-index:2; }
 
 .GMCursorBackground { position:relative; border:none; padding:0px; overflow:hidden; }
-.GMCursorBorderLeft { position:relative; padding-right:0px; padding-top:0px; padding-bottom:0px; border-right:none; border-top:none; border-bottom:none; 
+.GMCursorBorderLeft { position:relative; padding-right:0px; padding-top:0px; padding-bottom:0px; border-right:none; border-top:none; border-bottom:none; overflow:hidden; width:0px; height:0px; }
+.GMCursorBorderRight { position:relative; padding-left:0px; padding-top:0px; padding-bottom:0px; border-left:none; border-top:none; border-bottom:none; overflow:hidden; width:0px; height:0px; }
+.GMCursorBorderTop { position:relative; padding-bottom:0px; padding-left:0px; padding-right:0px; border-bottom:none; border-left:none; border-right:none; overflow:hidden; width:0px; height:0px; }
+.GMCursorBorderBottom { position:relative; padding-top:0px; padding-left:0px; padding-right:0px; border-top:none; border-left:none; border-right:none; overflow:hidden; width:0px; height:0px; }
 
-overflow:hidden; width:0px; height:0px; }
-.GMCursorBorderRight { position:relative; padding-left:0px; padding-top:0px; padding-bottom:0px; border-left:none; border-top:none; border-bottom:none; 
-
-overflow:hidden; width:0px; height:0px; }
-.GMCursorBorderTop { position:relative; padding-bottom:0px; padding-left:0px; padding-right:0px; border-bottom:none; border-left:none; border-right:none; 
-
-overflow:hidden; width:0px; height:0px; }
-.GMCursorBorderBottom { position:relative; padding-top:0px; padding-left:0px; padding-right:0px; border-top:none; border-left:none; border-right:none; 
-
-overflow:hidden; width:0px; height:0px; }
 
 /*--------------- Cell edges ----------------- */
 .GMNoLeft { border-left:none; }

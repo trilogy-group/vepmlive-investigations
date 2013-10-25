@@ -224,25 +224,21 @@ namespace WorkEnginePPM
             xCfg.CreateIntAttr("Sorting", 0);
             xCfg.CreateIntAttr("FastColumns", 1);
             xCfg.CreateIntAttr("StaticCursor", 1);
+            xCfg.CreateIntAttr("FocusWholeRow", 1);
             foreach (CfgAttr cfgAttr in m_cfgAttrs)
             {
                 xCfg.CreateStringAttr(cfgAttr.name, cfgAttr.value);
             }
-            //xCfg.CreateStringAttr("MainCol", "Permission");
-
-            //CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
+            CStruct xDef = xGrid.CreateSubStruct("Def");
+            CStruct xD = xDef.CreateSubStruct("D");
+            xD.CreateStringAttr("Name", "R");
+            xD.CreateStringAttr("HoverCell", "Color");
+            xD.CreateStringAttr("HoverRow", "Color");
+            xD.CreateStringAttr("FocusCell", "");
+            xD.CreateStringAttr("FocusRow", "Color");
             CStruct xCols = xGrid.CreateSubStruct("Cols");
-            //CStruct xHeader = xGrid.CreateSubStruct("Header");
-            //xHeader.CreateIntAttr("Visible", 1);
-            //xHeader.CreateIntAttr("SortIcons", 0);
 
             CStruct xC;
-            // Add FieldID column
-            //CStruct xC = xCols.CreateSubStruct("C");
-            //xC.CreateStringAttr("Name", "FieldID");
-            //xC.CreateStringAttr("Type", "Int");
-            //xC.CreateBooleanAttr("CanEdit", false);
-            //xC.CreateBooleanAttr("Visible", false);
 
             CStruct xHead = xGrid.CreateSubStruct("Head");
             CStruct xColHeader = xGrid.CreateSubStruct("Header");
@@ -280,14 +276,6 @@ namespace WorkEnginePPM
                     }
                     xC.CreateIntAttr("Width", col.width);
                     xC.CreateBooleanAttr("Visible", true);
-                    //xC.CreateIntAttr("MinWidth", 50);
-                    //xC.CreateIntAttr("CanMove", 0);
-                    //xC.CreateStringAttr("Defaults", jsonLookup);
-                    //xC.CreateStringAttr("Type", "Float");
-                    //xC.CreateStringAttr("EditFormat", "0.###");
-                    //xC.CreateStringAttr("Format", ",0.000;<span style='color:red;'>-,0.000</span>;");
-                    //xC.CreateIntAttr("CanResize", 0);
-                    //xC.CreateIntAttr("ShowHint", 0);
 
                     switch (col.type)
                     {
@@ -308,11 +296,9 @@ namespace WorkEnginePPM
                         case _TGrid.Type.date:
                             xC.CreateStringAttr("Type", "Date");
                             xC.CreateStringAttr("Format", "M/d/yyyy");
-                            //xC.CreateStringAttr("Button", "");
                             break;
                         case _TGrid.Type.combo:
                             xC.CreateStringAttr("Type", "Text");
-                            //xC.CreateIntAttr("CanEdit", 2);
                             string sJSON = "";
                             if (col.dicCombo != null)
                             {
@@ -328,7 +314,6 @@ namespace WorkEnginePPM
                             xC.CreateStringAttr("Button", "Defaults");
                             xC.CreateStringAttr("ValueField", col.name);
                             xC.CreateIntAttr("MinWidth", 30);
-                            //xC.CreateIntAttr("Range", 1);
                             break;
                         default:
                             xC.CreateStringAttr("Type", "Text");
@@ -437,17 +422,8 @@ namespace WorkEnginePPM
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-            //<link rel="stylesheet" type="text/css" href="/_layouts/ppm/RPEditor.ascx.css" />
-
-            //<script src="/_layouts/epmlive/TreeGrid/GridE.js" type="text/javascript"></script>
-            //<script src="/_layouts/ppm/tools/tgrid.ascx.js" type="text/javascript"></script>
             //if (!IsPostBack)
             {
-                //Type cstype = this.GetType();
-                //if (!Page.ClientScript.IsClientScriptBlockRegistered(cstype, "RPEditor.ascx.css"))
-                //    Page.ClientScript.RegisterClientScriptBlock(cstype, "RPEditor.ascx.css",
-                //        Page.ResolveUrl("/_layouts/ppm/RPEditor.ascx.css"));
-
                 if (!Page.ClientScript.IsClientScriptIncludeRegistered("GridE"))
                     Page.ClientScript.RegisterClientScriptInclude("GridE",
                         Page.ResolveUrl("/_layouts/epmlive/TreeGrid/GridE.js"));
