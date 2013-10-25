@@ -144,6 +144,9 @@
                                 <tr>
                                     <td><input type="checkbox" name="ribbons" value="optimizer"  <%if(arrMenus.Contains("optimizer")){%>checked<%}%>/> Optimizer</td>
                                 </tr>
+                                <tr>
+                                    <td><input type="checkbox" name="ribbons" value="portfolio"  <%if(arrMenus.Contains("portfolio")){%>checked<%}%>/> Cost Views</td>
+                                </tr>
                             </table>
 				         </Template_Control>
 			        </wssuc:InputFormControl>

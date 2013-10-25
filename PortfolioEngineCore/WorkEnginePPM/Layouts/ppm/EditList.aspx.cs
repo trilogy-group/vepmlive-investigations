@@ -78,10 +78,14 @@ namespace WorkEnginePPM.Layouts.ppm
                 {
                     snonactivex = Request["nonactivexs"].ToString();
                 }catch{}
-
+                string ribbons = "";
+                try
+                {
+                    ribbons = Request["ribbons"].ToString();
+                }catch{}
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_worklists", sWorkLists.Trim('|'));
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_fields", sb.ToString().Trim('|'));
-                EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_menus", Request["ribbons"].Replace(",", "|"));
+                EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_menus", ribbons.Replace(",", "|"));
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_nonactivexs", snonactivex.Replace(",", "|"));
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_costview", dllCostView.SelectedValue);
 
