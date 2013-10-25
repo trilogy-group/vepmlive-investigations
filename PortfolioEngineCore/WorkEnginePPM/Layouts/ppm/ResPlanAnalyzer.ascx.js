@@ -6229,9 +6229,8 @@
 	                    var selectedItem = selectView.options[selectView.selectedIndex];
 	                    document.getElementById("id_SaveView_Name").value = selectedItem.text;
 	                    var bDefault = false;
-	                    //    Joe wants the default for default to be off EVEN for the defaiult view 
-	                    //                       if (view.Default != 0)
-	                    //                           bDefault = true;
+	                    if (view.Default != 0)
+	                        bDefault = true;
 	                    document.getElementById("id_SaveView_Default").checked = bDefault;
 	                    var bPersonal = false;
 	                    if (view.Personal != 0)
