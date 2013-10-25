@@ -46,8 +46,9 @@ namespace UplandIntegrations.PowerSteering.Services
 
             if (!string.IsNullOrEmpty(response.ErrorMessage)) throw new Exception(response.ErrorMessage);
 
-            throw new Exception(string.Format("Could not process a request. Status: {0}. Endpoint: [{1}] {2}",
-                response.StatusDescription, request.Method, _client.BaseUrl + request.Resource));
+            throw new Exception(string.Format("Could not process a request. Status: ({0}) {1}. Endpoint: [{2}] {3}",
+                (int) response.StatusCode, response.StatusDescription, request.Method,
+                _client.BaseUrl + "/" + request.Resource));
         }
 
         #endregion Methods 

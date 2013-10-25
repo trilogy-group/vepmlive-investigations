@@ -31,7 +31,7 @@ namespace UplandIntegrations.PowerSteering.Services
 
         public void TestConnection()
         {
-            new MetadataService(_client).GetFields("Project");
+            new MetadataService(_client).GetFields("All");
         }
 
         #endregion Methods 
