@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using Microsoft.SharePoint;
@@ -258,6 +260,9 @@ namespace EPMLiveReportsAdmin
                                   new ColumnDef("ListId", "ListId", "ListId", SPFieldType.Guid, SqlDbType.UniqueIdentifier),
                                   new ColumnDef("ItemId", "ItemId", "ItemId", SPFieldType.Integer, SqlDbType.Int),
                                   new ColumnDef("WebUrl", "WebUrl", "WebUrl", SPFieldType.Text, SqlDbType.VarChar, 256),
+                                  new ColumnDef("Commenters", "Commenters", "Commenters", SPFieldType.Text, SqlDbType.NVarChar, 8001),
+                                  new ColumnDef("CommentersRead", "CommentersRead", "CommentersRead", SPFieldType.Text, SqlDbType.NVarChar, 8001),
+                                  new ColumnDef("CommentCount", "CommentCount", "CommentCount", SPFieldType.Integer, SqlDbType.Int)
                               };
             return columns;
         }
@@ -271,6 +276,13 @@ namespace EPMLiveReportsAdmin
 
         public static void AddColumn(ColumnDefCollection columns, SPField field)
         {
+            if ((from c in columns
+                where c.InternalName.Equals(field.InternalName, StringComparison.CurrentCultureIgnoreCase)
+                select c).Any())
+            {
+                return;
+            }
+
             SqlParameter p = GetParameterFromSPField(field);
             string sType = field.TypeAsString.ToLower();
             switch (field.Type)
