@@ -91,7 +91,7 @@ namespace EPMLiveCore
                                     var l = w.Lists[new Guid(listid)];
                                     var i = l.GetItemById(int.Parse(itemid));
 
-                                    i["WorkspaceUrl"] = string.Empty;
+                                    i["WorkspaceUrl"] = null;
                                     i.SystemUpdate();
                                 }
                             }
