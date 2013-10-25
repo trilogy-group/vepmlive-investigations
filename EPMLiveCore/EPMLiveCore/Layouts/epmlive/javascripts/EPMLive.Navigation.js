@@ -705,32 +705,102 @@
                     var removeLink = function (linkId, notifId) {
                         var remove = function (lid, nid) {
                             var $item = $('#' + lid);
+                            var $parent = $item.parent();
+                            
                             $item.fadeOut(300, function () {
                                 $item.remove();
-                            });
+                                
+                                var pId = $parent.get(0).id;
 
-                            if (nid) {
-                                if (nid === 'RI') {
-                                    toastr.options = {
-                                        'closeButton': false,
-                                        'debug': false,
-                                        'positionClass': 'toast-top-right',
-                                        'onclick': null,
-                                        'showDuration': 300,
-                                        'hideDuration': 1000,
-                                        'timeOut': 5000,
-                                        'extendedTimeOut': 1000,
-                                        'showEasing': 'swing',
-                                        'hideEasing': 'linear',
-                                        'showMethod': 'fadeIn',
-                                        'hideMethod': 'fadeOut'
-                                    };
+                                if (pId === 'epm-nav-sub-workspaces-static-links') {
+                                    if ($parent.find('a').length === 1) {
+                                        var wExists = false;
 
-                                    toastr.success('An existing item has been removed from your favorites list.');
-                                } else {
-                                    SP.UI.Notify.removeNotification(nid);
+                                        $parent.find('li').each(function () {
+                                            if ($(this).text() === 'No favorite workspace') {
+                                                wExists = true;
+                                            }
+                                        });
+                                        
+                                        if (!wExists) {
+                                            $('<li class="epm-nav-sub-placeholder">No favorite workspace</li>').insertAfter($($parent.find('.epm-nav-sub-header-bottom').get(1)));
+                                        }
+                                    }
+                                } else if (pId === 'epm-nav-sub-favorites-static-links') {
+                                    var iFound = false;
+                                    var pFound = false;
+
+                                    var iIndex = 0;
+
+                                    $parent.find('.epm-nav-sub-header').each(function () {
+                                        var $ph = $(this);
+
+                                        if ($ph.text() === 'Items') {
+                                            iIndex = $ph.index();
+                                        }
+                                    });
+
+                                    $parent.find('a').each(function () {
+                                        if ($(this).index() > iIndex) {
+                                            iFound = true;
+                                        } else {
+                                            pFound = true;
+                                        }
+                                    });
+
+                                    if (!pFound) {
+                                        var pExists = false;
+
+                                        $parent.find('li').each(function () {
+                                            if ($(this).text() === 'No pages') {
+                                                pExists = true;
+                                            }
+                                        });
+                                        
+                                        if (!pExists) {
+                                            $('<li class="epm-nav-sub-placeholder">No pages</li>').insertAfter($($parent.find('.epm-nav-sub-header-bottom').get(1)));
+                                        }
+                                    }
+
+                                    if (!iFound) {
+                                        var iExists = false;
+                                        
+                                        $parent.find('li').each(function() {
+                                            if ($(this).text() === 'No items') {
+                                                iExists = true;
+                                            }
+                                        });
+                                        
+                                        if (!iExists) {
+                                            $parent.get(0).innerHTML += '<li class="epm-nav-sub-placeholder">No items</li>';
+                                        }
+                                    }
                                 }
-                            }
+
+                                if (nid) {
+                                    if (nid === 'RI') {
+                                        toastr.options = {
+                                            'closeButton': false,
+                                            'debug': false,
+                                            'positionClass': 'toast-top-right',
+                                            'onclick': null,
+                                            'showDuration': 300,
+                                            'hideDuration': 1000,
+                                            'timeOut': 5000,
+                                            'extendedTimeOut': 1000,
+                                            'showEasing': 'swing',
+                                            'hideEasing': 'linear',
+                                            'showMethod': 'fadeIn',
+                                            'hideMethod': 'fadeOut'
+                                        };
+
+                                        toastr.success('An existing item has been removed from your favorites list.');
+                                    } else {
+                                        SP.UI.Notify.removeNotification(nid);
+                                    }
+                                }
+                                
+                            });
                         };
 
                         epmLiveService.execute('RemoveNavigationLink', linkId, function (response) {
