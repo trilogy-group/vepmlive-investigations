@@ -306,10 +306,15 @@ function registerCreateWorkspace2Script() {
                 else if (event.keyCode == 8) {
                     isValid = true;
                 }
+                else if (event.keyCode == 46) {
+                    isValid = true;
+                }
                 else if (event.keyCode == 189 && event.shiftKey) {
                     isValid = true;
                 }
-
+                else if (event.keyCode >= 35 && event.keyCode <= 40) {
+                    isValid = true;
+                }
                 return isValid;
             };
 
