@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
+using ReportFiltering;
 
 namespace EPMLiveCore.Controls.Navigation
 {
@@ -112,10 +114,8 @@ namespace EPMLiveCore.Controls.Navigation
                                                 var ql = (string) (c["QuickLaunch"] ?? string.Empty);
                                                 if (string.IsNullOrEmpty(ql)) return;
 
-                                                foreach (string linkId in ql.Split(','))
+                                                foreach (string id in ql.Split(',').Select(linkId => linkId.Split(':')[0]))
                                                 {
-                                                    string id = linkId.Split(':')[0];
-
                                                     if (!communityLinks.ContainsKey(communityName))
                                                     {
                                                         lock (locker)
@@ -158,6 +158,26 @@ namespace EPMLiveCore.Controls.Navigation
                                             }
                                         }
                                         catch { }
+                                    }
+
+                                    var tempCommunityLinks = communityLinks.ToDictionary(link => link.Key, link => link.Value);
+                                    communityLinks.Clear();
+
+                                    foreach (SPNavigationNode node in spWeb.Navigation.QuickLaunch)
+                                    {
+                                        foreach (var link in tempCommunityLinks)
+                                        {
+                                            var nodeKey = node.Id.ToString(CultureInfo.InvariantCulture);
+
+                                            if (!link.Value.Contains(nodeKey)) continue;
+
+                                            if (!communityLinks.ContainsKey(link.Key))
+                                            {
+                                                communityLinks.Add(link.Key,new List<string>());
+                                            }
+
+                                            communityLinks[link.Key].Add(nodeKey);
+                                        }
                                     }
                                 }
                             }
