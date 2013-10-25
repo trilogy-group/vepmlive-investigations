@@ -709,8 +709,27 @@
                                 $item.remove();
                             });
 
-                            if (nId) {
-                                SP.UI.Notify.removeNotification(nid);
+                            if (nid) {
+                                if (nid === 'RI') {
+                                    toastr.options = {
+                                        'closeButton': false,
+                                        'debug': false,
+                                        'positionClass': 'toast-top-right',
+                                        'onclick': null,
+                                        'showDuration': 300,
+                                        'hideDuration': 1000,
+                                        'timeOut': 5000,
+                                        'extendedTimeOut': 1000,
+                                        'showEasing': 'swing',
+                                        'hideEasing': 'linear',
+                                        'showMethod': 'fadeIn',
+                                        'hideMethod': 'fadeOut'
+                                    };
+
+                                    toastr.success('An existing item has been removed from your favorites list.');
+                                } else {
+                                    SP.UI.Notify.removeNotification(nid);
+                                }
                             }
                         };
 
@@ -788,11 +807,13 @@
                             break;
                         case '98':
                             if (command !== 'nav:addToFav') {
-                                if (command !== 'nav:remove' && command !== 'nav:removeFavWS') {
+                                if (command !== 'nav:remove' && command !== 'nav:removeFavWS' && command !== 'nav:removeFavRI') {
                                     $.get(redirectUrl).always(function() {
                                         removeLink(id);
                                     });
                                 } else {
+                                    var fKind = null;
+                                    
                                     if (command === 'nav:removeFavWS') {
                                         $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
                                             var $ws = $(this);
@@ -800,9 +821,19 @@
                                                 id = $ws.parent().get(0).id;
                                             }
                                         });
+                                    } else if (command === 'nav:removeFavRI') {
+                                        $('#epm-nav-sub-favorites-static-links').find('a').each(function () {
+                                            var $fa = $(this);
+                                            if ($fa.data('listid') === listId) {
+                                                if ($fa.data('itemid') == itemId) {
+                                                    id = $fa.parent().get(0).id;
+                                                    fKind = 'RI';
+                                                }
+                                            }
+                                        });
                                     }
 
-                                    removeLink(id);
+                                    removeLink(id, fKind);
 
                                     if (command === 'nav:remove') {
                                         var $a = $('#' + id).find('a');
@@ -827,16 +858,57 @@
                                 listId = listId === 'undefined' ? null : listId;
                                 itemId = itemId === 'undefined' ? null : itemId;
                                 var isItem = itemId === null ? 'False' : 'True';
-                                
-                                var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass"></Param><Param key="ItemId">' + itemId + '</Param><Param key="FString">' + webUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">' + isItem + '</Param></Data>';
 
-                                epmLiveService.execute('AddFavoritesWs', data, function (response) {
+                                var riFav = false;
+
+                                var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass"></Param><Param key="ItemId">' + itemId + '</Param><Param key="FString">' + webUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">' + isItem + '</Param></Data>';
+                                
+                                var methodName = 'AddFavoritesWs';
+                                var linkKind = 3;
+                                var icon = null;
+
+                                if ($link.parent().parent().get(0).id === 'epm-nav-sub-recent-static-links') {
+                                    methodName = 'AddFavorites';
+                                    linkKind = 1;
+
+                                    try {
+                                        icon = $($link.parent().find('span').get(0)).attr('class').split(' ')[1];
+                                    } catch(e) {
+                                    }
+
+                                    data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass">' + icon + '</Param><Param key="ItemId">' + itemId + '</Param><Param key="FString"></Param><Param key="Type">2</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">True</Param></Data>';
+
+                                    riFav = true;
+                                }
+
+                                var notify = function() {
+                                    if (riFav) {
+                                        toastr.options = {
+                                            'closeButton': false,
+                                            'debug': false,
+                                            'positionClass': 'toast-top-right',
+                                            'onclick': null,
+                                            'showDuration': 300,
+                                            'hideDuration': 1000,
+                                            'timeOut': 5000,
+                                            'extendedTimeOut': 1000,
+                                            'showEasing': 'swing',
+                                            'hideEasing': 'linear',
+                                            'showMethod': 'fadeIn',
+                                            'hideMethod': 'fadeOut'
+                                        };
+
+                                        toastr.success('A new item has been added to your favorites list.');
+                                    }
+                                };
+
+                                epmLiveService.execute(methodName, data, function (response) {
                                     window.epmLiveNavigation.registerLink({
                                         id: webId,
                                         title: title,
                                         url: webUrl,
                                         category: null,
-                                        cssClass: null,
+                                        cssClass: icon,
                                         order: null,
                                         siteId: _$$.currentSiteId,
                                         webId: webId,
@@ -846,8 +918,10 @@
                                         visible: true,
                                         active: true,
                                         seprator: false,
-                                        kind: 3
+                                        kind: linkKind
                                     });
+
+                                    notify();
                                 }, function (response) {
                                     window.epmLiveNavigation.registerLink({
                                         id: webId,
@@ -864,8 +938,10 @@
                                         visible: true,
                                         active: true,
                                         seprator: false,
-                                        kind: 3
+                                        kind: linkKind
                                     });
+                                    
+                                    notify();
                                 });
                             }
                             break;
@@ -1682,6 +1758,7 @@
                                 case 'nav:remove':
                                 case 'nav:addtofav':
                                 case 'nav:removefavws':
+                                case 'nav:removefavri':
                                     return 'icon-star-6';
                                 case 'view':
                                     return 'icon-info';
@@ -1838,31 +1915,41 @@
                             $a.data('listid', listId);
                             $a.data('itemid', itemId);
                         }
-                        
-                        var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
 
-                        epmLiveService.execute('GetContextualMenuItems', data, function (response) {
-                            var commands = [];
+                        var getMenuItems = function() {
+                            if (window.epmLive) {
+                                var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
 
-                            if (response.ContextualMenus.Items) {
-                                var items = response.ContextualMenus.Items.Item;
+                                epmLiveService.execute('GetContextualMenuItems', data, function (response) {
+                                    var commands = [];
 
-                                if (items) {
-                                    if (!items.length) {
-                                        items = [items];
+                                    if (response.ContextualMenus.Items) {
+                                        var items = response.ContextualMenus.Items.Item;
+
+                                        if (items) {
+                                            if (!items.length) {
+                                                items = [items];
+                                            }
+
+                                            for (var i = 0; i < items.length; i++) {
+                                                var item = items[i];
+                                                commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                            }
+                                        }
                                     }
 
-                                    for (var i = 0; i < items.length; i++) {
-                                        var item = items[i];
-                                        commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
-                                    }
-                                }
+                                    setup(commands, $a);
+                                }, function (response) {
+                                    setup([], $a);
+                                });
+                            } else {
+                                window.setTimeout(function () {
+                                    getMenuItems();
+                                }, 1);
                             }
+                        };
 
-                            setup(commands, $a);
-                        }, function (response) {
-                            setup([], $a);
-                        });
+                        getMenuItems();
                     } else {
                         toggleMenu();
                     }
@@ -2049,11 +2136,32 @@
                     };
 
                     var addCtxMenu = function ($li) {
-                        $($li.find('a').get(0)).attr('style', 'width: 115px !important;');
+                        var $a = $($li.find('a').get(0));
+                        $a.attr('style', 'width: 115px !important;');
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
-                            menuManager.setupMenu($li, []);
+                            var commands = [];
+
+                            var found = false;
+
+                            $('#epm-nav-sub-favorites-static-links').find('a').each(function () {
+                                var $fa = $(this);
+
+                                if ($fa.data('listid') === $a.data('listid')) {
+                                    if ($fa.data('itemid') === $a.data('itemid')) {
+                                        found = true;
+                                    }
+                                }
+                            });
+
+                            if (found) {
+                                commands.push({ title: 'Remove', command: 'nav:removeFavRI', kind: 98 });
+                            } else {
+                                commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
+                            }
+                            
+                            menuManager.setupMenu($li, commands);
                         });
                     };
 
