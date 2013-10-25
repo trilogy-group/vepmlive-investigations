@@ -77,6 +77,11 @@
     <Compile Include="Jira\JiraIntegrator.cs" />
     <Compile Include="Jira\JiraService.cs" />
     <Compile Include="Jira\JiraType.cs" />
+    <Compile Include="PowerSteering\Entities\Field.cs" />
+    <Compile Include="PowerSteering\Integrator.cs" />
+    <Compile Include="PowerSteering\Services\BaseService.cs" />
+    <Compile Include="PowerSteering\Services\MetadataService.cs" />
+    <Compile Include="PowerSteering\Services\PowerSteeringService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="Properties\Settings.Designer.cs" />
@@ -778,6 +783,7 @@
     <WCFMetadataStorage Include="Service References\TenroxTaskService\" />
     <WCFMetadataStorage Include="Service References\TenroxUserService\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\UplandIntegrations\UplandIntegrations\bin\Debug\UplandIntegrations.dll" /f
