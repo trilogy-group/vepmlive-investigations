@@ -202,7 +202,7 @@ namespace EPMLiveWebParts
                 getParams(curWeb);
 
 
-                
+
                 docXml = new XmlDocument();
                 docXml.LoadXml("<rows></rows>");
                 ndMainParent = docXml.ChildNodes[0];
@@ -1075,6 +1075,19 @@ namespace EPMLiveWebParts
                                         }
                                     }
                                     catch { }
+
+                                    var sWsUrl = string.Empty;
+                                    try
+                                    {
+                                        sWsUrl = dr["WorkspaceUrl"].ToString();
+                                        }
+                                    catch { }
+
+                                    if (!string.IsNullOrEmpty(sWsUrl))
+                                    {
+                                        var tVal = "&nbsp;<a href=\"" + sWsUrl.Split(',')[0] + "\"><img src=\"" + list.ParentWeb.ServerRelativeUrl + "/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>";
+                                        val += tVal;
+                                    }
                                 }
 
                                 displayValue = val;
@@ -2949,8 +2962,8 @@ namespace EPMLiveWebParts
                 SPQuery query = new SPQuery();
                 query.Query = spquery;
 
-                
-                if(iPageSize != 0)
+
+                if (iPageSize != 0)
                 {
                     XmlDocument docQ = new XmlDocument();
                     docQ.LoadXml("<Query>" + spquery + "</Query>");
@@ -2968,7 +2981,7 @@ namespace EPMLiveWebParts
                     if (iPage != 0)
                     {
 
-                        
+
                         if (iPage > 0)
                         {
                             string f = (string)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GVPageL-" + WPID + "-" + web.CurrentUser.ID, "GridSettings-" + list.ID.ToString(), () =>
@@ -3008,7 +3021,7 @@ namespace EPMLiveWebParts
 
                 foreach (SPListItem li in lic)
                 {
-                    if(iPageSize != 0)
+                    if (iPageSize != 0)
                     {
                         if (firstid == 0)
                         {
@@ -3176,7 +3189,7 @@ namespace EPMLiveWebParts
                 XmlNode nd = docXml.FirstChild.SelectSingleNode("//afterInit");
                 if (nd != null)
                 {
-                    
+
 
                     XmlNode ndCall = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
                     XmlAttribute attrName = docXml.CreateAttribute("command");
@@ -3319,7 +3332,7 @@ namespace EPMLiveWebParts
             {
                 string orderby = "";
                 string query = EPMLiveCore.ReportingData.GetReportQuery(web, list, spquery, out orderby);
-                
+
                 if (rolluplists == null)
                 {
                     try
