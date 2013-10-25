@@ -296,6 +296,12 @@
 	}
 
 
+	ResPlanAnalyzer.prototype.OnResizePanelFinish = function () {
+	    if (this.showingGraph == true) {
+	        this.createChart();
+	    }
+	}
+
 
 	ResPlanAnalyzer.prototype.HandlePingSession = function () {
 		try {
@@ -2606,6 +2612,8 @@
 	            this.layout_totals.cells(this.totalsGridArea).hideHeader();
 	            this.layout_totals.cells(this.totalsRibbonArea).setHeight(68);
 	            this.layout_totals.cells(this.totalsRibbonArea).fixSize(false, true);
+
+	            this.layout.attachEvent("onPanelResizeFinish", function () { LayoutOnResizePanelFinish();});
 
 
 	            //	        this.tabbar = this.layout.cells(this.mainRibbonArea).attachTabbar();
@@ -8252,6 +8260,10 @@ ResPlanAnalyzer.prototype.InitVars = function () {
 	    var tabbarOnSelectDelegate = MakeDelegate(this, this.tabbarOnSelect);
 
         var GetTotalsGridChartDataCompleteDelegate =  MakeDelegate(this, this.GetTotalsGridChartDataComplete);
+
+
+        var LayoutOnResizePanelFinish = MakeDelegate(this, this.OnResizePanelFinish);
+        
 
 //<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
 //	    $.getScript("/_layouts/ppm/Kendo/kendo.dataviz.min.js", function (data, textStatus, jqxhr) {
