@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using EPMLiveCore.Controls.Navigation;
 using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using System.Data.SqlClient;
 using EPMLiveCore.GlobalResources;
@@ -1472,7 +1473,7 @@ namespace EPMLiveCore
                             }
 
                             // clear EPM cache
-                            new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
+                            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
                         }
 
                         ew.Update();
@@ -1793,7 +1794,7 @@ namespace EPMLiveCore
             }
 
             // clear EPM cache
-            new GenericLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, origUser.LoginName).ClearCache();
+            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
         }
 
         private void MoveNode(int appId, string nodeType, string[] movementInfo)

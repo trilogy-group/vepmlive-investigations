@@ -76,16 +76,22 @@ namespace EPMLiveCore
 
             XmlNode ndGroupBy = doc.FirstChild.SelectSingleNode("//OrderBy");
 
-            foreach (XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
+            if (ndGroupBy != null)
             {
-                orderby += "," + nd.Attributes["Name"].Value;
-                try
+                foreach (XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
                 {
-                    if (nd.Attributes["Ascending"].Value.ToLower() == "false")
-                        orderby += " DESC";
+                    orderby += "," + nd.Attributes["Name"].Value;
+                    try
+                    {
+                        if (nd.Attributes["Ascending"].Value.ToLower() == "false")
+                            orderby += " DESC";
+                    }
+                    catch
+                    {
+                    }
                 }
-                catch { }
             }
+
             orderby = orderby.Trim(',');
 
             if (ndWhere == null)
