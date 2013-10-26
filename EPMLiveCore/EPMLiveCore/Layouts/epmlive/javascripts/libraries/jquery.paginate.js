@@ -249,10 +249,11 @@
                 outsidewidth_tmp = this.offsetLeft + this.offsetWidth;
             }
 
-            insidewidth += this.getBoundingClientRect().width;
+            insidewidth += Math.round(this.getBoundingClientRect().width * 100) / 100;
 
 
         })
+
 
         _ul.css('width', insidewidth + 'px');
 
@@ -263,3 +264,4 @@
 
 
 })(jQuery);
+
