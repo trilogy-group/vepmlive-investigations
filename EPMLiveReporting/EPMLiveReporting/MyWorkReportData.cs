@@ -569,6 +569,29 @@ namespace EPMLiveReportsAdmin
                     param.ParameterName = "@weburl_" + identifier;
                     param.Value = li.ParentList.ParentWeb.ServerRelativeUrl;
                     break;
+
+                //case "commenters":
+                //    param.Direction = ParameterDirection.Input;
+                //    param.SqlDbType = SqlDbType.NVarChar;
+                //    param.Size = 8001;
+                //    param.ParameterName = "@commenters";
+                //    param.Value = DBNull.Value;
+                //    break;
+
+                //case "commentcount":
+                //    param.Direction = ParameterDirection.Input;
+                //    param.SqlDbType = SqlDbType.Int;
+                //    param.ParameterName = "@commentcount";
+                //    param.Value = DBNull.Value;
+                //    break;
+
+                //case "commentersread":
+                //    param.Direction = ParameterDirection.Input;
+                //    param.SqlDbType = SqlDbType.NVarChar;
+                //    param.Size = 8001;
+                //    param.ParameterName = "@commentersread";
+                //    param.Value = DBNull.Value;
+                //    break;
             }
 
             return param;
@@ -587,27 +610,33 @@ namespace EPMLiveReportsAdmin
         {
             string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
 
-            cols = cols.Replace(")", ",[Commenters],[CommentersRead],[CommentCount],[WorkType],[DataSource])");
+            //cols = cols.Replace(")", ",[Commenters],[CommentersRead],[CommentCount],[WorkType],[DataSource])");
+            //values = values.Replace(")",
+            //                        string.Format(
+            //                            ",@Commenters_{0},@CommentersRead_{0},@CommentCount_{0},@WorkType_{0},@DataSource_{0})",
+            //                            identifier));
+
+            cols = cols.Replace(")", ",[WorkType],[DataSource])");
             values = values.Replace(")",
                                     string.Format(
-                                        ",@Commenters_{0},@CommentersRead_{0},@CommentCount_{0},@WorkType_{0},@DataSource_{0})",
+                                        ",@WorkType_{0},@DataSource_{0})",
                                         identifier));
 
             if (_cmdWithParams == null) _cmdWithParams = new SqlCommand();
 
-            foreach (string col in new[] {"Commenters", "CommentersRead", "CommentCount"})
-            {
-                object value = DBNull.Value;
+            //foreach (string col in new[] {"Commenters", "CommentersRead", "CommentCount"})
+            //{
+            //    object value = DBNull.Value;
 
-                if (spListItem.Fields.ContainsFieldWithInternalName(col) && spListItem[col] != null)
-                    value = spListItem[col].ToString();
+            //    if (spListItem.Fields.ContainsFieldWithInternalName(col) && spListItem[col] != null)
+            //        value = spListItem[col].ToString();
 
-                _cmdWithParams.Parameters.Add(new SqlParameter
-                                                  {
-                                                      ParameterName = string.Format("@{0}_{1}", col, identifier),
-                                                      Value = value
-                                                  });
-            }
+            //    _cmdWithParams.Parameters.Add(new SqlParameter
+            //                                      {
+            //                                          ParameterName = string.Format("@{0}_{1}", col, identifier),
+            //                                          Value = value
+            //                                      });
+            //}
 
             _cmdWithParams.Parameters.Add(new SqlParameter
                                               {

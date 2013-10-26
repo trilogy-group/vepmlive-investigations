@@ -268,6 +268,9 @@ namespace EPMLiveReportsAdmin
             _arrayList_defaultColumns.Add("listid");
             _arrayList_defaultColumns.Add("itemid");
             _arrayList_defaultColumns.Add("weburl");
+            _arrayList_defaultColumns.Add("commenters");
+            _arrayList_defaultColumns.Add("commentersread");
+            _arrayList_defaultColumns.Add("commentcount");
         }
 
         private void PopulateColumns()

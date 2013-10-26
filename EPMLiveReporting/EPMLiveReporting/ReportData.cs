@@ -1169,7 +1169,10 @@ namespace EPMLiveReportsAdmin
                     sColumnName == "WebId" ||
                     sColumnName == "ListId" ||
                     sColumnName == "ItemId" ||
-                    sColumnName == "WebUrl")
+                    sColumnName == "WebUrl" ||
+                    sColumnName == "Commenters" ||
+                    sColumnName == "CommentersRead" ||
+                    sColumnName == "CommentCount")
                 {
                     if (row["SharePointType"] != "Lookup")
                     {
@@ -1568,6 +1571,29 @@ namespace EPMLiveReportsAdmin
                     param.Size = 256;
                     param.ParameterName = "@weburl";
                     param.Value = li.ParentList.ParentWeb.ServerRelativeUrl;
+                    break;
+
+                case "commenters":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.NVarChar;
+                    param.Size = 8001;
+                    param.ParameterName = "@commenters";
+                    param.Value = DBNull.Value;
+                    break;
+
+                case "commentcount":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.Int;
+                    param.ParameterName = "@commentcount";
+                    param.Value = DBNull.Value;
+                    break;
+
+                case "commentersread":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.NVarChar;
+                    param.Size = 8001;
+                    param.ParameterName = "@commentersread";
+                    param.Value = DBNull.Value;
                     break;
             }
             return param;
