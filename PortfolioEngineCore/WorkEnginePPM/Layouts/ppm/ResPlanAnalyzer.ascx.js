@@ -2151,6 +2151,7 @@
 
 	            this.DetGrid = TreeGrid(sb.toString(), "gridDiv_1", "g_1");
 	            this.doTopApply = true;
+	            this.doBottomApply = true;
 
 	        }
 
@@ -7619,7 +7620,7 @@
 	}
 
 
-	function mycallback(dialogResult, returnValue) {
+	 function mycallback(dialogResult, returnValue) {
 		WorkEnginePPM.ResPlanAnalyzer.Execute("ReloadPlanData", "", ReloadPlanDataCompleteDelegate);
 		try {
 
@@ -7642,7 +7643,7 @@
 
 
 	ResPlanAnalyzer.prototype.ReloadPlanDataComplete = function () {
-		this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true); 
+	    this.stashgridsettings = this.BuildViewInf("guid", "name", false, false, true);
 		RefreshBothGrids();
 	}
 

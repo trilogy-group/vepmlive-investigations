@@ -301,7 +301,7 @@ namespace PortfolioEngineCore
             xRPE.Initialize("Views");
 
             //string sCommand = "SELECT VIEW_GUID,VIEW_NAME,VIEW_PERSONAL,VIEW_DEFAULT FROM EPG_VIEWS WHERE VIEW_CONTEXT=30000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
-            string sCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=32000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
+            string sCommand = "SELECT VIEW_DEFAULT,VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=32000 AND (WRES_ID=0 OR WRES_ID=" + this._userWResID.ToString() + ") ORDER BY VIEW_DEFAULT DESC,WRES_ID DESC,VIEW_NAME";
 
             SqlCommand oCommand = new SqlCommand(sCommand,  _sqlConnection);
             SqlDataReader reader = oCommand.ExecuteReader();
@@ -318,6 +318,7 @@ namespace PortfolioEngineCore
                 if (sXML != string.Empty)
                 {
                     xView.LoadXML(sXML);
+                    xView.SetBooleanAttr("Default", DBAccess.ReadBoolValue(reader["VIEW_DEFAULT"]));
                     xRPE.AppendSubStruct(xView);
                 }
             }
@@ -392,6 +393,14 @@ namespace PortfolioEngineCore
                 cmd.Parameters.AddWithValue("@wres", bPersonal ? this._userWResID : 0);
                 cmd.Parameters.AddWithValue("@def", bDefault);
                 cmd.Parameters.AddWithValue("@vdata", sData);
+                nRowsAffected = cmd.ExecuteNonQuery();
+            }
+            if (nRowsAffected == 1 && bDefault)
+            {
+                // clear other view default flags
+                sCommand = "UPDATE EPG_VIEWS SET VIEW_DEFAULT=0 WHERE VIEW_CONTEXT=32000 AND VIEW_GUID<>@VIEW_GUID";
+                cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                cmd.Parameters.AddWithValue("@VIEW_GUID", guidView);
                 nRowsAffected = cmd.ExecuteNonQuery();
             }
 

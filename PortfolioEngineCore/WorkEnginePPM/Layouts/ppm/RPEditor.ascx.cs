@@ -59,7 +59,7 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
         public string IsDlg
         {
             get { return m_sIsDlg; }
-            set { m_sIsDlg = value; }
+            set { m_sIsDlg = value.TrimStart().Substring(0,1); }
         }
 
         public string Webservice
