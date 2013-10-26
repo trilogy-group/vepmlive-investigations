@@ -259,7 +259,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             {
                 yield return new NavLink
                 {
-                    Title = "No favorite workspace",
+                    Title = "No favorite workspaces",
                     Url = "PlaceHolder"
                 };
             }

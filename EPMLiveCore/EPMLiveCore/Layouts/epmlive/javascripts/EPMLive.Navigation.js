@@ -717,7 +717,7 @@
                                         var wExists = false;
 
                                         $parent.find('li').each(function () {
-                                            if ($(this).text() === 'No favorite workspace') {
+                                            if ($(this).text() === 'No favorite workspaces') {
                                                 wExists = true;
                                             }
                                         });
