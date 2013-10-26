@@ -847,6 +847,20 @@
                     if (!redirectUrl && command) {
                         if (command.indexOf('epkcommand:') !== -1) {
                             redirectUrl = gaUrl + 'action=epkcommand&subaction=' + command.split(':')[1];
+                        } else if (command === 'createworkspace') {
+                            var loadWSCreationDialog = function() {
+                                if (window.CreateEPMLiveWorkspace) {
+                                    window.CreateEPMLiveWorkspace(listId, itemId);
+                                } else {
+                                    window.setTimeout(function() {
+                                        loadWSCreationDialog();
+                                    }, 1);
+                                }
+                            };
+
+                            loadWSCreationDialog();
+
+                            return;
                         } else {
                             redirectUrl = gaUrl + 'action=' + command;
                         }
