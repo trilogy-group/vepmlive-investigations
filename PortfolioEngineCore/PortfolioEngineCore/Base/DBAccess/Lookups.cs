@@ -57,9 +57,70 @@ namespace PortfolioEngineCore
                     }
                 }
 
+                //  Save the new Lookup values ready for updating
+                bool bInserts = false;
+                bool bUpdates = false;
+                bool bDeletes = false;
+
+                // read new lookup values into dic
+                Dictionary<int, PFELookupItem> dicValues = new Dictionary<int, PFELookupItem>();
+                int nIndex = 0;
+                int nMaxLevel = 0;
+                foreach (DataRow row in dtValues.Rows)
+                {
+                    PFELookupItem oItemLookup = new PFELookupItem();
+                    nIndex++;
+                    oItemLookup.UID = DBAccess.ReadIntValue(row["LV_UID"]);
+                    oItemLookup.ID = nIndex;
+                    oItemLookup.level = DBAccess.ReadIntValue(row["LV_LEVEL"]);
+                    oItemLookup.inactive = DBAccess.ReadIntValue(row["LV_INACTIVE"]);
+                    oItemLookup.name = DBAccess.ReadStringValue(row["LV_VALUE"]);
+
+                    int nkey;
+                    if (oItemLookup.UID == 0) { nkey = oItemLookup.ID + 200000000; bInserts = true; } else nkey = oItemLookup.UID;
+                    dicValues.Add(nkey, oItemLookup);
+
+                    if (nMaxLevel < oItemLookup.level) nMaxLevel = oItemLookup.level;
+                }
+
+                // figure fullname
+                string[] sLevelName = new string[nMaxLevel + 1];
+                int l = 0;
+                string sParentName = "";
+                // used to check for duplicate siblings
+                Dictionary<string, string> dicFullnames = new Dictionary<string, string>();
+
+                foreach (KeyValuePair<int, PFELookupItem> oItemLookup in dicValues)
+                {
+                    int lLevel = oItemLookup.Value.level;
+                    sLevelName[lLevel] = oItemLookup.Value.name;
+                    sParentName = "";
+                    for (l = 1; l <= lLevel - 1; l++)
+                    {
+                        if (l == 1)
+                            sParentName = sLevelName[l];
+                        else
+                            sParentName = sParentName + sLevelName[l];
+                        sParentName += ".";
+                    }
+                    oItemLookup.Value.fullname = sParentName + oItemLookup.Value.name;
+
+                    // need to check for duplicate siblings so stuff full name into dic, any error will be dup
+                    if (dicFullnames.ContainsKey(oItemLookup.Value.fullname))
+                    {
+                        sReply = DBAccess.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Can't save Lookup.\nDuplicate value not allowed: " + oItemLookup.Value.fullname);
+                        return StatusEnum.rsRequestCannotBeCompleted;
+                    }
+                    else
+                    {
+                        dicFullnames.Add(oItemLookup.Value.fullname, oItemLookup.Value.fullname);
+                    }
+                }
+
+
                 if (nLOOKUP_UID == 0)
                 {
-                    // ADD - no need to figure new UID as IDENTITY
+                    // ADD TABLE - no need to figure new UID as IDENTITY
                     Guid g = Guid.NewGuid();
                     string sg = g.ToString();
                     cmdText =
@@ -75,7 +136,7 @@ namespace PortfolioEngineCore
                 }
                 else
                 {
-                    //  update
+                    //  update TABLE
                     cmdText = "UPDATE EPGP_LOOKUP_TABLES "
                                 + " SET LOOKUP_NAME=@pLOOKUP_NAME,LOOKUP_DESC=@pLOOKUP_DESC"
                                 + " WHERE LOOKUP_UID = @pLOOKUP_UID";
@@ -88,67 +149,7 @@ namespace PortfolioEngineCore
 
                 if (nLOOKUP_UID > 0)
                 {
-                    //  update the Lookup values - using IDENTITY so can't delete and re-add
-                    bool bInserts = false;
-                    bool bUpdates = false;
-                    bool bDeletes = false;
-
-                    // read new lookup values into dic
-                    Dictionary<int, PFELookupItem> dicValues = new Dictionary<int, PFELookupItem>();
-                    int nIndex = 0;
-                    int nMaxLevel = 0;
-                    foreach (DataRow row in dtValues.Rows)
-                    {
-                        PFELookupItem oItemLookup = new PFELookupItem();
-                        nIndex++;
-                        oItemLookup.UID = DBAccess.ReadIntValue(row["LV_UID"]);
-                        oItemLookup.ID = nIndex;
-                        oItemLookup.level = DBAccess.ReadIntValue(row["LV_LEVEL"]);
-                        oItemLookup.inactive = DBAccess.ReadIntValue(row["LV_INACTIVE"]);
-                        oItemLookup.name = DBAccess.ReadStringValue(row["LV_VALUE"]);
-
-                        int nkey;
-                        if (oItemLookup.UID == 0) { nkey = oItemLookup.ID + 200000000; bInserts = true; } else nkey = oItemLookup.UID;
-                        dicValues.Add(nkey, oItemLookup);
-
-                        if (nMaxLevel < oItemLookup.level) nMaxLevel = oItemLookup.level;
-                    }
-
-                    // figure fullname
-                    string[] sLevelName = new string[nMaxLevel+1];
-                    int l = 0;
-                    string sParentName = "";
-                    // used to check for duplicate siblings
-                    Dictionary<string, string> dicFullnames = new Dictionary<string, string>();
-
-                    foreach (KeyValuePair<int, PFELookupItem> oItemLookup in dicValues)
-                    {
-                        int lLevel = oItemLookup.Value.level;
-                        sLevelName[lLevel] = oItemLookup.Value.name;
-                        sParentName = "";
-                        for (l = 1; l <= lLevel - 1; l++)
-                        {
-                            if (l == 1)
-                                sParentName = sLevelName[l];
-                            else
-                                sParentName = sParentName + sLevelName[l];
-                            sParentName += ".";
-                        }
-                        oItemLookup.Value.fullname = sParentName + oItemLookup.Value.name;
-
-                        // need to check for duplicate siblings so stuff full name into dic, any error will be dup
-                        if (dicFullnames.ContainsKey(oItemLookup.Value.fullname))
-                        {
-                            sReply = DBAccess.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Can't save Lookup.\nDuplicate value not allowed: " + oItemLookup.Value.fullname);
-                            return StatusEnum.rsRequestCannotBeCompleted;
-                        }
-                        else
-                        {
-                            dicFullnames.Add(oItemLookup.Value.fullname, oItemLookup.Value.fullname);
-                        }
-                    }
-
-                    // update existing then insert new values
+                    // update the Lookup VALUES - update existing then insert new value - using IDENTITY so can't delete and re-add
 
                     SqlTransaction transaction = dba.Connection.BeginTransaction();
                     cmdText = "SELECT LOOKUP_UID,LV_UID,LV_EXT_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_INACTIVE From EPGP_LOOKUP_VALUES WHERE LOOKUP_UID = @LookupUID";
