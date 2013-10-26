@@ -72,21 +72,21 @@ namespace EPMLiveCore
                                     i["WorkspaceUrl"] = null;
                                     i.SystemUpdate();
 
-                                    var dt = qExec.ExecuteReportingDBQuery(
-                                        "SELECT [TableName] FROM [RPTList] WHERE RPTListId = '" + l.ID + "'", new Dictionary<string, object>());
+//                                    var dt = qExec.ExecuteReportingDBQuery(
+//                                        "SELECT [TableName] FROM [RPTList] WHERE RPTListId = '" + l.ID + "'", new Dictionary<string, object>());
 
-                                    if (dt != null && dt.Rows.Cast<DataRow>().Any())
-                                    {
-                                        var sRptTblName = dt.Rows[0][0].ToString();
+//                                    if (dt != null && dt.Rows.Cast<DataRow>().Any())
+//                                    {
+//                                        var sRptTblName = dt.Rows[0][0].ToString();
 
-                                        var sDelWsUrlQuery =
-                                            @"IF EXISTS (select * from INFORMATION_SCHEMA.COLUMNS where table_name = '" + sRptTblName + @"' and column_name = 'WorkspaceUrl')
-	                                            BEGIN
-                                                    UPDATE " + sRptTblName + @" SET [WorkspaceUrl] = NULL WHERE [ListId] = '" + listid + @"' AND [ItemId] = " + itemid + @"
-                                                END";
+//                                        var sDelWsUrlQuery =
+//                                            @"IF EXISTS (select * from INFORMATION_SCHEMA.COLUMNS where table_name = '" + sRptTblName + @"' and column_name = 'WorkspaceUrl')
+//	                                            BEGIN
+//                                                    UPDATE " + sRptTblName + @" SET [WorkspaceUrl] = NULL WHERE [ListId] = '" + listid + @"' AND [ItemId] = " + itemid + @"
+//                                                END";
 
-                                        qExec.ExecuteReportingDBNonQuery(sDelWsUrlQuery, new Dictionary<string, object>());
-                                    }
+//                                        qExec.ExecuteReportingDBNonQuery(sDelWsUrlQuery, new Dictionary<string, object>());
+//                                    }
                                 }
                             }
                         });
