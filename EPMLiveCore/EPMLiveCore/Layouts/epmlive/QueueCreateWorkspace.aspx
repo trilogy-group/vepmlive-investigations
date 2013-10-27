@@ -42,7 +42,7 @@
                 </p>
             </div>
             <%--top section--%>
-	        <div style="border-bottom:1px solid #D6D6D6;padding-bottom: 10px;" data-bind="visible: isStandAlone() === 'true'">    
+	        <div class="divTopSection" data-bind="visible: isStandAlone() === 'true'">    
 	            <label style="font-family:Open Sans Regular;font-size:15px;padding-right:10px;">
                     What is the title of this Workspace?
 	            </label>  
@@ -51,13 +51,13 @@
 	            <label style="font-family:Open Sans Regular;font-size:15px;">
                     Permissions
 	            </label> 
-	            <br/> 
-	            <input id="permsPrivate" name="rPermGrp" type="radio" value="true" data-bind="checked: uniquePermission"/> Private - Invite only
 	            <br/>
-                <input id="permsOpen" name="rPermGrp" type="radio" value="false" data-bind="checked: uniquePermission" /> Open - Accessible and open to anyone who has permission to the parent site
-	        </div>
+                <input id="permsPrivate" name="rPermGrp" type="radio" value="true" data-bind="checked: uniquePermission"/> <span>Private - Invite only</span>
+                <br/>
+                <input id="permsOpen" name="rPermGrp" type="radio" value="false" data-bind="checked: uniquePermission" /> <span>Open - Accessible and open to anyone who has permission to the parent site</span> 
+            </div>
             <%--bottom section--%>
-	        <div style="border-top:1px solid #ffffff;width:860px;height:285px;overflow: hidden">
+	        <div class="divBottomSection" >
 		        <div class="toggle" data-bind="visible: onlineAvail() === 'true' && localAvail() === 'true'">
                     <span style="float:left;padding-left:8px;" class="toggleButton slider-selected" id="online" data-bind="click: function (data, event) { toggle(data, event); }">ONLINE</span>
                     <span style="float:right;padding-right:12px;" class="toggleButton" id="local" data-bind="click: function (data, event) { toggle(data, event); }">LOCAL</span>
@@ -70,7 +70,7 @@
 	                    <%--<div class="workspace-loading"  id="marketLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle;margin-right:auto;margin-left: auto; margin-top: 100px; width: 240px;" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
+	                    <div class="divNoOnlineTempMsg" data-bind="fadeVisible: (marketApps().length === 0) && !marketAppsLoading()">
                             <div style="text-align: center">There are no online templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (marketApps().length > 0)">
@@ -101,7 +101,7 @@
 	                    <%--<div class="workspace-loading" id="localLoading" >
                             <div class="loading-message">Loading Workspaces...</div>
                         </div>--%>
-	                    <div style="height: 50px; vertical-align: middle; margin-right:auto;margin-left: auto; margin-top: 100px; width: 230px;" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
+	                    <div class="divNoLocalTempMsg" data-bind="fadeVisible: (downloadedApps().length === 0) && !downloadedAppsLoading()">
                             <div style="text-align: center">There are no local templates available</div>
                         </div>
                         <div  data-bind="fadeVisible: (downloadedApps().length > 0)">
