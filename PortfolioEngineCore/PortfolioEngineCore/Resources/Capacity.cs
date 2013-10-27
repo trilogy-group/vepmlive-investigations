@@ -1027,8 +1027,13 @@ namespace PortfolioEngineCore
                         oCommand.Parameters.AddWithValue("@LastPeriod", lLastPeriod);
                         reader = oCommand.ExecuteReader();
 
+                        oCommitmentHours = new ResourceValues.clsCommitmentHours();
+
                         int l_UID, l_PeriodID;
                         int l_PrevUID = 0;
+                        int l_PrevPRD = 0;
+                        double dPeriodHours = 0;
+                        int l_PeriodFTEs = 0;
                         double dHours = 0;
 
                         while (reader.Read())         // this recordset is ordered by CMT_UID and PRD
@@ -1041,10 +1046,7 @@ namespace PortfolioEngineCore
                                 int lDisplayPeriod;
                                 if (dicDisplayPeriods.TryGetValue(l_PeriodID, out lDisplayPeriod)) l_PeriodID = lDisplayPeriod; else l_PeriodID = 0;
                             }
-                            oCommitmentHours = new ResourceValues.clsCommitmentHours();
-                            oCommitmentHours.UID = l_UID;
-                            oCommitmentHours.PeriodID = l_PeriodID;
-                            oCommitmentHours.Hours = DBAccess.ReadDoubleValue(reader["CMH_HOURS"]) / 100;
+                            dPeriodHours = DBAccess.ReadDoubleValue(reader["CMH_HOURS"]) / 100;
 
                             //  Need to calc FTE value when Plan Cal different from display Calendar
                             //  right now the FTE Factor comes from the CCR on the Plan Row - possible we want the resource one
@@ -1052,42 +1054,45 @@ namespace PortfolioEngineCore
                             //   OR - it might be easier as prob faster too to go get the xref info needed for these specifc resources (or all) - this similar to GetFORCDetails below
                             //   AND - now we've added Scheduled Work in here for call from Portfolio View we have the code below, so just need to move it up above here                     
 
+                            l_PeriodFTEs = 0;
                             if (RVClass.PlanningCalendarID == RVClass.CalendarID)
                             {
-                                oCommitmentHours.FTES = DBAccess.ReadIntValue(reader["CMH_FTES"]);
+                                l_PeriodFTEs = DBAccess.ReadIntValue(reader["CMH_FTES"]);
                             }
                             else
                             {
-                                oCommitmentHours.FTES = 0;
-                                if (RVClass.Commitments.TryGetValue(oCommitmentHours.UID, out oCommitment))
+                                if (RVClass.Commitments.TryGetValue(l_UID, out oCommitment))
                                 {
                                     if (oCommitment != null)
                                     {
-                                        oCommitmentHours.FTES = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, oCommitmentHours.Hours, oCommitmentHours.PeriodID);
+                                        l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID);
                                     }
                                 }
-                                //If Not oCommitment Is Nothing Then
-                                //    If oCommitment.UID <> oCommitmentHours.UID Then Set oCommitment = GetPrivateObject(oRVInfo.Commitments, oCommitmentHours.UID)
-                                //Else
-                                //    Set oCommitment = GetPrivateObject(oRVInfo.Commitments, oCommitmentHours.UID)
-                                //End If
-                                //If Not oCommitment Is Nothing Then
-                                //    oCommitmentHours.FTES = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, oCommitmentHours.Hours, oCommitmentHours.PeriodID)
-                                //End If
                             }
 
-                            RVClass.CommitmentHours.Add(oCommitmentHours);
+                            // if we are on the same plan line and for the same period then increment the existing HOURS entry - can happen when Calendar != RP Calendar
+                            if (l_PrevUID == 0 || l_PrevUID != l_UID || l_PrevPRD != l_PeriodID)
+                            {
+                                if (oCommitmentHours.Hours > 0) RVClass.CommitmentHours.Add(oCommitmentHours);
+                                oCommitmentHours = new ResourceValues.clsCommitmentHours();
+                                oCommitmentHours.UID = l_UID;
+                                oCommitmentHours.PeriodID = l_PeriodID;
+                            }
+                            oCommitmentHours.Hours += dPeriodHours;
+                            oCommitmentHours.FTES += l_PeriodFTEs;
+                            l_PrevPRD = l_PeriodID;
 
                             // a total for the UID - across all periods
-                            if (l_PrevUID > 0 && l_PrevUID != oCommitmentHours.UID)
+                            if (l_PrevUID > 0 && l_PrevUID != l_UID)
                             {
                                 ResourceValues.clsCommitment oCommitment1 = new ResourceValues.clsCommitment();
                                 if (RVClass.Commitments.TryGetValue(l_PrevUID, out oCommitment1)) { oCommitment1.HoursInWindow = dHours; }
                                 dHours = 0;
                             }
-                            l_PrevUID = oCommitmentHours.UID;
-                            dHours += oCommitmentHours.Hours;
+                            l_PrevUID = l_UID;
+                            dHours += dPeriodHours;
                         }
+                        if (l_PrevUID > 0 && oCommitmentHours.Hours > 0) RVClass.CommitmentHours.Add(oCommitmentHours);
                         if (l_PrevUID > 0 && dHours > 0)
                         {
                             ResourceValues.clsCommitment oCommitment1 = new ResourceValues.clsCommitment();
@@ -1126,9 +1131,15 @@ namespace PortfolioEngineCore
                     oCommand.Parameters.AddWithValue("@LastPeriod", lLastPeriod);
                     reader = oCommand.ExecuteReader();
 
+                    oCommitmentHours = new ResourceValues.clsCommitmentHours();
+
                     int l_UID, l_PeriodID;
                     int l_PrevUID = 0;
+                    int l_PrevPRD = 0;
+                    double dPeriodHours = 0;
+                    int l_PeriodFTEs = 0;
                     double dHours = 0;
+
                     while (reader.Read())         // this recordset is ordered by CMT_UID and PRD
                     {
                         l_UID = DBAccess.ReadIntValue(reader["CMT_UID"]);
@@ -1139,50 +1150,49 @@ namespace PortfolioEngineCore
                             int lDisplayPeriod;
                             if (dicDisplayPeriods.TryGetValue(l_PeriodID, out lDisplayPeriod)) l_PeriodID = lDisplayPeriod; else l_PeriodID = 0;
                         }
-                        oCommitmentHours = new ResourceValues.clsCommitmentHours();
-                        oCommitmentHours.UID = l_UID;
-                        oCommitmentHours.PeriodID = l_PeriodID;
-                        oCommitmentHours.Hours = DBAccess.ReadDoubleValue(reader["CMH_HOURS"]) / 100;
-
+                        dPeriodHours = DBAccess.ReadDoubleValue(reader["CMH_HOURS"]) / 100;
                         //  Need to calc FTE value when Plan Cal different from display Calendar
 
+                        l_PeriodFTEs = 0;
                         if (RVClass.PlanningCalendarID == RVClass.CalendarID)
                         {
-                            oCommitmentHours.FTES = DBAccess.ReadIntValue(reader["CMH_FTES"]);
+                            l_PeriodFTEs = DBAccess.ReadIntValue(reader["CMH_FTES"]);
                         }
                         else
                         {
-                            oCommitmentHours.FTES = 0;
-                            if (RVClass.Commitments.TryGetValue(oCommitmentHours.UID, out oCommitment))
+                            if (RVClass.OpenReqs.TryGetValue(l_UID, out oCommitment))
                             {
                                 if (oCommitment != null)
                                 {
-                                    oCommitmentHours.FTES = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, oCommitmentHours.Hours, oCommitmentHours.PeriodID);
+                                    l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID);
                                 }
                             }
-                            //If Not oCommitment Is Nothing Then
-                            //    If oCommitment.UID <> oCommitmentHours.UID Then Set oCommitment = GetPrivateObject(oRVInfo.Commitments, oCommitmentHours.UID)
-                            //Else
-                            //    Set oCommitment = GetPrivateObject(oRVInfo.Commitments, oCommitmentHours.UID)
-                            //End If
-                            //If Not oCommitment Is Nothing Then
-                            //    oCommitmentHours.FTES = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, oCommitmentHours.Hours, oCommitmentHours.PeriodID)
-                            //End If
                         }
 
-                        RVClass.OpenReqHours.Add(oCommitmentHours);
+                        // if we are on the same plan line and for the same period then increment the existing HOURS entry - can happen when Calendar != RP Calendar
+                        if (l_PrevUID == 0 || l_PrevUID != l_UID || l_PrevPRD != l_PeriodID)
+                        {
+                            if (oCommitmentHours.Hours > 0) RVClass.OpenReqHours.Add(oCommitmentHours);
+                            oCommitmentHours = new ResourceValues.clsCommitmentHours();
+                            oCommitmentHours.UID = l_UID;
+                            oCommitmentHours.PeriodID = l_PeriodID;
+                        }
+                        oCommitmentHours.Hours += dPeriodHours;
+                        oCommitmentHours.FTES += l_PeriodFTEs;
+                        l_PrevPRD = l_PeriodID;
                                                     
                         // a total for the UID - across all periods
-                            if (l_PrevUID > 0 && l_PrevUID != oCommitmentHours.UID)
+                        if (l_PrevUID > 0 && l_PrevUID != l_UID)
                             {
                                 ResourceValues.clsCommitment oCommitment1 = new ResourceValues.clsCommitment();
                                 if (RVClass.OpenReqs.TryGetValue(l_PrevUID, out oCommitment1)) { oCommitment1.HoursInWindow = dHours; }
                                 dHours = 0;
                             }
-                            l_PrevUID = oCommitmentHours.UID;
-                            dHours += oCommitmentHours.Hours;
+                        l_PrevUID = l_UID;
+                        dHours += dPeriodHours;
                         }
-                        if (l_PrevUID > 0 && dHours > 0)
+                    if (l_PrevUID > 0 && oCommitmentHours.Hours > 0) RVClass.OpenReqHours.Add(oCommitmentHours);
+                    if (l_PrevUID > 0 && dHours > 0)
                         {
                             ResourceValues.clsCommitment oCommitment1 = new ResourceValues.clsCommitment();
                             if (RVClass.OpenReqs.TryGetValue(l_PrevUID, out oCommitment1)) { oCommitment1.HoursInWindow = dHours; }
