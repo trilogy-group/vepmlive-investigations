@@ -116,7 +116,7 @@ html, body {
     var toolbar = new Toolbar(toobarData);
     toolbar.Render();
    
-    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1 = window['<%=dgrid1.UID%>'];
     var dgrid1_selectedRow = 0;
     var OnLoad = function (event) {
         dgrid1.addEventListener("onRowSelect", dgrid1_OnRowSelect);
@@ -361,7 +361,7 @@ html, body {
     };
 
     var thiswins = new dhtmlXWindows();
-    thiswins.setImagePath("/_layouts/ppm/images/");
+    thiswins.setImagePath("../epmlive/dhtml/windows/imgs/");
     thiswins.setSkin("dhx_web");
 
     if (document.addEventListener != null) { // e.g. Firefox

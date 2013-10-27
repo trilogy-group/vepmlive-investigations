@@ -110,7 +110,7 @@ html, body {
     var toolbar = new Toolbar(toolbarData);
     var toolbar2 = new Toolbar(toolbar2Data);
     
-    var dgrid1 = window.<%=dgrid1.UID%>;
+    var dgrid1 = window['<%=dgrid1.UID%>'];
     var dgrid1_selectedRow = 0;
     var tgrid1 = window['<%=tgrid1.UID%>'];
     var tgrid1_selectedRow = 0;
@@ -355,7 +355,7 @@ html, body {
     };
 
     var thiswins = new dhtmlXWindows();
-    thiswins.setImagePath("/_layouts/ppm/images/");
+    thiswins.setImagePath("../epmlive/dhtml/windows/imgs/");
     thiswins.setSkin("dhx_web");
 
     if (document.addEventListener != null) { // e.g. Firefox

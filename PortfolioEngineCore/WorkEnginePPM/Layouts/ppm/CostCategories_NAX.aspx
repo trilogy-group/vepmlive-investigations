@@ -637,7 +637,7 @@ html, body {
         }
     };
     var thiswins = new dhtmlXWindows();
-    thiswins.setImagePath("/_layouts/ppm/images/");
+    thiswins.setImagePath("../epmlive/dhtml/windows/imgs/");
     thiswins.setSkin("dhx_web");
     if (document.addEventListener != null) { // e.g. Firefox
         window.addEventListener("load", OnLoad, true);

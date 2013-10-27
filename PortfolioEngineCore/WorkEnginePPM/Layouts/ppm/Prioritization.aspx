@@ -582,7 +582,7 @@ background-color: #92C0E0;
     }
 
     var thiswins = new dhtmlXWindows();
-    thiswins.setImagePath("/_layouts/ppm/images/");
+    thiswins.setImagePath("../epmlive/dhtml/windows/imgs/");
     thiswins.setSkin("dhx_web");
     ExecuteOrDelayUntilScriptLoaded(initializeMyJS, 'jquery.min.js');
 </script></asp:Content>
