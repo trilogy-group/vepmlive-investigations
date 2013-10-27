@@ -198,6 +198,218 @@ namespace EPMLiveCore.API
             return retVal;
         }
 
+        public static string CreatePublicComment(string data)
+        {
+            string retVal = string.Empty;
+            SPWeb cWeb = SPContext.Current.Web;
+            SPSite cSite = SPContext.Current.Site;
+            // Data should look like the following:
+            // ===============================
+            // <Data>
+            // <Param key="ListId">someguid</Param>
+            // <Param key="ItemId">12</Param>
+            // <Param key="Comment">abcabac</Param>
+            // </Data>
+
+            // load data into XML manager
+            var dataMgr = new XMLDataManager(data);
+            EnsurePublicCommentsListExist();
+            var publicCommentsList = cWeb.Lists.TryGetList("PublicComments");
+            var commentsList = cWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
+            var itemId = dataMgr.GetPropVal("ItemId");
+            dataMgr.EditProp("ListId", publicCommentsList.ID.ToString());
+
+            if (string.IsNullOrEmpty(itemId))
+            {
+                cWeb.AllowUnsafeUpdates = true;
+                var newItem = publicCommentsList.Items.Add();
+                newItem.Update();
+                dataMgr.EditProp("ItemId", newItem.ID.ToString());
+            }
+
+            StringBuilder sbResult = new StringBuilder();
+            sbResult.Append(XML_RESPONSE_COMMENT_HEADER);
+
+            if (publicCommentsList != null && commentsList != null)
+            {
+                cWeb.AllowUnsafeUpdates = true;
+                SPListItem currentItem = commentsList.Items.Add();
+                string genericTitle = cWeb.CurrentUser.Name + " made a new comment at " + DateTime.Now.ToString();
+                currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
+                currentItem[commentsList.Fields.GetFieldByInternalName("ListId").Id] = dataMgr.GetPropVal("ListId");
+                currentItem[commentsList.Fields.GetFieldByInternalName("ItemId").Id] = dataMgr.GetPropVal("ItemId");
+                currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = dataMgr.GetPropVal("Comment");
+                //currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = Uri.UnescapeDataString(dataMgr.GetPropVal("Comment"));
+                currentItem.Update();
+
+                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()));
+                sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", currentItem.ParentList.ID.ToString())
+                                                         .Replace("##listName##", currentItem.ParentList.Title)
+                                                         .Replace("##itemId##", currentItem.ID.ToString())
+                                                         .Replace("##itemTitle##", currentItem.Title)
+                                                         .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime())
+                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment") ?? string.Empty)))));
+                sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
+                sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
+                sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
+                // save current user
+                SPUser originalUser = SPContext.Current.Web.CurrentUser;
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (SPSite es = new SPSite(SPContext.Current.Site.ID))
+                    {
+                        using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ServerRelativeUrl))
+                        {
+                            SPList originList = null;
+                            SPListItem originListItem = null;
+                            List<int> laCommenters = new List<int>();
+                            ew.AllowUnsafeUpdates = true;
+                            originList = ew.Lists[new Guid(dataMgr.GetPropVal("ListId"))];
+
+                            if (originList != null)
+                            {
+                                originListItem = originList.GetItemById(int.Parse(dataMgr.GetPropVal("ItemId")));
+                            }
+
+                            if (originListItem != null)
+                            {
+                                string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
+                                foreach (string s in sCommenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    if (!string.IsNullOrEmpty(s.Trim()))
+                                    {
+                                        laCommenters.Add(int.Parse(s));
+                                    }
+                                }
+                                // get user object 
+                                SPFieldUser author = (SPFieldUser)originListItem.Fields[SPBuiltInFieldId.Author];
+                                SPFieldUserValue userVal = (SPFieldUserValue)author.GetFieldValue(originListItem[SPBuiltInFieldId.Author].ToString());
+                                SPUser authorObj = userVal.User;
+
+                                // if user is not in commenters, and not creater or one of the assigned to users
+                                if (!laCommenters.Contains(originalUser.ID) &&
+                                    (authorObj != null && !originalUser.ID.Equals(authorObj.ID)) &&
+                                    !UserIsAssigned(originalUser.ID, originListItem))
+                                {
+                                    laCommenters.Add(originalUser.ID);
+                                    StringBuilder sbNewCommenters = new StringBuilder();
+                                    foreach (int id in laCommenters)
+                                    {
+                                        sbNewCommenters.Append(id.ToString() + ",");
+                                    }
+
+                                    sCommenters = sbNewCommenters.ToString();
+                                    sCommenters = sCommenters.Remove(sCommenters.LastIndexOf(','));
+
+                                    originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] = sCommenters;
+                                }
+
+                                // set commentersread to blank
+                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = string.Empty;
+                                // add current user to list
+                                originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = originalUser.ID.ToString();
+                                originListItem.SystemUpdate();
+                                List<int> emailSentIDs = new List<int>();
+                                // send email to author
+                                if (authorObj != null && originalUser.ID != authorObj.ID)
+                                {
+                                    emailSentIDs.Add(authorObj.ID);
+                                    SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                }
+
+                                // send email to assigned to people
+                                try
+                                {
+                                    string[] vals = originListItem[originListItem.Fields.GetFieldByInternalName("AssignedTo").Id].ToString().Split(new string[] { ";#" }, StringSplitOptions.None);
+                                    foreach (string val in vals)
+                                    {
+                                        int id;
+                                        if (int.TryParse(val, out id) && !id.Equals(originalUser.ID) && !emailSentIDs.Contains(id))
+                                        {
+                                            emailSentIDs.Add(id);
+                                            SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                }
+
+                                // send email to each person in thread
+                                foreach (int id in laCommenters)
+                                {
+                                    if ((id != originalUser.ID) && !emailSentIDs.Contains(id))
+                                    {
+                                        emailSentIDs.Add(id);
+                                        SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                    }
+                                }
+                            }
+
+                            string createdDate = currentItem["Created"].ToString();
+                            //retVal = currentItem.ID.ToString() + "," + createdDate;
+                            retVal = sbResult.ToString();
+                            InsertCommentCount(dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"));
+                        }
+                    }
+                });
+            }
+            else
+            {
+                throw new Exception("The 'PublicComments' list needs to be created to support this functionality.");
+            }
+
+            return retVal;
+        }
+
+        static void EnsurePublicCommentsListExist()
+        {
+            SPSite cSite = SPContext.Current.Site;
+            SPWeb cWeb = SPContext.Current.Web;
+            SPList lstPubComments = cWeb.Lists.TryGetList("PublicComments");
+
+            if (lstPubComments == null)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (var eleSite = new SPSite(cWeb.Url))
+                    {
+                        using (var eleWeb = eleSite.OpenWeb())
+                        {
+                            eleWeb.AllowUnsafeUpdates = true;
+                            var guid = eleWeb.Lists.Add("PublicComments", "", SPListTemplateType.GenericList);
+                            lstPubComments = eleWeb.Lists[guid];
+                            lstPubComments.Hidden = true;
+                            lstPubComments.Update();
+
+                            SPField fldCommenters = null;
+                            string fldCommentersName = lstPubComments.Fields.Add("Commenters", SPFieldType.Note, false);
+                            fldCommenters = lstPubComments.Fields.GetFieldByInternalName(fldCommentersName) as SPFieldMultiLineText;
+                            fldCommenters.Sealed = false;
+                            fldCommenters.Hidden = true;
+                            fldCommenters.AllowDeletion = false;
+                            fldCommenters.DefaultValue = string.Empty;
+                            fldCommenters.Update();
+
+                            SPField fldCommentersRead = null;
+                            string fldCommentersReadName = lstPubComments.Fields.Add("CommentersRead", SPFieldType.Note, false);
+                            fldCommentersRead = lstPubComments.Fields.GetFieldByInternalName(fldCommentersReadName) as SPFieldMultiLineText;
+                            fldCommentersRead.Hidden = true;
+                            fldCommentersRead.Sealed = false;
+                            fldCommentersRead.AllowDeletion = false;
+                            fldCommentersRead.DefaultValue = string.Empty;
+                            fldCommentersRead.Update();
+
+                            lstPubComments.Update();
+                            eleWeb.Update();
+                        }
+                    }
+                });
+            }
+
+        }
+
         public static string ReadComment(string data)
         {
             string retVal = string.Empty;
@@ -798,6 +1010,7 @@ namespace EPMLiveCore.API
             }
 
             SPList commentsList = cWeb.Lists.TryGetList(COMMENTS_LIST_NAME);
+            SPList publicCommentsList = cWeb.Lists.TryGetList("PublicComments");
             SPListItemCollection comments = commentsList.Items;
 
             if (commentsList != null)
@@ -810,7 +1023,8 @@ namespace EPMLiveCore.API
                 //              "<Geq><FieldRef Name=\"Created\" /><Value Type=\"DateTime\"><Today OffsetDays=\"" + dataMgr.GetPropVal("Created") + "\" /></Value></Geq>" +
                 //          "</And></Where><OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
 
-                q.Query = "<Where><Eq><FieldRef Name=\"Author\" LookupId=\"true\" /><Value Type=\"User\">" + cWeb.CurrentUser.ID.ToString() + "</Value></Eq></Where>" +
+                q.Query = "<Where><Or><Eq><FieldRef Name=\"Author\" LookupId=\"true\" /><Value Type=\"User\">" + cWeb.CurrentUser.ID.ToString() + "</Value></Eq>" +
+                    "<Eq><FieldRef Name=\"ListId\" /><Value Type=\"Text\">" + publicCommentsList.ID.ToString() + "</Value></Eq></Or></Where>" +
                           "<OrderBy><FieldRef Name=\"Created\" Ascending=\"False\" /></OrderBy>";
 
                 int numThreads = int.Parse(dataMgr.GetPropVal("NumThreads"));

@@ -993,6 +993,18 @@ namespace EPMLiveCore
             }
         }
 
+        public static string CreatePublicComment(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(CommentManager.CreatePublicComment(data));
+            }
+            catch (Exception e)
+            {
+                return Response.Failure(9000, e.Message);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>

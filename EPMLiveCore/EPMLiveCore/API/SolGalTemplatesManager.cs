@@ -16,6 +16,7 @@ using System.Data;
 using System.Reflection;
 using System.Diagnostics;
 using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveCore.API
 {
@@ -1014,6 +1015,9 @@ namespace EPMLiveCore.API
                     {
                         sResultWebId = w.ID.ToString();
                         sResultWebUrl = w.Url;
+                        
+                        WorkspaceData.SendCompletedSignalsToDB(w.Site.ID, parentWeb, w.ID, w.ServerRelativeUrl, w.Title);
+                        CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
                         EnsureWebInitFeature(sResultWebId, cSite, cWeb, cESite, cEWeb);
 
                         SPList list = null;
@@ -1623,6 +1627,4 @@ namespace EPMLiveCore.API
         #endregion
 
     }
-
-
 }
