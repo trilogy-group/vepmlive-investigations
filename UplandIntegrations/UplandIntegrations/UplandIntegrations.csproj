@@ -73,13 +73,14 @@
     <Compile Include="FileBound\FBConnection.cs" />
     <Compile Include="FileBound\FileBound.cs" />
     <Compile Include="FileBound\FileBoundSystem.cs" />
+    <Compile Include="Infrastructure\IRepository.cs" />
+    <Compile Include="Infrastructure\RestRepository.cs" />
     <Compile Include="Jira\CustomJsonConverter.cs" />
     <Compile Include="Jira\JiraIntegrator.cs" />
     <Compile Include="Jira\JiraService.cs" />
     <Compile Include="Jira\JiraType.cs" />
     <Compile Include="PowerSteering\Entities\Field.cs" />
     <Compile Include="PowerSteering\Integrator.cs" />
-    <Compile Include="PowerSteering\Services\BaseService.cs" />
     <Compile Include="PowerSteering\Services\MetadataService.cs" />
     <Compile Include="PowerSteering\Services\PowerSteeringService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
