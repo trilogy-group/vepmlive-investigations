@@ -1706,9 +1706,13 @@
                                                         }
 
                                                         if (!registered) {
-                                                            nl.kind = 2;
+                                                            if (nl.cssClass) {
+                                                                nl.kind = 2;
+                                                                nl.category = null;
 
-                                                            window.epmLiveNavigation.registerLink(nl);
+                                                                window.epmLiveNavigation.registerLink(nl);
+                                                            }
+                                                            
                                                             registeredLinks.push(nl.title);
                                                         } else {
                                                             for (var n = 0; n < tlNodes.length; n++) {
