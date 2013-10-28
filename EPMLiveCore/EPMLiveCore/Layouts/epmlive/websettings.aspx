@@ -212,6 +212,22 @@
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
         </wssuc:InputFormSection>
+        <wssuc:InputFormSection Title="Public Comments" Description="" runat="server">
+            <template_description>
+	                    Public comments settings.
+	                </template_description>
+            <template_inputformcontrols>
+		                <wssuc:InputFormControl ID="InputFormControl2" LabelText="" runat="server">
+			                 <Template_Control>
+			                    <asp:Label runat="server" Text="Default Text"></asp:Label>
+                                <br />
+                                <br />
+			                    <asp:TextBox ID="tbPublicCommentDefaultTxt" runat="server" />
+			                 </Template_Control>
+		                </wssuc:InputFormControl>
+	                </template_inputformcontrols>
+        </wssuc:InputFormSection>
+
         <wssuc:InputFormSection Title="Template Version" Description="" runat="server">
             <template_description>
                         

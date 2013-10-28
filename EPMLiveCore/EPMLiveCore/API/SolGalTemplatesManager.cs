@@ -943,7 +943,13 @@ namespace EPMLiveCore.API
             bool uniquePermission = bool.Parse(dataMgr.GetPropVal("UniquePermission"));
             bool inheritTopLink = bool.Parse(dataMgr.GetPropVal("InheritTopLink"));
 
+            Guid createdWebId = Guid.Empty;
+            string sCreatedWebUrl;
+            string sCreatedWebRelativeUrl;
+            string sCreatedWebTitle;
+
             string err = string.Empty;
+
             if (parentWeb.DoesUserHavePermissions(cWeb.CurrentUser.LoginName, SPBasePermissions.ManageSubwebs))
             {
                 if (dataMgr.GetPropVal("ParentWebUrl").Equals(cWeb.ServerRelativeUrl, StringComparison.CurrentCultureIgnoreCase))
@@ -953,7 +959,8 @@ namespace EPMLiveCore.API
                     cEWeb.AllowUnsafeUpdates = true;
                     cEWeb.Update();
 
-                    err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, cEWeb);
+                    err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, cEWeb, 
+                        out createdWebId, out sCreatedWebUrl, out sCreatedWebRelativeUrl, out sCreatedWebTitle);
                 }
                 else
                 {
@@ -968,7 +975,8 @@ namespace EPMLiveCore.API
                                 tSite.RootWeb.AllowUnsafeUpdates = true;
                                 tWeb.Update();
 
-                                err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, tWeb);
+                                err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, tWeb,
+                                        out createdWebId, out sCreatedWebUrl, out sCreatedWebRelativeUrl, out sCreatedWebTitle);
                             }
                         }
                     });
@@ -999,7 +1007,8 @@ namespace EPMLiveCore.API
                     {
                         Guid neededFeatureId = new Guid(err.Substring(err.IndexOf("{") + 1).Split('}')[0]);
                         cSite.Features.Add(neededFeatureId, true);
-                        err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, parentWeb);
+                        err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, parentWeb,
+                                out createdWebId, out sCreatedWebUrl, out sCreatedWebRelativeUrl, out sCreatedWebTitle);
                         trys++;
                     }
                 }
@@ -1018,6 +1027,8 @@ namespace EPMLiveCore.API
                         
                         WorkspaceData.SendCompletedSignalsToDB(w.Site.ID, parentWeb, w.ID, w.ServerRelativeUrl, w.Title);
                         CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                        WorkspaceData.AddWsPermission(w.Site.ID, createdWebId);
+
                         EnsureWebInitFeature(sResultWebId, cSite, cWeb, cESite, cEWeb);
 
                         SPList list = null;

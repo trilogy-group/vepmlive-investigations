@@ -357,7 +357,7 @@ namespace EPMLiveCore.API
             }
             else
             {
-                throw new Exception("The 'PublicComments' list needs to be created to support this functionality.");
+                throw new Exception("Both 'PublicComments' list and 'Comments' list needs to be created to support this functionality.");
             }
 
             return retVal;
