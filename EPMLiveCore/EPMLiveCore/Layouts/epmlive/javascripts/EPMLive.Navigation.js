@@ -986,9 +986,11 @@
                                     }
                                 };
 
+                                id = new Date().getTime() + '';
+
                                 epmLiveService.execute(methodName, data, function (response) {
                                     window.epmLiveNavigation.registerLink({
-                                        id: webId,
+                                        id: id,
                                         title: title,
                                         url: webUrl,
                                         category: null,
@@ -1008,7 +1010,7 @@
                                     notify();
                                 }, function (response) {
                                     window.epmLiveNavigation.registerLink({
-                                        id: webId,
+                                        id: id,
                                         title: title,
                                         url: webUrl,
                                         category: null,
@@ -2089,13 +2091,15 @@
             var manageFavorites = function () {
                 var favoritesManager = (function () {
                     window.epmLiveNavigation.addDragger = function ($li) {
-                        $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
+                        if ($li.get(0).innerHTML.indexOf('epm-nav-dragger') === -1) {
+                            $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
 
-                        $li.hover(function () {
-                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
-                        }, function () {
-                            $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
-                        });
+                            $li.hover(function() {
+                                $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
+                            }, function() {
+                                $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
+                            });
+                        }
                     };
 
                     window.epmLiveNavigation.addFavoritesMenu = function ($li) {
