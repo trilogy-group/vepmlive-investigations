@@ -1118,30 +1118,48 @@ namespace EPMLiveWebParts
                                         break;
                                 }
                             }
-                            else if (inEditMode && editable)
+                            else if (inEditMode && editable && bUseReporting)
                             {
-                                /*XmlAttribute attrxmlContent;
-                                XmlAttribute attrAutoComplete;
+                                
                                 XmlAttribute attrType;
                                 XmlAttribute attrText;
-                                switch (li.Fields.GetFieldByInternalName(field.InternalName).Type)
+                                switch (list.Fields.GetFieldByInternalName(field.InternalName).Type)
                                 {
                                     case SPFieldType.Number:
                                         if (fieldXml.InnerXml.Contains("Percentage=\"TRUE\""))
                                         {
-                                            double fval = double.Parse(val.Replace("%", "")) * 100;
-                                            val = fval.ToString();
-                                            displayValue = val;
+                                            try
+                                            {
+                                                double fval = double.Parse(val.Replace("%", "")) * 100;
+                                                val = fval.ToString();
+                                                displayValue = val;
+                                            }
+                                            catch { }
                                         }
+                                        attrType = docXml.CreateAttribute("type");
+                                        attrType.Value = "edn";
+                                        ndNewCell.Attributes.Append(attrType);
+                                        displayValue = val;
                                         break;
                                     case SPFieldType.User:
-                                        if (hshColumnSelectFilter.Contains(field.InternalName) && li[li.Fields.GetFieldByInternalName(field.InternalName).Id] != null)
+                                        if (hshColumnSelectFilter.Contains(field.InternalName) && dr[field.InternalName + "Text"] != null)
                                         {
-                                            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(li[li.Fields.GetFieldByInternalName(field.InternalName).Id].ToString());
-                                            foreach (SPFieldLookupValue lv in lvc)
+                                            if (field.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
                                             {
+                                                SPFieldLookupValue lv = new SPFieldLookupValue(dr[field.InternalName + "Text"].ToString());
                                                 addFilterItems(field.InternalName, lv.LookupValue);
                                             }
+                                            else
+                                            {
+                                                SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(dr[field.InternalName + "Text"].ToString());
+                                                foreach (SPFieldLookupValue lv in lvc)
+                                                {
+                                                    addFilterItems(field.InternalName, lv.LookupValue);
+                                                }
+                                            }
+
+
+
                                         }
                                         if (fieldXml.InnerXml.Contains("Type=\"UserMulti\""))
                                         {
@@ -1155,24 +1173,40 @@ namespace EPMLiveWebParts
                                             attrType.Value = "usereditor";
                                             ndNewCell.Attributes.Append(attrType);
                                         }
-
-                                        SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.Web, val);
                                         displayValue = "";
-                                        foreach (SPFieldUserValue uv in uvc)
+                                        if (val != "")
                                         {
-                                            if (uv.User != null)
-                                                displayValue += "\n" + uv.User.LoginName + "\n" + uv.User.Name;
-                                            else
-                                                displayValue += "\n" + uv.LookupId + "\n" + uv.LookupValue;
-                                        }
-                                        if (displayValue.Length > 1)
-                                            displayValue = displayValue.Substring(1);
 
+                                            if (field.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
+                                            {
+                                                SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, val);
+
+                                                if (uv.User != null)
+                                                    displayValue = uv.User.LoginName + "\n" + uv.User.Name;
+                                                else
+                                                    displayValue = uv.LookupId + "\n" + uv.LookupValue;
+                                            }
+                                            else
+                                            {
+
+                                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, val);
+                                                displayValue = "";
+                                                foreach (SPFieldUserValue uv in uvc)
+                                                {
+                                                    if (uv.User != null)
+                                                        displayValue += "\n" + uv.User.LoginName + "\n" + uv.User.Name;
+                                                    else
+                                                        displayValue += "\n" + uv.LookupId + "\n" + uv.LookupValue;
+                                                }
+                                                if (displayValue.Length > 1)
+                                                    displayValue = displayValue.Substring(1);
+                                            }
+                                        }
                                         displayValue += "\t";
 
-                                        if (hshComboCells.Contains(field.InternalName + "-" + li.Web.ID.ToString()))
+                                        if (hshComboCells.Contains(field.InternalName + "-" + list.ParentWeb.ID.ToString()))
                                         {
-                                            displayValue += hshComboCells[field.InternalName + "-" + li.Web.ID.ToString()].ToString();
+                                            displayValue += hshComboCells[field.InternalName + "-" + list.ParentWeb.ID.ToString()].ToString();
                                         }
                                         else
                                         {
@@ -1183,8 +1217,8 @@ namespace EPMLiveWebParts
                                             }
                                             catch { }
 
-                                            string userList = getMultiUser(mode, li.Web);
-                                            hshComboCells[field.InternalName + "-" + li.Web.ID.ToString()] = userList;
+                                            string userList = getMultiUser(mode, list.ParentWeb);
+                                            hshComboCells[field.InternalName + "-" + list.ParentWeb.ID.ToString()] = userList;
                                             displayValue += userList;
                                         }
                                         break;
@@ -1192,24 +1226,33 @@ namespace EPMLiveWebParts
                                         displayValue = "";
                                         if (val != "")
                                         {
-                                            string choices = val.Substring(2, val.Length - 4);
+                                            string choices = "";
+                                            if (val[0] == ';' && val[1] == '#')
+                                                choices = val.Substring(2, val.Length - 4);
+                                            else
+                                                choices = val;
+
                                             choices = choices.Replace(";#", "\n");
                                             foreach (string choice in choices.Split('\n'))
                                             {
                                                 displayValue += "\n" + choice + ";#" + choice;
+                                                if (hshColumnSelectFilter.Contains(field.InternalName))
+                                                {
+                                                    addFilterItems(field.InternalName, choice);
+                                                }
                                             }
                                             if (displayValue.Length > 1)
                                                 displayValue = displayValue.Substring(1);
                                         }
                                         displayValue += "\t";
-                                        if (hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
+                                        if (hshComboCells.Contains(field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()))
                                         {
-                                            displayValue += hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
+                                            displayValue += hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString();
                                         }
                                         else
                                         {
                                             XmlDocument doc = new XmlDocument();
-                                            doc.LoadXml(li.Fields.GetFieldByInternalName(field.InternalName).SchemaXml);
+                                            doc.LoadXml(list.Fields.GetFieldByInternalName(field.InternalName).SchemaXml);
 
                                             string inputs = "";
                                             foreach (XmlNode nd in doc.SelectNodes("//CHOICE"))
@@ -1219,48 +1262,52 @@ namespace EPMLiveWebParts
                                             if (inputs.Length > 1)
                                                 inputs = inputs.Substring(1);
                                             displayValue += inputs;
-                                            hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = inputs;
+                                            hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ID.ToString()] = inputs;
                                         }
                                         attrType = docXml.CreateAttribute("type");
                                         attrType.Value = "mchoice";
                                         ndNewCell.Attributes.Append(attrType);
                                         break;
                                     case SPFieldType.Choice:
-                                        attrxmlContent = docXml.CreateAttribute("xmlcontent");
-                                        attrxmlContent.Value = "1";
-                                        attrAutoComplete = docXml.CreateAttribute("autocomplete");
-                                        attrAutoComplete.Value = "1";
-                                        attrType = docXml.CreateAttribute("type");
-                                        attrType.Value = "combo";
-                                        attrText = docXml.CreateAttribute("text");
-                                        attrText.Value = displayValue;
-
-                                        ndNewCell.Attributes.Append(attrText);
-                                        ndNewCell.Attributes.Append(attrType);
-                                        ndNewCell.Attributes.Append(attrxmlContent);
-                                        ndNewCell.Attributes.Append(attrAutoComplete);
-
-
-                                        if (hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
+                                        displayValue = "";
+                                        if (val != "")
                                         {
-                                            displayValue += hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
+                                            if (!val.Contains(";#"))
+                                                displayValue = val + ";#" + val;
+                                            else
+                                                displayValue = val;
+
+                                            if (hshColumnSelectFilter.Contains(field.InternalName))
+                                            {
+                                                addFilterItems(field.InternalName, val);
+                                            }
+                                        }
+                                        displayValue += "\t";
+                                        if (hshComboCells.Contains(field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()))
+                                        {
+                                            displayValue += hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString();
                                         }
                                         else
                                         {
                                             XmlDocument doc = new XmlDocument();
-                                            doc.LoadXml(li.Fields.GetFieldByInternalName(field.InternalName).SchemaXml);
+                                            doc.LoadXml(list.Fields.GetFieldByInternalName(field.InternalName).SchemaXml);
 
                                             string inputs = "";
                                             foreach (XmlNode nd in doc.SelectNodes("//CHOICE"))
                                             {
-                                                inputs += "<option value=\"" + nd.InnerText + "\">" + nd.InnerText + "</option>";
+                                                inputs += "\n" + nd.InnerText + ";#" + nd.InnerText;
                                             }
+                                            if (inputs.Length > 1)
+                                                inputs = inputs.Substring(1);
                                             displayValue += inputs;
-                                            hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = inputs;
+                                            hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()] = inputs;
                                         }
+                                        attrType = docXml.CreateAttribute("type");
+                                        attrType.Value = "choice";
+                                        ndNewCell.Attributes.Append(attrType);
                                         break;
                                     case SPFieldType.Lookup:
-                                        if (li.Fields.GetFieldByInternalName(field.InternalName).TypeAsString == "LookupMulti")
+                                        if (list.Fields.GetFieldByInternalName(field.InternalName).TypeAsString == "LookupMulti")
                                         {
                                             attrType = docXml.CreateAttribute("type");
                                             attrType.Value = "mchoice";
@@ -1272,6 +1319,10 @@ namespace EPMLiveWebParts
                                                 foreach (SPFieldLookupValue lv in lvc)
                                                 {
                                                     displayValue += "\n" + lv.ToString();
+                                                    if (hshColumnSelectFilter.Contains(field.InternalName))
+                                                    {
+                                                        addFilterItems(field.InternalName, lv.LookupValue);
+                                                    }
                                                 }
                                                 if (displayValue.Length > 1)
                                                     displayValue = displayValue.Substring(1);
@@ -1279,11 +1330,11 @@ namespace EPMLiveWebParts
                                             string lookuplist = fieldXml.ChildNodes[0].Attributes["List"].Value;
                                             string lookupfield = fieldXml.ChildNodes[0].Attributes["ShowField"].Value;
 
-                                            if (!hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
+                                            if (!hshComboCells.Contains(field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()))
                                             {
-                                                hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = getLookupList(li.Web, lookuplist, lookupfield);
+                                                hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()] = getLookupList(list.ParentWeb, lookuplist, lookupfield);
                                             }
-                                            displayValue += "\t" + hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
+                                            displayValue += "\t" + hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString();
 
                                         }
                                         else
@@ -1292,46 +1343,50 @@ namespace EPMLiveWebParts
                                             if (val != "")
                                             {
                                                 SPFieldLookupValue lv = new SPFieldLookupValue(val);
-                                                val = lv.LookupId.ToString();
-                                                displayValue = lv.LookupValue;
+                                                val = lv.LookupId.ToString() + ";#" + lv.LookupValue;
+                                                if (hshColumnSelectFilter.Contains(field.InternalName))
+                                                {
+                                                    addFilterItems(field.InternalName, lv.LookupValue);
+                                                }
                                             }
 
                                             attrText = docXml.CreateAttribute("text");
                                             attrText.Value = displayValue;
 
                                             attrType = docXml.CreateAttribute("type");
-                                            attrType.Value = "combo";
+                                            attrType.Value = "choice";
 
-                                            if (hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
+                                            if (hshComboCells.Contains(field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()))
                                             {
-                                                displayValue = val + hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
+                                                displayValue = val + "\t" + hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString();
                                             }
                                             else
                                             {
                                                 string lookuplist = fieldXml.ChildNodes[0].Attributes["List"].Value;
                                                 string lookupfield = fieldXml.ChildNodes[0].Attributes["ShowField"].Value;
-                                                string lvals = getSingleLookup(lookuplist, lookupfield, li.Web);
-                                                hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = lvals;
-                                                displayValue = val + lvals;
+                                                string lvals = getLookupList(list.ParentWeb, lookuplist, lookupfield);
+                                                hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()] = lvals;
+                                                displayValue = val + "\t" + lvals;
                                             }
 
-                                            if (hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString() == "")
+                                            if (hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString() == "")
                                             {
                                                 attrType.Value = "ro";
                                             }
                                             else
                                             {
 
-                                                attrxmlContent = docXml.CreateAttribute("xmlcontent");
-                                                attrxmlContent.Value = "1";
-                                                attrAutoComplete = docXml.CreateAttribute("autocomplete");
-                                                attrAutoComplete.Value = "1";
+                                                //attrxmlContent = docXml.CreateAttribute("xmlcontent");
+                                                //attrxmlContent.Value = "1";
+                                                //attrAutoComplete = docXml.CreateAttribute("autocomplete");
+                                                //attrAutoComplete.Value = "1";
 
-                                                ndNewCell.Attributes.Append(attrxmlContent);
-                                                ndNewCell.Attributes.Append(attrAutoComplete);
-                                                ndNewCell.Attributes.Append(attrType);
-                                                ndNewCell.Attributes.Append(attrText);
+                                                //ndNewCell.Attributes.Append(attrxmlContent);
+                                                //ndNewCell.Attributes.Append(attrAutoComplete);
+                                                //ndNewCell.Attributes.Append(attrType);
+                                                //ndNewCell.Attributes.Append(attrText);
                                             }
+                                            ndNewCell.Attributes.Append(attrType);
                                         }
                                         break;
                                     case SPFieldType.Calculated:
@@ -1346,25 +1401,99 @@ namespace EPMLiveWebParts
                                         }
                                         break;
                                     case SPFieldType.Currency:
+                                        attrType = docXml.CreateAttribute("type");
+                                        attrType.Value = "edn";
+                                        ndNewCell.Attributes.Append(attrType);
                                         displayValue = val;
                                         break;
-                                    case SPFieldType.Attachments:
-                                        if (li.Attachments.Count > 0)
-                                        {
-                                            SPFolder sourceItemAttachmentsFolder = li.Web.Folders["Lists"].SubFolders[li.ParentList.Title].SubFolders["Attachments"].SubFolders[li.ID.ToString()];
-                                            val = "<a href=\"" + sourceItemAttachmentsFolder.Files[0].ServerRelativeUrl + "\">" + sourceItemAttachmentsFolder.Files[0].Name + "</a>";
-                                            displayValue = val;
-                                        }
-                                        else
-                                            val = "";
+                                    case SPFieldType.Text:
+                                        attrType = docXml.CreateAttribute("type");
+                                        attrType.Value = "ed";
+                                        ndNewCell.Attributes.Append(attrType);
                                         break;
                                     case SPFieldType.Boolean:
-                                        if (val == "False")
-                                            displayValue = "0";
-                                        else
+                                        attrType = docXml.CreateAttribute("type");
+                                        attrType.Value = "ch";
+                                        ndNewCell.Attributes.Append(attrType);
+                                        if (val.ToLower() == "true")
                                             displayValue = "1";
+                                        else
+                                            displayValue = "0";
                                         break;
-                                };*/
+                                    case SPFieldType.DateTime:
+                                        attrType = docXml.CreateAttribute("type");
+                                        attrType.Value = "dhxCalendarA";
+                                        ndNewCell.Attributes.Append(attrType);
+                                        break;
+                                    default:
+                                        switch (field.TypeAsString)
+                                        {
+                                            case "FilteredLookup":
+
+                                                if (inEditMode)
+                                                {
+
+                                                    Guid lookuplist = new Guid(fieldXml.ChildNodes[0].Attributes["List"].Value);
+                                                    Guid lookupfield = new Guid(fieldXml.ChildNodes[0].Attributes["ShowField"].Value);
+                                                    Guid lookupweb = new Guid(fieldXml.ChildNodes[0].Attributes["WebId"].Value);
+
+                                                    XmlNode nd = fieldXml.ChildNodes[0].SelectSingleNode("Customization").SelectSingleNode("ArrayOfProperty");
+
+                                                    string query = nd.SelectSingleNode("Property[Name='QueryFilterAsString']").SelectSingleNode("Value").InnerText;
+                                                    string listview = nd.SelectSingleNode("Property[Name='ListViewFilter']").SelectSingleNode("Value").InnerText;
+                                                    string multi = nd.SelectSingleNode("Property[Name='SupportsMultipleValues']").SelectSingleNode("Value").InnerText;
+                                                    string recurse = nd.SelectSingleNode("Property[Name='IsFilterRecursive']").SelectSingleNode("Value").InnerText;
+
+                                                    string strType = "choice";
+                                                    if (multi.ToLower() == "true")
+                                                    {
+                                                        strType = "mchoice";
+                                                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
+                                                        foreach (SPFieldLookupValue lv in lvc)
+                                                        {
+                                                            displayValue += "\n" + lv.ToString();
+                                                        }
+                                                        if (displayValue.Length > 1)
+                                                            displayValue = displayValue.Substring(1);
+                                                    }
+                                                    else
+                                                    {
+                                                        displayValue = val;
+                                                    }
+
+                                                    attrType = docXml.CreateAttribute("type");
+                                                    attrType.Value = strType;
+                                                    ndNewCell.Attributes.Append(attrType);
+
+                                                    if (!hshComboCells.Contains(field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()))
+                                                    {
+                                                        string choices = "";
+                                                        if (lookupweb == list.ParentWeb.ID)
+                                                        {
+                                                            choices = getLookupList(list.ParentWeb, lookuplist, lookupfield, query, listview);
+                                                        }
+                                                        else
+                                                        {
+                                                            try
+                                                            {
+                                                                using (SPWeb w = list.ParentWeb.Site.OpenWeb(lookupweb))
+                                                                {
+                                                                    choices = getLookupList(w, lookuplist, lookupfield, query, listview);
+                                                                }
+                                                            }
+                                                            catch { }
+                                                        }
+                                                        hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()] = choices;
+                                                    }
+                                                    displayValue += "\t" + hshComboCells[field.InternalName + "-" + list.ID.ToString() + "-" + list.ParentWeb.ID.ToString()].ToString();
+
+                                                }
+
+                                                break;
+                                        }
+                                        break;
+                                };
+                                
                             }
                             else
                             {

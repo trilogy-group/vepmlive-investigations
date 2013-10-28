@@ -43,7 +43,7 @@ function epmlive_doDelete(id, weburl, grid, curRowId)
 	{
 		if(curRowId)
 		{
-			grid.setRowHidden(grid.GetRowById(curRowId), true);
+			grid.setRowHidden(grid.getRowById(curRowId), true);
 		}
 		if(grid.getCheckedRowIds())
 		{
