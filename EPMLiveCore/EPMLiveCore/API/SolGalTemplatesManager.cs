@@ -1299,6 +1299,7 @@ namespace EPMLiveCore.API
                             SPList newList = eW.Lists[requestList.ID];
                             string fldWorkspaceUrlIntName = newList.Fields.Add("WorkspaceUrl", SPFieldType.URL, false);
                             SPFieldUrl fldWorkspaceUrl = newList.Fields.GetFieldByInternalName(fldWorkspaceUrlIntName) as SPFieldUrl;
+                            fldWorkspaceUrl.Hidden = true;
                             fldWorkspaceUrl.Update();
                         }
 

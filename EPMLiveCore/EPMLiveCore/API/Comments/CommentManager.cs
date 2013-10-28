@@ -43,6 +43,10 @@ namespace EPMLiveCore.API
         const string XML_RESPONSE_COMMENT_SECTION_FOOTER = "</CommentItem>";
         const string XML_RESPONSE_COMMENT_FOOTER = "</Comments>";
 
+        const string XML_RESPONSE_PUBLIC_COMMENT_ITEM = "<PublicCommentItem listId=\"##pubComListId##\" itemId=\"##pubComItemId##\" />";
+
+        //const string XML_RESPONSE_COMMENT_SECTION_HEADER = "<CommentItem listId=\"##listId##\" itemId=\"##itemId##\">";
+
         static string _userProfileUrl = SPContext.Current.Site.MakeFullUrl(SPContext.Current.Web.ServerRelativeUrl) + "/_layouts/userdisp.aspx?Force=True&ID=##userid##&source=" + HttpContext.Current.Request.UrlReferrer;
 
         public static string CreateComment(string data)
@@ -242,6 +246,7 @@ namespace EPMLiveCore.API
                 //currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = Uri.UnescapeDataString(dataMgr.GetPropVal("Comment"));
                 currentItem.Update();
 
+                sbResult.Append(XML_RESPONSE_PUBLIC_COMMENT_ITEM.Replace("##pubComListId##", dataMgr.GetPropVal("ListId")).Replace("##pubComItemId##", dataMgr.GetPropVal("ItemId")));
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_HEADER.Replace("##listId##", currentItem.ParentList.ID.ToString()).Replace("##itemId##", currentItem.ID.ToString()));
                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM.Replace("##listId##", currentItem.ParentList.ID.ToString())
                                                          .Replace("##listName##", currentItem.ParentList.Title)

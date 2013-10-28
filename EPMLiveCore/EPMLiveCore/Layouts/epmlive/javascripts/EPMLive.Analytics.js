@@ -61,8 +61,8 @@
                             if (a.isItem()) {
                                 // load different src
                                 $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
-                                    $(this).load(function () { $(this).fadeIn(); });
-                                    $(this).attr("src", "_layouts/epmlive/images/star-filled32.png");
+                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').load(function () { $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeIn(); });
+                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr("src", "_layouts/epmlive/images/star-filled32.png");
                                 });
                                 // is page or non item
                             } else {
@@ -247,8 +247,8 @@
                             //onSuccess(result);
                             if ($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star32.png') {
                                 $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
-                                    $(this).load(function () { $(this).fadeIn(); });
-                                    $(this).attr("src", "_layouts/epmlive/images/star-filled32.png");
+                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').load(function () { $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeIn(); });
+                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr("src", "_layouts/epmlive/images/star-filled32.png");
                                 });
                             }
 
@@ -508,8 +508,8 @@
                         if (epmLive.responseIsSuccess(result) && result['#text']) {
                             if ($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png') {
                                 $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
-                                    $(this).load(function () { $(this).fadeIn(); });
-                                    $(this).attr("src", "_layouts/epmlive/images/star32.png");
+                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').load(function () { $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').fadeIn(); });
+                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').attr("src", "_layouts/epmlive/images/star32.png");
                                 });
                             }
 
