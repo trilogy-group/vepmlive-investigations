@@ -262,7 +262,8 @@ namespace EPMLiveReportsAdmin
                                   new ColumnDef("WebUrl", "WebUrl", "WebUrl", SPFieldType.Text, SqlDbType.VarChar, 256),
                                   new ColumnDef("Commenters", "Commenters", "Commenters", SPFieldType.Text, SqlDbType.NVarChar, 8001),
                                   new ColumnDef("CommentersRead", "CommentersRead", "CommentersRead", SPFieldType.Text, SqlDbType.NVarChar, 8001),
-                                  new ColumnDef("CommentCount", "CommentCount", "CommentCount", SPFieldType.Integer, SqlDbType.Int)
+                                  new ColumnDef("CommentCount", "CommentCount", "CommentCount", SPFieldType.Integer, SqlDbType.Int),
+                                  new ColumnDef("WorkspaceUrl", "WorkspaceUrl", "WorkspaceUrl", SPFieldType.Text, SqlDbType.NVarChar, 8001)
                               };
             return columns;
         }

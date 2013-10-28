@@ -1172,7 +1172,8 @@ namespace EPMLiveReportsAdmin
                     sColumnName == "WebUrl" ||
                     sColumnName == "Commenters" ||
                     sColumnName == "CommentersRead" ||
-                    sColumnName == "CommentCount")
+                    sColumnName == "CommentCount" ||
+                    sColumnName == "WorkspaceUrl")
                 {
                     if (row["SharePointType"] != "Lookup")
                     {
@@ -1595,6 +1596,15 @@ namespace EPMLiveReportsAdmin
                     param.ParameterName = "@commentersread";
                     param.Value = DBNull.Value;
                     break;
+
+                case "workspaceurl":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.NVarChar;
+                    param.Size = 8001;
+                    param.ParameterName = "@workspaceurl";
+                    param.Value = DBNull.Value;
+                    break;
+
             }
             return param;
         }

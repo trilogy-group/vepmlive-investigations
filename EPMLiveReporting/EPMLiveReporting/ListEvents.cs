@@ -271,6 +271,7 @@ namespace EPMLiveReportsAdmin
             _arrayList_defaultColumns.Add("commenters");
             _arrayList_defaultColumns.Add("commentersread");
             _arrayList_defaultColumns.Add("commentcount");
+            _arrayList_defaultColumns.Add("workspaceurl");
         }
 
         private void PopulateColumns()
