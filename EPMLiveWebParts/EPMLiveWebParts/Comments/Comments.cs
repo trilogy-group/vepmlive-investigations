@@ -142,31 +142,6 @@ namespace EPMLiveWebParts.Comments
             try { sPubComTxt = CoreFunctions.getConfigSetting(cWeb, "EPMLivePublicCommentText"); }
             catch { }
 
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/Comments.UI.css\"/>");
-            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsWebPartStyle.css\"/>");
-
-            output.Write("<div id=\"commentsWebPartMainContainer\" class=\"commentsWPMainContainer\">");
-            output.Write("<div style=\"clear:both;\"></div>");
-            //TODO: add the div here and include the button
-            output.Write("<div class=\"divPublicCommentContainer\">");
-            output.Write("<div class=\"inputSearch tbComment epmliveinput\" style=\"width: 95%;background:white;\" id=\"inputPublicComment\" class=\"ms-socialCommentInputBox ms-rtestate-write tbCommentInput\" contenteditable=\"true\" disableribboncommands=\"True\">");
-            output.Write("<span style=\"color:gray\">" + sPubComTxt + "</span>");
-            output.Write("</div>");
-            output.Write("<div style=\"clear:both;\"></div>");
-            output.Write("<input id=\"btnGeneralPost\" class=\"epmliveButton\" type=\"button\" value=\"post\" />");
-            output.Write("</div>");
-
-            output.Write("<div style=\"clear:both;\"></div>");
-
-            output.Write("<div class=\"divGeneralComment\">");
-            //output.Write(_publicCommentsloadingHtml);
-            output.Write("</div>");
-
-            output.Write(_loadingHtml);
-            output.Write("<div style=\"clear:both;height:5px\"></div>");
-            output.Write(_noCommentHtml);
-            output.Write("</div>");
-
             SPUser user = cWeb.CurrentUser;
             //get user picture from user id
             SPList userInfoList = cWeb.SiteUserInfoList;
@@ -197,7 +172,7 @@ namespace EPMLiveWebParts.Comments
             }
             string userProfileUrl = cSite.MakeFullUrl(cWeb.ServerRelativeUrl) + "/_layouts/userdisp.aspx?Force=True&ID=" + user.ID + "&source=" + HttpContext.Current.Request.UrlReferrer;
 
-            
+
             output.Write("<script>" +
                            "curWebUrl = '" + cWeb.Url + "';" +
                            "curWebTitle = '" + cWeb.Title + "';" +
@@ -209,6 +184,47 @@ namespace EPMLiveWebParts.Comments
                            "maxComments = '" + this.MaxComments.ToString() + "';" +
                            "sPubComTxt = '" + sPubComTxt + "';" +
                          "</script>");
+
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/Comments.UI.css\"/>");
+            output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsWebPartStyle.css\"/>");
+
+            output.Write("<div id=\"commentsWebPartMainContainer\" class=\"commentsWPMainContainer\">");
+            output.Write("<div style=\"clear:both;\"></div>");
+            
+            output.Write(@"<div id='wrapper' class='divPublicCommentContainer'>
+                               <div id='comment-photo'>
+                                   <img src='" + userPictureUrl + @"' class='circleborder' />
+                               </div>
+                               <div id='whatsup'>
+                                   <div class='comment-box'>
+                                       <div id='inputPublicComment' class='comment-paragraph' contenteditable='true' data-placeholder='" + sPubComTxt + @"'>
+                                       </div>
+                                   </div>
+                               </div>
+                               <a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='display:inline-block;margin-left:10px;text-decoration:none;'>Share</a>
+                            </div>");
+
+            //output.Write("<div class=\"divPublicCommentContainer\">");
+            //output.Write("<div class=\"inputSearch tbComment epmliveinput\" style=\"width: 95%;background:white;\" id=\"inputPublicComment\" class=\"ms-socialCommentInputBox ms-rtestate-write tbCommentInput\" contenteditable=\"true\" disableribboncommands=\"True\">");
+            //output.Write("<span style=\"color:gray\">" + sPubComTxt + "</span>");
+            //output.Write("</div>");
+
+            //output.Write("<div style=\"clear:both;\"></div>");
+            //output.Write("<input id=\"btnGeneralPost\" class=\"epmliveButton\" type=\"button\" value=\"post\" />");
+            //output.Write("</div>");
+
+            output.Write("<div style=\"clear:both;\"></div>");
+
+            output.Write("<div class=\"divGeneralComment\">");
+            //output.Write(_publicCommentsloadingHtml);
+            output.Write("</div>");
+
+            output.Write(_loadingHtml);
+            output.Write("<div style=\"clear:both;height:5px\"></div>");
+            output.Write(_noCommentHtml);
+            output.Write("</div>");
+
+            
         }
 
         public override ToolPart[] GetToolParts()
