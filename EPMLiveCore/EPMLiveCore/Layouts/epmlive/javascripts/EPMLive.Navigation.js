@@ -732,7 +732,7 @@
 
                                     var iIndex = 0;
 
-                                    $parent.find('.epm-nav-sub-header').each(function () {
+                                    $parent.find('li').each(function () {
                                         var $ph = $(this);
 
                                         if ($ph.text() === 'Items') {
@@ -740,11 +740,15 @@
                                         }
                                     });
 
-                                    $parent.find('a').each(function () {
-                                        if ($(this).index() > iIndex) {
-                                            iFound = true;
-                                        } else {
-                                            pFound = true;
+                                    $parent.find('li').each(function () {
+                                        var $li = $(this);
+
+                                        if ($li.hasClass('epm-nav-node')) {
+                                            if ($li.index() > iIndex) {
+                                                iFound = true;
+                                            } else {
+                                                pFound = true;
+                                            }
                                         }
                                     });
 
