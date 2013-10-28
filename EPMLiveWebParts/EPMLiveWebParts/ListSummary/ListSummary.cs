@@ -257,7 +257,7 @@ namespace EPMLiveWebParts
                             output.Write("</a>");
 
                         output.Write(": " + val.ToString() + " ( " + (percent).ToString() + "% ) </td>");
-                        output.Write("<td><table width=\"100%\"><tr><td width=\"" + (percent).ToString() + "%\" height=\"15px\" class=\"ms-selected\"></td><td width=\"100%\"></td></tr></table></td></tr>");
+                        output.Write("<td><table width=\"100%\"><tr><td width=\"" + (percent).ToString() + "%\" height=\"15px\" style=\"background-color: rgb(0, 144, 202)\"></td><td width=\"100%\"></td></tr></table></td></tr>");
 
                     }
 
