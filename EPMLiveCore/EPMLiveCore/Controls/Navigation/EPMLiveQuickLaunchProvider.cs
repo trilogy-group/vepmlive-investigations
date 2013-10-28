@@ -7,7 +7,6 @@ using System.Web;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
-using ReportFiltering;
 
 namespace EPMLiveCore.Controls.Navigation
 {
@@ -114,7 +113,8 @@ namespace EPMLiveCore.Controls.Navigation
                                                 var ql = (string) (c["QuickLaunch"] ?? string.Empty);
                                                 if (string.IsNullOrEmpty(ql)) return;
 
-                                                foreach (string id in ql.Split(',').Select(linkId => linkId.Split(':')[0]))
+                                                foreach (
+                                                    string id in ql.Split(',').Select(linkId => linkId.Split(':')[0]))
                                                 {
                                                     if (!communityLinks.ContainsKey(communityName))
                                                     {
@@ -148,10 +148,10 @@ namespace EPMLiveCore.Controls.Navigation
                                     {
                                         try
                                         {
-                                            var node = FindSiteMapNodeFromKey(nodeKey);
+                                            SiteMapNode node = FindSiteMapNodeFromKey(nodeKey);
                                             if (node == null) continue;
 
-                                            var parentNode = node.ParentNode;
+                                            SiteMapNode parentNode = node.ParentNode;
                                             if (parentNode != null && parentNode.Title.Equals("Quick launch"))
                                             {
                                                 linkNodes[nodeKey] = node;
@@ -160,20 +160,21 @@ namespace EPMLiveCore.Controls.Navigation
                                         catch { }
                                     }
 
-                                    var tempCommunityLinks = communityLinks.ToDictionary(link => link.Key, link => link.Value);
+                                    Dictionary<string, IList<string>> tempCommunityLinks =
+                                        communityLinks.ToDictionary(link => link.Key, link => link.Value);
                                     communityLinks.Clear();
 
                                     foreach (SPNavigationNode node in spWeb.Navigation.QuickLaunch)
                                     {
                                         foreach (var link in tempCommunityLinks)
                                         {
-                                            var nodeKey = node.Id.ToString(CultureInfo.InvariantCulture);
+                                            string nodeKey = node.Id.ToString(CultureInfo.InvariantCulture);
 
                                             if (!link.Value.Contains(nodeKey)) continue;
 
                                             if (!communityLinks.ContainsKey(link.Key))
                                             {
-                                                communityLinks.Add(link.Key,new List<string>());
+                                                communityLinks.Add(link.Key, new List<string>());
                                             }
 
                                             communityLinks[link.Key].Add(nodeKey);
