@@ -652,7 +652,6 @@ AND scheduletype = 2
 update TIMERJOBS set lastqueuecheck = @dtRun
 WHERE
 (lastqueuecheck is null or DATEDIFF(MINUTE, lastqueuecheck, @dtRun) > 59)
-AND (enabled = 1) 
 AND scheduletype = 1
 -------------------------------------Delete old jobs----------------------------------
 delete from TIMERJOBS where timerjobuid in (select timerjobuid from vwQueueTimerLog where DateAdd(day, 1, dtfinished) < GETDATE() and scheduletype = 0)
