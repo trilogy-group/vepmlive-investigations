@@ -10,6 +10,7 @@ using Microsoft.SharePoint.WebControls;
 using System.Text;
 using System.Xml.Serialization;
 using Microsoft.SharePoint.WebPartPages;
+using EPMLiveCore;
 
 namespace EPMLiveWebParts.Comments
 {
@@ -115,7 +116,8 @@ namespace EPMLiveWebParts.Comments
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-            
+            EnsureCommentsListExist();
+            EnsurePublicCommentsListExist();
             ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
             //ScriptLink.Register(Page, "/epmlive/slimScroll.js", false);
             //ScriptLink.Register(Page, "/epmlive/TextBoxAutoGrow.js", false);
@@ -135,6 +137,11 @@ namespace EPMLiveWebParts.Comments
 
             SPWeb cWeb = SPContext.Current.Web;
             SPSite cSite = SPContext.Current.Site;
+
+            var sPubComTxt = string.Empty;
+            try { sPubComTxt = CoreFunctions.getConfigSetting(cWeb, "EPMLivePublicCommentText"); }
+            catch { }
+
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/Comments.UI.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsWebPartStyle.css\"/>");
 
@@ -143,7 +150,7 @@ namespace EPMLiveWebParts.Comments
             //TODO: add the div here and include the button
             output.Write("<div class=\"divPublicCommentContainer\">");
             output.Write("<div class=\"inputSearch tbComment epmliveinput\" style=\"width: 95%;background:white;\" id=\"inputPublicComment\" class=\"ms-socialCommentInputBox ms-rtestate-write tbCommentInput\" contenteditable=\"true\" disableribboncommands=\"True\">");
-            output.Write("<span style=\"color:gray\">Replaceble text...</span>");
+            output.Write("<span style=\"color:gray\">" + sPubComTxt + "</span>");
             output.Write("</div>");
             output.Write("<div style=\"clear:both;\"></div>");
             output.Write("<input id=\"btnGeneralPost\" class=\"epmliveButton\" type=\"button\" value=\"post\" />");
@@ -189,15 +196,18 @@ namespace EPMLiveWebParts.Comments
                 }
             }
             string userProfileUrl = cSite.MakeFullUrl(cWeb.ServerRelativeUrl) + "/_layouts/userdisp.aspx?Force=True&ID=" + user.ID + "&source=" + HttpContext.Current.Request.UrlReferrer;
+
             
             output.Write("<script>" +
                            "curWebUrl = '" + cWeb.Url + "';" +
+                           "curWebTitle = '" + cWeb.Title + "';" +
                            "userProfileUrl = '" + userProfileUrl + "';" +
                            "userEmail = '" + user.Email + "';" +
                            "userPicUrl = '" + userPictureUrl + "';" +
                            "userName = '" + user.Name + "';" +
                            "numThreads = '" + this.NumThreads.ToString() + "';" +
                            "maxComments = '" + this.MaxComments.ToString() + "';" +
+                           "sPubComTxt = '" + sPubComTxt + "';" +
                          "</script>");
         }
 
@@ -210,6 +220,91 @@ namespace EPMLiveWebParts.Comments
             toolparts[2] = new CustomPropertyToolPart();
 
             return toolparts;
+        }
+
+
+        static void EnsurePublicCommentsListExist()
+        {
+            SPSite cSite = SPContext.Current.Site;
+            SPWeb cWeb = SPContext.Current.Web;
+            SPList lstPubComments = cWeb.Lists.TryGetList("PublicComments");
+
+            if (lstPubComments == null)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (var eleSite = new SPSite(cWeb.Url))
+                    {
+                        using (var eleWeb = eleSite.OpenWeb())
+                        {
+                            eleWeb.AllowUnsafeUpdates = true;
+                            var guid = eleWeb.Lists.Add("PublicComments", "", SPListTemplateType.GenericList);
+                            lstPubComments = eleWeb.Lists[guid];
+                            lstPubComments.Hidden = true;
+                            lstPubComments.Update();
+
+                            SPField fldCommenters = null;
+                            string fldCommentersName = lstPubComments.Fields.Add("Commenters", SPFieldType.Note, false);
+                            fldCommenters = lstPubComments.Fields.GetFieldByInternalName(fldCommentersName) as SPFieldMultiLineText;
+                            fldCommenters.Sealed = false;
+                            fldCommenters.Hidden = true;
+                            fldCommenters.AllowDeletion = false;
+                            fldCommenters.DefaultValue = string.Empty;
+                            fldCommenters.Update();
+
+                            SPField fldCommentersRead = null;
+                            string fldCommentersReadName = lstPubComments.Fields.Add("CommentersRead", SPFieldType.Note, false);
+                            fldCommentersRead = lstPubComments.Fields.GetFieldByInternalName(fldCommentersReadName) as SPFieldMultiLineText;
+                            fldCommentersRead.Hidden = true;
+                            fldCommentersRead.Sealed = false;
+                            fldCommentersRead.AllowDeletion = false;
+                            fldCommentersRead.DefaultValue = string.Empty;
+                            fldCommentersRead.Update();
+
+                            lstPubComments.Update();
+                            eleWeb.Update();
+                        }
+                    }
+                });
+            }
+
+        }
+
+        static void EnsureCommentsListExist()
+        {
+            SPSite cSite = SPContext.Current.Site;
+            SPWeb cWeb = SPContext.Current.Web;
+            SPList commentsList = cWeb.Lists.TryGetList("Comments");
+
+            if (commentsList == null)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (SPSite eleSite = new SPSite(cWeb.Url))
+                    {
+                        using (SPWeb eleWeb = eleSite.OpenWeb())
+                        {
+                            eleWeb.AllowUnsafeUpdates = true;
+                            Guid guid = eleWeb.Lists.Add("Comments", "", SPListTemplateType.GenericList);
+                            commentsList = eleWeb.Lists[guid];
+                            commentsList.Hidden = true;
+                            commentsList.Fields.Add("ItemId", SPFieldType.Text, true);
+                            commentsList.Fields.Add("ListId", SPFieldType.Text, true);
+                            commentsList.Fields.Add("Comment", SPFieldType.Note, false);
+                            commentsList.Update();
+
+                            SPView view = commentsList.DefaultView;
+                            view.ViewFields.Add("ItemId");
+                            view.ViewFields.Add("ListId");
+                            view.ViewFields.Add("Comment");
+                            view.Update();
+
+                            commentsList.Update();
+                            eleWeb.Update();
+                        }
+                    }
+                });
+            }
         }
     }
 }

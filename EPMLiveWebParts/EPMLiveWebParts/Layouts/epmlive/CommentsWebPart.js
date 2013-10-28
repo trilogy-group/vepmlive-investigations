@@ -66,7 +66,7 @@ function GetData() {
                                     '<div style="clear:both;"></div>' +
                                     '<div id="divPublicComment_##itemId##" class="commentWebpart-socialcomment-contents-TRC" style="color:black">##comment##</div>' +
                                     '<div style="clear:both;"></div>' +
-                                    '<div style="margin-bottom:10px" ><span style="text-align:left;color:#707070;">##createdDate## on <a target="_blank" href="##listDispUrl##?ID=##itemId##">##itemTitle##</a> in <a target="_blank" href="##listUrl##">##listName##</a> list.</span></div>' +
+                                    '<div style="margin-bottom:10px" ><span style="text-align:left;color:#707070;">##createdDate## on <a target="_blank" href="##workspaceUrl##">##workspaceTitle##</a>.</span></div>' +
                                 '</div>' +
                             '</td>' +
                         '</tr>' +
@@ -155,7 +155,7 @@ function GetData() {
             '</div>' +
             '<div style=\"clear:both\"></div>' +
             '<div style=\"padding-top: 8px; padding-left: 5px;\">' +
-                '<a id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
+                '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
                 '<div class="inputSearch tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
@@ -164,10 +164,22 @@ function GetData() {
                 '</div>' +
             '</div>' +
             '<div style=\"clear:both\"></div>';
-        //            '<div style=\"margin-top: 5px;padding-left:5px;\">' +
-        //                '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">Show All</a>' +
-        //            '</div>' +
-        //            '<div style=\"clear:both\"></div>';
+       
+        var newPubCommentTemp =
+        // this is always at the end
+            '<div id="newItemAnchor_##listId##_##itemId##">' +
+            '</div>' +
+            '<div style=\"clear:both\"></div>' +
+            '<div style=\"padding-top: 8px; padding-left: 5px;\">' +
+                '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
+                '<div class="inputSearch tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
+                    '<span style="color:gray">Write a reply...</span>' +
+                '</div>' +
+                '<div style="height: 25px; margin-right: 5px; float: left; margin-top: 3px;display:none">' +
+                    '<input class="epmliveButton epmliveButton-disabled" type="button" id="btnNewComment##itemId##" value="comment" onclick="window.commentsWebPart.AddComment(\'##pubComListId##\', \'##pubComItemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" />' +
+                '</div>' +
+            '</div>' +
+            '<div style=\"clear:both\"></div>';
 
         function BeginGetMyCommentsByNotification() {
 
@@ -322,19 +334,31 @@ function GetData() {
                                                 $('#commentsWebPartMainContainer').append(commentDivider);
                                             }
                                             headingSpacePlaced = true;
-
-                                            var commentItem = CommentTemp.replace(/##itemId##/g, oComment['@itemId'])
-                                                                   .replace(/##userPicUrl##/g, oComment.UserInfo.UserPic['#cdata'])
-                                                                   .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
-                                                                   .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
-                                                                   .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
-                                                                   .replace(/##createdDate##/g, oComment['@createdDate'])
-                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
-                                                                   .replace(/##itemTitle##/g, oComment['@itemTitle'])
-                                                                   .replace(/##listName##/g, oComment['@listName'])
-                                                                   .replace(/##listUrl##/g, oComment['@listUrl'])
-                                                                   .replace(/##listDispUrl##/g, oComment['@listDispUrl'])
-                                                                   .replace(/##listId##/g, oComment['@listId']);
+                                            var commentItem;
+                                            if (oComment['@itemTitle']) {
+                                                commentItem = CommentTemp.replace(/##itemId##/g, oComment['@itemId'])
+                                                                       .replace(/##userPicUrl##/g, oComment.UserInfo.UserPic['#cdata'])
+                                                                       .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
+                                                                       .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
+                                                                       .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
+                                                                       .replace(/##createdDate##/g, oComment['@createdDate'])
+                                                                       .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
+                                                                       .replace(/##itemTitle##/g, oComment['@itemTitle'])
+                                                                       .replace(/##listName##/g, oComment['@listName'])
+                                                                       .replace(/##listUrl##/g, oComment['@listUrl'])
+                                                                       .replace(/##listDispUrl##/g, oComment['@listDispUrl'])
+                                                                       .replace(/##listId##/g, oComment['@listId']);
+                                            } else {
+                                                commentItem = PublicCommentTemp.replace(/##itemId##/g, oComment['@itemId'])
+                                                                       .replace(/##userPicUrl##/g, oComment.UserInfo.UserPic['#cdata'])
+                                                                       .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
+                                                                       .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
+                                                                       .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
+                                                                       .replace(/##createdDate##/g, oComment['@createdDate'])
+                                                                       .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
+                                                                       .replace(/##workspaceUrl##/g, curWebUrl)
+                                                                       .replace(/##workspaceTitle##/g, curWebTitle);
+                                            }
                                             hasComments = true;
 
                                             $('#commentsWebPartMainContainer').append(commentItem);
@@ -428,13 +452,13 @@ function GetData() {
                                             $('#tbCommentInput' + id).focus();
                                         });
 
-                                        $('#tbCommentInput' + oComment['@itemId']).focus(function () {         
+                                        $('#tbCommentInput' + oComment['@itemId']).focus(function () {
                                             if ($$.UnescapeHTML($(this).html()) === 'Write a reply...') {
                                                 $(this).empty();
                                             }
                                         });
 
-                                        $('#tbCommentInput' + oComment['@itemId']).blur(function (e) {                                          
+                                        $('#tbCommentInput' + oComment['@itemId']).blur(function (e) {
                                             return true;
                                         });
 
@@ -556,18 +580,32 @@ function GetData() {
                                             }
                                             headingSpacePlaced = true;
 
-                                            var commentItem = CommentTemp.replace(/##itemId##/g, oComment['@itemId'])
-                                                                   .replace(/##userPicUrl##/g, oComment.UserInfo.UserPic['#cdata'])
-                                                                   .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
-                                                                   .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
-                                                                   .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
-                                                                   .replace(/##createdDate##/g, oComment['@createdDate'])
-                                                                   .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
-                                                                   .replace(/##itemTitle##/g, oComment['@itemTitle'])
-                                                                   .replace(/##listName##/g, oComment['@listName'])
-                                                                   .replace(/##listUrl##/g, oComment['@listUrl'])
-                                                                   .replace(/##listDispUrl##/g, oComment['@listDispUrl'])
-                                                                   .replace(/##listId##/g, oComment['@listId']);
+
+                                            var commentItem;
+                                            if (oComment['@itemTitle']) {
+                                                commentItem = CommentTemp.replace(/##itemId##/g, oComment['@itemId'])
+                                                                       .replace(/##userPicUrl##/g, oComment.UserInfo.UserPic['#cdata'])
+                                                                       .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
+                                                                       .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
+                                                                       .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
+                                                                       .replace(/##createdDate##/g, oComment['@createdDate'])
+                                                                       .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
+                                                                       .replace(/##itemTitle##/g, oComment['@itemTitle'])
+                                                                       .replace(/##listName##/g, oComment['@listName'])
+                                                                       .replace(/##listUrl##/g, oComment['@listUrl'])
+                                                                       .replace(/##listDispUrl##/g, oComment['@listDispUrl'])
+                                                                       .replace(/##listId##/g, oComment['@listId']);
+                                            } else {
+                                                commentItem = PublicCommentTemp.replace(/##itemId##/g, oComment['@itemId'])
+                                                                       .replace(/##userPicUrl##/g, oComment.UserInfo.UserPic['#cdata'])
+                                                                       .replace(/##userEmail##/g, oComment.UserInfo.UserEmail['#cdata'])
+                                                                       .replace(/##userProfileUrl##/g, oComment.UserInfo.UserProfileUrl['#cdata'])
+                                                                       .replace(/##userName##/g, oComment.UserInfo.UserName['#cdata'])
+                                                                       .replace(/##createdDate##/g, oComment['@createdDate'])
+                                                                       .replace(/##comment##/g, $$.xmlUnescape(oComment['#cdata']))
+                                                                       .replace(/##workspaceUrl##/g, curWebUrl)
+                                                                       .replace(/##workspaceTitle##/g, curWebTitle);
+                                            }
                                             hasComments = true;
 
                                             $('#commentsWebPartMainContainer').append(commentItem);
@@ -791,7 +829,7 @@ function GetData() {
             });
         }
 
-        $$.AddComment = function(listId, itemId, comment, containerId) {
+        $$.AddComment = function (listId, itemId, comment, containerId) {
             //<Data>
             // <Param key="ListId">someguid</Param>
             // <Param key="ItemId">12</Param>
@@ -812,7 +850,7 @@ function GetData() {
                     data: "{ Function: 'CreateComment', Dataxml: '" + dataXml + "' }",
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.d) {
                             var responseJson = window.epmLive.parseJson(response.d);
                             if (window.epmLive.responseIsSuccess(responseJson.Result)) {
@@ -829,8 +867,8 @@ function GetData() {
                                     .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName']);
 
                                 $('#' + containerId).before(commentItem);
-                                $('#divWorkingNewComment').fadeOut('slow', function() {
-                                    $('.subitem:last').fadeIn('slow', function() {
+                                $('#divWorkingNewComment').fadeOut('slow', function () {
+                                    $('.subitem:last').fadeIn('slow', function () {
                                         $('#divWorkingNewComment').remove();
                                     });
                                 });
@@ -842,7 +880,7 @@ function GetData() {
                         $('#aNewCommentReply' + itemId).css('display', '');
 
                     },
-                    error: function(e) {
+                    error: function (e) {
                         alert('Failed to add new comment. ' + e.message);
                         $('#tbCommentInput' + itemId).empty();
                         $('#tbCommentInput' + itemId).css('display', 'none');
@@ -855,12 +893,13 @@ function GetData() {
             }
         };
 
-        $$.AddPublicComment = function(comment) {
+        $$.AddPublicComment = function (comment) {
             //<Data>
             // <Param key="ListId">someguid</Param>
             // <Param key="ItemId">12</Param>
             // <Param key="Comment">abcabac</Param>
             // </Data>
+            $('#inputPublicComment').html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
             $('#divLoaderPublic_CommentsWebPart').css('display', '');
 
             if (comment !== undefined) {
@@ -874,11 +913,11 @@ function GetData() {
                     data: "{ Function: 'CreatePublicComment', Dataxml: '" + dataXml + "' }",
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.d) {
                             var responseJson = window.epmLive.parseJson(response.d);
                             if (window.epmLive.responseIsSuccess(responseJson.Result)) {
-                                
+
                                 var publicCommentItem = PublicCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
                                                                   .replace(/##userPicUrl##/g, userPicUrl)
                                                                   .replace(/##userEmail##/g, userEmail)
@@ -886,13 +925,10 @@ function GetData() {
                                                                   .replace(/##userName##/g, userName)
                                                                   .replace(/##createdDate##/g, responseJson.Result.Comments.CommentItem.Comment['@createdDate'])
                                                                   .replace(/##comment##/g, orginalComment)
-                                                                  .replace(/##itemTitle##/g, responseJson.Result.Comments.CommentItem.Comment['@itemTitle'])
-                                                                  .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName'])
-                                                                  .replace(/##listUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listUrl'])
-                                                                  .replace(/##listDispUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listDispUrl'])
-                                                                  .replace(/##listId##/g, responseJson.Result.Comments.CommentItem.Comment['@listId']);
-                                
-                                if ($('#commentsWebPartMainContainer').find('.customCommentItem').length > 0) {                                    
+                                                                  .replace(/##workspaceUrl##/g, curWebUrl)
+                                                                  .replace(/##workspaceTitle##/g, curWebTitle);
+
+                                if ($('#commentsWebPartMainContainer').find('.customCommentItem').length > 0) {
                                     $($('#commentsWebPartMainContainer').find('.customCommentItem')[0]).before(publicCommentItem);
                                     $('#divPublicCommentItem' + responseJson.Result.Comments.CommentItem['@itemId']).after(
                                                 '<div style="clear:both;margin-top:3px"/>' +
@@ -902,7 +938,7 @@ function GetData() {
                                                 '</div>' +
                                                 '<div style="height: 10px; clear: both;"/>');
                                     var newCommentBox;
-                                    newCommentBox = newCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
+                                    newCommentBox = newPubCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
                                                        .replace(/##userPicUrl##/g, userPicUrl)
                                                        .replace(/##userEmail##/g, userEmail)
                                                        .replace(/##userProfileUrl##/g, userProfileUrl)
@@ -912,8 +948,10 @@ function GetData() {
                                                        .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName'])
                                                        .replace(/##listUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listUrl'])
                                                        .replace(/##listDispUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listDispUrl'])
-                                                       .replace(/##listId##/g, responseJson.Result.Comments.CommentItem.Comment['@listId']);
-
+                                                       .replace(/##listId##/g, responseJson.Result.Comments.CommentItem.Comment['@listId'])
+                                                       .replace(/##pubComItemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
+                                                       .replace(/##pubComListId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
+                                                       
                                     $('#callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId']).append(newCommentBox);
                                 } else {
                                     $('#commentsWebPartMainContainer').append(publicCommentItem);
@@ -924,7 +962,7 @@ function GetData() {
                                                     '<b class="notch"></b>' +
                                                 '</div>');
                                     var newCommentBox;
-                                    newCommentBox = newCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
+                                    newCommentBox = newPubCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
                                                        .replace(/##userPicUrl##/g, userPicUrl)
                                                        .replace(/##userEmail##/g, userEmail)
                                                        .replace(/##userProfileUrl##/g, userProfileUrl)
@@ -934,10 +972,13 @@ function GetData() {
                                                        .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName'])
                                                        .replace(/##listUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listUrl'])
                                                        .replace(/##listDispUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listDispUrl'])
-                                                       .replace(/##listId##/g, responseJson.Result.Comments.CommentItem.Comment['@listId']);
+                                                       .replace(/##listId##/g, responseJson.Result.Comments.CommentItem.Comment['@listId'])
+                                                       .replace(/##pubComItemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
+                                                       .replace(/##pubComListId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
+
                                     $('#callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId']).append(newCommentBox);
                                 }
-                                
+
                                 var iid = responseJson.Result.Comments.CommentItem['@itemId'];
                                 $('#aNewCommentReply' + iid).click(function (e) {
                                     var id = $(this).attr('id').replace('aNewCommentReply', '');
@@ -1003,13 +1044,13 @@ function GetData() {
                                         $('#btnNewComment' + id).removeClass('epmliveButton-emphasize');
                                         $('#btnNewComment' + id).addClass('epmliveButton-disabled');
                                     }
-                                }); 
+                                });
                             }
                         }
-                       
+
 
                     },
-                    error: function(e) {
+                    error: function (e) {
                         alert('Failed to add new comment. ' + e.message);
                         $('#divLoaderPublic_CommentsWebPart').FadeOut('slow');
                     }
@@ -1019,11 +1060,11 @@ function GetData() {
             }
         };
 
-        $$.ShowAllComments = function(element) {
+        $$.ShowAllComments = function (element) {
             if (element.text() == "Show All") {
                 var ctrlId = element.attr('id');
                 var ctrlSuffix = ctrlId.substr(ctrlId.indexOf('_') + 1);
-                $('div[item="' + ctrlSuffix + '"]').each(function() {
+                $('div[item="' + ctrlSuffix + '"]').each(function () {
                     if ($(this).attr('isExtra') == 'true') {
                         $(this).css('display', '');
                     }
@@ -1032,7 +1073,7 @@ function GetData() {
             } else {
                 var ctrlId = element.attr('id');
                 var ctrlSuffix = ctrlId.substr(ctrlId.indexOf('_') + 1);
-                $('div[item="' + ctrlSuffix + '"]').each(function() {
+                $('div[item="' + ctrlSuffix + '"]').each(function () {
                     if ($(this).attr('isExtra') == 'true') {
                         $(this).css('display', 'none');
                     }
@@ -1041,7 +1082,7 @@ function GetData() {
             }
         };
 
-        $$.UnescapeHTML = function(escapedHTML) {
+        $$.UnescapeHTML = function (escapedHTML) {
             var d = document.createElement("div");
             d.innerHTML = escapedHTML;
             if (!d.innerText) {
@@ -1051,7 +1092,7 @@ function GetData() {
             }
         };
 
-        $$.htmlEscape = function(str) {
+        $$.htmlEscape = function (str) {
             return str.replace(/&/g, '&amp;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;')
@@ -1059,14 +1100,14 @@ function GetData() {
                 .replace(/>/g, '&gt;');
         };
 
-        $$.xmlUnescape = function(str) {
+        $$.xmlUnescape = function (str) {
             return str.replace(/#quot#/g, '"')
                 .replace(/#amp#/g, '&')
                 .replace(/#apos#/g, '\'')
                 .replace(/#lt#/g, '<')
                 .replace(/#gt#/g, '>');
         };
-        
+
         $$.xmlEscape = function (str) {
             return str.replace(/'/g, '&quot;')
                 .replace(/"/g, '&quot;');
@@ -1075,7 +1116,7 @@ function GetData() {
         //$('#divLoader_CommentsWebPart').css('margin-left', '45%').css('display', '');
         BeginGetMyCommentsByNotification();
 
-        $(function() {
+        $(function () {
             $('#btnGeneralPost').click(function () {
                 var publicComment = $('#inputPublicComment').html();
                 publicComment = $$.xmlEscape(publicComment);
@@ -1083,14 +1124,14 @@ function GetData() {
                     $$.AddPublicComment(publicComment);
                 }
             });
-            
+
             $("#inputPublicComment").focus(function () {
-                if ($$.UnescapeHTML($(this).html()) === 'Replaceble text...') {
+                if ($$.UnescapeHTML($(this).html()) === sPubComTxt) {
                     $(this).empty();
                 }
             });
         });
-        
+
     })(window.commentsWebPart = window.commentsWebPart || {}, jQuery);
 }
 
