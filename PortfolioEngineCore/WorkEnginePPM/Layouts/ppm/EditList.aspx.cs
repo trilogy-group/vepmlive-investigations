@@ -25,16 +25,16 @@ namespace WorkEnginePPM.Layouts.ppm
 
             string sName = oList.Title.Replace(" ", "");
 
-            if(chkEnable.Checked)
+            if (chkEnable.Checked)
             {
 
                 StringBuilder sb = new StringBuilder();
-                foreach(GridViewRow gvr in gvWEToPFE.Rows)
+                foreach (GridViewRow gvr in gvWEToPFE.Rows)
                 {
-                    if(gvr.RowType == DataControlRowType.DataRow)
+                    if (gvr.RowType == DataControlRowType.DataRow)
                     {
                         DropDownList ddl = (DropDownList)gvr.Cells[1].FindControl("ddlSPField");
-                        if(ddl.SelectedValue != "")
+                        if (ddl.SelectedValue != "")
                         {
                             sb.Append("|");
                             sb.Append(gvr.Cells[2].Text);
@@ -46,12 +46,12 @@ namespace WorkEnginePPM.Layouts.ppm
                     }
                 }
 
-                foreach(GridViewRow gvr in gvPFEtoWE.Rows)
+                foreach (GridViewRow gvr in gvPFEtoWE.Rows)
                 {
-                    if(gvr.RowType == DataControlRowType.DataRow)
+                    if (gvr.RowType == DataControlRowType.DataRow)
                     {
                         DropDownList ddl = (DropDownList)gvr.Cells[1].FindControl("ddlSPField");
-                        if(ddl.SelectedValue != "")
+                        if (ddl.SelectedValue != "")
                         {
                             sb.Append("|");
                             sb.Append(gvr.Cells[2].Text);
@@ -65,9 +65,9 @@ namespace WorkEnginePPM.Layouts.ppm
 
                 string sWorkLists = "";
 
-                foreach(ListItem li in chkWorkLists.Items)
+                foreach (ListItem li in chkWorkLists.Items)
                 {
-                    if(li.Selected)
+                    if (li.Selected)
                     {
                         sWorkLists += "|" + li.Value;
                     }
@@ -78,18 +78,14 @@ namespace WorkEnginePPM.Layouts.ppm
                 {
                     snonactivex = Request["nonactivexs"].ToString();
                 }catch{}
-                string ribbons = "";
-                try
-                {
-                    ribbons = Request["ribbons"].ToString();
-                }catch{}
+
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_worklists", sWorkLists.Trim('|'));
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_fields", sb.ToString().Trim('|'));
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_menus", ribbons.Replace(",", "|"));
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_nonactivexs", snonactivex.Replace(",", "|"));
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epk" + sName + "_costview", dllCostView.SelectedValue);
 
-                if(oList != null)
+                if (oList != null)
                 {
                     Guid job = EPMLiveCore.API.Timer.AddTimerJob(Web.Site.ID, Web.ID, oList.ID, "Install Work Events", 80, "", "", 0, 9, "");
                     EPMLiveCore.API.Timer.Enqueue(job, 0, Web.Site);
@@ -101,7 +97,7 @@ namespace WorkEnginePPM.Layouts.ppm
 
                     try
                     {
-                        if(!arrLists.Contains(oList.Title))
+                        if (!arrLists.Contains(oList.Title))
                             arrLists.Add(oList.Title);
                     }
                     catch { }
@@ -132,6 +128,8 @@ namespace WorkEnginePPM.Layouts.ppm
 
                 EPMLiveCore.CoreFunctions.setConfigSetting(Web.Site.RootWeb, "epklists", String.Join(",", (string[])arrLists.ToArray(typeof(string))));
             }
+
+            EPMLiveCore.Infrastructure.CacheStore.Current.RemoveCategory("GridSettings-" + oList.ID);
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
 
