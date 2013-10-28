@@ -172,6 +172,12 @@
                         select.options[select.options.length] = new Option(view.Name, view.ViewGUID, true, true);
                         this.Views.push(view);
                     }
+                    if (view.Default == true) {
+                        for (var i = 0; i < this.Views.length; i++) {
+                            if (this.Views[i].ViewGUID != view.ViewGUID)
+                                this.Views[i].Default = false;
+                        }
+                    }
                     this.externalEvent('SaveView_Cancel');
                     break;
                 case "PostCostValues":
