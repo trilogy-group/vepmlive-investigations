@@ -126,7 +126,7 @@ function RemoveResource() {
 }
 
 function AddResourcePool() {
-    var options = { url: newResUrl, width: 800, height: 600, title: "Add Resource", dialogReturnValueCallback: onAddResourcePool };
+    var options = { url: newResUrl, width: 600, height: 600, title: "Add Resource", dialogReturnValueCallback: onAddResourcePool };
 
     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 }
