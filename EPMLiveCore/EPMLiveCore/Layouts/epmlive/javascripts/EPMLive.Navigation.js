@@ -1278,7 +1278,7 @@
                         var newWidth = 0;
 
                         if (snWidth < wsWidth) {
-                            newWidth = wsWidth + 20 + 20;
+                            newWidth = wsWidth + 5;
 
                             $sn.stop().animate({ width: newWidth }, 300);
                             $sn.parent().stop().animate({ width: newWidth }, 300);
@@ -1357,22 +1357,34 @@
                         }
                     });
 
-                    $('a.rtIn').each(function () {
-                        var $spans = $(this).parent().parent().find('span');
-                        if ($spans.length > 1) {
-                            var $span = $($spans.get(1));
+                    var registerWSExpandCollapseEvent = function() {
+                        var $workspaces = $('a.rtIn');
+                        
+                        if ($workspaces.length) {
+                            $workspaces.each(function() {
+                                var $spans = $(this).parent().parent().find('span');
+                                if ($spans.length > 1) {
+                                    var $span = $($spans.get(1));
 
-                            if ($span) {
-                                $span.click(function () {
-                                    expandOrCollapseWorkspaceMenu($(this));
-                                });
+                                    if ($span) {
+                                        $span.click(function() {
+                                            expandOrCollapseWorkspaceMenu($(this));
+                                        });
 
-                                $span.hover(function () {
-                                    window.epmLiveNavigation.wsNodeSelectorClass = $(this).attr('class');
-                                });
-                            }
+                                        $span.hover(function() {
+                                            window.epmLiveNavigation.wsNodeSelectorClass = $(this).attr('class');
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            window.setTimeout(function() {
+                                registerWSExpandCollapseEvent();
+                            }, 1);
                         }
-                    });
+                    };
+                    
+                    registerWSExpandCollapseEvent();
                 }
 
                 function registerProviderLinks(response) {
