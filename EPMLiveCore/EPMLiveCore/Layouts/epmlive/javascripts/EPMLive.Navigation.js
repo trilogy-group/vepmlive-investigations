@@ -723,7 +723,7 @@
                                         });
                                         
                                         if (!wExists) {
-                                            $('<li class="epm-nav-sub-placeholder">No favorite workspace</li>').insertAfter($($parent.find('.epm-nav-sub-header-bottom').get(1)));
+                                            $('<li class="epm-nav-sub-placeholder">No favorite workspaces</li>').insertAfter($($parent.find('.epm-nav-sub-header-bottom').get(1)));
                                         }
                                     }
                                 } else if (pId === 'epm-nav-sub-favorites-static-links') {
@@ -1646,7 +1646,7 @@
                                                 remove = true;
                                             } else if (link.kind === 1 && text === 'No items') {
                                                 remove = true;
-                                            } else if (link.kind === 2 && text === 'No favorite workspace') {
+                                            } else if (link.kind === 2 && text === 'No favorite workspaces') {
                                                 remove = true;
                                             }
 
