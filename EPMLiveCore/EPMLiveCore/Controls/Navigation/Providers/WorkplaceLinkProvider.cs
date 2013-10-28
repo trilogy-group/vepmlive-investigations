@@ -132,10 +132,10 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             SPListItem workplace = communities[0];
             var ql = (string) (workplace["QuickLaunch"] ?? string.Empty);
 
-            foreach (string id in ql.Split(','))
+            foreach (string id in ql.Split(',').Where(id => !string.IsNullOrEmpty(id)))
             {
                 int nodeId;
-                if (int.TryParse(id, out nodeId))
+                if (int.TryParse(id.Split(':')[0], out nodeId))
                 {
                     yield return nodeId;
                 }
