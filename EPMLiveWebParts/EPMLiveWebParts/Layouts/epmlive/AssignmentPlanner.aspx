@@ -72,6 +72,7 @@
             letter-spacing: 0.5px;
             position: absolute;
             top: 30px;
+            color: #ffffff !important;
         }
         
         #EPMSplash > span {
