@@ -481,7 +481,7 @@
                 });
             }
   
-            if(fixedRibbon) {
+            if(fixedRibbon == true && window.location.href.indexOf("IsDlg=1") == -1) {
        
                 // This function extends the original from INIT.JS
                 var FixRibbonAndWorkspaceDimensions = (function () {
@@ -494,9 +494,16 @@
                     // Remove the inline style attribute for the workspace div
                     $("#s4-ribbonrow").css("height","35px");
                     
+                    if(RibbonIsMinimized()==false)
+                    { 
+                  		var adjHeight = $("#s4-workspace").height() + 90 + "px";
+                        $("#s4-workspace").css("height",adjHeight);  
+                    }
+                    
                   };
                 })();
             }
+
 
         </SharePoint:ScriptBlock>   
     </body>
