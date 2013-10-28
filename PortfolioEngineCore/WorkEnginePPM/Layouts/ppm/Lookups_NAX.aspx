@@ -68,7 +68,7 @@ html, body {
         </tr>
     </table>
     <div style="width:516px; display:block; padding-top: 0px; padding-bottom: 10px;">
-        <table cellpadding="5">
+        <table cellpadding="5" style="width:100%;">
             <tr>
                 <td class="descriptioncell">
                     Enter the lookup values:</td>
