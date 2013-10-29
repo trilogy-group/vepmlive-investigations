@@ -235,7 +235,9 @@ html, body {
                 var newrow = tgrid1.grid.AddRow(null, null, true);
                 tgrid1.SetCellValue(newrow, "RT_NAME", "New Rate");
                 tgrid1.grid.SetAttribute(newrow, null, "wres_ids", "", 1, 0);
-                tgrid1.grid.SetAttribute(newrow, null, "rates", "", 1, 0);
+                var rates = "1899.12.30::0.0"
+                tgrid1.grid.SetAttribute(newrow, null, "rates", rates, 1, 0);
+                tgrid1.Focus(newrow, 'BC_RATE');
                 break;
             case "btnSave":
                 var sData = BuildSaveRatesInfo();
