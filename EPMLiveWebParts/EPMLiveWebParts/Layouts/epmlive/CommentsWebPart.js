@@ -113,7 +113,7 @@ function GetData() {
             '<div style=\"clear:both\"></div>';
 
         var HiddenSubCommentTemp =
-            '<div class=\"subitem\" item=\"##listId##_##itemId##\" style="" isExtra=\"##isExtra##\">' +
+            '<div class=\"subitem\" item=\"##listId##_##itemId##\" style="display:none" isExtra=\"##isExtra##\">' +
                 '<table class="ms-socialCommentItem customCommentItem" id="commentItem_##itemId##">' +
                     '<tbody>' +
                         '<tr>' +
@@ -458,8 +458,17 @@ function GetData() {
                                             }
                                         });
 
-                                        $('#tbCommentInput' + oComment['@itemId']).blur(function (e) {
-                                            return true;
+                                        $('.tbComment').blur(function (e) {
+                                            var itemId = $(this).attr('id').replace('tbCommentInput', '');
+
+                                            if ($(this).text().trim().length > 0) {
+
+                                            }
+                                            else {
+                                                $('#aNewCommentReply' + itemId).css('display', '');
+                                                $('#tbCommentInput' + itemId).css('display', 'none');
+                                                $('#btnNewComment' + itemId).parent().css('display', 'none');
+                                            }
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
@@ -721,21 +730,17 @@ function GetData() {
                                             $('#tbCommentInput' + id).focus();
                                         });
 
-                                        $('#tbCommentInput' + oComment['@itemId']).blur(function (e) {
-                                            //                                            var id = $(this).attr('id').replace('tbCommentInput', '');
-                                            //                                            var newTarget = e.originalEvent.explicitOriginalTarget || document.activeElement;
-                                            //                                            var newCommentBtnId = 'btnNewComment' + id;
+                                        $('.tbComment').blur(function (e) {
+                                            var itemId = $(this).attr('id').replace('tbCommentInput', '');
 
-                                            //                                            if (newTarget.id != newCommentBtnId) {
-                                            //                                                $('#' + newCommentBtnId).parent().css('display', 'none');
-                                            //                                                $(this).css('display', 'none');
-                                            //                                                $('#aNewCommentReply' + id).css('display', '');
-                                            //                                            }
-                                            //                                            if ($$.UnescapeHTML($(this).html()) === undefined || $$.UnescapeHTML($(this).html()) === '') {
-                                            //                                                $(this).append($('<span style="color:gray">Write a reply...</span>'));
-                                            //                                            }
+                                            if ($(this).text().trim().length > 0) {
 
-                                            return true;
+                                            }
+                                            else {
+                                                $('#aNewCommentReply' + itemId).css('display', '');
+                                                $('#tbCommentInput' + itemId).css('display', 'none');
+                                                $('#btnNewComment' + itemId).parent().css('display', 'none');
+                                            }
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
@@ -859,11 +864,12 @@ function GetData() {
                                     .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName']);
 
                                 $('#' + containerId).before(commentItem);
-                                //$('#divWorkingNewComment').fadeOut('slow', function () {
-                                //    $('.subitem:last').fadeIn('slow', function () {
-                                //        $('#divWorkingNewComment').remove();
-                                //    });
-                                //});
+                                $('#' + containerId).prevAll(".subitem:first").fadeIn('slow');
+
+                                $('#tbCommentInput' + itemId).empty();
+                                $('#aNewCommentReply' + itemId).css('display', '');
+                                $('#tbCommentInput' + itemId).css('display', 'none');
+                                $('#btnNewComment' + itemId).parent().css('display', 'none');
                             }
                         }
 
@@ -992,8 +998,17 @@ function GetData() {
                                     }
                                 });
 
-                                $('#tbCommentInput' + iid).blur(function (e) {
-                                    return true;
+                                $('.tbComment').blur(function (e) {
+                                    var itemId = $(this).attr('id').replace('tbCommentInput', '');
+
+                                    if ($(this).text().trim().length > 0) {
+
+                                    }
+                                    else {
+                                        $('#aNewCommentReply' + itemId).css('display', '');
+                                        $('#tbCommentInput' + itemId).css('display', 'none');
+                                        $('#btnNewComment' + itemId).parent().css('display', 'none');
+                                    }
                                 });
 
                                 $('#tbCommentInput' + iid).change(function () {
@@ -1053,6 +1068,24 @@ function GetData() {
 
             }
         };
+
+        $$.clickedOutsideElement = function (elemId, event) {
+            var theElem = null;
+            try {
+                theElem = (window.event) ? GetEventTarget(window.event) : event.target;
+            }
+            catch (e)
+            { }
+            while (theElem != null) {
+                if (theElem.id == elemId) {
+                    return false;
+                }
+                else {
+                    theElem = theElem.parentNode;
+                }
+            }
+            return true;
+        }
 
         $$.ShowAllComments = function (element) {
             if (element.text() == "Show All") {
@@ -1122,6 +1155,12 @@ function GetData() {
             $("#inputPublicComment").focus(function () {
                 if ($$.UnescapeHTML($(this).html()) === sPubComTxt) {
                     $(this).empty();
+                }
+            });
+
+            $("#inputPublicComment").blur(function () {
+                if ($$.UnescapeHTML($(this).html().trim()) === '') {
+                    $(this).html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
                 }
             });
 
