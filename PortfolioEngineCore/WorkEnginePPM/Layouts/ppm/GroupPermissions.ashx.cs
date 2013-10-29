@@ -298,14 +298,17 @@ namespace WorkEnginePPM
             xCfg.CreateIntAttr("SuppressCfg", 1);
             xCfg.CreateIntAttr("InEditMode", 0);
             //xCfg.CreateIntAttr("Selecting", 0);
+
             xCfg.CreateIntAttr("Dragging", 0);
             xCfg.CreateIntAttr("Dropping", 0);
             xCfg.CreateIntAttr("ColsMoving", 0);
             xCfg.CreateIntAttr("ColsPostLap", 1);
             xCfg.CreateIntAttr("ColsLap", 1);
-            //xCfg.CreateIntAttr("MaxHeight", 0);
             xCfg.CreateBooleanAttr("ShowDeleted", false);
             xCfg.CreateBooleanAttr("DateStrings", true);
+            //xCfg.CreateIntAttr("ConstHeight", 1);
+            xCfg.CreateIntAttr("ConstWidth", 2);
+            //xCfg.CreateIntAttr("MaxHeight", 1);
             xCfg.CreateIntAttr("MaxWidth", 1);
             xCfg.CreateIntAttr("AppendId", 0);
             xCfg.CreateIntAttr("FullId", 0);
@@ -318,9 +321,18 @@ namespace WorkEnginePPM
             xCfg.CreateStringAttr("CSS", "TGrid");
             xCfg.CreateIntAttr("Sorting", 0);
             xCfg.CreateIntAttr("FastColumns", 1);
+            xCfg.CreateIntAttr("StaticCursor", 1);
+            xCfg.CreateIntAttr("FocusWholeRow", 1);
             xCfg.CreateBooleanAttr("NoTreeLines", true);
 
             xCfg.CreateStringAttr("MainCol", "Permission");
+            CStruct xDef = xGrid.CreateSubStruct("Def");
+            CStruct xD = xDef.CreateSubStruct("D");
+            xD.CreateStringAttr("Name", "R");
+            xD.CreateStringAttr("HoverCell", "Color");
+            xD.CreateStringAttr("HoverRow", "Color");
+            xD.CreateStringAttr("FocusCell", "");
+            xD.CreateStringAttr("FocusRow", "Color");
 
             CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
             CStruct xCols = xGrid.CreateSubStruct("Cols");
