@@ -40,6 +40,9 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
         {
             switch (control)
             {
+                case "mywork":
+                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/mywork.aspx?isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                    break;
                 case "workplan":
                     Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/workplanner.aspx?CloseMethod=3&isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                     break;
