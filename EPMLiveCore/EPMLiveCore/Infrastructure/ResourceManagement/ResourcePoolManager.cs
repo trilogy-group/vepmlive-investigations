@@ -13,15 +13,16 @@ namespace EPMLiveCore.Infrastructure
 {
     public sealed class ResourcePoolManager : SPListItemManager
     {
-        #region Constructors (1) 
+        #region Constructors (2) 
+
+        public ResourcePoolManager(SPWeb web)
+            : base("Resources", web.ID, web.Site.ID, "Resources", "Resource") { }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ResourcePoolManager" /> class.
         /// </summary>
         public ResourcePoolManager()
-            : base("Resources", SPContext.Current.Web.ID, SPContext.Current.Site.ID, "Resources", "Resource")
-        {
-        }
+            : base("Resources", SPContext.Current.Web.ID, SPContext.Current.Site.ID, "Resources", "Resource") { }
 
         #endregion Constructors 
 
@@ -55,15 +56,15 @@ namespace EPMLiveCore.Infrastructure
 
                     foreach (
                         DataTable dataTable in
-                            from obj in new[] { "[dbo].[spGetReportListData]" }
+                            from obj in new[] {"[dbo].[spGetReportListData]"}
                             let queryExecutor = new QueryExecutor(spWeb)
                             select queryExecutor.ExecuteReportingDBQuery(
                                 @"SELECT COUNT(*) AS Found FROM dbo.sysobjects WHERE id = object_id(@Object)",
-                                new Dictionary<string, object> { { "@Object", obj } }))
+                                new Dictionary<string, object> {{"@Object", obj}}))
                     {
                         if (dataTable.Rows.Count > 0)
                         {
-                            if ((int)dataTable.Rows[0]["Found"] != 1)
+                            if ((int) dataTable.Rows[0]["Found"] != 1)
                             {
                                 exists = false;
                             }
@@ -82,16 +83,16 @@ namespace EPMLiveCore.Infrastructure
             }
 
             return useReportingDb
-                       ? GetAllFromReportingDB(includeHidden, includeReadOnly)
-                       : base.GetAll(includeHidden, includeReadOnly);
+                ? GetAllFromReportingDB(includeHidden, includeReadOnly)
+                : base.GetAll(includeHidden, includeReadOnly);
         }
 
         // Private Methods (3) 
 
         private List<XElement> BuildXmlElements(bool includeHidden, bool includeReadOnly,
-                                                IEnumerable<DataRow> rowCollection, List<SPField> spFieldCollection,
-                                                DataColumnCollection dataColumnCollection, DataTable resources,
-                                                out Dictionary<string, object[]> valueDictionary)
+            IEnumerable<DataRow> rowCollection, List<SPField> spFieldCollection,
+            DataColumnCollection dataColumnCollection, DataTable resources,
+            out Dictionary<string, object[]> valueDictionary)
         {
             var elements = new List<XElement>();
             valueDictionary = new Dictionary<string, object[]>();
@@ -169,9 +170,7 @@ namespace EPMLiveCore.Infrastructure
                                         list.Add(ids[i]);
                                         list.Add(values[i]);
                                     }
-                                    catch
-                                    {
-                                    }
+                                    catch { }
                                 }
 
                                 value = string.Join(";#", list.ToArray());
@@ -198,8 +197,8 @@ namespace EPMLiveCore.Infrastructure
                             if (!lookupValues.ContainsKey(key))
                             {
                                 GetFieldSpecialValues(spField, stringValue, value, out fieldEditValue,
-                                                      out fieldTextValue,
-                                                      out fieldHtmlValue);
+                                    out fieldTextValue,
+                                    out fieldHtmlValue);
 
                                 fieldHtmlValue = key;
 
@@ -222,8 +221,8 @@ namespace EPMLiveCore.Infrastructure
                             if (!userValues.ContainsKey(value))
                             {
                                 GetFieldSpecialValues(spField, stringValue, value, out fieldEditValue,
-                                                      out fieldTextValue,
-                                                      out fieldHtmlValue);
+                                    out fieldTextValue,
+                                    out fieldHtmlValue);
 
                                 userValues.Add(value, new[] {fieldTextValue, fieldEditValue, fieldHtmlValue});
                             }
@@ -238,8 +237,8 @@ namespace EPMLiveCore.Infrastructure
                             break;
                         case SPFieldType.DateTime:
                             string specialValue = string.IsNullOrEmpty(stringValue)
-                                                      ? string.Empty
-                                                      : ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                                ? string.Empty
+                                : ((DateTime) value).ToString("yyyy-MM-dd HH:mm:ss");
 
                             fieldTextValue = specialValue;
                             fieldHtmlValue = specialValue;
@@ -258,15 +257,15 @@ namespace EPMLiveCore.Infrastructure
                     }
 
                     itemElement.Add(new XElement("Data", new XAttribute("Field", internalName),
-                                                 new XAttribute("Type", spField.Type),
-                                                 new XAttribute("Format", formatDictionary[internalName]),
-                                                 new XAttribute("Hidden", isHidden),
-                                                 new XAttribute("ReadOnly", isReadOnly),
-                                                 new XAttribute("TextValue", fieldTextValue),
-                                                 new XAttribute("HtmlValue", fieldHtmlValue),
-                                                 new XAttribute("EditValue", fieldEditValue),
-                                                 new XAttribute("ProcessHtmlValue", processHtmlValue),
-                                                 new XCData(stringValue)));
+                        new XAttribute("Type", spField.Type),
+                        new XAttribute("Format", formatDictionary[internalName]),
+                        new XAttribute("Hidden", isHidden),
+                        new XAttribute("ReadOnly", isReadOnly),
+                        new XAttribute("TextValue", fieldTextValue),
+                        new XAttribute("HtmlValue", fieldHtmlValue),
+                        new XAttribute("EditValue", fieldEditValue),
+                        new XAttribute("ProcessHtmlValue", processHtmlValue),
+                        new XCData(stringValue)));
                 }
 
                 elements.Add(itemElement);
@@ -294,15 +293,15 @@ namespace EPMLiveCore.Infrastructure
                 SPWeb spWeb = ParentList.ParentWeb;
 
                 var parameters = new Dictionary<string, object>
-                                     {
-                                         {"@siteid", spWeb.Site.ID},
-                                         {"@webid", spWeb.ID},
-                                         {"@weburl", spWeb.ServerRelativeUrl},
-                                         {"@userid", spWeb.CurrentUser.ID},
-                                         {"@rollup", false},
-                                         {"@list", "ResourcePool"},
-                                         {"@query", string.Empty}
-                                     };
+                {
+                    {"@siteid", spWeb.Site.ID},
+                    {"@webid", spWeb.ID},
+                    {"@weburl", spWeb.ServerRelativeUrl},
+                    {"@userid", spWeb.CurrentUser.ID},
+                    {"@rollup", false},
+                    {"@list", "ResourcePool"},
+                    {"@query", string.Empty}
+                };
 
                 var queryExecutor = new QueryExecutor(spWeb);
                 DataTable resources = queryExecutor.ExecuteReportingDBStoredProc("spGetReportListData", parameters);
@@ -312,7 +311,7 @@ namespace EPMLiveCore.Infrastructure
                     var xml = new XDocument();
                     xml.Add(rootElement);
 
-                    return xml; 
+                    return xml;
                 }
 
                 List<SPField> spFieldCollection = ParentList.Fields.Cast<SPField>().ToList();
@@ -357,24 +356,24 @@ namespace EPMLiveCore.Infrastructure
                     eventWaitHandles.Add(eventWaitHandle);
 
                     var thread = new Thread(() =>
-                                                {
-                                                    Dictionary<string, object[]> valueDictionary;
+                    {
+                        Dictionary<string, object[]> valueDictionary;
 
-                                                    List<XElement> elements = BuildXmlElements(includeHidden,
-                                                                                               includeReadOnly, dataRows,
-                                                                                               spFieldCollection,
-                                                                                               dataColumnCollection,
-                                                                                               resources,
-                                                                                               out valueDictionary);
+                        List<XElement> elements = BuildXmlElements(includeHidden,
+                            includeReadOnly, dataRows,
+                            spFieldCollection,
+                            dataColumnCollection,
+                            resources,
+                            out valueDictionary);
 
-                                                    lock (locker)
-                                                    {
-                                                        resultDictionary.Add(order,
-                                                                             new object[] {elements, valueDictionary});
-                                                    }
+                        lock (locker)
+                        {
+                            resultDictionary.Add(order,
+                                new object[] {elements, valueDictionary});
+                        }
 
-                                                    eventWaitHandle.Set();
-                                                }) {Name = "GetResources" + pagesProcessed, IsBackground = true};
+                        eventWaitHandle.Set();
+                    }) {Name = "GetResources" + pagesProcessed, IsBackground = true};
                     thread.Start();
                 }
 
@@ -407,7 +406,7 @@ namespace EPMLiveCore.Infrastructure
                 foreach (XElement element in xElement.Elements("Data"))
                 {
                     XAttribute processHtmlAttr = element.Attribute("ProcessHtmlValue");
-                    var process = processHtmlAttr != null && processHtmlAttr.Value.ToLower().Equals("true");
+                    bool process = processHtmlAttr != null && processHtmlAttr.Value.ToLower().Equals("true");
 
                     if (processHtmlAttr != null) processHtmlAttr.Remove();
 

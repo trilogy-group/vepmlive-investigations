@@ -600,7 +600,7 @@ namespace EPMLiveCore.API
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        internal static string GetResourcePoolDataGrid(string data)
+        internal static string GetResourcePoolDataGrid(string data, SPWeb web)
         {
             try
             {
@@ -610,7 +610,7 @@ namespace EPMLiveCore.API
                     SPWeb spWeb = resourcesList.ParentWeb;
 
                     XDocument resourceXml =
-                        XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data))));
+                        XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), web));
 
                     var resultXml = new XDocument();
                     resultXml.Add(new XElement("Grid"));
@@ -1019,14 +1019,15 @@ namespace EPMLiveCore.API
         ///     Gets the resources.
         /// </summary>
         /// <param name="data">The data.</param>
+        /// <param name="oWeb"></param>
         /// <returns></returns>
-        internal static string GetResources(string data)
+        internal static string GetResources(string data, SPWeb web)
         {
             try
             {
                 XDocument resultXml;
 
-                using (var resourceManager = new ResourcePoolManager())
+                using (var resourceManager = new ResourcePoolManager(web))
                 {
                     bool includeHidden = false;
                     bool includeReadOnly = false;

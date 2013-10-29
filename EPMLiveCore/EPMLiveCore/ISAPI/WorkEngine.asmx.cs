@@ -1193,7 +1193,7 @@ namespace EPMLiveCore
                 var watch = new Stopwatch();
                 watch.Start();
 
-                var result = Response.Success(ResourceGrid.GetResources(data));
+                var result = Response.Success(ResourceGrid.GetResources(data, oWeb));
 
                 watch.Stop();
 
@@ -1217,7 +1217,7 @@ namespace EPMLiveCore
                 var watch = new Stopwatch();
                 watch.Start();
 
-                var result = ResourceGrid.GetResourcePoolDataGrid(data);
+                var result = ResourceGrid.GetResourcePoolDataGrid(data, oWeb);
 
                 watch.Stop();
 
