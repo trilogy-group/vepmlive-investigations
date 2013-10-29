@@ -13,12 +13,23 @@
     position: relative;
 }
 
-.callout .notch {
-    border-top-color:#fafafa;
-    border-right-color:transparent;
-    border-left-color:transparent;
-    border-bottom-color:#fafafa !important;
-}
+    .callout .notch {
+        border-top-color: #fafafa;
+        border-right-color: transparent;
+        border-left-color: transparent;
+        border-bottom-color: #fafafa !important;
+        border-style:  none solid solid;
+            border-width:  0 10px 10px;
+            font-size:  0;
+            height:  0;
+            left:  20px;
+            line-height:  0;
+            margin:  0;
+            padding:  0;
+            position:  absolute;
+            top:  -10px;
+            width:  0;
+    }
 
 .inputSearch {
     -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
@@ -36,7 +47,7 @@
 
     .inputSearch p {
         margin: 0;
-}
+    }
 
 .border-callout {
     border-left: 1px solid #CCCCCC !important;
@@ -45,10 +56,10 @@
     padding-bottom: 10px;
 }
 
-.border-callout .border-notch { 
-    border-bottom-color: #CCCCCC !important;
-    top: -11px;
-}
+    .border-callout .border-notch {
+        border-bottom-color: #CCCCCC !important;
+        top: -11px;
+    }
 
 .commentsWPMainContainer a:visited {
     color: #0072bc;
@@ -178,7 +189,6 @@
 }
 
 .subitem {
-    
     background-color: #fafafa !important;
     border-bottom: 0px !important;
     padding: 3px;
@@ -191,8 +201,8 @@
 
 .workingNewComment {
     width: 100%;
-    vertical-align: middle; 
-    white-space: nowrap; 
+    vertical-align: middle;
+    white-space: nowrap;
     background-color: #FAFAFA;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -203,29 +213,28 @@
     background-color: rgba(255, 255, 255, 0.85);
     border: 1px solid #ABABAB;
     color: #444444;
-    color: inherit;    
-    
+    color: inherit;
     vertical-align: middle;
     outline: none;
     resize: none;
     font-family: "Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif !important;
     font-size: 8pt !important;
-    line-height: 0px !important;
     min-height: 0px !important;
 }
 
     .epmliveinput:hover {
         border-color: #92C0E0;
-}
+    }
 
     .epmliveinput:focus {
         border-color: #2A8DD4;
-}
+    }
 
 .tbComment {
-border:1px solid #cccccc !important;
-width: 98% !important;
-height: 15px !important;
+    line-height: 16px;
+    border: 1px solid #cccccc !important;
+    width: 98% !important;
+    min-height: 15px !important;
 }
 
 .epmliveButton {
@@ -237,40 +246,40 @@ height: 15px !important;
     font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
     font-size: 12px;
     color: #444;
-    margin-left:0px !important;
-	padding: 4px 5px 5px !important;
-	border-radius:3px;
+    margin-left: 0px !important;
+    padding: 4px 5px 5px !important;
+    border-radius: 3px;
 }
 
 .epmliveButton-disabled {
-background-color: #FDFDFD !important;
+    background-color: #FDFDFD !important;
     border-color: #E1E1E1 !important;
     color: #B1B1B1 !important;
     cursor: default !important;
 }
 
 .epmliveButton:hover {
-border-color: #92C0E0;
-background-color: #E6F2FA;
+    border-color: #92C0E0;
+    background-color: #E6F2FA;
     cursor: pointer;
 }
 
 .epmliveButton:active {
-border-color: #2A8DD4;
-background-color: #92C0E0;
+    border-color: #2A8DD4;
+    background-color: #92C0E0;
     cursor: pointer;
 }
 
 .epmliveButton-emphasize {
-border-color: #0067B0 !important;
-background-color: #0072C6 !important;
-color: white !important;
+    border-color: #0067B0 !important;
+    background-color: #0072C6 !important;
+    color: white !important;
 }
 
     .epmliveButton-emphasize:hover {
-background-color: #0067B0 !important;
-    border-color: #004D85 !important;
-}
+        background-color: #0067B0 !important;
+        border-color: #004D85 !important;
+    }
 
 
 .epmliveButtonDisabled {
@@ -284,7 +293,7 @@ background-color: #0067B0 !important;
     margin-left: 10px;
     font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
     font-size: 11px;
-    border-color: #E1E1E1;        
+    border-color: #E1E1E1;
 }
 
 
@@ -311,17 +320,17 @@ background-color: #0067B0 !important;
 }
 
 .ms-socialDataFrameContents {
-   font-size: 8pt; 
-   font-family: verdana;  
+    font-size: 8pt;
+    font-family: verdana;
 }
 
-.ms-socialDataFrameContents a:hover {
-    text-decoration: underline; 
-}
+    .ms-socialDataFrameContents a:hover {
+        text-decoration: underline;
+    }
 
 .ms-socialDataFrame a:link, .ms-socialDataFrame a:visited {
     color: #0070c0;
-    text-decoration: none; 
+    text-decoration: none;
 }
 
 div.ms-TagCloud {
@@ -371,36 +380,36 @@ div.ms-TagCloud {
 }
 
 div.ms-TagCloudLink a:link {
-	/* [ReplaceColor(themeColor: "Dark1-Medium")] */
-	color: #3f3f3f;
+    /* [ReplaceColor(themeColor: "Dark1-Medium")] */
+    color: #3f3f3f;
 }
 
 div.ms-TagCloudLink a:visited {
-	/* [ReplaceColor(themeColor: "Dark1-Medium")] */
-	color: #3f3f3f;
+    /* [ReplaceColor(themeColor: "Dark1-Medium")] */
+    color: #3f3f3f;
 }
 
 div.ms-TagCloudLink a:hover {
-	/* [ReplaceColor(themeColor: "Light1")] */
-	color: #ffffff;
-	/* [ReplaceColor(themeColor: "Hyperlink")] */
-	background-color: #0072bc;
-	text-decoration: none; 
+    /* [ReplaceColor(themeColor: "Light1")] */
+    color: #ffffff;
+    /* [ReplaceColor(themeColor: "Hyperlink")] */
+    background-color: #0072bc;
+    text-decoration: none;
 }
 
 .ms-socialCommentEdit {
     background-color: #ffffff font-size: 8pt;
-	font-family: verdana; 
+    font-family: verdana;
 }
 
-.ms-socialCommentEdit .socialcomment-editbox {
-	width: 100%;
-	border: thin inset;
-	overflow-y: auto;
-}
+    .ms-socialCommentEdit .socialcomment-editbox {
+        width: 100%;
+        border: thin inset;
+        overflow-y: auto;
+    }
 
 .ms-socialCommentLoading {
-	text-align: right;
+    text-align: right;
 }
 
 .ms-socialCommentItem {
@@ -410,40 +419,40 @@ div.ms-TagCloudLink a:hover {
     font-family: Open Sans Regular !important;
 }
 
-.ms-socialCommentItem .socialcomment-top {
-	vertical-align: top;
+    .ms-socialCommentItem .socialcomment-top {
+        vertical-align: top;
         padding-top: 0px;
-}
+    }
 
-.ms-socialCommentItem .socialcomment-bottom {
+    .ms-socialCommentItem .socialcomment-bottom {
         padding-bottom: 24px;
-}
+    }
 
     .ms-socialCommentItem .socialcomment-pagecount {
-	vertical-align: top;
+        vertical-align: top;
         padding: 0px 0px 10px;
-}
+    }
 
 .ms-socialCommentPaging {
-	width: 100%;
-	font-size: 8pt; 
-	font-family: verdana; 
-	padding-bottom: 7px;
+    width: 100%;
+    font-size: 8pt;
+    font-family: verdana;
+    padding-bottom: 7px;
 }
 
-.ms-socialCommentPaging .socialcomment-pagelink {
-	color: #0072bc;
-	text-decoration: none; 
-	vertical-align: top;
-	padding: 3px 3px;
-}
+    .ms-socialCommentPaging .socialcomment-pagelink {
+        color: #0072bc;
+        text-decoration: none;
+        vertical-align: top;
+        padding: 3px 3px;
+    }
 
 .ms-socialCommentItem .socialcomment-image {
-	vertical-align: top;
+    vertical-align: top;
     width: 32px;
     height: 32px;
-	margin-top: 1px;
-	border: 0px;
+    margin-top: 1px;
+    border: 0px;
 }
 
     .ms-socialCommentItem .socialcomment-image img {
@@ -453,72 +462,72 @@ div.ms-TagCloudLink a:hover {
         padding: 0px !important;
         border-radius: 50% !important;
         border: 2px solid #4B89B2 !important;
-}
+    }
 
 .ms-socialCommentItem .socialcomment-IMPawn {
-	vertical-align: top;
+    vertical-align: top;
     width: 12px;
     height: 12px;
-	margin: 0px;
-	padding: 1px 0px;
+    margin: 0px;
+    padding: 1px 0px;
     border: 0px;
 }
 
 .ms-socialCommentItem .socialcomment-username a:link {
-	color: #1d71b6;
-	text-align: left;	
+    color: #1d71b6;
+    text-align: left;
 }
 
 .ms-socialCommentItem .socialcomment-username a:visited {
-	color: #1d71b6;
-	text-align: left;	
+    color: #1d71b6;
+    text-align: left;
 }
 
 .ms-socialCommentItem .socialcomment-username a:hover {
-   text-decoration: underline; 
- }
+    text-decoration: underline;
+}
 
 .ms-socialCommentItem .socialcomment-contents {
-	color: #676767;
-	width: 390px;
-	word-wrap: break-word;
-	overflow: hidden;
+    color: #676767;
+    width: 390px;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .ms-socialCommentItem .socialcomment-contents-TRC {
-	color: #676767;
-	width: 505px;
-	word-wrap: break-word;
-	overflow: hidden;
+    color: #676767;
+    width: 505px;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .ms-socialCommentItem .commentWebpart-socialcomment-contents-TRC {
     color: #676767;
-	word-wrap: break-word;
-	overflow: hidden;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .ms-socialCommentItem .socialcomment-time {
-	color: #707070;
-	text-align: left;	
-	padding-left: 5px;	
+    color: #707070;
+    text-align: left;
+    padding-left: 5px;
 }
 
 .ms-socialCommentItem .socialcomment-cmdlink {
-	text-align: right;
+    text-align: right;
 }
 
     .ms-socialCommentItem .socialcomment-cmdlink a:link {
-	color: #1d71b6;
-}
+        color: #1d71b6;
+    }
 
     .ms-socialCommentItem .socialcomment-cmdlink a:visited {
-	color: #1d71b6;
-}
+        color: #1d71b6;
+    }
 
     .ms-socialCommentItem .socialcomment-cmdlink a:hover {
-   text-decoration: underline; 
- }
+        text-decoration: underline;
+    }
 
 .ms-socialCommentItem .separator {
     color: #d9d9d9;
@@ -532,21 +541,21 @@ div.ms-TagCloudLink a:hover {
 }
 
 .ms-socialContextHeader {
-	border-color: #f2f2f2;
-	border-style: solid;
-	border-width: 0px 0px 1px 0px;
-	height: 20px; 
-	background-color: #f8f8f8;
-	padding-left: 10px;
-	font-size: 8pt; 
-	font-family: Tahoma, Verdana, Helvetica, sans-serif;  
+    border-color: #f2f2f2;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+    height: 20px;
+    background-color: #f8f8f8;
+    padding-left: 10px;
+    font-size: 8pt;
+    font-family: Tahoma, Verdana, Helvetica, sans-serif;
 }
 
 .ms-socialContextSearchFooter {
-	border-color: #f2f2f2;
-	border-style: solid;
-	border-width: 2px 0px 0px 0px;
-	padding: 5px;
+    border-color: #f2f2f2;
+    border-style: solid;
+    border-width: 2px 0px 0px 0px;
+    padding: 5px;
 }
 
 .ms-socialContextSingleItem {
@@ -555,76 +564,76 @@ div.ms-TagCloudLink a:hover {
 }
 
     .ms-socialContextSingleItem span {
-    text-align: center;
-    width: 30px; 
-    padding-left: 6px;
-    padding-right: 6px;
-}
+        text-align: center;
+        width: 30px;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
 
     .ms-socialContextSingleItem img {
-    vertical-align: middle;
-}
+        vertical-align: middle;
+    }
 
 .ms-socialThoughtHeader {
     clear: both;
     width: 100%;
-	font-family: Tahoma, Verdana, Helvetica, sans-serif; 
+    font-family: Tahoma, Verdana, Helvetica, sans-serif;
 }
 
     .ms-socialThoughtHeader .ms-socialThoughtHeaderTitle {
-	font-size: 12pt; 
-	color: #FD8003;
-	font-weight: bold; 
-}
+        font-size: 12pt;
+        color: #FD8003;
+        font-weight: bold;
+    }
 
-.ms-socialThoughtHeader img {
-	vertical-align: middle;
-}
+    .ms-socialThoughtHeader img {
+        vertical-align: middle;
+    }
 
 .ms-socialThoughtLeftHeader {
-	font-family: Tahoma, Verdana, Helvetica, sans-serif;  
-	float: left;
+    font-family: Tahoma, Verdana, Helvetica, sans-serif;
+    float: left;
 }
 
 .ms-socialThoughtModeLink {
-	font-size: 8pt; 
-	padding-left: 10px;
+    font-size: 8pt;
+    padding-left: 10px;
 }
 
 .ms-socialThoughtPageLink {
-	font-size: 8pt; 
+    font-size: 8pt;
     float: right;
 }
 
-.ms-socialThoughtPageLink img {
-	vertical-align: middle;
-	cursor: pointer;
-}
+    .ms-socialThoughtPageLink img {
+        vertical-align: middle;
+        cursor: pointer;
+    }
 
 .ms-socialThoughtNavigation {
-	padding: 0 5px;
+    padding: 0 5px;
     color: #8e8e90;
 }
 
 .ms-SocialThoughtContent {
     width: 100%;
     clear: both;
-	font-family: Tahoma, Verdana, Helvetica, sans-serif;  
-	font-size: 8pt; 
-	margin: 5px 0 10px 0;
+    font-family: Tahoma, Verdana, Helvetica, sans-serif;
+    font-size: 8pt;
+    margin: 5px 0 10px 0;
 }
 
 .ms-socialThoughtContentLeft {
     clear: both;
     float: left;
-	word-break: break-all;
+    word-break: break-all;
 }
 
 .ms-socialThoughtContentRight {
     text-align: right;
-	float: right;
+    float: right;
     vertical-align: middle;
-	word-break: break-word;
+    word-break: break-word;
 }
 
 .ms-socialThoughtComment {
@@ -633,140 +642,140 @@ div.ms-TagCloudLink a:hover {
 }
 
 .ms-socialThoughtBoxParent {
-	width: 350px;
-	padding-right: 24px;
-	float: left;
+    width: 350px;
+    padding-right: 24px;
+    float: left;
 }
 
 .ms-socialThoughtBoxParent2 {
-	width: 557px;
-	float: right;
+    width: 557px;
+    float: right;
 }
 
 .ms-socialThoughtBoxMonth {
-	padding-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 .ms-socialThoughtBoxView {
-	padding-bottom: 30px;
+    padding-bottom: 30px;
 }
 
 .ms-socialThoughtBoxTags {
-	padding-bottom: 30px;
-	line-height: 1.5;
-	width: 350px; 
+    padding-bottom: 30px;
+    line-height: 1.5;
+    width: 350px;
 }
 
 .ms-socialThoughtBoxTitle {
-	color: #003759;
-	font-size: 1.3em; 
-	padding-bottom: 10px;
+    color: #003759;
+    font-size: 1.3em;
+    padding-bottom: 10px;
 }
 
 .ms-socialThoughtView .viewdefault {
-	color: #676767;
+    color: #676767;
 }
 
 .ms-socialThoughtView .viewselect {
-	color: #0072bc;
+    color: #0072bc;
 }
 
 .ms-socialThoughtView a:hover {
-	color: #0072bc;
+    color: #0072bc;
 }
 
 .ms-socialThoughtActivitiesTitle {
-	color: #003759;
-	font-size: 1.3em; 
+    color: #003759;
+    font-size: 1.3em;
 }
 
 .ms-socialThoughtActivities .month {
-	display: inline-block;
-	color: #003759;
-	width: 124px; 
-	text-align: center;
-	font-size: 1.3em; 
+    display: inline-block;
+    color: #003759;
+    width: 124px;
+    text-align: center;
+    font-size: 1.3em;
 }
 
 .ms-socialThoughtActivities .tag {
-	color: #0072bc;
-	font-size: 1.3em; 
+    color: #0072bc;
+    font-size: 1.3em;
 }
 
 .ms-socialThoughtItems .itembox {
-	border-bottom: 1px dashed #BFBFBF;
-	padding-top: 12px;
-	padding-bottom: 12px;
+    border-bottom: 1px dashed #BFBFBF;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .ms-socialThoughtItems .commentbox {
-	padding: 4px 32px;
-	word-wrap: break-word;
+    padding: 4px 32px;
+    word-wrap: break-word;
 }
 
 .ms-socialThoughtItems .viewactivities {
-	padding-left: 20px;
-	color: #003759;
+    padding-left: 20px;
+    color: #003759;
 }
 
 .ms-socialThoughtItems .private {
-	padding-left: 24px;
-	color: #003759;
+    padding-left: 24px;
+    color: #003759;
 }
 
 .ms-socialThoughtItems .delete {
-	padding-left: 24px;
-	color: #003759;
+    padding-left: 24px;
+    color: #003759;
 }
 
 .ms-socialThoughtItems .selectedtag {
-	color: #ffffff;
-	background-color: #0072bc;
+    color: #ffffff;
+    background-color: #0072bc;
 }
 
 .ms-socialThoughtItems .loading {
-	text-align: center;
-	padding-top: 100px;
+    text-align: center;
+    padding-top: 100px;
 }
 
 .ms-socialThoughtItems a:hover {
-	color: #0072bc;
+    color: #0072bc;
 }
 
 .ms-socialThoughtBoxTagsSort {
-	padding-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 span.ms-socialThoughtSortTitle {
-	color: #000000;
+    color: #000000;
 }
 
 .ms-socialThoughtTagsSort .sortselect {
-	color: #0072bc;
+    color: #0072bc;
 }
 
 .ms-socialThoughtTagsSort .sortdefault {
-	color: #676767;
+    color: #676767;
 }
 
 .ms-socialThoughtTagsSort a:hover {
-	color: #0072bc;
+    color: #0072bc;
 }
 
 a.ms-socialThoughtTagSelect:link {
-	color: #ffffff;
-	background-color: #0072bc;
+    color: #ffffff;
+    background-color: #0072bc;
 }
 
 a.ms-socialThoughtTagDefault:link {
-	color: #3f3f3f;
+    color: #3f3f3f;
 }
 
 .ms-socialRecommendedTags {
     border-color: #e8e8e9;
     border-style: solid;
     border-width: 1px;
-	max-width: 100%;
+    max-width: 100%;
 }
 
 .ms-socialItems {
@@ -774,36 +783,36 @@ a.ms-socialThoughtTagDefault:link {
 }
 
 .ms-socialStandardheader {
-    font-size: 10pt; 
-    font-family: verdana; 
+    font-size: 10pt;
+    font-family: verdana;
     padding-bottom: 10px;
     text-align: left;
     color: #202122;
 }
 
 .ms-socialTagInputBox {
-	width: 100%;
-	min-height: 28px;
+    width: 100%;
+    min-height: 28px;
 }
 
 .ms-socialTagPrivateCheckBox {
-	font-size: 11px; 
-	font-family: verdana; 
-	text-align: left;
+    font-size: 11px;
+    font-family: verdana;
+    text-align: left;
 }
 
 .ms-socialTagSaveButton {
-	text-align: right;
+    text-align: right;
 }
 
 .ms-socialCommentInputBox {
-	font-family: verdana; 
-	font-size: 8pt; 
-	word-wrap: break-word;
-	word-break: keep-all;
-	white-space: normal;
-	min-height: 16px;
-	border: thin inset;
+    font-family: verdana;
+    font-size: 8pt;
+    word-wrap: break-word;
+    word-break: keep-all;
+    white-space: normal;
+    min-height: 16px;
+    border: thin inset;
 }
 
 .ms-socialCommentInputBoxBorder {
@@ -813,160 +822,160 @@ a.ms-socialThoughtTagDefault:link {
 }
 
 .ms-socialDataRibbonContents {
-	font-size: 11px; 
-	font-family: verdana; 
+    font-size: 11px;
+    font-family: verdana;
 }
 
 .ms-socialWPSeparatorTop {
-	Width: 100%;
-	padding-bottom: 10px;
-	border-bottom: 1px dashed #B6BABF;
+    Width: 100%;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #B6BABF;
 }
 
 .ms-socialWPSeparatorBottom {
-	Width: 100%;
-	padding-bottom: 10px;
+    Width: 100%;
+    padding-bottom: 10px;
 }
 
 .ms-socialTagInformationLabel {
-	padding-top: 20px;
-	padding-bottom: 3px;
-	color: #000000;
+    padding-top: 20px;
+    padding-bottom: 3px;
+    color: #000000;
 }
 
 .ms-socialTagInformationDescription {
-	padding-top: 10px;
+    padding-top: 10px;
 }
 
 div.ms-taggedItemsView {
-	padding-top: 10px;
-	padding-bottom: 5px;
+    padding-top: 10px;
+    padding-bottom: 5px;
 }
 
     div.ms-taggedItemsView span.view {
-	color: #000000;
-}
+        color: #000000;
+    }
 
     div.ms-taggedItemsView a.default {
-	color: #676767;
-}
+        color: #676767;
+    }
 
     div.ms-taggedItemsView a.select {
-	color: #0072bc;
-}
+        color: #0072bc;
+    }
 
     div.ms-taggedItemsView a:hover {
-	color: #0072bc;
-	text-decoration: underline; 
-}
+        color: #0072bc;
+        text-decoration: underline;
+    }
 
 .ms-taggedItems .itemTbl {
-	width: 100%;
-	padding-top: 14px;
-	padding-bottom: 14px;
-	border: 0px;
-	cellspacing: 0px;
+    width: 100%;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border: 0px;
+    cellspacing: 0px;
     cellpadding;
     0px;
 }
 
 .ms-taggedItems .lineArea {
-	height: 1.5em;
+    height: 1.5em;
 }
 
 .ms-taggedItems td.iconArea {
-	width: 42px;
+    width: 42px;
 }
 
 .ms-taggedItems img.itemIcon {
-	vertical-align: middle;
-	width: 32px;
-	height: 32px;
+    vertical-align: middle;
+    width: 32px;
+    height: 32px;
 }
 
 .ms-taggedItems img.itemIconSub {
-	vertical-align: middle;
-	padding-right: 6px;
-	width: 16px;
-	height: 16px;
+    vertical-align: middle;
+    padding-right: 6px;
+    width: 16px;
+    height: 16px;
 }
 
 .ms-taggedItems table:hover {
-	background-color: #f2f2f2;
+    background-color: #f2f2f2;
 }
 
 .ms-taggedItems .separator {
-	Width: 100%;
-	border-bottom: 1px dashed #cccccc;
+    Width: 100%;
+    border-bottom: 1px dashed #cccccc;
 }
 
 .ms-taggedItems .seeAll {
-	padding-top: 10px;
+    padding-top: 10px;
 }
 
 div.ms-taggedItems a.itemTitle {
-	color: #3f3f3f;
+    color: #3f3f3f;
 }
 
 div.ms-taggedItems a.relTag {
-	color: #0072bc;
+    color: #0072bc;
 }
 
     div.ms-taggedItems a.relTag:hover {
-	color: #0068ac;
-}
+        color: #0068ac;
+    }
 
 div.ms-taggedItems a.people {
-	color: #0072bc;
+    color: #0072bc;
 }
 
     div.ms-taggedItems a.people:hover {
-	color: #0068ac;
-}
+        color: #0068ac;
+    }
 
 .ms-socialTagInfoPanel {
-    /* [ReplaceColor(themeColor:"Accent1",themeTint:"0.10")] */ background: #F8FCFF; 
-    /* [ReplaceColor(themeColor:"Accent1-Lighter")] */ border: solid 1px #91CDF2; 
+    /* [ReplaceColor(themeColor:"Accent1",themeTint:"0.10")] */ background: #F8FCFF;
+    /* [ReplaceColor(themeColor:"Accent1-Lighter")] */ border: solid 1px #91CDF2;
     padding: 10px;
 }
 
 .ms-socialTagInfoTitle {
-    font-size: 1.4em; 
+    font-size: 1.4em;
 }
 
-.ms-socialTagInfoTitle span {
-    color: #0072bc;
-}
+    .ms-socialTagInfoTitle span {
+        color: #0072bc;
+    }
 
 .ms-socialTagInfoRelatedInfo {
     padding-left: 20px;
 }
 
 .ms-socialGetConnectedTermAdder {
-	margin-top: 5px;
+    margin-top: 5px;
 }
 
     .ms-socialGetConnectedTermAdder a {
-    font-size: 1.3em; 
-    margin-left: 6px;
-}
+        font-size: 1.3em;
+        margin-left: 6px;
+    }
 
     .ms-socialGetConnectedTermAdder span {
-    font-size: 1.3em; 
-    margin-left: 6px;
-}
+        font-size: 1.3em;
+        margin-left: 6px;
+    }
 
 .ms-socialGetConnectedPeopleSearch {
-	margin-top: 5px;
+    margin-top: 5px;
 }
 
     .ms-socialGetConnectedPeopleSearch img {
-	vertical-align: middle;
-}
+        vertical-align: middle;
+    }
 
     .ms-socialGetConnectedPeopleSearch a {
-    margin-left: 6px;
-}
+        margin-left: 6px;
+    }
 
 .ms-socialDialogTab {
     height: 22px;
@@ -974,98 +983,91 @@ div.ms-taggedItems a.people {
 }
 
     .ms-socialDialogTab ul {
-    margin-left: 8px;
-    margin-right: 8px;
-    float: none;
-}
+        margin-left: 8px;
+        margin-right: 8px;
+        float: none;
+    }
 
     .ms-socialDialogTab span {
-    padding-top: 2px;
-}
+        padding-top: 2px;
+    }
 
 #divCommentLinks li {
     display: inline;
 }
 
-.tbComment {
-    border: 1px solid #cccccc !important;
-    width: 98% !important;
-    height: 15px !important;
-}
-
-
 #wrapper {
-    white-space:nowrap;
-    margin:20px;
+    white-space: nowrap;
 }
 
 #comment-photo {
-    float:left;
-    
+    float: left;
 }
 
-.circleborder
-{
-    
-    border-radius:50%;
-    height:60px;
+.circleborder {
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
     border: 2px solid #4B89B2;
 }
 
-#whatsup
-{
-    height:30px;
-    padding-top:12px;
-    position:relative;
-    margin-left:15px;
-    max-width:500px;
-    width:100%;
-    display:inline-block;
-    position:relative;
+#whatsup {
+    height: 30px;
+    padding-top: 12px;
+    position: relative;
+    margin-left: 15px;
+    max-width: 500px;
+    width: 65%;
+    display: inline-block;
+    position: relative;
 }
 
- .comment-box { 
-    height:auto; 
-    background:#fff; 
-    border:1px solid #cccccc; 
-    position:relative;
-    font-size:12px;
-    font-family:"Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-    font-weight:400;
-    border-radius:3px;
+.comment-box {
+    height: auto;
+    background: #fff;
+    border: 1px solid #cccccc;
+    position: relative;
+    font-size: 12px;
+    font-family: "Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-weight: 400;
+    border-radius: 3px;
 }
-.comment-box:before { 
-    content:''; 
-    width:8px; 
-    height:8px; 
-    background:#fff; 
-    border-left:1px solid #d8d8d8; 
-    border-bottom:1px solid #d8d8d8; 
-    position:absolute; 
-    top:14px;
-    left:-5px; 
-    transform:rotate(45deg); -webkit-transform:rotate(45deg); -moz-transform:rotate(45deg); -ms-transform:rotate(45deg); -o-transform:rotate(45deg);
-    
-}
- 
-.comment-paragraph { 
-    color:#333333; 
-    line-height:16px; 
-    margin:10px 5px 10px 8px;
+
+    .comment-box:before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: #fff;
+        border-left: 1px solid #d8d8d8;
+        border-bottom: 1px solid #d8d8d8;
+        position: absolute;
+        top: 14px;
+        left: -5px;
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+    }
+
+.comment-paragraph {
+    color: #333333;
+    line-height: 16px;
+    margin: 10px 5px 10px 8px;
+    min-height: 16px;
 }
 
 #comment-btn {
-    margin-left:10px;
-    float:right;
-    display:inline-block;
-    position:relative;
+    margin-left: 10px;
+    float: right;
+    display: inline-block;
+    position: relative;
 }
 
 
 
-.comment-paragraph:focus 
-{
-    outline:none;
+.comment-paragraph:focus {
+    outline: none;
 }
 
 
@@ -1074,63 +1076,60 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
     content: attr(data-placeholder);
     float: left;
     margin-left: 0px;
-    color:#bbbbbb;
+    color: #bbbbbb;
 }
 
 
 .btn-disabled {
-pointer-events: none;
-cursor:default;
-opacity: 0.5;
-filter: alpha(opacity=50);
--webkit-box-shadow: none;
-box-shadow: none;
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
-.btn-primary:hover,.btn-primary:focus {
-background-color: #33a6d5;
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #33a6d5;
+    color: #fff !important;
 }
 
 .btn-primary {
-background-color: #0090ca;
-    color:#fff;
-    font-family:"Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-    font-weight:400;
+    background-color: #0090ca;
+    color: #fff !important;
+    font-family: "Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+    font-weight: 400;
 }
 
 .btn-small {
-font-size: 13px;
-font-size: 1.3rem;
-line-height: 20px;
-line-height: 2rem;
-padding: 6px 13px 8px;
-padding: 0.6rem 1.3rem 0.8rem;
-}
-
-.btn-small {
-  padding: 5px 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  border-radius: 3px;
-}
+    font-size: 13px;
+    font-size: 1.3rem;
+    line-height: 20px;
+    line-height: 2rem;
+    padding: 6px 13px 8px;
+    padding: 0.6rem 1.3rem 0.8rem;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
 }
 
 .btn {
-  display: inline-block;
-  padding: 6px 12px;
-  margin-bottom: 0;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1.428571429;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-       -o-user-select: none;
-          user-select: none;
+    display: inline-block;
+    padding: 6px 12px;
+    /*margin-bottom: 0;*/
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.428571429;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }

@@ -142,6 +142,11 @@ namespace EPMLiveWebParts.Comments
             try { sPubComTxt = CoreFunctions.getConfigSetting(cWeb, "EPMLivePublicCommentText"); }
             catch { }
 
+            if (string.IsNullOrEmpty(sPubComTxt))
+            {
+                sPubComTxt = "What are you working on?";
+            }
+
             SPUser user = cWeb.CurrentUser;
             //get user picture from user id
             SPList userInfoList = cWeb.SiteUserInfoList;
@@ -197,7 +202,7 @@ namespace EPMLiveWebParts.Comments
                                </div>
                                <div id='whatsup'>
                                    <div class='comment-box'>
-                                       <div id='inputPublicComment' class='comment-paragraph' contenteditable='true' data-placeholder='" + sPubComTxt + @"'>
+                                       <div id='inputPublicComment' class='comment-paragraph' contenteditable='true'>
                                        </div>
                                    </div>
                                </div>

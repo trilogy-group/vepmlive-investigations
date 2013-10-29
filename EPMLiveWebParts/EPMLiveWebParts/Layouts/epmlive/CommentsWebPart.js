@@ -113,7 +113,7 @@ function GetData() {
             '<div style=\"clear:both\"></div>';
 
         var HiddenSubCommentTemp =
-            '<div class=\"subitem\" item=\"##listId##_##itemId##\" style="display:none;" isExtra=\"##isExtra##\">' +
+            '<div class=\"subitem\" item=\"##listId##_##itemId##\" style="" isExtra=\"##isExtra##\">' +
                 '<table class="ms-socialCommentItem customCommentItem" id="commentItem_##itemId##">' +
                     '<tbody>' +
                         '<tr>' +
@@ -160,7 +160,7 @@ function GetData() {
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
                 '<div style="height: 25px; margin-right: 5px; float: left; margin-top: 3px;display:none">' +
-                    '<input class="epmliveButton epmliveButton-disabled" type="button" id="btnNewComment##itemId##" value="comment" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" />' +
+                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
                 '</div>' +
             '</div>' +
             '<div style=\"clear:both\"></div>';
@@ -176,7 +176,7 @@ function GetData() {
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
                 '<div style="height: 25px; margin-right: 5px; float: left; margin-top: 3px;display:none">' +
-                    '<input class="epmliveButton epmliveButton-disabled" type="button" id="btnNewComment##itemId##" value="comment" onclick="window.commentsWebPart.AddComment(\'##pubComListId##\', \'##pubComItemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" />' +
+                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##pubComListId##\', \'##pubComItemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
                 '</div>' +
             '</div>' +
             '<div style=\"clear:both\"></div>';
@@ -496,14 +496,10 @@ function GetData() {
                                             var value = $(this).text();
 
                                             if (value.length > 0) {
-
-                                                $('#btnNewComment' + id).removeClass('epmliveButton-disabled');
-                                                $('#btnNewComment' + id).addClass('epmliveButton-emphasize');
-
+                                                $('#btnNewComment' + id).removeClass('btn-disabled');
                                             }
                                             else {
-                                                $('#btnNewComment' + id).removeClass('epmliveButton-emphasize');
-                                                $('#btnNewComment' + id).addClass('epmliveButton-disabled');
+                                                $('#btnNewComment' + id).addClass('btn-disabled');
                                             }
                                         });
 
@@ -775,14 +771,10 @@ function GetData() {
 
                                             var value = $(this).text();
                                             if (value.length > 0) {
-
-                                                $('#btnNewComment' + id).removeClass('epmliveButton-disabled');
-                                                $('#btnNewComment' + id).addClass('epmliveButton-emphasize');
-
+                                                $('#btnNewComment' + id).removeClass('btn-disabled');
                                             }
                                             else {
-                                                $('#btnNewComment' + id).removeClass('epmliveButton-emphasize');
-                                                $('#btnNewComment' + id).addClass('epmliveButton-disabled');
+                                                $('#btnNewComment' + id).addClass('btn-disabled');
                                             }
                                         });
 
@@ -837,7 +829,7 @@ function GetData() {
             // </Data>
             $('#tbCommentInput' + itemId).css('display', 'none');
             $('#btnNewComment' + itemId).parent().css('display', 'none');
-            $('#' + containerId).before(loadingDiv);
+            //$('#' + containerId).before(loadingDiv);
 
             if (comment !== undefined) {
                 var orginalComment = comment;
@@ -867,11 +859,11 @@ function GetData() {
                                     .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName']);
 
                                 $('#' + containerId).before(commentItem);
-                                $('#divWorkingNewComment').fadeOut('slow', function () {
-                                    $('.subitem:last').fadeIn('slow', function () {
-                                        $('#divWorkingNewComment').remove();
-                                    });
-                                });
+                                //$('#divWorkingNewComment').fadeOut('slow', function () {
+                                //    $('.subitem:last').fadeIn('slow', function () {
+                                //        $('#divWorkingNewComment').remove();
+                                //    });
+                                //});
                             }
                         }
 
@@ -899,7 +891,6 @@ function GetData() {
             // <Param key="ItemId">12</Param>
             // <Param key="Comment">abcabac</Param>
             // </Data>
-            $('#inputPublicComment').html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
             $('#divLoaderPublic_CommentsWebPart').css('display', '');
 
             if (comment !== undefined) {
@@ -914,6 +905,10 @@ function GetData() {
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     success: function (response) {
+
+                        $('#inputPublicComment').empty();
+                        $('#inputPublicComment').html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
+
                         if (response.d) {
                             var responseJson = window.epmLive.parseJson(response.d);
                             if (window.epmLive.responseIsSuccess(responseJson.Result)) {
@@ -1036,13 +1031,12 @@ function GetData() {
 
                                     if (value.length > 0) {
 
-                                        $('#btnNewComment' + id).removeClass('epmliveButton-disabled');
-                                        $('#btnNewComment' + id).addClass('epmliveButton-emphasize');
+                                        $('#btnNewComment' + id).removeClass('btn-disabled');
 
                                     }
                                     else {
-                                        $('#btnNewComment' + id).removeClass('epmliveButton-emphasize');
-                                        $('#btnNewComment' + id).addClass('epmliveButton-disabled');
+                                      
+                                        $('#btnNewComment' + id).addClass('btn-disabled');
                                     }
                                 });
                             }
@@ -1130,6 +1124,8 @@ function GetData() {
                     $(this).empty();
                 }
             });
+
+            $('#inputPublicComment').html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
         });
 
     })(window.commentsWebPart = window.commentsWebPart || {}, jQuery);
