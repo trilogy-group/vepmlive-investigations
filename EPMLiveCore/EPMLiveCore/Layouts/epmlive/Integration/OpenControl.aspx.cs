@@ -76,6 +76,9 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
         {
             switch(control)
             {
+                case "workspace":
+                    Response.Redirect(Web.Url);
+                    break;
                 case "workplan":
                     Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/workplanner.aspx?ID=" + li.ID + "&listid=" + li.ParentList.ID + "&CloseMethod=3&isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                     break;
