@@ -1190,7 +1190,14 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(ResourceGrid.GetResources(data));
+                var watch = new Stopwatch();
+                watch.Start();
+
+                var result = Response.Success(ResourceGrid.GetResources(data));
+
+                watch.Stop();
+
+                return Response.Success(result + GetDiagnosticsInfo(watch));
             }
             catch (APIException ex)
             {
@@ -1207,7 +1214,14 @@ namespace EPMLiveCore
         {
             try
             {
-                return ResourceGrid.GetResourcePoolDataGrid(data);
+                var watch = new Stopwatch();
+                watch.Start();
+
+                var result = ResourceGrid.GetResourcePoolDataGrid(data);
+
+                watch.Stop();
+
+                return Response.Success(result + GetDiagnosticsInfo(watch));
             }
             catch (APIException ex)
             {
@@ -1242,7 +1256,14 @@ namespace EPMLiveCore
         {
             try
             {
-                return ResourceGrid.GetResourcePoolLayoutGrid(data);
+                var watch = new Stopwatch();
+                watch.Start();
+
+                var result = ResourceGrid.GetResourcePoolLayoutGrid(data);
+
+                watch.Stop();
+
+                return Response.Success(result + GetDiagnosticsInfo(watch));
             }
             catch (APIException ex)
             {
