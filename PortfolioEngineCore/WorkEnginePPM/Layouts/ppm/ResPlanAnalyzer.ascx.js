@@ -1241,6 +1241,11 @@
 	    this.ficalInfo.LastUserData.lastStartPerID = StartID;
 	    this.ficalInfo.LastUserData.lastFinishPerID = FinishID;
 
+	    if (this.analyzerTab != null) {
+	        var bchk = this.analyzerTab.getButtonState("chkOpenRequests");
+	        if (bchk == true)
+	            this.analyzerTab.setButtonStateOff("chkOpenRequests");
+	    }
 
 
 	    this.analyzerCalID = parseInt(this.ficalInfo.LastUserData.lastCalID);
