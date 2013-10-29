@@ -480,8 +480,8 @@
                     $("#idStorefrontHeader").append('<a href="https://epmlive.myshopify.com?Source=' + weburl + '" target="_blank"><div style="background-color:#0090CA;width:736px;height:300px;margin-bottom:20px;border:1px solid #007CC9;border-radius:3px;"><div style="float:left;width:300px;"><div style="margin-left:15px;margin-bottom:20px;text-align:center;color:#ffffff;font-family:Open Sans Light;font-size:30px;margin-top:20px;width:100%;">Install an EPM Live custom App</div><div style="margin-left:15px;text-align:center;width:100%;"><p style="font-size:18px;font-family:Open Sans Regular;color:#fff;">- OR -</p></div><div style="margin-left:15px;text-align:center;width:100%;"><p style="font-size:18px;font-family:Open Sans Regular;color:#fff;padding:15px;">browse from the list of SharePoint Apps below.</p></div></div><div style="float:right;padding:15px;margin-top:25px;"><img style="width:400px;" src="/_layouts/15/epmlive/images/screens.png"/></div></div></a>');
                 });
             }
-  
-            if(fixedRibbon == true && window.location.href.indexOf("IsDlg=1") == -1) {
+            
+            if(fixedRibbon == true && window.location.href.indexOf("IsDlg=1") == -1 && window.location.href.indexOf("VisibilityContext=WSSWebPartPage") == -1) {
        
                 // This function extends the original from INIT.JS
                 var FixRibbonAndWorkspaceDimensions = (function () {
