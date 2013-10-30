@@ -108,6 +108,15 @@ namespace UplandIntegrations.PowerSteering.Infrastructure
                 Entity.Set(entity, (row[column] ?? string.Empty).ToString(), Entity.GetFieldName(column, GetFields()));
             }
 
+            if (entity.Fields.ContainsKey("owner"))
+            {
+                try
+                {
+                    entity.Fields["owner"] = entity.Fields["owner"].Split(',')[0];
+                }
+                catch { }
+            }
+
             entity.EPMLiveId = Convert.ToInt32(row["SPID"]);
 
             string id = null;

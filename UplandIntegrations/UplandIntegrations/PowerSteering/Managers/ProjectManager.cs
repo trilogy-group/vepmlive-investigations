@@ -22,7 +22,7 @@ namespace UplandIntegrations.PowerSteering.Managers
             {
                 return new Dictionary<string, string>
                 {
-                    {"owner", "Owner"},
+                    {"owner", "ProjectManagers"},
                     {"organization", "Account"},
                     {"scheduledStartDate", "Start"},
                     {"scheduledEndDate", "Finish"}
