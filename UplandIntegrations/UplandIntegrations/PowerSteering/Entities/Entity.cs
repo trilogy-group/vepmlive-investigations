@@ -92,7 +92,8 @@ namespace UplandIntegrations.PowerSteering.Entities
         {
             List<string> tagFields = (from field in fields where field.Tag select field.Name).ToList();
 
-            var element = new XElement(_objectKind.ToLower());
+            var objKind = _objectKind.ToLower();
+            var element = new XElement(objKind);
 
             foreach (var field in Fields)
             {
@@ -119,6 +120,12 @@ namespace UplandIntegrations.PowerSteering.Entities
                 }
                 else
                 {
+                    if (objKind.Equals("project") && name.Equals("organization"))
+                    {
+                        element.Add(new XElement(name, new XAttribute("id", value)));
+                        continue;
+                    }
+
                     element.Add(new XElement(name, value));
                 }
             }
@@ -143,6 +150,18 @@ namespace UplandIntegrations.PowerSteering.Entities
 
         internal static void Set(Entity entity, string value, string key)
         {
+            if (!string.IsNullOrEmpty(value))
+            {
+                if (key.ToLower().Contains("date"))
+                {
+                    try
+                    {
+                        value = DateTime.Parse(value).ToString("yyyy-MM-dd");
+                    }
+                    catch { }
+                }    
+            }
+
             var field = key;
             foreach (string k in entity.Fields.Keys.Where(k => k.ToLower().Equals(field.ToLower())))
             {

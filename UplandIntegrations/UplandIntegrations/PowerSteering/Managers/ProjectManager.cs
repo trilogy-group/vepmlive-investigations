@@ -24,8 +24,8 @@ namespace UplandIntegrations.PowerSteering.Managers
                 {
                     {"owner", "ProjectManagers"},
                     {"organization", "Account"},
-                    {"scheduledStartDate", "Start"},
-                    {"scheduledEndDate", "Finish"}
+                    {"scheduledStartDate", "ProjectStart"},
+                    {"scheduledEndDate", "ProjectFinish"}
                 };
             }
         }

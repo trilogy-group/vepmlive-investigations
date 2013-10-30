@@ -105,7 +105,7 @@ namespace UplandIntegrations.PowerSteering.Infrastructure
                 where !col.Equals("spid")
                 select column)
             {
-                Entity.Set(entity, (row[column] ?? string.Empty).ToString(), Entity.GetFieldName(column, GetFields()));
+                Entity.Set(entity, GetValue(row, column), Entity.GetFieldName(column, GetFields()));
             }
 
             if (entity.Fields.ContainsKey("owner"))
@@ -135,6 +135,21 @@ namespace UplandIntegrations.PowerSteering.Infrastructure
             {
                 newObjects.Add(entity);
             }
+        }
+
+        private static string GetValue(DataRow row, string column)
+        {
+            var value = (row[column] ?? string.Empty).ToString();
+
+            if (string.IsNullOrEmpty(value) || !column.ToLower().Contains("date")) return value;
+
+            try
+            {
+                value = DateTime.Parse(value).ToString("yyyy-MM-dd");
+            }
+            catch { }
+
+            return value;
         }
 
         protected Entity FindById(string id, string resource)
