@@ -9,7 +9,7 @@ begin
     Print 'Updating Function spGetReportListData'
     SET @createoralter = 'ALTER'
 end
-exec(@createoralter + ' PROCEDURE [dbo].[spGetReportListData]
+exec(@createoralter + '  PROCEDURE [dbo].[spGetReportListData]
 
 @siteid uniqueidentifier,
 @webid uniqueidentifier,
@@ -28,9 +28,18 @@ BEGIN
 	declare @sql varchar(MAX)
 
 	set @list = REPLACE(@list, '' '', '''')
-	if @list = ''lstResources'' 
+	if @list = ''Resources'' 
 	begin
-		set @list = ''lstResourcePool''
+		set @list = ''ResourcePool''
+	end
+	
+	declare @sca varchar(255)
+	set @sca = ''''
+	if @userid = 1073741823
+	begin
+	
+		set @sca = ''insert into #groups (groupid, sectype) VALUES (999999, 1)''
+	
 	end
 
 	if @rollup = 1
@@ -74,9 +83,9 @@ BEGIN
 
 		set @sql = ''from lst'' + @list + '' where cast(listid as varchar(40)) + cast(itemid as varchar(20)) in (
 		SELECT     CAST(dbo.RPTITEMGROUPS.LISTID AS varchar(40)) + CAST(dbo.RPTITEMGROUPS.ITEMID AS varchar(20)) AS Expr1
-		FROM         dbo.RPTITEMGROUPS LEFT OUTER JOIN
-							  dbo.RPTGROUPUSER ON dbo.RPTITEMGROUPS.SITEID = dbo.RPTGROUPUSER.SITEID AND dbo.RPTITEMGROUPS.GROUPID = dbo.RPTGROUPUSER.GROUPID
-		where (''''1073741823'''' = '''''' + convert(varchar(10), @userid) + '''''' OR (userid='''''' + convert(varchar(10), @userid) + '''''' AND RPTITEMGROUPS.SECTYPE = 1) OR (RPTITEMGROUPS.GROUPID='''''' + convert(varchar(10), @userid) + '''''' AND RPTITEMGROUPS.SECTYPE = 0))
+		FROM         dbo.RPTITEMGROUPS INNER JOIN
+                      #Groups as gps ON gps.GROUPID = rptitemgroups.GROUPID
+		
 		) '' + @query
 
 		if @pagesize <> 0 
@@ -94,11 +103,21 @@ BEGIN
 			declare @topval int
 			set @topval = @page * @pagesize
 
+			
+
 			set @sql = ''
+			CREATE TABLE #Groups (GroupId INT, sectype int)
+			
+			INSERT INTO #Groups (GroupId, sectype) SELECT GROUPID, 1 FROM dbo.RPTGROUPUSER WHERE (USERID = '''''' + convert(varchar(10), @userid) + '''''') AND (SITEID = '''''' + CAST(@siteid as varchar(255)) + '''''')
+			
+			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
+			
 			select * INTO #tmp '' + @sql + '';
 			
+			'' + @sca + ''
+			
 			WITH MyCTE AS (
-				SELECT top '' + convert(varchar(15),@topval) + '' ROW_NUMBER () OVER  (order by + '' + @orderby + '') as RowID,*
+				SELECT top '' + convert(varchar(15),@topval) + '' ROW_NUMBER () OVER  (order by '' + @orderby + '') as RowID,*
 				from #tmp
 			)
 			SELECT *
@@ -108,7 +127,15 @@ BEGIN
 		end
 		else
 		begin
-			set @sql = ''select * '' + @sql;
+			set @sql = ''CREATE TABLE #Groups (GroupId INT, sectype int)
+			
+			INSERT INTO #Groups (GroupId, sectype) SELECT GROUPID, 1 FROM dbo.RPTGROUPUSER WHERE (USERID = '''''' + convert(varchar(10), @userid) + '''''') AND (SITEID = '''''' + CAST(@siteid as varchar(255)) + '''''')
+			
+			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
+			
+			'' + @sca + ''
+			
+			select * '' + @sql;
 		
 			if @orderby <> '''' begin
 			
@@ -116,10 +143,15 @@ BEGIN
 			
 			end
 		end
+		
+		print @sql
+		
 	exec(@sql)
 
-	print @sql
+	
 
 ENd
+
+
 
 ')
