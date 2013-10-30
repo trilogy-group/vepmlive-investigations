@@ -126,6 +126,12 @@ namespace UplandIntegrations.PowerSteering.Entities
                         continue;
                     }
 
+                    if (objKind.Equals("task") && name.Equals("project"))
+                    {
+                        element.Add(new XElement(name, new XAttribute("id", value)));
+                        continue;
+                    }
+
                     element.Add(new XElement(name, value));
                 }
             }
