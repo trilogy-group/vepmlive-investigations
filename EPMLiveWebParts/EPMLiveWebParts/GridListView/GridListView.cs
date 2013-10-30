@@ -1889,7 +1889,8 @@ namespace EPMLiveWebParts
                 else
                     newGridMode = PropMyDefaultControl.ToLower();
 
-                buildParams();
+                if(list != null)
+                    buildParams();
 
                 if (BOOLShowViewBar && view != null && list != null)
                 {
