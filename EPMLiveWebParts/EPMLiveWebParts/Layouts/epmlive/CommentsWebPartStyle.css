@@ -53,7 +53,7 @@
     border-left: 1px solid #CCCCCC !important;
     border-right: 1px solid #CCCCCC !important;
     border-top: 1px solid #CCCCCC !important;
-    padding-bottom: 10px;
+    padding-bottom: 5px;
 }
 
     .border-callout .border-notch {
@@ -70,7 +70,10 @@
     text-decoration: none;
 }
 
-
+.newCommentReply {
+    font-size:12px;
+    padding-left:2px;
+}
 
 .commentsWPMainContainer {
     overflow: hidden;
