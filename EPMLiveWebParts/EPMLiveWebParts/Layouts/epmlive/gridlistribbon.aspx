@@ -1332,6 +1332,22 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             }
             else
                 properties = this.$Grid.handleCommand(this.$Grid, commandId, properties);
+
+		    commandId = null;
+		    properties = null;
+
+		    e = e||event;
+
+		    if (e.stopPropagation)
+			    e.stopPropagation();
+		    else
+			    e.cancelBubble = true;
+
+            if (window.stop) {
+                    window.stop();
+                }
+
+                w.stopImmediatePropagation();
         }
     },
 
