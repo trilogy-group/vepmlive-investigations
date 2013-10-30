@@ -417,6 +417,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeStep.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeUtilities.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\44Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
     <Compile Include="Jobs\Integration.cs" />
