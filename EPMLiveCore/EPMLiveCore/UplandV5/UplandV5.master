@@ -481,7 +481,7 @@
                 });
             }
             
-            if(fixedRibbon == true && window.location.href.indexOf("IsDlg=1") == -1 && window.location.href.indexOf("VisibilityContext=WSSWebPartPage") == -1) {
+            if(fixedRibbon == true && window.location.href.indexOf("IsDlg=1") == -1 && window.location.href.indexOf("VisibilityContext=WSSWebPartPage") == -1 && !window.isIE8) {
        
                 // This function extends the original from INIT.JS
                 var FixRibbonAndWorkspaceDimensions = (function () {
