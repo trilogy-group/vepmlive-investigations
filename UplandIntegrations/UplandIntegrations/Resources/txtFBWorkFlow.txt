@@ -170,7 +170,7 @@
                 // ---------------------------------------------
                 // - EXAMPLE: original, Visual Workflow style:
                 // ---------------------------------------------
-                $.get(WebAPIUrl + "visualworkflow/data?routeid=" + routeId + "&routedobjectid=" + docId + "&" + Param, function (vwfData) {
+                $.get(WebAPIUrl + "visualworkflow/data?routeid=" + routeId + "&routedItemId=0&routedobjectid=" + docId + "&" + Param, function (vwfData) {
 
                     if (vwfData != null) {
 
