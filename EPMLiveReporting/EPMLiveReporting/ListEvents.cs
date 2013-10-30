@@ -23,6 +23,7 @@ namespace EPMLiveReportsAdmin
         SPListItem _item;
         SPItemEventProperties _properties;
         ArrayList _arrayList_defaultColumns;
+        ArrayList _mandatoryHiddenFlds;
 
         string _TableName;
         string _ListName;
@@ -249,6 +250,7 @@ namespace EPMLiveReportsAdmin
                 if (blnPopulateCols)
                 {
                     PopulateDefaultColumns();
+                    PopulateMandatoryHiddenFields();
                     PopulateColumns();
                 }
 
@@ -268,10 +270,15 @@ namespace EPMLiveReportsAdmin
             _arrayList_defaultColumns.Add("listid");
             _arrayList_defaultColumns.Add("itemid");
             _arrayList_defaultColumns.Add("weburl");
-            _arrayList_defaultColumns.Add("commenters");
-            _arrayList_defaultColumns.Add("commentersread");
-            _arrayList_defaultColumns.Add("commentcount");
-            _arrayList_defaultColumns.Add("workspaceurl");
+        }
+
+        private void PopulateMandatoryHiddenFields()
+        {
+            _mandatoryHiddenFlds = new ArrayList();
+            _mandatoryHiddenFlds.Add("commenters");
+            _mandatoryHiddenFlds.Add("commentersread");
+            _mandatoryHiddenFlds.Add("commentcount");
+            _mandatoryHiddenFlds.Add("workspaceurl");
         }
 
         private void PopulateColumns()
@@ -285,11 +292,11 @@ namespace EPMLiveReportsAdmin
             switch (sAction)
             {
                 case "insert":
-                    sSQL = _DAO.InsertSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sSQL = _DAO.InsertSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns, _mandatoryHiddenFlds); // - CAT.NET false-positive: All single quotes are escaped/removed.
                     break;
 
                 case "update":
-                    sSQL = _DAO.UpdateSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sSQL = _DAO.UpdateSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns, _mandatoryHiddenFlds); // - CAT.NET false-positive: All single quotes are escaped/removed.
                     break;
 
                 case "delete":

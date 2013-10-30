@@ -119,7 +119,7 @@ namespace EPMLiveReportsAdmin
         /// <param name="defaultColumns">The default columns.</param>
         /// <returns></returns>
         public string InsertSQL(string tableName, string listName, DataTable columns, SPListItem spListItem,
-                                ArrayList defaultColumns)
+                                ArrayList defaultColumns, ArrayList mandatoryHiddenFlds)
         {
             string sql = string.Empty;
             _cmdWithParams = null;
@@ -160,7 +160,7 @@ namespace EPMLiveReportsAdmin
                 SPListItem item = spListItem;
                 item["AssignedTo"] = "-99;#";
 
-                string allValues = AddColumnValues(item, columns, defaultColumns, "insert").Replace("'", string.Empty);
+                string allValues = AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert").Replace("'", string.Empty);
 
                 AddMetaInfoCols(listName, item, ref allCols, ref allValues);
 
@@ -187,7 +187,7 @@ namespace EPMLiveReportsAdmin
                         listItem["Work"] = hours;
                         listItem["AssignedTo"] = spFieldUserValue;
 
-                        string rvalues = AddColumnValues(listItem, columns, defaultColumns, "insert")
+                        string rvalues = AddColumnValues(listItem, columns, defaultColumns, mandatoryHiddenFlds, "insert")
                             .Replace("'", string.Empty);
 
                         AddMetaInfoCols(listName, listItem, ref rcols, ref rvalues);
@@ -246,7 +246,7 @@ namespace EPMLiveReportsAdmin
         /// <param name="defaultColumns">The default columns.</param>
         /// <param name="operation">The operation.</param>
         /// <returns></returns>
-        protected override string AddColumnValues(SPListItem spListItem, DataTable columns, ArrayList defaultColumns,
+        protected override string AddColumnValues(SPListItem spListItem, DataTable columns, ArrayList defaultColumns, ArrayList mandatoryHiddenFlds,
                                                   string operation)
         {
             string colValues = string.Empty;
@@ -273,7 +273,16 @@ namespace EPMLiveReportsAdmin
                     columnName = row["ColumnName"].ToString().Replace("'", string.Empty);
                     internalName = row["InternalName"].ToString().Replace("'", string.Empty);
 
-                    if (!defaultColumns.Contains(columnName.ToLower()))
+                    if (defaultColumns.Contains(columnName.ToLower()))
+                    {
+                        param = PopulateDefaultColumnValue(columnName.ToLower().Replace("'", string.Empty), spListItem);
+                       
+                    }
+                    else if (mandatoryHiddenFlds.Contains(columnName.ToLower()))
+                    {
+                        param = PopulateMandatoryHiddenFldsColumnValue(columnName.ToLower().Replace("'", string.Empty), spListItem);
+                    }
+                    else
                     {
                         if (spListItem.Fields.ContainsField(internalName))
                         {
@@ -292,7 +301,7 @@ namespace EPMLiveReportsAdmin
                                 {
                                     param.Value = field.Type != SPFieldType.DateTime
                                                       ? (spListItem[field.InternalName] != null
-                                                             ? (object) spListItem[field.InternalName].ToString()
+                                                             ? (object)spListItem[field.InternalName].ToString()
                                                              : DBNull.Value)
                                                       : (spListItem[field.InternalName] ?? DBNull.Value);
                                 }
@@ -300,7 +309,7 @@ namespace EPMLiveReportsAdmin
                                 {
                                     try
                                     {
-                                        param.Value = _DAO.GetCalculatedFieldValue(spListItem, (SPFieldCalculated) field);
+                                        param.Value = _DAO.GetCalculatedFieldValue(spListItem, (SPFieldCalculated)field);
                                     }
                                     catch (Exception)
                                     {
@@ -335,17 +344,13 @@ namespace EPMLiveReportsAdmin
                         else
                         {
                             param = new SqlParameter
-                                        {
-                                            ParameterName = string.Format("@{0}_{1}",
-                                                                          columnName.Replace("'", string.Empty),
-                                                                          identifier),
-                                            Value = DBNull.Value
-                                        };
+                            {
+                                ParameterName = string.Format("@{0}_{1}",
+                                                              columnName.Replace("'", string.Empty),
+                                                              identifier),
+                                Value = DBNull.Value
+                            };
                         }
-                    }
-                    else
-                    {
-                        param = PopulateDefaultColumnValue(columnName.ToLower().Replace("'", string.Empty), spListItem);
                     }
 
                     if (columnName.ToLower().Equals("worktype")) param.Value = spListItem.ParentList.Title;
@@ -569,31 +574,69 @@ namespace EPMLiveReportsAdmin
                     param.ParameterName = "@weburl_" + identifier;
                     param.Value = li.ParentList.ParentWeb.ServerRelativeUrl;
                     break;
-
-                //case "commenters":
-                //    param.Direction = ParameterDirection.Input;
-                //    param.SqlDbType = SqlDbType.NVarChar;
-                //    param.Size = 8001;
-                //    param.ParameterName = "@commenters";
-                //    param.Value = DBNull.Value;
-                //    break;
-
-                //case "commentcount":
-                //    param.Direction = ParameterDirection.Input;
-                //    param.SqlDbType = SqlDbType.Int;
-                //    param.ParameterName = "@commentcount";
-                //    param.Value = DBNull.Value;
-                //    break;
-
-                //case "commentersread":
-                //    param.Direction = ParameterDirection.Input;
-                //    param.SqlDbType = SqlDbType.NVarChar;
-                //    param.Size = 8001;
-                //    param.ParameterName = "@commentersread";
-                //    param.Value = DBNull.Value;
-                //    break;
             }
 
+            return param;
+        }
+
+        protected override SqlParameter PopulateMandatoryHiddenFldsColumnValue(string sColumn, SPListItem li)
+        {
+            string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+            SqlParameter param = new SqlParameter();
+            var val = string.Empty;
+            switch (sColumn)
+            {
+                case "commenters":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.NVarChar;
+                    param.Size = 8001;
+                    param.ParameterName = "@commenters_" + identifier;
+                    try
+                    {
+                        val = li["Commenters"].ToString();
+                        param.Value = val;
+                    }
+                    catch { param.Value = DBNull.Value; }
+                    break;
+
+                case "commentcount":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.Int;
+                    param.ParameterName = "@commentcount_" + identifier;                
+                    try
+                    {
+                        val = li["CommentCount"].ToString();
+                        param.Value = Convert.ToInt32(val);
+                    }
+                    catch { param.Value = DBNull.Value; }
+                    break;
+
+                case "commentersread":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.NVarChar;
+                    param.Size = 8001;
+                    param.ParameterName = "@commentersread_" + identifier;
+                    try
+                    {
+                        val = li["CommentersRead"].ToString();
+                        param.Value = val;
+                    }
+                    catch { param.Value = DBNull.Value; }
+                    break;
+
+                case "workspaceurl":
+                    param.Direction = ParameterDirection.Input;
+                    param.SqlDbType = SqlDbType.NVarChar;
+                    param.Size = 8001;
+                    param.ParameterName = "@workspaceurl_" + identifier;
+                    try
+                    {
+                        val = li["WorkspaceUrl"].ToString();
+                        param.Value = val;
+                    }
+                    catch { param.Value = DBNull.Value; }
+                    break;
+            }
             return param;
         }
 

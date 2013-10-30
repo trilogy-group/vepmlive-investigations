@@ -14,6 +14,7 @@ namespace EPMLiveReportsAdmin
 
         private const string TABLE_NAME = "LSTMyWork";
         private ArrayList _defaultColumns;
+        private ArrayList _mandatoryHiddenFlds;
         private DataTable _listColumns;
         private Guid _listId;
         private SPListItem _listItem;
@@ -123,7 +124,7 @@ namespace EPMLiveReportsAdmin
             switch (operation)
             {
                 case "INSERT":
-                    sql = _myWorkReportData.InsertSQL(TABLE_NAME, _listName, _listColumns, _listItem, _defaultColumns);
+                    sql = _myWorkReportData.InsertSQL(TABLE_NAME, _listName, _listColumns, _listItem, _defaultColumns, _mandatoryHiddenFlds);
                     break;
                 case "DELETE":
                     sql = _myWorkReportData.DeleteSQL(TABLE_NAME, _listId, _listItem.ID);
@@ -160,6 +161,7 @@ namespace EPMLiveReportsAdmin
                 if (populateColumns)
                 {
                     _defaultColumns = new ArrayList {"siteid", "webid", "listid", "itemid", "weburl"};
+                    _mandatoryHiddenFlds = new ArrayList { "commenters", "commentersread", "commentcount", "workspaceurl" };
                     _listColumns = _myWorkReportData.GetListColumns("My Work");
                     _listColumns = _listColumns.DefaultView.ToTable(true,
                                                                     (from DataColumn dataColumn in _listColumns.Columns

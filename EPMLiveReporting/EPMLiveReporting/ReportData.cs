@@ -945,17 +945,17 @@ namespace EPMLiveReportsAdmin
             return objTableName.ToString();
         }
 
-        public virtual string InsertSQL(string sTableName, DataTable dtColumns, SPListItem li, ArrayList arrayList_defaultColumns)
+        public virtual string InsertSQL(string sTableName, DataTable dtColumns, SPListItem li, ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
         {
-            string sSQL = "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") + AddColumnValues(li, dtColumns, arrayList_defaultColumns, "insert").Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            string sSQL = "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") + AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert").Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
             return sSQL;
         }
 
-        public virtual string UpdateSQL(string sTableName, DataTable dtColumns, SPListItem li, ArrayList arrayList_defaultColumns)
+        public virtual string UpdateSQL(string sTableName, DataTable dtColumns, SPListItem li, ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
         {
-            string sSQL = "UPDATE " + sTableName.Replace("'", "") + " SET " + AddColumnValues(li, dtColumns, arrayList_defaultColumns, "update").Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + " " +
+            string sSQL = "UPDATE " + sTableName.Replace("'", "") + " SET " + AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "update").Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + " " +
                           "IF @@ROWCOUNT = 0 " +
-                              "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") + AddColumnValues(li, dtColumns, arrayList_defaultColumns, "insert").Replace("'", "");
+                              "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") + AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert").Replace("'", "");
 
             //string sSQL = "IF EXISTS (SELECT * FROM " + sTableName.Replace("'", "") + "WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + ")" +
             //                "UPDATE " + sTableName.Replace("'", "") + " SET " + AddColumnValues(li, dtColumns, arrayList_defaultColumns, "update").Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + // - CAT.NET false-positive: All single quotes are escaped/removed.
@@ -1314,7 +1314,7 @@ namespace EPMLiveReportsAdmin
             return sReturnValue;
         }
 
-        protected virtual string AddColumnValues(SPListItem li, DataTable dtColumns, ArrayList arrayList_defaultColumns, string sAction)
+        protected virtual string AddColumnValues(SPListItem li, DataTable dtColumns, ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds, string sAction)
         {
             string sColValues = string.Empty;
             string sColumnName = string.Empty;
@@ -1340,7 +1340,15 @@ namespace EPMLiveReportsAdmin
                     sInternalName = row["InternalName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
 
                     //Check for Default Colunms
-                    if (!arrayList_defaultColumns.Contains(sColumnName.ToLower()))
+                    if (arrayList_defaultColumns.Contains(sColumnName.ToLower()))
+                    {
+                        param = PopulateDefaultColumnValue(sColumnName.ToLower().Replace("'", ""), li); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    }
+                    else if (mandatoryHiddenFlds.Contains(sColumnName.ToLower()))
+                    {
+                        param = PopulateMandatoryHiddenFldsColumnValue(sColumnName.ToLower().Replace("'", ""), li); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    }
+                    else
                     {
                         //Check for field on list
                         if (li.Fields.ContainsField(sInternalName))
@@ -1463,11 +1471,6 @@ namespace EPMLiveReportsAdmin
                             }
                         }
                     }
-                    else
-                    {
-                        param = PopulateDefaultColumnValue(sColumnName.ToLower().Replace("'", ""), li); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                    }
-
 
                     //Add parameter to collection
                     _params.Add(param);
@@ -1573,20 +1576,40 @@ namespace EPMLiveReportsAdmin
                     param.ParameterName = "@weburl";
                     param.Value = li.ParentList.ParentWeb.ServerRelativeUrl;
                     break;
+            }
+            return param;
+        }
 
+        protected virtual SqlParameter PopulateMandatoryHiddenFldsColumnValue(string sColumn, SPListItem li)
+        {
+            SqlParameter param = new SqlParameter();
+            var val = string.Empty;
+
+            switch (sColumn)
+            {
                 case "commenters":
                     param.Direction = ParameterDirection.Input;
                     param.SqlDbType = SqlDbType.NVarChar;
                     param.Size = 8001;
-                    param.ParameterName = "@commenters";
-                    param.Value = DBNull.Value;
+                    param.ParameterName = "@commenters";                   
+                    try
+                    {
+                        val = li["Commenters"].ToString();
+                        param.Value = val;
+                    }
+                    catch { param.Value = DBNull.Value; }
                     break;
 
                 case "commentcount":
                     param.Direction = ParameterDirection.Input;
                     param.SqlDbType = SqlDbType.Int;
                     param.ParameterName = "@commentcount";
-                    param.Value = DBNull.Value;
+                    try
+                    {
+                        val = li["CommentCount"].ToString();
+                        param.Value = param.Value = Convert.ToInt32(val); 
+                    }
+                    catch { param.Value = DBNull.Value; }
                     break;
 
                 case "commentersread":
@@ -1594,7 +1617,12 @@ namespace EPMLiveReportsAdmin
                     param.SqlDbType = SqlDbType.NVarChar;
                     param.Size = 8001;
                     param.ParameterName = "@commentersread";
-                    param.Value = DBNull.Value;
+                    try
+                    {
+                        val = li["CommentersRead"].ToString();
+                        param.Value = val;
+                    }
+                    catch { param.Value = DBNull.Value; }
                     break;
 
                 case "workspaceurl":
@@ -1602,9 +1630,13 @@ namespace EPMLiveReportsAdmin
                     param.SqlDbType = SqlDbType.NVarChar;
                     param.Size = 8001;
                     param.ParameterName = "@workspaceurl";
-                    param.Value = DBNull.Value;
+                    try
+                    {
+                        val = li["WorkspaceUrl"].ToString();
+                        param.Value = val;
+                    }
+                    catch { param.Value = DBNull.Value; }
                     break;
-
             }
             return param;
         }
@@ -1863,7 +1895,7 @@ namespace EPMLiveReportsAdmin
                     // set item info for logging
                     errItemID = item.ID.ToString();
                     errItemTitle = item.Title;
-                    
+
                     itemRow = dtItems.NewRow();
                     foreach (DataRow column in dtColumns.Rows)
                     {
@@ -2060,12 +2092,12 @@ namespace EPMLiveReportsAdmin
                             foreach (DataRow column in dtColumns.Rows)
                             {
                                 errColumnName = column["ColumnName"].ToString();
-                                if (spList.Fields.ContainsField(column["internalname"].ToString()) && 
+                                if (spList.Fields.ContainsField(column["internalname"].ToString()) &&
                                     spList.Fields.GetFieldByInternalName(column["internalname"].ToString()).Type.ToString().ToLower() == column["SharepointType"].ToString().ToLower())
                                 {
                                     if (column["SharepointType"].ToString().ToLower() == "lookup" || column["SharepointType"].ToString().ToLower() == "user" || column["SharepointType"].ToString().ToLower() == "multichoice")
                                     {
-                                      
+
                                         if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
                                         {
                                             if (ItemHasValue(item, column["internalname"].ToString()))
