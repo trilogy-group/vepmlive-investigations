@@ -39,6 +39,16 @@ namespace UplandIntegrations.PowerSteering.Managers
                 Entity o = FindById(id, "task") ?? new Entity("Task");
 
                 FillObjects(columns, newEntities, existingEntities, o, row);
+
+                foreach (var entity in newEntities)
+                {
+                    entity.Fields.Add("parent", entity.Fields["project"]);
+                }
+
+                foreach (var entity in existingEntities)
+                {
+                    entity.Fields.Add("parent", entity.Fields["project"]);
+                }
             }
         }
 
