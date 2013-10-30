@@ -75,8 +75,12 @@ namespace UplandIntegrations.PowerSteering.Entities
                     }
                     else if (name.Equals("taglist"))
                     {
-                        Set(entity, element.Element("tagset").Element("tag").Element("value").Value,
+                        try
+                        {
+                            Set(entity, element.Element("tagset").Element("tag").Element("value").Value,
                             element.Element("tagset").Element("name").Value);
+                        }
+                        catch { }
                     }
                     else
                     {
