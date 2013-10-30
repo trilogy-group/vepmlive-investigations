@@ -298,7 +298,7 @@ namespace EPMLiveCore
 
                         string siteTemplates = !string.IsNullOrEmpty(rawSiteTemplates) ? rawSiteTemplates.Split('|')[1] : string.Empty;
 
-                        if (!string.IsNullOrEmpty(nd.Attributes["ows_SiteTemplates"].Value))
+                        if (nd.Attributes["ows_SiteTemplates"] != null && !string.IsNullOrEmpty(nd.Attributes["ows_SiteTemplates"].Value))
                         {
                             siteTemplates = nd.Attributes["ows_SiteTemplates"].Value;
                         }
