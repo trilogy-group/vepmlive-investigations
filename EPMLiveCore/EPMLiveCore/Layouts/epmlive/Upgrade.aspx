@@ -96,7 +96,7 @@
 		 window.upgradeEpmLive = function() {
 			 if (window.epmLiveUpgradeEnabled) {
 				 var options = { url: 'PerformUpgrade.aspx', width: 500, height: 250, showClose: true };
-				 SP.UI.ModalDialog.showModalDialog(options);
+				 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 			 }
 		 };
 	</script>
