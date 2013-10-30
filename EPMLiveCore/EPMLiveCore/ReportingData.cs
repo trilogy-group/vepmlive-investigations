@@ -80,7 +80,12 @@ namespace EPMLiveCore
             {
                 foreach (XmlNode nd in ndGroupBy.SelectNodes("FieldRef"))
                 {
-                    orderby += "," + nd.Attributes["Name"].Value;
+
+                    SPField oField = list.Fields.GetFieldByInternalName(nd.Attributes["Name"].Value);
+                    if(oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
+                        orderby += "," + nd.Attributes["Name"].Value + "Text";
+                    else
+                        orderby += "," + nd.Attributes["Name"].Value;
                     try
                     {
                         if (nd.Attributes["Ascending"].Value.ToLower() == "false")
