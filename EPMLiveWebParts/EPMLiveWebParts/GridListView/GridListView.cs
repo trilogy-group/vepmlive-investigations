@@ -1846,21 +1846,23 @@ namespace EPMLiveWebParts
                         view = list.Views[PropView];
                     }
                     catch { }
-
-                    gSettings = (EPMLiveCore.GridGanttSettings)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GGS", "GridSettings-" + list.ID.ToString(), () =>
+                    try
                     {
-                        return new EPMLiveCore.GridGanttSettings(list);
-                    }).Value;
+                        gSettings = (EPMLiveCore.GridGanttSettings)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GGS", "GridSettings-" + list.ID.ToString(), () =>
+                        {
+                            return new EPMLiveCore.GridGanttSettings(list);
+                        }).Value;
 
-                    if (PropUseDefaults.Value && list != null)
-                    {
-                        BOOLShowViewBar = gSettings.ShowViewToolbar;
+                        if (PropUseDefaults.Value && list != null)
+                        {
+                            BOOLShowViewBar = gSettings.ShowViewToolbar;
+                        }
+                        else
+                        {
+                            BOOLShowViewBar = PropShowViewToolbar.Value;
+                        }
                     }
-                    else
-                    {
-                        BOOLShowViewBar = PropShowViewToolbar.Value;
-                    }
-
+                    catch { }
 
                 }
 
