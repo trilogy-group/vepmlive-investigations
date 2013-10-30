@@ -19,7 +19,7 @@
     border-left-color: transparent;
     border-bottom-color: #fafafa !important;
     border-style: none solid solid;
-    border-width: 0 10px 10px;
+    border-width: 0 6px 6px;  
     font-size: 0;
     height: 0;
     left: 20px;
@@ -27,7 +27,7 @@
     margin: 0;
     padding: 0;
     position: absolute;
-    top: -10px;
+    top: -6px;
     width: 0;
 }
 
@@ -58,7 +58,7 @@
 
     .border-callout .border-notch {
         border-bottom-color: #CCCCCC !important;
-        top: -11px;
+        top: -6px;
     }
 
 .commentsWPMainContainer a:visited {
