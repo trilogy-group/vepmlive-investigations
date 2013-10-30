@@ -66,7 +66,7 @@ namespace EPMLiveWebParts
             }
             ddlList.ID = "ddlList" + this.ID;
             ddlList.SelectedValue = myWP.PropList;
-            output.Write("<script src=\"/_layouts/epmlive/DHTML/dhtmlxajax.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/dhtmlxcommon.js\"></script>");
             output.Write("<div id=\"divTpLoading\" style=\"width:100%;height:400;background:#FFFFFF;display:none\" align=\"center\">");
             output.Write("<br><br><br><br><br><br><br><img src=\"_layouts/images/gears_anv4.gif\">");
             output.Write("</div>");
