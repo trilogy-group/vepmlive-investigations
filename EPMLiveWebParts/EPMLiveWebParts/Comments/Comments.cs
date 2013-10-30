@@ -193,9 +193,6 @@ namespace EPMLiveWebParts.Comments
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/Comments.UI.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsWebPartStyle.css\"/>");
 
-            output.Write("<div id=\"commentsWebPartMainContainer\" class=\"commentsWPMainContainer\">");
-            output.Write("<div style=\"clear:both;\"></div>");
-            
             output.Write(@"<div id='wrapper' class='divPublicCommentContainer'>
                                <div id='comment-photo'>
                                    <img src='" + userPictureUrl + @"' class='circleborder' />
@@ -209,20 +206,10 @@ namespace EPMLiveWebParts.Comments
                                <a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='display:inline-block;margin-left:10px;text-decoration:none;'>Share</a>
                             </div>");
 
-            //output.Write("<div class=\"divPublicCommentContainer\">");
-            //output.Write("<div class=\"inputSearch tbComment epmliveinput\" style=\"width: 95%;background:white;\" id=\"inputPublicComment\" class=\"ms-socialCommentInputBox ms-rtestate-write tbCommentInput\" contenteditable=\"true\" disableribboncommands=\"True\">");
-            //output.Write("<span style=\"color:gray\">" + sPubComTxt + "</span>");
-            //output.Write("</div>");
-
-            //output.Write("<div style=\"clear:both;\"></div>");
-            //output.Write("<input id=\"btnGeneralPost\" class=\"epmliveButton\" type=\"button\" value=\"post\" />");
-            //output.Write("</div>");
-
             output.Write("<div style=\"clear:both;\"></div>");
 
-            output.Write("<div class=\"divGeneralComment\">");
-            //output.Write(_publicCommentsloadingHtml);
-            output.Write("</div>");
+            output.Write("<div id=\"commentsWebPartMainContainer\" class=\"commentsWPMainContainer\">");
+            output.Write("<div style=\"clear:both;\"></div>");
 
             output.Write(_loadingHtml);
             output.Write("<div style=\"clear:both;height:5px\"></div>");

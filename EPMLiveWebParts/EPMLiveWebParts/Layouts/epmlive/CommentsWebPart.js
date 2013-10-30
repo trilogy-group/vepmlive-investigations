@@ -252,15 +252,17 @@ function GetData() {
                             if (responseJson.Result.Notifications) {
                                 data += '<Param key="ItemIds">';
                                 var notifications;
-                                if (!responseJson.Result.Notifications.Notification.length) {
-                                    notifications = [responseJson.Result.Notifications.Notification];
-                                }
-                                else {
-                                    notifications = responseJson.Result.Notifications.Notification;
-                                }
-                                for (var i in notifications) {
-                                    if (notifications[i]['@Type'] == '3') {
-                                        data += (notifications[i]['@ListId'] + '.' + notifications[i]['@ItemId'] + ',');
+                                if (responseJson.Result.Notifications.Notification) {
+                                    if (!responseJson.Result.Notifications.Notification.length) {
+                                        notifications = [responseJson.Result.Notifications.Notification];
+                                    }
+                                    else {
+                                        notifications = responseJson.Result.Notifications.Notification;
+                                    }
+                                    for (var i in notifications) {
+                                        if (notifications[i]['@Type'] == '3') {
+                                            data += (notifications[i]['@ListId'] + '.' + notifications[i]['@ItemId'] + ',');
+                                        }
                                     }
                                 }
                                 data += '</Param>';
@@ -803,7 +805,7 @@ function GetData() {
                     }
                     else {
                         $.getScript('/_layouts/epmlive/slimScroll.js', function () {
-                            //$('#commentsWebPartMainContainer').slimScroll({ height: '300px', size: '10px', wheelStep: 5 });
+                            $('#commentsWebPartMainContainer').slimScroll({ height: '300px', size: '10px', wheelStep: 5 });
                         }, true);
 
                         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
@@ -900,7 +902,10 @@ function GetData() {
             $('#divLoaderPublic_CommentsWebPart').css('display', '');
             $('#divNoCommentIndicator').css('display', 'none');
 
-            if (comment !== undefined) {
+            if (comment !== undefined &&
+                comment !== "<span style=&quot;color:gray&quot;>What are you working on?</span>" &&
+                comment !== "<span style=&quot;color:gray&quot;>" + sPubComTxt + "</span>") {
+
                 var orginalComment = comment;
 
                 var dataXml = '<Data><Param key="Comment"><![CDATA[' + comment + ']]></Param></Data>';
@@ -977,10 +982,10 @@ function GetData() {
                                                        .replace(/##listId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
                                                        
 
-                                    $('#callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId']).append(newCommentBox);
+                                    $('#callout_' + responseJson.Result.Comments.PublicCommentItem['@listId'] + '_' + responseJson.Result.Comments.PublicCommentItem['@itemId']).append(newCommentBox);
                                 }
 
-                                var iid = responseJson.Result.Comments.CommentItem['@itemId'];
+                                var iid = responseJson.Result.Comments.PublicCommentItem['@itemId'];
                                 $('#aNewCommentReply' + iid).click(function (e) {
                                     var id = $(this).attr('id').replace('aNewCommentReply', '');
                                     $('#tbCommentInput' + id).css('display', '');
