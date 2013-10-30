@@ -398,7 +398,7 @@ if not exists (select emailid from EMAILTEMPLATES where emailid = 6)
 begin
     INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (6,'Workspace Created Notification','Your new workspace {Workspace_Name} is now ready!','        <table width="100%" cellpadding="0" cellspacing="0">  
             <tr>  
-                <td style="font-size:18px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Workspace <a href="{ItemUrl}" style="font-size:16px;color:#3366CC;">{Workspace_Name}</a> is now ready!
+                <td style="font-size:18px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Workspace <a href="{ItemUrl}" style="font-size:16px;color:#3366CC;">{Workspace_Name}</a>&nbsp;is now ready!
                 </td>  
             </tr>  
             <tr>
@@ -423,7 +423,7 @@ else
 begin
     UPDATE EMAILTEMPLATES SET subject='Your new workspace {Workspace_Name} is now ready!', body='        <table width="100%" cellpadding="0" cellspacing="0">  
             <tr>  
-                <td style="font-size:18px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Workspace <a href="{ItemUrl}" style="font-size:16px;color:#3366CC;">{Workspace_Name}</a> is now ready!
+                <td style="font-size:18px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Workspace <a href="{ItemUrl}" style="font-size:16px;color:#3366CC;">{Workspace_Name}</a>&nbsp;is now ready!
                 </td>  
             </tr>  
             <tr>
