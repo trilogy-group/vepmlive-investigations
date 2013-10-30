@@ -105,16 +105,20 @@ namespace EPMLiveCore.API
             SSRS.Url = ssrsurl + "/ReportService2006.asmx";
             SSRS.UseDefaultCredentials = true;
 
-            SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
-
-            SPListItemCollection folders = list.GetItemsInFolder(list.DefaultView, list.RootFolder);
-
-            SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
-            dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
-
-            foreach(SPListItem li in folders)
+            SPList tList = web.Lists.TryGetList("Report Library");
+            if (tList != null)
             {
-                processRDL(SSRS, web, li, dsr, list, docFiles);
+                SPDocumentLibrary list = (SPDocumentLibrary)tList;
+
+                SPListItemCollection folders = list.GetItemsInFolder(list.DefaultView, list.RootFolder);
+
+                SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
+                dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
+
+                foreach (SPListItem li in folders)
+                {
+                    processRDL(SSRS, web, li, dsr, list, docFiles);
+                }
             }
         }
 

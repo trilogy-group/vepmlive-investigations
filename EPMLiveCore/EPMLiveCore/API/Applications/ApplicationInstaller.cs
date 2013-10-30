@@ -3370,7 +3370,7 @@ namespace EPMLiveCore.API
                 try
                 {
                     XmlNode ndSolutions = appDef.ApplicationXml.FirstChild.SelectSingleNode("Solutions");
-                    if (ndSolutions.ChildNodes.Count > 0)
+                    if (ndSolutions.SelectNodes("Solution").Count > 0)
                         bHasSolutions = true;
                 }
                 catch { }
