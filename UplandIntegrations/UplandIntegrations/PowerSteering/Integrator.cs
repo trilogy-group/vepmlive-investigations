@@ -3,15 +3,44 @@ using System.Collections.Generic;
 using System.Data;
 using System.Security;
 using EPMLiveIntegration;
+using UplandIntegrations.Infrastructure;
 using UplandIntegrations.PowerSteering.Services;
 
 namespace UplandIntegrations.PowerSteering
 {
     public class Integrator : IIntegrator
     {
-        #region Methods (2) 
+        #region Fields (1) 
 
-        // Private Methods (2) 
+        private const string UPSERT_ERROR_MESSAGE =
+            @"Could not upsert record. PowerSteering ID: {0}. EPMLive ID: {1}. Reason: {2}";
+
+        #endregion Fields 
+
+        #region Methods (4) 
+
+        // Private Methods (4) 
+
+        private Dictionary<string, string> BuildIdMap(DataTable items, out List<string> ids)
+        {
+            var idMap = new Dictionary<string, string>();
+            ids = new List<string>();
+
+            foreach (DataRow dataRow in items.Rows)
+            {
+                object oId = dataRow["ID"];
+
+                if (oId == null || oId == DBNull.Value) continue;
+
+                string id = oId.ToString();
+                if (ids.Contains(id)) continue;
+
+                ids.Add(id);
+                idMap.Add(id, dataRow["SPID"].ToString());
+            }
+
+            return idMap;
+        }
 
         private void GetAuthInfo(WebProperties webProps, out string serverUrl, out string contextName, out string apiKey,
             out SecureString apiSecret)
@@ -75,33 +104,138 @@ namespace UplandIntegrations.PowerSteering
             return new PowerSteeringService(serverUrl, contextName, apiKey, apiSecret);
         }
 
+        private void ProcessResults(DataTable items, IntegrationLog log, IEnumerable<IntTransactionResult> results,
+            Dictionary<string, string> idMap, TransactionTable transactionTable)
+        {
+            int index = 0;
+
+            foreach (IntTransactionResult result in results)
+            {
+                string psId = result.Id;
+                string spId;
+
+                try
+                {
+                    spId = idMap[psId];
+                }
+                catch
+                {
+                    spId = items.Rows[index]["SPID"].ToString();
+                }
+
+                if (result.Success)
+                {
+                    transactionTable.AddRow(spId, psId, result.TransactionType);
+                }
+                else
+                {
+                    transactionTable.AddRow(spId, psId, TransactionType.FAILED);
+                    log.LogMessage(string.Format(UPSERT_ERROR_MESSAGE, psId, spId, result.Error),
+                        IntegrationLogType.Warning);
+                }
+
+                index++;
+            }
+        }
+
         #endregion Methods 
 
         #region Implementation of IIntegrator
 
         public TransactionTable UpdateItems(WebProperties webProps, DataTable items, IntegrationLog log)
         {
-            throw new NotImplementedException();
+            var transactionTable = new TransactionTable();
+
+            try
+            {
+                PowerSteeringService psService = GetPowerSteeringService(webProps);
+
+                List<string> ids;
+                Dictionary<string, string> idMap = BuildIdMap(items, out ids);
+
+                IEnumerable<IntTransactionResult> results =
+                    psService.UpsertItems((string) webProps.Properties["Object"],
+                        items, webProps.IntegrationId);
+
+                ProcessResults(items, log, results, idMap, transactionTable);
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message, IntegrationLogType.Error);
+            }
+
+            return transactionTable;
         }
 
         public TransactionTable DeleteItems(WebProperties webProps, DataTable items, IntegrationLog log)
         {
-            throw new NotImplementedException();
+            var transactionTable = new TransactionTable();
+
+            try
+            {
+                PowerSteeringService psService = GetPowerSteeringService(webProps);
+
+                List<string> ids;
+                Dictionary<string, string> idMap = BuildIdMap(items, out ids);
+
+                IEnumerable<IntTransactionResult> results =
+                    psService.DeleteItems((string) webProps.Properties["Object"],
+                        ids.ToArray(), webProps.IntegrationId);
+
+                ProcessResults(items, log, results, idMap, transactionTable);
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message.Replace("upsert", "remove"), IntegrationLogType.Error);
+            }
+
+            return transactionTable;
         }
 
         public List<ColumnProperty> GetColumns(WebProperties webProps, IntegrationLog log, string listName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string objectName = null;
+
+                try
+                {
+                    objectName = webProps.Properties["Object"] as string;
+                }
+                catch { }
+
+                if (string.IsNullOrEmpty(objectName)) throw new Exception("Please provide an object.");
+
+                return GetPowerSteeringService(webProps).GetObjectFields(objectName);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, IntegrationLogType.Error);
+            }
+
+            return null;
         }
 
         public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynchDate)
         {
-            throw new NotImplementedException();
+            return items;
         }
 
         public DataTable GetItem(WebProperties webProps, IntegrationLog log, string itemId, DataTable items)
         {
-            throw new NotImplementedException();
+            try
+            {
+                PowerSteeringService psService = GetPowerSteeringService(webProps);
+                psService.GetObjectItemsById((string) webProps.Properties["Object"], itemId, items);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, e.Message.StartsWith("No records found")
+                    ? IntegrationLogType.Warning
+                    : IntegrationLogType.Error);
+            }
+
+            return items;
         }
 
         public Dictionary<string, string> GetDropDownValues(WebProperties webProps, IntegrationLog log, string property,
@@ -155,13 +289,15 @@ namespace UplandIntegrations.PowerSteering
             string integrationKey,
             string apiUrl)
         {
-            throw new NotImplementedException();
+            message = null;
+            return true;
         }
 
         public bool RemoveIntegration(WebProperties webProps, IntegrationLog log, out string message,
             string integrationKey)
         {
-            throw new NotImplementedException();
+            message = null;
+            return true;
         }
 
         #endregion
