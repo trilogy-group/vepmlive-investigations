@@ -4163,7 +4163,7 @@ namespace EPMLiveWebParts
 
             appendLookupQuery(ref xmlQuery, ref arrTempGroups);
 
-            query = xmlQuery.ChildNodes[0].InnerXml;
+            
 
 
             arrGroupFields = new string[arrTempGroups.Count];
@@ -4174,6 +4174,30 @@ namespace EPMLiveWebParts
 
 
             SortedList arrGTemp = new SortedList();
+
+            if (arrGroupFields.Length > 0)
+            {
+
+                XmlNode ndOrderBy = xmlQuery.FirstChild.SelectSingleNode("//OrderBy");
+                if (ndOrderBy == null)
+                {
+                    ndOrderBy = xmlQuery.CreateNode(XmlNodeType.Element, "OrderBy", docXml.NamespaceURI);
+                    xmlQuery.FirstChild.AppendChild(ndOrderBy);
+                }
+                foreach (string sG in arrGroupFields)
+                {
+                    XmlNode nd = xmlQuery.FirstChild.SelectSingleNode("//OrderBy/FieldRef[@Name='" + sG + "']");
+                    if (nd == null)
+                    {
+                        XmlNode newNode = xmlQuery.CreateNode(XmlNodeType.Element, "FieldRef", docXml.NamespaceURI);
+                        XmlAttribute attrId = xmlQuery.CreateAttribute("Name");
+                        attrId.Value = sG;
+                        newNode.Attributes.Append(attrId);
+                        ndOrderBy.PrependChild(newNode);
+                    }
+                }
+            }
+                query = xmlQuery.ChildNodes[0].InnerXml;
 
             populateGroups(query, arrGTemp, curWeb);
 
