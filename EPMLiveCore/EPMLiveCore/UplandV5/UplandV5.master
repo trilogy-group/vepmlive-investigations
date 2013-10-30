@@ -127,7 +127,7 @@
                             <div id="siteIcon" class="ms-tableCell ms-verticalAlignMiddle">
                                 <SharePoint:AjaxDelta id="DeltaSiteLogo" BlockElement="true" runat="server">
                                     <SharePoint:SPSimpleSiteLink CssClass="ms-siteicon-a" runat="server" id="onetidProjectPropertyTitleGraphic">
-                                        <SharePoint:SiteLogoImage CssClass="ms-siteicon-img" name="onetidHeadbnnr0" id="onetidHeadbnnr2" LogoImageUrl="/_layouts/15/epmlive/images/epmlivelogo-white.png" runat="server" style="max-height: 45px;" />
+                                        <SharePoint:SiteLogoImage CssClass="ms-siteicon-img" name="onetidHeadbnnr0" id="onetidHeadbnnr2" LogoImageUrl="/_layouts/15/epmlive/images/epmlivelogo-white.png" runat="server" style="max-height: 42px !important; height: 42px !important; margin-top: 2px !important;" />
                                     </SharePoint:SPSimpleSiteLink>
                                 </SharePoint:AjaxDelta>
                             </div>

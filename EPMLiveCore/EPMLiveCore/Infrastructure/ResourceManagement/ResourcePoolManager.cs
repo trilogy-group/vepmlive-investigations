@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.ReportingProxy;
+using EPMLiveCore.SSRS2005;
 using EPMLiveReportsAdmin;
 using Microsoft.SharePoint;
+using Task = System.Threading.Tasks.Task;
 
 namespace EPMLiveCore.Infrastructure
 {
@@ -319,7 +322,7 @@ namespace EPMLiveCore.Infrastructure
                 DataColumnCollection dataColumnCollection = resources.Columns;
                 EnumerableRowCollection<DataRow> rowCollection = resources.AsEnumerable();
 
-                var resultDictionary = new Dictionary<int, object[]>();
+                var tasks = new List<Task<object[]>>();
 
                 int totalRows = rowCollection.Count();
                 int pageSize = 200;
@@ -333,9 +336,6 @@ namespace EPMLiveCore.Infrastructure
 
                 int pagesProcessed = 0;
 
-                var locker = new object();
-                var eventWaitHandles = new List<EventWaitHandle>();
-
                 while (pagesProcessed < threadCount)
                 {
                     int page = pageSize;
@@ -348,15 +348,10 @@ namespace EPMLiveCore.Infrastructure
                         page = totalRows - offset;
                     }
 
-                    IEnumerable<DataRow> dataRows = (from r in rowCollection select r).Skip(offset).Take(page);
-
-                    int order = pagesProcessed;
-
-                    var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
-                    eventWaitHandles.Add(eventWaitHandle);
-
-                    var thread = new Thread(() =>
+                    var task = Task<object[]>.Factory.StartNew(() =>
                     {
+                        IEnumerable<DataRow> dataRows = (from r in rowCollection select r).Skip(offset).Take(page);
+
                         Dictionary<string, object[]> valueDictionary;
 
                         List<XElement> elements = BuildXmlElements(includeHidden,
@@ -366,24 +361,18 @@ namespace EPMLiveCore.Infrastructure
                             resources,
                             out valueDictionary);
 
-                        lock (locker)
-                        {
-                            resultDictionary.Add(order,
-                                new object[] {elements, valueDictionary});
-                        }
+                        return new object[] {elements, valueDictionary};
+                    });
 
-                        eventWaitHandle.Set();
-                    }) {Name = "GetResources" + pagesProcessed, IsBackground = true};
-                    thread.Start();
+                    tasks.Add(task);
                 }
 
-                WaitHandle.WaitAll(eventWaitHandles.ToArray());
-
-                foreach (var result in resultDictionary.OrderBy(r => r.Key))
+                foreach (var task in tasks)
                 {
-                    var elements = (List<XElement>) result.Value[0];
+                    var result = task.Result;
 
-                    ProcessHtmlValues(elements, (Dictionary<string, object[]>) result.Value[1]);
+                    var elements = (List<XElement>) result[0];
+                    ProcessHtmlValues(elements, (Dictionary<string, object[]>) result[1]);
 
                     rootElement.Add(elements);
                 }
