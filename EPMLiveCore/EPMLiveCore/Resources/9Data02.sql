@@ -214,6 +214,14 @@ else
 begin
     UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.CreateWorkspaceJob', [Title]='Create Workspace', Priority=9 where jobtype_id=100
 end
+if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 202)
+begin
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (202,'EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Jobs.Upgrades.OptInUpgradeJob','Opt-In Upgrade',5)
+end
+else
+begin
+    UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.Upgrades.OptInUpgradeJob', [Title]='Opt-In Upgrade', Priority=5 where jobtype_id=202
+end
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc499')
 begin
     INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc499','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.SQL','SQL','This provides access to data located in Microsoft SQL Server','sql.png','<Properties>
@@ -302,19 +310,19 @@ begin
 end
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'b0950b9b-3525-40b8-a456-6403156dc000')
 begin
-    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('b0950b9b-3525-40b8-a456-6403156dc000','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.Jira.JiraIntegrator','Jira','Jira provides software development tracking software. This connection will allow you to connect your lists to any of the Jira objects.','jira.png','<Properties><Connection><Input Type="Text" Property="ServerUrl" Title="Jira Server Url" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Text" Property="Password" Title="Password" /></Connection><General><Input Type="Text" Property="Object" Title="Object" /></General></Properties>','True','7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('b0950b9b-3525-40b8-a456-6403156dc000','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.Jira.JiraIntegrator','Jira','Jira provides software development tracking software. This connection will allow you to connect your lists to any of the Jira objects.','jira.png','<Properties><Connection><Input Type="Text" Property="ServerUrl" Title="Jira Server Url" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Object" Title="Object" /></General></Properties>','False','7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
 end
 else
 begin
-    UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.Jira.JiraIntegrator', [Title]='Jira', Description='Jira provides software development tracking software. This connection will allow you to connect your lists to any of the Jira objects.', Icon='jira.png', CustomProps='<Properties><Connection><Input Type="Text" Property="ServerUrl" Title="Jira Server Url" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Text" Property="Password" Title="Password" /></Connection><General><Input Type="Text" Property="Object" Title="Object" /></General></Properties>', AvailableOnline='True',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='b0950b9b-3525-40b8-a456-6403156dc000'
+    UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.Jira.JiraIntegrator', [Title]='Jira', Description='Jira provides software development tracking software. This connection will allow you to connect your lists to any of the Jira objects.', Icon='jira.png', CustomProps='<Properties><Connection><Input Type="Text" Property="ServerUrl" Title="Jira Server Url" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Object" Title="Object" /></General></Properties>', AvailableOnline='False',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='b0950b9b-3525-40b8-a456-6403156dc000'
 end
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-7403156dc491')
 begin
-    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-7403156dc491','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.PS.Integrator','PowerSteering','PowerSteering provides enhanced portfolio managment','ps.png','','True','599c89b2-6330-4e54-aea5-00185f20cce0')
+    INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-7403156dc491','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.PS.Integrator','PowerSteering','PowerSteering provides enhanced portfolio managment','ps.png','<Properties><Connection><Input Type="Text" Property="ServerUrl" Title="Server URL" /><Input Type="Text" Property="ContextName" Title="Context Name" /><Input Type="Text" Property="APIKey" Title="API Key" /><Input Type="Password" Property="APISecret" Title="API Secret" /></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map" /><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>','True','599c89b2-6330-4e54-aea5-00185f20cce0')
 end
 else
 begin
-    UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.PS.Integrator', [Title]='PowerSteering', Description='PowerSteering provides enhanced portfolio managment', Icon='ps.png', CustomProps='', AvailableOnline='True',INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0' where MODULE_ID='a0950b9b-3525-40b8-a456-7403156dc491'
+    UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.PS.Integrator', [Title]='PowerSteering', Description='PowerSteering provides enhanced portfolio managment', Icon='ps.png', CustomProps='<Properties><Connection><Input Type="Text" Property="ServerUrl" Title="Server URL" /><Input Type="Text" Property="ContextName" Title="Context Name" /><Input Type="Text" Property="APIKey" Title="API Key" /><Input Type="Password" Property="APISecret" Title="API Secret" /></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map" /><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>', AvailableOnline='True',INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0' where MODULE_ID='a0950b9b-3525-40b8-a456-7403156dc491'
 end
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-7403156dc492')
 begin
