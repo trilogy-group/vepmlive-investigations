@@ -3381,7 +3381,7 @@ namespace EPMLiveWebParts
                                 SPField field = getRealField(list.Fields.GetFieldByInternalName(groupby));
                                 //string newgroup = getField(li, groupby, true);
 
-                                if (bUseReporting && field.Type == SPFieldType.Lookup)
+                                if (bUseReporting && (field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User))
                                 {
                                     groupby += "Text";
                                 }

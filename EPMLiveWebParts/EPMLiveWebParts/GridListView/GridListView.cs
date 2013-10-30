@@ -3176,7 +3176,7 @@ namespace EPMLiveWebParts
                         <img alt=""Clear Search"" src=""/_layouts/epmlive/images/unsearch.png"" style=""padding-bottom:2px"" onclick=""unSearch" + sFullGridId + @"()""/>
                     </div>
                     <div style=""display: table-cell"">
-                        <input type=""text"" id=""searchtext" + sFullGridId + @""" class="""" style=""border: 0px; width:100%; margin-top:-5px; height:14px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px""/>
+                        <input type=""text"" id=""searchtext" + sFullGridId + @""" value=""" + sSearchValue + @""" class="""" style=""border: 0px; width:100%; margin-top:-5px; height:14px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px""/>
                         <select id=""searchchoice" + sFullGridId + @""" style=""border: 0px; width:100%"">
                         </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </div>
