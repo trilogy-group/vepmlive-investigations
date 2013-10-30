@@ -85,19 +85,26 @@
 						if (!$("link[href='" + escape(cssURL) + "']").length) {
 							$("head").append('<link rel="stylesheet" type="text/css" href="' + cssURL + '" />');
 						}
-						$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + fileId + ",routedobjecttype_6", function (routeobj) {
+						$.get(WebAPIUrl + "files/" + fileId + "/documents?" + Param, function (docs) {
+									var p = eval(docs);
+									if(p.length > 0)
+									{
+										var docid = p[0].documentId;
 
-							var routId = routeobj[0].routeId;
+										$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + docid + ",routedobjecttype_6", function (routeobj) {
 
-								$.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
+											var routId = routeobj[0].routeId;
+
+											 $.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
 
 														LoadVisualWorkflow(routId, docid, xml);
-													
 
 												});
 										
 
-						});
+										});
+									}
+							});
 
 					}
 				);
@@ -160,7 +167,7 @@
 
             });
 
-            function LoadVisualWorkflow(routeId, xml) {
+            function LoadVisualWorkflow(routeId, docId, xml) {
 
                 // make sure vr-content is empty:
                 $("#vr-content").empty();
@@ -181,10 +188,10 @@
 							
 							
 
-                            $.get(WebAPIUrl + "routeditems/" + vwfData.routedItemId + "?localtreeonly=true&lookupIdCode=true&visualWorkflow=true&" + Param, function (routedItems) {
+                             $.get(WebAPIUrl + "routeditems/" + vwfData.routedItemId + "?localtreeonly=true&lookupIdCode=true&visualWorkflow=true&" + Param, function (routedItems) {
 
                                 // need to make sure this only gets called if we have the VWF scripts downloaded already:
-                                VWF.GenerateDiagram(xml, routedItems, getTabs, vwfData.stepId);
+                                VWF.GenerateDiagram(xml, routedItems, getTabs, vwfData.stepId, FBSiteURL);
 
                                 // update the layout (positioning, etc.):
                                 VWF.UpdateLayout(getTabs, GetMaxHeight(), $("#vr-content").outerWidth(), parseFloat($("#vr-content").css("min-height")), true);
