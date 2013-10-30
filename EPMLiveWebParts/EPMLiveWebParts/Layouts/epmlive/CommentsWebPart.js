@@ -154,7 +154,7 @@ function GetData() {
             '<div id="newItemAnchor_##listId##_##itemId##">' +
             '</div>' +
             '<div style=\"clear:both\"></div>' +
-            '<div style=\"padding-top: 8px; padding-left: 5px;\">' +
+            '<div class=\"replyWrapper\">' +
                 '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
                 '<div class="inputSearch tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
                     '<span style="color:gray">Write a reply...</span>' +
@@ -170,7 +170,7 @@ function GetData() {
             '<div id="newItemAnchor_##listId##_##itemId##">' +
             '</div>' +
             '<div style=\"clear:both\"></div>' +
-            '<div style=\"padding-top: 8px; padding-left: 5px;\">' +
+            '<div class=\"replyWrapper\">' +
                 '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
                 '<div class="inputSearch tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
                     '<span style="color:gray">Write a reply...</span>' +

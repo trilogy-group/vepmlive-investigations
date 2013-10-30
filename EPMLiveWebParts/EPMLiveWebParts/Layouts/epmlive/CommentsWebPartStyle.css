@@ -13,23 +13,23 @@
     position: relative;
 }
 
-.callout .notch {
-    border-top-color: #fafafa;
-    border-right-color: transparent;
-    border-left-color: transparent;
-    border-bottom-color: #fafafa !important;
-    border-style: none solid solid;
-    border-width: 0 6px 6px;  
-    font-size: 0;
-    height: 0;
-    left: 20px;
-    line-height: 0;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    top: -6px;
-    width: 0;
-}
+    .callout .notch {
+        border-top-color: #fafafa;
+        border-right-color: transparent;
+        border-left-color: transparent;
+        border-bottom-color: #fafafa !important;
+        border-style: none solid solid;
+        border-width: 0 6px 6px;
+        font-size: 0;
+        height: 0;
+        left: 20px;
+        line-height: 0;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        top: -6px;
+        width: 0;
+    }
 
 .inputSearch {
     -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
@@ -1064,13 +1064,9 @@ div.ms-taggedItems a.people {
     position: relative;
 }
 
-
-
 .comment-paragraph:focus {
     outline: none;
 }
-
-
 
 div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
     content: attr(data-placeholder);
@@ -1078,7 +1074,6 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
     margin-left: 0px;
     color: #bbbbbb;
 }
-
 
 .btn-disabled {
     pointer-events: none;
@@ -1132,4 +1127,8 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
+}
+
+.replyWrapper{
+
 }
