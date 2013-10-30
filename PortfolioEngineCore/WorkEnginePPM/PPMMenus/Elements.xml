@@ -1,21 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
-	<CustomActionGroup
-			Id="PortfolioEngine.Admin"
-			Location="Microsoft.SharePoint.SiteSettings"
-			Title="PortfolioEngine Administration"
-			Sequence="201" ImageUrl="/_layouts/images/epmlivelogo.gif"/>
 	
-	<CustomAction
-		Id="EPMLive.Workgroup.Admin.SitePermissions"
-		GroupId="PortfolioEngine.Admin"
-		Location="Microsoft.SharePoint.SiteSettings"
-		Sequence="100"
-		Description="Access PortfolioEngine settings for this site."
-		RequireSiteAdministrator="True"
-		Title="General Settings">
-		<UrlAction Url="_layouts/ppm/settings.aspx" />
-	</CustomAction>
 
 	<CustomAction
 	Id="EPMLive.PortfolioEngineSettings"
