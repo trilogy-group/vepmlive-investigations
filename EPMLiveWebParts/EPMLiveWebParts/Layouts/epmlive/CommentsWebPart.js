@@ -176,7 +176,7 @@ function GetData() {
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
                 '<div style="height: 25px; margin-right: 5px; float: left; margin-top: 3px;display:none">' +
-                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##pubComListId##\', \'##pubComItemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
+                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
                 '</div>' +
             '</div>' +
             '<div style=\"clear:both\"></div>';
@@ -898,6 +898,7 @@ function GetData() {
             // <Param key="Comment">abcabac</Param>
             // </Data>
             $('#divLoaderPublic_CommentsWebPart').css('display', '');
+            $('#divNoCommentIndicator').css('display', 'none');
 
             if (comment !== undefined) {
                 var orginalComment = comment;
@@ -930,7 +931,7 @@ function GetData() {
                                                                   .replace(/##workspaceTitle##/g, curWebTitle);
 
                                 if ($('#commentsWebPartMainContainer').find('.customCommentItem').length > 0) {
-                                    $($('#commentsWebPartMainContainer').find('.customCommentItem')[0]).before(publicCommentItem);
+                                    $($('#commentsWebPartMainContainer').find('.customCommentItem')[0]).parent().before(publicCommentItem);
                                     $('#divPublicCommentItem' + responseJson.Result.Comments.CommentItem['@itemId']).after(
                                                 '<div style="clear:both;margin-top:3px"/>' +
                                                 '<div style="margin-left:60px" class="callout border-callout" id="callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId'] + '">' +
@@ -939,7 +940,7 @@ function GetData() {
                                                 '</div>' +
                                                 '<div style="height: 10px; clear: both;"/>');
                                     var newCommentBox;
-                                    newCommentBox = newPubCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
+                                    newCommentBox = newPubCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
                                                        .replace(/##userPicUrl##/g, userPicUrl)
                                                        .replace(/##userEmail##/g, userEmail)
                                                        .replace(/##userProfileUrl##/g, userProfileUrl)
@@ -949,9 +950,7 @@ function GetData() {
                                                        .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName'])
                                                        .replace(/##listUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listUrl'])
                                                        .replace(/##listDispUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listDispUrl'])
-                                                       .replace(/##listId##/g, responseJson.Result.Comments.CommentItem.Comment['@listId'])
-                                                       .replace(/##pubComItemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
-                                                       .replace(/##pubComListId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
+                                                       .replace(/##listId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
                                                        
                                     $('#callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId']).append(newCommentBox);
                                 } else {
@@ -961,9 +960,11 @@ function GetData() {
                                                 '<div style="margin-left:60px" class="callout border-callout" id="callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId'] + '">' +
                                                     '<b class="border-notch notch"></b>' +
                                                     '<b class="notch"></b>' +
-                                                '</div>');
+                                                '</div>' +
+                                                '<div style="height: 10px; clear: both;"/>');
+
                                     var newCommentBox;
-                                    newCommentBox = newPubCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
+                                    newCommentBox = newPubCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
                                                        .replace(/##userPicUrl##/g, userPicUrl)
                                                        .replace(/##userEmail##/g, userEmail)
                                                        .replace(/##userProfileUrl##/g, userProfileUrl)
@@ -973,9 +974,8 @@ function GetData() {
                                                        .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName'])
                                                        .replace(/##listUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listUrl'])
                                                        .replace(/##listDispUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listDispUrl'])
-                                                       .replace(/##listId##/g, responseJson.Result.Comments.CommentItem.Comment['@listId'])
-                                                       .replace(/##pubComItemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
-                                                       .replace(/##pubComListId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
+                                                       .replace(/##listId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
+                                                       
 
                                     $('#callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId']).append(newCommentBox);
                                 }
@@ -1016,7 +1016,7 @@ function GetData() {
                                     var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                     if ($(this).text() !== 'Write a reply...') {
-                                        var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
+                                        var val = $(this).html(); //replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
                                         shadow.html(val);
                                         $(this).css('height', Math.max(shadow.height(), minHeight));
                                     }
@@ -1028,7 +1028,7 @@ function GetData() {
                                     var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                     if ($(this).text() !== 'Write a reply...') {
-                                        var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
+                                        var val = $(this).html() //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
                                         shadow.html(val);
                                         if (e.keyCode != 8 && e.keyCode != 46) {
                                             $(this).css('height', Math.max(shadow.height(), minHeight));
