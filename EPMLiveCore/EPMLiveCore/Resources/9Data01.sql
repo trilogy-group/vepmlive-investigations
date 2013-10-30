@@ -403,9 +403,9 @@ begin
             </tr>  
             <tr>
                 <td>
-                    <table cellpadding="0" cellspacing="0" style="margin-top:15px;margin-bottom:15px;">
+                    <table cellpadding="0" cellspacing="10">
                         <tr>
-                            <td style="width: 100%; height: 20px; text-align: center; color: #ffffff; padding-top: 10px; padding-right: 20px; padding-bottom: 10px; padding-left: 20px; border-top-color: #5ea736; border-right-color: #5ea736; border-bottom-color: #5ea736; border-left-color: #5ea736; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; background-color: rgb(106, 189, 61);"><a style="color: rgb(255, 255, 255); font-family:Helvetica,Arial; font-size: 16px; font-weight: bold; text-decoration: none;" href="{ItemUrl}">{Workspace_Name}</a>
+                            <td style="width: 100%;text-align: center; color: #ffffff; padding-top: 5px; padding-right: 15px; padding-bottom: 5px; padding-left: 15px; border-top-color: #5ea736; border-right-color: #5ea736; border-bottom-color: #5ea736; border-left-color: #5ea736; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; background-color: rgb(106, 189, 61);"><a style="color: rgb(255, 255, 255); font-family:Helvetica,Arial; font-size: 16px; font-weight: bold; text-decoration: none;" href="{ItemUrl}">{Workspace_Name}</a>
                             </td>
                         </tr>
                     </table>
@@ -428,9 +428,9 @@ begin
             </tr>  
             <tr>
                 <td>
-                    <table cellpadding="0" cellspacing="0" style="margin-top:15px;margin-bottom:15px;">
+                    <table cellpadding="0" cellspacing="10">
                         <tr>
-                            <td style="width: 100%; height: 20px; text-align: center; color: #ffffff; padding-top: 10px; padding-right: 20px; padding-bottom: 10px; padding-left: 20px; border-top-color: #5ea736; border-right-color: #5ea736; border-bottom-color: #5ea736; border-left-color: #5ea736; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; background-color: rgb(106, 189, 61);"><a style="color: rgb(255, 255, 255); font-family:Helvetica,Arial; font-size: 16px; font-weight: bold; text-decoration: none;" href="{ItemUrl}">{Workspace_Name}</a>
+                            <td style="width: 100%;text-align: center; color: #ffffff; padding-top: 5px; padding-right: 15px; padding-bottom: 5px; padding-left: 15px; border-top-color: #5ea736; border-right-color: #5ea736; border-bottom-color: #5ea736; border-left-color: #5ea736; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; background-color: rgb(106, 189, 61);"><a style="color: rgb(255, 255, 255); font-family:Helvetica,Arial; font-size: 16px; font-weight: bold; text-decoration: none;" href="{ItemUrl}">{Workspace_Name}</a>
                             </td>
                         </tr>
                     </table>
