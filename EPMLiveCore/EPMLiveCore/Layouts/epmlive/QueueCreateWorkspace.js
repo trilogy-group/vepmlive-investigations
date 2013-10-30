@@ -78,6 +78,7 @@ function registerCreateWorkspace2Script() {
                             "<Param key=\"RowLimit\">100000</Param>" +
                             "<Param key=\"QueryOptions\"></Param>" +
                             "<Param key=\"CompLevels\">" + self.compLvls() + "</Param>" +
+                            "<Param key=\"SolutionType\">Site</Param>" +
                         "</Data>";
             }, this);
 
