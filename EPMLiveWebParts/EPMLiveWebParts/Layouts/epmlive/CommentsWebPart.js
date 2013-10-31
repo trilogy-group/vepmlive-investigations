@@ -156,10 +156,10 @@ function GetData() {
             '<div style=\"clear:both\"></div>' +
             '<div class=\"replyWrapper\">' +
                 '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
-                '<div class="inputSearch tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
+                '<div class="tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
-                '<div style="height: 25px; margin-right: 5px; float: left; margin-top: 3px;display:none">' +
+                '<div class="reply-button-wrapper" style=\"display:none;\">' +
                     '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
                 '</div>' +
             '</div>' +
@@ -172,10 +172,10 @@ function GetData() {
             '<div style=\"clear:both\"></div>' +
             '<div class=\"replyWrapper\">' +
                 '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
-                '<div class="inputSearch tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
+                '<div class="tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
-                '<div style="height: 25px; margin-right: 5px; float: left; margin-top: 3px;display:none">' +
+                '<div class="reply-button-wrapper" style=\"display:none;\">' +
                     '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
                 '</div>' +
             '</div>' +
@@ -445,6 +445,7 @@ function GetData() {
 
                                         $('#aNewCommentReply' + oComment['@itemId']).click(function (e) {
                                             var id = $(this).attr('id').replace('aNewCommentReply', '');
+                                            $('#tbCommentInput' + id).css('height', 'auto');
                                             $('#tbCommentInput' + id).css('display', '');
                                             $('#btnNewComment' + id).parent().css('display', '');
                                             $(this).css('display', 'none');
@@ -475,7 +476,7 @@ function GetData() {
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
                                             var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                            var shadow = $('<div class="tbComment epmliveinput"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                             if ($(this).text() !== 'Write a reply...') {
                                                 var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
@@ -487,7 +488,7 @@ function GetData() {
                                         $('#tbCommentInput' + oComment['@itemId']).keyup(function (e) {
                                             var id = $(this).attr('id').replace('tbCommentInput', '');
                                             var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                            var shadow = $('<div class="tbComment epmliveinput"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                             if ($(this).text() !== 'Write a reply...') {
                                                 var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
@@ -723,6 +724,7 @@ function GetData() {
 
                                         $('#aNewCommentReply' + oComment['@itemId']).click(function (e) {
                                             var id = $(this).attr('id').replace('aNewCommentReply', '');
+                                            $('#tbCommentInput' + id).css('height', 'auto');
                                             $('#tbCommentInput' + id).css('display', '');
                                             $('#btnNewComment' + id).parent().css('display', '');
                                             $(this).css('display', 'none');
@@ -747,7 +749,7 @@ function GetData() {
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
                                             var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                            var shadow = $('<div class="tbComment epmliveinput"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                             if ($(this).text() !== 'Write a reply...') {
                                                 var val = $(this).html(); //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
@@ -759,7 +761,7 @@ function GetData() {
                                         $('#tbCommentInput' + oComment['@itemId']).keyup(function (e) {
                                             var id = $(this).attr('id').replace('tbCommentInput', '');
                                             var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                            var shadow = $('<div class="tbComment epmliveinput"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                             if ($(this).text() !== 'Write a reply...') {
                                                 var val = $(this).html(); //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
@@ -988,6 +990,7 @@ function GetData() {
                                 var iid = responseJson.Result.Comments.PublicCommentItem['@itemId'];
                                 $('#aNewCommentReply' + iid).click(function (e) {
                                     var id = $(this).attr('id').replace('aNewCommentReply', '');
+                                    $('#tbCommentInput' + id).css('height', 'auto');
                                     $('#tbCommentInput' + id).css('display', '');
                                     $('#btnNewComment' + id).parent().css('display', '');
                                     $(this).css('display', 'none');
@@ -1018,7 +1021,7 @@ function GetData() {
 
                                 $('#tbCommentInput' + iid).change(function () {
                                     var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                    var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                    var shadow = $('<div class="tbComment epmliveinput"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                     if ($(this).text() !== 'Write a reply...') {
                                         var val = $(this).html(); //replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
@@ -1030,7 +1033,7 @@ function GetData() {
                                 $('#tbCommentInput' + iid).keyup(function (e) {
                                     var id = $(this).attr('id').replace('tbCommentInput', '');
                                     var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                    var shadow = $('<div class="inputSearch"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                    var shadow = $('<div class="tbComment epmliveinput"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
                                     if ($(this).text() !== 'Write a reply...') {
                                         var val = $(this).html() //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');

@@ -57,7 +57,7 @@
 }
 
     .border-callout .border-notch {
-        border-bottom-color: #CCCCCC !important;
+        border-bottom-color: #000 !important;
         top: -6px;
     }
 
@@ -246,8 +246,7 @@
     padding-top:11px;
 }
 
-.reply-button {
-    display: none;
+.reply-button-wrapper {
     float: left;
     height: 25px;
     margin-left: 2px;
