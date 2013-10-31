@@ -203,7 +203,7 @@ namespace EPMLiveWebParts.Comments
                                        </div>
                                    </div>
                                </div>
-                               <a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='display:inline-block;margin-left:10px;text-decoration:none;'>Share</a>
+                               <div class='general-button-wrapper'><a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='display:inline-block;margin-left:5px;text-decoration:none;'>Share</a></div>
                             </div>");
 
             output.Write("<div style=\"clear:both;\"></div>");
