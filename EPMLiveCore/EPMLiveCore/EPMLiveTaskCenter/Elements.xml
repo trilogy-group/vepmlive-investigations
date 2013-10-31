@@ -8,5 +8,5 @@
                 OnQuickLaunch="TRUE"
                 SecurityBits="11"
                 Sequence="360"
-                Image="/_layouts/images/ittask.gif" />
+                Image="/_layouts/epmlive/images/ittask.png" />
 </Elements>
