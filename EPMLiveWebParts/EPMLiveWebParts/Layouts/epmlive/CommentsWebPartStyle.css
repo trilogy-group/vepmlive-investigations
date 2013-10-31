@@ -72,7 +72,6 @@
 
 .newCommentReply {
     font-size:12px;
-    padding-left:2px;
 }
 
 .commentsWPMainContainer {
@@ -234,10 +233,26 @@
     }
 
 .tbComment {
-    line-height: 16px;
+    line-height: 25px;
     border: 1px solid #cccccc !important;
-    width: 98% !important;
-    min-height: 15px !important;
+    min-height: 25px !important;
+    border-radius: 3px 3px 3px 3px;
+    margin-left:2px;
+}
+
+.general-button-wrapper {
+    display: inline-block;
+    vertical-align: top;
+    padding-top:11px;
+}
+
+.reply-button {
+    display: none;
+    float: left;
+    height: 25px;
+    margin-left: 2px;
+    margin-right: 5px;
+    margin-top: 5px;
 }
 
 .epmliveButton {
@@ -1001,6 +1016,7 @@ div.ms-taggedItems a.people {
 
 #wrapper {
     white-space: nowrap;
+    height:65px;
 }
 
 #comment-photo {
@@ -1016,11 +1032,10 @@ div.ms-taggedItems a.people {
 
 #whatsup {
     height: 30px;
-    padding-top: 12px;
     position: relative;
     margin-left: 15px;
-    max-width: 500px;
-    width: 50%;
+    max-width: 320px;
+    width: 100%;
     display: inline-block;
     position: relative;
 }
@@ -1034,9 +1049,10 @@ div.ms-taggedItems a.people {
     font-family: "Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
     font-weight: 400;
     border-radius: 3px;
+    margin-top:10px;
 }
 
-    .comment-box:before {
+ .comment-box:before {
         content: '';
         width: 8px;
         height: 8px;
@@ -1058,6 +1074,7 @@ div.ms-taggedItems a.people {
     line-height: 16px;
     margin: 10px 5px 10px 8px;
     min-height: 16px;
+    white-space: pre-wrap;
 }
 
 #comment-btn {
@@ -1133,5 +1150,5 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
 }
 
 .replyWrapper{
-
+    padding-left:5px;
 }
