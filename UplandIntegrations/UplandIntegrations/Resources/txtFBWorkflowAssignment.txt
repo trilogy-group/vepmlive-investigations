@@ -66,7 +66,7 @@
 		var tabmain;
             var WebAPIUrl = "#APIUrl#";
             var FBSiteURL = "#SiteUrl#";
-            var Param = 
+            var Param = "";
             var getTabs = false;
             var getTaskButtons = true;
             var currentRoutes;
@@ -191,7 +191,7 @@
                              $.get(WebAPIUrl + "routeditems/" + vwfData.routedItemId + "?localtreeonly=true&lookupIdCode=true&visualWorkflow=true&" + Param, function (routedItems) {
 
                                 // need to make sure this only gets called if we have the VWF scripts downloaded already:
-                                VWF.GenerateDiagram(xml, routedItems, getTabs, vwfData.stepId, FBSiteURL);
+                                VWF.GenerateDiagram(xml, routedItems, getTabs, vwfData.stepId, WebAPIUrl);
 
                                 // update the layout (positioning, etc.):
                                 VWF.UpdateLayout(getTabs, GetMaxHeight(), $("#vr-content").outerWidth(), parseFloat($("#vr-content").css("min-height")), true);
