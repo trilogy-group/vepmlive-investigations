@@ -1134,7 +1134,7 @@ namespace EPMLiveWebParts
                     Sequence=""43""
                     Command=""EPKMultiAction""
                     CommandValueId=""ResourcePlanner""
-                    Image32by32=""/_layouts/" + language + @"/images/formatmap32x32.png"" Image32by32Top=""-352"" Image32by32Left=""-288""
+                    Image32by32=""/_layouts/epmlive/images/ribbon32.png"" Image32by32Top=""-65""
                     LabelText=""Edit Resource Plan""
                     TemplateAlias=""o1""
                     />");
@@ -1148,7 +1148,7 @@ namespace EPMLiveWebParts
                     Sequence=""44""
                     Command=""EPKSingleAction""
                     CommandValueId=""ResourcePlanner""
-                    Image32by32=""/_layouts/" + language + @"/images/formatmap32x32.png"" Image32by32Top=""-352"" Image32by32Left=""-288""
+                    Image32by32=""/_layouts/epmlive/images/ribbon32.png"" Image32by32Top=""-65""
                     LabelText=""Edit Resource Plan""
                     TemplateAlias=""o1""
                     />");
@@ -1357,7 +1357,7 @@ namespace EPMLiveWebParts
                         if (requestList)
                         {
                             ribbonExtensions = new XmlDocument();
-                            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.CreateWorkspace\" Sequence=\"13\" Command=\"CreateWorkspace\" LabelText=\"Create Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>");
+                            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.CreateWorkspace\" Sequence=\"13\" Command=\"CreateWorkspace\" LabelText=\"Create Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/createworkspace.png\"/>");
                             ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Actions.Controls._children");
 
                         }
