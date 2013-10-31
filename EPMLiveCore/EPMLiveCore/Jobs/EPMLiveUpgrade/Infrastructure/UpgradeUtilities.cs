@@ -12,7 +12,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
         // Internal Methods (2) 
 
-        internal static List<Type> GetUpgradeSteps()
+        internal static List<Type> GetUpgradeSteps(string version)
         {
             var versionedSteps = new Dictionary<double, Type>();
             var genericSteps = new Dictionary<double, Type>();
@@ -23,17 +23,33 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
                 var attribute =
                     type.GetCustomAttributes(typeof (UpgradeStepAttribute), true).FirstOrDefault() as
-                    UpgradeStepAttribute;
+                        UpgradeStepAttribute;
 
                 if (attribute == null) continue;
 
                 if (attribute.Version == EPMLiveVersion.GENERIC)
                 {
-                    genericSteps.Add(attribute.SequenceOrder, type);
+                    bool add = false;
+
+                    if (string.IsNullOrEmpty(version)) add = true;
+                    else
+                    {
+                        if (attribute.IsOptIn) add = true;
+                    }
+
+                    if (add) genericSteps.Add(attribute.SequenceOrder, type);
                 }
                 else
                 {
-                    versionedSteps.Add(attribute.SequenceOrder, type);
+                    bool add = false;
+
+                    if (string.IsNullOrEmpty(version)) add = true;
+                    else
+                    {
+                        if (attribute.IsOptIn && attribute.Name.Equals(version)) add = true;
+                    }
+
+                    if (add) versionedSteps.Add(attribute.SequenceOrder, type);
                 }
             }
 
@@ -44,7 +60,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         }
 
         internal static SPField TryAddField(string internalName, string displayName, SPFieldType spFieldType,
-                                            SPList spList, out string message, out MessageKind messageKind)
+            SPList spList, out string message, out MessageKind messageKind)
         {
             if (string.IsNullOrEmpty(internalName)) throw new ArgumentNullException("internalName");
             if (string.IsNullOrEmpty(displayName)) throw new ArgumentNullException("displayName");

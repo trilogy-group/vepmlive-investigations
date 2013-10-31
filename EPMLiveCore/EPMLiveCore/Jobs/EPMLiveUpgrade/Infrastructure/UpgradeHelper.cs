@@ -18,9 +18,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
     internal class UpgradeStepAttribute : Attribute
     {
-        #region Properties (5) 
+        #region Properties (6) 
 
         public string Description { get; set; }
+
+        public bool IsOptIn { get; set; }
 
         public string Name
         {
@@ -49,7 +51,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
         public double SequenceOrder
         {
-            get { return Version == EPMLiveVersion.GENERIC ? Order : Convert.ToDouble(Name.Replace(".", string.Empty)); }
+            get
+            {
+                return Version == EPMLiveVersion.GENERIC ? Order : Convert.ToDouble(Name.Replace(".", string.Empty));
+            }
         }
 
         public EPMLiveVersion Version { get; set; }

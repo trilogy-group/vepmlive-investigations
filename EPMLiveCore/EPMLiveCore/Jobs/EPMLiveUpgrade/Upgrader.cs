@@ -16,7 +16,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
         {
             bool isPfeSite = site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null;
 
-            List<Type> upgradeSteps = UpgradeUtilities.GetUpgradeSteps();
+            List<Type> upgradeSteps = UpgradeUtilities.GetUpgradeSteps(data);
             totalCount = upgradeSteps.Count;
 
             int progressCounter = 1;
