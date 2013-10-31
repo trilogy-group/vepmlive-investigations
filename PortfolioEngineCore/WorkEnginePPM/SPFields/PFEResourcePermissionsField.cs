@@ -5,7 +5,7 @@ using Microsoft.SharePoint.WebControls;
 
 namespace WorkEnginePPM.SPFields
 {
-    public class PFEResourcePermissionsField : SPFieldText
+    public class PFEResourcePermissionsField : SPFieldMultiLineText
     {
         #region Constructors (2) 
 
