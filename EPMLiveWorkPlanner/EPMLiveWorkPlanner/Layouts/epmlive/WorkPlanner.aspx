@@ -1596,7 +1596,7 @@ Name:&nbsp;&nbsp;<%=sProjectName %></div>
 
     <script>
         initmb();
-        <%if(Request["isldg"] == "1"){%>
+        <%if(Request["isdlg"] == "1"){%>
         document.getElementsByTagName("html")[0].className = "ms-dialog";
         <%}%>
     </script>
