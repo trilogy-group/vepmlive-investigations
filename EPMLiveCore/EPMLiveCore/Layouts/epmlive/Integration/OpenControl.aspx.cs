@@ -77,7 +77,18 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             switch(control)
             {
                 case "workspace":
-                    Response.Redirect(Web.Url);
+                    try
+                    {
+                        string url = li["WorkspaceUrl"].ToString();
+                        if (url != "")
+                        {
+                            Response.Redirect(url);
+                        }
+                    }
+                    catch { }
+
+                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("EPMLive/QueueCreateWorkspace.aspx?itemid=" + li.ID + "&listid=" + li.ParentList.ID + "&isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+
                     break;
                 case "workplan":
                     Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/workplanner.aspx?ID=" + li.ID + "&listid=" + li.ParentList.ID + "&CloseMethod=3&isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
