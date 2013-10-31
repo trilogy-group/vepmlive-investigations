@@ -64,7 +64,7 @@ namespace EPMLiveReportsAdmin
                         var sParentItem = string.Empty;
                         try
                         {
-                            sParentItem = es.RootWeb.AllProperties["ParentItem"].ToString();
+                            sParentItem = w.AllProperties["ParentItem"].ToString();
                         }
                         catch
                         {
@@ -75,8 +75,8 @@ namespace EPMLiveReportsAdmin
                         {
                             var sa = sParentItem.Split(new[] {"^^"}, StringSplitOptions.RemoveEmptyEntries);
                             var sItemWebId = sa[0];
-                            var sItemListId = sa[0];
-                            var sItemId = sa[0];
+                            var sItemListId = sa[1];
+                            var sItemId = sa[2];
                             
                             r["SiteId"] = es.ID;
                             r["ItemWebId"] = !string.IsNullOrEmpty(sItemWebId) ? new Guid(sItemWebId) : Guid.Empty;
