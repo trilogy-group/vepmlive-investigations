@@ -8,9 +8,11 @@ using UplandIntegrations.PowerSteering.Services;
 
 namespace UplandIntegrations.PowerSteering
 {
-    public class Integrator : IIntegrator
+    public class Integrator : IIntegrator, IIntegratorControls
     {
-        #region Fields (1) 
+        #region Fields (2) 
+
+        private const string PROJECT_INFO_URL = @"{0}/{1}/project/Summary1.epage?sp=U{2}";
 
         private const string UPSERT_ERROR_MESSAGE =
             @"Could not upsert record. PowerSteering ID: {0}. EPMLive ID: {1}. Reason: {2}";
@@ -298,6 +300,77 @@ namespace UplandIntegrations.PowerSteering
         {
             message = null;
             return true;
+        }
+
+        #endregion
+
+        #region Implementation of IIntegratorControls
+
+        public List<string> GetEmbeddedItemControls(WebProperties webProps, IntegrationLog log)
+        {
+            return new List<string>();
+        }
+
+        public List<IntegrationControl> GetPageButtons(WebProperties webProps, IntegrationLog log, bool globalButtons)
+        {
+            if (webProps.Properties["Object"].ToString().ToLower().Equals("project"))
+            {
+                return new List<IntegrationControl>
+                {
+                    new IntegrationControl
+                    {
+                        Control = "PS_ProjectInfo",
+                        Title = "Project Summary",
+                        Image = "ps_projectinfo.png",
+                        Window = IntegrationControlWindowStyle.SmallDialog
+                    }
+                };
+            }
+
+            return new List<IntegrationControl>();
+        }
+
+        public string GetURL(WebProperties webProps, IntegrationLog log, string control, string itemId)
+        {
+            try
+            {
+                string serverUrl;
+                string contextName;
+                string apiKey;
+                SecureString apiSecret;
+
+                GetAuthInfo(webProps, out serverUrl, out contextName, out apiKey, out apiSecret);
+
+                if (serverUrl.EndsWith("/"))
+                {
+                    serverUrl = serverUrl.Substring(0, serverUrl.Length - 1);
+                }
+
+                switch (control.ToLower())
+                {
+                    case "ps_projectinfo":
+                        return string.Format(PROJECT_INFO_URL, serverUrl, contextName, itemId);
+                }
+
+                throw new Exception(control + " is not a valid Tenrox control.");
+            }
+            catch (Exception exception)
+            {
+                log.LogMessage(exception.Message, IntegrationLogType.Error);
+            }
+
+            return null;
+        }
+
+        public string GetControlCode(WebProperties webProps, IntegrationLog log, string itemId, string control)
+        {
+            return string.Empty;
+        }
+
+        public string GetProxyResult(WebProperties webProps, IntegrationLog log, string itemId, string control,
+            string property)
+        {
+            return string.Empty;
         }
 
         #endregion
