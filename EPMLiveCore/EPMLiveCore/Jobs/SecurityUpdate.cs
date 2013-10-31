@@ -367,23 +367,7 @@ namespace EPMLiveCore.Jobs
             if (!string.IsNullOrEmpty(grpName))
             {
                 result = grpName;
-                result = result.Replace("\"", "")
-                           .Replace("/", "")
-                           .Replace("\\", "")
-                           .Replace("[", "")
-                           .Replace("]", "")
-                           .Replace(":", "")
-                           .Replace("|", "")
-                           .Replace("<", "")
-                           .Replace(">", "")
-                           .Replace("+", "")
-                           .Replace("=", "")
-                           .Replace(";", "")
-                           .Replace(",", "")
-                           .Replace("?", "")
-                           .Replace("*", "")
-                           .Replace("'", "")
-                           .Replace("@", "");
+                result = CoreFunctions.GetSafeGroupTitle(grpName);
             }
 
             return result;

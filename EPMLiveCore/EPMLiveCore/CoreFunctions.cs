@@ -659,6 +659,15 @@ namespace EPMLiveCore
             return username;
         }
 
+        public static string GetSafeGroupTitle(string sRawGrpName)
+        {
+            var safeGroupTitle = string.Empty;
+            Regex rgx = new Regex("[^a-zA-Z 0-9]");
+            safeGroupTitle = rgx.Replace(sRawGrpName, "");
+
+            return safeGroupTitle;
+        }
+
         public static string getMainDomain()
         {
             string s = "epm";
@@ -1943,7 +1952,7 @@ namespace EPMLiveCore
             catch (Exception ex) { return ex.Message.ToString(); }
         }
 
-        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink, 
+        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink,
             SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle)
         {
             createdWebId = Guid.Empty;
@@ -1953,6 +1962,9 @@ namespace EPMLiveCore
             try
             {
                 var sUrl = "";
+
+                Regex rgx = new Regex("[^a-zA-Z 0-9]");
+                title = rgx.Replace(title, "");
 
                 var finalTitle = title;
                 var exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
@@ -2041,7 +2053,7 @@ namespace EPMLiveCore
                                         m = thisClass.GetMethod("MapDefaultList",
                                             BindingFlags.Public | BindingFlags.Instance);
                                         apiClass = Activator.CreateInstance(thisClass,
-                                            new object[] {SPContext.Current.Site.ID});
+                                            new object[] { SPContext.Current.Site.ID });
                                     }
                                     catch
                                     {
@@ -2052,7 +2064,7 @@ namespace EPMLiveCore
                                         thisClass != null &&
                                         apiClass != null)
                                     {
-                                        m.Invoke(apiClass, new object[] {string.Join(",", listsToBeMapped)});
+                                        m.Invoke(apiClass, new object[] { string.Join(",", listsToBeMapped) });
                                     }
                                 }
                             }
@@ -2062,7 +2074,7 @@ namespace EPMLiveCore
                     if (strEPMLiveGroupsPermAssignments.Length > 1)
                     {
 
-                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] {"|~|"},
+                        string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" },
                             StringSplitOptions.None);
                         foreach (string strInner in strOuter)
                         {
@@ -2100,10 +2112,10 @@ namespace EPMLiveCore
 
                                 // add administrator group with full control, add rest with contribute
                                 foreach (var @group in from SPGroup @group in es.RootWeb.Groups
-                                                       let eGroup = es.RootWeb.Groups[@group.Name] 
-                                                       let c = eGroup.Roles 
-                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights) 134287360) 
-                                                       where @group.CanCurrentUserEditMembership && canUse 
+                                                       let eGroup = es.RootWeb.Groups[@group.Name]
+                                                       let c = eGroup.Roles
+                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
+                                                       where @group.CanCurrentUserEditMembership && canUse
                                                        select @group)
                                 {
                                     if (@group.Name.Contains("Administrators"))
@@ -2158,7 +2170,6 @@ namespace EPMLiveCore
             try
             {
                 var sUrl = "";
-
                 var finalTitle = title;
                 var exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
 
@@ -2213,32 +2224,39 @@ namespace EPMLiveCore
                             {
                                 var itemList = ew.Lists[listId];
                                 var item = itemList.GetItemById(itemId);
-
                                 var raColl = item.RoleAssignments;
+
+                                var safeGroupTitle = GetSafeGroupTitle(finalTitle);
+
+                                // find owner
                                 iowner = (from SPRoleAssignment owner in raColl
-                                    where owner.Member.Name.Contains(title + " Owner")
-                                    select owner.Member.ID).FirstOrDefault<int>();
+                                          where owner.Member.Name.Contains(safeGroupTitle + " Owner")
+                                          select owner.Member.ID).FirstOrDefault<int>();
                                 owners = (from SPRoleAssignment owner in raColl
-                                    where
-                                        owner.RoleDefinitionBindings.Contains(
-                                            ew.RoleDefinitions.GetByType(SPRoleType.Administrator))
-                                    select owner.Member.ID).ToList<int>();
+                                          where
+                                              owner.RoleDefinitionBindings.Contains(
+                                                  ew.RoleDefinitions.GetByType(SPRoleType.Administrator))
+                                          select owner.Member.ID).ToList<int>();
+
+                                // find member
                                 imember = (from SPRoleAssignment owner in raColl
-                                    where owner.Member.Name.Contains(title + " Member")
-                                    select owner.Member.ID).ToList<int>()[0];
+                                           where owner.Member.Name.Contains(safeGroupTitle + " Member")
+                                           select owner.Member.ID).FirstOrDefault<int>();
                                 members = (from SPRoleAssignment owner in raColl
-                                    where
-                                        owner.RoleDefinitionBindings.Contains(
-                                            ew.RoleDefinitions.GetByType(SPRoleType.Contributor))
-                                    select owner.Member.ID).ToList<int>();
+                                           where
+                                               owner.RoleDefinitionBindings.Contains(
+                                                   ew.RoleDefinitions.GetByType(SPRoleType.Contributor))
+                                           select owner.Member.ID).ToList<int>();
+
+                                // find visitor
                                 ivisitor = (from SPRoleAssignment owner in raColl
-                                    where owner.Member.Name.Contains(title + " Visitor")
-                                    select owner.Member.ID).ToList<int>()[0];
+                                            where owner.Member.Name.Contains(safeGroupTitle + " Visitor")
+                                            select owner.Member.ID).FirstOrDefault<int>();
                                 visitors = (from SPRoleAssignment owner in raColl
-                                    where
-                                        owner.RoleDefinitionBindings.Contains(
-                                            ew.RoleDefinitions.GetByType(SPRoleType.Reader))
-                                    select owner.Member.ID).ToList<int>();
+                                            where
+                                                owner.RoleDefinitionBindings.Contains(
+                                                    ew.RoleDefinitions.GetByType(SPRoleType.Reader))
+                                            select owner.Member.ID).ToList<int>();
                             }
                         }
                     });
@@ -2264,7 +2282,7 @@ namespace EPMLiveCore
                     {
                         string finalGroupName = string.Empty;
                         try
-                        {  
+                        {
                             newOwner = ownerByCreation;
                             finalGroupName = AddGroup(web, title, "Administrators", newOwner, ownerByCreation, "");
                         }
@@ -2365,7 +2383,7 @@ namespace EPMLiveCore
                 #endregion
                 #region Modify Open Workspace
                 else
-                {   
+                {
                     var ownerByCreation = web.AllUsers[user];
 
                     SPSecurity.RunWithElevatedPrivileges(delegate
@@ -2382,10 +2400,10 @@ namespace EPMLiveCore
 
                                 // administrator group full control, add rest at contribute
                                 foreach (var @group in from SPGroup @group in es.RootWeb.Groups
-                                                       let eGroup = es.RootWeb.Groups[@group.Name] 
-                                                       let c = eGroup.Roles 
-                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights) 134287360) 
-                                                       where @group.CanCurrentUserEditMembership && canUse 
+                                                       let eGroup = es.RootWeb.Groups[@group.Name]
+                                                       let c = eGroup.Roles
+                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
+                                                       where @group.CanCurrentUserEditMembership && canUse
                                                        select @group)
                                 {
                                     if (@group.Name.Contains("Administrators"))

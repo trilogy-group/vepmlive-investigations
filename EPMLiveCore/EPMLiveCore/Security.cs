@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace EPMLiveCore
@@ -11,6 +12,9 @@ namespace EPMLiveCore
     {
         public static Dictionary<string, SPRoleType> AddBasicSecurityToWorkspace(SPWeb eleWeb, string safeTitle, SPUser owner)
         {
+            var safeGroupTitle = string.Empty;
+            safeGroupTitle = CoreFunctions.GetSafeGroupTitle(safeTitle);
+
             eleWeb.AllowUnsafeUpdates = true;
             Dictionary<string, SPRoleType> pNewGroups = new Dictionary<string, SPRoleType>();
             string[] grps = new[] { "Owner", "Member", "Visitor" };
@@ -23,7 +27,7 @@ namespace EPMLiveCore
                 SPGroup testGrp = null;
                 try
                 {
-                    testGrp = eleWeb.SiteGroups[safeTitle + " " + grp];
+                    testGrp = eleWeb.SiteGroups[safeGroupTitle + " " + grp];
                 }
                 catch { }
                 if (testGrp != null)
@@ -34,7 +38,7 @@ namespace EPMLiveCore
                 {
                     try
                     {
-                        finalName = CoreFunctions.AddGroup(eleWeb, safeTitle, grp, owner, eleWeb.CurrentUser, string.Empty);
+                        finalName = CoreFunctions.AddGroup(eleWeb, safeGroupTitle, grp, owner, eleWeb.CurrentUser, string.Empty);
                         eleWeb.Update();
                     }
                     catch { }

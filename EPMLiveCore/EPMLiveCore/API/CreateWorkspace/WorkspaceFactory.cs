@@ -680,7 +680,7 @@ namespace EPMLiveCore.API
         }
 
         public void BaseProvision(SPSite site, SPWeb web, SPSite cESite, SPWeb cEWeb)
-        {
+        {   
             string sResultWebUrl = string.Empty;
             SPWeb parentWeb = site.OpenWeb(ParentWebId);
 
@@ -896,13 +896,15 @@ namespace EPMLiveCore.API
 
                         #endregion
                     }
+
+                    if (err.Substring(0, 1) == "1")
+                    {
+                        throw new Exception(err.Substring(2));
+                    }
                 }
                 else
-                {
-                    // err is in this 1:string format
-                    // that's why we substring(2)
-                    //throw new Exception(err.Substring(2));
-                    NotifyWsGeneralError(web, err.Substring(2));
+                {   
+                    throw new Exception(err.Substring(2));
                 }
             }
             else
@@ -1175,12 +1177,11 @@ namespace EPMLiveCore.API
                             BaseProvision(site, web, eSite, eWeb);
                             EnsureFieldsInRequestItem();
                             BuildWebInfoXml();
-                            Notify(eWeb);
                             AddToFavorites();
                             AddPermission();
                             ModifyNewWSProperty();
                             ActivateFeature();
-                            //RemoveSolutionFromGallery(eSite, eWeb);
+                            Notify(eWeb);
                         }
                         catch (Exception e)
                         {
@@ -1295,12 +1296,11 @@ namespace EPMLiveCore.API
                             BaseProvision(site, web, eSite, eWeb);
                             EnsureFieldsInRequestItem();
                             BuildWebInfoXml();
-                            Notify(eWeb);
                             AddToFavorites();
                             AddPermission();
                             ModifyNewWSProperty();
                             ActivateFeature();
-                            //RemoveSolutionFromGallery(eSite, eWeb);
+                            Notify(eWeb);
                         }
                         catch (Exception e)
                         {

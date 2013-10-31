@@ -404,12 +404,12 @@
 		    Also enter the name you would like to be displayed for a new item.<br />(Ex: for "New Project" enter "Project" in the box)
 		</Template_Description>
 		<Template_InputFormControls>
-			<wssuc:InputFormControl LabelText="Use Enhanced New Menu" runat="server">
+			<wssuc:InputFormControl LabelText="Use Enhanced New Menu" runat="server" visible="false">
 				 <Template_Control>
                     <asp:CheckBox ID="chkUseNewMenu" runat="server" Text="" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
-			<wssuc:InputFormControl LabelText="Name for New Item" runat="server">
+			<wssuc:InputFormControl LabelText="Name for New Item" runat="server" visible="false">
 				 <Template_Control>
                     <asp:TextBox ID="txtNewMenuName" runat="server"/><br /><br />
 				 </Template_Control>
@@ -419,7 +419,7 @@
                     <asp:CheckBox ID="chkHideNewButton" runat="server" Text="Hide New Button" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
-			<wssuc:InputFormControl LabelText="" runat="server">
+			<wssuc:InputFormControl LabelText="" runat="server" visible="false">
 				 <Template_Control>
                     <asp:CheckBox ID="chkDisableNewRollup" runat="server" Text="Disable New Button Modifications" />
 				 </Template_Control>
