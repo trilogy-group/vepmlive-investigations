@@ -1017,6 +1017,8 @@ div.ms-taggedItems a.people {
 #wrapper {
     white-space: nowrap;
     height:65px;
+    border-bottom: 1px solid #DDDDDD;
+    padding-bottom: 10px;
 }
 
 #comment-photo {
