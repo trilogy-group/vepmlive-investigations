@@ -1152,4 +1152,6 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
 
 .replyWrapper{
     padding-left:5px;
+    padding-right: 5px;
+    padding-top: 5px;
 }

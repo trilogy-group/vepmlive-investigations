@@ -156,7 +156,7 @@ function GetData() {
             '<div style=\"clear:both\"></div>' +
             '<div class=\"replyWrapper\">' +
                 '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
-                '<div class="tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
+                '<div class="tbComment epmliveinput" style="display:none;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
                 '<div class="reply-button-wrapper" style=\"display:none;\">' +
@@ -172,7 +172,7 @@ function GetData() {
             '<div style=\"clear:both\"></div>' +
             '<div class=\"replyWrapper\">' +
                 '<a class=\'newCommentReply\' id=\'aNewCommentReply##itemId##\' href=\'#\'>reply</a>' +
-                '<div class="tbComment epmliveinput" style="display:none;width: 95%;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
+                '<div class="tbComment epmliveinput" style="display:none;background:white;" id="tbCommentInput##itemId##" class="ms-socialCommentInputBox ms-rtestate-write tbCommentInput" contenteditable="true" disableribboncommands="True">' +
                     '<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
                 '<div class="reply-button-wrapper" style=\"display:none;\">' +
