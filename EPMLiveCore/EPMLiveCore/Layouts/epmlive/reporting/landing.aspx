@@ -155,8 +155,8 @@ opacity:.9;
         <ul>
             <a href="izenda/reporting.aspx" id="advanced"><li class="skyblue">
 		<div style="float:left;">
-                <h2>Advanced Reporting</h2>
-                <p>Access advanced reporting.</p>
+                <h2>Upland Analytics</h2>
+                <p>Access Upland Analytics for more advanced analytical reporting.</p>
 		</div>
 		<div style="float:right;" class="bi-chart">
 		<span class="icon-pie-5"></span>
@@ -165,7 +165,7 @@ opacity:.9;
             <a href="../../../../sitepages/report.aspx" id="classic"><li class="orange-crush">
 		<div style="float:left;">
                 <h2>Classic Reporting</h2>
-                <p>Access classic reporting.</p>
+                <p>Access classic reporting for basic reporting needs.</p>
 		</div>
 		<div style="float:right;" class="bi-chart">
 		<span class="icon-chart"></span>
