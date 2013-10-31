@@ -1044,7 +1044,7 @@ div.ms-taggedItems a.people {
 .comment-box {
     height: auto;
     background: #fff;
-    border: 1px solid #cccccc;
+    border: 2px solid #cccccc;
     position: relative;
     font-size: 12px;
     font-family: "Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
@@ -1058,11 +1058,11 @@ div.ms-taggedItems a.people {
         width: 8px;
         height: 8px;
         background: #fff;
-        border-left: 1px solid #d8d8d8;
-        border-bottom: 1px solid #d8d8d8;
+        border-left: 2px solid #d8d8d8;
+        border-bottom: 2px solid #d8d8d8;
         position: absolute;
         top: 14px;
-        left: -5px;
+        left: -6px;
         transform: rotate(45deg);
         -webkit-transform: rotate(45deg);
         -moz-transform: rotate(45deg);
