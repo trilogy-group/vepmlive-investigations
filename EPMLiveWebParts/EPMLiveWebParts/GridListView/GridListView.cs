@@ -1195,8 +1195,8 @@ namespace EPMLiveWebParts
                 Id=""Ribbon.ListItem.Manage.EPKResourceAnalyzer""
                 Sequence=""101""
                 Command=""EPKMultiAction""
-                Image16by16=""/_layouts/" + language + @"/images/formatmap16x16.png"" Image16by16Top=""-96"" Image16by16Left=""-192""
-                Image32by32=""/_layouts/" + language + @"/images/formatmap32x32.png"" Image32by32Top=""-256"" Image32by32Left=""-192""
+                Image16by16=""/_layouts/epmlive/images/ribbon16.png"" Image16by16Top=""-32"" Image16by16Left=""-208""
+                Image32by32=""/_layouts/epmlive/images/ribbon32.png"" Image32by32Top=""-385"" Image32by32Left=""-160""
                 LabelText=""Resource Analyzer""
                 TemplateAlias=""o1""
                 />");
@@ -1350,7 +1350,7 @@ namespace EPMLiveWebParts
                         {
                             //workspace = "<Button Id=\"Ribbon.ListItem.EPMLive.GoToWorkspace\" Sequence=\"12\" Command=\"GoToWorkspace\" LabelText=\"Go To Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
                             ribbonExtensions = new XmlDocument();
-                            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.GoToWorkspace\" Sequence=\"12\" Command=\"GoToWorkspace\" LabelText=\"Go To Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/spgraphic.gif\" Image32by32Top=\"7\" Image32by32Left=\"4\"/>");
+                            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.GoToWorkspace\" Sequence=\"12\" Command=\"GoToWorkspace\" LabelText=\"Go To Workspace\" TemplateAlias=\"o1\" Image32by32=\"/_layouts/epmlive/images/gotoworkspace.png\" Image32by32Top=\"7\" Image32by32Left=\"4\"/>");
                             ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Actions.Controls._children");
                         }
 
