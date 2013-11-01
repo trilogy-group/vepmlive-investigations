@@ -329,10 +329,6 @@ namespace UplandIntegrations.Jira
                         {
                             return string.Format("{0}/{1}/{2}", webProps.Properties["ServerUrl"].ToString(), "browse", itemDataTable.Rows[0]["key"]);
                         }
-                        else
-                        {
-                            return "";
-                        }
                         break;
                 }
                 throw new Exception(control + " is not a valid jira control.");
