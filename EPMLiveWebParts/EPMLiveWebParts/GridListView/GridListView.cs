@@ -1266,19 +1266,18 @@ namespace EPMLiveWebParts
                         var ribbon = SPRibbon.GetCurrent(Page);
                         if(ribbon != null)
                         {
-                            ribbon.Minimized = true;
+                            //ribbon.Minimized = true;
                             ribbon.CommandUIVisible = true;
-
+                            
                             //string initialTabId = "Ribbon.ListItem";
                             //if (newGridMode == "datasheet")
                             //    initialTabId = "Ribbon.List";
                             //if (!ribbon.IsTabAvailable(initialTabId))
                             //    ribbon.MakeTabAvailable(initialTabId);
-                            ribbon.InitialTabId = "Ribbon.ListItem";
+                            //ribbon.InitialTabId = "Ribbon.ListItem";
 
-                            ribbon.MakeContextualGroupInitiallyVisible("Ribbon.ListContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
+                            //ribbon.MakeContextualGroupInitiallyVisible("Ribbon.ListContextualTab", "CustomContextualTab" + SPRibbon.GetWebPartPageComponentId(this) + ".CustomVisibilityContext");
                         }
-
 
                         //============Clean Up Ribbon
                         if(!list.EnableFolderCreation)
@@ -1295,20 +1294,20 @@ namespace EPMLiveWebParts
 
                         string language = SPContext.Current.Web.Language.ToString();
 
-                        Microsoft.Web.CommandUI.Ribbon ribbon1 = SPRibbon.GetCurrent(this.Page);
+                        //Microsoft.Web.CommandUI.Ribbon ribbon1 = SPRibbon.GetCurrent(this.Page);
                         XmlDocument ribbonExtensions = new XmlDocument();
                         ribbonExtensions.LoadXml(Properties.Resources.gridribbon.Replace("#language#", language));
-                        ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.ViewFormat.Controls._children");
+                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.ViewFormat.Controls._children");
 
                         if(newGridMode == "gantt")
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml(Properties.Resources.txtGanttRibbon.Replace("#language#", language));
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Groups._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Groups._children");
 
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml("<MaxSize Id=\"Ribbon.List.EPMLiveGanttView.MaxSize\" Sequence=\"10\" GroupId=\"Ribbon.List.EPMLiveGanttView\" Size=\"LargeLarge\" />");
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Scaling._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Scaling._children");
 
                         }
 
@@ -1321,44 +1320,44 @@ namespace EPMLiveWebParts
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.CustomViews.Filters\" Sequence=\"4\" Command=\"ShowFilters\" Image16by16=\"/_layouts/images/fcofilter.png\" Image32by32=\"/_layouts/images/menufilter.gif\" LabelText=\"Hide/Show Search\" ToolTipTitle=\"Filters\" ToolTipDescription=\"\" TemplateAlias=\"o1\"/>");
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.CustomViews.Controls._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.CustomViews.Controls._children");
                         }
 
                         ribbonExtensions = new XmlDocument();
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Save\" Sequence=\"10\" Command=\"DatasheetSave\" Image16by16=\"/_layouts/" + language + "/images/formatmap16x16.png\" Image16by16Top=\"-256\" Image16by16Left=\"0\" Image32by32=\"/_layouts/" + language + "/images/formatmap32x32.png\" Image32by32Top=\"-416\" Image32by32Left=\"-256\" LabelText=\"Save Items\" ToolTipTitle=\"Save Items\" ToolTipDescription=\"Save all items in grid.\" TemplateAlias=\"o1\"/>");
-                        ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Datasheet.Controls._children");
+                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Datasheet.Controls._children");
 
                         if(newGridMode == "datasheet" || newGridMode == "grid" || newGridMode == "")
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Print\" Sequence=\"10\" Command=\"PrintGrid\" Image16by16=\"/_layouts/epmlive/images/print.gif\" Image32by32=\"/_layouts/epmlive/images/printmenu.gif\" LabelText=\"Print\" ToolTipTitle=\"Print\" ToolTipDescription=\"\" TemplateAlias=\"o1\"/>");
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Share.Controls._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Share.Controls._children");
                         }
 
                         if(newGridMode == "gantt")
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Print\" Sequence=\"10\" Command=\"PrintGantt\" Image16by16=\"/_layouts/epmlive/images/print.gif\" Image32by32=\"/_layouts/epmlive/images/printmenu.gif\" LabelText=\"Print\" ToolTipTitle=\"Print\" ToolTipDescription=\"\" TemplateAlias=\"o1\"/>");
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Share.Controls._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Share.Controls._children");
                         }
 
                         ribbonExtensions = new XmlDocument();
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Share.RefreshItems\" Sequence=\"1\" Command=\"RefreshItems\"  Image32by32=\"/_layouts/epmlive/images/refresh.png\" LabelText=\"Refresh Items\" ToolTipTitle=\"Refresh Items\" ToolTipDescription=\"Refresh all items in grid.\" TemplateAlias=\"o1\"/>");
-                        ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
+                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
                         
                         if (bRollups || requestList)
                         {
                             //workspace = "<Button Id=\"Ribbon.ListItem.EPMLive.GoToWorkspace\" Sequence=\"12\" Command=\"GoToWorkspace\" LabelText=\"Go To Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.GoToWorkspace\" Sequence=\"12\" Command=\"GoToWorkspace\" LabelText=\"Go To Workspace\" TemplateAlias=\"o1\" Image32by32=\"/_layouts/epmlive/images/gotoworkspace.png\" Image32by32Top=\"7\" Image32by32Left=\"4\"/>");
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Actions.Controls._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Actions.Controls._children");
                         }
 
                         if (requestList)
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.CreateWorkspace\" Sequence=\"13\" Command=\"CreateWorkspace\" LabelText=\"Create Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/createworkspace.png\"/>");
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Actions.Controls._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Actions.Controls._children");
 
                         }
 
@@ -1367,12 +1366,12 @@ namespace EPMLiveWebParts
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml(PlannerV2Menu);
-                            ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Manage.Controls._children");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Manage.Controls._children");
                         }
 
                         ribbonExtensions = new XmlDocument();
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.EditComments\" Sequence=\"140\" Command=\"EditComments\" LabelText=\"Comments\" TemplateAlias=\"o2\" Image16by16=\"_layouts/epmlive/images/comments16.gif\"/>");
-                        ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Manage.Controls._children");
+                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Manage.Controls._children");
 
                         EPMLiveCore.API.RibbonProperties rp = (EPMLiveCore.API.RibbonProperties)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GR-" + list.ParentWeb.CurrentUser.ID, "GridSettings-" + list.ID, () =>
                         {
@@ -1394,7 +1393,7 @@ namespace EPMLiveWebParts
                         {
                             //ribbon.TrimById("Ribbon.ListItem.Manage.EditProperties");
 
-                            getEPKButtons(rp, ribbon1, language);
+                            getEPKButtons(rp, ribbon, language);
 
                             //ribbonExtensions = new XmlDocument();
                             //ribbonExtensions.LoadXml(getEPKButtons(site).Replace("#language#",language));
@@ -1676,11 +1675,11 @@ namespace EPMLiveWebParts
 
                                 ribbonExtensions = new XmlDocument();
                                 ribbonExtensions.LoadXml(sbLinkedItems.ToString());
-                                ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Groups._children");
+                                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Groups._children");
 
                                 ribbonExtensions = new XmlDocument();
                                 ribbonExtensions.LoadXml("<MaxSize Id=\"Ribbon.ListItem.EPMLive.Associated.MaxSize\" Sequence=\"10\" GroupId=\"Ribbon.ListItem.EPMLive.Associated\" Size=\"MediumMedium\" />");
-                                ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Scaling._children");
+                                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Scaling._children");
 
 
 
@@ -3503,7 +3502,7 @@ namespace EPMLiveWebParts
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",switchFilterLoad" + sFullGridId + ");");
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",enablesearcher" + sFullGridId + ");");
             if(SPContext.Current.ViewContext.View != null)
-                output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",clickTab());");
+                output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",showrib());");
             
             output.Write("mygrid" + sFullGridId + ".attachEvent(\"onRowSelect\",selectRow" + sFullGridId + ");");
 
@@ -3734,6 +3733,9 @@ namespace EPMLiveWebParts
 
             if (SPContext.Current.ViewContext.View != null)
             {
+                output.WriteLine("function showrib(){");
+                output.Write("setTimeout(\"clickTab()\", 1);");
+                output.WriteLine("}");
                 if (newGridMode == "datasheet")
                 {
                     output.WriteLine("function clickTab(){");
@@ -3756,9 +3758,14 @@ namespace EPMLiveWebParts
                     output.WriteLine("function clickTab(){");
                     output.WriteLine("try{");
                     output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
-                    output.WriteLine("fireEvent(wp, 'mouseup');");
+                    output.WriteLine("WpClick({target: wp});");
+                    //output.WriteLine("_ribbonStartInit(\"Ribbon.ListItem\", true);");
+
+                    //output.WriteLine("SP.Ribbon.WebPartComponent.$3.deselectWebPartAndZone = function() { }; ");
+
+                    //output.WriteLine("fireEvent(wp, 'mouseup');");
                     //output.WriteLine("setTimeout(\"clickbrowse()\",1000);");
-                    output.WriteLine("}catch(e){}");
+                    output.WriteLine("}catch(e){}"); 
                     output.WriteLine("}");
 
                     output.WriteLine("function clickbrowse(){");
@@ -3771,7 +3778,7 @@ namespace EPMLiveWebParts
                 //output.Write("ExecuteOrDelayUntilScriptLoaded(clickTab, \"sp.ribbon.js\");");
 
 
-                output.Write("setTimeout(\"clickTab()\", 100);");
+                output.Write("setTimeout(\"clickTab()\", 1000);");
 
             }
             else
