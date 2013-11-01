@@ -1210,7 +1210,7 @@ namespace EPMLiveWebParts
                 Sequence=""102""
                 Command=""EPKMultiAction""
                 Image16by16=""/_layouts/epmlive/images/target.gif""
-                Image32by32=""/_layouts/epmlive/images/target.gif"" Image32by32Top=""8"" Image32by32Left=""8""
+                Image32by32=""/_layouts/epmlive/images/target.gif""
                 LabelText=""Modeler""
                 TemplateAlias=""o1""
                 />");
