@@ -76,6 +76,7 @@ namespace EPMLiveWebParts.Comments
 
         private int _numThreads;
         private int _maxComments;
+        private string _defaultHeight;
 
         [Category("Comments Properties")]
         [WebPartStorage(Storage.Shared)]
@@ -108,6 +109,23 @@ namespace EPMLiveWebParts.Comments
             set
             {
                 _maxComments = value;
+            }
+        }
+
+        [Category("Comments Properties")]
+        [WebPartStorage(Storage.Shared)]
+        [FriendlyNameAttribute("Number Of Comments")]
+        [Description("Default number of comments per thread.")]
+        [Browsable(false)]
+        public string DefaultHeight
+        {
+            get
+            {
+                return _defaultHeight;
+            }
+            set
+            {
+                _defaultHeight = value;
             }
         }
 
@@ -177,7 +195,7 @@ namespace EPMLiveWebParts.Comments
             }
             string userProfileUrl = cSite.MakeFullUrl(cWeb.ServerRelativeUrl) + "/_layouts/userdisp.aspx?Force=True&ID=" + user.ID + "&source=" + HttpContext.Current.Request.UrlReferrer;
 
-
+            var defaultHeight = 500;
             output.Write("<script>" +
                            "curWebUrl = '" + cWeb.Url + "';" +
                            "curWebTitle = '" + cWeb.Title + "';" +
@@ -188,6 +206,7 @@ namespace EPMLiveWebParts.Comments
                            "numThreads = '" + this.NumThreads.ToString() + "';" +
                            "maxComments = '" + this.MaxComments.ToString() + "';" +
                            "sPubComTxt = '" + sPubComTxt + "';" +
+                           "defaultHeight = '" + (int.TryParse(this.DefaultHeight, out defaultHeight) ? defaultHeight : 500) + "px';" +
                          "</script>");
 
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/Comments.UI.css\"/>");

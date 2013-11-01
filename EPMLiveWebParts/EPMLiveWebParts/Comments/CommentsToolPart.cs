@@ -19,6 +19,7 @@ namespace EPMLiveWebParts.Comments
 
             wpComments.NumThreads = int.Parse(Page.Request["tbMaxThreads"]);
             wpComments.MaxComments = int.Parse(Page.Request["tbMaxComments"]);
+            wpComments.DefaultHeight = Page.Request["tbDefaultHeight"];
         }
 
         protected override void RenderToolPart(HtmlTextWriter output)
@@ -41,6 +42,12 @@ namespace EPMLiveWebParts.Comments
             output.Write("<tr>");
             output.Write("<td>");
             output.Write("Default number of comments per thread: \r\n <input type=\"text\" id=\"tbMaxComments\" name=\"tbMaxComments\" value=\"" + myWP.MaxComments.ToString() + "\" />");
+            output.Write("</td>");
+            output.Write("</tr>");
+
+            output.Write("<tr>");
+            output.Write("<td>");
+            output.Write("Default height(px): \r\n <input type=\"text\" id=\"tbDefaultHeight\" name=\"tbDefaultHeight\" value=\"" + myWP.DefaultHeight.ToString() + "\" />");
             output.Write("</td>");
             output.Write("</tr>");
 

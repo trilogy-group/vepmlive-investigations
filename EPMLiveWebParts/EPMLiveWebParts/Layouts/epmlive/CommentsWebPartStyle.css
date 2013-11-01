@@ -71,7 +71,7 @@
 }
 
 .newCommentReply {
-    font-size:12px;
+    font-size: 12px;
 }
 
 .commentsWPMainContainer {
@@ -237,7 +237,7 @@
     border: 1px solid #cccccc !important;
     min-height: 25px !important;
     border-radius: 3px 3px 3px 3px;
-    margin-left:2px;
+    margin-left: 2px;
 }
 
 .general-button-wrapper {
@@ -1013,7 +1013,7 @@ div.ms-taggedItems a.people {
 
 #wrapper {
     white-space: nowrap;
-    height:65px;
+    height: 65px;
     border-bottom: 1px solid #DDDDDD;
     padding-bottom: 10px;
 }
@@ -1034,7 +1034,6 @@ div.ms-taggedItems a.people {
     position: relative;
     margin-left: 15px;
     max-width: 320px;
-    width: 100%;
     display: inline-block;
     position: relative;
 }
@@ -1048,7 +1047,7 @@ div.ms-taggedItems a.people {
     font-family: "Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
     font-weight: 400;
     border-radius: 3px;
-    margin-top:10px;
+    margin-top: 10px;
 }
 
  .comment-box:before {
@@ -1074,6 +1073,8 @@ div.ms-taggedItems a.people {
     margin: 10px 5px 10px 8px;
     min-height: 16px;
     white-space: pre-wrap;
+    overflow: hidden;
+    min-width: 150px;
 }
 
 #comment-btn {
@@ -1148,7 +1149,8 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
     user-select: none;
 }
 
-.replyWrapper{
-    padding-left:5px;
+.replyWrapper {
+    padding-left: 5px;
     padding-right: 5px;
+    padding-top: 5px;
 }

@@ -22,4 +22,5 @@
   <PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
   <NumThreads xmlns="Comments">5</NumThreads>
   <MaxComments xmlns="Comments">5</MaxComments>
+  <DefaultHeight xmlns="Comments">500</DefaultHeight>
 </WebPart>

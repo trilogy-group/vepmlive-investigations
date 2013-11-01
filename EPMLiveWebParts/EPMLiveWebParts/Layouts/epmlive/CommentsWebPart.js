@@ -73,11 +73,38 @@ function GetData() {
                     '</tbody>' +
                 '</table>' +
             '</div>';
-        // the notch
-        //        '<div style="margin-left:60px" class="callout border-callout" id="callout_##listId##_##itemId##">' +
-        //            '<b class="border-notch notch"></b>' +
-        //                '<b class="notch"></b>' +
-        //            '</div>';
+        var HiddenPublicCommentTemp =
+             '<div id="divPublicCommentItem##itemId##" style="display:none;">' +
+                '<table class="ms-socialCommentItem customCommentItem" id="publicCommentItem_##itemId##">' +
+                    '<tbody>' +
+                        '<tr>' +
+                            '<td class="socialcomment-image" vAlign="left" rowSpan="2">' +
+                                '<img alt="User Photo" style="width:45px;height:45px" src="##userPicUrl##">' +
+                            '</td>' +
+                            '<td class="socialcomment-IMPawn" rowSpan="2" align="left">' +
+                                '<span class="ms-imnSpan">' +
+	                                '<a class="ms-imnlink ms-spimn-presenceLink" onclick="IMNImageOnClick(event); return false;" href="#">' +
+		                                '<span class="ms-spimn-presenceWrapper ms-imnImg ms-spimn-imgSize-10x10"><img id="imn0,type=sip" sip="##userEmail##" src="/_layouts/15/images/spimn.png" showofflinepawn="1" class="ms-spimn-img ms-spimn-presence-disconnected-10x10x32" name="imnmark" alt="No presence information" title="">' +
+		                                '</span>' +
+	                                '</a>' +
+                                '</span>' +
+
+                            '</td>' +
+                            '<td class="socialcomment-top" vAlign="left">' +
+                                '<div>' +
+                                    '<span class="socialcomment-username">' +
+                                        '<a href="##userProfileUrl##" target="_blank"><b>##userName##</b></a>' +
+                                    '</span>' +
+                                    '<div style="clear:both;"></div>' +
+                                    '<div id="divPublicComment_##itemId##" class="commentWebpart-socialcomment-contents-TRC" style="color:black">##comment##</div>' +
+                                    '<div style="clear:both;"></div>' +
+                                    '<div style="margin-bottom:10px" ><span style="text-align:left;color:#707070;">##createdDate## on <a target="_blank" href="##workspaceUrl##">##workspaceTitle##</a>.</span></div>' +
+                                '</div>' +
+                            '</td>' +
+                        '</tr>' +
+                    '</tbody>' +
+                '</table>' +
+            '</div>';
 
         var SubCommentTemp =
             '<div class=\"subitem\" item=\"##listId##_##itemId##\" isExtra=\"##isExtra##\">' +
@@ -807,7 +834,7 @@ function GetData() {
                     }
                     else {
                         $.getScript('/_layouts/epmlive/slimScroll.js', function () {
-                            $('#commentsWebPartMainContainer').slimScroll({ height: '300px', size: '10px', wheelStep: 5 });
+                            $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5 });
                         }, true);
 
                         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
@@ -927,7 +954,7 @@ function GetData() {
                             var responseJson = window.epmLive.parseJson(response.d);
                             if (window.epmLive.responseIsSuccess(responseJson.Result)) {
 
-                                var publicCommentItem = PublicCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.CommentItem['@itemId'])
+                                var publicCommentItem = HiddenPublicCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
                                                                   .replace(/##userPicUrl##/g, userPicUrl)
                                                                   .replace(/##userEmail##/g, userEmail)
                                                                   .replace(/##userProfileUrl##/g, userProfileUrl)
@@ -936,12 +963,12 @@ function GetData() {
                                                                   .replace(/##comment##/g, orginalComment)
                                                                   .replace(/##workspaceUrl##/g, curWebUrl)
                                                                   .replace(/##workspaceTitle##/g, curWebTitle);
-
+                                
                                 if ($('#commentsWebPartMainContainer').find('.customCommentItem').length > 0) {
                                     $($('#commentsWebPartMainContainer').find('.customCommentItem')[0]).parent().before(publicCommentItem);
-                                    $('#divPublicCommentItem' + responseJson.Result.Comments.CommentItem['@itemId']).after(
+                                    $('#divPublicCommentItem' + responseJson.Result.Comments.PublicCommentItem['@itemId']).after(
                                                 '<div style="clear:both;margin-top:3px"/>' +
-                                                '<div style="margin-left:60px" class="callout border-callout" id="callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId'] + '">' +
+                                                '<div style="margin-left:60px" class="callout border-callout" id="callout_' + responseJson.Result.Comments.PublicCommentItem['@listId'] + '_' + responseJson.Result.Comments.PublicCommentItem['@itemId'] + '">' +
                                                     '<b class="border-notch notch"></b>' +
                                                     '<b class="notch"></b>' +
                                                 '</div>' +
@@ -959,12 +986,12 @@ function GetData() {
                                                        .replace(/##listDispUrl##/g, responseJson.Result.Comments.CommentItem.Comment['@listDispUrl'])
                                                        .replace(/##listId##/g, responseJson.Result.Comments.PublicCommentItem['@listId']);
                                                        
-                                    $('#callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId']).append(newCommentBox);
+                                    $('#callout_' + responseJson.Result.Comments.PublicCommentItem['@listId'] + '_' + responseJson.Result.Comments.PublicCommentItem['@itemId']).append(newCommentBox);
                                 } else {
                                     $('#commentsWebPartMainContainer').append(publicCommentItem);
                                     $('#commentsWebPartMainContainer').append(
                                                 '<div style="clear:both;margin-top:3px"/>' +
-                                                '<div style="margin-left:60px" class="callout border-callout" id="callout_' + responseJson.Result.Comments.CommentItem.Comment['@listId'] + '_' + responseJson.Result.Comments.CommentItem['@itemId'] + '">' +
+                                                '<div style="margin-left:60px" class="callout border-callout" id="callout_' + responseJson.Result.Comments.PublicCommentItem['@listId'] + '_' + responseJson.Result.Comments.PublicCommentItem['@itemId'] + '">' +
                                                     '<b class="border-notch notch"></b>' +
                                                     '<b class="notch"></b>' +
                                                 '</div>' +
@@ -988,6 +1015,7 @@ function GetData() {
                                 }
 
                                 var iid = responseJson.Result.Comments.PublicCommentItem['@itemId'];
+
                                 $('#aNewCommentReply' + iid).click(function (e) {
                                     var id = $(this).attr('id').replace('aNewCommentReply', '');
                                     $('#tbCommentInput' + id).css('height', 'auto');
@@ -1053,15 +1081,14 @@ function GetData() {
                                     var value = $(this).text();
 
                                     if (value.length > 0) {
-
-                                        $('#btnNewComment' + id).removeClass('btn-disabled');
-
+                                        $('#btnNewComment' + iid).removeClass('btn-disabled');
                                     }
-                                    else {
-                                      
-                                        $('#btnNewComment' + id).addClass('btn-disabled');
+                                    else {                                      
+                                        $('#btnNewComment' + iid).addClass('btn-disabled');
                                     }
                                 });
+
+                                $('#divPublicCommentItem' + iid).fadeIn('slow');
                             }
                         }
 
