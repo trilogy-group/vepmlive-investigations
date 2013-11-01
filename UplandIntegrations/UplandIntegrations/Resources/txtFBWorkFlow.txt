@@ -56,6 +56,12 @@
         </style>
 
         <script type="text/javascript" language="javascript">
+
+		$.ajaxSetup({
+		  cache: false
+		});
+
+
 		var tabmain;
             var WebAPIUrl = "#APIUrl#";
             var FBSiteURL = "#SiteUrl#";
