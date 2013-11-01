@@ -102,6 +102,9 @@ font-family: Open Sans Regular, Helvetica;
             if (sSource != "")
                 url += "&source=" + sSource;
 
+            <%if(Request["dodialog"] == "1"){%>
+                url += "&isdlg=1";
+            <%}%>
             parent.location.href = url;
 
         }
@@ -169,7 +172,11 @@ font-family: Open Sans Regular, Helvetica;
                 location.href = "getproject.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
             }
             else if (sProjectType == "Online") {
-                parent.location.href = "workplanner.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Planner=" + sPlannerID + "&PType=" + sProjectType + "&tasklistid=" + sTaskListId + "&SetDefault=" + sSetDefault + "&PCSelected=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
+                var url = "workplanner.aspx?id=" + sItemID + "&listid=" + sProjectListId + "&Planner=" + sPlannerID + "&PType=" + sProjectType + "&tasklistid=" + sTaskListId + "&SetDefault=" + sSetDefault + "&PCSelected=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
+                   <%if(Request["dodialog"] == "1"){%>
+                        url += "&isdlg=1";
+                    <%}%>
+                parent.location.href = url;
             }
             else {
                 location.href = "openmpp.aspx?Planner=" + sPlannerID + "&ProjectName=" + sProjectName + "&listid=" + sProjectListId + "&isdlg=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
