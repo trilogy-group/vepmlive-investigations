@@ -126,7 +126,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     break;
                 case "projectinfo":
                     {
-                        string url = li.ParentList.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&CloseMethod=3";
+                        string url = li.ParentList.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&CloseMethod=3&isdlg=1";
                         Response.Redirect(url);
                     }
                     break;
