@@ -321,7 +321,7 @@
         function showPlannerPop() {
 
 
-            var surl =  "<%=sWebUrl %>/_layouts/epmlive/workplannerwizard.aspx?Planner=<%=sPlannerID %>&ID=<%=sItemID %>&PType=<%=sProjectType %>&listid=<%=sProjectListId %>&tasklistid=<%=sTaskListId%>&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
+            var surl =  "<%=sWebUrl %>/_layouts/epmlive/workplannerwizard.aspx?dodialog=<%=Request["IsDlg"]%>&Planner=<%=sPlannerID %>&ID=<%=sItemID %>&PType=<%=sProjectType %>&listid=<%=sProjectListId %>&tasklistid=<%=sTaskListId%>&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
 
             var options = { url: surl, width: 450, title: "Select Planner", dialogReturnValueCallback: showPlannerPopClose };
 
