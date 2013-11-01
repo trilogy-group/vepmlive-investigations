@@ -13,7 +13,7 @@ namespace EPMLiveCore
     public partial class setup : LayoutsPageBase
     {
 
-        protected static string url;
+        protected string url;
         protected Button Button1;
         protected TextBox txtResourceURL;
         //protected TextBox txtMasterURL;
