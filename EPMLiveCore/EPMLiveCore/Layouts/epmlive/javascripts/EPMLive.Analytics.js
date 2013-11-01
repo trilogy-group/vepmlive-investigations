@@ -509,7 +509,7 @@
                             if ($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png') {
                                 $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').fadeOut(function () {
                                     $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').load(function () { $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').fadeIn(); });
-                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').attr("src", "_layouts/epmlive/images/star32.png");
+                                    $('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr("src", "_layouts/epmlive/images/star32.png");
                                 });
                             }
 
