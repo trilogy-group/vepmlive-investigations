@@ -180,7 +180,7 @@
 
                     if (vwfData != null) {
 
-						$("#vwf-title").append(vwfData.comment);
+						$("#vwf-title").text(vwfData.comment);
 
                         // show button:
                         $("#btnProcessDesigner").show();
