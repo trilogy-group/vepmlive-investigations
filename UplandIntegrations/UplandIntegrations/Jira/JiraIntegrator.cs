@@ -150,7 +150,7 @@ namespace UplandIntegrations.Jira
                     {
                         if (string.IsNullOrEmpty(curId))
                         {
-                            jiraService.CreateObjectItem((string)WebProps.Properties["Object"], item, Items.Columns);
+                            curId = jiraService.CreateObjectItem((string)WebProps.Properties["Object"], item, Items.Columns).ToString();
                             transactionTable.AddRow(spId, curId, TransactionType.INSERT);
                         }
                         else
@@ -160,7 +160,7 @@ namespace UplandIntegrations.Jira
 
                             if (getItemDataTable.Rows.Count == 0)
                             {
-                                jiraService.CreateObjectItem((string)WebProps.Properties["Object"], item, Items.Columns);
+                                curId = jiraService.CreateObjectItem((string)WebProps.Properties["Object"], item, Items.Columns).ToString();
                                 transactionTable.AddRow(spId, curId, TransactionType.INSERT);
                             }
                             else

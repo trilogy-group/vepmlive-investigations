@@ -230,7 +230,7 @@ namespace UplandIntegrations.Jira
                 throw ex;
             }
         }
-        public void CreateObjectItem(string objectName, DataRow Item, DataColumnCollection dataColumns)
+        public Int64 CreateObjectItem(string objectName, DataRow Item, DataColumnCollection dataColumns)
         {
             try
             {
@@ -239,18 +239,18 @@ namespace UplandIntegrations.Jira
                 switch (jiraType)
                 {
                     case JiraType.Components:
-                        CreateComponent(GetJson(Item, JiraType.Components, dataColumns));
+                        return CreateComponent(GetJson(Item, JiraType.Components, dataColumns));
                         break;
                     case JiraType.Versions:
-                        CreateVersion(GetJson(Item, JiraType.Versions, dataColumns));
+                        return CreateVersion(GetJson(Item, JiraType.Versions, dataColumns));
                         break;
                     case JiraType.Issues:
-                        CreateIssue(GetJson(Item, JiraType.Issues, dataColumns));
+                        return CreateIssue(GetJson(Item, JiraType.Issues, dataColumns));
                         break;
                     default:
                         break;
                 }
-
+                return 0;
             }
             catch (Exception ex)
             {
@@ -317,8 +317,9 @@ namespace UplandIntegrations.Jira
 
         #region Private
 
-        private void CreateVersion(JObject payLoad)
+        private Int64 CreateVersion(JObject payLoad)
         {
+            Int64 versionId = 0;
             var request = new RestRequest()
             {
                 Resource = GetRestRequestResourceByJiraType(JiraType.Versions),
@@ -327,10 +328,17 @@ namespace UplandIntegrations.Jira
                 Method = Method.POST
             };
             request.AddBody(payLoad);
-            Execute(request);
+            RestResponse response = Execute(request);
+            if (response != null && !string.IsNullOrEmpty(response.Content))
+            {
+                var jsonVersion = JValue.Parse(response.Content);
+                versionId = Convert.ToInt64(Convert.ToString(((JObject)jsonVersion).GetValue("id")));
+            }
+            return versionId;
         }
-        private void CreateComponent(JObject payLoad)
+        private Int64 CreateComponent(JObject payLoad)
         {
+            Int64 componentId = 0;
             var request = new RestRequest()
             {
                 Resource = GetRestRequestResourceByJiraType(JiraType.Components),
@@ -339,10 +347,17 @@ namespace UplandIntegrations.Jira
                 Method = Method.POST
             };
             request.AddBody(payLoad);
-            Execute(request);
+            RestResponse response = Execute(request);
+            if (response != null && !string.IsNullOrEmpty(response.Content))
+            {
+                var jsonComponent = JValue.Parse(response.Content);
+                componentId = Convert.ToInt64(Convert.ToString(((JObject)jsonComponent).GetValue("id")));
+            }
+            return componentId;
         }
-        private void CreateIssue(JObject payLoad)
+        private Int64 CreateIssue(JObject payLoad)
         {
+            Int64 issueId = 0;
             var request = new RestRequest()
             {
                 Resource = GetRestRequestResourceByJiraType(JiraType.Issues),
@@ -351,7 +366,13 @@ namespace UplandIntegrations.Jira
                 Method = Method.POST
             };
             request.AddBody(payLoad);
-            Execute(request);
+            RestResponse response = Execute(request);
+            if (response != null && !string.IsNullOrEmpty(response.Content))
+            {
+                var jsonIssue = JValue.Parse(response.Content);
+                issueId = Convert.ToInt64(Convert.ToString(((JObject)jsonIssue).GetValue("id")));
+            }
+            return issueId;
         }
 
         private void UpdateVersion(JObject payLoad, Int64 itemId)
@@ -524,7 +545,7 @@ namespace UplandIntegrations.Jira
             Execute(request);
         }
 
-        private void Execute(RestRequest request)
+        private RestResponse Execute(RestRequest request)
         {
             var response = restClient.Execute(request);
 
@@ -559,6 +580,7 @@ namespace UplandIntegrations.Jira
                     break;
             }
 
+            return (RestResponse)response;
         }
         private string GetRestRequestResourceByJiraType(JiraType jiraType)
         {
