@@ -79,10 +79,12 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 case "workspace":
                     try
                     {
+                         
                         string url = li["WorkspaceUrl"].ToString();
                         if (url != "")
                         {
-                            Response.Redirect(url);
+                            SPFieldUrlValue val = new SPFieldUrlValue(url);
+                            Response.Redirect(val.Url);
                         }
                     }
                     catch { }
