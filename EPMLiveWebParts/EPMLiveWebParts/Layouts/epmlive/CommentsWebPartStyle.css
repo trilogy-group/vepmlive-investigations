@@ -249,9 +249,7 @@
 .reply-button-wrapper {
     float: left;
     height: 25px;
-    margin-left: 2px;
-    margin-right: 5px;
-    margin-top: 5px;
+    margin: 6px 5px 5px 2px;
 }
 
 .epmliveButton {
@@ -1153,5 +1151,4 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
 .replyWrapper{
     padding-left:5px;
     padding-right: 5px;
-    padding-top: 5px;
 }
