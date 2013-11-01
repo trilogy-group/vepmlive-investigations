@@ -216,12 +216,12 @@ namespace EPMLiveWebParts.Comments
                             <table>
                                 <tbody>
 			                        <tr>
-				                        <td valign='left'>
+				                        <td valign='middle' align='left'>
 					                        <div id='comment-photo'>
                                                 <img src='" + userPictureUrl + @"' class='circleborder' />
                                             </div>
 				                        </td>
-				                        <td align='left' style='width:100%;padding-left:5px;padding-right:5px;'>
+				                        <td valign='middle' align='left' style='width:100%;padding-left:5px;padding-right:5px;'>
 					                        <div id='whatsup'>
                                                 <div class='comment-box'>
                                                     <div id='inputPublicComment' class='comment-paragraph' contenteditable='true'>
@@ -229,8 +229,8 @@ namespace EPMLiveWebParts.Comments
                                                 </div>
                                             </div>
 				                        </td>
-				                        <td valign='left'>
-					                        <div class='general-button-wrapper'><a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='display:inline-block;margin-left:5px;text-decoration:none;'>Share</a></div>
+				                        <td valign='middle' align='left'>
+					                        <div class='general-button-wrapper'><a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='text-decoration:none;'>Share</a></div>
 				                        </td>
 			                        </tr>
 		                        </tbody>
