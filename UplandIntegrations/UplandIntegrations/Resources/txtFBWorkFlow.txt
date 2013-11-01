@@ -279,7 +279,7 @@
                 var routeId = $("#ddlRoutes option:selected").val();
                 var xml = GetXML(routeId);
                 LoadVisualWorkflow(routeId, xml);
-
+				bSet = false;
 				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + routedItemId, function (ret) {
 						
 				});
