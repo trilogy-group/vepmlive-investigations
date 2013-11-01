@@ -208,7 +208,7 @@ namespace EPMLiveCore
                 if (rp.bBuildTeam)
                 {
                     ribbonExtensions = new XmlDocument();
-                    ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.BuildTeam\" Sequence=\"50\" Command=\"Ribbon.ListForm.Display.Manage.BuildTeam\" LabelText=\"Edit Team\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/buildteam.gif\"/>");
+                    ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.BuildTeam\" Sequence=\"50\" Command=\"Ribbon.ListForm.Display.Manage.BuildTeam\" LabelText=\"Edit Team\" TemplateAlias=\"o2\" Image16by16=\"_layouts/epmlive/images/buildteam16.gif\"/>");
                     ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
                 }
             }
@@ -257,7 +257,7 @@ namespace EPMLiveCore
                         Id=""Ribbon.ListItem.Manage.EPKResourcePlanner""
                         Sequence=""103""
                         Command=""Ribbon.ListForm.Display.Manage.EPKRP""
-                        Image32by32=""/_layouts/1033/images/formatmap32x32.png"" Image32by32Top=""-352"" Image32by32Left=""-288""
+                        Image32by32=""/_layouts/epmlive/images/ribbon32.png"" Image32by32Top=""-65""
                         LabelText=""Edit Resource Plan""
                         TemplateAlias=""o1""
                         />");
