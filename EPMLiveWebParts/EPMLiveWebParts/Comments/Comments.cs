@@ -24,7 +24,7 @@ namespace EPMLiveWebParts.Comments
         const string _loadingHtml = "<div id=\"divLoader_CommentsWebPart\" class=\"commentLoader\"></div>";
 
         const string _publicCommentsloadingHtml = "<div id=\"divLoaderPublic_CommentsWebPart\" style=\"display:none\" class=\"commentLoader\"></div>";
-        
+
         const string _noCommentHtml = "<div id=\"divNoCommentIndicator\" style=\"width: 100%; text-align: center;display:none\">" +
                                         "<span id=\"spanMainLoading\">You have no comments.</span>" +
                                        "</div>";
@@ -147,7 +147,7 @@ namespace EPMLiveWebParts.Comments
             EPMLiveCore.Act act = new EPMLiveCore.Act(SPContext.Current.Web);
             int activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.WebParts);
 
-            if(activation != 0)
+            if (activation != 0)
             {
                 output.Write(act.translateStatus(activation));
                 return;
@@ -213,17 +213,29 @@ namespace EPMLiveWebParts.Comments
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/CommentsWebPartStyle.css\"/>");
 
             output.Write(@"<div id='wrapper' class='divPublicCommentContainer'>
-                               <div id='comment-photo'>
-                                   <img src='" + userPictureUrl + @"' class='circleborder' />
-                               </div>
-                               <div id='whatsup'>
-                                   <div class='comment-box'>
-                                       <div id='inputPublicComment' class='comment-paragraph' contenteditable='true'>
-                                       </div>
-                                   </div>
-                               </div>
-                               <div class='general-button-wrapper'><a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='display:inline-block;margin-left:5px;text-decoration:none;'>Share</a></div>
-                            </div>");
+                            <table>
+                                <tbody>
+			                        <tr>
+				                        <td valign='left'>
+					                        <div id='comment-photo'>
+                                                <img src='" + userPictureUrl + @"' class='circleborder' />
+                                            </div>
+				                        </td>
+				                        <td align='left' style='width:100%;padding-left:5px;padding-right:5px;'>
+					                        <div id='whatsup'>
+                                                <div class='comment-box'>
+                                                    <div id='inputPublicComment' class='comment-paragraph' contenteditable='true'>
+                                                    </div>
+                                                </div>
+                                            </div>
+				                        </td>
+				                        <td valign='left'>
+					                        <div class='general-button-wrapper'><a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='display:inline-block;margin-left:5px;text-decoration:none;'>Share</a></div>
+				                        </td>
+			                        </tr>
+		                        </tbody>
+                            </table>
+                        </div>");
 
             output.Write("<div style=\"clear:both;\"></div>");
 
@@ -235,7 +247,7 @@ namespace EPMLiveWebParts.Comments
             output.Write(_noCommentHtml);
             output.Write("</div>");
 
-            
+
         }
 
         public override ToolPart[] GetToolParts()

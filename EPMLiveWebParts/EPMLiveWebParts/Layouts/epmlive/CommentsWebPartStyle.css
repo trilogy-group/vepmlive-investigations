@@ -241,9 +241,6 @@
 }
 
 .general-button-wrapper {
-    display: inline-block;
-    vertical-align: top;
-    padding-top:12px;
 }
 
 .reply-button-wrapper {
@@ -1030,12 +1027,6 @@ div.ms-taggedItems a.people {
 }
 
 #whatsup {
-    height: 30px;
-    position: relative;
-    margin-left: 15px;
-    max-width: 320px;
-    display: inline-block;
-    position: relative;
 }
 
 .comment-box {
@@ -1047,10 +1038,9 @@ div.ms-taggedItems a.people {
     font-family: "Open sans Regular","Segoe",Tahoma,Helvetica,Arial,sans-serif;
     font-weight: 400;
     border-radius: 3px;
-    margin-top: 10px;
 }
 
- .comment-box:before {
+    .comment-box:before {
         content: '';
         width: 8px;
         height: 8px;
@@ -1071,10 +1061,11 @@ div.ms-taggedItems a.people {
     color: #333333;
     line-height: 16px;
     margin: 10px 5px 10px 8px;
+    max-height: 45px;
     min-height: 16px;
-    white-space: pre-wrap;
-    overflow: hidden;
     min-width: 150px;
+    overflow: hidden;
+    white-space: pre-wrap;
 }
 
 #comment-btn {

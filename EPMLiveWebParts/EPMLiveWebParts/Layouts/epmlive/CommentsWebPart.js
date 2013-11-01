@@ -1171,7 +1171,7 @@ function GetData() {
         };
 
         $$.xmlEscape = function (str) {
-            return str.replace(/'/g, '&quot;')
+            return str.replace(/'/g, '&apos;')
                 .replace(/"/g, '&quot;');
         };
 
@@ -1200,6 +1200,9 @@ function GetData() {
             });
 
             $('#inputPublicComment').html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
+
+            // dynamically set max width
+            $('#whatsup').css('max-width', $('#whatsup').width() + 'px');
         });
 
     })(window.commentsWebPart = window.commentsWebPart || {}, jQuery);
