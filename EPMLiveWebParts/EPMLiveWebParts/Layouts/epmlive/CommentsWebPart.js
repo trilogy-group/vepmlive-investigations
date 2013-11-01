@@ -902,26 +902,30 @@ function GetData() {
                                     .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName']);
 
                                 $('#' + containerId).before(commentItem);
-                                $('#' + containerId).prevAll(".subitem:first").fadeIn('2000');
 
-                                $('#tbCommentInput' + itemId).empty();
-                                $('#tbCommentInput' + itemId).fadeOut('2000');
-                                $('#btnNewComment' + itemId).parent().fadeOut('2000');
+                                setTimeout(function () { $('#' + containerId).prevAll(".subitem:first").fadeIn(1500); }, 0);
+
+                                setTimeout(function () {$('#tbCommentInput' + itemId).empty();}, 0);
+                                setTimeout(function () {$('#tbCommentInput' + itemId).fadeOut(1500);}, 0);
+                                setTimeout(function () {$('#btnNewComment' + itemId).parent().fadeOut(1500);}, 0);
+
+                                setTimeout(function () { $('#aNewCommentReply' + itemId).fadeIn(1500); }, 0);
                                 
-                                $('#aNewCommentReply' + itemId).fadeIn('2000');
+
+                                
                             }
                         }
                     },
                     error: function (e) {
                         alert('Failed to add new comment. ' + e.message);
                         $('#tbCommentInput' + itemId).empty();
-                        $('#tbCommentInput' + itemId).fadeOut('2000');
-                        $('#btnNewComment' + itemId).parent().fadeOut('2000');
-                        $('#aNewCommentReply' + itemId).fadeIn('2000');
+                        $('#tbCommentInput' + itemId).fadeOut(1500);
+                        $('#btnNewComment' + itemId).parent().fadeOut(1500);
+                        $('#aNewCommentReply' + itemId).fadeIn(1500);
                     }
                 });
             } else {
-                $('#btnNewComment' + itemId).parent().fadeOut('2000');
+                $('#btnNewComment' + itemId).parent().fadeOut(1500);
             }
         };
 
@@ -1102,7 +1106,7 @@ function GetData() {
                                     }
                                 });
 
-                                $('#divPublicCommentItem' + iid).fadeIn('2000');
+                                $('#divPublicCommentItem' + iid).fadeIn(1500);
                             }
                         }
 
@@ -1110,7 +1114,7 @@ function GetData() {
                     },
                     error: function (e) {
                         alert('Failed to add new comment. ' + e.message);
-                        $('#divLoaderPublic_CommentsWebPart').fadeOut('2000');
+                        $('#divLoaderPublic_CommentsWebPart').fadeOut(1500);
                     }
                 });
             } else {
