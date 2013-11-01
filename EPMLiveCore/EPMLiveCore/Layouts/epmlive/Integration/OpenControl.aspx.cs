@@ -122,6 +122,12 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                         Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/worklog.aspx?ListId=" + li.ParentList.ID + "&itemid=" + li.ID + "&CloseMethod=3&isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                     }
                     break;
+                case "projectinfo":
+                    {
+                        string url = li.ParentList.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&CloseMethod=3";
+                        Response.Redirect(url);
+                    }
+                    break;
                 default:
                     lblError.Text = "Could not load control: " + control;
                     break;
