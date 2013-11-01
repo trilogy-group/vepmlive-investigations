@@ -121,7 +121,11 @@
 				}
 				break;
             case "RefreshPage":
-                window.location.reload();
+				document.all("EPKDisplay").HandleData("SetControl", "***CONTROL***");
+				document.all("EPKDisplay").HandleData("SetPage", "***PAGE***");
+				document.all("EPKDisplay").HandleData("SetParam1", '***PARAMS***');
+				document.all("EPKDisplay").HandleData("DisplayControl", "");
+				window.setTimeout('Body_OnResize();', 100);
                 break;
 			default:
 				alert(sContext);
@@ -278,18 +282,15 @@
 	{
 	}
 
-    //document.body.onload = this_Onload;
-    //document.body.onbeforeunload = Body_OnBeforeUnload;
-    //document.body.onunload = Body_OnUnload;
-    //document.body.onresize = Body_OnResize;
+	_spBodyOnLoadFunctionNames.push("this_Onload");
     if (document.addEventListener != null) { // e.g. Firefox
-        window.addEventListener("load", this_Onload, true);
+        //window.addEventListener("load", this_Onload, true);
         window.addEventListener("beforeunload", Body_OnBeforeUnload, true);
         window.addEventListener("unload", Body_OnUnload, true);
         window.addEventListener("resize", Body_OnResize, true);
     }
     else { // e.g. IE
-        window.attachEvent("onload", this_Onload);
+        //window.attachEvent("onload", this_Onload);
         window.attachEvent("onbeforeunload", Body_OnBeforeUnload);
         window.attachEvent("onunload", Body_OnUnload);
         window.attachEvent("onresize", Body_OnResize);
