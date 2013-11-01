@@ -209,7 +209,7 @@ namespace UplandIntegrations.Tfs
                 throw ex;
             }
         }
-        public void CreateObjectItem(string projectCollection, string objectName, DataRow Item, DataColumnCollection dataColumns)
+        public Int64 CreateObjectItem(string projectCollection, string objectName, DataRow Item, DataColumnCollection dataColumns)
         {
             try
             {
@@ -228,12 +228,12 @@ namespace UplandIntegrations.Tfs
                     case TfsType.Task:
                     case TfsType.Test_Case:
                     case TfsType.User_Story:
-                        CreateWorkItem(projectCollection, objectName.Replace("_", " "), Item, dataColumns);
+                        return CreateWorkItem(projectCollection, objectName.Replace("_", " "), Item, dataColumns);
                         break;
                     default:
                         break;
                 }
-
+                return 0;
             }
             catch (Exception ex)
             {
@@ -312,11 +312,11 @@ namespace UplandIntegrations.Tfs
 
         #region Private
 
-        private void CreateWorkItem(string projectCollection, string workItemType, DataRow item, DataColumnCollection dataColumns)
+        private Int64 CreateWorkItem(string projectCollection, string workItemType, DataRow item, DataColumnCollection dataColumns)
         {
             if (string.IsNullOrEmpty(Convert.ToString(item["Project|Id"])))
             {
-                return;
+                throw new Exception("Project|Id is required for creating this workitem.");
             }
             using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
             {
@@ -336,6 +336,7 @@ namespace UplandIntegrations.Tfs
                 var workItem = new WorkItem(workItemTypes[workItemType]);
                 FillWorkItemFromDataRow(workItem, item, dataColumns);
                 workItem.Save();
+                return workItem.Id;
             }
         }
         private void UpdateWorkItem(string projectCollection, string workItemType, DataRow item, Int64 itemId, DataColumnCollection dataColumns)

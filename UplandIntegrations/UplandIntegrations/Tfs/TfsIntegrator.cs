@@ -172,7 +172,7 @@ namespace UplandIntegrations.Tfs
                     {
                         if (string.IsNullOrEmpty(curId))
                         {
-                            tfsService.CreateObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], item, Items.Columns);
+                            curId = tfsService.CreateObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], item, Items.Columns).ToString();
                             transactionTable.AddRow(spId, curId, TransactionType.INSERT);
                         }
                         else
@@ -182,7 +182,7 @@ namespace UplandIntegrations.Tfs
 
                             if (getItemDataTable.Rows.Count == 0)
                             {
-                                tfsService.CreateObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], item, Items.Columns);
+                                curId = tfsService.CreateObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], item, Items.Columns).ToString();
                                 transactionTable.AddRow(spId, curId, TransactionType.INSERT);
                             }
                             else
