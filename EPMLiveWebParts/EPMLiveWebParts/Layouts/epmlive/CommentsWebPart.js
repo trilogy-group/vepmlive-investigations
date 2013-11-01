@@ -187,7 +187,7 @@ function GetData() {
                     //'<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
                 '<div class="reply-button-wrapper" style=\"display:none;\">' +
-                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
+                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
                 '</div>' +
             '</div>' +
             '<div style=\"clear:both\"></div>';
@@ -203,7 +203,7 @@ function GetData() {
                     //'<span style="color:gray">Write a reply...</span>' +
                 '</div>' +
                 '<div class="reply-button-wrapper" style=\"display:none;\">' +
-                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', $(\'#tbCommentInput##itemId##\').html(), \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
+                    '<a class="btn-primary btn btn-small" style="margin-left:0px !important; font-size: 10px !important;" href="#" id="btnNewComment##itemId##" onclick="window.commentsWebPart.AddComment(\'##listId##\', \'##itemId##\', \'newItemAnchor_##listId##_##itemId##\');" >Comment</a>' +
                 '</div>' +
             '</div>' +
             '<div style=\"clear:both\"></div>';
@@ -511,35 +511,36 @@ function GetData() {
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
-                                            var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                            //var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
+                                            //var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
-                                            if ($(this).text() !== 'Write a reply...') {
-                                                var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
-                                                shadow.html(val);
-                                                $(this).css('height', Math.max(shadow.height(), minHeight));
-                                            }
+                                            //if ($(this).text() !== 'Write a reply...') {
+                                            //    var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
+                                            //    shadow.html(val);
+                                            //    $(this).css('height', Math.max(shadow.height(), minHeight));
+                                            //}
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).keyup(function (e) {
-                                            var id = $(this).attr('id').replace('tbCommentInput', '');
-                                            var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
-                                            if ($(this).text() !== 'Write a reply...') {
-                                                var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
-                                                shadow.html(val);
-                                                if (e.keyCode != 8 && e.keyCode != 46) {
-                                                    $(this).css('height', Math.max(shadow.height(), minHeight));
-                                                }
-                                                else {
-                                                    var minH = Math.min(shadow.height(), minHeight);
-                                                    if (minH <= 0) {
-                                                        minH = 15;
-                                                    }
-                                                    $(this).css('height', Math.min(shadow.height(), minH));
-                                                }
-                                            }
+                                            var id = $(this).attr('id').replace('tbCommentInput', '');
+                                            //var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
+                                            //var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+
+                                            //if ($(this).text() !== 'Write a reply...') {
+                                            //    var val = $(this).text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
+                                            //    shadow.html(val);
+                                            //    if (e.keyCode != 8 && e.keyCode != 46) {
+                                            //        $(this).css('height', Math.max(shadow.height(), minHeight));
+                                            //    }
+                                            //    else {
+                                            //        var minH = Math.min(shadow.height(), minHeight);
+                                            //        if (minH <= 0) {
+                                            //            minH = 15;
+                                            //        }
+                                            //        $(this).css('height', Math.min(shadow.height(), minH));
+                                            //    }
+                                            //}
 
                                             var value = $(this).text();
 
@@ -775,35 +776,36 @@ function GetData() {
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).change(function () {
-                                            var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                            //var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
+                                            //var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
-                                            if ($(this).text() !== 'Write a reply...') {
-                                                var val = $(this).html(); //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
-                                                shadow.html(val);
-                                                $(this).css('height', Math.max(shadow.height(), minHeight));
-                                            }
+                                            //if ($(this).text() !== 'Write a reply...') {
+                                            //    var val = $(this).html(); //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
+                                            //    shadow.html(val);
+                                            //    $(this).css('height', Math.max(shadow.height(), minHeight));
+                                            //}
                                         });
 
                                         $('#tbCommentInput' + oComment['@itemId']).keyup(function (e) {
-                                            var id = $(this).attr('id').replace('tbCommentInput', '');
-                                            var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                            var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
-                                            if ($(this).text() !== 'Write a reply...') {
-                                                var val = $(this).html(); //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
-                                                shadow.html(val);
-                                                if (e.keyCode != 8 && e.keyCode != 46) {
-                                                    $(this).css('height', Math.max(shadow.height(), minHeight));
-                                                }
-                                                else {
-                                                    var minH = Math.min(shadow.height(), minHeight);
-                                                    if (minH <= 0) {
-                                                        minH = 15;
-                                                    }
-                                                    $(this).css('height', minH);
-                                                }
-                                            }
+                                            var id = $(this).attr('id').replace('tbCommentInput', '');
+                                            //var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
+                                            //var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+
+                                            //if ($(this).text() !== 'Write a reply...') {
+                                            //    var val = $(this).html(); //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
+                                            //    shadow.html(val);
+                                            //    if (e.keyCode != 8 && e.keyCode != 46) {
+                                            //        $(this).css('height', Math.max(shadow.height(), minHeight));
+                                            //    }
+                                            //    else {
+                                            //        var minH = Math.min(shadow.height(), minHeight);
+                                            //        if (minH <= 0) {
+                                            //            minH = 15;
+                                            //        }
+                                            //        $(this).css('height', minH);
+                                            //    }
+                                            //}
 
                                             var value = $(this).text();
                                             if (value.length > 0) {
@@ -857,12 +859,20 @@ function GetData() {
             });
         }
 
-        $$.AddComment = function (listId, itemId, comment, containerId) {
+        $$.AddComment = function (listId, itemId, containerId) {
             //<Data>
             // <Param key="ListId">someguid</Param>
             // <Param key="ItemId">12</Param>
             // <Param key="Comment">abcabac</Param>
             // </Data>
+            $('#tbCommentInput' + itemId).find('p').last().each(function () {
+                var $this = $(this);
+                if ($this.html().replace(/\s|&nbsp;/g, '').length == 0)
+                    $this.remove();
+            });
+
+            comment = $('#tbCommentInput' + itemId).html();
+
             $('#tbCommentInput' + itemId).css('display', 'none');
             $('#btnNewComment' + itemId).parent().css('display', 'none');
             //$('#' + containerId).before(loadingDiv);
@@ -926,6 +936,7 @@ function GetData() {
             // <Param key="ItemId">12</Param>
             // <Param key="Comment">abcabac</Param>
             // </Data>
+           
             $('#divLoaderPublic_CommentsWebPart').css('display', '');
             $('#divNoCommentIndicator').css('display', 'none');
 
@@ -1056,35 +1067,35 @@ function GetData() {
                                 });
 
                                 $('#tbCommentInput' + iid).change(function () {
-                                    var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                    var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                    //var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
+                                    //var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
-                                    if ($(this).text() !== 'Write a reply...') {
-                                        var val = $(this).html(); //replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
-                                        shadow.html(val);
-                                        $(this).css('height', Math.max(shadow.height(), minHeight));
-                                    }
+                                    //if ($(this).text() !== 'Write a reply...') {
+                                    //    var val = $(this).html(); //replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
+                                    //    shadow.html(val);
+                                    //    $(this).css('height', Math.max(shadow.height(), minHeight));
+                                    //}
                                 });
 
                                 $('#tbCommentInput' + iid).keyup(function (e) {
                                     var id = $(this).attr('id').replace('tbCommentInput', '');
-                                    var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
-                                    var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
+                                    //var $this = $(this), minHeight = $this.height(), lineHeight = $this.css('lineHeight');
+                                    //var shadow = $('<div class="tbComment"></div>').css({ position: 'absolute', top: -10000, left: -10000, width: $this.width(), fontSize: $this.css('fontSize'), fontFamily: $this.css('fontFamily'), lineHeight: $this.css('lineHeight'), resize: 'none' }).appendTo(document.body);
 
-                                    if ($(this).text() !== 'Write a reply...') {
-                                        var val = $(this).html() //.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\n/g, '<br/>');
-                                        shadow.html(val);
-                                        if (e.keyCode != 8 && e.keyCode != 46) {
-                                            $(this).css('height', Math.max(shadow.height(), minHeight));
-                                        }
-                                        else {
-                                            var minH = Math.min(shadow.height(), minHeight);
-                                            if (minH <= 0) {
-                                                minH = 15;
-                                            }
-                                            $(this).css('height', Math.min(shadow.height(), minH));
-                                        }
-                                    }
+                                    //if ($(this).text() !== 'Write a reply...') {
+                                    //    var val = $(this).html() 
+                                    //    shadow.html(val);
+                                    //    if (e.keyCode != 8 && e.keyCode != 46) {
+                                    //        $(this).css('height', Math.max(shadow.height(), minHeight));
+                                    //    }
+                                    //    else {
+                                    //        var minH = Math.min(shadow.height(), minHeight);
+                                    //        if (minH <= 0) {
+                                    //            minH = 15;
+                                    //        }
+                                    //        $(this).css('height', Math.min(shadow.height(), minH));
+                                    //    }
+                                    //}
 
                                     var value = $(this).text();
 
@@ -1188,6 +1199,12 @@ function GetData() {
 
         $(function () {
             $('#btnGeneralPost').click(function () {
+                $('#inputPublicComment').find('p').last().each(function () {
+                    var $this = $(this);
+                    if ($this.html().replace(/\s|&nbsp;/g, '').length == 0)
+                        $this.remove();
+                });
+
                 var publicComment = $('#inputPublicComment').html();
                 publicComment = $$.xmlEscape(publicComment);
                 if (publicComment) {
@@ -1217,12 +1234,6 @@ function GetData() {
                 }
                 else {
                     $('#wrapper').css('padding-bottom', '26px');
-                }
-
-                if ($(this).text().trim() === '') {
-                    if ($(this).find('p').length > 0) {
-                        $(this).find('p').remove();
-                    }
                 }
             });
 

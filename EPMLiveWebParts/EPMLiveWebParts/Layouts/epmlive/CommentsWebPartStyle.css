@@ -1149,3 +1149,13 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
 
 .replyWrapper {
 }
+
+.comment-paragraph p{
+    margin:0px;
+    padding:0px;
+}
+
+.commentsWPMainContainer p{
+    margin:0px;
+    padding:0px;
+}

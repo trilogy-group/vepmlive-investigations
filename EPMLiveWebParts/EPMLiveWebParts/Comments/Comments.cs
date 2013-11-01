@@ -221,7 +221,7 @@ namespace EPMLiveWebParts.Comments
                                                 <img src='" + userPictureUrl + @"' class='circleborder' />
                                             </div>
 				                        </td>
-				                        <td valign='middle' align='left' style='width:100%;padding-left:5px;padding-right:5px;'>
+				                        <td valign='middle' align='left' style='width:100%;padding-left:8px;padding-right:5px;'>
 					                        <div id='whatsup'>
                                                 <div class='comment-box'>
                                                     <div id='inputPublicComment' class='comment-paragraph' contenteditable='true'>
