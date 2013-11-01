@@ -179,6 +179,7 @@
 
                     if (vwfData != null) {
 
+						$("#vwf-title").append(vwfData.comment);
                         // show button:
                         $("#btnProcessDesigner").show();
 
