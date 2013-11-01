@@ -37,7 +37,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     DataTable dtMods = dsIntegrations.Tables[drCat["INT_CAT_ID"].ToString()];
                     foreach(DataRow dr in dtMods.Rows)
                     {
-                        sb.Append("<div style=\"width:270px;float:left;\">");
+                        sb.Append("<div style=\"width:270px;float:left;padding-right:20px\">");
 
                         string icon = dr["Icon"].ToString();
 
