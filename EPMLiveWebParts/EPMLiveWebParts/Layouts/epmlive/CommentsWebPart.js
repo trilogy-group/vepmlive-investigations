@@ -872,10 +872,7 @@ function GetData() {
             });
 
             comment = $('#tbCommentInput' + itemId).html();
-
-            $('#tbCommentInput' + itemId).css('display', 'none');
-            $('#btnNewComment' + itemId).parent().css('display', 'none');
-            //$('#' + containerId).before(loadingDiv);
+            comment = $$.xmlEscape(comment);
 
             if (comment !== undefined) {
                 var orginalComment = comment;
@@ -905,28 +902,26 @@ function GetData() {
                                     .replace(/##listName##/g, responseJson.Result.Comments.CommentItem.Comment['@listName']);
 
                                 $('#' + containerId).before(commentItem);
-                                $('#' + containerId).prevAll(".subitem:first").fadeIn('slow');
+                                $('#' + containerId).prevAll(".subitem:first").fadeIn('2000');
 
                                 $('#tbCommentInput' + itemId).empty();
-                                $('#aNewCommentReply' + itemId).css('display', '');
-                                $('#tbCommentInput' + itemId).css('display', 'none');
-                                $('#btnNewComment' + itemId).parent().css('display', 'none');
+                                $('#tbCommentInput' + itemId).fadeOut('2000');
+                                $('#btnNewComment' + itemId).parent().fadeOut('2000');
+                                
+                                $('#aNewCommentReply' + itemId).fadeIn('2000');
                             }
                         }
-
-                        $('#aNewCommentReply' + itemId).css('display', '');
-
                     },
                     error: function (e) {
                         alert('Failed to add new comment. ' + e.message);
                         $('#tbCommentInput' + itemId).empty();
-                        $('#tbCommentInput' + itemId).css('display', 'none');
-                        $('#btnNewComment' + itemId).parent().css('display', 'none');
-                        $('#aNewCommentReply' + itemId).css('display', '');
+                        $('#tbCommentInput' + itemId).fadeOut('2000');
+                        $('#btnNewComment' + itemId).parent().fadeOut('2000');
+                        $('#aNewCommentReply' + itemId).fadeIn('2000');
                     }
                 });
             } else {
-                $('#btnNewComment' + itemId).parent().css('display', 'none');
+                $('#btnNewComment' + itemId).parent().fadeOut('2000');
             }
         };
 
@@ -941,8 +936,8 @@ function GetData() {
             $('#divNoCommentIndicator').css('display', 'none');
 
             if (comment !== undefined &&
-                comment !== "<span style=&quot;color:gray&quot;>What are you working on?</span>" &&
-                comment !== "<span style=&quot;color:gray&quot;>" + sPubComTxt + "</span>") {
+                $('#inputPublicComment').text() !== "What are you working on?" &&
+                $('#inputPublicComment').text() !== sPubComTxt) {
 
                 var orginalComment = comment;
 
@@ -1107,7 +1102,7 @@ function GetData() {
                                     }
                                 });
 
-                                $('#divPublicCommentItem' + iid).fadeIn('slow');
+                                $('#divPublicCommentItem' + iid).fadeIn('2000');
                             }
                         }
 
@@ -1115,7 +1110,7 @@ function GetData() {
                     },
                     error: function (e) {
                         alert('Failed to add new comment. ' + e.message);
-                        $('#divLoaderPublic_CommentsWebPart').FadeOut('slow');
+                        $('#divLoaderPublic_CommentsWebPart').fadeOut('2000');
                     }
                 });
             } else {
@@ -1219,6 +1214,16 @@ function GetData() {
             });
 
             $("#inputPublicComment").blur(function () {
+                $('#inputPublicComment').find('p').each(function () {
+                    var $this = $(this);
+                    if ($this.html().replace(/\s|&nbsp;/g, '').length == 0)
+                        $this.remove();
+                });
+
+                if ($(this).text().trim() === '') {
+                    $(this).html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
+                }
+
                 if ($$.UnescapeHTML($(this).html().trim()) === '') {
                     $(this).html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
                 }

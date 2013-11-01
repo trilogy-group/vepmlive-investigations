@@ -157,7 +157,10 @@ namespace EPMLiveWebParts.Comments
             SPSite cSite = SPContext.Current.Site;
 
             var sPubComTxt = string.Empty;
-            try { sPubComTxt = CoreFunctions.getConfigSetting(cWeb, "EPMLivePublicCommentText"); }
+            try { 
+                sPubComTxt = CoreFunctions.getConfigSetting(cWeb, "EPMLivePublicCommentText");
+                sPubComTxt = HttpUtility.JavaScriptStringEncode(sPubComTxt);
+            }
             catch { }
 
             if (string.IsNullOrEmpty(sPubComTxt))
@@ -198,7 +201,7 @@ namespace EPMLiveWebParts.Comments
             var defaultHeight = 500;
             output.Write("<script>" +
                            "curWebUrl = '" + cWeb.Url + "';" +
-                           "curWebTitle = '" + cWeb.Title + "';" +
+                           "curWebTitle = '" + HttpUtility.JavaScriptStringEncode(cWeb.Title) + "';" +
                            "userProfileUrl = '" + userProfileUrl + "';" +
                            "userEmail = '" + user.Email + "';" +
                            "userPicUrl = '" + userPictureUrl + "';" +
