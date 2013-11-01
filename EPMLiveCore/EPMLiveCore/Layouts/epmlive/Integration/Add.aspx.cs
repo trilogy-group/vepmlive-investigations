@@ -28,7 +28,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
 
                 foreach (DataRow drCat in dtCat.Rows)
                 {
-                    sb.Append("<div style=\"width:100%;\">");
+                    sb.Append("<div class=\"header-wrapper\">");
                     sb.Append("<h4>" + drCat["CATEGORY"].ToString() + "</h4>");
                     sb.Append("</div>");
                     sb.Append("<div style=\"width:100%;overflow: hidden;\">");
@@ -37,7 +37,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     DataTable dtMods = dsIntegrations.Tables[drCat["INT_CAT_ID"].ToString()];
                     foreach(DataRow dr in dtMods.Rows)
                     {
-                        sb.Append("<div style=\"width:400px;float:left;\">");
+                        sb.Append("<div style=\"width:270px;float:left;\">");
 
                         string icon = dr["Icon"].ToString();
 
@@ -49,14 +49,12 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                         string desc = dr["Description"].ToString();
 
 
-                        sb.Append("<a href=\"javascript:void(0);\" onclick=\"AddIntegration('");
-                        sb.Append(dr["MODULE_ID"].ToString());
-                        sb.Append("')\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
-                        sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
+                        sb.Append("<TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
+                        sb.Append("<td class=\"add-app-logo-box\">");
                         sb.Append("<img src=\"");
                         sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                         sb.Append(icon);
-                        sb.Append("\"></td>");
+                        sb.Append("\"></td></tr><tr>");
                         sb.Append("<td class=\"titletd\"><b>");
                         sb.Append(dr["Title"].ToString());
                         sb.Append("</b>");
@@ -67,7 +65,14 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                             sb.Append("</div>");
                         }
                         sb.Append("</td>");
-                        sb.Append("</tr></table></a>");
+                        sb.Append("</tr>");
+                        sb.Append("<tr><td style=\"text-align:center;\">");
+                        sb.Append("<a href=\"javascript:void(0);\" onclick=\"AddIntegration('");
+                        sb.Append(dr["MODULE_ID"].ToString());
+                        sb.Append("')\" class=\"btn btn-large btn-success\" style=\"text-decoration:none;\">Configure</a>");    
+                        sb.Append("</td></tr>");    
+                            
+                        sb.Append("</table>");
 
                         sb.Append("</div>");
                     }
