@@ -56,7 +56,7 @@ html, body {
                 </tr>
                 <tr>
                     <td width="250" class="descriptioncell">
-                        Field Name
+                        Name
                     </td>
                     <td class="controlcell">
                         <input type="text" id="txtName" style="Width:400px;"/>
