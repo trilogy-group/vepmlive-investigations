@@ -44,20 +44,20 @@ namespace UplandIntegrations.FileBound
         public List<IntegrationControl> GetPageButtons(WebProperties WebProps, IntegrationLog Log, bool Global)
         {
             List<IntegrationControl> l = new List<IntegrationControl>();
-            if (Global)
-            {
+            //if (Global)
+            //{
 
-            }
-            else
-            {
-                IntegrationControl i = new IntegrationControl();
-                i.Control = "Docs";
-                i.Image = "workflows.png";
-                i.Title = "View FB Documents";
-                i.Window = IntegrationControlWindowStyle.FullWindow;
-                i.BItemLevel = true;
-                l.Add(i);
-            }
+            //}
+            //else
+            //{
+            //    IntegrationControl i = new IntegrationControl();
+            //    i.Control = "Docs";
+            //    i.Image = "workflows.png";
+            //    i.Title = "View FB Documents";
+            //    i.Window = IntegrationControlWindowStyle.FullWindow;
+            //    i.BItemLevel = true;
+            //    l.Add(i);
+            //}
             return l;
         }
         public string GetURL(WebProperties WebProps, IntegrationLog Log, string control, string itemid)
