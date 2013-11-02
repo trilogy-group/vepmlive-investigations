@@ -201,7 +201,7 @@
                                 <a id="epm-support-link" href="http://support.epmlive.com/" target="_blank" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Support Community"><span class="fui-question"></span></a>
                             </div>
                             <div id="uv-container" class="epm-global-button-right">
-                                <a href="javascript:window.showUserVoicePopup();" data-uv-lightbox="classic_widget" data-uv-mode="feedback" data-uv-primary-color="#0091ca" data-uv-link-color="#555555" data-uv-forum-id="225611" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom"  data-delay="100"><span class="fui-ext-megaphone"></span></a>
+                                <a href="javascript:window.showUserVoicePopup();" data-uv-lightbox="classic_widget" data-uv-mode="full" data-uv-primary-color="#0091ca" data-uv-link-color="#555555" data-uv-default-mode="support" data-uv-forum-id="161591" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom" data-delay="100"><span class="fui-ext-megaphone"></span></a>
                             </div>
                             <!-- Notification Counter -->
                             <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
