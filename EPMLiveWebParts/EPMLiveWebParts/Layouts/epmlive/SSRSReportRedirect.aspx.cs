@@ -98,6 +98,16 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         _srs2006.Credentials = new NetworkCredential(username, password);
                     }
                 });
+
+                try
+                {
+                    var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
+                    var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
+                    SSRS.CookieContainer = new CookieContainer();
+                    SSRS.CookieContainer.Add(fedAuth);
+                }
+                catch { }
+
                 valid = true;
             }
             catch { }
