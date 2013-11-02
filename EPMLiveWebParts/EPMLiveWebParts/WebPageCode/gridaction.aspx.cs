@@ -76,10 +76,13 @@ namespace EPMLiveWebParts
 
                 if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
                 {
-                    if (!isFav)
-                        items.Add("Add Favorite", getMenuItem(Request["grid"], "Add Favorite", "/_layouts/images/blank.gif", "AddFavorite", ""));
-                    else
-                        items.Add("Remove Favorite", getMenuItem(Request["grid"], "Remove Favorite", "/_layouts/images/blank.gif", "RemoveFavorite", ""));
+                    if (web.Features[new Guid("046f0200-30e5-4545-b00f-c8c73aef9f0e")] != null)
+                    {
+                        if (!isFav)
+                            items.Add("Add Favorite", getMenuItem(Request["grid"], "Add Favorite", "/_layouts/images/blank.gif", "AddFavorite", ""));
+                        else
+                            items.Add("Remove Favorite", getMenuItem(Request["grid"], "Remove Favorite", "/_layouts/images/blank.gif", "RemoveFavorite", ""));
+                    }
                 }
 
                 items.Add("SEP" + (counter++).ToString(), "");
