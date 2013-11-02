@@ -132,7 +132,12 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
                 var weburl = WEWebUrl + "/_layouts/epmlive/gridaction.aspx?action=GoToTaskPlanner&webid=" + WEWebId + "&listid=" + WEListId + "&id=" + WEItemId + "&Source=" + WESource;
 
-                location.href = weburl;
+                if (document.location.href.toLowerCase().indexOf("&isdlg=1") > 0)
+                {
+                    window.open(weburl, '', config='width=' + screen.width + ',height=' + screen.height + ',top=0,left=0')
+                }
+                else
+                    location.href = weburl;
             } catch (e) { }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPMLivePlanner') {
@@ -140,8 +145,11 @@ WEDispFormPageComponent.PageComponent.prototype = {
             try {
 
                 var weburl = WEWebUrl + "/_layouts/epmlive/workplanner.aspx?listid=" + WEListId + "&id=" + WEItemId + "&Source=" + WESource;
-
-                location.href = weburl;
+                if (document.location.href.toLowerCase().indexOf("&isdlg=1") > 0) {
+                    window.open(weburl, '', config = 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0')
+                }
+                else
+                    location.href = weburl;
 
             } catch (e) { }
         }
