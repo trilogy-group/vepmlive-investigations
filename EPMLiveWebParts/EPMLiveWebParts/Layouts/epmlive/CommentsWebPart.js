@@ -402,8 +402,8 @@ function GetData() {
                                                 '</div>');
 
                                             if (currentComments.length > parseInt(maxComments)) {
-                                                var showAllButton = '<div style=\"margin-top: 5px;padding-left:5px;border-bottom:1px solid #c5d9e8;padding:3px;\">' +
-                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">Show All</a>' +
+                                                var showAllButton = '<div style=\"margin-top: 1px;padding-left:5px;padding:3px;font-size:8pt;\">' +
+                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">Show all</a>' +
                                                                     '</div>';
 
                                                 $('#callout_' + oComment['@listId'] + '_' + oComment['@itemId']).append(
@@ -666,8 +666,8 @@ function GetData() {
                                                 '</div>');
 
                                             if (currentComments.length > parseInt(maxComments)) {
-                                                var showAllButton = '<div style=\"margin-top: 5px;padding-left:5px;border-bottom:1px solid #c5d9e8;padding:3px;\">' +
-                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">Show All</a>' +
+                                                var showAllButton = '<div style=\"margin-top: 1px;padding-left:5px;padding:3px;font-size:8pt;\">' +
+                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">Show all</a>' +
                                                                     '</div>';
 
                                                 $('#callout_' + oComment['@listId'] + '_' + oComment['@itemId']).append(
