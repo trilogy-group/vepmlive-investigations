@@ -237,7 +237,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         if (ticket.indexOf("General Error") != 0) {
             var listInfo = ticket.split('|');
 
-            var weburl = listInfo[0] + "/_layouts/epmlive/gridaction.aspx?action=linkeditems&list=" + listInfo[3] + "&field=" + listInfo[1] + "&LookupFieldList=" + listInfo[2] + "&Source=" + document.location.href;
+            var weburl = listInfo[0] + "/_layouts/epmlive/gridaction.aspx?action=linkeditems&list=" + listInfo[3] + "&field=" + listInfo[1] + "&LookupFieldList=" + listInfo[2] + "&Source=" + escape(document.location.href);
             var options = { url: weburl, showMaximized: true };
 
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
