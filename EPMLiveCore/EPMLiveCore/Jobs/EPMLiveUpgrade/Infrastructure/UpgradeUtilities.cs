@@ -31,7 +31,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                 {
                     bool add = false;
 
-                    if (string.IsNullOrEmpty(version)) add = true;
+                    if (string.IsNullOrEmpty(version))
+                    {
+                        if (!attribute.IsOptIn) add = true;
+                    }
                     else
                     {
                         if (attribute.IsOptIn) add = true;
@@ -43,10 +46,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                 {
                     bool add = false;
 
-                    if (string.IsNullOrEmpty(version)) add = true;
+                    if (string.IsNullOrEmpty(version))
+                    {
+                        if (!attribute.IsOptIn) add = true;
+                    }
                     else
                     {
-                        if (attribute.IsOptIn && attribute.Name.Equals(version)) add = true;
+                        if (attribute.IsOptIn && attribute.Name.StartsWith(version)) add = true;
                     }
 
                     if (add) versionedSteps.Add(attribute.SequenceOrder, type);
