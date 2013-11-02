@@ -216,9 +216,12 @@ namespace EPMLiveCore
 
             try
             {
+                int userId = 0;
+
                 SPFieldUserValue uv = new SPFieldUserValue(properties.Web, GetPropertyBeforeOrAfter(properties, "SharePointAccount"));
                 if(uv.User != null)
                 {
+                    userId = uv.LookupId;
                     Guid tJob = API.Timer.AddTimerJob(properties.SiteId, properties.Web.ID, "Process Security", 40, uv.User.ID.ToString(), "", 0, 99, "");
                     API.Timer.Enqueue(tJob, 0, properties.Web.Site);
                 }
@@ -227,8 +230,29 @@ namespace EPMLiveCore
                     SPUser u = properties.Web.EnsureUser(uv.LookupValue);
                     Guid tJob = API.Timer.AddTimerJob(properties.SiteId, properties.Web.ID, "Process Security", 40, u.ID.ToString(), "", 0, 99, "");
                     API.Timer.Enqueue(tJob, 0, properties.Web.Site);
+                    userId = u.ID; 
+
                 }
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (var site = new SPSite(properties.SiteId))
+                    {
+                        using (var w = site.OpenWeb())
+                        {
+                            SPList list = w.Lists["User Information List"];
+                            list.GetItemById(userId).SystemUpdate();
+                        }
+                    }
+                });
+
+                
+
+
             }catch{}
+
+            
+
         }
 
         private void ProcessDepartment(SPItemEventProperties properties)
