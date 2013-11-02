@@ -845,9 +845,14 @@ eXcell_tree.prototype.setValue = function (valAr) {
         var itemid = this.grid.getUserData(rid, "itemid");
 
         if (this.grid._enableCMenus && itemid != "") {
+
+            window.tryFixGridMenus = function() {
+                if (window.fixGridMenus) window.fixGridMenus();
+            };
+
             _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; position: relative; nowrap; height:" + (_isIE ? 20 : 18) + "px;' onmouseout=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenuout(this);\" onmouseover=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenu(this);\" id='" + this.cell.parentNode.idd + "'>";
             //_tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; position:absolute; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;'><SPAN>&nbsp;</SPAN><A id='menuA' onfocus='return false;' title='Open Menu' onclick='return false;' href='javascript:;'><IMG id='menuImg' class='ms-ellipsis-icon' style='visibility: hidden' alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23' width=7 height=4 border=0></A><SPAN>&nbsp;</SPAN></DIV>";
-            _tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;' class='ms-list-itemLink'><A style='top: -5px;' href='javascript:window.fixGridMenus();' class='ms-lstItmLinkAnchor ms-ellipsis-a'><IMG class=ms-ellipsis-icon alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23'></A></DIV>";
+            _tgc.menu = "<DIV id='menuDiv' style='HEIGHT: 22px; MARGIN: 0px; float:right; top:0px; right:0px; z-index: 10; ' onclick=\"this." + (_isKHTML ? "" : "parentNode.") + "parentNode.parentNode.parentNode.parentNode.grid.hovermenushow(this, " + this.cell._cellIndex + ");if(event){event.cancelBubble = true;}else{e.stopPropogation();}\" onmouseover='return false;' class='ms-list-itemLink'><A style='top: -5px;' href='javascript:window.tryFixGridMenus();' class='ms-lstItmLinkAnchor ms-ellipsis-a'><IMG class=ms-ellipsis-icon alt='Open Menu' src='/_layouts/15/images/spcommon.png?rev=23'></A></DIV>";
         }
         else {
             _tgc.start = "<div class='treegrid_cell' style='overflow:hidden; white-space : nowrap; height:" + (_isIE ? 20 : 18) + "px;'>";
