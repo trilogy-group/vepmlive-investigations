@@ -180,7 +180,7 @@
 
                     if (vwfData != null) {
 
-						$("#vwf-title").text(vwfData.comment);
+						
 
                         // show button:
                         $("#btnProcessDesigner").show();
@@ -212,6 +212,9 @@
                             });
 
                         });
+
+						$("#vwf-title").text(vwfData.comment);
+
                     } else {
                         // no diagram
 
