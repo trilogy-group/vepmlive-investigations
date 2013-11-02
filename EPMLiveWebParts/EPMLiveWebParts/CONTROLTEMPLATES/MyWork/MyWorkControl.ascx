@@ -8,23 +8,54 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MyWorkControl.ascx.cs" Inherits="EPMLiveWebParts.CONTROLTEMPLATES.MyWork.MyWorkControl" %>
 
 <div id="EPMAllWork">
+    <div id="MWG_Loader_<%= WebPartId %>" class="epmlive-loader"></div>
+
     <SharePoint:ScriptBlock runat="server">
-        function initializeEPMLoader() {
-            $(function() {
-                var url = (document.location.href + '').toLowerCase();
-                if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
-                    function showLoading() {
-                        EPM.UI.Loader.current().startLoading({id: 'WebPart<%= Qualifier %>', page: true, coverRibbon: true});
+        if (window.epmLiveMasterPageVersion >= 5.5) {
+            function initializeEPMLoaderV2() {
+                $(function() {
+                    $('#MWG_Loader_<%= WebPartId %>').hide();
+
+                    var url = (document.location.href + '').toLowerCase();
+                    if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
+
+                        function showLoading() {
+                            EPM.UI.Loader.current().startLoading({ id: 'WebPart<%= Qualifier %>', page: true, coverRibbon: true });
+                        }
+
+                        SP.SOD.executeOrDelayUntilScriptLoaded(showLoading, 'EPM.UI');
+                    } else {
+                        EPM.UI.Loader.current().startLoading({ id: 'WebPart<%= Qualifier %>' });
                     }
+                });
+            }
 
-                    SP.SOD.executeOrDelayUntilScriptLoaded(showLoading, 'EPM.UI');
-                } else {
-                    EPM.UI.Loader.current().startLoading({id: 'WebPart<%= Qualifier %>'});
-                }
-            });
+            SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoaderV2, 'jquery.min.js');
+        } else {
+            function initializeEPMLoader() {
+                $(function() {
+                    var url = (document.location.href + '').toLowerCase();
+                    if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
+
+                        function showLoading() {
+                            window.myWorkLoader = SP.UI.ModalDialog.showWaitScreenWithNoClose(SP.Res.dialogLoading15);
+                        }
+
+                        SP.SOD.executeOrDelayUntilScriptLoaded(showLoading, "sp.js");
+                    } else {
+                        var loader = $('#MWG_Loader_<%= WebPartId %>');
+                        var div = $('#WebPart<%= Qualifier %>');
+
+                        loader.css('top', (div.height() - loader.height()) / 2);
+                        loader.css('left', (div.width() - loader.width()) / 2);
+
+                        loader.show();
+                    }
+                });
+            }
+
+            SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, 'jquery.min.js');
         }
-
-        SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, 'jquery.min.js');
     </SharePoint:ScriptBlock>
     
     <div id="MWG_Header" style="overflow:hidden; display: <%= ShowToolbar ? "block" : "none" %>">

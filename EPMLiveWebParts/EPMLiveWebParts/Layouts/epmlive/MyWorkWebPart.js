@@ -53,10 +53,18 @@ Grids.OnGetSortValue = function(grid, row, col, val) {
 Grids.OnReady = function (grid, start) {
     if (grid.id === window.allWorkGridId) {
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
-        
-        var url = (document.location.href + '').toLowerCase();
-        if (url.indexOf('mywork.aspx') === -1 && url.indexOf('my%20work.aspx') === -1) {
-            window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+
+        if (window.epmLiveMasterPageVersion >= 5.5) {
+            var url = (document.location.href + '').toLowerCase();
+            if (url.indexOf('mywork.aspx') === -1 && url.indexOf('my%20work.aspx') === -1) {
+                window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+            }
+        } else {
+            if (window.myWorkLoader) {
+                window.myWorkLoader.close();
+            } else {
+                document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
+            }
         }
 
         if (MyWorkGrid.showingCompletedItems) {
@@ -2983,10 +2991,12 @@ var MyWorkGrid = {
                             }
                         };
 
-                        if (!MyWorkGrid.loaderStopped) {
-                            $(document.getElementById("s4-ribbonrow")).height(126);
-                            window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
-                            MyWorkGrid.loaderStopped = true;
+                        if (window.epmLiveMasterPageVersion >= 5.5) {
+                            if (!MyWorkGrid.loaderStopped) {
+                                $(document.getElementById("s4-ribbonrow")).height(126);
+                                window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+                                MyWorkGrid.loaderStopped = true;
+                            }
                         }
 
                         setTabStyle();
