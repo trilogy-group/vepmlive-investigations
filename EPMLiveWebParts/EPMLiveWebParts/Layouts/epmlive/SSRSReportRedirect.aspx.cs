@@ -103,8 +103,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 {
                     var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
                     var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
-                    SSRS.CookieContainer = new CookieContainer();
-                    SSRS.CookieContainer.Add(fedAuth);
+                    _srs2006.CookieContainer = new CookieContainer();
+                    _srs2006.CookieContainer.Add(fedAuth);
                 }
                 catch { }
 
