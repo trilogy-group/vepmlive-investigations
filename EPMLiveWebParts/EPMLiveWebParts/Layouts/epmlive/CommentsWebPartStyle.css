@@ -434,8 +434,7 @@ div.ms-TagCloudLink a:hover {
 .ms-socialCommentItem {
     width: 100%;
     font-size: 8pt;
-    font-family: verdana;
-    font-family: Open Sans Regular !important;
+    font-family: 'Open Sans Regular',Segoe UI,Verdana !important;
 }
 
     .ms-socialCommentItem .socialcomment-top {
