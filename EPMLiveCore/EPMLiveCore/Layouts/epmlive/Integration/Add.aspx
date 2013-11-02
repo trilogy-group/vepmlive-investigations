@@ -24,7 +24,7 @@
 <table align="center">
     <tr>
         <td>
-            <h3>Select Your Integration</h3>
+            
             <%=Integrations %>
             <br />
             <TABLE width="100%">
