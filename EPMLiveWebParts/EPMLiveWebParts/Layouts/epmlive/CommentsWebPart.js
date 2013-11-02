@@ -403,7 +403,7 @@ function GetData() {
 
                                             if (currentComments.length > parseInt(maxComments)) {
                                                 var showAllButton = '<div style=\"margin-top: 1px;padding-left:5px;padding:3px;font-size:8pt;\">' +
-                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">Show all</a>' +
+                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">show all</a>' +
                                                                     '</div>';
 
                                                 $('#callout_' + oComment['@listId'] + '_' + oComment['@itemId']).append(
@@ -667,7 +667,7 @@ function GetData() {
 
                                             if (currentComments.length > parseInt(maxComments)) {
                                                 var showAllButton = '<div style=\"margin-top: 1px;padding-left:5px;padding:3px;font-size:8pt;\">' +
-                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">Show all</a>' +
+                                                                        '<a id=\"lnkshowAll_##listId##_##itemId##" href="#" onclick="window.commentsWebPart.ShowAllComments($(this));">show all</a>' +
                                                                     '</div>';
 
                                                 $('#callout_' + oComment['@listId'] + '_' + oComment['@itemId']).append(
@@ -1145,7 +1145,7 @@ function GetData() {
         }
 
         $$.ShowAllComments = function (element) {
-            if (element.text() == "Show All") {
+            if (element.text() == "show all") {
                 var ctrlId = element.attr('id');
                 var ctrlSuffix = ctrlId.substr(ctrlId.indexOf('_') + 1);
                 $('div[item="' + ctrlSuffix + '"]').each(function () {
@@ -1153,7 +1153,7 @@ function GetData() {
                         $(this).css('display', '');
                     }
                 });
-                element.text('Hide Extra');
+                element.text('hide extra');
             } else {
                 var ctrlId = element.attr('id');
                 var ctrlSuffix = ctrlId.substr(ctrlId.indexOf('_') + 1);
@@ -1162,7 +1162,7 @@ function GetData() {
                         $(this).css('display', 'none');
                     }
                 });
-                element.text('Show All');
+                element.text('show all');
             }
         };
 
