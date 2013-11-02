@@ -1159,10 +1159,12 @@ function registerEpmLiveResourceGridScript() {
 
                                 setTabStyle();
                                 
-                                if (!epmLiveResourceGrid.loaderStopped) {
-                                    $(document.getElementById("s4-ribbonrow")).height(126);
-                                    window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
-                                    epmLiveResourceGrid.loaderStopped = true;
+                                if (window.epmLiveMasterPageVersion >= 5.5) {
+                                    if (!epmLiveResourceGrid.loaderStopped) {
+                                        $(document.getElementById("s4-ribbonrow")).height(126);
+                                        window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
+                                        epmLiveResourceGrid.loaderStopped = true;
+                                    }
                                 }
                             } catch (ex) {
                             }
@@ -1831,6 +1833,15 @@ function registerEpmLiveResourceGridScript() {
 
             if (!webPartHeight) {
                 maxHeight = $('#s4-workspace').height() - ($('#s4-titlerow').height() + $('#EPMLiveStatusbar').height() + $('#EPMLiveStatusbarTemplate').height() + $('#EPMLiveStatuTemplate').height() + $('#s4-statusbarcontainer').height() + offset) - 100;
+            }
+
+            if (!window.epmLiveMasterPageVersion || window.epmLiveMasterPageVersion < 5.5) {
+                if ($$.loader) {
+                    $$$.utils.fireEvent(document.getElementById('MSOZoneCell_WebPart' + $$.webpartQualifier), 'mouseup');
+                    $$.loader.close();
+                } else {
+                    $('#ResourceGridLoader').hide();
+                }
             }
 
             grid.MaxVScroll = maxHeight;
