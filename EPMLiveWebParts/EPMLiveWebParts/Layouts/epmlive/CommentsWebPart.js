@@ -2,6 +2,7 @@
 
 function GetData() {
     (function ($$, $, undefined) {
+      
         var loadingDiv = "<div class=\"workingNewComment\" id=\"divWorkingNewComment\">" +
                                     "<IMG style=\"VERTICAL-ALIGN: middle; margin-left:40%;\" title=\"Loading...\" alt=\"Loading...\" src=\"/_layouts/images/progress-circle-24.gif\">&nbsp;" +
                                     "<SPAN style=\"TEXT-ALIGN: center; WHITE-SPACE: nowrap; COLOR: black; VERTICAL-ALIGN: middle; OVERFLOW: hidden;font-family:Verdana;font-size:12px;color:#686868;\">Loading...</SPAN>" +
@@ -332,6 +333,7 @@ function GetData() {
                             loadedItemIds += ',' + responseJson.Result.Comments.LoadedIds;
 
                             if (responseJson.Result.Comments && responseJson.Result.Comments.CommentItem) {
+
                                 var comments;
                                 if (!responseJson.Result.Comments.CommentItem.length) {
                                     comments = [responseJson.Result.Comments.CommentItem];
@@ -555,6 +557,7 @@ function GetData() {
                                     }
 
                                 }
+
                             }
 
                         } else {
@@ -594,6 +597,7 @@ function GetData() {
                             loadedItemIds = responseJson.Result.Comments.LoadedIds;
 
                             if (responseJson.Result.Comments && responseJson.Result.Comments.CommentItem) {
+                   
                                 var comments;
                                 if (!responseJson.Result.Comments.CommentItem.length) {
                                     comments = [responseJson.Result.Comments.CommentItem];
@@ -820,6 +824,8 @@ function GetData() {
                                     }
 
                                 }
+
+                                
                             }
                             else {
                                 $('#divNoCommentIndicator').css('display', '');
@@ -865,6 +871,7 @@ function GetData() {
             // <Param key="ItemId">12</Param>
             // <Param key="Comment">abcabac</Param>
             // </Data>
+
             $('#tbCommentInput' + itemId).find('p').last().each(function () {
                 var $this = $(this);
                 if ($this.html().replace(/\s|&nbsp;/g, '').length == 0)
@@ -906,13 +913,10 @@ function GetData() {
                                 setTimeout(function () { $('#' + containerId).prevAll(".subitem:first").fadeIn(1500); }, 0);
 
                                 setTimeout(function () {$('#tbCommentInput' + itemId).empty();}, 0);
-                                setTimeout(function () {$('#tbCommentInput' + itemId).fadeOut(1500);}, 0);
-                                setTimeout(function () {$('#btnNewComment' + itemId).parent().fadeOut(1500);}, 0);
+                                setTimeout(function () {$('#tbCommentInput' + itemId).css('display', 'none');}, 0);
+                                setTimeout(function () {$('#btnNewComment' + itemId).parent().css('display', 'none');}, 0);
 
                                 setTimeout(function () { $('#aNewCommentReply' + itemId).fadeIn(1500); }, 0);
-                                
-
-                                
                             }
                         }
                     },
@@ -935,7 +939,7 @@ function GetData() {
             // <Param key="ItemId">12</Param>
             // <Param key="Comment">abcabac</Param>
             // </Data>
-           
+
             $('#divLoaderPublic_CommentsWebPart').css('display', '');
             $('#divNoCommentIndicator').css('display', 'none');
 
@@ -1198,6 +1202,7 @@ function GetData() {
 
         $(function () {
             $('#btnGeneralPost').click(function () {
+               
                 $('#inputPublicComment').find('p').last().each(function () {
                     var $this = $(this);
                     if ($this.html().replace(/\s|&nbsp;/g, '').length == 0)
