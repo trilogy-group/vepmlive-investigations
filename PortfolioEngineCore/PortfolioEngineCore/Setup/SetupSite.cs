@@ -162,7 +162,7 @@ namespace PortfolioEngineCore.Setup
             RunDBScript("02_CRTINDS", Properties.Resources._02_PE_CRTINDS);
             RunDBScript("04_CRTSPS", Properties.Resources._04_PE_CRTSPS);
             RunDBScript("05_CRTVWS", Properties.Resources._05_PE_CRTVWS);
-            //RunDBScript("06_DATA", Properties.Resources._06_DATA);
+            RunDBScript("07_DATA", Properties.Resources._07_PE_DATA);
 
             foreach(DataScript script in DataScripts)
             {
@@ -208,7 +208,7 @@ namespace PortfolioEngineCore.Setup
             RunDBScript("02_CRTINDS", Properties.Resources._02_PE_CRTINDS);
             RunDBScript("04_CRTSPS", Properties.Resources._04_PE_CRTSPS);
             RunDBScript("05_CRTVWS", Properties.Resources._05_PE_CRTVWS);
-            
+            RunDBScript("07_DATA", Properties.Resources._07_PE_DATA);
         }
 
         private void RunDBScript(string scriptname, string script)
