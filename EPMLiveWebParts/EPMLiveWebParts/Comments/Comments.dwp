@@ -20,7 +20,7 @@
   <Title>Comment Stream</Title>
   <Description></Description>
   <PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
-  <NumThreads xmlns="Comments">5</NumThreads>
-  <MaxComments xmlns="Comments">5</MaxComments>
-  <DefaultHeight xmlns="Comments">500</DefaultHeight>
+  <NumThreads xmlns="Comments">4</NumThreads>
+  <MaxComments xmlns="Comments">2</MaxComments>
+  <DefaultHeight xmlns="Comments">600</DefaultHeight>
 </WebPart>
