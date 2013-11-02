@@ -2,7 +2,7 @@
 
 function GetData() {
     (function ($$, $, undefined) {
-      
+        var newPubComListAndIds = '';
         var loadingDiv = "<div class=\"workingNewComment\" id=\"divWorkingNewComment\">" +
                                     "<IMG style=\"VERTICAL-ALIGN: middle; margin-left:40%;\" title=\"Loading...\" alt=\"Loading...\" src=\"/_layouts/images/progress-circle-24.gif\">&nbsp;" +
                                     "<SPAN style=\"TEXT-ALIGN: center; WHITE-SPACE: nowrap; COLOR: black; VERTICAL-ALIGN: middle; OVERFLOW: hidden;font-family:Verdana;font-size:12px;color:#686868;\">Loading...</SPAN>" +
@@ -276,6 +276,9 @@ function GetData() {
                         if (window.epmLive.responseIsSuccess(responseJson.Result)) {
                             var data = '<Data>';
                             data += '<Param key="NumThreads">' + numThreads + '</Param>';
+                            if (newPubComListAndIds) {
+                                loadedItemIds += newPubComListAndIds;
+                            }
                             data += '<Param key="LoadedItemIds">' + loadedItemIds + '</Param>';
                             if (responseJson.Result.Notifications) {
                                 data += '<Param key="ItemIds">';
@@ -293,6 +296,7 @@ function GetData() {
                                         }
                                     }
                                 }
+
                                 data += '</Param>';
                             }
                             data += '</Data>';
@@ -965,6 +969,8 @@ function GetData() {
                         if (response.d) {
                             var responseJson = window.epmLive.parseJson(response.d);
                             if (window.epmLive.responseIsSuccess(responseJson.Result)) {
+
+                                newPubComListAndIds += (',' + responseJson.Result.Comments.PublicCommentItem['@listId'] + '^' + responseJson.Result.Comments.PublicCommentItem['@itemId']);
 
                                 var publicCommentItem = HiddenPublicCommentTemp.replace(/##itemId##/g, responseJson.Result.Comments.PublicCommentItem['@itemId'])
                                                                   .replace(/##userPicUrl##/g, userPicUrl)
