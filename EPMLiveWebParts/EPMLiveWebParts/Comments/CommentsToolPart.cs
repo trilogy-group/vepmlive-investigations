@@ -47,7 +47,7 @@ namespace EPMLiveWebParts.Comments
 
             output.Write("<tr>");
             output.Write("<td>");
-            output.Write("Default height(px): \r\n <input type=\"text\" id=\"tbDefaultHeight\" name=\"tbDefaultHeight\" value=\"" + myWP.DefaultHeight.ToString() + "\" />");
+            output.Write("Default height(px): \r\n <input type=\"text\" id=\"tbDefaultHeight\" name=\"tbDefaultHeight\" value=\"" + ((myWP.DefaultHeight != null) ? myWP.DefaultHeight.ToString() : "500") + "\" />");
             output.Write("</td>");
             output.Write("</tr>");
 
