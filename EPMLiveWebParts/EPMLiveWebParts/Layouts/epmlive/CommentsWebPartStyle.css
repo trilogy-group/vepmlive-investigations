@@ -1,7 +1,4 @@
-﻿body {
-}
-
-.callout {
+﻿.callout {
     -moz-border-radius: 3px 3px 3px 3px !important;
     -webkit-border-radius: 3px 3px 3px 3px !important;
     background-color: #FAFAFA !important;
@@ -80,7 +77,6 @@
     overflow: hidden;
     /*max-width: 500px;*/
     padding-right: 10px;
-    border-top: 1px solid #DDDDDD;
 }
 
 .COuterContainer {
@@ -1018,6 +1014,7 @@ div.ms-taggedItems a.people {
 #wrapper {
     white-space: nowrap;
     height: 65px;
+    border-bottom: 1px solid #DDDDDD;
     padding-bottom: 10px;
 }
 

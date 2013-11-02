@@ -224,14 +224,16 @@ namespace EPMLiveWebParts.Comments
                                                 <img src='" + userPictureUrl + @"' class='circleborder' />
                                             </div>
 				                        </td>
-				                        <td valign='middle' colspan='2' align='left' style='width:100%;padding-left:8px;padding-right:5px;'>
-					                        <div id='whatsup' style='max-width:400px;display:inline-block;width:100%;'>
+				                        <td valign='middle' align='left' style='width:100%;padding-left:8px;padding-right:5px;'>
+					                        <div id='whatsup'>
                                                 <div class='comment-box'>
                                                     <div id='inputPublicComment' class='comment-paragraph' contenteditable='true'>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div style='display:inline-block;position:relative;top:-5px;margin-left:10px;' class='general-button-wrapper'><a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='text-decoration:none;'>Share</a></div>
+				                        </td>
+				                        <td valign='middle' align='left'>
+					                        <div class='general-button-wrapper'><a id='btnGeneralPost' href='#' class='btn-primary btn btn-small' style='text-decoration:none;'>Share</a></div>
 				                        </td>
 			                        </tr>
 		                        </tbody>
