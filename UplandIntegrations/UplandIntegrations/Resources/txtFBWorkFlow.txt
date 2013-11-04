@@ -284,6 +284,9 @@
                 //var xml = GetXML(routeId);
                 //LoadVisualWorkflow(routeId, xml);
 
+				document.getElementById("vr-load").style.display = "";
+				document.getElementById("vr-content").style.display = "none";
+
 				bSet = false;
 
 				$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + docId + ",routedobjecttype_6", function (routeobj) {

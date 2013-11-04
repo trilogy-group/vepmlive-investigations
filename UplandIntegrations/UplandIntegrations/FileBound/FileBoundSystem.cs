@@ -72,7 +72,7 @@ namespace UplandIntegrations.FileBound
                     }
                     else if (dc.ColumnName == "comment")
                     {
-                        dr[dc.ColumnName] = "You have a Workflow Task. Use the Worklow buttons to accept or reject your task.<br><br>Item: " + o.field[1];
+                        dr[dc.ColumnName] = "You have a Workflow Task. Use the Worklow buttons to accept or reject your task.<br><br>Item: " + o.field[0];
                     }
                     else if (dc.ColumnName == "stepName")
                     {
