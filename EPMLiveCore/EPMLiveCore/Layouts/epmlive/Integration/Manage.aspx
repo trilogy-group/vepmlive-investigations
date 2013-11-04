@@ -1,4 +1,4 @@
-﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
+﻿<%@ Assembly Name="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
@@ -8,9 +8,9 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Manage.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.Integration.Manage" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+    <link href="Manage.css" rel="stylesheet" type="text/css" />
     <script language="javascript">
-        function EditFields(list)
-        {
+        function EditFields(list) {
             var options = { url: "EditFields.aspx?LIST=" + list, width: 500, showClose: true };
 
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
@@ -35,7 +35,45 @@
 	    <AlternatingRowStyle CssClass="ms-alternating" />
 	</SharePoint:SPGridView><br /><br />
 
-    <a href="Add.aspx" style="text-decoration: none;">Add New App</a>
+    <a class="btn btn-success" style="text-decoration:none;" href="Add.aspx">Add New App</a>
+
+
+<script>
+
+    $("#ctl00_PlaceHolderMain_gvIntegrations").addClass("table");
+
+    $(".ms-vb").attr("width", "5%");
+
+    $(".ms-gb:first").find("td").css("padding-top", "0px");
+
+
+    $("img[alt*='Expand/Collapse']").attr("src", "/_layouts/15/epmlive/images/collapse.png");
+    $("img[alt*='Expand/Collapse']").css("position", "relative");
+    $("img[alt*='Expand/Collapse']").css("top", "2px");
+
+
+    $(".ms-core-menu-arrow").replaceWith("<span class='icon-arrow-down-15' style='padding-left:10px;font-size:14px;position:relative;top:1px;'></span>");
+    $("img[alt='Open Menu']").replaceWith("<span class='icon-pencil' style='padding-left:5px;font-size:10px;position:relative;top:-2px;'></span>");
+
+
+
+    $(".ms-gb").find("a").click(function () {
+        if ($(this).parent().parent().parent().parent().parent().parent().attr("isexp") == "true") {
+            $(this).find("img").attr("src", "/_layouts/15/epmlive/images/collapse.png");
+        }
+        else {
+            $(this).find("img").attr("src", "/_layouts/15/epmlive/images/expand.png");
+        }
+    });
+
+
+    $(".ms-unselectedtitle").click(function () {
+        $(".ms-core-menu-box").css("left", "0px");
+    });
+
+
+
+</script>
 
 </asp:Content>
 
