@@ -296,11 +296,9 @@
 
 						});
 										
-
 				});
 
-
-				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + routedItemId, function (ret) {
+				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + docId, function (ret) {
 						
 				});
 
