@@ -72,6 +72,7 @@
 			var fileId = "#fileId#";
 			var projectId = "#projectId#";
 			var IntUrl = "#inturl#";
+			var docId;
 
 			$.get("#proxyurl#", function (fbguid) {
 				
@@ -90,15 +91,15 @@
 									var p = eval(docs);
 									if(p.length > 0)
 									{
-										var docid = p[0].documentId;
+										docId = p[0].documentId;
 
-										$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + docid + ",routedobjecttype_6", function (routeobj) {
+										$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + docId + ",routedobjecttype_6", function (routeobj) {
 
 											var routId = routeobj[0].routeId;
 
 											 $.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
 
-														LoadVisualWorkflow(routId, docid, xml);
+														LoadVisualWorkflow(routId, docId, xml);
 
 												});
 										
@@ -285,13 +286,13 @@
 
 				bSet = false;
 
-				$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + routedItemId + ",routedobjecttype_6", function (routeobj) {
+				$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + docId + ",routedobjecttype_6", function (routeobj) {
 
 					var routId = routeobj[0].routeId;
 
 						$.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
 
-								LoadVisualWorkflow(routId, routedItemId, xml);
+								LoadVisualWorkflow(routId, docId, xml);
 
 						});
 										
