@@ -3470,8 +3470,13 @@ namespace EPMLiveWebParts
                 }
                 output.WriteLine("mygrid" + sFullGridId + ".enableAutoHeight(true," + h + ",true);");
             }
-            output.WriteLine("mygrid" + sFullGridId + ".enableSmartRendering(true);");
-            output.Write("mygrid" + sFullGridId + ".enableSmartXMLParsing(true);");
+
+            if (view.RowLimit > 100 || view.RowLimit <= 0)
+            {
+                output.WriteLine("mygrid" + sFullGridId + ".enableSmartRendering(true);");
+                output.Write("mygrid" + sFullGridId + ".enableSmartXMLParsing(true);");
+            }
+
             output.Write("mygrid" + sFullGridId + ".setAwaitedRowHeight(30);");
             
             output.Write("mygrid" + sFullGridId + ".setImageSize(1,1);");
