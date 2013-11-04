@@ -132,6 +132,18 @@ function getTop(obj) {
     return posY;
 }
 
+function getLeft(obj) {
+    var posY = obj.offsetLeft;
+
+    while (obj.offsetParent) {
+        posY = posY + obj.offsetParent.offsetLeft;
+        if (obj == document.getElementsByTagName('body')[0]) { break }
+        else { obj = obj.offsetParent; }
+    }
+
+    return posY;
+}
+
 function ShowResGrid() {
     if (isQueryShowResGrid()) {
         try {

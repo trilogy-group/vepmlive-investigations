@@ -822,6 +822,7 @@
     function setHeight(a, b, c) {
         //dhxLayout.cells("b").setHeight((getHeight() - getTop(document.getElementById("parentId"))));
         document.getElementById("parentId").style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
+
         document.getElementById("parentId").style.width = (getWidth() - 100) + "px";
         
         dhxLayout.setSizes();
