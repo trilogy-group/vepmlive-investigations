@@ -52,7 +52,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             propertyNameListMenu2.Controls.Add(testMenu7);
 
             this.Controls.Add(propertyNameListMenu2);
-
+            
             
 
             //===================================================================================
@@ -62,6 +62,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             colMenu.MenuTemplateId = "IntegrationGroupMenu";
             colMenu.TokenNameAndValueFields = "LISTID=LIST_ID";
             colMenu.SortExpression = "ListName";
+            colMenu.MenuFormat = MenuFormat.ArrowAlwaysVisible;
 
             gvIntegrations.GroupMenu = colMenu;
 
