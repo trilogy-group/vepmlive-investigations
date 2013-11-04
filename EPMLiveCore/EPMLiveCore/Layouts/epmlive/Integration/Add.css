@@ -22,6 +22,10 @@ background-color: #47a447;
 border-color: #398439;
 }
 
+#integrations-table table {
+padding-bottom:30px;
+}
+
 
 .btn-success {
 color: #fff;
