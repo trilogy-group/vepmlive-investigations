@@ -78,7 +78,8 @@
 			var docId = "#fileId#";
 			var projectId = "#projectId#";
 			var IntUrl = "#inturl#";
-			
+			var bSet = false;
+
 			$.get("#proxyurl#", function (fbguid) {
 				
 				Param = "guid=" + fbguid + "&fbsite=" + FBSiteURL;
