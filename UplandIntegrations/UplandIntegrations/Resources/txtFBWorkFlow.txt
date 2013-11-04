@@ -279,10 +279,26 @@
                 //}
 
                 // reload the diagram:
-                var routeId = $("#ddlRoutes option:selected").val();
-                var xml = GetXML(routeId);
-                LoadVisualWorkflow(routeId, xml);
+                //var routeId = $("#ddlRoutes option:selected").val();
+                //var xml = GetXML(routeId);
+                //LoadVisualWorkflow(routeId, xml);
+
 				bSet = false;
+
+				$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + routedItemId + ",routedobjecttype_6", function (routeobj) {
+
+					var routId = routeobj[0].routeId;
+
+						$.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
+
+								LoadVisualWorkflow(routId, routedItemId, xml);
+
+						});
+										
+
+				});
+
+
 				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + routedItemId, function (ret) {
 						
 				});

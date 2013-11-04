@@ -269,7 +269,7 @@
                 return "";
             }
 
-            function TaskButtonCallback(action, url) {
+            function TaskButtonCallback(action, url, routedItemId) {
                 // for anything other than "set due date" (action -9999),
                 // load the next routed item into view:
                 //                    if (action != "-9999") {
@@ -281,11 +281,27 @@
                 //}
 
                 // reload the diagram:
-                var routeId = $("#ddlRoutes option:selected").val();
-                var xml = GetXML(routeId);
-                LoadVisualWorkflow(routeId, xml);
+                //var routeId = $("#ddlRoutes option:selected").val();
+                //var xml = GetXML(routeId);
+                //LoadVisualWorkflow(routeId, xml);
 
-				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + fileId, function (ret) {
+				bSet = false;
+
+				$.get(WebAPIUrl + "routeditems/?" + Param +"&filter=routedobjectid_" + routedItemId + ",routedobjecttype_6", function (routeobj) {
+
+					var routId = routeobj[0].routeId;
+
+						$.get(WebAPIUrl + "routes/" + routId + "/xml?" + Param, function (xml) {
+
+								LoadVisualWorkflow(routId, routedItemId, xml);
+
+						});
+										
+
+				});
+
+
+				$.get(IntUrl + "?integrationkey=#associatedkey#&ID=" + routedItemId, function (ret) {
 						
 				});
 
