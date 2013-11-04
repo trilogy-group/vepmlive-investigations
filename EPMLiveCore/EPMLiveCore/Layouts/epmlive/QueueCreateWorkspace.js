@@ -98,7 +98,7 @@ function registerCreateWorkspace2Script() {
                             "<Param key=\"TemplateSource\">" + self.templateSource() + "</Param>" +
                             "<Param key=\"TemplateItemId\">" + self.templateItemId() + "</Param>" +
                             "<Param key=\"IncludeContent\">True</Param>" +
-                            "<Param key=\"SiteTitle\">" + self.workspaceTitle().replace(/[^a-zA-Z 0-9]+/g, '') + "</Param>" +
+                            "<Param key=\"SiteTitle\">" + self.workspaceTitle().replace(/[^a-zA-Z 0-9]+/g, '').trim() + "</Param>" +
                             "<Param key=\"SolutionName\">" + self.solutionName() + "</Param>" +
                             "<Param key=\"UniquePermission\">" + self.uniquePermission() + "</Param>" +
                             "<Param key=\"AttachedItemId\">" + self.itemId() + "</Param>" +
