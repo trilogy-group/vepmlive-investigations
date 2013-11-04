@@ -320,9 +320,9 @@ namespace UplandIntegrations.PowerSteering
                     new IntegrationControl
                     {
                         Control = "PS_ProjectInfo",
-                        Title = "Project Summary",
+                        Title = "Project Information",
                         Image = "ps_projectinfo.png",
-                        Window = IntegrationControlWindowStyle.SmallDialog
+                        Window = IntegrationControlWindowStyle.FullDialog
                     }
                 };
             }
