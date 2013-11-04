@@ -1247,7 +1247,7 @@ function GetData() {
             $("#inputPublicComment").keyup(function () {
              
                 if ($(this).height() == 16) {
-                    $('#wrapper').css('padding-bottom', '10px');
+                    $('#wrapper').css('padding-bottom', '15px');
                 }
                 else if ($(this).height() == 32) {
                     $('#wrapper').css('padding-bottom', '18px');
