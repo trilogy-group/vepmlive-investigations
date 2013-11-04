@@ -63,7 +63,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
             colMenu.TokenNameAndValueFields = "LISTID=LIST_ID";
             colMenu.SortExpression = "ListName";
             colMenu.MenuFormat = MenuFormat.ArrowAlwaysVisible;
-
+            
             gvIntegrations.GroupMenu = colMenu;
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
