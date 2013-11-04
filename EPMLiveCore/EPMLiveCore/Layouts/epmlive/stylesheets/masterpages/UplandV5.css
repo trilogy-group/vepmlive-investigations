@@ -16,6 +16,10 @@
     padding: 0 !important;
 }
 
+.ms-core-brandingText {
+    display:none;
+}
+
 .ms-welcome-root > a.ms-core-menu-root, .ms-signInLink {
     color: #FFFFFF;
     font-family: Open Sans Regular, arial;
