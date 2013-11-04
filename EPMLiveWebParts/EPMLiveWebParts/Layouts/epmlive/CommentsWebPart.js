@@ -1260,7 +1260,14 @@ function GetData() {
             $('#inputPublicComment').html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
 
             // dynamically set max width
-            $('#whatsup').css('max-width', $('#whatsup').width() + 'px');
+            if ($('#commentTblc2').width() > 500) {
+                $('#commentTblc2').css('width', '500px');
+                $('#whatsup').css('max-width', '500px');
+            }
+            else {
+                $('#commentTblc2').css('width', '100%');
+                $('#whatsup').css('max-width', $('#whatsup').width() + 'px');
+            }
         });
 
     })(window.commentsWebPart = window.commentsWebPart || {}, jQuery);
