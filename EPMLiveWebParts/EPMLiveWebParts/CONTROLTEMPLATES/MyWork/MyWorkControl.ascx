@@ -16,8 +16,8 @@
                 $(function() {
                     $('#MWG_Loader_<%= WebPartId %>').hide();
 
-                    var url = (document.location.href + '').toLowerCase();
-                    if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
+                    var url = (document.location.href + '').toLowerCase().replace('%20','').replace(' ','');
+                    if (url.indexOf('mywork.aspx') !== -1) {
 
                         function showLoading() {
                             EPM.UI.Loader.current().startLoading({ id: 'WebPart<%= Qualifier %>', page: true, coverRibbon: true });

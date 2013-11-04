@@ -55,8 +55,8 @@ Grids.OnReady = function (grid, start) {
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
 
         if (window.epmLiveMasterPageVersion >= 5.5) {
-            var url = (document.location.href + '').toLowerCase();
-            if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
+            var url = (document.location.href + '').toLowerCase().replace('%20', '').replace(' ', '');
+            if (url.indexOf('mywork.aspx') === -1) {
                 window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
             }
         } else {
