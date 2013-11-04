@@ -170,7 +170,7 @@ namespace EPMLiveCore
                 string childitem = "";
                 try
                 {
-                    childitem = ListItem["ChildItem"].ToString();
+                    childitem = ListItem["WorkspaceUrl"].ToString();
                 }
                 catch { }
 
