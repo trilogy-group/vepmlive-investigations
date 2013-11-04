@@ -3972,7 +3972,7 @@ namespace EPMLiveWebParts
             {
                 output.WriteLine("var objStsSync = GetStssyncData('tasks','Client', '', '/_layouts/images/menu');");
                 string listurl = EncodeNonAsciiCharacters(System.IO.Path.GetDirectoryName(list.DefaultViewUrl).Replace("\\", "/"));
-                output.WriteLine("mygrid" + sFullGridId + "._outlookexport = \"javaScript:ExportHailStorm('tasks','" + EncodeNonAsciiCharacters(web.Url) + "','{" + list.ID.ToString().ToUpper() + "}','" + web.Title + "','" + list.Title + "','" + listurl + "','','" + listurl + "')\";");
+                output.WriteLine("mygrid" + sFullGridId + "._outlookexport = \"javaScript:ExportHailStorm('tasks','" + EncodeNonAsciiCharacters(web.Url) + "','{" + list.ID.ToString().ToUpper() + "}','" + HttpUtility.UrlEncode(web.Title) + "','" + HttpUtility.UrlEncode(list.Title) + "','" + listurl + "','','" + listurl + "')\";");
             }
             else
                 output.WriteLine("mygrid" + sFullGridId + "._outlookexport = '';");
