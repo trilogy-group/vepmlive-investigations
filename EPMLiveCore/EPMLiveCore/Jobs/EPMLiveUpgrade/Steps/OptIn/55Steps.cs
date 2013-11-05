@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using EPMLiveCore.Infrastructure;
@@ -273,6 +274,135 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 3.0, Description = "Updating List Icons", IsOptIn = true)]
+    internal class UpdateListIcon55 : UpgradeStep
+    {
+        #region Fields (1) 
+
+        private readonly Dictionary<string, string> _listIcons;
+
+        #endregion Fields 
+
+        #region Constructors (1) 
+
+        public UpdateListIcon55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
+        {
+            _listIcons = new Dictionary<string, string>
+            {
+                {"Project Portfolios", "icon-notebook"},
+                {"Project Center", "icon-briefcase-3"},
+                {"Task Center", "icon-checkbox-checked"},
+                {"Issues", "icon-warning"},
+                {"Project Documents", "icon-libreoffice"},
+                {"Resources", "icon-user-3"},
+                {"Time Off", "icon-calendar-4"},
+                {"To Do", "icon-list-5"}
+            };
+        }
+
+        #endregion Constructors 
+
+        #region Methods (1) 
+
+        // Private Methods (1) 
+
+        private void UpdateListIcon(Guid siteId, Guid webId)
+        {
+            SPWebCollection webCollection;
+
+            using (var spSite = new SPSite(siteId))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(webId))
+                {
+                    LogTitle(GetWebInfo(spWeb), 1);
+
+                    foreach (var listIcon in _listIcons)
+                    {
+                        try
+                        {
+                            SPList spList = spWeb.Lists.TryGetList(listIcon.Key);
+
+                            if (spList != null)
+                            {
+                                LogTitle(GetListInfo(spList), 2);
+
+                                LogTitle("Icon: " + listIcon.Value, 3);
+
+                                var settings = new GridGanttSettings(spList);
+                                if (string.IsNullOrEmpty(settings.ListIcon) || settings.ListIcon.Equals("icon-square"))
+                                {
+                                    settings.ListIcon = listIcon.Value;
+                                    if (settings.SaveSettings(spList))
+                                    {
+                                        LogMessage(string.Empty, MessageKind.SUCCESS, 4);
+                                    }
+                                    else
+                                    {
+                                        LogMessage("Could not save the icon.", MessageKind.FAILURE, 4);
+                                    }
+                                }
+                                else
+                                {
+                                    LogMessage("The icon is already set to: " + settings.ListIcon, MessageKind.SKIPPED,
+                                        4);
+                                }
+                            }
+                            else
+                            {
+                                LogMessage("The list " + listIcon.Key + " does not exists.", MessageKind.SKIPPED, 3);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            LogMessage(e.Message, MessageKind.FAILURE, 2);
+                        }
+                    }
+
+                    webCollection = spWeb.Webs;
+                }
+            }
+
+            if (webCollection == null) return;
+
+            foreach (SPWeb spWeb in webCollection)
+            {
+                UpdateListIcon(siteId, spWeb.ID);
+            }
+        }
+
+        #endregion Methods 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                Guid siteId;
+                Guid webId;
+
+                using (var spSite = new SPSite(Web.Site.ID))
+                {
+                    using (SPWeb spWeb = spSite.OpenWeb())
+                    {
+                        siteId = spSite.ID;
+                        webId = spWeb.ID;
+                    }
+                }
+
+                UpdateListIcon(siteId, webId);
             }
             catch (Exception e)
             {
