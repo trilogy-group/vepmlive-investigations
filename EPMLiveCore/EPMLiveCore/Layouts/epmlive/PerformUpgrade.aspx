@@ -13,7 +13,7 @@
     
     <script type="text/javascript">
 
-        dhtmlxAjax.post("Upgraders/proxy.aspx", "Action=Start", StartClose);
+        dhtmlxAjax.post("<%= ProxyUrl %>", "Action=Start", StartClose);
 
         var jobuid = "";
 

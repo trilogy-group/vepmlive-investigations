@@ -419,6 +419,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\44Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
     <Compile Include="Jobs\Integration.cs" />
     <Compile Include="Jobs\Notifications.cs" />
@@ -1161,6 +1162,13 @@
     <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs">
       <DependentUpon>UpgradeResult.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx.cs">
+      <DependentUpon>OptInUpgrade55.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx.designer.cs">
+      <DependentUpon>OptInUpgrade55.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
       <DependentUpon>proxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1695,6 +1703,9 @@
       <DependentUpon>EPMLive.Notifications.v2.js</DependentUpon>
     </None>
     <None Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\EPMLive.Upgrader.min.js.map">
+      <DependentUpon>EPMLive.Upgrader.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
@@ -3293,6 +3304,7 @@
     <Content Include="Layouts\epmlive\images\comments32.png" />
     <Content Include="Layouts\epmlive\images\commonactions.gif" />
     <Content Include="Layouts\epmlive\images\Create.png" />
+    <Content Include="Layouts\epmlive\images\createworkspace.png" />
     <Content Include="Layouts\epmlive\images\delete.GIF" />
     <Content Include="Layouts\epmlive\images\deleteteam.png" />
     <Content Include="Layouts\epmlive\images\down.gif" />
@@ -3304,6 +3316,7 @@
     <Content Include="Layouts\epmlive\images\epmlivelogo-white.png" />
     <Content Include="Layouts\epmlive\images\error.png" />
     <Content Include="Layouts\epmlive\images\feedback.gif" />
+    <Content Include="Layouts\epmlive\images\gotoworkspace.png" />
     <Content Include="Layouts\epmlive\images\green-arrow.png" />
     <Content Include="Layouts\epmlive\images\info.png" />
     <Content Include="Layouts\epmlive\images\installapplication16.gif" />
@@ -3323,6 +3336,8 @@
     <Content Include="Layouts\epmlive\images\integration\tenrox.png" />
     <Content Include="Layouts\epmlive\images\iReportsLibrary.png" />
     <Content Include="Layouts\epmlive\images\itemworkspace.png" />
+    <Content Include="Layouts\epmlive\images\ittask.png" />
+    <Content Include="Layouts\epmlive\images\JiraPM.png" />
     <Content Include="Layouts\epmlive\images\left.GIF" />
     <Content Include="Layouts\epmlive\images\link.GIF" />
     <Content Include="Layouts\epmlive\images\linkeditems.gif" />
@@ -3361,6 +3376,8 @@
     <Content Include="Layouts\epmlive\images\ReportFilterViewCreator\HeaderLeftColumnBodyLayout.gif" />
     <Content Include="Layouts\epmlive\images\ReportFilterViewCreator\HeaderRightColumnBodyLayout.gif" />
     <Content Include="Layouts\epmlive\images\resources32.png" />
+    <Content Include="Layouts\epmlive\images\ribbon16.png" />
+    <Content Include="Layouts\epmlive\images\ribbon32.png" />
     <Content Include="Layouts\epmlive\images\right.GIF" />
     <Content Include="Layouts\epmlive\images\screens.png" />
     <Content Include="Layouts\epmlive\images\scrollto.gif" />
@@ -3421,6 +3438,10 @@
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Notifications.v2.min.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.js" />
     <Content Include="Layouts\epmlive\javascripts\EPMLive.TemplateVersoning.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Upgrader.js" />
+    <Content Include="Layouts\epmlive\javascripts\EPMLive.Upgrader.min.js">
+      <DependentUpon>EPMLive.Upgrader.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor-ie8.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.js" />
@@ -3570,6 +3591,10 @@
     <Content Include="Layouts\epmlive\stylesheets\statusbar.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.css" />
     <Content Include="Layouts\epmlive\stylesheets\tooltip.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\upgrader.css" />
+    <Content Include="Layouts\epmlive\stylesheets\upgrader.min.css">
+      <DependentUpon>upgrader.css</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\synchperiods.aspx" />
     <Content Include="Layouts\epmlive\TemplateGalleryRedirect.aspx" />
     <Content Include="Layouts\epmlive\timersettings.aspx" />
@@ -3805,6 +3830,7 @@
     <Content Include="Layouts\epmlive\unsealfields.aspx" />
     <Content Include="Layouts\epmlive\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\UpgradeResult.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />

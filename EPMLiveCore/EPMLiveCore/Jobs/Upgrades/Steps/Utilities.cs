@@ -27,6 +27,8 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps
             {
                 case "4.3.0":
                     return 200;
+                case "5.5.0":
+                    return 201;
             }
             return 0;
         }

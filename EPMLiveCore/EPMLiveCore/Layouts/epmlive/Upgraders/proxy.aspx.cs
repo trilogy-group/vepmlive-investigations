@@ -61,7 +61,18 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
                     outputData("Success", "", "0");
                 else
                 {
-                    Guid jobuid = API.Timer.AddTimerJob(Web.Site.ID, Web.ID, "Upgrader", jobtype, Jobs.Upgrades.Steps.Utilities.GetJobName(Request["V"]), "", -1, 9, "");
+                    Guid jobuid;
+
+                    var version = Request["V"] ?? string.Empty;
+
+                    if (jobtype == 201 && version.Equals("5.5.0"))
+                    {
+                        jobuid = API.Timer.AddTimerJob(Web.Site.ID, Web.ID, "Opt-in Upgrader", jobtype, version, string.Empty, -1, 9, string.Empty);
+                    }
+                    else
+                    {
+                        jobuid = API.Timer.AddTimerJob(Web.Site.ID, Web.ID, "Upgrader", jobtype, Jobs.Upgrades.Steps.Utilities.GetJobName(version), "", -1, 9, "");   
+                    }
 
                     API.Timer.Enqueue(jobuid, 0, Web.Site);
 
