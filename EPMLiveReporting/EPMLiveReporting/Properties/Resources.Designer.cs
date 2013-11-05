@@ -86,7 +86,8 @@ namespace EPMLiveReportsAdmin.Properties {
         ///      @UserId AS INT,
         ///      @SiteId AS UNIQUEIDENTIFIER
         ///AS
-        ///BEGIN        /// [rest of string was truncated]&quot;;.
+        ///BEGIN
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CheckReqSP {
             get {

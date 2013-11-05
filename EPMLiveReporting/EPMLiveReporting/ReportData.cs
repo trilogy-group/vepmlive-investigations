@@ -1607,7 +1607,7 @@ namespace EPMLiveReportsAdmin
                     try
                     {
                         val = li["CommentCount"].ToString();
-                        param.Value = param.Value = Convert.ToInt32(val); 
+                        param.Value = Convert.ToInt32(val); 
                     }
                     catch { param.Value = DBNull.Value; }
                     break;
@@ -2367,7 +2367,7 @@ namespace EPMLiveReportsAdmin
 
                 if (commentersRows.Count == 0)
                 {
-                    result.Rows.Add(listId, "CommentCount", "NVarChar", "8001", "Integer", "CommentCount", "CommentCount");
+                    result.Rows.Add(listId, "CommentCount", "NVarChar", "0", "Integer", "CommentCount", "CommentCount");
                 }
             }
 
