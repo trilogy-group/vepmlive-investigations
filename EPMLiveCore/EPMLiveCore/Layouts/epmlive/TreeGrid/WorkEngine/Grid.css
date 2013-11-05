@@ -1105,7 +1105,8 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuNextIcon { background:url(Menu.gif) no-repeat right -300px; padding-right:10px; }
 .GMMenuNextIconRtl { background:url(Menu.gif) no-repeat left -900px; padding-left:10px; }
 
-.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font: 11px "Open Sans Regular",Arial;    padding: 4px; }
+
+.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font: 11px "Open Sans Regular",Arial; padding: 4px 20px 4px 4px; }
 .GMMenuItemDisabled { opacity:0.50; filter:alpha(opacity=30); overflow:hidden; }
 .GMMenuLevel { color:blue; text-align:center; }  
 .GMMenuEnumParent,.GMMenuEditParent { padding-left:5px; padding-right:2px;}
