@@ -1268,6 +1268,15 @@ function GetData() {
                 $('#commentTblc2').css('width', '100%');
                 $('#whatsup').css('max-width', $('#whatsup').width() + 'px');
             }
+
+            $('.commentsWPMainContainer').mouseleave(function () {
+                $(this).siblings('.slimScrollBar').css('display', 'none');
+            });
+
+            $('.commentsWPMainContainer').mouseover(function () {
+                $(this).siblings('.slimScrollBar').css('display', 'block');
+            });
+
         });
 
     })(window.commentsWebPart = window.commentsWebPart || {}, jQuery);
