@@ -1711,9 +1711,10 @@
                                             var title = lnk['@Title'];
 
                                             if (title !== 'Workspaces' && title !== 'New Workspace' && title !== 'Favorite Workspaces' && title !== 'All Workspaces') {
-                                                var registerWS = function() {
+                                                var registerWS = function () {
+                                                    var nl = window.epmLiveNavigation.buildLink(lnk);
+                                                    
                                                     if (window.epmLiveNavigation.buildLink) {
-                                                        var nl = window.epmLiveNavigation.buildLink(lnk);
                                                         var registered = false;
 
                                                         for (var i = 0; i < registeredLinks.length; i++) {
@@ -1738,34 +1739,35 @@
 
                                                                 if (nde.provider === providerName) {
                                                                     var workspaceTree = window.epmLiveNavigation.workspaceTree();
-                                                                    workspaceTree.trackChanges();
+                                                                    
+                                                                    if (!workspaceTree.findNodeByText(nl.title)) {
+                                                                        workspaceTree.trackChanges();
+                                                                        nde.registerWorkspace(nl, workspaceTree);
+                                                                        workspaceTree.commitChanges();
 
-                                                                    nde.registerWorkspace(nl, workspaceTree);
+                                                                        $('a.rtIn').each(function () {
+                                                                            var $a = $(this);
+                                                                            var text = $a.text();
 
-                                                                    workspaceTree.commitChanges();
+                                                                            if (text === nl.title) {
+                                                                                var $parent = $a.parent();
 
-                                                                    $('a.rtIn').each(function () {
-                                                                        var $a = $(this);
-                                                                        var text = $a.text();
+                                                                                $parent.append('<div id="' + workspaceTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
+                                                                                $a.remove();
 
-                                                                        if (text === nl.title) {
-                                                                            var $parent = $a.parent();
+                                                                                $a.text('');
+                                                                                $a.append('<span>' + text + '</span>');
+                                                                                $parent.find('.epm-nav-ws-node').append($a);
 
-                                                                            $parent.append('<div id="' + workspaceTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
-                                                                            $a.remove();
+                                                                                var $p = $a.parent();
 
-                                                                            $a.text('');
-                                                                            $a.append('<span>' + text + '</span>');
-                                                                            $parent.find('.epm-nav-ws-node').append($a);
+                                                                                $p.addClass('epm-nav-sortable');
+                                                                                $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
 
-                                                                            var $p = $a.parent();
-
-                                                                            $p.addClass('epm-nav-sortable');
-                                                                            $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
-
-                                                                            window.epmLiveNavigation.addFavoriteWSMenu($p);
-                                                                        }
-                                                                    });
+                                                                                window.epmLiveNavigation.addFavoriteWSMenu($p);
+                                                                            }
+                                                                        });
+                                                                    }
 
                                                                     break;
                                                                 }
