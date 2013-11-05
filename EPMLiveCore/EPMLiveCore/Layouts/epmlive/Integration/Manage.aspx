@@ -28,7 +28,7 @@
 	    AllowSorting="True"
 	    AllowPaging="False" OnRowDataBound="gvIntegrations_RowDataBound"  GridLines="None"  >
         <Columns>
-	        <SharePoint:SPMenuField HeaderText="Integration Name" TextFields="Title" MenuFormat="ArrowOnHover" MenuTemplateId="IntegrationMenu" TokenNameAndValueFields="INTLISTID=INT_LIST_ID,LISTID=LIST_ID" ></SharePoint:SPMenuField>
+	        <SharePoint:SPMenuField HeaderText="Integration Name" TextFields="Title" MenuTemplateId="IntegrationMenu" TokenNameAndValueFields="INTLISTID=INT_LIST_ID,LISTID=LIST_ID" ></SharePoint:SPMenuField>
             <SharePoint:SPBoundField HeaderText ="Description" DataField="Description"></SharePoint:SPBoundField>
             <SharePoint:SPBoundField HeaderText ="Active" DataField="Active"></SharePoint:SPBoundField>
 	    </Columns>
