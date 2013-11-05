@@ -3299,6 +3299,7 @@
     <Content Include="Layouts\epmlive\images\buildteam16.gif" />
     <Content Include="Layouts\epmlive\images\Bullhorn.png" />
     <Content Include="Layouts\epmlive\images\calc.gif" />
+    <Content Include="Layouts\epmlive\images\collapse.png" />
     <Content Include="Layouts\epmlive\images\comments16.gif" />
     <Content Include="Layouts\epmlive\images\comments16.png" />
     <Content Include="Layouts\epmlive\images\comments32.png" />
@@ -3315,6 +3316,7 @@
     <Content Include="Layouts\epmlive\images\epmlive-logo.png" />
     <Content Include="Layouts\epmlive\images\epmlivelogo-white.png" />
     <Content Include="Layouts\epmlive\images\error.png" />
+    <Content Include="Layouts\epmlive\images\expand.png" />
     <Content Include="Layouts\epmlive\images\feedback.gif" />
     <Content Include="Layouts\epmlive\images\gotoworkspace.png" />
     <Content Include="Layouts\epmlive\images\green-arrow.png" />
@@ -3419,6 +3421,7 @@
     <Content Include="Layouts\epmlive\Integration\IntegrationList.aspx" />
     <Content Include="Layouts\epmlive\Integration\Log.aspx" />
     <Content Include="Layouts\epmlive\Integration\Manage.aspx" />
+    <Content Include="Layouts\epmlive\Integration\Manage.css" />
     <Content Include="Layouts\epmlive\Integration\OpenControl.aspx" />
     <Content Include="Layouts\epmlive\Integration\Properties.aspx" />
     <Content Include="Layouts\epmlive\Integration\Proxy.aspx" />

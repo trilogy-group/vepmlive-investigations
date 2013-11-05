@@ -12,11 +12,11 @@
 <!--[if lte IE 7]><script src="/_layouts/15/epmlive/javascripts/icomoon-ie7.min.js"> </script><![endif]-->
 
 <sharepoint:StyleBlock runat="server">
-    .epm-nav-unpinned { margin-left: 50px !important; }
+    .epm-nav-unpinned { padding-left: 50px !important; }
 
-    .epm-nav-pinned { margin-left: 230px !important; }
+    .epm-nav-pinned { padding-left: 230px !important; }
 
-    .ms-dialog .epm-nav-pinned, .ms-dialog .epm-nav-unpinned { margin-left: auto !important; }
+    .ms-dialog .epm-nav-pinned, .ms-dialog .epm-nav-unpinned { padding-left: 0 !important; }
 </sharepoint:StyleBlock>
 
 <% if (Pinned)
@@ -25,13 +25,13 @@
     <Sharepoint:StyleBlock runat="server">
         #s4-ribbonrow,
         #s4-workspace {
-        margin-left: 230px;
+            padding-left: 230px;
         }
 
         .ms-dialog .epm-nav-pinned,
         .ms-dialog #s4-ribbonrow,
         .ms-dialog #s4-workspace {
-        margin-left: 0;
+            padding-left: 0;
         }
     </Sharepoint:StyleBlock>
 <%
@@ -41,13 +41,13 @@
     <Sharepoint:StyleBlock runat="server">
         #s4-ribbonrow,
         #s4-workspace {
-        margin-left: 50px;
+            padding-left: 50px;
         }
         
         .ms-dialog .epm-nav-unpinned,
         .ms-dialog #s4-ribbonrow,
         .ms-dialog #s4-workspace {
-        margin-left: 0;
+            paddig-left: 0;
         }
     </Sharepoint:StyleBlock>
 <% } %>
