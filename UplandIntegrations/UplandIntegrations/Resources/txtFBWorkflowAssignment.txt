@@ -201,6 +201,7 @@
 										document.getElementById("vr-content").style.display = "";
 										document.getElementById("vr-view").style.display = "";
 										document.getElementById("vr-load").style.display = "none";
+										$("#vwf-title").text(vwfData.comment);
                                 });
 								document.getElementById("vwf-workflow-container").style.display="none";
 								$("#vwf-main").css("height","80px");
@@ -208,7 +209,7 @@
 
                         });
 
-						$("#vwf-title").text(vwfData.comment);
+						
                     } else {
                         // no diagram
 

@@ -90,7 +90,6 @@ namespace UplandIntegrations.FileBound
                             dr[dc.ColumnName] = c.email;
                         }
                         catch { }
-
                     }
                     else if (dc.ColumnName == "dueDate")
                     {
