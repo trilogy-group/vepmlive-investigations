@@ -243,13 +243,13 @@ function registerCreateWorkspace2Script() {
                         //var r = result;
                         //parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, 'success');
                         try {
-                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success');
+                            setTimeout(function () { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success'); }, 300);
                         } catch (e) {}
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
                         //parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.invalid, errorThrown);
                         try {
-                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, errorThrown);
+                            setTimeout(function () { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, errorThrown); }, 300);
                         } catch(e) {}
                     }
                 });
@@ -431,7 +431,12 @@ function registerCreateWorkspace2Script() {
                     $('.modal-footer').hide();
                 }
 
-                w.setTimeout(function() { $('.titleInput').focus(); }, 10);
+                if (self.isStandAlone() === 'true') {
+                    $('.divTopSection').show();
+                    self.AutosizeDialog();
+                }
+
+                w.setTimeout(function () { $('.titleInput').focus(); }, 10);
             };
 
             self.pageInit();
