@@ -18,6 +18,11 @@
     function GoToApp() {
         parent.location.href = "../ChangeApp.aspx?appid=<%=Request["appid"] %>";
     }
+    
+    try {
+        $('body', window.parent.document).scrollTop(0);
+    } catch (e) {
+    }
 </script>
 
 </asp:Content>

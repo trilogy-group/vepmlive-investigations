@@ -29,20 +29,17 @@
     }
 
     function Install() {
-
         if(installEnabled)
             location.href = "Install.aspx?AppId=<%=Request["AppId"]%>&CommId=<%=Request["CommId"]%>&isdlg=1";
 
     }
 
     function ReCheck() {
-
         location.href = "PreCheck.aspx?AppId=<%=Request["AppId"]%>&CommId=<%=Request["CommId"]%>&isdlg=1";
 
     }
 
     function BackToCommunity() {
-
         location.href = "<%=sWebUrl%>";
 
     }
@@ -66,6 +63,10 @@
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
 
+    try {
+        $('body', window.parent.document).scrollTop(0);
+    } catch (e) {
+    }
 </script>
 </asp:Content>
 

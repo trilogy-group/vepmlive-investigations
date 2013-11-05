@@ -62,6 +62,11 @@
                     break;      
             };
         }
+
+        try {
+            $('body', window.parent.document).scrollTop(0);
+        } catch (e) {
+        }
     </script>
 
     <div style="width:100%; text-align:center; height:100%">

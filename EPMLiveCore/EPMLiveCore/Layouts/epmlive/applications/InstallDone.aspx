@@ -28,8 +28,7 @@
     }
 
     function Install() {
-
-        if(installEnabled)
+        if (installEnabled)
             location.href = "Install.aspx?AppId=<%=Request["AppId"]%>&isdlg=1";
 
     }
@@ -56,6 +55,11 @@
 
     function GoToApp() {
         parent.location.href = "../ChangeApp.aspx?appid=<%=newAppId %>";
+    }
+    
+    try {
+        $('body', window.parent.document).scrollTop(0);
+    } catch (e) {
     }
 
 </script>
