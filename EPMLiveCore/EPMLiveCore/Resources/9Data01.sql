@@ -1,6 +1,6 @@
 if not exists (select emailid from EMAILTEMPLATES where emailid = 2)
 begin
-    INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (2,'Build Team Grant','You have been granted access to a WorkEngine site','<html>
+    INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (2,'Build Team Grant','You have been granted access to an EPM Live site','<html>
 <body>
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr>
@@ -37,7 +37,7 @@ begin
 end
 else
 begin
-    UPDATE EMAILTEMPLATES SET subject='You have been granted access to a WorkEngine site', body='<html>
+    UPDATE EMAILTEMPLATES SET subject='You have been granted access to an EPM Live site', body='<html>
 <body>
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr>
