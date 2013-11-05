@@ -846,7 +846,7 @@ function GetData() {
                     }
                     else {
                         $.getScript('/_layouts/epmlive/slimScroll.js', function () {
-                            $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5 });
+                            $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5, alwaysVisible: true });
                         }, true);
 
                         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
@@ -1260,7 +1260,7 @@ function GetData() {
             $('#inputPublicComment').html("<span style=\"color:gray\">" + sPubComTxt + "</span>");
 
             // dynamically set max width
-            if ($('#commentTblc2').width() > 500) {
+            if ($('#commentTblc2').closest('.divPublicCommentContainer').width() > 500) {
                 $('#commentTblc2').css('width', '500px');
                 $('#whatsup').css('max-width', '500px');
             }
