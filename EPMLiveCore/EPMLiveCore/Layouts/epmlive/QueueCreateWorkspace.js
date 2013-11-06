@@ -3,7 +3,7 @@
 
 function registerCreateWorkspace2Script() {
 
-    (function(CWS2, EPMLive, $, k, w, undefined) {
+    (function (CWS2, EPMLive, $, k, w, undefined) {
 
         k.bindingHandlers.fadeVisible = {
             init: function (element, valueAccessor) {
@@ -17,7 +17,7 @@ function registerCreateWorkspace2Script() {
                 shouldDisplay ? $(element).fadeIn(1000) : $(element).fadeOut();
             }
         };
-        
+
         // declare viewmodel
         function CreateWorkspaceViewModel() {
             // DATA - UI related
@@ -42,14 +42,14 @@ function registerCreateWorkspace2Script() {
             self.shouldShowDownloaded = ko.computed(function () {
                 return !self.downloadedAppsLoading() && self.currentView() == 'downloaded' && self.showInProgress() == 'false';
             });
-            self.noOnlineTemplate = ko.computed(function() {
+            self.noOnlineTemplate = ko.computed(function () {
                 return self.marketApps().length === 0;
             });
             self.noLocalTemplate = ko.computed(function () {
                 return self.downloadedApps().length === 0;
             });
             self.hasTempSelected = ko.observable(false);
-            
+
             // DATA - workspace creation related
             self.templateSource = ko.observable();
             self.solutionName = ko.observable();
@@ -66,7 +66,7 @@ function registerCreateWorkspace2Script() {
             self.currentWebFullUrl = ko.observable(w.epmLive.currentWebFullUrl);
             self.currentWebId = ko.observable(w.epmLive.currentWebId);
             self.currentSiteId = ko.observable(w.epmLive.currentSiteId);
-            
+
 
             self.loadMarketAppsParams = ko.computed(function () {
                 return "<Data>" +
@@ -123,7 +123,7 @@ function registerCreateWorkspace2Script() {
                         type: "POST",
                         url: self.solutionLibPath,
                         data: { data: self.loadMarketAppsParams() },
-                        success: function(result) {
+                        success: function (result) {
                             if (result !== "<Templates />") {
                                 var oJson = w.epmLive.parseJson(result);
                                 // make sure all properties exist, 
@@ -135,7 +135,7 @@ function registerCreateWorkspace2Script() {
                             //$('#marketLoading').fadeOut();
 
                         },
-                        error: function(jqXhr, textStatus, errorThrown) {
+                        error: function (jqXhr, textStatus, errorThrown) {
                             //alert(errorThrown);
                             self.marketAppsLoading(false);
                             //('#marketLoading').fadeOut();
@@ -146,7 +146,7 @@ function registerCreateWorkspace2Script() {
                     //('#marketLoading').fadeOut();
                 }
 
-                
+
             };
 
             self.loadDownloadedApps = function () {
@@ -157,7 +157,7 @@ function registerCreateWorkspace2Script() {
                         data: "{Function: 'GetAllTempGalTemps', Dataxml: '" + self.loadDownloadedAppParams() + "' }",
                         contentType: 'application/json; charset=utf-8',
                         dataType: 'json',
-                        success: function(result) {
+                        success: function (result) {
                             if (result.d != '<Result Status=\"0\"><Templates /></Result>') {
                                 var oJson = w.epmLive.parseJson(result.d);
                                 // make sure all properties exist, 
@@ -169,7 +169,7 @@ function registerCreateWorkspace2Script() {
                             self.downloadedAppsLoading(false);
                             //$('#localLoading').fadeOut();
                         },
-                        error: function(jqXhr, textStatus, errorThrown) {
+                        error: function (jqXhr, textStatus, errorThrown) {
                             //alert(errorThrown);
                             self.downloadedAppsLoading(false);
                             //$('#localLoading').fadeOut();
@@ -179,10 +179,10 @@ function registerCreateWorkspace2Script() {
                     self.downloadedAppsLoading(false);
                     //$('#localLoading').fadeOut();
                 }
-                
+
             };
-            
-            self.getCleanTempCollection = function(objColl) {
+
+            self.getCleanTempCollection = function (objColl) {
                 var qualifiedTemps = [];
                 if ($(objColl).length > 1) {
                     for (var j in objColl) {
@@ -203,7 +203,7 @@ function registerCreateWorkspace2Script() {
                 return qualifiedTemps;
             };
 
-            self.GetCleanTemp = function(temp) {
+            self.GetCleanTemp = function (temp) {
                 for (var k in self.propArray) {
                     if (self.propArray[k] == 'ImageUrl') {
                         if (!temp.hasOwnProperty(self.propArray[k]) || temp[self.propArray[k]]['#cdata'] == '') {
@@ -226,36 +226,40 @@ function registerCreateWorkspace2Script() {
                     alert('You must select a template.');
                     return;
                 }
-                
+
                 if (!self.workspaceTitle().trim()) {
                     alert('You must enter a site title.');
                     return;
                 }
 
+
                 $.ajax({
                     type: "POST",
                     url: self.workEngineSvcUrl,
                     data: "{Function: 'AddAndQueueCreateWorkspaceJob', Dataxml: '" + self.createWSParams() + "' }",
-                    contentType: 'application/json; charset=utf-8',
-                    context: this,
-                    dataType: 'json',
+                    //contentType: 'application/json; charset=utf-8',
+                    //context: this,
+                    //dataType: 'json',
                     success: function (result) {
-                        //var r = result;
-                        //parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, 'success');
-                        try {
-                            setTimeout(function () { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success'); }, 300);
-                        } catch (e) {}
+                        //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success');
+                        //try {
+                        //    SP.UI.ModalDialog.commonModalDialogClose(1, 'success');
+                        //} catch (e) { }
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
-                        //parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.invalid, errorThrown);
-                        try {
-                            setTimeout(function () { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, errorThrown); }, 300);
-                        } catch(e) {}
+                        //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, errorThrown);
+                        //try {
+                        //    SP.UI.ModalDialog.commonModalDialogClose(-1, errorThrown);
+                        //} catch (e) { }
                     }
                 });
+
+                //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success');
+                parent.SP.UI.ModalDialog.commonModalDialogClose(1, 'success');
+
             };
 
-            self.gotoTemplate = function(data, event) {
+            self.gotoTemplate = function (data, event) {
                 // UI behavior
                 var target = (event.currentTarget) ? event.currentTarget : event.srcElement;
                 $('.template').removeClass('template-selected');
@@ -281,15 +285,15 @@ function registerCreateWorkspace2Script() {
                 else if (self.localAvail() === 'true' && self.onlineAvail() === 'false') {
                     self.templateSource('downloaded');
                 }
-                
+
                 self.hasTempSelected(true);
             };
 
             self.PreventNonAlphaNumeric = function (data, event) {
                 var isValid = false;
-                
+
                 if (event.keyCode <= 13) isValid = true;
-                
+
                 if (event.keyCode >= 65 && event.keyCode <= 90) {
                     isValid = true;
                 }
@@ -319,7 +323,7 @@ function registerCreateWorkspace2Script() {
                 return isValid;
             };
 
-            self.AutosizeDialog = function() {
+            self.AutosizeDialog = function () {
                 //resize dialog if we are in one    
                 var dlg = parent.SP.UI.ModalDialog.get_childDialog();
                 if (dlg != null) {
@@ -330,13 +334,13 @@ function registerCreateWorkspace2Script() {
                             top: ($(w.top).height() / 2 - dlgWin.height() / 2) + "px",
                             left: $(w.top).width() / 2 - dlgWin.width() / 2
                         });
-                    } catch(e) {
+                    } catch (e) {
                     }
                 }
             };
 
 
-            self.cancelCreation = function() {
+            self.cancelCreation = function () {
                 parent.SP.UI.ModalDialog.commonModalDialogClose('', '');
             };
 
@@ -375,7 +379,7 @@ function registerCreateWorkspace2Script() {
                     height: '220px',
                     width: '850px'
                 });
-               
+
                 $('#localTemplates').slimScroll({
                     height: '220px',
                     width: '850px'
@@ -385,14 +389,14 @@ function registerCreateWorkspace2Script() {
                     self.loadMarketApps();
                     self.loadDownloadedApps();
                     if (self.createDefault() === 'online') {
-                        
+
                         self.currentView('market');
                         $(".toggleButton").removeClass("slider-selected");
                         $('#online').addClass('slider-selected');
                         $(".slider").css('margin-left', '0px');
                         $('#localTemplates').hide();
                         $('#localTemplates').parent().hide();
-                        
+
                         $('#onlineTemplates').show();
                         $('#onlineTemplates').parent().show();
 
@@ -405,10 +409,10 @@ function registerCreateWorkspace2Script() {
                         $(".slider").css('margin-left', '65px');
                         $('#localTemplates').show();
                         $('#localTemplates').parent().show();
-                        
+
                         $('#onlineTemplates').hide();
                         $('#onlineTemplates').parent().hide();
-                        
+
                         //self.loadDownloadedThenMarket();
                     }
                 }
@@ -424,7 +428,7 @@ function registerCreateWorkspace2Script() {
                     $('#onlineTemplates').parent().hide();
                     self.loadDownloadedApps();
                 }
-              
+
                 if (self.showInProgress() === 'true') {
                     $('#divProgress').show();
                     $('#divProgress').siblings().hide();
@@ -442,10 +446,10 @@ function registerCreateWorkspace2Script() {
             self.pageInit();
         }
 
-       
+
         // apply bindings
         k.applyBindings(new CreateWorkspaceViewModel(), document.getElementById('OuterContainer'));
-       
+
 
     })(window.CreateWS2 = window.CreateWS2 || {}, window.epmLive, window.jQuery, window.ko, window);
 

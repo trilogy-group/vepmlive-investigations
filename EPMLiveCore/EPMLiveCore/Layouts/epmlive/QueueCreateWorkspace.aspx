@@ -14,9 +14,11 @@
 
 <asp:content id="Main" contentplaceholderid="PlaceHolderMain" runat="server">
     <link href="/_layouts/epmlive/stylesheets/QueueCreateWorkspace.css" rel="stylesheet">
-    <link href="/_layouts/epmlive/stylesheets/libraries/epmlive/buttons.css" rel="stylesheet">
+    <link href="/_layouts/epmlive/stylesheets/libraries/epmlive/buttons.css" rel="stylesheet">     
+  
     <script type="text/javascript" src="QueueCreateWorkspace.js"></script>
     <script type="text/javascript" src="/_layouts/epmlive/javascripts/libraries/slimScroll.js"></script>
+
     <%--JS variables--%>
     <script type="text/javascript">
         var isStandAlone = '<%=_isStandAlone%>';
