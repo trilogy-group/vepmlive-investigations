@@ -1,0 +1,12 @@
+﻿
+.treegrid_cell {
+    height: auto !important;
+}
+
+div.gridbox_myworkspace table.obj td {
+    border: 0 solid;
+    font-family: Open Sans Regular,Segoe UI,Helvetica !important;
+    font-size: 13px !important;
+    padding-left: 4px;
+    padding-right: 4px;
+}
