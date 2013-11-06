@@ -5,7 +5,12 @@
         a.isItem = function() {
             var bItem = ($$.currentItemID !== "-1" &&
                 !$$.currentListViewUrl &&
-                ($$.currentUrl.indexOf('NewForm.aspx') !== -1 || $$.currentUrl.indexOf('EditForm.aspx') !== -1 || $$.currentUrl.indexOf('DispForm.aspx') !== -1))
+                ($$.currentUrl.indexOf('NewForm.aspx') !== -1 ||
+                $$.currentUrl.indexOf('EditForm.aspx') !== -1 ||
+                $$.currentUrl.indexOf('DispForm.aspx') !== -1 ||
+                $$.currentUrl.indexOf('fd_Item_New.aspx') !== -1 ||
+                $$.currentUrl.indexOf('fd_Item_Edit.aspx') !== -1 ||
+                $$.currentUrl.indexOf('fd_Item_Display.aspx') !== -1))
                 ? true : false;
 
             return bItem;
