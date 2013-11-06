@@ -340,7 +340,11 @@ namespace EPMLiveWebParts.ReportingChart
 
         protected override void CreateChildControls()
         {
-            AddControls();
+            try
+            {
+                AddControls();
+            }
+            catch { }
             //ConfigureDisplayFormat();
             //BuildSeries();
             //BuildXAxisItemLabels();
@@ -351,10 +355,15 @@ namespace EPMLiveWebParts.ReportingChart
 
         public override void RenderControl(HtmlTextWriter writer)
         {
-            ConfigureDisplayFormat();
-            BuildSeries();
-            BuildXAxisItemLabels();
-            BuildYAxisItemLabels();
+            try
+            {
+                ConfigureDisplayFormat();
+                BuildSeries();
+                BuildXAxisItemLabels();
+                BuildYAxisItemLabels();
+            }
+            catch { }
+
             base.RenderControl(writer);
 
             if (!string.IsNullOrEmpty(Width) && !string.IsNullOrEmpty(Height))
@@ -457,10 +466,14 @@ namespace EPMLiveWebParts.ReportingChart
         {
             if (!string.IsNullOrEmpty(PropChartSelectedListTitle) && !string.IsNullOrEmpty(PropChartSelectedViewTitle))
             {
-                _radChart.PlotArea.Series.Clear();
-                BuildSeries();
-                BuildXAxisItemLabels();
-                BuildYAxisItemLabels();
+                try
+                {
+                    _radChart.PlotArea.Series.Clear();
+                    BuildSeries();
+                    BuildXAxisItemLabels();
+                    BuildYAxisItemLabels();
+                }
+                catch { }
             }
 
         }
