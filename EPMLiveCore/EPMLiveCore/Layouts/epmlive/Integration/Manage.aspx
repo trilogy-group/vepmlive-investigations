@@ -36,7 +36,23 @@
 	</SharePoint:SPGridView><br /><br />
 
     <a class="btn btn-success" style="text-decoration:none;" href="Add.aspx">Add New App</a>
+    
+    <style>
+        #s4-ribbonrow, #s4-workspace {
+            margin-left: 0 !important;
+            overflow-x: hidden;
+        }
 
+        .epm-nav-pinned {
+            margin-left: 0 !important;
+            padding-left: 230px !important;
+        }
+
+        .epm-nav-unpinned {
+            margin-left: 0 !important;
+            padding-left: 50px !important;
+        }
+    </style>
 
 <script>
 
@@ -70,8 +86,6 @@
     $(".ms-unselectedtitle").click(function () {
         $(".ms-core-menu-box").css("left", "0px");
     });
-
-
 
 </script>
 
