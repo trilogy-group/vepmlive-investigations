@@ -158,8 +158,19 @@ WEDispFormPageComponent.PageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.ListForm.Display.Actions.Favorite') {
             if (!($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png')) {
+                
                 var viewDiv = document.createElement('div');
-                viewDiv.innerHTML = document.getElementById('favItem_Add_DivTemp').innerHTML;
+                viewDiv.innerHTML = '<div>' +
+                                        '<div style="width: 250px; padding: 5px;"> Title:&nbsp;' +
+                                            '<input type="text" value="' + epmLive.currentItemTitle + '" name="favItemTitle" id="favItemTitle" style="width:200px;">' +
+                                            '<br>' +
+                                            '<div style="clear: both; height: 20px;"></div>' +
+                                            '<div style="margin-left: 45px;">' +
+                                                '<input type="button" style="float: left; margin-right: 5px; width: 90px;" value="OK" onclick="$(\'#favItemTitle\').blur();SP.UI.ModalDialog.commonModalDialogClose(1, window.Analytics.getAddFavItemFromGridDynamicValue(this));" class="ms-ButtonHeightWidth" target="_self">' +
+                                                '<input type="button" style="float:left;width:90px;" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(0, \'Cancel clicked\');" class="ms-ButtonHeightWidth" target="_self">' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>';
 
                 var options = {
                     html: viewDiv,
@@ -175,13 +186,19 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                 
-                var myVar = setInterval(function () { setFocus(); }, 200);
-                function setFocus() {
-                    if ($('.ms-dlgFrameContainer').find('#favItemTitle').length > 0 && !$('.ms-dlgFrameContainer').find('#favItemTitle').is(':focus')) {
-                        $('.ms-dlgFrameContainer').find('#favItemTitle').focus().val(epmLive.currentItemTitle);
-                        clearInterval(myVar);
-                    }
-                }
+                //$(function () {
+                //    var myVar = setTimeout(function () { setFocus(); }, 100);
+                //    function setFocus() {
+                //        if ($("#favItemTitle").length > 0) {
+                //            $("#favItemTitle").focus().val(epmLive.currentItemTitle);
+                //            clearInterval(myVar);
+                //        }
+                //        else {
+                //            setTimeout(function (uniqueId) { setFocus(); }, 100);
+                //        }
+                //    }
+                //});
+                
             } else {
                 window.Analytics.removeItemFav();
             }
