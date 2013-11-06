@@ -292,6 +292,7 @@ namespace EPMLiveWebParts
 
             htmlBuilder.Append("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.css\"/>");
             htmlBuilder.Append("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid_skins.css\"/>");
+            htmlBuilder.Append("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/ReportViewer.css\"/>");
 
             htmlBuilder.Append("<script>_css_prefix=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/DHTML/xgrid/\"; _js_prefix=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/DHTML/xgrid/\"; </script>");
             htmlBuilder.Append("<script src=\"" + (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/ReportViewWebpart.js\"></script>");
