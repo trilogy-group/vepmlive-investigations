@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
+using EPMLiveCore.ListDefinitions;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
 
@@ -403,6 +405,71 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                 }
 
                 UpdateListIcon(siteId, webId);
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 4.0, Description = "Using Content DB", IsOptIn = true)]
+    internal class UseContentDB55 : UpgradeStep
+    {
+        public UseContentDB55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                using (var spSite = new SPSite(Web.Site.ID))
+                {
+                    using (SPWeb spWeb = spSite.OpenWeb())
+                    {
+                        LogTitle(GetWebInfo(spWeb), 1);
+
+                        var queryExecutor = new QueryExecutor(spWeb);
+                        foreach (var listId in queryExecutor.GetMappedListIds())
+                        {
+                            var spList = spWeb.Lists.GetList(listId, true);
+
+                            LogTitle(GetListInfo(spList), 2);
+
+                            var settings = new GridGanttSettings(spList);
+
+                            var reason = string.Empty;
+
+                            switch ((int) spList.BaseTemplate)
+                            {
+                                case (int) EPMLiveLists.ProjectCenter:
+                                    reason = "List Definition: Project Center.";
+                                    break;
+                                case (int) EPMLiveLists.TaskCenter:
+                                    reason = "List Definition: Task Center.";
+                                    break;
+                                default:
+                                    if (settings.EnableWorkList) reason = "Work List.";
+                                    break;
+                            }
+
+                            if (!string.IsNullOrEmpty(reason))
+                            {
+                                
+                                LogMessage(reason, MessageKind.SUCCESS, 3);
+                            }
+                            else
+                            {
+                                LogMessage("List is not a Project Center, Task Center or a Work list.", MessageKind.SKIPPED, 3);
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {

@@ -14,7 +14,11 @@ namespace EPMLiveCore.ListDefinitions
 
         [List(Name = "HolidaySchedules")] HolidaySchedules = 60003,
 
-        [List(Name = "Holidays")] Holidays = 60004
+        [List(Name = "Holidays")] Holidays = 60004,
+
+        [List(Name = "Project Center")] ProjectCenter = 10701,
+
+        [List(Name = "Task Center")] TaskCenter = 10702
     }
 
     public class ListAttribute : Attribute

@@ -24,9 +24,9 @@ namespace EPMLiveCore.Infrastructure
 
         #endregion Constructors 
 
-        #region Methods (4) 
+        #region Methods (6) 
 
-        // Protected Methods (4) 
+        // Protected Methods (6) 
 
         /// <summary>
         ///     Gets the epm data class.
@@ -37,13 +37,6 @@ namespace EPMLiveCore.Infrastructure
             Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.EPMData", true, true);
             ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
             return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
-        }
-
-        protected object GetReportDataClass()
-        {
-            Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportData", true, true);
-            ConstructorInfo constructorInfo = type.GetConstructor(new[] { typeof(Guid) });
-            return constructorInfo != null ? constructorInfo.Invoke(new object[] { Web.Site.ID }) : null;
         }
 
         /// <summary>
@@ -67,6 +60,20 @@ namespace EPMLiveCore.Infrastructure
         protected object GetProperty(string propertyName, object classInstance)
         {
             return classInstance.GetType().GetProperty(propertyName).GetValue(classInstance, null);
+        }
+
+        protected object GetReportBizClass()
+        {
+            Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportBiz", true, true);
+            ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
+            return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
+        }
+
+        protected object GetReportDataClass()
+        {
+            Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportData", true, true);
+            ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
+            return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
         }
 
         /// <summary>
