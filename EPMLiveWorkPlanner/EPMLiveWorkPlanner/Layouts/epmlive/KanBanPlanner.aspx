@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
     <script src="javascripts/kanban/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="javascripts/kanban/jquery-ui.js.js" type="text/javascript"></script>
+    <script src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js" type="text/javascript"></script>
     <style type="text/css">
         /* Large desktop */
         @media (min-width: 1680px) {
@@ -75,9 +76,9 @@
             vertical-align: middle;
             background: white;
             padding-top: 300px;
-            -moz-opacity: 0.25;
-            opacity: 0.25;
-            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=25);
+            -moz-opacity: 0.75;
+            opacity: 0.75;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=75);
         }
 
         /*.itemContainer {
@@ -208,6 +209,11 @@
             padding: 5px;*/
             float: left;
         }
+
+        .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+            background: none !important;
+            color: none !important;
+        }
     </style>
     <script type="text/javascript">
 
@@ -228,12 +234,14 @@
         });
 
 
-        function showHideLoading(show) {
+        function showHideLoading(show, message) {
             if (show) {
                 $("#loadingDiv").show();
+                $("#loadingDiv div").html(message);
             }
             else {
                 $("#loadingDiv").hide();
+                $("#loadingDiv div").html('');
             }
         }
 
@@ -255,7 +263,7 @@
         }
 
         function loadKanBanPlanners() {
-            showHideLoading(true);
+            showHideLoading(true, 'Loading Kanban Planners');
             $.ajax({
                 type: "POST",
                 url: "/_vti_bin/WorkPlanner.asmx/Execute",
@@ -263,12 +271,12 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 error: function (xhr, status, error) {
-                    showHideLoading(false);
+                    showHideLoading(false, '');
                     var err = eval("(" + xhr.responseText + ")");
                     alert(err.Message);
                 },
                 success: function (response) {
-                    showHideLoading(false);
+                    showHideLoading(false, '');
                     var obj = jQuery.parseJSON(response.d);
                     $("#ddlKanBanPlanners").children('option').remove();
                     $.each(obj.kanbanplanners, function (key, value) {
@@ -285,7 +293,7 @@
             }
             else {
                 resetControls(true);
-                showHideLoading(true);
+                showHideLoading(true, 'Loading Kanban Filters');
                 $.ajax({
                     type: "POST",
                     url: "/_vti_bin/WorkPlanner.asmx/Execute",
@@ -293,12 +301,12 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     error: function (xhr, status, error) {
-                        showHideLoading(false);
+                        showHideLoading(false, '');
                         var err = eval("(" + xhr.responseText + ")");
                         alert(err.Message);
                     },
                     success: function (response) {
-                        showHideLoading(false);
+                        showHideLoading(false, '');
                         var obj = jQuery.parseJSON(response.d);
 
                         $("#lblFilert1").text(obj.kanbanfilter1name);
@@ -307,13 +315,17 @@
                         $.each(obj.kanbanfilter1, function (key, value) {
                             $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
                         });
+
+                        $("span[id^='ddcl-']").remove();
+                        $("div[id^='ddcl-']").remove();
+                        $("#ddlKanBanFilter1").dropdownchecklist();
                     }
                 });
             }
         };
 
         function loadKanBanBoard(kanBanBoardName, kanBanFilter1) {
-            showHideLoading(true);
+            showHideLoading(true, 'Loading Kanban Board');
             $.ajax({
                 type: "POST",
                 url: "/_vti_bin/WorkPlanner.asmx/Execute",
@@ -321,12 +333,12 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 error: function (xhr, status, error) {
-                    showHideLoading(false);
+                    showHideLoading(false, '');
                     var err = eval("(" + xhr.responseText + ")");
                     alert(err.Message);
                 },
                 success: function (response) {
-                    showHideLoading(false);
+                    showHideLoading(false, '');
                     $("#mainContainer").html('');
                     $("#mainContainer").html(response.d);
 
@@ -375,7 +387,7 @@
                         <b><span id="lblFilert1"></span></b>
                     </td>
                     <td>
-                        <select id="ddlKanBanFilter1">
+                        <select id="ddlKanBanFilter1" multiple="multiple">
                         </select>
                     </td>
                     <td>
@@ -396,6 +408,7 @@
     </div>
 
     <div id="loadingDiv" style="display: none">
+        <div>Loading</div>
         <img alt="Loading" src="../images/gears_an.gif" />
     </div>
 </asp:Content>
