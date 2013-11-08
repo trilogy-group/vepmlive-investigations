@@ -483,6 +483,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             {
                 LogMessage(e.Message, MessageKind.FAILURE, 2);
             }
+            finally
+            {
+                CacheStore.Current.RemoveSafely(Web.Url, CacheStoreCategory.Navigation);
+            }
 
             return true;
         }
