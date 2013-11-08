@@ -17,15 +17,10 @@ namespace EPMLiveCore
     public class AppSettingsHelper
     {
         public int CurrentAppId = -1;
-        
+
         public AppSettingsHelper()
         {
             GetMyCurrentAppId();
-        }
-
-        public AppSettingsHelper(Guid siteId, Guid webId)
-        {
-            GetMyCurrentAppId(siteId, webId);
         }
 
         public bool AppListExists()
@@ -201,7 +196,7 @@ namespace EPMLiveCore
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 using (var spSite = new SPSite(SPContext.Current.Site.ID))
-                {   
+                {
                     // if can't get a default value
                     // and a "installed Applicatons" list
                     // exists, set new default
@@ -264,7 +259,7 @@ namespace EPMLiveCore
 
         public void SetCurrentAppId(int appId)
         {
-            
+
             using (var spSite = new SPSite(SPContext.Current.Site.ID))
             {
                 using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(spSite.WebApplication.Id)))
@@ -1864,7 +1859,7 @@ namespace EPMLiveCore
         }
 
 
-#region helper methods
+        #region helper methods
 
         public bool IsUrlInternal(string url)
         {
@@ -1937,7 +1932,7 @@ namespace EPMLiveCore
             return sUrl;
         }
 
-#endregion
+        #endregion
 
 
     }
