@@ -173,8 +173,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             {
                 LogMessage(string.Format("Node: {0}, URL: {1}", node.Title, url), 3);
 
-                node.Url = url;
-                node.Update();
+                var appSettingsHelper = new AppSettingsHelper();
+                appSettingsHelper.EditNodeById(-1, node.Id, node.Title, url, -1, string.Empty, Web.CurrentUser);
 
                 LogMessage(string.Empty, MessageKind.SUCCESS, 4);
             }
@@ -659,8 +659,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                         LogMessage("Old URL: " + navNode.Url, 3);
                                         LogMessage("New URL: " + newUrl, 3);
 
-                                        navNode.Url = newUrl;
-                                        navNode.Update();
+                                        var appSettingsHelper = new AppSettingsHelper();
+                                        appSettingsHelper.EditNodeById(-1, navNode.Id, navNode.Title, newUrl, -1, string.Empty,
+                                            Web.CurrentUser);
 
                                         LogMessage(null, MessageKind.SUCCESS, 4);
                                     }
