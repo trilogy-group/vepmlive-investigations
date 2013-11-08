@@ -282,6 +282,7 @@
                     $.each(obj.kanbanplanners, function (key, value) {
                         $("#ddlKanBanPlanners").append($("<option></option>").val(value.id).html(value.text));
                     });
+                    $("#ddlKanBanPlanners").val($("#ddlKanBanPlanners option:last-child").val());
                     loadKanBanFilter1($("#ddlKanBanPlanners").val());
                 }
             });
