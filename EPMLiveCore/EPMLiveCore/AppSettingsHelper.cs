@@ -23,6 +23,11 @@ namespace EPMLiveCore
             GetMyCurrentAppId();
         }
 
+        public AppSettingsHelper(Guid siteId, Guid webId)
+        {
+            GetMyCurrentAppId(siteId, webId);
+        }
+
         public bool AppListExists()
         {
             bool exists = false;
@@ -1612,17 +1617,11 @@ namespace EPMLiveCore
 
         public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType, SPUser origUser)
         {
-            EditNodeById(parentNodeId, nodeId, title, url, appId, nodeType, origUser, SPContext.Current.Site.ID,
-                SPContext.Current.Web.ID);
-        }
-
-        public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType, SPUser origUser, Guid siteId, Guid webId)
-        {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using (SPSite es = new SPSite(siteId))
+                using (SPSite es = new SPSite(SPContext.Current.Site.ID))
                 {
-                    using (SPWeb ew = es.OpenWeb(webId))
+                    using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ID))
                     {
                         int oldNodeId;
                         int newNodeId;
