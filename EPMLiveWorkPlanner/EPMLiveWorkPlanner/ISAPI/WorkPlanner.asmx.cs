@@ -5376,7 +5376,10 @@ namespace EPMLiveWorkPlanner
                         }
                         //filterRecords = "";
 
+                        sbItems.Append("<table>");
+                        sbItems.Append("<tr>");
 
+                        sbItems.Append("<td>");
                         sbItems.Append("<div class='itemContainer'>");
                         sbItems.Append("<div class='itemContainerTitle'>" + list.Title + " Items</div>");
 
@@ -5386,7 +5389,7 @@ namespace EPMLiveWorkPlanner
                         sbItems.Append("<div class='sortable-list' id='allTasks'>");
 
 
-                        sbItems.Append("<div class='sortable-item-header'>");
+                        //sbItems.Append("<div class='sortable-item-header'>");
                         //sbItems.Append("<div>" + list.Fields[SPBuiltInFieldId.Title].Title + "</div>");
                         //selectedColumns += list.Fields[SPBuiltInFieldId.Title].InternalName + ",";
                         //if (list.Fields.Contains(SPBuiltInFieldId.StartDate))
@@ -5398,12 +5401,12 @@ namespace EPMLiveWorkPlanner
                         if (!string.IsNullOrEmpty(props.KanBanAdditionalColumns))
                         {
                             selectedColumns += props.KanBanAdditionalColumns;
-                            foreach (string col in props.KanBanAdditionalColumns.Split(','))
-                            {
-                                sbItems.Append("<div>" + col + "</div>");
-                            }
+                            //foreach (string col in props.KanBanAdditionalColumns.Split(','))
+                            //{
+                            //    sbItems.Append("<div>" + col + "</div>");
+                            //}
                         }
-                        sbItems.Append("</div>");
+                        //sbItems.Append("</div>");
 
                         SPQuery qryFilterRecords = new SPQuery();
                         qryFilterRecords.Query = filterRecords;
@@ -5417,25 +5420,39 @@ namespace EPMLiveWorkPlanner
                             {
                                 if (!string.IsNullOrEmpty(column))
                                 {
-                                    sbItems.Append("<div><span>" + column + "&nbsp;:&nbsp;</span>" + item[column] + "&nbsp;</div>");
+                                    sbItems.Append("<div>" + item[column] + "&nbsp;</div>");
                                 }
                             }
                             sbItems.Append("</div>");
                         }
                         sbItems.Append("</div>");
                         sbItems.Append("</div>");
+                        sbItems.Append("</td>");
 
-                        //Load Splitter
-                        sbItems.Append("<div id='splitter'><<</div>");
+
+                        bool splitterLoaded = false;
 
                         //Load Stages
                         foreach (string status in props.KanBanItemStatusFields.Split(','))
                         {
+                            sbItems.Append("<td>");
                             sbItems.Append("<div class='stageContainer'>");
+
+                            //Load Splitter
+                            if (!splitterLoaded)
+                            {
+                                sbItems.Append("<div id='splitter'><<</div>");
+                                splitterLoaded = true;
+                            }
                             sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
                             sbItems.Append("<div class='sortable-list' id='" + status + "'></div>");
                             sbItems.Append("</div>");
+                            sbItems.Append("</td>");
                         }
+
+
+                        sbItems.Append("</tr>");
+                        sbItems.Append("</table>");
 
                     }
 
