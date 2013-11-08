@@ -12,6 +12,8 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Specialized;
+using System.Web.UI.WebControls;
 
 namespace EPMLiveWorkPlanner
 {
@@ -22,7 +24,7 @@ namespace EPMLiveWorkPlanner
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
-    // [System.Web.Script.Services.ScriptService]
+    [System.Web.Script.Services.ScriptService]
     public class WorkPlannerAPI : System.Web.Services.WebService
     {
         /*
@@ -59,6 +61,14 @@ namespace EPMLiveWorkPlanner
             public int iTaskType = 0;
             public bool bEnableLinking = false;
             public bool bStartSoon = false;
+
+            #region KanBan Props
+            public string KanBanStatusColumn;
+            public string KanBanFilterColumn;
+            public string KanBanTitleColumn;
+            public string KanBanAdditionalColumns;
+            public string KanBanItemStatusFields;
+            #endregion
         }
 
         [WebMethod]
@@ -5088,6 +5098,13 @@ namespace EPMLiveWorkPlanner
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "EnableLink"), out p.bEnableLinking);
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "StartSoon"), out p.bStartSoon);
 
+                #region KanBan Props
+                p.KanBanStatusColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanStatusColumn");
+                p.KanBanFilterColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanFilterColumn");
+                p.KanBanTitleColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanTitleColumn");
+                p.KanBanAdditionalColumns = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanAdditionalColumns");
+                p.KanBanItemStatusFields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanItemStatusFields");
+                #endregion
             }
             else
             {
@@ -5163,6 +5180,14 @@ namespace EPMLiveWorkPlanner
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "CalcCost"), out p.bCalcCost);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "EnableLink"), out p.bEnableLinking);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "StartSoon"), out p.bStartSoon);
+
+                        #region KanBan Props
+                        p.KanBanStatusColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanStatusColumn");
+                        p.KanBanFilterColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanFilterColumn");
+                        p.KanBanTitleColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanTitleColumn");
+                        p.KanBanAdditionalColumns = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanAdditionalColumns");
+                        p.KanBanItemStatusFields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanItemStatusFields");
+                        #endregion
                     }
                 }
             }
@@ -5183,5 +5208,254 @@ namespace EPMLiveWorkPlanner
         }
 
         //public static HelperClass.WorkPlannerProperties wps { get; set; }
+
+
+
+        #region KanBanPlanner
+
+        public static string GetKanBanPlanners(XmlDocument data, SPWeb oWeb)
+        {
+            //Get values from parameter
+            string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
+            string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
+            string webID = data.GetElementsByTagName("WebID")[0].InnerText;
+
+            StringBuilder jsonPlanners = new StringBuilder();
+            jsonPlanners.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "Select"));
+
+            //Using SharePoint Object Model fetching data values
+            using (SPSite spSite = new SPSite(siteUrl))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
+                {
+                    string planners = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlannerPlanners");
+
+                    foreach (string planner in planners.Split(','))
+                    {
+                        if (!String.IsNullOrEmpty(planner))
+                        {
+                            string[] sPlanner = planner.Split('|');
+                            string kanban = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + sPlanner[0] + "EnableKanBan");
+
+                            if (!string.IsNullOrEmpty(kanban))
+                            {
+                                jsonPlanners.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", sPlanner[0], EncodeJsonData(sPlanner[1])));
+                            }
+                        }
+                    }
+
+                    string jsonData = jsonPlanners.ToString();
+                    if (jsonData.Length > 1)
+                    {
+                        jsonData = jsonData.Substring(0, jsonData.Length - 1);
+                    }
+                    return string.Format("{{ \"kanbanplanners\": [{0}] }}", jsonData);
+                }
+            }
+
+
+        }
+
+        public static string GetKanBanFilter1(XmlDocument data, SPWeb oWeb)
+        {
+            //Get values from parameter
+            string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
+            string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
+            string webID = data.GetElementsByTagName("WebID")[0].InnerText;
+            string kanBanBoardName = data.GetElementsByTagName("KanBanBoardName")[0].InnerText;
+
+
+            //Using SharePoint Object Model fetching data values
+            using (SPSite spSite = new SPSite(siteUrl))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
+                {
+                    StringBuilder jsonFilter1 = new StringBuilder();
+
+                    WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
+
+                    SPList filterColumnList = spWeb.Lists[props.sListProjectCenter];
+
+                    if (filterColumnList != null)
+                    {
+                        SPField field = filterColumnList.Fields.GetField(props.KanBanFilterColumn);
+
+                        switch (field.Type)
+                        {
+                            case SPFieldType.Choice:
+                                {
+                                    SPFieldChoice choiceField = field as SPFieldChoice;
+                                    StringCollection choices = choiceField.Choices;
+                                    if (choices.Count > 0)
+                                    {
+                                        foreach (String choice in choices)
+                                        {
+                                            jsonFilter1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", EncodeJsonData(choice), EncodeJsonData(choice)));
+                                        }
+                                    }
+                                }
+                                break;
+                            case SPFieldType.Lookup:
+                            case SPFieldType.User:
+                                {
+                                    var results = new List<SPFieldLookupValue>();
+                                    var lookupField = field as SPFieldLookup;
+                                    var lookupList = filterColumnList.ParentWeb.Lists[Guid.Parse(lookupField.LookupList)];
+                                    var query = new SPQuery();
+
+                                    query.Query = String.Format("<OrderBy><FieldRef Name='{0}'/></OrderBy>", lookupField.LookupField);
+
+                                    foreach (SPListItem item in lookupList.GetItems(query))
+                                    {
+                                        results.Add(new SPFieldLookupValue(item.ID, item[lookupField.LookupField].ToString()));
+                                    }
+
+                                    foreach (SPFieldLookupValue result in results)
+                                    {
+                                        jsonFilter1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", EncodeJsonData(result.LookupValue), EncodeJsonData(result.LookupValue)));
+                                    }
+                                }
+                                break;
+                        }
+                    }
+
+                    string jsonData = jsonFilter1.ToString();
+                    if (jsonData.Length > 1)
+                    {
+                        jsonData = jsonData.Substring(0, jsonData.Length - 1);
+                    }
+                    return string.Format("{{ \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, jsonData);
+
+                }
+            }
+
+        }
+
+        public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
+        {
+            //Get values from parameter
+            string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
+            string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
+            string webID = data.GetElementsByTagName("WebID")[0].InnerText;
+            string kanBanBoardName = DecodeJsonData(data.GetElementsByTagName("KanBanBoardName")[0].InnerText);
+            string kanBanFilter1 = DecodeJsonData(data.GetElementsByTagName("KanBanFilter1")[0].InnerText);
+
+            StringBuilder sbItems = new StringBuilder();
+            string selectedColumns = string.Empty;
+            string filterRecords = string.Empty;
+
+
+            //Using SharePoint Object Model fetching data values
+            using (SPSite spSite = new SPSite(siteUrl))
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
+                {
+
+                    WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
+
+                    SPList list = spWeb.Lists[props.sListProjectCenter];
+
+                    if (list != null)
+                    {
+                        SPField field = list.Fields.GetField(props.KanBanFilterColumn);
+
+                        switch (field.Type)
+                        {
+                            case SPFieldType.Choice:
+                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='Choice'>" + kanBanFilter1 + "</Value></Eq></Where>";
+                                break;
+                            case SPFieldType.Lookup:
+                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='Lookup'>" + kanBanFilter1 + "</Value></Eq></Where>";
+                                break;
+                            case SPFieldType.User:
+                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='User'>" + kanBanFilter1 + "</Value></Eq></Where>";
+                                break;
+                            default:
+                                filterRecords = "";
+                                break;
+                        }
+                        //filterRecords = "";
+
+
+                        sbItems.Append("<div class='itemContainer'>");
+                        sbItems.Append("<div class='itemContainerTitle'>" + list.Title + " Items</div>");
+
+                        //Load Items
+
+
+                        sbItems.Append("<div class='sortable-list' id='allTasks'>");
+
+
+                        sbItems.Append("<div class='sortable-item-header'>");
+                        //sbItems.Append("<div>" + list.Fields[SPBuiltInFieldId.Title].Title + "</div>");
+                        //selectedColumns += list.Fields[SPBuiltInFieldId.Title].InternalName + ",";
+                        //if (list.Fields.Contains(SPBuiltInFieldId.StartDate))
+                        //{
+                        //    sbItems.Append("<div>" + list.Fields[SPBuiltInFieldId.StartDate].Title + "</div>");
+                        //    selectedColumns += list.Fields[SPBuiltInFieldId.StartDate].InternalName + ",";
+                        //}
+
+                        if (!string.IsNullOrEmpty(props.KanBanAdditionalColumns))
+                        {
+                            selectedColumns += props.KanBanAdditionalColumns;
+                            foreach (string col in props.KanBanAdditionalColumns.Split(','))
+                            {
+                                sbItems.Append("<div>" + col + "</div>");
+                            }
+                        }
+                        sbItems.Append("</div>");
+
+                        SPQuery qryFilterRecords = new SPQuery();
+                        qryFilterRecords.Query = filterRecords;
+                        SPListItemCollection allItems = list.GetItems(qryFilterRecords);
+
+                        foreach (SPListItem item in allItems)
+                        {
+                            sbItems.Append("<div class='sortable-item' id='" + item.ID + "'>");
+
+                            foreach (string column in selectedColumns.Split(','))
+                            {
+                                if (!string.IsNullOrEmpty(column))
+                                {
+                                    sbItems.Append("<div><span>" + column + "&nbsp;:&nbsp;</span>" + item[column] + "&nbsp;</div>");
+                                }
+                            }
+                            sbItems.Append("</div>");
+                        }
+                        sbItems.Append("</div>");
+                        sbItems.Append("</div>");
+
+                        //Load Splitter
+                        sbItems.Append("<div id='splitter'><<</div>");
+
+                        //Load Stages
+                        foreach (string status in props.KanBanItemStatusFields.Split(','))
+                        {
+                            sbItems.Append("<div class='stageContainer'>");
+                            sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
+                            sbItems.Append("<div class='sortable-list' id='" + status + "'></div>");
+                            sbItems.Append("</div>");
+                        }
+
+                    }
+
+                }
+            }
+
+            return sbItems.ToString();
+
+        }
+
+        private static string EncodeJsonData(string data)
+        {
+            return System.Web.HttpUtility.HtmlEncode(data.Replace("\\", "\\\\"));
+        }
+
+        private static string DecodeJsonData(string data)
+        {
+            return System.Web.HttpUtility.HtmlDecode(data.Replace("\\\\", "\\"));
+        }
+
+        #endregion
     }
 }
