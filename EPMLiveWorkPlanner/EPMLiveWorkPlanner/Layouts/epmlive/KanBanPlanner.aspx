@@ -9,9 +9,38 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="KanBanPlanner.aspx.cs" Inherits="EPMLiveWorkPlanner.KanBanPlanner" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+    <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
     <script src="javascripts/kanban/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="javascripts/kanban/jquery-ui.js.js" type="text/javascript"></script>
     <style type="text/css">
+        /* Large desktop */
+        @media (min-width: 1680px) {
+            .itemContainer,
+            .stageContainer {
+                width: 400px;
+                min-height: 825px;
+                float: left;
+            }
+        }
+
+        @media (min-width: 1200px) and (max-width: 1679px) {
+            .itemContainer,
+            .stageContainer {
+                width: 300px;
+                min-height: 625px;
+                float: left;
+            }
+        }
+
+        @media (max-width: 1199px) {
+            .itemContainer,
+            .stageContainer {
+                width: 200px;
+                min-height: 525px;
+                float: left;
+            }
+        }
+
         #section1 {
             width: auto;
             height: 75px;
@@ -20,16 +49,21 @@
         }
 
         #section2 {
-            width: auto;
-            height: 625px;
             margin: 5px;
-            border: 1px solid black;
-            overflow: auto;
         }
 
         #mainContainer {
-            width: 2500px;
         }
+
+            #mainContainer table {
+                border: 1px solid black;
+            }
+
+                #mainContainer table td {
+                    text-align: left;
+                    vertical-align: top;
+                    border-right: 1px dashed black;
+                }
 
         #loadingDiv {
             width: 100%;
@@ -46,19 +80,12 @@
             -ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=25);
         }
 
-        .itemContainer {
+        /*.itemContainer {
             width: 300px;
-            height: 600px;
-            float: left;
-            overflow: auto;
-        }
-
-        .stageContainer {
-            width: 250px;
             height: 625px;
             float: left;
-            border-left: 1px dashed black;
-        }
+            overflow: auto;
+        }*/
 
         #splitter {
             float: left;
@@ -66,7 +93,6 @@
             font-size: 12px;
             padding: 5px;
             font-weight: bold;
-            border-bottom: 1px solid black;
             cursor: pointer;
         }
 
@@ -74,7 +100,7 @@
             clear: both;
         }
 
-        .itemContainerTitle {
+        /*.itemContainerTitle {
             color: black;
             font-size: 12px;
             padding: 5px;
@@ -131,12 +157,9 @@
         .itemContainer .sortable-item div {
             display: table-cell;
             padding: 2px;
-        }
+        }*/
 
-            .itemContainer .sortable-item div span {
-                display: none;
-            }
-
+        .itemContainerTitle,
         .stageContainerTitle {
             color: black;
             font-size: 12px;
@@ -146,6 +169,7 @@
             text-align: center;
         }
 
+        .itemContainer .sortable-list,
         .stageContainer .sortable-list {
             margin: 0;
             float: left;
@@ -153,6 +177,7 @@
             min-height: 625px;
         }
 
+        .itemContainer .sortable-item,
         .stageContainer .sortable-item {
             background-color: #D6ECF2; /*0092CA*/
             border-left: 5px solid #009CCC;
@@ -163,8 +188,8 @@
             margin: 2px;
             padding: 2px;
             text-align: left;
-            /*width: 98px;
-            height: 48px;*/
+            min-width: 98px;
+            min-height: 48px;
             float: left;
             -webkit-border-radius: 0px 10px 0px 0px;
             -moz-border-radius: 0px 10px 0px 0px;
@@ -173,12 +198,6 @@
             -moz-box-shadow: #B3B3B3 2px 2px 2px;
             box-shadow: #B3B3B3 2px 2px 2px;
         }
-
-            .stageContainer .sortable-item div span {
-                display: block;
-                font-weight: bold;
-                float: left;
-            }
 
         .placeholder {
             /*background-color: #BFB;
