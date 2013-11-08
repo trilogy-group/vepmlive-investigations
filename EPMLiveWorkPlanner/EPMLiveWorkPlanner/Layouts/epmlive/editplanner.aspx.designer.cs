@@ -67,6 +67,15 @@ namespace EPMLiveWorkPlanner {
         protected global::System.Web.UI.WebControls.CheckBox chkProjectPlanner;
         
         /// <summary>
+        /// chkKanBanPlanner control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkKanBanPlanner;
+        
+        /// <summary>
         /// chkDisableParentChild control.
         /// </summary>
         /// <remarks>
@@ -290,6 +299,69 @@ namespace EPMLiveWorkPlanner {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkUseRes;
+        
+        /// <summary>
+        /// ddlKanBanStatusColumn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlKanBanStatusColumn;
+        
+        /// <summary>
+        /// ddlKanBanFilterColumn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlKanBanFilterColumn;
+        
+        /// <summary>
+        /// ddlKanBanAvailableItemStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox ddlKanBanAvailableItemStatus;
+        
+        /// <summary>
+        /// ddlKanBanSelectedItemStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox ddlKanBanSelectedItemStatus;
+        
+        /// <summary>
+        /// ddlKanBanTitleColumn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlKanBanTitleColumn;
+        
+        /// <summary>
+        /// ddlKanBanAvailableFields control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox ddlKanBanAvailableFields;
+        
+        /// <summary>
+        /// ddlKanBanSelectedFields control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox ddlKanBanSelectedFields;
         
         /// <summary>
         /// PlaceHolder1 control.
