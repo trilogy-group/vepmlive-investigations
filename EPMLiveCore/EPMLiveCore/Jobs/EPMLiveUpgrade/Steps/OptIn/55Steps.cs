@@ -167,14 +167,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
         // Private Methods (1) 
 
-        private void UpdateLink(string url, SPNavigationNode node)
+        private void UpdateLink(string url, SPNavigationNode node, SPWeb spWeb)
         {
             try
             {
                 LogMessage(string.Format("Node: {0}, URL: {1}", node.Title, url), 3);
 
                 var appSettingsHelper = new AppSettingsHelper();
-                appSettingsHelper.EditNodeById(-1, node.Id, node.Title, url, -1, string.Empty, Web.CurrentUser);
+                appSettingsHelper.EditNodeById(-1, node.Id, node.Title, url, -1, string.Empty, spWeb.CurrentUser,
+                    spWeb.Site.ID, spWeb.ID);
 
                 LogMessage(string.Empty, MessageKind.SUCCESS, 4);
             }
@@ -244,11 +245,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                                     SPNavigationNode node = spWeb.Navigation.GetNodeById(id);
                                                     if (node.Title.Equals("My Work"))
                                                     {
-                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyWork.aspx", node);
+                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyWork.aspx", node,
+                                                            spWeb);
                                                     }
                                                     else if (node.Title.Equals("Timesheet"))
                                                     {
-                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyTimesheet.aspx", node);
+                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyTimesheet.aspx",
+                                                            node, spWeb);
                                                     }
                                                 }
                                                 catch (Exception e)
@@ -660,8 +663,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                         LogMessage("New URL: " + newUrl, 3);
 
                                         var appSettingsHelper = new AppSettingsHelper();
-                                        appSettingsHelper.EditNodeById(-1, navNode.Id, navNode.Title, newUrl, -1, string.Empty,
-                                            Web.CurrentUser);
+                                        appSettingsHelper.EditNodeById(-1, navNode.Id, navNode.Title, newUrl, -1,
+                                            string.Empty,
+                                            Web.CurrentUser, spSite.ID, spWeb.ID);
 
                                         LogMessage(null, MessageKind.SUCCESS, 4);
                                     }
