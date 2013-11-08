@@ -66,7 +66,7 @@ function registerCreateWorkspace2Script() {
             self.currentWebFullUrl = ko.observable(w.epmLive.currentWebFullUrl);
             self.currentWebId = ko.observable(w.epmLive.currentWebId);
             self.currentSiteId = ko.observable(w.epmLive.currentSiteId);
-
+            self.readyToClose = ko.observable(false);
 
             self.loadMarketAppsParams = ko.computed(function () {
                 return "<Data>" +
@@ -237,26 +237,29 @@ function registerCreateWorkspace2Script() {
                     type: "POST",
                     url: self.workEngineSvcUrl,
                     data: "{Function: 'AddAndQueueCreateWorkspaceJob', Dataxml: '" + self.createWSParams() + "' }",
-                    //contentType: 'application/json; charset=utf-8',
-                    //context: this,
-                    //dataType: 'json',
-                    success: function (result) {
-                        //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success');
-                        //try {
-                        //    SP.UI.ModalDialog.commonModalDialogClose(1, 'success');
-                        //} catch (e) { }
+                    contentType: 'application/json; charset=utf-8',
+                    context: this,
+                    dataType: 'json',
+                    success: function (result) {                        
+                        self.readyToClose(true);
+                        self.setTimeoutClose();
                     },
-                    error: function (jqXhr, textStatus, errorThrown) {
-                        //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', -1, errorThrown);
-                        //try {
-                        //    SP.UI.ModalDialog.commonModalDialogClose(-1, errorThrown);
-                        //} catch (e) { }
+                    error: function (jqXhr, textStatus, errorThrown) {                        
+                        self.readyToClose(true);
+                        self.setTimeoutClose();
                     }
                 });
 
-                //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 1, 'success');
-                parent.SP.UI.ModalDialog.commonModalDialogClose(1, 'success');
+                //self.setTimeoutClose();
+            };
 
+            self.setTimeoutClose = function () {
+                if (self.readyToClose()) {
+                    setTimeout(function () { parent.SP.UI.ModalDialog.commonModalDialogClose(1, 'success'); }, 100);
+                }
+                else {
+                    self.setTimeoutClose();
+                }
             };
 
             self.gotoTemplate = function (data, event) {
