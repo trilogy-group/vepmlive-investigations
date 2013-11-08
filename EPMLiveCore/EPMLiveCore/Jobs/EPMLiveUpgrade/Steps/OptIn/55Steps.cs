@@ -167,15 +167,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
         // Private Methods (1) 
 
-        private void UpdateLink(string url, SPNavigationNode node, SPWeb spWeb)
+        private void UpdateLink(string url, SPNavigationNode node)
         {
             try
             {
                 LogMessage(string.Format("Node: {0}, URL: {1}", node.Title, url), 3);
 
-                var appSettingsHelper = new AppSettingsHelper();
-                appSettingsHelper.EditNodeById(-1, node.Id, node.Title, url, -1, string.Empty, spWeb.CurrentUser,
-                    spWeb.Site.ID, spWeb.ID);
+                node.Url = url;
+                node.Update();
 
                 LogMessage(string.Empty, MessageKind.SUCCESS, 4);
             }
@@ -199,6 +198,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                     {
                         using (SPWeb spWeb = spSite.OpenWeb())
                         {
+                            Web.AllowUnsafeUpdates = true;
+
                             LogTitle(GetWebInfo(spWeb), 1);
 
                             SPList spList = spWeb.Lists.TryGetList("Installed Applications");
@@ -245,13 +246,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                                     SPNavigationNode node = spWeb.Navigation.GetNodeById(id);
                                                     if (node.Title.Equals("My Work"))
                                                     {
-                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyWork.aspx", node,
-                                                            spWeb);
+                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyWork.aspx", node);
                                                     }
                                                     else if (node.Title.Equals("Timesheet"))
                                                     {
-                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyTimesheet.aspx",
-                                                            node, spWeb);
+                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyTimesheet.aspx", node);
                                                     }
                                                 }
                                                 catch (Exception e)
@@ -281,6 +280,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                             {
                                 LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE, 2);
                             }
+
+                            spWeb.AllowUnsafeUpdates = false;
+                            spWeb.Update();
                         }
                     }
                 });
@@ -586,6 +588,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                     {
                         using (SPWeb spWeb = spSite.OpenWeb())
                         {
+                            spWeb.AllowUnsafeUpdates = true;
+
                             LogTitle(GetWebInfo(spWeb), 1);
 
                             SPList spList = spWeb.Lists.TryGetList(LIST_NAME);
@@ -662,10 +666,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                         LogMessage("Old URL: " + navNode.Url, 3);
                                         LogMessage("New URL: " + newUrl, 3);
 
-                                        var appSettingsHelper = new AppSettingsHelper();
-                                        appSettingsHelper.EditNodeById(-1, navNode.Id, navNode.Title, newUrl, -1,
-                                            string.Empty,
-                                            Web.CurrentUser, spSite.ID, spWeb.ID);
+                                        navNode.Url = newUrl;
+                                        navNode.Update();
 
                                         LogMessage(null, MessageKind.SUCCESS, 4);
                                     }
@@ -682,6 +684,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                             {
                                 LogMessage("Advance reporting is already configured.", MessageKind.SKIPPED, 2);
                             }
+
+                            spWeb.AllowUnsafeUpdates = false;
+                            spWeb.Update();
                         }
                     }
                 });
