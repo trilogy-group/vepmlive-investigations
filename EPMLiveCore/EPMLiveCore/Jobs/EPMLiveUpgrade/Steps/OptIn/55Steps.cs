@@ -192,92 +192,95 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             try
             {
-                using (var spSite = new SPSite(Web.Site.ID))
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    using (SPWeb spWeb = spSite.OpenWeb())
+                    using (var spSite = new SPSite(Web.Site.ID))
                     {
-                        LogTitle(GetWebInfo(spWeb), 1);
-
-                        SPList spList = spWeb.Lists.TryGetList("Installed Applications");
-                        if (spList != null)
+                        using (SPWeb spWeb = spSite.OpenWeb())
                         {
-                            var qry = new SPQuery
-                            {
-                                Query =
-                                    @"<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>My Workplace</Value></Eq></Where>",
-                                ViewFields = @"<FieldRef Name='ID' />"
-                            };
+                            LogTitle(GetWebInfo(spWeb), 1);
 
-                            SPListItemCollection listItems = spList.GetItems(qry);
-
-                            if (listItems.Count != 0)
+                            SPList spList = spWeb.Lists.TryGetList("Installed Applications");
+                            if (spList != null)
                             {
-                                try
+                                var qry = new SPQuery
                                 {
-                                    LogTitle("Changing My Workplace to Global My Workplace", 2);
+                                    Query =
+                                        @"<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>My Workplace</Value></Eq></Where>",
+                                    ViewFields = @"<FieldRef Name='ID' />"
+                                };
 
-                                    SPListItem item = spList.GetItemById(listItems[0].ID);
+                                SPListItemCollection listItems = spList.GetItems(qry);
 
-                                    item["Title"] = "Global My Workplace";
-                                    item["HomePage"] = new SPFieldUrlValue
+                                if (listItems.Count != 0)
+                                {
+                                    try
                                     {
-                                        Url = spWeb.Url + "/SitePages/GlobalMyWorkplace.aspx",
-                                        Description = "Global My Workplace"
-                                    };
+                                        LogTitle("Changing My Workplace to Global My Workplace", 2);
 
-                                    item.SystemUpdate();
+                                        SPListItem item = spList.GetItemById(listItems[0].ID);
 
-                                    LogTitle("Updating links", 2);
-
-                                    string[] nodes = ((item["QuickLaunch"] ?? string.Empty).ToString()).Split(',');
-
-                                    if (nodes.Any())
-                                    {
-                                        foreach (string nodeId in nodes)
+                                        item["Title"] = "Global My Workplace";
+                                        item["HomePage"] = new SPFieldUrlValue
                                         {
-                                            try
-                                            {
-                                                int id = Convert.ToInt32(nodeId.Split(':')[0]);
+                                            Url = spWeb.Url + "/SitePages/GlobalMyWorkplace.aspx",
+                                            Description = "Global My Workplace"
+                                        };
 
-                                                SPNavigationNode node = spWeb.Navigation.GetNodeById(id);
-                                                if (node.Title.Equals("My Work"))
-                                                {
-                                                    UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyWork.aspx", node);
-                                                }
-                                                else if (node.Title.Equals("Timesheet"))
-                                                {
-                                                    UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyTimesheet.aspx", node);
-                                                }
-                                            }
-                                            catch (Exception e)
+                                        item.SystemUpdate();
+
+                                        LogTitle("Updating links", 2);
+
+                                        string[] nodes = ((item["QuickLaunch"] ?? string.Empty).ToString()).Split(',');
+
+                                        if (nodes.Any())
+                                        {
+                                            foreach (string nodeId in nodes)
                                             {
-                                                LogMessage(e.Message, MessageKind.FAILURE, 3);
+                                                try
+                                                {
+                                                    int id = Convert.ToInt32(nodeId.Split(':')[0]);
+
+                                                    SPNavigationNode node = spWeb.Navigation.GetNodeById(id);
+                                                    if (node.Title.Equals("My Work"))
+                                                    {
+                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyWork.aspx", node);
+                                                    }
+                                                    else if (node.Title.Equals("Timesheet"))
+                                                    {
+                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyTimesheet.aspx", node);
+                                                    }
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    LogMessage(e.Message, MessageKind.FAILURE, 3);
+                                                }
                                             }
                                         }
-                                    }
-                                    else
-                                    {
-                                        LogMessage("No navigation nodes were found.", MessageKind.FAILURE, 3);
-                                    }
+                                        else
+                                        {
+                                            LogMessage("No navigation nodes were found.", MessageKind.FAILURE, 3);
+                                        }
 
-                                    CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
+                                        CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        LogMessage(e.Message, MessageKind.FAILURE, 3);
+                                    }
                                 }
-                                catch (Exception e)
+                                else
                                 {
-                                    LogMessage(e.Message, MessageKind.FAILURE, 3);
+                                    LogMessage("The My Workplace community was not found.", MessageKind.SKIPPED, 2);
                                 }
                             }
                             else
                             {
-                                LogMessage("The My Workplace community was not found.", MessageKind.SKIPPED, 2);
+                                LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE, 2);
                             }
                         }
-                        else
-                        {
-                            LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE, 2);
-                        }
                     }
-                }
+                });
             }
             catch (Exception e)
             {
