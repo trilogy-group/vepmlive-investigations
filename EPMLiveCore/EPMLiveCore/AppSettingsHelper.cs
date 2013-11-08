@@ -1612,11 +1612,17 @@ namespace EPMLiveCore
 
         public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType, SPUser origUser)
         {
+            EditNodeById(parentNodeId, nodeId, title, url, appId, nodeType, origUser, SPContext.Current.Site.ID,
+                SPContext.Current.Web.ID);
+        }
+
+        public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType, SPUser origUser, Guid siteId, Guid webId)
+        {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using (SPSite es = new SPSite(SPContext.Current.Site.ID))
+                using (SPSite es = new SPSite(siteId))
                 {
-                    using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ID))
+                    using (SPWeb ew = es.OpenWeb(webId))
                     {
                         int oldNodeId;
                         int newNodeId;
