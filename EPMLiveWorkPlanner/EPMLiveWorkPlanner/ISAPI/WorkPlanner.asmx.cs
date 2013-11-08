@@ -39,6 +39,15 @@ namespace EPMLiveWorkPlanner
                 rolldowns = new ArrayList();
                 rollups = new ArrayList();
             }
+
+            #region KanBan Props
+            public string KanBanStatusColumn;
+            public string KanBanFilterColumn;
+            public string KanBanTitleColumn;
+            public string KanBanAdditionalColumns;
+            public string KanBanItemStatusFields;
+            #endregion
+
             public string sListProjectCenter;
             public string sListTaskCenter;
             public string sIterationCT;
@@ -61,14 +70,6 @@ namespace EPMLiveWorkPlanner
             public int iTaskType = 0;
             public bool bEnableLinking = false;
             public bool bStartSoon = false;
-
-            #region KanBan Props
-            public string KanBanStatusColumn;
-            public string KanBanFilterColumn;
-            public string KanBanTitleColumn;
-            public string KanBanAdditionalColumns;
-            public string KanBanItemStatusFields;
-            #endregion
         }
 
         [WebMethod]
@@ -5180,15 +5181,9 @@ namespace EPMLiveWorkPlanner
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "CalcCost"), out p.bCalcCost);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "EnableLink"), out p.bEnableLinking);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "StartSoon"), out p.bStartSoon);
-
-                        #region KanBan Props
-                        p.KanBanStatusColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanStatusColumn");
-                        p.KanBanFilterColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanFilterColumn");
-                        p.KanBanTitleColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanTitleColumn");
-                        p.KanBanAdditionalColumns = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanAdditionalColumns");
-                        p.KanBanItemStatusFields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanItemStatusFields");
-                        #endregion
                     }
+
+
                 }
             }
 
@@ -5207,12 +5202,14 @@ namespace EPMLiveWorkPlanner
             return p;
         }
 
-        //public static HelperClass.WorkPlannerProperties wps { get; set; }
-
-
-
         #region KanBanPlanner
 
+        /// <summary>
+        /// Get KanBan Planners
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="oWeb"></param>
+        /// <returns></returns>
         public static string GetKanBanPlanners(XmlDocument data, SPWeb oWeb)
         {
             //Get values from parameter
@@ -5237,7 +5234,7 @@ namespace EPMLiveWorkPlanner
                             string[] sPlanner = planner.Split('|');
                             string kanban = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + sPlanner[0] + "EnableKanBan");
 
-                            if (!string.IsNullOrEmpty(kanban))
+                            if (!string.IsNullOrEmpty(kanban) && Convert.ToBoolean(kanban))
                             {
                                 jsonPlanners.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", sPlanner[0], EncodeJsonData(sPlanner[1])));
                             }
@@ -5252,8 +5249,6 @@ namespace EPMLiveWorkPlanner
                     return string.Format("{{ \"kanbanplanners\": [{0}] }}", jsonData);
                 }
             }
-
-
         }
 
         public static string GetKanBanFilter1(XmlDocument data, SPWeb oWeb)
@@ -5333,6 +5328,8 @@ namespace EPMLiveWorkPlanner
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
         {
+            #region Read Parameters from data Xml
+
             //Get values from parameter
             string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
             string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
@@ -5340,10 +5337,15 @@ namespace EPMLiveWorkPlanner
             string kanBanBoardName = DecodeJsonData(data.GetElementsByTagName("KanBanBoardName")[0].InnerText);
             string kanBanFilter1 = DecodeJsonData(data.GetElementsByTagName("KanBanFilter1")[0].InnerText);
 
+            #endregion
+
+            #region Variable Declaration
+
             StringBuilder sbItems = new StringBuilder();
             string selectedColumns = string.Empty;
             string filterRecords = string.Empty;
 
+            #endregion
 
             //Using SharePoint Object Model fetching data values
             using (SPSite spSite = new SPSite(siteUrl))
@@ -5362,100 +5364,112 @@ namespace EPMLiveWorkPlanner
                         switch (field.Type)
                         {
                             case SPFieldType.Choice:
-                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='Choice'>" + kanBanFilter1 + "</Value></Eq></Where>";
+                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='Choice'>" + kanBanFilter1 + "</Value></Eq></Where><OrderBy><FieldRef Name='" + props.KanBanStatusColumn + "' /></OrderBy>";
                                 break;
                             case SPFieldType.Lookup:
-                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='Lookup'>" + kanBanFilter1 + "</Value></Eq></Where>";
+                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='Lookup'>" + kanBanFilter1 + "</Value></Eq></Where><OrderBy><FieldRef Name='" + props.KanBanStatusColumn + "' /></OrderBy>";
                                 break;
                             case SPFieldType.User:
-                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='User'>" + kanBanFilter1 + "</Value></Eq></Where>";
+                                filterRecords = "<Where><Eq><FieldRef Name='" + props.KanBanFilterColumn + "' /> <Value Type='User'>" + kanBanFilter1 + "</Value></Eq></Where><OrderBy><FieldRef Name='" + props.KanBanStatusColumn + "' /></OrderBy>";
                                 break;
                             default:
                                 filterRecords = "";
                                 break;
                         }
-                        //filterRecords = "";
+
+                        if (!string.IsNullOrEmpty(props.KanBanAdditionalColumns))
+                            selectedColumns += props.KanBanAdditionalColumns;
 
                         sbItems.Append("<table>");
+                        sbItems.Append("<tbody>");
                         sbItems.Append("<tr>");
 
                         sbItems.Append("<td>");
-                        sbItems.Append("<div class='itemContainer'>");
-                        sbItems.Append("<div class='itemContainerTitle'>" + list.Title + " Items</div>");
-
-                        //Load Items
-
-
-                        sbItems.Append("<div class='sortable-list' id='allTasks'>");
-
-
-                        //sbItems.Append("<div class='sortable-item-header'>");
-                        //sbItems.Append("<div>" + list.Fields[SPBuiltInFieldId.Title].Title + "</div>");
-                        //selectedColumns += list.Fields[SPBuiltInFieldId.Title].InternalName + ",";
-                        //if (list.Fields.Contains(SPBuiltInFieldId.StartDate))
-                        //{
-                        //    sbItems.Append("<div>" + list.Fields[SPBuiltInFieldId.StartDate].Title + "</div>");
-                        //    selectedColumns += list.Fields[SPBuiltInFieldId.StartDate].InternalName + ",";
-                        //}
-
-                        if (!string.IsNullOrEmpty(props.KanBanAdditionalColumns))
-                        {
-                            selectedColumns += props.KanBanAdditionalColumns;
-                            //foreach (string col in props.KanBanAdditionalColumns.Split(','))
-                            //{
-                            //    sbItems.Append("<div>" + col + "</div>");
-                            //}
-                        }
-                        //sbItems.Append("</div>");
-
-                        SPQuery qryFilterRecords = new SPQuery();
-                        qryFilterRecords.Query = filterRecords;
-                        SPListItemCollection allItems = list.GetItems(qryFilterRecords);
-
-                        foreach (SPListItem item in allItems)
-                        {
-                            sbItems.Append("<div class='sortable-item' id='" + item.ID + "'>");
-
-                            foreach (string column in selectedColumns.Split(','))
-                            {
-                                if (!string.IsNullOrEmpty(column))
-                                {
-                                    sbItems.Append("<div>" + item[column] + "&nbsp;</div>");
-                                }
-                            }
-                            sbItems.Append("</div>");
-                        }
-                        sbItems.Append("</div>");
-                        sbItems.Append("</div>");
-                        sbItems.Append("</td>");
-
+                        sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
+                        sbItems.Append("<div class='itemContainerTitle'>" + list.Title + " Items</div>"); //itemContainerTitle <div> completed
+                        sbItems.Append("<div class='sortable-list' id='" + list.Title + "'>");
 
                         bool splitterLoaded = false;
+                        SPQuery qryFilterRecords = new SPQuery();
+                        qryFilterRecords.Query = filterRecords;
+                        //SPListItemCollection allItems = list.GetItems(qryFilterRecords);
+                        SPListItemCollection allItems = list.Items;
 
-                        //Load Stages
-                        foreach (string status in props.KanBanItemStatusFields.Split(','))
+                        #region Load Blank Status Value Items
+
+                        foreach (SPListItem currentItem in allItems)
                         {
-                            sbItems.Append("<td>");
-                            sbItems.Append("<div class='stageContainer'>");
-
-                            //Load Splitter
-                            if (!splitterLoaded)
+                            if (string.IsNullOrEmpty(Convert.ToString(currentItem[props.KanBanStatusColumn]))) //Add Blank Items to Left Panel
                             {
-                                sbItems.Append("<div id='splitter'><<</div>");
-                                splitterLoaded = true;
+                                sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + currentItem.ID + "' data-userid='0' data-itemtitle='" + currentItem.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + currentItem.ID + "'>"); //sortable-item <div> started
+                                foreach (string column in selectedColumns.Split(','))
+                                {
+                                    if (!string.IsNullOrEmpty(column))
+                                    {
+                                        sbItems.Append("<div>" + Convert.ToString(currentItem[column]) + "&nbsp;</div>");
+                                    }
+                                }
                             }
-                            sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
-                            sbItems.Append("<div class='sortable-list' id='" + status + "'></div>");
-                            sbItems.Append("</div>");
-                            sbItems.Append("</td>");
+                        }
+                        sbItems.Append("</div>"); //sortable-list <div> completed
+                        sbItems.Append("</div>");//itemContainer <div> Completed
+                        sbItems.Append("</td>");
+
+                        #endregion
+
+                        #region Load Stages
+
+                        //Load All Stages - Based on Status Column Selection
+                        string statusFieldName = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanStatusColumn");
+                        SPFieldChoice choiceField = list.Fields.GetField(statusFieldName) as SPFieldChoice;
+                        StringCollection statusValues = choiceField.Choices;
+
+                        if (statusValues.Count > 0)
+                        {
+                            foreach (string status in statusValues)
+                            {
+                                sbItems.Append("<td>");
+                                sbItems.Append("<div class='stageContainer'>"); //stageContainer <div> started
+                                
+                                //Load Splitter...
+                                if (!splitterLoaded)
+                                {
+                                    sbItems.Append("<div id='splitter'><<</div>");
+                                    splitterLoaded = true;
+                                }
+
+                                sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
+                                sbItems.Append("<div class='sortable-list' id='" + status + "'>");
+
+                                SPQuery qryFilterStages = new SPQuery();
+                                qryFilterStages.Query = "<Where><Eq><FieldRef Name='" + props.KanBanStatusColumn + "' /><Value Type='Choice'>" + status + "</Value></Eq></Where>";
+                                SPListItemCollection stagingItems = list.GetItems(qryFilterStages);
+
+                                foreach (SPListItem item in stagingItems)
+                                {
+                                    sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + item.ID + "' data-userid='0' data-itemtitle='" + item.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + item.ID + "'>"); //sortable-item <div> started
+                                    foreach (string column in selectedColumns.Split(','))
+                                    {
+                                        if (!string.IsNullOrEmpty(column))
+                                        {
+                                            sbItems.Append("<div>" + item[column] + "&nbsp;</div>");
+                                        }
+                                    }
+                                    sbItems.Append("</div>");//sortable-item <div> Completed
+                                }
+
+                                sbItems.Append("</div>"); //sortable-list <div> completed
+                                sbItems.Append("</div>"); //stageContainer <div> completed
+                                sbItems.Append("</td>");
+                            }
                         }
 
-
                         sbItems.Append("</tr>");
+                        sbItems.Append("</tbody>");
                         sbItems.Append("</table>");
 
+                        #endregion
                     }
-
                 }
             }
 

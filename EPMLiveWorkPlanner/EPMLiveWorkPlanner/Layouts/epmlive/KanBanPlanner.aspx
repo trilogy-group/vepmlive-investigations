@@ -360,6 +360,7 @@
                         items: '.sortable-item',
                         update: function (event, ui) {
                             //alert("make ajax call to save [" + ui.item.attr("id") + "]  in [" + ui.item.parent().attr("id") + "]");
+                            alert("make ajax call to save [" + ui.item.attr("data-itemid") + "]  in [" + ui.item.attr("data-listid") + "]");
                         }
                     });
 

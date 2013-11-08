@@ -825,7 +825,8 @@ namespace EPMLiveWorkPlanner
                                 }
                                 else
                                 {
-                                    ddlKanBanAvailableFields.Items.Add(new ListItem(f.Title, f.InternalName));
+                                    if (f.Id != SPBuiltInFieldId.Title)
+                                        ddlKanBanAvailableFields.Items.Add(new ListItem(f.Title, f.InternalName));
                                     ddlKanBanTitleColumn.Items.Add(new ListItem(f.Title, f.InternalName));
                                 }
                             }
