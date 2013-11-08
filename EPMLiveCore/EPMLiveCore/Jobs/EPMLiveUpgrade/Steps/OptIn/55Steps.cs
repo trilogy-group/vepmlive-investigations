@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using EPMLiveCore.ListDefinitions;
@@ -420,7 +422,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 4.0, Description = "Using Content DB", IsOptIn = true)]
     internal class UseContentDB55 : UpgradeStep
     {
+        #region Constructors (1) 
+
         public UseContentDB55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        #endregion Constructors 
 
         #region Overrides of UpgradeStep
 
@@ -435,15 +441,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                         LogTitle(GetWebInfo(spWeb), 1);
 
                         var queryExecutor = new QueryExecutor(spWeb);
-                        foreach (var listId in queryExecutor.GetMappedListIds())
+                        foreach (SPList spList in queryExecutor.GetMappedListIds()
+                            .Select(listId => spWeb.Lists.GetList(listId, true)))
                         {
-                            var spList = spWeb.Lists.GetList(listId, true);
-
                             LogTitle(GetListInfo(spList), 2);
 
                             var settings = new GridGanttSettings(spList);
 
-                            var reason = string.Empty;
+                            string reason = string.Empty;
 
                             switch ((int) spList.BaseTemplate)
                             {
@@ -460,16 +465,214 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
                             if (!string.IsNullOrEmpty(reason))
                             {
-                                
+                                settings.EnableContentReporting = true;
+                                settings.SaveSettings(spList);
+
                                 LogMessage(reason, MessageKind.SUCCESS, 3);
                             }
                             else
                             {
-                                LogMessage("List is not a Project Center, Task Center or a Work list.", MessageKind.SKIPPED, 3);
+                                LogMessage("List is not a Project Center, Task Center or a Work list.",
+                                    MessageKind.SKIPPED, 3);
                             }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 5.0, Description = "Turning on Create Workspace functionality",
+        IsOptIn = true)]
+    internal class TurnOnCreateWorkspace55 : UpgradeStep
+    {
+        #region Constructors (1) 
+
+        public TurnOnCreateWorkspace55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                using (var spSite = new SPSite(Web.Site.ID))
+                {
+                    using (SPWeb spWeb = spSite.OpenWeb())
+                    {
+                        LogTitle(GetWebInfo(spWeb), 1);
+
+                        SPList spList = spWeb.Lists.TryGetList("Project Center");
+
+                        if (spList != null)
+                        {
+                            LogTitle(GetListInfo(spList), 2);
+
+                            var settings = new GridGanttSettings(spList) {EnableRequests = true};
+                            settings.SaveSettings(spList);
+
+                            LogMessage(string.Empty, MessageKind.SUCCESS, 3);
+                        }
+                        else
+                        {
+                            LogMessage("Cannot find the Project Center list.", MessageKind.FAILURE, 2);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 6.0, Description = "Configuring Advance Reporting",
+        IsOptIn = true)]
+    internal class ConfigureAdvanceReporting55 : UpgradeStep
+    {
+        #region Fields (2) 
+
+        private const string LIST_NAME = "IzendaReports";
+        private readonly string _storeUrl;
+
+        #endregion Fields 
+
+        #region Constructors (1) 
+
+        public ConfigureAdvanceReporting55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
+        {
+            ServicePointManager.ServerCertificateValidationCallback +=
+                (sender, certificate, chain, sslPolicyErrors) => true;
+
+            _storeUrl = "https://store.workengine.com";
+        }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    using (var spSite = new SPSite(Web.Site.ID))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb())
+                        {
+                            LogTitle(GetWebInfo(spWeb), 1);
+
+                            SPList spList = spWeb.Lists.TryGetList(LIST_NAME);
+
+                            if (spList == null)
+                            {
+                                LogMessage("Downloading new " + LIST_NAME + " list", 2);
+
+                                var catalog =
+                                    (SPDocumentLibrary) Web.Site.GetCatalog(SPListTemplateType.ListTemplateCatalog);
+
+                                const string TEMPLATE_NAME = LIST_NAME + " [5.5]";
+
+                                using (var webClient = new WebClient())
+                                {
+                                    byte[] bytes =
+                                        webClient.DownloadData(_storeUrl + "/Upgrade/" + LIST_NAME.ToLower() + ".stp");
+                                    SPFile file = catalog.RootFolder.Files.Add(LIST_NAME + "_55.stp", bytes, true);
+                                    SPListItem li = file.GetListItem();
+                                    li["Title"] = TEMPLATE_NAME;
+                                    li.SystemUpdate();
+                                }
+
+                                LogMessage("Creating the " + LIST_NAME + " list", 2);
+
+                                SPListTemplateCollection listTemplates = spSite.GetCustomListTemplates(spWeb);
+                                SPListTemplate template = listTemplates[TEMPLATE_NAME];
+
+                                spWeb.Lists.Add(LIST_NAME, string.Empty, template);
+
+                                SPList list = spWeb.Lists[LIST_NAME];
+                                list.Title = LIST_NAME;
+                                list.Hidden = true;
+                                list.AllowDeletion = false;
+                                list.Update();
+
+                                LogMessage("Processing reports", 2);
+
+                                string error;
+                                Reporting.ProcessIzendaReportsFromList(list, out error);
+
+                                if (!string.IsNullOrEmpty(error))
+                                {
+                                    LogMessage(error, MessageKind.FAILURE, 3);
+                                }
+
+                                LogMessage("Updating Navigation link", 2);
+
+                                string newUrl = spWeb.Url + "/_layouts/15/epmlive/reporting/landing.aspx";
+
+                                SPList lst = spWeb.Lists.TryGetList("Installed Applications");
+                                if (lst != null)
+                                {
+                                    var qry = new SPQuery
+                                    {
+                                        Query = @"<Where><IsNotNull><FieldRef Name='QuickLaunch' /></IsNotNull></Where>",
+                                        ViewFields = @"<FieldRef Name='QuickLaunch' />"
+                                    };
+
+                                    SPListItemCollection listItems = lst.GetItems(qry);
+
+                                    foreach (SPNavigationNode navNode in from SPListItem item in listItems
+                                        from node in item["QuickLaunch"].ToString().Split(',')
+                                        select Convert.ToInt32(node.Split(':')[0])
+                                        into nodeId
+                                        select spWeb.Navigation.GetNodeById(nodeId)
+                                        into navNode
+                                        let url = navNode.Url.ToLower()
+                                        where url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
+                                              url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx")
+                                        select navNode)
+                                    {
+                                        LogMessage("Node: " + navNode.Title, 3);
+                                        LogMessage("Old URL: " + navNode.Url, 3);
+                                        LogMessage("New URL: " + newUrl, 3);
+
+                                        navNode.Url = newUrl;
+                                        navNode.Update();
+
+                                        LogMessage(null, MessageKind.SUCCESS, 4);
+                                    }
+                                }
+                                else
+                                {
+                                    LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE,
+                                        3);
+                                }
+
+                                LogMessage(null, MessageKind.SUCCESS, 3);
+                            }
+                            else
+                            {
+                                LogMessage("Advance reporting is already configured.", MessageKind.SKIPPED, 2);
+                            }
+                        }
+                    }
+                });
             }
             catch (Exception e)
             {
