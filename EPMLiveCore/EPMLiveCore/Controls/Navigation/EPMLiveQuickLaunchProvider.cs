@@ -154,6 +154,18 @@ namespace EPMLiveCore.Controls.Navigation
                                             SiteMapNode parentNode = node.ParentNode;
                                             if (parentNode != null && parentNode.Title.Equals("Quick launch"))
                                             {
+
+                                                if (node.Url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx"))
+                                                {
+                                                    var title = node.Title;
+
+                                                    node = new SiteMapNode(this, nodeKey)
+                                                    {
+                                                        Title = title,
+                                                        Url = spWeb.Url + "/_layouts/15/epmlive/reporting/landing.aspx"
+                                                    };
+                                                }
+
                                                 linkNodes[nodeKey] = node;
                                             }
                                         }

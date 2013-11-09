@@ -30,8 +30,19 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         // Private Methods (3) 
 
-        private string CalculateUrl(string url, bool isRootWeb)
+        private string CalculateUrl(SPNavigationNode node, bool isRootWeb)
         {
+            var url = node.Url;
+
+            if (node.Title.Equals("My Work"))
+            {
+                url = Url + "_layouts/15/epmlive/MyWork.aspx";
+            }
+            else if (node.Title.Equals("Timesheet"))
+            {
+                url = Url + "/_layouts/15/epmlive/MyTimesheet.aspx";
+            }
+
             if (isRootWeb) return url;
 
             if (url.ToLower().Contains("_layouts"))
@@ -82,7 +93,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                                 select new NavLink
                                 {
                                     Title = node.Title,
-                                    Url = CalculateUrl(node.Url, isRootWeb)
+                                    Url = CalculateUrl(node, isRootWeb)
                                 });
                         }
                         catch { }
