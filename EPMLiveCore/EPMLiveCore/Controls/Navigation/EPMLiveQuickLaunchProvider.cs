@@ -162,7 +162,7 @@ namespace EPMLiveCore.Controls.Navigation
                                                     node = new SiteMapNode(this, nodeKey)
                                                     {
                                                         Title = title,
-                                                        Url = spWeb.Url + "/_layouts/15/epmlive/reporting/landing.aspx"
+                                                        Url = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/reporting/landing.aspx"
                                                     };
                                                 }
 

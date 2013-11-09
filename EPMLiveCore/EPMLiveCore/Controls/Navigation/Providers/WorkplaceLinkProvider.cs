@@ -36,11 +36,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             if (node.Title.Equals("My Work"))
             {
-                url = Url + "_layouts/15/epmlive/MyWork.aspx";
+                url = RelativeUrl + "/_layouts/15/epmlive/MyWork.aspx";
             }
             else if (node.Title.Equals("Timesheet"))
             {
-                url = Url + "/_layouts/15/epmlive/MyTimesheet.aspx";
+                url = RelativeUrl + "/_layouts/15/epmlive/MyTimesheet.aspx";
             }
 
             if (isRootWeb) return url;
