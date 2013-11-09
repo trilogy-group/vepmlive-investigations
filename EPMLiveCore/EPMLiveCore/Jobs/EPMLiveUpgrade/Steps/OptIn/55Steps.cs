@@ -701,4 +701,35 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
         #endregion
     }
+
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 7.0, Description = "Scheduling Reporting Refresh",
+        IsOptIn = true)]
+    internal class RefreshReporting : UpgradeStep
+    {
+        #region Constructors (1)
+
+        public RefreshReporting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        #endregion Constructors
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                var workEngineApi = new WorkEngineAPI();
+                workEngineApi.Execute("Reporting_RefreshAll", string.Empty);
+                LogMessage(null, MessageKind.SUCCESS, 1);
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.Message, MessageKind.FAILURE, 1);
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
 }
