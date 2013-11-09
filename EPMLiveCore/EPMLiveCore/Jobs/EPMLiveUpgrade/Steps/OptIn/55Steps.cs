@@ -246,7 +246,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                                     SPNavigationNode node = spWeb.Navigation.GetNodeById(id);
                                                     if (node.Title.Equals("My Work"))
                                                     {
-                                                        UpdateLink(spWeb.Url + "/_layouts/15/epmlive/MyWork.aspx", node);
+                                                        UpdateLink(spWeb.Url + "_layouts/15/epmlive/MyWork.aspx", node);
                                                     }
                                                     else if (node.Title.Equals("Timesheet"))
                                                     {

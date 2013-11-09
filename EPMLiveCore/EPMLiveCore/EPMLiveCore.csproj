@@ -966,6 +966,13 @@
     <Compile Include="Layouts\epmlive\notificationsadmin.aspx.designer.cs">
       <DependentUpon>notificationsadmin.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\OptInUpgrade.aspx.cs">
+      <DependentUpon>OptInUpgrade.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\OptInUpgrade.aspx.designer.cs">
+      <DependentUpon>OptInUpgrade.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\PerformUpgrade.aspx.cs">
       <DependentUpon>PerformUpgrade.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1161,13 +1168,6 @@
     </Compile>
     <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs">
       <DependentUpon>UpgradeResult.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx.cs">
-      <DependentUpon>OptInUpgrade55.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx.designer.cs">
-      <DependentUpon>OptInUpgrade55.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
       <DependentUpon>proxy.aspx</DependentUpon>
@@ -3499,6 +3499,7 @@
     <Content Include="Layouts\epmlive\notifications.aspx" />
     <Content Include="Layouts\epmlive\notificationsadmin.aspx" />
     <Content Include="Layouts\epmlive\openprojectplan.aspx" />
+    <Content Include="Layouts\epmlive\OptInUpgrade.aspx" />
     <Content Include="Layouts\epmlive\outlooksynch.aspx" />
     <Content Include="Layouts\epmlive\PerformUpgrade.aspx" />
     <Content Include="Layouts\epmlive\permissions.aspx" />
@@ -3833,7 +3834,6 @@
     <Content Include="Layouts\epmlive\unsealfields.aspx" />
     <Content Include="Layouts\epmlive\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\UpgradeResult.aspx" />
-    <Content Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />

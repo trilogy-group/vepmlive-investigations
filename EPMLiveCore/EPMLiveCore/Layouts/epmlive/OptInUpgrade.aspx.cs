@@ -2,9 +2,9 @@
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint.WebControls;
 
-namespace EPMLiveCore.Layouts.epmlive.Upgraders
+namespace EPMLiveCore.Layouts.epmlive
 {
-    public partial class OptInUpgrade55 : LayoutsPageBase
+    public partial class OptInUpgrade : LayoutsPageBase
     {
         #region Fields (1) 
 

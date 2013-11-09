@@ -7,10 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EPMLiveCore.Layouts.epmlive.Upgraders {
+namespace EPMLiveCore.Layouts.epmlive {
     
     
-    public partial class OptInUpgrade55 {
+    public partial class OptInUpgrade {
         
         /// <summary>
         /// lblError control.

@@ -5,7 +5,7 @@
 <%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="OptInUpgrade55.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.Upgraders.OptInUpgrade55" DynamicMasterPageFile="~masterurl/default.master" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="OptInUpgrade.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.OptInUpgrade" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
@@ -16,9 +16,9 @@
 	<asp:Panel ID="pnlMain" runat="server">
 		<div style="padding:20px">
 			<div style="width: 600px;margin-bottom: 50px;">
-				<div class="upgradeheader">Welcome the EPM Live 5.5 Opt-in Upgrader</div>
+				<div class="upgradeheader">EPM Live 5.5 Opt-in Upgrader</div>
 				<div class="upgradetext">
-					<p>This page will allow you to upgrade this site to EPM Live version 5.5.  By clicking the "I Agree" checkbox below, you are agreeing that this site will be upgraded to version 5.5 of EPM Live and all of its associated functionality. Although EPM Live fully supports upgrades, please understand that your existing business processes may change after the upgrade. We suggest creating a new trial site prior to the upgrade in order to understand the implications of this upgrade.</p>
+					<p>This page will allow you to upgrade this site to EPM Live version 5.5. By clicking the "I Agree" checkbox below, you are agreeing that this site will be upgraded to version 5.5 of EPM Live and all of its associated functionality. Although EPM Live fully supports upgrades, please understand that your existing business processes may change after the upgrade. We suggest creating a new trial site prior to the upgrade in order to understand the implications of this upgrade.</p>
 					<p>Also, please visit our <a href="http://support.epmlive.com" style="color: #438DE8; text-decoration: underline;" target="_blank">Support Community</a> for important upgrade announcements.</p>
 				</div>
 			</div>
@@ -38,9 +38,9 @@
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-5.5 Opt-in upgrader
+    Opt-in upgrader
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-5.5 Opt-in upgrader
+    Opt-in upgrader
 </asp:Content>
