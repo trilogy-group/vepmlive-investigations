@@ -155,7 +155,7 @@ namespace EPMLiveCore.Controls.Navigation
                                             if (parentNode != null && parentNode.Title.Equals("Quick launch"))
                                             {
 
-                                                if (node.Url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx"))
+                                                if (node.Url.ToLower().EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx"))
                                                 {
                                                     var title = node.Title;
 
