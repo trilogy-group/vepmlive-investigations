@@ -162,12 +162,12 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                if ((IsItem || IsListView) && string.IsNullOrEmpty(sIcon))
+                if ((IsItem || IsListView) && string.IsNullOrEmpty(sIcon) && Type == AnalyticsType.Favorite)
                 {
                     sIcon = DEFAULT_LIST_ICON;
                 }
 
-                if (!IsItem && !IsListView)
+                if (!IsItem && !IsListView && Type == AnalyticsType.Favorite)
                 {
                     sIcon = DEFAULT_PAGE_ICON;
                 }
