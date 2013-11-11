@@ -1,19 +1,17 @@
-﻿using System;
+﻿using Microsoft.SharePoint;
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Services;
-using System.Reflection;
-using Microsoft.SharePoint;
-using System.Xml;
+using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
-using System.Collections;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections.Specialized;
-using System.Web.UI.WebControls;
+using System.Web.Services;
+using System.Xml;
 
 namespace EPMLiveWorkPlanner
 {
@@ -4467,7 +4465,6 @@ namespace EPMLiveWorkPlanner
             }
         }
 
-
         public static string GetAddLinksLayout(XmlDocument data, SPWeb oWeb)
         {
 
@@ -4649,7 +4646,6 @@ namespace EPMLiveWorkPlanner
 
             return ndTask;
         }
-
 
         private static bool isAssignmentField(string fieldname, PlannerProps p)
         {
@@ -5382,36 +5378,55 @@ namespace EPMLiveWorkPlanner
                         sbItems.Append("<tbody>");
                         sbItems.Append("<tr>");
 
-                        sbItems.Append("<td>");
-                        sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
-                        sbItems.Append("<div class='itemContainerTitle'>" + list.Title + " Items</div>"); //itemContainerTitle <div> completed
-                        sbItems.Append("<div class='sortable-list' id='" + list.Title + "'>");
 
                         bool splitterLoaded = false;
+
                         SPQuery qryFilterRecords = new SPQuery();
                         qryFilterRecords.Query = filterRecords.ToString();
                         SPListItemCollection allItems = list.GetItems(qryFilterRecords);
 
                         #region Load Blank Status Value Items
 
-                        foreach (SPListItem currentItem in allItems)
+                        List<SPListItem> blankItems = (from spitems in allItems.OfType<SPListItem>() where Convert.ToString(spitems[props.KanBanStatusColumn]) == string.Empty select spitems).ToList<SPListItem>();
+
+                        if (blankItems.Count > 0)
                         {
-                            if (string.IsNullOrEmpty(Convert.ToString(currentItem[props.KanBanStatusColumn]))) //Add Blank Items to Left Panel
+                            sbItems.Append("<td>");
+                            sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
+                            sbItems.Append("<div class='itemContainerTitle'>" + list.Title + " Items</div>"); //itemContainerTitle <div> completed
+                            sbItems.Append("<div class='sortable-list' id='" + list.Title + "'>");
+
+                            foreach (SPListItem currentItem in blankItems)
                             {
-                                sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + currentItem.ID + "' data-userid='0' data-itemtitle='" + currentItem.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + currentItem.ID + "'>"); //sortable-item <div> started
-                                foreach (string column in selectedColumns.Split(','))
+                                if (string.IsNullOrEmpty(Convert.ToString(currentItem[props.KanBanStatusColumn]))) //Add Blank Items to Left Panel
                                 {
-                                    if (!string.IsNullOrEmpty(column))
+                                    sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + currentItem.ID + "' data-userid='0' data-itemtitle='" + currentItem.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + currentItem.ID + "'>"); //sortable-item <div> started
+                                    foreach (string column in selectedColumns.Split(','))
                                     {
-                                        sbItems.Append("<div>" + Convert.ToString(currentItem[column]) + "&nbsp;</div>");
+                                        if (!string.IsNullOrEmpty(column))
+                                        {
+                                            string itemTitle = Convert.ToString(currentItem[column]);
+                                            if (itemTitle.Contains(";#"))
+                                            {
+                                                sbItems.Append("<div>" + Convert.ToString(itemTitle.Split(new string[] { ";#" }, StringSplitOptions.None)[1]) + "&nbsp;</div>");
+                                            }
+                                            else
+                                            {
+                                                sbItems.Append("<div>" + itemTitle + "&nbsp;</div>");
+                                            }
+                                        }
                                     }
+                                    sbItems.Append("</div>"); //sortable-item <div> completed
                                 }
-                                sbItems.Append("</div>"); //sortable-item <div> completed
                             }
+                            sbItems.Append("</div>"); //sortable-list <div> completed
+                            sbItems.Append("</div>");//itemContainer <div> Completed
+                            sbItems.Append("</td>");
                         }
-                        sbItems.Append("</div>"); //sortable-list <div> completed
-                        sbItems.Append("</div>");//itemContainer <div> Completed
-                        sbItems.Append("</td>");
+                        else
+                        {
+                            splitterLoaded = true;
+                        }
 
                         #endregion
 
@@ -5451,7 +5466,15 @@ namespace EPMLiveWorkPlanner
                                         {
                                             if (!string.IsNullOrEmpty(column))
                                             {
-                                                sbItems.Append("<div>" + item[column] + "&nbsp;</div>");
+                                                string itemTitle = Convert.ToString(item[column]);
+                                                if (itemTitle.Contains(";#"))
+                                                {
+                                                    sbItems.Append("<div>" + Convert.ToString(itemTitle.Split(new string[] { ";#" }, StringSplitOptions.None)[1]) + "&nbsp;</div>");
+                                                }
+                                                else
+                                                {
+                                                    sbItems.Append("<div>" + itemTitle + "&nbsp;</div>");
+                                                }
                                             }
                                         }
                                         sbItems.Append("</div>");//sortable-item <div> Completed
@@ -5489,6 +5512,9 @@ namespace EPMLiveWorkPlanner
 
         public static string ReOrderAndSaveItem(XmlDocument data, SPWeb oWeb)
         {
+            const Int32 USER_ID = 0;
+            const Int32 TYPE = 50;
+
             //Get values from parameter
             string siteId = data.GetElementsByTagName("data-siteid")[0].InnerText;
             string webId = data.GetElementsByTagName("data-webid")[0].InnerText;
@@ -5507,6 +5533,7 @@ namespace EPMLiveWorkPlanner
             {
                 using (SPWeb web = site.OpenWeb(new Guid(webId)))
                 {
+                    //Update status to SharePoint list...
                     WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(web, fString);
                     web.AllowUnsafeUpdates = true;
                     SPList list = web.Lists[new Guid(listId)];
@@ -5517,9 +5544,50 @@ namespace EPMLiveWorkPlanner
                             item[props.KanBanStatusColumn] = string.Empty;
                         else
                             item[props.KanBanStatusColumn] = draggedStatus;
-                        item.Update();
+                        try
+                        {
+                            item.Update();
+                        }
+                        catch { }
                     }
                     web.AllowUnsafeUpdates = false;
+
+                    //Insert/Update Record to FRF list...
+                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                    {
+                        cn.Open();
+
+                        //Replace userId and Type fields after words...
+                        string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
+                        BEGIN
+	                        INSERT INTO FRF ([SITE_ID],[WEB_ID],[LIST_ID],[ITEM_ID],[USER_ID],[Title],[Icon],[Type],[F_String],[F_Date],[F_Int])
+                                    VALUES (@siteId, @webId, @listId, @itemId, @userId, @title, @icon, @type, @fString, @fDate, @fInt)
+                            SELECT * FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Title]=@title AND [Type]=@type
+                        END
+                        ELSE 
+                        BEGIN
+                            UPDATE FRF SET 
+                            [Title] = @title, 
+                            [F_Int] = [F_Int] + 1 
+                            WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type
+                            SELECT * FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type
+                        END";
+
+                        SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
+                        cmd.Parameters.AddWithValue("@siteId", siteId);
+                        cmd.Parameters.AddWithValue("@webId", webId);
+                        cmd.Parameters.AddWithValue("@listId", listId);
+                        cmd.Parameters.AddWithValue("@itemId", itemId);
+                        cmd.Parameters.AddWithValue("@userId", USER_ID);
+                        cmd.Parameters.AddWithValue("@title", itemTitle + " -> " + draggedStatus);
+                        cmd.Parameters.AddWithValue("@icon", icon);
+                        cmd.Parameters.AddWithValue("@type", TYPE);
+                        cmd.Parameters.AddWithValue("@fString", fString);
+                        cmd.Parameters.AddWithValue("@fDate", fDate);
+                        cmd.Parameters.AddWithValue("@fInt", fInt);
+
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
 
