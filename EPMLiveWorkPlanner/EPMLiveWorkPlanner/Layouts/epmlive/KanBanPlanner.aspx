@@ -232,11 +232,15 @@
                 loadKanBanFilter1(this.value);
             });
 
-            $("#btnApply").click(function () {
-                var kanBanBoardName = $("#ddlKanBanPlanners").val();
-                var kanBanFilter1 = $("#ddlKanBanFilter1").val().toString().replace("\\", "\\\\");
-                loadKanBanBoard(kanBanBoardName, kanBanFilter1);
-            });
+            //$("#btnApply").click(function () {
+            //    var kanBanBoardName = $("#ddlKanBanPlanners").val();
+            //    var kanBanFilter1 = "";
+            //    $("#ddlKanBanFilter1 option:selected").each(function () {
+            //        if (kanBanFilter1 != "") kanBanFilter1 += ",";
+            //        kanBanFilter1 += $(this).val().toString().replace("\\", "\\\\");
+            //    });
+            //    loadKanBanBoard(kanBanBoardName, kanBanFilter1);
+            //});
 
         });
 
@@ -254,14 +258,14 @@
 
         function resetControls(reset) {
             if (reset) {
-                $("#btnApply").show();
+                //$("#btnApply").show();
                 $("#lblFilert1").show();
                 $("#ddlKanBanFilter1").show();
                 $("#mainContainer").show();
                 $("#mainContainer").html('');
             }
             else {
-                $("#btnApply").hide();
+                //$("#btnApply").hide();
                 $("#lblFilert1").hide();
                 $("#ddlKanBanFilter1").hide();
                 $("#mainContainer").hide();
@@ -330,26 +334,38 @@
                         $("div[id^='ddcl-']").remove();
                         $("#ddlKanBanFilter1").dropdownchecklist({
                             width: 200,
-                            //forceMultiple: true,
+                            forceMultiple: true,
                             firstItemChecksAll: true,
-                            explicitClose: "...Close"
-                            //,                            onComplete: function (selector) {
-                            //    var kanBanFilter1 = "";
-                            //    for (i = 0; i < selector.options.length; i++) {
-                            //        if (selector.options[i].selected && (selector.options[i].value != "")) {
-                            //            if (kanBanFilter1 != "") kanBanFilter1 += ",";
-                            //            kanBanFilter1 += selector.options[i].value.toString().replace("\\", "\\\\");
-                            //        }
-                            //    }
-                            //    loadKanBanBoard($("#ddlKanBanPlanners").val(), kanBanFilter1);
-                            //}
+                            explicitClose: "...Close",
+                            onComplete: function (selector) {
+                                //var kanBanFilter1 = "";
+                                //for (i = 0; i < selector.options.length; i++) {
+                                //    if (selector.options[i].selected && (selector.options[i].value != "")) {
+                                //        if (kanBanFilter1 != "") kanBanFilter1 += ",";
+                                //        kanBanFilter1 += selector.options[i].value.toString().replace("\\", "\\\\");
+                                //    }
+                                //}
+                                //loadKanBanBoard($("#ddlKanBanPlanners").val(), kanBanFilter1);
+
+                                loadKanBanBoard();
+                            }
                         });
                     }
                 });
             }
         };
 
-        function loadKanBanBoard(kanBanBoardName, kanBanFilter1) {
+        //function loadKanBanBoard(kanBanBoardName, kanBanFilter1) {
+        function loadKanBanBoard() {
+
+            var kanBanBoardName = $("#ddlKanBanPlanners").val();
+            var kanBanFilter1 = "";
+
+            $("#ddlKanBanFilter1 option:selected").each(function () {
+                if (kanBanFilter1 != "") kanBanFilter1 += ",";
+                kanBanFilter1 += $(this).val().toString().replace("\\", "\\\\");
+            });
+
             if (kanBanFilter1 == "") {
                 return;
             }
@@ -387,6 +403,7 @@
                         placeholder: 'placeholder',
                         items: '.sortable-item',
                         update: function (event, ui) {
+                            showHideLoading(true, 'Saving item...');
                             var data = '<DataXml><data-siteid>' + ui.item.attr("data-siteid") + '</data-siteid><data-webid>' + ui.item.attr("data-webid") + '</data-webid><data-listid>' + ui.item.attr("data-listid") + '</data-listid><data-itemid>' + ui.item.attr("data-itemid") + '</data-itemid><data-userid>' + ui.item.attr("data-userid") + '</data-userid><data-itemtitle>' + ui.item.attr("data-itemtitle") + '</data-itemtitle><data-icon>' + ui.item.attr("data-icon") + '</data-icon><data-type>' + ui.item.attr("data-type") + '</data-type><data-fstring>' + ui.item.attr("data-fstring") + '</data-fstring><data-fdate>' + ui.item.attr("data-fdate") + '</data-fdate><data-fint>' + ui.item.attr("data-fint") + '</data-fint><data-dragged-status>' + ui.item.parent().attr("id") + '</data-dragged-status></DataXml>';
                             $.ajax({
                                 type: "POST",
@@ -400,7 +417,9 @@
                                     alert(err.Message);
                                 },
                                 success: function (response) {
-                                    $("#btnApply").click();
+                                    //$("#btnApply").click();
+                                    showHideLoading(false, '');
+                                    loadKanBanBoard();
                                 }
                             });
                         }
@@ -434,7 +453,7 @@
                         </select>
                     </td>
                     <td>
-                        <input id="btnApply" type="button" value="Apply" />
+                        <%--<input id="btnApply" type="button" value="Apply" />--%>
                     </td>
                 </tr>
             </table>
