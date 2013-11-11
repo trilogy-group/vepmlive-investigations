@@ -38,7 +38,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             {
                 url = RelativeUrl + "/_layouts/15/epmlive/MyWork.aspx";
             }
-            else if (node.Title.Equals("Timesheet"))
+            else if (node.Title.ToLower().Contains("timesheet"))
             {
                 url = RelativeUrl + "/_layouts/15/epmlive/MyTimesheet.aspx";
             }
