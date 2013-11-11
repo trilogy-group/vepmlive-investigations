@@ -127,35 +127,35 @@ namespace EPMLiveCore
                         description = list.Description;
                         imageUrl = list.ImageUrl;
 
-                        string rlists = string.Empty;
-                        rlists = gSettings.RollupLists;
+                        //string rlists = string.Empty;
+                        //rlists = gSettings.RollupLists;
 
-                        bool disableNewButtonMod = false;
-                        string sDisableNewButtonMod = string.Empty;
-                        disableNewButtonMod = gSettings.DisableNewItemMod;
+                        //bool disableNewButtonMod = false;
+                        //string sDisableNewButtonMod = string.Empty;
+                        //disableNewButtonMod = gSettings.DisableNewItemMod;
 
-                        bool useEnhancedNewMenu = false;
-                        string sUseEnhancedNewMenu = string.Empty;
-                        useEnhancedNewMenu = gSettings.UseNewMenu;
+                        //bool useEnhancedNewMenu = false;
+                        //string sUseEnhancedNewMenu = string.Empty;
+                        //useEnhancedNewMenu = gSettings.UseNewMenu;
 
                         // if "Use Enhanced New Menu" option is turned on
                         // use the new create modal dialog
-                        if (useEnhancedNewMenu && !disableNewButtonMod)
-                        {
-                            linkUrl = "#";
-                            string createNewWorkspaceUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/createnewworkspace.aspx?list=" + list.ID.ToString("B") + "&type=site&source=" + requestUrl;
-                            onclick = "javascript:HideLayers();var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
-                        }
+                        //if (useEnhancedNewMenu && !disableNewButtonMod)
+                        //{
+                        //    linkUrl = "#";
+                        //    string createNewWorkspaceUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/createnewworkspace.aspx?list=" + list.ID.ToString("B") + "&type=site&source=" + requestUrl;
+                        //    onclick = "javascript:HideLayers();var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                        //}
                         // check for roll up lists
                         // not a pop up
-                        else if (!string.IsNullOrEmpty(rlists) && !disableNewButtonMod)
-                        {
-                            onclick = "";
-                            string firstListLName = rlists.Split(',')[0];
-                            linkUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + requestUrl;
-                        }
+                        //else if (!string.IsNullOrEmpty(rlists) && !disableNewButtonMod)
+                        //{
+                        //    onclick = "";
+                        //    string firstListLName = rlists.Split(',')[0];
+                        //    linkUrl = (cWeb.ServerRelativeUrl == "/" ? "" : cWeb.ServerRelativeUrl) + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + requestUrl;
+                        //}
                         // if content management is allowed
-                        else if (list.AllowContentTypes)
+                        if (list.AllowContentTypes)
                         {
                             if (list.NavigateForFormsPages)
                             {
