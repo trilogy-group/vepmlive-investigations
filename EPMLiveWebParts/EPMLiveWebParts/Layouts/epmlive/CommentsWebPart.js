@@ -847,6 +847,9 @@ function GetData() {
                     else {
                         $.getScript('/_layouts/epmlive/slimScroll.js', function () {
                             $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5 });
+                            if ($('.slimScrollDiv').length > 0) {
+                                $('.slimScrollDiv').css('padding-bottom', '5px');
+                            }
                         }, true);
 
                         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
@@ -857,10 +860,7 @@ function GetData() {
                                 }
                             });
                         }, true);
-
-                        //                        $.getScript('/_layouts/epmlive/TextBoxAutoGrow.js', function () {
-                        //                            $('.tbComment').autogrow();
-                        //                        });
+                        
                     }
                 },
                 error: function (error) {
