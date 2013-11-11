@@ -227,9 +227,9 @@
                 loadKanBanFilter1(this.value);
             });
 
-            $("#btnApply").click(function () {
-                loadKanBanBoard($("#ddlKanBanPlanners").val(), $("#ddlKanBanFilter1").val());
-            });
+            //$("#btnApply").click(function () {
+            //    loadKanBanBoard($("#ddlKanBanPlanners").val(), $("#ddlKanBanFilter1").val());
+            //});
 
         });
 
@@ -247,14 +247,14 @@
 
         function resetControls(reset) {
             if (reset) {
-                $("#btnApply").show();
+                //$("#btnApply").show();
                 $("#lblFilert1").show();
                 $("#ddlKanBanFilter1").show();
                 $("#mainContainer").show();
                 $("#mainContainer").html('');
             }
             else {
-                $("#btnApply").hide();
+                //$("#btnApply").hide();
                 $("#lblFilert1").hide();
                 $("#ddlKanBanFilter1").hide();
                 $("#mainContainer").hide();
@@ -319,13 +319,32 @@
 
                         $("span[id^='ddcl-']").remove();
                         $("div[id^='ddcl-']").remove();
-                        $("#ddlKanBanFilter1").dropdownchecklist();
+                        $("#ddlKanBanFilter1").dropdownchecklist({
+                            width: 200,
+                            forceMultiple: true,
+                            firstItemChecksAll: true,
+                            explicitClose: "...Close",
+                            onComplete: function (selector) {
+                                var kanBanFilter1 = "";
+                                for (i = 0; i < selector.options.length; i++) {
+                                    if (selector.options[i].selected && (selector.options[i].value != "")) {
+                                        if (kanBanFilter1 != "") kanBanFilter1 += ",";
+                                        kanBanFilter1 += selector.options[i].value.toString().replace("\\", "\\\\");
+                                    }
+                                }
+                                loadKanBanBoard($("#ddlKanBanPlanners").val(), kanBanFilter1);
+                            }
+                        });
                     }
                 });
             }
         };
 
         function loadKanBanBoard(kanBanBoardName, kanBanFilter1) {
+            if (kanBanFilter1 == "") {
+                return;
+            }
+
             showHideLoading(true, 'Loading Kanban Board');
             $.ajax({
                 type: "POST",
@@ -360,7 +379,7 @@
                         items: '.sortable-item',
                         update: function (event, ui) {
                             //alert("make ajax call to save [" + ui.item.attr("id") + "]  in [" + ui.item.parent().attr("id") + "]");
-                            alert("make ajax call to save [" + ui.item.attr("data-itemid") + "]  in [" + ui.item.attr("data-listid") + "]");
+                            //alert("make ajax call to save [" + ui.item.attr("data-itemid") + "]  in [" + ui.item.attr("data-listid") + "]");
                         }
                     });
 
@@ -393,7 +412,7 @@
                         </select>
                     </td>
                     <td>
-                        <input id="btnApply" type="button" value="Apply" />
+                        <%--<input id="btnApply" type="button" value="Apply" />--%>
                     </td>
                 </tr>
             </table>

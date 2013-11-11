@@ -5266,6 +5266,7 @@ namespace EPMLiveWorkPlanner
                 using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
                 {
                     StringBuilder jsonFilter1 = new StringBuilder();
+                    jsonFilter1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "(All)"));
 
                     WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
 
