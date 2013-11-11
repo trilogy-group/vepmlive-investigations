@@ -1155,3 +1155,6 @@ div[data-placeholder]:not(:focus):not([data-div-placeholder-content]):before {
     margin:0px;
     padding:0px;
 }
+.slimScrollDiv{
+    padding-bottom: 5px;
+}
