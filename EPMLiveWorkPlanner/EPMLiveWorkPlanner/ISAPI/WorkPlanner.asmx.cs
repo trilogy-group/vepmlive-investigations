@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Services;
 using System.Xml;
+using System.Web;
 
 namespace EPMLiveWorkPlanner
 {
@@ -5579,7 +5580,7 @@ namespace EPMLiveWorkPlanner
                         cmd.Parameters.AddWithValue("@listId", listId);
                         cmd.Parameters.AddWithValue("@itemId", itemId);
                         cmd.Parameters.AddWithValue("@userId", USER_ID);
-                        cmd.Parameters.AddWithValue("@title", itemTitle + " -> " + draggedStatus);
+                        cmd.Parameters.AddWithValue("@title", itemTitle);
                         cmd.Parameters.AddWithValue("@icon", icon);
                         cmd.Parameters.AddWithValue("@type", TYPE);
                         cmd.Parameters.AddWithValue("@fString", fString);
