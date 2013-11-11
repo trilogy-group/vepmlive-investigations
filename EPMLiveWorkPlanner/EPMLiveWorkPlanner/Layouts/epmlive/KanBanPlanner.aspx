@@ -200,6 +200,11 @@
             box-shadow: #B3B3B3 2px 2px 2px;
         }
 
+            .itemContainer .sortable-item div:first-child,
+            .stageContainer .sortable-item div:first-child {
+                font-weight: bold;
+            }
+
         .placeholder {
             /*background-color: #BFB;
             border: 1px dashed #666;
