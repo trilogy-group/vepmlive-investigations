@@ -846,7 +846,7 @@ function GetData() {
                     }
                     else {
                         $.getScript('/_layouts/epmlive/slimScroll.js', function () {
-                            $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5, alwaysVisible: true });
+                            $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5 });
                         }, true);
 
                         $.getScript('/_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js', function () {
