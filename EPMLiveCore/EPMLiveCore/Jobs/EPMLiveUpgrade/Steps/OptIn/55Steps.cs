@@ -692,25 +692,25 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
                                     foreach (SPListItem item in listItems)
                                     {
-                                        foreach (string node in item["QuickLaunch"].ToString().Split(','))
+                                        foreach (SPNavigationNode navNode in
+                                            from node in item["QuickLaunch"].ToString().Split(',')
+                                            select Convert.ToInt32(node.Split(':')[0])
+                                            into i
+                                            select spWeb.Navigation.GetNodeById(i)
+                                            into navNode
+                                            where navNode != null
+                                            let url = navNode.Url.ToLower()
+                                            where url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
+                                                  url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx")
+                                            select navNode)
                                         {
-                                            int i = Convert.ToInt32(node.Split(':')[0]);
-                                            SPNavigationNode navNode = spWeb.Navigation.GetNodeById(i);
-                                            if (navNode != null)
-                                            {
-                                                string url = navNode.Url.ToLower();
-                                                if (url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
-                                                    url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx"))
-                                                {
-                                                    string message;
-                                                    MessageKind messageKind;
+                                            string message;
+                                            MessageKind messageKind;
 
-                                                    UpgradeUtilities.UpdateNodeLink(newUrl, item.ID, navNode, spWeb,
-                                                        out message, out messageKind);
+                                            UpgradeUtilities.UpdateNodeLink(newUrl, item.ID, navNode, spWeb,
+                                                out message, out messageKind);
 
-                                                    LogMessage(message, messageKind, 4);
-                                                }
-                                            }
+                                            LogMessage(message, messageKind, 3);
                                         }
                                     }
                                 }
@@ -720,7 +720,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                         3);
                                 }
 
-                                LogMessage(null, MessageKind.SUCCESS, 3);
+                                CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
                             }
                             else
                             {
