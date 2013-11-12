@@ -568,11 +568,27 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             LogMessage(groupName, 3);
 
-            spWeb.SiteGroups.Add(groupName, owner, user, null);
-            SPRole roll = spWeb.Roles["Read"];
-            roll.AddGroup(spWeb.SiteGroups[groupName]);
+            try
+            {
+                var spGroup = spWeb.SiteGroups.GetByName(groupName);
 
-            LogMessage(null, MessageKind.SUCCESS, 4);
+                if (spGroup == null)
+                {
+                    spWeb.SiteGroups.Add(groupName, owner, user, null);
+                    SPRole roll = spWeb.Roles["Read"];
+                    roll.AddGroup(spWeb.SiteGroups[groupName]);
+
+                    LogMessage(null, MessageKind.SUCCESS, 4);
+                }
+                else
+                {
+                    LogMessage("Group already exists.", MessageKind.SKIPPED, 4);
+                }
+            }
+            catch (Exception exception)
+            {
+                LogMessage(exception.Message, MessageKind.FAILURE, 4);
+            }
         }
 
         #endregion Methods 
