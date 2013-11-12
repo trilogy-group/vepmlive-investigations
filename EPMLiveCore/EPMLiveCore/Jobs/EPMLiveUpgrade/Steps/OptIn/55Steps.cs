@@ -716,8 +716,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                 }
                                 else
                                 {
-                                    LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE,
-                                        3);
+                                    LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE, 3);
                                 }
 
                                 CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
