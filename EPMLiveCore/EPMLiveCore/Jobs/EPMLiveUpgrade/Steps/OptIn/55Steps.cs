@@ -224,7 +224,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
                                                 if (node.Title.Equals("My Work"))
                                                 {
-                                                    string url = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/MyWork.aspx";
+                                                    string url = spWeb.ServerRelativeUrl +
+                                                                 "/_layouts/15/epmlive/MyWork.aspx";
 
                                                     if (url.ToLower().Equals(node.Url.ToLower())) continue;
 
@@ -235,7 +236,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                                 }
                                                 else if (node.Title.Equals("Timesheet"))
                                                 {
-                                                    string url = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/MyTimesheet.aspx";
+                                                    string url = spWeb.ServerRelativeUrl +
+                                                                 "/_layouts/15/epmlive/MyTimesheet.aspx";
 
                                                     if (url.ToLower().Equals(node.Url.ToLower())) continue;
 
@@ -570,7 +572,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
             try
             {
-                var spGroup = spWeb.SiteGroups.GetByName(groupName);
+                SPGroup spGroup = spWeb.SiteGroups.GetByName(groupName);
 
                 if (spGroup == null)
                 {
@@ -715,6 +717,37 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             catch (Exception e)
             {
                 LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 7.0, Description = "Scheduling Reporting Refresh",
+        IsOptIn = true)]
+    internal class RefreshReporting : UpgradeStep
+    {
+        #region Constructors (1) 
+
+        public RefreshReporting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                var workEngineApi = new WorkEngineAPI();
+                workEngineApi.Execute("Reporting_RefreshAll", string.Empty);
+                LogMessage(null, MessageKind.SUCCESS, 1);
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.Message, MessageKind.FAILURE, 1);
             }
 
             return true;
