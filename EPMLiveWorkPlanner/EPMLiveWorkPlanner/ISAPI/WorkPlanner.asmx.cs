@@ -5402,6 +5402,7 @@ namespace EPMLiveWorkPlanner
                                 if (string.IsNullOrEmpty(Convert.ToString(currentItem[props.KanBanStatusColumn]))) //Add Blank Items to Left Panel
                                 {
                                     sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + currentItem.ID + "' data-userid='0' data-itemtitle='" + currentItem.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + currentItem.ID + "'>"); //sortable-item <div> started
+                                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + currentItem.ID + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
                                     foreach (string column in selectedColumns.Split(','))
                                     {
                                         if (!string.IsNullOrEmpty(column))
@@ -5463,6 +5464,8 @@ namespace EPMLiveWorkPlanner
                                     foreach (SPListItem item in stagingItems)
                                     {
                                         sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + item.ID + "' data-userid='0' data-itemtitle='" + item.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + item.ID + "'>"); //sortable-item <div> started
+                                        sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + item.ID + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
+
                                         foreach (string column in selectedColumns.Split(','))
                                         {
                                             if (!string.IsNullOrEmpty(column))

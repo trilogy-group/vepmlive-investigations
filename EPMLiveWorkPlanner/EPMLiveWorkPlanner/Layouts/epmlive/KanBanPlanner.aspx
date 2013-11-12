@@ -200,8 +200,8 @@
             box-shadow: #B3B3B3 2px 2px 2px;
         }
 
-            .itemContainer .sortable-item div:first-child,
-            .stageContainer .sortable-item div:first-child {
+            .itemContainer .sortable-item div:nth-child(2),
+            .stageContainer .sortable-item div:nth-child(2) {
                 font-weight: bold;
             }
 
@@ -218,6 +218,12 @@
         .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
             background: none !important;
             color: none !important;
+        }
+
+        .associateditemscontextmenu {
+            list-style: none;
+            cursor: pointer;
+            position: absolute;
         }
     </style>
     <script type="text/javascript">
@@ -427,6 +433,9 @@
                         }
                     });
 
+                    $(".associateditemscontextmenu").each(function () {
+                        window.epmLiveNavigation.addContextualMenu($(this));
+                    });
                 }
             });
         };
