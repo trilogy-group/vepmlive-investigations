@@ -12,7 +12,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Services;
 using System.Xml;
-using System.Web;
 
 namespace EPMLiveWorkPlanner
 {
@@ -5296,7 +5295,7 @@ namespace EPMLiveWorkPlanner
                                     var lookupList = filterColumnList.ParentWeb.Lists[Guid.Parse(lookupField.LookupList)];
                                     var query = new SPQuery();
 
-                                    query.Query = String.Format("<OrderBy><FieldRef Name='{0}'/></OrderBy>", lookupField.LookupField);
+                                    query.Query = String.Format("<OrderBy><FieldRef Name='{0}'/></OrderBy><IsNull><FieldRef Name='" + props.KanBanFilterColumn + "' /></IsNull>", lookupField.LookupField);
 
                                     foreach (SPListItem item in lookupList.GetItems(query))
                                     {
@@ -5358,10 +5357,13 @@ namespace EPMLiveWorkPlanner
                     {
                         SPField field = list.Fields.GetField(props.KanBanFilterColumn);
 
-                        if (!string.IsNullOrEmpty(kanBanFilterColumnSelectedValues))
+                        if (!string.IsNullOrEmpty(kanBanFilterColumnSelectedValues) && kanBanFilterColumnSelectedValues.StartsWith("0"))
                         {
-                            filterRecords.Append("<Where><Or>");
+                            filterRecords.Append("<OrderBy><FieldRef Name='" + props.KanBanStatusColumn + "' /></OrderBy>");
+                            filterRecords.Append("<Where><Or><Or>");
                             filterRecords.Append("<IsNull><FieldRef Name='" + props.KanBanStatusColumn + "' /></IsNull>");
+                            filterRecords.Append("<IsNull><FieldRef Name='" + props.KanBanFilterColumn + "' /></IsNull>");
+                            filterRecords.Append("</Or>");
                             filterRecords.Append("<In><FieldRef Name='" + props.KanBanFilterColumn + "' />");
                             filterRecords.Append("<Values>");
                             foreach (string filterColumnValue in kanBanFilterColumnSelectedValues.Split(','))
@@ -5369,6 +5371,18 @@ namespace EPMLiveWorkPlanner
                                 filterRecords.Append("<Value Type='" + field.TypeAsString + "'>" + filterColumnValue + "</Value>");
                             }
                             filterRecords.Append("</Values></In></Or></Where>");
+                        }
+                        else
+                        {
+                            filterRecords.Append("<OrderBy><FieldRef Name='" + props.KanBanStatusColumn + "' /></OrderBy>");
+                            filterRecords.Append("<Where>");
+                            filterRecords.Append("<In><FieldRef Name='" + props.KanBanFilterColumn + "' />");
+                            filterRecords.Append("<Values>");
+                            foreach (string filterColumnValue in kanBanFilterColumnSelectedValues.Split(','))
+                            {
+                                filterRecords.Append("<Value Type='" + field.TypeAsString + "'>" + filterColumnValue + "</Value>");
+                            }
+                            filterRecords.Append("</Values></In></Where>");
                         }
 
                         selectedColumns += props.KanBanTitleColumn + ",";
@@ -5386,49 +5400,48 @@ namespace EPMLiveWorkPlanner
                         qryFilterRecords.Query = filterRecords.ToString();
                         SPListItemCollection allItems = list.GetItems(qryFilterRecords);
 
-                        #region Load Blank Status Value Items
+                        #region Load BackLog Status Items
 
-                        List<SPListItem> blankItems = (from spitems in allItems.OfType<SPListItem>() where Convert.ToString(spitems[props.KanBanStatusColumn]) == string.Empty select spitems).ToList<SPListItem>();
+                        string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
 
-                        if (blankItems.Count > 0)
+                        sbItems.Append("<td>");
+                        sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
+                        sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
+                        sbItems.Append("<div class='sortable-list' id='" + list.Title + "'>");
+
+                        foreach (SPListItem currentItem in allItems)
                         {
-                            sbItems.Append("<td>");
-                            sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
-                            sbItems.Append("<div class='itemContainerTitle'>" + list.Title + " Items</div>"); //itemContainerTitle <div> completed
-                            sbItems.Append("<div class='sortable-list' id='" + list.Title + "'>");
-
-                            foreach (SPListItem currentItem in blankItems)
+                            if (string.IsNullOrEmpty(Convert.ToString(currentItem[props.KanBanStatusColumn])) ||
+                                (!selectedStatusColumnValues.Contains(Convert.ToString(currentItem[props.KanBanStatusColumn])))) //Add Backlog Items to Left Panel
                             {
-                                if (string.IsNullOrEmpty(Convert.ToString(currentItem[props.KanBanStatusColumn]))) //Add Blank Items to Left Panel
+                                sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + currentItem.ID + "' data-userid='0' data-itemtitle='" + currentItem.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + currentItem.ID + "'>"); //sortable-item <div> started
+                                sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + currentItem.ID + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
+                                foreach (string column in selectedColumns.Split(','))
                                 {
-                                    sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + currentItem.ID + "' data-userid='0' data-itemtitle='" + currentItem.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + currentItem.ID + "'>"); //sortable-item <div> started
-                                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + currentItem.ID + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
-                                    foreach (string column in selectedColumns.Split(','))
+                                    if (!string.IsNullOrEmpty(column))
                                     {
-                                        if (!string.IsNullOrEmpty(column))
+                                        string itemTitle = Convert.ToString(currentItem[column]);
+                                        if (itemTitle.Contains(";#"))
                                         {
-                                            string itemTitle = Convert.ToString(currentItem[column]);
-                                            if (itemTitle.Contains(";#"))
-                                            {
-                                                sbItems.Append("<div>" + Convert.ToString(itemTitle.Split(new string[] { ";#" }, StringSplitOptions.None)[1]) + "&nbsp;</div>");
-                                            }
-                                            else
-                                            {
-                                                sbItems.Append("<div>" + itemTitle + "&nbsp;</div>");
-                                            }
+                                            sbItems.Append("<div>" + Convert.ToString(itemTitle.Split(new string[] { ";#" }, StringSplitOptions.None)[1]) + "&nbsp;</div>");
+                                        }
+                                        else
+                                        {
+                                            sbItems.Append("<div>" + itemTitle + "&nbsp;</div>");
                                         }
                                     }
-                                    sbItems.Append("</div>"); //sortable-item <div> completed
                                 }
+                                sbItems.Append("</div>"); //sortable-item <div> completed
                             }
-                            sbItems.Append("</div>"); //sortable-list <div> completed
-                            sbItems.Append("</div>");//itemContainer <div> Completed
-                            sbItems.Append("</td>");
                         }
-                        else
-                        {
-                            splitterLoaded = true;
-                        }
+                        sbItems.Append("</div>"); //sortable-list <div> completed
+                        sbItems.Append("</div>");//itemContainer <div> Completed
+                        sbItems.Append("</td>");
+                        //}
+                        //else
+                        //{
+                        //    splitterLoaded = true;
+                        //}
 
                         #endregion
 
@@ -5443,22 +5456,22 @@ namespace EPMLiveWorkPlanner
                         {
                             foreach (string status in statusValues)
                             {
-                                sbItems.Append("<td>");
-                                sbItems.Append("<div class='stageContainer'>"); //stageContainer <div> started
-
-                                //Load Splitter...
-                                if (!splitterLoaded)
-                                {
-                                    sbItems.Append("<div id='splitter'><<</div>");
-                                    splitterLoaded = true;
-                                }
-
-                                sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
-                                sbItems.Append("<div class='sortable-list' id='" + status + "'>");
-
-                                string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
                                 if (selectedStatusColumnValues.Contains(status))
                                 {
+                                    sbItems.Append("<td>");
+                                    sbItems.Append("<div class='stageContainer'>"); //stageContainer <div> started
+
+                                    //Load Splitter...
+                                    if (!splitterLoaded)
+                                    {
+                                        sbItems.Append("<div id='splitter'><<</div>");
+                                        splitterLoaded = true;
+                                    }
+
+                                    sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
+                                    sbItems.Append("<div class='sortable-list' id='" + status + "'>");
+
+                                    //selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
                                     List<SPListItem> stagingItems = (from spitems in allItems.OfType<SPListItem>() where Convert.ToString(spitems[props.KanBanStatusColumn]) == status select spitems).ToList<SPListItem>();
 
                                     foreach (SPListItem item in stagingItems)
@@ -5583,7 +5596,7 @@ namespace EPMLiveWorkPlanner
                         cmd.Parameters.AddWithValue("@listId", listId);
                         cmd.Parameters.AddWithValue("@itemId", itemId);
                         cmd.Parameters.AddWithValue("@userId", USER_ID);
-                        cmd.Parameters.AddWithValue("@title", itemTitle);
+                        cmd.Parameters.AddWithValue("@title", itemTitle + " -> " + draggedStatus);
                         cmd.Parameters.AddWithValue("@icon", icon);
                         cmd.Parameters.AddWithValue("@type", TYPE);
                         cmd.Parameters.AddWithValue("@fString", fString);

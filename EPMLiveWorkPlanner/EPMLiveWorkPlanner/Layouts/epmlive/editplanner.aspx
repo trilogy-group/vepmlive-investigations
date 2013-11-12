@@ -1055,7 +1055,7 @@
 			                                <table cellpadding="5">
                                             <tr>
                                                 <td class="ms-authoringcontrols">
-                                                    Item Status:<br />
+                                                    Backlog Item Status:<br />
                                                     <asp:ListBox runat="server" ID="ddlKanBanAvailableItemStatus" SelectionMode="Multiple" Rows="10" Width="200" CssClass="ms-input"></asp:ListBox>
                                                 </td>
                                                 <td>
@@ -1063,7 +1063,7 @@
                                                     <input type="button" value=" &lt; " onclick="removeItemStatusField();"/>
                                                 </td>
                                                 <td class="ms-authoringcontrols">
-                                                    Selected Status:<br />
+                                                    Selected Item Status:<br />
                                                     <asp:ListBox runat="server" ID="ddlKanBanSelectedItemStatus" SelectionMode="Multiple" Rows="10" Width="200" CssClass="ms-input"></asp:ListBox>
                                                 </td>
                                             </tr>
