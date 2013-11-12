@@ -161,7 +161,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
         public UpdateNav55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
-        #endregion Constructors  
+        #endregion Constructors 
 
         #region Overrides of UpgradeStep
 
@@ -169,67 +169,111 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(() =>
+                using (var spSite = new SPSite(Web.Site.ID))
                 {
-                    using (var spSite = new SPSite(Web.Site.ID))
+                    using (SPWeb spWeb = spSite.OpenWeb())
                     {
-                        using (SPWeb spWeb = spSite.OpenWeb())
+                        LogTitle(GetWebInfo(spWeb), 1);
+
+                        SPList spList = spWeb.Lists.TryGetList("Installed Applications");
+                        if (spList != null)
                         {
-                            Web.AllowUnsafeUpdates = true;
-
-                            LogTitle(GetWebInfo(spWeb), 1);
-
-                            SPList spList = spWeb.Lists.TryGetList("Installed Applications");
-                            if (spList != null)
+                            var qry = new SPQuery
                             {
-                                var qry = new SPQuery
-                                {
-                                    Query =
-                                        @"<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>My Workplace</Value></Eq></Where>",
-                                    ViewFields = @"<FieldRef Name='ID' />"
-                                };
+                                Query =
+                                    @"<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>My Workplace</Value></Eq></Where>",
+                                ViewFields = @"<FieldRef Name='ID' />"
+                            };
 
-                                SPListItemCollection listItems = spList.GetItems(qry);
+                            SPListItemCollection listItems = spList.GetItems(qry);
 
-                                if (listItems.Count != 0)
+                            if (listItems.Count != 0)
+                            {
+                                try
                                 {
-                                    try
+                                    LogTitle("Changing My Workplace to Global My Workplace", 2);
+
+                                    SPListItem item = spList.GetItemById(listItems[0].ID);
+
+                                    item["Title"] = "Global My Workplace";
+                                    item["HomePage"] = new SPFieldUrlValue
                                     {
-                                        LogTitle("Changing My Workplace to Global My Workplace", 2);
+                                        Url = spWeb.Url + "/SitePages/GlobalMyWorkplace.aspx",
+                                        Description = "Global My Workplace"
+                                    };
 
-                                        SPListItem item = spList.GetItemById(listItems[0].ID);
+                                    item.SystemUpdate();
 
-                                        item["Title"] = "Global My Workplace";
-                                        item["HomePage"] = new SPFieldUrlValue
+                                    LogTitle("Updating links", 2);
+
+                                    string[] nodes = ((item["QuickLaunch"] ?? string.Empty).ToString()).Split(',');
+
+                                    if (nodes.Any())
+                                    {
+                                        foreach (string nodeId in nodes)
                                         {
-                                            Url = spWeb.Url + "/SitePages/GlobalMyWorkplace.aspx",
-                                            Description = "Global My Workplace"
-                                        };
+                                            try
+                                            {
+                                                string message;
+                                                MessageKind messageKind;
 
-                                        item.SystemUpdate();
+                                                int id = Convert.ToInt32(nodeId.Split(':')[0]);
+                                                SPNavigationNode node = spWeb.Navigation.GetNodeById(id);
 
-                                        CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
+                                                if (node == null) continue;
+
+                                                if (node.Title.Equals("My Work"))
+                                                {
+                                                    string url = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/MyWork.aspx";
+
+                                                    if (url.ToLower().Equals(node.Url.ToLower())) continue;
+
+                                                    UpgradeUtilities.UpdateNodeLink(url, item.ID, node, spWeb,
+                                                        out message, out messageKind);
+
+                                                    LogMessage(message, messageKind, 3);
+                                                }
+                                                else if (node.Title.Equals("Timesheet"))
+                                                {
+                                                    string url = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/MyTimesheet.aspx";
+
+                                                    if (url.ToLower().Equals(node.Url.ToLower())) continue;
+
+                                                    UpgradeUtilities.UpdateNodeLink(url, item.ID, node, spWeb,
+                                                        out message, out messageKind);
+
+                                                    LogMessage(message, messageKind, 3);
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                LogMessage(e.Message, MessageKind.FAILURE, 3);
+                                            }
+                                        }
                                     }
-                                    catch (Exception e)
+                                    else
                                     {
-                                        LogMessage(e.Message, MessageKind.FAILURE, 3);
+                                        LogMessage("No navigation nodes were found.", MessageKind.FAILURE, 3);
                                     }
+
+                                    CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
                                 }
-                                else
+                                catch (Exception e)
                                 {
-                                    LogMessage("The My Workplace community was not found.", MessageKind.SKIPPED, 2);
+                                    LogMessage(e.Message, MessageKind.FAILURE, 3);
                                 }
                             }
                             else
                             {
-                                LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE, 2);
+                                LogMessage("The My Workplace community was not found.", MessageKind.SKIPPED, 2);
                             }
-
-                            spWeb.AllowUnsafeUpdates = false;
-                            spWeb.Update();
+                        }
+                        else
+                        {
+                            LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE, 2);
                         }
                     }
-                });
+                }
             }
             catch (Exception e)
             {
@@ -435,10 +479,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             {
                 LogMessage(e.Message, MessageKind.FAILURE, 2);
             }
-            finally
-            {
-                CacheStore.Current.RemoveSafely(Web.Url, CacheStoreCategory.Navigation);
-            }
 
             return true;
         }
@@ -520,6 +560,23 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
         #endregion Constructors 
 
+        #region Methods (1) 
+
+        // Private Methods (1) 
+
+        private void AddGroup(SPWeb spWeb, SPGroup owner, SPUser user, string groupName)
+        {
+            LogMessage(groupName, 3);
+
+            spWeb.SiteGroups.Add(groupName, owner, user, null);
+            SPRole roll = spWeb.Roles["Read"];
+            roll.AddGroup(spWeb.SiteGroups[groupName]);
+
+            LogMessage(null, MessageKind.SUCCESS, 4);
+        }
+
+        #endregion Methods 
+
         #region Overrides of UpgradeStep
 
         public override bool Perform()
@@ -532,8 +589,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                     {
                         using (SPWeb spWeb = spSite.OpenWeb())
                         {
-                            spWeb.AllowUnsafeUpdates = true;
-
                             LogTitle(GetWebInfo(spWeb), 1);
 
                             SPList spList = spWeb.Lists.TryGetList(LIST_NAME);
@@ -570,6 +625,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                 list.AllowDeletion = false;
                                 list.Update();
 
+                                LogMessage("Adding reporting groups", 2);
+
+                                SPGroup owner = spWeb.SiteGroups["Administrators"];
+                                SPUser user = spWeb.CurrentUser;
+
+                                AddGroup(spWeb, owner, user, "Report Viewers");
+                                AddGroup(spWeb, owner, user, "Report Writers");
+
                                 LogMessage("Processing reports", 2);
 
                                 string error;
@@ -579,18 +642,57 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                 {
                                     LogMessage(error, MessageKind.FAILURE, 3);
                                 }
+
+                                LogMessage("Updating Navigation link", 2);
+
+                                string newUrl = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/reporting/landing.aspx";
+
+                                SPList lst = spWeb.Lists.TryGetList("Installed Applications");
+                                if (lst != null)
+                                {
+                                    var qry = new SPQuery
+                                    {
+                                        Query = @"<Where><IsNotNull><FieldRef Name='QuickLaunch' /></IsNotNull></Where>",
+                                        ViewFields = @"<FieldRef Name='QuickLaunch' />"
+                                    };
+
+                                    SPListItemCollection listItems = lst.GetItems(qry);
+
+                                    foreach (SPListItem item in listItems)
+                                    {
+                                        foreach (SPNavigationNode navNode in
+                                            from node in item["QuickLaunch"].ToString().Split(',')
+                                            select Convert.ToInt32(node.Split(':')[0])
+                                            into i
+                                            select spWeb.Navigation.GetNodeById(i)
+                                            into navNode
+                                            let url = navNode.Url.ToLower()
+                                            where url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
+                                                  url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx")
+                                            select navNode)
+                                        {
+                                            string message;
+                                            MessageKind messageKind;
+
+                                            UpgradeUtilities.UpdateNodeLink(newUrl, item.ID, navNode, spWeb, out message,
+                                                out messageKind);
+
+                                            LogMessage(message, messageKind, 4);
+                                        }
+                                    }
+                                }
                                 else
                                 {
-                                    LogMessage(null, MessageKind.SUCCESS, 3);
+                                    LogMessage("The list Installed Applications does not exists.", MessageKind.FAILURE,
+                                        3);
                                 }
+
+                                LogMessage(null, MessageKind.SUCCESS, 3);
                             }
                             else
                             {
                                 LogMessage("Advance reporting is already configured.", MessageKind.SKIPPED, 2);
                             }
-
-                            spWeb.AllowUnsafeUpdates = false;
-                            spWeb.Update();
                         }
                     }
                 });
@@ -598,37 +700,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             catch (Exception e)
             {
                 LogMessage(e.Message, MessageKind.FAILURE, 2);
-            }
-
-            return true;
-        }
-
-        #endregion
-    }
-
-    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 7.0, Description = "Scheduling Reporting Refresh",
-        IsOptIn = true)]
-    internal class RefreshReporting : UpgradeStep
-    {
-        #region Constructors (1)
-
-        public RefreshReporting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
-
-        #endregion Constructors
-
-        #region Overrides of UpgradeStep
-
-        public override bool Perform()
-        {
-            try
-            {
-                var workEngineApi = new WorkEngineAPI();
-                workEngineApi.Execute("Reporting_RefreshAll", string.Empty);
-                LogMessage(null, MessageKind.SUCCESS, 1);
-            }
-            catch (Exception e)
-            {
-                LogMessage(e.Message, MessageKind.FAILURE, 1);
             }
 
             return true;

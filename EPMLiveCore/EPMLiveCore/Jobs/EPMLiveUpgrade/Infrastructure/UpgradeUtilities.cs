@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Navigation;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 {
     internal static class UpgradeUtilities
     {
-        #region Methods (2) 
+        #region Methods (3) 
 
-        // Internal Methods (2) 
+        // Internal Methods (3) 
 
         internal static List<Type> GetUpgradeSteps(string version)
         {
@@ -92,6 +94,64 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
             messageKind = MessageKind.SUCCESS;
 
             return field;
+        }
+
+        internal static void UpdateNodeLink(string url, int appId, SPNavigationNode node, SPWeb spWeb, out string message,
+            out MessageKind messageKind)
+        {
+            spWeb.AllowUnsafeUpdates = true;
+
+            messageKind = MessageKind.SUCCESS;
+
+            SPList spList = spWeb.Lists.TryGetList("Installed Applications");
+            if (spList != null)
+            {
+                message = string.Format(@"Node: {0}, New URL: {1}, Old URL: {2}", node.Title, url, node.Url);
+
+                var newNode = new SPNavigationNode(node.Title, url, node.IsExternal);
+
+                SPNavigationNode prevNode = null;
+
+                foreach (SPNavigationNode siblingNode in spWeb.Navigation.QuickLaunch.Cast<SPNavigationNode>()
+                    .TakeWhile(siblingNode => siblingNode.Id != node.Id))
+                {
+                    prevNode = siblingNode;
+                }
+
+                if (prevNode == null)
+                {
+                    spWeb.Navigation.QuickLaunch.AddAsLast(newNode);
+                }
+                else
+                {
+                    spWeb.Navigation.QuickLaunch.Add(newNode, prevNode);
+                }
+
+                node.Delete();
+
+                var spListItem = spList.GetItemById(appId);
+                
+                var nodes = (spListItem["QuickLaunch"] ?? string.Empty).ToString()
+                    .Replace(node.Id.ToString(CultureInfo.InvariantCulture),
+                        newNode.Id.ToString(CultureInfo.InvariantCulture));
+
+                if (!nodes.Contains("," + newNode.Id))
+                {
+                    nodes += "," + newNode.Id;
+                }
+
+                spListItem["QuickLaunch"] = nodes;
+                spListItem.SystemUpdate();
+
+                API.Applications.CreateQuickLaunchXML(spListItem.ID, spWeb);
+
+                spWeb.AllowUnsafeUpdates = false;
+                spWeb.Update();
+            }
+            else
+            {
+                throw new Exception("Cannot find the Installed Applications list.");
+            }
         }
 
         #endregion Methods 
