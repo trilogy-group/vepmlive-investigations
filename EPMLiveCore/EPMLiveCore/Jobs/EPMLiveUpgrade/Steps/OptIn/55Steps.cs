@@ -439,9 +439,18 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                         LogTitle(GetWebInfo(spWeb), 1);
 
                         var queryExecutor = new QueryExecutor(spWeb);
-                        foreach (SPList spList in queryExecutor.GetMappedListIds()
-                            .Select(listId => spWeb.Lists.GetList(listId, true)))
+                        foreach (Guid listId in queryExecutor.GetMappedListIds())
                         {
+                            SPList spList = null;
+
+                            try
+                            {
+                                spList = spWeb.Lists.GetList(listId, true);
+                            }
+                            catch { }
+
+                            if (spList == null) continue;
+
                             LogTitle(GetListInfo(spList), 2);
 
                             var settings = new GridGanttSettings(spList);
@@ -683,26 +692,25 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
                                     foreach (SPListItem item in listItems)
                                     {
-                                        foreach (SPNavigationNode navNode in
-                                            from node in item["QuickLaunch"].ToString().Split(',')
-                                            select Convert.ToInt32(node.Split(':')[0])
-                                            into i
-                                            select spWeb.Navigation.GetNodeById(i)
-                                            into navNode
-                                            where navNode != null
-                                            let url = navNode.Url.ToLower()
-                                            where
-                                                url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
-                                                url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx")
-                                            select navNode)
+                                        foreach (string node in item["QuickLaunch"].ToString().Split(','))
                                         {
-                                            string message;
-                                            MessageKind messageKind;
+                                            int i = Convert.ToInt32(node.Split(':')[0]);
+                                            SPNavigationNode navNode = spWeb.Navigation.GetNodeById(i);
+                                            if (navNode != null)
+                                            {
+                                                string url = navNode.Url.ToLower();
+                                                if (url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
+                                                    url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx"))
+                                                {
+                                                    string message;
+                                                    MessageKind messageKind;
 
-                                            UpgradeUtilities.UpdateNodeLink(newUrl, item.ID, navNode, spWeb, out message,
-                                                out messageKind);
+                                                    UpgradeUtilities.UpdateNodeLink(newUrl, item.ID, navNode, spWeb,
+                                                        out message, out messageKind);
 
-                                            LogMessage(message, messageKind, 4);
+                                                    LogMessage(message, messageKind, 4);
+                                                }
+                                            }
                                         }
                                     }
                                 }
