@@ -677,7 +677,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
                                 LogMessage("Updating Navigation link", 2);
 
-                                string newUrl = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/reporting/landing.aspx";
+                                var relativeUrl = spWeb.ServerRelativeUrl.ToLower();
+                                string newUrl = relativeUrl + "/_layouts/15/epmlive/reporting/landing.aspx";
 
                                 SPList lst = spWeb.Lists.TryGetList("Installed Applications");
                                 if (lst != null)
@@ -700,15 +701,16 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                             into navNode
                                             where navNode != null
                                             let url = navNode.Url.ToLower()
-                                            where url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
-                                                  url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx")
+                                            where
+                                                url.EndsWith(relativeUrl + "/reports.aspx") ||
+                                                url.EndsWith(relativeUrl + "/sitepages/report.aspx")
                                             select navNode)
                                         {
                                             string message;
                                             MessageKind messageKind;
 
-                                            UpgradeUtilities.UpdateNodeLink(newUrl, item.ID, navNode, spWeb,
-                                                out message, out messageKind);
+                                            UpgradeUtilities.UpdateNodeLink(newUrl, item.ID, navNode, spWeb, out message,
+                                                out messageKind);
 
                                             LogMessage(message, messageKind, 3);
                                         }
