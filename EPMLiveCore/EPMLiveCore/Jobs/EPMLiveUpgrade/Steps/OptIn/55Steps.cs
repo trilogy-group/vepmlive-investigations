@@ -572,7 +572,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
             try
             {
-                SPGroup spGroup = spWeb.SiteGroups.GetByName(groupName);
+                SPGroup spGroup = null;
+
+                try
+                {
+                    spGroup = spWeb.SiteGroups.GetByName(groupName);
+                }
+                catch { }
 
                 if (spGroup == null)
                 {
