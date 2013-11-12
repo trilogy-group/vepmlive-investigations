@@ -622,7 +622,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                 SPList list = spWeb.Lists[LIST_NAME];
                                 list.Title = LIST_NAME;
                                 list.Hidden = true;
-                                list.AllowDeletion = false;
                                 list.Update();
 
                                 LogMessage("Adding reporting groups", 2);
