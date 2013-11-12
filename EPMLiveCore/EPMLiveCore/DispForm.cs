@@ -184,17 +184,20 @@ namespace EPMLiveCore
 
             //=====================Favorite
 
-            ribbonExtensions = new XmlDocument();
-            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
-            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Actions.Controls._children");
+            if (Web.Features[new Guid("046f0200-30e5-4545-b00f-c8c73aef9f0e")] != null)
+            {
+                ribbonExtensions = new XmlDocument();
+                ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Actions.Controls._children");
 
-            ribbonExtensions = new XmlDocument();
-            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
-            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Edit.Actions.Controls._children");
+                ribbonExtensions = new XmlDocument();
+                ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Edit.Actions.Controls._children");
 
-            ribbonExtensions = new XmlDocument();
-            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
-            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.DocLibListForm.Edit.Actions.Controls._children");
+                ribbonExtensions = new XmlDocument();
+                ribbonExtensions.LoadXml("<Button Id=\"Ribbon.ListItem.EPMLive.FavoriteStatus\" Sequence=\"100\" Command=\"Ribbon.ListForm.Display.Actions.Favorite\" LabelText=\"Favorite\" TemplateAlias=\"o1\" Image32by32=\"_layouts/epmlive/images/star32.png\" Image16by16=\"_layouts/epmlive/images/star16.png\"/>");
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.DocLibListForm.Edit.Actions.Controls._children");
+            }
 
             EPMLiveCore.API.RibbonProperties rp = (EPMLiveCore.API.RibbonProperties)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GR-" + Web.CurrentUser.ID, "GridSettings-" + List.ID, () =>
             {
