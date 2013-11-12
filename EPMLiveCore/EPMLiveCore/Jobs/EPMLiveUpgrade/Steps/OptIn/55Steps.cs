@@ -683,9 +683,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                             into i
                                             select spWeb.Navigation.GetNodeById(i)
                                             into navNode
+                                            where navNode != null
                                             let url = navNode.Url.ToLower()
-                                            where url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
-                                                  url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx")
+                                            where
+                                                url.EndsWith(spWeb.ServerRelativeUrl + "/reports.aspx") ||
+                                                url.EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx")
                                             select navNode)
                                         {
                                             string message;
