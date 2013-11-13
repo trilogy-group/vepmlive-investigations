@@ -131,8 +131,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
 		#endregion Methods 
 
-
-
         #region Overrides of UpgradeStep
 
         public override bool Perform()
@@ -172,8 +170,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         public UpdateNav55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
 		#endregion Constructors 
-
-
 
         #region Overrides of UpgradeStep
 
@@ -398,8 +394,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
 		#endregion Methods 
 
-
-
         #region Overrides of UpgradeStep
 
         public override bool Perform()
@@ -439,8 +433,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         public UseContentDB55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
 		#endregion Constructors 
-
-
 
         #region Overrides of UpgradeStep
 
@@ -521,8 +513,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         public TurnOnCreateWorkspace55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
 		#endregion Constructors 
-
-
 
         #region Overrides of UpgradeStep
 
@@ -632,8 +622,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         }
 
 		#endregion Methods 
-
-
 
         #region Overrides of UpgradeStep
 
