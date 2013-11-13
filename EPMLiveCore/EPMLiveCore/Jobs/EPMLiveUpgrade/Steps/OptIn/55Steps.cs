@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
@@ -16,15 +17,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 1.0, Description = "Updating User Interface", IsOptIn = true)]
     internal class UpdateUI55 : UpgradeStep
     {
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         public UpdateUI55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
-        #endregion Constructors 
+		#endregion Constructors 
 
-        #region Methods (3) 
+		#region Methods (3) 
 
-        // Private Methods (3) 
+		// Private Methods (3) 
 
         private void ChangeMasterPage(string masterPage, SPWeb spWeb)
         {
@@ -128,7 +129,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             }
         }
 
-        #endregion Methods 
+		#endregion Methods 
+
+
 
         #region Overrides of UpgradeStep
 
@@ -164,11 +167,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 2.0, Description = "Updating Navigation", IsOptIn = true)]
     internal class UpdateNav55 : UpgradeStep
     {
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         public UpdateNav55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
-        #endregion Constructors 
+		#endregion Constructors 
+
+
 
         #region Overrides of UpgradeStep
 
@@ -298,13 +303,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 3.0, Description = "Updating List Icons", IsOptIn = true)]
     internal class UpdateListIcon55 : UpgradeStep
     {
-        #region Fields (1) 
+		#region Fields (1) 
 
         private readonly Dictionary<string, string> _listIcons;
 
-        #endregion Fields 
+		#endregion Fields 
 
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         public UpdateListIcon55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
         {
@@ -321,11 +326,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             };
         }
 
-        #endregion Constructors 
+		#endregion Constructors 
 
-        #region Methods (1) 
+		#region Methods (1) 
 
-        // Private Methods (1) 
+		// Private Methods (1) 
 
         private void UpdateListIcon(Guid siteId, Guid webId)
         {
@@ -391,7 +396,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             }
         }
 
-        #endregion Methods 
+		#endregion Methods 
+
+
 
         #region Overrides of UpgradeStep
 
@@ -427,11 +434,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 4.0, Description = "Using Content DB", IsOptIn = true)]
     internal class UseContentDB55 : UpgradeStep
     {
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         public UseContentDB55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
-        #endregion Constructors 
+		#endregion Constructors 
+
+
 
         #region Overrides of UpgradeStep
 
@@ -507,11 +516,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 5.0, Description = "Turning on Create Workspace functionality", IsOptIn = true)]
     internal class TurnOnCreateWorkspace55 : UpgradeStep
     {
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         public TurnOnCreateWorkspace55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
-        #endregion Constructors 
+		#endregion Constructors 
+
+
 
         #region Overrides of UpgradeStep
 
@@ -557,14 +568,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 6.0, Description = "Configuring Advance Reporting", IsOptIn = true)]
     internal class ConfigureAdvanceReporting55 : UpgradeStep
     {
-        #region Fields (2) 
+		#region Fields (2) 
 
-        private const string LIST_NAME = "IzendaReports";
         private readonly string _storeUrl;
+        private const string LIST_NAME = "IzendaReports";
 
-        #endregion Fields 
+		#endregion Fields 
 
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         public ConfigureAdvanceReporting55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
         {
@@ -574,11 +585,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             _storeUrl = "https://store.workengine.com";
         }
 
-        #endregion Constructors 
+		#endregion Constructors 
 
-        #region Methods (1) 
+		#region Methods (1) 
 
-        // Private Methods (1) 
+		// Private Methods (1) 
 
         private void AddGroup(SPWeb spWeb, SPGroup owner, SPUser user, string groupName)
         {
@@ -600,6 +611,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                     SPRole roll = spWeb.Roles["Read"];
                     roll.AddGroup(spWeb.SiteGroups[groupName]);
 
+                    try
+                    {
+                        var spList = spWeb.Lists["User Information List"];
+                        spList.Items.GetItemById(spWeb.SiteGroups[groupName].ID).SystemUpdate();
+                    }
+                    catch { }
+
                     LogMessage(null, MessageKind.SUCCESS, 4);
                 }
                 else
@@ -613,7 +631,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             }
         }
 
-        #endregion Methods 
+		#endregion Methods 
+
+
 
         #region Overrides of UpgradeStep
 
@@ -754,11 +774,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 7.0, Description = "Scheduling Reporting Refresh", IsOptIn = true)]
     internal class RefreshReporting : UpgradeStep
     {
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         public RefreshReporting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
-        #endregion Constructors 
+		#endregion Constructors 
+
+
 
         #region Overrides of UpgradeStep
 
@@ -766,8 +788,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             try
             {
-                var workEngineApi = new WorkEngineAPI();
-                workEngineApi.Execute("Reporting_RefreshAll", string.Empty);
+                var assemblyInstance = Assembly.Load("EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050");
+                var thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ReportingAPI", true, true);
+                var m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
+                var apiClass = Activator.CreateInstance(thisClass);
+                m.Invoke(apiClass, new object[] { null, Web });
+
                 LogMessage(null, MessageKind.SUCCESS, 1);
             }
             catch (Exception e)
