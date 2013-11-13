@@ -101,6 +101,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                         {
                             LogMessage("The default MasterPage is already set to UplandV5.", MessageKind.SKIPPED, 2);
                         }
+
+                        var spList = spWeb.Lists.TryGetList("Team");
+                        if (spList != null)
+                        {
+                            var settings = new GridGanttSettings(spList) {HideNewButton = true};
+                            settings.SaveSettings(spList);
+                        }
                     }
                     catch (Exception exception)
                     {
