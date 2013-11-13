@@ -504,8 +504,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         #endregion
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 5.0, Description = "Turning on Create Workspace functionality",
-        IsOptIn = true)]
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 5.0, Description = "Turning on Create Workspace functionality", IsOptIn = true)]
     internal class TurnOnCreateWorkspace55 : UpgradeStep
     {
         #region Constructors (1) 
@@ -555,8 +554,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         #endregion
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 6.0, Description = "Configuring Advance Reporting",
-        IsOptIn = true)]
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 6.0, Description = "Configuring Advance Reporting", IsOptIn = true)]
     internal class ConfigureAdvanceReporting55 : UpgradeStep
     {
         #region Fields (2) 
@@ -681,6 +679,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                 {
                                     LogMessage(error, MessageKind.FAILURE, 3);
                                 }
+                                else
+                                {
+                                    LogMessage(null, MessageKind.SUCCESS, 3);
+                                }
 
                                 LogMessage("Updating Navigation link", 2);
 
@@ -749,8 +751,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         #endregion
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 7.0, Description = "Scheduling Reporting Refresh",
-        IsOptIn = true)]
+    [UpgradeStep(Version = EPMLiveVersion.V55, Order = 7.0, Description = "Scheduling Reporting Refresh", IsOptIn = true)]
     internal class RefreshReporting : UpgradeStep
     {
         #region Constructors (1) 

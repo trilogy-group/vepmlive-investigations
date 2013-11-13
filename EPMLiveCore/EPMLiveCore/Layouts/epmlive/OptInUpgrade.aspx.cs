@@ -21,8 +21,9 @@ namespace EPMLiveCore.Layouts.epmlive
             if (!Web.CurrentUser.IsSiteAdmin)
             {
                 pnlMain.Visible = false;
-                lblError.Text =
-                    @"You are required to be the Site Collection Administrator in order to perform an upgrade.";
+
+                lblError.Text = @"You are required to be the Site Collection Administrator in order to perform an upgrade.";
+                lblError.Visible = true;
 
                 return;
             }
