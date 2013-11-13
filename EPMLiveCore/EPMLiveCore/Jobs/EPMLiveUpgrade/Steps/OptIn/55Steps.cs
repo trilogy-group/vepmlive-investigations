@@ -780,8 +780,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
 		#endregion Constructors 
 
-
-
         #region Overrides of UpgradeStep
 
         public override bool Perform()
