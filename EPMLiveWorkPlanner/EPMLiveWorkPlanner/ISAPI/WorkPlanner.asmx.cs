@@ -5407,7 +5407,7 @@ namespace EPMLiveWorkPlanner
                         sbItems.Append("<td>");
                         sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
                         sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
-                        sbItems.Append("<div class='sortable-list' id='" + list.Title + "'>");
+                        sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + list.Title.Replace(" ", "_") + "'>");
 
                         foreach (SPListItem currentItem in allItems)
                         {
@@ -5469,7 +5469,7 @@ namespace EPMLiveWorkPlanner
                                     }
 
                                     sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
-                                    sbItems.Append("<div class='sortable-list' id='" + status + "'>");
+                                    sbItems.Append("<div class='sortable-list' data-dragged-status='" + status + "' id='" + status.Replace(" ", "_") + "'>");
 
                                     //selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
                                     List<SPListItem> stagingItems = (from spitems in allItems.OfType<SPListItem>() where Convert.ToString(spitems[props.KanBanStatusColumn]) == status select spitems).ToList<SPListItem>();
@@ -5545,6 +5545,7 @@ namespace EPMLiveWorkPlanner
             string fDate = data.GetElementsByTagName("data-fdate")[0].InnerText;
             string fInt = data.GetElementsByTagName("data-fint")[0].InnerText;
             string draggedStatus = data.GetElementsByTagName("data-dragged-status")[0].InnerText;
+            string dataIndexOfItem = data.GetElementsByTagName("data-index-of-item")[0].InnerText;
 
             using (SPSite site = new SPSite(new Guid(siteId)))
             {
@@ -5578,16 +5579,18 @@ namespace EPMLiveWorkPlanner
                         string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
                         BEGIN
 	                        INSERT INTO FRF ([SITE_ID],[WEB_ID],[LIST_ID],[ITEM_ID],[USER_ID],[Title],[Icon],[Type],[F_String],[F_Date],[F_Int])
-                                    VALUES (@siteId, @webId, @listId, @itemId, @userId, @title, @icon, @type, @fString, @fDate, @fInt)
-                            SELECT * FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Title]=@title AND [Type]=@type
+                                    VALUES (@siteId, @webId, @listId, @itemId, @userId, @title, @icon, @type, @fString, @fDate, @dataIndexOfItem)
                         END
                         ELSE 
                         BEGIN
                             UPDATE FRF SET 
-                            [Title] = @title, 
                             [F_Int] = [F_Int] + 1 
-                            WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type
-                            SELECT * FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type
+                            WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [USER_ID]=@userId AND [Type]=@type AND [F_Int] >= @dataIndexOfItem AND [F_Int] <= @fInt 
+
+                            UPDATE FRF SET 
+                            [Title] = @title, 
+                            [F_Int] = @dataIndexOfItem 
+                            WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type 
                         END";
 
                         SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
@@ -5596,11 +5599,12 @@ namespace EPMLiveWorkPlanner
                         cmd.Parameters.AddWithValue("@listId", listId);
                         cmd.Parameters.AddWithValue("@itemId", itemId);
                         cmd.Parameters.AddWithValue("@userId", USER_ID);
-                        cmd.Parameters.AddWithValue("@title", itemTitle + " -> " + draggedStatus);
+                        cmd.Parameters.AddWithValue("@title", itemTitle);
                         cmd.Parameters.AddWithValue("@icon", icon);
                         cmd.Parameters.AddWithValue("@type", TYPE);
                         cmd.Parameters.AddWithValue("@fString", fString);
                         cmd.Parameters.AddWithValue("@fDate", fDate);
+                        cmd.Parameters.AddWithValue("@dataIndexOfItem", dataIndexOfItem);
                         cmd.Parameters.AddWithValue("@fInt", fInt);
 
                         cmd.ExecuteNonQuery();
