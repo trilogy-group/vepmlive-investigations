@@ -788,12 +788,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             try
             {
-                var assemblyInstance = Assembly.Load("EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050");
-                var thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ReportingAPI", true, true);
-                var m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
-                var apiClass = Activator.CreateInstance(thisClass);
-                m.Invoke(apiClass, new object[] { null, Web });
-
+                UpgradeUtilities.ScheduleReportingRefresh(Web);
                 LogMessage(null, MessageKind.SUCCESS, 1);
             }
             catch (Exception e)

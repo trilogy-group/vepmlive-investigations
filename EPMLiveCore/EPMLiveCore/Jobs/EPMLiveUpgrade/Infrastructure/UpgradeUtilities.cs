@@ -10,7 +10,19 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 {
     internal static class UpgradeUtilities
     {
-        #region Methods (3) 
+        #region Methods (4) 
+
+        // Public Methods (1) 
+
+        public static void ScheduleReportingRefresh(SPWeb spWeb)
+        {
+            Assembly assemblyInstance =
+                Assembly.Load("EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050");
+            Type thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ReportingAPI", true, true);
+            MethodInfo m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
+            object apiClass = Activator.CreateInstance(thisClass);
+            m.Invoke(apiClass, new object[] {null, spWeb});
+        }
 
         // Internal Methods (3) 
 
@@ -96,7 +108,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
             return field;
         }
 
-        internal static void UpdateNodeLink(string url, int appId, SPNavigationNode node, SPWeb spWeb, out string message,
+        internal static void UpdateNodeLink(string url, int appId, SPNavigationNode node, SPWeb spWeb,
+            out string message,
             out MessageKind messageKind)
         {
             spWeb.AllowUnsafeUpdates = true;
@@ -129,9 +142,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
                 node.Delete();
 
-                var spListItem = spList.GetItemById(appId);
-                
-                var nodes = (spListItem["QuickLaunch"] ?? string.Empty).ToString()
+                SPListItem spListItem = spList.GetItemById(appId);
+
+                string nodes = (spListItem["QuickLaunch"] ?? string.Empty).ToString()
                     .Replace(node.Id.ToString(CultureInfo.InvariantCulture),
                         newNode.Id.ToString(CultureInfo.InvariantCulture));
 
