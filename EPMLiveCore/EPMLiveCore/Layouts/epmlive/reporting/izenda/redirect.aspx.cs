@@ -35,7 +35,16 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 string b64 = EncodeTo64(CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "epmliveapiurl") + "/integration.asmx`" + gAuth);
 
-                string url = "https://reports.epmlive.com/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64;
+                string reportsurl = CoreFunctions.getFarmSetting("UplandAnalyticsUrl");
+
+                string url = "";
+
+                if (reportsurl == "https://reports.epmlive.com")
+                {
+                    url = "https://reports.epmlive.com/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64;
+                }
+                else
+                    url = reportsurl;
 
                 string rn = "";
                 try { rn = Request["rn"].ToString(); }
