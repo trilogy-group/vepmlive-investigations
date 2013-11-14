@@ -46,14 +46,18 @@ namespace EPMLiveCore.Layouts.epmlive
                 else
                     url = reportsurl;
 
-                string rn = "";
-                try { rn = Request["rn"].ToString(); }
-                catch { }
+                if (url != "")
+                {
+                    string rn = "";
+                    try { rn = Request["rn"].ToString(); }
+                    catch { }
 
-                if (rn != "")
-                    url += "&rn=" + rn;
+                    if (rn != "")
+                        url += "&rn=" + rn;
 
-                Response.Redirect(url + "&InFrame=1&RepUrl=" + System.Web.HttpUtility.UrlEncode(SPContext.Current.Web.Url  + "/_layouts/epmlive/reporting/izenda/reporting.aspx"));
+                    Response.Redirect(url + "&InFrame=1&RepUrl=" + System.Web.HttpUtility.UrlEncode(SPContext.Current.Web.Url + "/_layouts/epmlive/reporting/izenda/reporting.aspx"));
+                }
+
             }
             catch (Exception ex)
             {
