@@ -129,7 +129,7 @@
 		<Field Name="TypeName">ResourcePermissions</Field>
 		<Field Name="TypeDisplayName">Resource Permissions</Field>
 		<Field Name="TypeShortDescription">Resource Permissions</Field>
-		<Field Name="ParentType">Text</Field>
+		<Field Name="ParentType">Note</Field>
 		<Field Name="UserCreatable">FALSE</Field>
 		<Field Name="FieldTypeClass">EPMLiveCore.ResourcePermissionsField, EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5</Field>
 		<RenderPattern Name="DisplayPattern">
