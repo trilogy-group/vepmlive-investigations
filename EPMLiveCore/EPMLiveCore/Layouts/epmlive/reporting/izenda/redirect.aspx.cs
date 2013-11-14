@@ -39,12 +39,10 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 string url = "";
 
-                if (reportsurl == "https://reports.epmlive.com")
+                if (reportsurl != "")
                 {
-                    url = "https://reports.epmlive.com/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64;
+                    url = reportsurl + "/?dbid=" + SPContext.Current.Site.WebApplication.Id + "&siteid=" + SPContext.Current.Site.ID + "&webid=" + SPContext.Current.Web.ID + "&authid=" + b64;
                 }
-                else
-                    url = reportsurl;
 
                 if (url != "")
                 {
