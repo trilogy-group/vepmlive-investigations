@@ -64,6 +64,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -118,6 +119,13 @@
     </Compile>
     <Compile Include="Layouts\epmlive\ImportList.aspx.designer.cs">
       <DependentUpon>ImportList.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\KanBanPlanner.aspx.cs">
+      <DependentUpon>KanBanPlanner.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\KanBanPlanner.aspx.designer.cs">
+      <DependentUpon>KanBanPlanner.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\NoteEditor.aspx.cs">
       <DependentUpon>NoteEditor.aspx</DependentUpon>
@@ -381,6 +389,11 @@
     <Content Include="Layouts\epmlive\ImportExcel.aspx" />
     <Content Include="Layouts\epmlive\ImportExcelFinish.aspx" />
     <Content Include="Layouts\epmlive\ImportList.aspx" />
+    <Content Include="Layouts\epmlive\javascripts\kanban\jquery-1.9.1.js" />
+    <Content Include="Layouts\epmlive\javascripts\kanban\jquery-ui.js" />
+    <Content Include="Layouts\epmlive\javascripts\kanban\ui.dropdownchecklist-1.4-min.js" />
+    <Content Include="Layouts\epmlive\javascripts\kanban\ui.dropdownchecklist.js" />
+    <Content Include="Layouts\epmlive\KanBanPlanner.aspx" />
     <Content Include="Layouts\epmlive\NoteEditor.aspx" />
     <Content Include="Layouts\epmlive\openmpp.aspx" />
     <Content Include="Layouts\epmlive\PlannerAdmin.aspx" />

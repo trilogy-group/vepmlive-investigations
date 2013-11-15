@@ -5230,8 +5230,10 @@ namespace EPMLiveWorkPlanner
                         {
                             string[] sPlanner = planner.Split('|');
                             string kanban = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + sPlanner[0] + "EnableKanBan");
+                            string lookupField = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + sPlanner[0] + "PCField");
 
-                            if (!string.IsNullOrEmpty(kanban) && Convert.ToBoolean(kanban))
+                            if ((!string.IsNullOrEmpty(kanban) && Convert.ToBoolean(kanban)) &&
+                                (!string.IsNullOrEmpty(lookupField) && lookupField.ToLower().Equals("project")))
                             {
                                 jsonPlanners.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", sPlanner[0], EncodeJsonData(sPlanner[1])));
                             }
@@ -5255,12 +5257,12 @@ namespace EPMLiveWorkPlanner
             string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
             string webID = data.GetElementsByTagName("WebID")[0].InnerText;
             string kanBanBoardName = data.GetElementsByTagName("KanBanBoardName")[0].InnerText;
-            //string projectID = data.GetElementsByTagName("ID")[0].InnerText;
+            string projectID = data.GetElementsByTagName("ProjectID")[0].InnerText;
 
             //Prepare Queries...
             string qryTableName = "SELECT TableName FROM RPTList WHERE RPTListID = '{0}'";
             string qryFilterColumns = "SELECT ColumnName, SharePointType FROM RPTColumn WHERE RPTListId = '{0}' and InternalName = '{1}'";
-            string qryFilterColumnValues = "SELECT DISTINCT {0} FROM {1} WHERE WebId='{2}' AND ListId='{3}' ORDER BY {4}";
+            string qryFilterColumnValues = "SELECT DISTINCT {0} FROM {1} WHERE WebId='{2}' AND ListId='{3}' AND ID=" + projectID + " ORDER BY {4}";
 
             StringBuilder jsonFilterColumnValues1 = new StringBuilder();
             string columnName = string.Empty;
@@ -5375,7 +5377,7 @@ namespace EPMLiveWorkPlanner
             string webID = data.GetElementsByTagName("WebID")[0].InnerText;
             string kanBanBoardName = DecodeJsonData(data.GetElementsByTagName("KanBanBoardName")[0].InnerText);
             string kanBanFilterColumnSelectedValues = DecodeJsonData(data.GetElementsByTagName("KanBanFilter1")[0].InnerText);
-            //string projectID = data.GetElementsByTagName("ID")[0].InnerText;
+            string projectID = data.GetElementsByTagName("ProjectID")[0].InnerText;
 
             bool isNullValueIncluded = kanBanFilterColumnSelectedValues.Contains("(Blank)");
 
@@ -5476,7 +5478,7 @@ namespace EPMLiveWorkPlanner
                         {
                             try
                             {
-                                string qryWhereClause = string.Format(" {0} in ({1}) {2}", columnName, filterColumnValues, isNullValueIncluded ? " or " + columnName + " is null " : "");
+                                string qryWhereClause = string.Format(" {0} in ({1}) {2} AND ID={3}", columnName, filterColumnValues, isNullValueIncluded ? " or " + columnName + " is null " : "", projectID);
                                 dtSourceListData = EPMLiveCore.ReportingData.GetReportingData(spWeb, list.Title, false, qryWhereClause, props.KanBanStatusColumn);
                             }
                             catch { }
