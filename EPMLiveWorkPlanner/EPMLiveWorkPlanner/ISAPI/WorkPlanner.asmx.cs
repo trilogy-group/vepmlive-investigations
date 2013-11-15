@@ -1,4 +1,5 @@
-﻿using Microsoft.SharePoint;
+﻿using EPMLiveCore.ReportingProxy;
+using Microsoft.SharePoint;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,10 +7,10 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web.Services;
 using System.Xml;
 
@@ -5249,78 +5250,119 @@ namespace EPMLiveWorkPlanner
 
         public static string GetKanBanFilter1(XmlDocument data, SPWeb oWeb)
         {
-            //Get values from parameter
+            //Get values from parameter...
             string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
             string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
             string webID = data.GetElementsByTagName("WebID")[0].InnerText;
             string kanBanBoardName = data.GetElementsByTagName("KanBanBoardName")[0].InnerText;
+            //string projectID = data.GetElementsByTagName("ID")[0].InnerText;
 
+            //Prepare Queries...
+            string qryTableName = "SELECT TableName FROM RPTList WHERE RPTListID = '{0}'";
+            string qryFilterColumns = "SELECT ColumnName, SharePointType FROM RPTColumn WHERE RPTListId = '{0}' and InternalName = '{1}'";
+            string qryFilterColumnValues = "SELECT DISTINCT {0} FROM {1} WHERE WebId='{2}' AND ListId='{3}' ORDER BY {4}";
 
-            //Using SharePoint Object Model fetching data values
-            using (SPSite spSite = new SPSite(siteUrl))
+            StringBuilder jsonFilterColumnValues1 = new StringBuilder();
+            string columnName = string.Empty;
+            string tableName = string.Empty;
+            bool isLookupOrUserField = false;
+
+            WorkPlannerAPI.PlannerProps props = null;
+            DataTable dtTableName = new DataTable();
+            DataTable dtFilterColumns = new DataTable();
+            DataTable dtFilterColumnValues = new DataTable();
+
+            try
             {
-                using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
+                using (SPSite spSite = new SPSite(siteUrl))
                 {
-                    StringBuilder jsonFilter1 = new StringBuilder();
-                    jsonFilter1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "(All)"));
-
-                    WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
-
-                    SPList filterColumnList = spWeb.Lists[props.sListProjectCenter];
-
-                    if (filterColumnList != null)
+                    using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
                     {
-                        SPField field = filterColumnList.Fields.GetField(props.KanBanFilterColumn);
+                        props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
+                        SPList sourceList = spWeb.Lists[props.sListProjectCenter];
 
-                        switch (field.Type)
+                        try
                         {
-                            case SPFieldType.Choice:
+                            var queryExecutor = new QueryExecutor(spWeb);
+                            dtTableName = queryExecutor.ExecuteReportingDBQuery(string.Format(qryTableName, sourceList.ID.ToString()),
+                                new Dictionary<string, object>
                                 {
-                                    SPFieldChoice choiceField = field as SPFieldChoice;
-                                    StringCollection choices = choiceField.Choices;
-                                    if (choices.Count > 0)
-                                    {
-                                        foreach (String choice in choices)
+                                    {"@WebId", webID}
+                                });
+
+                        }
+                        catch { }
+
+                        if (dtTableName != null && dtTableName.Rows.Count > 0)
+                        {
+                            tableName = Convert.ToString(dtTableName.Rows[0]["TableName"]);
+                            try
+                            {
+                                var queryExecutor = new QueryExecutor(spWeb);
+                                dtFilterColumns = queryExecutor.ExecuteReportingDBQuery(string.Format(qryFilterColumns, Convert.ToString(sourceList.ID), props.KanBanFilterColumn),
+                                    new Dictionary<string, object>
+                                {
+                                    {"@WebId", webID}
+                                });
+
+                            }
+                            catch { }
+
+                            if (dtFilterColumns.Rows.Count > 0)
+                            {
+                                switch (Convert.ToString(dtFilterColumns.Rows[0]["SharePointType"]))
+                                {
+                                    case "User":
+                                    case "Lookup":
                                         {
-                                            jsonFilter1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", EncodeJsonData(choice), EncodeJsonData(choice)));
+                                            columnName = "IsNull(" + Convert.ToString(dtFilterColumns.Rows[1]["ColumnName"]) + ",'(Blank)'), IsNull(" + Convert.ToString(dtFilterColumns.Rows[0]["ColumnName"] + ",'')");
+                                            isLookupOrUserField = true;
+                                        }
+                                        break;
+                                    case "Choice":
+                                        columnName = "IsNull(" + Convert.ToString(dtFilterColumns.Rows[0]["ColumnName"]) + ",'(Blank)')";
+                                        break;
+                                }
+
+                                try
+                                {
+                                    qryFilterColumnValues = string.Format(qryFilterColumnValues, columnName, tableName, spWeb.ID.ToString(), sourceList.ID.ToString(), columnName);
+                                    var queryExecutor = new QueryExecutor(spWeb);
+                                    dtFilterColumnValues = queryExecutor.ExecuteReportingDBQuery(qryFilterColumnValues,
+                                        new Dictionary<string, object>
+                                {
+                                    {"@WebId", webID}
+                                });
+
+                                    if (dtFilterColumnValues != null && dtFilterColumnValues.Rows.Count > 0)
+                                    {
+                                        jsonFilterColumnValues1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "(All)"));
+                                        for (int row = 0; row < dtFilterColumnValues.Rows.Count; row++)
+                                        {
+                                            if (isLookupOrUserField)
+                                                jsonFilterColumnValues1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", EncodeJsonData(Convert.ToString(dtFilterColumnValues.Rows[row][0])), EncodeJsonData(Convert.ToString(dtFilterColumnValues.Rows[row][0]))));
+                                            else
+                                                jsonFilterColumnValues1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", EncodeJsonData(Convert.ToString(dtFilterColumnValues.Rows[row][0])), EncodeJsonData(Convert.ToString(dtFilterColumnValues.Rows[row][0]))));
                                         }
                                     }
                                 }
-                                break;
-                            case SPFieldType.Lookup:
-                            case SPFieldType.User:
-                                {
-                                    var results = new List<SPFieldLookupValue>();
-                                    var lookupField = field as SPFieldLookup;
-                                    var lookupList = filterColumnList.ParentWeb.Lists[Guid.Parse(lookupField.LookupList)];
-                                    var query = new SPQuery();
-
-                                    query.Query = String.Format("<OrderBy><FieldRef Name='{0}'/></OrderBy><IsNull><FieldRef Name='" + props.KanBanFilterColumn + "' /></IsNull>", lookupField.LookupField);
-
-                                    foreach (SPListItem item in lookupList.GetItems(query))
-                                    {
-                                        results.Add(new SPFieldLookupValue(item.ID, item[lookupField.LookupField].ToString()));
-                                    }
-
-                                    foreach (SPFieldLookupValue result in results)
-                                    {
-                                        jsonFilter1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", EncodeJsonData(result.LookupValue), EncodeJsonData(result.LookupValue)));
-                                    }
-                                }
-                                break;
+                                catch { }
+                            }
+                        }
+                        else
+                        {
+                            //TODO: Display message that List {0} does not configure with Reporting database...
                         }
                     }
-
-                    string jsonData = jsonFilter1.ToString();
-                    if (jsonData.Length > 1)
-                    {
-                        jsonData = jsonData.Substring(0, jsonData.Length - 1);
-                    }
-                    return string.Format("{{ \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, jsonData);
-
                 }
             }
-
+            catch { }
+            string jsonData = jsonFilterColumnValues1.ToString();
+            if (jsonData.Length > 1)
+            {
+                jsonData = jsonData.Substring(0, jsonData.Length - 1);
+            }
+            return string.Format("{{ \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
@@ -5333,14 +5375,32 @@ namespace EPMLiveWorkPlanner
             string webID = data.GetElementsByTagName("WebID")[0].InnerText;
             string kanBanBoardName = DecodeJsonData(data.GetElementsByTagName("KanBanBoardName")[0].InnerText);
             string kanBanFilterColumnSelectedValues = DecodeJsonData(data.GetElementsByTagName("KanBanFilter1")[0].InnerText);
+            //string projectID = data.GetElementsByTagName("ID")[0].InnerText;
 
+            bool isNullValueIncluded = kanBanFilterColumnSelectedValues.Contains("(Blank)");
+
+            kanBanFilterColumnSelectedValues = kanBanFilterColumnSelectedValues.Replace("0,(Blank),", "");
             #endregion
 
             #region Variable Declaration
 
+            bool splitterLoaded = false;
             StringBuilder sbItems = new StringBuilder();
-            string selectedColumns = string.Empty;
             StringBuilder filterRecords = new StringBuilder();
+
+            string tableName = string.Empty;
+            string columnName = string.Empty;
+            string filterColumnValues = string.Empty;
+            string selectedColumns = string.Empty;
+            string selectedColumnsDBFormat = string.Empty;
+            string displayColumnsForSourceListData = string.Empty;
+
+            string qryGetColumns = "SELECT ColumnName, SharePointType FROM RPTColumn WHERE InternalName IN({0}) AND RPTListId='{1}'";
+            string qryFRFData = "SELECT * FROM FRF WHERE SITE_ID = '{0}' AND WEB_ID = '{1}' AND LIST_ID = '{2}' AND F_String = '{3}' ORDER BY ITEM_ID";
+
+            DataTable dtSourceListData = new DataTable();
+            DataTable dtColumns = new DataTable();
+            DataTable dtFRFData = new DataTable();
 
             #endregion
 
@@ -5357,164 +5417,209 @@ namespace EPMLiveWorkPlanner
                     {
                         SPField field = list.Fields.GetField(props.KanBanFilterColumn);
 
-                        if (!string.IsNullOrEmpty(kanBanFilterColumnSelectedValues) && kanBanFilterColumnSelectedValues.StartsWith("0"))
+                        switch (field.Type)
                         {
-                            filterRecords.Append("<OrderBy><FieldRef Name='" + props.KanBanStatusColumn + "' /></OrderBy>");
-                            filterRecords.Append("<Where><Or><Or>");
-                            filterRecords.Append("<IsNull><FieldRef Name='" + props.KanBanStatusColumn + "' /></IsNull>");
-                            filterRecords.Append("<IsNull><FieldRef Name='" + props.KanBanFilterColumn + "' /></IsNull>");
-                            filterRecords.Append("</Or>");
-                            filterRecords.Append("<In><FieldRef Name='" + props.KanBanFilterColumn + "' />");
-                            filterRecords.Append("<Values>");
-                            foreach (string filterColumnValue in kanBanFilterColumnSelectedValues.Split(','))
-                            {
-                                filterRecords.Append("<Value Type='" + field.TypeAsString + "'>" + filterColumnValue + "</Value>");
-                            }
-                            filterRecords.Append("</Values></In></Or></Where>");
-                        }
-                        else
-                        {
-                            filterRecords.Append("<OrderBy><FieldRef Name='" + props.KanBanStatusColumn + "' /></OrderBy>");
-                            filterRecords.Append("<Where>");
-                            filterRecords.Append("<In><FieldRef Name='" + props.KanBanFilterColumn + "' />");
-                            filterRecords.Append("<Values>");
-                            foreach (string filterColumnValue in kanBanFilterColumnSelectedValues.Split(','))
-                            {
-                                filterRecords.Append("<Value Type='" + field.TypeAsString + "'>" + filterColumnValue + "</Value>");
-                            }
-                            filterRecords.Append("</Values></In></Where>");
+                            case SPFieldType.User:
+                            case SPFieldType.Lookup:
+                                columnName = field.InternalName + "Text";
+                                break;
+                            default:
+                                columnName = field.InternalName;
+                                break;
                         }
 
-                        selectedColumns += props.KanBanTitleColumn + ",";
+                        selectedColumns += props.KanBanTitleColumn + ",ID,";
                         if (!string.IsNullOrEmpty(props.KanBanAdditionalColumns))
                             selectedColumns += props.KanBanAdditionalColumns;
 
-                        sbItems.Append("<table>");
-                        sbItems.Append("<tbody>");
-                        sbItems.Append("<tr>");
+                        selectedColumnsDBFormat = "'" + selectedColumns.Replace(",", "','") + "'";
 
-
-                        bool splitterLoaded = false;
-
-                        SPQuery qryFilterRecords = new SPQuery();
-                        qryFilterRecords.Query = filterRecords.ToString();
-                        SPListItemCollection allItems = list.GetItems(qryFilterRecords);
-
-                        #region Load BackLog Status Items
-
-                        string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
-
-                        sbItems.Append("<td>");
-                        sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
-                        sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
-                        sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + list.Title.Replace(" ", "_") + "'>");
-
-                        foreach (SPListItem currentItem in allItems)
+                        try
                         {
-                            if (string.IsNullOrEmpty(Convert.ToString(currentItem[props.KanBanStatusColumn])) ||
-                                (!selectedStatusColumnValues.Contains(Convert.ToString(currentItem[props.KanBanStatusColumn])))) //Add Backlog Items to Left Panel
-                            {
-                                sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + currentItem.ID + "' data-userid='0' data-itemtitle='" + currentItem.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + currentItem.ID + "'>"); //sortable-item <div> started
-                                sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + currentItem.ID + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
-                                foreach (string column in selectedColumns.Split(','))
+                            //Title, Project, AssignedTo, Status => Title, ProjectID, ProjectText, AssignedToID, AssignedToText, Status
+                            var queryExecutor = new QueryExecutor(spWeb);
+                            dtColumns = queryExecutor.ExecuteReportingDBQuery(string.Format(qryGetColumns, selectedColumnsDBFormat, list.ID.ToString()),
+                                new Dictionary<string, object>
                                 {
-                                    if (!string.IsNullOrEmpty(column))
+                                    {"@WebId", webID}
+                                });
+
+                        }
+                        catch { }
+
+                        if (dtColumns != null && dtColumns.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < dtColumns.Rows.Count; i++)
+                            {
+                                string colName = Convert.ToString(dtColumns.Rows[i]["ColumnName"]);
+                                string colType = Convert.ToString(dtColumns.Rows[i]["SharePointType"]);
+
+                                if ((colType.ToLower().Equals("lookup") || colType.ToLower().Equals("user")) && colName.ToLower().EndsWith("id"))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    displayColumnsForSourceListData += Convert.ToString(dtColumns.Rows[i]["ColumnName"]);
+                                    if (i < dtColumns.Rows.Count - 1)
+                                        displayColumnsForSourceListData += ",";
+                                }
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(kanBanFilterColumnSelectedValues))
+                        {
+                            filterColumnValues = "'" + kanBanFilterColumnSelectedValues.Replace(",", "','") + "'";
+                        }
+
+                        if (!string.IsNullOrEmpty(filterColumnValues))
+                        {
+                            try
+                            {
+                                string qryWhereClause = string.Format(" {0} in ({1}) {2}", columnName, filterColumnValues, isNullValueIncluded ? " or " + columnName + " is null " : "");
+                                dtSourceListData = EPMLiveCore.ReportingData.GetReportingData(spWeb, list.Title, false, qryWhereClause, props.KanBanStatusColumn);
+                            }
+                            catch { }
+
+                            if (dtSourceListData != null && dtSourceListData.Rows.Count > 0)
+                            {
+                                DataColumn fIntDataColumn = new DataColumn("F_INT", typeof(Int32));
+                                fIntDataColumn.DefaultValue = 0;
+                                dtSourceListData.Columns.Add(fIntDataColumn);
+                                //Insert/Update Record to FRF list...
+                                using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(spWeb.Site.WebApplication.Id)))
+                                {
+                                    cn.Open();
+                                    SqlCommand cmd = new SqlCommand(string.Format(qryFRFData, siteId, webID, list.ID.ToString(), kanBanBoardName), cn);
+                                    using (SqlDataAdapter dap = new SqlDataAdapter(cmd))
                                     {
-                                        string itemTitle = Convert.ToString(currentItem[column]);
-                                        if (itemTitle.Contains(";#"))
+                                        dap.Fill(dtFRFData);
+                                    }
+                                }
+
+                                if (dtFRFData != null && dtFRFData.Rows.Count > 0)
+                                {
+                                    foreach (DataRow dr in dtSourceListData.Rows)
+                                    {
+                                        DataRow[] fIntDataRow = dtFRFData.Select("ITEM_ID = " + dr["ID"]);
+                                        if (fIntDataRow != null && fIntDataRow.Length > 0)
                                         {
-                                            sbItems.Append("<div>" + Convert.ToString(itemTitle.Split(new string[] { ";#" }, StringSplitOptions.None)[1]) + "&nbsp;</div>");
-                                        }
-                                        else
-                                        {
-                                            sbItems.Append("<div>" + itemTitle + "&nbsp;</div>");
+                                            dr["F_INT"] = fIntDataRow[0]["F_INT"];
                                         }
                                     }
                                 }
-                                sbItems.Append("</div>"); //sortable-item <div> completed
                             }
                         }
-                        sbItems.Append("</div>"); //sortable-list <div> completed
-                        sbItems.Append("</div>");//itemContainer <div> Completed
-                        sbItems.Append("</td>");
-                        //}
-                        //else
-                        //{
-                        //    splitterLoaded = true;
-                        //}
-
-                        #endregion
-
-                        #region Load Stages
-
-                        //Load All Stages - Based on Status Column Selection
-                        string statusFieldName = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanStatusColumn");
-                        SPFieldChoice choiceField = list.Fields.GetField(statusFieldName) as SPFieldChoice;
-                        StringCollection statusValues = choiceField.Choices;
-
-                        if (statusValues.Count > 0)
+                        else
                         {
-                            foreach (string status in statusValues)
+                            return string.Empty;
+                        }
+
+                        DataRow[] dtSourceListDataRows = dtSourceListData.Select("", string.Format("{0},{1}", props.KanBanStatusColumn, "F_INT"));
+
+                        if (dtSourceListDataRows != null && dtSourceListDataRows.Length > 0)
+                        {
+                            //Actual Logic Started...
+                            sbItems.Append("<table>");
+                            sbItems.Append("<tbody>");
+                            sbItems.Append("<tr>");
+
+                            sbItems.Append("<td>");
+                            sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
+                            sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
+                            sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + list.Title.Replace(" ", "_") + "'>");
+
+                            string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
+
+                            #region Load BackLog Status Items
+
+                            foreach (DataRow row in dtSourceListDataRows)
                             {
-                                if (selectedStatusColumnValues.Contains(status))
+                                string statusColumnValue = Convert.ToString(row[props.KanBanStatusColumn]);
+                                if (string.IsNullOrEmpty(statusColumnValue) ||
+                                    (!selectedStatusColumnValues.Contains(statusColumnValue))) //Add Backlog Items to Left Panel
                                 {
-                                    sbItems.Append("<td>");
-                                    sbItems.Append("<div class='stageContainer'>"); //stageContainer <div> started
-
-                                    //Load Splitter...
-                                    if (!splitterLoaded)
+                                    sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
+                                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
+                                    foreach (string column in displayColumnsForSourceListData.Split(','))
                                     {
-                                        sbItems.Append("<div id='splitter'><<</div>");
-                                        splitterLoaded = true;
-                                    }
-
-                                    sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
-                                    sbItems.Append("<div class='sortable-list' data-dragged-status='" + status + "' id='" + status.Replace(" ", "_") + "'>");
-
-                                    //selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
-                                    List<SPListItem> stagingItems = (from spitems in allItems.OfType<SPListItem>() where Convert.ToString(spitems[props.KanBanStatusColumn]) == status select spitems).ToList<SPListItem>();
-
-                                    foreach (SPListItem item in stagingItems)
-                                    {
-                                        sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + item.ID + "' data-userid='0' data-itemtitle='" + item.Title + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='' id='" + item.ID + "'>"); //sortable-item <div> started
-                                        sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + item.ID + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
-
-                                        foreach (string column in selectedColumns.Split(','))
+                                        if (!string.IsNullOrEmpty(column))
                                         {
-                                            if (!string.IsNullOrEmpty(column))
+                                            sbItems.Append("<div>" + Convert.ToString(row[column]) + "&nbsp;</div>");
+                                        }
+                                    }
+                                    sbItems.Append("</div>"); //sortable-item <div> completed
+                                }
+                            }
+
+                            sbItems.Append("</div>"); //sortable-list <div> completed
+                            sbItems.Append("</div>");//itemContainer <div> Completed
+                            sbItems.Append("</td>");
+
+                            #endregion
+
+                            #region Load Stages
+
+                            //Load All Stages - Based on Status Column Selection
+                            string statusFieldName = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanStatusColumn");
+                            SPFieldChoice choiceField = list.Fields.GetField(statusFieldName) as SPFieldChoice;
+                            StringCollection statusValues = choiceField.Choices;
+
+                            if (statusValues.Count > 0)
+                            {
+                                foreach (string status in statusValues)
+                                {
+                                    if (selectedStatusColumnValues.Contains(status))
+                                    {
+                                        sbItems.Append("<td>");
+                                        sbItems.Append("<div class='stageContainer'>"); //stageContainer <div> started
+
+                                        //Load Splitter...
+                                        if (!splitterLoaded)
+                                        {
+                                            sbItems.Append("<div id='splitter'><<</div>");
+                                            splitterLoaded = true;
+                                        }
+
+                                        sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
+                                        sbItems.Append("<div class='sortable-list' data-dragged-status='" + status + "' id='" + status.Replace(" ", "_") + "'>");
+
+                                        foreach (DataRow row in dtSourceListDataRows)
+                                        {
+                                            string currentProcessingStatus = Convert.ToString(row[statusFieldName]);
+                                            if (currentProcessingStatus.Equals(status, StringComparison.InvariantCultureIgnoreCase))
                                             {
-                                                string itemTitle = Convert.ToString(item[column]);
-                                                if (itemTitle.Contains(";#"))
+                                                sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
+                                                sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
+
+                                                foreach (string column in displayColumnsForSourceListData.Split(','))
                                                 {
-                                                    sbItems.Append("<div>" + Convert.ToString(itemTitle.Split(new string[] { ";#" }, StringSplitOptions.None)[1]) + "&nbsp;</div>");
+                                                    if (!string.IsNullOrEmpty(column))
+                                                    {
+                                                        sbItems.Append("<div>" + Convert.ToString(row[column]) + "&nbsp;</div>");
+                                                    }
                                                 }
-                                                else
-                                                {
-                                                    sbItems.Append("<div>" + itemTitle + "&nbsp;</div>");
-                                                }
+                                                sbItems.Append("</div>");//sortable-item <div> Completed
                                             }
                                         }
-                                        sbItems.Append("</div>");//sortable-item <div> Completed
+
+                                        sbItems.Append("</div>"); //sortable-list <div> completed
+                                        sbItems.Append("</div>"); //stageContainer <div> completed
+                                        sbItems.Append("</td>");
                                     }
                                 }
-
-                                sbItems.Append("</div>"); //sortable-list <div> completed
-                                sbItems.Append("</div>"); //stageContainer <div> completed
-                                sbItems.Append("</td>");
                             }
+
+                            sbItems.Append("</tr>");
+                            sbItems.Append("</tbody>");
+                            sbItems.Append("</table>");
+
+                            #endregion
                         }
-
-                        sbItems.Append("</tr>");
-                        sbItems.Append("</tbody>");
-                        sbItems.Append("</table>");
-
-                        #endregion
                     }
                 }
             }
-
             return sbItems.ToString();
-
         }
 
         private static string EncodeJsonData(string data)
@@ -5543,9 +5648,9 @@ namespace EPMLiveWorkPlanner
             string type = data.GetElementsByTagName("data-type")[0].InnerText;
             string fString = data.GetElementsByTagName("data-fstring")[0].InnerText; //Name of the Board
             string fDate = data.GetElementsByTagName("data-fdate")[0].InnerText;
-            string fInt = data.GetElementsByTagName("data-fint")[0].InnerText;
+            Int32 fInt = Convert.ToInt32(data.GetElementsByTagName("data-fint")[0].InnerText);
             string draggedStatus = data.GetElementsByTagName("data-dragged-status")[0].InnerText;
-            string dataIndexOfItem = data.GetElementsByTagName("data-index-of-item")[0].InnerText;
+            Int32 dataIndexOfItem = Convert.ToInt32(data.GetElementsByTagName("data-index-of-item")[0].InnerText);
 
             using (SPSite site = new SPSite(new Guid(siteId)))
             {
@@ -5611,7 +5716,7 @@ namespace EPMLiveWorkPlanner
                     }
                 }
             }
-
+            Thread.Sleep(2000);
             return string.Empty;
         }
 
