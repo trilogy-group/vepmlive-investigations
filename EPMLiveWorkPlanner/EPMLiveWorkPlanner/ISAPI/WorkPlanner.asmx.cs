@@ -5262,7 +5262,7 @@ namespace EPMLiveWorkPlanner
             //Prepare Queries...
             string qryTableName = "SELECT TableName FROM RPTList WHERE RPTListID = '{0}'";
             string qryFilterColumns = "SELECT ColumnName, SharePointType FROM RPTColumn WHERE RPTListId = '{0}' and InternalName = '{1}'";
-            string qryFilterColumnValues = "SELECT DISTINCT {0} FROM {1} WHERE WebId='{2}' AND ListId='{3}' AND ID=" + projectID + " ORDER BY {4}";
+            string qryFilterColumnValues = "SELECT DISTINCT {0} FROM {1} WHERE WebId='{2}' AND ListId='{3}' AND ProjectID=" + projectID + " ORDER BY {4}";
 
             StringBuilder jsonFilterColumnValues1 = new StringBuilder();
             string columnName = string.Empty;
@@ -5281,7 +5281,7 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
                     {
                         props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
-                        SPList sourceList = spWeb.Lists[props.sListProjectCenter];
+                        SPList sourceList = spWeb.Lists[props.sListTaskCenter];
 
                         try
                         {
@@ -5413,7 +5413,7 @@ namespace EPMLiveWorkPlanner
                 {
                     WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
 
-                    SPList list = spWeb.Lists[props.sListProjectCenter];
+                    SPList list = spWeb.Lists[props.sListTaskCenter];
 
                     if (list != null)
                     {
@@ -5430,7 +5430,7 @@ namespace EPMLiveWorkPlanner
                                 break;
                         }
 
-                        selectedColumns += props.KanBanTitleColumn + ",ID,";
+                        selectedColumns += props.KanBanTitleColumn + ",";
                         if (!string.IsNullOrEmpty(props.KanBanAdditionalColumns))
                             selectedColumns += props.KanBanAdditionalColumns;
 
@@ -5478,7 +5478,7 @@ namespace EPMLiveWorkPlanner
                         {
                             try
                             {
-                                string qryWhereClause = string.Format(" {0} in ({1}) {2} AND ID={3}", columnName, filterColumnValues, isNullValueIncluded ? " or " + columnName + " is null " : "", projectID);
+                                string qryWhereClause = string.Format(" {0} in ({1}) {2} AND ProjectID={3}", columnName, filterColumnValues, isNullValueIncluded ? " or " + columnName + " is null " : "", projectID);
                                 dtSourceListData = EPMLiveCore.ReportingData.GetReportingData(spWeb, list.Title, false, qryWhereClause, props.KanBanStatusColumn);
                             }
                             catch { }

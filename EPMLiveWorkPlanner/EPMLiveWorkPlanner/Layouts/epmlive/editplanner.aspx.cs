@@ -280,6 +280,10 @@ namespace EPMLiveWorkPlanner
             SPWeb web = SPContext.Current.Web;
             loadTaskCenterFields(web, true);
             filltaskfields(web);
+            GetStatusColumns(web);
+            GetFilterColumns(web);
+            GetAllListColumns(web, true);
+            GetColumnValues(web, true);
         }
 
         protected void ddlProjectCenter_SelectedIndexChanged(object sender, EventArgs e)
@@ -292,10 +296,6 @@ namespace EPMLiveWorkPlanner
             //fillbackloglist(web);
             loadTaskCenterFields(web, true);
             filltaskfields(web);
-            GetStatusColumns(web);
-            GetFilterColumns(web);
-            GetAllListColumns(web, true);
-            GetColumnValues(web, true);
         }
 
         protected void Button1_Click(object sender, EventArgs e)
@@ -692,9 +692,9 @@ namespace EPMLiveWorkPlanner
             ddlKanBanStatusColumn.Items.Clear();
             try
             {
-                if (ddlProjectCenter.SelectedValue != null)
+                if (ddlTaskCenter.SelectedValue != null)
                 {
-                    SPList list = web.Lists[new Guid(ddlProjectCenter.SelectedValue)];
+                    SPList list = web.Lists[new Guid(ddlTaskCenter.SelectedValue)];
 
                     foreach (SPField field in list.Fields)
                     {
@@ -717,9 +717,9 @@ namespace EPMLiveWorkPlanner
             try
             {
                 ddlKanBanFilterColumn.Items.Clear();
-                if (ddlProjectCenter.SelectedItem != null)
+                if (ddlTaskCenter.SelectedItem != null)
                 {
-                    SPList list = web.Lists[new Guid(ddlProjectCenter.SelectedValue)];
+                    SPList list = web.Lists[new Guid(ddlTaskCenter.SelectedValue)];
 
                     foreach (SPField field in list.Fields)
                     {
@@ -763,7 +763,7 @@ namespace EPMLiveWorkPlanner
                     ddlKanBanAvailableItemStatus.Items.Clear();
                     ddlKanBanSelectedItemStatus.Items.Clear();
 
-                    SPList list = web.Lists[ddlProjectCenter.SelectedItem.Text];
+                    SPList list = web.Lists[ddlTaskCenter.SelectedItem.Text];
                     SPFieldChoice choiceField = list.Fields.GetField(ddlKanBanStatusColumn.SelectedValue) as SPFieldChoice;
                     StringCollection choices = choiceField.Choices;
 
@@ -806,9 +806,9 @@ namespace EPMLiveWorkPlanner
                     fields = new ArrayList(kanbanAdditionalColumns.Split(','));
                 }
 
-                if (ddlProjectCenter.SelectedValue != null)
+                if (ddlTaskCenter.SelectedValue != null)
                 {
-                    SPList list = web.Lists.TryGetList(ddlProjectCenter.SelectedItem.Text);
+                    SPList list = web.Lists.TryGetList(ddlTaskCenter.SelectedItem.Text);
                     ddlKanBanAvailableFields.Items.Clear();
                     ddlKanBanSelectedFields.Items.Clear();
                     ddlKanBanTitleColumn.Items.Clear();

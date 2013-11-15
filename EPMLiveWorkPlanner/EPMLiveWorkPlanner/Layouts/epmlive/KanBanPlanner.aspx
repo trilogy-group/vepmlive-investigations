@@ -344,7 +344,7 @@
                 $.ajax({
                     type: "POST",
                     url: "/_vti_bin/WorkPlanner.asmx/Execute",
-                    data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName><%=strPlanner %></KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                    data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     error: function (xhr, status, error) {
@@ -356,6 +356,8 @@
                         showHideLoading(false, '');
                         var obj = jQuery.parseJSON(response.d);
 
+                        $("span[id^='ddcl-']").remove();
+                        $("div[id^='ddcl-']").remove();
 
                         if (obj.kanbanerror != "") {
                             resetControls(false);
@@ -369,9 +371,7 @@
                             $.each(obj.kanbanfilter1, function (key, value) {
                                 $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
                             });
-
-                            $("span[id^='ddcl-']").remove();
-                            $("div[id^='ddcl-']").remove();
+                           
                             $("#ddlKanBanFilter1").dropdownchecklist({
                                 width: 200,
                                 forceMultiple: true,
@@ -415,7 +415,7 @@
             $.ajax({
                 type: "POST",
                 url: "/_vti_bin/WorkPlanner.asmx/Execute",
-                data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName><%=strPlanner%></KanBanBoardName><KanBanFilter1>" + kanBanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><KanBanFilter1>" + kanBanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 error: function (xhr, status, error) {
