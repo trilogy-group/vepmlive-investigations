@@ -18,7 +18,7 @@
         @media (min-width: 1680px) {
             .itemContainer,
             .stageContainer {
-                width: 400px;
+                width: 435px;
                 min-height: 825px;
                 float: left;
             }
@@ -36,7 +36,7 @@
         @media (max-width: 1199px) {
             .itemContainer,
             .stageContainer {
-                width: 200px;
+                width: 300px;
                 min-height: 525px;
                 float: left;
             }
@@ -189,7 +189,7 @@
             margin: 2px;
             padding: 2px;
             text-align: left;
-            min-width: 98px;
+            min-width: 135px;
             min-height: 48px;
             float: left;
             -webkit-border-radius: 0px 10px 0px 0px;
@@ -206,13 +206,27 @@
             }
 
         .placeholder {
-            /*background-color: #BFB;
-            border: 1px dashed #666;
-            height: 50px;
-            width: 50px;
-            margin: 5px;
-            padding: 5px;*/
+            background-color: #e6e6e6; /*0092CA*/
+            border-left: 5px solid #009CCC;
+            border-top: 1px dashed #000;
+            border-right: 1px dashed #000;
+            border-bottom: 1px dashed #000;
+            cursor: pointer;
+            display: block;
+            color: black;
+            font-size: 12px;
+            margin: 2px;
+            padding: 2px;
+            text-align: left;
+            min-width: 135px;
+            min-height: 48px;
             float: left;
+            -webkit-border-radius: 0px 10px 0px 0px;
+            -moz-border-radius: 0px 10px 0px 0px;
+            border-radius: 0px 10px 0px 0px;
+            -webkit-box-shadow: #B3B3B3 2px 2px 2px;
+            -moz-box-shadow: #B3B3B3 2px 2px 2px;
+            box-shadow: #B3B3B3 2px 2px 2px;
         }
 
         .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
@@ -225,6 +239,13 @@
             cursor: pointer;
             position: absolute;
         }
+
+        /*#saveprogress {
+            width: 25px;
+            height: 25px;
+            display: none;
+            float: right;
+        }*/
     </style>
     <script type="text/javascript">
 
@@ -267,14 +288,14 @@
                 //$("#btnApply").show();
                 $("#lblFilert1").show();
                 $("#ddlKanBanFilter1").show();
-                $("#mainContainer").show();
+                //$("#mainContainer").show();
                 $("#mainContainer").html('');
             }
             else {
                 //$("#btnApply").hide();
                 $("#lblFilert1").hide();
                 $("#ddlKanBanFilter1").hide();
-                $("#mainContainer").hide();
+                //$("#mainContainer").hide();
                 $("#mainContainer").html('');
             }
         }
@@ -299,7 +320,13 @@
                     $.each(obj.kanbanplanners, function (key, value) {
                         $("#ddlKanBanPlanners").append($("<option></option>").val(value.id).html(value.text));
                     });
-                    $("#ddlKanBanPlanners").val($("#ddlKanBanPlanners option:last-child").val());
+
+                    if ($("#ddlKanBanPlanners option[value='<%=strPlanner%>']").length > 0) {
+                        $("#ddlKanBanPlanners").val('<%=strPlanner%>');
+                    }
+                    else {
+                        $("#ddlKanBanPlanners").val($("#ddlKanBanPlanners option:last-child").val());
+                    }
                     loadKanBanFilter1($("#ddlKanBanPlanners").val());
                 }
             });
@@ -329,33 +356,41 @@
                         showHideLoading(false, '');
                         var obj = jQuery.parseJSON(response.d);
 
-                        $("#lblFilert1").text(obj.kanbanfilter1name);
 
-                        $("#ddlKanBanFilter1").children('option').remove();
-                        $.each(obj.kanbanfilter1, function (key, value) {
-                            $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
-                        });
+                        if (obj.kanbanerror != "") {
+                            resetControls(false);
+                            $("#mainContainer").html(obj.kanbanerror);
+                        }
+                        else {
+                            resetControls(true);
+                            $("#lblFilert1").text(obj.kanbanfilter1name);
 
-                        $("span[id^='ddcl-']").remove();
-                        $("div[id^='ddcl-']").remove();
-                        $("#ddlKanBanFilter1").dropdownchecklist({
-                            width: 200,
-                            forceMultiple: true,
-                            firstItemChecksAll: true,
-                            explicitClose: "...Close",
-                            onComplete: function (selector) {
-                                //var kanBanFilter1 = "";
-                                //for (i = 0; i < selector.options.length; i++) {
-                                //    if (selector.options[i].selected && (selector.options[i].value != "")) {
-                                //        if (kanBanFilter1 != "") kanBanFilter1 += ",";
-                                //        kanBanFilter1 += selector.options[i].value.toString().replace("\\", "\\\\");
-                                //    }
-                                //}
-                                //loadKanBanBoard($("#ddlKanBanPlanners").val(), kanBanFilter1);
+                            $("#ddlKanBanFilter1").children('option').remove();
+                            $.each(obj.kanbanfilter1, function (key, value) {
+                                $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
+                            });
 
-                                loadKanBanBoard();
-                            }
-                        });
+                            $("span[id^='ddcl-']").remove();
+                            $("div[id^='ddcl-']").remove();
+                            $("#ddlKanBanFilter1").dropdownchecklist({
+                                width: 200,
+                                forceMultiple: true,
+                                firstItemChecksAll: true,
+                                explicitClose: "...Close",
+                                onComplete: function (selector) {
+                                    //var kanBanFilter1 = "";
+                                    //for (i = 0; i < selector.options.length; i++) {
+                                    //    if (selector.options[i].selected && (selector.options[i].value != "")) {
+                                    //        if (kanBanFilter1 != "") kanBanFilter1 += ",";
+                                    //        kanBanFilter1 += selector.options[i].value.toString().replace("\\", "\\\\");
+                                    //    }
+                                    //}
+                                    //loadKanBanBoard($("#ddlKanBanPlanners").val(), kanBanFilter1);
+
+                                    loadKanBanBoard();
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -410,10 +445,14 @@
                         items: '.sortable-item',
                         update: function (event, ui) {
                             if (ui.sender == null) {
-                                showHideLoading(true, 'Saving item...');
+                                //showHideLoading(true, 'Saving item...');
                                 var parentId = ui.item.parent().attr("id");
                                 var childId = ui.item.attr("id");
                                 var indexOfItem = $("#" + parentId + " > div").index($("#" + childId));
+
+                                //$("#" + childId + " > div[id^='saveprogress']").show();
+                                $("#" + childId).fadeTo(10, 0.25);
+
                                 var data = '<DataXml><data-siteid>' + ui.item.attr("data-siteid") + '</data-siteid><data-webid>' + ui.item.attr("data-webid") + '</data-webid><data-listid>' + ui.item.attr("data-listid") + '</data-listid><data-itemid>' + ui.item.attr("data-itemid") + '</data-itemid><data-userid>' + ui.item.attr("data-userid") + '</data-userid><data-itemtitle>' + ui.item.attr("data-itemtitle") + '</data-itemtitle><data-icon>' + ui.item.attr("data-icon") + '</data-icon><data-type>' + ui.item.attr("data-type") + '</data-type><data-fstring>' + ui.item.attr("data-fstring") + '</data-fstring><data-fdate>' + ui.item.attr("data-fdate") + '</data-fdate><data-fint>' + ui.item.attr("data-fint") + '</data-fint><data-dragged-status>' + ui.item.parent().attr("data-dragged-status") + '</data-dragged-status><data-index-of-item>' + indexOfItem + '</data-index-of-item></DataXml>';
                                 $.ajax({
                                     type: "POST",
@@ -422,14 +461,22 @@
                                     contentType: "application/json; charset=utf-8",
                                     dataType: "json",
                                     error: function (xhr, status, error) {
-                                        showHideLoading(false, '');
+                                        //showHideLoading(false, '');
                                         var err = eval("(" + xhr.responseText + ")");
                                         alert(err.Message);
                                     },
                                     success: function (response) {
                                         //$("#btnApply").click();
-                                        showHideLoading(false, '');
-                                        loadKanBanBoard();
+                                        //showHideLoading(false, '');
+                                        //loadKanBanBoard();
+
+                                        //$("#" + childId + " > div[id^='saveprogress']").hide();
+                                        $("#" + childId).fadeTo(10, 1);
+                                        if ($("#" + parentId).attr("data-dragged-status") == $(".itemContainer div:nth-child(2)").attr("data-dragged-status")) {
+                                            $("#" + childId + " > div[id^='key']").html('&nbsp;');
+                                        } else {
+                                            $("#" + childId + " > div[id^='key']").html($("#" + parentId).attr("data-dragged-status"));
+                                        }
                                     }
                                 });
                             }

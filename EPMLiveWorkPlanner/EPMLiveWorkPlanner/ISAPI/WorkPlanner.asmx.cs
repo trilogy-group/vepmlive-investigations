@@ -5351,7 +5351,7 @@ namespace EPMLiveWorkPlanner
                         }
                         else
                         {
-                            //TODO: Display message that List {0} does not configure with Reporting database...
+                            return string.Format("{{ \"kanbanerror\": \"List not configured for reporting. Please contact administrator.\", \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, "");
                         }
                     }
                 }
@@ -5362,7 +5362,7 @@ namespace EPMLiveWorkPlanner
             {
                 jsonData = jsonData.Substring(0, jsonData.Length - 1);
             }
-            return string.Format("{{ \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, jsonData);
+            return string.Format("{{ \"kanbanerror\": \"\", \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
@@ -5440,7 +5440,7 @@ namespace EPMLiveWorkPlanner
                             var queryExecutor = new QueryExecutor(spWeb);
                             dtColumns = queryExecutor.ExecuteReportingDBQuery(string.Format(qryGetColumns, selectedColumnsDBFormat, list.ID.ToString()),
                                 new Dictionary<string, object>
-                                {
+                            {
                                     {"@WebId", webID}
                                 });
 
@@ -5484,7 +5484,7 @@ namespace EPMLiveWorkPlanner
                             if (dtSourceListData != null && dtSourceListData.Rows.Count > 0)
                             {
                                 DataColumn fIntDataColumn = new DataColumn("F_INT", typeof(Int32));
-                                fIntDataColumn.DefaultValue = 0;
+                                fIntDataColumn.DefaultValue = 9999;
                                 dtSourceListData.Columns.Add(fIntDataColumn);
                                 //Insert/Update Record to FRF list...
                                 using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(spWeb.Site.WebApplication.Id)))
@@ -5525,9 +5525,9 @@ namespace EPMLiveWorkPlanner
                             sbItems.Append("<tr>");
 
                             sbItems.Append("<td>");
-                            sbItems.Append("<div class='itemContainer'>"); //itemContainer <div> started
+                            sbItems.Append("<div id='itemContainer' class='itemContainer'>"); //itemContainer <div> started
                             sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
-                            sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + list.Title.Replace(" ", "_") + "'>");
+                            sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + Regex.Replace(list.Title, "[^a-zA-Z_]+", "").Replace(" ","") + "'>");
 
                             string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
 
@@ -5545,9 +5545,11 @@ namespace EPMLiveWorkPlanner
                                     {
                                         if (!string.IsNullOrEmpty(column))
                                         {
-                                            sbItems.Append("<div>" + Convert.ToString(row[column]) + "&nbsp;</div>");
+                                            sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + ">" + Convert.ToString(row[column]) + "&nbsp;</div>");
                                         }
                                     }
+                                    //sbItems.Append("<div id='saveprogress'><img alt='Saving Item' src='../images/gears_anv4.gif' /></div>");
+
                                     sbItems.Append("</div>"); //sortable-item <div> completed
                                 }
                             }
@@ -5582,7 +5584,7 @@ namespace EPMLiveWorkPlanner
                                         }
 
                                         sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
-                                        sbItems.Append("<div class='sortable-list' data-dragged-status='" + status + "' id='" + status.Replace(" ", "_") + "'>");
+                                        sbItems.Append("<div class='sortable-list' data-dragged-status='" + status + "' id='" + Regex.Replace(status, "[^a-zA-Z_]+", "").Replace(" ", "") + "'>");
 
                                         foreach (DataRow row in dtSourceListDataRows)
                                         {
@@ -5596,9 +5598,11 @@ namespace EPMLiveWorkPlanner
                                                 {
                                                     if (!string.IsNullOrEmpty(column))
                                                     {
-                                                        sbItems.Append("<div>" + Convert.ToString(row[column]) + "&nbsp;</div>");
+                                                        sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + ">" + Convert.ToString(row[column]) + "&nbsp;</div>");
                                                     }
                                                 }
+                                                //sbItems.Append("<div id='saveprogress'><img alt='Saving Item' src='../images/gears_anv4.gif' /></div>");
+
                                                 sbItems.Append("</div>");//sortable-item <div> Completed
                                             }
                                         }
@@ -5716,7 +5720,7 @@ namespace EPMLiveWorkPlanner
                     }
                 }
             }
-            Thread.Sleep(2000);
+
             return string.Empty;
         }
 

@@ -11,9 +11,25 @@ namespace EPMLiveWorkPlanner
 {
     public partial class KanBanPlanner : LayoutsPageBase
     {
+        public string strPlanner
+        {
+            get
+            {
+                return Convert.ToString(Request["planner"]);
+            }
+        }
+
+        public string strProjectId
+        {
+            get
+            {
+                return Convert.ToString(Request["ID"]);
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+
         }
     }
 }
