@@ -43,9 +43,6 @@
                     text-align: left;
                     vertical-align: top;
                     border-right: 1px dashed black;
-                    width: 20%;
-                    min-width: 20%;
-                    max-width: 20%;
                 }
 
         #loadingDiv {
@@ -471,6 +468,11 @@
                             }
                         }
                     });
+
+                    var per = (100 / $("#mainTR td").length).toFixed(2);
+                    $("#mainTR td").css("width", per+"%");
+                    $("#mainTR td").css("min-width", per + "%");
+                    $("#mainTR td").css("max-width", per + "%");
 
                     $(".associateditemscontextmenu").each(function () {
                         window.epmLiveNavigation.addContextualMenu($(this));

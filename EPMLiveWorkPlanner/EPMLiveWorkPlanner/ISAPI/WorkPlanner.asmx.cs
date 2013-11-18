@@ -5524,7 +5524,7 @@ namespace EPMLiveWorkPlanner
                             //Actual Logic Started...
                             sbItems.Append("<table>");
                             sbItems.Append("<tbody>");
-                            sbItems.Append("<tr>");
+                            sbItems.Append("<tr id='mainTR'>");
 
                             sbItems.Append("<td id='itemContainerTD'>");
                             sbItems.Append("<div id='itemContainer' class='itemContainer'>"); //itemContainer <div> started
