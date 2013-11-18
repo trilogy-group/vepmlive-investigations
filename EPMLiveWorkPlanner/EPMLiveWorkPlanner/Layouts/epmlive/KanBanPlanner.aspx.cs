@@ -1,35 +1,48 @@
 ﻿using System;
-using Microsoft.SharePoint;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint.WebControls;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Web.UI.WebControls;
-using EPMLiveWorkPlanner.Layouts.EPMLiveWorkPlanner;
-using System.Text;
 
 namespace EPMLiveWorkPlanner
 {
     public partial class KanBanPlanner : LayoutsPageBase
     {
+        #region Fields (1) 
+
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
+
+        #endregion Fields 
+
+        #region Properties (2) 
+
         public string strPlanner
         {
-            get
-            {
-                return Convert.ToString(Request["planner"]);
-            }
+            get { return Convert.ToString(Request["planner"]); }
         }
 
         public string strProjectId
         {
-            get
-            {
-                return Convert.ToString(Request["ID"]);
-            }
+            get { return Convert.ToString(Request["ID"]); }
         }
 
-        protected void Page_Load(object sender, EventArgs e)
+        #endregion Properties 
+
+        #region Methods (2) 
+
+        // Protected Methods (2) 
+
+        protected override void OnPreRender(EventArgs e)
         {
+            base.OnPreRender(e);
 
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "libraries/jquery.min", "libraries/jquery-ui", "@EPMLive.Navigation",
+                "kanban/ui.dropdownchecklist-1.4-min"
+            });
         }
+
+        protected void Page_Load(object sender, EventArgs e) { }
+
+        #endregion Methods 
     }
 }

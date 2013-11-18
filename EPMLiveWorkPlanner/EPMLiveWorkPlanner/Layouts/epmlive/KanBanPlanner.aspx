@@ -10,9 +10,6 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
-    <script src="javascripts/kanban/jquery-1.9.1.js" type="text/javascript"></script>
-    <script src="javascripts/kanban/jquery-ui.js" type="text/javascript"></script>
-    <script src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js" type="text/javascript"></script>
     <style type="text/css">
         .itemContainer,
         .stageContainer {
@@ -474,9 +471,13 @@
                     $("#mainTR td").css("min-width", per + "%");
                     $("#mainTR td").css("max-width", per + "%");
 
-                    $(".associateditemscontextmenu").each(function () {
-                        window.epmLiveNavigation.addContextualMenu($(this));
-                    });
+                    var addContextualMenu = function () {
+                        $(".associateditemscontextmenu").each(function () {
+                            window.epmLiveNavigation.addContextualMenu($(this));
+                        });
+                    };
+                    
+                    ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
                 }
             });
         };
