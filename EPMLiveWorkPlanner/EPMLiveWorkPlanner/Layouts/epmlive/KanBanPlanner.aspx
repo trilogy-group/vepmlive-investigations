@@ -14,32 +14,11 @@
     <script src="javascripts/kanban/jquery-ui.js" type="text/javascript"></script>
     <script src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js" type="text/javascript"></script>
     <style type="text/css">
-        /* Large desktop */
-        @media (min-width: 1680px) {
-            .itemContainer,
-            .stageContainer {
-                width: 435px;
-                min-height: 825px;
-                float: left;
-            }
-        }
-
-        @media (min-width: 1200px) and (max-width: 1679px) {
-            .itemContainer,
-            .stageContainer {
-                width: 300px;
-                min-height: 625px;
-                float: left;
-            }
-        }
-
-        @media (max-width: 1199px) {
-            .itemContainer,
-            .stageContainer {
-                width: 300px;
-                min-height: 525px;
-                float: left;
-            }
+        .itemContainer,
+        .stageContainer {
+            width: 100%;
+            min-height: 625px;
+            float: left;
         }
 
         #section1 {
@@ -64,6 +43,9 @@
                     text-align: left;
                     vertical-align: top;
                     border-right: 1px dashed black;
+                    width: 20%;
+                    min-width: 20%;
+                    max-width: 20%;
                 }
 
         #loadingDiv {
@@ -189,7 +171,8 @@
             margin: 2px;
             padding: 2px;
             text-align: left;
-            min-width: 135px;
+            max-width: 115px;
+            min-width: 115px;
             min-height: 48px;
             float: left;
             -webkit-border-radius: 0px 10px 0px 0px;
@@ -218,7 +201,8 @@
             margin: 2px;
             padding: 2px;
             text-align: left;
-            min-width: 135px;
+            max-width: 115px;
+            min-width: 115px;
             min-height: 48px;
             float: left;
             -webkit-border-radius: 0px 10px 0px 0px;
@@ -371,7 +355,7 @@
                             $.each(obj.kanbanfilter1, function (key, value) {
                                 $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
                             });
-                           
+
                             $("#ddlKanBanFilter1").dropdownchecklist({
                                 width: 200,
                                 forceMultiple: true,
@@ -429,14 +413,12 @@
                     $("#mainContainer").html(response.d);
 
                     $("#splitter").click(function () {
-                        if ($(".itemContainer").is(":visible")) {
+                        if ($("#itemContainerTD").is(":visible")) {
                             $("#splitter").html(">>");
                         } else {
                             $("#splitter").html("<<");
                         }
-                        $(".itemContainer").toggle("fast", function () {
-
-                        });
+                        $("#itemContainerTD").toggle("fast", function () { });
                     });
 
                     $("#mainContainer .sortable-list").sortable({
@@ -475,7 +457,14 @@
                                         if ($("#" + parentId).attr("data-dragged-status") == $(".itemContainer div:nth-child(2)").attr("data-dragged-status")) {
                                             $("#" + childId + " > div[id^='key']").html('&nbsp;');
                                         } else {
-                                            $("#" + childId + " > div[id^='key']").html($("#" + parentId).attr("data-dragged-status"));
+                                            if ($("#" + parentId).attr("data-dragged-status").length > 15) {
+                                                $("#" + childId + " > div[id^='key']").html($("#" + parentId).attr("data-dragged-status").substr(0, 15) + '...');
+                                                $("#" + childId + " > div[id^='key']").attr("title", $("#" + parentId).attr("data-dragged-status").substr(0, 15) + '...');
+                                            }
+                                            else {
+                                                $("#" + childId + " > div[id^='key']").html($("#" + parentId).attr("data-dragged-status"));
+                                                $("#" + childId + " > div[id^='key']").attr("title", $("#" + parentId).attr("data-dragged-status"));
+                                            }
                                         }
                                     }
                                 });

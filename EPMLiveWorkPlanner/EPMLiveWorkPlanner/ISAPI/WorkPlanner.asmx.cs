@@ -5526,10 +5526,10 @@ namespace EPMLiveWorkPlanner
                             sbItems.Append("<tbody>");
                             sbItems.Append("<tr>");
 
-                            sbItems.Append("<td>");
+                            sbItems.Append("<td id='itemContainerTD'>");
                             sbItems.Append("<div id='itemContainer' class='itemContainer'>"); //itemContainer <div> started
                             sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
-                            sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + Regex.Replace(list.Title, "[^a-zA-Z_]+", "").Replace(" ","") + "'>");
+                            sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + Regex.Replace(list.Title, "[^a-zA-Z_]+", "").Replace(" ", "") + "'>");
 
                             string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
 
@@ -5547,7 +5547,10 @@ namespace EPMLiveWorkPlanner
                                     {
                                         if (!string.IsNullOrEmpty(column))
                                         {
-                                            sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + ">" + Convert.ToString(row[column]) + "&nbsp;</div>");
+                                            Int32 intLenght = Convert.ToString(row[column]).Length;
+                                            string strFullText = Convert.ToString(row[column]);
+                                            string strTruncatedText = intLenght > 15 ? strFullText.Substring(0, 15) + "..." : strFullText;
+                                            sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + " title='" + strFullText + "'>" + strTruncatedText + "&nbsp;</div>");
                                         }
                                     }
                                     //sbItems.Append("<div id='saveprogress'><img alt='Saving Item' src='../images/gears_anv4.gif' /></div>");
@@ -5600,7 +5603,10 @@ namespace EPMLiveWorkPlanner
                                                 {
                                                     if (!string.IsNullOrEmpty(column))
                                                     {
-                                                        sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + ">" + Convert.ToString(row[column]) + "&nbsp;</div>");
+                                                        Int32 intLenght = Convert.ToString(row[column]).Length;
+                                                        string strFullText = Convert.ToString(row[column]);
+                                                        string strTruncatedText = intLenght > 15 ? strFullText.Substring(0, 15) + "..." : strFullText;
+                                                        sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + " title='" + strFullText + "'>" + strTruncatedText + "&nbsp;</div>");
                                                     }
                                                 }
                                                 //sbItems.Append("<div id='saveprogress'><img alt='Saving Item' src='../images/gears_anv4.gif' /></div>");
