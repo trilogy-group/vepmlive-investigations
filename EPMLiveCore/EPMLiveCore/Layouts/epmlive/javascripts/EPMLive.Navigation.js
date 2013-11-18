@@ -1855,7 +1855,7 @@
             epmLiveNavigation.init();
 
             var menuManager = (function () {
-                var _setupMenu = function ($li, defaultCommands) {
+                var _setupMenu = function ($li, defaultCommands, forcePopup) {
                     defaultCommands = defaultCommands || [];
 
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
@@ -1915,6 +1915,10 @@
 
                         for (var i = 0; i < commands.length; i++) {
                             var cmd = commands[i];
+
+                            if (forcePopup) {
+                                cmd.kind = 0;
+                            }
 
                             var webId = $ca.data('webid');
 
@@ -2068,11 +2072,11 @@
                 };
             })();
 
-            window.epmLiveNavigation.addContextualMenu = function($li, defaultCommands) {
+            window.epmLiveNavigation.addContextualMenu = function($li, defaultCommands, forcePopup) {
                 $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                 $($li.find('.epm-menu-btn').get(0)).click(function () {
-                    menuManager.setupMenu($li, defaultCommands);
+                    menuManager.setupMenu($li, defaultCommands, forcePopup);
                 });
             };
 
