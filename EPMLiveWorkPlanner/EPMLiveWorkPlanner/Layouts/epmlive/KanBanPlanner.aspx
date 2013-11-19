@@ -9,6 +9,9 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="KanBanPlanner.aspx.cs" Inherits="EPMLiveWorkPlanner.KanBanPlanner" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+
+    <script src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js" type="text/javascript"></script>
+
     <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
     <style type="text/css">
         .itemContainer,
@@ -467,16 +470,16 @@
                     });
 
                     var per = (100 / $("#mainTR td").length).toFixed(2);
-                    $("#mainTR td").css("width", per+"%");
+                    $("#mainTR td").css("width", per + "%");
                     $("#mainTR td").css("min-width", per + "%");
                     $("#mainTR td").css("max-width", per + "%");
 
                     var addContextualMenu = function () {
                         $(".associateditemscontextmenu").each(function () {
-                            window.epmLiveNavigation.addContextualMenu($(this));
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true);
                         });
                     };
-                    
+
                     ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
                 }
             });
