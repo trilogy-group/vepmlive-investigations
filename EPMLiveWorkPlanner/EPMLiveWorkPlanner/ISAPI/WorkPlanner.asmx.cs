@@ -802,14 +802,16 @@ namespace EPMLiveWorkPlanner
                 {
                     bool canProject = false;
                     bool canOnline = false;
+                    bool isKanban = false;
 
                     if (EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableOnline") == "")
                         canOnline = true;
                     else
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableOnline"), out canOnline);
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableProject"), out canProject);
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "EnableKanBan"), out isKanban);
 
-                    if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
+                    if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject) || isKanban)
                     {
 
                         arrPlanners.Add(sPlanner[0], sPlanner[1]);
