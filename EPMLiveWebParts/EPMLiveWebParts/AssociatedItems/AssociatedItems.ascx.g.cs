@@ -164,40 +164,40 @@ namespace EPMLiveWebParts.AssociatedItems {
                     "        });\r\n\r\n                window.SP.SOD.notifyScriptLoadedAndExecuteWaiting" +
                     "Jobs(\'EPMLive.Navigation.js\');\r\n\r\n                $(\'.associateditemscontextmenu" +
                     "\').each(function () {\r\n                    window.epmLiveNavigation.addContextua" +
-                    "lMenu($(this));\r\n                });\r\n\r\n            });\r\n        }\r\n    }\r\n\r\n\r\n\r" +
-                    "\n\r\n    function showItemUrl(weburl) {\r\n        $.ajax({\r\n            type: \"POST" +
-                    "\",\r\n            url: weburl,\r\n            success: function (ticket) {\r\n        " +
-                    "        if (ticket.indexOf(\"General Error\") != 0) {\r\n                    var lis" +
-                    "tInfo = ticket.split(\'|\');\r\n\r\n                    var viewSiteContentUrl = listI" +
-                    "nfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=associateditems&list=\" + list" +
-                    "Info[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInfo[2] + \"&Source" +
-                    "=\" + document.location.href;\r\n                    var options = { url: viewSiteC" +
-                    "ontentUrl, showMaximized: true };\r\n                    SP.SOD.execute(\'SP.UI.Dia" +
-                    "log.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n                }\r\n    " +
-                    "            else {\r\n                    alert(ticket);\r\n                }\r\n     " +
-                    "       }\r\n        });\r\n    }\r\n\r\n    function showNewForm(weburl) {\r\n        var " +
-                    "options = { url: weburl, showMaximized: false, dialogReturnValueCallback: functi" +
-                    "on (dialogResult) { fillWebPartData(); } };\r\n        SP.SOD.execute(\'SP.UI.Dialo" +
-                    "g.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n    }\r\n\r\n    function sho" +
-                    "wItemPopup(siteurl, webid, listid, itemid) {\r\n        showSharePointPopup(siteur" +
-                    "l + \'/_layouts/epmlive/gridaction.aspx?action=getcontextmenus&webid=\' + webid +\r" +
-                    "\n            \'&listid=\' + listid + \'&ID=\' + itemid, null, false, true, null, {\r\n" +
-                    "                gridId: \"myDiv\",\r\n                rowId: \"myDiv\",\r\n             " +
-                    "   col: \"myDiv\"\r\n            }, 300, 400);\r\n    }\r\n\r\n    function emptyFunction(" +
-                    ") {\r\n    }\r\n\r\n    function showSharePointPopup(url, title, allowMaximize, showCl" +
-                    "ose, func, funcParams, width, height) {\r\n        if (allowMaximize == null) allo" +
-                    "wMaximize = true;\r\n        if (showClose == null) showClose = true;\r\n        if " +
-                    "(func == null) func = emptyFunction;\r\n\r\n        var options;\r\n\r\n        if (widt" +
-                    "h !== undefined && height !== undefined) {\r\n            options = {\r\n           " +
-                    "     title: title,\r\n                allowMaximize: allowMaximize,\r\n             " +
-                    "   showClose: showClose,\r\n                url: url,\r\n                dialogRetur" +
-                    "nValueCallback: Function.createCallback(Function.createDelegate(null, func), fun" +
-                    "cParams),\r\n                width: width,\r\n                height: height\r\n      " +
-                    "      };\r\n        } else {\r\n            options = { title: title, allowMaximize:" +
-                    " allowMaximize, showClose: showClose, url: url, dialogReturnValueCallback: Funct" +
-                    "ion.createCallback(Function.createDelegate(null, func), funcParams) };\r\n        " +
-                    "}\r\n\r\n        SP.UI.ModalDialog.showModalDialog(options);\r\n    }\r\n\r\n</script>\r\n\r\n" +
-                    "");
+                    "lMenu($(this), null, true);\r\n                });\r\n\r\n            });\r\n        }\r\n" +
+                    "    }\r\n\r\n\r\n\r\n\r\n    function showItemUrl(weburl) {\r\n        $.ajax({\r\n           " +
+                    " type: \"POST\",\r\n            url: weburl,\r\n            success: function (ticket)" +
+                    " {\r\n                if (ticket.indexOf(\"General Error\") != 0) {\r\n               " +
+                    "     var listInfo = ticket.split(\'|\');\r\n\r\n                    var viewSiteConten" +
+                    "tUrl = listInfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=associateditems&l" +
+                    "ist=\" + listInfo[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInfo[2" +
+                    "] + \"&Source=\" + document.location.href;\r\n                    var options = { ur" +
+                    "l: viewSiteContentUrl, showMaximized: true };\r\n                    SP.SOD.execut" +
+                    "e(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n           " +
+                    "     }\r\n                else {\r\n                    alert(ticket);\r\n            " +
+                    "    }\r\n            }\r\n        });\r\n    }\r\n\r\n    function showNewForm(weburl) {\r\n" +
+                    "        var options = { url: weburl, showMaximized: false, dialogReturnValueCall" +
+                    "back: function (dialogResult) { fillWebPartData(); } };\r\n        SP.SOD.execute(" +
+                    "\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n    }\r\n\r\n    " +
+                    "function showItemPopup(siteurl, webid, listid, itemid) {\r\n        showSharePoint" +
+                    "Popup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontextmenus&webid=" +
+                    "\' + webid +\r\n            \'&listid=\' + listid + \'&ID=\' + itemid, null, false, tru" +
+                    "e, null, {\r\n                gridId: \"myDiv\",\r\n                rowId: \"myDiv\",\r\n " +
+                    "               col: \"myDiv\"\r\n            }, 300, 400);\r\n    }\r\n\r\n    function em" +
+                    "ptyFunction() {\r\n    }\r\n\r\n    function showSharePointPopup(url, title, allowMaxi" +
+                    "mize, showClose, func, funcParams, width, height) {\r\n        if (allowMaximize =" +
+                    "= null) allowMaximize = true;\r\n        if (showClose == null) showClose = true;\r" +
+                    "\n        if (func == null) func = emptyFunction;\r\n\r\n        var options;\r\n\r\n    " +
+                    "    if (width !== undefined && height !== undefined) {\r\n            options = {\r" +
+                    "\n                title: title,\r\n                allowMaximize: allowMaximize,\r\n " +
+                    "               showClose: showClose,\r\n                url: url,\r\n               " +
+                    " dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null" +
+                    ", func), funcParams),\r\n                width: width,\r\n                height: he" +
+                    "ight\r\n            };\r\n        } else {\r\n            options = { title: title, al" +
+                    "lowMaximize: allowMaximize, showClose: showClose, url: url, dialogReturnValueCal" +
+                    "lback: Function.createCallback(Function.createDelegate(null, func), funcParams) " +
+                    "};\r\n        }\r\n\r\n        SP.UI.ModalDialog.showModalDialog(options);\r\n    }\r\n\r\n<" +
+                    "/script>\r\n\r\n");
             parameterContainer.Controls[0].RenderControl(@__w);
             @__w.Write("\r\n");
             parameterContainer.Controls[1].RenderControl(@__w);

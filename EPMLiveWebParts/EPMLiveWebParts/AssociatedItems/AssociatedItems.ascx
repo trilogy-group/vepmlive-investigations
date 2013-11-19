@@ -80,7 +80,7 @@
                 window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
 
                 $('.associateditemscontextmenu').each(function () {
-                    window.epmLiveNavigation.addContextualMenu($(this));
+                    window.epmLiveNavigation.addContextualMenu($(this), null, true);
                 });
 
             });
