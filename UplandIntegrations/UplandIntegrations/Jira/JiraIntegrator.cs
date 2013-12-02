@@ -85,7 +85,7 @@ namespace UplandIntegrations.Jira
             Dictionary<string, string> props = new Dictionary<string, string>();
             if (Property == "Object")
             {
-                props.Add(JiraType.Users.ToString(), JiraType.Users.ToString());
+                //props.Add(JiraType.Users.ToString(), JiraType.Users.ToString());
                 props.Add(JiraType.Projects.ToString(), JiraType.Projects.ToString());
                 props.Add(JiraType.Components.ToString(), JiraType.Components.ToString());
                 props.Add(JiraType.Versions.ToString(), JiraType.Versions.ToString());
