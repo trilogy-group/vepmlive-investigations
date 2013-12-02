@@ -258,7 +258,7 @@ namespace EPMLiveCore.Jobs
             string[] grps = new[] { "Owner", "Member", "Visitor" };
             SPGroup ownerGrp = null;
             //SPListItem eI = ew.Lists[base.ListUid].GetItemById(base.ItemID);
-
+            var spUInfoList = ew.Lists["User Information List"];
             foreach (string grp in grps)
             {
                 string finalName = string.Empty;
@@ -277,6 +277,7 @@ namespace EPMLiveCore.Jobs
                     try
                     {
                         finalName = CoreFunctions.AddGroup(ew, safeTitle, grp, ew.CurrentUser, ew.CurrentUser, string.Empty);
+                        spUInfoList.Items.GetItemById(ew.SiteGroups[finalName].ID).SystemUpdate();
                         ew.Update();
                         Thread.Sleep(1000);
                     }
