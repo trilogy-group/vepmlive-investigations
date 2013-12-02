@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.ReportingProxy;
-using EPMLiveCore.SSRS2005;
 using EPMLiveReportsAdmin;
 using Microsoft.SharePoint;
-using Task = System.Threading.Tasks.Task;
 
 namespace EPMLiveCore.Infrastructure
 {
@@ -132,7 +129,7 @@ namespace EPMLiveCore.Infrastructure
                         }
                     }
 
-                    object value;
+                    object value = null;
 
                     if (dataColumnCollection.Contains(internalName))
                     {
@@ -154,29 +151,48 @@ namespace EPMLiveCore.Infrastructure
                             object idValue = row[internalName + "ID"];
                             object textValue = row[internalName + "Text"];
 
-                            if (idValue == null || idValue == DBNull.Value || textValue == null ||
-                                textValue == DBNull.Value)
+                            if (spField.Type == SPFieldType.MultiChoice)
                             {
-                                value = string.Empty;
+                                try
+                                {
+                                    var choiceValue = new SPFieldMultiChoiceValue(value.ToString());
+
+                                    var list = new List<string>();
+                                    for (int i = 0; i < choiceValue.Count; i++)
+                                    {
+                                        list.Add(choiceValue[i]);
+                                    }
+
+                                    value = string.Join(", ", list.ToArray());
+                                }
+                                catch { }
                             }
                             else
                             {
-                                string[] ids = idValue.ToString().Split(',');
-                                string[] values = textValue.ToString().Split(',');
-
-                                var list = new List<string>();
-
-                                for (int i = 0; i < ids.Length; i++)
+                                if (idValue == null || idValue == DBNull.Value || textValue == null ||
+                                    textValue == DBNull.Value)
                                 {
-                                    try
-                                    {
-                                        list.Add(ids[i]);
-                                        list.Add(values[i]);
-                                    }
-                                    catch { }
+                                    value = string.Empty;
                                 }
+                                else
+                                {
+                                    string[] ids = idValue.ToString().Split(',');
+                                    string[] values = textValue.ToString().Split(',');
 
-                                value = string.Join(";#", list.ToArray());
+                                    var list = new List<string>();
+
+                                    for (int i = 0; i < ids.Length; i++)
+                                    {
+                                        try
+                                        {
+                                            list.Add(ids[i]);
+                                            list.Add(values[i]);
+                                        }
+                                        catch { }
+                                    }
+
+                                    value = string.Join(";#", list.ToArray());
+                                }
                             }
                         }
                         else
@@ -184,6 +200,8 @@ namespace EPMLiveCore.Infrastructure
                             value = string.Empty;
                         }
                     }
+
+                    value = value ?? string.Empty;
 
                     string stringValue = value.ToString().Trim();
 
@@ -348,7 +366,7 @@ namespace EPMLiveCore.Infrastructure
                         page = totalRows - offset;
                     }
 
-                    var task = Task<object[]>.Factory.StartNew(() =>
+                    Task<object[]> task = Task<object[]>.Factory.StartNew(() =>
                     {
                         IEnumerable<DataRow> dataRows = (from r in rowCollection select r).Skip(offset).Take(page);
 
@@ -369,7 +387,7 @@ namespace EPMLiveCore.Infrastructure
 
                 foreach (var task in tasks)
                 {
-                    var result = task.Result;
+                    object[] result = task.Result;
 
                     var elements = (List<XElement>) result[0];
                     ProcessHtmlValues(elements, (Dictionary<string, object[]>) result[1]);
