@@ -432,14 +432,11 @@ namespace WorkEnginePPM.Core.ResourceManagement
                             newValue = currentValue;
                         }
 
-                        if (!AreEqualObjects(newValue, currentValue, spField, properties.Web))
-                        {
-                            dataRow["Id"] = fieldId;
-                            dataRow["Value"] = newValue;
-                            dataRow["Field"] = spField;
+                        dataRow["Id"] = fieldId;
+                        dataRow["Value"] = newValue;
+                        dataRow["Field"] = spField;
 
-                            fieldsTable.Rows.Add(dataRow);
-                        }
+                        fieldsTable.Rows.Add(dataRow);
                     }
                 }
             }
