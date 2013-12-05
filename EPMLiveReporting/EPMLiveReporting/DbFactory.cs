@@ -136,6 +136,10 @@ namespace EPMLiveReportsAdmin
                     type = SPFieldType.Integer;
                     break;
 
+                case "resourcepermissions":
+                    type = SPFieldType.Note;
+                    break;
+
                 default:
                     type = SPFieldType.Text;
                     break;
@@ -460,6 +464,11 @@ namespace EPMLiveReportsAdmin
 
                         case "totalrollup":
                             param.SqlDbType = SqlDbType.Float;
+                            break;
+
+                        case "resourcepermissions":
+                            param.SqlDbType = SqlDbType.NVarChar;
+                            param.Size = 8001;
                             break;
 
                         default:
