@@ -117,12 +117,13 @@ namespace WorkEnginePPM
                     DataRow row = dt.Rows[0];
                     xCalendar.CreateString("name", DBAccess.ReadStringValue(row["CB_NAME"], ""));
                     xCalendar.CreateString("desc", DBAccess.ReadStringValue(row["CB_DESC"], ""));
-                    DateTime date = DBAccess.ReadDateValue(row["CB_LOCK_TO"]);
-                    if (date > DateTime.MinValue)
-                        xCalendar.CreateDate("lockto", date);
-                    date = DBAccess.ReadDateValue(row["CB_LOCK_FROM"]);
-                    if (date > DateTime.MinValue)
-                        xCalendar.CreateDate("lockfrom", date);
+                    // Error reported by Mark Virnig working with CEVA - Locks are period ids not dates - However, don't appear to be used
+                    //DateTime date = DBAccess.ReadDateValue(row["CB_LOCK_TO"]);
+                    //if (date > DateTime.MinValue)
+                    //    xCalendar.CreateDate("lockto", date);
+                    //date = DBAccess.ReadDateValue(row["CB_LOCK_FROM"]);
+                    //if (date > DateTime.MinValue)
+                    //    xCalendar.CreateDate("lockfrom", date);
                 }
                 dbaCalendars.SelectCalendarPeriods(dba, nCalendarId, out dt);
 

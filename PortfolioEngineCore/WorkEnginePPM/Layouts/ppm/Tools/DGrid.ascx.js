@@ -76,9 +76,15 @@
     DGrid.prototype.SetSizes = function (w, h) {
         var div = document.getElementById(params.grid_div);
         if (w > 11)
-            div.style.width = (w-11) + "px";
+            div.style.width = (w - 11) + "px";
         if (h > 5)
-            div.style.height = (h-5) + "px";
+            div.style.height = (h - 5) + "px";
+        this.grid.setSizes();
+    };
+    DGrid.prototype.SetMaxSize = function () {
+        var div = document.getElementById(params.grid_div);
+        div.style.width = "100%";
+        div.style.height = "100%";
         this.grid.setSizes();
     };
     DGrid.prototype.findAbsolutePosition = function (obj) {

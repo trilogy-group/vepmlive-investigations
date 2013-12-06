@@ -340,7 +340,7 @@ background-position:center center !important;
 .GMIcon { background-repeat:no-repeat; }
 .GMHidden { }
 .GMHiddenSpace { display:none; }
-.GMHeaderText { font:11px Tahoma; padding-left:6px; padding-right:3px; padding-bottom:0px; padding-top:0px; vertical-align:middle color: #131519;}
+.GMHeaderText { font:11px Tahoma; padding-left:3px; padding-right:3px; padding-bottom:0px; padding-top:0px; vertical-align:middle color: #131519;}
 .GMAbs { padding:0px; }
 .GMUser { padding:0px; }
 .GMPagerEdit {

@@ -41,6 +41,7 @@
             Grids.OnFocus = GridsOnFocusDelegate;
             Grids.OnAfterColResize = GridsOnAfterColResizeDelegate;
             Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
+            Grids.OnGetHtmlValue = GridsOnGetHtmlValueDelegate;
 
             WorkEnginePPM.EditCosts.set_path(this.params.Webservice);
             WorkEnginePPM.EditCosts.CheckStatus("", CheckStatusCompleteDelegate);
@@ -1271,6 +1272,26 @@
         }
         return val;
     };
+
+    EditCosts.prototype.GridsOnGetHtmlValue = function (grid, row, col, val) {
+        if (row.Kind != "Data" || grid.Cols[col] == null)
+            return null;
+        if (grid.Cols[col].Sec != 1)
+            return null;
+        if (col.charAt(0) != "C" && col != "TC")
+            return null;
+        if (val == null || val == 0)
+            return null;
+        if (parseInt(val) == val)
+            return null;
+
+        var altformat = grid.GetAttribute(null, col, "AltFormat");
+        var s = NumberToString(val, altformat);
+        if (s == "")
+            return null;
+        return s;
+    }
+
     EditCosts.prototype.GridsOnAfterValueChanged = function (grid, row, col, val) {
         var sType = col.substring(0, 1);
         var sId = col.substring(1);
@@ -1860,6 +1881,7 @@
         this.showArray = null;
         this.hideArray = null;
         this.hideAllArray = null;
+        this.showCostDPs = false;
 
         var loadDelegate = MakeDelegate(this, this.OnLoad);
         var resizeDelegate = MakeDelegate(this, this.OnResizeInternal);
@@ -1882,6 +1904,7 @@
         var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
         var GridsOnFocusDelegate = MakeDelegate(this, this.GridsOnFocus);
         var GridsOnAfterColResizeDelegate = MakeDelegate(this, this.OnAfterColResize);
+        var GridsOnGetHtmlValueDelegate = MakeDelegate(this, this.GridsOnGetHtmlValue);
 
         if (document.addEventListener != null) { // e.g. Firefox
             window.addEventListener("load", loadDelegate, true);

@@ -147,12 +147,14 @@ html, body {
                 break;
         }
     };
-    function OnResize(event) {
-        var top = dgrid1.GetTop();
-        var newHeight = document.documentElement.clientHeight - top - 5;
+    var OnResize = function (event) {
+        var lefttop = dgrid1.GetLeftTopPositions();
+        var newHeight = document.documentElement.clientHeight - lefttop[1] - 5;
         dgrid1.SetHeight(newHeight);
+        var newWidth = document.documentElement.clientWidth - lefttop[0] - 3;
+        dgrid1.SetWidth(newWidth);
     };
-    function  DisplayDialog (width, height, title, idWindow, idAttachObj, bModal, bResize) {
+    function DisplayDialog(width, height, title, idWindow, idAttachObj, bModal, bResize) {
         var dlg = jsf_displayDialog(thiswins, 0, 0, width, height, title, idWindow, idAttachObj, bModal, bResize);
         dlg.attachEvent("onClose", function (win) { return CloseDialog(idWindow); });
         return dlg;

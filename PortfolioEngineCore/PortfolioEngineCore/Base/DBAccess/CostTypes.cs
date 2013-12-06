@@ -732,7 +732,7 @@ namespace PortfolioEngineCore
                     {
                         lEMode = DBAccess.ReadIntValue(reader["CT_EDIT_MODE"]);
 
-                        if (lEMode != 9 && lEMode != 41)  // Resource Plans and WE Timesheet Actuals
+                        if (lEMode != 9 && lEMode != 41 && lEMode != 5)  // Resource Plans and WE Timesheet Actuals and Scheduled Work
                         {
                             sReply = DBAccess.FormatAdminError("error", "CostTypes.UpdatePostOptionsInfo", "Post Options not valid for this Cost Type");
                             return StatusEnum.rsRequestCannotBeCompleted;

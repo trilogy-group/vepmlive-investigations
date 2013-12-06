@@ -6490,7 +6490,7 @@ namespace ModelDataCache
                     sCTs = sCTs + "," + m_sOtherCostTypes;
             }
 
-            sCommand = "SELECT * FROM EPGP_MODEL_TARGET_DETAILS WHERE TARGET_ID IN (" + targets + ") ORDER BY TARGET_ID";
+            sCommand = "SELECT MTD.*, CC.BC_UOM FROM EPGP_MODEL_TARGET_DETAILS MTD LEFT JOIN EPGP_COST_CATEGORIES CC ON (MTD.BC_UID = CC.BC_UID) WHERE TARGET_ID IN (" + targets + ") ORDER BY TARGET_ID";
 
             oCommand = new SqlCommand(sCommand, oDataAccess);
             reader = oCommand.ExecuteReader();
@@ -6503,6 +6503,7 @@ namespace ModelDataCache
                 Det.CT_ID = DBAccess.ReadIntValue(reader["CT_ID"]);
                 Det.BC_UID = DBAccess.ReadIntValue(reader["BC_UID"]);
                 Det.BC_SEQ = DBAccess.ReadIntValue(reader["TARGET_UID"]);
+                Det.sUoM = DBAccess.ReadStringValue(reader["BC_UOM"]);
 
                 Det.Scenario_ID = DBAccess.ReadIntValue(reader["TARGET_ID"]);
 

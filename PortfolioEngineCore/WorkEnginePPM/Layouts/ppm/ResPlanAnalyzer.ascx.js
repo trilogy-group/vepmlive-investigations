@@ -41,7 +41,9 @@
 			    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetPortfolioItemList", "", GetPortfolioItemListCompleteDelegate);
 			else
 			    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetRAUserCalendarInfo", "", GetCalendarInfoCompleteDelegate);
-        }
+
+			jsf_loadScriptOrLinkFile("/_layouts/ppm/Kendo/kendo.dataviz.min.js", "js");
+}
 	    catch (e) {
 	        alert("Resource Analyzer OnLoad Exception");
 	    }
@@ -1101,8 +1103,10 @@
 
 
 	            window.setTimeout(SetInitialDisplayFocus, 100);
-
-
+	            if (cal_arr.length == 1) {
+	                this.ShowWorkingPopup();
+	                this.SelectFiscalDlg_OKOnClick(0);
+	            }
 	        }
 	    }
 
@@ -1240,13 +1244,6 @@
 
 	    this.ficalInfo.LastUserData.lastStartPerID = StartID;
 	    this.ficalInfo.LastUserData.lastFinishPerID = FinishID;
-
-	    if (this.analyzerTab != null) {
-	        var bchk = this.analyzerTab.getButtonState("chkOpenRequests");
-	        if (bchk == true)
-	            this.analyzerTab.setButtonStateOff("chkOpenRequests");
-	    }
-
 
 	    this.analyzerCalID = parseInt(this.ficalInfo.LastUserData.lastCalID);
 
@@ -2643,6 +2640,8 @@
 
 	            this.analyzerTab.Render();
 
+	            this.analyzerTab.hideItem('chkAll');
+	            this.analyzerTab.hideItem('chkNone');
 
 
 
@@ -2771,12 +2770,11 @@
 				this.analyzerTab.setButtonStateOff("chkActual");
 			}
 
-
-			if (this.DetailsData.ProposedWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkRequests");
-			else {
-				this.analyzerTab.setButtonStateOff("chkRequests");
-			}
+            if (this.DetailsData.ProposedWork.Value == "1")
+                this.analyzerTab.setButtonStateOn("chkRequests");
+            else {
+                this.analyzerTab.setButtonStateOff("chkRequests");
+            }
 
 			if (this.DetailsData.ScheduledWork.Value == "1")
 				this.analyzerTab.setButtonStateOn("chkMSP");
@@ -2797,9 +2795,9 @@
 			}
 
 			if (this.DetailsData.OpenRequestWork.Value == "1")
-				this.analyzerTab.setButtonStateOn("chkOpenRequest");
+				this.analyzerTab.setButtonStateOn("chkOpenRequests");
 			else {
-				this.analyzerTab.setButtonStateOff("chkOpenRequest");
+				this.analyzerTab.setButtonStateOff("chkOpenRequests");
 			}
 		}
 		catch(e) {}
@@ -2880,8 +2878,6 @@
 				this.InitializeLayout();
 
 				window.setTimeout(HandlePopulateUI, 200);
-
-
 
 				this.PingSessionData();
 			}
@@ -3169,7 +3165,7 @@
 
 			sb.append("</Rows>");
 
-	 //       alert(sb.toString());
+	        //alert(sb.toString());
 
 			WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADetailsSelectedFlag", sb.toString());
 			this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
@@ -3199,6 +3195,35 @@
 	}
 
 	ResPlanAnalyzer.prototype.GridsOnClickCell = function (grid, row, col) {
+	    if (row.Kind != "Data" && col == "Select") {
+	        this.allSelectedTopGrid = !this.allSelectedTopGrid;
+	        var value = '0';
+	        var allSelectedTopGrid = document.getElementById('allSelectedTopGrid');
+	        if (this.allSelectedTopGrid == true) {
+	            value = '1';
+	            allSelectedTopGrid.src = "/_layouts/ppm/images/checked-dark.png";
+	        } else {
+	            allSelectedTopGrid.src = "/_layouts/ppm/images/unchecked-dark.png";
+	        }
+	        var sb = new StringBuilder();
+	        sb.append("<Rows ");
+	        sb.append(" value='" + value + "'>");
+
+	        var toprow = grid.GetFirst();
+	        while (toprow != null) {
+	            HandleClick(grid, toprow, col, value, sb);
+	            toprow = grid.GetNextSibling(toprow);
+	        }
+	        sb.append("</Rows>");
+
+	        //alert(sb.toString());
+
+	        WorkEnginePPM.ResPlanAnalyzer.Execute("SetRADetailsSelectedFlag", sb.toString());
+	        this.bottomgriddragstash = this.BuildViewInf("guid", "name", false, false, true);
+	        RefreshBottomGrid();
+	        return;
+	    }
+
 
 	    if (grid.id == "g_1") {
 
@@ -3222,10 +3247,10 @@
 	    if (grid.id == "et_1") {
 	        this.csrow = row;
 
-            if (this.dlgSpreadDlg != null) {
+	        if (this.dlgSpreadDlg != null) {
 	            var itemName = this.EditGrid.GetString(this.csrow, "CostCategory");
 	            this.dlgSpreadDlg.window("winSpreadDlg").setText("Allocate " + (this.CSHourMode ? "Hours" : "FTEs") + " to " + itemName);
-            }
+	        }
 	    }
 	}
 
@@ -7800,12 +7825,12 @@ ResPlanAnalyzer.prototype.createChart = function () {
         xdata.legend = new Object();
         xdata.legend.visible = true;
 
-       // xdata.seriesDefaults = new Object();
-       // xdata.seriesDefaults.type = "column";
+        // xdata.seriesDefaults = new Object();
+        // xdata.seriesDefaults.type = "column";
 
         xdata.valueAxis = new Object();
-      //  xdata.valueAxis.labels = new Object();
-      //  xdata.valueAxis.labels.template = "#= kendo.format('{0:N0}', value) #";
+        //  xdata.valueAxis.labels = new Object();
+        //  xdata.valueAxis.labels.template = "#= kendo.format('{0:N0}', value) #";
         xdata.valueAxis.line = new Object();
         xdata.valueAxis.line.visible = false;
 
@@ -7825,8 +7850,7 @@ ResPlanAnalyzer.prototype.createChart = function () {
         var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
 
 
-        if (StartID == -1)
-        {
+        if (StartID == -1) {
             StartID = this.UsingPeriods.CurrentPeriod.Value;
         }
 
@@ -7837,7 +7861,7 @@ ResPlanAnalyzer.prototype.createChart = function () {
         var ystp = 0;
 
         if (ycnt > 40) {
-            ystp = Math.floor(ycnt/40) + 1;
+            ystp = Math.floor(ycnt / 40) + 1;
             xdata.categoryAxis.labels.step = ystp;
         }
 
@@ -7880,8 +7904,8 @@ ResPlanAnalyzer.prototype.createChart = function () {
 
         }
 
-        
-                
+
+
         var oba = new Object;
         xdata.series[cnt++] = oba;
         oba.name = "Availability";
@@ -7892,117 +7916,115 @@ ResPlanAnalyzer.prototype.createChart = function () {
         oba.data = avail;
 
 
- // do something funcky for the avail....
+        // do something funcky for the avail....
 
-//         oba.type = "candlestick"
-//         oba.data = new Array();
+        //         oba.type = "candlestick"
+        //         oba.data = new Array();
 
-//        for (var i = StartID; i <= FinishID; i++) {
-//            var obc = new Object();
-//            var adj = 0;
+        //        for (var i = StartID; i <= FinishID; i++) {
+        //            var obc = new Object();
+        //            var adj = 0;
 
-//            if ( avail[i - StartID] != 0)
-//                adj = 2;
-//            else
-//                adj = 0;
-//            obc.high = avail[i - StartID];
-//            obc.low = avail[i - StartID] - adj;
-//            obc.open = avail[i - StartID];
-//            obc.close = avail[i - StartID] - adj;
+        //            if ( avail[i - StartID] != 0)
+        //                adj = 2;
+        //            else
+        //                adj = 0;
+        //            obc.high = avail[i - StartID];
+        //            obc.low = avail[i - StartID] - adj;
+        //            obc.open = avail[i - StartID];
+        //            obc.close = avail[i - StartID] - adj;
 
-//            oba.data.push(obc);
-//        }
+        //            oba.data.push(obc);
+        //        }
 
 
-//         oba.type = "scatterLine"
-//         oba.data = new Array();
+        //         oba.type = "scatterLine"
+        //         oba.data = new Array();
 
-//        for (var i = StartID; i <= FinishID; i++) {
-//            var obc = new Array();
-//            obc.push(i - StartID);
-//            obc.push(avail[i - StartID]);
-//            oba.data.push(obc);
+        //        for (var i = StartID; i <= FinishID; i++) {
+        //            var obc = new Array();
+        //            obc.push(i - StartID);
+        //            obc.push(avail[i - StartID]);
+        //            oba.data.push(obc);
 
-//            obc = new Array();
-//            obc.push(i - StartID + 1);
-//            obc.push(avail[i - StartID]);
-//            oba.data.push(obc);
+        //            obc = new Array();
+        //            obc.push(i - StartID + 1);
+        //            obc.push(avail[i - StartID]);
+        //            oba.data.push(obc);
 
-//        }
+        //        }
 
 
         // done!
 
-		var cdata = {
-                legend: {
-                    visible: true
-                },
-                series: [{
-                    name: "Steve Masters",
-                    stack: true,
-					type: "column",
-                    data: [0, 0, 0, 0, 0, 40, 40, 40, 0, 0]
-                },     
-                {
-                    name: "Munjal Patel",
-                    stack: true,
-					type: "column",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 100, 0]
-                },  
-                {
-                    name: "DBA",
-                    stack: true,
-					type: "column",
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                }, 
-				{
-                    name: "Adam Barr",
-                    stack: true,
-					type: "column",
-                    data: [0, 85, 0, 0, 0, 90, 100, 120, 120, 0]
-                }, 
-				{
-                    name: "Availability",
-					type: "line",
-                    data: [352, 336, 552, 504, 528, 552, 480, 552, 528, 488]
-                }],
-                valueAxis: {
-                    line: {
-                        visible: false
-                    }
-                },
-                categoryAxis: {
-                    categories: ["Mar 2012"	,"Apr 2012"	, "May 2012","Jun 2012"	,"Jul 2012","Aug 2012"	,	"Sep 2012"	,	"Oct 2012"	,"Nov 2012"	,	"Dec 2012"],
-                    majorGridLines: {
-                        visible: false
-                    }
-                },
-                tooltip: {
-                    visible: true,
-                }
-            }
+        //		var cdata = {
+        //                legend: {
+        //                    visible: true
+        //                },
+        //                series: [{
+        //                    name: "Steve Masters",
+        //                    stack: true,
+        //					type: "column",
+        //                    data: [0, 0, 0, 0, 0, 40, 40, 40, 0, 0]
+        //                },     
+        //                {
+        //                    name: "Munjal Patel",
+        //                    stack: true,
+        //					type: "column",
+        //                    data: [0, 0, 0, 0, 0, 0, 0, 0, 100, 0]
+        //                },  
+        //                {
+        //                    name: "DBA",
+        //                    stack: true,
+        //					type: "column",
+        //                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        //                }, 
+        //				{
+        //                    name: "Adam Barr",
+        //                    stack: true,
+        //					type: "column",
+        //                    data: [0, 85, 0, 0, 0, 90, 100, 120, 120, 0]
+        //                }, 
+        //				{
+        //                    name: "Availability",
+        //					type: "line",
+        //                    data: [352, 336, 552, 504, 528, 552, 480, 552, 528, 488]
+        //                }],
+        //                valueAxis: {
+        //                    line: {
+        //                        visible: false
+        //                    }
+        //                },
+        //                categoryAxis: {
+        //                    categories: ["Mar 2012"	,"Apr 2012"	, "May 2012","Jun 2012"	,"Jul 2012","Aug 2012"	,	"Sep 2012"	,	"Oct 2012"	,"Nov 2012"	,	"Dec 2012"],
+        //                    majorGridLines: {
+        //                        visible: false
+        //                    }
+        //                },
+        //                tooltip: {
+        //                    visible: true
+        //                }
+        //            }
+        if (this.kendochart != null) {
+            var chart = $("#chart").data("kendoChart");
+            chart.destroy();
 
-            if (this.kendochart != null) {
-                var chart = $("#chart").data("kendoChart");
-                chart.destroy();
+            this.kendochart = null;
+        }
 
-                this.kendochart = null;
-            }
+        this.kendochart = $("#chart").kendoChart(xdata);
 
-            this.kendochart = $("#chart").kendoChart(xdata);
 
-                            
-	                       var gdiv = document.getElementById('gridDiv_1');
-	                       var cdiv = document.getElementById('chart');
+        var gdiv = document.getElementById('gridDiv_1');
+        var cdiv = document.getElementById('chart');
 
-                           cdiv.style.height = gdiv.style.height;
+        cdiv.style.height = gdiv.style.height;
 
     }
     catch (e) {
         alert("Create Graph error:" + e.toString());
     }
 }
-
 
 ResPlanAnalyzer.prototype.InitVars = function () {
     this.fromresource = "";
@@ -8177,6 +8199,7 @@ ResPlanAnalyzer.prototype.InitVars = function () {
 
     this.showingTotDet = false;
     this.selectPIList = null;
+    this.allSelectedTopGrid = true;
 }
 
 	try {

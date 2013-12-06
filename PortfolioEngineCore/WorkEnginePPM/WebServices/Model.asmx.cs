@@ -25,9 +25,9 @@ using Microsoft.Win32;
 using PortfolioEngineCore.PortfolioItems;
 
 
-
 namespace WorkEnginePPM
 {
+
     //enum GlobalPermissionsEnum
     //{
     //    gpToday = 3001,       // EPK B01 Home, Delegate,
@@ -94,12 +94,13 @@ namespace WorkEnginePPM
         private static string username;
         private static SecurityLevels securityLevel;
 
-
         [WebMethod(EnableSession = true)]
         public string Execute(string Ticket, string Function, string Dataxml)
         {
             string sStage;
+
             ModelCache ModelData;
+
             if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket"))
                 ModelData = (ModelCache)GetCachedData(this.Context, Ticket);
             else
@@ -120,7 +121,8 @@ namespace WorkEnginePPM
                 {
                     return HandleError("Execute", 99999, string.Format("Error executing function: {0}", ex.Message));
                 }
-                if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket"))
+
+                if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket")) 
                     SaveCachedData(this.Context, Ticket, ModelData);
             }
             else
@@ -156,7 +158,7 @@ namespace WorkEnginePPM
         {
             string sReply = "";
 
-
+            
 
             WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
             PortfolioItems oPI = new PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);

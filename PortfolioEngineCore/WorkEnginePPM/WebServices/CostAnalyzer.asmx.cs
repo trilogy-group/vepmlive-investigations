@@ -202,7 +202,6 @@ namespace WorkEnginePPM
         }
 
 
-
         public static string CASessionPing(HttpContext Context, string sXML, CostAnalyzerDataCache datacache)
         {
             

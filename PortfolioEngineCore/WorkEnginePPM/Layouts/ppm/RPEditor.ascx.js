@@ -183,23 +183,27 @@
                 case "PostCostValues":
                     break;
                 case "DeleteResourcePlanView":
-                    var viewGUID = result.View.ViewGUID;
-                    var select = document.getElementById("idViewTab_SelView");
-                    for (var i = 0; i < select.options.length; i++) {
-                        if (select.options[i].value == viewGUID) {
-                            select.options[i] = null;
-                            for (var i = 0; i < this.Views.length; i++) {
-                                var view = this.Views[i];
-                                if (view.ViewGUID == viewGUID) {
-                                    delete this.Views[i];
-                                    break;
+                    if (result.View != null) {
+                        var viewGUID = result.View.ViewGUID;
+                        var select = document.getElementById("idViewTab_SelView");
+                        for (var i = 0; i < select.options.length; i++) {
+                            if (select.options[i].value == viewGUID) {
+                                select.options[i] = null;
+                                for (var i = 0; i < this.Views.length; i++) {
+                                    var view = this.Views[i];
+                                    if (view != null && view.ViewGUID == viewGUID) {
+                                        delete this.Views[i];
+                                        break;
+                                    }
                                 }
+                                this.externalEvent('DeleteView_Cancel');
+                                this.externalEvent('ViewTab_SelView_Changed');
+                                break;
                             }
-                            this.externalEvent('DeleteView_Cancel');
-                            this.externalEvent('ViewTab_SelView_Changed');
-                            break;
                         }
                     }
+                    else
+                        alert("No View Found");
                     break;
                 case "AddNote":
                     this.RefreshNotesDialog(null);
@@ -1345,6 +1349,7 @@
         if (this.initialized != true) {
             if (grid.id == "g_RPE") {
                 //this.SetPlanRowsEditStatus();
+                grid.SortRows();
             }
             else if (grid.id == "g_Res") {
                 this.SetPaddingWidth();
@@ -1877,6 +1882,7 @@
                         case "CCRole_Name":
                         case "Dept_Name":
                         case "Res_Name":
+                        case "NamedRate_Name":
                             sAttr = this.GetNamePrefix(col) + "_UID";
                             break;
                         default:
@@ -2047,6 +2053,12 @@
                     plangrid.SetAttribute(childplanrow, null, "Private", plangrid.GetAttribute(planrow, null, "Private"), 0, 0);
                     var activeCommitment = plangrid.GetAttribute(planrow, null, "ActiveCommitment");
                     plangrid.SetAttribute(childplanrow, null, "ActiveCommitment", activeCommitment, 0, 0);
+                    var userIsPM = plangrid.GetAttribute(parentplanrow, null, "UserIsPM");
+                    if (userIsPM != null)
+                        plangrid.SetAttribute(childplanrow, null, "UserIsPM", userIsPM, 0, 0);
+                    var userIsRM = plangrid.GetAttribute(parentplanrow, null, "UserIsRM");
+                    if (userIsRM != null)
+                        plangrid.SetAttribute(childplanrow, null, "UserIsRM", userIsRM, 0, 0);
                 }
                 var group = plangrid.GetAttribute(planrow, null, "Group");
                 var projectID = plangrid.GetAttribute(planrow, null, "Project_UID");
@@ -2586,13 +2598,18 @@
                                     if (b) {
                                         var row = plangrid.FRow;
                                         var reqrow = this.GetParentRequirement(row);
-                                        var wresId = plangrid.GetAttribute(row, null, "Res_UID");
-                                        var resrow = this.FindResourceRow(wresId);
                                         plangrid.DeleteRow(row, 2); // 1=okmsg+del; 2=del; 3=undel
                                         if (reqrow != null) {
                                             this.UpdatePlanRowCalculatedValues(reqrow, 0);
                                             this.RefreshPlanRowPeriods(plangrid, reqrow, true);
                                         }
+                                        var wresId = plangrid.GetAttribute(row, null, "Res_UID");
+                                        var resrow = this.FindResourceRow(wresId);
+                                        if (wresId != null && resrow != null) {
+                                            this.CalculateResourceRowCommitted(wresId, resrow);
+                                        }
+                                        wresId = plangrid.GetAttribute(row, null, "PendingRes_UID");
+                                        resrow = this.FindResourceRow(wresId);
                                         if (wresId != null && resrow != null) {
                                             this.CalculateResourceRowCommitted(wresId, resrow);
                                         }
@@ -3863,7 +3880,7 @@
             planrow = plangrid.GetNext(planrow);
         }
         if (bPrivateRows == true) {
-            this.DisplayDialog(20, 30, 320, 150, "Make Private Rows Public?", "winPrivateRowsDlg", "idPrivateRowsDlg", true, false);
+            this.DisplayDialog(20, 30, 340, 150, "Make Private Rows Public?", "winPrivateRowsDlg", "idPrivateRowsDlg", true, false);
             return false;
         }
         return true;
@@ -4683,9 +4700,9 @@
                     this.resrows = resrows;
                     var grandParentRequirement = this.GetParentRequirement(planrow);
                     if (parentIsGeneric == null || parentIsGeneric == false || grandParentRequirement != null) {
-                        this.DisplayDialog(20, 30, 320, 150, "Split Row?", "winSplitDlg", "idSplitDlg", true, false);
+                        this.DisplayDialog(20, 30, 340, 160, "Split Row?", "winSplitDlg", "idSplitDlg", true, false);
                     } else {
-                        this.DisplayDialog(20, 30, 320, 150, "Fulfill Requirement?", "winFulfillDlg", "idFulfillDlg", true, false);
+                        this.DisplayDialog(20, 30, 340, 160, "Fulfill Requirement?", "winFulfillDlg", "idFulfillDlg", true, false);
                     }
                     break;
             }
@@ -4718,7 +4735,8 @@
     RPEditor.prototype.CanAddResourceToLevel = function (parentplanrow, resrow) {
         var resgrid = this.resgrid;
         var plangrid = this.plangrid;
-        var planrow = plangrid.GetFirst(parentplanrow);
+        //var planrow = plangrid.GetFirst(parentplanrow);
+        var planrow = parentplanrow.firstChild;
         var wresId = resgrid.GetAttribute(resrow, null, "Res_UID");
         var resName = resgrid.GetAttribute(resrow, null, "Res_Name");
         var projectID = plangrid.GetAttribute(parentplanrow, null, "Project_UID");
@@ -4726,7 +4744,7 @@
             if (projectID == plangrid.GetAttribute(planrow, null, "Project_UID")) {
                 var deleted = plangrid.GetAttribute(planrow, null, "Deleted");
                 if (deleted != 1) {
-                    if (planrow.Level == parentplanrow.Level + 1) {
+                    //if (planrow.Level == parentplanrow.Level + 1) {
                         var planwresId = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
                         if (planwresId == null)
                             planwresId = plangrid.GetAttribute(planrow, null, "Res_UID");
@@ -4734,10 +4752,11 @@
                             alert(resName + " already exists at this plan level");
                             return false;
                         }
-                    }
+                    //}
                 }
             }
-            planrow = plangrid.GetNext(planrow);
+            //planrow = plangrid.GetNext(planrow);
+            planrow = planrow.nextSibling;
         }
         return true;
     };
@@ -4905,14 +4924,14 @@
                         switch (this.displayMode) {
                             case 0: /* Hours */
                                 var split = this.GetIntValue(this.GetPeriodHours(plangrid, parentplanrow, col), null);
-                                if (split != null) {
+                                if (split != null && split > 0) {
                                     this.SetPeriodValue(plangrid, childplanrow, col, split / div);
                                 }
                                 break;
                             case 1: /* FTE */
                             case 2: /* FTE %*/
                                 split = this.GetIntValue(this.GetPeriodFTE(plangrid, parentplanrow, col), null);
-                                if (split != null) {
+                                if (split != null && split > 0) {
                                     this.SetPeriodValue(plangrid, childplanrow, col, split / div);
                                 }
                                 break;
@@ -5295,6 +5314,8 @@
             case const_Project:
                 plangrid.SetAttribute(planrow, "Dept_Name", "CanEdit", "0", 0, 0);
                 plangrid.SetAttribute(planrow, "Dept_Name", "Button", "", 0, 0);
+                plangrid.SetAttribute(row, "NamedRate_Name", "CanEdit", "0", 0, 0);
+                plangrid.SetAttribute(row, "NamedRate_Name", "Button", "", 0, 0);
                 return;
             case const_Requirement:
                 plangrid.SetAttribute(planrow, "Dept_Name", "CanEdit", "0", 0, 0);
@@ -5303,6 +5324,8 @@
             case const_Commitment:
                 plangrid.SetAttribute(planrow, "Dept_Name", "CanEdit", "0", 0, 0);
                 plangrid.SetAttribute(planrow, "Dept_Name", "Button", "", 0, 0);
+                plangrid.SetAttribute(row, "NamedRate_Name", "CanEdit", "2", 0, 0);
+                plangrid.SetAttribute(row, "NamedRate_Name", "Button", "Defaults", 0, 0);
                 break;
         }
         for (var c = 0; c < plangrid.ColNames[2].length; c++) {

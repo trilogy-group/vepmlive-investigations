@@ -108,6 +108,10 @@
         selected.rolesIndex = -1;
         if (ddl != null & ddl.selectedIndex >= 0)
             selected.rolesIndex = ddl.selectedIndex;
+        ddl = document.getElementById('<%=ddlOperationMode.ClientID%>');
+        selected.operationModeIndex = -1;
+        if (ddl != null & ddl.selectedIndex >= 0)
+            selected.operationModeIndex = ddl.selectedIndex;
     };
     var OnBeforeUnload = function (event) {
         if (pagechanged == true)
@@ -180,6 +184,25 @@
                     var r = confirm(s);
                     if (r != true)
                         ddl.selectedIndex = selected.rolesIndex;
+                    else
+                        pagechanged = true;
+                }
+                break;
+            case "ddlOperationMode":
+                var ddl = document.getElementById('<%=ddlOperationMode.ClientID%>');
+                if (ddl != null && ddl.selectedIndex == 1 && selected.operationModeIndex == 0) {
+                    var sb = new StringBuilder("");
+                    sb.appendLine("WARNING!");
+                    sb.appendLine("");
+                    sb.appendLine("You are about to turn off resource planning negotiation mode.");
+                    sb.appendLine("Please ensure that all pending negotiations are complete before continuing.");
+                    sb.appendLine("");
+                    sb.appendLine("Press 'Cancel' to stay with the current setting  (recommended)");
+                    sb.appendLine("Press 'OK' to save your changes if you are certain");
+                    var s = sb.toString();
+                    var r = confirm(s);
+                    if (r != true)
+                        ddl.selectedIndex = selected.operationModeIndex;
                     else
                         pagechanged = true;
                 }

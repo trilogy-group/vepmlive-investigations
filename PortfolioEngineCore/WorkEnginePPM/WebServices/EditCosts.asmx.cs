@@ -593,7 +593,8 @@ Status_Error:
 
             // add in lookup info in json format
             LookupItem[] arrNamedRateItems = namedRateItems.ToArray();
-            jsonRateLookup = "{Items:[" + BuildJSONLookup(arrNamedRateItems, 0, false) + "]}";
+            //jsonRateLookup = "{Items:[" + BuildJSONLookup(arrNamedRateItems, 0, false) + "]}";
+            jsonRateLookup = BuildJSONLookup(arrNamedRateItems, false, true);
             return dba.Status;
         }
 
@@ -657,7 +658,7 @@ Status_Error:
 
                         // add in lookup info in json format
                         LookupItem[] arrLookupItems = lookupItems.ToArray();
-                        costCustomField.jsonLookup = "{Items:[" + BuildJSONLookup(arrLookupItems, 0, costCustomField.LeafOnly) + "]}";
+                        costCustomField.jsonLookup = BuildJSONLookup(arrLookupItems, costCustomField.LeafOnly, true);
                     }
                 }
             }
@@ -690,7 +691,18 @@ Status_Error:
 Status_Error:
             return dba.Status;
         }
-
+        private string BuildJSONLookup(LookupItem[] lookupItems, bool bCatLeafOnly, bool bIncludeNone)
+        {
+            string sJSON = BuildJSONLookup(lookupItems, 0, bCatLeafOnly);
+            if (bIncludeNone == true)
+            {
+                if (sJSON != "")
+                    sJSON = "{Name:'0',Text:'[None]',Value:'0_'}," + sJSON;
+                else
+                    sJSON = "{Name:'0',Text:'[None]',Value:'0_'}";
+            }
+            return "{Items:[" + sJSON + "]}";
+        }
         private string BuildJSONLookup(LookupItem[] lookupItems, int nIndex, bool bCatLeafOnly)
         {
             string sJSON = "";
@@ -2186,8 +2198,9 @@ Exit_Function:
                 xC.CreateStringAttr("Name", "C" + sId);
                 xC.CreateStringAttr("Type", "Float");
                 xC.CreateStringAttr("EditFormat", "0.##");
-                //xC.CreateStringAttr("Format", ",0.##;<span style='color:red;'>-,0.##</span>;");
                 xC.CreateStringAttr("Format", ",0;<span style='color:red;'>-,0</span>;");
+                xC.CreateStringAttr("AltFormat", ",0.00;<span style='color:red;'>-,0.00</span>;");
+                //xC.CreateStringAttr("Format", ",0;<span style='color:red;'>-,0</span>;");
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("MinWidth", 50);
                 xC.CreateIntAttr("Width", 70);
@@ -2222,7 +2235,8 @@ Exit_Function:
                 xC.CreateStringAttr("Type", "Float");
                 //xC.CreateStringAttr("Formula", m_sCFormula);
                 //xC.CreateStringAttr("Format", ",#.##;<span style='color:red;'>-,#.##</span>;");
-                xC.CreateStringAttr("Format", ",#;<span style='color:red;'>-,#</span>;");
+                xC.CreateStringAttr("Format", ",0;<span style='color:red;'>-,0</span>;");
+                xC.CreateStringAttr("AltFormat", ",0.00;<span style='color:red;'>-,0.00</span>;");
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("MinWidth", 25);
                 xC.CreateIntAttr("Width", 90);

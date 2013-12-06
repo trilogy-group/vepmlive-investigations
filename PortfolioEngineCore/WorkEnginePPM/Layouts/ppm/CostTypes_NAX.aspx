@@ -67,6 +67,7 @@ html, body {
                             <option value='1'>Editable</option>
                             <option value='41'>Timesheet Actuals</option>
                             <option value='9'>Resource Plans</option>
+                            <option value='5'>Scheduled Work</option>
                             <option value='3'>Calculated from other Cost Types</option>
                             <option value='30'>Calculated - Cumulative</option>
                             <option value='0'>Display Only - populated directly to database</option>

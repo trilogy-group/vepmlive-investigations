@@ -68,9 +68,9 @@ namespace PortfolioEngineCore
             }
             catch (Exception ex)
             {
-                HandleStatusError(SeverityEnum.Exception, "Sql.Open", (StatusEnum)99959, ex.Message.ToString() + "; Connect='" + m_oConnection.ConnectionString + "'");
+                return HandleStatusError(SeverityEnum.Exception, "Sql.Open", (StatusEnum)99959, ex.Message.ToString() + "; Connect='" + m_oConnection.ConnectionString + "'");
             }
-            return m_eStatus;
+            return StatusEnum.rsSuccess;
         }
 
         public void Close()
@@ -101,6 +101,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 eStatus = HandleStatusError(SeverityEnum.Exception, "SelectData", (StatusEnum)eStatusOnException, ex.Message.ToString());
+                throw new PFEException(99991, "SqlDb.SelectData : " + ex.GetBaseMessage());
             }
             return eStatus;
         }
@@ -121,6 +122,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 eStatus = HandleStatusError(SeverityEnum.Exception, "SelectData", (StatusEnum)eStatusOnException, ex.Message.ToString());
+                throw new PFEException(99992, "SqlDb.SelectData : " + ex.GetBaseMessage());
             }
             return eStatus;
         }
@@ -143,6 +145,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 eStatus = HandleStatusError(SeverityEnum.Exception, "SelectDataById", (StatusEnum)eStatusOnException, ex.Message);
+                throw new PFEException(99993, "SqlDb.SelectDataById : " + ex.GetBaseMessage());
             }
             return eStatus;
         }

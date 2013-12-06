@@ -20,7 +20,6 @@ using PortfolioEngineCore;
 using PortfolioEngineCore.Analyzers;
 using PortfolioEngineCore.PortfolioItems;
 
-
 namespace WorkEnginePPM
 {
 
@@ -107,7 +106,6 @@ namespace WorkEnginePPM
 
                         if ((Function != "GetPortfolioItemList") && (Function != "GetGeneratedPortfolioItemTicket"))
                             SaveCachedData(Context, rpkey, RAData);
-                       
 
                         return result.ToString();
                     }
@@ -182,21 +180,21 @@ namespace WorkEnginePPM
 
             WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
             PortfolioItems oPI = new PortfolioItems(basePath, username, ppmId, ppmCompany, ppmDbConn, false);
-
+ 
             try
             {
                 string sPIDs = "";
-                string sExts = "";
+                string sExts= "";
                 string sxml = "";
 
                 oPI.ObtainManagedPortfolioItems(out sExts, out sPIDs, out sxml);
                 CStruct xResult = BuildResultXML("GetPortfolioItemList", 0);
                 CStruct xData = xResult.CreateSubStruct("IDLists");
-                xData.CreateStringAttr("EXTLIST", sExts);
+                xData.CreateStringAttr("EXTLIST",sExts );
                 xData.CreateStringAttr("IDLIST", sPIDs);
                 xData.AppendXML(sxml);
 
-                sReply = xResult.XML();
+                sReply =  xResult.XML();
 
             }
             catch (Exception ex)
@@ -224,7 +222,7 @@ namespace WorkEnginePPM
                 CStruct xData = xResult.CreateSubStruct("Ticket");
                 xData.CreateStringAttr("Value", sGUID);
 
-                sReply = xResult.XML();
+                sReply =  xResult.XML();
 
             }
             catch (Exception ex)

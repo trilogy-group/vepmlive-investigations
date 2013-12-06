@@ -230,7 +230,8 @@ namespace RPADataCache
             m_xHeader1.CreateIntAttr("PortfolioItemVisible", 1);
             m_xHeader1.CreateIntAttr("Spanned", -1);
             m_xHeader1.CreateIntAttr("SortIcons", 2);
-    //        m_xHeader1.CreateStringAttr("Def", "Tree");
+            m_xHeader1.CreateIntAttr("NoEscape", 1);
+            //        m_xHeader1.CreateStringAttr("Def", "Tree");
 
 
             CStruct xC = xLeftCols.CreateSubStruct("C");
@@ -279,7 +280,7 @@ namespace RPADataCache
             xC.CreateIntAttr("CanFilter", 0);
             xC.CreateStringAttr("Width", "20");
             xC.CreateStringAttr("Class", "");
-            m_xHeader1.CreateStringAttr("Select", " ");
+            m_xHeader1.CreateStringAttr("Select", "<img id='allSelectedTopGrid' src='/_layouts/ppm/images/checked-dark.png' />");
 
             xC.CreateIntAttr("CanHide", 0);
             xC.CreateIntAttr("CanSelect", 0);
@@ -1761,7 +1762,6 @@ namespace RPADataCache
 
                                 xI.CreateStringAttr(sn, ""); // sPIVal);
                                 break;
-
 
                             case RPConstants.TGRID_TOTCC_ID:
                                 if (by_role == false)

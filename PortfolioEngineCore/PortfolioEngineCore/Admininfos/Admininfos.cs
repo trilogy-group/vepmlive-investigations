@@ -2683,6 +2683,16 @@ namespace PortfolioEngineCore
                 }
                 _sqlConnection.Close();
                 sResult = xResult.XML();
+
+                // if there are any AutoPost instructions then set a job on the queue to do that
+                int[,] autoposts = new int[10, 2];
+                bool bRet = GetAutoPosts("ScheduledWork", ref autoposts);
+                if (autoposts[0, 0] > 0)
+                {
+                    // there is at least one autopost instruction so set up a job
+                    bRet = PostCostValuesForScheduledWork();
+                }
+
                 return bupdateOK;
             }
             catch (Exception exception)
@@ -3789,6 +3799,16 @@ namespace PortfolioEngineCore
                 }
                 _sqlConnection.Close();
                 sResult = xResult.XML();
+
+                // if there are any AutoPost instructions then set a job on the queue to do that
+                int[,] autoposts = new int[10, 2];
+                bool bRet = GetAutoPosts("ScheduledWork", ref autoposts);
+                if (autoposts[0, 0] > 0)
+                {
+                    // there is at least one autopost instruction so set up a job
+                    bRet = PostCostValuesForScheduledWork();
+                }
+
                 return bupdateOK;
             }
             catch (Exception exception)
@@ -4577,6 +4597,70 @@ namespace PortfolioEngineCore
                 throw new PFEException((int)PFEError.UpdateWorkSchedule, exception.GetBaseMessage());
             }
         }
+
+        private bool GetAutoPosts(string datatype, ref int[,] autoposts)
+        {
+            if (_PFECN.State != ConnectionState.Open) _PFECN.Open();
+            int larrayindex = 0;
+            int lmainkey = -1;
+            if (datatype.ToUpper() == "SCHEDULEDWORK") { lmainkey = 21; }
+            else if (datatype.ToUpper() == "TIMESHEETS") { lmainkey = 31; }
+            else if (datatype.ToUpper() == "RESOURCEPLANS") { lmainkey = 1; }
+
+            const string cmdText = "SELECT CT_ID,CB_ID From EPGP_COST_VALUES_TOSET Where TOSET_MAINKEY=@mainkey";
+            SqlCommand oCommand = new SqlCommand(cmdText, _dba.Connection);
+            oCommand.Parameters.AddWithValue("@mainkey", lmainkey);
+            SqlDataReader reader = oCommand.ExecuteReader();
+            if (reader.Read())
+            {
+                if (autoposts.GetUpperBound(0) >= larrayindex)
+                {
+                    autoposts[larrayindex, 0] = DBAccess.ReadIntValue(reader["CT_ID"]);
+                    autoposts[larrayindex, 1] = DBAccess.ReadIntValue(reader["CB_ID"]);
+                }
+                larrayindex++;
+            }
+            reader.Close();
+
+            return true;
+        }
+
+        private bool PostCostValuesForScheduledWork()
+        {
+            try
+            {
+                if (_PFECN.State != ConnectionState.Open) _PFECN.Open();
+
+                CStruct xRequest = new CStruct();
+                xRequest.Initialize("Request");
+                CStruct xSet = xRequest.CreateSubStruct("EPKSet");
+                xSet.CreateString("EPKAuth", "");
+                CStruct xProcess = xSet.CreateSubStruct("EPKProcess");
+                // SetSavePSCostValues = 5
+                xProcess.CreateInt("RequestNo", 5);
+
+                const string sCommand = "INSERT INTO EPG_JOBS(JOB_GUID,JOB_CONTEXT,JOB_SESSION,WRES_ID,JOB_SUBMITTED,JOB_STATUS,JOB_COMMENT,JOB_CONTEXT_DATA) VALUES(@JOB_GUID,@JOB_CONTEXT,@JOB_SESSION,@WRES_ID,@JOB_SUBMITTED,@JOB_STATUS,@JOB_COMMENT,@JOB_CONTEXT_DATA)";
+                SqlCommand cmd = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                cmd.Parameters.AddWithValue("@JOB_GUID", Guid.NewGuid());
+                //    qjcCustom = 0
+                cmd.Parameters.AddWithValue("@JOB_CONTEXT", 0);
+                cmd.Parameters.AddWithValue("@JOB_SESSION", Guid.NewGuid());
+                cmd.Parameters.AddWithValue("@WRES_ID", _dba.UserWResID);
+                cmd.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
+                cmd.Parameters.AddWithValue("@JOB_STATUS", 0); // For now let 0 mean Not Started
+                cmd.Parameters.AddWithValue("@JOB_COMMENT", "PostCostValues Scheduled Work ");
+                cmd.Parameters.AddWithValue("@JOB_CONTEXT_DATA", xRequest.XML());
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                _dba.HandleException("PostCostValuesForTimesheetData", (StatusEnum)99999, ex);
+            }
+            finally { _dba.Close(); }
+            return (_dba.Status == StatusEnum.rsSuccess);
+        }
+
 
         /// <summary>
         /// Posts Cost Values for a CB/CT combination, optional list of PROJECT_IDs

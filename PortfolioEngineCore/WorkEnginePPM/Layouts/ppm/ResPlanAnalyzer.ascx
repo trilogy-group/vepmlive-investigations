@@ -49,8 +49,8 @@
 <link rel="stylesheet" type="text/css" href="Styles/bootstrap.min.css" />
 <script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
 
-<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
-
+<%--<script src="/_layouts/ppm/Kendo/kendo.dataviz.min.js" type="text/javascript"></script>
+--%>
 <style type="text/css">
     html, body {
         width: 100%;

@@ -210,14 +210,12 @@
             <div>Do you want to split the selected plan row or replace the existing resource?</div>
             <div style="padding-top:15px;">Please select the required action:</div>
 		</div>
-		<div style="width:300px;float:right;">
-			<div class="button-container">
-			    <input type="button" class="epmliveButton" value="Split" onclick="javascript: dialogEvent('splitDlg_Split');"/>
-        		<input type="button" class="epmliveButton" value="Replace" onclick="javascript: dialogEvent('splitDlg_Replace');"/>
-        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('splitDlg_Cancel');"/>
-			</div>
-		</div>
     </div>
+	<div class="button-container">
+		<input type="button" class="epmliveButton" value="Split" onclick="javascript: dialogEvent('splitDlg_Split');"/>
+        <input type="button" class="epmliveButton" value="Replace" onclick="javascript: dialogEvent('splitDlg_Replace');"/>
+        <input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('splitDlg_Cancel');"/>
+	</div>
 </div>
 <div class="modalContent" id="idPrivateRowsDlg" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
@@ -225,14 +223,12 @@
             <div>Some plan rows are marked as private.</div>
             <div style="padding-top:15px;">Would you like to make them public?</div>
 		</div>
-		<div style="float:right;">
-			<div class="button-container" style="margin-left:3px;">
-			    <input type="button" class="epmliveButton" value="Yes" onclick="javascript: dialogEvent('privateRowsDlg_Yes');"/>
-        		<input type="button" class="epmliveButton" value="No" onclick="javascript: dialogEvent('privateRowsDlg_No');"/>
-        		<input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('privateRowsDlg_Cancel');"/>
-			</div>
-		</div>
     </div>
+	<div class="button-container" style="margin-left:3px;">
+		<input type="button" class="epmliveButton" value="Yes" onclick="javascript: dialogEvent('privateRowsDlg_Yes');"/>
+        <input type="button" class="epmliveButton" value="No" onclick="javascript: dialogEvent('privateRowsDlg_No');"/>
+        <input type="button" class="epmliveButton" value="Cancel" onclick="javascript: dialogEvent('privateRowsDlg_Cancel');"/>
+	</div>
 </div>
 <div class="modalContent" id="idFulfillDlg" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">

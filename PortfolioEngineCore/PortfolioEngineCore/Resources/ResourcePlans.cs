@@ -694,7 +694,14 @@ namespace PortfolioEngineCore
                         xGrid = xResult.CreateSubStruct("Grid");
                         CStruct xIO = xGrid.CreateSubStruct("IO");
                         xIO.CreateIntAttr("Result", -11);
-                        xIO.CreateStringAttr("Message", FormatErrorText());
+                        if (_dba.Status == (StatusEnum)123456)
+                        {
+                            xIO.CreateStringAttr("Message", _dba.StatusText);
+                        }
+                        else
+                        {
+                            xIO.CreateStringAttr("Message", FormatErrorText());
+                        }
                         sReply = xResult.XML();
                     }
                 }
@@ -1832,18 +1839,20 @@ namespace PortfolioEngineCore
                 reader.Close();
                 sPos = "q";
                 // Read in the rates used for named rates
+                oRPCategory = oRPCategories.CreateSubStruct("RPCategory");
+                oRPCategory.CreateInt("FieldID", (int)SpecialFieldIDsEnum.sfResourceRate);
+                CStruct oLookupList = oRPCategory.CreateSubStruct("LookupList");
+                CStruct xItems = oLookupList.CreateSubStruct("Items");
+
                 oCommand = new SqlCommand("EPG_SP_ReadRates", _dba.Connection);
                 oCommand.CommandType = CommandType.StoredProcedure;
                 reader = oCommand.ExecuteReader();
-
-                CStruct xRates = xRPE.CreateSubStruct("Rates");
-
                 while (reader.Read())
                 {
-                    CStruct xRate = xRates.CreateSubStruct("Rate");
-                    xRate.CreateIntAttr("ID", DBAccess.ReadIntValue(reader["RT_UID"]));
-                    xRate.CreateIntAttr("Level", DBAccess.ReadIntValue(reader["RT_LEVEL"]));
-                    xRate.CreateStringAttr("Name", DBAccess.ReadStringValue(reader["RT_NAME"]));
+                    CStruct xItem = xItems.CreateSubStruct("Item");
+                    xItem.CreateIntAttr("ID", DBAccess.ReadIntValue(reader["RT_UID"]));
+                    xItem.CreateIntAttr("Level", DBAccess.ReadIntValue(reader["RT_LEVEL"]));
+                    xItem.CreateStringAttr("Name", DBAccess.ReadStringValue(reader["RT_NAME"]));
                 }
                 reader.Close();
 
@@ -1976,7 +1985,7 @@ namespace PortfolioEngineCore
 
                     lValue = DBAccess.ReadIntValue(reader["CMT_RT_UID"], out bNull);
                     if (!bNull)
-                        xPlanRow.CreateInt("RateUID", lValue);
+                        xPlanRow.CreateInt("Rate_UID", lValue);
 
                     dblValue = DBAccess.ReadDoubleValue(reader["CMT_CALC_TOTAL_COST"], out bNull);
                     if (!bNull)
@@ -2225,6 +2234,8 @@ namespace PortfolioEngineCore
             sbValues.Append("," + xI.GetIntAttr("Role_UID").ToString("0"));
             sbParams.Append(",CMT_DEPT");
             sbValues.Append("," + xI.GetIntAttr("Dept_UID").ToString("0"));
+            sbParams.Append(",CMT_RT_UID");
+            sbValues.Append("," + xI.GetIntAttr("NamedRate_UID").ToString("0"));
             sbParams.Append(",WRES_ID");
             sbValues.Append("," + xI.GetIntAttr("Res_UID").ToString("0"));
             sbParams.Append(",WRES_ID_PENDING");
@@ -2279,6 +2290,7 @@ namespace PortfolioEngineCore
             if (xI.GetBooleanAttr("CCRoleParent_UIDChanged") == true)
                 sb.Append(",PARENT_BC_UID=" + xI.GetIntAttr("CCRoleParent_UID").ToString("0"));
             sb.Append(",CMT_DEPT=" + xI.GetIntAttr("Dept_UID").ToString("0"));
+            sb.Append(",CMT_RT_UID=" + xI.GetIntAttr("NamedRate_UID").ToString("0"));
             sb.Append(",WRES_ID=" + xI.GetIntAttr("Res_UID").ToString("0"));
             sb.Append(",WRES_ID_PENDING=" + xI.GetIntAttr("PendingRes_UID").ToString("0"));
 
@@ -2556,12 +2568,12 @@ namespace PortfolioEngineCore
                                 if (_dba.ExecuteReader(sCommand, (StatusEnum)99999, out reader) == StatusEnum.rsSuccess)
                                 {
                                     if (reader.Read())
-                                        changedby = DBAccess.ReadStringValue(reader["RES_NAME"]) + "(" + DBAccess.ReadIntValue(reader["CMT_ENTEREDBY_WRES_ID"]).ToString() + ")";
+                                        changedby = DBAccess.ReadStringValue(reader["RES_NAME"]); // +"(" + DBAccess.ReadIntValue(reader["CMT_ENTEREDBY_WRES_ID"]).ToString() + ")";
                                     reader.Close();
                                 }
                                 
                                 _dba.Status = (StatusEnum)123456;
-                                _dba.StatusText = "Row '" + itemname + "' has been updated by '" + changedby + "'.\nPlease refresh your plan and resubmit your changes.";
+                                _dba.StatusText = "Save has failed.\nRow '" + itemname + "' has been already been changed by '" + changedby + "'.\nPlease refresh your plan and resave your changes.";
                                 goto Exit_Transaction;
                             }
                             sSQL = BuildSQLPlanCategoryRowUpdate(xI);
@@ -2612,7 +2624,7 @@ namespace PortfolioEngineCore
 
                     foreach (CStruct xI in clnPlanRows)
                     {
-                        if (xI.GetBooleanAttr("Changed") == true)
+                        if (xI.GetBooleanAttr("Changed") == true && xI.GetBooleanAttr("Deleted") == false)
                         {
                             int lUID = xI.GetIntAttr("UID");
                             for (int lPeriod = lStartPeriodID; lPeriod <= lFinishPeriodID; lPeriod++)

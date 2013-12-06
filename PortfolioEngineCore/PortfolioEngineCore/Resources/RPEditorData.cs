@@ -232,6 +232,7 @@ namespace PortfolioEngineCore
             List<CStruct> listRPCats = xRPCats.GetList("RPCategory");
             SortedList<string, SortedList<string, CStruct>> listLookups = new SortedList<string, SortedList<string, CStruct>>();
             SortedList<string, CStruct> listDepts = null;
+            SortedList<string, CStruct> listRates = null;
             foreach (CStruct xRPCat in listRPCats)
             {
                 CStruct xLookup = xRPCat.GetSubStruct("LookupList");
@@ -239,10 +240,9 @@ namespace PortfolioEngineCore
                 SortedList<string, CStruct> listItems = xItems.GetListSortedByAttribute("Item", "ID");
                 int lFieldID = xRPCat.GetInt("FieldID");
                 if (lFieldID == 9007) listDepts = listItems;
+                if (lFieldID == (int)SpecialFieldIDsEnum.sfResourceRate) listRates = listItems;
                 listLookups.Add(lFieldID.ToString(), listItems);
             }
-
-
 
             //string[] delims = new string[] { "/n" };
             foreach (CStruct xField in listFields)
@@ -284,6 +284,8 @@ namespace PortfolioEngineCore
                         sColIDName = "Res_Names";
                         break;
                     case SpecialFieldIDsEnum.sfResourceRate:
+                        sColIDName = "NamedRate_Name";
+                        xLookup = GetLookup(listRPCats, (int)eFieldID);
                         break;
                     case SpecialFieldIDsEnum.sfDescription:
                         sColIDName = "Description";
@@ -323,7 +325,7 @@ namespace PortfolioEngineCore
                         List<CStruct> listItems = xItems.GetList("Item");
                         bool bCatLeafOnly = xField.GetBooleanAttr("CatLeafOnly");
                         bool bUseFullName = xField.GetBooleanAttr("UseFullName");
-                        xC.CreateStringAttr("Defaults", "{Items:[" + BuildJSONLookup(listItems.ToArray(), 0, bCatLeafOnly, bUseFullName) + "]}");
+                        xC.CreateStringAttr("Defaults", BuildJSONLookup(listItems.ToArray(), bCatLeafOnly, bUseFullName, true));
                         xC.CreateStringAttr("Button", "Defaults");
                         xC.CreateIntAttr("MinWidth", 30);
                         // setting WidthPad to 0 make dropdown button disappear
@@ -388,14 +390,16 @@ namespace PortfolioEngineCore
             List<CStruct> listPlanRows = xPlanRows.GetList("PlanRow");
             SortedList<string,bool> listGroups = new SortedList<string,bool>();
             string sResourceUIDs = xPlanData.GetStringAttr("ResourceUIDs", "");
+            string sProjectIDs = xPlanData.GetStringAttr("ProjectIDs", "");
+            bool bProjectMode = (sProjectIDs != "") ? true : false;
             bool bRequired;
             CStruct xI;
             foreach (CStruct xPI in listPIs.Values)
             {
                 string sProjectID = xPI.GetStringAttr("ProjectID");
-                bool bUserCanEdit = xPI.GetBooleanAttr("UserCanEdit", false);
+                //bool bUserCanEdit = xPI.GetBooleanAttr("UserCanEdit", false);
                 bool bIsUsed = xPI.GetBooleanAttr("IsUsed", false);
-                if (sProjectID != "" && (bUserCanEdit || bIsUsed))
+                if (sProjectID != "" && (bProjectMode || bIsUsed))
                 {
                     xI = xB.CreateSubStruct("I");
                     xI.CreateStringAttr("Project_UID", sProjectID);
@@ -698,10 +702,14 @@ namespace PortfolioEngineCore
                                     //}
                                     break;
                                 case SpecialFieldIDsEnum.sfResourceName:
-                                    //sColIDName = "Res_Names";
+                                    //sColIDName = "Res_Name";
                                     //sValue = FormatPendingNames(sResName, sPendingResName);
                                     break;
                                 case SpecialFieldIDsEnum.sfResourceRate:
+                                    sColIDName = "NamedRate_Name";
+                                    lUID = xPlanRow.GetInt("Rate_UID");
+                                    if (listRates.TryGetValue(lUID.ToString(), out xCCRole2))
+                                        sValue = xCCRole2.GetStringAttr("Name");
                                     break;
                                 case SpecialFieldIDsEnum.sfDescription:
                                     sColIDName = "Description";
@@ -886,8 +894,18 @@ namespace PortfolioEngineCore
             }
             return null;
         }
-
-
+        private static string BuildJSONLookup(CStruct[] lookupItems, bool bCatLeafOnly, bool bUseFullName, bool bIncludeNone)
+        {
+            string sJSON = BuildJSONLookup(lookupItems, 0, bCatLeafOnly, bUseFullName);
+            if (bIncludeNone == true)
+            {
+                if (sJSON != "")
+                    sJSON = "{Name:'0',Text:'[None]',Value:'0_'}," + sJSON;
+                else
+                    sJSON = "{Name:'0',Text:'[None]',Value:'0_'}";
+            }
+            return "{Items:[" + sJSON + "]}";
+        }
         private static string BuildJSONLookup(CStruct[] lookupItems, int nIndex, bool bCatLeafOnly, bool bUseFullName)
         {
             string sJSON = "";

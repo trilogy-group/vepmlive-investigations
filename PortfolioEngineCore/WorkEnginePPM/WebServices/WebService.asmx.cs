@@ -255,7 +255,14 @@ namespace WorkEnginePPM
 
             string s = xReply.XML();
             //WebAdmin.DBTrace((StatusEnum)91111, TraceChannelEnum.WebServices, "WebService.HandleError", "Reply", sContext, s);
-            EventLog.WriteEntry("DBAccess HandleError", s, EventLogEntryType.Error);
+            Microsoft.SharePoint.SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                try
+                {
+                    EventLog.WriteEntry("DBAccess HandleError", s, EventLogEntryType.Error);
+                }
+                catch { }
+            });
             return s;
         }
 
@@ -269,7 +276,14 @@ namespace WorkEnginePPM
 
             string s = xReply.XML();
             //WebAdmin.DBTrace((StatusEnum)99812, TraceChannelEnum.WebServices, "WebService.HandleException", "Reply", sContext, s);
-            EventLog.WriteEntry("WebService HandleException", s, EventLogEntryType.Error);
+            Microsoft.SharePoint.SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                try
+                {
+                    EventLog.WriteEntry("WebService HandleException", s, EventLogEntryType.Error);
+                }
+                catch { }
+            });
             return s;
         }
     }
