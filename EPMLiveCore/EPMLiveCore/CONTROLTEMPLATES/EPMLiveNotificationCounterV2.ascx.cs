@@ -49,7 +49,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             SPSite spSite = SPContext.Current.Site;
             currentUser = GetProfileUser(spSite, false, currentUser);
             SPListItem spListItem = spSite.RootWeb.SiteUserInfoList.GetItemById(currentUser.ID);
-            _prifilePicUrl = GetProfilePicturePath(spListItem);
+            _prifilePicUrl = GetProfilePicturePath(spListItem) + "?v=" + DateTime.Now.Ticks;
         }
 
         private string GetProfilePicturePath(SPListItem spListItem)
