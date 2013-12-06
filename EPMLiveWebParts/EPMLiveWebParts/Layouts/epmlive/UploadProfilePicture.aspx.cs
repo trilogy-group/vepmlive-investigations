@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             string resizeInfo = ResizeInfoField.Value;
             if (!string.IsNullOrEmpty(resizeInfo))
             {
-                pic = ResizeImage(resizeInfo);
+                pic = ResizeImage2(resizeInfo);
             }
             else
             {
@@ -183,7 +184,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         private string GetPictureFileName()
         {
             string loginName = GetCleanUserName(SPContext.Current.Web.CurrentUser.LoginName);
-            return string.Format("{0}{1}", loginName, Path.GetExtension(FileNameField.Value));
+            return string.Format("{0}.png", loginName);
         }
 
         private static string GetPictureUrl(string fileName)
@@ -225,6 +226,55 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 var img = new Bitmap(stream);
                 var converter = new ImageConverter();
                 return (byte[]) converter.ConvertTo(img, typeof (byte[]));
+            }
+        }
+
+        private byte[] ResizeImage2(string resizeInfo)
+        {
+            string[] picInfo = resizeInfo.Split('|');
+
+            int width = int.Parse(picInfo[0]);
+            int height = int.Parse(picInfo[1]);
+            int targetWidth = int.Parse(picInfo[2]);
+            int targetHeight = int.Parse(picInfo[3]);
+            int x = int.Parse(picInfo[4]);
+            int y = int.Parse(picInfo[5]);
+
+            using (var fileStore = new EPMLiveFileStore(Web))
+            {
+                using (var sourceImage = new Bitmap(fileStore.GetStream(FileNameField.Value)))
+                {
+                    using (var bitmap = new Bitmap(width, height))
+                    {
+                        using (var graphics = Graphics.FromImage(bitmap))
+                        {
+                            graphics.CompositingQuality = CompositingQuality.HighQuality;
+                            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                            graphics.SmoothingMode = SmoothingMode.HighQuality;
+
+                            graphics.DrawImage(sourceImage, new Rectangle(0, 0, width, height));
+
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                bitmap.Save(memoryStream, ImageFormat.Png);
+
+                                using (var bmp = new Bitmap(bitmap))
+                                {
+                                    using (var pic = bmp.Clone(new Rectangle(x, y, targetWidth, targetHeight),
+                                        bitmap.PixelFormat))
+                                    {
+                                        using (var stream = new MemoryStream())
+                                        {
+                                            pic.Save(stream, ImageFormat.Png);
+                                            return stream.ToArray();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

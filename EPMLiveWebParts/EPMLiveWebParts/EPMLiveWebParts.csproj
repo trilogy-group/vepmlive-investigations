@@ -1200,6 +1200,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\MyWork.aspx" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.min.css" />
     <Content Include="Layouts\epmlive\MyWorkWebPart.min.js" />
+    <Content Include="Layouts\epmlive\ReportViewer.css" />
     <Content Include="Layouts\epmlive\SSRSReportRedirect.aspx" />
     <Content Include="Layouts\epmlive\Stylesheets\addmenu.css" />
     <Content Include="Layouts\epmlive\ajaxpost.aspx" />
