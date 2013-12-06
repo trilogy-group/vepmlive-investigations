@@ -11,7 +11,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API
 {
-    internal sealed class ResourceGrid
+    public sealed class ResourceGrid
     {
         #region Fields (2) 
 
@@ -62,36 +62,13 @@ namespace EPMLiveCore.API
 
         #endregion Enums 
 
-        #region Methods (21) 
+        #region Methods (22) 
 
         // Public Methods (1) 
 
-        /// <summary>
-        ///     Exports the resources.
-        /// </summary>
-        /// <param name="spWeb">The sp web.</param>
-        /// <returns></returns>
-        public static string ExportResources(SPWeb spWeb)
+        public static void ClearCache(SPWeb spWeb)
         {
-            try
-            {
-                string file;
-                string message;
-
-                var resourceExporter = new ResourceExporter(spWeb);
-                bool exported = resourceExporter.Export(out file, out message);
-
-                return string.Format(@"<ResourceExporter Success=""{0}"" Message=""{1}"" File=""{2}"" />", exported,
-                    message, file);
-            }
-            catch (APIException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw new APIException((int) Errors.ExportResources, e.Message);
-            }
+            CacheStore.Current.RemoveSafely(spWeb.Url, GetCacheCategory(spWeb));
         }
 
         // Private Methods (11) 
@@ -718,7 +695,7 @@ namespace EPMLiveCore.API
             resultRootElement.Add(cfgElement);
         }
 
-        // Internal Methods (9) 
+        // Internal Methods (10) 
 
         /// <summary>
         ///     Deletes the resource pool resource.
@@ -813,6 +790,34 @@ namespace EPMLiveCore.API
             catch (Exception e)
             {
                 throw new APIException((int) Errors.DeleteResourcePoolViews, e.Message);
+            }
+        }
+
+        /// <summary>
+        ///     Exports the resources.
+        /// </summary>
+        /// <param name="spWeb">The sp web.</param>
+        /// <returns></returns>
+        internal static string ExportResources(SPWeb spWeb)
+        {
+            try
+            {
+                string file;
+                string message;
+
+                var resourceExporter = new ResourceExporter(spWeb);
+                bool exported = resourceExporter.Export(out file, out message);
+
+                return string.Format(@"<ResourceExporter Success=""{0}"" Message=""{1}"" File=""{2}"" />", exported,
+                    message, file);
+            }
+            catch (APIException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new APIException((int) Errors.ExportResources, e.Message);
             }
         }
 
