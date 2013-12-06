@@ -2532,7 +2532,7 @@ namespace PortfolioEngineCore
 
                         // total the hours
                         double dblHours = 0;
-                        for (int lPeriod = lStartPeriodID; lPeriod < lFinishPeriodID; lPeriod++)
+                        for (int lPeriod = lStartPeriodID; lPeriod <= lFinishPeriodID; lPeriod++)
                         {
                             bool bFoundH;
                             string suffix = lPeriod.ToString("0");
