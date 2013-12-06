@@ -51,6 +51,40 @@ namespace EPMLiveCore
             return Convert.ToBase64String(gZipBuffer);
         }
 
+        public static byte[] Zip(this string text)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+
+            using (var memoryStream = new MemoryStream(bytes))
+            {
+                using (var stream = new MemoryStream())
+                {
+                    using (var gZipStream = new GZipStream(stream, CompressionMode.Compress))
+                    {
+                        memoryStream.CopyTo(gZipStream);
+                    }
+
+                    return stream.ToArray();
+                }
+            }
+        }
+
+        public static string Unzip(this byte[] bytes)
+        {
+            using (var memoryStream = new MemoryStream(bytes))
+            {
+                using (var stream = new MemoryStream())
+                {
+                    using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+                    {
+                        gZipStream.CopyTo(stream);
+                    }
+
+                    return Encoding.UTF8.GetString(stream.ToArray());
+                }
+            }
+        }
+
         /// <summary>
         ///     Decodes to base64.
         /// </summary>
@@ -901,7 +935,7 @@ namespace EPMLiveCore
                 }
                 else if (typeName.Equals("System.String"))
                 {
-                    size += obj.ToString().Length * sizeof(Char);
+                    size += obj.ToString().Length*sizeof (Char);
                 }
                 else if (typeName.Equals("System.DateTime"))
                 {
@@ -915,35 +949,26 @@ namespace EPMLiveCore
                 {
                     var dict = (IDictionary) obj;
 
-                    foreach (var key in dict.Keys)
-                    {
-                        size += GetSize(key);
-                    }
+                    size += dict.Keys.Cast<object>().Sum(key => GetSize(key));
 
-                    foreach (var value in dict.Values)
-                    {
-                        size += GetSize(value);
-                    }
+                    size += dict.Values.Cast<object>().Sum(value => GetSize(value));
                 }
                 else if (typeName.StartsWith("System.Collections.Generic.List"))
                 {
                     var list = (IList) obj;
 
-                    foreach (var o in list)
-                    {
-                        size += GetSize(o);
-                    }
+                    size += list.Cast<object>().Sum(o => GetSize(o));
                 }
                 else
                 {
                     IEnumerable<FieldInfo> fields = GetFields(t);
 
                     size += (from fieldInfo in fields
-                             select fieldInfo.GetValue(obj)
-                                 into subObj
-                                 where subObj != obj
-                                 where subObj != null
-                                 select GetSize(subObj)).Sum();
+                        select fieldInfo.GetValue(obj)
+                        into subObj
+                        where subObj != obj
+                        where subObj != null
+                        select GetSize(subObj)).Sum();
                 }
 
                 return size;
@@ -1002,16 +1027,7 @@ namespace EPMLiveCore
                     return sizeof (Boolean)*((Boolean[]) objValue).Length;
                 default:
                     var enumerable = objValue as IEnumerable;
-
-                    if (enumerable == null) return 0L;
-
-                    long size = 0;
-                    foreach (object obj in enumerable)
-                    {
-                        if (obj != null) size += obj.GetSize();
-                    }
-
-                    return size;
+                    return enumerable == null ? 0L : (from object obj in enumerable where obj != null select obj.GetSize()).Sum();
             }
         }
 

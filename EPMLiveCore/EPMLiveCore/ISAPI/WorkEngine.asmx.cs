@@ -1259,7 +1259,7 @@ namespace EPMLiveCore
                 var watch = new Stopwatch();
                 watch.Start();
 
-                var result = ResourceGrid.GetResourcePoolLayoutGrid(data);
+                var result = ResourceGrid.GetResourcePoolLayoutGrid(data, oWeb);
 
                 watch.Stop();
 

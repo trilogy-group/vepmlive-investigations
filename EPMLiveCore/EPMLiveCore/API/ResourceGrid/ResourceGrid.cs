@@ -62,7 +62,7 @@ namespace EPMLiveCore.API
 
         #endregion Enums 
 
-        #region Methods (17) 
+        #region Methods (21) 
 
         // Public Methods (1) 
 
@@ -94,7 +94,7 @@ namespace EPMLiveCore.API
             }
         }
 
-        // Private Methods (7) 
+        // Private Methods (11) 
 
         /// <summary>
         ///     Builds the department hierarchy.
@@ -175,9 +175,7 @@ namespace EPMLiveCore.API
                         profilePic = thumbnail.Remove(thumbnail.IndexOf(','));
                     }
                 }
-                catch
-                {
-                }
+                catch { }
             }
 
             if (!gridSafeFields.ContainsKey(field))
@@ -428,6 +426,229 @@ namespace EPMLiveCore.API
             }
         }
 
+        private static string GetCacheCategory(SPWeb web)
+        {
+            return "ResourceGrid_S_" + web.Site.ID;
+        }
+
+        private static string GetCacheKey(SPWeb web, string kind)
+        {
+            return "ResourceGrid_" + kind + "_W_" + web.ID + "_U_" + web.CurrentUser.ID;
+        }
+
+        private static string GetDataGrid(string data, SPWeb web)
+        {
+            using (var resourceManager = new ResourcePoolManager())
+            {
+                SPList resourcesList = resourceManager.ParentList;
+                SPWeb spWeb = resourcesList.ParentWeb;
+
+                XDocument resourceXml =
+                    XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), web));
+
+                var resultXml = new XDocument();
+                resultXml.Add(new XElement("Grid"));
+
+                // ReSharper disable PossibleNullReferenceException
+
+                XElement gridElement = resultXml.Root;
+
+                gridElement.Add(new XElement("Body"));
+                XElement bodyElement = gridElement.Element("Body");
+
+                bodyElement.Add(new XElement("B"));
+
+                XElement bElement = bodyElement.Element("B");
+
+                var gridSafeFields = new Dictionary<string, string>();
+                var gridFields = new Dictionary<string, SPField>();
+
+                IEnumerable<XElement> resourceElements = resourceXml.Root.Elements("Resource");
+
+                var dtUserInfo = new DataTable();
+
+                XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
+                if (arrResourceElements.Any())
+                {
+                    dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
+                    dtUserInfo.PrimaryKey = new[] {dtUserInfo.Columns["ID"]};
+                }
+
+                foreach (XElement resourceElement in arrResourceElements)
+                {
+                    var iElement = new XElement("I");
+
+                    int resourceId = 0;
+                    string profilePic = string.Format("{0}/_layouts/images/person.gif",
+                        spWeb.SafeServerRelativeUrl());
+
+                    foreach (XElement dataElement in resourceElement.Elements())
+                    {
+                        string field = dataElement.Attribute("Field").Value;
+
+                        if (field.Equals("LinkTitle") || field.Equals("LinkTitleNoMenu")) continue;
+
+                        string value = dataElement.Attribute("HtmlValue").Value;
+                        string type = dataElement.Attribute("Type").Value;
+
+                        BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
+                            spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
+                            ref resourceId);
+                    }
+
+                    iElement.Add(new XAttribute("ResourceID", resourceId));
+                    iElement.Add(new XAttribute("ProfilePic",
+                        string.Format(
+                            @"<div class=""EPMLiveResourceGridPicture"">
+															  <img src=""{0}"" height=""50""/>
+														  </div>",
+                            profilePic)));
+
+                    iElement.Add(new XAttribute("IsMyResource",
+                        resourceElement.Attribute("IsMyResource").Value.ToBool() ? 1 : 0));
+
+                    bElement.Add(iElement);
+                }
+
+                // ReSharper restore PossibleNullReferenceException
+
+                return resultXml.ToString();
+            }
+        }
+
+        private static string GetLayoutGrid(string data)
+        {
+            XDocument dataXml = XDocument.Parse(Utilities.DecodeGridData(data));
+
+            XDocument resultXml = XDocument.Parse(Resources.ResourceGridLayout);
+            XElement resultRootElement = resultXml.Root;
+
+            if (resultRootElement == null)
+            {
+                throw new APIException((int) Errors.LayoutGridCNFRootElement,
+                    "Cannot find the Root element of the grid layout.");
+            }
+
+            RegisterGridIdAndCss(resultRootElement, dataXml);
+
+            XElement leftColsElement = resultRootElement.Element("LeftCols");
+
+            if (leftColsElement == null)
+            {
+                throw new APIException((int) Errors.LayoutGridCNFLeftColsElement,
+                    "Cannot find the LeftCols element of the grid layout.");
+            }
+
+            XElement colsElement = resultRootElement.Element("Cols");
+
+            if (colsElement == null)
+            {
+                throw new APIException((int) Errors.LayoutGridCNFColElement,
+                    "Cannot find the Col element of the grid layout.");
+            }
+
+            XElement headerElement = resultRootElement.Element("Header");
+
+            if (headerElement == null)
+            {
+                throw new APIException((int) Errors.LayoutGridCNFHeaderElement,
+                    "Cannot find the Header element of the grid layout.");
+            }
+
+            var existingCols = new List<string>();
+
+            foreach (XAttribute colName in colsElement.Elements().Select(colElement => colElement.Attribute("Name"))
+                )
+            {
+                if (colName == null)
+                {
+                    throw new APIException((int) Errors.LayoutGridCNFColNameInCols,
+                        "Cannot find the column name in the grid layout.");
+                }
+
+                existingCols.Add(colName.Value);
+            }
+
+            foreach (
+                XAttribute colName in leftColsElement.Elements().Select(colElement => colElement.Attribute("Name")))
+            {
+                if (colName == null)
+                {
+                    throw new APIException((int) Errors.LayoutGridCNFColNameInLeftCols,
+                        "Cannot find the column name in the grid layout.");
+                }
+
+                existingCols.Add(colName.Value);
+            }
+
+            using (var resourceManager = new ResourcePoolManager())
+            {
+                SPWeb spWeb = SPContext.Current.Web;
+                SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ??
+                                                        spWeb.Site.RootWeb.RegionalSettings;
+
+                var cultureInfo = new CultureInfo((int) spRegionalSettings.LocaleId);
+
+                string currencyFormat = string.Format("{0}#.00", cultureInfo.NumberFormat.CurrencySymbol);
+                string shortDatePattern = cultureInfo.DateTimeFormat.ShortDatePattern;
+
+                SPList resourcesList = resourceManager.ParentList;
+
+                foreach (SPField spField in resourcesList.Fields)
+                {
+                    if (spField.Hidden && !spField.InternalName.Equals("EXTID")) continue;
+
+                    string internalName = spField.InternalName;
+
+                    if (internalName.Equals("LinkTitle") || internalName.Equals("LinkTitleNoMenu")) continue;
+
+                    if (existingCols.Contains(internalName)) continue;
+
+                    string relatedGridType = Utils.GetRelatedGridTypeForReadOnly(spField);
+                    string format = Utils.GetFormat(spField);
+
+                    var cElement = new XElement("C");
+
+                    string gridSafeFieldName = Utils.ToGridSafeFieldName(internalName);
+
+                    cElement.Add(new XAttribute("Name", gridSafeFieldName));
+                    cElement.Add(new XAttribute("Type", relatedGridType));
+
+                    if (relatedGridType.Equals("Icon"))
+                    {
+                        cElement.Add(new XAttribute("IconAlign", "Center"));
+                    }
+
+                    if (spField.Type == SPFieldType.Currency)
+                    {
+                        cElement.Add(new XAttribute("Format", currencyFormat));
+                    }
+                    else if (relatedGridType.Equals("Date"))
+                    {
+                        cElement.Add(new XAttribute("Format", shortDatePattern));
+                    }
+                    else if (!string.IsNullOrEmpty(format))
+                    {
+                        cElement.Add(new XAttribute("Format", format));
+                    }
+
+                    cElement.Add(new XAttribute("Visible", 0));
+
+                    if (spField.InternalName.Equals("EXTID"))
+                    {
+                        cElement.Add(new XAttribute("CanFilter", 0), new XAttribute("CanGroup", 0),
+                            new XAttribute("CanHide", 0));
+                    }
+
+                    colsElement.Add(cElement);
+
+                    headerElement.Add(new XAttribute(gridSafeFieldName, spField.Title));
+                }
+
+                return resultXml.ToString();
+            }
+        }
+
         /// <summary>
         ///     Parses the resources.
         /// </summary>
@@ -604,82 +825,8 @@ namespace EPMLiveCore.API
         {
             try
             {
-                using (var resourceManager = new ResourcePoolManager())
-                {
-                    SPList resourcesList = resourceManager.ParentList;
-                    SPWeb spWeb = resourcesList.ParentWeb;
-
-                    XDocument resourceXml =
-                        XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), web));
-
-                    var resultXml = new XDocument();
-                    resultXml.Add(new XElement("Grid"));
-
-                    // ReSharper disable PossibleNullReferenceException
-
-                    XElement gridElement = resultXml.Root;
-
-                    gridElement.Add(new XElement("Body"));
-                    XElement bodyElement = gridElement.Element("Body");
-
-                    bodyElement.Add(new XElement("B"));
-
-                    XElement bElement = bodyElement.Element("B");
-
-                    var gridSafeFields = new Dictionary<string, string>();
-                    var gridFields = new Dictionary<string, SPField>();
-
-                    IEnumerable<XElement> resourceElements = resourceXml.Root.Elements("Resource");
-
-                    var dtUserInfo = new DataTable();
-
-                    XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
-                    if (arrResourceElements.Any())
-                    {
-                        dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
-                        dtUserInfo.PrimaryKey = new[] {dtUserInfo.Columns["ID"]};
-                    }
-
-                    foreach (XElement resourceElement in arrResourceElements)
-                    {
-                        var iElement = new XElement("I");
-
-                        int resourceId = 0;
-                        string profilePic = string.Format("{0}/_layouts/images/person.gif",
-                            spWeb.SafeServerRelativeUrl());
-
-                        foreach (XElement dataElement in resourceElement.Elements())
-                        {
-                            string field = dataElement.Attribute("Field").Value;
-
-                            if (field.Equals("LinkTitle") || field.Equals("LinkTitleNoMenu")) continue;
-
-                            string value = dataElement.Attribute("HtmlValue").Value;
-                            string type = dataElement.Attribute("Type").Value;
-
-                            BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
-                                spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
-                                ref resourceId);
-                        }
-
-                        iElement.Add(new XAttribute("ResourceID", resourceId));
-                        iElement.Add(new XAttribute("ProfilePic",
-                            string.Format(
-                                @"<div class=""EPMLiveResourceGridPicture"">
-															  <img src=""{0}"" height=""50""/>
-														  </div>",
-                                profilePic)));
-
-                        iElement.Add(new XAttribute("IsMyResource",
-                            resourceElement.Attribute("IsMyResource").Value.ToBool() ? 1 : 0));
-
-                        bElement.Add(iElement);
-                    }
-
-                    // ReSharper restore PossibleNullReferenceException
-
-                    return resultXml.ToString();
-                }
+                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Data"), GetCacheCategory(web),
+                    () => GetDataGrid(data, web).Zip()).Value).Unzip();
             }
             catch (APIException)
             {
@@ -793,9 +940,7 @@ namespace EPMLiveCore.API
                                 spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
                                 ref resourceId);
                         }
-                        catch
-                        {
-                        }
+                        catch { }
                     }
 
                     iElement.Add(new XAttribute("ResourceID", resourceId));
@@ -828,139 +973,12 @@ namespace EPMLiveCore.API
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        internal static string GetResourcePoolLayoutGrid(string data)
+        internal static string GetResourcePoolLayoutGrid(string data, SPWeb web)
         {
             try
             {
-                XDocument dataXml = XDocument.Parse(Utilities.DecodeGridData(data));
-
-                XDocument resultXml = XDocument.Parse(Resources.ResourceGridLayout);
-                XElement resultRootElement = resultXml.Root;
-
-                if (resultRootElement == null)
-                {
-                    throw new APIException((int) Errors.LayoutGridCNFRootElement,
-                        "Cannot find the Root element of the grid layout.");
-                }
-
-                RegisterGridIdAndCss(resultRootElement, dataXml);
-
-                XElement leftColsElement = resultRootElement.Element("LeftCols");
-
-                if (leftColsElement == null)
-                {
-                    throw new APIException((int) Errors.LayoutGridCNFLeftColsElement,
-                        "Cannot find the LeftCols element of the grid layout.");
-                }
-
-                XElement colsElement = resultRootElement.Element("Cols");
-
-                if (colsElement == null)
-                {
-                    throw new APIException((int) Errors.LayoutGridCNFColElement,
-                        "Cannot find the Col element of the grid layout.");
-                }
-
-                XElement headerElement = resultRootElement.Element("Header");
-
-                if (headerElement == null)
-                {
-                    throw new APIException((int) Errors.LayoutGridCNFHeaderElement,
-                        "Cannot find the Header element of the grid layout.");
-                }
-
-                var existingCols = new List<string>();
-
-                foreach (XAttribute colName in colsElement.Elements().Select(colElement => colElement.Attribute("Name"))
-                    )
-                {
-                    if (colName == null)
-                    {
-                        throw new APIException((int) Errors.LayoutGridCNFColNameInCols,
-                            "Cannot find the column name in the grid layout.");
-                    }
-
-                    existingCols.Add(colName.Value);
-                }
-
-                foreach (
-                    XAttribute colName in leftColsElement.Elements().Select(colElement => colElement.Attribute("Name")))
-                {
-                    if (colName == null)
-                    {
-                        throw new APIException((int) Errors.LayoutGridCNFColNameInLeftCols,
-                            "Cannot find the column name in the grid layout.");
-                    }
-
-                    existingCols.Add(colName.Value);
-                }
-
-                using (var resourceManager = new ResourcePoolManager())
-                {
-                    SPWeb spWeb = SPContext.Current.Web;
-                    SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ??
-                                                            spWeb.Site.RootWeb.RegionalSettings;
-
-                    var cultureInfo = new CultureInfo((int) spRegionalSettings.LocaleId);
-
-                    string currencyFormat = string.Format("{0}#.00", cultureInfo.NumberFormat.CurrencySymbol);
-                    string shortDatePattern = cultureInfo.DateTimeFormat.ShortDatePattern;
-
-                    SPList resourcesList = resourceManager.ParentList;
-
-                    foreach (SPField spField in resourcesList.Fields)
-                    {
-                        if (spField.Hidden && !spField.InternalName.Equals("EXTID")) continue;
-
-                        string internalName = spField.InternalName;
-
-                        if (internalName.Equals("LinkTitle") || internalName.Equals("LinkTitleNoMenu")) continue;
-
-                        if (existingCols.Contains(internalName)) continue;
-
-                        string relatedGridType = Utils.GetRelatedGridTypeForReadOnly(spField);
-                        string format = Utils.GetFormat(spField);
-
-                        var cElement = new XElement("C");
-
-                        string gridSafeFieldName = Utils.ToGridSafeFieldName(internalName);
-
-                        cElement.Add(new XAttribute("Name", gridSafeFieldName));
-                        cElement.Add(new XAttribute("Type", relatedGridType));
-
-                        if (relatedGridType.Equals("Icon"))
-                        {
-                            cElement.Add(new XAttribute("IconAlign", "Center"));
-                        }
-
-                        if (spField.Type == SPFieldType.Currency)
-                        {
-                            cElement.Add(new XAttribute("Format", currencyFormat));
-                        }
-                        else if (relatedGridType.Equals("Date"))
-                        {
-                            cElement.Add(new XAttribute("Format", shortDatePattern));
-                        }
-                        else if (!string.IsNullOrEmpty(format))
-                        {
-                            cElement.Add(new XAttribute("Format", format));
-                        }
-
-                        cElement.Add(new XAttribute("Visible", 0));
-
-                        if (spField.InternalName.Equals("EXTID"))
-                        {
-                            cElement.Add(new XAttribute("CanFilter", 0), new XAttribute("CanGroup", 0),
-                                new XAttribute("CanHide", 0));
-                        }
-
-                        colsElement.Add(cElement);
-
-                        headerElement.Add(new XAttribute(gridSafeFieldName, spField.Title));
-                    }
-
-                    return resultXml.ToString();
-                }
+                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Layout"), GetCacheCategory(web),
+                    () => GetLayoutGrid(data).Zip()).Value).Unzip();
             }
             catch (APIException)
             {
