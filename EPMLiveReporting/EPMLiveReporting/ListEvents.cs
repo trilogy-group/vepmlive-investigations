@@ -52,8 +52,14 @@ namespace EPMLiveReportsAdmin
 
                     EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Added");
                     myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry("Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2001);
+                    myLog.WriteEntry(
+                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID.ToString() + " : " + ex.Message +
+                        ex.StackTrace, EventLogEntryType.Error, 2001);
                 });
+            }
+            finally
+            {
+                ClearResourceGridCache(properties);
             }
         }
 
@@ -82,6 +88,10 @@ namespace EPMLiveReportsAdmin
                     myLog.MaximumKilobytes = 32768;
                     myLog.WriteEntry("Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2002);
                 });
+            }
+            finally
+            {
+                ClearResourceGridCache(properties);
             }
         }
 
@@ -115,6 +125,10 @@ namespace EPMLiveReportsAdmin
                     myLog.MaximumKilobytes = 32768;
                     myLog.WriteEntry("Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2003);
                 });
+            }
+            finally
+            {
+                ClearResourceGridCache(properties);
             }
         }
 
@@ -304,6 +318,20 @@ namespace EPMLiveReportsAdmin
                     break;
             }
             return sSQL;
+        }
+
+        private void ClearResourceGridCache(SPItemEventProperties properties)
+        {
+            try
+            {
+                var listName = properties.ListTitle.ToLower();
+
+                if (listName.Equals("resources") || listName.Equals("departments"))
+                {
+                    EPMLiveCore.API.ResourceGrid.ClearCache(properties.Web);
+                }
+            }
+            catch { }
         }
     }
 }
