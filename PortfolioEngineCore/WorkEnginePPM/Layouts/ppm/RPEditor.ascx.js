@@ -232,7 +232,7 @@
                 case "SynchronizeTeam":
                     break;
                 case "GetImportWorkHours":
-                    this.ApplyResourceWork(result.Resources);
+                    this.ImportResourceWork(result.Resources);
                     break;
                 case "ReadCalendarCosttypeCombinations":
                     this.DisplayImportCostsDialog(result.Costtypes);
@@ -391,22 +391,99 @@
             this.HandleException("ApplyCostValues", e);
         }
     };
-    RPEditor.prototype.ApplyResourceWork = function (resources) {
+    RPEditor.prototype.PopulatePeriodDropdown = function (elementid, selectMode) {
+        //selectMode 0=none; 1=first;2=last; 3=firstvisible; 4=lastvisible
+        var from = document.getElementById(elementid);
+        from.options.length = 0;
+        from.options.selectedIndex = -1;
+        var grid = this.plangrid;
+        var periodIndex = -1;
+        for (var c = 0; c < grid.ColNames[2].length; c++) {
+            var col = grid.ColNames[2][c];
+            var sType = col.substring(0, 1);
+            if (sType == "Q") {
+                var isVisible = grid.GetAttribute(null, col, "Visible");
+                var sPeriod = grid.GetCaption(col);
+                var periodid = parseInt(col.substring(1));
+                from.options[from.options.length] = new Option(sPeriod, periodid);
+                if (selectMode == 1 && periodIndex == -1)
+                    periodIndex = from.options.length - 1;
+                if (isVisible != 0) {
+                    if (selectMode == 3 && periodIndex == -1)
+                        periodIndex = from.options.length - 1;
+                }
+                if (selectMode == 2)
+                    periodIndex = from.options.length - 1;
+                if (selectMode == 4 && isVisible != 0)
+                    periodIndex = from.options.length - 1;
+            }
+        }
+        from.options.selectedIndex = periodIndex;
+    };
+    RPEditor.prototype.ImportResourceWork = function (resources) {
         var tempmode = null;
         var bChanges = false;
         var changedplanrows = [];
         var plangrid = this.plangrid;
+        var projectID = plangrid.GetAttribute(this.planrow, null, "Project_UID");
+        var projectRow = this.FindProjectRow(projectID);
         try {
             if (resources == null) {
-                alert("No work found");
+                alert("No work found for " + this.importWorkProjectName);
                 return;
             }
             else {
-                var Resources = JSON_GetArray(resources, "Resource");
-                tempmode = this.displayMode;
-                this.displayMode = 0;
-                for (var i = 0; i < Resources.length; i++) {
-                    var resource = Resources[i];
+                this.importWorkResources = JSON_GetArray(resources, "Resource");
+                var idWorkStatusDiv = document.getElementById('idWorkStatusDiv');
+                var shtml = "";
+                for (var i = 0; i < this.importWorkResources.length; i++) {
+                    var resource = this.importWorkResources[i];
+                    var WResID = resource.WResID;
+                    var nCount = this.CountResourcePlanRows(projectRow, resource.WResID);
+                    var option = document.createElement("option");
+                    var resrow = this.FindResourceRow(WResID);
+                    if (resrow != null) {
+                        var resName = this.resgrid.GetAttribute(resrow, null, "Res_Name");
+                        switch (nCount) {
+                            case 0:
+                                shtml += '<label id="idWorkItemLabel_' + i + '"><input id="idWorkItem_' + i + '" type="checkbox" checked="checked" />' + resName + ' will be added to a new plan row' + '<br /></label>';
+                                break;
+                            case 1:
+                                shtml += '<label id="idWorkItemLabel_' + i + '"><input id="idWorkItem_' + i + '" type="checkbox" checked="checked" />' + resName + ' plan row will be updated' + '<br /></label>';
+                                break;
+                            default:
+                                shtml += '<label id="idWorkItemLabel_' + i + '"><input id="idWorkItem_' + i + '" type="checkbox"  />' + 'WARNING: ' + resName + ' found on ' + nCount + ' plan rows only first found will be updated' + '<br /></label>';
+                                break;
+                        }
+                    }
+                    else {
+                    }
+                }
+                idWorkStatusDiv.innerHTML = shtml;
+                //selectMode 0=none; 1=first;2=last; 3=firstvisible; 4=lastvisible
+                this.PopulatePeriodDropdown("idWorkStart", 3);
+                this.PopulatePeriodDropdown("idWorkFinish", 4);
+                this.DisplayDialog(20, 30, 450, 280, "Import Work for " + this.importWorkProjectName, "winImportWorkDlg", "idImportWorkDlg", true, true);
+            }
+        }
+        catch (e) {
+            this.HandleException("ApplyResourceWork", e);
+        }
+    };
+    RPEditor.prototype.ApplyResourceWork = function () {
+        if (this.importWorkResources != null) {
+            var tempmode = null;
+            var bChanges = false;
+            var changedplanrows = [];
+            var plangrid = this.plangrid;
+            tempmode = this.displayMode;
+            this.displayMode = 0;
+            var i = 0;
+            var cblabel = document.getElementById('idWorkItemLabel_' + i);
+            var cb = document.getElementById('idWorkItem_' + i);
+            while (cb != null) {
+                if (cb.checked == true && cblabel.style.display != "none") {
+                    var resource = this.importWorkResources[i];
                     var WResID = resource.WResID;
                     var planrow = this.FindChildPlanRow(this.planrow, resource.WResID);
                     if (planrow == null) {
@@ -425,36 +502,77 @@
                         colhours[col] = hours[j];
                     }
                     var length = plangrid.ColNames[2].length;
+                    var from = document.getElementById("idWorkStart");
+                    var to = document.getElementById("idWorkFinish");
+
+                    var fromPeriod = parseInt(from.options[from.options.selectedIndex].value);
+                    var toPeriod = parseInt(to.options[to.options.selectedIndex].value);
                     for (var c = 0; c < length; c++) {
                         var col = plangrid.ColNames[2][c];
-                        var newhours = colhours[col];
-                        var oldhours = this.GetPeriodValue(plangrid, planrow, col);
-                        if (newhours != oldhours) {
-                            bChanges = true;
-                            if (newhours == null) newhours = 0;
-                            this.SetPeriodValue(plangrid, planrow, col, newhours);
-                            changedplanrows[changedplanrows.length] = planrow;
+                        var periodid = parseInt(col.substring(1));
+                        if (periodid >= fromPeriod && periodid <= toPeriod) {
+                            var newhours = colhours[col];
+                            var oldhours = this.GetPeriodValue(plangrid, planrow, col);
+                            if (newhours != oldhours) {
+                                bChanges = true;
+                                if (newhours == null) newhours = 0;
+                                this.SetPeriodValue(plangrid, planrow, col, newhours);
+                                changedplanrows[changedplanrows.length] = planrow;
+                            }
+                        }
+                    }
+                    cblabel.style.display = "none";
+                }
+                i++;
+                cblabel = document.getElementById('idWorkItemLabel_' + i);
+                cb = document.getElementById('idWorkItem_' + i);
+            }
+            if (tempmode != null) {
+                this.displayMode = tempmode;
+            }
+            if (bChanges == true) {
+                var length = changedplanrows.length;
+                for (var i = 0; i < length; i++) {
+                    this.RefreshPlanRowPeriods(plangrid, changedplanrows[i], true);
+                    plangrid.RefreshRow(changedplanrows[i]);
+                }
+                alert("Import values have been applied for selected rows and period range.");
+            }
+            else
+                alert("Import did not change any values");
+            this.UpdateButtonsAsync();
+
+        }
+    };
+    RPEditor.prototype.CountResourcePlanRows = function (planprojectrow, res_uid) {
+        var nCount = 0;
+        try {
+            if (planprojectrow.firstChild != null) {
+                if (res_uid != null) {
+                    var plangrid = this.plangrid;
+                    if (plangrid.RowCount > 0) {
+                        var planrow = planprojectrow.firstChild;
+                        while (planrow != null) {
+                            var wresId = plangrid.GetAttribute(planrow, null, "Res_UID");
+                            if (res_uid == wresId) {
+                                nCount++;
+                            }
+                            else {
+                                wresId = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
+                                if (res_uid == wresId) {
+                                    nCount++;
+                                }
+                            }
+                            planrow = plangrid.GetNextSibling(planrow);
                         }
                     }
                 }
             }
         }
         catch (e) {
-            this.HandleException("ApplyResourceWork", e);
+            this.HandleException("CountResourcePlanRows", e);
         }
-        if (tempmode != null) {
-            this.displayMode = tempmode;
-        }
-        if (bChanges == true) {
-            var length = changedplanrows.length;
-            for (var i = 0; i < length; i++) {
-                this.RefreshPlanRowPeriods(plangrid, changedplanrows[i], true);
-                plangrid.RefreshRow(changedplanrows[i]);
-            }
-        }
-        else
-            alert("Import did not change any values");
-        this.UpdateButtonsAsync();
+        return nCount;
     };
     RPEditor.prototype.FindChildPlanRow = function (planprojectrow, res_uid) {
         try {
@@ -468,6 +586,12 @@
                             if (res_uid == wresId) {
                                 return planrow;
                             }
+                            else {
+                                wresId = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
+                                if (res_uid == wresId) {
+                                    return planrow;
+                                }
+                            }
                             planrow = plangrid.GetNextSibling(planrow);
                         }
                     }
@@ -475,7 +599,7 @@
             }
         }
         catch (e) {
-            this.HandleException("FindPlanRow", e);
+            this.HandleException("FindChildPlanRow", e);
         }
         return null;
     };
@@ -2651,12 +2775,12 @@
                     break;
                 case "EditorTab_ImportWork":
                     if (this.editorTab.isItemDisabled("ImportWorkBtn") == true)
-                        alert("A project row must be selected to import work");
+                        alert("A row must be selected to import work");
                     else {
                         var sbd = new StringBuilder();
                         sbd.append('<Execute Function="GetImportWorkHours">');
-
                         var projectuid = this.plangrid.GetAttribute(this.planrow, null, "Project_UID");
+                        this.importWorkProjectName = this.plangrid.GetAttribute(this.planrow, null, "Project_Name");
                         sbd.append('<ProjectID>' + projectuid.toString() + '</ProjectID>');
                         sbd.append('</Execute>');
 
@@ -3008,6 +3132,12 @@
                     break;
                 case "notificationRowDlg_Close":
                     this.dhxWins_CloseDialog("winNotificationDlg");
+                    break;
+                case "ImportWork_Apply":
+                    this.ApplyResourceWork();
+                    break;
+                case "ImportWork_Cancel":
+                    this.dhxWins_CloseDialog("winImportWorkDlg");
                     break;
                 default:
                     alert("unhandled external event - " + event);
@@ -4050,6 +4180,7 @@
             return;
         var status = 0;
         var canEdit = 0;
+        var projectid = 0;
         if (this.planrow != null) {
             status = this.plangrid.GetAttribute(this.planrow, null, "Status");
             this.editorTab.enableItem("PostResourcePlanBtn");
@@ -4059,6 +4190,7 @@
                 this.editorTab.enableItem("PublicBtn");
             else
                 this.editorTab.disableItem("PublicBtn");
+            projectid = this.plangrid.GetAttribute(this.planrow, null, "Project_UID");
         } else {
             this.editorTab.disableItem("PostResourcePlanBtn");
         }
@@ -4098,22 +4230,31 @@
             this.editorTab.disableItem("RejectBtn");
         }
 
+        if (projectid > 0) {
+            this.editorTab.enableItem("ImportWorkBtn");
+            //this.editorTab.enableItem("ImportCostPlanBtn");
+        }
+        else {
+            this.editorTab.disableItem("ImportWorkBtn");
+            //this.editorTab.disableItem("ImportCostPlanBtn");
+        }
+
         if (status == const_Project) {
             this.editorTab.disableItem("SpreadBtn");
             //this.editorTab.disableItem("NotesBtn");
             this.editorTab.disableItem("RowNoteBtn");
             this.editorTab.disableItem("RowHistoryBtn");
             if (this.planrow != null && canEdit == 1) {
-                this.editorTab.enableItem("ImportWorkBtn");
+                //this.editorTab.enableItem("ImportWorkBtn");
                 this.editorTab.enableItem("ImportCostPlanBtn");
             } else {
-                this.editorTab.disableItem("ImportWorkBtn");
+                //this.editorTab.disableItem("ImportWorkBtn");
                 this.editorTab.disableItem("ImportCostPlanBtn");
             }
             this.resourcesTab.disableItem("MatchBtn");
         }
         else {
-            this.editorTab.disableItem("ImportWorkBtn");
+            //this.editorTab.disableItem("ImportWorkBtn");
             this.editorTab.disableItem("ImportCostPlanBtn");
             if (this.planrow != null) {
                 this.editorTab.enableItem("RowNoteBtn");
@@ -4534,6 +4675,16 @@
         }
         return null;
     };
+    RPEditor.prototype.FindProjectRow = function (projectUID) {
+        var grid = Grids["g_RPE"];
+        var row = grid.GetFirst(null, 0);
+        while (row != null) {
+            if (projectUID == grid.GetAttribute(row, null, "Project_UID"))
+                return row;
+            row = grid.GetNext(row);
+        }
+        return null;
+    };
     RPEditor.prototype.FindPlanRow = function (planrowGUID) {
         var grid = Grids["g_RPE"];
         var row = grid.GetFirst(null, 0);
@@ -4733,31 +4884,31 @@
         return true;
     };
     RPEditor.prototype.CanAddResourceToLevel = function (parentplanrow, resrow) {
-        var resgrid = this.resgrid;
-        var plangrid = this.plangrid;
-        //var planrow = plangrid.GetFirst(parentplanrow);
-        var planrow = parentplanrow.firstChild;
-        var wresId = resgrid.GetAttribute(resrow, null, "Res_UID");
-        var resName = resgrid.GetAttribute(resrow, null, "Res_Name");
-        var projectID = plangrid.GetAttribute(parentplanrow, null, "Project_UID");
-        while (planrow != null) {
-            if (projectID == plangrid.GetAttribute(planrow, null, "Project_UID")) {
-                var deleted = plangrid.GetAttribute(planrow, null, "Deleted");
-                if (deleted != 1) {
-                    //if (planrow.Level == parentplanrow.Level + 1) {
-                        var planwresId = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
-                        if (planwresId == null)
-                            planwresId = plangrid.GetAttribute(planrow, null, "Res_UID");
-                        if (wresId == planwresId) {
-                            alert(resName + " already exists at this plan level");
-                            return false;
-                        }
-                    //}
-                }
-            }
-            //planrow = plangrid.GetNext(planrow);
-            planrow = planrow.nextSibling;
-        }
+        //var resgrid = this.resgrid;
+        //var plangrid = this.plangrid;
+        ////var planrow = plangrid.GetFirst(parentplanrow);
+        //var planrow = parentplanrow.firstChild;
+        //var wresId = resgrid.GetAttribute(resrow, null, "Res_UID");
+        //var resName = resgrid.GetAttribute(resrow, null, "Res_Name");
+        //var projectID = plangrid.GetAttribute(parentplanrow, null, "Project_UID");
+        //while (planrow != null) {
+        //    if (projectID == plangrid.GetAttribute(planrow, null, "Project_UID")) {
+        //        var deleted = plangrid.GetAttribute(planrow, null, "Deleted");
+        //        if (deleted != 1) {
+        //            //if (planrow.Level == parentplanrow.Level + 1) {
+        //                var planwresId = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
+        //                if (planwresId == null)
+        //                    planwresId = plangrid.GetAttribute(planrow, null, "Res_UID");
+        //                if (wresId == planwresId) {
+        //                    alert(resName + " already exists at this plan level");
+        //                    return false;
+        //                }
+        //            //}
+        //        }
+        //    }
+        //    //planrow = plangrid.GetNext(planrow);
+        //    planrow = planrow.nextSibling;
+        //}
         return true;
     };
     RPEditor.prototype.CanAddResourceToLevel2 = function (siblingplanrow, resrow) {
@@ -4770,25 +4921,25 @@
             firstsiblingplanrow = planrow;
             planrow = planrow.previousSibling;
         }
-        if (firstsiblingplanrow == null)
-            return true;
+        //if (firstsiblingplanrow == null)
+        //    return true;
 
-        planrow = firstsiblingplanrow;
-        var wresId = resgrid.GetAttribute(resrow, null, "Res_UID");
-        var resName = resgrid.GetAttribute(resrow, null, "Res_Name");
-        while (planrow != null) {
-            var deleted = plangrid.GetAttribute(planrow, null, "Deleted");
-            if (deleted != 1) {
-                var planwresId = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
-                if (planwresId == null)
-                    planwresId = plangrid.GetAttribute(planrow, null, "Res_UID");
-                if (wresId == planwresId) {
-                    alert(resName + " already exists at this plan level");
-                    return false;
-                }
-            }
-            planrow = planrow.nextSibling;
-        }
+        //planrow = firstsiblingplanrow;
+        //var wresId = resgrid.GetAttribute(resrow, null, "Res_UID");
+        //var resName = resgrid.GetAttribute(resrow, null, "Res_Name");
+        //while (planrow != null) {
+        //    var deleted = plangrid.GetAttribute(planrow, null, "Deleted");
+        //    if (deleted != 1) {
+        //        var planwresId = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
+        //        if (planwresId == null)
+        //            planwresId = plangrid.GetAttribute(planrow, null, "Res_UID");
+        //        if (wresId == planwresId) {
+        //            alert(resName + " already exists at this plan level");
+        //            return false;
+        //        }
+        //    }
+        //    planrow = planrow.nextSibling;
+        //}
         return true;
     };
     RPEditor.prototype.AddRowsToPlan = function (parentplanrow, resrows, projectID, projectName, buttonPress) {
@@ -5400,6 +5551,8 @@
         this.showHeatmap = false;
         this.savingPlan = false;
         this.arrPIs = null;
+        this.importWorkResources = null;
+        this.importWorkProjectName = "";
 
         var const_HoursFormat = "0.##";
         var const_FTEFormat = "0.####";

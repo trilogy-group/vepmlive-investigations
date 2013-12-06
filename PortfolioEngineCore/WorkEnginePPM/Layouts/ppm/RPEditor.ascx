@@ -62,6 +62,29 @@
 	    </div>
     </div>
 </div>
+<div class="modalContent" id="idImportWorkDlg" style="display:none;">
+	<div style="margin-top:20px;padding-right:5px;">
+ 	    <div id="idWorkStatusDiv" style="border:1px solid #ccc; width:100%; height:100px; overflow:auto"></div>         
+		<div style="padding-bottom:3px;">
+            <table cellspacing="0">
+                <tr>
+                    <td class="descriptioncell">Start Period</td>
+                    <td class="controlcell"><select id="idWorkStart" name="WorkP"></select></td>
+                </tr>
+                <tr>
+                    <td class="descriptioncell">Finish Period</td>
+                    <td class="controlcell"><select id="idWorkFinish" name="WorkP"></select></td>
+                </tr>
+            </table>
+	    </div>
+        <div style="float:right;">
+		    <div class="button-container" >
+			    <input type="button" class="epmliveButton" value="Apply" onclick="javascript:dialogEvent('ImportWork_Apply');"/>
+			    <input type="button" class="epmliveButton" value="Close" onclick="javascript:dialogEvent('ImportWork_Cancel');"/>
+		    </div>
+	    </div>
+    </div>
+</div>
 <div class="modalContent" id="idNoteButtonsDiv" style="display:none;">
 	<div style="margin-top:10px;padding-right:10px;">
 		<div style="width:300px;float:right;">
