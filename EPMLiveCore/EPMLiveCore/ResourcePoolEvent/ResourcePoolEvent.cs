@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Security.Permissions;
+using EPMLiveCore.API;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Security;
 using Microsoft.SharePoint.Utilities;
@@ -705,51 +706,36 @@ namespace EPMLiveCore
 
                 ArrayList arr = new ArrayList(newProps.Split(','));
 
-                foreach(SPGroup group in properties.Web.Groups)
+                var webGroups = APITeam.GetWebGroups(properties.Web);
+
+                foreach (SPGroup group in webGroups)
                 {
-                    SPRoleCollection c = group.Roles;
-
-                    bool canUse = false;
-
-                    foreach(SPRole role in c)
+                    if (arr.Contains(group.ID.ToString()))
                     {
-                        if(role.PermissionMask != (SPRights)134287360)
+                        try
                         {
-                            canUse = true;
-                            break;
+                            group.AddUser(u);
                         }
+                        catch { }
                     }
-
-                    if(group.CanCurrentUserEditMembership && canUse)
+                    else
                     {
-                        if(arr.Contains(group.ID.ToString()))
+                        try
                         {
-                            try
-                            {
-                                group.AddUser(u);
-                            }
-                            catch { }
+                            group.RemoveUser(u);
                         }
-                        else
-                        {
-                            try
-                            {
-                                group.RemoveUser(u);
-                            }
-                            catch { }
-                        }
+                        catch { }
                     }
                 }
 
 
                 if(!String.IsNullOrEmpty(newProps) && String.IsNullOrEmpty(curProps))
                     sendEmail = true;
-                
 
                 try
                 {
                     string perms = "";
-                    foreach(SPGroup wGroup in properties.Web.Groups)
+                    foreach (SPGroup wGroup in webGroups)
                     {
                         try
                         {

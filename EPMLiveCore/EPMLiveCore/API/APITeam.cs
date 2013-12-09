@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using System.Data;
 using System.Xml;
 using System.Collections;
 using System.Data.SqlClient;
+using DataTable = System.Data.DataTable;
 
 namespace EPMLiveCore.API
 {
@@ -1831,5 +1835,40 @@ namespace EPMLiveCore.API
 
             return dt;
         }
+
+        public static List<SPGroup> GetWebGroups(SPWeb spWeb)
+        {
+            var spGroups = new List<SPGroup>();
+
+            try
+            {
+                var queryExecutor = new QueryExecutor(spWeb);
+
+                var dataTable = queryExecutor.ExecuteReportingDBQuery(WEB_GROUPS_QUERY, new Dictionary<string, object>
+                {
+                    {"@WebId", spWeb.ID}
+                });
+
+                spGroups.AddRange(from DataRow row in dataTable.Rows select spWeb.Groups.GetByID((int) row["Id"]));
+            }
+            catch
+            {
+                spGroups.AddRange(from SPGroup spGroup in spWeb.Groups
+                    let roles = spGroup.Roles
+                    let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights) 134287360)
+                    where spGroup.CanCurrentUserEditMembership && canUse
+                    select spGroup);
+            }
+
+            return spGroups;
+        }
+
+        private const string WEB_GROUPS_QUERY =
+            @"SELECT    dbo.RPTWEBGROUPS.GROUPID AS Id
+              FROM      dbo.RPTWEBGROUPS INNER JOIN dbo.LSTUserInformationList 
+                            ON dbo.RPTWEBGROUPS.WEBID = dbo.LSTUserInformationList.WebId 
+                            AND dbo.RPTWEBGROUPS.GROUPID = dbo.LSTUserInformationList.ID
+              WHERE     (dbo.RPTWEBGROUPS.WEBID = @WebId) AND (dbo.RPTWEBGROUPS.SECTYPE = 1) AND (dbo.RPTWEBGROUPS.GROUPID <> 999999)
+              ORDER BY  dbo.LSTUserInformationList.Title";
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using EPMLiveCore.API;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
 using System.Collections;
+using ListItem = System.Web.UI.WebControls.ListItem;
 
 namespace EPMLiveCore
 {
@@ -57,28 +59,9 @@ namespace EPMLiveCore
                 {
                     using(SPWeb eWeb = eSite.OpenWeb(web.ID))
                     {
-                        foreach(SPGroup group in web.Groups)
+                        foreach(SPGroup group in APITeam.GetWebGroups(eWeb))
                         {
-                            SPGroup eGroup = eWeb.Groups[group.Name];
-
-                            SPRoleCollection c = eGroup.Roles;
-
-                            bool canUse = false;
-
-                            foreach(SPRole role in c)
-                            {
-                                if(role.PermissionMask != (SPRights)134287360)
-                                {
-                                    canUse = true;
-                                    break;
-                                }
-                            }
-
-                            if(group.CanCurrentUserEditMembership && canUse)
-                            {
-                                dt.Rows.Add(new string[] { group.Name, group.ID.ToString() });
-                            }
-
+                            dt.Rows.Add(new string[] { group.Name, group.ID.ToString() });
                         }
                     }
                 }
@@ -136,7 +119,6 @@ namespace EPMLiveCore
             }
             catch
             {
-                ;
             }
         }
 
