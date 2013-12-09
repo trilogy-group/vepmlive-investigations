@@ -515,7 +515,9 @@
                 }
 
                 function selectLink() {
+                    var selected = false;
                     var link = $.parseJSON($.cookie(selectedLinkCookie));
+                    
                     if (link) {
                         if (link.id) {
                             var $a = $($sn.find('#' + link.id).get(0));
@@ -526,6 +528,7 @@
 
                                 if (id !== 'epm-nav-sub-favorites-static-links' && id !== 'epm-nav-sub-recent-static-links' && id !== 'epm-nav-sub-new-static-links') {
                                     $parent.addClass(selectedClass);
+                                    selected = true;
                                 }
                             }
                         } else {
@@ -536,16 +539,64 @@
 
                                 if (!index || index === -1) {
                                     $menu.find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
+                                    selected = true;
                                 } else {
                                     var $nodes = getLinkNodes($menu.parent().attr('id'));
                                     for (var i = 0; i < $nodes.length; i++) {
                                         if (i === index) {
                                             $($nodes[i]).find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
+                                            selected = true;
                                             break;
                                         }
                                     }
                                 }
                             }
+                        }
+                    }
+                    
+                    var url = escape(unescape(window.location.href)).toLowerCase();
+
+                    if (selected) {
+                        var $node = $('.epm-nav-node-selected');
+                        $node.find('a').each(function() {
+                            var lnk = escape(unescape(this.href)).toLowerCase();
+                            
+                            if (url.indexOf(lnk) === -1) {
+                                $node.removeClass(selectedClass);
+                                selected = false;
+                            }
+                        });
+                    }
+                    
+                    if (!selected) {
+                        $('td.epm-nav-node').each(function() {
+                            if (!selected) {
+                                $(this).find('a').each(function () {
+                                    if (!selected) {
+                                        var $link = $(this);
+                                        var lnk = escape(unescape($link.get(0).href)).toLowerCase();
+
+                                        if (url.indexOf(lnk) !== -1) {
+                                            $link.parents('table').addClass(selectedClass);
+                                            selected = true;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        
+                        if (!selected) {
+                            $('#epm-nav-sub-workplace').find('a').each(function() {
+                                if (!selected) {
+                                    var $link = $(this);
+                                    var lnk = escape(unescape($link.get(0).href)).toLowerCase();
+                                    
+                                    if (url.indexOf(lnk) !== -1) {
+                                        $link.parents('li').addClass(selectedClass);
+                                        selected = true;
+                                    }
+                                }
+                            });
                         }
                     }
                 }
