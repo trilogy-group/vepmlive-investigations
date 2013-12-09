@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using EPMLiveCore;
+using EPMLiveCore.API;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using WorkEnginePPM.WebServices.Core;
@@ -236,16 +237,10 @@ namespace WorkEnginePPM.Core.ResourceManagement
                         var list = new List<string>();
                         string[] currentPermissions = value.Split(',').Select(perm => perm.Trim()).ToArray();
 
-                        foreach (SPGroup spGroup in properties.Web.Groups)
+                        foreach (SPGroup spGroup in APITeam.GetWebGroups(properties.Web))
                         {
                             try
                             {
-                                bool canUse =
-                                    spGroup.Roles.Cast<SPRole>()
-                                        .Any(spRole => spRole.PermissionMask != (SPRights) 134287360);
-
-                                if (!spGroup.CanCurrentUserEditMembership || !canUse) continue;
-
                                 if (currentPermissions.Contains(spGroup.Name))
                                 {
                                     list.Add(spGroup.Name + ":" + true);

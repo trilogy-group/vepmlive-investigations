@@ -1081,6 +1081,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\Candidates.gif" />
     <Content Include="Layouts\ppm\Images\capscenariosl20x20.png" />
     <Content Include="Layouts\ppm\Images\categories.png" />
+    <Content Include="Layouts\ppm\Images\checked-dark.png" />
     <Content Include="Layouts\ppm\Images\clearfilter.jpg" />
     <Content Include="Layouts\ppm\Images\clearsort.gif" />
     <Content Include="Layouts\ppm\Images\CLOSE.GIF" />
@@ -1181,6 +1182,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
     <Content Include="Layouts\ppm\Images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
     <Content Include="Layouts\ppm\Images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="Layouts\ppm\Images\unchecked-dark.png" />
     <Content Include="Layouts\ppm\Images\UnsubmittedOffer.gif" />
     <Content Include="Layouts\ppm\Images\UnsubmittedRequest.gif" />
     <Content Include="Layouts\ppm\Images\ViewDefault.gif" />
