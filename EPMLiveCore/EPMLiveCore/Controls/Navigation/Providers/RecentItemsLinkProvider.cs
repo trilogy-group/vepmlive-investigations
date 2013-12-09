@@ -46,7 +46,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         public override IEnumerable<INavObject> GetLinks()
         {
-            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, new CacheStoreCategory(Web).Navigation, () =>
             {
                 List<NavLink> links = GetFrequentApps();
                 links.AddRange(GetRecentItems());

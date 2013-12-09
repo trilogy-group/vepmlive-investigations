@@ -1274,7 +1274,7 @@ namespace EPMLiveCore.API
                         }
                     }
 
-                    EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(web.Url, Infrastructure.CacheStoreCategory.Navigation);
+                    EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(web.Url, new Infrastructure.CacheStoreCategory(web).Navigation);
 
                     return li.ID;
                 }

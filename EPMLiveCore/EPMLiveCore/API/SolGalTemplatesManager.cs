@@ -1026,7 +1026,7 @@ namespace EPMLiveCore.API
                         sResultWebUrl = w.Url;
                         
                         WorkspaceData.SendCompletedSignalsToDB(w.Site.ID, parentWeb, w.ID, w.ServerRelativeUrl, w.Title);
-                        CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                        CacheStore.Current.RemoveCategory(new CacheStoreCategory(w).Navigation);
                         WorkspaceData.AddWsPermission(w.Site.ID, createdWebId);
 
                         EnsureWebInitFeature(sResultWebId, cSite, cWeb, cESite, cEWeb);

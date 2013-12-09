@@ -265,7 +265,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                         LogMessage("No navigation nodes were found.", MessageKind.FAILURE, 3);
                                     }
 
-                                    CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
+                                    CacheStore.Current.RemoveSafely(spWeb.Url, new CacheStoreCategory(spWeb).Navigation);
                                 }
                                 catch (Exception e)
                                 {
@@ -740,7 +740,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                         3);
                                 }
 
-                                CacheStore.Current.RemoveSafely(spWeb.Url, CacheStoreCategory.Navigation);
+                                CacheStore.Current.RemoveSafely(spWeb.Url, new CacheStoreCategory(spWeb).Navigation);
                             }
                             else
                             {

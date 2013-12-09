@@ -51,7 +51,7 @@ namespace EPMLiveCore.Jobs.Applications
                 }
 
                 // clear nav cache
-                CacheStore.Current.RemoveSafely(oweb.Url, CacheStoreCategory.Navigation);
+                CacheStore.Current.RemoveSafely(oweb.Url, new CacheStoreCategory(oweb).Navigation);
             }
             catch(Exception ex)
             {

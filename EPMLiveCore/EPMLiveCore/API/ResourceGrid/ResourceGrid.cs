@@ -68,7 +68,7 @@ namespace EPMLiveCore.API
 
         public static void ClearCache(SPWeb spWeb)
         {
-            CacheStore.Current.RemoveSafely(spWeb.Url, GetCacheCategory(spWeb));
+            CacheStore.Current.RemoveSafely(spWeb.Url, new CacheStoreCategory(spWeb).ResourceGrid);
         }
 
         // Private Methods (11) 
@@ -401,11 +401,6 @@ namespace EPMLiveCore.API
 
                 resourceElement.Add(new XAttribute("IsMyResource", validDepartment));
             }
-        }
-
-        private static string GetCacheCategory(SPWeb web)
-        {
-            return "ResourceGrid_S_" + web.Site.ID;
         }
 
         private static string GetCacheKey(SPWeb web, string kind)
@@ -830,8 +825,8 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Data"), GetCacheCategory(web),
-                    () => GetDataGrid(data, web).Zip()).Value).Unzip();
+                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Data"), 
+                    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
             }
             catch (APIException)
             {
@@ -982,8 +977,8 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Layout"), GetCacheCategory(web),
-                    () => GetLayoutGrid(data).Zip()).Value).Unzip();
+                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Layout"),
+                    new CacheStoreCategory(web).ResourceGrid, () => GetLayoutGrid(data).Zip()).Value).Unzip();
             }
             catch (APIException)
             {

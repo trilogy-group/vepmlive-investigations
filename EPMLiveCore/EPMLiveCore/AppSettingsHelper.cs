@@ -1473,7 +1473,7 @@ namespace EPMLiveCore
                             }
 
                             // clear EPM cache
-                            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                            CacheStore.Current.RemoveCategory(new CacheStoreCategory().Navigation);
                         }
 
                         ew.Update();
@@ -1598,7 +1598,7 @@ namespace EPMLiveCore
                             // clear EPM cache
                             try
                             {
-                                EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(ew.Url, Infrastructure.CacheStoreCategory.Navigation);
+                                EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(ew.Url, new Infrastructure.CacheStoreCategory(ew).Navigation);
                             }
                             catch { }
                         }
@@ -1794,7 +1794,7 @@ namespace EPMLiveCore
             }
 
             // clear EPM cache
-            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+            CacheStore.Current.RemoveCategory(new CacheStoreCategory().Navigation);
         }
 
         private void MoveNode(int appId, string nodeType, string[] movementInfo)

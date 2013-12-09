@@ -81,7 +81,7 @@ namespace EPMLiveCore.Controls.Navigation
             var navLinks =
                 (object[])
                     CacheStore.Current.Get("NavLinks_Navigation_W_" + webId + "_U_" + currentWeb.CurrentUser.ID,
-                        CacheStoreCategory.Navigation, () =>
+                        new CacheStoreCategory(Web).Navigation, () =>
                         {
                             var communityLinks = new Dictionary<string, IList<string>>();
                             var linkNodes = new Dictionary<string, SiteMapNode>();

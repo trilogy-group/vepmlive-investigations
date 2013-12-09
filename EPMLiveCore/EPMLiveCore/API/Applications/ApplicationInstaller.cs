@@ -3198,7 +3198,7 @@ namespace EPMLiveCore.API
 
                     if (!bVerifyOnly)
                     {
-                        EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(oWeb.Url, Infrastructure.CacheStoreCategory.Navigation);
+                        EPMLiveCore.Infrastructure.CacheStore.Current.RemoveSafely(oWeb.Url, new Infrastructure.CacheStoreCategory(oWeb).Navigation);
                         try
                         {
                             oListItem["InstallXML"] = appDef.ApplicationXml.OuterXml;

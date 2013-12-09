@@ -326,7 +326,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 }
             }
 
-            var fLinks = (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
+            var fLinks = (IEnumerable<INavObject>) CacheStore.Current.Get(_key, new CacheStoreCategory(Web).Navigation, () =>
             {
                 List<SPNavLink> allWorkspaces = GetAllWorkspaces().ToList();
                 IEnumerable<NavLink> favoriteWorkspaces = GetFavoriteWorkspaces(allWorkspaces);

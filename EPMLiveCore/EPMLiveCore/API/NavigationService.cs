@@ -499,14 +499,14 @@ namespace EPMLiveCore.API
             return new Tuple<string, string, string, string, bool>(title, command, imgUrl, kind, allowed);
         }
 
-        private static string CalculateLinkId(NavLink navLink, string providerName)
+        private string CalculateLinkId(NavLink navLink, string providerName)
         {
             const string CACHE_KEY = "NavLink_ID_Dict";
             string linkKey = providerName + "|" + navLink.Order + "|" + navLink.Url;
 
             var dict =
                 (Dictionary<string, string>)
-                    CacheStore.Current.Get(CACHE_KEY, CacheStoreCategory.Navigation,
+                    CacheStore.Current.Get(CACHE_KEY, new CacheStoreCategory(_spWeb).Navigation,
                         () => new Dictionary<string, string>()).Value;
 
             if (dict.ContainsKey(linkKey)) return dict[linkKey];
@@ -514,7 +514,7 @@ namespace EPMLiveCore.API
             string linkId = linkKey.Md5();
 
             dict.Add(linkKey, linkId);
-            CacheStore.Current.Set(CACHE_KEY, dict, CacheStoreCategory.Navigation);
+            CacheStore.Current.Set(CACHE_KEY, dict, new CacheStoreCategory(_spWeb).Navigation);
 
             return linkId;
         }
@@ -623,7 +623,7 @@ namespace EPMLiveCore.API
             catch { }
         }
 
-        private static string GetLinkId(NavLink navLink, string providerName)
+        private string GetLinkId(NavLink navLink, string providerName)
         {
             return navLink.Id ?? CalculateLinkId(navLink, providerName);
         }

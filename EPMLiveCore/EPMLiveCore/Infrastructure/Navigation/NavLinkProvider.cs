@@ -6,18 +6,19 @@ namespace EPMLiveCore.Infrastructure.Navigation
 {
     public abstract class NavLinkProvider : INavLinkProvider
     {
-        #region Fields (6) 
+		#region Fields (7) 
 
         protected readonly string RelativeUrl;
         protected readonly Guid SiteId;
         protected readonly string Url;
         protected readonly int UserId;
         protected readonly string Username;
+        protected readonly SPWeb Web;
         protected readonly Guid WebId;
 
-        #endregion Fields 
+		#endregion Fields 
 
-        #region Constructors (1) 
+		#region Constructors (1) 
 
         protected NavLinkProvider(Guid siteId, Guid webId, string username)
         {
@@ -32,35 +33,37 @@ namespace EPMLiveCore.Infrastructure.Navigation
                     RelativeUrl = spWeb.ServerRelativeUrl;
                     Url = spWeb.Url;
                     UserId = spWeb.CurrentUser.ID;
+                    Web = spWeb;
                 }
             }
         }
 
-        #endregion Constructors 
+		#endregion Constructors 
 
-        #region Properties (1) 
+		#region Properties (1) 
 
         protected abstract string Key { get; }
 
-        #endregion Properties 
+		#endregion Properties 
 
-        #region Methods (3) 
+		#region Methods (4) 
 
-        // Public Methods (1) 
+		// Public Methods (2) 
 
         public virtual void ClearCache(bool safeRemove = false)
         {
             if (!safeRemove)
             {
-                CacheStore.Current.Remove(Key, CacheStoreCategory.Navigation);
+                CacheStore.Current.Remove(Key, new CacheStoreCategory(Web).Navigation);
             }
             else
             {
-                CacheStore.Current.RemoveSafely(Url, CacheStoreCategory.Navigation, Key);
+                CacheStore.Current.RemoveSafely(Url, new CacheStoreCategory(Web).Navigation, Key);
             }
         }
 
-        // Protected Methods (2) 
+        public abstract IEnumerable<INavObject> GetLinks();
+		// Protected Methods (2) 
 
         protected SPUserToken GetUserToken()
         {
@@ -88,12 +91,6 @@ namespace EPMLiveCore.Infrastructure.Navigation
             return (o ?? string.Empty).ToString();
         }
 
-        #endregion Methods 
-
-        #region Implementation of INavLinkProvider
-
-        public abstract IEnumerable<INavObject> GetLinks();
-
-        #endregion
+		#endregion Methods 
     }
 }

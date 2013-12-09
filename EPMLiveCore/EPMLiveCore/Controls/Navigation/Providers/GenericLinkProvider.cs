@@ -122,11 +122,11 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
             if (safeRemove)
             {
-                CacheStore.Current.RemoveSafely(Url, CacheStoreCategory.Navigation, navKey);
+                CacheStore.Current.RemoveSafely(Url, new CacheStoreCategory(Web).Navigation, navKey);
             }
             else
             {
-                CacheStore.Current.Remove(navKey, CacheStoreCategory.Navigation);
+                CacheStore.Current.Remove(navKey, new CacheStoreCategory(Web).Navigation);
             }
 
             new ApplicationsLinkProvider(SiteId, WebId, Username).ClearCache(safeRemove);

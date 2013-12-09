@@ -75,7 +75,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
 
         private IEnumerable<INavObject> GetSettings()
         {
-            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, CacheStoreCategory.Navigation, () =>
+            return (IEnumerable<INavObject>) CacheStore.Current.Get(_key, new CacheStoreCategory(Web).Navigation, () =>
             {
                 var links = new List<NavLink>();
 

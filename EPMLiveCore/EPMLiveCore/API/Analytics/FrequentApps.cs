@@ -40,19 +40,22 @@ namespace EPMLiveCore.API
         {
             try
             {
+                SPWeb web = null;
+
                 try
                 {
                     using (var spSite = new SPSite(data.SiteId))
                     {
                         using (SPWeb spWeb = spSite.OpenWeb(data.WebId))
                         {
+                            web = spWeb;
                             new RecentItemsLinkProvider(data.SiteId, data.WebId, spWeb.Users.GetByID(data.UserId).LoginName).ClearCache();
                         }
                     }
                 }
                 catch
                 {
-                    CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                    CacheStore.Current.RemoveCategory(new CacheStoreCategory(web).Navigation);
                 }
             }
             catch { }

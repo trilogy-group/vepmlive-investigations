@@ -140,7 +140,7 @@ namespace EPMLiveCore
                 }
                 catch
                 {
-                    CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+                    CacheStore.Current.RemoveCategory(new CacheStoreCategory().Navigation);
                 }
             }
             catch { }

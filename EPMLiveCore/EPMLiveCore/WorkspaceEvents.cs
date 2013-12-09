@@ -94,7 +94,7 @@ namespace EPMLiveCore
                     catch { }
                 }
 
-                CacheStore.Current.RemoveSafely(properties.Web.Url, CacheStoreCategory.Navigation);
+                CacheStore.Current.RemoveSafely(properties.Web.Url, new CacheStoreCategory(properties.Web).Navigation);
             }
             catch
             {
