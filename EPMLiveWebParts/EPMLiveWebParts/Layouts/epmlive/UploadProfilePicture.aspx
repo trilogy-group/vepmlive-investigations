@@ -98,6 +98,8 @@
 
                     x2 = h < w ? h : w;
                     y2 = x2;
+            
+                    $('#ResizeInfoField').val(w + '|' + h + '|' + w + '|' + h + '|0|0|' + x2 + '|' + y2);
 
                     $(document).ready(function () {
                         $pic.imgAreaSelect({

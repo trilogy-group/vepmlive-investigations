@@ -36,7 +36,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             string resizeInfo = ResizeInfoField.Value;
             if (!string.IsNullOrEmpty(resizeInfo))
             {
-                pic = ResizeImage2(resizeInfo);
+                pic = ResizeImage(resizeInfo);
             }
             else
             {
@@ -194,42 +194,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
         }
 
         private byte[] ResizeImage(string resizeInfo)
-        {
-            string[] picInfo = resizeInfo.Split('|');
-
-            int width = int.Parse(picInfo[0]);
-            int height = int.Parse(picInfo[1]);
-            int targetWidth = int.Parse(picInfo[2]);
-            int targetHeight = int.Parse(picInfo[3]);
-            int x = int.Parse(picInfo[4]);
-            int y = int.Parse(picInfo[5]);
-
-            Image src;
-
-            using (var fileStore = new EPMLiveFileStore(Web))
-            {
-                src = Image.FromStream(fileStore.GetStream(FileNameField.Value));
-            }
-
-            var pic = new Bitmap(width, height);
-            Graphics.FromImage(pic).DrawImage(src, 0, 0, width, height);
-
-            var bitmap = new Bitmap(pic);
-            Bitmap target = bitmap.Clone(new Rectangle(x, y, targetWidth, targetHeight), bitmap.PixelFormat);
-
-            using (Stream stream = new MemoryStream())
-            {
-                var encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 100L);
-                target.Save(stream, GetEncoder(ImageFormat.Jpeg), encoderParameters);
-
-                var img = new Bitmap(stream);
-                var converter = new ImageConverter();
-                return (byte[]) converter.ConvertTo(img, typeof (byte[]));
-            }
-        }
-
-        private byte[] ResizeImage2(string resizeInfo)
         {
             string[] picInfo = resizeInfo.Split('|');
 

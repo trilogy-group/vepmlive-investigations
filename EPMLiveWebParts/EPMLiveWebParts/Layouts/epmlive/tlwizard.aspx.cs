@@ -264,7 +264,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             ProcessLists(web);
                             ProcessIzenda(web);
 
-                            ClearNavigationCache();
+                            ClearNavigationCache(web);
 
                             if (rdoYes.Checked)
                             {
@@ -297,7 +297,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         }
                         finally
                         {
-                            ClearNavigationCache();
+                            ClearNavigationCache(web);
                         }
                     }
                 }
@@ -557,7 +557,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
             finally
             {
-                ClearNavigationCache();
+                ClearNavigationCache(SPContext.Current.Web);
             }
         }
 
@@ -886,9 +886,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
         }
 
-        private void ClearNavigationCache()
+        private void ClearNavigationCache(SPWeb spWeb)
         {
-            CacheStore.Current.RemoveCategory(CacheStoreCategory.Navigation);
+            CacheStore.Current.RemoveCategory(new CacheStoreCategory(spWeb).Navigation);
         }
     }
 }
