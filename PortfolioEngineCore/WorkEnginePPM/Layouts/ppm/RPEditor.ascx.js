@@ -1167,7 +1167,8 @@
                             },
                             {
                                 items: [
-                                    { type: "smallbutton", id: "idResourcesTab_ShowHeatmap", name: "Heat Map", img: "formatmap16x16.png", style: "top: -176px; left: -192px;position:relative;z-index:5;", tooltip: "Show Heat Map", onclick: "dialogEvent('ResourcesTab_ShowHeatmap_Click');" }
+                                    { type: "smallbutton", id: "idResourcesTab_ShowHeatmap", name: "Heat Map", img: "formatmap16x16.png", style: "top: -176px; left: -192px;position:relative;z-index:5;", tooltip: "Show Heat Map", onclick: "dialogEvent('ResourcesTab_ShowHeatmap_Click');" },
+                                    { type: "smallbutton", id: "idResourcesTab_IncludePending", name: "Include Pending", img: "showhidefilters-16.png", tooltip: "Include Pending", onclick: "dialogEvent('ResourcesTab_IncludePending_Click');" }
                                 ]
                             }
                         ]
@@ -1198,6 +1199,7 @@
             this.viewTab.Render();
             this.resourcesTab = new Ribbon(resourcesTabData);
             this.resourcesTab.Render();
+            this.resourcesTab.setButtonStateOn("idResourcesTab_IncludePending");
 
             if (this.NegotiationMode != true) {
                 this.editorTab.hideItem('CancelBtn');
@@ -1458,7 +1460,7 @@
                     this.ApplyGridView(grid.id, selectedView, false);
                 this.ShowHidePeriods(grid);
                 this.ShowSelectedResourceGroup();
-                this.RefreshResourcePeriods();
+                this.RefreshResourcePeriods(false);
                 this.viewTab.refreshSelect("idViewTab_FromPeriod");
                 window.setTimeout(thisID + ".HandleAction('OnStart')", 100);
                 window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(gridRPE.GetFirst(null, 0), "ItemName"); }, 10);
@@ -1480,7 +1482,7 @@
                 this.GridsOnSectionResize(this.plangrid, 2, 0);
                 this.initialized = true;
                 this.UpdateButtonsAsync();
-                this.CheckPlanAsync();
+                this.CheckPlanResDeptsAsync();
                 this.HideWorkingPopup("divLoading");
                 grid.ActionFilterOn();
                 grid.ActionGroupOn();
@@ -2119,6 +2121,7 @@
             this.ExecuteJSON(sb.toString(), "GeneralFunctions");
 
             this.SetPlanRowsEditStatus();
+            this.RefreshResourcePeriods(true);
         }
         this.UpdateButtonsAsync();
     };
@@ -2850,7 +2853,7 @@
                         var grid = Grids["g_RPE"];
                         this.RefreshGrid(grid);
                         this.InitialiseResourceGrid();
-                        this.RefreshResourcePeriods();
+                        this.RefreshResourcePeriods(false);
                         this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
                         this.ShowHidePeriods(this.plangrid);
                         this.ShowHidePeriods(this.resgrid);
@@ -2903,7 +2906,7 @@
                     var grid = Grids["g_RPE"];
                     this.RefreshGrid(grid);
                     this.InitialiseResourceGrid();
-                    this.RefreshResourcePeriods();
+                    this.RefreshResourcePeriods(false);
                     this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
                     this.UpdateButtonsAsync();
                     break;
@@ -2983,11 +2986,24 @@
                         this.hideFilters(grid);
                     }
                     break;
+                case "ResourcesTab_IncludePending_Click":
+                    var stateOn = this.resourcesTab.getButtonState("idResourcesTab_IncludePending");
+                    var grid = Grids["g_Res"];
+                    if (stateOn == false) {
+                        this.resourcesTab.setButtonStateOn("idResourcesTab_IncludePending");
+                        this.includePending = true;
+                    } else {
+                        this.resourcesTab.setButtonStateOff("idResourcesTab_IncludePending");
+                        this.includePending = false;
+                    }
+                    this.RefreshResourcePeriods(true);
+                    this.UpdateButtonsAsync();
+                    break;
                 case "ResourcesTab_ShowMe_Changed":
                     var selectShowMe = document.getElementById("idResourcesTab_ShowMe");
                     var selectedItem = selectShowMe.options[selectShowMe.selectedIndex];
                     this.ResourceDisplayMode = selectedItem.value;
-                    this.RefreshResourcePeriods();
+                    this.RefreshResourcePeriods(false);
                     this.UpdateButtonsAsync();
                     break;
                 case "ResourcesTab_ShowGrouping_Click":
@@ -3012,7 +3028,7 @@
                         this.showHeatmap = false;
                     }
                     this.InitialiseResourceGrid();
-                    this.RefreshResourcePeriods();
+                    this.RefreshResourcePeriods(false);
                     this.UpdateButtonsAsync();
                     break;
                 case "ResourcesTab_RemoveSorting_Click":
@@ -3981,8 +3997,8 @@
     RPEditor.prototype.UpdateButtonsAsync = function () {
         window.setTimeout(thisID + ".HandleButtons()", 100);
     };
-    RPEditor.prototype.CheckPlanAsync = function () {
-        window.setTimeout(thisID + ".CheckPlan()", 100);
+    RPEditor.prototype.CheckPlanResDeptsAsync = function () {
+        window.setTimeout(thisID + ".CheckPlanResDepts()", 100);
     };
     RPEditor.prototype.CheckPlanOKToSave = function () {
         var plangrid = Grids["g_RPE"];
@@ -4015,7 +4031,7 @@
         }
         return true;
     };
-    RPEditor.prototype.CheckPlan = function () {
+    RPEditor.prototype.CheckPlanResDepts = function () {
         var plangrid = Grids["g_RPE"];
         var planrow = plangrid.GetFirst(null, 0);
         var idSelect = document.getElementById("idSelectPlanResources");
@@ -4046,6 +4062,36 @@
         if (idSelect.options.length > 0)
             this.DisplayDialog(20, 30, 430, 315, "Invalid Resources", "winInvalidResDeptsDlg", "idInvalidResDeptsDlg", true, true);
     };
+    //RPEditor.prototype.CheckPlanFTEConversions = function () {
+    //    var plangrid = Grids["g_RPE"];
+    //    var planrow = plangrid.GetFirst(null, 0);
+    //    var idSelect = document.getElementById("idSelectPlanResources");
+    //    while (planrow != null) {
+    //        var resuid = plangrid.GetAttribute(planrow, null, "Res_UID");
+    //        var plandeptUid = plangrid.GetAttribute(planrow, null, "Dept_UID");
+    //        if (resuid > 0) {
+    //            var resrow = this.FindResourceRow(resuid);
+    //            if (resrow != null) {
+    //                var resName = this.resgrid.GetAttribute(resrow, null, "Res_Name");
+    //                var resdeptUid = this.resgrid.GetAttribute(resrow, null, "Dept_UID");
+    //                if (plandeptUid != resdeptUid) {
+    //                    var plandept = plangrid.GetAttribute(planrow, null, "Dept_Name");
+    //                    var resdept = this.resgrid.GetAttribute(resrow, null, "Dept_Name");
+
+    //                    var option = document.createElement("option");
+    //                    option.text = resName + " is in department '" + resdept + "' not '" + plandept + "'";
+    //                    option.selected = true;
+    //                    option.value = plangrid.GetAttribute(planrow, null, "GUID");
+    //                    idSelect.add(option, null);
+
+    //                }
+    //            }
+    //        }
+    //        planrow = plangrid.GetNext(planrow);
+    //    }
+    //    if (idSelect.options.length > 0)
+    //        this.DisplayDialog(20, 30, 430, 315, "Invalid Resources", "winInvalidResDeptsDlg", "idInvalidResDeptsDlg", true, true);
+    //};
     RPEditor.prototype.HasChanges = function () {
         var grid = Grids["g_RPE"];
         if (grid == null)
@@ -4695,10 +4741,12 @@
         }
         return null;
     };
-    RPEditor.prototype.RefreshResourcePeriods = function () {
+    RPEditor.prototype.RefreshResourcePeriods = function (bCalculate) {
         var resgrid = Grids["g_Res"];
         var row = resgrid.GetFirst(null, 0);
         while (row != null) {
+            if (bCalculate == true)
+                this.CalculateResourceRowCommitted(null, row);
             this.RefreshResourceRowPeriods(resgrid, row, false);
             row = resgrid.GetNext(row);
         }
@@ -4707,8 +4755,9 @@
         resgrid.Calculate(1, 0);
     };
     RPEditor.prototype.CalculateResourceRowCommitted = function (resuid, resrow) {
+        if (resuid == null)
+            resuid = Grids["g_Res"].GetAttribute(resrow, null, "Res_UID");
         var plangrid = this.plangrid;
-
         for (var c = 0; c < plangrid.ColNames[2].length; c++) {
             var col = plangrid.ColNames[2][c];
             var sType = col.substring(0, 1);
@@ -4730,18 +4779,29 @@
                 var origH = plangrid.GetAttribute(row, null, "H" + periodid + "Orig");
                 var deleted = plangrid.GetAttribute(row, null, "Deleted");
                 if (deleted == 1 && origH == null) {
-                    deltaC -= this.GetPeriodHours(plangrid, row, "H" + periodid);
+                    deltaC -= this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid);
                 }
                 else if (deleted == 1 && origH != null) {
                     deltaC -= origH;
                 }
                 else if (origH != null)
-                    deltaC += this.GetPeriodHours(plangrid, row, "H" + periodid) - origH;
+                    deltaC += this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid) - origH;
             }
             row = plangrid.GetNext(row);
         }
         this.resgrid.SetAttribute(resrow, null, "D" + periodid, deltaC, 0, 0);
         this.RefreshResourceRowPeriod(this.resgrid, resrow, periodid, bRefreshCell);
+    };
+    RPEditor.prototype.GetPeriodHoursSpecial = function (grid, row, col) {
+        var sId = col.substring(1);
+        var value = null;
+        if (this.includePending == true) {
+            value = grid.GetAttribute(row, "h" + sId);
+        }
+        if (value == null) {
+            value = grid.GetAttribute(row, "H" + sId);
+        }
+        return value;
     };
     RPEditor.prototype.RefreshResourceRowPeriod = function (grid, row, periodid, bRefreshCell) {
         var ccruid = grid.GetAttribute(row, null, "CCRole_UID");
@@ -5553,6 +5613,7 @@
         this.arrPIs = null;
         this.importWorkResources = null;
         this.importWorkProjectName = "";
+        this.includePending = true;
 
         var const_HoursFormat = "0.##";
         var const_FTEFormat = "0.####";
