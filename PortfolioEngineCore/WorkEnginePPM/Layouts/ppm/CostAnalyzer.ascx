@@ -38,6 +38,7 @@
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxcontainer.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/windows/dhtmlxwindows.js" type="text/javascript"></script>
+<script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
 
 <script src="/_layouts/epmlive/TreeGrid/GridE.js" type="text/javascript"></script>
 
