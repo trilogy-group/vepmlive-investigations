@@ -2694,6 +2694,9 @@
 	        this.initDataStart = this.initDataStart - 1;
 	        this.initDataFinish = this.initDataFinish - 1;
 
+	        FromList.options.length = 0;
+	        ToList.options.length = 0;
+
 	        FromList.options[0] = new Option("Current", -1, this.initDataStart == -1, this.initDataStart == -1);
 
 	        if (this.UsingPeriods.CurrentPeriod == undefined) {
@@ -2723,7 +2726,6 @@
 
 	        this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
 	        this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
-
 	        this.flashTotalsButtons();
 
 	        this.Tabbar.setTabActive("tab_Display");
