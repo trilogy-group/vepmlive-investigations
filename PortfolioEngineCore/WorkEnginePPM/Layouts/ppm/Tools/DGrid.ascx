@@ -11,13 +11,13 @@
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css"/>
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/xgrid/skins/dhtmlxgrid_dhx_dgrid.css" />
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css" />
+<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/calendar/skins/dhtmlxcalendar_dhx_skyblue.css" />
 
 <script src="/_layouts/epmlive/dhtml/xgrid/dhtmlxcommon.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.js" type="text/javascript"></script>
 <script src="/_layouts/epmlive/dhtml/xgrid/dhtmlxgridcell.js" type="text/javascript"></script>
 <script type="text/css" src="/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.js"></script>
 <script type="text/css" src="/_layouts/epmlive/dhtml/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js"></script>
-<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/dhtml/calendar/skins/dhtmlxcalendar_dhx_skyblue.css" />
 
 
 
@@ -38,7 +38,7 @@
         params.Skin = "dhx_skyblue";
         params.Data = document.getElementById('<%=hiddenTableData.ClientID%>').value;
         params.Columns = document.getElementById('<%=hiddenColumnData.ClientID%>').value;
-        window.<%=UID%> = new DGrid(params);
+        window["<%=UID%>"] = new DGrid(params);
         document.getElementById('<%=hiddenTableData.ClientID%>').value = "";
         document.getElementById('<%=hiddenColumnData.ClientID%>').value = "";
     }
