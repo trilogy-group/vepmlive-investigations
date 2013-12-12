@@ -1199,6 +1199,7 @@
             this.viewTab.Render();
             this.resourcesTab = new Ribbon(resourcesTabData);
             this.resourcesTab.Render();
+            this.resourcesTab.hideItem('idResourcesTab_IncludePending');
             this.resourcesTab.setButtonStateOn("idResourcesTab_IncludePending");
 
             if (this.NegotiationMode != true) {
@@ -4062,36 +4063,6 @@
         if (idSelect.options.length > 0)
             this.DisplayDialog(20, 30, 430, 315, "Invalid Resources", "winInvalidResDeptsDlg", "idInvalidResDeptsDlg", true, true);
     };
-    //RPEditor.prototype.CheckPlanFTEConversions = function () {
-    //    var plangrid = Grids["g_RPE"];
-    //    var planrow = plangrid.GetFirst(null, 0);
-    //    var idSelect = document.getElementById("idSelectPlanResources");
-    //    while (planrow != null) {
-    //        var resuid = plangrid.GetAttribute(planrow, null, "Res_UID");
-    //        var plandeptUid = plangrid.GetAttribute(planrow, null, "Dept_UID");
-    //        if (resuid > 0) {
-    //            var resrow = this.FindResourceRow(resuid);
-    //            if (resrow != null) {
-    //                var resName = this.resgrid.GetAttribute(resrow, null, "Res_Name");
-    //                var resdeptUid = this.resgrid.GetAttribute(resrow, null, "Dept_UID");
-    //                if (plandeptUid != resdeptUid) {
-    //                    var plandept = plangrid.GetAttribute(planrow, null, "Dept_Name");
-    //                    var resdept = this.resgrid.GetAttribute(resrow, null, "Dept_Name");
-
-    //                    var option = document.createElement("option");
-    //                    option.text = resName + " is in department '" + resdept + "' not '" + plandept + "'";
-    //                    option.selected = true;
-    //                    option.value = plangrid.GetAttribute(planrow, null, "GUID");
-    //                    idSelect.add(option, null);
-
-    //                }
-    //            }
-    //        }
-    //        planrow = plangrid.GetNext(planrow);
-    //    }
-    //    if (idSelect.options.length > 0)
-    //        this.DisplayDialog(20, 30, 430, 315, "Invalid Resources", "winInvalidResDeptsDlg", "idInvalidResDeptsDlg", true, true);
-    //};
     RPEditor.prototype.HasChanges = function () {
         var grid = Grids["g_RPE"];
         if (grid == null)
@@ -4243,11 +4214,11 @@
         if (this.HasChanges() == true) {
             this.editorTab.enableItem("SavePlanBtn");
             this.viewTab.enableItem("SavePlanBtn2");
-            this.dirty = true;
+            //this.dirty = true;
         } else {
             this.editorTab.disableItem("SavePlanBtn");
             this.viewTab.disableItem("SavePlanBtn2");
-            this.dirty = false;
+            //this.dirty = false;
         }
 
         var grid = Grids["g_RPE"];
@@ -4418,7 +4389,6 @@
         select.options[select.options.length] = new Option("Hours", 0, true, false);
         select.options[select.options.length] = new Option("FTE", 1, false, false);
         select.options[select.options.length] = new Option("FTE Percent", 2, false, false);
-        //select.options[select.options.length] = new Option("FTE Conversion", 3, false, false);
         this.viewTab.refreshSelect("idViewTab_DisplayedValues");
 
         try { grid.CalcWidth("Res_Names", 0); } catch (e) { }
@@ -5270,6 +5240,7 @@
                 if (tH != null) remHours -= tH;
                 var remhours = reqHours;
                 if (th != null) remhours -= th;
+                
                 plangrid.SetAttribute(reqrow, null, "H" + sId, remHours, 0, 0);
                 plangrid.SetAttribute(reqrow, null, "h" + sId, remhours, 0, 0);
 
@@ -5283,12 +5254,15 @@
                 plangrid.SetAttribute(reqrow, null, "F" + sId, remFte, 0, 0);
                 plangrid.SetAttribute(reqrow, null, "f" + sId, remfte, 0, 0);
 
-                if (H != remHours || h != remhours || F != remFte || f != remfte) {
-                    plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
-                }
+                //if (!this.CompareIntValues(H, remHours) || !this.CompareIntValues(h, remhours) || !this.CompareIntValues(F, remFte) || !this.CompareIntValues(f, remfte)) {
+                //    plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
+                //}
                 break;
         }
     };
+    //RPEditor.prototype.CompareIntValues = function (value1, value2) {
+    //    return (this.GetIntValue(value1, 0) == this.GetIntValue(value2, 0));
+    //};
     RPEditor.prototype.GetIntValue = function (value, defaultvalue) {
         if (isNaN(value))
             return defaultvalue;
@@ -5573,7 +5547,7 @@
         this.ResourcesSelectMode = 0;
         this.initialized = false;
         this.ribbonDataInitialized = false;
-        this.dirty = false;
+        //this.dirty = false;
         this.isLoaded = false;
         this.isClosed = false;
         this.ScrollMasterGridId = null;
