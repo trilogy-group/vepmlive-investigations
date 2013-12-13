@@ -1,5 +1,5 @@
 <Grid>
-   <Cfg TextVersion="90205"/>
+   <Cfg TextVersion="90301"/>
    <Lang>
       
 <!-- All alert / confirm non HTML texts -->
@@ -203,6 +203,10 @@ V9_0=""
 V9_2=""
    ExpandCols="Expanding columns"
    CollapseCols="Collapsing columns"
+V9_3=""
+   PagingUpdate="Creating pages ..."
+   CopySlow="The copy action took too long time (%d ms), please press the Ctrl+C again to finish the action"
+   CopyOk="The copy action finished successfuly"
  	/>
 
 
@@ -582,6 +586,8 @@ V8_0=""
    Cont = "..."
    ContLeft = "... "
    ContRight = " ..."
+   
+   PivotSeparators="|,|:|&lt;b style='color:blue;'>,&lt;/b> | &lt;b style='color:red;'>+&lt;/b> | &lt;b style='color:red;'>=&lt;/b> "
    
    />
    </Lang>

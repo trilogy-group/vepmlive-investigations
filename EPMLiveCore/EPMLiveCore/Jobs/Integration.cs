@@ -76,8 +76,8 @@ namespace EPMLiveCore.Jobs
                         GridGanttSettings settings = new GridGanttSettings(list);
 
                         bool bBuildTeamSec = settings.BuildTeamSecurity;
-
-                        DataSet dsUserFields = core.GetDataSet(list, "", Guid.Empty);
+                        
+                        DataSet dsUserFields = core.GetDataSet(list, "", intlistid);
                         DataTable dtUserFields = dsUserFields.Tables[1];
                         Hashtable hshUserMap = new Hashtable();
                         if(dtUserFields.Select("Type='1'").Length > 0 || bBuildTeamSec)

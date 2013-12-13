@@ -2,7 +2,7 @@
    
 	<!-- Basic grid configuration -->
    <Cfg
-      DefaultsVersion="90205"
+      DefaultsVersion="90301"
       
 		AutoVersion="1" SuppressCfg="0" DefaultCfg="3" DefaultCfgMenu="1"
       
@@ -18,14 +18,14 @@
       DetailOn="1" DetailRowsVisible="3"
       PivotUpdate="3" PivotMaxCols="100"
       CopyPasteTree="0" CopyPasteInternal="0"
-      CopySelected="1" CopyFocused="1" CopyCols="1" CopyEdit="1"
+      CopySelected="1" CopyFocused="1" CopyCols="1" CopyEdit="1" CopyTime=""
       Pasting="1" PasteSelected="1" PasteFocused="8" PasteCols="4" PasteTree="2"
       MaxAvailability="100000"
       
       PageTime="200" RemoveUnusedPages="2"
 		Paging="0" PageLength="20" PageLengthDiv="1" AllPages="1" MaxPages="20"
       ColPaging="0" ColPageLength="10" ColPageMin="10" MaxColPages="10"
-		ChildPaging="2" RemoveCollapsed="0" 
+		ChildPaging="2" RemoveCollapsed="0" RemoveChanged="0"
       ChildParts="" ChildPartLength="20" ChildPartMin="3" MaxChildParts="0"
 		
 		LastId="" IdPrefix="" IdPostfix="" IdChars="_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" SetIds="1" CaseSensitiveId="1" AutoIdPrefix="AR" GroupIdPrefix="GR" ChildIdPrefix="CR"
@@ -127,6 +127,8 @@
       OnClickSideDate="Focus,ShowCalendar"
       OnClickSideDates="Focus,ShowDates"
       OnClickSideFilter="Focus,ShowFilterMenu"
+      OnClickSideCheck="Focus,SetChecked"
+      OnDblClickSideCheck="SetChecked"
       OnClickSideExpand="Focus,ExpandCell"
       OnDblClickSideExpand="1"
       OnClickExpand="Focus,Expand OR Collapse"
@@ -303,11 +305,12 @@
       <!-- Default column for type Gantt -->
       <D Name="Gantt" Def="C" MenuName="Gantt chart"
          CanSort="0" CanEdit="0" CanResize="0" CanFilter="0" CanCopyPaste="0" CanGroup="0" CanSearch="0" WidthPad="" ShowHint="0" CanDrag="0"
-         GanttOrder="Chart,Availability,Constraints,Run,Main,Flow,Mark,Dependency,Format,Flags,Points" GanttObject="Main" GanttFormatObject="Last" GanttFormat="*GanttResources*" GanttFlowJoin="1" GanttResizeBeforeMove="2"
+         GanttOrder="Chart,Availability,Constraints,Run,Main,Flow,Mark,Dependency,Format,Flags,Points" GanttObject="Main" GanttFormatObject="Last" GanttFormat="*GanttResources*" 
+         GanttFlowJoin="1" GanttFlagsType="1" GanttFlagsMove="1"
          GanttSize="" GanttWidth="18" GanttUnits="d" GanttLeft="0" GanttRight="0" MaxWidth="10000" GanttRoundUnits="0"
-         GanttDataUnits="d" GanttLastUnit="" GanttResourcesAssign="4" GanttPointsShift="3" GanttAvailabilityFormat="0.##"
-         GanttHover="1" GanttEdit="All" GanttResizeDelete="1" GanttUseConstraints="2" GanttShowConstraints="1"
-         GanttSmoothZoom="1" GanttHideExclude="0" GanttChangeExclude="0" GanttMaxExclude="10000000" GanttBase="" GanttBaseCanEdit="2" GanttFinish="" GanttFinishCanEdit="1"
+         GanttDataUnits="d" GanttLastUnit="" GanttResourcesAssign="4" GanttPointsShift="3" GanttAvailabilityFormat="0.##" GanttAvailabilityTransparent="1"
+         GanttHover="1" GanttEdit="All" GanttResizeDelete="1" GanttResizeBeforeMove="2" GanttUseConstraints="2" GanttShowConstraints="1"
+         GanttSmoothZoom="1" GanttHideExclude="0" GanttChangeExclude="0" GanttMaxExclude="10000000" GanttBase="" GanttBaseCanEdit="2" GanttFinish="" GanttFinishCanEdit="1" GanttFitVisible="0"
          GanttCheck="4" GanttCheckTime="1000" GanttCheckExclude="1" GanttStrict="1" GanttBasePreferred="0" GanttFinishPreferred="0" GanttEditStartMove="1" GanttMinSlack="0" GanttErrSlack="0" GanttSeparateSlack="0" GanttShowBounds="1"
          GanttCheckDependencies="2" GanttCorrectDependencies="2" GanttIncorrectDependencies="1" GanttCorrectDependenciesFixed="0" GanttAllDependencies="2" GanttFixComplete="0" GanttMaxCorrectingLoops="40"
          GanttRunResize="Resize" GanttRunMove="Slide" GanttRunAdjust="Shift" GanttRunAdjustStart="Slip" GanttRunAdjustCorrect="Slip" GanttRunError="Sort"
