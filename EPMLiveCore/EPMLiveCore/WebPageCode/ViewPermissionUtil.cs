@@ -77,7 +77,28 @@ namespace EPMLiveCore
                 }
             }
 
-            foreach (SPGroup group in currentList.ParentWeb.Groups)
+            List<SPGroup> oGroups = new List<SPGroup>();
+
+            foreach(SPGroup group in currentList.ParentWeb.Groups)
+            {
+                SPRoleCollection c = group.Roles;
+
+                bool canUse = false;
+
+                foreach(SPRole role in c)
+                {
+                    if(role.PermissionMask != (SPRights)134287360)
+                    {
+                        canUse = true;
+                        break;
+                    }
+                }
+
+                if(canUse)
+                    oGroups.Add(group);
+            }
+
+            foreach(SPGroup group in oGroups)
             {
                 roleProperties.Add(group.ID, new Dictionary<string, bool>());
                 string defaultViewId = GetDefautView(groupValues, group.ID);
