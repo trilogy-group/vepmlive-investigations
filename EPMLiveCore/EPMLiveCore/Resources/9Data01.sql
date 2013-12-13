@@ -284,6 +284,7 @@ begin
                 <li><strong>Due Date:</strong>&nbsp;&nbsp;{DueDate}</li>
                 <li><strong>Priority:</strong>&nbsp;&nbsp;{Priority}</li>
                 <li><strong>Status:</strong>&nbsp;&nbsp;{Status}</li>
+				<li><strong>Project:</strong>&nbsp;&nbsp;{Project}</li>
                 <li><strong>Description:</strong>&nbsp;&nbsp;{Body}</li>
 </ul>
 </td>
@@ -321,6 +322,7 @@ begin
                 <li><strong>Due Date:</strong>&nbsp;&nbsp;{DueDate}</li>
                 <li><strong>Priority:</strong>&nbsp;&nbsp;{Priority}</li>
                 <li><strong>Status:</strong>&nbsp;&nbsp;{Status}</li>
+				<li><strong>Project:</strong>&nbsp;&nbsp;{Project}</li>
                 <li><strong>Description:</strong>&nbsp;&nbsp;{Body}</li>
 </ul>
 </td>

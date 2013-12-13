@@ -222,6 +222,7 @@ else
 begin
     UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.Upgrades.OptInUpgradeJob', [Title]='Opt-In Upgrade', Priority=5 where jobtype_id=202
 end
+
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc499')
 begin
     INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc499','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.API.Integration.SQL','SQL','This provides access to data located in Microsoft SQL Server','sql.png','<Properties>
@@ -250,6 +251,8 @@ begin
 	</General>
 </Properties>', AvailableOnline='False',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='a0950b9b-3525-40b8-a456-6403156dc499'
 end
+
+
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc49a')
 begin
     INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49a','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Integrations.Salesforce.Integrator','SalesForce','This connector allows data synchronization to and from salesforce','salesforce.png','<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</Input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>','True','7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
@@ -258,6 +261,7 @@ else
 begin
     UPDATE INT_MODULES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Integrations.Salesforce.Integrator', [Title]='SalesForce', Description='This connector allows data synchronization to and from salesforce', Icon='salesforce.png', CustomProps='<Properties><Connection><Input Type="Text" Property="Username" Title="Salesforce Username">Please make sure that this user has the ''API Enabled'' and ''Modify All Data'' permissions.</Input><Input Type="Password" Property="Password" Title="Password"/><Input Type="Password" Property="SecurityToken" Title="Security Token"/><Input Type="Checkbox" Property="Sandbox" Title="Sandbox">Check this box if you are connecting to your Sandbox organization.</Input></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>', AvailableOnline='True',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='a0950b9b-3525-40b8-a456-6403156dc49a'
 end
+
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-6403156dc49b')
 begin
     INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-6403156dc49b','EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Integrations.Office365.Integrator','Office 365','This provides access to list data located on an Office 365 SharePoint site.','office365.png','<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="Office 365 Site URL">Your Office 365 Site URL. For example, https://company.sharepoint.com/sites/it</Input><Input Type="Text" Property="Username" Title="Username">Your Office 365 username. For example, user@company.onmicrosoft.com</Input><Input Type="Password" Property="Password" Title="Password"/></Connection><General><Input Type="Select" Property="List" Title="Select a list to map"/><Input Type="Select" Property="UserMapType" Title="Select the user mapping field"/></General></Properties>','True','7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
@@ -300,6 +304,7 @@ begin
 	</General>
 </Properties>', AvailableOnline='True',INT_CAT_ID='960be444-30f5-4a97-8721-5a210b286dad' where MODULE_ID='a0950b9b-3525-40b8-a456-6403156dc49c'
 end
+/*
 if not exists (select MODULE_ID from INT_MODULES where MODULE_ID = 'a0950b9b-3525-40b8-a456-7403156dc490')
 begin
     INSERT INTO INT_MODULES (MODULE_ID,NetAssembly,NetClass,[Title],Description,Icon,CustomProps,AvailableOnline,INT_CAT_ID) VALUES ('a0950b9b-3525-40b8-a456-7403156dc490','UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','UplandIntegrations.FileBound.Integrator','FileBound','Filebound will allow you to connect your lists to an advanced workflow system.','fb.png','<Properties><Connection><Input Type="Text" Property="SiteUrl" Title="FileBound Site URL" /><Input Type="Text" Property="APIUrl" Title="FileBound API URL" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Folder" Title="Select a folder" /><Input Type="Select" Property="DataType" Title="Select data type" /><Input Type="Password" Property="RelatedAssign" Title="Assignment Integration Key" >When selecting the Item data type, enter the integration key here for the associated assignments list integration.</Input><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>','True','599c89b2-6330-4e54-aea5-00185f20cce0')
@@ -332,6 +337,8 @@ else
 begin
     UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.Tenrox.Integrator', [Title]='Tenrox', Description='Tenrox will provide you with all your PSA needs including Timesheets, Expenses, and Billing', Icon='tenrox.png', CustomProps='<Properties><Connection><Input Type="Text" Property="OrgUrl" Title="Organization URL" /><Input Type="Text" Property="OrgName" Title="Organization Name" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /></Connection><General><Input Type="Select" Property="Object" Title="Select an object to map" /><Input Type="Select" Property="UserMapType" Title="Select the user mapping field" /></General></Properties>', AvailableOnline='True',INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0' where MODULE_ID='a0950b9b-3525-40b8-a456-7403156dc492'
 end
+
+*/
 if not exists (select INT_CAT_ID from INT_CATEGORY where INT_CAT_ID = '599c89b2-6330-4e54-aea5-00185f20cce0')
 begin
     INSERT INTO INT_CATEGORY (INT_CAT_ID,CATEGORY,ICON,ORDERBY) VALUES ('599c89b2-6330-4e54-aea5-00185f20cce0','Upland','upland.png','1')

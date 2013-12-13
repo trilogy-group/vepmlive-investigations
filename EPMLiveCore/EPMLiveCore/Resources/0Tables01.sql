@@ -811,7 +811,30 @@ begin
 
 end
 
+-----------------Izenda------------
 
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'IzendaAdHocReports')
+	begin
+		
+		print 'Creating Table Reports'
+	
+		CREATE TABLE [dbo].[IzendaAdHocReports](
+			[Name] [nvarchar](255) NULL,
+			[Xml] [ntext] NULL,
+			[CreatedDate] [datetime] NULL,
+			[ModifiedDate] [datetime] NULL,
+			[TenantID] [nvarchar](255) NULL,
+			[Thumbnail] [varbinary](max) NULL
+		) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+		
+end
+else
+begin
+
+	print 'Updating Table Reports'
+
+
+end
 
 
 -------------------------Constraints-----------------
