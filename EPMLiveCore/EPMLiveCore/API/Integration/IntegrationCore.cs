@@ -18,7 +18,7 @@ namespace EPMLiveCore.API.Integration
     public class IntegrationCore
     {
         SPSite _site;
-        SPWeb _web;
+        SPWeb _web = null;
         SqlConnection cn;
         private bool WasOpen = false;
 
@@ -2220,7 +2220,8 @@ namespace EPMLiveCore.API.Integration
 
         ~IntegrationCore()
         {
-            _web.Close();
+            if(_web != null)
+                _web.Close();
         }
     }
 }

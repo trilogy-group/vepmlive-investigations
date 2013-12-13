@@ -141,7 +141,7 @@ namespace EPMLiveCore.API.Integration
             switch(Property)
             {
                 case "UserMapType":
-                    props.Add("EmailAddress", "Email Address");
+                    props.Add("Email", "Email Address");
                     props.Add("Username", "Username");
                     props.Add("SPID", "SharePoint User ID");
                     break;
