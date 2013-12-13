@@ -64,6 +64,7 @@ namespace EPMLiveCore
                    hshProps.Add("Priority", getFieldVal("Priority", properties, list));
                    hshProps.Add("Status", getFieldVal("Status", properties, list));
                    hshProps.Add("Body", getFieldVal("Body", properties, list));
+                   hshProps.Add("Project", getFieldVal("Project", properties, list));
 
                    ArrayList curUsers = new ArrayList();
                    ArrayList newUsers = new ArrayList();
@@ -152,6 +153,21 @@ namespace EPMLiveCore
                             else
                                 return dt.ToString();
                         }catch{}
+                        return "";
+                    case SPFieldType.Lookup:
+                        if (val != "")
+                        {
+                            if (val.Contains(";#"))
+                            {
+                                return f.GetFieldValueAsText(val);
+                            }
+                            else
+                            {
+                                SPList lookupList = properties.Web.Lists[new Guid(((SPFieldLookup)f).LookupList)];
+                                SPListItem lookupItem = lookupList.GetItemById(int.Parse(val));
+                                return lookupItem[((SPFieldLookup)f).LookupField].ToString();
+                            }
+                        }
                         return "";
                     default:
                         return f.GetFieldValue(val).ToString();
