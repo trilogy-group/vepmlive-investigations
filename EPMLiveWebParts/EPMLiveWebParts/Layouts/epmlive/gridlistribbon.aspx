@@ -1335,7 +1335,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
 		    commandId = null;
 		    properties = null;
-
+            try
+            {
 		    e = e||event;
 
 		    if (e.stopPropagation)
@@ -1347,7 +1348,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                     window.stop();
                 }
 
-                w.stopImmediatePropagation();
+                window.stopImmediatePropagation();
+            }catch(e){}
         }
     },
 
