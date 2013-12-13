@@ -276,7 +276,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
             // clear cache
 
-            CacheStore.Current.RemoveSafely(web.Url, CacheStoreCategory.Navigation);
+            CacheStore.Current.RemoveSafely(web.Url, new CacheStoreCategory(web).Navigation);
             finishJob();
         }
 
