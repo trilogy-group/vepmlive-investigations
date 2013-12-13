@@ -293,6 +293,10 @@ namespace EPMLiveWorkPlanner
             kanbanItemStatusFields = "";
             SPWeb web = SPContext.Current.Web;
             filltasklist(web);
+            GetStatusColumns(web);
+            GetFilterColumns(web);
+            GetAllListColumns(web, true);
+            GetColumnValues(web, true);
             //fillbackloglist(web);
             loadTaskCenterFields(web, true);
             filltaskfields(web);
