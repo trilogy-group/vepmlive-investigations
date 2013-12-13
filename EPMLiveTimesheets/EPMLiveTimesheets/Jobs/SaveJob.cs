@@ -535,7 +535,7 @@ namespace TimeSheets
                             ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList);
 
                             count++;
-                            float pct = count / total * 100;
+                            float pct = count / total * 98;
 
                             if (pct >= percent + 10)
                             {
@@ -548,6 +548,9 @@ namespace TimeSheets
                             }
                         }
 
+                        cmd = new SqlCommand("update TSQUEUE set percentcomplete=98 where TSQUEUE_ID=@QueueUid", cn);
+                        cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                        cmd.ExecuteNonQuery();
 
                         foreach (DataRow drDelItem in dtItems.Rows)
                         {
@@ -558,6 +561,10 @@ namespace TimeSheets
                         
                         if (liveHours)
                             sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
+
+                        cmd = new SqlCommand("update TSQUEUE set percentcomplete=99 where TSQUEUE_ID=@QueueUid", cn);
+                        cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                        cmd.ExecuteNonQuery();
 
                         SharedFunctions.processResources(cn, TSUID.ToString(), site.RootWeb, user.LoginName);
                     }
