@@ -743,7 +743,7 @@ function DoPopUp(grid, row, col) {
 
                     grid.EndEdit(true);
 
-                    var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer' onMouseDown=\"stopProp(event);\" onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='position: absolute; margin-left: 65px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='width:150px;height:75px;border:0px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
+                    var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer' onMouseDown=\"stopProp(event);\" onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='position: absolute; margin-left: 65px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='width:140px;height:60px;border:0px;margin-bottom:5px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
 
                     if (bLocked)
                         strDivTag += " disabled=\"disabled\"";
