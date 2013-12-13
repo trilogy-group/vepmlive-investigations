@@ -1917,6 +1917,12 @@ namespace TimeSheets
                         attr1.Value = float.Parse(drHours[0]["TS_ITEM_HOURS"].ToString()).ToString(culture);
                         ndCol.Attributes.Append(attr1);
                     }
+                    else
+                    {
+                        XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("P" + dtStart.Ticks);
+                        attr1.Value = "0";
+                        ndCol.Attributes.Append(attr1);
+                    }
 
                     if (drNotes.Length > 0)
                     {
@@ -1931,6 +1937,12 @@ namespace TimeSheets
                     {
                         XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("P" + dtStart.Ticks);
                         attr1.Value = float.Parse(drHours[0]["TS_ITEM_HOURS"].ToString()).ToString(culture);
+                        ndCol.Attributes.Append(attr1);
+                    }
+                    else
+                    {
+                        XmlAttribute attr1 = ndCol.OwnerDocument.CreateAttribute("P" + dtStart.Ticks);
+                        attr1.Value = "0";
                         ndCol.Attributes.Append(attr1);
                     }
                 }
@@ -2272,10 +2284,24 @@ namespace TimeSheets
                                 cmd.Parameters.AddWithValue("@listuid", drItem["LIST_UID"].ToString());
                                 cmd.Parameters.AddWithValue("@itemid", drItem["ITEM_ID"].ToString());
                                 cmd.Parameters.AddWithValue("@title", drItem["TITLE"].ToString());
-                                cmd.Parameters.AddWithValue("@project", drItem["PROJECT"].ToString());
-                                cmd.Parameters.AddWithValue("@projectid", drItem["PROJECT_ID"].ToString());
+
+                                if (drItem["PROJECT"].ToString() == "")
+                                    cmd.Parameters.AddWithValue("@project", DBNull.Value);
+                                else
+                                    cmd.Parameters.AddWithValue("@project", drItem["PROJECT"].ToString());
+
+                                if (drItem["PROJECT_ID"].ToString() == "")
+                                    cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                else
+                                    cmd.Parameters.AddWithValue("@projectid", drItem["PROJECT_ID"].ToString());
+
                                 cmd.Parameters.AddWithValue("@list", drItem["LIST"].ToString());
-                                cmd.Parameters.AddWithValue("@projectlistuid", drItem["PROJECT_LIST_UID"].ToString());
+
+                                if (drItem["PROJECT_LIST_UID"].ToString() == "")
+                                    cmd.Parameters.AddWithValue("@projectlistuid", DBNull.Value);
+                                else
+                                    cmd.Parameters.AddWithValue("@projectlistuid", drItem["PROJECT_LIST_UID"].ToString());
+
                                 cmd.ExecuteNonQuery();
 
                             }
