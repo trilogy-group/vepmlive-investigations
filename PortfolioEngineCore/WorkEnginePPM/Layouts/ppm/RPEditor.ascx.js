@@ -1855,6 +1855,12 @@
         grid.SetAttribute(row, null, "Changed", 1, 0, 0);
         if (status == const_Requirement)
             this.CalculateRequirementCellValue(row, sId, 0);
+        else {
+            var reqrow = this.GetParentRequirement(row);
+            if (reqrow != null) {
+                this.CalculateRequirementCellValue(reqrow, sId, 0);
+            }
+        }
     };
     RPEditor.prototype.FormatHours = function (grid, row, col, bFulfillmentMode, bEditMode) {
         var sId = col.substring(1);
@@ -1865,6 +1871,20 @@
             sTotal = NumberToString(total / 100, const_HoursFormat);
             if (bEditMode == true)
                 return sTotal;
+            if (sTotal != "") {
+                var hours = grid.GetAttribute(row, "H" + sId);
+                if (hours != null) {
+                    lhours = parseInt(hours) / 100;
+                    if (lhours != 0) {
+                        sValue = NumberToString(lhours, const_HoursFormat);
+                    }
+                }
+                if (sValue == "")
+                    sValue = sTotal;
+                else
+                    sValue = sTotal + " | " + sValue;
+            }
+            return sValue;
         }
         var lHours = 0;
         var Hours = grid.GetAttribute(row, "H" + sId);
@@ -1884,12 +1904,12 @@
                     sValue += "(" + NumberToString(lHours, const_HoursFormat) + ")";
             }
         }
-        if (sTotal != "") {
-            if (sValue == "")
-                sValue = sTotal;
-            else
-                sValue = sTotal + " | " + sValue;
-        }
+        //if (sTotal != "") {
+        //    if (sValue == "")
+        //        sValue = sTotal;
+        //    else
+        //        sValue = sTotal + " | " + sValue;
+        //}
         return sValue;
     };
     RPEditor.prototype.FormatFTE = function (grid, row, col, bFulfillmentMode, bEditMode) {
@@ -2613,6 +2633,11 @@
             if (resrow != null) this.RefreshResourceRowPeriods(resgrid, resrow, true);
             if (pendingresrow != null) this.RefreshResourceRowPeriods(resgrid, pendingresrow, true);
             plangrid.RefreshRow(planrow);
+            var reqrow = this.GetParentRequirement(planrow);
+            if (reqrow != null) {
+                this.UpdatePlanRowCalculatedValues(reqrow, 0);
+                this.RefreshPlanRowPeriods(plangrid, reqrow, true);
+            }
         }
         catch (e) {
             this.HandleException("CommitPlanRow - " + event, e);
@@ -5187,16 +5212,26 @@
             if (deleted != 1) {
                 var Value; var value;
                 Value = this.GetIntValue(plangrid.GetAttribute(row, null, "H" + sId), null);
-                if (Value != null) { if (tH == null) tH = Value; else tH += Value; }
+                if (Value != null) {
+                    if (tH == null) tH = Value; else tH += Value;
+                }
                 value = this.GetIntValue(plangrid.GetAttribute(row, null, "h" + sId), null);
-                if (value == null) value = Value;
-                if (value != null) { if (th == null) th = value; else th += value; }
+                if (value == null)
+                    value = Value;
+                if (value != null) {
+                    if (th == null) th = value; else th += value;
+                }
 
                 Value = this.GetIntValue(plangrid.GetAttribute(row, null, "F" + sId), null);
-                if (Value != null) { if (tF == null) tF = Value; else tF += Value; }
+                if (Value != null) {
+                    if (tF == null) tF = Value; else tF += Value;
+                }
                 value = this.GetIntValue(plangrid.GetAttribute(row, null, "f" + sId), null);
-                if (value == null) value = Value;
-                if (value != null) { if (tf == null) tf = value; else tf += value; }
+                if (value == null)
+                    value = Value;
+                if (value != null) {
+                    if (tf == null) tf = value; else tf += value;
+                }
             }
             row = row.nextSibling;
         }
@@ -5204,17 +5239,13 @@
         var F; var f;
         switch (calcMode) {
             case 1: // Initial - calculate the totals. NB there is only one set of totals
-                h = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "h" + sId), null);
-                if (h == null)
-                    h = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "H" + sId), null);
+                h = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "H" + sId), null);
                 var totalHours = h;
-                if (th != null) totalHours += th;
+                if (tH != null) totalHours += tH;
                 plangrid.SetAttribute(reqrow, null, "t" + sId, totalHours, 0, 0);
-                f = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "f" + sId), null);
-                if (f == null)
-                    f = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "F" + sId), null);
+                f = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "F" + sId), null);
                 var totalFTE = f;
-                if (tf != null) totalFTE += tf;
+                if (tF != null) totalFTE += tF;
                 plangrid.SetAttribute(reqrow, null, "u" + sId, totalFTE, 0, 0);
                 break;
             case 2: // Convert commitment to Fulfillment
@@ -5254,15 +5285,15 @@
                 plangrid.SetAttribute(reqrow, null, "F" + sId, remFte, 0, 0);
                 plangrid.SetAttribute(reqrow, null, "f" + sId, remfte, 0, 0);
 
-                //if (!this.CompareIntValues(H, remHours) || !this.CompareIntValues(h, remhours) || !this.CompareIntValues(F, remFte) || !this.CompareIntValues(f, remfte)) {
-                //    plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
-                //}
+                if (!this.CompareIntValues(H, remHours) || !this.CompareIntValues(F, remFte)) {
+                    plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
+                }
                 break;
         }
     };
-    //RPEditor.prototype.CompareIntValues = function (value1, value2) {
-    //    return (this.GetIntValue(value1, 0) == this.GetIntValue(value2, 0));
-    //};
+    RPEditor.prototype.CompareIntValues = function (value1, value2) {
+        return (this.GetIntValue(value1, 0) == this.GetIntValue(value2, 0));
+    };
     RPEditor.prototype.GetIntValue = function (value, defaultvalue) {
         if (isNaN(value))
             return defaultvalue;
